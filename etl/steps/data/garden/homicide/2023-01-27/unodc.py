@@ -75,7 +75,7 @@ def clean_data(df: pd.DataFrame) -> list[Table]:
     Splitting the data into four dataframes/tables based on the dimension columns:
     * Total
     * by mechanism
-    * by relationship to perpatrator
+    * by relationship to perpertrator
     * by situational context
     """
     df["age"] = df["age"].map({"Total": "All ages"}, na_action="ignore").fillna(df["age"])
@@ -83,11 +83,12 @@ def clean_data(df: pd.DataFrame) -> list[Table]:
 
     tb_mech = create_table(df, table_name="by mechanisms")
     tb_perp = create_table(df, table_name="by relationship to perpetrator")
+    tb_situ = create_table(df, table_name="by situational context")
     tb_tot = create_total_table(df)
 
     tb_share = calculate_share_of_homicides(tb_tot, tb_perp)
     tb_share.update_metadata_from_yaml(paths.metadata_path, "share")
-    tb_garden_list = [tb_mech, tb_tot, tb_perp]
+    tb_garden_list = [tb_mech, tb_tot, tb_perp, tb_situ]
 
     return tb_garden_list
 
@@ -189,7 +190,10 @@ def build_metadata(col: tuple, table_name: str) -> VariableMeta:
         description = f"The {metric_dict[col[0]]['title'].lower()} recorded in a year."
     elif table_name == "by relationship to perpetrator":
         title = f"{metric_dict[col[0]]['title']} - {col[1]} - {col[2]} - {col[3]}"
-        description = f"The {metric_dict[col[0]]['title'].lower()} shown by the victims relationship to the perpatrator. The age and sex characteristics relate to that of the victim, rather than the perpatrator"
+        description = f"The {metric_dict[col[0]]['title'].lower()} shown by the victims relationship to the perpertrator. The age and sex characteristics relate to that of the victim, rather than the perpertrator."
+    elif table_name == "by situational context":
+        title = f"{metric_dict[col[0]]['title']} - {col[1]} - {col[2]} - {col[3]}"
+        description = f"The {metric_dict[col[0]]['title'].lower()} shown by the situational context of the homicide."
     else:
         title = ""
         description = ""
@@ -217,12 +221,12 @@ def clean_up_categories(df: pd.DataFrame) -> pd.DataFrame:
         "Without a weapon/ other Mechanism": " without a weapon or by another mechanism",
         "Firearms or explosives": "firearms or explosives",
         "Another weapon": "an unspecified weapon",
-        "Intimate partner or family member": "perpertrator is an intimate partner or family member",
-        "Intimate partner or family member: Intimate partner": "perpertrator is an intimate partner",
-        "Intimate partner or family member: Family member": "perpertrator is a family member",
-        "Other Perpetrator known to the victim": "an other known perpetrator",
-        "Perpetrator unknown": "perpertrator is unknown",
-        "Relationship to perpetrator is not known": "a perpertrator where the relationship to the victim is not known",
+        "Intimate partner or family member": "Perpertrator is an intimate partner or family member",
+        "Intimate partner or family member: Intimate partner": "Perpertrator is an intimate partner",
+        "Intimate partner or family member: Family member": "Perpertrator is a family member",
+        "Other Perpetrator known to the victim": "Another known perpetrator",
+        "Perpetrator unknown": "Perpertrator is unknown",
+        "Relationship to perpetrator is not known": "Perpertrator where the relationship to the victim is not known",
     }
     df = df.replace({"category": category_dict})
 
