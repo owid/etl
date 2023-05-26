@@ -1,0 +1,31 @@
+meta:
+  namespace: papers
+  short_name: ray_et_al_2019
+  name: Climate change has likely already affected global food production - Ray et
+    al. (2019)
+  version: '2023-05-26'
+  publication_year: 2019
+
+  publication_date: '2019-05-31'
+  source_name: Ray et al. (2019)
+  source_published_by: 'Ray DK, West PC, Clark M, Gerber JS, Prishchepov AV, et al.
+    (2019) Climate change has likely already affected global food production. PLOS
+    ONE 14(5): e0217148. https://doi.org/10.1371/journal.pone.0217148'
+  url: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0217148
+  source_data_url: https://doi.org/10.1371/journal.pone.0217148.s017
+  file_extension: xlsx
+  license_url: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0217148
+  license_name: Creative Commons Attribution License
+  date_accessed: 2023-05-26
+  is_public: true
+  description: |
+    Ray et al. (2019) modelled the impact of observed climate change on yields of the top ten global crops. These ten crops account for ~83% of global kilocalorie production.
+
+    The impact of climate change on crop yields is calculated as the difference between actual observed yields under current climate conditions and the yields that would have been achieved until historical climate conditions.
+
+    Historical climate is defined as the 30-year average weather prior to 1974. Current climate is defined as the historical climate plus the addition of the linear trend of the weather for the 35 years ending in 2008, from the year 1974.
+wdir: ../../../data/snapshots/papers/2023-05-26
+outs:
+- md5: 1d238b2bc16d39070cba72f06e2a575a
+  size: 111688
+  path: ray_et_al_2019.xlsx
