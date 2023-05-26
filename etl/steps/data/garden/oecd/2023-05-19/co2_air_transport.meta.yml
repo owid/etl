@@ -1,0 +1,170 @@
+dataset:
+  title: Air Transport CO2 Emissions
+  description: >
+    This database includes annual, quarterly, and monthly information on CO2 emissions related to commercial passenger, freight, and general aviation flights, on both a territory and a residence basis, for 186 countries. These CO2 emissions are estimated by the OECD, based on a consistent methodology across countries.
+  licenses:
+  - name: Creative Commons BY 4.0
+    url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
+  sources:
+  - name: OECD (2023), Air Transport CO2 Emissions
+    url: https://stats.oecd.org/Index.aspx?DataSetCode=AIRTRANS_CO2#
+    date_accessed: '2023-05-18'
+    publication_date: January 2023
+    publication_year: 2023
+tables:
+  co2_air_transport:
+    variables:
+      africa:
+        title: Africa
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      asia:
+        title: Asia
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      europe:
+        title: Europe
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      north_america:
+        title: North America
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      oceania:
+        title: Oceania
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      south_america:
+        title: South America
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      ter_dom_a:
+        title: Annual CO2 emissions from domestic aviation
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      ter_int_a:
+        title: Annual CO2 emissions from international aviation
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      population:
+        title: Population
+        unit: ''
+        short_unit: ''
+      per_capita_ter_dom_a:
+        title: Per capita CO2 emissions from domestic aviation
+        unit: pounds
+        short_unit: lb
+        display:
+          numDecimalPlaces: 0
+      per_capita_ter_int_a:
+        title: Per capita CO2 emissions from international aviation
+        unit: pounds
+        short_unit: lb
+        display:
+          numDecimalPlaces: 0
+      int_inb_out:
+        title: Per capita CO2 emissions from international flights, international tourism-adjusted
+        unit: pounds
+        short_unit: lb
+        display:
+          numDecimalPlaces: 0
+      ter_dom_m:
+        title: Monthly CO2 emissions from domestic aviation
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      january:
+        title: January
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      february:
+        title: February
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      march:
+        title: March
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      april:
+        title: April
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      may:
+        title: May
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      june:
+        title: June
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      july:
+        title: July
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      august:
+        title: August
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      september:
+        title: September
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      october:
+        title: October
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      november:
+        title: November
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      december:
+        title: December
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      ter_int_m:
+        title: Monthly CO2 emissions from international aviation
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0

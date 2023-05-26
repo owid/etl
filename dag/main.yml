@@ -341,7 +341,7 @@ steps:
   data://grapher/technology/2023-03-16/hcctad:
   - data://garden/technology/2023-03-16/hcctad
 
-# Happiness report
+  # Happiness report
   data://meadow/happiness/2023-03-20/happiness:
   - snapshot://happiness/2023-03-20/happiness.xls
   data://garden/happiness/2023-03-20/happiness:
@@ -370,6 +370,47 @@ steps:
   - data://garden/regions/2023-01-01/regions
   data://grapher/eth/2023-03-15/ethnic_power_relations:
   - data://garden/eth/2023-03-15/ethnic_power_relations
+
+# Oil Spills
+  data://meadow/itopf/2023-05-18/oil_spills:
+  - snapshot://itopf/2023-05-18/oil_spills.pdf
+  data://garden/itopf/2023-05-18/oil_spills:
+  - data://meadow/itopf/2023-05-18/oil_spills
+  data://grapher/itopf/2023-05-18/oil_spills:
+  - data://garden/itopf/2023-05-18/oil_spills
+
+# UNWTO tourism
+    # Key indicators
+  data://meadow/tourism/2023-05-05/unwto:
+  - snapshot://tourism/2023-05-04/unwto.xlsx
+  data://garden/tourism/2023-05-05/unwto:
+  - data://meadow/tourism/2023-05-05/unwto
+  data://grapher/tourism/2023-05-11/unwto:
+  - data://garden/tourism/2023-05-05/unwto
+  # Environment Tables Implementations
+  data://meadow/tourism/2023-05-09/unwto_environment:
+  - snapshot://tourism/2023-05-09/unwto_environment.xlsx
+  data://garden/tourism/2023-05-10/unwto_environment:
+  - data://meadow/tourism/2023-05-09/unwto_environment
+  data://grapher/tourism/2023-05-23/unwto_environment:
+  - data://garden/tourism/2023-05-10/unwto_environment
+
+  # GDP
+  data://meadow/tourism/2023-05-09/unwto_gdp:
+  - snapshot://tourism/2023-05-09/unwto_gdp.xlsx
+  data://garden/tourism/2023-05-10/unwto_gdp:
+  - data://meadow/tourism/2023-05-09/unwto_gdp
+  data://grapher/tourism/2023-05-23/unwto_gdp:
+  - data://garden/tourism/2023-05-10/unwto_gdp
+
+# CO2 emissions from air transport (OECD)
+  data://meadow/oecd/2023-05-18/co2_air_transport:
+  - snapshot://oecd/2023-05-18/co2_air_transport.csv
+  data://garden/oecd/2023-05-19/co2_air_transport:
+  - data://garden/tourism/2023-05-05/unwto
+  - data://meadow/oecd/2023-05-18/co2_air_transport
+  data://grapher/oecd/2023-05-19/co2_air_transport:
+  - data://garden/oecd/2023-05-19/co2_air_transport
 
 
   # WB income groups
