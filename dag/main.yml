@@ -75,6 +75,7 @@ steps:
     - snapshot://homicide/2023-01-03/who_mort_db.csv
   data://garden/homicide/2023-01-03/who_mort_db:
     - data://meadow/homicide/2023-01-03/who_mort_db
+    - data://garden/un/2022-07-11/un_wpp
   data://grapher/homicide/2023-01-03/who_mort_db:
     - data://garden/homicide/2023-01-03/who_mort_db
 

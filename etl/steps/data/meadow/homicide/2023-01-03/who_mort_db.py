@@ -42,9 +42,9 @@ def run(dest_dir: str) -> None:
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    df = df[(df["Sex"] == "All") & (df["Age group code"] == "Age_all")]
+    # df = df[(df["Sex"] == "All") & (df["Age group code"] == "Age_all")]
     df = df.rename(columns={"Country Name": "country", "Year": "year", "Number": "number_of_deaths"}).drop(
-        columns=["Region Code", "Region Name", "Country Code", "Sex", "Age group code", "Age Group"]
+        columns=["Region Code", "Region Name", "Country Code", "Age Group"]
     )
-    df["number_of_deaths"] = df["number_of_deaths"].astype(int)
+    df["number_of_deaths"] = df["number_of_deaths"].astype("Int64")
     return df
