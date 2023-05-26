@@ -454,21 +454,21 @@ tables:
           The variable ranges from 0 to 1 (most free).
       freeexpr_vdem_high_owid:
         description: |-
-          The variable denotes the upper-bound estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and present different political perspectives, and the freedom of academic and cultural expression.
+          The variable denotes the upper-bound estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and can present different political perspectives, and the freedom of academic and cultural expression.
 
           It is based on the V-Dem variable v2x_freexp_altinf_codehigh, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most free).
       freeexpr_vdem_low_owid:
         description: |-
-          The variable denotes the lower-bound estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and present different political perspectives, and the freedom of academic and cultural expression.
+          The variable denotes the lower-bound estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and can present different political perspectives, and the freedom of academic and cultural expression.
 
           It is based on the V-Dem variable v2x_freexp_altinf_codelow, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most free).
       freeexpr_vdem_owid:
         description: |-
-          The variable denotes the best estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and present different political perspectives, and the freedom of academic and cultural expression.
+          The variable denotes the best estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and can present different political perspectives, and the freedom of academic and cultural expression.
 
           It is based on the V-Dem variable v2x_freexp_altinf, and we expand it to cover more years for some countries.
 
