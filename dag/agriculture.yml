@@ -25,3 +25,11 @@ steps:
     - data://garden/faostat/2023-02-22/faostat_qcl
   data://grapher/agriculture/2023-04-21/uk_long_term_yields:
     - data://garden/agriculture/2023-04-21/uk_long_term_yields
+  #
+  # Attainable yields.
+  #
+  data://garden/agriculture/2023-05-26/attainable_yields:
+    - data://garden/papers/2023-05-26/mueller_et_al_2012
+    - data://garden/faostat/2023-02-22/faostat_qcl
+  data://grapher/agriculture/2023-05-26/attainable_yields:
+    - data://garden/agriculture/2023-05-26/attainable_yields

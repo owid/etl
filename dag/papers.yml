@@ -54,3 +54,10 @@ steps:
     - data://meadow/papers/2023-05-26/ray_et_al_2019
   data://grapher/papers/2023-05-26/ray_et_al_2019:
     - data://garden/papers/2023-05-26/ray_et_al_2019
+  #
+  # Mueller et al. (2012). Attainable yields.
+  #
+  data://meadow/papers/2023-05-26/mueller_et_al_2012:
+    - snapshot://papers/2023-05-26/mueller_et_al_2012.xls
+  data://garden/papers/2023-05-26/mueller_et_al_2012:
+    - data://meadow/papers/2023-05-26/mueller_et_al_2012
