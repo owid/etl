@@ -43,7 +43,10 @@ nav:
       - Walkthrough: "tutorials/adding-data/walkthrough.md"
       - Manually add: "tutorials/adding-data/manual.md"
       - Fast-track: "tutorials/adding-data/fast-track.md"
-    - Updating charts: "tutorials/updating-charts.md"
+    - Updating charts:
+      - Submitting chart revisions: "tutorials/charts/updating-charts.md"
+      - Reviewing chart revisions: "tutorials/charts/reviewing-charts.md"
+      - Using chatGPT: "tutorials/charts/chatgpt.md"
     - Harmonize country names: "tutorials/harmonize-countries.md"
     - Backporting Grapher datasets to ETL: "tutorials/backport.md"
     - Importing a private dataset to ETL: "tutorials/private-import.md"
@@ -89,6 +92,7 @@ theme:
     # - navigation.sections
     # - toc.follow
     - navigation.top
+  custom_dir: docs/overrides
 
 markdown_extensions:
   - admonition

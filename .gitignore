@@ -27,6 +27,7 @@ ign.*
 .idea
 examples/data/*
 
+playground*
 playground.ipynb
 !walkthrough/**/playground.ipynb
 

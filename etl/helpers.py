@@ -19,6 +19,7 @@ from owid.datautils.common import ExceptionFromDocstring
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
+from etl import grapher_helpers as gh
 from etl import paths
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import extract_step_attributes, load_dag, reverse_graph
@@ -65,8 +66,13 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
 
 def grapher_checks(ds: catalog.Dataset) -> None:
     """Check that the table is in the correct format for Grapher."""
+    assert ds.metadata.title, "Dataset must have a title."
+
     for tab in ds:
         assert {"year", "country"} <= set(tab.reset_index().columns), "Table must have columns country and year."
+        assert (
+            tab.reset_index()["year"].dtype in gh.INT_TYPES
+        ), f"year must be of an integer type but was: {tab['country'].dtype}"
         for col in tab:
             if col in ("year", "country"):
                 continue
@@ -274,7 +280,10 @@ class PathFinder:
 
         if channel in ["meadow", "garden", "grapher", "explorers", "examples"]:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
-        elif channel in ["snapshot", "walden"]:
+        elif channel == "snapshot":
+            # match also on snapshot short_names without extension
+            step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
+        elif channel == "walden":
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
         elif channel is None:
             step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}$"
@@ -404,6 +413,18 @@ class PathFinder:
             )
             dataset = catalog.Dataset(dataset_path)
 
+        return dataset
+
+    def load_snapshot_dependency(self) -> Snapshot:
+        """Load snapshot dependency with the same name."""
+        snap = self.load_dependency(channel="snapshot", short_name=self.short_name)
+        assert isinstance(snap, Snapshot)
+        return snap
+
+    def load_dataset_dependency(self) -> catalog.Dataset:
+        """Load dataset dependency with the same name."""
+        dataset = self.load_dependency(short_name=self.short_name)
+        assert isinstance(dataset, catalog.Dataset)
         return dataset
 
 

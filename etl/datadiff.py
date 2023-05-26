@@ -2,8 +2,9 @@ import difflib
 import os
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional
+from typing import Any, Callable, Dict, Iterable, List, Optional, cast
 
+import numpy as np
 import pandas as pd
 import requests
 import rich
@@ -74,21 +75,27 @@ class DatasetDiff:
             table_a = ds_a[table_name]
             table_b = ds_b[table_name]
 
+            # set default index for datasets that don't have one
+            if table_a.index.names == [None] and table_b.index.names == [None]:
+                candidates = {"entity", "date", "country"}
+                new_index = list(candidates & set(table_a.columns) & set(table_b.columns))
+                if new_index:
+                    table_a = table_a.set_index(new_index)
+                    table_b = table_b.set_index(new_index)
+
             # only sort index if different to avoid unnecessary sorting for huge datasets such as ghe
             if len(table_a) != len(table_b) or not _index_equals(table_a, table_b):
                 index_diff = True
-                table_a = _sort_index(table_a)
-                table_b = _sort_index(table_b)
-
-                # align tables by index
-                table_a, table_b = table_a.align(table_b, join="outer")
+                table_a, table_b, eq_index = _align_tables(table_a, table_b)
             else:
                 index_diff = False
+                eq_index = pd.Series(True, index=table_a.index)
 
             # resetting index will make comparison easier
             dims = table_a.index.names
             table_a: Table = table_a.reset_index()
             table_b: Table = table_b.reset_index()
+            eq_index = eq_index.reset_index(drop=True)
 
             # compare table metadata
             diff = _dict_diff(_table_metadata_dict(table_a), _table_metadata_dict(table_b), tabs=3)
@@ -111,8 +118,10 @@ class DatasetDiff:
                     col_a = table_a[col]
                     col_b = table_b[col]
 
-                    eq = series_equals(table_a[col], table_b[col])
-                    data_diff = (~eq).any()
+                    # equality on index and series
+                    eq_data = series_equals(table_a[col], table_b[col])
+                    data_diff = (~eq_data).any()
+                    eq = eq_index & eq_data
 
                     col_a_meta = col_a.metadata.to_dict()
                     col_b_meta = col_b.metadata.to_dict()
@@ -323,12 +332,13 @@ def _data_diff(
 
     # changes in index
     for dim in dims:
-        diff_elements = table_a.loc[~eq, dim].dropna().astype(str).sort_values().unique().tolist()
-        detail = f"{len(diff_elements)} affected" if len(diff_elements) > 5 else ", ".join(diff_elements)
-        lines.append(f"- {dim}: {detail}")
+        if dim is not None:
+            diff_elements = table_a.loc[~eq, dim].dropna().astype(str).sort_values().unique().tolist()
+            detail = f"{len(diff_elements)} affected" if len(diff_elements) > 5 else ", ".join(diff_elements)
+            lines.append(f"- {dim}: {detail}")
 
     # changes in values
-    if table_a[col].dtype == "category":
+    if table_a[col].dtype in ("category", "object") or np.issubdtype(table_a[col].dtype, np.datetime64):
         vals_a = set(table_a.loc[~eq, col].dropna())
         vals_b = set(table_b.loc[~eq, col].dropna())
         if vals_a - vals_b:
@@ -351,6 +361,19 @@ def _data_diff(
     else:
         # add tabs
         return "\t" * tabs + "\n".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
+
+
+def _align_tables(table_a: Table, table_b: Table) -> tuple[Table, Table, pd.Series]:
+    table_a = _sort_index(table_a)
+    table_b = _sort_index(table_b)
+
+    # align tables by index
+    table_a, table_b = table_a.assign(_x=1).align(table_b.assign(_x=1), join="outer")
+    eq_index = table_a["_x"].notnull() & table_b["_x"].notnull()
+    table_a = cast(Table, table_a.drop(columns="_x"))
+    table_b = cast(Table, table_b.drop(columns="_x"))
+
+    return table_a, table_b, eq_index
 
 
 def _sort_index(df: Table) -> Table:

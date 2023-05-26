@@ -17,6 +17,17 @@ from etl.db_utils import DBUtils
 log = structlog.get_logger()
 
 
+INT_TYPES = (
+    "int",
+    "uint16",
+    "Int16",
+    "uint32",
+    "Int32",
+    "uint64",
+    "Int64",
+)
+
+
 def as_table(df: pd.DataFrame, table: catalog.Table) -> catalog.Table:
     """Convert dataframe into Table and add metadata from other table if available."""
     t = catalog.Table(df, metadata=table.metadata)

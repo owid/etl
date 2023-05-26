@@ -13,9 +13,9 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
 # EPR classifies some countries as both their historical and current name. This is not ideal for some cases where their borders changed completely
 def separate_historical_countries(df: pd.DataFrame) -> pd.DataFrame:
-
     df["country"] = df["country"].astype(str)
     # RUSSIA / SOVIET UNION
     # Change the country name for the Soviet Union to Russia for years less or equal to 1991
@@ -118,7 +118,6 @@ def load_population() -> pd.DataFrame:
 
 # Function to add regional aggregations to data
 def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
-
     # Load population data
     tb_population = load_population()
 
@@ -227,10 +226,10 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
     # Concatenate df with df_regions
     df = pd.concat([df, df_regions], ignore_index=True)
 
-    # Drop headcount and population columns
-    df = df.drop(columns=["population"] + pop_vars_headcount)
+    # Drop population column
+    df = df.drop(columns=["population"])
 
-    # Verify index and sort
+    # # Verify index and sort
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     return df

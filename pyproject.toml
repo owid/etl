@@ -11,6 +11,7 @@ publish = 'etl.publish:publish_cli'
 prune = 'etl.prune:prune_cli'
 harmonize = 'etl.harmonize:harmonize'
 backport = 'backport.backport:backport_cli'
+backport-migrate = 'backport.migrate.migrate:cli'
 bulk_backport = 'backport.bulk_backport:bulk_backport'
 backport-datasync = 'backport.datasync.datasync:cli'
 walkthrough = 'walkthrough.cli:cli'
@@ -24,6 +25,7 @@ etl-translate-varmap = 'etl.variable_mapping_translate:main_cli'
 etl-chart-suggester = 'etl.chart_revision.cli:main_cli'
 etl-metadata-export = 'etl.metadata_export:cli'
 etl-datadiff = 'etl.datadiff:cli'
+etl-chartgpt = 'etl.chart_revision.v2.chartgpt:cli'
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -67,6 +69,7 @@ streamlit = "^1.22.0"
 # pinned because of frictionless, remove this pin when frictionless is updated
 fsspec = "2022.11.0"
 openai = "^0.27.7"
+pdfplumber = "^0.9.0"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=7.1.2"

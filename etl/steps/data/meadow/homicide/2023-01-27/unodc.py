@@ -47,9 +47,8 @@ def run(dest_dir: str) -> None:
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-
     df = df[
-        (df["Dimension"].isin(["Total", "by mechanisms"]))
+        (df["Dimension"].isin(["Total", "by mechanisms", "by relationship to perpetrator", "by situational context"]))
         & (
             df["Indicator"].isin(
                 ["Victims of intentional homicide", "Victims of Intentional Homicide - Regional Estimate"]

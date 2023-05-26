@@ -33,10 +33,8 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
     # Define a list of variable to make them binary
     binary_vars = [
         "equal_age",
-        "unequal_age",
         "constitution",
         "conversion_therapies",
-        "death_penalty",
         "employment_discrim",
         "gender_surgery",
         "hate_crimes",
@@ -45,14 +43,15 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
         "lgb_military",
         "lgb_military_ban",
         "marriage_equality",
-        "marriage_ban",
         "samesex_legal",
         "third_gender",
         "trans_military",
         "civil_unions",
         "gendermarker",
-        "propaganda",
     ]
+
+    # List of regressive binary variables
+    regressive_vars = ["death_penalty", "propaganda", "unequal_age", "marriage_ban"]
 
     # Create a new column _yes that is 1 if the variable is 1 and 0 otherwise; and _no that is 1 if the variable is < 1 and 0 otherwise
     # Also create a new column _yes_pop that is the product of _yes and population; and _no_pop that is the product of _no and population
@@ -68,6 +67,23 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
 
         df[f"{var}_yes"] = df[f"{var}"].apply(lambda x: 1 if x == 1 else 0)
         df[f"{var}_no"] = df[f"{var}"].apply(lambda x: 1 if x < 1 else 0)
+
+        df[f"{var}_yes_pop"] = df[f"{var}_yes"] * df["population"]
+        df[f"{var}_no_pop"] = df[f"{var}_no"] * df["population"]
+
+    # Run a similar code for regressive policy variables (yes and partially should be together)
+    regressive_vars_yes = []
+    regressive_vars_no = []
+    regressive_vars_yes_pop = []
+    regressive_vars_no_pop = []
+    for var in regressive_vars:
+        regressive_vars_yes.append(f"{var}_yes")
+        regressive_vars_no.append(f"{var}_no")
+        regressive_vars_yes_pop.append(f"{var}_yes_pop")
+        regressive_vars_no_pop.append(f"{var}_no_pop")
+
+        df[f"{var}_yes"] = df[f"{var}"].apply(lambda x: 1 if x > 0 else 0)
+        df[f"{var}_no"] = df[f"{var}"].apply(lambda x: 1 if x == 0 else 0)
 
         df[f"{var}_yes_pop"] = df[f"{var}_yes"] * df["population"]
         df[f"{var}_no_pop"] = df[f"{var}_no"] * df["population"]
@@ -104,6 +120,10 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
         + binary_vars_no
         + binary_vars_yes_pop
         + binary_vars_no_pop
+        + regressive_vars_yes
+        + regressive_vars_no
+        + regressive_vars_yes_pop
+        + regressive_vars_no_pop
         + ["population"],
         "sum",
     )
@@ -118,8 +138,17 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
     df_regions = df[df["country"].isin(regions)].reset_index(drop=True)
     df = df[~df["country"].isin(regions)].reset_index(drop=True)
 
-    # Also drop binary_vars_yes and binary_vars_no in df (they are only useful for regions)
-    df = df.drop(columns=binary_vars_yes + binary_vars_no + binary_vars_yes_pop + binary_vars_no_pop)
+    # Also drop binary vars in df (they are only useful for regions)
+    df = df.drop(
+        columns=binary_vars_yes
+        + binary_vars_no
+        + binary_vars_yes_pop
+        + binary_vars_no_pop
+        + regressive_vars_yes
+        + regressive_vars_no
+        + regressive_vars_yes_pop
+        + regressive_vars_no_pop
+    )
 
     # Calculate average variables for regions
     for var in pop_vars:
@@ -131,7 +160,7 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
     # Drop weighted and population columns
     df = df.drop(columns=["population"] + pop_vars_weighted)
 
-    # Verify index and sort
+    # # Verify index and sort
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     return df
