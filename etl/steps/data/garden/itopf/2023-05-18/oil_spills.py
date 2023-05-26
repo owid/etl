@@ -60,6 +60,8 @@ def run(dest_dir: str) -> None:
         if col not in ["country", "year"]:
             df[col] = df[col].round(0)
 
+    df["country"] = df["country"].str.replace(",", "")  # to avoid double ,,
+
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name="oil_spills")
 
