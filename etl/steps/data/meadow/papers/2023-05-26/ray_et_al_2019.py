@@ -56,7 +56,7 @@ def combine_data_from_relevant_sheets(data: pd.ExcelFile) -> pd.DataFrame:
         df_i = df_i.rename(columns=renaming, errors="raise")
 
         # Add a year column.
-        # TODO: Why are we assigning 2013?
+        # Note: It's unclear what year to assign, since some of the metrics are computed over a range of years.
         df_i["year"] = 2013
 
         # Merge data from this sheet to the complete dataframe.

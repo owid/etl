@@ -29,11 +29,11 @@ tables:
         unit: "%"
         short_unit: "%"
       oilpalm_change_in_yield:
-        title: "Oilpalm yield change"
+        title: "Oil palm yield change"
         unit: "tonnes per hectare"
         short_unit: "t/ha"
       oilpalm_change_with_respect_to_current:
-        title: "Oilpalm yield change with respect to current yield"
+        title: "Oil palm yield change with respect to current yield"
         unit: "%"
         short_unit: "%"
       rapeseed_change_in_yield:
