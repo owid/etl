@@ -2,7 +2,6 @@
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
