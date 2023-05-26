@@ -33,12 +33,16 @@ def run(dest_dir: str) -> None:
     # Call a function to harmonize country names in the DataFrame.
     df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
 
-    # Group the data by decade
+    # Group the data by decade for 'world' country only
     for column in ["bel_700t", "ab_700t", "oil_spilled"]:
-        df["decadal_" + str(column)] = df[column].groupby(df["year"] // 10 * 10).transform("mean")
+        mask = df["country"] == "World"  # Filter for 'world' country
+        df.loc[mask, "decadal_" + str(column)] = (
+            df.loc[mask, column].groupby(df.loc[mask, "year"] // 10 * 10).transform("mean")
+        )
         # set NaN everywhere except start of a decade
-        df["decadal_" + str(column)] = df["decadal_" + str(column)].where(df["year"] % 10 == 0, np.nan)
-
+        df.loc[mask, "decadal_" + str(column)] = df.loc[mask, "decadal_" + str(column)].where(
+            df.loc[mask, "year"] % 10 == 0, np.nan
+        )
     # Replace any '__' in column names with a space (done because of double _ in some variable names)
     newnames = [name.replace("__", "_") for name in df.columns]
     df.columns = newnames
