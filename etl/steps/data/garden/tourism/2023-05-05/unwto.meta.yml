@@ -102,8 +102,8 @@ tables:
           numDecimalPlaces: 0
       in_to_ex_tr:
         title: Inbound tourism-expenditure (travel)
-        unit: ''
-        short_unit: ''
+        unit: 'US million dollars'
+        short_unit: 'US million $'
         display:
           numDecimalPlaces: 0
       in_to_pu_bu_an_pr:
@@ -156,8 +156,8 @@ tables:
           numDecimalPlaces: 0
       ou_to_ex_tr:
         title: Outbound tourism-expenditure (travel)
-        unit: US million $
-        short_unit: ''
+        unit: US million dollar
+        short_unit: US million $
         display:
           numDecimalPlaces: 0
       to_in_av_ca_be_pl_pe_10_in:
@@ -313,16 +313,12 @@ tables:
       outbound_exp_per_tourist:
         title: Expenditure for each tourist on outbound tourism
         unit: US dollars
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
+        short_unit: 'US $'
       inb_exp_per_tourist:
         title: Expenditure for each tourist on inbound tourism
         unit: US dollars
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
+        short_unit: 'US $'
       ou_to_ex_tr_per_capita:
         title: Outbound tourism expenditure per capita
-        unit: ''
-        short_unit: ''
+        unit:  US dollars
+        short_unit: US $
