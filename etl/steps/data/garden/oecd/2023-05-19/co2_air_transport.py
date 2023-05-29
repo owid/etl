@@ -84,10 +84,17 @@ def run(dest_dir: str) -> None:
 
     merge_df = merge_df.rename(columns={"ter_int_m_filled_ukraine": "TER_INT_m"})
 
-    regions_ = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
+    regions_ = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
     for region in regions_:
-        merge_df = geo.add_region_aggregates(df=merge_df, country_col="country", year_col="year", region=region)
+        merge_df = geo.add_region_aggregates(
+            df=merge_df,
+            country_col="country",
+            countries_that_must_have_data=[],
+            year_col="year",
+            region=region,
+            frac_allowed_nans_per_year=0.9,
+        )
 
     merge_df["TER_INT_m"] = merge_df["TER_INT_m"].replace(0, np.nan)
     merge_df = merge_df[merge_df["year"] != 2023]
@@ -260,7 +267,8 @@ def add_inbound_outbound_tour(df, df_tr):
     df = pd.merge(df, just_inb_ratio, on=["year", "country"])
 
     # Calculate the interaction between TER_INT_a and inb_outb_tour
-    df["int_inb_out"] = df["per_capita_TER_INT_a"] * df["inb_outb_tour"]
+    df["int_inb_out_per_capita"] = df["per_capita_TER_INT_a"] * df["inb_outb_tour"]
+    df["int_inb_out"] = df["TER_INT_a"] * df["inb_outb_tour"]
 
     # Drop the 'inb_outb_tour' column
     df = df.drop(["inb_outb_tour"], axis=1)
