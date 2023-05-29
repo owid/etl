@@ -148,10 +148,20 @@
   "Congo- Republic of": "Congo",
   "Fiji Islands": "Fiji",
   "Iran Islamic Republic": "Iran",
-  "Israel incl. Palestine-": "Israel incl. Palestine (Mueller et al. (2012))",
   "Korea- Republic of": "South Korea",
   "Libyan Arab Jamahiriya": "Libya",
   "Macedonia-The Fmr Yug Rp": "North Macedonia",
   "Moldova- Republic of": "Moldova",
-  "Tanzania- United Rep of": "Tanzania"
+  "Tanzania- United Rep of": "Tanzania",
+  "World": "World",
+  "Israel incl. Palestine-": "Israel incl. Palestine (Mueller et al. (2012))",
+  "East Asia": "East Asia (Mueller et al. (2012))",
+  "Middle East & North Africa": "Middle East & North Africa (Mueller et al. (2012))",
+  "North America": "North America (Mueller et al. (2012))",
+  "Sub-Saharan Africa": "Sub-Saharan Africa (Mueller et al. (2012))",
+  "Western Europe": "Western Europe (Mueller et al. (2012))",
+  "Eastern Europe & Central Asia": "Eastern Europe & Central Asia (Mueller et al. (2012))",
+  "South Asia": "South Asia (Mueller et al. (2012))",
+  "Southeast Asia & Oceania": "Southeast Asia & Oceania (Mueller et al. (2012))",
+  "Latin America & Caribbean": "Latin America & Caribbean (Mueller et al. (2012))"
 }

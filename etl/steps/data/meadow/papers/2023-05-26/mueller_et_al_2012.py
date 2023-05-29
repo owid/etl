@@ -17,31 +17,46 @@ paths = PathFinder(__file__)
 
 
 def combine_data_from_sheets(data: pd.ExcelFile) -> pd.DataFrame:
-    # Select sheet names to use.
-    sheet_names = [sheet for sheet in data.sheet_names if "_intensification_by_co" in sheet]
+    # Sheet names end in "by_country" for individual countries data, and "by_region" for aggregate regions.
+    # However, sometimes the name is not complete, and it ends in "by_re", or "by_countr".
+    # But after inspection, the shortest sheet name for region data ends in "by_re".
 
     # Initialize an empty table that will contain all relevant data.
-    df = pd.DataFrame({"country": [], "year": []})
-    for sheet_name in sheet_names:
+    df_countries = pd.DataFrame({"country": [], "year": []})
+    df_regions = pd.DataFrame({"country": [], "year": []})
+    for sheet_name in data.sheet_names:
         # Item name for current sheet (e.g. "barley").
         item = sheet_name.split("_")[0]
-        # Columns to select from each sheet, and how to rename them.
-        renaming = {
-            "country": "country",
-            "attainable yield (t/ha - avg across area of interest)": f"{item}_attainable_yield",
-        }
 
         # Parse data for current sheet.
         df_i = data.parse(sheet_name, skiprows=1)
 
-        # Select and rename required columns.
-        df_i = df_i[list(renaming)].rename(columns=renaming, errors="raise")
+        if "by_re" in sheet_name:
+            # Columns to select from each sheet, and how to rename them.
+            renaming = {
+                "region": "country",
+                "attainable yield (t/ha - avg across area of interest)": f"{item}_attainable_yield",
+            }
+            # Select and rename required columns, and add a year column
+            df_i = df_i[list(renaming)].rename(columns=renaming, errors="raise").assign(**{"year": 2000})
 
-        # Assign year.
-        df_i["year"] = 2000
+            # Merge with the combined table.
+            df_countries = pd.merge(df_countries, df_i, on=["country", "year"], how="outer")
+        else:
+            # Columns to select from each sheet, and how to rename them.
+            renaming = {
+                "country": "country",
+                "attainable yield (t/ha - avg across area of interest)": f"{item}_attainable_yield",
+            }
 
-        # Merge with the combined table.
-        df = pd.merge(df, df_i, on=["country", "year"], how="outer")
+            # Select and rename required columns, and add a year column
+            df_i = df_i[list(renaming)].rename(columns=renaming, errors="raise").assign(**{"year": 2000})
+
+            # Merge with the combined table.
+            df_regions = pd.merge(df_regions, df_i, on=["country", "year"], how="outer")
+
+    # Concatenate data for regions and for countries.
+    df = pd.concat([df_countries, df_regions], ignore_index=True)
 
     return df
 
