@@ -151,7 +151,7 @@ def run(dest_dir: str) -> None:
     for item in ITEM_CODES:
         if f"{item}_attainable_yield" in tb.columns:
             # Clip the series at zero (negative values mean that the yield has been attained).
-            tb[f"{item}_yield_gap"] = tb[f"{item}_attainable_yield"] - tb[f"{item}_yield"].clip(0)
+            tb[f"{item}_yield_gap"] = (tb[f"{item}_attainable_yield"] - tb[f"{item}_yield"]).clip(0)
 
     # Update table and variable metadata.
     tb = add_table_and_variable_metadata(tb=tb)
