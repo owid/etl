@@ -36,3 +36,12 @@ steps:
     - snapshot://papers/2023-04-21/brassley_2000.csv
   data://garden/papers/2023-04-21/brassley_2000:
     - data://meadow/papers/2023-04-21/brassley_2000
+  #
+  # Wuepper et al. (2020). Data on crop yields and nitrogen pollution.
+  #
+  data://meadow/papers/2023-05-26/wuepper_et_al_2020:
+    - snapshot://papers/2023-05-26/wuepper_et_al_2020.xlsx
+  data://garden/papers/2023-05-26/wuepper_et_al_2020:
+    - data://meadow/papers/2023-05-26/wuepper_et_al_2020
+  data://grapher/papers/2023-05-26/wuepper_et_al_2020:
+    - data://garden/papers/2023-05-26/wuepper_et_al_2020
