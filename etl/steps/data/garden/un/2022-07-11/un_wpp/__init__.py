@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Any, List
 
@@ -71,14 +72,8 @@ def df_to_table(df: pd.DataFrame, **kwargs: Any) -> Table:
 
 
 def load_country_mapping() -> Any:
-    return (
-        pd.read_csv(
-            Path(__file__).parent / "un_wpp.country_std.csv",
-            index_col="Country",
-        )
-        .squeeze()
-        .to_dict()
-    )
+    with open(Path(__file__).parent / "un_wpp.countries.json") as f:
+        return json.load(f)
 
 
 def get_wide_df(df: pd.DataFrame) -> pd.DataFrame:
