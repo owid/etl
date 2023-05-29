@@ -386,6 +386,7 @@ steps:
   - snapshot://tourism/2023-05-04/unwto.xlsx
   data://garden/tourism/2023-05-05/unwto:
   - data://meadow/tourism/2023-05-05/unwto
+  - data://garden/owid/latest/key_indicators
   data://grapher/tourism/2023-05-11/unwto:
   - data://garden/tourism/2023-05-05/unwto
   # Environment Tables Implementations
