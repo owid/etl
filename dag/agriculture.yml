@@ -38,3 +38,11 @@ steps:
   #
   data://explorers/agriculture/2023-05-26/crop_yields:
     - data://grapher/agriculture/2023-05-26/attainable_yields
+  #
+  # Long-run crop yields.
+  #
+  data://garden/agriculture/2023-05-30/long_term_crop_yields:
+    - data://garden/faostat/2023-02-22/faostat_qcl
+    - data://garden/agriculture/2023-04-21/uk_long_term_yields
+    - data://garden/usda_nass/2023-04-20/us_corn_yields
+    - data://garden/agriculture/2023-04-20/long_term_wheat_yields
