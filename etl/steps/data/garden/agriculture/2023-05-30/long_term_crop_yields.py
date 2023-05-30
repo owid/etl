@@ -109,13 +109,12 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    print("HERE")
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb])
 
     # Combine sources and licenses from all involved datasets.
-    ds_garden.metadata.sources = [ds.metadata.sources for ds in [ds_uk, ds_us, ds_wheat, ds_qcl]]
-    ds_garden.metadata.licenses = [ds.metadata.licenses for ds in [ds_uk, ds_us, ds_wheat, ds_qcl]]
+    ds_garden.metadata.sources = sum([ds.metadata.sources for ds in [ds_uk, ds_us, ds_wheat, ds_qcl]], [])
+    ds_garden.metadata.licenses = sum([ds.metadata.licenses for ds in [ds_uk, ds_us, ds_wheat, ds_qcl]], [])
 
     # Save changes in the new garden dataset.
     ds_garden.save()
