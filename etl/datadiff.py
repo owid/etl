@@ -14,7 +14,6 @@ from owid.catalog import Dataset, DatasetMeta, LocalCatalog, RemoteCatalog, Tabl
 from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
 
-from etl import config
 from etl.files import yaml_dump
 from etl.tempcompare import series_equals
 
