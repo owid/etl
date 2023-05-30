@@ -90,7 +90,7 @@ def run(dest_dir: str) -> None:
 
 
 def clean_up_dimensions(df: pd.DataFrame) -> pd.DataFrame:
-    sex_dict = {"All": "Both Sexes", "Male": "Males", "Female": "Females", "unknown": "Unknown sex"}
+    sex_dict = {"All": "Both Sexes", "Male": "Males", "Female": "Females", "Unknown": "Unknown sex"}
     age_dict = {"Age_all": "All ages", "Age_unknown": "Unknown age"}
     df = df.replace({"sex": sex_dict, "age_group_code": age_dict})
 
@@ -151,10 +151,19 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
         "Unknown age": "Unknown age",
     }
 
+    age_groups_child = {
+        "Age00": "Age 0-19",
+        "Age01_04": "Age 0-19",
+        "Age05_09": "Age 0-19",
+        "Age10_14": "Age 0-19",
+        "Age15_19": "Age 0-19",
+    }
+
     df_age_group_ihme = build_custom_age_groups(df, age_groups=age_groups_ihme)
     df_age_group_decadal = build_custom_age_groups(df, age_groups=age_groups_decadal)
+    df_age_group_child = build_custom_age_groups(df, age_groups=age_groups_child)
     df_orig = remove_granular_age_groups(df)
-    df_combined = pd.concat([df_orig, df_age_group_ihme, df_age_group_decadal], axis=0)
+    df_combined = pd.concat([df_orig, df_age_group_ihme, df_age_group_decadal, df_age_group_child], axis=0)
     df_combined = df_combined.loc[:, ~df_combined.columns.duplicated()]
     return df_combined
 
@@ -166,6 +175,10 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
     df_age = df.copy()
     # Add population values for each dimension
     log.info("who_mort_db.add_population_values")
+
+    df_age = df_age[df_age["age_group_code"].isin(age_groups.keys())]
+
+    total_deaths = df_age["number_of_deaths"].sum()
 
     df_age = add_population(
         df=df_age,
@@ -183,7 +196,6 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
 
     df_age["age_group_code"] = df_age["age_group_code"].map(age_groups)
 
-    assert df_age["age_group_code"].isna().sum() == 0, "Age-group missing from the age-group dict"
     # Sum
     df_age = df_age.drop(
         [
@@ -199,7 +211,7 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
     ) * 100000
     df_age = df_age.drop(columns=["population"]).reset_index()
 
-    assert df["number_of_deaths"].sum() == df_age["number_of_deaths"].sum()
+    assert total_deaths == df_age["number_of_deaths"].sum()
 
     return df_age
 
