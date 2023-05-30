@@ -4,7 +4,6 @@ import re
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, cast
 
-import bugsnag
 import numpy as np
 import pandas as pd
 import requests
@@ -21,16 +20,20 @@ from etl.tempcompare import series_equals
 
 log = structlog.get_logger()
 
-config.enable_bugsnag()
-
 
 class DatasetDiff:
     """Compare two datasets and print a summary of the differences."""
 
     def __init__(
-        self, ds_a: Optional[Dataset], ds_b: Optional[Dataset], verbose: bool = False, print: Callable = rich.print
+        self,
+        ds_a: Optional[Dataset],
+        ds_b: Optional[Dataset],
+        verbose: bool = False,
+        cols: Optional[str] = None,
+        print: Callable = rich.print,
     ):
         """
+        :param cols: Only compare columns matching pattern
         :param print: Function to print the diff summary. Defaults to rich.print.
         """
         assert ds_a or ds_b, "At least one Dataset must be provided"
@@ -38,6 +41,7 @@ class DatasetDiff:
         self.ds_b = ds_b
         self.p = print
         self.verbose = verbose
+        self.cols = cols
 
     def _diff_datasets(self, ds_a: Optional[Dataset], ds_b: Optional[Dataset]):
         if ds_a and ds_b:
@@ -78,7 +82,7 @@ class DatasetDiff:
 
             # set default index for datasets that don't have one
             if table_a.index.names == [None] and table_b.index.names == [None]:
-                candidates = {"entity", "date", "country"}
+                candidates = {"entity", "date", "country", "year"}
                 new_index = list(candidates & set(table_a.columns) & set(table_b.columns))
                 if new_index:
                     table_a = table_a.set_index(new_index)
@@ -111,6 +115,9 @@ class DatasetDiff:
             # compare columns
             all_cols = sorted(set(table_a.columns) | set(table_b.columns))
             for col in all_cols:
+                if self.cols and not re.search(self.cols, col):
+                    continue
+
                 if col not in table_a.columns:
                     self.p(f"\t\t[green]+ Column [b]{col}[/b]")
                 elif col not in table_b.columns:
@@ -137,10 +144,12 @@ class DatasetDiff:
 
                     if changed:
                         self.p(f"\t\t[yellow]~ Column [b]{col}[/b] (changed [u]{' & '.join(changed)}[/u])")
-                        if self.verbose and meta_diff:
-                            self.p(_dict_diff(col_a_meta, col_b_meta, tabs=4))
                         if self.verbose:
+                            if meta_diff:
+                                self.p(_dict_diff(col_a_meta, col_b_meta, tabs=4))
                             if data_diff or index_diff:
+                                if meta_diff:
+                                    self.p("")
                                 out = _data_diff(table_a, table_b, col, dims, tabs=4, eq=eq)
                                 if out:
                                     self.p(out)
@@ -204,6 +213,11 @@ class RemoteDataset:
     help="Compare only datasets matching pattern",
 )
 @click.option(
+    "--cols",
+    type=str,
+    help="Compare only columns matching pattern",
+)
+@click.option(
     "--exclude",
     "-e",
     type=str,
@@ -219,6 +233,7 @@ def cli(
     path_b: str,
     channel: Iterable[CHANNEL],
     include: Optional[str],
+    cols: Optional[str],
     exclude: Optional[str],
     verbose: bool,
 ) -> None:
@@ -246,6 +261,7 @@ def cli(
     path_to_ds_b = _load_catalog_datasets(path_b, channel, include, exclude)
 
     any_diff = False
+    any_error = False
 
     for path in sorted(set(path_to_ds_a.keys()) | set(path_to_ds_b.keys())):
         ds_a = _match_dataset(path_to_ds_a, path)
@@ -263,16 +279,13 @@ def cli(
             console.print(x)
 
         try:
-            differ = DatasetDiff(ds_a, ds_b, print=_append_and_print, verbose=verbose)
+            differ = DatasetDiff(ds_a, ds_b, cols=cols, print=_append_and_print, verbose=verbose)
             differ.summary()
         except Exception as e:
-            # soft fail if bugsnag is active
-            if bugsnag.configuration._api_key:
-                bugsnag.notify(e)
-                log.exception(e)
-                continue
-            else:
-                raise e
+            # soft fail and continue with another dataset
+            log.exception(e)
+            any_error = True
+            continue
 
         if any("~" in line for line in lines):
             any_diff = True
@@ -280,6 +293,8 @@ def cli(
     console.print()
     if not path_to_ds_a and not path_to_ds_b:
         console.print("[yellow]❓ No datasets found[/yellow]")
+    elif any_error:
+        console.print("[bold red]⚠ Found errors, create an issue please[/bold red]")
     elif any_diff:
         console.print("[red]❌ Found differences[/red]")
     else:
@@ -306,7 +321,9 @@ def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 10
     else:
         index_a = table_a.sample(sample, random_state=0).index
         index_b = table_b.sample(sample, random_state=0).index
-    return series_equals(pd.Series(index_a), pd.Series(index_b)).all()  # type: ignore
+
+    return (index_a == index_b).all()  # type: ignore
+    # return series_equals(pd.Series(index_a), pd.Series(index_b)).all()
 
 
 def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
@@ -347,7 +364,7 @@ def _data_diff(
             lines.append(f"- {dim}: {detail}")
 
     # changes in values
-    if table_a[col].dtype in ("category", "object") or np.issubdtype(table_a[col].dtype, np.datetime64):
+    if table_a[col].dtype in ("category", "object") or _is_datetime(table_a[col].dtype):
         vals_a = set(table_a.loc[~eq, col].dropna())
         vals_b = set(table_b.loc[~eq, col].dropna())
         if vals_a - vals_b:
@@ -358,7 +375,9 @@ def _data_diff(
         mean_a = table_a.loc[~eq, col].mean()
         mean_b = table_b.loc[~eq, col].mean()
         abs_diff = mean_b - mean_a
-        rel_diff = abs_diff / 0.5 / (mean_a + mean_b)
+        mean = (mean_a + mean_b) / 2
+
+        rel_diff = abs_diff / mean if mean != 0 else np.nan
 
         lines.append(f"- Avg. change: {abs_diff:.2f} ({rel_diff:.0%})")
 
@@ -372,7 +391,16 @@ def _data_diff(
         return "\t" * tabs + "\n".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
 
 
+def _is_datetime(dtype: Any) -> bool:
+    try:
+        return np.issubdtype(dtype, np.datetime64)
+    except Exception:
+        return False
+
+
 def _align_tables(table_a: Table, table_b: Table) -> tuple[Table, Table, pd.Series]:
+    assert table_a.index.is_unique and table_b.index.is_unique
+
     table_a = _sort_index(table_a)
     table_b = _sort_index(table_b)
 
