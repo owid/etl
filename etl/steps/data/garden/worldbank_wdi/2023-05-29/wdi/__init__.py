@@ -10,7 +10,7 @@ import re
 import zipfile
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, cast
 
 import pandas as pd
 import structlog
@@ -18,6 +18,8 @@ from owid.catalog import Dataset, Source, Table, VariableMeta
 from owid.catalog.utils import underscore
 from owid.walden import Catalog
 
+from etl.data_helpers import geo
+from etl.helpers import PathFinder, create_dataset
 from etl.paths import DATA_DIR
 
 from .variable_matcher import VariableMatcher
@@ -26,34 +28,29 @@ COUNTRY_MAPPING_PATH = (Path(__file__).parent / "wdi.country_mapping.json").as_p
 
 log = structlog.get_logger()
 
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
 
 def run(dest_dir: str) -> None:
-    version = Path(__file__).parent.parent.stem
-    fname = Path(__file__).parent.stem
-    namespace = Path(__file__).parent.parent.parent.stem
-    ds_meadow = Dataset((DATA_DIR / f"meadow/{namespace}/{version}/{fname}").as_posix())
+    log.info("wdi.start")
 
-    assert len(ds_meadow.table_names) == 1, "Expected meadow dataset to have only one table, but found > 1 table names."
-    tb_meadow = ds_meadow[fname]
-    df = pd.DataFrame(tb_meadow).reset_index()
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset.
+    ds_meadow = paths.load_dataset_dependency()
 
-    # harmonize entity names
-    country_mapping = load_country_mapping()
-    excluded_countries = load_excluded_countries()  # noqa: F841
-    df = df.query("country not in @excluded_countries").copy()
-    assert df["country"].notnull().all()
-    countries = df["country"].apply(lambda x: country_mapping.get(x, None))
-    if countries.isnull().any():
-        missing_countries = [x for x in df["country"].drop_duplicates() if x not in country_mapping]
-        raise RuntimeError(
-            "The following raw country names have not been harmonized. "
-            f"Please: (a) edit {COUNTRY_MAPPING_PATH} to include these country "
-            "names; or (b) remove these country names from the raw table."
-            f"Raw country names: {missing_countries}"
-        )
+    # Read table from meadow dataset.
+    tb_meadow = ds_meadow["wdi"]
 
-    df["country"] = countries
-    df.set_index(tb_meadow.metadata.primary_key, inplace=True)
+    tb_meadow = geo.harmonize_countries(
+        df=tb_meadow.reset_index(),
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
+    ).set_index(["country", "year"])
+
+    df = pd.DataFrame(tb_meadow)
 
     df_cust = mk_custom_entities(df)
     assert all([col in df.columns for col in df_cust.columns])
@@ -348,32 +345,26 @@ def mk_custom_entities(df: pd.DataFrame) -> pd.DataFrame:
 def add_variable_metadata(table: Table) -> Table:
     var_codes = table.columns.tolist()
 
-    # retrieves raw data from walden
-    version = Path(__file__).parent.parent.stem
-    fname = Path(__file__).parent.stem
-    namespace = Path(__file__).parent.parent.parent.stem
-    walden_ds = Catalog().find_one(namespace=namespace, short_name=fname, version=version)
-    local_file = walden_ds.ensure_downloaded()
-    zf = zipfile.ZipFile(local_file)
+    # metadata from snapshot
+    snap = paths.load_snapshot_dependency()
+
+    # Load data from snapshot.
+    zf = zipfile.ZipFile(snap.path)
     df_vars = pd.read_csv(zf.open("WDISeries.csv"))
+
     df_vars.dropna(how="all", axis=1, inplace=True)
     df_vars.columns = df_vars.columns.map(underscore)
     df_vars.rename(columns={"series_code": "indicator_code"}, inplace=True)
     df_vars["indicator_code"] = df_vars["indicator_code"].apply(underscore)
     df_vars = df_vars.query("indicator_code in @var_codes").set_index("indicator_code", verify_integrity=True)
 
-    df_vars["indicator_name"].str.replace(r"\s+", " ", regex=True)
+    df_vars["indicator_name"] = df_vars["indicator_name"].str.replace(r"\s+", " ", regex=True)
     clean_source_mapping = load_clean_source_mapping()
 
     # construct metadata for each variable
     vm = VariableMatcher()
     for var_code in var_codes:
         var = df_vars.loc[var_code].to_dict()
-
-        if var["indicator_name"] == "Agricultural land (sq. km)":
-            __import__('ipdb').set_trace()
-            print(21)
-
         # retrieves unit + display metadata from the most recently updated
         # WDI grapher variable that matches this variable's name
         unit = ""
@@ -422,13 +413,12 @@ def add_variable_metadata(table: Table) -> Table:
         source = Source(
             name=clean_source["name"],
             description=None,
-            url=walden_ds.metadata["url"],
-            source_data_url=walden_ds.metadata["source_data_url"],
-            owid_data_url=walden_ds.metadata["owid_data_url"],
-            date_accessed=walden_ds.metadata["date_accessed"],
-            publication_date=walden_ds.metadata["publication_date"],
-            publication_year=walden_ds.metadata["publication_year"],
-            published_by=walden_ds.metadata["name"],
+            url=snap.metadata.url,
+            source_data_url=snap.metadata.source_data_url,
+            date_accessed=str(snap.metadata.date_accessed),
+            publication_date=str(snap.metadata.publication_date),
+            publication_year=snap.metadata.publication_year,
+            published_by=snap.metadata.name,
             publisher_source=clean_source["dataPublisherSource"],
         )
 
@@ -452,20 +442,6 @@ def add_variable_metadata(table: Table) -> Table:
         )
 
     return table
-
-
-def load_country_mapping() -> Dict[str, str]:
-    with open(COUNTRY_MAPPING_PATH, "r") as f:
-        mapping = json.load(f)
-        assert isinstance(mapping, dict)
-    return mapping
-
-
-def load_excluded_countries() -> List[str]:
-    with open(Path(__file__).parent / "wdi.country_exclude.json", "r") as f:
-        data = json.load(f)
-        assert isinstance(data, list)
-    return data
 
 
 def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:

@@ -4,16 +4,18 @@ import functools
 import json
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Optional, TypeVar, Union, cast
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Table
 from owid.datautils.common import ExceptionFromDocstring, warn_on_list_of_entities
 from owid.datautils.dataframes import groupby_agg, map_series
 from owid.datautils.io.json import load_json
 
 from etl.paths import DATA_DIR, LATEST_REGIONS_DATASET_PATH
+
+TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 
 # When creating region aggregates for a certain variable in a certain year, some mandatory countries must be
 # informed, otherwise the aggregate will be nan (since we consider that there is not enough information).
@@ -348,7 +350,7 @@ def add_region_aggregates(
 
 
 def harmonize_countries(
-    df: pd.DataFrame,
+    df: TableOrDataFrame,
     countries_file: Union[Path, str],
     excluded_countries_file: Optional[Union[Path, str]] = None,
     country_col: str = "country",
@@ -357,7 +359,7 @@ def harmonize_countries(
     warn_on_unused_countries: bool = True,
     warn_on_unknown_excluded_countries: bool = True,
     show_full_warning: bool = True,
-) -> pd.DataFrame:
+) -> TableOrDataFrame:
     """Harmonize country names in dataframe, following the mapping given in a file.
 
     Countries in dataframe that are not in mapping will left unchanged (or converted to nan, if
