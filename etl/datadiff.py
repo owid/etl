@@ -377,7 +377,7 @@ def _data_diff(
         abs_diff = mean_b - mean_a
         mean = (mean_a + mean_b) / 2
 
-        rel_diff = abs_diff / mean if mean != 0 else np.nan
+        rel_diff = abs_diff / mean if not pd.isnull(mean) and mean != 0 else np.nan
 
         lines.append(f"- Avg. change: {abs_diff:.2f} ({rel_diff:.0%})")
 
