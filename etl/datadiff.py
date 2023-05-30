@@ -20,6 +20,10 @@ from etl.tempcompare import series_equals
 log = structlog.get_logger()
 
 
+class DatasetError(Exception):
+    pass
+
+
 class DatasetDiff:
     """Compare two datasets and print a summary of the differences."""
 
@@ -280,6 +284,10 @@ def cli(
         try:
             differ = DatasetDiff(ds_a, ds_b, cols=cols, print=_append_and_print, verbose=verbose)
             differ.summary()
+        except DatasetError as e:
+            # soft fail and continue with another dataset
+            _append_and_print(f"[bold red]⚠ Error: {e}[/bold red]")
+            continue
         except Exception as e:
             # soft fail and continue with another dataset
             log.exception(e)
@@ -321,8 +329,7 @@ def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 10
         index_a = table_a.sample(sample, random_state=0).index
         index_b = table_b.sample(sample, random_state=0).index
 
-    return (index_a == index_b).all()  # type: ignore
-    # return series_equals(pd.Series(index_a), pd.Series(index_b)).all()
+    return index_a.equals(index_b)
 
 
 def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
@@ -398,18 +405,28 @@ def _is_datetime(dtype: Any) -> bool:
 
 
 def _align_tables(table_a: Table, table_b: Table) -> tuple[Table, Table, pd.Series]:
-    assert table_a.index.is_unique and table_b.index.is_unique
+    if not table_a.index.is_unique or not table_b.index.is_unique:
+        raise DatasetError("Index must be unique.")
+
+    if len(table_a.index.names) * len(table_a) >= 2 * 10**8:
+        # table_a.align is very memory intensive for large tables as doesn't handle
+        # categorical indexes well. We'd have to convert all categories to codes first,
+        # align them and then convert back to categories.
+        raise DatasetError("Cannot run datadiff for an index of such size.")
 
     table_a = _sort_index(table_a)
     table_b = _sort_index(table_b)
 
     # align tables by index
-    table_a, table_b = table_a.assign(_x=1).align(table_b.assign(_x=1), join="outer")
-    eq_index = table_a["_x"].notnull() & table_b["_x"].notnull()
-    table_a = cast(Table, table_a.drop(columns="_x"))
-    table_b = cast(Table, table_b.drop(columns="_x"))
+    table_a["_x"] = 1
+    table_b["_x"] = 1
+    table_a, table_b = table_a.align(table_b, join="outer", copy=False)
 
-    return table_a, table_b, eq_index
+    eq_index = table_a["_x"].notnull() & table_b["_x"].notnull()
+    table_a.drop(columns="_x", inplace=True)
+    table_b.drop(columns="_x", inplace=True)
+
+    return cast(Table, table_a), cast(Table, table_b), eq_index
 
 
 def _sort_index(df: Table) -> Table:
