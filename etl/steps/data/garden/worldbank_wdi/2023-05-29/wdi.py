@@ -52,30 +52,26 @@ def run(dest_dir: str) -> None:
     assert all([col in df.columns for col in df_cust.columns])
     df = pd.concat([df, df_cust], axis=0)
 
-    # move this to the end
-    ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata
-
-    # move this to the end
-    tb_garden = Table(df)
-    tb_garden.metadata = tb_meadow.metadata
+    tb_garden = Table(df, metadata=tb_meadow.metadata)
 
     log.info("wdi.add_variable_metadata")
     tb_garden = add_variable_metadata(tb_garden, ds_meadow.metadata.sources[0])
 
-    __import__("ipdb").set_trace()
     tb_omm = mk_omms(tb_garden)
-    tb_garden2 = tb_garden.join(tb_omm, how="outer")
-    tb_garden2.metadata = tb_garden.metadata
-    for col in tb_garden2.columns:
-        if col in tb_garden:
-            tb_garden2[col].metadata = tb_garden[col].metadata
-        else:
-            tb_garden2[col].metadata = tb_omm[col].metadata
+    tb_garden = tb_garden.join(tb_omm, how="outer")
 
-    ds_garden.add(tb_garden2)
+    # TODO: is it fine if there's YAML file? what happens? can we move titles of OMMs there?
 
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
+
+    # Save changes in the new garden dataset.
     ds_garden.save()
+
+    log.info("wdi.end")
 
 
 def mk_omms(table: Table) -> Table:
@@ -366,8 +362,6 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
 
     table.update_metadata_from_yaml(paths.metadata_path, "wdi")
 
-    new_sources = set()
-
     # construct metadata for each variable
     for var_code in var_codes:
         var = df_vars.loc[var_code].to_dict()
@@ -375,9 +369,6 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
         # retrieve clean source name, then construct source.
         source_raw_name = var["source"]
         clean_source = clean_source_mapping.get(source_raw_name)
-        if not clean_source:
-            new_sources.add(source_raw_name)
-        continue
         assert clean_source, f'`rawName` "{source_raw_name}" not found in wdi.sources.json'
         source = Source(
             name=clean_source["name"],
@@ -394,10 +385,6 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
         table[var_code].metadata.description = create_description(var)
         table[var_code].metadata.sources = [source]
 
-    for s in new_sources:
-        print(s)
-    raise NotImplemented()
-
     if not all([len(table[var_code].sources) == 1 for var_code in var_codes]):
         missing = [var_code for var_code in var_codes if len(table[var_code].sources) != 1]
         raise RuntimeError(
@@ -405,6 +392,8 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
             f"do not: {missing}. Are the source names for these variables "
             "missing from `wdi.sources.json`?"
         )
+
+    __import__("ipdb").set_trace()
 
     return table
 
@@ -443,16 +432,3 @@ def create_description(var: Dict[str, Any]) -> Optional[str]:
         return None
 
     return desc
-
-
-def replace_years(s: str, year: Union[int, str]) -> str:
-    """replaces all years in string with {year}.
-
-    Example:
-
-        >>> replace_years("GDP (constant 2010 US$)", 2015)
-        "GDP (constant 2015 US$)"
-    """
-    year_regex = re.compile(r"\b([1-2]\d{3})\b")
-    s_new = year_regex.sub(str(year), s)
-    return s_new
