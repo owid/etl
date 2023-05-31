@@ -476,7 +476,6 @@
 - code: "TLS"
   name: "East Timor"
   aliases:
-    - "Timor"
     - "Timor-Leste"
 
 - code: "ECU"
