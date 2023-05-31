@@ -498,7 +498,7 @@ def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
 
     # sort sources by name
     if "sources" in d:
-        d["sources"] = sorted(d["sources"], key=lambda x: x["name"])
+        d["sources"] = sorted(d["sources"], key=lambda x: x["name"] or "")
 
     d.pop("source_checksum", None)
     return d
