@@ -64,3 +64,5 @@ steps:
   - snapshot-private://fasttrack/latest/owid_upload_top1_percent_compare_1980.csv
   data://grapher/fasttrack/latest/treatment_gap_anxiety_disorders_world_mental_health_surveys:
   - snapshot://fasttrack/latest/treatment_gap_anxiety_disorders_world_mental_health_surveys.csv
+  data-private://grapher/fasttrack/latest/lead_paint_regulation__who__2023:
+  - snapshot-private://fasttrack/latest/lead_paint_regulation__who__2023.csv

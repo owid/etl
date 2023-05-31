@@ -1,0 +1,17 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: lead_paint_regulation__who__2023
+  title: DRAFT Lead paint regulation (WHO, 2023)
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-05-31
+tables:
+  lead_paint_regulation__who__2023:
+    variables:
+      lead_paint_regulation:
+        title: lead_paint_regulation
+        unit: ''

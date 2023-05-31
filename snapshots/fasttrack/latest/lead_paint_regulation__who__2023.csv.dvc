@@ -1,0 +1,19 @@
+meta:
+  namespace: fasttrack
+  short_name: lead_paint_regulation__who__2023
+  file_extension: csv
+  date_accessed: 2023-05-31
+  name: DRAFT Lead paint regulation (WHO, 2023)
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: 
+    gAAAAABkdtTRESG-VEPUp3KpuArYYlNTL3VIT9yXcd1bXvT3diyutZComo7P5UpHbqljza2nx4DYR8UdVqGwEVf-GDsI2jbuoQ==
+  is_public: false
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 4dc8aba7f374bae5068d139db545cd8c
+  size: 3689
+  path: lead_paint_regulation__who__2023.csv
