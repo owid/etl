@@ -70,6 +70,10 @@ def combine_variables_metadata(combined_table: Table, individual_tables: List[Ta
         title = column.capitalize().replace("_", " ").replace("  ", " ").replace("n e c", "n.e.c.")
         combined_table[column].metadata.title = title
 
+        # Define units.
+        combined_table[column].metadata.unit = "tonnes per hectare"
+        combined_table[column].metadata.short_unit = "t/ha"
+
     return combined_table
 
 
@@ -123,8 +127,9 @@ def run(dest_dir: str) -> None:
         df1=tb_us, df2=tb, index_columns=["country", "year"], keep_column_order=True
     )
 
-    # Combine variables metadata.
+    # Combine variables metadata and adjust table metadata.
     tb = combine_variables_metadata(combined_table=tb, individual_tables=[tb_uk, tb_us, tb_wheat, tb_qcl])
+    tb.metadata.short_name = paths.short_name
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
