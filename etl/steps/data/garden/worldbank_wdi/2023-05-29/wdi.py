@@ -40,6 +40,10 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["wdi"]
 
+    x = tb_meadow["dt_nfl_unid_cd"]
+
+    __import__("ipdb").set_trace()
+
     tb_meadow = geo.harmonize_countries(
         df=tb_meadow.reset_index(),
         countries_file=paths.country_mapping_path,
@@ -61,6 +65,12 @@ def run(dest_dir: str) -> None:
     tb_garden = tb_garden.join(tb_omm, how="outer")
 
     # TODO: is it fine if there's YAML file? what happens? can we move titles of OMMs there?
+
+    # validate that all columns have title
+    for col in tb_garden.columns:
+        assert tb_garden[col].metadata.title is not None, 'Variable "{}" has no title'.format(col)
+
+    __import__("ipdb").set_trace()
 
     #
     # Save outputs.
@@ -392,8 +402,6 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
             f"do not: {missing}. Are the source names for these variables "
             "missing from `wdi.sources.json`?"
         )
-
-    __import__("ipdb").set_trace()
 
     return table
 
