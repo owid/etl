@@ -12,12 +12,12 @@ meta:
     https://www.who.int/data/gho/data/themes/topics/indicator-groups/legally-binding-controls-on-lead-paint
   source_published_by: Google Sheet
   source_data_url: 
-    gAAAAABkdteWb33L_1z04kqa6Qxyz8b_-RWl2f0uW45VyhfB6wO_qw-VYV-55YqV7LH0ZrP8Ab-jFfmDcXlIw_tSebqud1ZY0ShtQbFNKTB6tMKWf30G0UfvV9slpabWH_uUor4zTsMENEyJN4YLwWQmmuyfAtzwg56yEnZt_sfIk5pT0khdQ2-d5PDAXd_hhJxlYfGX46LkoEBdpdQYteihMOZDqfCTusHUEArH5MVy4xecvKWxYPE5dba7dbeWgvUyVfhv42JK
+    gAAAAABkdtlKFROfJmTTI0kiwMN8g8jqxKDp3ASIayEI6qExtGh9xRk0aUXmJdn_zeCoYYiZvEXU1-C9Tq1Sj8Ns9p9OeJkEHKkKcgPao-BejfizDpHeQo53bCy6w5fIC5uYrAcDlYA6BC5aT2Fbc7kGOQmcpbY1Uk0fX28vhS72IKJHI7bjK7wmvarQYzSj5_n7DI7uuxPG-uA71lKoVsyKSDzZ9xoc00qC3u9NwX6w-Ekp0u3xwbk16X6v7F-3lUgA5h8op-N2
   is_public: false
   version: latest
   publication_year: 2023
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 4dc8aba7f374bae5068d139db545cd8c
-  size: 3689
+- md5: 1699f03673a329af3bf555a0b4e6e8a0
+  size: 2935
   path: lead_paint_regulation_who.csv
