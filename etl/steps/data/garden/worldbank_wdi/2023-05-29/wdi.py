@@ -60,8 +60,10 @@ def run(dest_dir: str) -> None:
     tb_garden = Table(df)
     tb_garden.metadata = tb_meadow.metadata
 
+    log.info("wdi.add_variable_metadata")
     tb_garden = add_variable_metadata(tb_garden, ds_meadow.metadata.sources[0])
 
+    __import__("ipdb").set_trace()
     tb_omm = mk_omms(tb_garden)
     tb_garden2 = tb_garden.join(tb_omm, how="outer")
     tb_garden2.metadata = tb_garden.metadata
@@ -364,7 +366,7 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
 
     table.update_metadata_from_yaml(paths.metadata_path, "wdi")
 
-    __import__("ipdb").set_trace()
+    new_sources = set()
 
     # construct metadata for each variable
     for var_code in var_codes:
@@ -373,11 +375,10 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
         # retrieve clean source name, then construct source.
         source_raw_name = var["source"]
         clean_source = clean_source_mapping.get(source_raw_name)
+        if not clean_source:
+            new_sources.add(source_raw_name)
+        continue
         assert clean_source, f'`rawName` "{source_raw_name}" not found in wdi.sources.json'
-        assert table[var_code].metadata.to_dict() == {}, (
-            f"Expected metadata for variable {var_code} to be empty, but "
-            f"metadata is: {table[var_code].metadata.to_dict()}."
-        )
         source = Source(
             name=clean_source["name"],
             description=None,
@@ -390,16 +391,12 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
             publisher_source=clean_source["dataPublisherSource"],
         )
 
-        table[var_code].metadata = VariableMeta(
-            title=df_vars.loc[var_code, "indicator_name"],
-            description=create_description(var),
-            sources=[source],
-            unit=unit,
-            short_unit=short_unit,
-            display=display,
-            additional_info=None
-            # licenses=[var['license_type']]
-        )
+        table[var_code].metadata.description = create_description(var)
+        table[var_code].metadata.sources = [source]
+
+    for s in new_sources:
+        print(s)
+    raise NotImplemented()
 
     if not all([len(table[var_code].sources) == 1 for var_code in var_codes]):
         missing = [var_code for var_code in var_codes if len(table[var_code].sources) != 1]

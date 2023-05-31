@@ -468,9 +468,9 @@ tables:
         short_unit: '%'
         unit: '% of GNI'
       dc_oda_totl_kd:
-        title: Net ODA provided, total (constant 2015 US$)
+        title: Net ODA provided, total (constant 2020 US$)
         short_unit: $
-        unit: constant 2015 US$
+        unit: constant 2020 US$
       dt_dod_dect_cd:
         title: External debt stocks, total (DOD, current US$)
         short_unit: $
@@ -684,15 +684,15 @@ tables:
         short_unit: $
         unit: current US$
       dt_oda_alld_kd:
-        title: Net official development assistance and official aid received (constant 2018 US$)
+        title: Net official development assistance and official aid received (constant 2020 US$)
         short_unit: $
-        unit: constant 2018 US$
+        unit: constant 2020 US$
       dt_oda_oatl_cd:
         title: Net official aid received (current US$)
         short_unit: $
         unit: current US$
       dt_oda_oatl_kd:
-        title: Net official aid received (constant 2018 US$)
+        title: Net official aid received (constant 2020 US$)
       dt_oda_odat_cd:
         title: Net official development assistance received (current US$)
         short_unit: $
@@ -706,7 +706,7 @@ tables:
         short_unit: '%'
         unit: '% of GNI'
       dt_oda_odat_kd:
-        title: Net official development assistance received (constant 2018 US$)
+        title: Net official development assistance received (constant 2020 US$)
       dt_oda_odat_mp_zs:
         title: Net ODA received (% of imports of goods, services and primary income)
         short_unit: '%'
@@ -764,7 +764,7 @@ tables:
       eg_cft_accs_ur_zs:
         title: Access to clean fuels and technologies for cooking, urban (% of urban population)
       eg_cft_accs_zs:
-        title: Access to clean fuels and technologies for cooking  (% of population)
+        title: Access to clean fuels and technologies for cooking (% of population)
         short_unit: '%'
         unit: '% of population'
         display:
@@ -1776,14 +1776,8 @@ tables:
         title: Patent applications, residents
       ip_tmk_nrct:
         title: Trademark applications, nonresident, by count
-      ip_tmk_nres:
-        title: Trademark applications, direct nonresident
-      ip_tmk_resd:
-        title: Trademark applications, direct resident
       ip_tmk_rsct:
         title: Trademark applications, resident, by count
-      ip_tmk_totl:
-        title: Trademark applications, total
       iq_cpa_breg_xq:
         title: CPIA business regulatory environment rating (1=low to 6=high)
         unit: 1=low to 6=high
@@ -1865,7 +1859,7 @@ tables:
       iq_spi_pil2:
         title: 'Statistical performance indicators (SPI): Pillar 2 data services score (scale 0-100)'
       iq_spi_pil3:
-        title: 'Statistical performance indicators (SPI): Pillar 3 data products score  (scale 0-100)'
+        title: 'Statistical performance indicators (SPI): Pillar 3 data products score (scale 0-100)'
       iq_spi_pil4:
         title: 'Statistical performance indicators (SPI): Pillar 4 data sources score (scale 0-100)'
       iq_spi_pil5:
@@ -3334,7 +3328,7 @@ tables:
         unit: '% of women age 15-49'
       sg_dmk_srcr_fn_zs:
         title: Women making their own informed decisions regarding sexual relations, contraceptive use and reproductive health
-          care  (% of women age 15-49)
+          care (% of women age 15-49)
         short_unit: '%'
         unit: '% of women age 15-49'
       sg_gen_parl_zs:
@@ -3977,7 +3971,7 @@ tables:
         short_unit: '%'
         unit: '%'
       si_pov_dday:
-        title: Poverty headcount ratio at $1.90 a day (2011 PPP) (% of population)
+        title: Poverty headcount ratio at $2.15 a day (2017 PPP) (% of population)
         short_unit: '%'
         unit: '%'
         display:
@@ -3985,7 +3979,7 @@ tables:
           tolerance: 5
           isProjection: false
       si_pov_gaps:
-        title: Poverty gap at $1.90 a day (2011 PPP) (%)
+        title: Poverty gap at $2.15 a day (2017 PPP) (%)
         short_unit: '%'
         unit: '%'
       si_pov_gini:
@@ -3993,11 +3987,11 @@ tables:
         short_unit: '%'
         unit: '%'
       si_pov_lmic:
-        title: Poverty headcount ratio at $3.20 a day (2011 PPP) (% of population)
+        title: Poverty headcount ratio at $3.65 a day (2017 PPP) (% of population)
         short_unit: '%'
         unit: '%'
       si_pov_lmic_gp:
-        title: Poverty gap at $3.20 a day (2011 PPP) (%)
+        title: Poverty gap at $3.65 a day (2017 PPP) (%)
         short_unit: '%'
         unit: '%'
       si_pov_mdim:
@@ -4021,11 +4015,11 @@ tables:
         short_unit: '%'
         unit: '% of population'
       si_pov_umic:
-        title: Poverty headcount ratio at $5.50 a day (2011 PPP) (% of population)
+        title: Poverty headcount ratio at $6.85 a day (2017 PPP) (% of population)
         short_unit: '%'
         unit: '%'
       si_pov_umic_gp:
-        title: Poverty gap at $5.50 a day (2011 PPP) (%)
+        title: Poverty gap at $6.85 a day (2017 PPP) (%)
         short_unit: '%'
         unit: '%'
       si_rmt_cost_ib_zs:
@@ -4037,18 +4031,18 @@ tables:
         short_unit: '%'
         unit: '%'
       si_spr_pc40:
-        title: Survey mean consumption or income per capita, bottom 40% of population (2011 PPP $ per day)
+        title: Survey mean consumption or income per capita, bottom 40% of population (2017 PPP $ per day)
         short_unit: $
-        unit: 2011 PPP $
+        unit: 2017 PPP $
       si_spr_pc40_zg:
         title: Annualized average growth rate in per capita real survey mean consumption or income, bottom 40% of population
           (%)
         short_unit: '%'
         unit: '%'
       si_spr_pcap:
-        title: Survey mean consumption or income per capita, total population (2011 PPP $ per day)
+        title: Survey mean consumption or income per capita, total population (2017 PPP $ per day)
         short_unit: $
-        unit: 2011 PPP $
+        unit: 2017 PPP $
       si_spr_pcap_zg:
         title: Annualized average growth rate in per capita real survey mean consumption or income, total population (%)
         short_unit: '%'
@@ -5019,8 +5013,8 @@ tables:
         short_unit: '%'
         unit: '%'
       tm_uvi_mrch_xd_wd:
-        title: Import unit value index (2000 = 100)
-        unit: 2000 = 100
+        title: Import unit value index (2015 = 100)
+        unit: 2015 = 100
       tm_val_agri_zs_un:
         title: Agricultural raw materials imports (% of merchandise imports)
         short_unit: '%'
@@ -5134,8 +5128,8 @@ tables:
         title: Export volume index (2000 = 100)
         unit: 2000 = 100
       tx_uvi_mrch_xd_wd:
-        title: Export unit value index (2000 = 100)
-        unit: 2000 = 100
+        title: Export unit value index (2015 = 100)
+        unit: 2015 = 100
       tx_val_agri_zs_un:
         title: Agricultural raw materials exports (% of merchandise exports)
         short_unit: '%'
@@ -5266,27 +5260,27 @@ tables:
       vc_ihr_psrc_p5:
         title: Intentional homicides (per 100,000 people)
         unit: per 100,000 people
-      omm_urb_pop_slum:
-        title: Urban population living in slums
-      omm_urb_pop_nonslum:
-        title: Urban population not living in slums
-      omm_share_service_exports:
-        title: Share of services in total goods and services exports
-        short_unit: '%'
-        unit: '% of goods and services exports'
-      omm_merch_exp_share_gdp:
-        title: Merchandise exports as a share of GDP
-        short_unit: '%'
-        unit: '% of GDP'
-      omm_goods_exp_share_gdp:
-        title: Goods exports as a share of GDP
-        short_unit: '%'
-        unit: '% of GDP'
-      omm_tax_rev_percap:
-        title: Tax revenues per capita (current international $)
-        short_unit: $
-        unit: current international $
-      omm_net_savings_percap:
-        title: Adjusted net savings per capita, excluding particulate emission damage (current US$)
-        short_unit: $
-        unit: current US$
+      # omm_urb_pop_slum:
+      #   title: Urban population living in slums
+      # omm_urb_pop_nonslum:
+      #   title: Urban population not living in slums
+      # omm_share_service_exports:
+      #   title: Share of services in total goods and services exports
+      #   short_unit: '%'
+      #   unit: '% of goods and services exports'
+      # omm_merch_exp_share_gdp:
+      #   title: Merchandise exports as a share of GDP
+      #   short_unit: '%'
+      #   unit: '% of GDP'
+      # omm_goods_exp_share_gdp:
+      #   title: Goods exports as a share of GDP
+      #   short_unit: '%'
+      #   unit: '% of GDP'
+      # omm_tax_rev_percap:
+      #   title: Tax revenues per capita (current international $)
+      #   short_unit: $
+      #   unit: current international $
+      # omm_net_savings_percap:
+      #   title: Adjusted net savings per capita, excluding particulate emission damage (current US$)
+      #   short_unit: $
+      #   unit: current US$
