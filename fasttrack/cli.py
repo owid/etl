@@ -238,8 +238,6 @@ def app(dummy_data: bool, commit: bool) -> None:
         """
     ## Uploading Snapshot...
 
-    This may take up to a minute, please be patient. Performance fix is in the works.
-
     """
     )
     snapshot_path = fast_import.upload_snapshot()

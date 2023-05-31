@@ -1,14 +1,12 @@
+import json
 from pathlib import Path
 
 import pandas as pd
 from pandas.api.types import CategoricalDtype
 
-_countries = pd.read_csv(
-    Path(__file__).parent / "un_wpp.country_std.csv",
-    index_col="Country",
-)
+with open(Path(__file__).parent / "un_wpp.countries.json") as f:
+    countries = sorted(set(json.load(f).values()))
 
-countries = sorted(set(_countries["Our World In Data Name"].tolist()))
 metrics = {
     "birth_rate",
     "births",
