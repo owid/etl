@@ -1,6 +1,8 @@
 tables:
   wdi:
     variables:
+      ag_agr_trac_no:
+        title: Agricultural machinery, tractors
       ag_con_fert_pt_zs:
         title: Fertilizer consumption (% of fertilizer production)
         short_unit: '%'
@@ -87,6 +89,8 @@ tables:
         title: Urban land area (sq. km)
         short_unit: sq. km
         unit: sq. km
+      ag_lnd_trac_zs:
+        title: Agricultural machinery, tractors per 100 sq. km of arable land
       ag_prd_crel_mt:
         title: Cereal production (metric tons)
         unit: metric tons
@@ -311,6 +315,8 @@ tables:
         title: Market capitalization of listed domestic companies (% of GDP)
         short_unit: '%'
         unit: '% of GDP'
+      cm_mkt_ldom_no:
+        title: Listed domestic companies, total
       cm_mkt_trad_cd:
         title: Stocks traded, total value (current US$)
         short_unit: $
@@ -379,6 +385,8 @@ tables:
         title: Net bilateral aid flows from DAC donors, Greece (current US$)
         short_unit: $
         unit: current US$
+      dc_dac_hunl_cd:
+        title: Net bilateral aid flows from DAC donors, Hungary (current US$)
       dc_dac_irll_cd:
         title: Net bilateral aid flows from DAC donors, Ireland (current US$)
         short_unit: $
@@ -643,6 +651,8 @@ tables:
         title: Net official flows from UN agencies, UNECE (current US$)
         short_unit: $
         unit: current US$
+      dt_nfl_unep_cd:
+        title: Net official flows from UN agencies, UNEP (current US$)
       dt_nfl_unfp_cd:
         title: Net official flows from UN agencies, UNFPA (current US$)
         short_unit: $
@@ -659,6 +669,8 @@ tables:
         title: Net official flows from UN agencies, UNTA (current US$)
         short_unit: $
         unit: current US$
+      dt_nfl_unwt_cd:
+        title: Net official flows from UN agencies, UNWTO (current US$)
       dt_nfl_wfpg_cd:
         title: Net official flows from UN agencies, WFP (current US$)
         short_unit: $
@@ -679,6 +691,8 @@ tables:
         title: Net official aid received (current US$)
         short_unit: $
         unit: current US$
+      dt_oda_oatl_kd:
+        title: Net official aid received (constant 2018 US$)
       dt_oda_odat_cd:
         title: Net official development assistance received (current US$)
         short_unit: $
@@ -691,6 +705,8 @@ tables:
         title: Net ODA received (% of GNI)
         short_unit: '%'
         unit: '% of GNI'
+      dt_oda_odat_kd:
+        title: Net official development assistance received (constant 2018 US$)
       dt_oda_odat_mp_zs:
         title: Net ODA received (% of imports of goods, services and primary income)
         short_unit: '%'
@@ -743,12 +759,18 @@ tables:
         title: Multilateral debt service (% of public and publicly guaranteed debt service)
         short_unit: '%'
         unit: '% of public and publicly guaranteed debt service'
+      eg_cft_accs_ru_zs:
+        title: Access to clean fuels and technologies for cooking, rural (% of rural population)
+      eg_cft_accs_ur_zs:
+        title: Access to clean fuels and technologies for cooking, urban (% of urban population)
       eg_cft_accs_zs:
         title: Access to clean fuels and technologies for cooking  (% of population)
         short_unit: '%'
         unit: '% of population'
         display:
           name: Access to clean fuels and technologies for cooking
+      eg_egy_prim_pp_kd:
+        title: Energy intensity level of primary energy (MJ/$2017 PPP GDP)
       eg_elc_accs_ru_zs:
         title: Access to electricity, rural (% of rural population)
         short_unit: '%'
@@ -975,6 +997,8 @@ tables:
       en_atm_sf6g_kt_ce:
         title: SF6 gas emissions (thousand metric tons of CO2 equivalent)
         unit: thousand metric tons of CO2 equivalent
+      en_bir_thrd_no:
+        title: Bird species, threatened
       en_clc_drsk_xq:
         title: Disaster risk reduction progress score (1-5 scale; 5=best)
         unit: 1-5 scale; 5=best
@@ -1006,10 +1030,14 @@ tables:
         title: CO2 emissions from transport (% of total fuel combustion)
         short_unit: '%'
         unit: '% of total fuel combustion'
+      en_fsh_thrd_no:
+        title: Fish species, threatened
       en_hpt_thrd_no:
         title: Plant species (higher), threatened
         short_unit: higher
         unit: higher
+      en_mam_thrd_no:
+        title: Mammal species, threatened
       en_pop_dnst:
         title: Population density (people per sq. km of land area)
         short_unit: people
@@ -1030,10 +1058,14 @@ tables:
         title: Population living in slums (% of urban population)
         short_unit: '%'
         unit: '% of urban population'
+      en_urb_lcty:
+        title: Population in largest city
       en_urb_lcty_ur_zs:
         title: Population in the largest city (% of urban population)
         short_unit: '%'
         unit: '% of urban population'
+      en_urb_mcty:
+        title: Population in urban agglomerations of more than 1 million
       en_urb_mcty_tl_zs:
         title: Population in urban agglomerations of more than 1 million (% of total population)
         short_unit: '%'
@@ -1071,6 +1103,8 @@ tables:
         title: Annual freshwater withdrawals, industry (% of total freshwater withdrawal)
         short_unit: '%'
         unit: '% of total freshwater withdrawal'
+      er_h2o_fwst_zs:
+        title: 'Level of water stress: freshwater withdrawal as a proportion of available freshwater resources'
       er_h2o_fwtl_k3:
         title: Annual freshwater withdrawals, total (billion cubic meters)
         unit: billion cubic meters
@@ -1132,6 +1166,8 @@ tables:
         title: Total reserves (% of total external debt)
         short_unit: '%'
         unit: '% of total external debt'
+      fi_res_totl_mo:
+        title: Total reserves in months of imports
       fi_res_xgld_cd:
         title: Total reserves minus gold (current US$)
         short_unit: $
@@ -1150,6 +1186,8 @@ tables:
       fm_ast_nfrg_cn:
         title: Net foreign assets (current LCU)
         unit: current LCU
+      fm_ast_prvt_gd_zs:
+        title: Monetary Sector credit to private sector (% GDP)
       fm_ast_prvt_zg_m3:
         title: Claims on private sector (annual growth as % of broad money)
         short_unit: '%'
@@ -1163,6 +1201,8 @@ tables:
         title: Broad money (% of GDP)
         short_unit: '%'
         unit: '% of GDP'
+      fm_lbl_bmny_ir_zs:
+        title: Broad money to total reserves ratio
       fm_lbl_bmny_zg:
         title: Broad money growth (annual %)
         short_unit: '%'
@@ -1421,6 +1461,8 @@ tables:
         title: Subsidies and other transfers (% of expense)
         short_unit: '%'
         unit: '% of expense'
+      gf_xpd_budg_zs:
+        title: Primary government expenditures as a proportion of original approved budget (%)
       hd_hci_ovrl:
         title: Human capital index (HCI) (scale 0-1)
         unit: scale 0-1
@@ -1722,6 +1764,26 @@ tables:
         title: Public private partnerships investment in water and sanitation (current US$)
         short_unit: $
         unit: current US$
+      ip_ids_nrct:
+        title: Industrial design applications, nonresident, by count
+      ip_ids_rsct:
+        title: Industrial design applications, resident, by count
+      ip_jrn_artc_sc:
+        title: Scientific and technical journal articles
+      ip_pat_nres:
+        title: Patent applications, nonresidents
+      ip_pat_resd:
+        title: Patent applications, residents
+      ip_tmk_nrct:
+        title: Trademark applications, nonresident, by count
+      ip_tmk_nres:
+        title: Trademark applications, direct nonresident
+      ip_tmk_resd:
+        title: Trademark applications, direct resident
+      ip_tmk_rsct:
+        title: Trademark applications, resident, by count
+      ip_tmk_totl:
+        title: Trademark applications, total
       iq_cpa_breg_xq:
         title: CPIA business regulatory environment rating (1=low to 6=high)
         unit: 1=low to 6=high
@@ -1788,15 +1850,33 @@ tables:
       iq_sci_mthd:
         title: Methodology assessment of statistical capacity (scale 0 - 100)
         unit: scale 0 - 100
+      iq_sci_ovrl:
+        title: Statistical Capacity Score (Overall Average) (scale 0 - 100)
       iq_sci_prdc:
         title: Periodicity and timeliness assessment of statistical capacity (scale 0 - 100)
         unit: scale 0 - 100
       iq_sci_srce:
         title: Source data assessment of statistical capacity (scale 0 - 100)
         unit: scale 0 - 100
+      iq_spi_ovrl:
+        title: 'Statistical performance indicators (SPI): Overall score (scale 0-100)'
+      iq_spi_pil1:
+        title: 'Statistical performance indicators (SPI): Pillar 1 data use score (scale 0-100)'
+      iq_spi_pil2:
+        title: 'Statistical performance indicators (SPI): Pillar 2 data services score (scale 0-100)'
+      iq_spi_pil3:
+        title: 'Statistical performance indicators (SPI): Pillar 3 data products score  (scale 0-100)'
+      iq_spi_pil4:
+        title: 'Statistical performance indicators (SPI): Pillar 4 data sources score (scale 0-100)'
+      iq_spi_pil5:
+        title: 'Statistical performance indicators (SPI): Pillar 5 data infrastructure score (scale 0-100)'
+      is_air_dprt:
+        title: Air transport, registered carrier departures worldwide
       is_air_good_mt_k1:
         title: Air transport, freight (million ton-km)
         unit: million ton-km
+      is_air_psgr:
+        title: Air transport, passengers carried
       is_rrs_good_mt_k6:
         title: Railways, goods transported (million ton-km)
         unit: million ton-km
@@ -1819,12 +1899,18 @@ tables:
       it_cel_sets_p2:
         title: Mobile cellular subscriptions (per 100 people)
         unit: per 100 people
+      it_mlt_main:
+        title: Fixed telephone subscriptions
       it_mlt_main_p2:
         title: Fixed telephone subscriptions (per 100 people)
         unit: per 100 people
+      it_net_bbnd:
+        title: Fixed broadband subscriptions
       it_net_bbnd_p2:
         title: Fixed broadband subscriptions (per 100 people)
         unit: per 100 people
+      it_net_secr:
+        title: Secure Internet servers
       it_net_secr_p6:
         title: Secure Internet servers (per 1 million people)
         unit: per 1 million people
@@ -1865,6 +1951,8 @@ tables:
       ms_mil_mprt_kd:
         title: Arms imports (SIPRI trend indicator values)
         unit: SIPRI trend indicator values
+      ms_mil_totl_p1:
+        title: Armed forces personnel, total
       ms_mil_totl_tf_zs:
         title: Armed forces personnel (% of total labor force)
         short_unit: '%'
@@ -1908,6 +1996,20 @@ tables:
         title: General government final consumption expenditure (% of GDP)
         short_unit: '%'
         unit: '% of GDP'
+      ne_con_prvt_cd:
+        title: Household and NPISHs Final consumption expenditure (current US$)
+      ne_con_prvt_cn:
+        title: Household and NPISHs Final consumption expenditure (current LCU)
+      ne_con_prvt_cn_ad:
+        title: 'Households and NPISHs final consumption expenditure: linked series (current LCU)'
+      ne_con_prvt_kd:
+        title: Households and NPISHs Final consumption expenditure (constant 2015 US$)
+      ne_con_prvt_kd_zg:
+        title: Household and NPISHs Final consumption expenditure (annual % growth)
+      ne_con_prvt_kn:
+        title: Household and NPISHs Final consumption expenditure (constant LCU)
+      ne_con_prvt_pc_kd:
+        title: Households and NPISHs final consumption expenditure per capita (constant 2015 US$)
       ne_con_prvt_pc_kd_zg:
         title: Household final consumption expenditure per capita growth (annual %)
         short_unit: '%'
@@ -1916,6 +2018,8 @@ tables:
         title: Households and NPISHs Final consumption expenditure, PPP (current international $)
         short_unit: $
         unit: current international $
+      ne_con_prvt_pp_kd:
+        title: Households and NPISHs Final consumption expenditure, PPP (constant 2017 international $)
       ne_con_prvt_zs:
         title: Households and NPISHs final consumption expenditure (% of GDP)
         short_unit: '%'
@@ -2086,6 +2190,8 @@ tables:
         title: Trade (% of GDP)
         short_unit: '%'
         unit: '% of GDP'
+      nv_agr_empl_kd:
+        title: Agriculture, forestry, and fishing, value added per worker (constant 2015 US$)
       nv_agr_totl_cd:
         title: Agriculture, forestry, and fishing, value added (current US$)
         short_unit: $
@@ -2093,6 +2199,8 @@ tables:
       nv_agr_totl_cn:
         title: Agriculture, forestry, and fishing, value added (current LCU)
         unit: current LCU
+      nv_agr_totl_kd:
+        title: Agriculture, forestry, and fishing, value added (constant 2015 US$)
       nv_agr_totl_kd_zg:
         title: Agriculture, forestry, and fishing, value added (annual % growth)
         short_unit: '%'
@@ -2110,6 +2218,8 @@ tables:
       nv_fsm_totl_kn:
         title: Financial intermediary services indirectly Measured (FISIM) (constant LCU)
         unit: constant LCU
+      nv_ind_empl_kd:
+        title: Industry (including construction), value added per worker (constant 2015 US$)
       nv_ind_manf_cd:
         title: Manufacturing, value added (current US$)
         short_unit: $
@@ -2139,6 +2249,8 @@ tables:
       nv_ind_totl_cn:
         title: Industry (including construction), value added (current LCU)
         unit: current LCU
+      nv_ind_totl_kd:
+        title: Industry (including construction), value added (constant 2015 US$)
       nv_ind_totl_kd_zg:
         title: Industry (including construction), value added (annual % growth)
         short_unit: '%'
@@ -2166,6 +2278,8 @@ tables:
         title: Other manufacturing (% of value added in manufacturing)
         short_unit: '%'
         unit: '% of value added in manufacturing'
+      nv_mnf_tech_zs_un:
+        title: Medium and high-tech manufacturing value added (% manufacturing value added)
       nv_mnf_txtl_zs_un:
         title: Textiles and clothing (% of value added in manufacturing)
         short_unit: '%'
@@ -2342,6 +2456,8 @@ tables:
       ny_gdp_fcst_cn:
         title: Gross value added at basic prices (GVA) (current LCU)
         unit: current LCU
+      ny_gdp_fcst_kd:
+        title: Gross value added at basic prices (GVA) (constant 2015 US$)
       ny_gdp_fcst_kn:
         title: Gross value added at basic prices (GVA) (constant LCU)
         unit: constant LCU
@@ -2453,6 +2569,8 @@ tables:
       ny_gnp_mktp_cn:
         title: GNI (current LCU)
         unit: current LCU
+      ny_gnp_mktp_cn_ad:
+        title: 'GNI: linked series (current LCU)'
       ny_gnp_mktp_kd:
         title: GNI (constant 2015 US$)
         short_unit: $
@@ -2729,6 +2847,8 @@ tables:
         title: Preprimary education, duration (years)
         short_unit: years
         unit: years
+      se_pre_enrl_tc_zs:
+        title: Pupil-teacher ratio, preprimary
       se_pre_enrr:
         title: School enrollment, preprimary (% gross)
         short_unit: '%'
@@ -2782,10 +2902,14 @@ tables:
         title: Primary education, duration (years)
         short_unit: years
         unit: years
+      se_prm_enrl:
+        title: Primary education, pupils
       se_prm_enrl_fe_zs:
         title: Primary education, pupils (% female)
         short_unit: '%'
         unit: '% female'
+      se_prm_enrl_tc_zs:
+        title: Pupil-teacher ratio, primary
       se_prm_enrr:
         title: School enrollment, primary (% gross)
         short_unit: '%'
@@ -2898,6 +3022,8 @@ tables:
         title: Trained teachers in primary education (% of total teachers)
         short_unit: '%'
         unit: '% of total teachers'
+      se_prm_tchr:
+        title: Primary education, teachers
       se_prm_tchr_fe_zs:
         title: Primary education, teachers (% female)
         short_unit: '%'
@@ -2914,10 +3040,16 @@ tables:
         title: Adjusted net enrollment rate, primary, male (% of primary school age children)
         short_unit: '%'
         unit: '% of primary school age children'
+      se_prm_uner:
+        title: Children out of school, primary
+      se_prm_uner_fe:
+        title: Children out of school, primary, female
       se_prm_uner_fe_zs:
         title: Children out of school, female (% of female primary school age)
         short_unit: '%'
         unit: '% of female primary school age'
+      se_prm_uner_ma:
+        title: Children out of school, primary, male
       se_prm_uner_ma_zs:
         title: Children out of school, male (% of male primary school age)
         short_unit: '%'
@@ -2973,14 +3105,26 @@ tables:
         title: Secondary education, duration (years)
         short_unit: years
         unit: years
+      se_sec_enrl:
+        title: Secondary education, pupils
       se_sec_enrl_fe_zs:
         title: Secondary education, pupils (% female)
         short_unit: '%'
         unit: '% female'
+      se_sec_enrl_gc:
+        title: Secondary education, general pupils
       se_sec_enrl_gc_fe_zs:
         title: Secondary education, general pupils (% female)
         short_unit: '%'
         unit: '% female'
+      se_sec_enrl_lo_tc_zs:
+        title: Pupil-teacher ratio, lower secondary
+      se_sec_enrl_tc_zs:
+        title: Pupil-teacher ratio, secondary
+      se_sec_enrl_up_tc_zs:
+        title: Pupil-teacher ratio, upper secondary
+      se_sec_enrl_vo:
+        title: Secondary education, vocational pupils
       se_sec_enrl_vo_fe_zs:
         title: Secondary education, vocational pupils (% female)
         short_unit: '%'
@@ -3061,6 +3205,10 @@ tables:
         title: Trained teachers in secondary education (% of total teachers)
         short_unit: '%'
         unit: '% of total teachers'
+      se_sec_tchr:
+        title: Secondary education, teachers
+      se_sec_tchr_fe:
+        title: Secondary education, teachers, female
       se_sec_tchr_fe_zs:
         title: Secondary education, teachers (% female)
         short_unit: '%'
@@ -3113,6 +3261,8 @@ tables:
       se_ter_cuat_st_zs:
         title: Educational attainment, at least completed short-cycle tertiary, population 25+, total (%) (cumulative)
         unit: cumulative
+      se_ter_enrl_tc_zs:
+        title: Pupil-teacher ratio, tertiary
       se_ter_enrr:
         title: School enrollment, tertiary (% gross)
         short_unit: '%'
@@ -3191,6 +3341,8 @@ tables:
         title: Proportion of seats held by women in national parliaments (%)
         short_unit: '%'
         unit: '%'
+      sg_law_indx:
+        title: Women Business and the Law Index Score (scale 1-100)
       sg_tim_uwrk_fe:
         title: Proportion of time spent on unpaid domestic and care work, female (% of 24 hour day)
         short_unit: '%'
@@ -3228,11 +3380,17 @@ tables:
         title: Women who believe a husband is justified in beating his wife when she refuses sex with him (%)
         short_unit: '%'
         unit: '%'
+      sh_alc_pcap_fe_li:
+        title: Total alcohol consumption per capita, female (liters of pure alcohol, projected estimates, female 15+ years
+          of age)
       sh_alc_pcap_li:
         title: Total alcohol consumption per capita (liters of pure alcohol, projected estimates, 15+ years of age)
         unit: liters of pure alcohol, projected estimates, 15+ years of age
         display:
           name: Alcohol consumption
+      sh_alc_pcap_ma_li:
+        title: Total alcohol consumption per capita, male (liters of pure alcohol, projected estimates, male 15+ years of
+          age)
       sh_anm_allw_zs:
         title: Prevalence of anemia among women of reproductive age (% of women ages 15-49)
         short_unit: '%'
@@ -3253,18 +3411,40 @@ tables:
         title: Condom use, population ages 15-24, male (% of males ages 15-24)
         short_unit: '%'
         unit: '% of males ages 15-24'
+      sh_dth_0509:
+        title: Number of deaths ages 5-9 years
+      sh_dth_1014:
+        title: Number of deaths ages 10-14 years
+      sh_dth_1519:
+        title: Number of deaths ages 15-19 years
+      sh_dth_2024:
+        title: Number of deaths ages 20-24 years
       sh_dth_comm_zs:
         title: Cause of death, by communicable diseases and maternal, prenatal and nutrition conditions (% of total)
         short_unit: '%'
         unit: '% of total'
+      sh_dth_imrt:
+        title: Number of infant deaths
       sh_dth_injr_zs:
         title: Cause of death, by injury (% of total)
         short_unit: '%'
         unit: '% of total'
+      sh_dth_mort:
+        title: Number of under-five deaths
       sh_dth_ncom_zs:
         title: Cause of death, by non-communicable diseases (% of total)
         short_unit: '%'
         unit: '% of total'
+      sh_dth_nmrt:
+        title: Number of neonatal deaths
+      sh_dyn_0509:
+        title: Probability of dying among children ages 5-9 years (per 1,000)
+      sh_dyn_1014:
+        title: Probability of dying among adolescents ages 10-14 years (per 1,000)
+      sh_dyn_1519:
+        title: Probability of dying among adolescents ages 15-19 years (per 1,000)
+      sh_dyn_2024:
+        title: Probability of dying among youth ages 20-24 years (per 1,000)
       sh_dyn_aids_fe_zs:
         title: Women's share of population ages 15+ living with HIV (%)
         short_unit: '%'
@@ -3291,6 +3471,10 @@ tables:
           name: Child mortality rate of boys
           tolerance: 5
           conversionFactor: 0.1
+      sh_dyn_ncom_fe_zs:
+        title: Mortality from CVD, cancer, diabetes or CRD between exact ages 30 and 70, female (%)
+      sh_dyn_ncom_ma_zs:
+        title: Mortality from CVD, cancer, diabetes or CRD between exact ages 30 and 70, male (%)
       sh_dyn_ncom_zs:
         title: Mortality from CVD, cancer, diabetes or CRD between exact ages 30 and 70 (%)
         short_unit: '%'
@@ -3352,6 +3536,12 @@ tables:
       sh_hiv_incd_tl:
         title: Adults (ages 15+) and children (ages 0-14) newly infected with HIV
         unit: ages 0-14
+      sh_hiv_incd_tl_p3:
+        title: Incidence of HIV, all (per 1,000 uninfected population)
+      sh_hiv_incd_yg:
+        title: Young people (ages 15-24) newly infected with HIV
+      sh_hiv_incd_yg_p3:
+        title: Incidence of HIV, ages 15-24 (per 1,000 uninfected population ages 15-24)
       sh_hiv_incd_zs:
         title: Incidence of HIV, ages 15-49 (per 1,000 uninfected population ages 15-49)
         short_unit: '%'
@@ -3398,6 +3588,8 @@ tables:
         title: Children with fever receiving antimalarial drugs (% of children under age 5 with fever)
         short_unit: '%'
         unit: '% of children under age 5 with fever'
+      sh_mmr_dths:
+        title: Number of maternal deaths
       sh_mmr_risk:
         title: 'Lifetime risk of maternal death (1 in: rate varies by country)'
         unit: '1 in: rate varies by country'
@@ -3434,6 +3626,12 @@ tables:
       sh_sgr_proc_p5:
         title: Number of surgical procedures (per 100,000 population)
         unit: per 100,000 population
+      sh_sta_airp_fe_p5:
+        title: Mortality rate attributed to household and ambient air pollution, age-standardized, female (per 100,000 female
+          population)
+      sh_sta_airp_ma_p5:
+        title: Mortality rate attributed to household and ambient air pollution, age-standardized, male (per 100,000 male
+          population)
       sh_sta_airp_p5:
         title: Mortality rate attributed to household and ambient air pollution, age-standardized (per 100,000 population)
         unit: per 100,000 population
@@ -3537,6 +3735,8 @@ tables:
         title: Prevalence of overweight, weight for height, male (% of children under 5)
         short_unit: '%'
         unit: '% of children under 5'
+      sh_sta_owgh_me_zs:
+        title: Prevalence of overweight (modeled estimate, % of children under 5)
       sh_sta_owgh_zs:
         title: Prevalence of overweight, weight for height (% of children under 5)
         short_unit: '%'
@@ -3554,6 +3754,8 @@ tables:
         title: People using safely managed sanitation services, rural (% of rural population)
         short_unit: '%'
         unit: '% of rural population'
+      sh_sta_smss_ur_zs:
+        title: People using safely managed sanitation services, urban (% of urban population)
       sh_sta_smss_zs:
         title: People using safely managed sanitation services (% of population)
         short_unit: '%'
@@ -3566,10 +3768,16 @@ tables:
         title: Prevalence of stunting, height for age, male (% of children under 5)
         short_unit: '%'
         unit: '% of children under 5'
+      sh_sta_stnt_me_zs:
+        title: Prevalence of stunting, height for age (modeled estimate, % of children under 5)
       sh_sta_stnt_zs:
         title: Prevalence of stunting, height for age (% of children under 5)
         short_unit: '%'
         unit: '% of children under 5'
+      sh_sta_suic_fe_p5:
+        title: Suicide mortality rate, female (per 100,000 female population)
+      sh_sta_suic_ma_p5:
+        title: Suicide mortality rate, male (per 100,000 male population)
       sh_sta_suic_p5:
         title: Suicide mortality rate (per 100,000 population)
         unit: per 100,000 population
@@ -3650,16 +3858,22 @@ tables:
           (%)
         short_unit: '%'
         unit: '%'
+      sh_uhc_oopc_10_to:
+        title: Number of people spending more than 10% of household consumption or income on out-of-pocket health care expenditure
       sh_uhc_oopc_10_zs:
         title: Proportion of population spending more than 10% of household consumption or income on out-of-pocket health
           care expenditure (%)
         short_unit: '%'
         unit: '%'
+      sh_uhc_oopc_25_to:
+        title: Number of people spending more than 25% of household consumption or income on out-of-pocket health care expenditure
       sh_uhc_oopc_25_zs:
         title: Proportion of population spending more than 25% of household consumption or income on out-of-pocket health
           care expenditure (%)
         short_unit: '%'
         unit: '%'
+      sh_uhc_srvs_cv_xd:
+        title: UHC service coverage index
       sh_vac_ttns_zs:
         title: Newborns protected against tetanus (%)
         short_unit: '%'
@@ -3752,6 +3966,8 @@ tables:
         title: Income share held by highest 10%
         short_unit: '%'
         unit: '%'
+      si_dst_50md:
+        title: Proportion of people living below 50 percent of median income (%)
       si_dst_frst_10:
         title: Income share held by lowest 10%
         short_unit: '%'
@@ -3784,6 +4000,22 @@ tables:
         title: Poverty gap at $3.20 a day (2011 PPP) (%)
         short_unit: '%'
         unit: '%'
+      si_pov_mdim:
+        title: Multidimensional poverty headcount ratio (% of total population)
+      si_pov_mdim_17:
+        title: Multidimensional poverty headcount ratio, children (% of child population)
+      si_pov_mdim_17_xq:
+        title: Multidimensional poverty index, children (scale 0-1)
+      si_pov_mdim_fe:
+        title: Multidimensional poverty headcount ratio, female (% of female population)
+      si_pov_mdim_hh:
+        title: Multidimensional poverty headcount ratio, household (% of total households)
+      si_pov_mdim_it:
+        title: Multidimensional poverty intensity
+      si_pov_mdim_ma:
+        title: Multidimensional poverty headcount ratio, male (% of male population)
+      si_pov_mdim_xq:
+        title: Multidimensional poverty index (scale 0-1)
       si_pov_nahc:
         title: Poverty headcount ratio at national poverty lines (% of population)
         short_unit: '%'
@@ -4162,6 +4394,8 @@ tables:
         title: Labor force, female (% of total labor force)
         short_unit: '%'
         unit: '% of total labor force'
+      sl_tlf_totl_in:
+        title: Labor force, total
       sl_uem_1524_fe_ne_zs:
         title: Unemployment, youth female (% of female labor force ages 15-24) (national estimate)
         unit: national estimate
@@ -4258,6 +4492,14 @@ tables:
         title: Children in employment, wage workers (% of children in employment, ages 7-14)
         short_unit: '%'
         unit: '% of children in employment, ages 7-14'
+      sm_pop_netm:
+        title: Net migration
+      sm_pop_refg:
+        title: Refugee population by country or territory of asylum
+      sm_pop_refg_or:
+        title: Refugee population by country or territory of origin
+      sm_pop_totl:
+        title: International migrant stock, total
       sm_pop_totl_zs:
         title: International migrant stock (% of population)
         short_unit: '%'
@@ -4268,10 +4510,14 @@ tables:
         unit: '% of population'
         display:
           numDecimalPlaces: 1
+      sn_itk_msfi_zs:
+        title: Prevalence of moderate or severe food insecurity in the population (%)
       sn_itk_salt_zs:
         title: Consumption of iodized salt (% of households)
         short_unit: '%'
         unit: '% of households'
+      sn_itk_svfi_zs:
+        title: Prevalence of severe food insecurity in the population (%)
       sn_itk_vita_zs:
         title: Vitamin A supplementation coverage rate (% of children ages 6-59 months)
         short_unit: '%'
@@ -4361,14 +4607,20 @@ tables:
         title: Population ages 00-04, male (% of male population)
         short_unit: '%'
         unit: '% of male population'
+      sp_pop_0014_fe_in:
+        title: Population ages 0-14, female
       sp_pop_0014_fe_zs:
         title: Population ages 0-14, female (% of female population)
         short_unit: '%'
         unit: '% of total'
+      sp_pop_0014_ma_in:
+        title: Population ages 0-14, male
       sp_pop_0014_ma_zs:
         title: Population ages 0-14, male (% of male population)
         short_unit: '%'
         unit: '% of total'
+      sp_pop_0014_to:
+        title: Population ages 0-14, total
       sp_pop_0014_to_zs:
         title: Population ages 0-14 (% of total population)
         short_unit: '%'
@@ -4397,14 +4649,20 @@ tables:
         title: Population ages 15-19, male (% of male population)
         short_unit: '%'
         unit: '% of male population'
+      sp_pop_1564_fe_in:
+        title: Population ages 15-64, female
       sp_pop_1564_fe_zs:
         title: Population ages 15-64, female (% of female population)
         short_unit: '%'
         unit: '% of total'
+      sp_pop_1564_ma_in:
+        title: Population ages 15-64, male
       sp_pop_1564_ma_zs:
         title: Population ages 15-64, male (% of male population)
         short_unit: '%'
         unit: '% of total'
+      sp_pop_1564_to:
+        title: Population ages 15-64, total
       sp_pop_1564_to_zs:
         title: Population ages 15-64 (% of total population)
         short_unit: '%'
@@ -4489,14 +4747,20 @@ tables:
         title: Population ages 65-69, male (% of male population)
         short_unit: '%'
         unit: '% of male population'
+      sp_pop_65up_fe_in:
+        title: Population ages 65 and above, female
       sp_pop_65up_fe_zs:
         title: Population ages 65 and above, female (% of female population)
         short_unit: '%'
         unit: '% of total'
+      sp_pop_65up_ma_in:
+        title: Population ages 65 and above, male
       sp_pop_65up_ma_zs:
         title: Population ages 65 and above, male (% of male population)
         short_unit: '%'
         unit: '% of total'
+      sp_pop_65up_to:
+        title: Population ages 65 and above, total
       sp_pop_65up_to_zs:
         title: Population ages 65 and above (% of total population)
         short_unit: '%'
@@ -4553,10 +4817,16 @@ tables:
       sp_pop_tech_rd_p6:
         title: Technicians in R&D (per million people)
         unit: per million people
+      sp_pop_totl:
+        title: Population, total
+      sp_pop_totl_fe_in:
+        title: Population, female
       sp_pop_totl_fe_zs:
         title: Population, female (% of total population)
         short_unit: '%'
         unit: '% of total'
+      sp_pop_totl_ma_in:
+        title: Population, male
       sp_pop_totl_ma_zs:
         title: Population, male (% of total population)
         short_unit: '%'
@@ -4585,6 +4855,8 @@ tables:
         title: Completeness of death registration with cause-of-death information (%)
         short_unit: '%'
         unit: '%'
+      sp_rur_totl:
+        title: Rural population
       sp_rur_totl_zg:
         title: Rural population growth (annual %)
         short_unit: '%'
@@ -4597,6 +4869,8 @@ tables:
         title: Urban population growth (annual %)
         short_unit: '%'
         unit: annual %
+      sp_urb_totl:
+        title: Urban population
       sp_urb_totl_in_zs:
         title: Urban population (% of total population)
         short_unit: '%'
@@ -4605,6 +4879,10 @@ tables:
         title: Unmet need for contraception (% of married women ages 15-49)
         short_unit: '%'
         unit: '% of married women ages 15-49'
+      st_int_arvl:
+        title: International tourism, number of arrivals
+      st_int_dprt:
+        title: International tourism, number of departures
       st_int_rcpt_cd:
         title: International tourism, receipts (current US$)
         short_unit: $
@@ -4988,6 +5266,10 @@ tables:
       vc_ihr_psrc_p5:
         title: Intentional homicides (per 100,000 people)
         unit: per 100,000 people
+      omm_urb_pop_slum:
+        title: Urban population living in slums
+      omm_urb_pop_nonslum:
+        title: Urban population not living in slums
       omm_share_service_exports:
         title: Share of services in total goods and services exports
         short_unit: '%'

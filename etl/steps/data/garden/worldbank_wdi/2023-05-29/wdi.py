@@ -22,10 +22,6 @@ from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 from etl.paths import DATA_DIR
 
-from .variable_matcher import VariableMatcher
-
-COUNTRY_MAPPING_PATH = (Path(__file__).parent / "wdi.country_mapping.json").as_posix()
-
 log = structlog.get_logger()
 
 # Get paths and naming conventions for current step.
@@ -56,13 +52,15 @@ def run(dest_dir: str) -> None:
     assert all([col in df.columns for col in df_cust.columns])
     df = pd.concat([df, df_cust], axis=0)
 
+    # move this to the end
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
 
+    # move this to the end
     tb_garden = Table(df)
     tb_garden.metadata = tb_meadow.metadata
 
-    tb_garden = add_variable_metadata(tb_garden)
+    tb_garden = add_variable_metadata(tb_garden, ds_meadow.metadata.sources[0])
 
     tb_omm = mk_omms(tb_garden)
     tb_garden2 = tb_garden.join(tb_omm, how="outer")
@@ -342,13 +340,8 @@ def mk_custom_entities(df: pd.DataFrame) -> pd.DataFrame:
     return df_cust
 
 
-def add_variable_metadata(table: Table) -> Table:
-    var_codes = table.columns.tolist()
-
-    # metadata from snapshot
+def load_variable_metadata() -> pd.DataFrame:
     snap = paths.load_snapshot_dependency()
-
-    # Load data from snapshot.
     zf = zipfile.ZipFile(snap.path)
     df_vars = pd.read_csv(zf.open("WDISeries.csv"))
 
@@ -356,51 +349,26 @@ def add_variable_metadata(table: Table) -> Table:
     df_vars.columns = df_vars.columns.map(underscore)
     df_vars.rename(columns={"series_code": "indicator_code"}, inplace=True)
     df_vars["indicator_code"] = df_vars["indicator_code"].apply(underscore)
-    df_vars = df_vars.query("indicator_code in @var_codes").set_index("indicator_code", verify_integrity=True)
 
     df_vars["indicator_name"] = df_vars["indicator_name"].str.replace(r"\s+", " ", regex=True)
+
+    return df_vars.set_index("indicator_code")
+
+
+def add_variable_metadata(table: Table, ds_source: Source) -> Table:
+    var_codes = table.columns.tolist()
+
+    df_vars = load_variable_metadata()
+
     clean_source_mapping = load_clean_source_mapping()
 
+    table.update_metadata_from_yaml(paths.metadata_path, "wdi")
+
+    __import__("ipdb").set_trace()
+
     # construct metadata for each variable
-    vm = VariableMatcher()
     for var_code in var_codes:
         var = df_vars.loc[var_code].to_dict()
-        # retrieves unit + display metadata from the most recently updated
-        # WDI grapher variable that matches this variable's name
-        unit = ""
-        short_unit = ""
-        display = {}
-        grapher_vars = vm.find_grapher_variables(var["indicator_name"])
-        if grapher_vars:
-            found_unit_metadata = False
-            gvar = None
-            while len(grapher_vars) and not found_unit_metadata:
-                gvar = grapher_vars.pop(0)
-                found_unit_metadata = bool(gvar["unit"] or gvar["shortUnit"])
-
-            if found_unit_metadata and gvar:
-                if pd.notnull(gvar["unit"]):
-                    unit = gvar["unit"]
-                if pd.notnull(gvar["shortUnit"]):
-                    short_unit = gvar["shortUnit"]
-                if pd.notnull(gvar["display"]):
-                    display = json.loads(gvar["display"])
-
-                year_regex = re.compile(r"\b([1-2]\d{3})\b")
-                regex_res = year_regex.search(var["indicator_name"])
-                if regex_res:
-                    assert len(regex_res.groups()) == 1
-                    year = regex_res.groups()[0]
-                    unit = replace_years(unit, year)
-                    short_unit = replace_years(short_unit, year)
-                    for k in ["name", "unit", "shortUnit"]:
-                        if pd.notnull(display.get(k)):
-                            display[k] = replace_years(display[k], year)
-        else:
-            log.warning(
-                f"Variable does not match an existing {fname} variable name in the grapher",
-                variable_name=var["indicator_name"],
-            )
 
         # retrieve clean source name, then construct source.
         source_raw_name = var["source"]
@@ -413,12 +381,12 @@ def add_variable_metadata(table: Table) -> Table:
         source = Source(
             name=clean_source["name"],
             description=None,
-            url=snap.metadata.url,
-            source_data_url=snap.metadata.source_data_url,
-            date_accessed=str(snap.metadata.date_accessed),
-            publication_date=str(snap.metadata.publication_date),
-            publication_year=snap.metadata.publication_year,
-            published_by=snap.metadata.name,
+            url=ds_source.url,
+            source_data_url=ds_source.source_data_url,
+            date_accessed=str(ds_source.date_accessed),
+            publication_date=str(ds_source.publication_date),
+            publication_year=ds_source.publication_year,
+            published_by=ds_source.name,
             publisher_source=clean_source["dataPublisherSource"],
         )
 
