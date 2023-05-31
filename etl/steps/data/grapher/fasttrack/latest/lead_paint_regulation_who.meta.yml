@@ -1,0 +1,27 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: lead_paint_regulation_who
+  title: Lead paint regulations (WHO, 2023)
+  description: The WHO collects data on which countries have legally-binding controls
+    on lead paint. It sources this data from surveys conducted by WHO and UNEP of
+    national authorities.
+  sources:
+  - name: Lead paint regulations (WHO, 2023)
+    published_by: World Health Organization (WHO)
+    publication_year: 2023
+    url: https://www.who.int/data/gho/data/themes/topics/indicator-groups/legally-binding-controls-on-lead-paint
+tables:
+  lead_paint_regulation_who:
+    variables:
+      lead_paint_regulation:
+        title: lead_paint_regulation
+        unit: ''
+        description: Notes whether each country has adopted legally-binding laws,
+          regulations, standards and/or procedures  to control the production,  import,
+          export, sale and use of lead paints.
+        sources:
+        - name: Lead paint regulations (WHO, 2023)
+          published_by: World Health Organization (WHO)
+          publication_year: 2023
+          url: https://www.who.int/data/gho/data/themes/topics/indicator-groups/legally-binding-controls-on-lead-paint
