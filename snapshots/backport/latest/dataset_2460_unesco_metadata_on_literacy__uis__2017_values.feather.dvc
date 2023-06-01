@@ -11,3 +11,8 @@ meta:
   is_public: true
   version: latest
   publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 29677c3d970d54aab9b57c73e3ea2576
+  size: 23666
+  path: dataset_2460_unesco_metadata_on_literacy__uis__2017_values.feather

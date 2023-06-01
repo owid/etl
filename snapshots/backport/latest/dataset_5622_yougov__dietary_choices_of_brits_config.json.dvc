@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5622_yougov__dietary_choices_of_brits_config
   file_extension: json
-  date_accessed: 2023-06-01 14:56:14.899465
+  date_accessed: 2023-06-01 15:52:52.038862
   name: Grapher metadata for dataset_5622_yougov__dietary_choices_of_brits
   description: 
     https://github.com/owid/notebooks/tree/main/EdouardMathieu/yougov_dietary_choices
