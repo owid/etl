@@ -30,7 +30,7 @@ docs: .venv
 	poetry run mkdocs serve
 
 watch-all:
-	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
+	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd lib/walden && make unittest)' --recursive --drop .
 
 test-all: test
 	cd vendor/owid-catalog-py && make test
