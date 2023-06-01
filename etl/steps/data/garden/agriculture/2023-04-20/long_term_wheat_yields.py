@@ -47,8 +47,11 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Select the relevant item and element from faostat data.
+    # Also, select only countries that appear in the Bayliss-Smith & Wanmali (1984) dataset.
     df_qcl = df_qcl[
-        (df_qcl["item_code"] == ITEM_CODE_FOR_WHEAT) & (df_qcl["element_code"] == ELEMENT_CODE_FOR_YIELD)
+        (df_qcl["item_code"] == ITEM_CODE_FOR_WHEAT)
+        & (df_qcl["element_code"] == ELEMENT_CODE_FOR_YIELD)
+        & (df_qcl["country"].isin(df_bayliss["country"].unique()))
     ].reset_index(drop=True)
 
     # Sanity check.

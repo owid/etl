@@ -1,6 +1,6 @@
 steps:
   #
-  # Long-term wheat yields.
+  # Long-term wheat yields in Europe.
   #
   data://garden/agriculture/2023-04-20/long_term_wheat_yields:
     - data://garden/papers/2023-04-20/bayliss_smith_wanmali_1984
