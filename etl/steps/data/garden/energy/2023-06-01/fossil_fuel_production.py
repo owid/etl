@@ -6,8 +6,8 @@ Statistical Review dataset and Shift data on fossil fuel production.
 import numpy as np
 from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
-from shared import add_population
 
+from etl.data_helpers.geo import add_population_to_dataframe
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -137,15 +137,15 @@ def add_annual_change(tb: Table) -> Table:
     return combined
 
 
-def add_per_capita_variables(tb: Table, population: Table) -> Table:
+def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
     """Add per-capita variables to combined BP & Shift dataset.
 
     Parameters
     ----------
     tb : Table
         Combined BP & Shift dataset.
-    population : Table
-        Population data.
+    ds_population : Dataset
+        Population dataset.
 
     Returns
     -------
@@ -161,9 +161,9 @@ def add_per_capita_variables(tb: Table, population: Table) -> Table:
         country for country in tb["country"].unique() if (("(BP)" in country) or ("(Shift)" in country))
     ]
     # Add population to data.
-    combined = add_population(
+    combined = add_population_to_dataframe(
         df=tb,
-        population=population,
+        ds_population=ds_population,
         country_col="country",
         year_col="year",
         population_col="population",
@@ -219,9 +219,8 @@ def run(dest_dir: str) -> None:
     ds_shift: Dataset = paths.load_dependency("fossil_fuel_production")
     tb_shift = ds_shift["fossil_fuel_production"]
 
-    # Load population dataset and read its main table.
+    # Load population dataset.
     ds_population: Dataset = paths.load_dependency("population")
-    tb_population = ds_population["population"]
 
     #
     # Process data.
@@ -239,7 +238,7 @@ def run(dest_dir: str) -> None:
     tb = add_annual_change(tb=tb)
 
     # Add per-capita variables.
-    tb = add_per_capita_variables(tb=tb, population=tb_population)
+    tb = add_per_capita_variables(tb=tb, ds_population=ds_population)
 
     # Remove spurious values and rows that only have nans.
     tb = remove_spurious_values(tb=tb)

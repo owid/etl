@@ -7,8 +7,8 @@ from typing import Dict, List
 
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
-from shared import add_population
 
+from etl.data_helpers.geo import add_population_to_dataframe
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -135,7 +135,7 @@ def process_ember_data(table_ember: Table) -> Table:
     return tb_ember
 
 
-def add_per_capita_variables(combined: Table, population: Table) -> Table:
+def add_per_capita_variables(combined: Table, ds_population: Dataset) -> Table:
     """Add per capita variables (in kWh per person) to the combined BP and Ember dataframe.
 
     The list of variables to make per capita are given in this function. The new variable names will be 'per_capita_'
@@ -145,8 +145,8 @@ def add_per_capita_variables(combined: Table, population: Table) -> Table:
     ----------
     combined : Table
         Combination of BP's Statistical Review and Ember's Combined Electricity.
-    population: Table
-        Population data.
+    ds_population: Dataset
+        Population dataset.
 
     Returns
     -------
@@ -175,7 +175,7 @@ def add_per_capita_variables(combined: Table, population: Table) -> Table:
         "solar_and_wind_generation__twh",
     ]
     # Add a column for population (only for harmonized countries).
-    combined = add_population(df=combined, population=population, warn_on_missing_countries=False)
+    combined = add_population_to_dataframe(df=combined, ds_population=ds_population, warn_on_missing_countries=False)
 
     for variable in per_capita_variables:
         assert "twh" in variable, f"Variables are assumed to be in TWh, but {variable} is not."
@@ -260,9 +260,8 @@ def run(dest_dir: str) -> None:
     ds_ember: Dataset = paths.load_dependency("combined_electricity")
     table_ember = ds_ember["combined_electricity"]
 
-    # Load population dataset and read its main table.
+    # Load population dataset.
     ds_population: Dataset = paths.load_dependency("population")
-    tb_population = ds_population["population"]
 
     #
     # Process data.
@@ -282,7 +281,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Add per capita variables.
-    combined = add_per_capita_variables(combined=combined, population=tb_population)
+    combined = add_per_capita_variables(combined=combined, ds_population=ds_population)
 
     # Add "share" variables.
     combined = add_share_variables(combined=combined)

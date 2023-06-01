@@ -20,8 +20,8 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.meta import Source
 from owid.datautils import dataframes
-from shared import add_population
 
+from etl.data_helpers.geo import add_population_to_dataframe
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -65,7 +65,7 @@ def gather_sources_from_tables(tables: List[Table]) -> List[Source]:
 
 def combine_tables_data_and_metadata(
     tables: Dict[str, Table],
-    population: Table,
+    ds_population: Dataset,
     countries_regions: Table,
     gdp: Table,
     variable_mapping: pd.DataFrame,
@@ -77,8 +77,8 @@ def combine_tables_data_and_metadata(
     tables : dict
         Dictionary where the key is the short name of the table, and the value is the actual table, for all tables to be
         combined.
-    population: Table
-        Population data.
+    ds_population: Dataset
+        Population dataset.
     countries_regions : Table
         Main table from countries-regions dataset.
     gdp: Table
@@ -103,7 +103,9 @@ def combine_tables_data_and_metadata(
     df_combined = pd.merge(df_combined, countries_regions, left_on="country", right_on="name", how="left")
 
     # Add population and gdp of countries (except for dataset-specific regions e.g. those ending in (BP) or (Shift)).
-    df_combined = add_population(df=df_combined, population=population, warn_on_missing_countries=False)
+    df_combined = add_population_to_dataframe(
+        df=df_combined, ds_population=ds_population, warn_on_missing_countries=False
+    )
     df_combined = pd.merge(df_combined, gdp, on=["country", "year"], how="left")
 
     # Check that there were no repetition in column names.
@@ -173,7 +175,6 @@ def run(dest_dir: str) -> None:
     tb_fossil_fuels = ds_fossil_fuels["fossil_fuel_production"].reset_index()
     tb_primary_energy = ds_primary_energy["primary_energy_consumption"].reset_index()
     tb_electricity_mix = ds_electricity_mix["electricity_mix"].reset_index()
-    tb_population = ds_population["population"].reset_index()
     tb_regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
     tb_ggdc = ds_ggdc["maddison_gdp"].reset_index()[["country", "year", "gdp"]].dropna()
 
@@ -194,7 +195,7 @@ def run(dest_dir: str) -> None:
     }
     tb_combined = combine_tables_data_and_metadata(
         tables=tables,
-        population=tb_population,
+        ds_population=ds_population,
         countries_regions=tb_regions,
         gdp=tb_ggdc,
         variable_mapping=variable_mapping,

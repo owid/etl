@@ -8,8 +8,8 @@ from typing import cast
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import add_population
 
+from etl.data_helpers.geo import add_population_to_dataframe
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -171,15 +171,15 @@ def add_annual_change(tb: Table) -> Table:
     return combined
 
 
-def add_per_capita_variables(tb: Table, population: Table) -> Table:
+def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
     """Add a population column and add per-capita variables.
 
     Parameters
     ----------
     tb : Table
         Data.
-    population : Table
-        Population data.
+    ds_population : Dataset
+        Population dataset.
 
     Returns
     -------
@@ -190,9 +190,9 @@ def add_per_capita_variables(tb: Table, population: Table) -> Table:
     tb = tb.copy()
 
     # Add population to data.
-    tb = add_population(
+    tb = add_population_to_dataframe(
         df=tb,
-        population=population,
+        ds_population=ds_population,
         country_col="country",
         year_col="year",
         population_col="Population",
@@ -277,9 +277,8 @@ def run(dest_dir: str) -> None:
     ds_ggdc: Dataset = paths.load_dependency("ggdc_maddison")
     tb_ggdc = ds_ggdc["maddison_gdp"]
 
-    # Load population dataset from garden and read its main table.
+    # Load population dataset.
     ds_population: Dataset = paths.load_dependency("population")
-    tb_population = ds_population["population"]
 
     #
     # Process data.
@@ -300,7 +299,7 @@ def run(dest_dir: str) -> None:
     tb = add_annual_change(tb=tb)
 
     # Add per-capita variables.
-    tb = add_per_capita_variables(tb=tb, population=tb_population)
+    tb = add_per_capita_variables(tb=tb, ds_population=ds_population)
 
     # Add per-GDP variables.
     tb = add_per_gdp_variables(tb=tb, ggdc_table=tb_ggdc)
