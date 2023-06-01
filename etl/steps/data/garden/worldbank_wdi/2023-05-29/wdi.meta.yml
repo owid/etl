@@ -5262,28 +5262,11 @@ tables:
         unit: per 100,000 people
       dt_nfl_unid_cd:
         title: Net official flows from UN agencies, UNIDIR (current US$)
-      # omm_urb_pop_slum:
-      #   title: Urban population living in slums
-      # omm_urb_pop_nonslum:
-      #   title: Urban population not living in slums
-      # omm_share_service_exports:
-      #   title: Share of services in total goods and services exports
-      #   short_unit: '%'
-      #   unit: '% of goods and services exports'
-      # omm_merch_exp_share_gdp:
-      #   title: Merchandise exports as a share of GDP
-      #   short_unit: '%'
-      #   unit: '% of GDP'
-      # omm_goods_exp_share_gdp:
-      #   title: Goods exports as a share of GDP
-      #   short_unit: '%'
-      #   unit: '% of GDP'
-      # omm_tax_rev_percap:
-      #   title: Tax revenues per capita (current international $)
-      #   short_unit: $
-      #   unit: current international $
-      # omm_net_savings_percap:
-      #   title: Adjusted net savings per capita, excluding particulate emission damage (current US$)
-      #   short_unit: $
-      #   unit: current US$
+      omm_urb_pop_slum: {}
+      omm_urb_pop_nonslum: {}
+      omm_share_service_exports: {}
+      omm_merch_exp_share_gdp: {}
+      omm_goods_exp_share_gdp: {}
+      omm_tax_rev_percap: {}
+      omm_net_savings_percap: {}
 

@@ -362,7 +362,7 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
 
     clean_source_mapping = load_clean_source_mapping()
 
-    table.update_metadata_from_yaml(paths.metadata_path, "wdi")
+    table.update_metadata_from_yaml(paths.metadata_path, "wdi", extra_variables="ignore")
 
     # construct metadata for each variable
     for var_code in var_codes:
