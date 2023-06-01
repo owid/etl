@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2760_terrain_ruggedness_index__nunn_and_puga__2012_config
   file_extension: json
-  date_accessed: 2023-06-01 14:57:04.273840
+  date_accessed: 2023-06-01 15:59:52.936187
   name: Grapher metadata for dataset_2760_terrain_ruggedness_index__nunn_and_puga__2012
   description: ''
   source_name: Our World in Data catalog backport

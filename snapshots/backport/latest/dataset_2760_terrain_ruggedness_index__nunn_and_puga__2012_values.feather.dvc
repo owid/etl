@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2760_terrain_ruggedness_index__nunn_and_puga__2012_values
   file_extension: feather
-  date_accessed: 2023-02-23 15:11:37.173434
+  date_accessed: 2023-06-01 16:00:05.184531
   name: Terrain Ruggedness Index - Nunn and Puga (2012)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8c068b3b549c6b296d698e5c0ba74cc2
-  size: 14370
+- md5: 7d8e96512df5c766827a92a5f4081afb
+  size: 14378
   path: dataset_2760_terrain_ruggedness_index__nunn_and_puga__2012_values.feather
