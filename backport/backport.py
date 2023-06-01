@@ -57,7 +57,6 @@ def backport_cli(
 
 
 class PotentialBackport:
-
     dataset_id: int
     ds: gm.Dataset
     config: GrapherConfig
