@@ -51,6 +51,12 @@ def run(dest_dir: str) -> None:
     tb_omm = mk_omms(tb_garden)
     tb_garden = tb_garden.join(tb_omm, how="outer")
 
+    # add empty strings to all columns without units
+    # TODO: should this be default?
+    for col in tb_garden.columns:
+        if tb_garden[col].metadata.unit is None:
+            tb_garden[col].metadata.unit = ""
+
     # validate that all columns have title
     for col in tb_garden.columns:
         assert tb_garden[col].metadata.title is not None, 'Variable "{}" has no title'.format(col)
