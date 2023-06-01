@@ -1,23 +1,5 @@
 dataset:
-  namespace: ember
-  version: 2023-02-20
-  title: Combined Electricity Data (Ember, 2023)
-  short_name: combined_electricity
-  sources:
-    -
-      name: Our World in Data based on Ember's Yearly Electricity Data (2023).
-      published_by: Ember
-      publication_year: 2023
-      publication_date: 2023-01-31
-      date_accessed: 2023-02-20
-      url: https://ember-climate.org/data-catalogue/yearly-electricity-data/
-    -
-      name: Our World in Data based on Ember's European Electricity Review (2022).
-      published_by: Ember
-      publication_year: 2022
-      publication_date: 2022-02-01
-      date_accessed: 2022-08-01
-      url: https://ember-climate.org/insights/research/european-electricity-review-2022/
+  title: Combined Electricity Data (Ember, 2023b)
 
 tables:
   european_electricity_review:
