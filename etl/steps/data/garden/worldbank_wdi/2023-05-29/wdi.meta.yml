@@ -5260,6 +5260,8 @@ tables:
       vc_ihr_psrc_p5:
         title: Intentional homicides (per 100,000 people)
         unit: per 100,000 people
+      dt_nfl_unid_cd:
+        title: Net official flows from UN agencies, UNIDIR (current US$)
       # omm_urb_pop_slum:
       #   title: Urban population living in slums
       # omm_urb_pop_nonslum:
@@ -5284,3 +5286,4 @@ tables:
       #   title: Adjusted net savings per capita, excluding particulate emission damage (current US$)
       #   short_unit: $
       #   unit: current US$
+

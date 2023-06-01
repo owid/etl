@@ -40,10 +40,6 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["wdi"]
 
-    x = tb_meadow["dt_nfl_unid_cd"]
-
-    __import__("ipdb").set_trace()
-
     tb_meadow = geo.harmonize_countries(
         df=tb_meadow.reset_index(),
         countries_file=paths.country_mapping_path,
@@ -69,8 +65,6 @@ def run(dest_dir: str) -> None:
     # validate that all columns have title
     for col in tb_garden.columns:
         assert tb_garden[col].metadata.title is not None, 'Variable "{}" has no title'.format(col)
-
-    __import__("ipdb").set_trace()
 
     #
     # Save outputs.
