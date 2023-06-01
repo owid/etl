@@ -1,0 +1,238 @@
+all_sources:
+  - source_testing: &source-testing
+      name: Our World in Data based on Ember's European Electricity Review (2023).
+      published_by: Ember's European Electricity Review (2023).
+      url: https://ember-climate.org/insights/research/european-electricity-review-2023/
+      date_accessed: 2023-02-20
+      publication_date: 2023-01-31
+      publication_year: 2023
+
+dataset:
+  title: European Electricity Review (Ember, 2023)
+  licenses:
+    - name: Creative Commons ShareAlike Attribution Licence (CC BY-SA 4.0)
+      url: https://ember-climate.org/creative-commons/
+  sources:
+    - *source-testing
+  description: |
+    The European Electricity Review analyses full-year electricity generation and demand data for 2022 in all EU-27 countries to understand the region's progress in transitioning from fossil fuels to clean electricity.
+
+tables:
+  european_electricity_review:
+    variables:
+      demand__twh:
+        title: Demand
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      demand_per_capita__mwh:
+        title: Demand per capita
+        short_unit: 'MWh'
+        unit: 'megawatt-hours'
+      generation__clean__pct:
+        title: Share of electricity generation from clean sources
+        short_unit: '%'
+        unit: '%'
+      generation__clean__twh:
+        title: Electricity generation from clean sources
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__coal__pct:
+        title: Share of electricity generation from coal
+        short_unit: '%'
+        unit: '%'
+      generation__coal__twh:
+        title: Electricity generation from coal
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__fossil__pct:
+        title: Share of electricity generation from fossil
+        short_unit: '%'
+        unit: '%'
+      generation__fossil__twh:
+        title: Electricity generation from fossil
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__hydro__bioenergy_and_other_renewables__pct:
+        title: Share of electricity generation from hydro, bioenergy and other renewables
+        short_unit: '%'
+        unit: '%'
+      generation__hydro__bioenergy_and_other_renewables__twh:
+        title: Electricity generation from hydro, bioenergy and other renewables
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__renewables__pct:
+        title: Share of electricity generation from renewables
+        short_unit: '%'
+        unit: '%'
+      generation__renewables__twh:
+        title: Electricity generation from renewables
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__wind_and_solar__pct:
+        title: Share of electricity generation from wind and solar
+        short_unit: '%'
+        unit: '%'
+      generation__wind_and_solar__twh:
+        title: Electricity generation from wind and solar
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__bioenergy__pct:
+        title: Share of electricity generation from bioenergy
+        short_unit: '%'
+        unit: '%'
+      generation__bioenergy__twh:
+        title: Electricity generation from bioenergy
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__gas__pct:
+        title: Share of electricity generation from gas
+        short_unit: '%'
+        unit: '%'
+      generation__gas__twh:
+        title: Electricity generation from gas
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__hard_coal__pct:
+        title: Share of electricity generation from hard coal
+        short_unit: '%'
+        unit: '%'
+      generation__hard_coal__twh:
+        title: Electricity generation from hard coal
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__hydro__pct:
+        title: Share of electricity generation from hydro
+        short_unit: '%'
+        unit: '%'
+      generation__hydro__twh:
+        title: Electricity generation from hydro
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__lignite__pct:
+        title: Share of electricity generation from lignite
+        short_unit: '%'
+        unit: '%'
+      generation__lignite__twh:
+        title: Electricity generation from lignite
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__nuclear__pct:
+        title: Share of electricity generation from nuclear
+        short_unit: '%'
+        unit: '%'
+      generation__nuclear__twh:
+        title: Electricity generation from nuclear
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__other_fossil__pct:
+        title: Share of electricity generation from other fossil
+        short_unit: '%'
+        unit: '%'
+      generation__other_fossil__twh:
+        title: Electricity generation from other fossil
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__other_renewables__pct:
+        title: Share of electricity generation from other renewables
+        short_unit: '%'
+        unit: '%'
+      generation__other_renewables__twh:
+        title: Electricity generation from other renewables
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__solar__pct:
+        title: Share of electricity generation from solar
+        short_unit: '%'
+        unit: '%'
+      generation__solar__twh:
+        title: Electricity generation from solar
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__wind__pct:
+        title: Share of electricity generation from wind
+        short_unit: '%'
+        unit: '%'
+      generation__wind__twh:
+        title: Electricity generation from wind
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      generation__total__twh:
+        title: Total electricity generation
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      net_imports__total__twh:
+        title: Net electricity imports
+        short_unit: 'TWh'
+        unit: 'terawatt-hours'
+      emissions__clean__mtco2:
+        title: Emissions from clean sources
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__coal__mtco2:
+        title: Emissions from coal
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__fossil__mtco2:
+        title: Emissions from fossil
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__hydro__bioenergy_and_other_renewables__mtco2:
+        title: Emissions from hydro, bioenergy and other renewables
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__renewables__mtco2:
+        title: Emissions from renewables
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__wind_and_solar__mtco2:
+        title: Emissions from wind and solar
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__co2_intensity__gco2_per_kwh:
+        title: CO2 intensity
+        short_unit: 'gCO2/kWh'
+        unit: 'grams of CO2 equivalent per kilowatt-hour'
+      emissions__bioenergy__mtco2:
+        title: Emissions from bioenergy
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__gas__mtco2:
+        title: Emissions from gas
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__hard_coal__mtco2:
+        title: Emissions from hard coal
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__hydro__mtco2:
+        title: Emissions from hydro
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__lignite__mtco2:
+        title: Emissions from lignite
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__nuclear__mtco2:
+        title: Emissions from nuclear
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__other_fossil__mtco2:
+        title: Emissions from other fossil
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__other_renewables__mtco2:
+        title: Emissions from other renewables
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__solar__mtco2:
+        title: Emissions from solar
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__wind__mtco2:
+        title: Emissions from wind
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
+      emissions__total__mtco2:
+        title: Total emissions
+        short_unit: 'mtCO2'
+        unit: 'megatonnes of CO2 equivalent'
