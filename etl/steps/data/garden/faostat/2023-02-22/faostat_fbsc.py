@@ -73,6 +73,8 @@ def combine_fbsh_and_fbs_datasets(
     fbsh = pd.DataFrame(fbsh_dataset["faostat_fbsh"]).reset_index()
     fbs = pd.DataFrame(fbs_dataset["faostat_fbs"]).reset_index()
 
+    __import__("ipdb").set_trace()
+
     # Harmonize items and elements in both datasets.
     fbsh = harmonize_items(df=fbsh, dataset_short_name="faostat_fbsh")
     fbsh = harmonize_elements(df=fbsh)
