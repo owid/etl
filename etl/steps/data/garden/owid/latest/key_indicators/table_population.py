@@ -22,7 +22,7 @@ DIR_PATH = Path(__file__).parent
 EXCLUDE_COUNTRIES = [
     "Czechoslovakia",
     "East Germany",
-    "Eritrea and Ethiopia",
+    "Ethiopia (former)",
     "Serbia and Montenegro",
     "USSR",
     "West Germany",

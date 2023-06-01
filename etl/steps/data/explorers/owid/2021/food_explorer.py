@@ -674,7 +674,7 @@ former_to_current = {
         "Montenegro",
     ],
     "Czechoslovakia": ["Czechia", "Slovakia"],
-    "Eritrea and Ethiopia": ["Ethiopia", "Eritrea"],
+    "Ethiopia (former)": ["Ethiopia", "Eritrea"],
     "Serbia and Montenegro": ["Serbia", "Montenegro"],
     "Sudan (former)": ["Sudan", "South Sudan"],
 }
@@ -778,7 +778,7 @@ country2continent["Sudan (former)"] = "Africa"
 country2income = {
     **country2income,
     "Czechoslovakia": "High-income countries",
-    "Eritrea and Ethiopia": "Low-income countries",
+    "Ethiopia (former)": "Low-income countries",
     "Serbia and Montenegro": "Upper-middle-income countries",
     "Yugoslavia": "Upper-middle-income countries",
     "USSR": "Upper-middle-income countries",
