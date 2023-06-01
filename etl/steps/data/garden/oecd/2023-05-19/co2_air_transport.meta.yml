@@ -8,7 +8,7 @@ dataset:
   - name: Creative Commons BY 4.0
     url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
   sources:
-  - name: OECD
+  - name: OECD (2023), Air Transport CO2 Emissions
     url: https://stats.oecd.org/Index.aspx?DataSetCode=AIRTRANS_CO2#
     date_accessed: '2023-05-18'
     publication_date: January 2023
