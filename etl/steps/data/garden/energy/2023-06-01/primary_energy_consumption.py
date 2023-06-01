@@ -110,7 +110,7 @@ def prepare_ggdc_data(tb_ggdc: Table) -> Table:
     return cast(Table, tb_ggdc)
 
 
-def combine_bp_and_eia_data(tb_bp: Table, tb_eia: Table) -> pd.DataFrame:
+def combine_bp_and_eia_data(tb_bp: Table, tb_eia: Table) -> Table:
     """Combine BP and EIA data.
 
     Parameters
@@ -122,7 +122,7 @@ def combine_bp_and_eia_data(tb_bp: Table, tb_eia: Table) -> pd.DataFrame:
 
     Returns
     -------
-    combined : pd.DataFrame
+    combined : Table
         Combined data.
 
     """
@@ -135,31 +135,29 @@ def combine_bp_and_eia_data(tb_bp: Table, tb_eia: Table) -> pd.DataFrame:
     # Combine EIA data (which goes further back in the past) with BP data (which is more up-to-date).
     # On coincident rows, prioritise BP data.
     index_columns = ["country", "year"]
-    combined = cast(pd.DataFrame, pd.concat([tb_eia, tb_bp], ignore_index=True)).drop_duplicates(
-        subset=index_columns, keep="last"
-    )
+    combined = Table(pd.concat([tb_eia, tb_bp], ignore_index=True)).drop_duplicates(subset=index_columns, keep="last")
 
-    # Convert to conventional dataframe, and sort conveniently.
-    combined = pd.DataFrame(combined).sort_values(index_columns).reset_index(drop=True)
+    # Sort conveniently.
+    combined = combined.sort_values(index_columns).reset_index(drop=True)
 
-    return cast(pd.DataFrame, combined)
+    return combined
 
 
-def add_annual_change(df: pd.DataFrame) -> pd.DataFrame:
-    """Add annual change variables to combined BP & EIA dataset.
+def add_annual_change(tb: Table) -> Table:
+    """Add annual change variables to combined BP & EIA data.
 
     Parameters
     ----------
-    df : pd.DataFrame
-        Combined BP & EIA dataset.
+    tb : Table
+        Combined BP & EIA data.
 
     Returns
     -------
-    combined : pd.DataFrame
-        Combined BP & EIA dataset after adding annual change variables.
+    combined : Table
+        Combined BP & EIA data after adding annual change variables.
 
     """
-    combined = df.copy()
+    combined = tb.copy()
 
     # Calculate annual change.
     combined = combined.sort_values(["country", "year"]).reset_index(drop=True)
@@ -173,27 +171,27 @@ def add_annual_change(df: pd.DataFrame) -> pd.DataFrame:
     return combined
 
 
-def add_per_capita_variables(df: pd.DataFrame, population: pd.DataFrame) -> pd.DataFrame:
+def add_per_capita_variables(tb: Table, population: Table) -> Table:
     """Add a population column and add per-capita variables.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    tb : Table
         Data.
-    population : pd.DataFrame
+    population : Table
         Population data.
 
     Returns
     -------
-    df : pd.DataFrame
+    tb : Table
         Data after adding population and per-capita variables.
 
     """
-    df = df.copy()
+    tb = tb.copy()
 
     # Add population to data.
-    df = add_population(
-        df=df,
+    tb = add_population(
+        df=tb,
         population=population,
         country_col="country",
         year_col="year",
@@ -202,92 +200,86 @@ def add_per_capita_variables(df: pd.DataFrame, population: pd.DataFrame) -> pd.D
     )
 
     # Calculate consumption per capita.
-    df["Primary energy consumption per capita (kWh)"] = (
-        df["Primary energy consumption (TWh)"] / df["Population"] * TWH_TO_KWH
+    tb["Primary energy consumption per capita (kWh)"] = (
+        tb["Primary energy consumption (TWh)"] / tb["Population"] * TWH_TO_KWH
     )
 
-    return df
+    return tb
 
 
-def add_per_gdp_variables(df: pd.DataFrame, ggdc_table: Table) -> pd.DataFrame:
+def add_per_gdp_variables(tb: Table, ggdc_table: Table) -> Table:
     """Add a GDP column and add per-gdp variables.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    tb : Table
         Data.
     ggdc_table : Table
         GDP data from the GGDC Maddison dataset.
 
     Returns
     -------
-    df : pd.DataFrame
+    tb : Table
         Data after adding GDP and per-gdp variables.
 
     """
-    df = df.copy()
+    tb = tb.copy()
 
     # Add population to data.
-    df = pd.merge(df, ggdc_table, on=["country", "year"], how="left")
+    tb = pd.merge(tb, ggdc_table, on=["country", "year"], how="left")
 
     # Calculate consumption per GDP.
-    df["Primary energy consumption per GDP (kWh per $)"] = (
-        df["Primary energy consumption (TWh)"] / df["GDP"] * TWH_TO_KWH
+    tb["Primary energy consumption per GDP (kWh per $)"] = (
+        tb["Primary energy consumption (TWh)"] / tb["GDP"] * TWH_TO_KWH
     )
 
-    return df
+    return tb
 
 
-def remove_outliers(df: pd.DataFrame) -> pd.DataFrame:
+def remove_outliers(tb: Table) -> Table:
     """Remove infinity values and data that has been identified as spurious outliers.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    tb : Table
         Data.
 
     Returns
     -------
-    df : pd.DataFrame
+    tb : Table
         Data after removing spurious data.
 
     """
-    df = df.copy()
+    tb = tb.copy()
 
     # Remove spurious values.
-    df = df.replace(np.inf, np.nan)
+    tb = tb.replace(np.inf, np.nan)
 
     # Remove indexes of outliers from data.
-    df = df[~df["country"].isin(OUTLIERS)].reset_index(drop=True)
+    tb = tb[~tb["country"].isin(OUTLIERS)].reset_index(drop=True)
 
-    return df
+    return tb
 
 
 def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Load BP statistical review dataset.
+    # Load BP statistical review dataset and read its main table.
     ds_bp: Dataset = paths.load_dependency("statistical_review")
-    # Read main table from dataset.
     tb_bp = ds_bp["statistical_review"]
 
-    # Load EIA dataset on energy consumption.
+    # Load EIA dataset on energy consumption and read its main table.
     ds_eia: Dataset = paths.load_dependency("energy_consumption")
-    # Read main table from dataset.
     tb_eia = ds_eia["energy_consumption"]
 
-    # Load GGDC Maddison data on GDP.
+    # Load GGDC Maddison data on GDP and read its main table.
     ds_ggdc: Dataset = paths.load_dependency("ggdc_maddison")
-    # Read main table from dataset.
     tb_ggdc = ds_ggdc["maddison_gdp"]
 
-    # Load population dataset from garden.
+    # Load population dataset from garden and read its main table.
     ds_population: Dataset = paths.load_dependency("population")
-    # Get table from dataset.
     tb_population = ds_population["population"]
-    # Make a dataframe out of the data in the table, with the required columns.
-    df_population = pd.DataFrame(tb_population)
 
     #
     # Process data.
@@ -302,29 +294,34 @@ def run(dest_dir: str) -> None:
     tb_ggdc = prepare_ggdc_data(tb_ggdc=tb_ggdc)
 
     # Combine BP and EIA data.
-    df = combine_bp_and_eia_data(tb_bp=tb_bp, tb_eia=tb_eia)
+    tb = combine_bp_and_eia_data(tb_bp=tb_bp, tb_eia=tb_eia)
 
     # Add annual change.
-    df = add_annual_change(df=df)
+    tb = add_annual_change(tb=tb)
 
     # Add per-capita variables.
-    df = add_per_capita_variables(df=df, population=df_population)
+    tb = add_per_capita_variables(tb=tb, population=tb_population)
 
     # Add per-GDP variables.
-    df = add_per_gdp_variables(df=df, ggdc_table=tb_ggdc)
+    tb = add_per_gdp_variables(tb=tb, ggdc_table=tb_ggdc)
 
     # Remove outliers.
-    df = remove_outliers(df=df)
+    tb = remove_outliers(tb=tb)
 
     # Create an appropriate index and sort conveniently.
-    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
-    # Create new table.
-    table = Table(df, short_name="primary_energy_consumption")
+    # Update table short name.
+    tb.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[table])
+    ds_garden = create_dataset(dest_dir, tables=[tb])
+
+    # Combine sources and licenses from the original datasets.
+    ds_garden.metadata.sources = sum([ds.metadata.sources for ds in [ds_bp, ds_eia]], [])
+    ds_garden.metadata.licenses = sum([ds.metadata.licenses for ds in [ds_bp, ds_eia]], [])
+
     ds_garden.save()

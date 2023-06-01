@@ -5,8 +5,7 @@ Electricity Review and the Yearly Electricity Data) to create the Electricity Mi
 
 from typing import Dict, List
 
-import pandas as pd
-from owid import catalog
+from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from shared import add_population
 
@@ -22,18 +21,18 @@ TWH_TO_KWH = 1e9
 MT_TO_G = 1e12
 
 
-def process_bp_data(table_bp: catalog.Table) -> pd.DataFrame:
+def process_bp_data(table_bp: Table) -> Table:
     """Load necessary columns from BP's Statistical Review dataset, and create some new variables (e.g. electricity
     generation from fossil fuels).
 
     Parameters
     ----------
-    table_bp : catalog.Table
+    table_bp : Table
         BP's Statistical Review (already processed, with harmonized countries and region aggregates).
 
     Returns
     -------
-    df_bp : pd.DataFrame
+    df_bp : Table
         Processed BP data.
 
     """
@@ -74,27 +73,27 @@ def process_bp_data(table_bp: catalog.Table) -> pd.DataFrame:
         ],
     }
 
-    # Create a dataframe with a dummy index.
-    df_bp = pd.DataFrame(table_bp).reset_index()
+    # Create a table with a dummy index.
+    tb_bp = table_bp.reset_index()
 
     # Create new columns, by adding up other columns (and allowing for only one nan in each sum).
     for new_column in aggregates:
-        df_bp[new_column] = df_bp[aggregates[new_column]].sum(axis=1, min_count=len(aggregates[new_column]) - 1)
+        tb_bp[new_column] = tb_bp[aggregates[new_column]].sum(axis=1, min_count=len(aggregates[new_column]) - 1)
 
-    return df_bp
+    return tb_bp
 
 
-def process_ember_data(table_ember: catalog.Table) -> pd.DataFrame:
+def process_ember_data(table_ember: Table) -> Table:
     """Load necessary columns from the Combined Electricity dataset and prepare a dataframe with the required variables.
 
     Parameters
     ----------
-    table_ember : catalog.Table
+    table_ember : Table
         Combined Electricity (combination of Ember's Yearly Electricity Data and European Electricity Review).
 
     Returns
     -------
-    df_ember : pd.DataFrame
+    df_ember : Table
         Processed Combined Electricity data.
 
     """
@@ -120,23 +119,23 @@ def process_ember_data(table_ember: catalog.Table) -> pd.DataFrame:
     }
     table_ember = table_ember[list(columns)].rename(columns=columns, errors="raise")
 
-    # Create a dataframe with a dummy index.
-    df_ember = pd.DataFrame(table_ember).reset_index()
+    # Create a table with a dummy index.
+    tb_ember = table_ember.reset_index()
 
     # In BP data, there is a variable "Geo Biomass Other", which combines all other renewables.
     # In Ember data, "other rewenables" excludes bioenergy.
     # To be able to combine both datasets, create a new variable for generation of other renewables including bioenergy.
-    df_ember["other_renewables_including_bioenergy_generation__twh"] = (
-        df_ember["other_renewables_excluding_bioenergy_generation__twh"] + df_ember["bioenergy_generation__twh"]
+    tb_ember["other_renewables_including_bioenergy_generation__twh"] = (
+        tb_ember["other_renewables_excluding_bioenergy_generation__twh"] + tb_ember["bioenergy_generation__twh"]
     )
 
     # Create a new variable for solar and wind generation.
-    df_ember["solar_and_wind_generation__twh"] = df_ember["solar_generation__twh"] + df_ember["wind_generation__twh"]
+    tb_ember["solar_and_wind_generation__twh"] = tb_ember["solar_generation__twh"] + tb_ember["wind_generation__twh"]
 
-    return df_ember
+    return tb_ember
 
 
-def add_per_capita_variables(combined: pd.DataFrame, population: pd.DataFrame) -> pd.DataFrame:
+def add_per_capita_variables(combined: Table, population: Table) -> Table:
     """Add per capita variables (in kWh per person) to the combined BP and Ember dataframe.
 
     The list of variables to make per capita are given in this function. The new variable names will be 'per_capita_'
@@ -144,14 +143,14 @@ def add_per_capita_variables(combined: pd.DataFrame, population: pd.DataFrame) -
 
     Parameters
     ----------
-    combined : pd.DataFrame
+    combined : Table
         Combination of BP's Statistical Review and Ember's Combined Electricity.
-    population: pd.DataFrame
+    population: Table
         Population data.
 
     Returns
     -------
-    combined : pd.DataFrame
+    combined : Table
         Input dataframe after adding per capita variables.
 
     """
@@ -186,7 +185,7 @@ def add_per_capita_variables(combined: pd.DataFrame, population: pd.DataFrame) -
     return combined
 
 
-def add_share_variables(combined: pd.DataFrame) -> pd.DataFrame:
+def add_share_variables(combined: Table) -> Table:
     """Add variables for the electricity generation as a share of the total electricity generation (as a percentage).
 
     The following new variables will be created:
@@ -197,12 +196,12 @@ def add_share_variables(combined: pd.DataFrame) -> pd.DataFrame:
 
     Parameters
     ----------
-    combined : pd.DataFrame
+    combined : Table
         Combination of BP's Statistical Review and Ember's Combined Electricity.
 
     Returns
     -------
-    combined : pd.DataFrame
+    combined : Table
         Input dataframe after adding share variables.
 
     """
@@ -253,34 +252,27 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Load BP's statistical review dataset.
-    ds_bp: catalog.Dataset = paths.load_dependency("statistical_review")
-    # Select main table.
+    # Load BP's statistical review dataset and read its main table.
+    ds_bp: Dataset = paths.load_dependency("statistical_review")
     table_bp = ds_bp["statistical_review"]
-    # Create a convenient dataframe.
-    df_bp = pd.DataFrame(table_bp)
 
-    # Idem for Ember's combined electricity.
-    ds_ember: catalog.Dataset = paths.load_dependency("combined_electricity")
+    # Load Ember's combined electricity dataset and read its main table.
+    ds_ember: Dataset = paths.load_dependency("combined_electricity")
     table_ember = ds_ember["combined_electricity"]
-    df_ember = pd.DataFrame(table_ember)
 
-    # Idem for population dataset.
-    ds_population: catalog.Dataset = paths.load_dependency("population")
-    # Get table from dataset.
+    # Load population dataset and read its main table.
+    ds_population: Dataset = paths.load_dependency("population")
     tb_population = ds_population["population"]
-    # Make a dataframe out of the data in the table, with the required columns.
-    df_population = pd.DataFrame(tb_population)
 
     #
     # Process data.
     #
     # Prepare BP and Ember data.
-    df_bp = process_bp_data(table_bp=table_bp)
-    df_ember = process_ember_data(table_ember=table_ember)
+    tb_bp = process_bp_data(table_bp=table_bp)
+    tb_ember = process_ember_data(table_ember=table_ember)
 
     # Combine both tables, giving priority to Ember data (on overlapping values).
-    combined = combine_two_overlapping_dataframes(df1=df_ember, df2=df_bp, index_columns=["country", "year"])
+    combined = combine_two_overlapping_dataframes(df1=tb_ember, df2=tb_bp, index_columns=["country", "year"])
 
     # Add carbon intensities.
     # There is already a variable for this in the Ember dataset, but now that we have combined
@@ -290,7 +282,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Add per capita variables.
-    combined = add_per_capita_variables(combined=combined, population=df_population)
+    combined = add_per_capita_variables(combined=combined, population=tb_population)
 
     # Add "share" variables.
     combined = add_share_variables(combined=combined)
@@ -298,12 +290,17 @@ def run(dest_dir: str) -> None:
     # Set an appropriate index and sort rows and columns conveniently.
     combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
-    # Convert dataframe into a table (with no metadata).
-    table = catalog.Table(combined, short_name="electricity_mix")
+    # Set a table name.
+    combined.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[table])
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[combined])
+
+    # Combine sources and licenses from the original datasets.
+    ds_garden.metadata.sources = sum([ds.metadata.sources for ds in [ds_bp, ds_ember]], [])
+    ds_garden.metadata.licenses = sum([ds.metadata.licenses for ds in [ds_bp, ds_ember]], [])
+
     ds_garden.save()

@@ -13,14 +13,14 @@ Auxiliary datasets:
 
 """
 
-from typing import Dict, cast
+from typing import Dict, List, cast
 
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.meta import Source
 from owid.datautils import dataframes
-from shared import add_population, gather_sources_from_tables
+from shared import add_population
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -31,11 +31,43 @@ paths = PathFinder(__file__)
 VARIABLE_MAPPING_FILE = paths.directory / "owid_energy_variable_mapping.csv"
 
 
+def gather_sources_from_tables(tables: List[Table]) -> List[Source]:
+    """Gather unique sources from the metadata.dataset of each table in a list of tables.
+
+    Note: To check if a source is already listed, only the name of the source is considered (not the description or any
+    other field in the source).
+
+    Parameters
+    ----------
+    tables : list
+        List of tables with metadata.
+
+    Returns
+    -------
+    known_sources : list
+        List of unique sources from all tables.
+
+    """
+    # Initialise list that will gather all unique metadata sources from the tables.
+    known_sources: List[Source] = []
+    for table in tables:
+        # Get list of sources of the dataset of current table.
+        table_sources = table.metadata.dataset.sources
+        # Go source by source of current table, and check if its name is not already in the list of known_sources.
+        for source in table_sources:
+            # Check if this source's name is different to all known_sources.
+            if all([source.name != known_source.name for known_source in known_sources]):
+                # Add the new source to the list.
+                known_sources.append(source)
+
+    return known_sources
+
+
 def combine_tables_data_and_metadata(
     tables: Dict[str, Table],
     population: Table,
     countries_regions: Table,
-    gdp: pd.DataFrame,
+    gdp: Table,
     variable_mapping: pd.DataFrame,
 ) -> Table:
     """Combine data and metadata of a list of tables, map variable names and add variables metadata.
@@ -49,8 +81,8 @@ def combine_tables_data_and_metadata(
         Population data.
     countries_regions : Table
         Main table from countries-regions dataset.
-    gdp: pd.DataFrame
-        GDP (from owid catalog, after converting into a dataframe, resetting index, and selecting country, year and gdp
+    gdp: Table
+        GDP (from owid catalog, after resetting index, and selecting country, year and gdp
         columns).
     variable_mapping : pd.DataFrame
         Dataframe (with columns variable, source_variable, source_dataset, description, source) that specifies the names

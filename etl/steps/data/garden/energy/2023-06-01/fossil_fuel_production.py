@@ -4,7 +4,6 @@ Statistical Review dataset and Shift data on fossil fuel production.
 """
 
 import numpy as np
-import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
 from shared import add_population
@@ -75,7 +74,7 @@ def prepare_shift_data(tb_shift: Table) -> Table:
     return tb_shift
 
 
-def combine_bp_and_shift_data(tb_bp: Table, tb_shift: Table) -> pd.DataFrame:
+def combine_bp_and_shift_data(tb_bp: Table, tb_shift: Table) -> Table:
     """Combine BP and Shift data.
 
     Parameters
@@ -87,7 +86,7 @@ def combine_bp_and_shift_data(tb_bp: Table, tb_shift: Table) -> pd.DataFrame:
 
     Returns
     -------
-    combined : pd.DataFrame
+    combined : Table
         Combined data.
 
     """
@@ -104,26 +103,26 @@ def combine_bp_and_shift_data(tb_bp: Table, tb_shift: Table) -> pd.DataFrame:
     combined = combined.dropna(subset=combined.drop(columns=["country", "year"]).columns, how="all")
 
     # Sort data appropriately.
-    combined = pd.DataFrame(combined).sort_values(index_columns).reset_index(drop=True)
+    combined = combined.sort_values(index_columns).reset_index(drop=True)
 
     return combined
 
 
-def add_annual_change(df: pd.DataFrame) -> pd.DataFrame:
+def add_annual_change(tb: Table) -> Table:
     """Add annual change variables to combined BP & Shift dataset.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    tb : Table
         Combined BP & Shift dataset.
 
     Returns
     -------
-    combined : pd.DataFrame
+    combined : Table
         Combined BP & Shift dataset after adding annual change variables.
 
     """
-    combined = df.copy()
+    combined = tb.copy()
 
     # Calculate annual change.
     combined = combined.sort_values(["country", "year"]).reset_index(drop=True)
@@ -138,32 +137,32 @@ def add_annual_change(df: pd.DataFrame) -> pd.DataFrame:
     return combined
 
 
-def add_per_capita_variables(df: pd.DataFrame, population: pd.DataFrame) -> pd.DataFrame:
+def add_per_capita_variables(tb: Table, population: Table) -> Table:
     """Add per-capita variables to combined BP & Shift dataset.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    tb : Table
         Combined BP & Shift dataset.
-    population : pd.DataFrame
+    population : Table
         Population data.
 
     Returns
     -------
-    combined : pd.DataFrame
+    combined : Table
         Combined BP & Shift dataset after adding per-capita variables.
 
     """
-    df = df.copy()
+    tb = tb.copy()
 
     # List countries for which we expect to have no population.
     # These are countries and regions defined by BP and Shift.
     expected_countries_without_population = [
-        country for country in df["country"].unique() if (("(BP)" in country) or ("(Shift)" in country))
+        country for country in tb["country"].unique() if (("(BP)" in country) or ("(Shift)" in country))
     ]
     # Add population to data.
     combined = add_population(
-        df=df,
+        df=tb,
         population=population,
         country_col="country",
         year_col="year",
@@ -183,51 +182,46 @@ def add_per_capita_variables(df: pd.DataFrame, population: pd.DataFrame) -> pd.D
     return combined
 
 
-def remove_spurious_values(df: pd.DataFrame) -> pd.DataFrame:
+def remove_spurious_values(tb: Table) -> Table:
     """Remove spurious infinity values.
 
     These values are generated when calculating the annual change of a variable that is zero or nan the previous year.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    tb : Table
         Data that may contain infinity values.
 
     Returns
     -------
-    df : pd.DataFrame
+    tb : Table
         Corrected data.
 
     """
     # Replace any infinity value by nan.
-    df = df.replace([np.inf, -np.inf], np.nan)
+    tb = tb.replace([np.inf, -np.inf], np.nan)
 
     # Remove rows that only have nan.
-    df = df.dropna(subset=df.drop(columns=["country", "year"]).columns, how="all").reset_index(drop=True)
+    tb = tb.dropna(subset=tb.drop(columns=["country", "year"]).columns, how="all").reset_index(drop=True)
 
-    return df
+    return tb
 
 
 def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Load BP statistical review dataset.
+    # Load BP statistical review dataset and read its main table.
     ds_bp: Dataset = paths.load_dependency("statistical_review")
-    # Read main table from dataset.
     tb_bp = ds_bp["statistical_review"]
 
-    # Load Shift data.
+    # Load Shift dataset and read its main table.
     ds_shift: Dataset = paths.load_dependency("fossil_fuel_production")
-    # Read main table from dataset.
     tb_shift = ds_shift["fossil_fuel_production"]
 
-    # Load population dataset from garden.
+    # Load population dataset and read its main table.
     ds_population: Dataset = paths.load_dependency("population")
-    # Get table from dataset.
     tb_population = ds_population["population"]
-    # Make a dataframe out of the data in the table, with the required columns.
-    df_population = pd.DataFrame(tb_population)
 
     #
     # Process data.
@@ -239,26 +233,31 @@ def run(dest_dir: str) -> None:
     tb_shift = prepare_shift_data(tb_shift=tb_shift)
 
     # Combine BP and Shift data.
-    df = combine_bp_and_shift_data(tb_bp=tb_bp, tb_shift=tb_shift)
+    tb = combine_bp_and_shift_data(tb_bp=tb_bp, tb_shift=tb_shift)
 
     # Add annual change.
-    df = add_annual_change(df=df)
+    tb = add_annual_change(tb=tb)
 
     # Add per-capita variables.
-    df = add_per_capita_variables(df=df, population=df_population)
+    tb = add_per_capita_variables(tb=tb, population=tb_population)
 
     # Remove spurious values and rows that only have nans.
-    df = remove_spurious_values(df=df)
+    tb = remove_spurious_values(tb=tb)
 
     # Create an appropriate index and sort conveniently.
-    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
-    # Create new table.
-    table = Table(df, short_name="fossil_fuel_production")
+    # Update table name.
+    tb.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
     #
     # Create a new dataset with the same metadata as in Meadow.
-    ds_garden = create_dataset(dest_dir, tables=[table])
+    ds_garden = create_dataset(dest_dir, tables=[tb])
+
+    # Combine sources and licenses from the original datasets.
+    ds_garden.metadata.sources = sum([ds.metadata.sources for ds in [ds_bp, ds_shift]], [])
+    ds_garden.metadata.licenses = sum([ds.metadata.licenses for ds in [ds_bp, ds_shift]], [])
+
     ds_garden.save()
