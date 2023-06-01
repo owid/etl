@@ -5,7 +5,7 @@ meta:
   date_accessed: 2023-06-01
   name: Cholera reported cases, deaths and case fatality rate (WHO, 2023)
   description: |-
-    A combination of WHO Weekly Epidemiological Reports for cholera reported cases, deaths and case fatality rate.
+    The data is created by combining multiple WHO Weekly Epidemiological Reports for cholera reported cases, deaths and case fatality rate.
 
     The reports for the years 2017-2021 can be found at:
 
@@ -22,8 +22,8 @@ meta:
   url: ''
   source_published_by: Google Sheet
   source_data_url: 
-    gAAAAABkeF9vf0kMxvyclrbHmP1kanid_3EiuMOKHF0Z2mG0jfeuq10_jOmpQiEMLD1i9Fgo2AJUIMDKC2QjNKiM9A13lq1hNL5nVk7Vqi5prqnNTVIFbGfewmSRR1N3nw-mbXyd3X-2azGwfQBfBNQBrwdFxGBneMMDOXnCrxcOu_KPDkBSd_QU2Ly2fp5INKKYijDwexGOvy4v-_lZnTO79ux5GgWBz2Lb0ocXnyHn-ZEgcL3rvjzmvnf4zq--HS7Mp4-QxQZ-
-  is_public: false
+    https://docs.google.com/spreadsheets/d/e/2PACX-1vSlmIK_QFOjnb3DSPq6AoEeVFCPhsvKBE4yiUKrOogGhyu98SqoJutDR_3CEI43nvslvYIcJjICn-qI/pub?output=csv
+  is_public: true
   version: '2023-05-31'
 wdir: ../../../data/snapshots/fasttrack/2023-05-31
 outs:

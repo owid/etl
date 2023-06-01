@@ -4,7 +4,7 @@ dataset:
   short_name: cholera
   title: Cholera reported cases, deaths and case fatality rate (WHO, 2023)
   description: |-
-    A combination of WHO Weekly Epidemiological Reports for cholera reported cases, deaths and case fatality rate.
+    The data is created by combining multiple WHO Weekly Epidemiological Reports for cholera reported cases, deaths and case fatality rate.
 
     The reports for the years 2017-2021 can be found at:
 
@@ -18,7 +18,7 @@ dataset:
 
     2021: https://web.archive.org/web/20230526223955/https://apps.who.int/iris/bitstream/handle/10665/362858/WER9737-453-464-eng-fre.pdf?sequence=1&isAllowed=y
   sources:
-  - name: World Health Organization
+  - name: World Health Organization (2023)
     published_by: World Health Organization
     date_accessed: 2023-05-31
 tables:
@@ -30,7 +30,7 @@ tables:
         description: Confirmed cholera cases, including those confirmed clinically,
           epidemiologically, or by laboratory investigation.
         sources:
-        - name: World Health Organization
+        - name: World Health Organization (2023)
           published_by: World Health Organization
           date_accessed: 2023-05-31
       cholera_case_fatality_rate:
@@ -40,7 +40,7 @@ tables:
         description: WHO calculates case fatality rates based on the numbers of cases
           and deaths as reported by national authorities (Ministries of Health).
         sources:
-        - name: World Health Organization
+        - name: World Health Organization (2023)
           published_by: World Health Organization
           date_accessed: 2023-05-31
       cholera_deaths:
@@ -48,6 +48,6 @@ tables:
         unit: deaths
         description: Number of deaths from cholera reported to WHO
         sources:
-        - name: World Health Organization
+        - name: World Health Organization (2023)
           published_by: World Health Organization
           date_accessed: 2023-05-31
