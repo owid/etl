@@ -12,10 +12,8 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Load garden dataset.
+    # Load garden dataset and read its main table.
     ds_garden: Dataset = paths.load_dependency("primary_energy_consumption")
-
-    # Read table from garden dataset.
     tb_garden = ds_garden["primary_energy_consumption"].reset_index()
 
     #
