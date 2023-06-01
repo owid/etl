@@ -1,8 +1,9 @@
 meta:
   namespace: backport
-  short_name: dataset_988_global_deaths_by_cause_and_risk__global_burden_of_disease__2017_config
+  short_name: 
+    dataset_988_global_deaths_by_cause_and_risk__global_burden_of_disease__2017_config
   file_extension: json
-  date_accessed: 2023-02-23 15:00:41.049957
+  date_accessed: 2023-06-01 12:56:24.590249
   name: Grapher metadata for dataset_988_global_deaths_by_cause_and_risk__global_burden_of_disease__2017
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +14,7 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fafed0fcd1cd49c29b8b0336a3fc2e8f
+- md5: 79a32fed65f2730dd4983d0cd1c45dd3
   size: 15769
-  path: dataset_988_global_deaths_by_cause_and_risk__global_burden_of_disease__2017_config.json
+  path: 
+    dataset_988_global_deaths_by_cause_and_risk__global_burden_of_disease__2017_config.json

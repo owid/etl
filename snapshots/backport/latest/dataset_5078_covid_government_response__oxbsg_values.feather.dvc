@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5078_covid_government_response__oxbsg_values
   file_extension: feather
-  date_accessed: 2023-05-13 06:31:40.335808
+  date_accessed: 2023-06-01 12:32:32.719931
   name: COVID Government Response (OxBSG)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 36e681ca6e41852360998ad588ace10e
-  size: 20493634
+- md5: bb7aaa3f7bf3b12b18b142f244afb91a
+  size: 20491642
   path: dataset_5078_covid_government_response__oxbsg_values.feather

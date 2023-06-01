@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5362_world_bank_edstats_2020_values
   file_extension: feather
-  date_accessed: 2023-02-23 16:33:59.646030
+  date_accessed: 2023-06-01 12:33:26.221663
   name: World Bank EdStats 2020
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e21f192df9fc6ce6508f2b5f1e7f4ac5
-  size: 27763186
+- md5: 5bd2f39ccc5d693a3f27b3289866c88b
+  size: 27760378
   path: dataset_5362_world_bank_edstats_2020_values.feather

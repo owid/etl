@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2423_mental_and_substance_use_disorders_config
   file_extension: json
-  date_accessed: 2023-02-23 19:09:23.082260
+  date_accessed: 2023-06-01 12:32:40.360566
   name: Grapher metadata for dataset_2423_mental_and_substance_use_disorders
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c7f581b73186e69674fc83ba14e89280
+- md5: dd6fc705d0f4f86e8225929a21df1b7c
   size: 72253
   path: dataset_2423_mental_and_substance_use_disorders_config.json

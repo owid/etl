@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2952_extreme_poverty_share_to_2030__crespo_cuaresma__2018_values
   file_extension: feather
-  date_accessed: 2023-02-23 17:31:59.102589
+  date_accessed: 2023-06-01 12:41:36.514805
   name: Extreme Poverty Share to 2030 - Crespo-Cuaresma (2018)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7776a5281c218db88620d152f2ce0663
-  size: 48002
+- md5: 746f2e76bc3761f219cf4740fc7f06ac
+  size: 48010
   path: dataset_2952_extreme_poverty_share_to_2030__crespo_cuaresma__2018_values.feather

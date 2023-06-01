@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4882_gavi_country_eligibility__2019_values
   file_extension: feather
-  date_accessed: 2023-02-23 17:08:29.228315
+  date_accessed: 2023-06-01 13:16:56.160484
   name: GAVI country eligibility - 2019
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0499649032151b8aad6d34eb638d4ff3
-  size: 12874
+- md5: d1e90f7f6218defa9fa20c1b0c70d8f9
+  size: 12882
   path: dataset_4882_gavi_country_eligibility__2019_values.feather

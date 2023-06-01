@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5096_covid_19_model_estimates__ihme__2022_values
   file_extension: feather
-  date_accessed: 2023-02-23 18:58:58.222411
+  date_accessed: 2023-06-01 13:19:03.996342
   name: COVID-19 Model Estimates – IHME (2022)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0900a06de8b8b1a04761417f2f38749d
+- md5: efadd9b9c74a10c2d4d2fa6b86c0c80e
   size: 3008058
   path: dataset_5096_covid_19_model_estimates__ihme__2022_values.feather

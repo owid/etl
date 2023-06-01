@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1740_autism_values
   file_extension: feather
-  date_accessed: 2023-02-23 18:47:02.949366
+  date_accessed: 2023-06-01 12:51:32.347667
   name: Autism
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5bba333559fbc4ff7d76fae3861fc079
+- md5: e795a4ab71dbd9c849c4babc732e5c65
   size: 963298
   path: dataset_1740_autism_values.feather

@@ -1,8 +1,9 @@
 meta:
   namespace: backport
-  short_name: dataset_2519_difference_in_the_value_of_goods_exported_to_and_imported_by_the_us_for_2016__dots__2017_values
+  short_name: 
+    dataset_2519_difference_in_the_value_of_goods_exported_to_and_imported_by_the_us_for_2016__dots__2017_values
   file_extension: feather
-  date_accessed: 2023-02-23 16:40:09.469772
+  date_accessed: 2023-06-01 12:38:29.081658
   name: Difference in the value of goods exported to and imported by the US for 2016
     (DOTS (2017))
   description: ''
@@ -14,6 +15,7 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 65eb2f88c397f70daf91fcafcfdd4043
+- md5: cdcd40e0812fe8583017268e7c262c93
   size: 13690
-  path: dataset_2519_difference_in_the_value_of_goods_exported_to_and_imported_by_the_us_for_2016__dots__2017_values.feather
+  path: 
+    dataset_2519_difference_in_the_value_of_goods_exported_to_and_imported_by_the_us_for_2016__dots__2017_values.feather

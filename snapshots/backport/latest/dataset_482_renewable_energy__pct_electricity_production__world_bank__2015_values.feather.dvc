@@ -1,8 +1,9 @@
 meta:
   namespace: backport
-  short_name: dataset_482_renewable_energy__pct_electricity_production__world_bank__2015_values
+  short_name: 
+    dataset_482_renewable_energy__pct_electricity_production__world_bank__2015_values
   file_extension: feather
-  date_accessed: 2023-02-23 19:50:26.335122
+  date_accessed: 2023-06-01 13:12:34.200244
   name: Renewable Energy (% electricity production) - World Bank (2015)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +14,7 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 69786d2ccd1f41bbf08c7f2452e9468f
+- md5: 0a7f1c27ca11106d2afcea93632c537c
   size: 48226
-  path: dataset_482_renewable_energy__pct_electricity_production__world_bank__2015_values.feather
+  path: 
+    dataset_482_renewable_energy__pct_electricity_production__world_bank__2015_values.feather
