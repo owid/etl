@@ -10,17 +10,15 @@ import re
 import zipfile
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, Optional
 
 import pandas as pd
 import structlog
-from owid.catalog import Dataset, Source, Table, VariableMeta
+from owid.catalog import Source, Table, VariableMeta
 from owid.catalog.utils import underscore
-from owid.walden import Catalog
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-from etl.paths import DATA_DIR
 
 log = structlog.get_logger()
 

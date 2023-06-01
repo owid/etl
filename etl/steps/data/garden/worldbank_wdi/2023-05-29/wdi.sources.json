@@ -1126,118 +1126,118 @@
     "dataPublisherSource": "Poverty and Inequality Platform - World Bank"
   },
   {
-    "rawName": "International Labour Organization. “ILO modelled estimates database” ILOSTAT. Accessed January 2021. https://ilostat.ilo.org/data/.",
-    "name": "TODO International Labour Organization. “ILO modelled estimates database” ILOSTAT. Accessed January 2021. https://ilostat.ilo.org/data/.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision. (2) University of California, Berkeley, and Max Planck Institute for Demographic Research. The Human Mortality Database.",
-    "name": "TODO (1) United Nations Population Division. World Population Prospects: 2022 Revision. (2) University of California, Berkeley, and Max Planck Institute for Demographic Research. The Human Mortality Database.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision. (2) Census reports and other statistical publications from national statistical offices, (3) Eurostat: Demographic Statistics, (4) United Nations Statistical Division. Population and Vital Statistics Reprot (various years), (5) U.S. Census Bureau: International Database, and (6) Secretariat of the Pacific Community: Statistics and Demography Programme.",
-    "name": "TODO (1) United Nations Population Division. World Population Prospects: 2022 Revision. (2) Census reports and other statistical publications from national statistical offices, (3) Eurostat: Demographic Statistics, (4) United Nations Statistical Division. Population and Vital Statistics Reprot (various years), (5) U.S. Census Bureau: International Database, and (6) Secretariat of the Pacific Community: Statistics and Demography Programme.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "World Bank, World Development Indicators database. Estimates are based on employment, population, GDP, and PPP data obtained from International Labour Organization, United Nations Population Division, Eurostat, OECD, and World Bank.",
-    "name": "TODO World Bank, World Development Indicators database. Estimates are based on employment, population, GDP, and PPP data obtained from International Labour Organization, United Nations Population Division, Eurostat, OECD, and World Bank.",
-    "dataPublisherSource": "TODO"
-  },
-  {
     "rawName": "International Labour Organization. “ILO modelled estimates database” ILOSTAT. Accessed June 2021. https://ilostat.ilo.org/data/.",
-    "name": "TODO International Labour Organization. “ILO modelled estimates database” ILOSTAT. Accessed June 2021. https://ilostat.ilo.org/data/.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "International Labour Organization. “Wages and Working Time Statistics database (COND)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
-    "name": "TODO International Labour Organization. “Wages and Working Time Statistics database (COND)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022. https://apiportal.uis.unesco.org/bdds.",
-    "name": "TODO UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022. https://apiportal.uis.unesco.org/bdds.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "Center for International Earth Science Information Network - CIESIN - Columbia University, and CUNY Institute for Demographic Research - CIDR - City University of New York. 2021. Low Elevation Coastal Zone (LECZ) Urban-Rural Population and Land Area Estimates, Version 3. Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). https://doi.org/10.7927/d1x1-d702.",
-    "name": "TODO Center",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "International Labour Organization. “Labour Market-related SDG Indicators database (ILOSDG)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
-    "name": "TODO International Labour Organization. “Labour Market-related SDG Indicators database (ILOSDG)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "International Labour Organization. “Labour Force Statistics database (LFS)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
-    "name": "TODO International Labour Organization. “Labour Force Statistics database (LFS)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "World Bank, World Development Indicators database. Estimates are based on data obtained from International Labour Organization, ILOSTAT at https://ilostat.ilo.org/data/.",
-    "name": "TODO World Bank, World Development Indicators database. Estimates are based on data obtained from International Labour Organization, ILOSTAT at https://ilostat.ilo.org/data/.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "International Labour Organization. “ILO Modelled Estimates and Projections database (ILOEST)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
-    "name": "TODO International Labour Organization. “ILO Modelled Estimates and Projections database (ILOEST)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "World Bank staff estimates using the World Bank's total population and age/sex distributions of the United Nations Population Division's World Population Prospects: 2022 Revision.",
-    "name": "TODO World Bank staff estimates using the World Bank's total population and age/sex distributions of the United Nations Population Division's World Population Prospects: 2022 Revision.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "UNICEF global databases, based on administrative reports from countries (link: https://data.unicef.org/topic/nutrition/vitamin-a-deficiency/)",
-    "name": "TODO UNICEF global databases, based on administrative reports from countries (link: https://data.unicef.org/topic/nutrition/vitamin-a-deficiency/)",
-    "dataPublisherSource": "TODO"
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "ILO modelled estimates database - ILOSTAT"
   },
   {
     "rawName": "UNESCO Institute for Statistics (http://uis.unesco.org/). Data as of March 2021.",
-    "name": "TODO UNESCO Institute for Statistics (http://uis.unesco.org/). Data as of March 2021.",
-    "dataPublisherSource": "TODO"
+    "name": "UNESCO Institute for Statistics (via World Bank)",
+    "dataPublisherSource": "UNESCO Institute for Statistics"
   },
   {
-    "rawName": "World Bank, World Development Indicators database. Estimates are based on data obtained from International Labour Organization and United Nations Population Division.",
-    "name": "TODO World Bank, World Development Indicators database. Estimates are based on data obtained from International Labour Organization and United Nations Population Division.",
-    "dataPublisherSource": "TODO"
+    "rawName": "International Labour Organization. “Labour Force Statistics database (LFS)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "Labour Force Statistics database - ILOSTAT"
   },
   {
-    "rawName": "World Bank staff estimates based on age/sex distributions of United Nations Population Division's World Population Prospects: 2022 Revision.",
-    "name": "TODO World Bank staff estimates based on age/sex distributions of United Nations Population Division's World Population Prospects: 2022 Revision.",
-    "dataPublisherSource": "TODO"
+    "rawName": "World Bank, World Development Indicators database. Estimates are based on data obtained from International Labour Organization, ILOSTAT at https://ilostat.ilo.org/data/.",
+    "name": "World Bank based on data from International Labour Organization",
+    "dataPublisherSource": "World Development Indicators - World Bank, ILOSTAT - International Labour Organization"
   },
   {
-    "rawName": "United Nations Population Division. World Population Prospects: 2022 Revision.",
-    "name": "TODO United Nations Population Division. World Population Prospects: 2022 Revision.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision, or derived from male and female life expectancy at birth from sources such as: (2) Census reports and other statistical publications from national statistical offices, (3) Eurostat: Demographic Statistics, (4) United Nations Statistical Division. Population and Vital Statistics Reprot (various years), (5) U.S. Census Bureau: International Database, and (6) Secretariat of the Pacific Community: Statistics and Demography Programme.",
-    "name": "TODO (1) United Nations Population Division. World Population Prospects: 2022 Revision, or derived from male and female life expectancy at birth from sources such as: (2) Census reports and other statistical publications from national statistical offices, (3) Eurostat: Demographic Statistics, (4) United Nations Statistical Division. Population and Vital Statistics Reprot (various years), (5) U.S. Census Bureau: International Database, and (6) Secretariat of the Pacific Community: Statistics and Demography Programme.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "International Labour Organization. “Education and Mismatch Indicators database (EMI)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
-    "name": "TODO International Labour Organization. “Education and Mismatch Indicators database (EMI)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
-    "dataPublisherSource": "TODO"
-  },
-  {
-    "rawName": "Derived from total population. Population source: (1) United Nations Population Division. World Population Prospects: 2022 Revision, (2) Census reports and other statistical publications from national statistical offices, (3) Eurostat: Demographic Statistics, (4) United Nations Statistical Division. Population and Vital Statistics Reprot (various years), (5) U.S. Census Bureau: International Database, and (6) Secretariat of the Pacific Community: Statistics and Demography Programme.",
-    "name": "TODO Derived from total population. Population source: (1) United Nations Population Division. World Population Prospects: 2022 Revision, (2) Census reports and other statistical publications from national statistical offices, (3) Eurostat: Demographic Statistics, (4) United Nations Statistical Division. Population and Vital Statistics Reprot (various years), (5) U.S. Census Bureau: International Database, and (6) Secretariat of the Pacific Community: Statistics and Demography Programme.",
-    "dataPublisherSource": "TODO"
+    "rawName": "World Bank staff estimates using the World Bank's total population and age/sex distributions of the United Nations Population Division's World Population Prospects: 2022 Revision.",
+    "name": "World Bank based on data from the UN Population Division",
+    "dataPublisherSource": "World Bank based on World Population Prospects - UN Population Division (2022)"
   },
   {
     "rawName": "World Bank staff estimates based on age distributions of United Nations Population Division's World Population Prospects: 2022 Revision.",
-    "name": "TODO World Bank staff estimates based on age distributions of United Nations Population Division's World Population Prospects: 2022 Revision.",
-    "dataPublisherSource": "TODO"
+    "name": "World Bank based on data from the UN Population Division",
+    "dataPublisherSource": "World Bank based on World Population Prospects - UN Population Division (2022)"
+  },
+  {
+    "rawName": "International Labour Organization. “Education and Mismatch Indicators database (EMI)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "Education and Mismatch Indicators database - ILOSTAT"
+  },
+  {
+    "rawName": "International Labour Organization. “Wages and Working Time Statistics database (COND)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "Wages and Working Time Statistics database - ILOSTAT"
+  },
+  {
+    "rawName": "International Labour Organization. “ILO modelled estimates database” ILOSTAT. Accessed January 2021. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "ILO modelled estimates database - ILOSTAT"
+  },
+  {
+    "rawName": "United Nations Population Division. World Population Prospects: 2022 Revision.",
+    "name": "United Nations Population Division (via World Bank)",
+    "dataPublisherSource": "World Population Prospects - UN Population Division (2022)"
+  },
+  {
+    "rawName": "International Labour Organization. “Labour Market-related SDG Indicators database (ILOSDG)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "Labour Market-related SDG Indicators Database - ILOSTAT"
+  },
+  {
+    "rawName": "World Bank, World Development Indicators database. Estimates are based on employment, population, GDP, and PPP data obtained from International Labour Organization, United Nations Population Division, Eurostat, OECD, and World Bank.",
+    "name": "World Bank",
+    "dataPublisherSource": "World Development Indicators Database - World Bank"
+  },
+  {
+    "rawName": "World Bank, World Development Indicators database. Estimates are based on data obtained from International Labour Organization and United Nations Population Division.",
+    "name": "World Bank",
+    "dataPublisherSource": "World Development Indicators Database - World Bank"
+  },
+  {
+    "rawName": "Derived from total population. Population source: (1) United Nations Population Division. World Population Prospects: 2022 Revision, (2) Census reports and other statistical publications from national statistical offices, (3) Eurostat: Demographic Statistics, (4) United Nations Statistical Division. Population and Vital Statistics Reprot (various years), (5) U.S. Census Bureau: International Database, and (6) Secretariat of the Pacific Community: Statistics and Demography Programme.",
+    "name": "United Nations Population Division and others (via World Bank)",
+    "dataPublisherSource": "World Population Prospects, Census Reports, Eurostat, United Nations Statistical Division, U.S. Census Bureau, Secretariat of the Pacific Community"
+  },
+  {
+    "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision. (2) Census reports and other statistical publications from national statistical offices, (3) Eurostat: Demographic Statistics, (4) United Nations Statistical Division. Population and Vital Statistics Reprot (various years), (5) U.S. Census Bureau: International Database, and (6) Secretariat of the Pacific Community: Statistics and Demography Programme.",
+    "name": "United Nations Population Division and others (via World Bank)",
+    "dataPublisherSource": "World Population Prospects, Census Reports, Eurostat, United Nations Statistical Division, U.S. Census Bureau, Secretariat of the Pacific Community"
+  },
+  {
+    "rawName": "UNICEF global databases, based on administrative reports from countries (link: https://data.unicef.org/topic/nutrition/vitamin-a-deficiency/)",
+    "name": "UNICEF (via World Bank)",
+    "dataPublisherSource": "UNICEF Global Databases"
+  },
+  {
+    "rawName": "International Labour Organization. “ILO Modelled Estimates and Projections database (ILOEST)” ILOSTAT. Accessed December 6, 2022. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "ILO Modelled Estimates and Projections Database - ILOSTAT"
+  },
+  {
+    "rawName": "Center for International Earth Science Information Network - CIESIN - Columbia University, and CUNY Institute for Demographic Research - CIDR - City University of New York. 2021. Low Elevation Coastal Zone (LECZ) Urban-Rural Population and Land Area Estimates, Version 3. Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). https://doi.org/10.7927/d1x1-d702.",
+    "name": "CIESIN and CIDR (via World Bank)",
+    "dataPublisherSource": "Low Elevation Coastal Zone (LECZ) Urban-Rural Population and Land Area Estimates - CIESIN / CIDR"
+  },
+  {
+    "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision, or derived from male and female life expectancy at birth from sources such as: (2) Census reports and other statistical publications from national statistical offices, (3) Eurostat: Demographic Statistics, (4) United Nations Statistical Division. Population and Vital Statistics Reprot (various years), (5) U.S. Census Bureau: International Database, and (6) Secretariat of the Pacific Community: Statistics and Demography Programme.",
+    "name": "United Nations Population Division and others (via World Bank)",
+    "dataPublisherSource": "World Population Prospects, Census Reports, Eurostat, United Nations Statistical Division, U.S. Census Bureau, Secretariat of the Pacific Community"
+  },
+  {
+    "rawName": "UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022. https://apiportal.uis.unesco.org/bdds.",
+    "name": "UNESCO (via World Bank)",
+    "dataPublisherSource": "UNESCO Institute for Statistics"
   },
   {
     "rawName": "Global Findex Database, World Bank (https://www.worldbank.org/en/publication/globalfindex).",
-    "name": "TODO Global Findex Database, World Bank (https://www.worldbank.org/en/publication/globalfindex).",
-    "dataPublisherSource": "TODO"
+    "name": "World Bank",
+    "dataPublisherSource": "Global Findex Database - World Bank"
+  },
+  {
+    "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision. (2) University of California, Berkeley, and Max Planck Institute for Demographic Research. The Human Mortality Database.",
+    "name": "United Nations Population Division and others (via World Bank)",
+    "dataPublisherSource": "World Population Prospects, Human Mortality Database - University of California, Berkeley / Max Planck Institute for Demographic Research"
+  },
+  {
+    "rawName": "World Bank staff estimates based on age/sex distributions of United Nations Population Division's World Population Prospects: 2022 Revision.",
+    "name": "World Bank",
+    "dataPublisherSource": "World Population Prospects - United Nations Population Division"
   }
 ]
