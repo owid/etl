@@ -544,6 +544,7 @@ class FruitYieldAnomaly(HighYieldAnomaly):
     description = (  # type: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "For example, the yield of item 'Fruit Primary' in Denmark prior to 1985 is larger than 6000 tonnes/ha. "
+        "Similar issues happen to Antigua and Barbuda and Burkina Faso. "
         "For Netherlands, a similar anomaly is found but prior to 1984 (which will be considered separately). "
         "Therefore, we remove these possibly spurious values."
     )
@@ -592,7 +593,7 @@ class FruitYieldAnomaly(HighYieldAnomaly):
 class FruitYieldNetherlandsAnomaly(HighYieldAnomaly):
     description = (  # type: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
-        "The yield of item 'Fruit Primary' in Netherlands prior to 1984 is significantly larger after that year. "
+        "This happens to item 'Fruit Primary' in Netherlands prior to 1984. "
         "Therefore, we remove these possibly spurious values."
     )
 
@@ -637,6 +638,7 @@ class FruitYieldNetherlandsAnomaly(HighYieldAnomaly):
 class LocustBeansYieldAnomaly(HighYieldAnomaly):
     description = (  # type: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
+        "This happens to item 'Locust beans (carobs)' for region 'Net Food Importing Developing Countries (FAO)'. "
         "Therefore, we remove these possibly spurious values."
     )
 
@@ -682,6 +684,7 @@ class LocustBeansYieldAnomaly(HighYieldAnomaly):
 class WalnutsYieldAnomaly(HighYieldAnomaly):
     description = (  # type: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
+        "This happens to item 'Walnuts, in shell' for region 'Eastern Asia (FAO)'. "
         "Therefore, we remove these possibly spurious values."
     )
 
@@ -727,6 +730,7 @@ class WalnutsYieldAnomaly(HighYieldAnomaly):
 class OtherTropicalFruitYieldNorthernAfricaAnomaly(HighYieldAnomaly):
     description = (  # type: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
+        "This happens to item 'Other tropical fruits, n.e.c.' for region 'Northern Africa (FAO)'. "
         "Therefore, we remove these possibly spurious values."
     )
 
@@ -764,6 +768,7 @@ class OtherTropicalFruitYieldNorthernAfricaAnomaly(HighYieldAnomaly):
 class OtherTropicalFruitYieldSouthAmericaAnomaly(HighYieldAnomaly):
     description = (  # type: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
+        "This happens to item 'Other tropical fruits, n.e.c.' for South America. "
         "Therefore, we remove these possibly spurious values."
     )
 
