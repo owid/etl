@@ -42,7 +42,6 @@ def main(upload: bool) -> None:
 
 def load_external_metadata() -> dict:
     meta_orig = json.loads(requests.get(URL_METADATA).content)
-    # print({k: v for k, v in meta.items() if k not in ['indicators', 'resources', 'citation']})
 
     pub_date = dt.datetime.strptime(meta_orig.get("last_updated_date"), "%Y-%m-%dT%H:%M:%S").date()
 

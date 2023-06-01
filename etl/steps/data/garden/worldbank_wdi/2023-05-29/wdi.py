@@ -1,10 +1,3 @@
-"""
-
-Harmonize country names:
-
-    $ harmonize data/meadow/worldbank_wdi/{version}/wdi/wdi.feather country etl/steps/data/garden/worldbank_wdi/{version}/wdi.country_mapping.json
-"""
-
 import json
 import re
 import zipfile
@@ -57,8 +50,6 @@ def run(dest_dir: str) -> None:
 
     tb_omm = mk_omms(tb_garden)
     tb_garden = tb_garden.join(tb_omm, how="outer")
-
-    # TODO: is it fine if there's YAML file? what happens? can we move titles of OMMs there?
 
     # validate that all columns have title
     for col in tb_garden.columns:
@@ -399,6 +390,7 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
 
 
 def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:
+    # TODO: say something about how it was created
     with open(Path(__file__).parent / "wdi.sources.json", "r") as f:
         sources = json.load(f)
         source_mapping = {source["rawName"]: source for source in sources}

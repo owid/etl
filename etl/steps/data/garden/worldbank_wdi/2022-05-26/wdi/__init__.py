@@ -370,10 +370,6 @@ def add_variable_metadata(table: Table) -> Table:
     for var_code in var_codes:
         var = df_vars.loc[var_code].to_dict()
 
-        if var["indicator_name"] == "Agricultural land (sq. km)":
-            __import__('ipdb').set_trace()
-            print(21)
-
         # retrieves unit + display metadata from the most recently updated
         # WDI grapher variable that matches this variable's name
         unit = ""

@@ -390,9 +390,6 @@ def _data_diff(
     table_a: Table, table_b: Table, col: str, dims: list[str], tabs: int, eq: Optional[pd.Series] = None
 ) -> str:
     """Return summary of data differences."""
-    table_a = table_a[table_a.country == "United States"]
-    table_b = table_b[table_b.country == "United States"]
-
     if eq is None:
         eq = series_equals(table_a[col], table_b[col])
 
