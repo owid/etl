@@ -372,12 +372,12 @@ class ChartVariableUpdater(ChartUpdater):
         Dict[str, Any]
             Updated chart configuration.
         """
-        log.info("variable_update: updating sortBy property")
         if "sortBy" in config:
+            log.info("variable_update: updating sortBy property")
             if config["sortBy"] == "column":
                 assert "sortColumnSlug" in config, "sortBy is 'column' but sortColumnSlug is not defined!"
                 var_old_id = config["sortColumnSlug"]
-                config["sortColumnSlug"] = str(self.variable_mapping.get(var_old_id, var_old_id))
+                config["sortColumnSlug"] = str(self.variable_mapping.get(int(var_old_id), var_old_id))
         return config
 
     def _update_config_time_specific_chart(
