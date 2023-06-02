@@ -85,8 +85,7 @@ tables:
         display:
           numDecimalPlaces: 0
       int_inb_out_per_capita:
-        title: Per capita CO2 emissions from international flights, international
-          tourism-adjusted
+        title: Per capita CO2 emissions from international flights, international tourism-adjusted
         unit: pounds
         short_unit: lb
         display:
