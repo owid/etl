@@ -109,6 +109,11 @@ def migrate_to_latest_schema(config: Dict[str, Any]) -> Dict[str, Any]:
             if "variableId" not in config_new["map"]:
                 config_new["map"]["variableId"] = config_new["map"]["columnSlug"]
             del config_new["map"]["columnSlug"]
+    if "properties" in config_new:
+        if ("timelineMaxTime" in config_new["properties"]) and (config_new["properties"]["timelineMaxTime"] is None):
+            del config_new["properties"]["timelineMaxTime"]
+        if ("timelineMinTime" in config_new["properties"]) and (config_new["properties"]["timelineMinTime"] is None):
+            del config_new["properties"]["timelineMinTime"]
     return config_new
 
 
