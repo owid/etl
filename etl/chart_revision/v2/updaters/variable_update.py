@@ -14,8 +14,8 @@ import etl.grapher_model as gm
 from backport.datasync.data_metadata import variable_data_df_from_s3
 from etl.chart_revision.v2.base import ChartUpdater
 from etl.chart_revision.v2.schema import (
+    fix_errors_in_schema,
     get_schema_chart_config,
-    migrate_to_latest_schema,
     validate_chart_config_and_remove_defaults,
     validate_chart_config_and_set_defaults,
 )
@@ -148,7 +148,7 @@ class ChartVariableUpdater(ChartUpdater):
         """Run the chart variable updater."""
         log.info("variable_update: updating configuration")
         # Validate the configuration of the chart and add default values
-        config_new = migrate_to_latest_schema(config)
+        config_new = fix_errors_in_schema(config)
         config_new = validate_chart_config_and_set_defaults(config_new, self.schema)
         # Update map configuration
         config_new = self.update_config_map(
