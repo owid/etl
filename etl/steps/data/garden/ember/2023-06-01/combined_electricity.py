@@ -1,4 +1,4 @@
-"""Garden step that combines Ember's European Electricity Review (EER) 2022 and the latest Ember's Yearly Electricity
+"""Garden step that combines Ember's European Electricity Review (EER) and the latest Ember's Yearly Electricity
 Data (YED).
 
 The YED dataset contains data for all countries in EER 2022.
@@ -297,4 +297,9 @@ def run(dest_dir: str) -> None:
         tables=[combined_global, combined_european, combined, net_flows],
         default_metadata=ds_global.metadata,
     )
+
+    # Combine sources and licenses from the original datasets.
+    ds_garden.metadata.sources = sum([ds.metadata.sources for ds in [ds_global, ds_european]], [])
+    ds_garden.metadata.licenses = sum([ds.metadata.licenses for ds in [ds_global, ds_european]], [])
+
     ds_garden.save()

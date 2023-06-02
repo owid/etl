@@ -13,15 +13,15 @@ Auxiliary datasets:
 
 """
 
-from typing import Dict, cast
+from typing import Dict, List, cast
 
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.meta import Source
 from owid.datautils import dataframes
-from shared import add_population, gather_sources_from_tables
 
+from etl.data_helpers.geo import add_population_to_dataframe
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -31,11 +31,43 @@ paths = PathFinder(__file__)
 VARIABLE_MAPPING_FILE = paths.directory / "owid_energy_variable_mapping.csv"
 
 
+def gather_sources_from_tables(tables: List[Table]) -> List[Source]:
+    """Gather unique sources from the metadata.dataset of each table in a list of tables.
+
+    Note: To check if a source is already listed, only the name of the source is considered (not the description or any
+    other field in the source).
+
+    Parameters
+    ----------
+    tables : list
+        List of tables with metadata.
+
+    Returns
+    -------
+    known_sources : list
+        List of unique sources from all tables.
+
+    """
+    # Initialise list that will gather all unique metadata sources from the tables.
+    known_sources: List[Source] = []
+    for table in tables:
+        # Get list of sources of the dataset of current table.
+        table_sources = table.metadata.dataset.sources
+        # Go source by source of current table, and check if its name is not already in the list of known_sources.
+        for source in table_sources:
+            # Check if this source's name is different to all known_sources.
+            if all([source.name != known_source.name for known_source in known_sources]):
+                # Add the new source to the list.
+                known_sources.append(source)
+
+    return known_sources
+
+
 def combine_tables_data_and_metadata(
     tables: Dict[str, Table],
-    population: Table,
+    ds_population: Dataset,
     countries_regions: Table,
-    gdp: pd.DataFrame,
+    gdp: Table,
     variable_mapping: pd.DataFrame,
 ) -> Table:
     """Combine data and metadata of a list of tables, map variable names and add variables metadata.
@@ -45,12 +77,12 @@ def combine_tables_data_and_metadata(
     tables : dict
         Dictionary where the key is the short name of the table, and the value is the actual table, for all tables to be
         combined.
-    population: Table
-        Population data.
+    ds_population: Dataset
+        Population dataset.
     countries_regions : Table
         Main table from countries-regions dataset.
-    gdp: pd.DataFrame
-        GDP (from owid catalog, after converting into a dataframe, resetting index, and selecting country, year and gdp
+    gdp: Table
+        GDP (from owid catalog, after resetting index, and selecting country, year and gdp
         columns).
     variable_mapping : pd.DataFrame
         Dataframe (with columns variable, source_variable, source_dataset, description, source) that specifies the names
@@ -71,7 +103,9 @@ def combine_tables_data_and_metadata(
     df_combined = pd.merge(df_combined, countries_regions, left_on="country", right_on="name", how="left")
 
     # Add population and gdp of countries (except for dataset-specific regions e.g. those ending in (BP) or (Shift)).
-    df_combined = add_population(df=df_combined, population=population, warn_on_missing_countries=False)
+    df_combined = add_population_to_dataframe(
+        df=df_combined, ds_population=ds_population, warn_on_missing_countries=False
+    )
     df_combined = pd.merge(df_combined, gdp, on=["country", "year"], how="left")
 
     # Check that there were no repetition in column names.
@@ -141,7 +175,6 @@ def run(dest_dir: str) -> None:
     tb_fossil_fuels = ds_fossil_fuels["fossil_fuel_production"].reset_index()
     tb_primary_energy = ds_primary_energy["primary_energy_consumption"].reset_index()
     tb_electricity_mix = ds_electricity_mix["electricity_mix"].reset_index()
-    tb_population = ds_population["population"].reset_index()
     tb_regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
     tb_ggdc = ds_ggdc["maddison_gdp"].reset_index()[["country", "year", "gdp"]].dropna()
 
@@ -162,7 +195,7 @@ def run(dest_dir: str) -> None:
     }
     tb_combined = combine_tables_data_and_metadata(
         tables=tables,
-        population=tb_population,
+        ds_population=ds_population,
         countries_regions=tb_regions,
         gdp=tb_ggdc,
         variable_mapping=variable_mapping,

@@ -1,8 +1,5 @@
 dataset:
-  namespace: energy
-  version: 2023-02-20
   title: Energy dataset (OWID, 2023)
-  short_name: owid_energy
   description: |
     OWID Energy dataset.
 

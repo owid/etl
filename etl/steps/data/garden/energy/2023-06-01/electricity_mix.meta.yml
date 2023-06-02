@@ -1,8 +1,5 @@
 dataset:
-  namespace: energy
-  version: 2023-02-20
-  title: Electricity mix (BP & Ember, 2023)
-  short_name: electricity_mix
+  title: Electricity mix (BP & Ember, 2023b)
   description: |
     Data is compiled by Our World in Data based on three main sources:
     - <a href="https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html">BP Statistical Review of World Energy</a>.
@@ -61,27 +58,6 @@ dataset:
     * "Latin America and Caribbean (Ember)": Antigua and Barbuda, Argentina, Bahamas, Barbados, Belize, Bolivia, Brazil, Chile, Colombia, Costa Rica, Cuba, Dominica, Dominican Republic, Ecuador, El Salvador, Grenada, Guatemala, Guyana, Haiti, Honduras, Jamaica, Mexico, Nicaragua, Panama, Paraguay, Peru, Saint Kitts and Nevis, Saint Lucia, Saint Vincent and the Grenadines, Suriname, Trinidad and Tobago, Uruguay, Venezuela, Aruba, British Virgin Islands, Cayman Islands, Falkland Islands, French Guiana, Guadeloupe, Martinique, Montserrat, Puerto Rico, Turks and Caicos Islands and United States Virgin Islands.
     * "Middle East (Ember)": Bahrain, Iran, Iraq, Israel, Jordan, Kuwait, Lebanon, Oman, Palestine, Qatar, Saudi Arabia, Syria, United Arab Emirates and Yemen.
     * "OECD (Ember)" - Organization For Economic Co-operation and Development: Austria, Belgium, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Iceland, Ireland, Italy, Latvia, Lithuania, Luxembourg, Netherlands, Norway, Poland, Portugal, Slovakia, Slovenia, Spain, Sweden, Switzerland, Turkey, United Kingdom, Australia, Canada, Chile, Colombia, Israel, Japan, Mexico, New Zealand, South Korea, and United States.
-  sources:
-    -
-      name: Our World in Data based on BP Statistical Review of World Energy (2022)
-      published_by: BP Statistical Review of World Energy
-      publication_year: 2022
-      date_accessed: 2022-07-08
-      url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
-    -
-      name: Our World in Data based on Ember's Yearly Electricity Data (2023)
-      published_by: Ember
-      publication_year: 2023
-      publication_date: 2023-01-31
-      date_accessed: 2023-02-20
-      url: https://ember-climate.org/data-catalogue/yearly-electricity-data/
-    -
-      name: Our World in Data based on Ember's European Electricity Review (2022)
-      published_by: Ember
-      publication_year: 2022
-      publication_date: 2022-02-01
-      date_accessed: 2022-08-01
-      url: https://ember-climate.org/insights/research/european-electricity-review-2022/
 
 tables:
   electricity_mix:

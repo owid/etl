@@ -3,10 +3,8 @@
 """
 
 import numpy as np
-import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
-from shared import gather_sources_from_tables
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -24,8 +22,8 @@ EJ_TO_TWH = 1e6 / 3600
 EFFICIENCY_FACTOR = 0.36
 
 
-def prepare_bp_data(tb_bp: Table) -> pd.DataFrame:
-    df_bp = pd.DataFrame(tb_bp).reset_index()
+def prepare_bp_data(tb_bp: Table) -> Table:
+    tb_bp = tb_bp.reset_index()
 
     # BP gives generation of direct energy in TWh, and, for non-fossil sources of electricity,
     # consumption of input-equivalent energy in EJ.
@@ -62,27 +60,27 @@ def prepare_bp_data(tb_bp: Table) -> pd.DataFrame:
         "solar_consumption__ej": "solar__ej_substituted_energy",
         "wind_consumption__ej": "wind__ej_substituted_energy",
     }
-    df_bp = df_bp[list(bp_columns)].rename(columns=bp_columns)
+    tb_bp = tb_bp[list(bp_columns)].rename(columns=bp_columns)
     # Convert all units to TWh.
-    for column in df_bp.columns:
+    for column in tb_bp.columns:
         if "_ej_" in column:
             # Create a new column in TWh instead of EJ.
-            df_bp[column.replace("_ej_", "_twh_")] = df_bp[column] * EJ_TO_TWH
+            tb_bp[column.replace("_ej_", "_twh_")] = tb_bp[column] * EJ_TO_TWH
             # Remove the column in EJ.
-            df_bp = df_bp.drop(columns=column)
+            tb_bp = tb_bp.drop(columns=column)
     # For completeness, create columns of substituted energy for fossil sources (even if they would coincide with
     # direct energy).
     for fossil_source in ["biofuels", "coal", "gas", "oil"]:
-        df_bp[f"{fossil_source}__twh_substituted_energy"] = df_bp[f"{fossil_source}__twh_direct_energy"]
+        tb_bp[f"{fossil_source}__twh_substituted_energy"] = tb_bp[f"{fossil_source}__twh_direct_energy"]
 
     # Select only data for the World (which is the only region informed in Smil's data).
-    df_bp = df_bp[df_bp["country"] == "World"].reset_index(drop=True)
+    tb_bp = tb_bp[tb_bp["country"] == "World"].reset_index(drop=True)
 
-    return df_bp
+    return tb_bp
 
 
-def prepare_smil_data(tb_smil: Table) -> pd.DataFrame:
-    df_smil = pd.DataFrame(tb_smil).reset_index()
+def prepare_smil_data(tb_smil: Table) -> Table:
+    tb_smil = tb_smil.reset_index()
 
     # Create columns for input-equivalent energy.
     # To do this, we follow a similar approach to BP:
@@ -95,24 +93,24 @@ def prepare_smil_data(tb_smil: Table) -> pd.DataFrame:
     # However, since we cannot separate biomass from the rest of sources in 'other renewables',
     # we use the same 36% factor as all other non-fossil sources.
     for source in ["hydropower", "nuclear", "other_renewables", "solar", "wind"]:
-        df_smil[f"{source}__twh_substituted_energy"] = df_smil[f"{source}__twh_direct_energy"] / EFFICIENCY_FACTOR
+        tb_smil[f"{source}__twh_substituted_energy"] = tb_smil[f"{source}__twh_direct_energy"] / EFFICIENCY_FACTOR
     # For fossil sources (including biofuels and traditional biomass), direct and substituted energy are the same.
     for source in ["biofuels", "coal", "gas", "oil", "traditional_biomass"]:
-        df_smil[f"{source}__twh_substituted_energy"] = df_smil[f"{source}__twh_direct_energy"]
+        tb_smil[f"{source}__twh_substituted_energy"] = tb_smil[f"{source}__twh_direct_energy"]
 
-    return df_smil
+    return tb_smil
 
 
-def combine_bp_and_smil_data(df_bp: pd.DataFrame, df_smil: pd.DataFrame) -> pd.DataFrame:
-    df_bp = df_bp.copy()
-    df_smil = df_smil.copy()
+def combine_bp_and_smil_data(tb_bp: Table, tb_smil: Table) -> Table:
+    tb_bp = tb_bp.copy()
+    tb_smil = tb_smil.copy()
 
     # Add a new column that informs of the source of the data.
-    df_bp["data_source"] = "BP"
-    df_smil["data_source"] = "Smil"
-    # Combine both dataframes, prioritizing BP's data on overlapping rows.
+    tb_bp["data_source"] = "BP"
+    tb_smil["data_source"] = "Smil"
+    # Combine both tables, prioritizing BP's data on overlapping rows.
     combined = combine_two_overlapping_dataframes(
-        df1=df_bp, df2=df_smil, index_columns=["country", "year"]
+        df1=tb_bp, df2=tb_smil, index_columns=["country", "year"]
     ).sort_values(["year"])
 
     # Replace <NA> by numpy nans.
@@ -121,7 +119,7 @@ def combine_bp_and_smil_data(df_bp: pd.DataFrame, df_smil: pd.DataFrame) -> pd.D
     # We do not have data for traditional biomass after 2015 (BP does not provide it).
     # So, to be able to visualize the complete mix of global energy consumption,
     # we extrapolate Smil's data for traditional biomass from 2015 onwards, by repeating its last value.
-    missing_years_mask = combined["year"] >= df_smil["year"].max()
+    missing_years_mask = combined["year"] >= tb_smil["year"].max()
     combined.loc[missing_years_mask, "traditional_biomass__twh_direct_energy"] = combined[missing_years_mask][
         "traditional_biomass__twh_direct_energy"
     ].ffill()
@@ -135,7 +133,7 @@ def combine_bp_and_smil_data(df_bp: pd.DataFrame, df_smil: pd.DataFrame) -> pd.D
     return combined
 
 
-def add_total_consumption_and_percentages(combined: pd.DataFrame) -> pd.DataFrame:
+def add_total_consumption_and_percentages(combined: Table) -> Table:
     # Create a column with the total direct energy (ensuring there is at least one non-nan value).
     combined["total_consumption__twh_direct_energy"] = combined[
         [column for column in combined.columns if "direct_energy" in column]
@@ -174,41 +172,40 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Load BP statistical review dataset.
+    # Load BP statistical review dataset and read its main table.
     ds_bp: Dataset = paths.load_dependency("statistical_review")
-    # Read main table from dataset.
     tb_bp = ds_bp["statistical_review"]
 
-    # Load Smil dataset.
+    # Load Smil dataset and read its main table.
     ds_smil: Dataset = paths.load_dependency("global_primary_energy")
-    # Read main table from dataset.
     tb_smil = ds_smil["global_primary_energy"]
 
     #
     # Process data.
     #
     # Prepare BP data.
-    df_bp = prepare_bp_data(tb_bp=tb_bp)
+    tb_bp = prepare_bp_data(tb_bp=tb_bp)
 
     # Prepare Smil data.
-    df_smil = prepare_smil_data(tb_smil=tb_smil)
+    tb_smil = prepare_smil_data(tb_smil=tb_smil)
 
     # Combine BP and Smil data.
-    combined = combine_bp_and_smil_data(df_bp=df_bp, df_smil=df_smil)
+    combined = combine_bp_and_smil_data(tb_bp=tb_bp, tb_smil=tb_smil)
 
     # Add variables for total consumption and variables of % share of each source.
     combined = add_total_consumption_and_percentages(combined=combined)
 
-    # Create a new table with combined data (and no metadata).
-    tb_combined = Table(combined, short_name="global_primary_energy")
+    # Update table name.
+    combined.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
     #
-    # Create a new empty garden dataset to gather metadata sources from all tables' original dataset sources.
-    ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata.sources = gather_sources_from_tables(tables=[tb_bp, tb_smil])
-
     # Save garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined], default_metadata=ds_garden.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[combined], default_metadata=ds_bp.metadata)
+
+    # Combine sources and licenses from the original datasets.
+    ds_garden.metadata.sources = sum([ds.metadata.sources for ds in [ds_bp, ds_smil]], [])
+    ds_garden.metadata.licenses = sum([ds.metadata.licenses for ds in [ds_bp, ds_smil]], [])
+
     ds_garden.save()
