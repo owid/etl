@@ -268,7 +268,7 @@ def add_inbound_outbound_tour(df, df_tr):
 
     # Calculate the interaction between TER_INT_a and inb_outb_tour
     df["int_inb_out_per_capita"] = df["per_capita_TER_INT_a"] * df["inb_outb_tour"]
-    df["int_inb_out"] = df["TER_INT_a"] * df["inb_outb_tour"]
+    df["int_inb_out_tot"] = df["TER_INT_a"] * df["inb_outb_tour"]
 
     # Drop the 'inb_outb_tour' column
     df = df.drop(["inb_outb_tour"], axis=1)

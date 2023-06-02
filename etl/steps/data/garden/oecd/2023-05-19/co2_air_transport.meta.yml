@@ -90,7 +90,7 @@ tables:
         short_unit: lb
         display:
           numDecimalPlaces: 0
-      int_inb_out:
+      int_inb_out_tot:
         title: CO2 emissions from international flights, international tourism-adjusted
         unit: pounds
         short_unit: lb
