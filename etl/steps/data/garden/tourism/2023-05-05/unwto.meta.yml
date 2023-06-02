@@ -8,13 +8,13 @@ dataset:
   - name: Creative Commons BY 4.0
     url: https://www.unwto.org/copyright
   sources:
-  - name: UNWTO (2023)
+  - name: United Nations World Tourism Organization (UNWTO, 2023)
     url: https://www.unwto.org/tourism-statistics/key-tourism-statistics
     source_data_url: https://webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2023-03/unwto-all-data-download_032023.xlsx
     date_accessed: '2023-05-04'
     publication_date: '2023-01-25'
     publication_year: 2023
-    published_by: United Nations World Tourism Organization (UNWTO), 2023
+    published_by: UNWTO, 2023
 tables:
   unwto:
     variables:
