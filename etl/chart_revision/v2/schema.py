@@ -99,7 +99,7 @@ def validate_chart_config_and_set_defaults(
     return config_new
 
 
-def migrate_to_latest_schema(config: Dict[str, Any]) -> Dict[str, Any]:
+def fix_errors_in_schema(config: Dict[str, Any]) -> Dict[str, Any]:
     """Fix common errors in schema and tries to catch up with latest schema version."""
     config_new = copy.deepcopy(config)
     # Remove map.columnSlug. This should be map.variableId instead.
