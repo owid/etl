@@ -102,6 +102,9 @@ tables:
         short_unit: t
         display:
           numDecimalPlaces: 0
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
       january:
         title: January
         unit: tonnes
@@ -180,3 +183,5 @@ tables:
         short_unit: t
         display:
           numDecimalPlaces: 0
+          zeroDay: '2019-01-01'
+          yearIsDay: true
