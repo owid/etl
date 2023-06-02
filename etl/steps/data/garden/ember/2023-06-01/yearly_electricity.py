@@ -7,21 +7,51 @@ import pandas as pd
 from owid import catalog
 from owid.catalog import Dataset, Table
 from shared import add_population, add_region_aggregates, correct_data_points
+from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
+# Initialize log.
+log = get_logger()
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Aggregate regions to add, following OWID definitions.
+# Regions and income groups to create by aggregating contributions from member countries.
+# In the following dictionary, if nothing is stated, the region is supposed to be a default continent/income group.
+# Otherwise, the dictionary can have "regions_included", "regions_excluded", "countries_included", and
+# "countries_excluded". The aggregates will be calculated on the resulting countries.
+REGIONS = {
+    # Default continents.
+    "Africa": {},
+    "Asia": {},
+    "Europe": {},
+    "European Union (27)": {},
+    "North America": {},
+    "Oceania": {},
+    "South America": {},
+    # Ember already has data for "World".
+    # "World": {},
+    # Income groups.
+    "Low-income countries": {},
+    "Upper-middle-income countries": {},
+    "Lower-middle-income countries": {},
+    "High-income countries": {},
+}
+
 # Corrections to the output tables.
-# They are all the same correction: Remove aggregates for 2022, given that only EU countries are informed.
+# They are all the same correction: Remove region aggregates for the latest year, given that many countries are not
+# informed, which causes the aggregates to be unreliable
+# (e.g. generation__total_generation__twh in Africa drops in 2022 because only a few countries are informed).
+AFFECTED_YEAR = 2022
 AMENDMENTS = {
     "Capacity": [
         (
             {
-                "country": ["Europe", "Upper-middle-income countries", "High-income countries"],
-                "year": [2022],
+                "country": list(REGIONS),
+                "year": [AFFECTED_YEAR],
             },
             {
                 "Clean (GW)": pd.NA,
@@ -45,8 +75,8 @@ AMENDMENTS = {
     "Electricity demand": [
         (
             {
-                "country": ["Europe", "Upper-middle-income countries", "High-income countries"],
-                "year": [2022],
+                "country": list(REGIONS),
+                "year": [AFFECTED_YEAR],
             },
             {
                 "Demand (TWh)": pd.NA,
@@ -58,8 +88,8 @@ AMENDMENTS = {
     "Electricity generation": [
         (
             {
-                "country": ["Europe", "Upper-middle-income countries", "High-income countries"],
-                "year": [2022],
+                "country": list(REGIONS),
+                "year": [AFFECTED_YEAR],
             },
             {
                 "Clean (%)": pd.NA,
@@ -99,8 +129,8 @@ AMENDMENTS = {
     "Electricity imports": [
         (
             {
-                "country": ["Europe", "Upper-middle-income countries", "High-income countries"],
-                "year": [2022],
+                "country": list(REGIONS),
+                "year": [AFFECTED_YEAR],
             },
             {
                 "Net Imports (TWh)": np.nan,
@@ -110,8 +140,8 @@ AMENDMENTS = {
     "Power sector emissions": [
         (
             {
-                "country": ["Europe", "Upper-middle-income countries", "High-income countries"],
-                "year": [2022],
+                "country": list(REGIONS),
+                "year": [AFFECTED_YEAR],
             },
             {
                 "Clean (mtCO2)": pd.NA,
@@ -135,29 +165,6 @@ AMENDMENTS = {
             },
         ),
     ],
-}
-
-# Aggregate regions to add, following OWID definitions.
-# Regions and income groups to create by aggregating contributions from member countries.
-# In the following dictionary, if nothing is stated, the region is supposed to be a default continent/income group.
-# Otherwise, the dictionary can have "regions_included", "regions_excluded", "countries_included", and
-# "countries_excluded". The aggregates will be calculated on the resulting countries.
-REGIONS = {
-    # Default continents.
-    "Africa": {},
-    "Asia": {},
-    "Europe": {},
-    "European Union (27)": {},
-    "North America": {},
-    "Oceania": {},
-    "South America": {},
-    # Ember already has data for "World".
-    # "World": {},
-    # Income groups.
-    "Low-income countries": {},
-    "Upper-middle-income countries": {},
-    "Lower-middle-income countries": {},
-    "High-income countries": {},
 }
 
 # Conversion factors.
@@ -493,7 +500,9 @@ def run(dest_dir: str) -> None:
 
     # Apply amendments, and set an appropriate index and short name to each table an sort conveniently.
     for table_name in tables:
-        tables[table_name] = correct_data_points(df=tables[table_name], corrections=AMENDMENTS[table_name])
+        if table_name in AMENDMENTS:
+            log.info(f"Applying amendments to table: {table_name}")
+            tables[table_name] = correct_data_points(df=tables[table_name], corrections=AMENDMENTS[table_name])
         tables[table_name] = tables[table_name].set_index(["country", "year"], verify_integrity=True).sort_index()
         tables[table_name].metadata.short_name = catalog.utils.underscore(table_name)
 
