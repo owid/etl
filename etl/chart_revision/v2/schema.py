@@ -110,9 +110,9 @@ def fix_errors_in_schema(config: Dict[str, Any]) -> Dict[str, Any]:
                 config_new["map"]["variableId"] = config_new["map"]["columnSlug"]
             del config_new["map"]["columnSlug"]
     if ("timelineMaxTime" in config_new) and (config_new["timelineMaxTime"] is None):
-        del config_new["properties"]["timelineMaxTime"]
+        del config_new["timelineMaxTime"]
     if ("timelineMinTime" in config_new) and (config_new["timelineMinTime"] is None):
-        del config_new["properties"]["timelineMinTime"]
+        del config_new["timelineMinTime"]
     return config_new
 
 
