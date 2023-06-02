@@ -489,17 +489,16 @@ def add_population_to_dataframe(
     missing_countries = set(df[country_col]) - set(population[country_col])
     if expected_countries_without_population is not None:
         missing_countries = missing_countries - set(expected_countries_without_population)
-    if len(missing_countries) > 0:
-        if warn_on_missing_countries:
-            warn_on_list_of_entities(
-                list_of_entities=missing_countries,
-                warning_message=(
-                    f"{len(missing_countries)} countries not found in population"
-                    " dataset. They will remain in the dataset, but have nan"
-                    " population."
-                ),
-                show_list=show_full_warning,
-            )
+    if (len(missing_countries) > 0) and warn_on_missing_countries:
+        warn_on_list_of_entities(
+            list_of_entities=missing_countries,
+            warning_message=(
+                f"{len(missing_countries)} countries not found in population"
+                " dataset. They will remain in the dataset, but have nan"
+                " population."
+            ),
+            show_list=show_full_warning,
+        )
 
     if interpolate_missing_population:
         # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
