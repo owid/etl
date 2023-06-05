@@ -48,8 +48,8 @@ def run(dest_dir: str) -> None:
     df = df.reset_index(drop=True)
     cols_check = df.columns.drop(["country", "hemisphere", "date", "year"])
     df[cols_check] = df[cols_check].dropna(axis="rows", how="all")
-    df["pcnt_posSENTINEL", "pcnt_posNONSENTINEL", "pcnt_posNOTDEFINED"] = df[
-        "pcnt_posSENTINEL", "pcnt_posNONSENTINEL", "pcnt_posNOTDEFINED"
+    df[["pcnt_posSENTINEL", "pcnt_posNONSENTINEL", "pcnt_posNOTDEFINED"]] = df[
+        ["pcnt_posSENTINEL", "pcnt_posNONSENTINEL", "pcnt_posNOTDEFINED"]
     ].astype("Float64")
 
     tb_garden = Table(df, short_name=paths.short_name).reset_index(drop=True)
