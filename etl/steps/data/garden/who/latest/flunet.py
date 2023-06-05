@@ -1,5 +1,4 @@
 """Load a meadow dataset and create a garden dataset."""
-import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -216,7 +215,7 @@ def calculate_percent_positive(df: pd.DataFrame, surveillance_cols: list[str]) -
         df = df.drop(columns=["pcnt_pos_1" + col, "pcnt_pos_2" + col, "pcnt_pos_3" + col])
 
         # Drop rows where pcnt_pos is >100
-        df.loc[df["pcnt_pos" + col] > 100, "pcnt_pos" + col] = np.nan
+        df.loc[df["pcnt_pos" + col] > 100, "pcnt_pos" + col] = pd.NA
 
         # Rows where the percentage positive is 100 but all possible denominators are 0
         df.loc[
