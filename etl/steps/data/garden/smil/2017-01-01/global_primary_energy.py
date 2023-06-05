@@ -29,6 +29,7 @@ def run(dest_dir: str) -> None:
     tb_garden = tb_garden[sorted(tb_garden.columns)].sort_index()
 
     # Update metadata using yaml file.
+    ds_garden.metadata.sources[0].name = "Smil (2017)"
     ####################################################################################################################
     # Temporary solution: At the moment, 'published_by' cannot be added to walden metadata.
     # I could add a new source to the yaml file in this step (with the appropriate 'published_by') and use

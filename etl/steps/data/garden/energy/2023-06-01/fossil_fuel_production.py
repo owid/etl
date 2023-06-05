@@ -8,7 +8,7 @@ from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
 
 from etl.data_helpers.geo import add_population_to_dataframe
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder, create_dataset_with_combined_metadata
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -252,11 +252,6 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new dataset with the same metadata as in Meadow.
-    ds_garden = create_dataset(dest_dir, tables=[tb])
-
-    # Combine sources and licenses from the original datasets.
-    ds_garden.metadata.sources = sum([ds.metadata.sources for ds in [ds_bp, ds_shift]], [])
-    ds_garden.metadata.licenses = sum([ds.metadata.licenses for ds in [ds_bp, ds_shift]], [])
-
+    # Create a new garden dataset.
+    ds_garden = create_dataset_with_combined_metadata(dest_dir, datasets=[ds_bp, ds_shift], tables=[tb])
     ds_garden.save()

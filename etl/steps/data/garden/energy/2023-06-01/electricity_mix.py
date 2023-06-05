@@ -9,7 +9,7 @@ from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
 from etl.data_helpers.geo import add_population_to_dataframe
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder, create_dataset_with_combined_metadata
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -296,10 +296,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[combined])
-
-    # Combine sources and licenses from the original datasets.
-    ds_garden.metadata.sources = sum([ds.metadata.sources for ds in [ds_bp, ds_ember]], [])
-    ds_garden.metadata.licenses = sum([ds.metadata.licenses for ds in [ds_bp, ds_ember]], [])
-
+    ds_garden = create_dataset_with_combined_metadata(dest_dir=dest_dir, datasets=[ds_bp, ds_ember], tables=[combined])
     ds_garden.save()
