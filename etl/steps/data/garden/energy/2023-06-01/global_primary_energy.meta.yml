@@ -38,7 +38,6 @@ tables:
         unit: terawatt-hours
         display:
           name: Coal
-      # data_source
       gas__twh_direct_energy:
         title: Gas (TWh, direct energy)
         short_unit: TWh

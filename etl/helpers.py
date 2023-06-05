@@ -150,6 +150,44 @@ def create_dataset(
     return ds
 
 
+def create_dataset_with_combined_metadata(
+    dest_dir: Union[str, Path], datasets: List[catalog.Dataset], tables: List[catalog.Table], *args, **kwargs
+) -> catalog.Dataset:
+    # Gather unique sources from the original datasets.
+    sources = []
+    licenses = []
+    for dataset_i in datasets:
+        for source in dataset_i.metadata.sources:
+            if source.name not in [known_source.name for known_source in sources]:
+                sources.append(source)
+        for license in dataset_i.metadata.licenses:
+            if license.name not in [known_license.name for known_license in licenses]:
+                licenses.append(license)
+
+    # Assign combined sources and licenses to each of the variables in each of the tables.
+    for table in tables:
+        index_columns = table.metadata.primary_key
+        # If the table has an index, reset it, so that sources and licenses can also be assigned to index columns.
+        if len(index_columns) > 0:
+            table = table.reset_index()
+        # Assign sources and licenses to the metadata of each variable in the table.
+        for variable in table.columns:
+            table[variable].metadata.sources = sources
+            table[variable].metadata.licenses = licenses
+        # Bring original index back.
+        if len(index_columns) > 0:
+            table = table.set_index(index_columns)
+
+    # Create a new dataset.
+    ds = create_dataset(dest_dir=dest_dir, tables=tables, *args, **kwargs)
+
+    # Assign combined sources and licenses to the new dataset.
+    ds.metadata.sources = sources
+    ds.metadata.licenses = licenses
+
+    return ds
+
+
 class CurrentFileMustBeAStep(ExceptionFromDocstring):
     """Current file must be an ETL step."""
 
