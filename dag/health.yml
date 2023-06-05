@@ -177,5 +177,7 @@ steps:
   data://garden/who/2023-06-01/cholera:
     - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
     - snapshot://fasttrack/2023-05-31/cholera.csv
+    - data://garden/regions/2023-01-01/regions
+
   data://grapher/who/2023-06-01/cholera:
     - data://garden/who/2023-06-01/cholera
