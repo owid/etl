@@ -198,12 +198,11 @@ def calculate_percent_positive(df: pd.DataFrame, surveillance_cols: list[str]) -
     Remove rows where the percent = 100 but all available denominators are 0.
     """
     for col in surveillance_cols:
-
         df.loc[
             (df["inf_negative" + col] == 0)
             & (df["inf_negative" + col] + df["inf_all" + col] != df["spec_processed_nb" + col]),
             "inf_negative" + col,
-        ] = np.nan
+        ] = pd.NA
 
         df["pcnt_pos_1" + col] = (df["inf_all" + col] / (df["inf_all" + col] + df["inf_negative" + col])) * 100
         df["pcnt_pos_2" + col] = (df["inf_all" + col] / df["spec_processed_nb" + col]) * 100
@@ -226,7 +225,7 @@ def calculate_percent_positive(df: pd.DataFrame, surveillance_cols: list[str]) -
             & (df["spec_processed_nb" + col] == 0)
             & (df["spec_received_nb" + col] == 0),
             "pcnt_pos" + col,
-        ] = np.nan
+        ] = pd.NA
         # df = df.dropna(axis=1, how="all")
 
     return df
