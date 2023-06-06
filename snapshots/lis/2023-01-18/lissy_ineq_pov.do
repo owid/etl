@@ -30,7 +30,7 @@ HOW TO EXECUTE:
 
 9. Repeat the process for the different settings you want to extract.
 10. Once all the files have been created, copy them into the lis snapshot directory in the ETL, run concat_files.py and then update the snapshot, by using these comands one by one:
-	python snapshots/lis/2023-01-18/concat.py
+	python snapshots/lis/2023-01-18/concat_files.py
 	python snapshots/lis/2023-01-18/lis_keyvars.py --path-to-file snapshots/lis/2023-01-18/lis_keyvars.csv
 	python snapshots/lis/2023-01-18/lis_abs_poverty.py --path-to-file snapshots/lis/2023-01-18/lis_abs_poverty.csv
 	python snapshots/lis/2023-01-18/lis_distribution.py --path-to-file snapshots/lis/2023-01-18/lis_distribution.csv
