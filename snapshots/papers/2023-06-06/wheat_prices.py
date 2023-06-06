@@ -18,16 +18,20 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 def main(upload: bool) -> None:
     # Load backported snapshot.
-    snap_values = Snapshot("backport/latest/{{cookiecutter.backport_short_name}}_values.feather")
+    snap_values = Snapshot(
+        "backport/latest/dataset_3222_wheat_prices__long_run__in_england__makridakis_et_al__1997_values.feather"
+    )
     snap_values.pull()
-    snap_config = Snapshot("backport/latest/{{cookiecutter.backport_short_name}}_config.json")
+    snap_config = Snapshot(
+        "backport/latest/dataset_3222_wheat_prices__long_run__in_england__makridakis_et_al__1997_config.json"
+    )
     snap_config.pull()
 
     # Create snapshot metadata for the new file
     meta = SnapshotMeta(**snap_values.metadata.to_dict())
     meta.namespace = SNAPSHOT_NAMESPACE
     meta.version = SNAPSHOT_VERSION
-    meta.short_name = "{{cookiecutter.short_name}}"
+    meta.short_name = "wheat_prices"
     meta.fill_from_backport_snapshot(snap_config.path)
     meta.save()
 
