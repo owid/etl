@@ -2,6 +2,7 @@ import copy
 import os
 from typing import Any, Dict, Tuple
 
+import pandas as pd
 import rich_click as click
 from owid.catalog import Dataset
 
@@ -34,14 +35,14 @@ def cli(
     if output:
         os.makedirs(os.path.dirname(output), exist_ok=True)
         with open(output, "w") as f:
-            f.write(meta_str)
+            f.write(yaml_dump(meta_str))  # type: ignore
     else:
         print(meta_str)
 
 
 def metadata_export(
     ds: Dataset,
-) -> str:
+) -> dict:
     ds_meta = ds.metadata.to_dict()
 
     # transform dataset metadata
@@ -78,6 +79,13 @@ def metadata_export(
                 continue
             variable = tab[col].metadata.to_dict()
 
+            # move units and short units from display
+            if "display" in variable:
+                if not variable.get("unit"):
+                    variable["unit"] = variable["display"].pop("unit", "")
+                if not variable.get("short_unit"):
+                    variable["short_unit"] = variable["display"].pop("shortUnit", "")
+
             variable.pop("additional_info", None)
 
             # add required units
@@ -91,6 +99,11 @@ def metadata_export(
             if "sources" in variable:
                 variable["sources"] = variable.pop("sources")
 
+            # fix sources
+            for source in variable["sources"]:
+                if "date_accessed" in source:
+                    source["date_accessed"] = pd.to_datetime(source["date_accessed"]).date()
+
             t["variables"][col] = variable
 
         tb_meta[tab.metadata.short_name] = t
@@ -102,7 +115,7 @@ def metadata_export(
         "tables": tb_meta,
     }
 
-    return yaml_dump(final)  # type: ignore
+    return final
 
 
 def _move_sources_to_dataset(ds_meta: Dict[str, Any], tb_meta: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
