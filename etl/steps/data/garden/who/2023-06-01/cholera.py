@@ -109,11 +109,19 @@ def add_regions(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
                 region=continent,
                 countries_in_region=countries_in_regions[continent],
                 countries_that_must_have_data=[],
-                num_allowed_nans_per_year=None,
+                num_allowed_nans_per_year=200,
+                country_col="country",
+                year_col="year",
+                frac_allowed_nans_per_year=1,
             )
         df_cont = df_cont[df_cont["country"].isin(continents)]
         df_out = pd.concat([df_out, df_cont])
     df_out["cholera_case_fatality_rate"] = (df_out["cholera_deaths"] / df_out["cholera_reported_cases"]) * 100
+
+    dfg = df[df["country"] == "World"].groupby("year")["cholera_deaths"].sum()
+    df_out_gr = df_out.groupby("year")["cholera_deaths"].sum()
+
+    pd.merge(dfg, df_out_gr)
 
     df = pd.concat([df, df_out])
 
