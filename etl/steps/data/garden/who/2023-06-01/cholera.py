@@ -45,6 +45,7 @@ def run(dest_dir: str) -> None:
             "indicator__number_of_reported_deaths_from_cholera": "cholera_deaths",
         }
     )
+    # The regional and global data in the backport is only provided for 2013 so we remove it here and recalculate it
     cholera_bp = geo.harmonize_countries(
         df=cholera_bp, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
