@@ -23,7 +23,6 @@ meta:
   url: https://robjhyndman.com/forecasting/
   source_published_by: 'Makridakis, Wheelwright, and Hyndman (1997) - Forecasting:
     Methods and Applications. Wiley.'
-
   is_public: true
   version: '2023-06-06'
   publication_date: latest
