@@ -1,0 +1,12 @@
+dataset:
+  title: Tourism data by World Region - UNWTO (2019)
+tables:
+  unwto_tourism:
+    variables:
+      international_tourist_arrivals:
+        title: International Tourist Arrivals
+        description: ''
+        unit: arrivals
+        display:
+          unit: Percent
+        short_unit: ''

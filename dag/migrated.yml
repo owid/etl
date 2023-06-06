@@ -4,3 +4,7 @@ steps:
   - data://garden/papers/2023-06-06/wheat_prices
   data://garden/papers/2023-06-06/wheat_prices:
   - snapshot://papers/2023-06-06/wheat_prices.feather
+  data://grapher/tourism/2023-06-06/unwto_tourism:
+  - data://garden/tourism/2023-06-06/unwto_tourism
+  data://garden/tourism/2023-06-06/unwto_tourism:
+  - snapshot://tourism/2023-06-06/unwto_tourism.feather
