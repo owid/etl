@@ -1,8 +1,5 @@
 dataset:
-  namespace: shift
-  version: 2022-07-18
   title: Fossil fuel production (Shift, 2022)
-  short_name: fossil_fuel_production
   description: |
     Fossil fuel production, produced by Our World in Data based on data from <a href="https://www.theshiftdataportal.org/energy">The Shift Dataportal</a>.
   sources:

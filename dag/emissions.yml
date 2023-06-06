@@ -23,7 +23,7 @@ steps:
     - data://garden/emissions/2023-05-02/national_contributions
     - data://garden/gcp/2023-04-28/global_carbon_budget
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-    - data://garden/energy/2023-02-20/primary_energy_consumption
+    - data://garden/energy/2023-06-01/primary_energy_consumption
     - data://garden/demography/2022-12-08/population
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/regions/2023-01-01/regions
@@ -50,7 +50,7 @@ steps:
   data://garden/gcp/2023-04-28/global_carbon_budget:
     - data://meadow/gcp/2023-04-28/global_carbon_budget
     # Loaded to calculate emissions per unit energy.
-    - data://garden/energy/2023-02-20/primary_energy_consumption
+    - data://garden/energy/2023-06-01/primary_energy_consumption
     # Loaded to calculate emissions per GDP.
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     # Loaded to create per-capita variables.

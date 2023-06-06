@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4184_world_bank__education_dataset__world_bank__2019_values
   file_extension: feather
-  date_accessed: 2023-02-23 19:47:41.232213
+  date_accessed: 2023-06-01 13:02:33.437301
   name: 'World Bank: Education Dataset - World Bank (2019)'
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ef46b75d3ddbd6c478f3bc342ebae99b
+- md5: c7b5ad545e43ef5c78f80cce9cb6cb8c
   size: 62994
   path: dataset_4184_world_bank__education_dataset__world_bank__2019_values.feather

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_582_daily_protein_supply__fao__2017_values
   file_extension: feather
-  date_accessed: 2023-02-23 18:53:16.546460
+  date_accessed: 2023-06-01 12:50:10.261349
   name: Daily protein supply - FAO (2017)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 65880c93a41e7e59411a1e0c50743192
+- md5: e96507f81910f6af23ef07ada0758ee4
   size: 131978
   path: dataset_582_daily_protein_supply__fao__2017_values.feather

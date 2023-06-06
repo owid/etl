@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5685_carbon_dioxide_emissions_by_sector__cait__2022_values
   file_extension: feather
-  date_accessed: 2023-02-23 16:48:50.780257
+  date_accessed: 2023-06-01 12:38:53.027711
   name: Carbon dioxide emissions by sector (CAIT, 2022)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 84ffaf91670a60c49b565317097bb97a
-  size: 657754
+- md5: 0eaec77de08410d3eed6bf166821ab54
+  size: 657810
   path: dataset_5685_carbon_dioxide_emissions_by_sector__cait__2022_values.feather

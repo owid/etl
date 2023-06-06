@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5225_deforestation_in_trade__pendrill_config
   file_extension: json
-  date_accessed: 2023-02-23 18:04:41.048462
+  date_accessed: 2023-06-01 15:04:16.658763
   name: Grapher metadata for dataset_5225_deforestation_in_trade__pendrill
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7cc2e5f5501263a24dcc88fa94cd53f3
+- md5: a574caf559528f45e4f9c2a0bb9b34ac
   size: 10696
   path: dataset_5225_deforestation_in_trade__pendrill_config.json

@@ -18,9 +18,6 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb_garden = ds_garden["vehicles"]
 
-    # hotfix, do proper fix asap
-    tb_garden["registered_vehicles_per_thousand"] = tb_garden["registered_vehicles_per_thousand"].astype(float)
-
     #
     # Process data.
     #

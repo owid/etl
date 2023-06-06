@@ -1,9 +1,11 @@
 meta:
   namespace: backport
-  short_name: dataset_975_long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana_config
+  short_name: 
+    dataset_975_long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana_config
   file_extension: json
-  date_accessed: 2023-02-23 15:03:55.577217
-  name: Grapher metadata for dataset_975_long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana
+  date_accessed: 2023-06-01 15:10:32.880344
+  name: Grapher metadata for 
+    dataset_975_long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana
   description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/975
@@ -13,6 +15,7 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d872a227e94262477dc46f45283da220
+- md5: d731497a66965af0715b91ae3ee650f6
   size: 4509
-  path: dataset_975_long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana_config.json
+  path: 
+    dataset_975_long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana_config.json

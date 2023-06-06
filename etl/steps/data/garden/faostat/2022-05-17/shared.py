@@ -165,7 +165,7 @@ HISTORIC_TO_CURRENT_REGION = {
             "Slovakia",
         ],
     },
-    "Eritrea and Ethiopia": {
+    "Ethiopia (former)": {
         "continent": "Africa",
         "income_group": "Low-income countries",
         "members": [

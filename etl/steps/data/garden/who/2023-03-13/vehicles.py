@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     who_gh = who_gh_dataset[short_name]
 
     # Use the same index as popoulation
-    registered_vehicles = who_gh["indicator__number_of_registered_vehicles"].dropna()
+    registered_vehicles = who_gh["indicator__number_of_registered_vehicles"].astype(float).dropna()
     registered_vehicles = (
         registered_vehicles.reset_index()
         .rename(columns={"entity_name": "country"})

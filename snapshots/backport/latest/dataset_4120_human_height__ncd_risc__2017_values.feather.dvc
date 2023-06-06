@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4120_human_height__ncd_risc__2017_values
   file_extension: feather
-  date_accessed: 2023-02-23 19:26:47.961380
+  date_accessed: 2023-06-01 15:18:36.848922
   name: Human Height - NCD RisC (2017)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bbd6b428aa14a4d18f2c0987e348e157
-  size: 825874
+- md5: 2fcc4696eb08d3a1403cf0fd1d58c77d
+  size: 825882
   path: dataset_4120_human_height__ncd_risc__2017_values.feather

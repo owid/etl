@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3219_learning_adjusted_years_of_schooling__world_bank__2018_config
   file_extension: json
-  date_accessed: 2023-02-23 18:23:28.041432
+  date_accessed: 2023-06-01 13:08:42.139532
   name: Grapher metadata for dataset_3219_learning_adjusted_years_of_schooling__world_bank__2018
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b30c1546c508d214eb90ae43403eb370
+- md5: e278b8a7b3ec1d88b528047f2476ca05
   size: 1787
   path: dataset_3219_learning_adjusted_years_of_schooling__world_bank__2018_config.json

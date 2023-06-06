@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5311_biodiversity_habitat_loss__williams_et_al__2021_values
   file_extension: feather
-  date_accessed: 2023-02-23 18:23:41.326227
+  date_accessed: 2023-06-01 12:43:07.419390
   name: Biodiversity habitat loss (Williams et al. 2021)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 55afc7da5d8282111643179e3011eed8
-  size: 79338
+- md5: 3be6af78c40a183d57fec586f93beb6c
+  size: 79322
   path: dataset_5311_biodiversity_habitat_loss__williams_et_al__2021_values.feather

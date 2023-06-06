@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog.datasets import NULLABLE_DTYPES
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -28,6 +29,10 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["flunet"]
+
+    # Convert nullable types to float64, otherwise we risk pd.NA and np.nan being mixed up.
+    float64_cols = [col for col, dtype in tb_meadow.dtypes.items() if dtype in NULLABLE_DTYPES]
+    tb_meadow[float64_cols] = tb_meadow[float64_cols].astype(float)
 
     # Create a dataframe with data from the table.
     df = pd.DataFrame(tb_meadow)
@@ -198,7 +203,6 @@ def calculate_percent_positive(df: pd.DataFrame, surveillance_cols: list[str]) -
     Remove rows where the percent = 100 but all available denominators are 0.
     """
     for col in surveillance_cols:
-
         df.loc[
             (df["inf_negative" + col] == 0)
             & (df["inf_negative" + col] + df["inf_all" + col] != df["spec_processed_nb" + col]),

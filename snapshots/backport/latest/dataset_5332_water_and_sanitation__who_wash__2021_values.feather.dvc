@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5332_water_and_sanitation__who_wash__2021_values
   file_extension: feather
-  date_accessed: 2023-02-23 16:46:06.716731
+  date_accessed: 2023-06-01 15:18:20.428793
   name: Water and Sanitation (WHO WASH, 2021)
   description: |-
     Data cleaned using this script: https://github.com/owid/notebooks/blob/main/FionaSpooner/WASH/cleaning_who_wash_data.Rmd
@@ -16,6 +16,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fb0eb7dc71668b4fb33093a6032e1ca4
-  size: 1618650
+- md5: cf4a0bcd3559f45d0f5501818abd4566
+  size: 1619218
   path: dataset_5332_water_and_sanitation__who_wash__2021_values.feather

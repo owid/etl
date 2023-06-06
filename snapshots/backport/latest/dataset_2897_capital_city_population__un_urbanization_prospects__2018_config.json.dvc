@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2897_capital_city_population__un_urbanization_prospects__2018_config
   file_extension: json
-  date_accessed: 2023-02-23 16:15:07.410061
+  date_accessed: 2023-06-01 12:39:19.546276
   name: Grapher metadata for dataset_2897_capital_city_population__un_urbanization_prospects__2018
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,7 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 81768f6e9bd5060250228294f6fb7154
+- md5: e14b6e7d000e13c9e638c9d5cd85bd4e
   size: 1837
-  path: dataset_2897_capital_city_population__un_urbanization_prospects__2018_config.json
+  path: 
+    dataset_2897_capital_city_population__un_urbanization_prospects__2018_config.json

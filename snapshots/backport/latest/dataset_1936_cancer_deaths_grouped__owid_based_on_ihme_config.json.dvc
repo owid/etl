@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1936_cancer_deaths_grouped__owid_based_on_ihme_config
   file_extension: json
-  date_accessed: 2023-02-23 16:58:10.074296
+  date_accessed: 2023-06-01 12:47:20.118717
   name: Grapher metadata for dataset_1936_cancer_deaths_grouped__owid_based_on_ihme
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 792c10556ab2b58301ebda2eba2bf4d7
+- md5: c63d69741444b7d7adf0d0603f7d382d
   size: 13749
   path: dataset_1936_cancer_deaths_grouped__owid_based_on_ihme_config.json
