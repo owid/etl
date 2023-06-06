@@ -2,6 +2,7 @@
 
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog.datasets import NULLABLE_DTYPES
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -56,6 +57,9 @@ def run(dest_dir: str) -> None:
 
     tb_garden = Table(cholera_combined.set_index(["country", "year"], verify_integrity=True), short_name="cholera")
 
+    # Convert nullable types to float64, otherwise we risk pd.NA and np.nan being mixed up.
+    float64_cols = [col for col, dtype in tb_garden.dtypes.items() if dtype in NULLABLE_DTYPES]
+    tb_garden[float64_cols] = tb_garden[float64_cols].astype(float)
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
