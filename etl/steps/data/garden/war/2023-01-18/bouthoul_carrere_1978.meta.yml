@@ -9,7 +9,7 @@ all_sources:
       # description: Source description.
 
 dataset:
-  title: Major armed conflicts and deaths – Bouthoul and Carrère
+  title: Major armed conflicts and deaths (Bouthoul and Carrère, 1978)
   namespace: war
   short_name: bouthoul_carrere_1978
   version: 2023-01-18
