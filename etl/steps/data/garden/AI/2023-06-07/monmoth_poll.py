@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["monmoth_poll"]
     df = pd.DataFrame(tb)
-    df["answer"] = df["answer"].str.replace("\(VOL\) ", "", regex=True)
+    df["answer"] = df["answer"].str.replace(r"\(VOL\) ", "", regex=True)
     columns_to_rename = df.columns.difference(["year", "answer"])
     new_column_names = [f"Q{i+1}" for i in range(len(columns_to_rename))]
     column_rename_dict = dict(zip(columns_to_rename, new_column_names))
