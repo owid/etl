@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
     # Merge operations_total with merged_causes on 'year' and 'country'
     merge_cause_op = pd.merge(
         causes_df, ops_df, on=["year", "country"]
-    )  # country actually just means "Large (>700t)" or "Small (7-700t)" oil spills
+    )  # country actually just means "Large (>700t)" or "Medium (7-700t)" oil spills
 
     # Merge nsp_quant (oil spilled and number of spills) with merge_cause_op (causes and operation type of indcidents) on 'year' and 'country'
     combined_df = pd.merge(nsp_quant, merge_cause_op, on=["year", "country"], how="outer")
@@ -98,7 +98,7 @@ def prepare_ops_dataframe(df, country):
         Expected to have at least one row and multiple columns where the second column onwards represent numeric data.
 
     country : str
-        A string representing the category of oil spills (e.g., 'Large (>700t)' or 'Small (7-700t)').
+        A string representing the category of oil spills (e.g., 'Large (>700t)' or 'Medium (7-700t)').
 
     Returns
     -------
@@ -108,7 +108,7 @@ def prepare_ops_dataframe(df, country):
 
     Note
     ----
-    The 'country' label is used here to categorize large and small oil spills, a naming trick used for visualization.
+    The 'country' label is used here to categorize large and medium oil spills, a naming trick used for visualization.
     The function assigns a constant year (2023) for all operations.
     """
     # Convert columns from the second one onwards to integers
@@ -151,10 +151,10 @@ def extract_operations(df_above_7000, df_7_7000):
         unnecessary columns removed.
     Note
     ----
-    The 'country' label is used here to categorize large and small oil spills, a naming trick used for visualization.
+    The 'country' label is used here to categorize large and medium oil spills, a naming trick used for visualization.
     """
     operations_ab_7000 = prepare_ops_dataframe(df_above_7000, "Large (>700t)")
-    operations_bel_7000 = prepare_ops_dataframe(df_7_7000, "Small (7-700t)")
+    operations_bel_7000 = prepare_ops_dataframe(df_7_7000, "Medium (7-700t)")
     # Concatenate the last rows from both dataframes into a new dataframe
     operations_total = pd.concat([operations_bel_7000, operations_ab_7000])
     operations_total = append_suffix_to_non_year_country_columns(operations_total, " ops")
@@ -186,7 +186,7 @@ def extract_causes_of_oil_spills(df_above_7000, df_below_7000):
         A pandas dataframe containing the total causes from both input dataframes, with columns renamed to append '_causes'.
     """
     df_above_7000_cause_totals_pv = extract_cause_totals(df_above_7000, 2022, "Large (>700t)")
-    df_below_7000_cause_totals_pv = extract_cause_totals(df_below_7000, 2022, "Small (7-700t)")
+    df_below_7000_cause_totals_pv = extract_cause_totals(df_below_7000, 2022, "Medium (7-700t)")
     # Concatenate the two pivoted DataFrames along the row axis
     merged_causes = pd.concat([df_above_7000_cause_totals_pv, df_below_7000_cause_totals_pv], axis=0)
     # Append suffix '_causes' to non 'year' and 'country' columns

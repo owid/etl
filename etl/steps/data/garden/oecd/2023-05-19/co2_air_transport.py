@@ -66,9 +66,9 @@ def run(dest_dir: str) -> None:
 
     emissions_columns = [col for col in pivot_table_ye.columns if col not in ("country", "year", "population")]
 
-    # Generate per capital co2 emissions data and add it do the dataframe and convert to pounds
+    # Generate per capital co2 emissions data and add it do the dataframe and convert to kg
     for col in emissions_columns:
-        pivot_table_ye[f"per_capita_{col}"] = (pivot_table_ye[col] * 2204.62) / pivot_table_ye["population"]
+        pivot_table_ye[f"per_capita_{col}"] = (pivot_table_ye[col] * 1000) / pivot_table_ye["population"]
 
     # Add Inbound/Outbound tourism to the dataframe (multiply international aviation emissions by international arrivals/departures)
     pivot_outb = add_inbound_outbound_tour(pivot_table_ye, df_tr)
