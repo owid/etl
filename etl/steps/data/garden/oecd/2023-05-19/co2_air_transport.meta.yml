@@ -75,26 +75,26 @@ tables:
           numDecimalPlaces: 0
       per_capita_ter_dom_a:
         title: Per capita CO2 emissions from domestic aviation
-        unit: pounds
-        short_unit: lb
+        unit: kilograms
+        short_unit: kg
         display:
           numDecimalPlaces: 0
       per_capita_ter_int_a:
         title: Per capita CO2 emissions from international aviation
-        unit: pounds
-        short_unit: lb
+        unit: kilograms
+        short_unit: kg
         display:
           numDecimalPlaces: 0
       int_inb_out_per_capita:
         title: Per capita CO2 emissions from international flights, international tourism-adjusted
-        unit: pounds
-        short_unit: lb
+        unit: kilograms
+        short_unit: kg
         display:
           numDecimalPlaces: 0
       int_inb_out_tot:
         title: CO2 emissions from international flights, international tourism-adjusted
-        unit: pounds
-        short_unit: lb
+        unit: kilograms
+        short_unit: kg
         display:
           numDecimalPlaces: 0
       ter_dom_m:
