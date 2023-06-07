@@ -8,7 +8,7 @@ dataset:
   - name: Creative Commons BY 4.0
     url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
   sources:
-    name: Clarke et al. (2022)
+  - name: Clarke et al. (2022)
     published_by: "Clarke, D., et al. (2022), CO2 Emissions from air transport: A near-real-time global database for policy analysis, OECD Statistics Working Papers, No. 2022/04, OECD Publishing, Paris, https://doi.org/10.1787/ecc9f16b-en."
     url: https://stats.oecd.org/Index.aspx?DataSetCode=AIRTRANS_CO2#
     date_accessed: '2023-05-18'
