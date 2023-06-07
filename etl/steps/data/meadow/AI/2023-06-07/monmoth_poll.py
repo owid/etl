@@ -42,8 +42,6 @@ def run(dest_dir: str) -> None:
     combined_df = pd.concat(preprocessed_dataframes, ignore_index=True)
 
     # Sort the dataframe by the "year" column
-    combined_df.sort_values("year", inplace=True)
-
     # Reset the index
     combined_df.reset_index(drop=True, inplace=True)
     # pivot to have
@@ -154,7 +152,7 @@ def preprocess_data(dataframes, texts):
         dataframe = dataframe.iloc[index_2023 + 1 :].dropna(how="any")
 
         # Drop the rows where the index contains "(n)" - sample size so don't really need this here
-        dataframe = dataframe[~dataframe.astype(str).apply(lambda row: row.str.contains("\(n\)")).any(axis=1)]
+        dataframe = dataframe[~dataframe.astype(str).apply(lambda row: row.str.contains(r"\(n\)")).any(axis=1)]
 
         # Add 'question' name the answer column as a 'country' columns
         question = texts[index]
@@ -172,7 +170,6 @@ def preprocess_data(dataframes, texts):
 
         # Append the preprocessed dataframe to the list
         preprocessed_dataframes.append(melted_dataframe)
-        print("hi")
 
     return preprocessed_dataframes
 
