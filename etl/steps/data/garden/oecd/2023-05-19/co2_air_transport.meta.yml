@@ -21,42 +21,49 @@ tables:
     variables:
       africa:
         title: Africa
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       asia:
         title: Asia
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       europe:
         title: Europe
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       north_america:
         title: North America
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       oceania:
         title: Oceania
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       south_america:
         title: South America
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       world:
         title: World
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
@@ -99,6 +106,7 @@ tables:
           numDecimalPlaces: 0
       ter_dom_m:
         title: Monthly CO2 emissions from domestic aviation
+        description: 'months in year column as date from 2019-01-01'
         unit: tonnes
         short_unit: t
         display:
@@ -107,24 +115,28 @@ tables:
           yearIsDay: true
       january:
         title: January
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       february:
         title: February
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       march:
         title: March
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       april:
         title: April
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
@@ -137,48 +149,56 @@ tables:
           numDecimalPlaces: 0
       june:
         title: June
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       july:
         title: July
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       august:
         title: August
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       september:
         title: September
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       october:
         title: October
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       november:
         title: November
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       december:
         title: December
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       ter_int_m:
         title: Monthly CO2 emissions from international aviation
+        description: 'months in year column as date from 2019-01-01'
         unit: tonnes
         short_unit: t
         display:
