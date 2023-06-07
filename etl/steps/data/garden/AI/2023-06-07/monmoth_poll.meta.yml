@@ -1,0 +1,155 @@
+dataset:
+  title: Monmouth (“Mon-muth”) University Poll (2023)
+  description: The Monmouth University Poll was sponsored and conducted by the Monmouth
+    University Polling Institute from January 26 to 30, 2023 with a probability-based
+    national random sample of 805 adults age 18 and older. This includes 281 contacted
+    by a live interviewer on a landline telephone and 524 contacted by a live interviewer
+    on a cell phone, in English. Telephone numbers were selected through a mix of
+    random digit dialing and list-based sampling. Landline respondents were selected
+    with a modified Troldahl-Carter youngest adult household screen. Interviewing
+    services were provided by Braun Research, with sample obtained from Dynata (RDD,
+    n= 569), Aristotle (list, n= 152) and a panel of prior Monmouth poll participants
+    (n= 84). Monmouth is responsible for all aspects of the survey design, data weighting
+    and analysis. The full sample is weighted for region, age, education, gender and
+    race based on US Census information (ACS 2021 one-year survey). For results based
+    on this sample, one can say with 95% confidence that the error attributable to
+    sampling has a maximum margin of plus or minus 5.7 percentage points (adjusted
+    for sample design effects). Sampling error can be larger for sub-groups (see table
+    below). In addition to sampling error, one should bear in mind that question wording
+    and practical difficulties in conducting surveys can introduce error or bias into
+    the findings of opinion polls.
+  sources:
+  - name: Monmouth University Poll
+    description: The Monmouth University Poll was sponsored and conducted by the Monmouth
+      University Polling Institute from January 26 to 30, 2023 with a probability-based
+      national random sample of 805 adults age 18 and older. This includes 281 contacted
+      by a live interviewer on a landline telephone and 524 contacted by a live interviewer
+      on a cell phone, in English. Telephone numbers were selected through a mix of
+      random digit dialing and list-based sampling. Landline respondents were selected
+      with a modified Troldahl-Carter youngest adult household screen. Interviewing
+      services were provided by Braun Research, with sample obtained from Dynata (RDD,
+      n= 569), Aristotle (list, n= 152) and a panel of prior Monmouth poll participants
+      (n= 84). Monmouth is responsible for all aspects of the survey design, data
+      weighting and analysis. The full sample is weighted for region, age, education,
+      gender and race based on US Census information (ACS 2021 one-year survey). For
+      results based on this sample, one can say with 95% confidence that the error
+      attributable to sampling has a maximum margin of plus or minus 5.7 percentage
+      points (adjusted for sample design effects). Sampling error can be larger for
+      sub-groups (see table below). In addition to sampling error, one should bear
+      in mind that question wording and practical difficulties in conducting surveys
+      can introduce error or bias into the findings of opinion polls.
+    url: https://www.monmouth.edu/polling-institute/reports/monmouthpoll_us_021523/#:~:text=Nearly%203%20in%204%20(73,same%20as%20eight%20years%20ago.
+    source_data_url: https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_021523.pdf/
+    date_accessed: '2023-06-07'
+    publication_date: '2023-06-07'
+    publication_year: 2023
+    published_by: Monmouth (“Mon-muth”) University Poll, 2023
+tables:
+  monmoth_poll:
+    variables:
+      country:
+        title: Answer
+        short_unit: ''
+        unit: ''
+      q1:
+        title: Armed military search drones that distinguish between enemy combatants
+          and civilian bystanders and decide which buildings to attack
+        unit: 'percent'
+        short_unit: '%'
+      q2:
+        title: Artificial intelligence is the ability of computers and machines to
+          carry out decision-making and thought processes similar to humans, sometimes
+          referred to as computers being able to think for themselves. How much have
+          you read or heard about recent developments in this area – a lot, a little,
+          or nothing at all?
+        unit: 'percent'
+        short_unit: '%'
+      q3:
+        title: Do you think having machines with the ability to think for themselves
+          will help or hurt human beings’ quality of life?
+        unit: 'percent'
+        short_unit: '%'
+      q4:
+        title: Do you think having machines with the ability to think for themselves
+          will help or hurt jobs and the economy?
+        unit: 'percent'
+        short_unit: '%'
+      q5:
+        title: Do you think it would be a good thing or a bad thing if news articles
+          were written by artificial intelligence?
+        unit: 'percent'
+        short_unit: '%'
+      q6:
+        title: Do you think there will be a time when entire news articles will be
+          written by artificial intelligence, or not?
+        unit: 'percent'
+        short_unit: '%'
+      q7:
+        title: Facial recognition technology that can identify and monitor people
+          who try to enter public places such as stadiums
+        unit: 'percent'
+        short_unit: '%'
+      q8:
+        title: Have you heard about A.I. products – such as ChatGPT – that can have
+          conversations with you and write entire essays based on just a few prompts
+          from humans?
+        unit: 'percent'
+        short_unit: '%'
+      q9:
+        title: Have you heard of the term Artificial Intelligence or A.I., or have
+          you not heard of this?
+        unit: 'percent'
+        short_unit: '%'
+      q10:
+        title: How likely do you think it is that students will be able use A.I. programs
+          like ChatGPT to cheat on their schoolwork – very likely, somewhat likely,
+          not too likely, or not at all likely?
+        unit: 'percent'
+        short_unit: '%'
+      q11:
+        title: How much do you rely on computers and technology in your daily life
+          – a great deal, some, not much, or not at all?
+        unit: 'percent'
+        short_unit: '%'
+      q12:
+        title: How often do you use voice recognition technology, such as Siri, Alexa,
+          or Google Assistant – every day, a few times a week, once a week, less than
+          once a week, or never?
+        unit: 'percent'
+        short_unit: '%'
+      q13:
+        title: How worried are you that machines with artificial intelligence could
+          eventually pose a threat to the existence of the human race – very, somewhat,
+          not too, or not at all worried?
+        unit: 'percent'
+        short_unit: '%'
+      q14:
+        title: If computer scientists really were able to develop computers with artificial
+          intelligence, what effect do you think this would have on society as a whole?
+          Would it do more good than
+        unit: 'percent'
+        short_unit: '%'
+      q15:
+        title: Machines that monitor and make decisions about the safety operations
+          of a nuclear power plant
+        unit: 'percent'
+        short_unit: '%'
+      q16:
+        title: Machines that perform risky jobs such as coal mining
+        unit: 'percent'
+        short_unit: '%'
+      q17:
+        title: Robotic nurses for bedridden patients that can diagnose situations
+          and decide when to administer medicine.
+        unit: 'percent'
+        short_unit: '%'
+      q18:
+        title: Self-driven local delivery trucks
+        unit: 'percent'
+        short_unit: '%'
+      q19:
+        title: Would you favor or oppose having a federal agency regulate the use
+          of artificial intelligence similar to how the FDA regulates the approval
+          of drugs and medical devices?
+        unit: 'percent'
+        short_unit: '%'
