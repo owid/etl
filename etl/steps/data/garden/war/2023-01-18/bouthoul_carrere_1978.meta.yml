@@ -23,7 +23,7 @@ dataset:
 
 tables:
   bouthoul_carrere_1978:
-    variables:
+    variables: {}
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units

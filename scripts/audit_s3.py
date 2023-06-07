@@ -3,10 +3,12 @@ import gzip
 import json
 from io import BytesIO
 
+import pandas as pd
 import rich_click as click
 import structlog
 
 from backport.datasync.datasync import upload_gzip_dict
+from etl.db import get_engine
 from etl.publish import connect_s3
 
 log = structlog.get_logger()
@@ -51,6 +53,23 @@ def list_files(s3, bucket, prefix):
             yield content["Key"]
 
 
+def list_files_from_variable_ids(variable_ids, prefix):
+    for var_id in variable_ids:
+        yield f"{prefix}{var_id}.json"
+
+
+def load_variable_ids() -> list[int]:
+    q = """
+    select
+        v.id
+    from variables as v
+    join datasets as d on v.datasetId = d.id
+    where d.isArchived = 0;
+    """
+    df = pd.read_sql(q, get_engine())
+    return list(df["id"])
+
+
 @click.command(help=__doc__)
 @click.argument(
     "bucket",
@@ -87,10 +106,11 @@ def cli(
 
     s3 = connect_s3()
 
-    keys = list_files(s3, bucket, prefix)
+    variable_ids = load_variable_ids()
 
-    # log.info("cli", files_count=len(keys))
-    log.info("cli")
+    keys = list(list_files_from_variable_ids(variable_ids, prefix))
+
+    log.info("cli", files_count=len(keys))
 
     if workers == 1:
         for key in keys:

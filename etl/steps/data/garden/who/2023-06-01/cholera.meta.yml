@@ -1,0 +1,54 @@
+all_sources:
+  - who_gho: &who-gho
+      name: WHO, Global Health Observatory (2022)
+      published_by: WHO, Global Health Observatory (2022)
+      description: The cholera data is sourced from here for all years up to and including 2016.
+      date_accessed: 2022-08-03
+      publication_year: 2022
+  - who_wer: &who-wer
+      name: WHO, Weekly Epidemic Reports (2023)
+      published_by: WHO, Weekly Epidemic Reports (2023)
+      description: |
+        The data is created by combining multiple WHO Weekly Epidemiological Reports for cholera reported cases, deaths and case fatality rate.
+
+        The reports for the years 2017-2021 can be found at:
+
+        2017: https://web.archive.org/web/20230328164426/https://apps.who.int/iris/bitstream/handle/10665/274655/WER9338-489-497.pdf?sequence=1&isAllowed=y
+
+        2018: https://web.archive.org/web/20230601084841/https://apps.who.int/iris/bitstream/handle/10665/330005/WER9448-561-568-eng-fre.pdf?sequence=1&isAllowed=y
+
+        2019: https://web.archive.org/web/20221007234707/http://apps.who.int/iris/bitstream/handle/10665/334242/WER9537-441-448-eng-fre.pdf?sequence=1&isAllowed=y
+
+        2020: https://web.archive.org/web/20230326231135/http://apps.who.int/iris/bitstream/handle/10665/345271/WER9637-445-454-eng-fre.pdf?sequence=1&isAllowed=y
+
+        2021: https://web.archive.org/web/20230526223955/https://apps.who.int/iris/bitstream/handle/10665/362858/WER9737-453-464-eng-fre.pdf?sequence=1&isAllowed=y
+dataset:
+  title: World Health Organization - Cholera report cases, deaths and case fatality rate
+  licenses:
+    - name: Attribution 4.0 International (CC BY 4.0)
+      url: https://cdn.who.int/media/docs/default-source/publishing-policies/data-policy/who-policy-on-use-and-sharing-of-data-collected-in-member-states-outside-phe_en.pdf?sfvrsn=713112d4_27
+  sources:
+    - *who-gho
+    - *who-wer
+tables:
+  cholera:
+    variables:
+        cholera_case_fatality_rate:
+          title: Cholera case fatality rate
+          description: WHO calculates case fatality rates based on the numbers of cases and deaths as reported by national authorities. The case fatality rate is the number of reported deaths, divided by the number of reported cases, shown as a percentage.
+          unit: "%"
+          short_unit: "%"
+          display:
+            numDecimalPlaces: 2
+        cholera_reported_cases:
+          title: Reported cholera cases
+          description: Confirmed cholera cases, including those confirmed clinically, epidemiologically, or by laboratory investigation.
+          unit: reported cases
+          display:
+            numDecimalPlaces: 0
+        cholera_deaths:
+          title: Reported cholera deaths
+          description: Number of deaths from cholera reported to WHO.
+          unit: reported deaths
+          display:
+            numDecimalPlaces: 0
