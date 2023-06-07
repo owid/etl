@@ -38,3 +38,15 @@ steps:
   #
   data://explorers/agriculture/2023-05-26/crop_yields:
     - data://grapher/agriculture/2023-05-26/attainable_yields
+  #
+  # Food expenditure in US - USDA
+  #
+  data://meadow/usda_ers/2023-06-07/food_expenditure_in_us_archive:
+    - snapshot://usda_ers/2023-06-07/food_expenditure_in_us_archive.xlsx
+  data://meadow/usda_ers/2023-06-07/food_expenditure_in_us:
+    - snapshot://usda_ers/2023-06-07/food_expenditure_in_us.xlsx
+  data://garden/usda_ers/2023-06-07/food_expenditure_in_us:
+    - data://meadow/usda_ers/2023-06-07/food_expenditure_in_us_archive
+    - data://meadow/usda_ers/2023-06-07/food_expenditure_in_us
+  data://grapher/usda_ers/2023-06-07/food_expenditure_in_us:
+    - data://garden/usda_ers/2023-06-07/food_expenditure_in_us
