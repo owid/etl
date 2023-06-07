@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     df = pd.read_csv(snap.path)
     # Choose variables to keep.
-    vars_to_keep = ["Country", "Year", "MEASURE", "Value"]
+    vars_to_keep = ["Country", "Year", "MEASURE", "Value", "Flags"]
     df = df[vars_to_keep]
 
     #

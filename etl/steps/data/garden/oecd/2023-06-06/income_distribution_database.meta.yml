@@ -1,35 +1,96 @@
-# (Inherited from meadow, remove if not different.)
-all_sources:
-  - source_testing: &source-testing
-      name: # Example: Testing Short Citation
-      published_by: # (if different to short citation). Example: Testing Full Citation
-      url: # Example: https://url_of_testing_source.com/
-      date_accessed: # Example: 2023-01-01
-      publication_date: # Example: 2023-01-01
-      publication_year: # (if publication_date is not given). Example: 2023
-      # description: Source description.
+# # (Inherited from meadow, remove if not different.)
+# all_sources:
+#   - source_testing: &source-testing
+#       name: # Example: Testing Short Citation
+#       published_by: # (if different to short citation). Example: Testing Full Citation
+#       url: # Example: https://url_of_testing_source.com/
+#       date_accessed: # Example: 2023-01-01
+#       publication_date: # Example: 2023-01-01
+#       publication_year: # (if publication_date is not given). Example: 2023
+#       # description: Source description.
 
-# (Inherited from meadow, remove if not different.)
-dataset:
-  title: # Example: Testing Dataset Name (Institution, 2023)
-  # description: Dataset description.
-  licenses:
-    - name: # Example: Testing License Name
-      url: # Example: https://url_of_testing_source.com/license
-  sources:
-    - *source-testing
+# # (Inherited from meadow, remove if not different.)
+# dataset:
+#   title: # Example: Testing Dataset Name (Institution, 2023)
+#   # description: Dataset description.
+#   licenses:
+#     - name: # Example: Testing License Name
+#       url: # Example: https://url_of_testing_source.com/license
+#   sources:
+#     - *source-testing
 
 tables:
   income_distribution_database:
-    # (Inherited from meadow, remove if not different.)
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description: Full description of testing variable.
-      #   sources:
-      #     - *source-testing
-      #   display:
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
+      gini:
+        title: Gini coefficient (disposable income, post taxes and transfers)
+        description:
+        short_unit: ''
+        unit: ''
+        display:
+          name: Gini coefficient
+          numDecimalPlaces: 3
+      stdg:
+        title: Standard error of Gini coefficient (post taxes and transfers)
+        description:
+        short_unit: ''
+        unit: ''
+        display:
+          name: Standard error of Gini coefficient
+          numDecimalPlaces: 3
+      ginib:
+        title: Gini coefficient (market income, before taxes and transfers)
+        description:
+        short_unit: ''
+        unit: ''
+        display:
+          name: Gini coefficient
+          numDecimalPlaces: 3
+      ginig:
+        title: Gini coefficient (gross income, before taxes)
+        description:
+        short_unit: ''
+        unit: ''
+        display:
+          name: Gini coefficient
+          numDecimalPlaces: 3
+      palma:
+        title: Palma ratio
+        description:
+        short_unit: ''
+        unit: ''
+        display:
+          name: Palma ratio
+          numDecimalPlaces: 2
+      p90p10:
+        title: P90/P10 ratio
+        description:
+        short_unit: ''
+        unit: ''
+        display:
+          name: P90/P10 ratio
+          numDecimalPlaces: 2
+      p90p50:
+        title: P90/P50 ratio
+        description:
+        short_unit: ''
+        unit: ''
+        display:
+          name: P90/P50 ratio
+          numDecimalPlaces: 2
+      p50p10:
+        title: P50/P10 ratio
+        description:
+        short_unit: ''
+        unit: ''
+        display:
+          name: P50/P10 ratio
+          numDecimalPlaces: 2
+      s80s20:
+        title: S80/S20 ratio
+        description:
+        short_unit: ''
+        unit: ''
+        display:
+          name: S80/S20 ratio
+          numDecimalPlaces: 2

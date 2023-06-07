@@ -453,6 +453,14 @@ steps:
   data://grapher/research_development/2023-05-25/us_patents:
   - data://garden/research_development/2023-05-25/us_patents
 
+  # OECD Income Distribution Database
+  data://meadow/oecd/2023-06-06/income_distribution_database:
+  - snapshot://oecd/2023-06-06/income_distribution_database.csv
+  data://garden/oecd/2023-06-06/income_distribution_database:
+  - data://meadow/oecd/2023-06-06/income_distribution_database
+  data://grapher/oecd/2023-06-06/income_distribution_database:
+  - data://garden/oecd/2023-06-06/income_distribution_database
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
