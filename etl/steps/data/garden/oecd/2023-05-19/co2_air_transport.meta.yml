@@ -1,11 +1,9 @@
 dataset:
   title: Air Transport CO2 Emissions
-  description: The OECD Air Transport CO2 Emissions database includes annual, quarterly, and monthly information on
+  description: This database includes annual, quarterly, and monthly information on
     CO2 emissions related to commercial passenger, freight, and general aviation flights,
     on both a territory and a residence basis, for 186 countries. These CO2 emissions
     are estimated by the OECD, based on a consistent methodology across countries.
-
-    OECD database is updated by the end of the first month of each quarter with new data from the previous quarter.
   licenses:
   - name: Creative Commons BY 4.0
     url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
@@ -57,10 +55,8 @@ tables:
           numDecimalPlaces: 0
       world:
         title: World
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
+        short_unit: 'tonnes'
+        unit: 't'
       ter_dom_a:
         title: Annual CO2 emissions from domestic aviation
         unit: tonnes
@@ -73,6 +69,10 @@ tables:
         short_unit: t
         display:
           numDecimalPlaces: 0
+      population:
+        title: Population
+        unit: ''
+        short_unit: ''
       per_capita_ter_dom_a:
         title: Per capita CO2 emissions from domestic aviation
         unit: pounds
@@ -86,12 +86,13 @@ tables:
         display:
           numDecimalPlaces: 0
       int_inb_out_per_capita:
-        title: Per capita CO2 emissions from international flights, international tourism-adjusted
+        title: Per capita CO2 emissions from international flights, international
+          tourism-adjusted
         unit: pounds
         short_unit: lb
         display:
           numDecimalPlaces: 0
-      int_inb_out_tot:
+      int_inb_out:
         title: CO2 emissions from international flights, international tourism-adjusted
         unit: pounds
         short_unit: lb
@@ -103,8 +104,6 @@ tables:
         short_unit: t
         display:
           numDecimalPlaces: 0
-          zeroDay: '2019-01-01'
-          yearIsDay: true
       january:
         title: January
         unit: tonnes
@@ -183,5 +182,3 @@ tables:
         short_unit: t
         display:
           numDecimalPlaces: 0
-          zeroDay: '2019-01-01'
-          yearIsDay: true
