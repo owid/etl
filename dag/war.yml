@@ -20,6 +20,8 @@ steps:
     - snapshot://war/2023-02-03/war_brecke.xlsx
   data://meadow/war/2023-02-03/prio_v31:
     - snapshot://war/2023-02-02/prio_v31.xls
+  data://meadow/war/2023-06-07/prio_v1:
+    - snapshot://war/2023-02-03/prio_v1.zip
   # Garden
   data://garden/war/2023-01-18/bouthoul_carrere_1978:
     - data://meadow/war/2023-01-10/bouthoul_carrere_1978
