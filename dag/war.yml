@@ -22,6 +22,11 @@ steps:
     - snapshot://war/2023-02-02/prio_v31.xls
   data://meadow/war/2023-06-07/prio_v1:
     - snapshot://war/2023-02-03/prio_v1.zip
+  data://meadow/war/2023-06-07/cow:
+    - snapshot://war/2023-03-14/cow.extra_state.csv
+    - snapshot://war/2023-03-14/cow.inter_state.csv
+    - snapshot://war/2023-03-14/cow.intra_state.zip
+    - snapshot://war/2023-03-14/cow.non_state.csv
   # Garden
   data://garden/war/2023-01-18/bouthoul_carrere_1978:
     - data://meadow/war/2023-01-10/bouthoul_carrere_1978

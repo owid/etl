@@ -30,9 +30,9 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot and create tables
     files_relevant = {
-        "COW_Interstate_War_Conflict_Years 1.0.xls": "interstate",
-        "COW_Intrastate_War_Conflict_Years 1.0.xls": "intrastate",
-        "COW_Extrastate_War_Conflict_Years 1.0.xls": "extrastate",
+        "COW_Interstate_War_Conflict_Years 1.0.xls": "inter_state",
+        "COW_Intrastate_War_Conflict_Years 1.0.xls": "intra_state",
+        "COW_Extrastate_War_Conflict_Years 1.0.xls": "extra_state",
     }
     with tempfile.TemporaryDirectory() as tmp_dir:
         # Decompress main zip
