@@ -50,3 +50,12 @@ steps:
     - data://meadow/usda_ers/2023-06-07/food_expenditure_in_us
   data://grapher/usda_ers/2023-06-07/food_expenditure_in_us:
     - data://garden/usda_ers/2023-06-07/food_expenditure_in_us
+  #
+  # Food expenditure - USDA
+  #
+  data://meadow/usda_ers/2023-06-07/food_expenditure:
+    - snapshot://usda_ers/2023-06-07/food_expenditure.xlsx
+  data://garden/usda_ers/2023-06-07/food_expenditure:
+    - data://meadow/usda_ers/2023-06-07/food_expenditure
+  data://grapher/usda_ers/2023-06-07/food_expenditure:
+    - data://garden/usda_ers/2023-06-07/food_expenditure
