@@ -24,7 +24,7 @@ tables:
           zeroDay: '2021-01-01'
           yearIsDay: true
       _2_year:
-        title: 2-year of post-secondary education
+        title: 2-years of post-secondary education
         unit: 'percent'
         short_unit: '%'
         display:
@@ -40,7 +40,7 @@ tables:
           zeroDay: '2021-01-01'
           yearIsDay: true
       _4_year:
-        title: 4-year of post-secondary education
+        title: 4-years of post-secondary education
         unit: 'percent'
         short_unit: '%'
         display:
