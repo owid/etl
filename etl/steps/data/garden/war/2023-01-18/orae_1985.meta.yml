@@ -23,7 +23,7 @@ dataset:
 
 tables:
   orae_1985:
-    variables:
+    variables: {}
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units
