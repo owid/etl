@@ -1,7 +1,8 @@
 """Generate GHE garden dataset"""
 
-from typing import cast
+from typing import Any, cast
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
@@ -45,7 +46,7 @@ def run(dest_dir: str) -> None:
     # read dataset from meadow
     ds_meadow = N.meadow_dataset
     df = pd.DataFrame(ds_meadow["ghe"])
-
+    df = df.drop(columns="flag_level")
     # Load countries regions
     regions_dataset: Dataset = N.load_dependency("regions")
     regions = regions_dataset["regions"]
@@ -83,10 +84,79 @@ def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
             "daly_rate100k": "float32",
             "death_count": "int32",
             "death_rate100k": "float32",
-            "flag_level": "uint8",
         }
     )
-    return df.set_index(["country", "year", "age_group", "sex", "cause"])
+    return df.set_index(["country", "year", "age_group", "sex", "cause"], verify_integrity=True)
+
+
+def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Create custom age-group aggregations, there are a range of different ones that might be useful for this dataset.
+    For example, we may want to compare to other causes of death imported via the IHME dataset, so we should include age-groups that match our chosen IHME groups.
+
+    """
+    age_groups_ihme = {
+        "YEARS0-1": "YEARS0-4",
+        "YEARS1-4": "YEARS0-4",
+        "YEARS5-9": "YEARS5-14",
+        "YEARS10-14": "YEARS5-14",
+        "YEARS15-19": "YEARS15-49",
+        "YEARS20-24": "YEARS15-49",
+        "YEARS25-29": "YEARS15-49",
+        "YEARS30-34": "YEARS15-49",
+        "YEARS35-39": "YEARS15-49",
+        "YEARS40-44": "YEARS15-49",
+        "YEARS45-49": "YEARS15-49",
+        "YEARS50-54": "YEARS50-69",
+        "YEARS55-59": "YEARS50-69",
+        "YEARS60-64": "YEARS50-69",
+        "YEARS65-69": "YEARS50-69",
+        "YEARS70-74": "YEARS70+",
+        "YEARS75-79": "YEARS70+",
+        "YEARS80-84": "YEARS70+",
+        "YEARS85PLUS": "YEARS70+",
+    }
+
+    age_groups_self_harm = {
+        "YEARS0-1": "YEARS0-14",
+        "YEARS1-4": "YEARS0-14",
+        "YEARS5-9": "YEARS0-14",
+        "YEARS10-14": "YEARS0-14",
+        "YEARS15-19": "YEARS15-19",
+        "YEARS20-24": "YEARS20-24",
+        "YEARS25-29": "YEARS25-34",
+        "YEARS30-34": "YEARS25-34",
+        "YEARS35-39": "YEARS35-44",
+        "YEARS40-44": "YEARS35-44",
+        "YEARS45-49": "YEARS45-54",
+        "YEARS50-54": "YEARS45-54",
+        "YEARS55-59": "YEARS55-64",
+        "YEARS60-64": "YEARS55-64",
+        "YEARS65-69": "YEARS65-74",
+        "YEARS70-74": "YEARS65-74",
+        "YEARS75-79": "YEARS75-84",
+        "YEARS80-84": "YEARS75-84",
+        "YEARS85PLUS": "YEARS85PLUS",
+    }
+    df = add_population(
+        df=df,
+        country_col="country",
+        year_col="year",
+        sex_col="sex",
+        sex_group_all="Both sexes",
+        sex_group_female="Female",
+        sex_group_male="Male",
+        age_col="age_group",
+        age_group_mapping=AGE_GROUPS_RANGES,
+    )
+    assert df["population"].isna().sum() == 0
+    df_age_group_ihme = build_custom_age_groups(df, age_groups=age_groups_ihme)
+    df_age_group_self_harm = build_custom_age_groups(df, age_groups=age_groups_self_harm, select_causes=["Self-harm"])
+    df = remove_granular_age_groups(df, age_groups_to_keep=["ALLAges"])
+    df_combined = pd.concat([df, df_age_group_ihme, df_age_group_self_harm], axis=0)
+    df_combined = df_combined.loc[:, ~df_combined.columns.duplicated()]
+
+    return df_combined
 
 
 def combine_drug_and_alcohol(df: pd.DataFrame) -> pd.DataFrame:
@@ -116,47 +186,45 @@ def calculate_rates(df: pd.DataFrame) -> pd.DataFrame:
             age_col="age_group",
             age_group_mapping=AGE_GROUPS_RANGES,
         )
-    df["daly_rate100k"] = 100000 * df["daly_count"] / df["population"]
-    df["death_rate100k"] = 100000 * df["death_count"] / df["population"]
+    df["daly_rate100k"] = 100000 * (df["daly_count"] / df["population"])
+    df["death_rate100k"] = 100000 * (df["death_count"] / df["population"])
+    df["daly_rate100k"] = np.where(df["daly_count"] == 0, 0, df["daly_rate100k"])
+    df["death_rate100k"] = np.where(df["death_count"] == 0, 0, df["death_rate100k"])
     df = df.drop(columns=["population"])
 
     return df
 
 
-def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: list[str] = [""]) -> pd.DataFrame:
+def build_custom_age_groups(df_age: pd.DataFrame, age_groups: dict, select_causes: Any = None) -> pd.DataFrame:
     """
     Estimate metrics for broader age groups. In line with the age-groups we define in the age_groups dict:
     """
-    df_age = df.copy()
     # Add population values for each dimension
-    log.info("ghe.add_population_values")
-
+    age_groups_to_drop = (
+        df_age["age_group"].drop_duplicates()[~df_age["age_group"].drop_duplicates().isin(age_groups.keys())].to_list()
+    )
+    log.info(f"Not including... {age_groups_to_drop} in custom age groups")
     df_age = df_age[df_age["age_group"].isin(age_groups.keys())]
-    if select_causes is not [""]:
+    if select_causes is not None:
         df_age = df_age[df_age["cause"].isin(select_causes)]
 
-    total_deaths = df_age["death_count"].sum()
-
-    df_age = add_population(
-        df=df_age,
-        country_col="country",
-        year_col="year",
-        sex_col="sex",
-        sex_group_all="Both sexes",
-        sex_group_female="Female",
-        sex_group_male="Male",
-        age_col="age_group",
-        age_group_mapping=AGE_GROUPS_RANGES,
-    )
+    total_deaths = df_age.groupby(["country", "year"])["death_count"].sum().reset_index()
     # Map age groups to broader age groups. Missing age groups in the list are passed as they are (no need to assign to broad group)
     log.info("ghe.create_broader_age_groups")
-
     df_age["age_group"] = df_age["age_group"].map(age_groups)
-
+    log.info("ghe.re-estimate metrics")
+    df_age = (
+        df_age.groupby(["country", "year", "age_group", "sex", "cause"])
+        .agg({"death_count": "sum", "daly_count": "sum", "population": "sum"})
+        .reset_index()
+    )
     df_age = calculate_rates(df_age)
 
-    assert total_deaths == df_age["death_count"].sum()
+    # Checking we have the same number of deaths after aggregating age-groups
+    total_deaths_check = df_age.groupby(["country", "year"])["death_count"].sum().reset_index()
+    comparison = total_deaths == total_deaths_check
 
+    assert all(comparison)
     return df_age
 
 
@@ -169,67 +237,9 @@ def remove_granular_age_groups(df: pd.DataFrame, age_groups_to_keep: list[str]) 
     return df
 
 
-def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Create custom age-group aggregations, there are a range of different ones that might be useful for this dataset.
-    For example, we may want to compare to other causes of death imported via the IHME dataset, so we should include age-groups that match our chosen IHME groups.
-
-    """
-    age_groups_ihme = {
-        "YEARS0-1": "YEARS0-4",
-        "YEARS1-4": "YEARS0-4",
-        "YEARS5-9": "YEARS5-14",
-        "YEARS10-14": "YEARS5-14",
-        "YEARS15-19": "YEARS15-49",
-        "YEARS20-24": "YEARS15-49",
-        "YEARS25_29": "YEARS15-49",
-        "YEARS30_34": "YEARS15-49",
-        "YEARS35_39": "YEARS15-49",
-        "YEARS40_44": "YEARS15-49",
-        "YEARS45_49": "YEARS15-49",
-        "YEARS50_54": "YEARS50-69",
-        "YEARS55_59": "YEARS50-69",
-        "YEARS60_64": "YEARS50-69",
-        "YEARS65_69": "YEARS50-69",
-        "YEARS70_74": "YEARS70+",
-        "YEARS75_79": "YEARS70+",
-        "YEARS80_84": "YEARS70+",
-        "YEARS85PLUS": "YEARS70+",
-    }
-
-    age_groups_self_harm = {
-        "YEARS0-1": "YEARS0-14",
-        "YEARS1-4": "YEARS0-14",
-        "YEARS5-9": "YEARS0-14",
-        "YEARS10-14": "YEARS0-14",
-        "YEARS25-29": "YEARS25-34",
-        "YEARS30-34": "YEARS25-34",
-        "YEARS35-39": "YEARS35-44",
-        "YEARS40-44": "YEARS35-44",
-        "YEARS45-49": "YEARS45-54",
-        "YEARS50-54": "YEARS45-54",
-        "YEARS55-59": "YEARS55-64",
-        "YEARS60-64": "YEARS55-64",
-        "YEARS65-69": "YEARS65-74",
-        "YEARS70-74": "YEARS65-74",
-        "YEARS75-79": "YEARS75-84",
-        "YEARS80-84": "YEARS75-84",
-    }
-
-    df_age_group_ihme = build_custom_age_groups(df, age_groups=age_groups_ihme)
-    df_age_group_self_harm = build_custom_age_groups(df, age_groups=age_groups_self_harm, select_causes=["Self-harm"])
-    df = remove_granular_age_groups(df, age_groups_to_keep=["ALLAges"])
-    df_combined = pd.concat([df, df_age_group_ihme, df_age_group_self_harm], axis=0)
-    df_combined = df_combined.loc[:, ~df_combined.columns.duplicated()]
-
-    return df_combined
-
-
 def add_global_total(df: pd.DataFrame) -> pd.DataFrame:
     df_glob = (
-        df.groupby(["year", "age_group", "sex", "cause", "flag_level"])
-        .agg({"daly_count": "sum", "death_count": "sum"})
-        .reset_index()
+        df.groupby(["year", "age_group", "sex", "cause"]).agg({"daly_count": "sum", "death_count": "sum"}).reset_index()
     )
     df_glob["country"] = "World"
     df = pd.concat([df, df_glob])
@@ -248,7 +258,7 @@ def add_regional_and_global_aggregates(df: pd.DataFrame, regions: Table) -> pd.D
     assert df_cont["continent"].isna().sum() == 0
 
     df_cont = (
-        df_cont.groupby(["year", "continent", "age_group", "sex", "cause", "flag_level"])
+        df_cont.groupby(["year", "continent", "age_group", "sex", "cause"])
         .agg({"daly_count": "sum", "death_count": "sum"})
         .reset_index()
     )
