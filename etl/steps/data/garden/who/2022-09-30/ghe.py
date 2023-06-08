@@ -40,7 +40,7 @@ AGE_GROUPS_RANGES = {
 
 
 def run(dest_dir: str) -> None:
-    log.info("ghe: start")
+    log.info("ghe.start")
 
     # read dataset from meadow
     ds_meadow = N.meadow_dataset
@@ -54,7 +54,7 @@ def run(dest_dir: str) -> None:
     code_to_country = cast(Dataset, N.load_dependency("regions"))["regions"]["name"].to_dict()
     df["country"] = dataframes.map_series(df["country"], code_to_country, warn_on_missing_mappings=True)
 
-    df = clean_data(df)
+    df = clean_data(df, regions)
 
     ds_garden = create_dataset(dest_dir, tables=[Table(df, short_name="ghe")], default_metadata=ds_meadow.metadata)
     ds_garden.save()
@@ -62,16 +62,15 @@ def run(dest_dir: str) -> None:
     log.info("ghe.end")
 
 
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    log.info("ghe: basic cleaning")
+def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
+    log.info("ghe.basic cleaning")
     df["sex"] = df["sex"].map({"BTSX": "Both sexes", "MLE": "Male", "FMLE": "Female"})
     # Combine substance and alcohol abuse
     df = combine_drug_and_alcohol(df)
     # Add broader age groups
     df = add_age_groups(df)
     # Add global and regional values
-    df = add_global_total(df)
-    df = add_regions(df)
+    df = add_regional_and_global_aggregates(df, regions)
     # Set indices
     df = df.astype(
         {
@@ -124,7 +123,7 @@ def calculate_rates(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: list[str] = None) -> pd.DataFrame:
+def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: list[str] = [""]) -> pd.DataFrame:
     """
     Estimate metrics for broader age groups. In line with the age-groups we define in the age_groups dict:
     """
@@ -133,7 +132,7 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: l
     log.info("ghe.add_population_values")
 
     df_age = df_age[df_age["age_group"].isin(age_groups.keys())]
-    if select_causes is not None:
+    if select_causes is not [""]:
         df_age = df_age[df_age["cause"].isin(select_causes)]
 
     total_deaths = df_age["death_count"].sum()
@@ -226,50 +225,38 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     return df_combined
 
 
-def add_global_total(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
-    """
-    Calculate global total of cholera cases and add it to the existing dataset
-    """
-
-    countries = regions[regions["region_type"] == "country"]["name"].to_list()
-    assert all(
-        df["country"].isin(countries)
-    ), f"{df['country'][~df['country'].isin(countries)].drop_duplicates()}, is not a country"
+def add_global_total(df: pd.DataFrame) -> pd.DataFrame:
     df_glob = (
         df.groupby(["year", "age_group", "sex", "cause", "flag_level"])
         .agg({"daly_count": "sum", "death_count": "sum"})
         .reset_index()
     )
     df_glob["country"] = "World"
-    df_glob = calculate_rates(df_glob)
     df = pd.concat([df, df_glob])
 
     return df
 
 
-def add_regions(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
+def add_regional_and_global_aggregates(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
     continents = regions[regions["region_type"] == "continent"]["name"].to_list()
-
-    countries_in_regions = {
-        region: sorted(set(geo.list_countries_in_region(region)) & set(df["country"])) for region in continents
-    }
-    df_cont = df
-    df_out = pd.DataFrame()
+    cont_out = pd.DataFrame()
     for continent in continents:
-        df_cont = geo.add_region_aggregates(
-            df=df[["year", "age_group", "sex", "cause", "flag_level"]],
-            region=continent,
-            countries_in_region=countries_in_regions[continent],
-            countries_that_must_have_data=[],
-            num_allowed_nans_per_year=None,
-            country_col="country",
-            year_col="year",
-            frac_allowed_nans_per_year=1,
-        )
-        df_cont = df_cont[df_cont["country"].isin(continents)]
-        df_out = pd.concat([df_out, df_cont])
-    df_out = calculate_rates(df_out)
+        cont_df = pd.DataFrame({"continent": continent, "country": pd.Series(geo.list_countries_in_region(continent))})
+        cont_out = pd.concat([cont_out, cont_df])
+    df_cont = pd.merge(df, cont_out, on="country")
 
-    df = pd.concat([df, df_out])
+    assert df_cont["continent"].isna().sum() == 0
+
+    df_cont = (
+        df_cont.groupby(["year", "continent", "age_group", "sex", "cause", "flag_level"])
+        .agg({"daly_count": "sum", "death_count": "sum"})
+        .reset_index()
+    )
+    df_cont = df_cont.rename(columns={"continent": "country"})
+
+    df_regions = add_global_total(df_cont)
+    df_regions = calculate_rates(df_regions)
+
+    df = pd.concat([df, df_regions])
 
     return df
