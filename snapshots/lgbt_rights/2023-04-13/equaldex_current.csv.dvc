@@ -11,7 +11,7 @@ meta:
   file_extension: csv
   license_url: https://www.equaldex.com/terms
   license_name: Equaldex Terms and Conditions of Use
-  date_accessed: 2023-05-15
+  date_accessed: 2023-06-08
   is_public: true
   description: |
     Equaldex is a collaborative knowledge base for the LGBT (lesbian, gay, bisexual, transgender) movement. The site aims to crowdsource every law related to LGBT rights to provide a comprehensive and global view of the LGBT rights movement.
@@ -19,6 +19,6 @@ meta:
     This version of the dataset contains only the current situation of each issue.
 wdir: ../../../data/snapshots/lgbt_rights/2023-04-13
 outs:
-- md5: 755b34f94a54870419409a0cfeb695bf
-  size: 494696
+- md5: 44aa5dd079016b650bea94c3c510c9f4
+  size: 498404
   path: equaldex_current.csv
