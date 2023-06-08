@@ -506,6 +506,31 @@ steps:
   data://meadow/artificial_intelligence/2023-06-08/yougov_end_of_humanity:
   - snapshot://artificial_intelligence/2023-06-08/yougov_end_of_humanity.pdf
 
+# AI polls
+# Monmouth University Poll
+  data://meadow/AI/2023-06-07/monmoth_poll:
+  - snapshot://AI/2023-06-07/monmoth_poll.pdf
+  data://garden/AI/2023-06-07/monmoth_poll:
+  - data://meadow/AI/2023-06-07/monmoth_poll
+  data://grapher/AI/2023-06-07/monmoth_poll:
+  - data://garden/AI/2023-06-07/monmoth_poll
+
+# YouGov
+  data://meadow/AI/2023-06-08/yougov_robots:
+  - snapshot://AI/2023-06-07/yougov_robots.xlsx
+  data://garden/AI/2023-06-08/yougov_robots:
+  - data://meadow/AI/2023-06-08/yougov_robots
+  data://grapher/AI/2023-06-08/yougov_robots:
+  - data://garden/AI/2023-06-08/yougov_robots
+
+  data://meadow/AI/2023-06-08/yougov_job_automation:
+  - snapshot://AI/2023-06-08/yougov_job_automation.xlsx
+  data://garden/AI/2023-06-08/yougov_job_automation:
+  - data://meadow/AI/2023-06-08/yougov_job_automation
+  data://grapher/AI/2023-06-08/yougov_job_automation:
+  - data://garden/AI/2023-06-08/yougov_job_automation
+
+
 # OECD exchange rates
   data://meadow/oecd/2023-06-20/ppp_exchange_rates:
   - snapshot://oecd/2023-06-20/ppp_exchange_rates.csv
