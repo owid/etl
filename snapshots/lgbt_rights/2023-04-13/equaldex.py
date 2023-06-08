@@ -17,6 +17,9 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
     type=bool,
     help="Upload dataset to Snapshot",
 )
+# TODO: Don't use --path-to-file, but load the files directly from the directory.
+
+
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.

@@ -21,6 +21,7 @@ import datetime
 import json
 import os
 from pathlib import Path
+from typing import List, Tuple
 
 import pandas as pd
 import requests
@@ -37,7 +38,7 @@ GET_DATA_FROM_API = True
 
 
 # Function to extract data from the EqualDex API
-def extract_from_api(country_list: list) -> tuple[pd.DataFrame, pd.DataFrame]:
+def extract_from_api(country_list: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     # Initialize logger.
     log = get_logger()
 
@@ -62,6 +63,7 @@ def extract_from_api(country_list: list) -> tuple[pd.DataFrame, pd.DataFrame]:
         }
 
         # Run query, ensuring it delivers output with status 200
+        # TODO: Make it less agressive. Pablo recommends "You could sleep in between requests, and add a maximum number of trials."
         status = 0
         while status != 200:
             response = requests.get(url, headers=headers, params=querystring, timeout=500)

@@ -142,6 +142,7 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
     }
 
     # Match id variables with the new ids in new columns
+    # TODO: Consider updating the map function to datautils.dataframes.map_series (when there's no match it copies the original value)
     df["homosexuality"] = df["value_formatted_homosexuality"].map(id_homosexuality)
     df["changing_gender"] = df["value_formatted_changing_gender"].map(id_changing_gender)
     df["marriage"] = df["value_formatted_marriage"].map(id_marriage)
