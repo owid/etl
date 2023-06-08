@@ -19,13 +19,13 @@ tables:
           Share of consumer expenditures that are spent on alcohol and tobacco.
       consumer_expenditure:
         title: "Total consumer expenditure"
-        short_unit: "current US$"
-        unit: "$"
+        unit: "current US$"
+        short_unit: "$"
         description: |
           Total consumer expenditure on goods and services per year.
       food_expenditure:
         title: "Total food expenditure"
-        short_unit: "current US$"
-        unit: "$"
+        unit: "current US$"
+        short_unit: "$"
         description: |
           Amount of money spend on food in a given year. This only includes food eaten at home, and does not include alcoholic beverages and tobacco.
