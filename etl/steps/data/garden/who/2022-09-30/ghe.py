@@ -86,7 +86,7 @@ def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
     # Add broader age groups
     df = add_age_groups(df)
     # Add global and regional values
-    df = add_regional_and_global_aggregates(df, regions)
+    df_reg = add_regional_and_global_aggregates(df, regions)
     # Set indices
     df = df.astype(
         {
@@ -234,8 +234,8 @@ def remove_granular_age_groups(df: pd.DataFrame, age_groups_to_keep: list[str]) 
 
 def add_global_total(df: pd.DataFrame) -> pd.DataFrame:
     df_glob = (
-        df.groupby(["year", "age_group", "sex", "cause", "population"], observed=True, as_index=False)
-        .agg({"daly_count": "sum", "death_count": "sum"})
+        df.groupby(["year", "age_group", "sex", "cause"], observed=True)
+        .agg({"daly_count": "sum", "death_count": "sum", "population": "sum"})
         .reset_index()
     )
     df_glob["country"] = "World"
@@ -255,8 +255,8 @@ def add_regional_and_global_aggregates(df: pd.DataFrame, regions: Table) -> pd.D
     assert df_cont["continent"].isna().sum() == 0
 
     df_cont = (
-        df_cont.groupby(["year", "continent", "age_group", "sex", "cause", "population"], observed=True, as_index=False)
-        .agg({"daly_count": "sum", "death_count": "sum"})
+        df_cont.groupby(["year", "continent", "age_group", "sex", "cause"], observed=True)
+        .agg({"daly_count": "sum", "death_count": "sum", "population": "sum"})
         .reset_index()
     )
     df_cont = df_cont.rename(columns={"continent": "country"})
