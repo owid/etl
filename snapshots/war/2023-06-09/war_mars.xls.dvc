@@ -10,16 +10,17 @@ meta:
   source_published_by: 'Lyall, Jason. Divided Armies: Inequality and Battlefield Performance
     in Modern War (Princeton, NJ: Princeton University Press, 2020)'
   url: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DUO7IE
-  source_data_url: https://dataverse.harvard.edu/file.xhtml?fileId=5857675&version=2.0
-  file_extension: zip
+  source_data_url: https://dataverse.harvard.edu/api/access/datafile/5857675
+  file_extension: xls
   license_url: https://dataverse.org/best-practices/dataverse-community-norms
   license_name: CC0 Public Domain
   date_accessed: 2023-06-09
   is_public: true
   description: |
     Project Mars. This dataset records new data on 229 unique belligerents in 252 conventional wars fought between 1800 and 2011. Project Mars introduces new data about these belligerents, including their level of prewar military inequality, and new measures of battlefield performance, including desertion, defection, and fratricidal violence. The latest version is Version 1.1. (2022-02-08)
+
 wdir: ../../../data/snapshots/war/2023-06-09
 outs:
-- md5: ef2d4fd912cb9b28a473018c3f33844f
-  size: 89044
-  path: war_mars.zip
+- md5: 2ef660345fcdf5efabc14416c540a155
+  size: 1200128
+  path: war_mars.xls

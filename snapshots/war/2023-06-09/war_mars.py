@@ -19,7 +19,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"war/{SNAPSHOT_VERSION}/war_mars.zip")
+    snap = Snapshot(f"war/{SNAPSHOT_VERSION}/war_mars.xls")
 
     # Download data from source.
     snap.download_from_source()
