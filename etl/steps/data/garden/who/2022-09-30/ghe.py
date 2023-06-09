@@ -86,7 +86,7 @@ def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
     # Add broader age groups
     df = add_age_groups(df)
     # Add global and regional values
-    df_reg = add_regional_and_global_aggregates(df, regions)
+    df = add_regional_and_global_aggregates(df, regions)
     # Set indices
     df = df.astype(
         {
@@ -101,7 +101,7 @@ def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
             "death_rate100k": "float32",
         }
     )
-    df = df.drop(columns=["population", "index"])
+    df = df.drop(columns=["population"])
     return df.set_index(["country", "year", "age_group", "sex", "cause"], verify_integrity=True)
 
 
