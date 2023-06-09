@@ -123,11 +123,6 @@ def add_regions(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
         df_out = pd.concat([df_out, df_cont])
     df_out["cholera_case_fatality_rate"] = (df_out["cholera_deaths"] / df_out["cholera_reported_cases"]) * 100
 
-    dfg = df[df["country"] == "World"].groupby("year")["cholera_deaths"].sum()
-    df_out_gr = df_out.groupby("year")["cholera_deaths"].sum()
-
-    pd.merge(dfg, df_out_gr)
-
     df = pd.concat([df, df_out])
 
     return df
