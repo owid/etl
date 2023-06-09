@@ -1,12 +1,14 @@
 meta:
   namespace: war
-  short_name: orae_1985
+  short_name: kaye_1985
   name: ORAE Report 95 - National Defence of Canada (1985)
-  source_name: National Defence of Canada (1985)
+  source_name: Kaye et al. (1985)
   publication_year: 1985
   publication_date: 1985-11-01
-  url: https://books.google.es/books/about/Major_Armed_Conflict.html?id=Xce_PwAACAAJ&redir_esc=y
-  source_data_url: https://docs.google.com/spreadsheets/d/1GIB-8ZPNXqTATwHU4ZDavKz0iJoiOg2UROfoRz43kQY/edit#gid=1251805698
+  url: 
+    https://books.google.es/books/about/Major_Armed_Conflict.html?id=Xce_PwAACAAJ&redir_esc=y
+  source_data_url: 
+    https://docs.google.com/spreadsheets/d/1GIB-8ZPNXqTATwHU4ZDavKz0iJoiOg2UROfoRz43kQY/edit#gid=1251805698
   file_extension: csv
   license_url:
   license_name: Department of National Defence, Canada, Operational Research and Analysis
@@ -144,4 +146,4 @@ wdir: ../../../data/snapshots/war/2023-01-09
 outs:
 - md5: ebe21d08d52544800ffdfdb2b9ceec62
   size: 81484
-  path: orae_1985.csv
+  path: kaye_1985.csv

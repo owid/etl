@@ -10,8 +10,8 @@ steps:
     - snapshot://war/2023-01-09/dunnigan_martel_1987.csv
   data://meadow/war/2023-01-10/eckhardt_1991:
     - snapshot://war/2023-01-09/eckhardt_1991.csv
-  data://meadow/war/2023-01-10/orae_1985:
-    - snapshot://war/2023-01-09/orae_1985.csv
+  data://meadow/war/2023-01-10/kaye_1985:
+    - snapshot://war/2023-01-09/kaye_1985.csv
   data://meadow/war/2023-01-10/sorokin_1937:
     - snapshot://war/2023-01-09/sorokin_1937.csv
   data://meadow/war/2023-01-10/sutton_1971:
@@ -41,8 +41,8 @@ steps:
     - data://meadow/war/2023-01-10/dunnigan_martel_1987
   data://garden/war/2023-01-18/eckhardt_1991:
     - data://meadow/war/2023-01-10/eckhardt_1991
-  data://garden/war/2023-01-18/orae_1985:
-    - data://meadow/war/2023-01-10/orae_1985
+  data://garden/war/2023-01-18/kaye_1985:
+    - data://meadow/war/2023-01-10/kaye_1985
   data://garden/war/2023-01-18/sorokin_1937:
     - data://meadow/war/2023-01-10/sorokin_1937
   data://garden/war/2023-01-18/sutton_1971:
