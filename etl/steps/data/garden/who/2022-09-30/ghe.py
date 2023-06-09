@@ -209,7 +209,7 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: A
         log.info("Dropping unused causes...")
         msk = df_age["cause"].isin(select_causes)
         df_age = df_age[msk].reset_index(drop=True).copy()
-    total_deaths = df_age.groupby(["country", "year"])["death_count"].sum().reset_index()
+    total_deaths = df_age.groupby(["country", "year"], observed=True)["death_count"].sum().reset_index()
     # Map age groups to broader age groups. Missing age groups in the list are passed as they are (no need to assign to broad group)
     log.info("ghe.create_broader_age_groups")
     df_age["age_group"] = df_age["age_group"].map(age_groups)
@@ -223,7 +223,7 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: A
     df_age = calculate_rates(df_age)
 
     # Checking we have the same number of deaths after aggregating age-groups
-    total_deaths_check = df_age.groupby(["country", "year"])["death_count"].sum().reset_index()
+    total_deaths_check = df_age.groupby(["country", "year"], observed=True)["death_count"].sum().reset_index()
     comparison = total_deaths == total_deaths_check
 
     assert all(comparison)
@@ -242,7 +242,9 @@ def remove_granular_age_groups(df: pd.DataFrame, age_groups_to_keep: list[str]) 
 
 def add_global_total(df: pd.DataFrame) -> pd.DataFrame:
     df_glob = (
-        df.groupby(["year", "age_group", "sex", "cause"]).agg({"daly_count": "sum", "death_count": "sum"}).reset_index()
+        df.groupby(["year", "age_group", "sex", "cause"], observed=True)
+        .agg({"daly_count": "sum", "death_count": "sum"})
+        .reset_index()
     )
     df_glob["country"] = "World"
     df = pd.concat([df, df_glob])
@@ -261,7 +263,7 @@ def add_regional_and_global_aggregates(df: pd.DataFrame, regions: Table) -> pd.D
     assert df_cont["continent"].isna().sum() == 0
 
     df_cont = (
-        df_cont.groupby(["year", "continent", "age_group", "sex", "cause"])
+        df_cont.groupby(["year", "continent", "age_group", "sex", "cause"], observed=True)
         .agg({"daly_count": "sum", "death_count": "sum"})
         .reset_index()
     )
