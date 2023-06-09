@@ -18,10 +18,16 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     #
     snap = paths.load_snapshot_dependency()
-    df = pd.read_feather(snap.path)
-
-    # Convert long to wide format.
-    df = long_to_wide(df)
+    df = (
+        pd.read_csv(snap.path)
+        .rename(
+            columns={
+                "time": "year",
+                "value": "wheat_price",
+            }
+        )
+        .assign(country="England")
+    )
 
     #
     # Process data.

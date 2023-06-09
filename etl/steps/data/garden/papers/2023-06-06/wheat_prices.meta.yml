@@ -3,7 +3,7 @@ dataset:
 tables:
   wheat_prices:
     variables:
-      wheat_price_in_1996_pounds__makridakis_et_al__1997:
+      wheat_price:
         title: Wheat price in 1996 pounds (Makridakis et al. (1997))
         description: Long-run series on wheat prices in England, measured in constant
           1996 pounds per tonne.
