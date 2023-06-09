@@ -13,3 +13,5 @@ steps:
   - snapshot://space/2023-06-09/space_track.csv
   data://garden/space/2023-06-09/space_track:
   - data://meadow/space/2023-06-09/space_track
+  data://grapher/space/2023-06-09/space_track:
+  - data://garden/space/2023-06-09/space_track
