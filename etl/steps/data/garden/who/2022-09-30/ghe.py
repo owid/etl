@@ -15,7 +15,7 @@ from etl.helpers import PathFinder, create_dataset
 log = get_logger()
 
 # naming conventions
-N = PathFinder(__file__)
+paths = PathFinder(__file__)
 AGE_GROUPS_RANGES = {
     "ALLAges": [0, None],
     "YEARS0-1": [0, 1],
@@ -44,20 +44,22 @@ def run(dest_dir: str) -> None:
     log.info("ghe.start")
 
     # read dataset from meadow
-    ds_meadow = N.meadow_dataset
+    ds_meadow = paths.meadow_dataset
     df = pd.DataFrame(ds_meadow["ghe"])
     df = df.drop(columns="flag_level")
     # Load countries regions
-    regions_dataset: Dataset = N.load_dependency("regions")
+    regions_dataset: Dataset = paths.load_dependency("regions")
     regions = regions_dataset["regions"]
 
     # convert codes to country names
-    code_to_country = cast(Dataset, N.load_dependency("regions"))["regions"]["name"].to_dict()
+    code_to_country = cast(Dataset, paths.load_dependency("regions"))["regions"]["name"].to_dict()
     df["country"] = dataframes.map_series(df["country"], code_to_country, warn_on_missing_mappings=True)
 
     df = clean_data(df, regions)
 
-    ds_garden = create_dataset(dest_dir, tables=[Table(df, short_name="ghe")], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir, tables=[Table(df, short_name=paths.short_name)], default_metadata=ds_meadow.metadata
+    )
     ds_garden.save()
 
     log.info("ghe.end")
@@ -200,19 +202,17 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: A
     """
     # Add population values for each dimension
     df_age = df.copy()
-    age_groups_to_drop = (
-        df_age["age_group"].drop_duplicates()[~df_age["age_group"].drop_duplicates().isin(age_groups.keys())].to_list()
-    )
+    age_groups_to_drop = set(df_age["age_group"]) - set(age_groups)
     log.info(f"Not including... {age_groups_to_drop} in custom age groups")
     df_age = df_age[df_age["age_group"].isin(age_groups.keys())]
     if select_causes is not None:
         log.info("Dropping unused causes...")
         msk = df_age["cause"].isin(select_causes)
         df_age = df_age[msk].reset_index(drop=True).copy()
-    total_deaths = df_age.groupby(["country", "year"], observed=True)["death_count"].sum().reset_index()
+    total_deaths = df_age.groupby(["country", "year"], observed=True, as_index=False)["death_count"].sum()
     # Map age groups to broader age groups. Missing age groups in the list are passed as they are (no need to assign to broad group)
     log.info("ghe.create_broader_age_groups")
-    df_age["age_group"] = df_age["age_group"].map(age_groups)
+    df_age["age_group"] = df_age["age_group"].map(age_groups, na_action="ignore")
     log.info("ghe.re-estimate metrics")
 
     df_age = (
@@ -223,7 +223,7 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: A
     df_age = calculate_rates(df_age)
 
     # Checking we have the same number of deaths after aggregating age-groups
-    total_deaths_check = df_age.groupby(["country", "year"], observed=True)["death_count"].sum().reset_index()
+    total_deaths_check = df_age.groupby(["country", "year"], observed=True, as_index=False)["death_count"].sum()
     comparison = total_deaths == total_deaths_check
 
     assert all(comparison)
@@ -242,7 +242,7 @@ def remove_granular_age_groups(df: pd.DataFrame, age_groups_to_keep: list[str]) 
 
 def add_global_total(df: pd.DataFrame) -> pd.DataFrame:
     df_glob = (
-        df.groupby(["year", "age_group", "sex", "cause"], observed=True)
+        df.groupby(["year", "age_group", "sex", "cause"], observed=True, as_index=False)
         .agg({"daly_count": "sum", "death_count": "sum"})
         .reset_index()
     )
@@ -263,7 +263,7 @@ def add_regional_and_global_aggregates(df: pd.DataFrame, regions: Table) -> pd.D
     assert df_cont["continent"].isna().sum() == 0
 
     df_cont = (
-        df_cont.groupby(["year", "continent", "age_group", "sex", "cause"], observed=True)
+        df_cont.groupby(["year", "continent", "age_group", "sex", "cause"], observed=True, as_index=False)
         .agg({"daly_count": "sum", "death_count": "sum"})
         .reset_index()
     )
