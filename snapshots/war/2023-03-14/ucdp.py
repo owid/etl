@@ -2,10 +2,10 @@
 
 This dataset is built from four different datasets:
 
-    - Non-state wars: The use of armed force between two organised armed groups.
-    - Intra-state wars: A conflict between a government and a non-governmental party, with no interference from other countries.
-    - Inter-state wars: A conflict between two or more governments.
-    - Extra-state wars: An extra-systemic conflict is a conflict between a state and a non-state group outside its own territory. These conflicts are by definition territorial, since the government side is fighting to retain control of a territory outside the state system.
+    - One-sided Violence: An actor-year dataset with information of intentional attacks on civilians by governments and formally organized armed groups.
+    - Non-State Conflict: A conflict-year dataset containing information on communal and organized armed conflict where none of the parties is the government of a state.
+    - Battle-Related Deaths: A dyad-year dataset with information on the number of battle-related deaths in the conflicts from 1989-2021 that appear in the UCDP/PRIO Armed Conflict Dataset.
+
 """
 
 from pathlib import Path
