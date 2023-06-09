@@ -477,6 +477,34 @@ steps:
   - data://garden/papers/2023-06-07/commodity_prices
   data://garden/papers/2023-06-07/commodity_prices:
   - snapshot://papers/2023-06-07/commodity_prices.xlsx
+# AI polls
+# Monmoth University Poll
+  data://meadow/artificial_intelligence/2023-06-07/monmouth_poll:
+  - snapshot://artificial_intelligence/2023-06-07/monmouth_poll.pdf
+  data://garden/artificial_intelligence/2023-06-07/monmouth_poll:
+  - data://meadow/artificial_intelligence/2023-06-07/monmouth_poll
+  data://grapher/artificial_intelligence/2023-06-07/monmouth_poll:
+  - data://garden/artificial_intelligence/2023-06-07/monmouth_poll
+
+# YouGov
+  data://meadow/artificial_intelligence/2023-06-08/yougov_robots:
+  - snapshot://artificial_intelligence/2023-06-08/yougov_robots.xlsx
+  data://garden/artificial_intelligence/2023-06-08/yougov_robots:
+  - data://meadow/artificial_intelligence/2023-06-08/yougov_robots
+  data://grapher/artificial_intelligence/2023-06-08/yougov_robots:
+  - data://garden/artificial_intelligence/2023-06-08/yougov_robots
+
+  data://meadow/artificial_intelligence/2023-06-08/yougov_job_automation:
+  - snapshot://artificial_intelligence/2023-06-08/yougov_job_automation.xlsx
+  data://garden/artificial_intelligence/2023-06-08/yougov_job_automation:
+  - data://meadow/artificial_intelligence/2023-06-08/yougov_job_automation
+  data://grapher/artificial_intelligence/2023-06-08/yougov_job_automation:
+  - data://garden/artificial_intelligence/2023-06-08/yougov_job_automation
+
+  data://meadow/artificial_intelligence/2023-06-08/yougov_jobs:
+  - snapshot://artificial_intelligence/2023-06-08/yougov_jobs.pdf
+  data://meadow/artificial_intelligence/2023-06-08/yougov_end_of_humanity:
+  - snapshot://artificial_intelligence/2023-06-08/yougov_end_of_humanity.pdf
 
 # OECD exchange rates
   data://meadow/oecd/2023-06-20/ppp_exchange_rates:
