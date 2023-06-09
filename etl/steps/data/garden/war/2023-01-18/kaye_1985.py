@@ -5,7 +5,7 @@ from owid.catalog import Dataset, Table
 from shared import make_tables, table_to_clean_df
 from structlog import get_logger
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
 
@@ -43,12 +43,7 @@ def run(dest_dir: str) -> None:
     #
     log.info(f"{SHORT_NAME}: adding tables to dataset")
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
-    # Add table of processed data to the new dataset.
-    for table in tables:
-        ds_garden.add(table)
-    # Update dataset and table metadata using the adjacent yaml file.
-    ds_garden.update_metadata(paths.metadata_path)
+    ds_garden = create_dataset(dest_dir, tables=tables, default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

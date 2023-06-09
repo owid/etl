@@ -9,7 +9,7 @@ all_sources:
       # description: Source description.
 
 dataset:
-  title: Wars and deaths – Dunnigan and Martel
+  title: Wars and deaths (Dunnigan and Martel, 1987)
   namespace: war
   short_name: dunnigan_martel_1987
   version: 2023-01-18

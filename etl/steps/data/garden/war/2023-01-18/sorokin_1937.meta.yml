@@ -9,7 +9,7 @@ all_sources:
       # description: Source description.
 
 dataset:
-  title: Wars and casualties – Sorokin
+  title: Wars and casualties (Sorokin, 1937)
   namespace: war
   short_name: sorokin_1937
   version: 2023-01-18

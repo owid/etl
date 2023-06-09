@@ -1,10 +1,10 @@
 meta:
   namespace: war
   short_name: prio_v1
-  name: Battledeaths Dataset (PRIO v1.0, 2005)
+  name: Battledeaths Dataset (PRIO, 2005)
   version: 2023-02-03
   publication_year: 2005
-  source_name: PRIO
+  source_name: PRIO v1.0 (2005)
   source_published_by: "Lacina, Bethany & Nils Petter Gleditsch, 2005. 'Monitoring\
     \ Trends in Global Combat: A New Dataset of Battle Deaths', European Journal of\
     \ Population 21(2–3): 145–166."

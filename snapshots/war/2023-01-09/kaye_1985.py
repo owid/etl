@@ -24,7 +24,7 @@ SNAPSHOT_VERSION = "2023-01-09"
 )
 def main(path_to_file: str, upload: bool) -> None:
     # Create new snapshot.
-    snap = Snapshot(f"war/{SNAPSHOT_VERSION}/orae_1985.csv")
+    snap = Snapshot(f"war/{SNAPSHOT_VERSION}/kaye_1985.csv")
     # Ensure destination folder exists.
     snap.path.parent.mkdir(exist_ok=True, parents=True)
     # Copy local data file to snapshots data folder.

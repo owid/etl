@@ -9,9 +9,9 @@ all_sources:
       # description: Source description.
 
 dataset:
-  title: Major armed conflicts and deaths – Kaye et al.
+  title: Major armed conflicts and deaths (Kaye et al., 1985)
   namespace: war
-  short_name: orae_1985
+  short_name: kaye_1985
   version: 2023-01-18
   description: |
     This dataset provides information on direct and indirect military and civilian deaths from major armed conflicts, drawn from the report by Kaye et al. (1985).
@@ -22,7 +22,7 @@ dataset:
     - *source-testing
 
 tables:
-  orae_1985:
+  kaye_1985:
     variables: {}
       # testing_variable:
       #   title: Testing variable title
