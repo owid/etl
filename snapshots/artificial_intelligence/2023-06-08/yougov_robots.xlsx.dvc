@@ -13,7 +13,7 @@ meta:
   file_extension: xlsx
   license_url:
   license_name: Public domain
-  date_accessed: 2023-06-07
+  date_accessed: 2023-06-08
   is_public: true
   description: |
     Biannual tracker of Americans' concerns regarding robotic intelligence. Next update is in July. The provided results are weighted to ensure they are representative of the United States population across various demographic factors. The weighting is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This weighting process helps to account for the diversity within the population and ensures that the results reflect a broader representation of the United States as a whole. Each wave comprises responses from 1004 - 1085 US Adults.
