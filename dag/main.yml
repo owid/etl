@@ -488,3 +488,4 @@ include:
   - dag/excess_mortality.yml
   - dag/environment.yml
   - dag/agriculture.yml
+  - dag/space.yml
