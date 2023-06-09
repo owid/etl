@@ -23,6 +23,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    tb = tb.rename(columns={"entity": "country"})
 
     #
     # Save outputs.
