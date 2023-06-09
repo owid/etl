@@ -35,6 +35,7 @@ ITEM_CODES = {
     # Item code for "Seed cotton, unginned".
     "cotton": "00000328",
     # Item code for "Groundnuts, excluding shelled".
+    # NOTE: This was wrong, the correct item code should have been "00000242". This is corrected in the new version.
     "groundnut": "00000234",
     # Item code for "Maize (corn)".
     "maize": "00000056",

@@ -58,10 +58,6 @@ def process(table: Table) -> Table:
         )
 
     table = table.reset_index()
-    table = table.drop(columns=["flag_level"])
-
-    # Add World totals (should probably be in Garden)
-    table = add_global_totals(table)
 
     # Use subset of the data for now
     if GHE_SUBSET_ONLY:
@@ -87,17 +83,3 @@ def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
         ((table["sex"] == "Both sexes") & (table["age_group"] == "ALLAges")) | (table["cause"].isin(causes_include_all))
     ]
     return table
-
-
-def add_global_totals(df: pd.DataFrame) -> pd.DataFrame:
-    # Get age_group=all and sex=all (avoid duplicates)
-    df_ = df[(df["sex"] == "Both sexes") & (df["age_group"] == "ALLAges")]
-    # Group by year and cause, sum
-    glob_total = df_.groupby(["year", "cause"], as_index=False, observed=True)[["daly_count", "death_count"]].sum()
-    # Fill other fields
-    glob_total["country"] = "World"
-    glob_total["age_group"] = "ALLAges"
-    glob_total["sex"] = "Both sexes"
-    # Merge with complete table
-    df = pd.concat([df, glob_total])
-    return df

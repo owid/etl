@@ -23,7 +23,7 @@ dataset:
 
 tables:
   clodfelter_2017:
-    variables:
+    variables: {}
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units

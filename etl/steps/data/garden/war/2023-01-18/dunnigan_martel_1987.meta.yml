@@ -23,7 +23,7 @@ dataset:
 
 tables:
   dunnigan_martel_1987:
-    variables:
+    variables: {}
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units
