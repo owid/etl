@@ -153,8 +153,7 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     df_age_group_ihme = build_custom_age_groups(df, age_groups=age_groups_ihme)
     df_age_group_self_harm = build_custom_age_groups(df, age_groups=age_groups_self_harm, select_causes=["Self-harm"])
     df = remove_granular_age_groups(df, age_groups_to_keep=["ALLAges"])
-    df_combined = pd.concat([df, df_age_group_ihme, df_age_group_self_harm], axis=0)
-    df_combined = df_combined.loc[:, ~df_combined.columns.duplicated()]
+    df_combined = pd.concat([df, df_age_group_ihme, df_age_group_self_harm], ignore_index=True).drop(columns=["index"])
 
     return df_combined
 
@@ -195,26 +194,29 @@ def calculate_rates(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def build_custom_age_groups(df_age: pd.DataFrame, age_groups: dict, select_causes: Any = None) -> pd.DataFrame:
+def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: Any = None) -> pd.DataFrame:
     """
     Estimate metrics for broader age groups. In line with the age-groups we define in the age_groups dict:
     """
     # Add population values for each dimension
+    df_age = df.copy()
     age_groups_to_drop = (
         df_age["age_group"].drop_duplicates()[~df_age["age_group"].drop_duplicates().isin(age_groups.keys())].to_list()
     )
     log.info(f"Not including... {age_groups_to_drop} in custom age groups")
     df_age = df_age[df_age["age_group"].isin(age_groups.keys())]
     if select_causes is not None:
-        df_age = df_age[df_age["cause"].isin(select_causes)]
-
+        log.info("Dropping unused causes...")
+        msk = df_age["cause"].isin(select_causes)
+        df_age = df_age[msk].reset_index(drop=True).copy()
     total_deaths = df_age.groupby(["country", "year"])["death_count"].sum().reset_index()
     # Map age groups to broader age groups. Missing age groups in the list are passed as they are (no need to assign to broad group)
     log.info("ghe.create_broader_age_groups")
     df_age["age_group"] = df_age["age_group"].map(age_groups)
     log.info("ghe.re-estimate metrics")
+
     df_age = (
-        df_age.groupby(["country", "year", "age_group", "sex", "cause"])
+        df_age.groupby(["country", "year", "age_group", "sex", "cause"], as_index=False, observed=True)
         .agg({"death_count": "sum", "daly_count": "sum", "population": "sum"})
         .reset_index()
     )
@@ -234,6 +236,7 @@ def remove_granular_age_groups(df: pd.DataFrame, age_groups_to_keep: list[str]) 
     """
     df = df[df["age_group"].isin(age_groups_to_keep)]
     assert len(df["age_group"].drop_duplicates()) == len(age_groups_to_keep)
+    df = df.drop(columns=["population"]).reset_index(drop=True)
     return df
 
 
