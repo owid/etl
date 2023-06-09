@@ -50,7 +50,9 @@ def count_leo_by_type(df: pd.DataFrame) -> pd.DataFrame:
         df_year = df_year[["object_type"]].groupby("object_type", as_index=False).size().assign(year=year)
         dataframes.append(df_year)
 
-    leo_by_type = pd.concat(dataframes).reset_index(drop=True).rename({"object_type": "entity", "size": "objects"})
+    leo_by_type = (
+        pd.concat(dataframes).reset_index(drop=True).rename(columns={"object_type": "entity", "size": "objects"})
+    )
 
     return leo_by_type
 
@@ -69,7 +71,9 @@ def count_non_debris_by_orbit(df: pd.DataFrame) -> pd.DataFrame:
         df_year = df_year[["orbit"]].groupby("orbit", as_index=False).size().assign(year=year)
         dataframes.append(df_year)
 
-    non_debris_by_orbit = pd.concat(dataframes).reset_index(drop=True).rename({"orbit": "entity", "size": "objects"})
+    non_debris_by_orbit = (
+        pd.concat(dataframes).reset_index(drop=True).rename(columns={"orbit": "entity", "size": "objects"})
+    )
 
     return non_debris_by_orbit
 
