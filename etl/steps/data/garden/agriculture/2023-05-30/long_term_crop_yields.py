@@ -2,6 +2,7 @@
 
 from typing import List, cast
 
+import numpy as np
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
@@ -13,6 +14,9 @@ log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# FAOSTAT source name (used to be able to put this source first in the list of sources of each variable).
+FAOSTAT_SOURCE_NAME = "Food and Agriculture Organization of the United Nations"
 
 # FAOSTAT element code for "Yield".
 ELEMENT_CODE_FOR_YIELD = "005419"
@@ -61,8 +65,21 @@ def combine_variables_metadata(combined_table: Table, individual_tables: List[Ta
         for table in individual_tables:
             if column in table.columns:
                 # If the current variable was in this table, assign its sources and licenses to the current variable.
-                sources += table.metadata.dataset.sources
-                licenses += table.metadata.dataset.licenses
+                for source in table.metadata.dataset.sources:
+                    if source.name not in [known_source.name for known_source in sources]:
+                        sources.append(source)
+                for license in table.metadata.dataset.licenses:
+                    if license.name not in [known_license.name for known_license in licenses]:
+                        licenses.append(license)
+
+        # Given that FAOSTAT is the main source of data, place this source first in the list of sources.
+        sources_without_faostat = [source for source in sources if source.name != FAOSTAT_SOURCE_NAME]
+        # Sort the rest of the sources in alphabetical order.
+        sources_sorting = np.argsort([source.name for source in sources_without_faostat])
+        sources = [source for source in sources if source.name == FAOSTAT_SOURCE_NAME] + np.array(
+            sources_without_faostat
+        )[sources_sorting].tolist()
+
         combined_table[column].metadata.sources = sources
         combined_table[column].metadata.licenses = licenses
 
