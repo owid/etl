@@ -35,4 +35,3 @@ def main(path_to_file: str, upload: bool) -> None:
 
 if __name__ == "__main__":
     main()
-
