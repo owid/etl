@@ -68,6 +68,19 @@ def run(dest_dir: str) -> None:
 def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
     log.info("ghe.basic cleaning")
     df["sex"] = df["sex"].map({"BTSX": "Both sexes", "MLE": "Male", "FMLE": "Female"})
+    df = add_population(
+        df=df,
+        country_col="country",
+        year_col="year",
+        sex_col="sex",
+        sex_group_all="Both sexes",
+        sex_group_female="Female",
+        sex_group_male="Male",
+        age_col="age_group",
+        age_group_mapping=AGE_GROUPS_RANGES,
+    )
+    assert df["population"].isna().sum() == 0
+
     # Combine substance and alcohol abuse
     df = combine_drug_and_alcohol(df)
     # Add broader age groups
@@ -88,6 +101,7 @@ def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
             "death_rate100k": "float32",
         }
     )
+    df = df.drop(columns=["population"])
     return df.set_index(["country", "year", "age_group", "sex", "cause"], verify_integrity=True)
 
 
@@ -140,18 +154,7 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
         "YEARS80-84": "YEARS75-84",
         "YEARS85PLUS": "YEARS85PLUS",
     }
-    df = add_population(
-        df=df,
-        country_col="country",
-        year_col="year",
-        sex_col="sex",
-        sex_group_all="Both sexes",
-        sex_group_female="Female",
-        sex_group_male="Male",
-        age_col="age_group",
-        age_group_mapping=AGE_GROUPS_RANGES,
-    )
-    assert df["population"].isna().sum() == 0
+
     df_age_group_ihme = build_custom_age_groups(df, age_groups=age_groups_ihme)
     df_age_group_self_harm = build_custom_age_groups(df, age_groups=age_groups_self_harm, select_causes=["Self-harm"])
     df = remove_granular_age_groups(df, age_groups_to_keep=["ALLAges"])
@@ -164,7 +167,7 @@ def combine_drug_and_alcohol(df: pd.DataFrame) -> pd.DataFrame:
     substance_use_disorders = ["Drug use disorders", "Alcohol use disorders"]
     substance_df = df[df["cause"].isin(substance_use_disorders)]
     substance_agg = (
-        substance_df.groupby(["country", "year", "age_group", "sex"], as_index=False, observed=True)[
+        substance_df.groupby(["country", "year", "age_group", "sex", "population"], as_index=False, observed=True)[
             ["daly_count", "death_count"]
         ]
         .sum()
@@ -172,28 +175,16 @@ def combine_drug_and_alcohol(df: pd.DataFrame) -> pd.DataFrame:
     )
     substance_agg = calculate_rates(substance_agg)
     substance_agg["cause"] = "Substance use disorders"
-    df = pd.concat([df, substance_agg])
+    substance_agg = substance_agg.reset_index(drop=True)
+    df = pd.concat([df, substance_agg], ignore_index=True).drop(columns=["index"])
     return df
 
 
 def calculate_rates(df: pd.DataFrame) -> pd.DataFrame:
-    if all(df.columns != "population"):
-        df = add_population(
-            df=df,
-            country_col="country",
-            year_col="year",
-            sex_col="sex",
-            sex_group_all="Both sexes",
-            sex_group_female="Female",
-            sex_group_male="Male",
-            age_col="age_group",
-            age_group_mapping=AGE_GROUPS_RANGES,
-        )
     df["daly_rate100k"] = 100000 * (df["daly_count"] / df["population"])
     df["death_rate100k"] = 100000 * (df["death_count"] / df["population"])
     df["daly_rate100k"] = np.where(df["daly_count"] == 0, 0, df["daly_rate100k"])
     df["death_rate100k"] = np.where(df["death_count"] == 0, 0, df["death_rate100k"])
-    df = df.drop(columns=["population"])
 
     return df
 
@@ -238,14 +229,13 @@ def remove_granular_age_groups(df: pd.DataFrame, age_groups_to_keep: list[str]) 
     """
     df = df[df["age_group"].isin(age_groups_to_keep)]
     assert len(df["age_group"].drop_duplicates()) == len(age_groups_to_keep)
-    df = df.drop(columns=["population"]).reset_index(drop=True)
     return df
 
 
 def add_global_total(df: pd.DataFrame) -> pd.DataFrame:
     df_glob = (
-        df.groupby(["year", "age_group", "sex", "cause"], observed=True, as_index=False)
-        .agg({"daly_count": "sum", "death_count": "sum"})
+        df.groupby(["year", "age_group", "sex", "cause"], observed=True)
+        .agg({"daly_count": "sum", "death_count": "sum", "population": "sum"})
         .reset_index()
     )
     df_glob["country"] = "World"
@@ -265,8 +255,8 @@ def add_regional_and_global_aggregates(df: pd.DataFrame, regions: Table) -> pd.D
     assert df_cont["continent"].isna().sum() == 0
 
     df_cont = (
-        df_cont.groupby(["year", "continent", "age_group", "sex", "cause"], observed=True, as_index=False)
-        .agg({"daly_count": "sum", "death_count": "sum"})
+        df_cont.groupby(["year", "continent", "age_group", "sex", "cause"], observed=True)
+        .agg({"daly_count": "sum", "death_count": "sum", "population": "sum"})
         .reset_index()
     )
     df_cont = df_cont.rename(columns={"continent": "country"})
