@@ -171,6 +171,8 @@ def combine_drug_and_alcohol(df: pd.DataFrame) -> pd.DataFrame:
         .reset_index()
     )
     substance_agg = calculate_rates(substance_agg)
+    substance_agg["cause"] = "Substance use disorders"
+    df = pd.concat([df, substance_agg])
     return df
 
 
