@@ -350,6 +350,15 @@ steps:
   data://grapher/happiness/2023-03-20/happiness:
   - data://garden/happiness/2023-03-20/happiness
 
+# Equaldex dataset
+  data://meadow/lgbt_rights/2023-04-13/equaldex:
+  - snapshot://lgbt_rights/2023-04-13/equaldex.csv
+  - snapshot://lgbt_rights/2023-04-13/equaldex_current.csv
+  data://garden/lgbt_rights/2023-04-13/equaldex:
+  - data://meadow/lgbt_rights/2023-04-13/equaldex
+  data://grapher/lgbt_rights/2023-04-13/equaldex:
+  - data://garden/lgbt_rights/2023-04-13/equaldex
+
 # LGBTI Policy Index (Velasco, 2020)
   data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
   - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
@@ -452,6 +461,14 @@ steps:
   - data://meadow/research_development/2023-05-24/us_patents
   data://grapher/research_development/2023-05-25/us_patents:
   - data://garden/research_development/2023-05-25/us_patents
+
+  # OECD Income Distribution Database
+  data://meadow/oecd/2023-06-06/income_distribution_database:
+  - snapshot://oecd/2023-06-06/income_distribution_database.csv
+  data://garden/oecd/2023-06-06/income_distribution_database:
+  - data://meadow/oecd/2023-06-06/income_distribution_database
+  data://grapher/oecd/2023-06-06/income_distribution_database:
+  - data://garden/oecd/2023-06-06/income_distribution_database
 
 # Sub-dags to import
 include:

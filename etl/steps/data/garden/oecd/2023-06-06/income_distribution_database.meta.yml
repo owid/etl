@@ -1,0 +1,138 @@
+descriptions:
+  gini: &gini_description |
+    The Gini coefficient is a measure of the inequality of the income distribution in a population. Higher values indicate a higher level of inequality.
+  disposable_income: &disposable_income_description |
+    Income here is measured after taxes and benefits.
+  market_income: &market_income_description |
+    Income here is measured before taxes and benefits.
+  gross_income: &gross_income_description |
+    Income here is measured before taxes and after benefits.
+  equivalization: &equivalization_description |
+    Income has also been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
+  additional_info: &additional_info_description |
+    The entire population of each country is considered, and also the income definition is the newest from the OECD since 2012. For more information on the methodology, visit the <href="http://www.oecd.org/social/income-distribution-database.htm">OECD Income Distribution Database (IDD)</href>
+  covid: &covid_description |
+    Survey estimates for 2020 are subject to additional uncertainty and are to be treated with extra caution, as in most countries the survey fieldwork was affected by the Coronavirus (COVID-19) pandemic.
+tables:
+  income_distribution_database:
+    variables:
+      gini:
+        title: Gini coefficient (disposable income, post taxes and transfers)
+        description:
+          - *gini_description
+          - *disposable_income_description
+          - *equivalization_description
+          - *additional_info_description
+          - *covid_description
+        short_unit: ''
+        unit: ''
+        display:
+          name: Gini coefficient
+          numDecimalPlaces: 3
+      stdg:
+        title: Standard error of Gini coefficient (post taxes and transfers)
+        description: Standard error of Gini coefficient (post taxes and transfers)
+        short_unit: ''
+        unit: ''
+        display:
+          name: Standard error of Gini coefficient
+          numDecimalPlaces: 3
+      ginib:
+        title: Gini coefficient (market income, before taxes and transfers)
+        description:
+          - *gini_description
+          - *market_income_description
+          - *equivalization_description
+          - *additional_info_description
+          - *covid_description
+        short_unit: ''
+        unit: ''
+        display:
+          name: Gini coefficient
+          numDecimalPlaces: 3
+      gini_reduction:
+        title: Percentage reduction in Gini coefficient (before vs. after tax)
+        description: This is the percentage difference between the Gini coefficient before taxes and benefits and the Gini coefficient after taxes and benefits.
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Percentage reduction in Gini coefficient
+          numDecimalPlaces: 1
+      ginig:
+        title: Gini coefficient (gross income, before taxes)
+        description:
+          - *gini_description
+          - *gross_income_description
+          - *equivalization_description
+          - *additional_info_description
+          - *covid_description
+        short_unit: ''
+        unit: ''
+        display:
+          name: Gini coefficient
+          numDecimalPlaces: 3
+      palma:
+        title: Palma ratio
+        description:
+          - The share of income of the richest 10% divided by the share of the poorest 40%.<br>
+          - *disposable_income_description
+          - *equivalization_description
+          - *additional_info_description
+          - *covid_description
+        short_unit: ''
+        unit: ''
+        display:
+          name: Palma ratio
+          numDecimalPlaces: 2
+      p90p10:
+        title: P90/P10 ratio
+        description:
+          - P90 and P10 are the levels of income or consumption below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
+          - *disposable_income_description
+          - *equivalization_description
+          - *additional_info_description
+          - *covid_description
+        short_unit: ''
+        unit: ''
+        display:
+          name: P90/P10 ratio
+          numDecimalPlaces: 2
+      p90p50:
+        title: P90/P50 ratio
+        description:
+          - The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income or consumption.
+          - *disposable_income_description
+          - *equivalization_description
+          - *additional_info_description
+          - *covid_description
+        short_unit: ''
+        unit: ''
+        display:
+          name: P90/P50 ratio
+          numDecimalPlaces: 2
+      p50p10:
+        title: P50/P10 ratio
+        description:
+          - The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median income or consumption is two times higher than that of someone just falling in the poorest tenth of the population.
+          - *disposable_income_description
+          - *equivalization_description
+          - *additional_info_description
+          - *covid_description
+        short_unit: ''
+        unit: ''
+        display:
+          name: P50/P10 ratio
+          numDecimalPlaces: 2
+      s80s20:
+        title: S80/S20 ratio
+        description:
+          - The share of income of the richest 20% divided by the share of the poorest 20%.<br>
+          - *disposable_income_description
+          - *equivalization_description
+          - *additional_info_description
+          - *covid_description
+        short_unit: ''
+        unit: ''
+        display:
+          name: S80/S20 ratio
+          numDecimalPlaces: 2

@@ -26,6 +26,53 @@ steps:
   data://grapher/agriculture/2023-04-21/uk_long_term_yields:
     - data://garden/agriculture/2023-04-21/uk_long_term_yields
   #
+  # Food expenditure in US - USDA
+  #
+  data://meadow/usda_ers/2023-06-07/food_expenditure_in_us_archive:
+    - snapshot://usda_ers/2023-06-07/food_expenditure_in_us_archive.xlsx
+  data://meadow/usda_ers/2023-06-07/food_expenditure_in_us:
+    - snapshot://usda_ers/2023-06-07/food_expenditure_in_us.xlsx
+  data://garden/usda_ers/2023-06-07/food_expenditure_in_us:
+    - data://meadow/usda_ers/2023-06-07/food_expenditure_in_us_archive
+    - data://meadow/usda_ers/2023-06-07/food_expenditure_in_us
+  data://grapher/usda_ers/2023-06-07/food_expenditure_in_us:
+    - data://garden/usda_ers/2023-06-07/food_expenditure_in_us
+  #
+  # Food expenditure - USDA
+  #
+  data://meadow/usda_ers/2023-06-07/food_expenditure:
+    - snapshot://usda_ers/2023-06-07/food_expenditure.xlsx
+  data://garden/usda_ers/2023-06-07/food_expenditure:
+    - data://meadow/usda_ers/2023-06-07/food_expenditure
+  data://grapher/usda_ers/2023-06-07/food_expenditure:
+    - data://garden/usda_ers/2023-06-07/food_expenditure
+  #
+  # Long-run crop yields.
+  #
+  data://garden/agriculture/2023-05-30/long_term_crop_yields:
+    - data://garden/faostat/2023-02-22/faostat_qcl
+    - data://garden/agriculture/2023-04-21/uk_long_term_yields
+    - data://garden/usda_nass/2023-04-20/us_corn_yields
+    - data://garden/agriculture/2023-04-20/long_term_wheat_yields
+  data://grapher/agriculture/2023-05-30/long_term_crop_yields:
+    - data://garden/agriculture/2023-05-30/long_term_crop_yields
+  #
+  # Attainable yields.
+  #
+  data://garden/agriculture/2023-05-30/attainable_yields:
+    - data://garden/papers/2023-05-26/mueller_et_al_2012
+    - data://garden/agriculture/2023-05-30/long_term_crop_yields
+  data://grapher/agriculture/2023-05-30/attainable_yields:
+    - data://garden/agriculture/2023-05-30/attainable_yields
+  #
+  # Crop yields explorer.
+  #
+  data://explorers/agriculture/2023-05-30/crop_yields:
+    - data://grapher/agriculture/2023-05-30/attainable_yields
+
+  ######################################################################################################################
+  # To be archived:
+  #
   # Attainable yields.
   #
   data://garden/agriculture/2023-05-26/attainable_yields:

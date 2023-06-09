@@ -8,8 +8,6 @@ steps:
   - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
   data-private://grapher/fasttrack/2022-11-01/lighting_efficiency_uk:
   - snapshot-private://fasttrack/2022-11-01/lighting_efficiency_uk.csv
-  data-private://grapher/fasttrack/2023-01-19/food_expenditures_by_country:
-  - snapshot-private://fasttrack/2023-01-19/food_expenditures_by_country.csv
   data-private://grapher/fasttrack/latest/metaculus__complementary_data:
   - snapshot-private://fasttrack/latest/metaculus__complementary_data.csv
   data-private://grapher/fasttrack/latest/global_extreme_poverty_future_scenario:
