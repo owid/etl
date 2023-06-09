@@ -1,0 +1,5 @@
+steps:
+
+  # Exoplanets (NASA)
+  data://meadow/space/2023-06-09/exoplanets:
+  - snapshot://space/2023-06-09/exoplanets.csv
