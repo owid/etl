@@ -28,19 +28,20 @@ def process_data(tb: Table) -> Table:
 
     # Check if gini values are all below 1
     # There is currently an issue with the value of GINIG for Latvia in 2021, so I first correct it manually dividing by 100
-    latvia_point = tb.loc[
-        (tb["country"] == "Latvia") & (tb["year"] == 2021) & (tb["measure"] == "GINIG"), "value"
-    ].values[0]
-    if latvia_point > 1:
-        tb.loc[(tb["country"] == "Latvia") & (tb["year"] == 2021) & (tb["measure"] == "GINIG"), "value"] = (
-            latvia_point / 100
-        )
+    mask = (tb["country"] == "Latvia") & (tb["year"] == 2021) & (tb["measure"] == "GINIG")
+    # Sanity check (mask corresponds to only one value)
+    if len(tb[mask]) > 1:
+        raise ValueError(f"Only expected 1 data point. Got {len(tb[mask])}")
+    # Correction of data point if applicable
+    if (tb.loc[mask, "value"] > 1).all():
+        tb.loc[mask, "value"] /= 100
 
-    gini_outliers = tb[(tb["measure"].str.contains("GINI")) & (tb["value"] > 1)]
+    # If additional cases appear in future updates:
+    mask = (tb["measure"].str.contains("GINI")) & (tb["value"] > 1)
 
-    if len(gini_outliers) > 0:
-        log.warning(f"There are {len(gini_outliers)} Gini values greater than 1 and will be removed:\n {gini_outliers}")
-        tb = tb[~((tb["measure"].str.contains("GINI")) & (tb["value"] > 1))].reset_index(drop=True)
+    if mask.sum() > 0:
+        log.warning(f"There are {mask.sum()} Gini values greater than 1 and will be removed:\n {tb[mask]}")
+        tb = tb[~mask].reset_index(drop=True)
 
     # Drop values with the flag "post taxes and before transfers"
     # These are values assigned into the before taxes and transfers category which might generate confusion
