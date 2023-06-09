@@ -205,8 +205,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/gcp/2023-04-28/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
-    # The following step is not the latest version available.
-    - data://garden/bp/2022-07-14/energy_mix
+    - data://garden/bp/2023-02-20/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Global GDP in the long run
@@ -350,6 +349,15 @@ steps:
   - backport://backport/owid/latest/dataset_235_world_happiness_report__2022
   data://grapher/happiness/2023-03-20/happiness:
   - data://garden/happiness/2023-03-20/happiness
+
+# Equaldex dataset
+  data://meadow/lgbt_rights/2023-04-13/equaldex:
+  - snapshot://lgbt_rights/2023-04-13/equaldex.csv
+  - snapshot://lgbt_rights/2023-04-13/equaldex_current.csv
+  data://garden/lgbt_rights/2023-04-13/equaldex:
+  - data://meadow/lgbt_rights/2023-04-13/equaldex
+  data://grapher/lgbt_rights/2023-04-13/equaldex:
+  - data://garden/lgbt_rights/2023-04-13/equaldex
 
 # LGBTI Policy Index (Velasco, 2020)
   data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:

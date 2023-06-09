@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2722_current_gdp__british_pounds__fouquin_and_hugot__cepii_2016_config
   file_extension: json
-  date_accessed: 2023-02-23 17:36:11.235078
+  date_accessed: 2023-06-01 13:15:38.390479
   name: Grapher metadata for dataset_2722_current_gdp__british_pounds__fouquin_and_hugot__cepii_2016
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,7 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d6e7029f38dfc341ce821423e8937d38
+- md5: 3cb9187bcda04e3340bf67513b10e02b
   size: 2964
-  path: dataset_2722_current_gdp__british_pounds__fouquin_and_hugot__cepii_2016_config.json
+  path: 
+    dataset_2722_current_gdp__british_pounds__fouquin_and_hugot__cepii_2016_config.json

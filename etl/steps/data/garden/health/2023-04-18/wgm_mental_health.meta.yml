@@ -6,6 +6,7 @@ tables:
       share:
         title: "Share"
         unit: "%"
+        short_unit: "%"
         description: >-
           Share of the participants in the demographic group (country, age and gender) that marked a particular answer to the question.
 

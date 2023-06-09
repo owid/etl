@@ -1,8 +1,9 @@
 meta:
   namespace: backport
-  short_name: dataset_2732_military_expenditure_as_a_share_of_gdp__owid_based_on_cow__and__sipri__2017_values
+  short_name: 
+    dataset_2732_military_expenditure_as_a_share_of_gdp__owid_based_on_cow__and__sipri__2017_values
   file_extension: feather
-  date_accessed: 2023-02-23 15:15:01.643683
+  date_accessed: 2023-06-01 12:36:21.647987
   name: Military expenditure as a share of GDP - OWID based on COW & SIPRI (2017)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +14,7 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d631859d747cd151d8781b3950683c41
-  size: 105914
-  path: dataset_2732_military_expenditure_as_a_share_of_gdp__owid_based_on_cow__and__sipri__2017_values.feather
+- md5: e47cf86c38292cd55fae05d8258bee80
+  size: 105922
+  path: 
+    dataset_2732_military_expenditure_as_a_share_of_gdp__owid_based_on_cow__and__sipri__2017_values.feather

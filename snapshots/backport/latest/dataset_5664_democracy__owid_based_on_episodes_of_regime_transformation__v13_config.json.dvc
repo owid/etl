@@ -1,8 +1,9 @@
 meta:
   namespace: backport
-  short_name: dataset_5664_democracy__owid_based_on_episodes_of_regime_transformation__v13_config
+  short_name: 
+    dataset_5664_democracy__owid_based_on_episodes_of_regime_transformation__v13_config
   file_extension: json
-  date_accessed: 2023-03-10 16:06:43.199816
+  date_accessed: 2023-06-01 15:14:47.330941
   name: Grapher metadata for dataset_5664_democracy__owid_based_on_episodes_of_regime_transformation__v13
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +14,7 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 07c7ee2ba25efe0b94a896c2baf916e5
+- md5: a2cd56bc25f5f665eea394d767f42ed1
   size: 20650
-  path: dataset_5664_democracy__owid_based_on_episodes_of_regime_transformation__v13_config.json
+  path: 
+    dataset_5664_democracy__owid_based_on_episodes_of_regime_transformation__v13_config.json

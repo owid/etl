@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5380_world_regions_according_to_the_united_nations_values
   file_extension: feather
-  date_accessed: 2023-02-23 16:37:24.268601
+  date_accessed: 2023-06-01 15:02:39.004633
   name: world-regions-according-to-the-united-nations
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 073c74a84c8f31b8102edaed84a3c0d7
-  size: 15050
+- md5: 9a8cf8c71330817fe03b58af6932bb59
+  size: 15058
   path: dataset_5380_world_regions_according_to_the_united_nations_values.feather

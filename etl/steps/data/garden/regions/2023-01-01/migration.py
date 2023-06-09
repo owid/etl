@@ -53,7 +53,7 @@ continent_members = {
         "Egypt",
         "Equatorial Guinea",
         "Eritrea",
-        "Eritrea and Ethiopia",
+        "Ethiopia (former)",
         "Eswatini",
         "Ethiopia",
         "Gabon",
@@ -466,7 +466,7 @@ historical_regions = {
             "Germany",
         ],
     },
-    "Eritrea and Ethiopia": {
+    "Ethiopia (former)": {
         "end_year": 1993,
         "successors": [
             "Eritrea",

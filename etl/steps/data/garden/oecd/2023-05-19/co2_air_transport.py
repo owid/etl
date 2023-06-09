@@ -66,9 +66,9 @@ def run(dest_dir: str) -> None:
 
     emissions_columns = [col for col in pivot_table_ye.columns if col not in ("country", "year", "population")]
 
-    # Generate per capital co2 emissions data and add it do the dataframe and convert to pounds
+    # Generate per capital co2 emissions data and add it do the dataframe and convert to kg
     for col in emissions_columns:
-        pivot_table_ye[f"per_capita_{col}"] = (pivot_table_ye[col] * 2204.62) / pivot_table_ye["population"]
+        pivot_table_ye[f"per_capita_{col}"] = (pivot_table_ye[col] * 1000) / pivot_table_ye["population"]
 
     # Add Inbound/Outbound tourism to the dataframe (multiply international aviation emissions by international arrivals/departures)
     pivot_outb = add_inbound_outbound_tour(pivot_table_ye, df_tr)
@@ -78,11 +78,6 @@ def run(dest_dir: str) -> None:
 
     concatenated_df = pd.merge(pivot_outb, pivot_table_mn, on=["year", "country"], how="outer")
     merge_df = pd.merge(concatenated_df, pivot_df, on=["year", "country"], how="outer")
-
-    merge_df = ukraine_fill_war_for_reg_agg(merge_df)
-    merge_df = merge_df.drop("TER_INT_m", axis=1)
-
-    merge_df = merge_df.rename(columns={"ter_int_m_filled_ukraine": "TER_INT_m"})
 
     regions_ = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
@@ -115,6 +110,7 @@ def run(dest_dir: str) -> None:
     )
 
     merged_df = pd.merge(df_pivoted, merge_df, on=["country", "year"], how="outer")
+    merged_df = merged_df.drop(["population"], axis=1)
 
     # Create a new table with the processed data.
     tb_garden = Table(merged_df, short_name="co2_air_transport")
@@ -128,58 +124,6 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("co2_air_transport.end")
-
-
-def ukraine_fill_war_for_reg_agg(df):
-    """
-    Fill missing values for 'Ukraine' in the DataFrame with zero values for the 'TER_INT_m'
-    column for concatenating regional emissions (then reset back to NaN) (2023 war so technically zero emissions and shouldn't be misleading for regional aggregates)
-
-    Args:
-        df (pd.DataFrame): Input DataFrame containing CO2 transport data.
-
-    Returns:
-        pd.DataFrame: DataFrame with missing values filled for 'Ukraine' in the 'TER_INT_m' column.
-
-    """
-    # Get a list of unique countries
-    unique_countries = df["country"].unique()
-
-    # Get the range of years that exist in the 'year' column
-    all_years = df["year"].unique()  # Inclusive range of years
-
-    # Create a DataFrame with all possible combinations of years and countries
-    new_index = pd.MultiIndex.from_product([all_years, unique_countries], names=["year", "country"])
-    new_df = pd.DataFrame(index=new_index).reset_index()
-
-    # Merge the new DataFrame with the original DataFrame
-    merged_df = pd.merge(new_df, df, on=["year", "country"], how="left")
-
-    # Optionally, sort the resulting DataFrame by the 'year' and 'country' columns
-    merged_df = merged_df.sort_values(["year", "country"]).reset_index(drop=True)
-
-    # Set values to NaN for missing years
-    merged_df.loc[merged_df["year"] < merged_df["year"].min(), "TER_INT_m"] = float("nan")
-    merged_df.loc[merged_df["year"] > merged_df["year"].max(), "TER_INT_m"] = float("nan")
-
-    # Create a Boolean mask to identify rows where the year is outside the desired range
-    year_mask = (merged_df["year"] < 2015) | (merged_df["year"] > 2023)
-
-    # Create a Boolean mask to identify rows where the country is 'Ukraine'
-    country_mask = merged_df["country"] == "Ukraine"
-
-    # Combine the masks using the logical AND operator
-    combined_mask = year_mask & country_mask
-
-    # Create the 'ter_int_m_filled_ukraine' column and fill it with the original 'TER_INT_m' values
-    merged_df["ter_int_m_filled_ukraine"] = merged_df["TER_INT_m"]
-
-    # Fill NaN values with 0s in the 'ter_int_m_filled_ukraine' column where the year is outside the range and the country is 'Ukraine'
-    merged_df.loc[combined_mask, "ter_int_m_filled_ukraine"] = merged_df.loc[
-        combined_mask, "ter_int_m_filled_ukraine"
-    ].fillna(0)
-
-    return merged_df
 
 
 def process_annual_data(df):
@@ -268,7 +212,7 @@ def add_inbound_outbound_tour(df, df_tr):
 
     # Calculate the interaction between TER_INT_a and inb_outb_tour
     df["int_inb_out_per_capita"] = df["per_capita_TER_INT_a"] * df["inb_outb_tour"]
-    df["int_inb_out"] = df["TER_INT_a"] * df["inb_outb_tour"]
+    df["int_inb_out_tot"] = df["TER_INT_a"] * df["inb_outb_tour"]
 
     # Drop the 'inb_outb_tour' column
     df = df.drop(["inb_outb_tour"], axis=1)

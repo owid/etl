@@ -488,11 +488,326 @@ class TeaProductionAnomaly(DataAnomaly):
         return df_fixed
 
 
+class HighYieldAnomaly(DataAnomaly):
+    description = ()  # type: ignore
+
+    affected_item_codes = []
+    affected_element_codes = []
+    affected_years = []
+    affected_countries = []
+
+    def check(self, df):
+        # Check that the data in the affected years is higher than expected, and significantly lower from then on.
+        assert (
+            df[
+                (df["country"].isin(self.affected_countries))
+                & (df["item_code"].isin(self.affected_item_codes))
+                & (df["element_code"].isin(self.affected_element_codes))
+                & (df["year"].isin(self.affected_years))
+            ]["value"]
+            > 100
+        ).all()
+        assert (
+            df[
+                (df["country"].isin(self.affected_countries))
+                & (df["item_code"].isin(self.affected_item_codes))
+                & (df["element_code"].isin(self.affected_element_codes))
+                & ~(df["year"].isin(self.affected_years))
+            ]["value"]
+            < 100
+        ).all()
+
+    def inspect(self, df):
+        log.info("The anomaly causes: " "\n* The yield of certain items, countries and years to be unreasonably high.")
+        for element_code in self.affected_element_codes:
+            selection = (df["item_code"].isin(self.affected_item_codes)) & (df["element_code"] == element_code)
+            df_affected = df[selection].astype({"country": str}).sort_values(["country", "year"])
+            title = _split_long_title(self.description + f"Element code {element_code}")
+            fig = px.line(df_affected, x="year", y="value", color="country", title=title)
+            fig.show()
+
+    def fix(self, df):
+        indexes_to_drop = df[
+            (
+                (df["country"].isin(self.affected_countries))
+                & (df["item_code"].isin(self.affected_item_codes))
+                & (df["element_code"].isin(self.affected_element_codes))
+                & (df["year"].isin(self.affected_years))
+            )
+        ].index
+        df_fixed = df.drop(indexes_to_drop).reset_index(drop=True)
+
+        return df_fixed
+
+
+class FruitYieldAnomaly(HighYieldAnomaly):
+    description = (  # type: ignore
+        "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
+        "For example, the yield of item 'Fruit Primary' in Denmark prior to 1985 is larger than 6000 tonnes/ha. "
+        "Similar issues happen to Antigua and Barbuda and Burkina Faso. "
+        "For Netherlands, a similar anomaly is found but prior to 1984 (which will be considered separately). "
+        "Therefore, we remove these possibly spurious values."
+    )
+
+    affected_item_codes = [
+        # Item code for "Fruit Primary".
+        "00001738",
+    ]
+    affected_element_codes = [
+        # Element code for "Yield".
+        "005419",
+    ]
+    affected_years = [
+        1961,
+        1962,
+        1963,
+        1964,
+        1965,
+        1966,
+        1967,
+        1968,
+        1969,
+        1970,
+        1971,
+        1972,
+        1973,
+        1974,
+        1975,
+        1976,
+        1977,
+        1978,
+        1979,
+        1980,
+        1981,
+        1982,
+        1983,
+        1984,
+    ]
+    affected_countries = [
+        "Antigua and Barbuda",
+        "Burkina Faso",
+        "Denmark",
+    ]
+
+
+class FruitYieldNetherlandsAnomaly(HighYieldAnomaly):
+    description = (  # type: ignore
+        "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
+        "This happens to item 'Fruit Primary' in Netherlands prior to 1984. "
+        "Therefore, we remove these possibly spurious values."
+    )
+
+    affected_item_codes = [
+        # Item code for "Fruit Primary".
+        "00001738",
+    ]
+    affected_element_codes = [
+        # Element code for "Yield".
+        "005419",
+    ]
+    affected_years = [
+        1961,
+        1962,
+        1963,
+        1964,
+        1965,
+        1966,
+        1967,
+        1968,
+        1969,
+        1970,
+        1971,
+        1972,
+        1973,
+        1974,
+        1975,
+        1976,
+        1977,
+        1978,
+        1979,
+        1980,
+        1981,
+        1982,
+        1983,
+    ]
+    affected_countries = [
+        "Netherlands",
+    ]
+
+
+class LocustBeansYieldAnomaly(HighYieldAnomaly):
+    description = (  # type: ignore
+        "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
+        "This happens to item 'Locust beans (carobs)' for region 'Net Food Importing Developing Countries (FAO)'. "
+        "Therefore, we remove these possibly spurious values."
+    )
+
+    affected_item_codes = [
+        # Item code for "Locust beans (carobs)".
+        "00000461",
+    ]
+    affected_element_codes = [
+        # Element code for "Yield".
+        "005419",
+    ]
+    affected_years = [
+        1961,
+        1962,
+        1963,
+        1964,
+        1965,
+        1966,
+        1967,
+        1968,
+        1969,
+        1970,
+        1971,
+        1972,
+        1973,
+        1974,
+        1975,
+        1976,
+        1977,
+        1978,
+        1979,
+        1980,
+        1981,
+        1982,
+        1983,
+        1984,
+    ]
+    affected_countries = [
+        "Net Food Importing Developing Countries (FAO)",
+    ]
+
+
+class WalnutsYieldAnomaly(HighYieldAnomaly):
+    description = (  # type: ignore
+        "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
+        "This happens to item 'Walnuts, in shell' for region 'Eastern Asia (FAO)'. "
+        "Therefore, we remove these possibly spurious values."
+    )
+
+    affected_item_codes = [
+        # Item code for "Walnuts, in shell".
+        "00000222",
+    ]
+    affected_element_codes = [
+        # Element code for "Yield".
+        "005419",
+    ]
+    affected_years = [
+        1961,
+        1962,
+        1963,
+        1964,
+        1965,
+        1966,
+        1967,
+        1968,
+        1969,
+        1970,
+        1971,
+        1972,
+        1973,
+        1974,
+        1975,
+        1976,
+        1977,
+        1978,
+        1979,
+        1980,
+        1981,
+        1982,
+        1983,
+        1984,
+    ]
+    affected_countries = [
+        "Eastern Asia (FAO)",
+    ]
+
+
+class OtherTropicalFruitYieldNorthernAfricaAnomaly(HighYieldAnomaly):
+    description = (  # type: ignore
+        "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
+        "This happens to item 'Other tropical fruits, n.e.c.' for region 'Northern Africa (FAO)'. "
+        "Therefore, we remove these possibly spurious values."
+    )
+
+    affected_item_codes = [
+        # Item code for "Other tropical fruits, n.e.c.".
+        "00000603",
+    ]
+    affected_element_codes = [
+        # Element code for "Yield".
+        "005419",
+    ]
+    affected_years = [
+        1961,
+        1962,
+        1963,
+        1964,
+        1965,
+        1966,
+        1967,
+        1968,
+        1969,
+        1970,
+        1971,
+        1972,
+        1973,
+        1974,
+        1975,
+        1976,
+    ]
+    affected_countries = [
+        "Northern Africa (FAO)",
+    ]
+
+
+class OtherTropicalFruitYieldSouthAmericaAnomaly(HighYieldAnomaly):
+    description = (  # type: ignore
+        "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
+        "This happens to item 'Other tropical fruits, n.e.c.' for South America. "
+        "Therefore, we remove these possibly spurious values."
+    )
+
+    affected_item_codes = [
+        # Item code for "Other tropical fruits, n.e.c.".
+        "00000603",
+    ]
+    affected_element_codes = [
+        # Element code for "Yield".
+        "005419",
+    ]
+    affected_years = [
+        1961,
+        1962,
+        1963,
+        1964,
+        1965,
+        1966,
+        1967,
+        1968,
+        1969,
+    ]
+    affected_countries = [
+        "South America (FAO)",
+        "South America",
+    ]
+
+
 detected_anomalies = {
     "faostat_qcl": [
         SpinachAreaHarvestedAnomaly,
         EggYieldNorthernEuropeAnomaly,
         TeaProductionAnomaly,
+        FruitYieldAnomaly,
+        FruitYieldNetherlandsAnomaly,
+        LocustBeansYieldAnomaly,
+        WalnutsYieldAnomaly,
+        OtherTropicalFruitYieldNorthernAfricaAnomaly,
+        OtherTropicalFruitYieldSouthAmericaAnomaly,
     ],
     "faostat_fbsc": [
         CocoaBeansFoodAvailableAnomaly,

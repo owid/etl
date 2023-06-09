@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5496_reported_guinea_worm_cases__who__2021_values
   file_extension: feather
-  date_accessed: 2023-02-23 18:22:47.900168
+  date_accessed: 2023-06-01 15:33:08.379520
   name: Reported guinea worm cases - WHO (2021)
   description: |-
     Manual update of spreadsheet for cases. Certification data is scraped from here https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
@@ -16,6 +16,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bfe0e710f1ce3de136a835a214a72c4e
+- md5: a1d8beb96af65dac1f00cafdd82c8011
   size: 71546
   path: dataset_5496_reported_guinea_worm_cases__who__2021_values.feather

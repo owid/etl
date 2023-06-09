@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1852_usa_patents_granted__us_patent__and__trademark_office_values
   file_extension: feather
-  date_accessed: 2023-04-19 12:17:48.952386
+  date_accessed: 2023-06-01 15:22:34.537895
   name: USA patents granted - US Patent & Trademark Office
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,7 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 65ce2d1d792bd47fb5e3aefe1cbaa45a
+- md5: 2ca79dba099c1947b87e33237b59d3ca
   size: 12906
-  path: dataset_1852_usa_patents_granted__us_patent__and__trademark_office_values.feather
+  path: 
+    dataset_1852_usa_patents_granted__us_patent__and__trademark_office_values.feather

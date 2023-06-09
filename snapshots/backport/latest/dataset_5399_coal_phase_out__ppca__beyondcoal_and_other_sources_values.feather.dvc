@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5399_coal_phase_out__ppca__beyondcoal_and_other_sources_values
   file_extension: feather
-  date_accessed: 2023-02-23 17:39:10.708877
+  date_accessed: 2023-06-01 13:18:33.872513
   name: Coal Phase Out (PPCA, BeyondCoal and other sources)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6bdff1adbc18140948aa3bb6d43847f4
-  size: 9970
+- md5: fedddc003d3d09d638d40e5a767fe470
+  size: 9978
   path: dataset_5399_coal_phase_out__ppca__beyondcoal_and_other_sources_values.feather

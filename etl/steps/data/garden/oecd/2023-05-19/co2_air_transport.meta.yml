@@ -1,14 +1,17 @@
 dataset:
   title: Air Transport CO2 Emissions
-  description: This database includes annual, quarterly, and monthly information on
+  description: The OECD Air Transport CO2 Emissions database includes annual, quarterly, and monthly information on
     CO2 emissions related to commercial passenger, freight, and general aviation flights,
     on both a territory and a residence basis, for 186 countries. These CO2 emissions
     are estimated by the OECD, based on a consistent methodology across countries.
+
+    OECD database is updated by the end of the first month of each quarter with new data from the previous quarter.
   licenses:
   - name: Creative Commons BY 4.0
     url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
   sources:
-  - name: OECD (2023), Air Transport CO2 Emissions
+  - name: Clarke et al. (2022)
+    published_by: "Clarke, D., et al. (2022), CO2 Emissions from air transport: A near-real-time global database for policy analysis, OECD Statistics Working Papers, No. 2022/04, OECD Publishing, Paris, https://doi.org/10.1787/ecc9f16b-en."
     url: https://stats.oecd.org/Index.aspx?DataSetCode=AIRTRANS_CO2#
     date_accessed: '2023-05-18'
     publication_date: January 2023
@@ -18,44 +21,53 @@ tables:
     variables:
       africa:
         title: Africa
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       asia:
         title: Asia
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       europe:
         title: Europe
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       north_america:
         title: North America
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       oceania:
         title: Oceania
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       south_america:
         title: South America
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       world:
         title: World
-        short_unit: 'tonnes'
-        unit: 't'
+        description: Total CO2 emissions from international aviation (by month in 'country' column)
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
       ter_dom_a:
         title: Annual CO2 emissions from domestic aviation
         unit: tonnes
@@ -68,61 +80,63 @@ tables:
         short_unit: t
         display:
           numDecimalPlaces: 0
-      population:
-        title: Population
-        unit: ''
-        short_unit: ''
       per_capita_ter_dom_a:
         title: Per capita CO2 emissions from domestic aviation
-        unit: pounds
-        short_unit: lb
+        unit: kilograms
+        short_unit: kg
         display:
           numDecimalPlaces: 0
       per_capita_ter_int_a:
         title: Per capita CO2 emissions from international aviation
-        unit: pounds
-        short_unit: lb
+        unit: kilograms
+        short_unit: kg
         display:
           numDecimalPlaces: 0
       int_inb_out_per_capita:
-        title: Per capita CO2 emissions from international flights, international
-          tourism-adjusted
-        unit: pounds
-        short_unit: lb
+        title: Per capita CO2 emissions from international flights, international tourism-adjusted
+        unit: kilograms
+        short_unit: kg
         display:
           numDecimalPlaces: 0
-      int_inb_out:
+      int_inb_out_tot:
         title: CO2 emissions from international flights, international tourism-adjusted
-        unit: pounds
-        short_unit: lb
+        unit: kilograms
+        short_unit: kg
         display:
           numDecimalPlaces: 0
       ter_dom_m:
         title: Monthly CO2 emissions from domestic aviation
+        description: 'months in year column as date from 2019-01-01'
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
+          zeroDay: '2019-01-01'
+          yearIsDay: true
       january:
         title: January
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       february:
         title: February
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       march:
         title: March
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       april:
         title: April
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
@@ -135,49 +149,59 @@ tables:
           numDecimalPlaces: 0
       june:
         title: June
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       july:
         title: July
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       august:
         title: August
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       september:
         title: September
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       october:
         title: October
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       november:
         title: November
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       december:
         title: December
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       ter_int_m:
         title: Monthly CO2 emissions from international aviation
+        description: 'months in year column as date from 2019-01-01'
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
+          zeroDay: '2019-01-01'
+          yearIsDay: true

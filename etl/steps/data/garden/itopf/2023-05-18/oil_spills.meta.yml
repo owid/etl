@@ -17,7 +17,7 @@ tables:
   oil_spills:
     variables:
       bel_700t:
-        title: Small oil spills (7-700 tonnes)
+        title: Medium oil spills (7-700 tonnes)
         unit: spills
         short_unit: ''
         display:
@@ -149,7 +149,7 @@ tables:
         short_unit: 't'
         unit: 'tonnes'
       decadal_bel_700t:
-        title: Decadal small oil spills (7-700 tonnes)
+        title: Decadal medium oil spills (7-700 tonnes)
         display:
           numDecimalPlaces: 0
         unit: spills

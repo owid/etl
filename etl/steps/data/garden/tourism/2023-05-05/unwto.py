@@ -207,7 +207,27 @@ def run(dest_dir: str) -> None:
         "to_in_nu_of_ro",
         "to_in_oc_ra_be_pl",
         "in_to_pu_to",
+        "in_to_ar_to_ar",
+        "do_to_ac_ho_an_si_es_ov",
+        "do_to_tr_sa_da_vi_ex",
+        "do_to_tr_to_tr",
+        "em_ac_se_fo_vi_ho_an_si_es",
+        "in_to_ac_ho_an_si_es_ov",
+        "in_to_tr_ai",
+        "in_to_tr_la",
+        "in_to_tr_wa",
+        "ou_to_de_to_de",
+        "to_in_av_ca_be_pl_pe_10_in",
+        "to_in_oc_ra_ro",
+        "population",
+        "em_ac_se_fo_vi_ho_an_si_es_per_1000",
+        "em_ot_ac_se_per_1000",
+        "em_ot_to_in_per_1000",
+        "em_pa_tr_per_1000",
+        "em_tr_ag_an_ot_re_se_ac_per_1000",
+        "inb_outb_tot",
     ]
+
     merged_df_concat_transf = merged_df_concat_transf.drop(columns_to_exclude, axis=1)
 
     # Create a new table with the processed data.

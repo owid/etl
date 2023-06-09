@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5303_childhood_vaccination_policies__vanderslott_et_al__2021_values
   file_extension: feather
-  date_accessed: 2023-02-23 18:08:40.098872
+  date_accessed: 2023-06-01 12:34:55.886449
   name: Childhood vaccination policies (Vanderslott et al. 2021)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,7 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 85ea2c80655b107dd641180c459dc27a
+- md5: 29bf709e0559383da38807bd3c722e7c
   size: 14122
-  path: dataset_5303_childhood_vaccination_policies__vanderslott_et_al__2021_values.feather
+  path: 
+    dataset_5303_childhood_vaccination_policies__vanderslott_et_al__2021_values.feather
