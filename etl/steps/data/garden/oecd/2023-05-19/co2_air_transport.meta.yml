@@ -106,7 +106,6 @@ tables:
           numDecimalPlaces: 0
       ter_dom_m:
         title: Monthly CO2 emissions from domestic aviation
-        description: 'months in year column as date from 2019-01-01'
         unit: tonnes
         short_unit: t
         display:
@@ -198,7 +197,6 @@ tables:
           numDecimalPlaces: 0
       ter_int_m:
         title: Monthly CO2 emissions from international aviation
-        description: 'months in year column as date from 2019-01-01'
         unit: tonnes
         short_unit: t
         display:
