@@ -47,7 +47,9 @@ def count_leo_by_type(df: pd.DataFrame) -> pd.DataFrame:
     for year in years:
         # For each year, keep all launched objects up to that year & that haven't decayed yet
         df_year = df[(df.launch_year <= year) & (df.decay_date.isnull() | (df.decay_year > year))]
-        df_year = df_year[["object_type"]].groupby("object_type", as_index=False).size().assign(year=year)
+        df_year = (
+            df_year[["object_type"]].groupby("object_type", as_index=False, observed=True).size().assign(year=year)
+        )
         dataframes.append(df_year)
 
     leo_by_type = (
