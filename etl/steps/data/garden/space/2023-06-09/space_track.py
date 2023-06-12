@@ -52,7 +52,7 @@ def count_leo_by_type(df: pd.DataFrame) -> pd.DataFrame:
 
     leo_by_type = (
         pd.concat(dataframes).reset_index(drop=True).rename(columns={"object_type": "entity", "size": "objects"})
-    )
+    )  # type: ignore
 
     return leo_by_type
 
@@ -73,7 +73,7 @@ def count_non_debris_by_orbit(df: pd.DataFrame) -> pd.DataFrame:
 
     non_debris_by_orbit = (
         pd.concat(dataframes).reset_index(drop=True).rename(columns={"orbit": "entity", "size": "objects"})
-    )
+    )  # type: ignore
 
     return non_debris_by_orbit
 
