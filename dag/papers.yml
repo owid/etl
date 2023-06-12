@@ -61,3 +61,9 @@ steps:
     - snapshot://papers/2023-05-26/mueller_et_al_2012.xls
   data://garden/papers/2023-05-26/mueller_et_al_2012:
     - data://meadow/papers/2023-05-26/mueller_et_al_2012
+
+  # Wheat prices, long run, in England (Makridakis et al. 1997)
+  data://grapher/papers/2023-06-06/wheat_prices:
+  - data://garden/papers/2023-06-06/wheat_prices
+  data://garden/papers/2023-06-06/wheat_prices:
+  - snapshot://papers/2023-06-06/wheat_prices.csv

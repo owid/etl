@@ -12,7 +12,7 @@ from sqlalchemy.engine import Engine
 from etl import config
 from etl.backport_helpers import create_dataset
 from etl.db import get_engine
-from etl.files import apply_black_formatter_to_files
+from etl.files import apply_black_formatter_to_files, yaml_dump
 from etl.metadata_export import metadata_export
 from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
 from walkthrough.utils import add_to_dag
@@ -193,13 +193,18 @@ def _generate_metadata_yaml(namespace: str, version: str, short_name: str, backp
     ds.metadata.version = version
     ds.metadata.short_name = short_name
 
-    meta_str = metadata_export(ds)
+    meta = metadata_export(ds)
+
+    # remove source and description which is already in snapshot
+    meta["dataset"].pop("sources")
+    meta["dataset"].pop("description")
+
     yml_path = STEP_DIR / f"data/{ds.metadata.uri}.meta.yml"
 
     yml_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(yml_path, "w") as f:
-        f.write(meta_str)
+        f.write(yaml_dump(meta))  # type: ignore
 
 
 if __name__ == "__main__":

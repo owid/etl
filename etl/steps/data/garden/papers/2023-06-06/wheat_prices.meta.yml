@@ -1,0 +1,14 @@
+dataset:
+  title: Wheat prices, long run, in England (Makridakis et al. 1997)
+tables:
+  wheat_prices:
+    variables:
+      wheat_price:
+        title: Wheat price in 1996 pounds (Makridakis et al. (1997))
+        description: Long-run series on wheat prices in England, measured in constant
+          1996 pounds per tonne.
+        unit: 1996 pounds per tonne
+        display:
+          name: Wheat prices
+          numDecimalPlaces: 2
+        short_unit: £
