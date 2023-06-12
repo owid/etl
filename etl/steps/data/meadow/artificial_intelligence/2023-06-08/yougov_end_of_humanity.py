@@ -4,6 +4,7 @@ from typing import cast
 
 import pandas as pd
 import pdfplumber
+import shared
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -113,7 +114,7 @@ def question_1_df(snap: Snapshot, question: str) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The extracted data as a DataFrame.
     """
-    table = read_table_from_pdf(snap.path, 1)
+    table = shared.read_table_from_pdf(snap.path, 1)
     # Select relevant entries (pdf file reads all lines into 1 messy dataframe; lines 19-28 are the relevant entries for the first question)
     question1 = table.iloc[19:28]
 
@@ -160,7 +161,7 @@ def question_2_df(snap: Snapshot, column_names: list, question: str) -> pd.DataF
     Returns:
         pd.DataFrame: The extracted data as a DataFrame.
     """
-    table = read_table_from_pdf(snap.path, 1)
+    table = shared.read_table_from_pdf(snap.path, 1)
 
     # Select relevant entries (pdf file reads all lines into 1 messy dataframe; lines starting from 34 are the relevant entries)
     question2 = table.iloc[34:]
@@ -220,7 +221,7 @@ def question3_df(snap: Snapshot, column_names: list, question: str) -> pd.DataFr
     Returns:
         pd.DataFrame: The extracted data as a DataFrame.
     """
-    table = read_table_from_pdf(snap.path, 2)
+    table = shared.read_table_from_pdf(snap.path, 2)
     # Skip the first row
     question3 = table.iloc[1:]
 
@@ -272,7 +273,7 @@ def question3_split_by_age(snap: Snapshot, risks: list) -> pd.DataFrame:
     """
     df_age = []
     for p, page in enumerate([18, 20, 22, 24, 26, 28, 30, 32, 34]):
-        table = read_table_from_pdf(snap.path, page)
+        table = shared.read_table_from_pdf(snap.path, page)
         df = table.iloc[7:23]
         df = pd.DataFrame(df[df.columns[0]])
         df = df.drop(index=range(18, 22))

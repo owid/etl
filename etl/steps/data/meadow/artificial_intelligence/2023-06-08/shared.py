@@ -1,4 +1,5 @@
 import pandas as pd
+import pdfplumber
 from structlog import get_logger
 
 from etl.snapshot import Snapshot
@@ -59,3 +60,25 @@ def process_data(excel_object: pd.ExcelFile):
     df_concat = pd.concat(data_frames, axis=0)
     df_concat.reset_index(drop=True, inplace=True)
     return df_concat
+
+
+def read_table_from_pdf(pdf_path, page_number: int) -> pd.DataFrame:
+    """
+    Read a table from a PDF file and convert it into a DataFrame.
+
+    Args:
+        pdf_path (str): The path to the PDF file.
+        page_number (int): The page number containing the table (1-indexed).
+
+    Returns:
+        pd.DataFrame: The extracted table as a DataFrame.
+    """
+    table_settings = {"vertical_strategy": "text", "horizontal_strategy": "text"}
+    with pdfplumber.open(pdf_path) as pdf:
+        page = pdf.pages[page_number - 1]  # Adjust page number to 0-indexed
+        table = page.extract_tables(table_settings=table_settings)[0]  # Extract the first table with custom settings
+
+        # Convert the table data into a DataFrame
+        df = pd.DataFrame(table[1::], columns=table[0])
+
+        return df

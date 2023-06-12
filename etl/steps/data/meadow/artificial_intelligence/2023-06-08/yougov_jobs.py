@@ -2,8 +2,8 @@
 
 from typing import cast
 
-import camelot
 import pandas as pd
+import shared
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -25,36 +25,23 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snap = cast(Snapshot, paths.load_dependency("yougov_jobs.pdf"))
-    pdf_path_str = str(snap.path)
-
-    # Read the tables from the PDF
-    tables = camelot.read_pdf(pdf_path_str, flavor="stream", pages="1-2")
-
-    # Convert each table to a DataFrame and make the first row the column names
-    # Convert each table to a DataFrame and make column name changes
-    dfs = []
-    question_1 = "Do you think that advances in artificial intelligence (AI) will increase or decrease the number of jobs available in the U.S. for the following people?"
-    question_2 = "Thinking about the effects artificial intelligence (AI) will have on businesses and their employees, do you believe it will increase or decrease each of the following?"
-
-    for table in tables:
-        df = table.df.copy()  # Create a copy of the DataFrame
-        new_header = df.iloc[1]  # Select the first row as the new header
-        df = df[2:]  # Remove the first row from the DataFrame
-        df.columns = new_header  # Set the new header as the column names
-        if table == tables[0]:
-            df.rename(columns={"": question_1, df.columns[2]: "Have no effect"}, inplace=True)
-        elif table == tables[1]:
-            df.rename(columns={"": question_2, df.columns[2]: "Have no effect"}, inplace=True)
-        dfs.append(df)
-
-    concatenated_df = pd.concat(dfs, ignore_index=True)
-    concatenated_df = concatenated_df.apply(lambda x: x.str.replace("%", "") if x.dtype == "object" else x)
 
     #
     # Process data.
     #
+    questions = [
+        "Do you think that advances in artificial intelligence (AI) will increase or decrease the number of jobs available in the U.S. for the following people?",
+        "Thinking about the effects artificial intelligence (AI) will have on businesses and their employees, do you believe it will increase or decrease each of the following. . . ?",
+    ]
+
+    # Extract survey results for questions listed above
+
+    df1 = process_job_title_data(snap.path, questions[0])
+    df2 = process_activity_data(snap.path, questions[1])
+    merged_df = pd.merge(df1, df2, how="outer")
+
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(concatenated_df, short_name=paths.short_name, underscore=True)
+    tb = Table(merged_df, short_name=paths.short_name, underscore=True)
 
     #
     # Save outputs.
@@ -66,3 +53,117 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
     log.info("yougov_jobs.end")
+
+
+def process_job_title_data(pdf_path, question):
+    # Read table from PDF file
+    df1 = shared.read_table_from_pdf(pdf_path, 1)
+
+    # Select the desired rows
+    df1 = df1[19:61]
+
+    # Set the column names from the 6th row
+    df1.columns = df1.iloc[5]
+
+    # Remove unnecessary rows
+    df1 = df1[3:]
+
+    # Drop the 2nd and 3rd columns
+    df1 = df1.drop(df1.columns[[1, 2]], axis=1)
+
+    # Rename the columns
+    df1.columns = [question, "Increase", "Have no effect", "Decrease", "Not sure"]
+
+    # Remove "%" from the values
+    df1 = df1.replace("%", "", regex=True)
+
+    # Convert columns to numeric values
+    df1[df1.columns[1:]] = df1[df1.columns[1:]].apply(pd.to_numeric)
+
+    # Drop rows with missing values
+    df1 = df1.dropna(axis=0)
+
+    # Reset the index
+    df1.reset_index(inplace=True, drop=True)
+
+    # List of occupations
+    df1occupations = [
+        "Accountants",
+        "Artists",
+        "Child care workers",
+        "Computer programmers",
+        "Customer service agents",
+        "Data scientists",
+        "Medical doctors",
+        "Engineers",
+        "Graphic designers",
+        "Journalists",
+        "Judges",
+        "Lawyers",
+        "Librarians",
+        "Market research analysts",
+        "Manufacturing workers",
+        "Real estate agents",
+        "Retail sales workers",
+        "Social workers",
+        "Teachers",
+        "Truck drivers",
+    ]
+
+    # Add occupations as a new column
+    df1[question] = df1occupations
+
+    return df1
+
+
+def process_activity_data(pdf_path, question):
+    """
+    Process activity data from a PDF file.
+
+    Args:
+        pdf_path (str): The path to the PDF file.
+
+    Returns:
+        pd.DataFrame: Processed activity data as a DataFrame.
+    """
+    # Read table from PDF file
+    df2 = shared.read_table_from_pdf(pdf_path, 2)
+
+    # Set the column names
+    df2.columns = [question, "Increase", "Have no effect", "Decrease", "Not sure"]
+
+    # Select the desired rows
+    df2 = df2[4:]
+
+    # Remove "%" from the values
+    df2 = df2.replace("%", "", regex=True)
+
+    # Convert columns to numeric values
+    df2[df2.columns[1:]] = df2[df2.columns[1:]].apply(pd.to_numeric)
+
+    # Drop rows with missing values
+    df2 = df2.dropna(axis=0)
+
+    # Reset the index
+    df2.reset_index(inplace=True, drop=True)
+
+    # List of items
+    items = [
+        "Automation of routine tasks",
+        "Customer costs",
+        "Customer satisfaction",
+        "Innovation",
+        "Job opportunities",
+        "Operating costs",
+        "Productivity",
+        "Remote-work capabilities",
+        "The quality of work",
+        "Worker satisfaction",
+        "Work-life balance",
+        "Workplace monitoring of employees",
+    ]
+
+    # Add items as a new column
+    df2[question] = items
+
+    return df2
