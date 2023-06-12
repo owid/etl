@@ -14,7 +14,7 @@ HOW TO EXECUTE:
 
 1. Open this do-file in a local installation of Stata (execution time: ~5-10 minutes)
 2. It generates one file, wid_indices_992j.csv, which needs to be imported as a snapshot in the ETL, as
-	python snapshots/wid/2023-01-27/world_inequality_database.py --path-to-file wid_indices_992j.csv
+	python snapshots/wid/2023-01-27/world_inequality_database.py --path-to-file snapshots/wid/2023-01-27/wid_indices_992j.csv
 
 	(Change the date for future updates)
 
@@ -103,6 +103,7 @@ drop p0p100_thr*
 local var_names pretax posttax_nat posttax_dis wealth
 
 *Calculate ratios for each variable + create a duplicate variable for median
+* Also, generate a variable for the share between p90 and p99 and recalculate p50p90_share, because their components are more available.
 foreach var in `var_names' {
 
 	gen palma_ratio_`var' = p90p100_share_`var' / (p0p50_share_`var' - p40p50_share_`var')
@@ -112,8 +113,12 @@ foreach var in `var_names' {
 	gen p90_p10_ratio_`var' = p90p100_thr_`var' / p10p20_thr_`var'
 	gen p90_p50_ratio_`var' = p90p100_thr_`var' / p50p60_thr_`var'
 	gen p50_p10_ratio_`var' = p50p60_thr_`var' / p10p20_thr_`var'
-	
+
 	gen median_`var' = p50p60_thr_`var'
+
+	gen p90p99_share_`var' = p90p100_share_`var' - p99p100_share_`var'
+
+	replace p50p90_share_`var' = p50p60_share_`var' + p60p70_share_`var' + p70p80_share_`var' + p80p90_share_`var'
 
 }
 
