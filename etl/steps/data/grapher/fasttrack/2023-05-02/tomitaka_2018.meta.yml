@@ -20,8 +20,8 @@ dataset:
 tables:
   tomitaka_2018:
     variables:
-      none_at_all:
-        title: None at all
+      not_at_all:
+        title: Not at all
         short_unit: '%'
         unit: '%'
       several_days:
