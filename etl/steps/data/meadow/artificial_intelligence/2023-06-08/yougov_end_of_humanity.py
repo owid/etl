@@ -50,10 +50,10 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Extract survey results for questions listed above (df_q1, df_q2, df_q3 and for the 3rd question exctract survey results split by age group)
-    df_q1 = question_1_df(snap.path, questions[0])
-    df_q2 = question_2_df(snap.path, column_names, questions[1])
-    df_q3 = question3_df(snap.path, column_names, questions[2])
-    df_q3_age = question3_split_by_age(snap.path, column_names[1:])
+    df_q1 = question_1_df(snap, questions[0])
+    df_q2 = question_2_df(snap, column_names, questions[1])
+    df_q3 = question3_df(snap, column_names, questions[2])
+    df_q3_age = question3_split_by_age(snap, column_names[1:])
 
     # Merge the DataFrames on 'options' column
     merged_df = pd.merge(df_q1, df_q2, on="options", how="outer")
@@ -78,7 +78,7 @@ def run(dest_dir: str) -> None:
     log.info("yougov_end_of_humanity.end")
 
 
-def read_table_from_pdf(pdf_path: str, page_number: int) -> pd.DataFrame:
+def read_table_from_pdf(pdf_path, page_number: int) -> pd.DataFrame:
     """
     Read a table from a PDF file and convert it into a DataFrame.
 
@@ -100,7 +100,7 @@ def read_table_from_pdf(pdf_path: str, page_number: int) -> pd.DataFrame:
         return df
 
 
-def question_1_df(pdf_path: str, question: str) -> pd.DataFrame:
+def question_1_df(snap: Snapshot, question: str) -> pd.DataFrame:
     """
     Extract the data for the first question -
     "How concerned, if at all, are you about the possibility of the end of the human race on Earth?",
@@ -113,7 +113,7 @@ def question_1_df(pdf_path: str, question: str) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The extracted data as a DataFrame.
     """
-    table = read_table_from_pdf(pdf_path, 1)
+    table = read_table_from_pdf(snap.path, 1)
     # Select relevant entries (pdf file reads all lines into 1 messy dataframe; lines 19-28 are the relevant entries for the first question)
     question1 = table.iloc[19:28]
 
@@ -146,7 +146,7 @@ def question_1_df(pdf_path: str, question: str) -> pd.DataFrame:
     return concern_df
 
 
-def question_2_df(pdf_path: str, column_names: list, question: str) -> pd.DataFrame:
+def question_2_df(snap: Snapshot, column_names: list, question: str) -> pd.DataFrame:
     """
     Extract the data for the second question -
     "How likely, if at all, do you think it is that the following would cause the end of the human race on Earth?",
@@ -160,7 +160,7 @@ def question_2_df(pdf_path: str, column_names: list, question: str) -> pd.DataFr
     Returns:
         pd.DataFrame: The extracted data as a DataFrame.
     """
-    table = read_table_from_pdf(pdf_path, 1)
+    table = read_table_from_pdf(snap.path, 1)
 
     # Select relevant entries (pdf file reads all lines into 1 messy dataframe; lines starting from 34 are the relevant entries)
     question2 = table.iloc[34:]
@@ -206,7 +206,7 @@ def question_2_df(pdf_path: str, column_names: list, question: str) -> pd.DataFr
     return transposed_df
 
 
-def question3_df(pdf_path: str, column_names: list, question: str) -> pd.DataFrame:
+def question3_df(snap: Snapshot, column_names: list, question: str) -> pd.DataFrame:
     """
     Extract the data for the third question -
     "How concerned, if at all, are you about the possibility that the following will cause the end of the human race on Earth?",
@@ -220,7 +220,7 @@ def question3_df(pdf_path: str, column_names: list, question: str) -> pd.DataFra
     Returns:
         pd.DataFrame: The extracted data as a DataFrame.
     """
-    table = read_table_from_pdf(pdf_path, 2)
+    table = read_table_from_pdf(snap.path, 2)
     # Skip the first row
     question3 = table.iloc[1:]
 
@@ -257,7 +257,7 @@ def question3_df(pdf_path: str, column_names: list, question: str) -> pd.DataFra
     return question3_t
 
 
-def question3_split_by_age(pdf_path: str, risks: list) -> pd.DataFrame:
+def question3_split_by_age(snap: Snapshot, risks: list) -> pd.DataFrame:
     """
     Extract the data for the question -
     "How concerned, if at all, are you about the possibility that the following will cause the end of the human race on Earth?"
@@ -272,7 +272,7 @@ def question3_split_by_age(pdf_path: str, risks: list) -> pd.DataFrame:
     """
     df_age = []
     for p, page in enumerate([18, 20, 22, 24, 26, 28, 30, 32, 34]):
-        table = read_table_from_pdf(pdf_path, page)
+        table = read_table_from_pdf(snap.path, page)
         df = table.iloc[7:23]
         df = pd.DataFrame(df[df.columns[0]])
         df = df.drop(index=range(18, 22))
