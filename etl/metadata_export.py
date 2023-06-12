@@ -86,10 +86,15 @@ def metadata_export(
                 if not variable.get("short_unit"):
                     variable["short_unit"] = variable["display"].pop("shortUnit", "")
 
+            # remove empty descriptions and short units
+            if variable.get("description") == "":
+                variable.pop("description", None)
+            if variable.get("short_unit") == "":
+                variable.pop("short_unit", None)
+
             variable.pop("additional_info", None)
 
             # add required units
-            variable.setdefault("short_unit", "")
             variable.setdefault("unit", "")
 
             for source in variable.get("sources", []):

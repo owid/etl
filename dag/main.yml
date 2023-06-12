@@ -470,6 +470,12 @@ steps:
   data://grapher/oecd/2023-06-06/income_distribution_database:
   - data://garden/oecd/2023-06-06/income_distribution_database
 
+  # Real commodity prices
+  data://grapher/papers/2023-06-07/commodity_prices:
+  - data://garden/papers/2023-06-07/commodity_prices
+  data://garden/papers/2023-06-07/commodity_prices:
+  - snapshot://papers/2023-06-07/commodity_prices.xlsx
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
