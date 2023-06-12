@@ -1,0 +1,25 @@
+meta:
+  namespace: faostat
+  short_name: faostat_el
+  name: 'Land, Inputs and Sustainability: Land use indicators - FAO (2022)'
+  description: The Agri-environmental Indicators—Land Use domain provides information
+    on the distribution of agricultural and forest land, and their sub-components,
+    including irrigated areas and areas under organic agriculture, at national, regional
+    and global levels.Per capita values are included in this update.
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2022
+  publication_date: '2022-07-11'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/EL
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Environment_LandUse_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: 28cf5e5e2e822e21b02d132cac357f5f
+  size: 1149353
+  path: faostat_el.zip

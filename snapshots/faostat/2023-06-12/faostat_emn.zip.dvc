@@ -1,0 +1,33 @@
+meta:
+  namespace: faostat
+  short_name: faostat_emn
+  name: 'Land, Inputs and Sustainability: Livestock Manure - FAO (2022)'
+  description: 'The Livestock Manure domain of FAOSTAT contains estimates of nitrogen
+    (N) inputs to agricultural soils from livestock manure. Data on the N losses to
+    air and water are also disseminated. These estimates are compiled using official
+    FAOSTAT statistics of animal stocks and by applying the internationally approved
+    Guidelines of the Intergovernmental Panel on Climate Change (IPCC). Data are available
+    by country, with global coverage and relative to the period 1961–2020, with annual
+    updates. The following elements are disseminated: 1) Stocks; 2) Amount excreted
+    in manure (N content);  3) Manure left on pasture (N content); 4) Manure left
+    on pasture that volatilises (N content); 5) Manure left on pasture that leaches
+    (N content); 6) Manure treated (N content); 7) Losses from manure treated (N content);
+    8) Manure applied to soils (N content); 9) Manure applied to soils that volatilises
+    (N content); 10) Manure applied to soils that leaches (N content).'
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2022
+  publication_date: '2022-09-29'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/EMN
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Environment_LivestockManure_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: f9e890ff73ecf618cce9475eea681241
+  size: 24040717
+  path: faostat_emn.zip

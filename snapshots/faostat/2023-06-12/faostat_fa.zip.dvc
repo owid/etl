@@ -1,0 +1,22 @@
+meta:
+  namespace: faostat
+  short_name: faostat_fa
+  name: 'Discontinued archives and data series: Food Aid Shipments (WFP) - FAO (2016)'
+  description: ''
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2016
+  publication_date: '2016-12-22'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/FA
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Food_Aid_Shipments_WFP_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: 809424bcbbf7d42e42c629fbbdc8a951
+  size: 257866
+  path: faostat_fa.zip

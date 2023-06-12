@@ -1,0 +1,37 @@
+meta:
+  namespace: faostat
+  short_name: faostat_rt
+  name: 'Land, Inputs and Sustainability: Pesticides Trade - FAO (2022)'
+  description: 'This domain contains data on pesticides and covers two different categories:
+    pesticides traded in form or packagingfor retail sale or as preparations or articles,
+    and pesticides traded as separate chemically defined compounds (if relevant for
+    the Rotterdam Convention on the Prior Informed Consent Procedure for Certain Hazardous
+    Chemicals and Pesticides in International Trade). The pesticides traded for retail
+    sale or as preparations or articles are those classified under code 38.08 in the
+    Harmonized System Nomenclature (HS) and include: hazardous pesticides, insecticides,
+    fungicides, herbicides, disinfectants and other. For these pesticides, this domain
+    contains trade data (imports and exports) in values only (current 1000 US dollars),
+    and the time series extends from 1961 onwards. The pesticides traded as separate
+    chemically defined compounds are those listed in Annex III of the Rotterdam Convention
+    (excluding industrial chemicals) and therefore subject to the Prior Informed Consent
+    (PIC) procedure. The correspondence with the HS Nomenclature is shown in the table  at
+    the Related Documents section. For these pesticides, this domain contains trade
+    data (imports and exports) in both value (current 1000 US dollars) and quantity
+    (net weight in tonnes), and the time series extends from 2007 onwards.'
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2022
+  publication_date: '2022-06-17'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/RT
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Inputs_Pesticides_Trade_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: f26de7a8c46d9c7be901e0ab8a1b913e
+  size: 1548230
+  path: faostat_rt.zip

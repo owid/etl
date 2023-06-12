@@ -1,0 +1,31 @@
+meta:
+  namespace: faostat
+  short_name: faostat_ef
+  name: 'Land, Inputs and Sustainability: Fertilizers indicators - FAO (2022)'
+  description: 'The FAOSTAT domain Fertilizers Indicators provides information on
+    three rations: a) the ratio between the totals by nutrient of agricultural use
+    of chemical or mineral fertilizers, reported in the FAOSTAT domain “Inputs/Fertilizers
+    by Nutrient” for nitrogen (N), phosphorus (expressed as P2O5) and potassium (expressed
+    as K2O) and the area of cropland reported in the FAOSTAT domain “Inputs/Land Use”;
+    b) The ratio of fertilizers use and the annual population reported in the FAOSTAT
+    domain “Population and Employment/Population”; and c) The ratio of fertilizers
+    use and the value of agricultural production reported in the FAOSTAT domain “Production/Value
+    of Agricultural Production.Data are available at national, regional, and global
+    level over the time series 1961-present.'
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2022
+  publication_date: '2022-06-20'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/EF
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Environment_Fertilizers_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: d7d3b0664ca5f88495df10c12cfa7e18
+  size: 721705
+  path: faostat_ef.zip

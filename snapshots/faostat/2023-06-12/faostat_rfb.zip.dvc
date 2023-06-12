@@ -1,0 +1,26 @@
+meta:
+  namespace: faostat
+  short_name: faostat_rfb
+  name: 'Land, Inputs and Sustainability: Fertilizers by Product - FAO (2022)'
+  description: 'The Fertilizers by Product dataset contains information on the Production,
+    Trade and Agriculture Use of inorganic (chemical or mineral) fertilizers products,
+    over the time series 2002-present. The fertilizer statistics data are for a set
+    of 23 product categories. Both straight and compound fertilizers are included.
+    There is information available about methodology at: http://fenixservices.fao.org/faostat/static/documents/RFB/RFB_EN_README.pdf.'
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2022
+  publication_date: '2022-06-10'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/RFB
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Inputs_FertilizersProduct_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: 0bb82d105437fedfb4691fd585b7832a
+  size: 1713298
+  path: faostat_rfb.zip

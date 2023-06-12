@@ -1,0 +1,38 @@
+meta:
+  namespace: faostat
+  short_name: faostat_wcad
+  name: 'World Census of Agriculture: Structural data from agricultural censuses -
+    FAO (2023)'
+  description: Data from censuses of agriculture are collected at holding level and
+    provide information about the structure of agriculture of a country or a territory
+    (e.g. size and number of holdings, land tenure, legal status, and holder gender).
+    An agricultural holding is an economic unit of agricultural production under single
+    management comprising all livestock kept and all land used wholly or partly for
+    agricultural production purposes. Member countries provided census data to FAO
+    under the World Programme for the Census of Agriculture (WCA). National censuses
+    are conducted at least once every ten years in an internationally comparable way.
+    The ‘’Structural data from agricultural censuses’’ domain in FAOSTAT provides
+    structural data from the last four WCA rounds (WCA 2020, 2010, 2000 and 1990)
+    for each participating country and territory, to the extent possible. For earlier
+    rounds (WCA 1930, 1950, 1960, 1970 and 1980) data are provided only on the number
+    and area of holdings. The data are prepared based on the national census reports,
+    later disseminated by FAO through the publications SDS 17, SDS 12 and SDS 9 and
+    9a, and recent methodological review of the available country census data of WCA
+    2020 round.
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2023
+  publication_date: '2023-01-30'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/WCAD
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/World_Census_Agriculture_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: e217efd74ff08d23216c98ddad0e360e
+  size: 176497
+  path: faostat_wcad.zip

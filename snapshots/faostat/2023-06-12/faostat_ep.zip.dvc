@@ -1,0 +1,24 @@
+meta:
+  namespace: faostat
+  short_name: faostat_ep
+  name: 'Land, Inputs and Sustainability: Pesticides indicators - FAO (2022)'
+  description: Agri-environmental indicator on the Use of pesticides per area of cropland
+    (which is the sum of arable land and land under permanent crops) at national level
+    for the period 1990 to 2016.
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2022
+  publication_date: '2022-06-20'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/EP
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Environment_Pesticides_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: 641aa0dc864512aaf75e7e32d14f7f23
+  size: 98619
+  path: faostat_ep.zip

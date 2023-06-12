@@ -1,0 +1,711 @@
+all_sources:
+  - faostat: &faostat_source
+      name: Food and Agriculture Organization of the United Nations
+      published_by: Food and Agriculture Organization of the United Nations
+      url: http://www.fao.org/faostat/en/#data/
+      date_accessed: "2023-02-22"
+      publication_date: "2023-02-22"
+      publication_year: 2023
+
+dataset:
+  title: Additional variables (FAOSTAT, 2023)
+  description: |
+    Additional variables created using data from different FAOSTAT datasets.
+  sources:
+    - *faostat_source
+
+tables:
+  arable_land_per_crop_output:
+    variables:
+      area:
+        title: 'Arable land'
+        unit: 'hectares'
+        short_unit: 'ha'
+        description: |
+          Arable land is the total of areas (extent of surface of land or water) under temporary crops, temporary meadows and pastures, and land with temporary fallow.  Arable land does not include land that is potentially cultivable but is not normally cultivated.
+      index:
+        title: 'Gross Production Index Number'
+        unit: ''
+        short_unit: ''
+        description: |
+          Gross Production Index Number (2014-2016 = 100).
+      arable_land_per_crop_output:
+        title: Arable land needed to produce a fixed quantity of crops
+        unit: ''
+        short_unit: ''
+        description: |
+          Index of arable land needed to produce a fixed quantity of crops (where values in 1961 are equal to 1.0). This is calculated as arable land divided by the crop production index (PIN). The crop production index here is the sum of crop commodities produced (after deductions of quantities used as seed and feed). It is weighted by the commodity prices.
+
+          This metric measures the index of arable land needed to produce a fixed quantity of crops (where values in 1961 are equal to 1.0).
+
+          Arable land is the total of areas (extent of surface of land or water) under temporary crops, temporary meadows and pastures, and land with temporary fallow.  Arable land does not include land that is potentially cultivable but is not normally cultivated.
+  area_used_per_crop_type:
+    variables:
+      area_used_for_production:
+        title: "Area used for production"
+        unit: "hectares"
+        short_unit: "ha"
+        # Description will be fetched from the original FAOSTAT item and element descriptions.
+        # description: |
+  share_of_sustainable_and_overexploited_fish:
+    variables:
+      sustainable_fish:
+        title: "Percentage of fish stocks within biologically sustainable levels"
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Fish stock are subpopulations of a particular species of fish which have common parameters such as location, growth and mortality which define their population dynamics. Fish stocks are within biologically sustainable levels when fish catch does not exceed the maximum sustainable yield (MSY) - the rate at which fish populations can regenerate.
+      overexploited_fish:
+        title : "Percentage of overexploited fish stocks"
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Fish stock are subpopulations of a particular species of fish which have common parameters such as location, growth and mortality which define their population dynamics. Fish stocks are overexploited when fish catch exceeds the maximum sustainable yield (MSY) - the rate at which fish populations can regenerate.
+  land_spared_by_increased_crop_yields:
+    variables:
+      area:
+        title: "Actual cropland area today"
+        unit: "hectares"
+        short_unit: "ha"
+        description: |
+          Total cropland area on a given year, calculated by dividing the total production by the crop yield.
+      area_with_yield_of_1961:
+        title: "Cropland area needed if yields stagnated in 1961"
+        unit: "hectares"
+        short_unit: "ha"
+        description: |
+          Total cropland area that would be necessary if crop yields stagnated in 1961.
+          
+          This area is calculated by dividing the total production on a given year by the crop yield of 1961.
+      spared_land:
+        title: "Land spared due to crop yield increases"
+        unit: "hectares"
+        short_unit: "ha"
+        description: |
+          Land spared since 1961 due to the increase of crop yields.
+
+          This area is calculated as the cropland area that would be necessary if crop yields stagnated in 1961 (the total production on a given year divided by the crop yield of 1961), minus the true cropland area on a given year.
+      spared_land__pct:
+        title: "Percentage reduction in area needed due to crop yield increases"
+        unit: "hectares"
+        short_unit: "ha"
+        description: |
+          Land spared since 1961 due to the increase of crop yields, as a percentage of the total land that would be necessary if crop yields had not increased since then.
+  # All metadata for food_available_for_consumption is prepared via script.
+  # food_available_for_consumption:
+  macronutrient_compositions:
+    variables:
+      energy_from_animal_products:
+        title: "Daily caloric intake per person from animal products"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: &macronutrient_composition_variable_description |
+          The FAO provide annual figures from 1961 by country on daily caloric supply, fat supply (in grams),   and protein supply (in grams). To calculate the daily per capita supply of carbohydrates, we assume an energy density by macronutrient of 4 kcal per gram of both protein and carbohydrate and 9 kcal per gram of fat (based on established nutritional guidelines reported by the FAO). The daily supply of carbohydrates is therefore calculated as:
+
+          ((Daily supply of kcal)-(Daily supply of protein * 4 + Daily supply of fat * 9)) / 4
+
+          The quantity of calories from each macronutrient is then calculated based on the energy density figures given above (e.g. calories from protein is calculated by multiplying the daily supply of protein in grams by 4).
+
+          For an explanation of these conversion factors, see "Chapter 3: Calculation Of The Energy Content Of Foods - Energy Conversion Factors", available at: http://www.fao.org/docrep/006/Y5022E/y5022e04.htm
+
+          The share of calories derived from each macronutrient is then calculated by dividing the number of calories derived from a given macronutrient by the total daily caloric supply.
+
+          Protein of animal origin includes protein supplied in the form of all meat commodities, eggs and dairy products, and fish & seafood.
+      energy_from_animal_protein:
+        title: "Daily caloric intake per person that comes from animal protein"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      energy_from_vegetal_products:
+        title: "Daily caloric intake per person from vegetal products"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      energy_from_vegetal_protein:
+        title: "Daily caloric intake per person that comes from vegetal protein"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      fat_from_animal_products:
+        title: "Daily fat intake per person from animal products"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+      fat_from_vegetal_products:
+        title: "Daily fat intake per person from vegetal products"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+      protein_from_animal_products:
+        title: "Daily protein intake from animal products"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+      protein_from_vegetal_products:
+        title: "Daily protein intake per person from vegetal products"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+      share_of_energy_from_animal_protein:
+        title: "Share of the daily caloric intake that comes from animal protein"
+        unit: "%"
+        short_unit: "%"
+        description: *macronutrient_composition_variable_description
+      share_of_energy_from_carbohydrates:
+        title: "Share of the daily caloric intake that comes from carbohydrates"
+        unit: "%"
+        short_unit: "%"
+        description: *macronutrient_composition_variable_description
+      share_of_energy_from_fat:
+        title: "Share of the daily caloric intake that comes from fat"
+        unit: "%"
+        short_unit: "%"
+        description: *macronutrient_composition_variable_description
+      share_of_energy_from_protein:
+        title: "Share of the daily caloric intake that comes from protein"
+        unit: "%"
+        short_unit: "%"
+        description: *macronutrient_composition_variable_description
+      share_of_energy_from_vegetal_protein:
+        title: "Share of the daily caloric intake that comes from vegetal protein"
+        unit: "%"
+        short_unit: "%"
+        description: *macronutrient_composition_variable_description
+      total_carbohydrates:
+        title: "Daily carbohydrates intake per person"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+      total_energy:
+        title: "Daily caloric intake per person"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      total_energy_from_carbohydrates:
+        title: "Daily caloric intake per person from carbohydrates"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      total_energy_from_fat:
+        title: "Daily caloric intake per person from fat"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      total_energy_from_protein:
+        title: "Daily caloric intake per person from protein"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      total_fat:
+        title: "Daily fat intake per person"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+      total_protein:
+        title: "Daily protein intake per person"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+  fertilizers:
+    variables:
+      nitrogen_per_cropland:
+        title: Nitrogen use per area of cropland
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        description: |
+          Nutrient nitrogen (N) from all fertilizer products per area of cropland, which corresponds to the sum of arable land and permanent crops.
+      phosphate_per_cropland:
+        title: Phosphate use per area of cropland
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        description: |
+           Nutrient phosphate (P2O5) from all fertilizer products per area of cropland, which corresponds to the sum of arable land and permanent crops.
+      potash_per_cropland:
+        title: Potash use per area of cropland
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        description: |
+          Nutrient potash (K2O) from all fertilizer products per area of cropland, which corresponds to the sum of arable land and permanent crops.
+      all_fertilizers_per_cropland:
+        title: All fertilizers use per area of cropland
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        description: |
+          Agricultural use of all fertilizer products (including nitrogenous, potash, and phosphate fertilizers) per area of cropland, which corresponds to the sum of arable land and permanent crops.
+      cropland:
+        title: Area of cropland
+        unit: hectares
+        short_unit: ha
+        description: 
+          Surface area of cropland, which corresponds to the sum of arable land and permanent crops.
+      nitrogen_use:
+        title: Nitrogen use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Agricultural use of nutrient nitrogen (N) from all fertilizer products.
+      phosphate_use:
+        title: Phosphate use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Agricultural use of nutrient phosphate (P2O5) from all fertilizer products.
+      potash_use:
+        title: Potash use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Agricultural use of nutrient potash (K2O) from all fertilizer products.
+      all_fertilizers_use:
+        title: All fertilizers use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Agricultural use from all fertilizer products (including nitrogenous, potash, and phosphate fertilizers).
+  vegetable_oil_yields:
+    variables:
+      sunflower_production:
+        title: Production of sunflower oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of sunflower oil produced.
+      soybean_production:
+        title: Production of soybean oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of soybean oil produced.
+      groundnut_production:
+        title: Production of groundnut oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of groundnut oil produced.
+      coconut_production:
+        title: Production of coconut oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of coconut oil produced.
+      olive_production:
+        title: Production of olive oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of olive oil produced.
+      cottonseed_production:
+        title: Production of cottonseed oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of cottonseed oil produced.
+      sesame_production:
+        title: Production of sesame oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of sesame oil produced.
+      rapeseed_production:
+        title: Production of rapeseed oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of rapeseed oil produced.
+      palm_production:
+        title: Production of palm oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of palm oil produced. Palm oil includes palm kernel oil.
+      sunflower_area:
+        title: Area harvested for sunflower crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest sunflower crops.
+      cottonseed_area:
+        title: Area harvested for cottonseed crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest cottonseed crops.
+      soybean_area:
+        title: Area harvested for soybean crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest soybean crops.
+      groundnut_area:
+        title: Area harvested for groundnut crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest groundnut crops.
+      olive_area:
+        title: Area harvested for olive crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest olive crops.
+      rapeseed_area:
+        title: Area harvested for rapeseed crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest rapeseed crops.
+      coconut_area:
+        title: Area harvested for coconut crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest coconut crops.
+      sesame_area:
+        title: Area harvested for sesame crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest sesame crops.
+      palm_area:
+        title: Area harvested for palm fruit crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest palm fruit crops. Palm oil includes palm kernel oil.
+      vegetable_oils_production:
+        title: Global production of vegetable oils
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of vegetable oils produced worldwide.
+      palm_tonnes_per_hectare:
+        title: Palm oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of palm oil produced per hectare of palm fruit crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil. Palm oil includes palm kernel oil.
+      palm_hectares_per_tonne:
+        title: Area of palm fruit crops harvested to produce a tonne of palm oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of palm fruit crops harvested to produce a tonne of palm oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil. Palm oil includes palm kernel oil.
+      palm_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only palm oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow palm fruit crops if it was to meet global vegetable oil demand alone. Palm oil includes palm kernel oil.
+      sunflower_tonnes_per_hectare:
+        title: Sunflower oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of sunflower oil produced per hectare of sunflower crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      sunflower_hectares_per_tonne:
+        title: Area of sunflower crops harvested to produce a tonne of sunflower oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of sunflower crops harvested to produce a tonne of sunflower oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      sunflower_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only sunflower oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow sunflower crops if it was to meet global vegetable oil demand alone.
+      rapeseed_tonnes_per_hectare:
+        title: Rapeseed oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of rapeseed oil produced per hectare of rapeseed crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      rapeseed_hectares_per_tonne:
+        title: Area of rapeseed crops harvested to produce a tonne of rapeseed oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of rapeseed crops harvested to produce a tonne of rapeseed oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      rapeseed_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only rapeseed oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow rapeseed crops if it was to meet global vegetable oil demand alone.
+      soybean_tonnes_per_hectare:
+        title: Soybean oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of soybean oil produced per hectare of soybean crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      soybean_hectares_per_tonne:
+        title: Area of soybean crops harvested to produce a tonne of soybean oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of soybean crops harvested to produce a tonne of soybean oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      soybean_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only soybean oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow soybean crops if it was to meet global vegetable oil demand alone.
+      olive_tonnes_per_hectare:
+        title: Olive oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of olive oil produced per hectare of olive crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      olive_hectares_per_tonne:
+        title: Area of olive crops harvested to produce a tonne of olive oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of olive crops harvested to produce a tonne of olive oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      olive_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only olive oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow olive crops if it was to meet global vegetable oil demand alone.
+      coconut_tonnes_per_hectare:
+        title: Coconut oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of coconut oil produced per hectare of coconut crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      coconut_hectares_per_tonne:
+        title: Area of coconut crops harvested to produce a tonne of coconut oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of coconut crops harvested to produce a tonne of coconut oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      coconut_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only coconut oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow coconut crops if it was to meet global vegetable oil demand alone.
+      groundnut_tonnes_per_hectare:
+        title: Groundnut oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of groundnut oil produced per hectare of groundnut crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      groundnut_hectares_per_tonne:
+        title: Area of groundnut crops harvested to produce a tonne of groundnut oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of groundnut crops harvested to produce a tonne of groundnut oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      groundnut_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only groundnut oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow groundnut crops if it was to meet global vegetable oil demand alone.
+      cottonseed_tonnes_per_hectare:
+        title: Cottonseed oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of cottonseed oil produced per hectare of cottonseed crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      cottonseed_hectares_per_tonne:
+        title: Area of cottonseed crops harvested to produce a tonne of cottonseed oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of cottonseed crops harvested to produce a tonne of cottonseed oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      cottonseed_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only cottonseed oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow cottonseed crops if it was to meet global vegetable oil demand alone.
+      sesame_tonnes_per_hectare:
+        title: Sesame oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of sesame oil produced per hectare of sesame crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      sesame_hectares_per_tonne:
+        title: Area of sesame crops harvested to produce a tonne of sesame oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of sesame crops harvested to produce a tonne of sesame oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      sesame_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only sesame oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow sesame crops if it was to meet global vegetable oil demand alone.
+  agriculture_land_use_evolution:
+    variables:
+      agriculture_area:
+        title: Area used for agriculture
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to agriculture on a given year.
+      agriculture_area_one_decade_back:
+        title: Area used for agriculture one decade back
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to agriculture one decade before a given year. For example, for year 2020, this variable gives the extent of agricultural land in 2010.
+      cropland_area:
+        title: Area used for croplands
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to croplands on a given year.
+      cropland_area_one_decade_back:
+        title: Area used for croplands one decade back
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to croplands one decade before a given year. For example, for year 2020, this variable gives the extent of croplands in 2010.
+      pasture_area:
+        title: Area used for pastures
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to pastures on a given year.
+      pasture_area_one_decade_back:
+        title: Area used for pastures one decade back
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to pastures one decade before a given year. For example, for year 2020, this variable gives the extent of pastures in 2010.
+      year_one_decade_back:
+        title: Year one decade back
+        unit: ""
+        short_unit: ""
+        description: |
+          Year one decade before a given year. For example, for year 2020, this variable would be 2010.
+      agriculture_area_change:
+        title: Change in agriculture area with respect to one decade back
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Percentage change in surface area devoted to agriculture with respect to 10 years before. Negative values imply that surface area has decreased with respect to the previous decade.
+
+          This data is used to assess which countries may have already peaked in their agricultural land use. 
+
+          Assessing this by looking at annual land use data is difficult because there can be significant year-to-year variability. That land use for one or two years was lower than previous years would be insufficient to conclude that a country had peaked.
+
+          For this reason we look at decadal changes in agricultural land. We look at land use in the latest year relative to 10 years before.
+
+          If land use is lower in the latest year then we suggest that land use may have peaked. If land use it the same or higher than a decade back, we suggest that it hasn't, or this is uncertain.
+      cropland_area_change:
+        title: Change in cropland area with respect to one decade back
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Percentage change in surface area devoted to croplands with respect to 10 years before. Negative values imply that surface area has decreased with respect to the previous decade.
+
+          This data is used to assess which countries may have already peaked in their agricultural land use. 
+
+          Assessing this by looking at annual land use data is difficult because there can be significant year-to-year variability. That land use for one or two years was lower than previous years would be insufficient to conclude that a country had peaked.
+
+          For this reason we look at decadal changes in agricultural land. We look at land use in the latest year relative to 10 years before.
+
+          If land use is lower in the latest year then we suggest that land use may have peaked. If land use it the same or higher than a decade back, we suggest that it hasn't, or this is uncertain.
+      pasture_area_change:
+        title: Change in pasture area with respect to one decade back
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Percentage change in surface area devoted to pastures with respect to 10 years before. Negative values imply that surface area has decreased with respect to the previous decade.
+
+          This data is used to assess which countries may have already peaked in their agricultural land use. 
+
+          Assessing this by looking at annual land use data is difficult because there can be significant year-to-year variability. That land use for one or two years was lower than previous years would be insufficient to conclude that a country had peaked.
+
+          For this reason we look at decadal changes in agricultural land. We look at land use in the latest year relative to 10 years before.
+
+          If land use is lower in the latest year then we suggest that land use may have peaked. If land use it the same or higher than a decade back, we suggest that it hasn't, or this is uncertain.
+  hypothetical_meat_consumption:
+    variables:
+      animals_global:
+        title: Number of slaughtered animals to produce meat worldwide
+        unit: "animals"
+        short_unit: ""
+      animals_global_hypothetical:
+        title: Hypothetical number of slaughtered animals if everyone ate like the average citizen of a given country
+        unit: "animals"
+        short_unit: ""
+        description: |
+          Hypothetical number of slaughtered animals worldwide if everyone in the world ate the same quantity as the average citizen of a given country.
+
+          This is a hypothetical variable derived by Our World in Data which answers the question: "How many animals would need to be slaughtered if everyone in the world consumed the average per capita amount of a given country?". For example: "How many animals would need to be slaughtered if everyone in the world consumed the same amount of meat as the average UK citizen?".
+
+          This was derived by multiplying global population by the per capita number of slaughtered animals of a given country.
+      animals_per_capita:
+        title: Number of slaughtered animals per person in each country
+        unit: "animals per person"
+        short_unit: ""
+      global_population:
+        title: World population
+        unit: "people"
+        short_unit: ""
+      production_global:
+        title: Total amount of meat produced worldwide
+        unit: "tonnes"
+        short_unit: "t"
+      production_global_hypothetical:
+        title: Hypothetical global meat demand if everyone ate like the average citizen of a given country
+        unit: "tonnes"
+        short_unit: "t"
+        description: |
+          Hypothetical global meat demand if everyone in the world ate the same quantity as the average citizen of a given country.
+
+          This is a hypothetical variable derived by Our World in Data which answers the question: "What would global meat production have to be if everyone in the world consumed the average per capita amount of a given country?". For example: "How much meat would we need to produce if everyone in the world consumed the same amount of meat as the average UK citizen?".
+
+          This was derived by multiplying global population by per capita meat supply of a given country.
+      production_per_capita:
+        title: Per-capita production of meat in each country
+        unit: "tonnes per person"
+        short_unit: "t/person"
+  cereal_allocation:
+    variables:
+      cereals_allocated_to_animal_feed:
+        title: Cereals allocated to animal feed
+        unit: tonnes
+        short_unit: t
+        description: |
+          Quantity of cereal crops allocated to animal feed (and not human food or other uses, such as biofuel production).
+      cereals_allocated_to_food:
+        title: Cereals allocated to human food
+        unit: tonnes
+        short_unit: t
+        description: |
+          Quantity of cereal crops allocated to human food (and not animal feed or other uses, such as biofuel production).
+      cereals_allocated_to_other_uses:
+        title: Cereals allocated to other uses
+        unit: tonnes
+        short_unit: t
+        description: |
+          Quantity of cereal crops allocated to other uses (and not to human food or animal feed), predominantly industrial uses such as biofuel production.
+      share_of_cereals_allocated_to_animal_feed:
+        title: Share of cereals that are allocated to animal feed
+        unit: "%"
+        short_unit: "%"
+        description: |
+          This is calculated by dividing the amount of cereals allocated to animal feed by the sum of all cereal uses considered (namely human food, animal feed, and other uses such us biofuel production). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
+      share_of_cereals_allocated_to_food:
+        title: Share of cereals that are allocated to human food
+        unit: "%"
+        short_unit: "%"
+        description: |
+          This is calculated by dividing the amount of cereals allocated to human food by the sum of all cereal uses considered (namely human food, animal feed, and other uses such us biofuel production). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
+      share_of_cereals_allocated_to_other_uses:
+        title: Share of cereals that are allocated to other uses such as biofuel production
+        unit: "%"
+        short_unit: "%"
+        description: |
+          This is calculated by dividing the amount of cereals allocated to other uses (predominantly industrial uses such as biofuel production) by the sum of all cereal uses considered (namely human food, animal feed, and other uses). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
+  # All metadata for maize_and_wheat and fertilizer_exports is prepared via script.
+  # maize_and_wheat:
+  # fertilizer_exports:

@@ -1,0 +1,26 @@
+meta:
+  namespace: faostat
+  short_name: faostat_ei
+  name: 'Climate Change: Emissions intensities - FAO (2022)'
+  description: The FAOSTAT domain Emissions intensities contains analytical data on
+    the intensity of greenhouse gas (GHG) emissions by agricultural commodity. This
+    indicator is defined as greenhouse gas emissions per kg of product. Data are available
+    for a set of agricultural commodities (e.g. rice and other cereals, meat, milk,
+    eggs), by country, with global coverage and relative to the period 1961–2020.
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2022
+  publication_date: '2022-10-03'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/EI
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Environment_Emissions_intensities_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: aefe8849df9857816a5b73fe81f04231
+  size: 3499456
+  path: faostat_ei.zip

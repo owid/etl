@@ -1,0 +1,36 @@
+meta:
+  namespace: faostat
+  short_name: faostat_ic
+  name: 'Investment: Credit to Agriculture - FAO (2022)'
+  description: The Credit to Agriculture dataset provides national data for over 130
+    countries on the amount of loans provided by the private/commercial banking sector
+    to producers in agriculture, forestry and fishing, including household producers,
+    cooperatives, and agro-businesses. For some countries, the three subsectors of
+    agriculture, forestry, and fishing are completely specified. In other cases, complete
+    disaggregations are not available. The dataset also provides statistics on the
+    total credit to all industries, indicators on the share of credit to agricultural
+    producers, and an agriculture orientation index (AOI) for credit that normalizes
+    the share of credit to agriculture over total credit by dividing it by the share
+    of agriculture in gross domestic product (GDP). As such, it can provide a more
+    accurate indication of the relative importance that banking sectors place on financing
+    the sector. An AOI lower than 1 indicates that the agriculture sector receives
+    a credit share lower than its contribution to the economy, while an AOI greater
+    than 1 indicates a credit share to the agriculture sector greater than its economic
+    contribution.
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2022
+  publication_date: '2022-11-29'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/IC
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Investment_CreditAgriculture_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: 2efd2831bbb4e007139be9c295a3454d
+  size: 470123
+  path: faostat_ic.zip
