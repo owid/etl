@@ -21,49 +21,49 @@ tables:
     variables:
       africa:
         title: Africa
-        description: Total CO2 emissions from international aviation (by month in 'country' column)
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       asia:
         title: Asia
-        description: Total CO2 emissions from international aviation (by month in 'country' column)
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       europe:
         title: Europe
-        description: Total CO2 emissions from international aviation (by month in 'country' column)
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       north_america:
         title: North America
-        description: Total CO2 emissions from international aviation (by month in 'country' column)
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       oceania:
         title: Oceania
-        description: Total CO2 emissions from international aviation (by month in 'country' column)
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       south_america:
         title: South America
-        description: Total CO2 emissions from international aviation (by month in 'country' column)
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       world:
         title: World
-        description: Total CO2 emissions from international aviation (by month in 'country' column)
+        description: Total CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
         display:
