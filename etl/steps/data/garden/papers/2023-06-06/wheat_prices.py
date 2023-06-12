@@ -4,7 +4,6 @@ import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
-from etl.backport_helpers import long_to_wide
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
