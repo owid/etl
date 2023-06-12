@@ -191,10 +191,10 @@ pct_dict = {
     },
     "p0p50": {"decile10": "Bottom 50%", "decile9": "Bottom 50%", "thr_number": "", "decile10_extra": "Bottom 50%"},
     "p90p99": {
-        "decile10": "9th decile - top 99%",
+        "decile10": "Between 90th and 99th percentiles%",
         "decile9": "",
         "thr_number": "",
-        "decile10_extra": "People between the 9oth and 99th percentiles",
+        "decile10_extra": "People between the 90th and 99th percentiles",
     },
 }
 
