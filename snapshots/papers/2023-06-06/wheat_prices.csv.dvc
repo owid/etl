@@ -1,0 +1,34 @@
+meta:
+  namespace: papers
+  short_name: wheat_prices
+  file_extension: csv
+  date_accessed: 2019-02-21
+  name: Wheat prices, long run, in England (Makridakis et al. 1997)
+  description: |-
+    Long-run series on wheat prices in England, measured in constant 1996 pounds per tonne.
+
+    Data is sourced from Makridakis, Wheelwright, and Hyndman (1997) - Forecasting: Methods and Applications. Wiley.
+
+    The data is available at the book's accompanying website here: https://robjhyndman.com/forecasting/
+
+    This book is online here: http://otexts.com/fpp/
+
+    Data can be loaded from R with
+    ```R
+    install.packages("fma")
+    library(fma)
+    plot(wheat)
+    ```
+  source_name: Wheat prices, long run, in England (Makridakis et al. 1997)
+  url: https://robjhyndman.com/forecasting/
+  source_published_by: 'Makridakis, Wheelwright, and Hyndman (1997) - Forecasting:
+    Methods and Applications. Wiley.'
+
+  is_public: true
+  version: '2023-06-06'
+  publication_date: latest
+wdir: ../../../data/snapshots/papers/2023-06-06
+outs:
+- md5: 97f300f1ff74c5271d602e3d3b29e718
+  size: 8731
+  path: wheat_prices.csv
