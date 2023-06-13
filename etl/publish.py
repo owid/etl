@@ -262,24 +262,36 @@ def get_remote_checksum(s3: Any, bucket: str, path: str) -> Optional[str]:
     return object_md5(s3, bucket, path, obj)
 
 
-def connect_s3(s3_config: Optional[Config] = None) -> Any:
+def connect_s3(s3_config: Optional[Config] = None, r2=False) -> Any:
     # TODO: use https://github.com/owid/data-utils-py/blob/main/owid/datautils/io/s3.py
     session = boto3.Session()
-    return session.client(
-        "s3",
-        region_name=config.S3_REGION_NAME,
-        endpoint_url=config.S3_ENDPOINT_URL,
-        aws_access_key_id=config.S3_ACCESS_KEY,
-        aws_secret_access_key=config.S3_SECRET_KEY,
-        config=s3_config,
-    )
+    if r2:
+        assert config.R2_ACCESS_KEY, "R2_ACCESS_KEY not set in environment"
+        assert config.R2_SECRET_KEY, "R2_SECRET_KEY not set in environment"
+        return session.client(
+            "s3",
+            region_name=config.R2_REGION_NAME,
+            endpoint_url=config.R2_ENDPOINT_URL,
+            aws_access_key_id=config.R2_ACCESS_KEY,
+            aws_secret_access_key=config.R2_SECRET_KEY,
+            config=s3_config,
+        )
+    else:
+        return session.client(
+            "s3",
+            region_name=config.S3_REGION_NAME,
+            endpoint_url=config.S3_ENDPOINT_URL,
+            aws_access_key_id=config.S3_ACCESS_KEY,
+            aws_secret_access_key=config.S3_SECRET_KEY,
+            config=s3_config,
+        )
 
 
 @lru_cache(maxsize=None)
-def connect_s3_cached(s3_config: Optional[Config] = None) -> Any:
+def connect_s3_cached(s3_config: Optional[Config] = None, r2=False) -> Any:
     """Connect to S3, but cache the connection for subsequent calls. This is more efficient than
     creating a new connection for every request."""
-    return connect_s3(s3_config)
+    return connect_s3(s3_config=s3_config, r2=r2)
 
 
 def _channel_path(channel: CHANNEL, format: FileFormat) -> Path:

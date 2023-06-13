@@ -247,7 +247,7 @@ def upsert_table(
 
         # process and upload data to S3
         var_data = variable_data(df)
-        data_path = upload_gzip_dict(var_data, variable.s3_data_path())
+        data_path = upload_gzip_dict(var_data, variable.s3_data_path(), r2=True)
 
         # we need to commit changes because we use SQL command in `variable_metadata`. We wouldn't
         # have to if we used ORM instead
@@ -256,7 +256,7 @@ def upsert_table(
 
         # process and upload metadata to S3
         var_metadata = variable_metadata(engine, variable_id, df)
-        metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path())
+        metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path(), r2=True)
 
         variable.dataPath = data_path
         variable.metadataPath = metadata_path
