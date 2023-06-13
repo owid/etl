@@ -48,6 +48,9 @@ tables:
         title: Eating disorders (share of population)
         description: >-
           Share of population with eating disorders. This is estimated as the total number of cases with eating disorders relative to the population of a country.
+
+
+          This indicator only includes anorexia nervosa and bulimia nervosa (i.e. it does not include binge eating disorder and other specified feeding or eating disorder (OSFED)).
         unit: "%"
       share_schizophrenia_disorders:
         title: Schizophrenia disorders (share of population)
