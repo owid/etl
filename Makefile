@@ -37,9 +37,9 @@ test-all:
 	@echo '================ etl ================='
 	@make test
 	@for lib in $(LIBS); do \
-		@echo "================ $$lib ================="; \
-		@(cd $$lib && make test); \
-	@done
+		echo "================ $$lib ================="; \
+		(cd $$lib && make test); \
+	done
 
 watch: .venv
 	poetry run watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
