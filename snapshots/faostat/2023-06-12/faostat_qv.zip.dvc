@@ -1,7 +1,7 @@
 meta:
   namespace: faostat
   short_name: faostat_qv
-  name: 'Production: Value of Agricultural Production - FAO (2022)'
+  name: 'Production: Value of Agricultural Production - FAO (2023)'
   description: 'Crop and livestock statistics are recorded for 278 products, covering
     the following categories:1) CROPS PRIMARY:Cereals, Citrus Fruit, Fibre Crops,
     Fruit, Oil Crops, Oil Crops and Cakes in Oil Equivalent, Pulses, Roots and Tubers,
@@ -28,18 +28,19 @@ meta:
     whole dried, whole evaporated); Silk raw; Tallow; Whey (condensed and dry); Yoghurt'
   source_name: Food and Agriculture Organization of the United Nations
   source_published_by: Food and Agriculture Organization of the United Nations
-  publication_year: 2022
-  publication_date: '2022-11-08'
-  date_accessed: '2023-02-22'
-  version: '2023-02-22'
+  publication_year: 2023
+  publication_date: '2023-05-08'
+  date_accessed: '2023-06-12'
+  version: '2023-06-12'
   url: http://www.fao.org/faostat/en/#data/QV
-  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Value_of_Production_E_All_Data_(Normalized).zip
+  source_data_url: 
+    https://fenixservices.fao.org/faostat/static/bulkdownloads/Value_of_Production_E_All_Data_(Normalized).zip
   file_extension: zip
   license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
   license_name: CC BY-NC-SA 3.0 IGO
   is_public: true
-wdir: ../../../data/snapshots/faostat/2023-02-22
+wdir: ../../../data/snapshots/faostat/2023-06-12
 outs:
-- md5: 9492ee528ca7d169328377cd54cb5925
-  size: 26236943
+- md5: 3d069f7b3ac5c5bbe3bfe9a31810c3f8
+  size: 25458556
   path: faostat_qv.zip

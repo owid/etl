@@ -169,13 +169,13 @@ def generate_area_used_for_production_per_crop_type(df_qcl: pd.DataFrame) -> Tab
 
 
 def generate_percentage_of_sustainable_and_overexploited_fish(df_sdgb: pd.DataFrame) -> Table:
-    # "14.4.1 Proportion of fish stocks within biologically sustainable levels (not overexploited) (%)"
-    ITEM_CODE_SUSTAINABLE_FISH = "00024029"
+    # "14.4.1 Proportion of fish stocks within biologically sustainable levels"
+    ITEM_CODE_SUSTAINABLE_FISH = "00000000024029"
 
     # Select the necessary item.
     df_sdgb = df_sdgb[df_sdgb["item_code"] == ITEM_CODE_SUSTAINABLE_FISH].reset_index(drop=True)
     error = "Unit for fish data has changed."
-    assert list(df_sdgb["unit"].unique()) == ["percent"], error
+    assert list(df_sdgb["unit"].unique()) == ["Percent"], error
     error = "Element for fish data has changed."
     assert list(df_sdgb["element"].unique()) == ["Value"], error
 
@@ -663,7 +663,7 @@ def generate_fertilizers(df_ef: pd.DataFrame, df_rl: pd.DataFrame) -> Table:
 
     # Sanity checks.
     error = "Unit for use per area has changed."
-    assert list(fertilizers["unit"].unique()) == ["kilograms per hectare"], error
+    assert list(fertilizers["unit"].unique()) == ["Kilograms per hectare"], error
 
     error = "Unexpected list of item codes for fertilizers (maybe another was added to faostat_ef)."
     assert set(fertilizers["item_code"]) == set(ITEM_CODES_FOR_FERTILIZERS), error

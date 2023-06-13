@@ -3,12 +3,12 @@ all_sources:
       name: Food and Agriculture Organization of the United Nations
       published_by: Food and Agriculture Organization of the United Nations
       url: http://www.fao.org/faostat/en/#data/
-      date_accessed: "2023-02-22"
-      publication_date: "2023-02-22"
+      date_accessed: "2023-06-12"
+      publication_date: "2023-06-12"
       publication_year: 2023
 
 dataset:
-  title: Additional variables (FAOSTAT, 2023)
+  title: Additional variables (FAOSTAT, 2023b)
   description: |
     Additional variables created using data from different FAOSTAT datasets.
   sources:

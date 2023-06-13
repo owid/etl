@@ -1,30 +1,32 @@
 meta:
   namespace: faostat
   short_name: faostat_gn
-  name: 'Climate Change: Energy Use - FAO (2022)'
+  name: 'Climate Change: Agrifood systems emissions: Emissions from Energy use in
+    agriculture - FAO (2023)'
   description: Greenhouse gas (GHG) emissions from direct on-farm energy use consist
     of carbon dioxide, methane, and nitrous oxide gases related with fuel combustion
     and electricity generation in agriculture (including fisheries). The FAOSTAT emissions
-    database has a global scope for the period 1970 to 2020 (with annual updates),
-    by motor gasoline (gas-diesel oils, gasoline, natural gas, liquefied petroleum
-    gas, residual fuel oil, hard coal, electricity, gas-diesel oils in fisheries,
+    database has a global scope for the period 1970 to 2021 (with annual updates),
+    by motor gasoline, gas-diesel oils, gasoline, natural gas, liquefied petroleum
+    gas, residual fuel oil, coal, electricity, heat, gas-diesel oils in fisheries,
     residual fuel oil in fisheries, and by aggregates (total energy, energy consumed
-    in fishery and total energy without electricity). Activity data(Energy consumption
-    in farm) is also provided.
+    in fishery and total energy without electricity  heat). Activity data(Energy use)
+    is also provided.
   source_name: Food and Agriculture Organization of the United Nations
   source_published_by: Food and Agriculture Organization of the United Nations
-  publication_year: 2022
-  publication_date: '2022-07-13'
-  date_accessed: '2023-02-22'
-  version: '2023-02-22'
+  publication_year: 2023
+  publication_date: '2023-04-27'
+  date_accessed: '2023-06-12'
+  version: '2023-06-12'
   url: http://www.fao.org/faostat/en/#data/GN
-  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Emissions_Agriculture_Energy_E_All_Data_(Normalized).zip
+  source_data_url: 
+    https://fenixservices.fao.org/faostat/static/bulkdownloads/Emissions_Agriculture_Energy_E_All_Data_(Normalized).zip
   file_extension: zip
   license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
   license_name: CC BY-NC-SA 3.0 IGO
   is_public: true
-wdir: ../../../data/snapshots/faostat/2023-02-22
+wdir: ../../../data/snapshots/faostat/2023-06-12
 outs:
-- md5: 2921a1ed84c5571176f75c5ca052a040
-  size: 2775328
+- md5: f54282a5f46024b435a9274d5fc4a15e
+  size: 2356003
   path: faostat_gn.zip

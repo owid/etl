@@ -1,7 +1,7 @@
 meta:
   namespace: faostat
   short_name: faostat_scl
-  name: 'Food Balances: Supply Utilization Accounts (2010-) - FAO (2022)'
+  name: 'Food Balances: Supply Utilization Accounts (2010-) - FAO (2023)'
   description: Supply Utilization Accounts and Food Balance Sheet present a comprehensive
     picture of the pattern of a country's food supply during a specified reference
     period. The food balance sheet shows for each food item - i.e. each primary commodity
@@ -20,18 +20,19 @@ meta:
     - also in terms of caloric value and protein and fat content.
   source_name: Food and Agriculture Organization of the United Nations
   source_published_by: Food and Agriculture Organization of the United Nations
-  publication_year: 2022
-  publication_date: '2022-11-09'
-  date_accessed: '2023-02-22'
-  version: '2023-02-22'
+  publication_year: 2023
+  publication_date: '2023-04-26'
+  date_accessed: '2023-06-12'
+  version: '2023-06-12'
   url: http://www.fao.org/faostat/en/#data/SCL
-  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/SUA_Crops_Livestock_E_All_Data_(Normalized).zip
+  source_data_url: 
+    https://fenixservices.fao.org/faostat/static/bulkdownloads/SUA_Crops_Livestock_E_All_Data_(Normalized).zip
   file_extension: zip
   license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
   license_name: CC BY-NC-SA 3.0 IGO
   is_public: true
-wdir: ../../../data/snapshots/faostat/2023-02-22
+wdir: ../../../data/snapshots/faostat/2023-06-12
 outs:
-- md5: 124f265dc78223db5dc3145eab7350bd
-  size: 75898881
+- md5: b0a61a8665a33e67ff239fc1a5c96669
+  size: 62382058
   path: faostat_scl.zip

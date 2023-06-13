@@ -52,6 +52,7 @@ from shared import (
     FLAGS_RANKING,
     N_CHARACTERS_ELEMENT_CODE,
     N_CHARACTERS_ITEM_CODE,
+    N_CHARACTERS_ITEM_CODE_SDGB,
     NAMESPACE,
     harmonize_elements,
     harmonize_items,
@@ -185,14 +186,23 @@ def clean_global_dataset_descriptions_dataframe(
     return datasets_df
 
 
-def check_that_item_and_element_harmonization_does_not_trim_codes(data: pd.DataFrame, category: str) -> None:
+def check_that_item_and_element_harmonization_does_not_trim_codes(
+    data: pd.DataFrame, dataset_short_name: str, category: str
+) -> None:
     # Ensure that the number of digits of all item and element codes is smaller than the limits defined
     # at the beginning of the garden shared module, by N_CHARACTERS_ITEM_CODE and N_CHARACTERS_ELEMENT_CODE,
     # respectively.
-    n_characters = {"element": N_CHARACTERS_ELEMENT_CODE, "item": N_CHARACTERS_ITEM_CODE}
+
+    # Set the maximum number of characters for item_code.
+    if dataset_short_name == f"{NAMESPACE}_sdgb":
+        n_characters_item_code = N_CHARACTERS_ITEM_CODE_SDGB
+    else:
+        n_characters_item_code = N_CHARACTERS_ITEM_CODE
+
+    n_characters = {"element": N_CHARACTERS_ELEMENT_CODE, "item": n_characters_item_code}
     error = (
-        f"{category.capitalize()} codes found with more than N_CHARACTERS_{category.upper()}_CODE digits. "
-        f"This parameter is defined in garden shared module and may need to be increased. "
+        f"{category.capitalize()} codes found with more characters than expected for {dataset_short_name}. "
+        f"This parameter (N_CHARACTERS_*_CODE*) is defined in garden shared module and may need to be increased. "
         f"This would change how {category} codes are harmonized, increasing the length of variable names. "
         f"It may have further unwanted consequences, so do it with caution."
     )
@@ -227,7 +237,9 @@ def create_items_dataframe_for_domain(
         df.rename(columns={"item": "fao_item"})[["item_code", "fao_item"]].drop_duplicates().reset_index(drop=True)
     )
     # Sanity check.
-    check_that_item_and_element_harmonization_does_not_trim_codes(data=df, category="item")
+    check_that_item_and_element_harmonization_does_not_trim_codes(
+        data=df, dataset_short_name=dataset_short_name, category="item"
+    )
     # Ensure items are well constructed and amend already known issues (defined in shared.ITEM_AMENDMENTS).
     items_from_data = harmonize_items(df=items_from_data, dataset_short_name=dataset_short_name, item_col="fao_item")
 
@@ -409,7 +421,9 @@ def create_elements_dataframe_for_domain(
         .reset_index(drop=True)
     )
     # Sanity check.
-    check_that_item_and_element_harmonization_does_not_trim_codes(data=df, category="element")
+    check_that_item_and_element_harmonization_does_not_trim_codes(
+        data=df, dataset_short_name=dataset_short_name, category="element"
+    )
     # Ensure element_code is always a string of a fix number of characters.
     elements_from_data = harmonize_elements(df=elements_from_data, element_col="fao_element")
 
@@ -881,6 +895,7 @@ def process_metadata(
 
     # Gather all variables from the latest version of each meadow dataset.
     for dataset_short_name in tqdm(dataset_short_names, file=sys.stdout):
+        print(dataset_short_name)
         # Load latest meadow table for current dataset.
         ds_latest: catalog.Dataset = paths.load_dependency(dataset_short_name)
         table = ds_latest[dataset_short_name]
@@ -894,14 +909,23 @@ def process_metadata(
 
         df["area_code"] = df["area_code"].astype("Int64")
 
+        ################################################################################################################
         # Temporary patch.
-        if dataset_short_name == "faostat_wcad":
-            error = (
-                "Dataset faostat_wcad had 'French Guiana' for area code 69 (unlike other datasets, that had "
-                "'French Guyana'). But this may no longer the case, so this patch in the code can be removed."
-            )
-            assert "French Guiana" in df["fao_country"].unique(), error
+        # Some areas are defined with different names (but same area codes) in different domains.
+        # This causes some issues at a later stage.
+        # For now, manually rename those areas here.
+        if "French Guiana" in df["fao_country"].unique():
             df["fao_country"] = dataframes.map_series(df["fao_country"], mapping={"French Guiana": "French Guyana"})
+        if "Netherlands (Kingdom of the)" in df["fao_country"].unique():
+            df["fao_country"] = dataframes.map_series(
+                df["fao_country"], mapping={"Netherlands (Kingdom of the)": "Netherlands"}
+            )
+        if "Saint Martin (French part)" in df["fao_country"].unique():
+            df["fao_country"] = dataframes.map_series(
+                df["fao_country"], mapping={"Saint Martin (French part)": "Saint-Martin (French part)"}
+            )
+
+        ################################################################################################################
 
         if f"{dataset_short_name}_flag" in metadata.table_names:
             check_that_all_flags_in_dataset_are_in_ranking(
@@ -916,7 +940,7 @@ def process_metadata(
 
         # Gather dataset descriptions, items, and element-units for current domain.
         datasets_from_data = create_dataset_descriptions_dataframe_for_domain(
-            table, dataset_short_name=dataset_short_name
+            table=table, dataset_short_name=dataset_short_name
         )
 
         items_from_data = create_items_dataframe_for_domain(

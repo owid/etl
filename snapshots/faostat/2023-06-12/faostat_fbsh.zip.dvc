@@ -2,7 +2,7 @@ meta:
   namespace: faostat
   short_name: faostat_fbsh
   name: 'Food Balances: Food Balances (-2013, old methodology and population) - FAO
-    (2021)'
+    (2023)'
   description: Food Balance Sheet presents a comprehensive picture of the pattern
     of a country's food supply during a specified reference period. The food balance
     sheet shows for each food item - i.e. each primary commodity and a number of processed
@@ -21,18 +21,19 @@ meta:
     of caloric value and protein and fat content.
   source_name: Food and Agriculture Organization of the United Nations
   source_published_by: Food and Agriculture Organization of the United Nations
-  publication_year: 2021
-  publication_date: '2021-12-03'
-  date_accessed: '2023-02-22'
-  version: '2023-02-22'
+  publication_year: 2023
+  publication_date: '2023-03-10'
+  date_accessed: '2023-06-12'
+  version: '2023-06-12'
   url: http://www.fao.org/faostat/en/#data/FBSH
-  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/FoodBalanceSheetsHistoric_E_All_Data_(Normalized).zip
+  source_data_url: 
+    https://fenixservices.fao.org/faostat/static/bulkdownloads/FoodBalanceSheetsHistoric_E_All_Data_(Normalized).zip
   file_extension: zip
   license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
   license_name: CC BY-NC-SA 3.0 IGO
   is_public: true
-wdir: ../../../data/snapshots/faostat/2023-02-22
+wdir: ../../../data/snapshots/faostat/2023-06-12
 outs:
-- md5: da7d6b0079808a3a525ac7213819cab6
-  size: 71024495
+- md5: 0697f7ac5708c968d6ac09ec491a47bc
+  size: 72813025
   path: faostat_fbsh.zip

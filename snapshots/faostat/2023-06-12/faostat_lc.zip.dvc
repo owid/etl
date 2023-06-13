@@ -15,16 +15,17 @@ meta:
   source_published_by: Food and Agriculture Organization of the United Nations
   publication_year: 2022
   publication_date: '2022-05-12'
-  date_accessed: '2023-02-22'
-  version: '2023-02-22'
+  date_accessed: '2023-06-12'
+  version: '2023-06-12'
   url: http://www.fao.org/faostat/en/#data/LC
-  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Environment_LandCover_E_All_Data_(Normalized).zip
+  source_data_url: 
+    https://fenixservices.fao.org/faostat/static/bulkdownloads/Environment_LandCover_E_All_Data_(Normalized).zip
   file_extension: zip
   license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
   license_name: CC BY-NC-SA 3.0 IGO
   is_public: true
-wdir: ../../../data/snapshots/faostat/2023-02-22
+wdir: ../../../data/snapshots/faostat/2023-06-12
 outs:
-- md5: 6c71a81515207f0f2312fee4df86d020
-  size: 1616181
+- md5: eb3777dd9c4e7602a3143910b3ce5785
+  size: 1616180
   path: faostat_lc.zip

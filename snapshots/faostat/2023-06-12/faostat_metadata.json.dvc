@@ -6,17 +6,17 @@ meta:
   source_name: Food and Agriculture Organization of the United Nations
   source_published_by: Food and Agriculture Organization of the United Nations
   publication_year: 2023
-  publication_date: '2023-03-08'
-  date_accessed: '2023-02-22'
-  version: '2023-02-22'
+  publication_date: '2023-06-12'
+  date_accessed: '2023-06-12'
+  version: '2023-06-12'
   url: http://www.fao.org/faostat/en/#data
   source_data_url:
   file_extension: json
   license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
   license_name: CC BY-NC-SA 3.0 IGO
   is_public: true
-wdir: ../../../data/snapshots/faostat/2023-02-22
+wdir: ../../../data/snapshots/faostat/2023-06-12
 outs:
-- md5: 8fc9d8298a064676a80601d3393a2548
-  size: 13973943
+- md5: a2c459f4c92ac75a9e7efff76aab0266
+  size: 14458332
   path: faostat_metadata.json
