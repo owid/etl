@@ -61,7 +61,7 @@ xlrd = ">=2.0.1"
 PyPDF2 = ">=2.11.1"
 dvc = {extras = ["s3"], version = ">=2.56.0"}
 "ruamel.yaml" = ">=0.17.21"
-owid-repack = "^0.1.2"
+owid-repack = {path = "lib/owid-repack-py", develop = true}
 mkdocs-jupyter = "^0.22.0"
 gitpython = "^3.1.30"
 rapidfuzz = "^2.13.7"

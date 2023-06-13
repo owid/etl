@@ -14,7 +14,7 @@ default:
 
 .venv: pyproject.toml poetry.toml poetry.lock
 	poetry install || poetry install
-	touch $@
+	test -d .venv && touch $@
 
 audit: .venv
 	@echo '==> Auditing JSON records'

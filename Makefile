@@ -8,6 +8,7 @@ include default.mk
 
 SRC = etl snapshots backport walkthrough fasttrack tests
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
+LIBS = lib/*
 
 help:
 	@echo 'Available commands:'
@@ -30,11 +31,15 @@ docs: .venv
 	poetry run mkdocs serve
 
 watch-all:
-	poetry run watchmedo shell-command -c 'clear; make unittest; (cd lib/owid-catalog-py && make unittest); (cd lib/walden && make unittest)' --recursive --drop .
+	poetry run watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .
 
-test-all: test
-	cd lib/owid-catalog-py && make test
-	cd lib/walden && make test
+test-all:
+	@echo '================ etl ================='
+	@make test
+	@for lib in $(LIBS); do \
+		@echo "================ $$lib ================="; \
+		@(cd $$lib && make test); \
+	@done
 
 watch: .venv
 	poetry run watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
