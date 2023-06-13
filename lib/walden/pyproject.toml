@@ -18,7 +18,7 @@ openpyxl = ">=3.0.9"
 rich = ">=12.1.0"
 beautifulsoup4 = ">=4.11.1"
 structlog = ">=21.5.0"
-owid-datautils = {git = "https://github.com/owid/owid-datautils-py.git", tag = "v0.5.2-alpha"}
+owid-datautils = {path = "../owid-datautils-py", develop = true}
 pyrsistent = ">=0.19.1"
 owid-repack = ">=0.1.1"
 
