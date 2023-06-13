@@ -2,7 +2,7 @@ meta:
   namespace: fasttrack
   short_name: whm_treatment_gap_anxiety_disorders
   file_extension: csv
-  date_accessed: 2023-05-31
+  date_accessed: 2023-06-13
   name: Treatment gap for anxiety disorders (WMH, 2017)
   description: 'This dataset comes from the World Mental Health surveys, which conducted
     national studies in 21 countries, using validated structured interviews to survey
@@ -42,6 +42,6 @@ meta:
   publication_year: 2017
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 24b2bc09a23fe8ed5ab7e8a37df42c4d
-  size: 1297
+- md5: 2ef040684f17d2121ded34c460efa4aa
+  size: 2000
   path: whm_treatment_gap_anxiety_disorders.csv
