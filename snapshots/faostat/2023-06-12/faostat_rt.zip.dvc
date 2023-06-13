@@ -1,7 +1,7 @@
 meta:
   namespace: faostat
   short_name: faostat_rt
-  name: 'Land, Inputs and Sustainability: Pesticides Trade - FAO (2022)'
+  name: 'Land, Inputs and Sustainability: Pesticides Trade - FAO (2023)'
   description: 'This domain contains data on pesticides and covers two different categories:
     pesticides traded in form or packagingfor retail sale or as preparations or articles,
     and pesticides traded as separate chemically defined compounds (if relevant for
@@ -20,18 +20,19 @@ meta:
     (net weight in tonnes), and the time series extends from 2007 onwards.'
   source_name: Food and Agriculture Organization of the United Nations
   source_published_by: Food and Agriculture Organization of the United Nations
-  publication_year: 2022
-  publication_date: '2022-06-17'
-  date_accessed: '2023-02-22'
-  version: '2023-02-22'
+  publication_year: 2023
+  publication_date: '2023-05-04'
+  date_accessed: '2023-06-12'
+  version: '2023-06-12'
   url: http://www.fao.org/faostat/en/#data/RT
-  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Inputs_Pesticides_Trade_E_All_Data_(Normalized).zip
+  source_data_url: 
+    https://fenixservices.fao.org/faostat/static/bulkdownloads/Inputs_Pesticides_Trade_E_All_Data_(Normalized).zip
   file_extension: zip
   license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
   license_name: CC BY-NC-SA 3.0 IGO
   is_public: true
-wdir: ../../../data/snapshots/faostat/2023-02-22
+wdir: ../../../data/snapshots/faostat/2023-06-12
 outs:
-- md5: f26de7a8c46d9c7be901e0ab8a1b913e
-  size: 1548230
+- md5: ad419eb70e87c74f7e37d3e62387c94a
+  size: 1545737
   path: faostat_rt.zip

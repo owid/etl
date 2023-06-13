@@ -1,7 +1,7 @@
 meta:
   namespace: faostat
   short_name: faostat_sdgb
-  name: 'SDG Indicators: SDG Indicators - FAO (2022)'
+  name: 'SDG Indicators: SDG Indicators - FAO (2023)'
   description: As the custodian agency of 21 SDG indicators, the Food and Agriculture
     Organization of the United Nations (FAO) is responsible for curating and refining
     the methodologies of these indicators, collecting data from national sources,
@@ -18,18 +18,19 @@ meta:
     metadata page in the document on the right. 
   source_name: Food and Agriculture Organization of the United Nations
   source_published_by: Food and Agriculture Organization of the United Nations
-  publication_year: 2022
-  publication_date: '2022-10-28'
-  date_accessed: '2023-02-22'
-  version: '2023-02-22'
+  publication_year: 2023
+  publication_date: '2023-05-23'
+  date_accessed: '2023-06-12'
+  version: '2023-06-12'
   url: http://www.fao.org/faostat/en/#data/SDGB
-  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/SDG_BulkDownloads_E_All_Data_(Normalized).zip
+  source_data_url: 
+    https://fenixservices.fao.org/faostat/static/bulkdownloads/SDG_BulkDownloads_E_All_Data_(Normalized).zip
   file_extension: zip
   license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
   license_name: CC BY-NC-SA 3.0 IGO
   is_public: true
-wdir: ../../../data/snapshots/faostat/2023-02-22
+wdir: ../../../data/snapshots/faostat/2023-06-12
 outs:
-- md5: a6cfeb05401d6da35b9f6a50857cc65b
-  size: 2724656
+- md5: 3e8c6daf9c4ff89bdf38135fb0a47de5
+  size: 3923254
   path: faostat_sdgb.zip
