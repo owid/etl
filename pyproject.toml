@@ -29,8 +29,8 @@ etl-chartgpt = 'etl.chart_revision.v2.chartgpt:cli'
 
 [tool.poetry.dependencies]
 python = "^3.10"
-owid-catalog = {path = "vendor/owid-catalog-py", develop = true}
-walden = {path = "vendor/walden", develop = true}
+owid-catalog = {path = "lib/owid-catalog-py", develop = true}
+walden = {path = "lib/walden", develop = true}
 click = ">=8.0.1"
 PyYAML = ">=5.4.1"
 papermill = ">=2.3.3"

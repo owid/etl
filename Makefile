@@ -30,19 +30,14 @@ docs: .venv
 	poetry run mkdocs serve
 
 watch-all:
-	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
+	poetry run watchmedo shell-command -c 'clear; make unittest; (cd lib/owid-catalog-py && make unittest); (cd lib/walden && make unittest)' --recursive --drop .
 
 test-all: test
-	cd vendor/owid-catalog-py && make test
-	cd vendor/walden && make test
+	cd lib/owid-catalog-py && make test
+	cd lib/walden && make test
 
 watch: .venv
 	poetry run watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
-
-.submodule-init:
-	@echo '==> Initialising submodules'
-	git submodule update --init
-	touch $@
 
 .sanity-check:
 	@echo '==> Checking your Python setup'
@@ -55,7 +50,7 @@ watch: .venv
 	fi
 	touch .sanity-check
 
-.venv: .sanity-check pyproject.toml poetry.toml poetry.lock .submodule-init
+.venv: .sanity-check pyproject.toml poetry.toml poetry.lock
 	@echo '==> Installing packages'
 	poetry install || poetry install
 	touch $@
