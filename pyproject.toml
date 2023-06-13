@@ -29,8 +29,8 @@ etl-chartgpt = 'etl.chart_revision.v2.chartgpt:cli'
 
 [tool.poetry.dependencies]
 python = "^3.10"
-owid-catalog = {path = "vendor/owid-catalog-py", develop = true}
-walden = {path = "vendor/walden", develop = true}
+owid-catalog = {path = "lib/catalog", develop = true}
+walden = {path = "lib/walden", develop = true}
 click = ">=8.0.1"
 PyYAML = ">=5.4.1"
 papermill = ">=2.3.3"
@@ -52,7 +52,7 @@ pydantic = ">=1.9.0"
 structlog = ">=21.5.0"
 sqlmodel = "^0.0.6"
 rich = ">=12.1.0"
-owid-datautils = {git = "https://github.com/owid/owid-datautils-py.git", tag = "v0.5.2-alpha"}
+owid-datautils = {path = "lib/datautils", develop = true}
 rich-click = ">=1.5.1"
 tenacity = ">=8.0.1"
 simplejson = ">=3.17.6"
@@ -61,7 +61,7 @@ xlrd = ">=2.0.1"
 PyPDF2 = ">=2.11.1"
 dvc = {extras = ["s3"], version = ">=2.56.0"}
 "ruamel.yaml" = ">=0.17.21"
-owid-repack = "^0.1.2"
+owid-repack = {path = "lib/repack", develop = true}
 mkdocs-jupyter = "^0.22.0"
 gitpython = "^3.1.30"
 rapidfuzz = "^2.13.7"

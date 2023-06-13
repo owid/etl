@@ -8,6 +8,7 @@ include default.mk
 
 SRC = etl snapshots backport walkthrough fasttrack tests
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
+LIBS = lib/*
 
 help:
 	@echo 'Available commands:'
@@ -30,19 +31,18 @@ docs: .venv
 	poetry run mkdocs serve
 
 watch-all:
-	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
+	poetry run watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .
 
-test-all: test
-	cd vendor/owid-catalog-py && make test
-	cd vendor/walden && make test
+test-all:
+	@echo '================ etl ================='
+	@make test
+	@for lib in $(LIBS); do \
+		echo "================ $$lib ================="; \
+		(cd $$lib && make test); \
+	done
 
 watch: .venv
 	poetry run watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
-
-.submodule-init:
-	@echo '==> Initialising submodules'
-	git submodule update --init
-	touch $@
 
 .sanity-check:
 	@echo '==> Checking your Python setup'
@@ -55,7 +55,7 @@ watch: .venv
 	fi
 	touch .sanity-check
 
-.venv: .sanity-check pyproject.toml poetry.toml poetry.lock .submodule-init
+.venv: .sanity-check pyproject.toml poetry.toml poetry.lock
 	@echo '==> Installing packages'
 	poetry install || poetry install
 	touch $@
