@@ -32,6 +32,10 @@ steps:
     - snapshot://war/2023-03-14/ucdp.non_state.zip
     - snapshot://war/2023-03-14/ucdp.battle_related_conflict.zip
     - snapshot://war/2023-03-14/ucdp.battle_related_dyadic.zip
+  data://meadow/war/2023-06-09/war_mars:
+    - snapshot://war/2023-06-09/war_mars.xls
+  data://meadow/war/2023-06-09/cow_mid:
+    - snapshot://war/2023-06-09/cow_mid.zip
   # Garden
   data://garden/war/2023-01-18/bouthoul_carrere_1978:
     - data://meadow/war/2023-01-10/bouthoul_carrere_1978
