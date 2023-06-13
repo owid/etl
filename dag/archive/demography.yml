@@ -12,3 +12,9 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
     - data://garden/hmd/2022-11-04/life_tables
     - data://garden/owid/latest/key_indicators
+  # Population density
+  data://garden/demography/2023-04-14/population_density:
+    - data://garden/demography/2023-03-31/population
+    - data://garden/faostat/2023-02-22/faostat_rl
+  data://grapher/demography/2023-04-14/population_density:
+    - data://garden/demography/2023-04-14/population_density
