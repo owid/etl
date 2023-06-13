@@ -4052,7 +4052,7 @@ Unidecode = ">=1.3.4"
 
 [package.source]
 type = "directory"
-url = "lib/owid-catalog-py"
+url = "lib/catalog"
 
 [[package]]
 name = "owid-datautils"
@@ -4076,7 +4076,7 @@ structlog = ">=21.5.0"
 
 [package.source]
 type = "directory"
-url = "lib/owid-datautils-py"
+url = "lib/datautils"
 
 [[package]]
 name = "owid-repack"
@@ -4093,7 +4093,7 @@ pandas = ">=1.5.2"
 
 [package.source]
 type = "directory"
-url = "lib/owid-repack-py"
+url = "lib/repack"
 
 [[package]]
 name = "packaging"
@@ -6659,7 +6659,7 @@ click = ">=8.0.1"
 dataclasses-json = ">=0.5.4"
 jsonschema = ">=3.2.0"
 openpyxl = ">=3.0.9"
-owid-datautils = {path = "../owid-datautils-py", develop = true}
+owid-datautils = {path = "../datautils", develop = true}
 owid-repack = ">=0.1.1"
 pandas = ">=1.3.4"
 pyrsistent = ">=0.19.1"
@@ -7041,4 +7041,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "44db753f05aa92dd41449ea1a89099279054b00a722b9a3424ffebe0f3e17a84"
+content-hash = "7aa4c525ce9e49ba8934d79f5d8e42653727daf2f3eab3e68a79c3dacc11d74b"

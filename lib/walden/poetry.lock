@@ -1831,7 +1831,7 @@ structlog = ">=21.5.0"
 
 [package.source]
 type = "directory"
-url = "../owid-datautils-py"
+url = "../datautils"
 
 [[package]]
 name = "owid-repack"
@@ -3153,4 +3153,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "ce57064ad8c2efe28b6ee7a2f860b425c8370086d1a834f7d556a7eaabde3699"
+content-hash = "98217db87918327160b2319827c82527cd98793155595a0521c29f72cbf87e7e"
