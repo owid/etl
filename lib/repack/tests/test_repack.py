@@ -3,9 +3,8 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import pytest
-from pandas.testing import assert_frame_equal
-
 from owid import repack
+from pandas.testing import assert_frame_equal
 
 
 def test_repack_non_object_columns():
