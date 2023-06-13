@@ -97,11 +97,7 @@ def _load_country_data():
     country_all = pd.merge(country_almost, report_select, on=["iso3c", "date"], how="outer")
 
     # the most recent date can have null known_excess_deaths, fill them with False
-    is_last_date = country_all.date == country_all.date.max()
-    country_all.loc[is_last_date, "known_excess_deaths"] = country_all.loc[is_last_date, "known_excess_deaths"].fillna(
-        False
-    )
-    assert country_all["known_excess_deaths"].notnull().all(), "Some known_excess_deaths are null"
+    country_all["known_excess_deaths"] = country_all["known_excess_deaths"].fillna(False)
 
     return country_all
 
