@@ -428,7 +428,7 @@ def harmonize_countries(
         show_full_warning=show_full_warning,
     )
 
-    return df_harmonized
+    return df_harmonized  # type: ignore
 
 
 def add_population_to_dataframe(
