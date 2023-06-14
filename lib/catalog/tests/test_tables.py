@@ -14,7 +14,7 @@ import pytest
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
 from owid.catalog.tables import SCHEMA, Table
-from owid.catalog.variables import Variable
+from owid.catalog.variables import UPDATE_PROCESSING_LOG, Variable
 
 from .mocking import mock
 
@@ -296,7 +296,11 @@ def test_copy_metadata_from() -> None:
 def test_addition_without_metadata() -> None:
     t: Table = Table({"a": [1, 2], "b": [3, 4]})
     t["c"] = t["a"] + t["b"]
-    assert t.c.metadata == VariableMeta()
+    if UPDATE_PROCESSING_LOG:
+        expected_metadata = VariableMeta(processing_log=[{"variable": "c", "parents": ["a", "b"], "operation": "+"}])
+    else:
+        expected_metadata = VariableMeta()
+    assert t.c.metadata == expected_metadata
 
 
 def test_addition_with_metadata() -> None:
@@ -306,8 +310,11 @@ def test_addition_with_metadata() -> None:
 
     t["c"] = t["a"] + t["b"]
 
-    # addition should not inherit metadata
-    assert t.c.metadata == VariableMeta()
+    if UPDATE_PROCESSING_LOG:
+        expected_metadata = VariableMeta(processing_log=[{"variable": "c", "parents": ["a", "b"], "operation": "+"}])
+    else:
+        expected_metadata = VariableMeta()
+    assert t.c.metadata == expected_metadata
 
     t.c.metadata.title = "C"
 
@@ -324,7 +331,19 @@ def test_addition_same_variable() -> None:
 
     t["a"] = t["a"] + t["b"]
 
-    # addition shouldn't change the metadata of the original columns
+    # Now variable "a" has a different meaning, so the title should not be preserved (but "b"'s title should).
+    assert t.a.metadata.title is None
+    assert t.b.metadata.title == "B"
+
+
+def test_addition_of_scalar() -> None:
+    t: Table = Table({"a": [1, 2], "b": [3, 4]})
+    t.a.metadata.title = "A"
+    t.b.metadata.title = "B"
+
+    t["a"] = t["a"] + 1
+
+    # Adding a scalar should not affect the variable's metadata (except the processing log).
     assert t.a.metadata.title == "A"
     assert t.b.metadata.title == "B"
 
