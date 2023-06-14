@@ -105,8 +105,12 @@ def is_catalog_up_to_date(s3: Any, bucket: str, catalog: Path, channel: CHANNEL)
     return remote == local
 
 
-def sync_datasets(s3: Any, bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False) -> None:
-    "Go dataset by dataset and check if each one needs updating."
+def sync_datasets(
+    s3: Any, bucket: str, catalog: Path, channel: CHANNEL, delete_datasets: bool = False, dry_run: bool = False
+) -> None:
+    """Go dataset by dataset and check if each one needs updating.
+    :param delete_datasets: if True, delete datasets from S3 that are not in the local catalog
+    """
     existing = get_published_checksums(bucket, channel)
 
     to_delete = set(existing)
@@ -129,11 +133,12 @@ def sync_datasets(s3: Any, bucket: str, catalog: Path, channel: CHANNEL, dry_run
         if not dry_run:
             sync_folder(s3, bucket, catalog, catalog / path, path, public=ds.metadata.is_public)
 
-    print("Datasets to delete:")
-    for path in to_delete:
-        print("-", path)
-        if not dry_run:
-            delete_dataset(s3, bucket, path)
+    if delete_datasets:
+        print("Datasets to delete:")
+        for path in to_delete:
+            print("-", path)
+            if not dry_run:
+                delete_dataset(s3, bucket, path)
 
 
 def sync_folder(
