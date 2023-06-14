@@ -84,7 +84,13 @@ steps:
   data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
     - data://meadow/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
   data://grapher/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
-  - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
+    - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
+  # DALYs vs Prevalence
+  data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world:
+    - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
+    - data://garden/ihme_gbd/2019/gbd_cause
+  data://grapher/ihme_gbd/2023-06-14/prevalence_dalys_world:
+    - data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world
 
   # Temporary additional to add Drug Disorders to grapher
   data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders:
