@@ -1,6 +1,0 @@
-[submodule "vendor/owid-catalog-py"]
-	path = vendor/owid-catalog-py
-	url = https://github.com/owid/owid-catalog-py
-[submodule "vendor/walden"]
-	path = vendor/walden
-	url = https://github.com/owid/walden

@@ -1,0 +1,61 @@
+[tool.poetry]
+name = "owid-datautils"
+version = "0.5.2"
+description = "Data utils library by the Data Team at Our World in Data"
+authors = ["Our World In Data <tech@ourworldindata.org>"]
+license = "MIT"
+packages = [{ include = "owid" }]
+readme = "README.md"
+repository = "https://github.com/owid/owid-datautils-py"
+homepage = "https://github.com/owid/owid-datautils-py"
+keywords = [
+    "our world in data",
+    "data cleaning",
+    "data processing",
+    "data processing",
+    "data utils",
+]
+
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pandas = ">=1.3.3"
+boto3 = ">=1.21.16"
+structlog = ">=21.5.0"
+colorama = ">=0.4.4"
+mypy-boto3-s3 = ">=1.21.23"
+owid-catalog = ">=0.3.4"
+gdown = ">=4.5.2"
+gsheets = ">=0.6.1"
+pydrive2 = ">=1.15.0"
+
+
+[tool.poetry.dev-dependencies]
+pytest = ">=6.2.5"
+pytest-cov = ">=2.12.1"
+black = ">=22.3"
+mypy = ">=0.981"
+flake8 = ">=3.9.2"
+flake8-docstrings = ">=1.6.0"
+flake8-html = ">=0.4.2"
+flake8-bugbear = ">=22.4.25"
+flake8-builtins = ">=1.5.3"
+flake8-bandit = ">=3.0.0"
+flake8-type-annotations = ">=0.1.0"
+Sphinx = "4.5.0"
+furo = ">=2022.4.7"
+bumpversion = ">=0.6.0"
+watchdog = ">=2.1.5"
+boto3-stubs = { extras = ["s3"], version = ">=1.21.16" }
+ipdb = ">=0.13.9"
+ipykernel = ">=6.13.0"
+flake8-rst-docstrings = ">=0.2.6"
+jupyter = ">=1.0.0"
+openpyxl = ">=3.0.10"
+lxml = ">=4.9.1"
+jupyterlab = ">=3.4.8"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

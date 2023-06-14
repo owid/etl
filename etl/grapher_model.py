@@ -676,8 +676,17 @@ class SuggestedChartRevisions(SQLModel, table=True):
     users_: Optional["User"] = Relationship(back_populates="suggested_chart_revisions_")
 
     @classmethod
-    def load_pending(cls, session: Session):
-        return session.exec(select(SuggestedChartRevisions).where(SuggestedChartRevisions.status == "pending")).all()
+    def load_pending(cls, session: Session, user_id: Optional[int] = None):
+        if user_id is None:
+            return session.exec(
+                select(SuggestedChartRevisions).where((SuggestedChartRevisions.status == "pending"))
+            ).all()
+        else:
+            return session.exec(
+                select(SuggestedChartRevisions)
+                .where(SuggestedChartRevisions.status == "pending")
+                .where(SuggestedChartRevisions.createdBy == user_id)
+            ).all()
 
 
 class DimensionFilter(TypedDict):
@@ -852,6 +861,10 @@ class Variable(SQLModel, table=True):
     @classmethod
     def load_variable(cls, session: Session, variable_id: int) -> "Variable":
         return session.exec(select(cls).where(cls.id == variable_id)).one()
+
+    @classmethod
+    def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
+        return session.exec(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
 
     def s3_data_path(self) -> str:
         """Path to S3 with data in JSON format for Grapher. Typically

@@ -5,10 +5,9 @@ tables:
         title: Country
       year:
         title: Year
-        short_unit: $
       age_group:
         title: Age-group
-      sex: 
+      sex:
         title: Sex
       cause:
         title: Cause
@@ -19,9 +18,9 @@ tables:
       daly_count:
         title: The number of Disability Adjusted Life Yeats (DALYs) lost
         description:  One DALY represents the loss of the equivalent of one year of full health.
-      death_rate100k: 
+      death_rate100k:
         title: Death rate per 100,000 people
         description: The number of deaths per 100,000 people
-      death_count: 
+      death_count:
         title: Deaths
         description: The total number of deaths

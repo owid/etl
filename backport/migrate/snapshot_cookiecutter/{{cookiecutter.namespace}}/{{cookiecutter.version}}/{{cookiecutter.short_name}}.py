@@ -17,15 +17,18 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
     help="Upload dataset to Snapshot",
 )
 def main(upload: bool) -> None:
-    # Load backported snapshot with values.
+    # Load backported snapshot.
     snap_values = Snapshot("backport/latest/{{cookiecutter.backport_short_name}}_values.feather")
     snap_values.pull()
+    snap_config = Snapshot("backport/latest/{{cookiecutter.backport_short_name}}_config.json")
+    snap_config.pull()
 
     # Create snapshot metadata for the new file
     meta = SnapshotMeta(**snap_values.metadata.to_dict())
     meta.namespace = SNAPSHOT_NAMESPACE
     meta.version = SNAPSHOT_VERSION
     meta.short_name = "{{cookiecutter.short_name}}"
+    meta.fill_from_backport_snapshot(snap_config.path)
     meta.save()
 
     # Create a new snapshot.

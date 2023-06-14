@@ -20,30 +20,3 @@ dataset:
     date_accessed: '2023-01-03'
     publication_date: '2022-09-01'
     publication_year: 2022
-tables:
-  who_mort_db:
-    variables:
-      number_of_deaths:
-        title: Number of homicides
-        short_unit: ''
-        unit: 'homicides'
-        display:
-          numDecimalPlaces: 0
-      percentage_of_cause_specific_deaths_out_of_total_deaths:
-        title: Percentage of homicides out of total deaths
-        short_unit: '%'
-        unit: '% of total deaths'
-        display:
-          numDecimalPlaces: 2
-      age_standardized_death_rate_per_100_000_standard_population:
-        title: Age-standardized homicide rate per 100,000 standard population
-        short_unit: ''
-        unit: 'homicides per 100,000 people'
-        display:
-          numDecimalPlaces: 2
-      death_rate_per_100_000_population:
-        title: Homicide rate per 100,000 population
-        short_unit: ''
-        unit: 'homicides per 100,000 people'
-        display:
-          numDecimalPlaces: 2

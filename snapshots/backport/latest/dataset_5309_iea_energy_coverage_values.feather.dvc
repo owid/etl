@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5309_iea_energy_coverage_values
   file_extension: feather
-  date_accessed: 2023-02-23 18:37:16.767836
+  date_accessed: 2023-06-01 15:47:31.346271
   name: IEA Energy Coverage
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fe3465c1a33a5ffc6278f777a04be55a
-  size: 12682
+- md5: 294420e8bc4592a58a5f0963dbe711cb
+  size: 12690
   path: dataset_5309_iea_energy_coverage_values.feather

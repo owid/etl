@@ -1,0 +1,35 @@
+meta:
+  namespace: faostat
+  short_name: faostat_cahd
+  name: 'Cost and Affordability of a Healthy Diet: Cost and Affordability of a Healthy
+    Diet (CoAHD) - FAO (2023)'
+  description: Indicators on the cost and affordability of a healthy diet are estimated
+    in each country and show the population’s physical and economic access to least
+    expensive locally available foods to meet requirements for a healthy diet, as
+    defined in food-based dietary guidelines (FBDGs). The indicators use observed
+    retail food consumer prices and income distributions to provide an operational
+    measure of people’s access to locally available foods in the proportions needed
+    for health. These indicators support efforts within the framework of the Sustainable
+    Development Goals (SDGs) to end hunger, achieve food security and improved nutrition,
+    and promote sustainable agriculture by 2030 (SDG 2). They also support the monitoring
+    of progress towards the objective of transforming agrifood systems by promoting
+    “nutrition-sensitive agriculture”. For definitions of these indicators, see Definitions
+    and standards.
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2023
+  publication_date: '2023-02-06'
+  date_accessed: '2023-06-12'
+  version: '2023-06-12'
+  url: http://www.fao.org/faostat/en/#data/CAHD
+  source_data_url: 
+    https://fenixservices.fao.org/faostat/static/bulkdownloads/Cost_Affordability_Healthy_Diet_(CoAHD)_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-06-12
+outs:
+- md5: 004b51e253faa435734f95ba5013c125
+  size: 33599
+  path: faostat_cahd.zip

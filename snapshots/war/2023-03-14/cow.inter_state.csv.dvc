@@ -1,14 +1,14 @@
 meta:
   namespace: war
   short_name: war_cow
-  name: Inter-State Wars v4.0 (COW War Data, 1816 – 2007)
+  name: "War data: Inter-State Wars v4.0 (COW, 2010)"
   version: 2023-03-14
   publication_year: 2010
   publication_date: 2010-01-27
-  source_name: Brecke
+  source_name: COW (2010)
   source_published_by: 'Sarkees, Meredith Reid and Frank Wayman (2010). Resort to
     War: 1816 – 2007. Washington DC: CQ Press.'
-  url: hthttps://correlatesofwar.org/data-sets/cow-war/
+  url: https://correlatesofwar.org/data-sets/cow-war/
   source_data_url: https://correlatesofwar.org/wp-content/uploads/Inter-StateWarData_v4.0.csv
   file_extension: csv
   license_url:

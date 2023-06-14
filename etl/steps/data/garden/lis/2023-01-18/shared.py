@@ -180,8 +180,10 @@ rel_dict = {40: "40% of dhi median", 50: "50% of dhi median", 60: "60% of dhi me
 # Details for each absolute poverty line
 abs_dict = {
     100: "$1 a day",
+    200: "$2 a day",
     215: "$2.15 a day",
     365: "$3.65 a day",
+    500: "$5 a day",
     685: "$6.85 a day",
     1000: "$10 a day",
     2000: "$20 a day",

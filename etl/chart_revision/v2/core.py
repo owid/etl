@@ -101,6 +101,8 @@ def build_updaters_and_get_charts(
     charts: Optional[List[gm.Chart]] = None,
     chatgpt_reviews: bool = False,
     fastt_reduce: bool = True,
+    schema_chart_config: Optional[Dict[str, Any]] = None,
+    skip_slider_check_limit: Optional[int] = None,
 ) -> Tuple[List[ChartUpdater], List[gm.Chart]]:
     """Build the list of updaters to process charts.
 
@@ -122,6 +124,11 @@ def build_updaters_and_get_charts(
         [NOT IMPLEMENTED] Set to True if you want to use ChatGPT to suggest revisions for the charts (e.g. subtitle revisions, etc.). Defaults to False.
     fastt_reduce : bool, optional
         Set to True if you want to simplify the FASTT. At the moment it just removes the field "data". Defaults to True.
+    schema : Optional[Dict[str, Any]]
+            Schema of the chart configuration. Defaults to None.
+    skip_slider_check_limit : int
+        If the number of variables to be updated is greater than this value, the slider range check is disabled. That is, no changes to the slider are performed.
+        This is to avoid errors when updating charts with many variables. Defaults to None.
 
     Returns
     -------
@@ -133,7 +140,11 @@ def build_updaters_and_get_charts(
     updaters = []
     # If variable mapping is given, get list of charts to be updated
     if variable_mapping is not None:
-        updater_from_variables = ChartVariableUpdater(variable_mapping)
+        updater_from_variables = ChartVariableUpdater(
+            variable_mapping,
+            schema=schema_chart_config,
+            skip_slider_check_limit=skip_slider_check_limit,
+        )
         # Get list of charts affected
         charts = updater_from_variables.find_charts_to_be_updated()
         # Add updater to list
@@ -225,6 +236,7 @@ def submit_chart_comparisons(revisions: List[gm.SuggestedChartRevisions]) -> Non
     revisions : List[gm.SuggestedChartRevisions]
         Chart revisions.
     """
+    log.info("chart_revision: submitting revisions to the database...")
     with Session(get_engine()) as session:
         session.bulk_save_objects(revisions)
         session.commit()

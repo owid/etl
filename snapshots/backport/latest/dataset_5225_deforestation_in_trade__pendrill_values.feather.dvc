@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5225_deforestation_in_trade__pendrill_values
   file_extension: feather
-  date_accessed: 2023-02-23 18:05:07.569280
+  date_accessed: 2023-06-01 15:06:31.809341
   name: Deforestation in trade (Pendrill)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: eea0101eeed59a98624d1086a384ef7f
-  size: 140290
+- md5: 967b5b30576e85a2837d315c8f3b781e
+  size: 140282
   path: dataset_5225_deforestation_in_trade__pendrill_values.feather

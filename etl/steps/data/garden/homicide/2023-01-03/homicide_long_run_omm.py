@@ -60,8 +60,11 @@ def get_who_mortality_db() -> pd.DataFrame:
 
     ds_who_db: catalog.Dataset = paths.load_dependency("who_mort_db")
     df_who = ds_who_db["who_mort_db"].reset_index()
-    df_who = pd.DataFrame(df_who[["country", "year", "death_rate_per_100_000_population"]])
-    df_who = df_who.dropna(subset="death_rate_per_100_000_population")
+    df_who = pd.DataFrame(df_who[["country", "year", "death_rate_per_100_000_population_both_sexes_all_ages"]])
+    df_who = df_who.dropna(subset="death_rate_per_100_000_population_both_sexes_all_ages")
+    df_who = df_who.rename(
+        columns={"death_rate_per_100_000_population_both_sexes_all_ages": "death_rate_per_100_000_population"}
+    )
     df_who["source"] = "WHO"
     return df_who
 
@@ -72,16 +75,17 @@ def get_unodc() -> pd.DataFrame:
     """
 
     ds_unodc: catalog.Dataset = paths.load_dependency("unodc")
-    df_unodc = ds_unodc["unodc"]
-    df_unodc = pd.DataFrame(df_unodc[["country", "year", "rate_per_100_000_population"]])
-    df_unodc = df_unodc.dropna(subset="rate_per_100_000_population")
-    df_unodc = df_unodc.rename(columns={"rate_per_100_000_population": "death_rate_per_100_000_population"})
+    df_unodc = ds_unodc["total"]
+    df_unodc = pd.DataFrame(df_unodc["rate_per_100_000_population_both_sexes_all_ages"]).reset_index()
+    df_unodc = df_unodc.dropna(subset="rate_per_100_000_population_both_sexes_all_ages")
+    df_unodc = df_unodc.rename(
+        columns={"rate_per_100_000_population_both_sexes_all_ages": "death_rate_per_100_000_population"}
+    )
     df_unodc["source"] = "UNODC"
     return df_unodc
 
 
 def combine_datasets(eisner: pd.DataFrame, recent_df: pd.DataFrame) -> pd.DataFrame:
-
     # Combine the Eisner dataset with a more recent dataset
     df_combined = pd.merge(
         eisner, recent_df, how="outer", on=["country", "year", "death_rate_per_100_000_population", "source"]

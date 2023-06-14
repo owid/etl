@@ -1,4 +1,5 @@
 import datetime as dt
+import json
 import re
 import shutil
 from contextlib import contextmanager
@@ -55,10 +56,10 @@ class Snapshot:
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
-    def pull(self) -> None:
+    def pull(self, force=True) -> None:
         """Pull file from S3."""
         with _unignore_backports(self.path):
-            dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private")
+            dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -217,6 +218,29 @@ class SnapshotMeta:
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> "SnapshotMeta":
         ...
+
+    def fill_from_backport_snapshot(self, snap_config_path: Path) -> None:
+        """Load metadat from backported snapshot.
+
+        Usage:
+            snap_config = Snapshot(
+                "backport/latest/dataset_3222_wheat_prices__long_run__in_england__makridakis_et_al__1997_config.json"
+            )
+            snap_config.pull()
+            meta.fill_from_backport_snapshot(snap_config.path)
+        """
+        with open(snap_config_path) as f:
+            js = json.load(f)
+
+        # NOTE: this is similar to `convert_grapher_source`, DRY it when possible
+        assert len(js["sources"]) == 1
+        s = js["sources"][0]
+        self.name = js["dataset"]["name"]
+        self.source_name = s["name"]
+        self.description = s["description"].get("additionalInfo")
+        self.url = s["description"].get("link")
+        self.date_accessed = pd.to_datetime(s["description"].get("retrievedDate")).date()
+        self.source_published_by = s["description"].get("dataPublishedBy")
 
 
 def add_snapshot(

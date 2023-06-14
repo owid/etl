@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_580_land_under_cereal_production_index__world_bank__2017_values
   file_extension: feather
-  date_accessed: 2023-02-23 19:30:47.308360
+  date_accessed: 2023-06-01 12:58:07.496129
   name: Land under cereal production index - World Bank (2017)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5046c67b4e427bcfb637d7aa59703406
-  size: 44362
+- md5: b066f55ddffdf24d53e0389917bf525c
+  size: 44370
   path: dataset_580_land_under_cereal_production_index__world_bank__2017_values.feather

@@ -1,9 +1,11 @@
 meta:
   namespace: backport
-  short_name: dataset_2762_cross_country_literacy_rates__world_bank__cia_world_factbook__and_other_sources_config
+  short_name: 
+    dataset_2762_cross_country_literacy_rates__world_bank__cia_world_factbook__and_other_sources_config
   file_extension: json
-  date_accessed: 2023-02-23 19:38:37.204113
-  name: Grapher metadata for dataset_2762_cross_country_literacy_rates__world_bank__cia_world_factbook__and_other_sources
+  date_accessed: 2023-06-01 13:13:11.877173
+  name: Grapher metadata for 
+    dataset_2762_cross_country_literacy_rates__world_bank__cia_world_factbook__and_other_sources
   description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2762
@@ -13,6 +15,7 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 39ca62955823ca693a169ec485f4ea91
+- md5: ccfa45e34b9a01840b8bca390bf04ccc
   size: 4719
-  path: dataset_2762_cross_country_literacy_rates__world_bank__cia_world_factbook__and_other_sources_config.json
+  path: 
+    dataset_2762_cross_country_literacy_rates__world_bank__cia_world_factbook__and_other_sources_config.json

@@ -85,6 +85,13 @@ def sample_from_dataframe(df: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
     return cast(pd.DataFrame, df.sample(**kwargs).sort_index())
 
 
+def align_categoricals(s1: pd.Series, s2: pd.Series) -> tuple[pd.Series, pd.Series]:
+    uc = union_categoricals([s1, s2])
+    s1 = pd.Series(pd.Categorical(s1.values, categories=uc.categories), index=s1.index)
+    s2 = pd.Series(pd.Categorical(s2.values, categories=uc.categories), index=s2.index)
+    return s1, s2
+
+
 def series_equals(
     s1: pd.Series,
     s2: pd.Series,
@@ -97,9 +104,7 @@ def series_equals(
 
     # Union categories of categorical columns to enable comparison
     if s1.dtype == "category":
-        uc = union_categoricals([s1, s2])
-        s1 = pd.Series(pd.Categorical(s1.values, categories=uc.categories), index=s1.index)
-        s2 = pd.Series(pd.Categorical(s2.values, categories=uc.categories), index=s2.index)
+        s1, s2 = align_categoricals(s1, s2)
 
     # Eq above does not take tolerance into account so compare again with tolerance
     # for columns that are numeric. this could probably be sped up with a check on any on

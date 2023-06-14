@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple, cast
 import pandas as pd
 from pydantic import BaseModel
 
-from etl.grapher_import import INT_TYPES
+from etl.grapher_helpers import INT_TYPES
 
 from .yaml_meta import YAMLMeta
 

@@ -103,6 +103,7 @@ fbsc_bulk.head()
 # - `2556 Groundnuts (Shelled Eq)` --> `2552 Groundnuts`
 # - `2805 Rice (Milled Equivalent)` --> `2807 Rice and products`
 
+
 # %%
 def group_item_codes(
     df: pd.DataFrame, ids_old: List[int], ids_new: List[int], assign_to_old: List[bool]
@@ -146,6 +147,7 @@ fbsc_bulk = group_item_codes(fbsc_bulk, ids_old=[2556, 2805], ids_new=[2552, 280
 #
 #
 # The following cell examines how many datapoints would be removed if we did _flag-prioritisation_. As per the output, we see that we would eliminate 30,688 rows (~1% of the data).
+
 
 # %%
 def check_flags_1(df: pd.DataFrame) -> None:
@@ -241,6 +243,7 @@ print(fbsc_bulk.shape)
 #
 # **Note: This step uses file `PATH_MAP_ELEM`, which is a file that was generated using the code in a later cell.**
 
+
 # %%
 # Where do each element appear?
 def get_stats_elements(df: pd.DataFrame) -> pd.DataFrame:
@@ -264,6 +267,7 @@ get_stats_elements(fbsc_bulk)
 # This step is simple and brief. It attempts to pivot the dataset in order to have three identifying columns (i.e. "keys") and several "value" columns based on the `element_code` and `Value` columns.
 #
 # This format is more Grapher/Explorer friendly, as it clearly divides the dataset columns into: Entities, year, [Values].
+
 
 # %%
 def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
@@ -301,6 +305,7 @@ print("FBSC:", fbsc_bulk.shape)
 # Load table from dataset containing Element information
 qcl_elem = qcl_garden["meta_qcl_element"]
 fbsc_elem = fbsc_garden["meta_fbs_element"]
+
 
 # %%
 def get_elements_to_standardize(df: pd.DataFrame, df_elem: pd.DataFrame) -> pd.DataFrame:
@@ -364,6 +369,7 @@ qcl_item.head()
 # - We first create two separate dictionaries, mapping `item_group_code --> item_group` and `item_code --> Item`, respectively.
 # - We note, however, that some codes appear both as "Items" and "item_groups". This might be due to the fact that there are more than one level of items. That is, an Item can "belong" to an item_group, which in turn belongs to yet a higher up item_group. Therefore, we remove these codes from the item dictionary so they only appear in the item_group dictionary.
 # - Next, we create a table with all items, their occurrences, whether they are item_groups, and their FAO original namings.
+
 
 # %%
 def get_items_to_standardize(df: pd.DataFrame, df_item: pd.DataFrame) -> pd.DataFrame:
@@ -533,6 +539,7 @@ assert (
 # %% [markdown]
 # Next, we filter out items that we are not interested in and add a new column (`product`) with the standardised item names.
 
+
 # %%
 def standardise_product_names(df: pd.DataFrame) -> pd.DataFrame:
     df = df.reset_index()
@@ -612,7 +619,7 @@ gapminder_country_codes = {
     "ussr": "USSR",
     "cheslo": "Czechoslovakia",
     "yug": "Yugoslavia",
-    "eri_a_eth": "Eritrea and Ethiopia",
+    "eri_a_eth": "Ethiopia (former)",
     "scg": "Serbia and Montenegro",
 }
 former_states = list(gapminder_country_codes.values())
@@ -667,7 +674,7 @@ former_to_current = {
         "Montenegro",
     ],
     "Czechoslovakia": ["Czechia", "Slovakia"],
-    "Eritrea and Ethiopia": ["Ethiopia", "Eritrea"],
+    "Ethiopia (former)": ["Ethiopia", "Eritrea"],
     "Serbia and Montenegro": ["Serbia", "Montenegro"],
     "Sudan (former)": ["Sudan", "South Sudan"],
 }
@@ -771,7 +778,7 @@ country2continent["Sudan (former)"] = "Africa"
 country2income = {
     **country2income,
     "Czechoslovakia": "High-income countries",
-    "Eritrea and Ethiopia": "Low-income countries",
+    "Ethiopia (former)": "Low-income countries",
     "Serbia and Montenegro": "Upper-middle-income countries",
     "Yugoslavia": "Upper-middle-income countries",
     "USSR": "Upper-middle-income countries",
@@ -789,6 +796,7 @@ fe_bulk = fe_bulk.loc[~fe_bulk.country.isin(regions_all)].reset_index(drop=True)
 # %% [markdown]
 # #### Function and variables to get metrics for regions
 # Definition of functions recurrently needed and some variables
+
 
 # %%
 def get_df_regions(
@@ -946,6 +954,7 @@ fe_bulk_melted_regions = fe_bulk_melted[msk]
 
 # %% [markdown]
 # Next, we build a dataframe `x` which contains the _population difference_ for each region given a product, metric and year.
+
 
 # %%
 def build_df(x: pd.DataFrame, ncountries: bool = True) -> pd.DataFrame:
@@ -1209,6 +1218,7 @@ patch = {
 }
 element_metadata["name_std"] = element_metadata["name_std"].replace(patch)
 
+
 # %%
 # Fill 'easy' fields
 def _get_source_ids(dataset_code: str) -> List[int]:
@@ -1305,6 +1315,7 @@ table_bulk._fields = fields
 # %% [markdown]
 # To work in an explorer, we need to add the table in CSV format. To make it more scalable for use, we want
 # to split that dataset into many small files, one per product.
+
 
 # %%
 def to_short_name(raw: str) -> str:

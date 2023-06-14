@@ -333,6 +333,121 @@ tables:
           numDecimalPlaces: 1
         sources:
           - *source-epr
+      lpop_headcount:
+        title: Population ethnically relevant
+        description:
+          - Sum of the ethnically relevant population in this country.<br>
+          - *description_ethnic_group
+          - *description_group_relevance
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population ethnically relevant
+          numDecimalPlaces: 0
+      egippop_headcount:
+        title: Population in ethnic groups in power (EGIP)
+        description:
+          - Population of all EGIP groups in this country.<br>
+          - *description_ethnic_group
+          - *description_egip
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population in EGIP groups
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      exclpop_headcount:
+        title: Population in marginalized ethnic groups (MEG)
+        description:
+          - Population of all MEG groups in this country.<br>
+          - *description_ethnic_group
+          - *description_meg
+        unit: ""
+        short_unit: ""
+        display:
+          name: Share of population in MEG groups
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      restpop_headcount:
+        title: Population not belonging to an ethnically relevant group
+        description:
+          - Population that is not part of an ethnic group in power (EGIP) or a marginalized ethnic group (MEG).<br>
+          - *description_ethnic_group
+          - *description_egip
+          - *description_meg
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population not belonging to an ethnically relevant group
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      discrimpop_headcount:
+        title: Population discriminated
+        description:
+          - Discriminated population in this country.<br>
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population discriminated
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      maxexclpop_headcount:
+        title: Population of the largest marginalized ethnic group (MEG)
+        description:
+          - Size of the largest MEG group in this country.<br>
+          - *description_ethnic_group
+          - *description_meg
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population of the largest MEG group
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      regautpop_headcount:
+        title: Population with regional autonomy
+        description:
+          - Sum of population with regional autonomy in this country.<br>
+          - *description_autonomy
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population with regional autonomy
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      regautexclpop_headcount:
+        title: Population with regional autonomy and in a marginalized ethnic group (MEG)
+        description:
+          - Sum of population with regional autonomy and excluded (MEG) in this country.<br>
+          - *description_ethnic_group
+          - *description_meg
+          - *description_autonomy
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population with regional autonomy and in a MEG group
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      regautegippop_headcount:
+        title: Population with regional autonomy and in an ethnic group in power (EGIP)
+        description:
+          - Sum of population with regional autonomy and included (EGIP) in this country<br>
+          - *description_ethnic_group
+          - *description_egip
+          - *description_autonomy
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population with regional autonomy and in an EGIP group
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
       cntr_relevance:
         title: Relevance
         description:

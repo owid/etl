@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5535_sipri_military_expenditure_database_config
   file_extension: json
-  date_accessed: 2023-02-23 18:41:05.825698
+  date_accessed: 2023-06-01 15:31:45.982833
   name: Grapher metadata for dataset_5535_sipri_military_expenditure_database
   description: https://github.com/owid/importers/tree/master/sipri
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e841ff7419b227bc8713f1ffcfa5afa0
+- md5: 16294d6e9a18b4e183e2323c91e58ba5
   size: 3952
   path: dataset_5535_sipri_military_expenditure_database_config.json

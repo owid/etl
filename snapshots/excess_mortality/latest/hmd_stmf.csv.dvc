@@ -2,7 +2,7 @@ meta:
   namespace: excess_mortality
   short_name: hmd_stmf
   file_extension: csv
-  date_accessed: 2023-04-24
+  date_accessed: 2023-06-13
   name: Short-Term Mortality Fluctuations (HMD, 2023)
   description: |-
     In response to the COVID-19 pandemic, the HMD team decided to establish a new data resource: Short-term Mortality Fluctuations (STMF) data series. Objective and internationally comparable data are crucial to determine the effectiveness of different strategies used to address epidemics. Weekly death counts provide the most objective and comparable way of assessing the scale of short-term mortality elevations across countries and time. More details about this data project can be found in the recently published paper (https://www.nature.com/articles/s41597-021-01019-1).
@@ -25,9 +25,9 @@ meta:
   is_public: true
   version: latest
   publication_year: 2023
-  publication_date: 2023-04-21
+  publication_date: 2023-06-07
 wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: 668609e3d23fb014e97dec09d0942778
-  size: 19741709
+- md5: e6f660b068065e948ed92b4fa9cc5737
+  size: 19860074
   path: hmd_stmf.csv

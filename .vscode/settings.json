@@ -1,11 +1,27 @@
 {
-    "esbonio.sphinx.confDir": "",
-    "files.associations": {
-        "*.dvc": "yaml"
+  "esbonio.sphinx.confDir": "",
+  "files.associations": {
+    "*.dvc": "yaml"
+  },
+  "files.trimTrailingWhitespace": true,
+  "yaml.schemas": {
+    "schemas/snapshot-schema.json": "**/*.dvc",
+    "schemas/dataset-schema.json": "**/*.meta.yml"
+  },
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
     },
-    "files.trimTrailingWhitespace": true,
-    "yaml.schemas": {
-        "schemas/snapshot-schema.json": "**/*.dvc",
-        "schemas/dataset-schema.json": "**/*.meta.yml"
-    }
+    "editor.formatOnType": true,
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "isort.args": ["--profile", "black"],
+  "python.linting.flake8Enabled": true,
+  "python.linting.enabled": true,
+  "python.linting.ignorePatterns": [
+    "**/site-packages/**/*.py",
+    ".vscode/*.py",
+    "**/*.ipynb"
+  ]
 }

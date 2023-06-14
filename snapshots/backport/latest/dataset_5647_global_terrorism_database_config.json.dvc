@@ -2,9 +2,10 @@ meta:
   namespace: backport
   short_name: dataset_5647_global_terrorism_database_config
   file_extension: json
-  date_accessed: 2023-03-14 10:19:30.851718
+  date_accessed: 2023-06-01 14:59:12.325876
   name: Grapher metadata for dataset_5647_global_terrorism_database
-  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/global_terrorism_database
+  description: 
+    https://github.com/owid/notebooks/tree/main/EdouardMathieu/global_terrorism_database
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5647
   source_published_by: Our World in Data catalog backport
@@ -13,6 +14,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a8dbdb1953ae9fb7eb48e17369f24feb
+- md5: 403ff4d132c73b41096373660d7fe306
   size: 7379
   path: dataset_5647_global_terrorism_database_config.json

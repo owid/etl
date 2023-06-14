@@ -36,3 +36,28 @@ steps:
     - snapshot://papers/2023-04-21/brassley_2000.csv
   data://garden/papers/2023-04-21/brassley_2000:
     - data://meadow/papers/2023-04-21/brassley_2000
+  #
+  # Wuepper et al. (2020). Data on crop yields and nitrogen pollution.
+  #
+  data://meadow/papers/2023-05-26/wuepper_et_al_2020:
+    - snapshot://papers/2023-05-26/wuepper_et_al_2020.xlsx
+  data://garden/papers/2023-05-26/wuepper_et_al_2020:
+    - data://meadow/papers/2023-05-26/wuepper_et_al_2020
+  data://grapher/papers/2023-05-26/wuepper_et_al_2020:
+    - data://garden/papers/2023-05-26/wuepper_et_al_2020
+  #
+  # Ray et al. (2019). Climate impact on crop yields.
+  #
+  data://meadow/papers/2023-05-26/ray_et_al_2019:
+    - snapshot://papers/2023-05-26/ray_et_al_2019.xlsx
+  data://garden/papers/2023-05-26/ray_et_al_2019:
+    - data://meadow/papers/2023-05-26/ray_et_al_2019
+  data://grapher/papers/2023-05-26/ray_et_al_2019:
+    - data://garden/papers/2023-05-26/ray_et_al_2019
+  #
+  # Mueller et al. (2012). Attainable yields.
+  #
+  data://meadow/papers/2023-05-26/mueller_et_al_2012:
+    - snapshot://papers/2023-05-26/mueller_et_al_2012.xls
+  data://garden/papers/2023-05-26/mueller_et_al_2012:
+    - data://meadow/papers/2023-05-26/mueller_et_al_2012

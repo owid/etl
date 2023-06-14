@@ -22,9 +22,15 @@ def get_schema_chart_config() -> Dict[str, Any]:
     Dict[str, Any]
         Schema of a chart configuration.
     """
+    # import json
+    # path = "~/repos/owid-grapher/packages/@ourworldindata/grapher/src/schema"
+    # path = f"{path}/grapher-schema.{SCHEMA_VERSION}.json"
+    # print(path)
+    # with open(path, "r") as f:
+    #     return json.load(f)
     return requests.get(
         f"https://files.ourworldindata.org/schemas/grapher-schema.{SCHEMA_VERSION}.json",
-        timeout=10,
+        timeout=20,
     ).json()
 
 
@@ -81,12 +87,32 @@ def validate_chart_config_and_set_defaults(
         schema = get_schema_chart_config()
     # Validate and update config with defaults
     config_new = copy.deepcopy(config)
-    DefaultSetterValidatingValidator(schema).validate(config_new)
+    try:
+        DefaultSetterValidatingValidator(schema).validate(config_new)
+    except Exception as e:
+        raise Exception(f"Could not validate schema for chart {config['id']}: {e}")
     # Add minTime if not set (no default provided in schema)
     # Kinda hacky
     if config_new["type"] not in {"StackedDiscreteBar", "Marimekko", "DiscreteBar"}:
         if "minTime" not in config_new:
             config_new["minTime"] = "earliest"
+    return config_new
+
+
+def fix_errors_in_schema(config: Dict[str, Any]) -> Dict[str, Any]:
+    """Fix common errors in schema and tries to catch up with latest schema version."""
+    config_new = copy.deepcopy(config)
+    # Remove map.columnSlug. This should be map.variableId instead.
+    if "map" in config_new:
+        if "columnSlug" in config_new["map"]:
+            print("DELETE")
+            if "variableId" not in config_new["map"]:
+                config_new["map"]["variableId"] = config_new["map"]["columnSlug"]
+            del config_new["map"]["columnSlug"]
+    if ("timelineMaxTime" in config_new) and (config_new["timelineMaxTime"] is None):
+        del config_new["timelineMaxTime"]
+    if ("timelineMinTime" in config_new) and (config_new["timelineMinTime"] is None):
+        del config_new["timelineMinTime"]
     return config_new
 
 

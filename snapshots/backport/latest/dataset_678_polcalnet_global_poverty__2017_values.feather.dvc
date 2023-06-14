@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_678_polcalnet_global_poverty__2017_values
   file_extension: feather
-  date_accessed: 2023-02-23 15:07:14.945879
+  date_accessed: 2023-06-01 13:19:56.881690
   name: PolcalNet Global Poverty (2017)
   description: Mean and Median monthly per capita consumption/income expenditures
     from country level household surveys in 2011 PPP international dollars.
@@ -14,6 +14,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c85ddcc34a7fad722e9c395bca707ed5
-  size: 29138
+- md5: f6befe9247073e8561748525cb280e15
+  size: 29130
   path: dataset_678_polcalnet_global_poverty__2017_values.feather

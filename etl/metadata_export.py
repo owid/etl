@@ -2,6 +2,7 @@ import copy
 import os
 from typing import Any, Dict, Tuple
 
+import pandas as pd
 import rich_click as click
 from owid.catalog import Dataset
 
@@ -34,14 +35,14 @@ def cli(
     if output:
         os.makedirs(os.path.dirname(output), exist_ok=True)
         with open(output, "w") as f:
-            f.write(meta_str)
+            f.write(yaml_dump(meta_str))  # type: ignore
     else:
         print(meta_str)
 
 
 def metadata_export(
     ds: Dataset,
-) -> str:
+) -> dict:
     ds_meta = ds.metadata.to_dict()
 
     # transform dataset metadata
@@ -78,10 +79,22 @@ def metadata_export(
                 continue
             variable = tab[col].metadata.to_dict()
 
+            # move units and short units from display
+            if "display" in variable:
+                if not variable.get("unit"):
+                    variable["unit"] = variable["display"].pop("unit", "")
+                if not variable.get("short_unit"):
+                    variable["short_unit"] = variable["display"].pop("shortUnit", "")
+
+            # remove empty descriptions and short units
+            if variable.get("description") == "":
+                variable.pop("description", None)
+            if variable.get("short_unit") == "":
+                variable.pop("short_unit", None)
+
             variable.pop("additional_info", None)
 
             # add required units
-            variable.setdefault("short_unit", "")
             variable.setdefault("unit", "")
 
             for source in variable.get("sources", []):
@@ -90,6 +103,11 @@ def metadata_export(
             # move sources at the end
             if "sources" in variable:
                 variable["sources"] = variable.pop("sources")
+
+            # fix sources
+            for source in variable.get("sources", []):
+                if "date_accessed" in source:
+                    source["date_accessed"] = pd.to_datetime(source["date_accessed"]).date()
 
             t["variables"][col] = variable
 
@@ -102,7 +120,7 @@ def metadata_export(
         "tables": tb_meta,
     }
 
-    return yaml_dump(final)  # type: ignore
+    return final
 
 
 def _move_sources_to_dataset(ds_meta: Dict[str, Any], tb_meta: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
@@ -120,7 +138,7 @@ def _move_sources_to_dataset(ds_meta: Dict[str, Any], tb_meta: Dict[str, Any]) -
     vars_sources = [var_meta.pop("sources", None) for var_meta in tb["variables"].values()]
 
     # every one must have a single source
-    if not all([len(sources) == 1 for sources in vars_sources]):
+    if not all([sources is not None and len(sources) == 1 for sources in vars_sources]):
         return ds_meta_orig, tb_meta_orig
 
     vars_sources = [sources[0] for sources in vars_sources]

@@ -26,6 +26,7 @@ from etl.scripts.faostat.shared import (
     INCLUDED_DATASETS_CODES,
     NAMESPACE,
     RUN_FILE_NAME,
+    SNAPSHOTS_FILE_EXTENSION,
     VERSION,
     log,
 )
@@ -185,7 +186,7 @@ def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> List[str]:
 
     """
     # List all relevant snapshots.
-    snapshots = [snapshot for snapshot in snapshot_catalog(match=NAMESPACE) if snapshot.metadata.namespace == NAMESPACE]
+    snapshots = [snapshot for snapshot in snapshot_catalog(match=namespace) if snapshot.metadata.namespace == namespace]
 
     snapshots_latest_version = sorted([snapshot.metadata.version for snapshot in snapshots])[-1]  # type: ignore
 
@@ -435,7 +436,7 @@ def create_steps(channel: str, step_names: List[str]) -> None:
 
 
 def create_dag_line_for_latest_natural_dependency(
-    channel: str, step_name: str, namespace: str = NAMESPACE
+    channel: str, step_name: str, namespace: str = NAMESPACE, snapshots_file_extension: str = SNAPSHOTS_FILE_EXTENSION
 ) -> Optional[str]:
     """Create dag line for latest version of the natural dependency of a given step.
 
@@ -462,6 +463,8 @@ def create_dag_line_for_latest_natural_dependency(
     # Define the channel of the natural dependency.
     if channel == "meadow":
         dependency_channel = "snapshot"
+        # When adding a new snapshot dependency, the file extension has to be included.
+        step_name += "." + snapshots_file_extension
     elif channel == "garden":
         dependency_channel = "meadow"
     elif channel == "grapher":

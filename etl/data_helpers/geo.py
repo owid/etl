@@ -31,8 +31,9 @@ NUM_ALLOWED_NANS_PER_YEAR = None
 
 # Paths to datasets used in this module. Feel free to update the versions or paths whenever there is a
 # new version of the datasets.
-# Path to Key Indicators dataset
-DATASET_KEY_INDICATORS = DATA_DIR / "garden" / "owid" / "latest" / "key_indicators"
+# Path to Key Indicators dataset (TODO: should change it)
+# DATASET_POPULATION = DATA_DIR / "garden" / "demography" / "2023-03-31" / "population"
+DATASET_POPULATION = DATA_DIR / "garden" / "owid" / "latest" / "key_indicators"
 TNAME_KEY_INDICATORS = "population"
 # Path to Key Indicators dataset
 # TODO: we should update it to latest garden/wb/*/income_groups dataset
@@ -42,7 +43,7 @@ TNAME_WB_INCOME = "wb_income_group"
 
 @functools.lru_cache
 def _load_population() -> pd.DataFrame:
-    population = Dataset(DATASET_KEY_INDICATORS)[TNAME_KEY_INDICATORS]
+    population = Dataset(DATASET_POPULATION)[TNAME_KEY_INDICATORS]
     population = population.reset_index()
     return cast(pd.DataFrame, population)
 
@@ -436,6 +437,8 @@ def add_population_to_dataframe(
     population_col: str = "population",
     warn_on_missing_countries: bool = True,
     show_full_warning: bool = True,
+    interpolate_missing_population: bool = False,
+    expected_countries_without_population: Optional[List[str]] = None,
 ) -> pd.DataFrame:
     """Add column of population to a dataframe.
 
@@ -455,6 +458,13 @@ def add_population_to_dataframe(
         True to warn about countries that appear in original dataframe but not in population dataset.
     show_full_warning : bool
         True to display list of countries in warning messages.
+    interpolate_missing_population : bool
+        True to linearly interpolate population on years that are presented in df, but for which we do not have
+        population data; otherwise False to keep missing population data as nans.
+        For example, if interpolate_missing_population is True and df has data for all years between 1900 and 1910,
+        but population is only given for 1900 and 1910, population will be linearly interpolated between those years.
+    expected_countries_without_population : list
+        Countries that are expected to not have population (that should be ignored if warnings are activated).
 
     Returns
     -------
@@ -475,19 +485,34 @@ def add_population_to_dataframe(
         }
     )[[country_col, year_col, population_col]]
 
-    # Check if there is any missing country.
+    # Check if there is any unexpected missing country.
     missing_countries = set(df[country_col]) - set(population[country_col])
-    if len(missing_countries) > 0:
-        if warn_on_missing_countries:
-            warn_on_list_of_entities(
-                list_of_entities=missing_countries,
-                warning_message=(
-                    f"{len(missing_countries)} countries not found in population"
-                    " dataset. They will remain in the dataset, but have nan"
-                    " population."
-                ),
-                show_list=show_full_warning,
-            )
+    if expected_countries_without_population is not None:
+        missing_countries = missing_countries - set(expected_countries_without_population)
+    if (len(missing_countries) > 0) and warn_on_missing_countries:
+        warn_on_list_of_entities(
+            list_of_entities=missing_countries,
+            warning_message=(
+                f"{len(missing_countries)} countries not found in population"
+                " dataset. They will remain in the dataset, but have nan"
+                " population."
+            ),
+            show_list=show_full_warning,
+        )
+
+    if interpolate_missing_population:
+        # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
+        # Optionally fill missing years linearly.
+        countries_in_data = df[country_col].unique()
+        years_in_data = df[year_col].unique()
+
+        population = population.set_index([country_col, year_col]).reindex(
+            pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, year_col])
+        )
+
+        population = population.groupby(country_col).transform(
+            lambda x: x.interpolate(method="linear", limit_direction="both")
+        )
 
     # Add population to original dataframe.
     df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")

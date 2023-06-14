@@ -157,7 +157,7 @@ First of all, you need to have the [ETL project](https://github.com/owid/etl) in
 git clone https://github.com/owid/etl.git
 ```
 
-Along with various directories and files, the project also has two submodules in the `vendor/` folder: [owid-catalog-py](https://github.com/owid/owid-catalog-py) and [walden](https://github.com/owid/walden) (deprecated), both in-house developed libraries, which simplify the interaction with our datasets.
+Along with various directories and files, the project also has sub-packages in the `lib/` folder: `catalog`, `walden` (deprecated), `repack` and `datautils`. These redistributable in-house libraries simplify access to data.
 
 ## Check your environment
 
@@ -173,7 +173,7 @@ The best way to check if your environment is healthy is to run:
 make test
 ```
 
-This will update the two submodules in the `vendor/` folder, install the project, and then run all CI checks.
+This will install the project, and then run all CI checks.
 
 If `make test` succeeds, then you should be able to build any dataset you like, including the entire catalog. If it fails, please raise a [Github issue](https://github.com/owid/etl/issues) (if OWID staff, you can also ask using the `#tech-issues` Slack channel).
 
@@ -201,7 +201,7 @@ This will list all the folders and directories in the project. Find a brief expl
 | `schemas/`    | Metadata schemas for ETL datasets. |
 | `scripts/`    | Various scripts. |
 | `tests/`    | ETL library tests. |
-| `vendor/`    | Dependencies of other OWID git projects. |
+| `lib/`    | Other OWID sub-packages. |
 | `docs/`, `.readthedocs.yaml`, `mkdocs.yml`    | Project documentation config files and directory. |
 | `.dvc/`, `.dvcignore`       | DVC config folder and file.  |
 | `Makefile`, `default.mk`    | `make`-related files. |

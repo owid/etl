@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5376_national_net_zero_targets__net_zero_tracker_values
   file_extension: feather
-  date_accessed: 2023-02-23 18:46:47.624810
+  date_accessed: 2023-06-01 14:54:18.377006
   name: National Net-Zero Targets (Net Zero Tracker)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5bd3f33d34c5bd6c3b08d7176a1786e8
-  size: 12442
+- md5: abf53c418a562eb72090d94ec789f183
+  size: 12450
   path: dataset_5376_national_net_zero_targets__net_zero_tracker_values.feather

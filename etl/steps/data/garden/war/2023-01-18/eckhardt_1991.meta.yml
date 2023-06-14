@@ -9,7 +9,7 @@ all_sources:
       # description: Source description.
 
 dataset:
-  title: Wars and deaths – Eckhardt
+  title: Wars and deaths (Eckhardt, 1991)
   namespace: war
   short_name: eckhardt_1991
   version: 2023-01-18
@@ -23,7 +23,7 @@ dataset:
 
 tables:
   eckhardt_1991:
-    variables:
+    variables: {}
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units

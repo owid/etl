@@ -11,7 +11,7 @@ meta:
   file_extension: csv
   license_url:
   license_name:
-  date_accessed: 2023-03-29
+  date_accessed: 2023-06-12
   is_public: true
   description: |
     The World Inequality Database (WID) is an extensive database on the distribution of income and wealth, both between and within countries. It is primarily maintained by the World Inequality Lab (WIL), located at the Paris School of Economics (PSE). But it is fundamentally the result of a coordinated, collaborative effort involving hundreds of researchers throughout the world over the past twenty years.
@@ -83,6 +83,6 @@ meta:
     More information is available at https://wid.world/methodology/
 wdir: ../../../data/snapshots/wid/2023-01-27
 outs:
-- md5: 8d10049a8b3c5180729f755376a365e9
-  size: 10221168
+- md5: d0fa7c81ec3bd788e577fdd70a4115e0
+  size: 10406082
   path: world_inequality_database.csv

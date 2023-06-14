@@ -75,6 +75,7 @@ steps:
     - snapshot://homicide/2023-01-03/who_mort_db.csv
   data://garden/homicide/2023-01-03/who_mort_db:
     - data://meadow/homicide/2023-01-03/who_mort_db
+    - data://garden/un/2022-07-11/un_wpp
   data://grapher/homicide/2023-01-03/who_mort_db:
     - data://garden/homicide/2023-01-03/who_mort_db
 
@@ -204,8 +205,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/gcp/2023-04-28/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
-    # The following step is not the latest version available.
-    - data://garden/bp/2022-07-14/energy_mix
+    - data://garden/bp/2023-02-20/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Global GDP in the long run
@@ -341,7 +341,7 @@ steps:
   data://grapher/technology/2023-03-16/hcctad:
   - data://garden/technology/2023-03-16/hcctad
 
-# Happiness report
+  # Happiness report
   data://meadow/happiness/2023-03-20/happiness:
   - snapshot://happiness/2023-03-20/happiness.xls
   data://garden/happiness/2023-03-20/happiness:
@@ -349,6 +349,15 @@ steps:
   - backport://backport/owid/latest/dataset_235_world_happiness_report__2022
   data://grapher/happiness/2023-03-20/happiness:
   - data://garden/happiness/2023-03-20/happiness
+
+# Equaldex dataset
+  data://meadow/lgbt_rights/2023-04-13/equaldex:
+  - snapshot://lgbt_rights/2023-04-13/equaldex.csv
+  - snapshot://lgbt_rights/2023-04-13/equaldex_current.csv
+  data://garden/lgbt_rights/2023-04-13/equaldex:
+  - data://meadow/lgbt_rights/2023-04-13/equaldex
+  data://grapher/lgbt_rights/2023-04-13/equaldex:
+  - data://garden/lgbt_rights/2023-04-13/equaldex
 
 # LGBTI Policy Index (Velasco, 2020)
   data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
@@ -370,6 +379,48 @@ steps:
   - data://garden/regions/2023-01-01/regions
   data://grapher/eth/2023-03-15/ethnic_power_relations:
   - data://garden/eth/2023-03-15/ethnic_power_relations
+
+# Oil Spills
+  data://meadow/itopf/2023-05-18/oil_spills:
+  - snapshot://itopf/2023-05-18/oil_spills.pdf
+  data://garden/itopf/2023-05-18/oil_spills:
+  - data://meadow/itopf/2023-05-18/oil_spills
+  data://grapher/itopf/2023-05-18/oil_spills:
+  - data://garden/itopf/2023-05-18/oil_spills
+
+# UNWTO tourism
+    # Key indicators
+  data://meadow/tourism/2023-05-05/unwto:
+  - snapshot://tourism/2023-05-04/unwto.xlsx
+  data://garden/tourism/2023-05-05/unwto:
+  - data://meadow/tourism/2023-05-05/unwto
+  - data://garden/owid/latest/key_indicators
+  data://grapher/tourism/2023-05-11/unwto:
+  - data://garden/tourism/2023-05-05/unwto
+  # Environment Tables Implementations
+  data://meadow/tourism/2023-05-09/unwto_environment:
+  - snapshot://tourism/2023-05-09/unwto_environment.xlsx
+  data://garden/tourism/2023-05-10/unwto_environment:
+  - data://meadow/tourism/2023-05-09/unwto_environment
+  data://grapher/tourism/2023-05-23/unwto_environment:
+  - data://garden/tourism/2023-05-10/unwto_environment
+
+  # GDP
+  data://meadow/tourism/2023-05-09/unwto_gdp:
+  - snapshot://tourism/2023-05-09/unwto_gdp.xlsx
+  data://garden/tourism/2023-05-10/unwto_gdp:
+  - data://meadow/tourism/2023-05-09/unwto_gdp
+  data://grapher/tourism/2023-05-23/unwto_gdp:
+  - data://garden/tourism/2023-05-10/unwto_gdp
+
+# CO2 emissions from air transport (OECD)
+  data://meadow/oecd/2023-05-18/co2_air_transport:
+  - snapshot://oecd/2023-05-18/co2_air_transport.csv
+  data://garden/oecd/2023-05-19/co2_air_transport:
+  - data://garden/tourism/2023-05-05/unwto
+  - data://meadow/oecd/2023-05-18/co2_air_transport
+  data://grapher/oecd/2023-05-19/co2_air_transport:
+  - data://garden/oecd/2023-05-19/co2_air_transport
 
 
   # WB income groups
@@ -403,6 +454,28 @@ steps:
   data://grapher/wb/2023-05-12/women_business_law_additional:
   - data://garden/wb/2023-05-12/women_business_law_additional
 
+  # U.S. patent activity since 1790 (USPTO)
+  data://meadow/research_development/2023-05-24/us_patents:
+  - snapshot://research_development/2023-05-24/us_patents.htm
+  data://garden/research_development/2023-05-25/us_patents:
+  - data://meadow/research_development/2023-05-24/us_patents
+  data://grapher/research_development/2023-05-25/us_patents:
+  - data://garden/research_development/2023-05-25/us_patents
+
+  # OECD Income Distribution Database
+  data://meadow/oecd/2023-06-06/income_distribution_database:
+  - snapshot://oecd/2023-06-06/income_distribution_database.csv
+  data://garden/oecd/2023-06-06/income_distribution_database:
+  - data://meadow/oecd/2023-06-06/income_distribution_database
+  data://grapher/oecd/2023-06-06/income_distribution_database:
+  - data://garden/oecd/2023-06-06/income_distribution_database
+
+  # Real commodity prices
+  data://grapher/papers/2023-06-07/commodity_prices:
+  - data://garden/papers/2023-06-07/commodity_prices
+  data://garden/papers/2023-06-07/commodity_prices:
+  - snapshot://papers/2023-06-07/commodity_prices.xlsx
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
@@ -421,3 +494,4 @@ include:
   - dag/excess_mortality.yml
   - dag/environment.yml
   - dag/agriculture.yml
+  - dag/space.yml
