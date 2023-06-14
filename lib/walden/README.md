@@ -1,7 +1,6 @@
 # walden
 
-[![Build status](https://badge.buildkite.com/edcdffa923dfa79116d64f028a0ed069cfbe879a4e9924a0b8.svg)](https://buildkite.com/our-world-in-data/walden-unit-tests)
-![](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue.svg)
+[![Build status](https://badge.buildkite.com/a2012d475d9eed5ae6d85b9362acc07aa5cab265a810d9a37b.svg)](https://buildkite.com/our-world-in-data/walden-unit-tests)
 
 
 _A prototype catalog of all upstream datasets used to build Our World In Data._
