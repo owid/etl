@@ -1,0 +1,28 @@
+dataset:
+  title: Math Word Problem Solving (Papers With Code, 2023)
+  description: Problem Solving on MATH dataset of 12,500 challenging competition mathematics
+    problems. Each problem in MATH has a full step-by-step solution which can be used
+    to teach models to generate answer derivations and explanations.
+  licenses:
+  - name: CC BY-SA 4.0
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+  sources:
+  - name: Papers With Code (2023)
+    description: Problem Solving on MATH dataset of 12,500 challenging competition
+      mathematics problems. Each problem in MATH has a full step-by-step solution
+      which can be used to teach models to generate answer derivations and explanations.
+    url: https://paperswithcode.com/sota/math-word-problem-solving-on-math
+    source_data_url: https://paperswithcode.com/sota/math-word-problem-solving-on-math
+    date_accessed: '2023-06-14'
+    publication_year: 2023
+    published_by: Papers With Code
+tables:
+  papers_with_code_math:
+    variables:
+      performance:
+        title: Accuracy
+        unit: ''
+      name:
+        title: name
+        unit: ''
+
