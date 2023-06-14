@@ -16,6 +16,8 @@ log = get_logger()
 VERSION = str(dt.date.today())
 # Global namespace for datasets.
 NAMESPACE = "faostat"
+# Default snapshot file extension (to be used when creating a new snapshot).
+SNAPSHOTS_FILE_EXTENSION = "zip"
 # URL where FAOSTAT can be manually accessed (used in metadata, but not to actually retrieve the data).
 FAO_DATA_URL = "http://www.fao.org/faostat/en/#data"
 # Metadata source name.
@@ -26,6 +28,8 @@ LICENSE_NAME = "CC BY-NC-SA 3.0 IGO"
 # Codes of FAOSTAT domains to download from FAO and upload to walden bucket.
 # This is the list that will determine the datasets (faostat_*) to be created in all further etl data steps.
 INCLUDED_DATASETS_CODES = [
+    # Cost and Affordability of a Healthy Diet.
+    "cahd",
     # Land, Inputs and Sustainability: Fertilizers indicators.
     "ef",
     # Climate Change: Emissions intensities.

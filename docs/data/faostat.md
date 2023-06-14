@@ -254,11 +254,19 @@ If no dataset requires an update, the workflow stops here.
     ```bash
     INSPECT_ANOMALIES=True etl garden/faostat/YYYY-MM-DD
     ```
+    !!! note
+    
+      If a new domain has been added to this version, you may need to manually add its meadow step as a dependency of garden/faostat/YYYY-MM-DD/faostat_metadata in the dag (this is a known bug).
 
 6. Inspect and update any possible changes of dataset/item/element/unit names and descriptions.
 
     ```bash
     python etl/scripts/faostat/update_custom_metadata.py
+    ```
+
+    If any changes were found, re-run the garden steps.
+    ```bash
+    etl garden/faostat/YYYY-MM-DD
     ```
 
 7. Create new grapher steps.
@@ -299,7 +307,8 @@ accept or reject changes.
 
     Run internal sanity checks on the generated files.
 
-13. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too.
+13. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too. Manually update all other datasets that use any faostat dataset as a dependency.
+
     !!! note
 
         In the future this could be handled automatically by one of the existing scripts.
