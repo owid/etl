@@ -13,7 +13,7 @@ meta:
   license_name: Creative Commons Attribution 4.0
   date_accessed: 2023-05-29
   is_public: true
-  description: |
+  description: >
     The World Development Indicators (WDI) is the primary
     World Bank collection of development indicators, compiled
     from officially-recognized international sources. It
