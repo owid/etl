@@ -585,8 +585,23 @@ class Table(pd.DataFrame):
             **kwargs,
         )
 
-    def pivot(self, *args, **kwargs) -> "Table":
-        return pivot(data=self, *args, **kwargs)
+    def pivot(
+        self,
+        *,
+        index: Optional[Union[str, List[str]]] = None,
+        columns: Optional[Union[str, List[str]]] = None,
+        values: Optional[Union[str, List[str]]] = None,
+        join_column_levels_with: Optional[str] = None,
+        **kwargs,
+    ) -> "Table":
+        return pivot(
+            data=self,
+            index=index,
+            columns=columns,
+            values=values,
+            join_column_levels_with=join_column_levels_with,
+            **kwargs,
+        )
 
     def underscore(self) -> "Table":
         from .utils import underscore_table
@@ -698,9 +713,79 @@ def melt(
     return table
 
 
-# TODO: Handle metadata and processing info for each of the following functions.
-def pivot(*args, **kwargs) -> Table:
-    return Table(pd.pivot(*args, **kwargs))
+def _flatten_multiindex_column_names(table: Table, join_column_levels_with: str) -> List[str]:
+    new_columns = []
+    for column in table.columns:
+        if isinstance(column, tuple):
+            levels = [level for level in column if len(level) > 0]
+            new_column = join_column_levels_with.join(levels)
+        else:
+            new_column = column
+        new_columns.append(new_column)
+
+    return new_columns
+
+
+def pivot(
+    data: Table,
+    *,
+    index: Optional[Union[str, List[str]]] = None,
+    columns: Optional[Union[str, List[str]]] = None,
+    values: Optional[Union[str, List[str]]] = None,
+    join_column_levels_with: Optional[str] = None,
+    **kwargs,
+) -> Table:
+    # Get the new pivot table.
+    table = Table(
+        pd.pivot(
+            data=data,
+            index=index,
+            columns=columns,
+            values=values,
+            **kwargs,
+        )
+    )
+    # Copy the original table metadata to the new table.
+    table.metadata = copy.deepcopy(data.metadata)
+
+    # Update variable metadata in the new table.
+    for column in table.columns:
+        if isinstance(values, str):
+            variables_to_combine = [data[values]]
+        else:
+            variables_to_combine = [data[column[0]]]
+        # "column" is a tuple with all column index levels.
+        # For now, I assume the only metadata we want to propagate is the one of the upper level.
+        # Alternatively, we could combine the metadata of the upper level variable with the metadata of the original
+        # variable of all subsequent levels.
+        column_metadata = variables.combine_variables_metadata(
+            variables=variables_to_combine, operation="pivot", name=column[0]
+        )
+        # Assign metadata of the original variable in the upper level to the new multiindex column.
+        # NOTE: This allows accessing the metadata via, e.g. `table[("level_0", "level_1", "level_2")].metadata`,
+        # but not via, e.g. `table["level_0"]["level_1"]["level_2"].metadata`.
+        # There may be a way to allow for both.
+        table[column].metadata = column_metadata
+
+    # Transfer also the metadata of the index columns.
+    # Note: This metadata will only be accessible if columns are reset and flattened to one level.
+    for index_column in list(table.index.names):
+        table._fields[index_column] = data._fields[index_column]
+
+    if join_column_levels_with is not None:
+        # Gather metadata of index columns.
+        index_metadata = [table._fields[index_column] for index_column in table.index.names]
+        # Gather metadata of each multiindex column.
+        columns_metadata = [table[column].metadata for column in table.columns]
+        # Reset index (which can create multi-index columns).
+        table = table.reset_index()
+        # Join column levels with a certain string, e.g. ("level_0", "level_1", "level_2") -> "level_0-level_1-level_2".
+        table.columns = _flatten_multiindex_column_names(table, join_column_levels_with=join_column_levels_with)
+        # Assign the gathered metadata for indexes and columns to the corresponding new columns.
+        for i, column in enumerate(table.columns):
+            table[column].metadata = (index_metadata + columns_metadata)[i]
+
+    return table
 
 
 def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[TableMeta]) -> Table:
