@@ -522,6 +522,20 @@ steps:
   data://garden/oecd/2023-06-20/ppp_exchange_rates:
   - data://meadow/oecd/2023-06-20/ppp_exchange_rates
 
+  # Artificial Intelligence Conference Attendance
+  data://meadow/artificial_intelligence/2023-06-14/ai_conferences_total:
+  - snapshot://artificial_intelligence/2023-06-14/ai_conferences_total.csv
+  data://meadow/artificial_intelligence/2023-06-14/ai_small_conferences:
+  - snapshot://artificial_intelligence/2023-06-14/ai_small_conferences.csv
+  data://meadow/artificial_intelligence/2023-06-14/ai_large_conferences:
+  - snapshot://artificial_intelligence/2023-06-14/ai_large_conferences.csv
+  data://garden/artificial_intelligence/2023-06-14/ai_all_conferences:
+  - data://meadow/artificial_intelligence/2023-06-14/ai_conferences_total
+  - data://meadow/artificial_intelligence/2023-06-14/ai_small_conferences
+  - data://meadow/artificial_intelligence/2023-06-14/ai_large_conferences
+  data://grapher/artificial_intelligence/2023-06-14/ai_all_conferences:
+  -  data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
