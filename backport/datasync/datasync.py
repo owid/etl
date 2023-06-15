@@ -112,7 +112,8 @@ def cli(
                 "max_attempts": 10,
                 "mode": "adaptive",
             }
-        )
+        ),
+        r2=True,
     )
 
     for n, ds in enumerate(datasets):
