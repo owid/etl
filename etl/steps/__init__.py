@@ -23,16 +23,6 @@ import pandas as pd
 import requests
 import structlog
 import yaml
-from dvc.dvcfile import load_file
-from dvc.repo import Repo
-
-from etl.db import get_engine
-
-# smother deprecation warnings by papermill
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    import papermill as pm
-
 from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Dataset as WaldenDataset
@@ -40,6 +30,7 @@ from owid.walden import Dataset as WaldenDataset
 from etl import backport_helpers, config, files, git
 from etl import grapher_helpers as gh
 from etl import paths
+from etl.db import get_engine
 from etl.grapher_import import (
     DatasetUpsertResult,
     VariableUpsertResult,
@@ -498,6 +489,11 @@ class DataStep(Step):
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
+        # smother deprecation warnings by papermill
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            import papermill as pm
+
         notebook_path = self._search_path.with_suffix(".ipynb")
         with tempfile.TemporaryDirectory() as tmp_dir:
             notebook_out = Path(tmp_dir) / "notebook.ipynb"
@@ -582,11 +578,16 @@ class SnapshotStep(Step):
         return f"snapshot://{self.path}"
 
     def run(self) -> None:
+        from dvc.repo import Repo
+
         with _unignore_backports(Path(self._path)):
             Repo(paths.BASE_DIR).pull(self._path, remote="public-read", force=True)
 
     def is_dirty(self) -> bool:
         # check if the snapshot has been added to DVC
+        from dvc.dvcfile import load_file
+        from dvc.repo import Repo
+
         with open(self._dvc_path) as istream:
             if "outs:\n" not in istream.read():
                 raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
@@ -618,6 +619,8 @@ class SnapshotStepPrivate(SnapshotStep):
         return f"snapshot-private://{self.path}"
 
     def run(self) -> None:
+        from dvc.repo import Repo
+
         with _unignore_backports(Path(self._path)):
             Repo(paths.BASE_DIR).pull(self._path, remote="private", force=True)
 
