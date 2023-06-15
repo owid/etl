@@ -11,8 +11,6 @@ from typing import Any, Dict, List, Literal, Optional, Union
 import pandas as pd
 import yaml
 from dataclasses_json import dataclass_json
-from dvc.exceptions import UploadError
-from dvc.repo import Repo
 from owid.catalog.meta import pruned_json
 from owid.datautils import dataframes
 from owid.walden import files
@@ -23,11 +21,22 @@ from tenacity.stop import stop_after_attempt
 from etl import paths
 from etl.files import yaml_dump
 
-dvc = Repo(paths.BASE_DIR)
+dvc = None
 
 # DVC is not thread-safe, so we need to lock it
 dvc_lock = Lock()
 unignore_backports_lock = Lock()
+
+
+def get_dvc():
+    from dvc.repo import Repo
+
+    global dvc
+
+    if dvc is None:
+        dvc = Repo(paths.BASE_DIR)
+
+    return dvc
 
 
 @dataclass
@@ -59,7 +68,7 @@ class Snapshot:
     def pull(self, force=True) -> None:
         """Pull file from S3."""
         with _unignore_backports(self.path):
-            dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
+            get_dvc().pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -76,6 +85,10 @@ class Snapshot:
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
+        from dvc.exceptions import UploadError
+
+        dvc = get_dvc()
+
         with dvc_lock, _unignore_backports(self.path):
             dvc.add(str(self.path), fname=str(self.metadata_path))
             if upload:
