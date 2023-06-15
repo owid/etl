@@ -116,6 +116,7 @@ def underscore(name: Optional[str], validate: bool = True, camel_to_snake: bool 
 
     return name
 
+
 def _camel_to_snake(name: str) -> str:
     """Convert string camelCase to snake_case.
 
@@ -135,8 +136,8 @@ def _camel_to_snake(name: str) -> str:
     str:
         String using snake_case formatting.
     """
-    name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', name).lower()
+    name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
 
 
 def _resolve_collisions(
