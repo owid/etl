@@ -12,6 +12,7 @@ from typing import Optional, Tuple
 from urllib.parse import urlparse
 
 from botocore.exceptions import ClientError
+
 from owid.walden.ui import bail, log
 
 from .files import ChecksumDoesNotMatch, checksum
