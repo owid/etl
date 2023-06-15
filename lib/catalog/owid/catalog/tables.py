@@ -105,9 +105,8 @@ class Table(pd.DataFrame):
         """
         Save this table in one of our SUPPORTED_FORMATS.
         """
-        if UPDATE_PROCESSING_LOG:
-            # Add entry in the processing log about operation "save".
-            self = update_processing_logs_when_saving_table(table=self, path=path)
+        # Add entry in the processing log about operation "save".
+        self = update_processing_logs_when_saving_table(table=self, path=path)
 
         if isinstance(path, Path):
             path = path.as_posix()
@@ -144,10 +143,9 @@ class Table(pd.DataFrame):
         # If each variable does not have sources, load them from the dataset.
         table = assign_dataset_sources_and_licenses_to_each_variable(table=table)
 
-        if UPDATE_PROCESSING_LOG:
-            # Add processing log to the metadata of each variable in the table.
-            # TODO: For some reason, the snapshot loading entry gets repeated.
-            table = update_processing_logs_when_loading_or_creating_table(table=table)
+        # Add processing log to the metadata of each variable in the table.
+        # TODO: For some reason, the snapshot loading entry gets repeated.
+        table = update_processing_logs_when_loading_or_creating_table(table=table)
 
         return table
 
@@ -390,15 +388,14 @@ class Table(pd.DataFrame):
             else:
                 fields[new_col] = copy.deepcopy(self._fields[old_col])
 
-            if UPDATE_PROCESSING_LOG:
-                # Update processing log.
-                if old_col != new_col:
-                    fields[new_col].processing_log = variables.add_entry_to_processing_log(
-                        processing_log=fields[new_col].processing_log,
-                        variable=new_col,
-                        parents=[old_col],
-                        operation="rename",
-                    )
+            # Update processing log.
+            if old_col != new_col:
+                fields[new_col].processing_log = variables.add_entry_to_processing_log(
+                    processing_log=fields[new_col].processing_log,
+                    variable=new_col,
+                    parents=[old_col],
+                    operation="rename",
+                )
 
         new_table._fields = defaultdict(VariableMeta, fields)
 
@@ -855,43 +852,36 @@ def update_processing_logs_when_saving_table(table: Table, path: Union[str, Path
     return table
 
 
+def _get_all_variable_names_in_table(table: Table) -> List[str]:
+    # Get the names of all columns including those currently used for the index of the table (if any).
+    all_variables = [name for name in table.index.names if name is not None] + list(table.columns)
+
+    return all_variables
+
+
 def _add_processing_log_entry_to_each_variable(
     table: Table, parents: List[Any], operation: variables.OPERATION
 ) -> Table:
-    # Get the names of the columns currently used for the index of the table (if any).
-    index_columns = table.metadata.primary_key
+    # Get the names of all columns including those currently used for the index of the table (if any).
+    all_columns = _get_all_variable_names_in_table(table=table)
 
-    # If the table has an index, reset it so we have access to all variables in the table.
-    if len(index_columns) > 0:
-        table = table.reset_index(drop=False)  # type: ignore
-    for column in table.columns:
+    for column in all_columns:
         # New entry to add to the processing log.
         log_new_entry = {"variable": column, "parents": parents, "operation": operation}
 
-        if table[column].metadata.processing_log is None:
-            # If no processing log is found for a variable, start a new one.
-            table[column].metadata.processing_log = []
-
-        if log_new_entry in table[column].metadata.processing_log:
+        if log_new_entry not in table._fields[column].processing_log:
             # If the processing log is not empty but the last entry is identical to the one we want to insert, skip, to
             # avoid storing the same entry multiple times.
             # This happens for example when saving tables, given that tables are stored in different formats.
-            pass
-        else:
-            # Append a new entry to the processing log.
-            table[column].metadata.processing_log = variables.add_entry_to_processing_log(
-                processing_log=table[column].metadata.processing_log, **log_new_entry
+            # Otherwise, append a new entry to the processing log.
+            table._fields[column].processing_log = variables.add_entry_to_processing_log(
+                processing_log=table._fields[column].processing_log, **log_new_entry
             )
-    if len(index_columns) > 0:
-        table = table.set_index(index_columns)
 
     return table
 
 
 def assign_dataset_sources_and_licenses_to_each_variable(table: Table) -> Table:
-    # Get the names of the columns currently used for the index of the table (if any).
-    index_columns = table.metadata.primary_key
-
     # Get sources and licenses from the table dataset.
     sources = []
     licenses = []
@@ -904,19 +894,14 @@ def assign_dataset_sources_and_licenses_to_each_variable(table: Table) -> Table:
         # There are no default sources/licenses to assign to each variable.
         return table
 
-    # If the table has an index, reset it so we have access to all variables in the table.
-    if len(index_columns) > 0:
-        table = table.reset_index(drop=False)  # type: ignore
+    # Get the names of all columns including those currently used for the index of the table (if any).
+    all_columns = _get_all_variable_names_in_table(table=table)
 
     # If a variable does not have sources/licenses defined, assign the ones from the dataset.
-    for column in table.columns:
-        if len(table[column].metadata.sources) == 0:
-            table[column].metadata.sources = sources
-        if len(table[column].metadata.licenses) == 0:
-            table[column].metadata.licenses = licenses
-
-    # Set the original index to the table.
-    if len(index_columns) > 0:
-        table = table.set_index(index_columns)
+    for column in all_columns:
+        if len(table._fields[column].sources) == 0:
+            table._fields[column].sources = sources
+        if len(table._fields[column].licenses) == 0:
+            table._fields[column].licenses = licenses
 
     return table

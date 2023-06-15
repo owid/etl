@@ -339,13 +339,14 @@ def add_entry_to_processing_log(
     # Consider using a deepcopy if any of the operations in this function alter mutable objects in processing_log.
     processing_log_updated = processing_log.copy()
 
-    # Define new log entry.
-    log_new_entry = {"variable": variable, "parents": parents, "operation": operation}
-    if comment is not None:
-        log_new_entry["comment"] = comment
+    if UPDATE_PROCESSING_LOG:
+        # Define new log entry.
+        log_new_entry = {"variable": variable, "parents": parents, "operation": operation}
+        if comment is not None:
+            log_new_entry["comment"] = comment
 
-    # Add new entry to log.
-    processing_log_updated += [log_new_entry]
+        # Add new entry to log.
+        processing_log_updated += [log_new_entry]
 
     return processing_log_updated
 
@@ -381,17 +382,16 @@ def combine_variables_metadata(
     metadata.licenses = get_unique_licenses_from_variables(variables=variables_only)
     metadata.processing_log = combine_variables_processing_logs(variables=variables_only)
 
-    if UPDATE_PROCESSING_LOG:
-        # List names of variables and scalars (or other objects passed in variables).
-        variables_and_scalars_names = [
-            variable.name if hasattr(variable, "name") else str(variable) for variable in variables
-        ]
-        metadata.processing_log = add_entry_to_processing_log(
-            processing_log=metadata.processing_log,
-            variable=name,
-            parents=variables_and_scalars_names,
-            operation=operation,
-        )
+    # List names of variables and scalars (or other objects passed in variables).
+    variables_and_scalars_names = [
+        variable.name if hasattr(variable, "name") else str(variable) for variable in variables
+    ]
+    metadata.processing_log = add_entry_to_processing_log(
+        processing_log=metadata.processing_log,
+        variable=name,
+        parents=variables_and_scalars_names,
+        operation=operation,
+    )
 
     return metadata
 
