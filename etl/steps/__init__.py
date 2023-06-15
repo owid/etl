@@ -27,20 +27,10 @@ from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Dataset as WaldenDataset
 
-from etl import backport_helpers, config, files, git
+from etl import config, files, git
 from etl import grapher_helpers as gh
 from etl import paths
 from etl.db import get_engine
-from etl.grapher_import import (
-    DatasetUpsertResult,
-    VariableUpsertResult,
-    cleanup_ghost_sources,
-    cleanup_ghost_variables,
-    fetch_db_checksum,
-    set_dataset_checksum_and_editedAt,
-    upsert_dataset,
-    upsert_table,
-)
 from etl.snapshot import _unignore_backports
 
 log = structlog.get_logger()
@@ -653,14 +643,18 @@ class GrapherStep(Step):
         return self.data_step._output_dataset
 
     def is_dirty(self) -> bool:
+        import etl.grapher_import as gi
+
         if self.data_step.is_dirty():
             return True
 
         # dataset exists, but it is possible that we haven't inserted everything into DB
         dataset = self.dataset
-        return fetch_db_checksum(dataset) != self.data_step.checksum_input()
+        return gi.fetch_db_checksum(dataset) != self.data_step.checksum_input()
 
     def run(self) -> None:
+        import etl.grapher_import as gi
+
         # save dataset to grapher DB
         dataset = self.dataset
 
@@ -669,7 +663,7 @@ class GrapherStep(Step):
         engine = get_engine()
 
         assert dataset.metadata.namespace
-        dataset_upsert_results = upsert_dataset(
+        dataset_upsert_results = gi.upsert_dataset(
             engine,
             dataset,
             dataset.metadata.namespace,
@@ -688,7 +682,7 @@ class GrapherStep(Step):
 
             # generate table with entity_id, year and value for every column
             tables = gh._yield_wide_table(table, na_action="drop")
-            upsert = lambda t: upsert_table(  # noqa: E731
+            upsert = lambda t: gi.upsert_table(  # noqa: E731
                 engine,
                 t,
                 dataset_upsert_results,
@@ -709,32 +703,36 @@ class GrapherStep(Step):
         self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
         # set checksum and updatedAt timestamps after all data got inserted
-        set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
+        gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
 
     def checksum_output(self) -> str:
         raise NotImplementedError("GrapherStep should not be used as an input")
 
     @classmethod
     def _cleanup_ghost_resources(
-        cls, dataset_upsert_results: DatasetUpsertResult, variable_upsert_results: List[VariableUpsertResult]
+        cls,
+        dataset_upsert_results,
+        variable_upsert_results: List[Any],
     ) -> None:
         """
         Cleanup all ghost variables and sources that weren't upserted
         NOTE: we can't just remove all dataset variables before starting this step because
         there could be charts that use them and we can't remove and recreate with a new ID
         """
+        import etl.grapher_import as gi
+
         upserted_variable_ids = [r.variable_id for r in variable_upsert_results]
         upserted_source_ids = list(dataset_upsert_results.source_ids.values()) + [
             r.source_id for r in variable_upsert_results
         ]
         # Try to cleanup ghost variables, but make sure to raise an error if they are used
         # in any chart
-        cleanup_ghost_variables(
+        gi.cleanup_ghost_variables(
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
             workers=config.GRAPHER_INSERT_WORKERS,
         )
-        cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
+        gi.cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
 
 
 @dataclass
@@ -804,6 +802,8 @@ class BackportStep(DataStep):
         return f"backport://{self.path}"
 
     def run(self) -> None:
+        from etl import backport_helpers
+
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 

@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast
 
 import pandas as pd
-import requests
 import structlog
 from owid import catalog
 from owid.catalog import CHANNEL
@@ -19,11 +18,9 @@ from owid.datautils.common import ExceptionFromDocstring
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
-from etl import grapher_helpers as gh
 from etl import paths
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import extract_step_attributes, load_dag, reverse_graph
-from etl.steps.data.converters import convert_snapshot_metadata
 
 log = structlog.get_logger()
 
@@ -33,6 +30,8 @@ def downloaded(url: str) -> Iterator[str]:
     """
     Download the url to a temporary file and yield the filename.
     """
+    import requests
+
     with tempfile.NamedTemporaryFile() as tmp:
         with requests.get(url, stream=True) as r:
             r.raise_for_status()
@@ -52,6 +51,8 @@ def get_latest_github_sha(org: str, repo: str, branch: str) -> str:
 
 
 def _get_github_branches(org: str, repo: str) -> List[Any]:
+    import requests
+
     url = f"https://api.github.com/repos/{org}/{repo}/branches?per_page=100"
     resp = requests.get(url, headers={"Accept": "application/vnd.github.v3+json"})
     if resp.status_code != 200:
@@ -66,6 +67,8 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
 
 def grapher_checks(ds: catalog.Dataset) -> None:
     """Check that the table is in the correct format for Grapher."""
+    from etl import grapher_helpers as gh
+
     assert ds.metadata.title, "Dataset must have a title."
 
     for tab in ds:
@@ -105,6 +108,8 @@ def create_dataset(
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
         ds.save()
     """
+    from etl.steps.data.converters import convert_snapshot_metadata
+
     # convert snapshot SnapshotMeta to DatasetMeta
     if isinstance(default_metadata, SnapshotMeta):
         default_metadata = convert_snapshot_metadata(default_metadata)
@@ -191,6 +196,8 @@ def create_dataset_with_combined_metadata(
         New dataset with combined metadata.
 
     """
+    from etl.steps.data.converters import convert_snapshot_metadata
+
     # Gather unique sources from the original datasets.
     sources = []
     licenses = []
