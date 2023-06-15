@@ -86,6 +86,7 @@ def create_dataset(
     tables: Iterable[catalog.Table],
     default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,
     underscore_table: bool = True,
+    camel_to_snake: bool = False,
     formats: List[FileFormat] = DEFAULT_FORMATS,
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
@@ -100,6 +101,7 @@ def create_dataset(
     :param tables: A list of tables to add to the dataset.
     :param default_metadata: The default metadata to use for the dataset, could be either SnapshotMeta or DatasetMeta.
     :param underscore_table: Whether to underscore the table name before adding it to the dataset.
+    :param camel_to_snake: Whether to convert camel case to snake case for the table name.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -115,7 +117,7 @@ def create_dataset(
     # add tables to dataset
     for table in tables:
         if underscore_table:
-            table = catalog.utils.underscore_table(table)
+            table = catalog.utils.underscore_table(table, camel_to_snake=camel_to_snake)
         ds.add(table, formats=formats)
 
     # set metadata from dest_dir

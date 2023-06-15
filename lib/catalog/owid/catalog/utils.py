@@ -10,24 +10,42 @@ from .variables import Variable
 
 
 @overload
-def underscore(name: str, validate: bool = True) -> str:
+def underscore(name: str, validate: bool = True, camel_to_snake: bool = False) -> str:
     ...
 
 
 @overload
-def underscore(name: None, validate: bool = True) -> None:
+def underscore(name: None, validate: bool = True, camel_to_snake: bool = False) -> None:
     ...
 
 
-def underscore(name: Optional[str], validate: bool = True) -> Optional[str]:
+def underscore(name: Optional[str], validate: bool = True, camel_to_snake: bool = False) -> Optional[str]:
     """Convert arbitrary string to under_score. This was fine tuned on WDI bank column names.
     This function might evolve in the future, so make sure to have your use cases in tests
     or rather underscore your columns yourself.
+
+    Parameters
+    ----------
+    name : str
+        String to format.
+    validate: bool, optional
+        Whether to validate that the string is under_score. Defaults to True.
+    camel_to_snake: bool, optional
+        Whether to convert camelCase to snake_case. Defaults to False.
+
+    Returns
+    -------
+    str:
+        String using snake_case formatting.
     """
     if name is None:
         return None
 
     orig_name = name
+
+    # camelCase to snake_case
+    if camel_to_snake:
+        name = _camel_to_snake(name)
 
     name = (
         name.replace(" ", "_")
@@ -99,6 +117,29 @@ def underscore(name: Optional[str], validate: bool = True) -> Optional[str]:
     return name
 
 
+def _camel_to_snake(name: str) -> str:
+    """Convert string camelCase to snake_case.
+
+    Reference: https://stackoverflow.com/a/1176023/5056599 CC BY-SA 4.0
+
+    Example:
+    >>> _camel_to_snake('camelCase')
+    'camel_case'
+
+    Parameters
+    ----------
+    name : str
+        String using camelCase formatting.
+
+    Returns
+    -------
+    str:
+        String using snake_case formatting.
+    """
+    name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
+
+
 def _resolve_collisions(
     orig_cols: pd.Index,
     new_cols: pd.Index,
@@ -130,14 +171,27 @@ def underscore_table(
     t: Table,
     collision: Literal["raise", "rename", "ignore"] = "raise",
     inplace: bool = False,
+    camel_to_snake: bool = False,
 ) -> Table:
     """Convert column and index names to underscore. In extremely rare cases
     two columns might have the same underscored version. Use `collision` param
-    to control whether to raise an error or append numbered suffix."""
+    to control whether to raise an error or append numbered suffix.
+
+    Parameters
+    ----------
+    t : Table
+        Table to underscore.
+    collision : Literal["raise", "rename", "ignore"], optional
+        How to handle collisions, by default "raise".
+    inplace : bool, optional
+        Whether to modify the table in place, by default False.
+    camel_to_snake : bool, optional
+        Whether to convert strings camelCase to snake_case, by default False.
+    """
     orig_cols = t.columns
 
     # underscore columns and resolve collisions
-    new_cols = pd.Index([underscore(c) for c in t.columns])
+    new_cols = pd.Index([underscore(c, camel_to_snake=camel_to_snake) for c in t.columns])
     new_cols = _resolve_collisions(orig_cols, new_cols, collision)
 
     columns_map = {c_old: c_new for c_old, c_new in zip(orig_cols, new_cols)}
@@ -146,9 +200,9 @@ def underscore_table(
     else:
         t = t.rename(columns=columns_map)
 
-    t.index.names = [underscore(e) for e in t.index.names]
+    t.index.names = [underscore(e, camel_to_snake=camel_to_snake) for e in t.index.names]
     t.metadata.primary_key = t.primary_key
-    t.metadata.short_name = underscore(t.metadata.short_name)
+    t.metadata.short_name = underscore(t.metadata.short_name, camel_to_snake=camel_to_snake)
 
     # put original names as titles into metadata by default
     for c_old, c_new in columns_map.items():
