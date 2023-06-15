@@ -11,9 +11,7 @@ from os import path
 from typing import Optional, Tuple
 from urllib.parse import urlparse
 
-import boto3
 from botocore.exceptions import ClientError
-
 from owid.walden.ui import bail, log
 
 from .files import ChecksumDoesNotMatch, checksum
@@ -104,6 +102,8 @@ def download(s3_url: str, filename: str, expected_md5: Optional[str] = None, qui
 
 def connect():
     "Return a connection to Walden's DigitalOcean space."
+    import boto3
+
     check_for_default_profile()
 
     session = boto3.Session(profile_name=AWS_PROFILE)

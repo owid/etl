@@ -1,17 +1,15 @@
 """S3 utils."""
 
-import os
 import json
+import os
 import tempfile
 from os import path
-from typing import Union, Tuple, Any, List
-from mypy_boto3_s3 import S3Client
+from typing import Any, List, Tuple, Union
+from urllib.parse import urlparse
 
 import pandas as pd
-import boto3
-from urllib.parse import urlparse
-from botocore.exceptions import ClientError
 import structlog
+from botocore.exceptions import ClientError
 
 logger = structlog.get_logger()
 
@@ -30,8 +28,10 @@ class S3:
     def __init__(self, profile_name: str = AWS_PROFILE) -> None:
         self.client = self.connect(profile_name)
 
-    def connect(self, profile_name: str = AWS_PROFILE) -> S3Client:
+    def connect(self, profile_name: str = AWS_PROFILE) -> Any:
         """Return a connection to Walden's DigitalOcean space."""
+        import boto3
+
         check_for_aws_profile(profile_name)
 
         session = boto3.Session(profile_name=profile_name)
@@ -58,9 +58,7 @@ class S3:
             s3_path += "/"
 
         bucket_name, s3_file = s3_path_to_bucket_key(s3_path)
-        objects_request = self.client.list_objects_v2(
-            Bucket=bucket_name, Prefix=s3_file
-        )
+        objects_request = self.client.list_objects_v2(Bucket=bucket_name, Prefix=s3_file)
 
         if objects_request["KeyCount"] == 0:
             return []
@@ -111,9 +109,7 @@ class S3:
         # Upload
         extra_args = {"ACL": "public-read"} if public else {}
         try:
-            self.client.upload_file(
-                local_path, bucket_name, s3_file, ExtraArgs=extra_args
-            )
+            self.client.upload_file(local_path, bucket_name, s3_file, ExtraArgs=extra_args)
         except ClientError as e:
             logger.error(e)
             raise UploadError(e)
@@ -158,9 +154,7 @@ class S3:
 
         return
 
-    def obj_to_s3(
-        self, obj: S3_OBJECT, s3_path: str, public: bool = False, **kwargs: Any
-    ) -> None:
+    def obj_to_s3(self, obj: S3_OBJECT, s3_path: str, public: bool = False, **kwargs: Any) -> None:
         """Upload an object to S3, as a file.
 
         Parameters
@@ -192,13 +186,9 @@ class S3:
                 if s3_path.endswith(".csv") or s3_path.endswith(".zip"):
                     obj.to_csv(output_path, index=False, **kwargs)
                 elif s3_path.endswith(".xls") or s3_path.endswith(".xlsx"):
-                    obj.to_excel(
-                        output_path, index=False, engine="xlsxwriter", **kwargs
-                    )
+                    obj.to_excel(output_path, index=False, engine="xlsxwriter", **kwargs)
                 else:
-                    raise ValueError(
-                        "pd.DataFrame must be exported to either CSV or XLS/XLSX!"
-                    )
+                    raise ValueError("pd.DataFrame must be exported to either CSV or XLS/XLSX!")
             else:
                 raise ValueError(
                     f"Type of `obj` is not supported ({type(obj).__name__}). Supported"
@@ -283,9 +273,7 @@ aws_secret_access_key = ...
     return
 
 
-def obj_to_s3(
-    data: S3_OBJECT, s3_path: str, public: bool = False, **kwargs: Any
-) -> None:
+def obj_to_s3(data: S3_OBJECT, s3_path: str, public: bool = False, **kwargs: Any) -> None:
     """See S3.obj_to_s3."""
     s3 = S3()
     return s3.obj_to_s3(data, s3_path, public, **kwargs)
