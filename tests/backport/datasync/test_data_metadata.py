@@ -138,7 +138,7 @@ def test_variable_data_df_from_s3():
 
     with mock.patch("pandas.read_sql", return_value=entities):
         with mock.patch("pandas.read_json", return_value=s3_data):
-            df = variable_data_df_from_s3(engine, ["123.json"])
+            df = variable_data_df_from_s3(engine, ["https://api.ourworldindata.org/v1/indicators/123.data.json"])
 
     assert df.to_dict(orient="records") == [
         {"entityId": 1, "value": "a", "year": 2000, "variableId": 123, "entityName": "UK", "entityCode": "GBR"},
