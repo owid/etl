@@ -1,6 +1,6 @@
 """Numeric formatting."""
 import re
-from typing import Union, Any, Dict, Set
+from typing import Any, Dict, Set, Union
 
 
 class IntegerNumber:
