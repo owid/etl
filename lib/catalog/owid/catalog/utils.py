@@ -170,14 +170,27 @@ def underscore_table(
     t: Table,
     collision: Literal["raise", "rename", "ignore"] = "raise",
     inplace: bool = False,
+    camel_to_snake: bool = False,
 ) -> Table:
     """Convert column and index names to underscore. In extremely rare cases
     two columns might have the same underscored version. Use `collision` param
-    to control whether to raise an error or append numbered suffix."""
+    to control whether to raise an error or append numbered suffix.
+
+    Parameters
+    ----------
+    t : Table
+        Table to underscore.
+    collision : Literal["raise", "rename", "ignore"], optional
+        How to handle collisions, by default "raise".
+    inplace : bool, optional
+        Whether to modify the table in place, by default False.
+    camel_to_snake : bool, optional
+        Whether to convert strings camelCase to snake_case, by default False.
+    """
     orig_cols = t.columns
 
     # underscore columns and resolve collisions
-    new_cols = pd.Index([underscore(c) for c in t.columns])
+    new_cols = pd.Index([underscore(c, camel_to_snake=camel_to_snake) for c in t.columns])
     new_cols = _resolve_collisions(orig_cols, new_cols, collision)
 
     columns_map = {c_old: c_new for c_old, c_new in zip(orig_cols, new_cols)}
@@ -186,9 +199,9 @@ def underscore_table(
     else:
         t = t.rename(columns=columns_map)
 
-    t.index.names = [underscore(e) for e in t.index.names]
+    t.index.names = [underscore(e, camel_to_snake=camel_to_snake) for e in t.index.names]
     t.metadata.primary_key = t.primary_key
-    t.metadata.short_name = underscore(t.metadata.short_name)
+    t.metadata.short_name = underscore(t.metadata.short_name, camel_to_snake=camel_to_snake)
 
     # put original names as titles into metadata by default
     for c_old, c_new in columns_map.items():
