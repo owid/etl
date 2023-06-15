@@ -1,6 +1,5 @@
 import pandas as pd
 import pytest
-
 from owid.catalog import Table
 from owid.catalog.utils import underscore, underscore_table
 
@@ -84,7 +83,7 @@ def test_underscore():
     )
 
     # camelCase to snake_case
-    assert underscore("camelCase") == "camelCase"
+    assert underscore("camelCase") == "camelcase"
     assert underscore("camelcase", camel_to_snake=True) == "camelcase"
     assert underscore("camelCase", camel_to_snake=True) == "camel_case"
     assert underscore("CamelCase", camel_to_snake=True) == "camel_case"
