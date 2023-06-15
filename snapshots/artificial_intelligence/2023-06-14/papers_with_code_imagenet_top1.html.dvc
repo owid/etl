@@ -1,7 +1,7 @@
 meta:
   namespace: artificial_intelligence
   short_name: papers_with_code_imagenet_top1
-  name: Image Classification on ImageNet, Top - 1 Accuracy(Papers With Code, 2023)
+  name: Image Classification on ImageNet, Top - 1 Accuracy (Papers With Code, 2023)
   version: '2023-06-14'
   publication_year: 2023
   source_name: Papers With Code (2023)

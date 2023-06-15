@@ -1,4 +1,62 @@
+"""Load a meadow dataset and create a garden dataset."""
+
+from typing import cast
+
 import pandas as pd
+from owid.catalog import Dataset, Table
+from structlog import get_logger
+
+from etl.helpers import PathFinder, create_dataset
+
+log = get_logger()
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
+
+def run(dest_dir: str) -> None:
+    log.info("papers_with_code_imagenet.start")
+
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset.
+    ds_meadow = cast(Dataset, paths.load_dependency("papers_with_code_imagenet"))
+    df_top5_top1 = []
+    for table_title in ["papers_with_code_imagenet_top1", "papers_with_code_imagenet_top5"]:
+        df = pd.DataFrame(ds_meadow[table_title])
+        df.rename(columns={"performance": table_title}, inplace=True)
+        df[table_title] = df[table_title] * 100
+        df["additional_data"] = df["additional_data"].cat.rename_categories(
+            {"false": "Without extra training data", "true": "With extra training data"}
+        )
+        # Calculate the number of days since 2019
+        df["date"] = pd.to_datetime(df["date"])
+
+        # Extract the year into a new column
+        df["year"] = df["date"].dt.year
+        df.drop("date", axis=1, inplace=True)
+
+        # Drop the original date column
+        pivot_df = pd.pivot_table(df, values=table_title, index=["name", "year"], columns="additional_data")
+        pivot_df.reset_index(inplace=True)
+        pivot_df.index.name = None
+        df_best = select_best(pivot_df)
+        combined = combine_with_without(df_best, table_title)
+        df_top5_top1.append(combined)
+
+    merge_top1_top5 = pd.merge(df_top5_top1[0], df_top5_top1[1], on=["year", "name"], how="inner")
+    tb = Table(merge_top1_top5, short_name="papers_with_code_imagenet", underscore=True)
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+    log.info("papers_with_code_imagenet.end")
 
 
 def select_best(df):
@@ -43,7 +101,7 @@ def select_best(df):
     return merged_df
 
 
-def combine_with_without(df):
+def combine_with_without(df, table_title):
     df["name"] = df["name"].astype(str)
     # Add a star at the end of the "name" column where "without_extra_training_data" is NaN
     df.loc[df["Without extra training data"].isnull(), "name"] += "*"
@@ -53,12 +111,10 @@ def combine_with_without(df):
     result_df = df.copy()
 
     # Combine "without_extra_training_data" and "with_extra_training_data" into one column
-    result_df["performance_data"] = result_df["Without extra training data"].fillna(
-        result_df["With extra training data"]
-    )
+    result_df[table_title] = result_df["Without extra training data"].fillna(result_df["With extra training data"])
 
     # Create a new column indicating whether it's training data or not
-    result_df["training_data"] = (
+    result_df["training_data_" + table_title] = (
         result_df["Without extra training data"]
         .notnull()
         .map({True: "With extra training data", False: "Without extra training data"})

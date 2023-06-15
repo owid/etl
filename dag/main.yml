@@ -569,3 +569,5 @@ include:
   - dag/environment.yml
   - dag/agriculture.yml
   - dag/space.yml
+  - dag/artificial_intelligence.yml
+

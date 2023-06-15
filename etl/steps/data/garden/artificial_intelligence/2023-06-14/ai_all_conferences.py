@@ -3,10 +3,11 @@
 from typing import cast
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+from etl.snapshot import Snapshot
 
 log = get_logger()
 
@@ -20,34 +21,29 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
-    ds_meadow_ai_small = cast(Dataset, paths.load_dependency("ai_small_conferences"))
-    ds_meadow_ai_large = cast(Dataset, paths.load_dependency("ai_large_conferences"))
-    ds_meadow_ai_total = cast(Dataset, paths.load_dependency("ai_conferences_total"))
+    # Load snapshots
+    snap_large_conf = cast(Snapshot, paths.load_dependency("ai_large_conferences.csv"))
+    snap_small_conf = cast(Snapshot, paths.load_dependency("ai_small_conferences.csv"))
+    snap_total_conf = cast(Snapshot, paths.load_dependency("ai_conferences_total.csv"))
 
-    # Read table from meadow dataset.
-    tb_small = ds_meadow_ai_small["ai_small_conferences"]
-    tb_large = ds_meadow_ai_large["ai_large_conferences"]
-    tb_total = ds_meadow_ai_total["ai_conferences_total"]
+    df_small = pd.read_csv(snap_small_conf.path)
+    df_large = pd.read_csv(snap_large_conf.path)
+    df_total = pd.read_csv(snap_total_conf.path)
 
-    df_small = pd.DataFrame(tb_small)
-    df_large = pd.DataFrame(tb_large)
-    df_total = pd.DataFrame(tb_total)
-
-    df_total["conference"] = "Total"
+    df_total["Conference"] = "Total"
     df_small_tot = pd.concat([df_small, df_total], axis=0, join="inner").reset_index(drop=True)
     df_all = pd.concat([df_small_tot, df_large], axis=0, join="inner").reset_index(drop=True)
 
-    df_all["number_of_attendees__in_thousands"] = df_all["number_of_attendees__in_thousands"].apply(
+    df_all["Number of Attendees (in Thousands)"] = df_all["Number of Attendees (in Thousands)"].apply(
         lambda x: round(x * 1000)
     )
-    tb = Table(df_all, short_name="ai_all_conferences")
+    tb = Table(df_all, short_name="ai_all_conferences", underscore=True)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow_ai_large.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=snap_total_conf.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

@@ -15,15 +15,16 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("papers_with_code_imagenet_top1"))
+    ds_garden = cast(Dataset, paths.load_dependency("papers_with_code_imagenet"))
 
     # Read table from garden dataset.
-    tb = ds_garden["papers_with_code_imagenet_top1"]
+    tb = ds_garden["papers_with_code_imagenet"]
 
     #
     # Process data.
     #
     tb = tb.rename(columns={"name": "country"})
+    print(tb)
 
     #
     # Save outputs.

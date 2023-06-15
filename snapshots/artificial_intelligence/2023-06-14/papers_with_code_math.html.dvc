@@ -17,6 +17,6 @@ meta:
     Problem Solving on MATH dataset of 12,500 challenging competition mathematics problems. Each problem in MATH has a full step-by-step solution which can be used to teach models to generate answer derivations and explanations.
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
 outs:
-- md5: 1e111804a00b8eb6e5a7ada72ff03c5e
+- md5: b22f12f48bfbed77e2595dd7d4329f7f
   size: 69312
   path: papers_with_code_math.html

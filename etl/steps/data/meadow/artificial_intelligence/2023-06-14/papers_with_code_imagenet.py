@@ -23,25 +23,32 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("papers_with_code_imagenet_top1.html"))
+    snap_top1 = cast(Snapshot, paths.load_dependency("papers_with_code_imagenet_top1.html"))
+    snap_top5 = cast(Snapshot, paths.load_dependency("papers_with_code_imagenet_top5.html"))
 
     # Load data from snapshot.
     # Read the HTML file
-    with open(snap.path, "r") as file:
+    with open(snap_top1.path, "r") as file:
         html_content = file.read()
+    df_top1 = shared.extract_data_papers_with_code(html_content)
+
+    with open(snap_top5.path, "r") as file:
+        html_content = file.read()
+    df_top5 = shared.extract_data_papers_with_code(html_content)
+
     #
     # Process data.
     #
-    df = shared.extract_data_papers_with_code(html_content)
 
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb_top1 = Table(df_top1, short_name="papers_with_code_imagenet_top1", underscore=True)
+    tb_top5 = Table(df_top5, short_name="papers_with_code_imagenet_top5", underscore=True)
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb_top1, tb_top5], default_metadata=snap_top1.metadata)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
