@@ -607,10 +607,12 @@ class Table(pd.DataFrame):
 
     def dropna(self, *args, **kwargs) -> "Table":
         tb = super().dropna(*args, **kwargs).copy()
-        for column in tb.columns:
-            tb[column].update_log(variable=column, parents=[column], operation="dropna")
+        for column in _get_all_variable_names_in_table(tb):
+            tb._fields[column].processing_log = variables.update_log(
+                processing_log=tb._fields[column].processing_log, variable=column, parents=[column], operation="dropna"
+            )
 
-        return tb
+        return cast("Table", tb)
 
     def update_log(
         self,
@@ -634,6 +636,15 @@ class Table(pd.DataFrame):
                 operation=operation,
                 comment=comment,
             )
+
+    def sort_values(self, by: str, *args, **kwargs) -> "Table":
+        tb = super().sort_values(by=by, *args, **kwargs).copy()
+        for column in _get_all_variable_names_in_table(tb):
+            tb._fields[column].processing_log = variables.update_log(
+                processing_log=tb._fields[column].processing_log, variable=column, parents=[by], operation="sort"
+            )
+
+        return cast("Table", tb)
 
 
 def merge(left, right, *args, **kwargs) -> Table:
@@ -813,9 +824,12 @@ def pivot(
 def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[TableMeta]) -> Table:
     if metadata is not None:
         table.metadata = metadata
-        for column in table.columns:
-            table[column].metadata.sources = metadata.dataset.sources  # type: ignore
-            table[column].metadata.licenses = metadata.dataset.licenses  # type: ignore
+        for column in _get_all_variable_names_in_table(table=table):
+            table._fields[column].sources = metadata.dataset.sources  # type: ignore
+            table._fields[column].licenses = metadata.dataset.licenses  # type: ignore
+        # for column in table.columns:
+        #     table[column].metadata.sources = metadata.dataset.sources  # type: ignore
+        #     table[column].metadata.licenses = metadata.dataset.licenses  # type: ignore
     if UPDATE_PROCESSING_LOG:
         table = update_processing_logs_when_loading_or_creating_table(table=table)
 
@@ -868,7 +882,7 @@ def update_processing_logs_when_saving_table(table: Table, path: Union[str, Path
     return table
 
 
-def _get_all_variable_names_in_table(table: Table) -> List[str]:
+def _get_all_variable_names_in_table(table: Union[pd.DataFrame, Table]) -> List[str]:
     # Get the names of all columns including those currently used for the index of the table (if any).
     all_variables = [name for name in table.index.names if name is not None] + list(table.columns)
 

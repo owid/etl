@@ -38,6 +38,7 @@ OPERATION = Literal[
     "melt",
     "pivot",
     "concat",
+    "sort",
 ]
 
 # Switch to write to processing log if True.
