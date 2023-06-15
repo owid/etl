@@ -183,9 +183,8 @@ def run(dest_dir: str) -> None:
 
     #
     # Process data.
-    #
-    # Drop numiso and uncode columns (auxiliary columns from the author's original dataset).
-    df = df.drop(columns=["numiso", "uncode"])
+    # Drop region column
+    df = df.drop(columns=["region"])
 
     # Harmonize country names.
     log.info("lgbti_policy_index.harmonize_countries")

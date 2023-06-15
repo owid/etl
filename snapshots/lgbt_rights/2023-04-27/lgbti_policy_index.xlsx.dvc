@@ -12,7 +12,7 @@ meta:
   file_extension: xlsx
   license_url:
   license_name: ''
-  date_accessed: 2023-03-31
+  date_accessed: 2023-06-15
   is_public: true
   description: |
     Velasco measures a country’s LGBT+ policy landscape with an original LGBT+ policy index that he created; the LGBT+ Policy Index captures the implementation of 18 different LGBT+ policies. Policies included in the index are limited to those adopted across at least three countries or are explicitly advocated for by transnational activists.
@@ -57,6 +57,6 @@ meta:
     Multiple sources were consulted to find the necessary data to construct this index. The primary data source was the State Sponsored Homophobia Reports produced by ILGA. These reports, produced almost annually, outline the adoption of various policies and provide some information on implementation. For information on trans- and intersex-specific policies and military information, other sources were used, including the Trans Legal Mapping Report, also produced by ILGA, reports and documentation provided by Transgender Europe, Movement Advancement Project, The Hague Center for Strategic Studies LGBT+ Military Index, and academic studies such as Reynolds (2013). Furthermore, multiple sources were used to obtain data on the evidence of enforcement – particularly arrests – including an extensive newspaper search across each country using LexisNexis and Factiva and other external reports by Amnesty International, Human Rights Watch, and the U.S. State Department.
 wdir: ../../../data/snapshots/lgbt_rights/2023-04-27
 outs:
-- md5: ef891cbe74677c191de6893fb0f0916b
-  size: 408425
+- md5: e82a8f0caecf5b3187afb24e70591ec4
+  size: 380622
   path: lgbti_policy_index.xlsx

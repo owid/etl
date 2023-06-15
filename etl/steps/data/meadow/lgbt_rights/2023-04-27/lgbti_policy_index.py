@@ -28,6 +28,14 @@ def run(dest_dir: str) -> None:
 
     #
     # Process data.
+
+    # Remove duplicated values for Australia in region = Europe (the author's original dataset has a duplicated value for Australia, one for Oceania and one for Europe).
+    mask = (df["country"] == "Australia") & (df["region"] == "Europe")
+
+    if mask.sum() > 0:
+        log.info("There are duplicated values for Australia in the Europe region. They will be removed.")
+        df = df[~mask]
+
     #
     # Verify index and sort
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
