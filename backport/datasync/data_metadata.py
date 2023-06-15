@@ -1,5 +1,6 @@
 import concurrent.futures
 import json
+import re
 from http.client import RemoteDisconnected
 from typing import Any, Dict, List, Union, cast
 from urllib.error import HTTPError, URLError
@@ -29,9 +30,20 @@ def variable_data_df_from_mysql(engine: Engine, variable_id: int) -> pd.DataFram
     return pd.read_sql(q, engine, params={"variable_id": variable_id})
 
 
+def _extract_variable_id_from_data_path(data_path: str) -> int:
+    match = re.search(r"/indicators/(\d+)", data_path)
+    if match:
+        return int(match.group(1))
+    else:
+        match = re.search(r"/data/(\d+)", data_path)
+        assert match, f"Could not find variableId in dataPath `{data_path}`"
+        return int(match.group(1))
+
+
 def _fetch_data_df_from_s3(data_path: str):
     try:
-        variable_id = int(data_path.split("/")[-1].replace(".json", ""))
+        variable_id = _extract_variable_id_from_data_path(data_path)
+
         # Cloudflare limits us to 600 requests per minute, retry in case we hit the limit
         # NOTE: increase wait time or attempts if we hit the limit too often
         for attempt in Retrying(
