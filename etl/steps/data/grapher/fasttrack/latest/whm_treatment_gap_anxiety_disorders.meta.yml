@@ -81,16 +81,18 @@ tables:
         unit: '%'
         description: Share who met the criteria for having an anxiety disorder in
           the past 12 months and received a treatment that potentially is not adequate.
-          "Potentially adequate treatment" was defined as pharmacological medication,
-          psychotherapy, or complementary alternative medicine.
+          "Other treatment" was defined as seeing a religious or spiritual advisor,
+          social worker, or counsellor in any setting other than specialist mental
+          health.
       other_treatments__conditional:
         title: Other treatments, conditional
         short_unit: '%'
         unit: '%'
         description: Share who received a treatment that potentially is not adequate,
           among those who met the criteria for an anxiety disorder in the past 12
-          months. "Potentially adequate treatment" was defined as pharmacological
-          medication, psychotherapy, or complementary alternative medicine.
+          months. "Other treatment" was defined as seeing a religious or spiritual
+          advisor, social worker, or counsellor in any setting other than specialist
+          mental health.
       untreated:
         title: Untreated
         short_unit: '%'
