@@ -100,6 +100,12 @@ class Dataset:
         for col in list(table.columns) + list(table.index.names):
             utils.validate_underscore(col, "Variable's name")
 
+        # make an assert from this
+        if not table.index.is_unique:
+            warnings.warn(
+                f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
+            )
+
         # check Float64 and Int64 columns for np.nan
         for col, dtype in table.dtypes.items():
             if dtype in NULLABLE_DTYPES:
