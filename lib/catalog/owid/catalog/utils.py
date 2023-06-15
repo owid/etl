@@ -19,15 +19,33 @@ def underscore(name: None, validate: bool = True) -> None:
     ...
 
 
-def underscore(name: Optional[str], validate: bool = True) -> Optional[str]:
+def underscore(name: Optional[str], validate: bool = True, camel_to_snake: bool = False) -> Optional[str]:
     """Convert arbitrary string to under_score. This was fine tuned on WDI bank column names.
     This function might evolve in the future, so make sure to have your use cases in tests
     or rather underscore your columns yourself.
+
+    Parameters
+    ----------
+    name : str
+        String to format.
+    validate: bool, optional
+        Whether to validate that the string is under_score. Defaults to True.
+    camel_to_snake: bool, optional
+        Whether to convert camelCase to snake_case. Defaults to False.
+
+    Returns
+    -------
+    str:
+        String using snake_case formatting.
     """
     if name is None:
         return None
 
     orig_name = name
+
+    # camelCase to snake_case
+    if camel_to_snake:
+        name = _camel_to_snake(name)
 
     name = (
         name.replace(" ", "_")
@@ -97,6 +115,28 @@ def underscore(name: Optional[str], validate: bool = True) -> Optional[str]:
         validate_underscore(name, f"`{orig_name}`")
 
     return name
+
+def _camel_to_snake(name: str) -> str:
+    """Convert string camelCase to snake_case.
+
+    Reference: https://stackoverflow.com/a/1176023/5056599 CC BY-SA 4.0
+
+    Example:
+    >>> _camel_to_snake('camelCase')
+    'camel_case'
+
+    Parameters
+    ----------
+    name : str
+        String using camelCase formatting.
+
+    Returns
+    -------
+    str:
+        String using snake_case formatting.
+    """
+    name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', name).lower()
 
 
 def _resolve_collisions(
