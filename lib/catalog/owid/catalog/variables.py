@@ -241,6 +241,33 @@ class Variable(pd.Series):
     def div(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> Series:
         return self.truediv(other=other, *args, **kwargs)
 
+    def update_log(
+        self, parents: List[Any], operation: str, variable: Optional[str] = None, comment: Optional[str] = None
+    ) -> None:
+        if variable is None:
+            # TODO: Should it be UNNAMED_VARIABLE instead of self.name?
+            variable = self.name or UNNAMED_VARIABLE
+        self.metadata.processing_log = update_log(
+            processing_log=self.metadata.processing_log,
+            variable=variable,
+            parents=parents,
+            operation=operation,
+            comment=comment,
+        )
+
+    def amend_log(
+        self,
+        variable: Optional[str] = None,
+        parents: Optional[List[Any]] = None,
+        operation: Optional[str] = None,
+        comment: Optional[str] = None,
+        entry_num: int = -1,
+    ) -> None:
+        fields = {"variable": variable, "parents": parents, "operation": operation, "comment": comment}
+        for field, value in fields.items():
+            if value:
+                self.metadata.processing_log[entry_num][field] = value
+
 
 # dynamically add all metadata properties to the class
 for k in VariableMeta.__dataclass_fields__:
@@ -329,24 +356,28 @@ def get_unique_licenses_from_variables(variables: List[Variable]) -> List[Licens
     return unique_licenses
 
 
-def add_entry_to_processing_log(
+def update_log(
     processing_log: List[Any],
     variable: str,
     parents: List[Any],
     operation: str,
     comment: Optional[str] = None,
 ) -> List[Any]:
+
+    if not UPDATE_PROCESSING_LOG:
+        # Avoid any processing and simply return the same input processing log.
+        return processing_log
+
     # Consider using a deepcopy if any of the operations in this function alter mutable objects in processing_log.
     processing_log_updated = processing_log.copy()
 
-    if UPDATE_PROCESSING_LOG:
-        # Define new log entry.
-        log_new_entry = {"variable": variable, "parents": parents, "operation": operation}
-        if comment is not None:
-            log_new_entry["comment"] = comment
+    # Define new log entry.
+    log_new_entry = {"variable": variable, "parents": parents, "operation": operation}
+    if comment is not None:
+        log_new_entry["comment"] = comment
 
-        # Add new entry to log.
-        processing_log_updated += [log_new_entry]
+    # Add new entry to log.
+    processing_log_updated += [log_new_entry]
 
     return processing_log_updated
 
@@ -386,7 +417,7 @@ def combine_variables_metadata(
     variables_and_scalars_names = [
         variable.name if hasattr(variable, "name") else str(variable) for variable in variables
     ]
-    metadata.processing_log = add_entry_to_processing_log(
+    metadata.processing_log = update_log(
         processing_log=metadata.processing_log,
         variable=name,
         parents=variables_and_scalars_names,

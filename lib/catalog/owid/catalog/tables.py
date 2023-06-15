@@ -390,7 +390,7 @@ class Table(pd.DataFrame):
 
             # Update processing log.
             if old_col != new_col:
-                fields[new_col].processing_log = variables.add_entry_to_processing_log(
+                fields[new_col].processing_log = variables.update_log(
                     processing_log=fields[new_col].processing_log,
                     variable=new_col,
                     parents=[old_col],
@@ -608,9 +608,7 @@ class Table(pd.DataFrame):
     def dropna(self, *args, **kwargs) -> "Table":
         tb = super().dropna(*args, **kwargs).copy()
         for column in tb.columns:
-            tb[column].metadata.processing_log = variables.add_entry_to_processing_log(
-                processing_log=tb[column].metadata.processing_log, variable=column, parents=[column], operation="dropna"
-            )
+            tb[column].update_log(variable=column, parents=[column], operation="dropna")
 
         return tb
 
@@ -640,12 +638,7 @@ def concat(objs: List[Table], *, axis: int = 0, join: str = "outer", ignore_inde
         for i, column in enumerate(table.columns):
             assert column == original_variables[i].name
             table[column].metadata = original_variables[i].metadata
-            table[column].metadata.processing_log = variables.add_entry_to_processing_log(
-                processing_log=table[column].metadata.processing_log,
-                variable=column,
-                parents=[column],
-                operation="concat",
-            )
+            table[column].update_log(variable=column, parents=[column], operation="concat")
     elif axis == 0:
         # Add to each column either the metadata of the original variable (if the variable appeared only in one of the input
         # tables) or the combination of the metadata from different tables (if the variable appeared in various tables).
@@ -874,7 +867,7 @@ def _add_processing_log_entry_to_each_variable(
             # avoid storing the same entry multiple times.
             # This happens for example when saving tables, given that tables are stored in different formats.
             # Otherwise, append a new entry to the processing log.
-            table._fields[column].processing_log = variables.add_entry_to_processing_log(
+            table._fields[column].processing_log = variables.update_log(
                 processing_log=table._fields[column].processing_log, **log_new_entry
             )
 
