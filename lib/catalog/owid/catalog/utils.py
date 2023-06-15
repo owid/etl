@@ -10,12 +10,12 @@ from .variables import Variable
 
 
 @overload
-def underscore(name: str, validate: bool = True) -> str:
+def underscore(name: str, validate: bool = True, camel_to_snake: bool = False) -> str:
     ...
 
 
 @overload
-def underscore(name: None, validate: bool = True) -> None:
+def underscore(name: None, validate: bool = True, camel_to_snake: bool = False) -> None:
     ...
 
 
