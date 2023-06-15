@@ -612,6 +612,29 @@ class Table(pd.DataFrame):
 
         return tb
 
+    def update_log(
+        self,
+        operation: str,
+        parents: Optional[List[Any]] = None,
+        variable_names: Optional[List[str]] = None,
+        comment: Optional[str] = None,
+    ):
+        # Append a new entry to the processing log of the required variables.
+        if variable_names is None:
+            # If no variable is specified, assume all (including index columns).
+            variable_names = _get_all_variable_names_in_table(table=self)
+        for column in variable_names:
+            # If parents is not defined, assume the parents are simply the current variable.
+            _parents = parents or [column]
+            # Update (in place) the processing log of current variable.
+            self._fields[column].processing_log = variables.update_log(
+                processing_log=self._fields[column].processing_log,
+                variable=column,
+                parents=_parents,
+                operation=operation,
+                comment=comment,
+            )
+
 
 def merge(left, right, *args, **kwargs) -> Table:
     # TODO: This function needs further logic. For example, to handle "on"/"left_on"/"right_on" columns,
