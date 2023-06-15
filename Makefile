@@ -13,18 +13,22 @@ LIBS = lib/*
 help:
 	@echo 'Available commands:'
 	@echo
-	@echo '  make etl       Fetch data and run all transformations for garden'
-	@echo '  make full      Fetch all data and run full transformations'
-	@echo '  make lab       Start a Jupyter Lab server'
-	@echo '  make test      Run all linting and unit tests'
-	@echo '  make publish   Publish the generated catalog to S3'
-	@echo '  make grapher   Publish supported datasets to Grapher'
-	@echo '  make dot       Build a visual graph of the dependencies'
-	@echo '  make watch     Run all tests, watching for changes'
-	@echo '  make clean     Delete all non-reference data in the data/ folder'
-	@echo '  make clobber   Delete non-reference data and .venv'
-	@echo '  make deploy    Re-run the full ETL on production'
-	@echo '  make docs      Serve documentation locally'
+	@echo '  make clean     	Delete all non-reference data in the data/ folder'
+	@echo '  make clobber   	Delete non-reference data and .venv'
+	@echo '  make deploy    	Re-run the full ETL on production'
+	@echo '  make docs      	Serve documentation locally'
+	@echo '  make dot       	Build a visual graph of the dependencies'
+	@echo '  make etl       	Fetch data and run all transformations for garden'
+	@echo '  make format    	Format code'
+	@echo '  make format-all 	Format code (including modules in lib/)'
+	@echo '  make full      	Fetch all data and run full transformations'
+	@echo '  make grapher   	Publish supported datasets to Grapher'
+	@echo '  make lab       	Start a Jupyter Lab server'
+	@echo '  make publish   	Publish the generated catalog to S3'
+	@echo '  make test      	Run all linting and unit tests'
+	@echo '  make test-all      Run all linting and unit tests (including for modules in lib/)'
+	@echo '  make watch     	Run all tests, watching for changes'
+	@echo '  make watch-all     Run all tests, watching for changes (including for modules in lib/)'
 	@echo
 
 docs: .venv
@@ -39,6 +43,14 @@ test-all:
 	@for lib in $(LIBS); do \
 		echo "================ $$lib ================="; \
 		(cd $$lib && make test); \
+	done
+
+format-all:
+	@echo '================ etl ================='
+	@make test
+	@for lib in $(LIBS); do \
+		echo "================ $$lib ================="; \
+		(cd $$lib && make format); \
 	done
 
 watch: .venv
