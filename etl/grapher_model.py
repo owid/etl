@@ -868,13 +868,13 @@ class Variable(SQLModel, table=True):
 
     def s3_data_path(self) -> str:
         """Path to S3 with data in JSON format for Grapher. Typically
-        s3://owid-catalog/baked-variables/live_grapher/data/123.json."""
-        return f"{config.BAKED_VARIABLES_PATH}/data/{self.id}.json"
+        s3://owid-api/v1/indicators/123.data.json."""
+        return f"{config.BAKED_VARIABLES_PATH}/{self.id}.data.json"
 
     def s3_metadata_path(self) -> str:
         """Path to S3 with metadata in JSON format for Grapher. Typically
-        s3://owid-catalog/baked-variables/live_grapher/metadata/123.json."""
-        return f"{config.BAKED_VARIABLES_PATH}/metadata/{self.id}.json"
+        s3://owid-api/v1/indicators/123.metadata.json."""
+        return f"{config.BAKED_VARIABLES_PATH}/{self.id}.metadata.json"
 
 
 class ChartDimensions(SQLModel, table=True):
