@@ -84,13 +84,14 @@ def test_underscore():
     )
 
     # camelCase to snake_case
-    assert (underscore("camelCase") == "camelCase")
-    assert (underscore("camelcase", camel_to_snake=True) == "camelcase")
-    assert (underscore("camelCase", camel_to_snake=True) == "camel_case")
-    assert (underscore("CamelCase", camel_to_snake=True) == "camel_case")
-    assert (underscore("CAMELCase", camel_to_snake=True) == "camel_case")
-    assert (underscore("camelCase1", camel_to_snake=True) == "camel_case1")
-    assert (underscore("camelCase_1", camel_to_snake=True) == "camel_case_1")
+    assert underscore("camelCase") == "camelCase"
+    assert underscore("camelcase", camel_to_snake=True) == "camelcase"
+    assert underscore("camelCase", camel_to_snake=True) == "camel_case"
+    assert underscore("CamelCase", camel_to_snake=True) == "camel_case"
+    assert underscore("CAMELCase", camel_to_snake=True) == "camel_case"
+    assert underscore("camelCase1", camel_to_snake=True) == "camel_case1"
+    assert underscore("camelCase_1", camel_to_snake=True) == "camel_case_1"
+
 
 def test_underscore_table():
     df = pd.DataFrame({"A": [1, 2, 3]})
