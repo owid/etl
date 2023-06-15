@@ -608,6 +608,15 @@ class Table(pd.DataFrame):
 
         return underscore_table(self, inplace=False)
 
+    def dropna(self, *args, **kwargs) -> "Table":
+        tb = super().dropna(*args, **kwargs).copy()
+        for column in tb.columns:
+            tb[column].metadata.processing_log = variables.add_entry_to_processing_log(
+                processing_log=tb[column].metadata.processing_log, variable=column, parents=[column], operation="dropna"
+            )
+
+        return tb
+
 
 def merge(left, right, *args, **kwargs) -> Table:
     # TODO: This function needs further logic. For example, to handle "on"/"left_on"/"right_on" columns,
@@ -617,9 +626,9 @@ def merge(left, right, *args, **kwargs) -> Table:
     columns_that_were_in_right = set(tb.columns) & set(right.columns)
 
     for column in columns_that_were_in_left:
-        tb[column].metadata = variables.combine_variables_metadata([left[column]], operation="merge")
+        tb[column].metadata = variables.combine_variables_metadata([left[column]], operation="merge", name=column)
     for column in columns_that_were_in_right:
-        tb[column].metadata = variables.combine_variables_metadata([right[column]], operation="merge")
+        tb[column].metadata = variables.combine_variables_metadata([right[column]], operation="merge", name=column)
 
     return tb
 
