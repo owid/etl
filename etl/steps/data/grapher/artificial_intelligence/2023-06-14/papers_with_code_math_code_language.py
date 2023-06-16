@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden["papers_with_code_math_code_language"]
     tb = tb.rename(columns={"name": "country"})
-    tb = tb.rename(columns={"days_since_2019": "year"})
+    tb = tb.rename(columns={"days_since": "year"})
 
     #
     # Process data.

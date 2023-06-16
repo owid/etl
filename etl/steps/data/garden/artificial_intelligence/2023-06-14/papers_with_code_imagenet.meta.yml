@@ -31,16 +31,13 @@ tables:
         short_unit: '%'
         display:
           numDecimalPlaces: 0
-      training_data_papers_with_code_imagenet_top1:
-        title: 'Extra Data (Top - 1 Accuracy)'
-        unit: ''
       papers_with_code_imagenet_top5:
         title: Top-5 accuracy
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 0
-      training_data_papers_with_code_imagenet_top5:
-        title:  'Extra Data (Top - 5 Accuracy)'
+      training_data:
+        title: With/without extra training data
         unit: ''
 

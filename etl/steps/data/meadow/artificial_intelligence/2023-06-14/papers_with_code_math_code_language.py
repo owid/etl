@@ -124,13 +124,23 @@ def language_extract(html_content):
         evaluation_date_match = re.search(r'"evaluation_date":\s*"([^"]*)"', entry_str)
 
         # Extract the values from the match objects if available
-        method_short = method_short_match.group(1) if method_short_match else np.nan
-        average = average_match.group(1) if average_match else np.nan
-        humanities = humanities_match.group(1) if humanities_match else np.nan
-        stem = stem_match.group(1) if stem_match else np.nan
-        social_sciences = social_sciences_match.group(1) if social_sciences_match else np.nan
-        other = other_match.group(1) if other_match else np.nan
-        evaluation_date = evaluation_date_match.group(1) if evaluation_date_match else np.nan
+        method_short = (
+            method_short_match.group(1) if method_short_match and method_short_match.group(1) != "null" else np.nan
+        )
+        average = average_match.group(1) if average_match and average_match.group(1) != "null" else np.nan
+        humanities = humanities_match.group(1) if humanities_match and humanities_match.group(1) != "null" else np.nan
+        stem = stem_match.group(1) if stem_match and stem_match.group(1) != "null" else np.nan
+        social_sciences = (
+            social_sciences_match.group(1)
+            if social_sciences_match and social_sciences_match.group(1) != "null"
+            else np.nan
+        )
+        other = other_match.group(1) if other_match and other_match.group(1) != "null" else np.nan
+        evaluation_date = (
+            evaluation_date_match.group(1)
+            if evaluation_date_match and evaluation_date_match.group(1) != "null"
+            else np.nan
+        )
 
         # Add the extracted data to the list
         table_data.append((method_short, average, humanities, stem, social_sciences, other, evaluation_date))
@@ -138,7 +148,16 @@ def language_extract(html_content):
     # Convert the table data to a DataFrame
     df = pd.DataFrame(
         table_data,
-        columns=["name", "Average (%)", "Humanities", "STEM", "Social Sciences", "Other", "date"],
+        columns=[
+            "name",
+            "performance_language_average",
+            "performance_humanities",
+            "performance_stem",
+            "performance_social_sciences",
+            "performance_other",
+            "date",
+        ],
     )
+    df = df.replace('"', "", regex=True)
 
     return df

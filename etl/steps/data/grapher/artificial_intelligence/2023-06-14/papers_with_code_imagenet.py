@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = tb.rename(columns={"name": "country"})
-    print(tb)
+    tb = tb.rename(columns={"days_since": "year"})
 
     #
     # Save outputs.

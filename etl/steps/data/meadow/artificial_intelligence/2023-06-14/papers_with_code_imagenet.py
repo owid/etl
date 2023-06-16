@@ -101,7 +101,6 @@ def imagenet_html_extract(html_content):
         method_short_match = re.search(r'"method_short":\s*"([^"]*)"', entry_str)
         top_1_accuracy_match = re.search(r'"Top 1 Accuracy":\s*"([^"]*)"', entry_str)
         top_5_accuracy_match = re.search(r'"Top 5 Accuracy":\s*"([^"]*)"', entry_str)
-        number_of_params_match = re.search(r'"Number of params":\s*"([^"]*)"', entry_str)
         uses_additional_data_match = re.search(r'"uses_additional_data":\s*(true|false)', entry_str)
         evaluation_date_match = re.search(r'"evaluation_date":\s*"([^"]*)"', entry_str)
 
@@ -109,24 +108,30 @@ def imagenet_html_extract(html_content):
         method_short = method_short_match.group(1) if method_short_match else np.nan
         top_1_accuracy = top_1_accuracy_match.group(1) if top_1_accuracy_match else np.nan
         top_5_accuracy = top_5_accuracy_match.group(1) if top_5_accuracy_match else np.nan
-        number_of_params = number_of_params_match.group(1) if number_of_params_match else np.nan
         uses_additional_data = uses_additional_data_match.group(1).lower() if uses_additional_data_match else np.nan
         evaluation_date = evaluation_date_match.group(1) if evaluation_date_match else np.nan
 
-        table_data.append(
-            (method_short, top_1_accuracy, top_5_accuracy, number_of_params, uses_additional_data, evaluation_date)
-        )
+        table_data.append((method_short, top_1_accuracy, top_5_accuracy, uses_additional_data, evaluation_date))
 
     # Convert the table data to a DataFrame
     df = pd.DataFrame(
         table_data,
         columns=[
-            "Method Short",
-            "Top 1 Accuracy",
-            "Top 5 Accuracy",
-            "Number of Params",
-            "Uses Additional Data",
-            "Evaluation Date",
+            "name",
+            "papers_with_code_imagenet_top1",
+            "papers_with_code_imagenet_top5",
+            "training_data",
+            "date",
         ],
     )
+    df = df.replace("%", "", regex=True)
+    df["training_data"] = df["training_data"].replace("false", "Without extra data")
+    df["training_data"] = df["training_data"].replace("true", "With extra data")
+    # Pivot the DataFrame based on the "training_data" column
+    df.loc[df["training_data"] == "With extra data", "name"] = (
+        df.loc[df["training_data"] == "With extra data", "name"] + "*"
+    )
+    # Reset the index
+    df = df.reset_index(drop=True)
+
     return df
