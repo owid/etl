@@ -112,14 +112,31 @@ _MyDumper.add_representer(
 )
 
 
-def yaml_dump(d: Dict[str, Any], stream: Optional[TextIO] = None, strip_lines: bool = True) -> Optional[str]:
+def yaml_dump(
+    d: Dict[str, Any], stream: Optional[TextIO] = None, strip_lines: bool = True, replace_confusing_ascii: bool = False
+) -> Optional[str]:
     """Alternative to yaml.dump which produces good looking multi-line strings and perserves ordering
     of keys. If strip_lines is True, all lines in the string will be stripped and all tabs will be
     replaced by two spaces."""
     # strip lines, otherwise YAML won't output strings in literal format
     if strip_lines:
         d = _strip_lines_in_dict(d)
-    return yaml.dump(d, stream=stream, sort_keys=False, allow_unicode=True, Dumper=_MyDumper, width=120)
+    s = yaml.dump(d, stream=stream, sort_keys=False, allow_unicode=True, Dumper=_MyDumper, width=120)
+    if replace_confusing_ascii:
+        assert s, "replace_confusing_ascii does not work for streams"
+        s = (
+            s.replace("’", "'")
+            .replace("‘", "'")
+            .replace("“", '"')
+            .replace("”", '"')
+            .replace("–", "-")
+            .replace("‑", "")
+            .replace("…", "...")
+            .replace("—", "-")
+            .replace("•", "-")
+            .replace(" ", " ")
+        )
+    return s
 
 
 def _strip_lines(s: str) -> str:
