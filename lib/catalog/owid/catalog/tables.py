@@ -607,7 +607,7 @@ class Table(pd.DataFrame):
 
     def dropna(self, *args, **kwargs) -> "Table":
         tb = super().dropna(*args, **kwargs).copy()
-        for column in _get_all_variable_names_in_table(tb):
+        for column in list(tb.all_columns):
             tb._fields[column].processing_log = variables.update_log(
                 processing_log=tb._fields[column].processing_log, variable=column, parents=[column], operation="dropna"
             )
@@ -624,7 +624,7 @@ class Table(pd.DataFrame):
         # Append a new entry to the processing log of the required variables.
         if variable_names is None:
             # If no variable is specified, assume all (including index columns).
-            variable_names = _get_all_variable_names_in_table(table=self)
+            variable_names = list(self.all_columns)
         for column in variable_names:
             # If parents is not defined, assume the parents are simply the current variable.
             _parents = parents or [column]
@@ -639,7 +639,7 @@ class Table(pd.DataFrame):
 
     def sort_values(self, by: str, *args, **kwargs) -> "Table":
         tb = super().sort_values(by=by, *args, **kwargs).copy()
-        for column in _get_all_variable_names_in_table(tb):
+        for column in list(tb.all_columns):
             tb._fields[column].processing_log = variables.update_log(
                 processing_log=tb._fields[column].processing_log, variable=column, parents=[by], operation="sort"
             )
@@ -824,7 +824,7 @@ def pivot(
 def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[TableMeta]) -> Table:
     if metadata is not None:
         table.metadata = metadata
-        for column in _get_all_variable_names_in_table(table=table):
+        for column in list(table.all_columns):
             table._fields[column].sources = metadata.dataset.sources  # type: ignore
             table._fields[column].licenses = metadata.dataset.licenses  # type: ignore
         # for column in table.columns:
@@ -881,20 +881,11 @@ def update_processing_logs_when_saving_table(table: Table, path: Union[str, Path
     return table
 
 
-def _get_all_variable_names_in_table(table: Union[pd.DataFrame, Table]) -> List[str]:
-    # Get the names of all columns including those currently used for the index of the table (if any).
-    all_variables = [name for name in table.index.names if name is not None] + list(table.columns)
-
-    return all_variables
-
-
 def _add_processing_log_entry_to_each_variable(
     table: Table, parents: List[Any], operation: variables.OPERATION
 ) -> Table:
-    # Get the names of all columns including those currently used for the index of the table (if any).
-    all_columns = _get_all_variable_names_in_table(table=table)
-
-    for column in all_columns:
+    # Add a processing log entry to each column, including index columns.
+    for column in list(table.all_columns):
         # New entry to add to the processing log.
         log_new_entry = {"variable": column, "parents": parents, "operation": operation}
 
@@ -923,11 +914,9 @@ def assign_dataset_sources_and_licenses_to_each_variable(table: Table) -> Table:
         # There are no default sources/licenses to assign to each variable.
         return table
 
-    # Get the names of all columns including those currently used for the index of the table (if any).
-    all_columns = _get_all_variable_names_in_table(table=table)
-
     # If a variable does not have sources/licenses defined, assign the ones from the dataset.
-    for column in all_columns:
+    # Do this for all columns, including index columns.
+    for column in list(table.all_columns):
         if len(table._fields[column].sources) == 0:
             table._fields[column].sources = sources
         if len(table._fields[column].licenses) == 0:
