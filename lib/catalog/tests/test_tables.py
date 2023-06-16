@@ -14,7 +14,7 @@ import pytest
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
 from owid.catalog.tables import SCHEMA, Table
-from owid.catalog.variables import UPDATE_PROCESSING_LOG, Variable
+from owid.catalog.variables import PROCESSING_LOG, Variable
 
 from .mocking import mock
 
@@ -296,7 +296,7 @@ def test_copy_metadata_from() -> None:
 def test_addition_without_metadata() -> None:
     t: Table = Table({"a": [1, 2], "b": [3, 4]})
     t["c"] = t["a"] + t["b"]
-    if UPDATE_PROCESSING_LOG:
+    if PROCESSING_LOG:
         expected_metadata = VariableMeta(processing_log=[{"variable": "c", "parents": ["a", "b"], "operation": "+"}])
     else:
         expected_metadata = VariableMeta()
@@ -310,7 +310,7 @@ def test_addition_with_metadata() -> None:
 
     t["c"] = t["a"] + t["b"]
 
-    if UPDATE_PROCESSING_LOG:
+    if PROCESSING_LOG:
         expected_metadata = VariableMeta(processing_log=[{"variable": "c", "parents": ["a", "b"], "operation": "+"}])
     else:
         expected_metadata = VariableMeta()

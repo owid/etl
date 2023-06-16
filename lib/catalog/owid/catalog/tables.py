@@ -22,7 +22,6 @@ from pandas.util._decorators import rewrite_axis_style_signature
 
 from . import variables
 from .meta import Source, TableMeta, VariableMeta
-from .variables import UPDATE_PROCESSING_LOG
 
 log = structlog.get_logger()
 
@@ -830,8 +829,7 @@ def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[
         # for column in table.columns:
         #     table[column].metadata.sources = metadata.dataset.sources  # type: ignore
         #     table[column].metadata.licenses = metadata.dataset.licenses  # type: ignore
-    if UPDATE_PROCESSING_LOG:
-        table = update_processing_logs_when_loading_or_creating_table(table=table)
+    table = update_processing_logs_when_loading_or_creating_table(table=table)
 
     return table
 
