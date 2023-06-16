@@ -52,7 +52,7 @@ def run(dest_dir: str) -> None:
 
     merged_df = pd.concat(df_list)
 
-    all_dfs = pd.merge(lang_df, merged_df, on=["date", "name"])
+    all_dfs = pd.merge(lang_df, merged_df, on=["date", "name"], how="outer")
     all_dfs.reset_index(inplace=True, drop=True)
 
     #
