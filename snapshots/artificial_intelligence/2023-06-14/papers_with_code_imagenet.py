@@ -19,7 +19,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"artificial_intelligence/{SNAPSHOT_VERSION}/papers_with_code_imagenet_top1.html")
+    snap = Snapshot(f"artificial_intelligence/{SNAPSHOT_VERSION}/papers_with_code_imagenet.html")
 
     # Download data from source.
     snap.download_from_source()

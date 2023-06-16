@@ -3,7 +3,7 @@ import re
 import pandas as pd
 
 
-def extract_data_papers_with_code(html_content):
+def extract_data_papers_with_code(html_content, metric):
     # Define the regex pattern to match the table information
     pattern = r'\{"x": "(.*?)", "y": (.*?), "name": "(.*?)", "nameShort": "(.*?)", "nameDetails": "(.*?)", "paperSlug": "(.*?)", "usesAdditionalData": (.*?)\}'
 
@@ -19,7 +19,7 @@ def extract_data_papers_with_code(html_content):
         uses_additional_data = match[6]
 
         # Append the extracted information to the data list
-        data.append({"date": x, "performance": y, "name": name, "additional_data": uses_additional_data})
+        data.append({"date": x, "performance_" + metric: y, "name": name, "additional_data": uses_additional_data})
 
     # Create the DataFrame from the data list
     df = pd.DataFrame(data)

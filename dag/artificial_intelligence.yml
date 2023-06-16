@@ -11,23 +11,19 @@ steps:
   # Artificial Intelligence Papers with Code (benchmarks)
   # ImageNet
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
-    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet_top1.html
-    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet_top5.html
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet.html
   data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
     - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet
   data://grapher/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet
 
 
-  # Math
-  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math:
+  # Math & Code and Language
+  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_math.html
-  data://garden/artificial_intelligence/2023-06-14/papers_with_code_math:
-    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math
-  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_math:
-    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_math
-
-  # Code
-
-  # Language
-
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_coding.html
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_language.html
+  data://garden/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
+  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
