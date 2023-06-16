@@ -1,0 +1,21 @@
+meta:
+  namespace: fasttrack
+  short_name: guinea_worm
+  file_extension: csv
+  date_accessed: 2023-06-16
+  name: Guinea Worm Cases - Carter Center (2023)
+  description: The number of cases of guinea worm disease worldwide since 1989
+  source_name: Google Sheet
+  url: 
+    https://www.cartercenter.org/resources/pdfs/news/health_publications/guinea_worm/guinea-worm-cases-by-year-from-1989.pdf
+  source_published_by: Google Sheet
+  source_data_url: 
+    gAAAAABkjHGN8__lM1kWeAJ-Roi9h4dPLV5NzypX6f2DXgz7O3tbipv-3RjyDQ-3tCvLD3lQE8DWIftWrUCN8wCGSVXtOdEEXKmw6MhSJeCfR8al29r2AyZhLCWq3aW66DIgQW2cMmV88msDH0nNGkdvKaJ69nSRCEKbINaFioWZZQNbWSWoeHGexWOsG_Y-9VZnY8Yc1HS39XOwKnNZtAtmC9iPZg59MO0tVkoTc_q_dude2tq9bOsF76u9tBErhJxlV7r842K1
+  is_public: false
+  version: '2023-06-16'
+  publication_year: 2023
+wdir: ../../../data/snapshots/fasttrack/2023-06-16
+outs:
+- md5: 44af3d83549167d5edde31c323526c19
+  size: 582
+  path: guinea_worm.csv
