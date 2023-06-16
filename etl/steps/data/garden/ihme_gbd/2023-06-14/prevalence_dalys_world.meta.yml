@@ -1,0 +1,46 @@
+all_sources:
+  - source_testing: &source-ihme
+      name: IHME, Global Burden of Disease (2020)
+      published_by: 'Global Burden of Disease Collaborative Network. Global Burden
+        of Disease Study 2019 (GBD 2019) Results. Seattle, United States: Institute for
+        Health Metrics and Evaluation (IHME), 2020. Available from https://vizhub.healthdata.org/gbd-results/'
+      url: https://vizhub.healthdata.org/gbd-results/
+      date_accessed: 2023-05-15
+      publication_year: 2020
+      # description: Source description.
+
+dataset:
+  title: "Global Burden of Disease: Mental disorders, Global DALYs and prevalence rates (IHME, 2020)"
+  description: >-
+    The Global Burden of Disease (GBD) provides a comprehensive picture of mortality and disability across countries, time, age, and sex. It quantifies health loss from hundreds of diseases, injuries, and risk factors, so that health systems can be improved and disparities eliminated.
+
+
+    GBD research incorporates both the prevalence of a given disease or risk factor and the relative harm it causes. With these tools, decision-makers can compare different health issues and their effects.
+
+
+    This dataset only contains Prevalence rates and DALYs rates metrics for mental health-related causes and for the World (i.e. no country data).
+
+  licenses:
+    - name: IHME Free-of-Charge Non-Commercial-User Agreement
+      url: https://www.healthdata.org/data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
+  sources:
+    - *source-ihme
+
+tables:
+  prevalence_dalys_world:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      dalys_rate:
+        title: DALYs (rate)
+        description: >-
+          One DALY represents the loss of the equivalent of one year of full health. DALYs for a disease or health condition are the sum of the years of life lost to due
+          to premature mortality (YLLs) and the years lived with a disability (YLDs) due to prevalent cases of the disease or health condition in a population.
+
+          This is estimated as the total number of DALYs per 100,000 population.
+        unit: DALYs per 100,000 people
+      share_rate:
+        title: Prevalence (share of population)
+        description: >-
+          Share of population of a particular disease or health condition. This is estimated as the total share of cases with anxiety disorders relative to the population of a country.
+        unit: "%"
+        short_unit: "%"

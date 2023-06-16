@@ -1,11 +1,11 @@
 """Google Sheet utils."""
 import os
-from typing import Union, Any, Optional
+from typing import Any, Optional, Union
+
+import pandas as pd
 from gsheets import Sheets
 from gsheets.models import SpreadSheet, WorkSheet
-
 from owid.datautils.google.config import CLIENT_SECRETS_PATH, CREDENTIALS_PATH
-import pandas as pd
 
 
 class GSheetsApi:

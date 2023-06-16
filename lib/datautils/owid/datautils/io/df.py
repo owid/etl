@@ -1,11 +1,10 @@
 """DataFrame io operations."""
 import inspect
 from pathlib import Path
+from typing import Any, List, Optional, Union
 
 import pandas as pd
 from owid.datautils.decorators import enable_file_download
-from typing import Any, Optional, Union, List
-
 
 COMPRESSION_SUPPORTED = ["gz", "bz2", "zip", "xz", "zst", "tar"]
 

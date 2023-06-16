@@ -2,10 +2,11 @@
 
 
 import functools
-from owid.datautils.web import download_file_from_url
-from owid.datautils.s3 import S3
 import tempfile
-from typing import Callable, Any, Optional
+from typing import Any, Callable, Optional
+
+from owid.datautils.s3 import S3
+from owid.datautils.web import download_file_from_url
 
 
 def enable_file_download(path_arg_name: Optional[str] = None) -> Callable[[Any], Any]:

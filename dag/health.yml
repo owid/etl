@@ -84,7 +84,13 @@ steps:
   data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
     - data://meadow/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
   data://grapher/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
-  - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
+    - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
+  # DALYs vs Prevalence
+  data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world:
+    - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
+    - data://garden/ihme_gbd/2019/gbd_cause
+  data://grapher/ihme_gbd/2023-06-14/prevalence_dalys_world:
+    - data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world
 
   # Temporary additional to add Drug Disorders to grapher
   data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders:
@@ -179,6 +185,13 @@ steps:
     - snapshot://fasttrack/2023-05-31/cholera.csv
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2021-07-01/wb_income
-
   data://grapher/who/2023-06-01/cholera:
     - data://garden/who/2023-06-01/cholera
+
+  # Diarrhea treatment
+  data://meadow/unicef/2023-06-16/diarrhea:
+    - snapshot://unicef/2023-06-16/diarrhea.xlsx
+  data://garden/unicef/2023-06-16/diarrhea:
+    - data://meadow/unicef/2023-06-16/diarrhea
+  data://grapher/unicef/2023-06-16/diarrhea:
+    - data://garden/unicef/2023-06-16/diarrhea

@@ -1,8 +1,8 @@
 """Input/Output functions for local files."""
 
+import tarfile
 import zipfile
 from pathlib import Path
-import tarfile
 from typing import Union
 
 from owid.datautils.decorators import enable_file_download

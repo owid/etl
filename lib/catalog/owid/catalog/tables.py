@@ -13,7 +13,6 @@ from typing import Any, Dict, List, Literal, Optional, Tuple, Union, cast, overl
 import pandas as pd
 import pyarrow
 import pyarrow.parquet as pq
-import requests
 import structlog
 import yaml
 from owid.repack import repack_frame
@@ -335,6 +334,8 @@ class Table(pd.DataFrame):
 
     @staticmethod
     def _read_metadata(data_path: str) -> Dict[str, Any]:
+        import requests
+
         metadata_path = splitext(data_path)[0] + ".meta.json"
 
         if metadata_path.startswith("http"):

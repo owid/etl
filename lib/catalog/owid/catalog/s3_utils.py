@@ -8,7 +8,6 @@ from os import path
 from typing import Any, Tuple
 from urllib.parse import urlparse
 
-import boto3
 from botocore.exceptions import ClientError
 
 SPACES_ENDPOINT = "https://nyc3.digitaloceanspaces.com"
@@ -72,6 +71,8 @@ def download(s3_url: str, filename: str, quiet: bool = False) -> None:
 
 def connect() -> Any:
     "Return a connection to Walden's DigitalOcean space."
+    import boto3
+
     check_for_default_profile()
 
     session = boto3.Session(profile_name=AWS_PROFILE)
