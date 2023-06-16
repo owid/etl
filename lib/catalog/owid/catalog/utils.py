@@ -231,9 +231,11 @@ def concat_variables(variables: List[Variable]) -> Table:
     return t
 
 
-def dynamic_yaml_load(path: Union[Path, str]) -> dict:
+def dynamic_yaml_load(path: Union[Path, str], params: dict = {}) -> dict:
     with open(path) as istream:
         yd = dynamic_yaml.load(istream)
+
+    yd.update(params)
 
     # additional parameters
     yd["TODAY"] = dt.datetime.now().astimezone(pytz.timezone("Europe/London")).strftime("%-d %B %Y")

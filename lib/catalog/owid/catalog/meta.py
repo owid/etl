@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 
+import pandas as pd
 from dataclasses_json import dataclass_json
 
 from . import utils
@@ -185,9 +186,16 @@ class DatasetMeta:
     def from_dict(d: Dict[str, Any]) -> "DatasetMeta":
         ...
 
+    def _params_yaml(self) -> dict:
+        """Parameters passed to YAML for dynamic interpolation."""
+        params = {}
+        if self.version and self.version != "latest":
+            params["YEAR"] = pd.to_datetime(self.version).year
+        return params
+
     def update_from_yaml(self, path: Union[Path, str], if_source_exists: SOURCE_EXISTS_OPTIONS = "fail") -> None:
         """The main reason for wanting to do this is to manually override what goes into Grapher before an export."""
-        annot = utils.dynamic_yaml_load(path)
+        annot = utils.dynamic_yaml_load(path, self._params_yaml())
 
         dataset_sources = annot.get("dataset", {}).get("sources", []) or []
 

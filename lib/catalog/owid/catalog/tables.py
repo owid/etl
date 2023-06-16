@@ -452,8 +452,10 @@ class Table(pd.DataFrame):
         :param path: Path to YAML file.
         :param table_name: Name of table, also updates this in the metadata.
         """
+        from .meta import DatasetMeta
         from .utils import dynamic_yaml_load
-        annot = dynamic_yaml_load(path)
+
+        annot = dynamic_yaml_load(path, DatasetMeta._params_yaml(self.metadata.dataset or DatasetMeta()))
 
         self.metadata.short_name = table_name
 
