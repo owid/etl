@@ -1,17 +1,15 @@
 """S3 utils."""
 
-import os
 import json
+import os
 import tempfile
 from os import path
-from typing import Union, Tuple, Any, List
-from mypy_boto3_s3 import S3Client
+from typing import Any, List, Tuple, Union
+from urllib.parse import urlparse
 
 import pandas as pd
-import boto3
-from urllib.parse import urlparse
-from botocore.exceptions import ClientError
 import structlog
+from botocore.exceptions import ClientError
 
 logger = structlog.get_logger()
 
@@ -30,8 +28,10 @@ class S3:
     def __init__(self, profile_name: str = AWS_PROFILE) -> None:
         self.client = self.connect(profile_name)
 
-    def connect(self, profile_name: str = AWS_PROFILE) -> S3Client:
+    def connect(self, profile_name: str = AWS_PROFILE) -> Any:
         """Return a connection to Walden's DigitalOcean space."""
+        import boto3
+
         check_for_aws_profile(profile_name)
 
         session = boto3.Session(profile_name=profile_name)
