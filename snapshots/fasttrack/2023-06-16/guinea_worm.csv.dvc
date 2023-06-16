@@ -10,8 +10,8 @@ meta:
     https://www.cartercenter.org/resources/pdfs/news/health_publications/guinea_worm/guinea-worm-cases-by-year-from-1989.pdf
   source_published_by: Google Sheet
   source_data_url: 
-    gAAAAABkjHGN8__lM1kWeAJ-Roi9h4dPLV5NzypX6f2DXgz7O3tbipv-3RjyDQ-3tCvLD3lQE8DWIftWrUCN8wCGSVXtOdEEXKmw6MhSJeCfR8al29r2AyZhLCWq3aW66DIgQW2cMmV88msDH0nNGkdvKaJ69nSRCEKbINaFioWZZQNbWSWoeHGexWOsG_Y-9VZnY8Yc1HS39XOwKnNZtAtmC9iPZg59MO0tVkoTc_q_dude2tq9bOsF76u9tBErhJxlV7r842K1
-  is_public: false
+    https://docs.google.com/spreadsheets/d/e/2PACX-1vQRR-nQzFpJXWz6cuB9aqrt2yt2Z8BtOtu3eNkF4WvI3xuNEdinb0vCN3wIagy2hEOHiSj3xUAffHeX/pub?output=csv
+  is_public: true
   version: '2023-06-16'
   publication_year: 2023
 wdir: ../../../data/snapshots/fasttrack/2023-06-16
