@@ -5,7 +5,7 @@
 import copy
 import json
 import os
-from typing import Any, Dict, List, Literal, Optional, Union, cast
+from typing import Any, Dict, List, Literal, Optional, Union, cast, overload
 
 import pandas as pd
 import structlog
@@ -261,16 +261,22 @@ class Variable(pd.Series):
 
     def amend_log(
         self,
-        variable: Optional[str] = None,
+        variable_name: Optional[str] = None,
         parents: Optional[List[Any]] = None,
         operation: Optional[str] = None,
         comment: Optional[str] = None,
         entry_num: int = -1,
+        inplace: bool = False,
     ) -> None:
-        fields = {"variable": variable, "parents": parents, "operation": operation, "comment": comment}
-        for field, value in fields.items():
-            if value:
-                self.metadata.processing_log[entry_num][field] = value
+        return amend_log(
+            variable=self,
+            variable_name=variable_name,
+            parents=parents,
+            operation=operation,
+            comment=comment,
+            entry_num=entry_num,
+            inplace=inplace,
+        )
 
 
 # dynamically add all metadata properties to the class
@@ -385,6 +391,30 @@ def add_entry_to_processing_log(
     return processing_log_updated
 
 
+@overload
+def update_log(
+    variable: Variable,
+    parents: List[Any],
+    operation: str,
+    variable_name: Optional[str] = None,
+    comment: Optional[str] = None,
+    inplace: bool = True,
+) -> None:
+    ...
+
+
+@overload
+def update_log(
+    variable: Variable,
+    parents: List[Any],
+    operation: str,
+    variable_name: Optional[str] = None,
+    comment: Optional[str] = None,
+    inplace: bool = False,
+) -> Variable:
+    ...
+
+
 def update_log(
     variable: Variable,
     parents: List[Any],
@@ -408,6 +438,80 @@ def update_log(
         parents=parents,
         operation=operation,
         comment=comment,
+    )
+
+    if not inplace:
+        return variable
+
+
+def amend_entry_in_processing_log(
+    processing_log: List[Dict[str, Any]],
+    parents: Optional[List[Any]],
+    operation: Optional[str],
+    variable_name: Optional[str] = None,
+    comment: Optional[str] = None,
+    entry_num: Optional[int] = -1,
+) -> List[Any]:
+    if not PROCESSING_LOG:
+        # Avoid any processing and simply return the same input processing log.
+        return processing_log
+
+    # Consider using a deepcopy if any of the operations in this function alter mutable objects in processing_log.
+    processing_log_updated = copy.deepcopy(processing_log)
+
+    fields = {"variable": variable_name, "parents": parents, "operation": operation, "comment": comment}
+    for field, value in fields.items():
+        if value:
+            processing_log_updated[entry_num][field] = value  # type: ignore
+
+    return processing_log_updated
+
+
+@overload
+def amend_log(
+    variable: Variable,
+    variable_name: Optional[str] = None,
+    parents: Optional[List[Any]] = None,
+    operation: Optional[str] = None,
+    comment: Optional[str] = None,
+    entry_num: int = -1,
+    inplace: bool = True,
+) -> None:
+    ...
+
+
+@overload
+def amend_log(
+    variable: Variable,
+    variable_name: Optional[str] = None,
+    parents: Optional[List[Any]] = None,
+    operation: Optional[str] = None,
+    comment: Optional[str] = None,
+    entry_num: int = -1,
+    inplace: bool = False,
+) -> Variable:
+    ...
+
+
+def amend_log(
+    variable: Variable,
+    variable_name: Optional[str] = None,
+    parents: Optional[List[Any]] = None,
+    operation: Optional[str] = None,
+    comment: Optional[str] = None,
+    entry_num: int = -1,
+    inplace: bool = False,
+) -> Optional[Variable]:
+    if not inplace:
+        variable = variable.copy()
+
+    variable.metadata.processing_log = amend_entry_in_processing_log(
+        processing_log=variable.metadata.processing_log,
+        parents=parents,
+        operation=operation,
+        variable_name=variable_name,
+        comment=comment,
+        entry_num=entry_num,
     )
 
     if not inplace:
