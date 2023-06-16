@@ -1,0 +1,33 @@
+tables:
+  diarrhea:
+    variables:
+      diarcare:
+        title: Careseeking for diarrhea - percentage of children (under age 5) with diarrhea for whom advice or treatment was sought from a health facility or provider
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      ors:
+        title: Diarrhea treatment - percentage of children (under age 5) with diarrhea who received ORS (packets or pre-packaged fluids)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      orszinc:
+        title: Diarrhea treatment - percentage of children (under age 5) with diarrhea who received ORS and zinc
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      ortcf:
+        title: Diarrhea treatment - percentage of children (under age 5) with diarrhea who received ORT (oral rehydration salts or recommended homemade fluids or increased fluids) and continued feeding
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      zinc:
+        title: Diarrhea treatment - percentage of children (under age 5) with diarrhea who received zinc
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
