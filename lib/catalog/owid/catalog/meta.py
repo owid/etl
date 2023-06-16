@@ -9,8 +9,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 
-import yaml
 from dataclasses_json import dataclass_json
+
+from . import utils
 
 T = TypeVar("T")
 
@@ -186,8 +187,7 @@ class DatasetMeta:
 
     def update_from_yaml(self, path: Union[Path, str], if_source_exists: SOURCE_EXISTS_OPTIONS = "fail") -> None:
         """The main reason for wanting to do this is to manually override what goes into Grapher before an export."""
-        with open(path) as istream:
-            annot = yaml.safe_load(istream)
+        annot = utils.dynamic_yaml_load(path)
 
         dataset_sources = annot.get("dataset", {}).get("sources", []) or []
 

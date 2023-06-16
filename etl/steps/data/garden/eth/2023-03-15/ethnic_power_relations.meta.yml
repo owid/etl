@@ -14,6 +14,12 @@ all_sources:
       publication_date: 2021-06-08
       description: The ACD2EPR 2021 dataset links ACD (Armed Conflict Database) 20.1 conflicts to Ethnic Power Relations-Core 2021 groups.
 
+desc:
+  ethnic_group: |-
+    The Ethnic Power Relations dataset defines ethnicity as any subjectively experienced sense of commonality based on the belief in common ancestry and shared culture. Given this definition, an ethnic group (i.e. a group of individuals sharing a common ethnicity) is included in the EPR Core dataset if it is politically relevant at least once in the sample period. An ethnic group is classified as politically relevant if at least one political organization claims to represent it in national politics or if its members are subjected to state-led political discrimination.
+  group_relevance: |-
+    An ethnic group is deemed relevant in a given group-year if at least one political organization claims to represent it in national politics or if its members are subjected to state-led political discrimination.
+
 definitions:
   - ethnic_group:
       description: &description_ethnic_group |
@@ -165,10 +171,12 @@ tables:
           - *source-epr
       lpop:
         title: Share of population ethnically relevant
-        description:
-          - Sum of the ethnically relevant population in this country (as a fraction of total population).<br>
-          - *description_ethnic_group
-          - *description_group_relevance
+        description: |-
+          Sum of the ethnically relevant population in this country (as a fraction of total population).
+
+          {desc.ethnic_group}
+
+          {desc.group_relevance}
         unit: "%"
         short_unit: "%"
         display:

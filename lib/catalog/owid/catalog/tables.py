@@ -26,7 +26,6 @@ import pandas as pd
 import pyarrow
 import pyarrow.parquet as pq
 import structlog
-import yaml
 from owid.repack import repack_frame
 from pandas.util._decorators import rewrite_axis_style_signature
 
@@ -453,8 +452,8 @@ class Table(pd.DataFrame):
         :param path: Path to YAML file.
         :param table_name: Name of table, also updates this in the metadata.
         """
-        with open(path) as istream:
-            annot = yaml.safe_load(istream)
+        from .utils import dynamic_yaml_load
+        annot = dynamic_yaml_load(path)
 
         self.metadata.short_name = table_name
 

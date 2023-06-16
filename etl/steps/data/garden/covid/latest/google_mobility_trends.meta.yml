@@ -23,7 +23,7 @@ dataset:
 
     This index is smoothed to the rolling 7-day average.
   sources:
-  - name: Google COVID-19 Community Mobility Trends - Last updated <DATE>
+  - name: Google COVID-19 Community Mobility Trends - Last updated {TODAY}
     url: https://www.google.com/covid19/mobility/
     date_accessed: '2023-06-16'
     published_by: Google LLC "Google COVID-19 Community Mobility Reports".
