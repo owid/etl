@@ -51,7 +51,8 @@ def run(dest_dir: str) -> None:
         df_list.append(df)
 
     merged_df = pd.concat(df_list)
-    all_dfs = pd.concat([lang_df, merged_df])
+
+    all_dfs = pd.merge(lang_df, merged_df, on=["date", "name"])
     all_dfs.reset_index(inplace=True, drop=True)
 
     #
@@ -95,7 +96,7 @@ def language_extract(html_content):
     assert evaluation_script is not None, "Evaluation script not found in HTML content."
 
     # Extract the contents of the script tag
-    script_content = evaluation_script.string
+    script_content = str(evaluation_script)
 
     assert script_content is not None, "Script content is empty."
     script_bytes = script_content.encode("utf-8")

@@ -76,7 +76,7 @@ def imagenet_html_extract(html_content):
     assert evaluation_script is not None, "Evaluation script not found in HTML content."
 
     # Extract the contents of the script tag
-    script_content = evaluation_script.string
+    script_content = str(evaluation_script)
 
     assert script_content is not None, "Script content is empty."
 
