@@ -185,6 +185,13 @@ steps:
     - snapshot://fasttrack/2023-05-31/cholera.csv
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2021-07-01/wb_income
-
   data://grapher/who/2023-06-01/cholera:
     - data://garden/who/2023-06-01/cholera
+
+  # Diarrhea treatment
+  data://meadow/unicef/2023-06-16/diarrhea:
+    - snapshot://unicef/2023-06-16/diarrhea.xlsx
+  data://garden/unicef/2023-06-16/diarrhea:
+    - data://meadow/unicef/2023-06-16/diarrhea
+  data://grapher/unicef/2023-06-16/diarrhea:
+    - data://garden/unicef/2023-06-16/diarrhea

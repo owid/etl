@@ -1,0 +1,26 @@
+meta:
+  namespace: unicef
+  short_name: diarrhea
+  name: Diarrhea treatment (UNICEF, 2022)
+  version: '2023-06-16'
+  publication_year: 2022
+
+  publication_date: '2022-05-01'
+  source_name: UNICEF (2022)
+  source_published_by: Several health and multiple indicator cluster surveys compiled
+    by UNICEF
+  url: https://data.unicef.org/resources/dataset/diarrhoea/
+  source_data_url: 
+    https://data.unicef.org/wp-content/uploads/2018/06/Child-Health-Coverage-Database-May-2022.xlsx
+  file_extension: xlsx
+  license_url: https://data.unicef.org/about-us/
+  license_name: Creative Commons Attribution-NonCommercial 3.0 IGO license
+  date_accessed: 2023-06-16
+  is_public: true
+  description: |
+
+wdir: ../../../data/snapshots/unicef/2023-06-16
+outs:
+- md5: 9710d68b6b8575c51217e8e1ad25d77a
+  size: 2067580
+  path: diarrhea.xlsx
