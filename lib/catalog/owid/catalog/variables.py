@@ -2,6 +2,7 @@
 #  variables.py
 #
 
+import copy
 import json
 import os
 from typing import Any, Dict, List, Literal, Optional, Union, cast
@@ -242,17 +243,20 @@ class Variable(pd.Series):
         return self.truediv(other=other, *args, **kwargs)
 
     def update_log(
-        self, parents: List[Any], operation: str, variable: Optional[str] = None, comment: Optional[str] = None
-    ) -> None:
-        if variable is None:
-            # TODO: Should it be UNNAMED_VARIABLE instead of self.name?
-            variable = self.name or UNNAMED_VARIABLE
-        self.metadata.processing_log = update_log(
-            processing_log=self.metadata.processing_log,
-            variable=variable,
+        self,
+        parents: List[Any],
+        operation: str,
+        variable_name: Optional[str] = None,
+        comment: Optional[str] = None,
+        inplace: bool = False,
+    ) -> Optional[Series]:
+        return update_log(
+            variable=self,
             parents=parents,
             operation=operation,
+            variable_name=variable_name,
             comment=comment,
+            inplace=inplace,
         )
 
     def amend_log(
@@ -356,23 +360,22 @@ def get_unique_licenses_from_variables(variables: List[Variable]) -> List[Licens
     return unique_licenses
 
 
-def update_log(
+def add_entry_to_processing_log(
     processing_log: List[Any],
-    variable: str,
+    variable_name: str,
     parents: List[Any],
     operation: str,
     comment: Optional[str] = None,
 ) -> List[Any]:
-
     if not PROCESSING_LOG:
         # Avoid any processing and simply return the same input processing log.
         return processing_log
 
     # Consider using a deepcopy if any of the operations in this function alter mutable objects in processing_log.
-    processing_log_updated = processing_log.copy()
+    processing_log_updated = copy.deepcopy(processing_log)
 
     # Define new log entry.
-    log_new_entry = {"variable": variable, "parents": parents, "operation": operation}
+    log_new_entry = {"variable": variable_name, "parents": parents, "operation": operation}
     if comment is not None:
         log_new_entry["comment"] = comment
 
@@ -382,7 +385,36 @@ def update_log(
     return processing_log_updated
 
 
-def combine_variables_processing_logs(variables: List[Variable]):
+def update_log(
+    variable: Variable,
+    parents: List[Any],
+    operation: str,
+    variable_name: Optional[str] = None,
+    comment: Optional[str] = None,
+    inplace: bool = False,
+) -> Optional[Variable]:
+
+    if not inplace:
+        variable = copy.deepcopy(variable)
+
+    if variable_name is None:
+        # If a variable name is not specified, take it from the variable, or otherwise use UNNAMED_VARIABLE.
+        variable_name = variable.name or UNNAMED_VARIABLE
+
+    # Add new entry to the variable's processing log.
+    variable.metadata.processing_log = add_entry_to_processing_log(
+        processing_log=variable.metadata.processing_log,
+        variable_name=variable_name,
+        parents=parents,
+        operation=operation,
+        comment=comment,
+    )
+
+    if not inplace:
+        return variable
+
+
+def combine_variables_processing_logs(variables: List[Variable]) -> List[Dict[str, Any]]:
     # Make a list with all entries in the processing log of all variables.
     processing_log = sum(
         [
@@ -417,9 +449,9 @@ def combine_variables_metadata(
     variables_and_scalars_names = [
         variable.name if hasattr(variable, "name") else str(variable) for variable in variables
     ]
-    metadata.processing_log = update_log(
+    metadata.processing_log = add_entry_to_processing_log(
         processing_log=metadata.processing_log,
-        variable=name,
+        variable_name=name,
         parents=variables_and_scalars_names,
         operation=operation,
     )

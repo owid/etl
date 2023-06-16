@@ -390,9 +390,9 @@ class Table(pd.DataFrame):
 
             # Update processing log.
             if old_col != new_col:
-                fields[new_col].processing_log = variables.update_log(
+                fields[new_col].processing_log = variables.add_entry_to_processing_log(
                     processing_log=fields[new_col].processing_log,
-                    variable=new_col,
+                    variable_name=new_col,
                     parents=[old_col],
                     operation="rename",
                 )
@@ -608,11 +608,21 @@ class Table(pd.DataFrame):
     def dropna(self, *args, **kwargs) -> "Table":
         tb = super().dropna(*args, **kwargs).copy()
         for column in list(tb.all_columns):
-            tb._fields[column].processing_log = variables.update_log(
-                processing_log=tb._fields[column].processing_log, variable=column, parents=[column], operation="dropna"
+            tb._fields[column].processing_log = variables.add_entry_to_processing_log(
+                processing_log=tb._fields[column].processing_log,
+                variable_name=column,
+                parents=[column],
+                operation="dropna",
             )
 
         return cast("Table", tb)
+
+    def copy_metadata(
+        self, from_table: "Table", include_missing_variables: bool = False, inplace: bool = False
+    ) -> Optional["Table"]:
+        return copy_metadata(
+            to_table=self, from_table=from_table, include_missing_variables=include_missing_variables, inplace=inplace
+        )
 
     def update_log(
         self,
@@ -620,28 +630,22 @@ class Table(pd.DataFrame):
         parents: Optional[List[Any]] = None,
         variable_names: Optional[List[str]] = None,
         comment: Optional[str] = None,
-    ):
-        # Append a new entry to the processing log of the required variables.
-        if variable_names is None:
-            # If no variable is specified, assume all (including index columns).
-            variable_names = list(self.all_columns)
-        for column in variable_names:
-            # If parents is not defined, assume the parents are simply the current variable.
-            _parents = parents or [column]
-            # Update (in place) the processing log of current variable.
-            self._fields[column].processing_log = variables.update_log(
-                processing_log=self._fields[column].processing_log,
-                variable=column,
-                parents=_parents,
-                operation=operation,
-                comment=comment,
-            )
+        inplace: bool = False,
+    ) -> Optional["Table"]:
+        return update_log(
+            table=self,
+            operation=operation,
+            parents=parents,
+            variable_names=variable_names,
+            comment=comment,
+            inplace=inplace,
+        )
 
     def sort_values(self, by: str, *args, **kwargs) -> "Table":
         tb = super().sort_values(by=by, *args, **kwargs).copy()
         for column in list(tb.all_columns):
-            tb._fields[column].processing_log = variables.update_log(
-                processing_log=tb._fields[column].processing_log, variable=column, parents=[by], operation="sort"
+            tb._fields[column].processing_log = variables.add_entry_to_processing_log(
+                processing_log=tb._fields[column].processing_log, variable_name=column, parents=[by], operation="sort"
             )
 
         return cast("Table", tb)
@@ -672,7 +676,7 @@ def concat(objs: List[Table], *, axis: int = 0, join: str = "outer", ignore_inde
         for i, column in enumerate(table.columns):
             assert column == original_variables[i].name
             table[column].metadata = original_variables[i].metadata
-            table[column].update_log(variable=column, parents=[column], operation="concat")
+            table[column].update_log(variable_name=column, parents=[column], operation="concat", inplace=True)
     elif axis == 0:
         # Add to each column either the metadata of the original variable (if the variable appeared only in one of the input
         # tables) or the combination of the metadata from different tables (if the variable appeared in various tables).
@@ -887,14 +891,16 @@ def _add_processing_log_entry_to_each_variable(
     # Add a processing log entry to each column, including index columns.
     for column in list(table.all_columns):
         # New entry to add to the processing log.
-        log_new_entry = {"variable": column, "parents": parents, "operation": operation}
+        # Note: The function add_entry_to_processing_log receives the argument variable_name, but in the processing log,
+        # the entry has the field "variable" (for simplicity).
+        log_new_entry = {"variable_name": column, "parents": parents, "operation": operation}
 
         if log_new_entry not in table._fields[column].processing_log:
             # If the processing log is not empty but the last entry is identical to the one we want to insert, skip, to
             # avoid storing the same entry multiple times.
             # This happens for example when saving tables, given that tables are stored in different formats.
             # Otherwise, append a new entry to the processing log.
-            table._fields[column].processing_log = variables.update_log(
+            table._fields[column].processing_log = variables.add_entry_to_processing_log(
                 processing_log=table._fields[column].processing_log, **log_new_entry
             )
 
@@ -923,3 +929,96 @@ def assign_dataset_sources_and_licenses_to_each_variable(table: Table) -> Table:
             table._fields[column].licenses = licenses
 
     return table
+
+
+@overload
+def copy_metadata(
+    from_table: Table, to_table: Table, include_missing_variables: bool = False, inplace: bool = False
+) -> Table:
+    ...
+
+
+@overload
+def copy_metadata(
+    from_table: Table, to_table: Table, include_missing_variables: bool = False, inplace: bool = True
+) -> None:
+    ...
+
+
+def copy_metadata(
+    from_table: Table, to_table: Table, include_missing_variables: bool = False, inplace: bool = False
+) -> Optional[Table]:
+    if not inplace:
+        to_table = to_table.copy()
+
+    # Copy the table metadata.
+    to_table.metadata = copy.deepcopy(from_table.metadata)
+
+    if include_missing_variables:
+        # Copy metadata from all variables (in case you may need them later).
+        to_table._fields = copy.deepcopy(from_table._fields)
+    else:
+        # Find variables in the destination table that had metadata in the reference table.
+        existing_variables = set(to_table.all_columns) & set(from_table._fields.keys())
+        # Copy the metadata of those variables from the reference table to the destination table.
+        to_table._fields = copy.deepcopy(
+            defaultdict(VariableMeta, {variable: from_table._fields[variable] for variable in existing_variables})
+        )
+
+    if not inplace:
+        return to_table
+
+
+@overload
+def update_log(
+    table: Table,
+    operation: str,
+    parents: Optional[List[Any]] = None,
+    variable_names: Optional[List[str]] = None,
+    comment: Optional[str] = None,
+    inplace: bool = True,
+) -> None:
+    ...
+
+
+@overload
+def update_log(
+    table: Table,
+    operation: str,
+    parents: Optional[List[Any]] = None,
+    variable_names: Optional[List[str]] = None,
+    comment: Optional[str] = None,
+    inplace: bool = False,
+) -> Table:
+    ...
+
+
+def update_log(
+    table: Table,
+    operation: str,
+    parents: Optional[List[Any]] = None,
+    variable_names: Optional[List[str]] = None,
+    comment: Optional[str] = None,
+    inplace: bool = False,
+) -> Optional[Table]:
+    if not inplace:
+        table = table.copy()
+
+    # Append a new entry to the processing log of the required variables.
+    if variable_names is None:
+        # If no variable is specified, assume all (including index columns).
+        variable_names = list(table.all_columns)
+    for column in variable_names:
+        # If parents is not defined, assume the parents are simply the current variable.
+        _parents = parents or [column]
+        # Update (in place) the processing log of current variable.
+        table._fields[column].processing_log = variables.add_entry_to_processing_log(
+            processing_log=table._fields[column].processing_log,
+            variable_name=column,
+            parents=_parents,
+            operation=operation,
+            comment=comment,
+        )
+
+    if not inplace:
+        return table
