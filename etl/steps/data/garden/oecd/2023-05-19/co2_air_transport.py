@@ -211,7 +211,7 @@ def add_inbound_outbound_tour(df, df_tr):
     df = pd.merge(df, just_inb_ratio, on=["year", "country"])
 
     # Calculate the interaction between TER_INT_a and inb_outb_tour
-    df["int_inb_out_per_capita"] = df["per_capita_TER_INT_a"] * df["inb_outb_tour"]
+    df["int_inb_out_per_capita"] = df["per_capita_TER_INT_a"] / df["inb_outb_tour"]
     df["int_inb_out_tot"] = df["TER_INT_a"] * df["inb_outb_tour"]
 
     # Drop the 'inb_outb_tour' column
