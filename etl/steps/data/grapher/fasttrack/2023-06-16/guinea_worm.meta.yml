@@ -7,7 +7,6 @@ dataset:
   sources:
   - name: The Carter Center (2023)
     published_by: The Carter Center (2023)
-    publisher_source: The Carter Center
     publication_year: 2023
     date_accessed: 2023-06-16
     url: https://www.cartercenter.org/resources/pdfs/news/health_publications/guinea_worm/guinea-worm-cases-by-year-from-1989.pdf
@@ -21,7 +20,6 @@ tables:
         sources:
         - name: The Carter Center (2023)
           published_by: The Carter Center (2023)
-          publisher_source: The Carter Center
           publication_year: 2023
           date_accessed: 2023-06-16
           url: https://www.cartercenter.org/resources/pdfs/news/health_publications/guinea_worm/guinea-worm-cases-by-year-from-1989.pdf
