@@ -8,3 +8,5 @@ steps:
   - data://garden/dummy/2020-01-01/dummy
   data://explorers/dummy/2020-01-01/dummy:
   - data://garden/dummy/2020-01-01/dummy
+<<<<<<< HEAD
+=======

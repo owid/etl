@@ -32,8 +32,10 @@ def run(dest_dir: str) -> None:
         pd.to_datetime(df["date"].astype(str), format="%Y-%m-%d") - pd.to_datetime("2019-01-01")
     ).dt.days
     df = df.drop("date", axis=1)
-    pivot_df = shared.select_best_on_date(df, "days_since")
 
+    df["performance_coding"] = df["performance_coding"] * 100
+
+    pivot_df = shared.select_best_on_date(df, "days_since")
     #
     # Process data.
     #

@@ -1,0 +1,25 @@
+dataset:
+  title:  Performance on Atari Games (Papers With Code, 2023)
+  description:
+    Average performance across 57 Atari 2600 games, such as Frogger and Pac-Man.
+    Measured relative to human performance, which is set to 100%.
+  licenses:
+  - name: CC BY-SA 4.0
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+  sources:
+  - name: Papers With Code (2023)
+    description:
+    url: https://paperswithcode.com/sota/atari-games-on-atari-57
+    source_data_url: https://paperswithcode.com/sota/atari-games-on-atari-57
+    date_accessed: '2023-06-14'
+    publication_year: 2023
+    published_by: Papers With Code
+tables:
+  papers_with_code_atari:
+    variables:
+      performance_atari:
+        title: Average score on Atari games relative to humans (100%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0

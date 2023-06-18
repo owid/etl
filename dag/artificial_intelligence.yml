@@ -27,3 +27,12 @@ steps:
     - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
   data://grapher/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
+
+
+  # Atari
+  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari:
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_atari.html
+  data://garden/artificial_intelligence/2023-06-14/papers_with_code_atari:
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari
+  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_atari:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_atari
