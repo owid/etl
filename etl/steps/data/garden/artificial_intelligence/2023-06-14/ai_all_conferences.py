@@ -34,9 +34,8 @@ def run(dest_dir: str) -> None:
     df_small_tot = pd.concat([df_small, df_total], axis=0, join="inner").reset_index(drop=True)
     df_all = pd.concat([df_small_tot, df_large], axis=0, join="inner").reset_index(drop=True)
 
-    df_all["Number of Attendees (in Thousands)"] = df_all["Number of Attendees (in Thousands)"].apply(
-        lambda x: round(x * 1000)
-    )
+    df_all["Number of Attendees (in Thousands)"] = (1000 * df_all["Number of Attendees (in Thousands)"]).round()
+
     tb = Table(df_all, short_name="ai_all_conferences", underscore=True)
 
     #

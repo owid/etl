@@ -1,6 +1,7 @@
 dataset:
   title: Image Classification on ImageNet, Accuracy (Papers With Code, 2023)
-  description: ImageNet is one of the most widely used benchmarks for image classification.
+  description: &desc |
+      ImageNet is one of the most widely used benchmarks for image classification.
       This dataset includes over 14 million images across 20,000 different object
       categories such as “strawberry” or “balloon.” Performance on ImageNet is measured
       through various accuracy metrics.
@@ -16,7 +17,7 @@ dataset:
     url: https://creativecommons.org/licenses/by-sa/4.0/
   sources:
   - name: Papers With Code (2023)
-    description:
+    description: *desc
     url: https://paperswithcode.com/sota/image-classification-on-imagenet
     source_data_url: https://paperswithcode.com/sota/image-classification-on-imagenet
     date_accessed: '2023-06-14'

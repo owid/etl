@@ -1,6 +1,6 @@
 dataset:
   title: Math, Coding and Language Benchmarks (Papers With Code, 2023)
-  description: &description-language-code-math |
+  description: &desc |
       The dataset includes two benchmarks of AI models performance: MATH and APPS and MMLU.
       The MATH benchmark consists of 12,500 challenging competition mathematics problems.
       The problems in the MATH benchmark are designed to test problem-solving skills and measure
@@ -19,7 +19,7 @@ dataset:
     url: https://creativecommons.org/licenses/by-sa/4.0/
   sources:
   - name: Papers With Code (2023)
-    description: *description-language-code-math
+    description: *desc
     url: https://paperswithcode.com/sota/multi-task-language-understanding-on-mmlu
     source_data_url: https://paperswithcode.com/sota/multi-task-language-understanding-on-mmlu
     date_accessed: '2023-06-14'
