@@ -364,8 +364,13 @@ class Table(pd.DataFrame):
             else:
                 self._fields[key] = VariableMeta()
 
-    def equals_table(self, rhs: "Table") -> bool:
-        return isinstance(rhs, Table) and self.metadata == rhs.metadata and self.to_dict() == rhs.to_dict()
+    def equals_table(self, table: "Table") -> bool:
+        return (
+            isinstance(table, Table)
+            and self.metadata == table.metadata
+            and self.to_dict() == table.to_dict()
+            and self._fields == table._fields
+        )
 
     @rewrite_axis_style_signature(
         "mapper",
