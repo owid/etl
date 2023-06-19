@@ -2,10 +2,12 @@
 #  test_variables
 #
 
+from collections import defaultdict
+
 import pandas as pd
 import pytest
 
-from owid.catalog.meta import VariableMeta
+from owid.catalog.meta import TableMeta, VariableMeta
 from owid.catalog.tables import Table
 from owid.catalog.variables import License, Source, Variable
 
@@ -55,128 +57,190 @@ def test_variable_can_be_type_cast() -> None:
     assert (v == v2).all()
 
 
-def test_all_operations() -> None:
-    # TODO: Properly split into separate tests.
+@pytest.fixture
+def sources():
+    sources = {
+        1: Source(name="Name of Source 1", description="Description of Source 1"),
+        2: Source(name="Name of Source 2", description="Description of Source 2"),
+        3: Source(name="Name of Source 3", description="Description of Source 3"),
+        4: Source(name="Name of Source 4", description="Description of Source 4"),
+    }
+    return sources
 
-    # Define metadata that should not change.
-    table_1_description = "Description of Table 1"
-    table_1_variable_a_title = "Title of Table 1 Variable a"
-    table_1_variable_a_description = "Description of Table 1 Variable a"
-    table_1_variable_b_title = "Title of Table 1 Variable b"
-    table_1_variable_b_description = "Description of Table 1 Variable b"
-    source_1 = Source(name="Name of Source 1", description="Description of Source 1")
-    source_2 = Source(name="Name of Source 2", description="Description of Source 2")
-    source_3 = Source(name="Name of Source 3", description="Description of Source 3")
-    license_1 = License(name="Name of License 1", url="URL of License 1")
-    license_2 = License(name="Name of License 2", url="URL of License 2")
-    license_3 = License(name="Name of License 3", url="URL of License 3")
-    # Create a table with the above metadata and some mock data.
+
+@pytest.fixture
+def licenses():
+    licenses = {
+        1: License(name="Name of License 1", url="URL of License 1"),
+        2: License(name="Name of License 2", url="URL of License 2"),
+        3: License(name="Name of License 3", url="URL of License 3"),
+        4: License(name="Name of License 4", url="URL of License 4"),
+    }
+    return licenses
+
+
+@pytest.fixture
+def table_1(sources, licenses):
     tb1 = Table({"country": ["Spain", "Spain", "France"], "year": [2020, 2021, 2021], "a": [1, 2, 3], "b": [4, 5, 6]})
-    tb1.metadata.description = table_1_description
-    tb1["a"].metadata.title = table_1_variable_a_title
-    tb1["a"].metadata.description = table_1_variable_a_description
-    tb1["b"].metadata.title = table_1_variable_b_title
-    tb1["b"].metadata.description = table_1_variable_b_description
-    tb1["a"].metadata.sources = [source_2, source_1]
-    tb1["b"].metadata.sources = [source_2, source_3]
-    tb1["a"].metadata.licenses = [license_1]
-    tb1["b"].metadata.licenses = [license_2, license_3]
+    tb1.metadata = TableMeta(title="Title of Table 1", description="Description of Table 1")
+    tb1._fields = defaultdict(
+        VariableMeta,
+        {
+            "a": VariableMeta(
+                title="Title of Table 1 Variable a",
+                description="Description of Table 1 Variable a",
+                sources=[sources[2], sources[1]],
+                licenses=[licenses[1]],
+            ),
+            "b": VariableMeta(
+                title="Title of Table 1 Variable b",
+                description="Description of Table 1 Variable b",
+                sources=[sources[2], sources[3]],
+                licenses=[licenses[2], licenses[3]],
+            ),
+        },
+    )
+    return tb1
 
-    def _assert_untouched_data_and_metadata_did_not_change(tb1):
-        assert (tb1["a"] == pd.Series([1, 2, 3])).all()
-        assert (tb1["b"] == pd.Series([4, 5, 6])).all()
-        assert tb1.metadata.description == table_1_description
-        assert tb1["a"].metadata.title == table_1_variable_a_title
-        assert tb1["b"].metadata.title == table_1_variable_b_title
-        assert tb1["a"].metadata.description == table_1_variable_a_description
-        assert tb1["b"].metadata.description == table_1_variable_b_description
-        assert tb1["a"].metadata.sources == [source_2, source_1]
-        assert tb1["b"].metadata.sources == [source_2, source_3]
-        assert tb1["a"].metadata.licenses == [license_1]
-        assert tb1["b"].metadata.licenses == [license_2, license_3]
 
-    # Create a new variable as the sum of another two variables.
+@pytest.fixture
+def table_2(sources, licenses):
+    tb2 = Table(
+        {"country": ["Spain", "France", "France"], "year": [2020, 2021, 2022], "a": [10, 20, 30], "c": [40, 50, 60]}
+    )
+    tb2.metadata = TableMeta(title="Title of Table 2", description="Description of Table 2")
+    tb2._fields = defaultdict(
+        VariableMeta,
+        {
+            "a": VariableMeta(
+                title="Title of Table 2 Variable a",
+                description="Description of Table 2 Variable a",
+                sources=[sources[2]],
+                licenses=[licenses[2]],
+            ),
+            "c": VariableMeta(
+                title="Title of Table 2 Variable c",
+                description="Description of Table 2 Variable c",
+                sources=[sources[2], sources[4]],
+                licenses=[licenses[4], licenses[2]],
+            ),
+        },
+    )
+    return tb2
+
+
+def _assert_untouched_data_and_metadata_did_not_change(tb1, tb1_expected):
+    # Check that all columns that were in the old table have not been affected.
+    for column in tb1_expected.columns:
+        assert (tb1[column] == tb1_expected[column]).all()
+        assert tb1._fields[column] == tb1_expected._fields[column]
+
+
+def test_create_new_variable_as_sum_of_other_two(table_1, sources, licenses) -> None:
+    tb1 = table_1.copy()
     tb1["c"] = tb1["a"] + tb1["b"]
-    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1)
+    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
     assert (tb1["c"] == pd.Series([5, 7, 9])).all()
     assert tb1["c"].metadata.title is None
     assert tb1["c"].metadata.description is None
-    assert tb1["c"].metadata.sources == [source_2, source_1, source_3]
-    assert tb1["c"].metadata.licenses == [license_1, license_2, license_3]
+    assert tb1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert tb1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
-    # Create a new variables as the sum of another variable plus a scalar.
+
+def test_create_new_variable_as_sum_of_another_variable_plus_a_scalar(table_1) -> None:
+    tb1 = table_1.copy()
     tb1["d"] = tb1["a"] + 1
-    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1)
+    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
     assert (tb1["d"] == pd.Series([2, 3, 4])).all()
-    assert tb1["d"].metadata.title == table_1_variable_a_title
-    assert tb1["d"].metadata.description == table_1_variable_a_description
-    assert tb1["d"].metadata.sources == [source_2, source_1]
-    assert tb1["d"].metadata.licenses == [license_1]
+    assert tb1["d"].metadata.title == table_1["a"].metadata.title
+    assert tb1["d"].metadata.description == table_1["a"].metadata.description
+    assert tb1["d"].metadata.sources == table_1["a"].metadata.sources
+    assert tb1["d"].metadata.licenses == table_1["a"].metadata.licenses
 
-    # Replace a variables' own value.
-    tb1["d"] = tb1["d"] + 1
-    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1)
-    assert (tb1["d"] == pd.Series([3, 4, 5])).all()
-    assert tb1["d"].metadata.title == table_1_variable_a_title
-    assert tb1["d"].metadata.description == table_1_variable_a_description
-    assert tb1["d"].metadata.sources == [source_2, source_1]
-    assert tb1["d"].metadata.licenses == [license_1]
 
+def test_replace_a_variables_own_value(table_1) -> None:
+    tb1 = table_1.copy()
+    tb1["a"] = tb1["a"] + 1
+    assert (tb1["a"] == pd.Series([2, 3, 4])).all()
+    # Metadata for "a" and "b" should be identical.
+    assert tb1._fields["a"] == table_1._fields["a"]
+    assert tb1._fields["b"] == table_1._fields["b"]
+
+
+def test_create_new_variable_as_product_of_other_two(table_1, sources, licenses) -> None:
+    tb1 = table_1.copy()
     tb1["e"] = tb1["a"] * tb1["b"]
-    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1)
+    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
     assert (tb1["e"] == pd.Series([4, 10, 18])).all()
     assert tb1["e"].metadata.title is None
     assert tb1["e"].metadata.description is None
-    assert tb1["e"].metadata.sources == [source_2, source_1, source_3]
-    assert tb1["e"].metadata.licenses == [license_1, license_2, license_3]
+    assert tb1["e"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert tb1["e"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
+
+def test_create_new_variable_as_product_of_other_three(table_1, sources, licenses) -> None:
+    tb1 = table_1.copy()
+    tb1["c"] = tb1["a"] + tb1["b"]
     tb1["f"] = tb1["a"] * tb1["b"] * tb1["c"]
-    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1)
+    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
     assert (tb1["c"] == pd.Series([5, 7, 9])).all()
     assert (tb1["f"] == pd.Series([20, 70, 162])).all()
     assert tb1["f"].metadata.title is None
     assert tb1["f"].metadata.description is None
-    assert tb1["f"].metadata.sources == [source_2, source_1, source_3]
-    assert tb1["f"].metadata.licenses == [license_1, license_2, license_3]
+    assert tb1["f"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert tb1["f"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
+
+def test_create_new_variable_as_division_of_other_two(table_1, sources, licenses) -> None:
+    tb1 = table_1.copy()
     tb1["g"] = tb1["a"] / tb1["b"]
-    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1)
+    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
     assert (tb1["g"] == pd.Series([0.25, 0.40, 0.50])).all()
     assert tb1["g"].metadata.title is None
     assert tb1["g"].metadata.description is None
-    assert tb1["g"].metadata.sources == [source_2, source_1, source_3]
-    assert tb1["g"].metadata.licenses == [license_1, license_2, license_3]
+    assert tb1["g"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert tb1["g"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
+
+def test_create_new_variable_as_floor_division_of_other_two(table_1, sources, licenses) -> None:
+    tb1 = table_1.copy()
     tb1["h"] = tb1["b"] // tb1["a"]
-    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1)
+    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
     assert (tb1["h"] == pd.Series([4, 2, 2])).all()
     assert tb1["h"].metadata.title is None
     assert tb1["h"].metadata.description is None
-    assert tb1["h"].metadata.sources == [source_2, source_3, source_1]
-    assert tb1["h"].metadata.licenses == [license_2, license_3, license_1]
+    assert tb1["h"].metadata.sources == [sources[2], sources[3], sources[1]]
+    assert tb1["h"].metadata.licenses == [licenses[2], licenses[3], licenses[1]]
 
-    # Create a new variable as another variable to the power of a scalar
-    tb1["j"] = tb1["a"] ** 2
-    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1)
-    assert (tb1["j"] == pd.Series([1, 4, 9])).all()
-    assert tb1["j"].metadata.title is None
-    assert tb1["j"].metadata.description is None
-    assert tb1["j"].metadata.sources == [source_2, source_1]
-    assert tb1["j"].metadata.licenses == [license_1]
 
-    # Create a new variable as another variable to the power of another variable.
-    tb1["k"] = tb1["a"] ** tb1["b"]
-    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1)
-    assert (tb1["k"] == pd.Series([1, 32, 729])).all()
-    assert tb1["k"].metadata.title is None
-    assert tb1["k"].metadata.description is None
-    assert tb1["k"].metadata.sources == [source_2, source_1, source_3]
-    assert tb1["k"].metadata.licenses == [license_1, license_2, license_3]
-
+def test_create_new_variable_as_module_division_of_other_two(table_1, sources, licenses) -> None:
+    tb1 = table_1.copy()
     tb1["i"] = tb1["a"] % tb1["b"]
-    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1)
+    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
     assert (tb1["i"] == pd.Series([1, 2, 3])).all()
     assert tb1["i"].metadata.title is None
     assert tb1["i"].metadata.description is None
-    assert tb1["i"].metadata.sources == [source_2, source_1, source_3]
-    assert tb1["i"].metadata.licenses == [license_1, license_2, license_3]
+    assert tb1["i"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert tb1["i"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+
+
+def test_create_new_variable_as_another_variable_to_the_power_of_a_scalar(table_1, sources, licenses) -> None:
+    tb1 = table_1.copy()
+    tb1["j"] = tb1["a"] ** 2
+    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
+    assert (tb1["j"] == pd.Series([1, 4, 9])).all()
+    assert tb1["j"].metadata.title is None
+    assert tb1["j"].metadata.description is None
+    assert tb1["j"].metadata.sources == [sources[2], sources[1]]
+    assert tb1["j"].metadata.licenses == [licenses[1]]
+
+
+def test_create_new_variables_as_another_variable_to_the_power_of_another_variable(table_1, sources, licenses) -> None:
+    tb1 = table_1.copy()
+    tb1["k"] = tb1["a"] ** tb1["b"]
+    _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
+    assert (tb1["k"] == pd.Series([1, 32, 729])).all()
+    assert tb1["k"].metadata.title is None
+    assert tb1["k"].metadata.description is None
+    assert tb1["k"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert tb1["k"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
