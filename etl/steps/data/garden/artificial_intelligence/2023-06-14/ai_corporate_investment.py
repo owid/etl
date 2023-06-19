@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
 
     df.rename(columns={"Label": "type", "Year": "year"}, inplace=True)
     # convert to regulat number
-    df["Total Investment (in Billions of U.S. Dollars)"] = df["Total Investment (in Billions of U.S. Dollars)"] * 10e9
+    df["Total Investment (in Billions of U.S. Dollars)"] = df["Total Investment (in Billions of U.S. Dollars)"] * 10e8
     df.rename(
         columns={"Label": "type", "Year": "year", "Total Investment (in Billions of U.S. Dollars)": "Total Investment"},
         inplace=True,
@@ -55,8 +55,8 @@ def run(dest_dir: str) -> None:
     # Merge df5 with CPI data
     df_cpi_inv = pd.merge(df_wdi_cpi_us, df, on="year", how="left")
 
-    df_cpi_inv["total_corporate_investment_by_activity_inflation_adjusted"] = (
-        round(100 * df_cpi_inv["Total Investment"]) / df_cpi_inv["cpi_adj_2021"]
+    df_cpi_inv["total_corporate_investment_by_activity_inflation_adjusted"] = round(
+        100 * df_cpi_inv["Total Investment"] / df_cpi_inv["cpi_adj_2021"]
     )
 
     tb = Table(df_cpi_inv, short_name="ai_corporate_investment", underscore=True)
