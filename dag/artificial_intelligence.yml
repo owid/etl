@@ -79,3 +79,9 @@ steps:
     - snapshot://artificial_intelligence/2023-06-14/ai_employers.csv
   data://grapher/artificial_intelligence/2023-06-14/ai_employers:
     - data://garden/artificial_intelligence/2023-06-14/ai_employers
+
+  # AI github productivity
+  data://garden/artificial_intelligence/2023-06-14/ai_github:
+    - snapshot://artificial_intelligence/2023-06-14/ai_github.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_github:
+    - data://garden/artificial_intelligence/2023-06-14/ai_github
