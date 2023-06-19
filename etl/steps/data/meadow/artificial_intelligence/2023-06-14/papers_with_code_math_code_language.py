@@ -33,26 +33,23 @@ def run(dest_dir: str) -> None:
 
     with open(snap_language.path, "r") as file:
         html_content = file.read()
-    lang_df = language_extract(html_content)
+    df_lang = language_extract(html_content)
+
+    snap_coding = cast(Snapshot, paths.load_dependency("papers_with_code_coding.html"))
+    with open(snap_coding.path, "r") as file:
+        html_content = file.read()
+    df_code = code_extract(html_content)
 
     snap_math = cast(Snapshot, paths.load_dependency("papers_with_code_math.html"))
-    snap_coding = cast(Snapshot, paths.load_dependency("papers_with_code_coding.html"))
 
-    # Math and Coding
-    df_list = []
-    # Load data from snapshot.
-    # Read the HTML file
-    column_suffix = ["math", "coding"]
-    for p, path in enumerate([snap_math, snap_coding]):
-        with open(path.path, "r") as file:
-            html_content = file.read()
-        df = shared.extract_data_papers_with_code(html_content, column_suffix[p])
-        df.drop("additional_data", axis=1, inplace=True)
-        df_list.append(df)
+    with open(snap_math.path, "r") as file:
+        html_content = file.read()
+    df_math = shared.extract_data_papers_with_code(html_content, "math")
+    df_math.drop("additional_data", axis=1, inplace=True)
 
-    merged_df = pd.concat(df_list)
+    df_code_math = pd.merge(df_code, df_math, on=["date", "name"], how="outer")
 
-    all_dfs = pd.merge(lang_df, merged_df, on=["date", "name"], how="outer")
+    all_dfs = pd.merge(df_code_math, df_lang, on=["date", "name"], how="outer")
     all_dfs.reset_index(inplace=True, drop=True)
 
     #
@@ -160,5 +157,88 @@ def language_extract(html_content):
         ],
     )
     df = df.replace('"', "", regex=True)
+
+    return df
+
+
+def code_extract(html_content):
+    """
+    Extracts table data from the HTML content of the language evaluation page on Papers with Code.
+
+    Args:
+        html_content (str): The HTML content of the language evaluation page.
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing the extracted table data.
+
+    Raises:
+        AssertionError: If the evaluation script or script content is not found, or if any required fields are missing in an entry.
+
+    """
+    # Parse the HTML using BeautifulSoup
+    # Parse the HTML using BeautifulSoup
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    # Find the script with id="evaluation-table-data"
+    evaluation_script = soup.find("script", id="evaluation-table-data")
+
+    assert evaluation_script is not None, "Evaluation script not found in HTML content."
+
+    # Extract the contents of the script tag
+    script_content = evaluation_script.string
+
+    assert script_content is not None, "Script content is empty."
+    script_bytes = script_content.encode("utf-8")
+
+    # Extract the entries using regex pattern
+    pattern = rb'{"table_id": 10864.*?(?=\{"table_id": 10864|$)'
+
+    entries = re.findall(pattern, script_bytes)
+
+    assert entries, "No entries found in script content."
+
+    # Create a list to store the extracted data
+    table_data = []
+
+    # Iterate through each entry
+    for entry in entries:
+        entry_str = entry.decode("utf-8")
+
+        # Extract the desired fields using regex
+        method_short_match = re.search(r'"method_short":\s*"([^"]*)"', entry_str)
+        competition_match = re.search(r'"Competition Pass@any":\s*"([^"]*)"', entry_str)
+        interview_match = re.search(r'"Interview Pass@any":\s*"([^"]*)"', entry_str)
+        evaluation_date_match = re.search(r'"evaluation_date":\s*"([^"]*)"', entry_str)
+
+        # Extract the values from the match objects if available
+        method_short = (
+            method_short_match.group(1) if method_short_match and method_short_match.group(1) != "null" else np.nan
+        )
+        competition = (
+            competition_match.group(1) if competition_match and competition_match.group(1) != "null" else np.nan
+        )
+        interview = interview_match.group(1) if interview_match and interview_match.group(1) != "null" else np.nan
+        evaluation_date = (
+            evaluation_date_match.group(1)
+            if evaluation_date_match and evaluation_date_match.group(1) != "null"
+            else np.nan
+        )
+
+        # Add the extracted data to the list
+        table_data.append((method_short, competition, interview, evaluation_date))
+
+    # Convert the table data to a DataFrame
+    df = pd.DataFrame(
+        table_data,
+        columns=[
+            "name",
+            "performance_code_any_competition",
+            "performance_code_any_interview",
+            "date",
+        ],
+    )
+
+    df = df.replace('"', "", regex=True)
+    df = df.replace("%", "", regex=True)
 
     return df

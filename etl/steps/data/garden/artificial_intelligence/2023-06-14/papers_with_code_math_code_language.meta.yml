@@ -65,9 +65,16 @@ tables:
         display:
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
+      performance_code_any_competition:
+        title: Coding APPS performance (any competition)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '2019-01-01'
           yearIsDay: true
-      performance_coding:
-        title: Coding APPS performance
+      performance_code_any_interview:
+        title: Coding APPS performance (any interview)
         unit: '%'
         short_unit: '%'
         display:

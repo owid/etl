@@ -1,0 +1,26 @@
+dataset:
+  title: AI Job Postings (AI Index, 2023)
+  description: &desc |
+    Data from Lightcast which mined millions of job postings collected from over 51,000 websites since 2010 and flagged listings calling for AI skills (via AI Index (2023)). Includes percentage of all job
+    postings that require some kind of AI skil across select countries.
+  licenses:
+  - name: Public domain
+    url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  sources:
+  - name: Lightcast (2022) via AI Index (2023)
+    description:  *desc
+    url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
+    source_data_url: https://drive.google.com/uc?export=download&id=1jUKch8p9fuofRSeVqQl5WmC9mtejcnM5
+    date_accessed: '2023-06-19'
+    publication_date: '2023-03-20'
+    publication_year: 2023
+    published_by: Lightcast (2022) via the AI Index 2023 Annual Report,” AI Index
+      Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford,
+      CA, April 2023
+tables:
+  ai_job_postings_py:
+    variables:
+      ai_job_postings__pct_of_all_job_postings:
+        title: AI Job Postings (% of All Job Postings)
+        unit: '%'
+        short_unit: '%'

@@ -36,3 +36,34 @@ steps:
     - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari
   data://grapher/artificial_intelligence/2023-06-14/papers_with_code_atari:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_atari
+
+# DeepFakes
+  data://garden/artificial_intelligence/2023-06-14/ai_deepfakes:
+    - snapshot://artificial_intelligence/2023-06-14/ai_deepfakes.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_deepfakes:
+    - data://garden/artificial_intelligence/2023-06-14/ai_deepfakes
+
+# AI companies
+  data://garden/artificial_intelligence/2023-06-14/ai_companies:
+    - snapshot://artificial_intelligence/2023-06-14/ai_companies.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_companies:
+    - data://garden/artificial_intelligence/2023-06-14/ai_companies
+
+# AI adoption by organisations
+  data://garden/artificial_intelligence/2023-06-14/ai_adoption:
+    - snapshot://artificial_intelligence/2023-06-14/ai_adoption.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_adoption:
+    - data://garden/artificial_intelligence/2023-06-14/ai_adoption
+
+# AI job postings
+  data://garden/artificial_intelligence/2023-06-14/ai_job_postings:
+    - snapshot://artificial_intelligence/2023-06-14/ai_job_postings.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_job_postings:
+    - data://garden/artificial_intelligence/2023-06-14/ai_job_postings
+
+  # AI corporate investment
+  data://garden/artificial_intelligence/2023-06-14/ai_corporate_investment:
+    - snapshot://artificial_intelligence/2023-06-14/ai_corporate_investment.csv
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+  data://grapher/artificial_intelligence/2023-06-14/ai_corporate_investment:
+    - data://garden/artificial_intelligence/2023-06-14/ai_corporate_investment

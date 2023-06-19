@@ -33,8 +33,6 @@ def run(dest_dir: str) -> None:
     ).dt.days
     df = df.drop("date", axis=1)
 
-    df["performance_coding"] = df["performance_coding"] * 100
-
     pivot_df = shared.select_best_on_date(df, "days_since")
     #
     # Process data.
