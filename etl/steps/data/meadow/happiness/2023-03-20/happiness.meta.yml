@@ -5,13 +5,15 @@ dataset:
 
     Life evaluations from the Gallup World Poll provide the basis for the annual happiness rankings. They are based on answers to the main life evaluation question. The Cantril ladder asks respondents to think of a ladder, with the best possible life for them being a 10 and the worst possible life being a 0. They are then asked to rate their own current lives on that 0 to 10 scale. The rankings for a given year are from nationally representative samples over three years surrounding the year in question, so the values for 2021 use Gallup World Poll survey data for 2020-2022.
 
-    2023 report data available at: https://happiness-report.s3.amazonaws.com/2023/DataForFigure2.1WHR2023.xls
+    The data for current and previous reports can be found at:
 
-    2022 report data available at: https://happiness-report.s3.amazonaws.com/2022/Appendix_2_Data_for_Figure_2.1.xls
+    2023: https://happiness-report.s3.amazonaws.com/2023/DataForFigure2.1WHR2023.xls
 
-    2021 report  data available at: https://happiness-report.s3.amazonaws.com/2021/DataForFigure2.1WHR2021C2.xls
+    2022: https://happiness-report.s3.amazonaws.com/2022/Appendix_2_Data_for_Figure_2.1.xls
 
-    Previous data available at: https://happiness-report.s3.amazonaws.com/2021/DataPanelWHR2021C2.xls
+    2021: https://happiness-report.s3.amazonaws.com/2021/DataForFigure2.1WHR2021C2.xls
+
+    Previous years: https://happiness-report.s3.amazonaws.com/2021/DataPanelWHR2021C2.xls
   sources:
   - name: World Happiness Report (2023)
   - published_by: 'Helliwell, J. F., Layard, R., Sachs, J. D., De Neve, J.-E., Aknin, L. B., & Wang, S. (Eds.). (2023). World Happiness Report 2023. New York: Sustainable Development Solutions Network.'
