@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
 
     df.rename(columns={"Label": "country"}, inplace=True)
 
-    tb = Table(df, short_name="ai_job_postings.py", underscore=True)
+    tb = Table(df, short_name="ai_job_postings", underscore=True)
     #
     # Save outputs.
     #

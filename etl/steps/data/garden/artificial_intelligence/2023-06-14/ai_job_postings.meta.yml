@@ -18,7 +18,7 @@ dataset:
       Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford,
       CA, April 2023
 tables:
-  ai_job_postings_py:
+  ai_job_postings:
     variables:
       ai_job_postings__pct_of_all_job_postings:
         title: AI Job Postings (% of All Job Postings)

@@ -53,7 +53,7 @@ def run(dest_dir: str) -> None:
 
     # Assuming df5 exists and it has a column named 'Year'
     # Merge df5 with CPI data
-    df_cpi_inv = pd.merge(df_wdi_cpi_us, df, on="year", how="left")
+    df_cpi_inv = pd.merge(df_wdi_cpi_us, df, on="year", how="inner")
 
     df_cpi_inv["total_corporate_investment_by_activity_inflation_adjusted"] = round(
         100 * df_cpi_inv["Total Investment"] / df_cpi_inv["cpi_adj_2021"]
