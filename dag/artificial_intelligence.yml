@@ -1,13 +1,5 @@
 steps:
 
-  # Artificial Intelligence Conference Attendance
-  data://garden/artificial_intelligence/2023-06-14/ai_all_conferences:
-    - snapshot://artificial_intelligence/2023-06-14/ai_large_conferences.csv
-    - snapshot://artificial_intelligence/2023-06-14/ai_small_conferences.csv
-    - snapshot://artificial_intelligence/2023-06-14/ai_conferences_total.csv
-  data://grapher/artificial_intelligence/2023-06-14/ai_all_conferences:
-    -  data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
-
   # Artificial Intelligence Papers with Code (benchmarks)
   # ImageNet
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
@@ -16,7 +8,6 @@ steps:
     - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet
   data://grapher/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet
-
 
   # Math & Code and Language
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
@@ -28,7 +19,6 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
 
-
   # Atari
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari:
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_atari.html
@@ -37,25 +27,35 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/papers_with_code_atari:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_atari
 
-# DeepFakes
+  # AI Index report
+
+  # Artificial Intelligence Conference Attendance
+  data://garden/artificial_intelligence/2023-06-14/ai_all_conferences:
+    - snapshot://artificial_intelligence/2023-06-14/ai_large_conferences.csv
+    - snapshot://artificial_intelligence/2023-06-14/ai_small_conferences.csv
+    - snapshot://artificial_intelligence/2023-06-14/ai_conferences_total.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_all_conferences:
+    -  data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
+
+  # DeepFakes
   data://garden/artificial_intelligence/2023-06-14/ai_deepfakes:
     - snapshot://artificial_intelligence/2023-06-14/ai_deepfakes.csv
   data://grapher/artificial_intelligence/2023-06-14/ai_deepfakes:
     - data://garden/artificial_intelligence/2023-06-14/ai_deepfakes
 
-# AI companies
+  # AI companies
   data://garden/artificial_intelligence/2023-06-14/ai_companies:
     - snapshot://artificial_intelligence/2023-06-14/ai_companies.csv
   data://grapher/artificial_intelligence/2023-06-14/ai_companies:
     - data://garden/artificial_intelligence/2023-06-14/ai_companies
 
-# AI adoption by organisations
+  # AI adoption by organisations
   data://garden/artificial_intelligence/2023-06-14/ai_adoption:
     - snapshot://artificial_intelligence/2023-06-14/ai_adoption.csv
   data://grapher/artificial_intelligence/2023-06-14/ai_adoption:
     - data://garden/artificial_intelligence/2023-06-14/ai_adoption
 
-# AI job postings
+  # AI job postings
   data://garden/artificial_intelligence/2023-06-14/ai_job_postings:
     - snapshot://artificial_intelligence/2023-06-14/ai_job_postings.csv
   data://grapher/artificial_intelligence/2023-06-14/ai_job_postings:
@@ -67,3 +67,15 @@ steps:
     - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/artificial_intelligence/2023-06-14/ai_corporate_investment:
     - data://garden/artificial_intelligence/2023-06-14/ai_corporate_investment
+
+  # AI bills passed into law
+  data://garden/artificial_intelligence/2023-06-14/ai_bills:
+    - snapshot://artificial_intelligence/2023-06-14/ai_bills.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_bills:
+    - data://garden/artificial_intelligence/2023-06-14/ai_bills
+
+  # AI employment by sector
+  data://garden/artificial_intelligence/2023-06-14/ai_employers:
+    - snapshot://artificial_intelligence/2023-06-14/ai_employers.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_employers:
+    - data://garden/artificial_intelligence/2023-06-14/ai_employers
