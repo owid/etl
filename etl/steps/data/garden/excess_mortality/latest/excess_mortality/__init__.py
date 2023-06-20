@@ -54,6 +54,22 @@ def run(dest_dir: str) -> None:
     # Update dataset and table metadata using the adjacent yaml file.
     ds_garden.update_metadata(paths.metadata_path)
 
+    # NOTE: ideally we wouldn't define sources in YAML, but inherit them from snapshots
+    # setting date_accessed is a workaround
+    # Get latest date_accessed from all sources and use it for variables and dataset.
+    max_date_accessed = max(
+        ds_hmd.metadata.sources[0].date_accessed,  # type: ignore
+        ds_wmd.metadata.sources[0].date_accessed,  # type: ignore
+        ds_kobak.metadata.sources[0].date_accessed,  # type: ignore
+    )
+    for col in tb_garden.columns:
+        for source in tb_garden[col].metadata.sources:
+            source.date_accessed = max_date_accessed
+
+    # Add date_accessed to dataset metadata.
+    for source in ds_garden.metadata.sources:
+        source.date_accessed = max_date_accessed
+
     # Save changes in the new garden dataset.
     ds_garden.save()
 
