@@ -105,8 +105,9 @@ class Snapshot:
 @dataclass_json
 @dataclass
 class SnapshotMeta:
-    # how we identify the dataset
+    # how we identify the dataset, determined automatically from snapshot path
     namespace: str  # a short source name (usually institution name)
+    version: str  # date, `latest` or year (discouraged)
     short_name: str  # a slug, ideally unique, snake_case, no spaces
 
     # how to get the data file
@@ -134,24 +135,10 @@ class SnapshotMeta:
 
     is_public: Optional[bool] = True
 
-    # use either publication_year or publication_date as dataset version if not given explicitly
-    version: Optional[str] = None
     publication_year: Optional[int] = None
     publication_date: Union[Optional[dt.date], Literal["latest"]] = None
 
     outs: Any = None
-
-    def __post_init__(self) -> None:
-        if self.version is None:
-            if self.publication_date:
-                self.version = str(self.publication_date)
-            elif self.publication_year:
-                self.version = str(self.publication_year)
-            else:
-                raise ValueError("no versioning field found")
-        else:
-            # version can be loaded as datetime.date, but it has to be string
-            self.version = str(self.version)
 
     @property
     def path(self) -> Path:
@@ -179,7 +166,19 @@ class SnapshotMeta:
             yml = yaml.safe_load(istream)
             if "meta" not in yml:
                 raise ValueError("Metadata YAML should be stored under `meta` key")
-            return cls.from_dict(dict(**yml["meta"], outs=yml.get("outs", [])))
+            meta = yml["meta"]
+
+            # fill metadata that can be inferred from path
+            if "namespace" not in meta:
+                meta["namespace"] = _parse_snapshot_path(Path(filename))[0]
+            if "version" not in meta:
+                meta["version"] = _parse_snapshot_path(Path(filename))[1]
+            if "short_name" not in meta:
+                meta["short_name"] = _parse_snapshot_path(Path(filename))[2]
+            if "file_extension" not in meta:
+                meta["file_extension"] = _parse_snapshot_path(Path(filename))[3]
+
+            return cls.from_dict(dict(**meta, outs=yml.get("outs", [])))
 
     @property
     def md5(self) -> str:
@@ -284,3 +283,11 @@ def _unignore_backports(path: Path):
                     f.write(s)
     else:
         yield
+
+
+def _parse_snapshot_path(path: Path) -> tuple[str, str, str, str]:
+    """Parse snapshot path into namespace, short_name, file_extension."""
+    version = path.parent.name
+    namespace = path.parent.parent.name
+    short_name, ext = path.stem.split(".")
+    return namespace, version, short_name, ext
