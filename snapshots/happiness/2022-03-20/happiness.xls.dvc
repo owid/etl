@@ -9,7 +9,8 @@ meta:
     Aknin, L. B., & Wang, S. (Eds.). (2022). World Happiness Report 2022. New York:
     Sustainable Development Solutions Network.'
   url: https://worldhappiness.report/ed/2022/
-  source_data_url: https://happiness-report.s3.amazonaws.com/2022/DataForTable2.1.xls
+  source_data_url: 
+    https://happiness-report.s3.amazonaws.com/2022/Appendix_2_Data_for_Figure_2.1.xls
   file_extension: xls
   license_url:
   license_name: ''
@@ -19,6 +20,6 @@ meta:
 
 wdir: ../../../data/snapshots/happiness/2022-03-20
 outs:
-- md5: eb4d95e0c3168484251ed3a14b53c84a
-  size: 497152
+- md5: 794e6a6f8355266c370c25b82b8734fb
+  size: 308224
   path: happiness.xls

@@ -8,8 +8,7 @@ meta:
   source_published_by: 'Helliwell, J., Layard, R., & Sachs, J. (2018). World Happiness
     Report 2018, New York: Sustainable Development Solutions Network.'
   url: https://worldhappiness.report/ed/2018/
-  source_data_url: 
-    https://worldhappiness.report/ed/2018/#appendices-and-data:~:text=Chapter%202%3A%20Online%20Data
+  source_data_url: https://s3.amazonaws.com/happiness-report/2018/WHR2018Chapter2OnlineData.xls
   file_extension: xls
   license_url:
   license_name: ''
@@ -19,6 +18,6 @@ meta:
 
 wdir: ../../../data/snapshots/happiness/2018-03-20
 outs:
-- md5: 928c4bdf0d334886b26cae34275b9a99
-  size: 33617
+- md5: 1c0396ad519b9dc22edc72f25414561c
+  size: 739840
   path: happiness.xls
