@@ -705,10 +705,10 @@ def merge(left, right, how="inner", on=None, left_on=None, right_on=None, suffix
         right_on = []
 
     # Find columns that existed in both left and right tables whose name will be modified with suffixes.
-    overlapping_columns = ((set(left.all_columns) - set(left_on)) & (set(right.all_columns) - set(right_on))) - set(on)
+    overlapping_columns = ((set(left.all_columns) - set(left_on)) & (set(right.all_columns) - set(right_on))) - set(on)  # type: ignore
 
     # Find columns that existed in both left and right tables that will preserve their names (since they are columns to join on).
-    common_columns = on or (set(left_on) & set(right_on))
+    common_columns = on or (set(left_on) & set(right_on))  # type: ignore
 
     columns_from_left = set(left.all_columns) - set(common_columns)
     columns_from_right = set(right.all_columns) - set(common_columns)

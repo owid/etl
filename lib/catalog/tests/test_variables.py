@@ -193,7 +193,7 @@ def test_combine_variables_metadata_with_different_fields(variable_1, variable_2
     variable_2 = variable_2.copy()
     for operation in ["+", "-", "melt", "pivot", "concat"]:
         # TODO: Assert this raises a warning because units are different.
-        metadata = combine_variables_metadata([variable_1, variable_2], operation=operation)
+        metadata = combine_variables_metadata([variable_1, variable_2], operation=operation)  # type: ignore
         # If titles/descriptions/units/short_units are different, they should not be propagated.
         assert metadata.title is None
         assert metadata.description is None
@@ -208,7 +208,7 @@ def test_combine_variables_metadata_with_equal_fields(variable_1, variable_2) ->
     # Impose that variable 2 is identical to 1.
     variable_2 = variable_1.copy()
     for operation in ["+", "-", "melt", "pivot", "concat"]:
-        metadata = combine_variables_metadata([variable_1, variable_2], operation=operation)
+        metadata = combine_variables_metadata([variable_1, variable_2], operation=operation)  # type: ignore
         # If titles/descriptions/units/short_units are identical, they should be propagated.
         assert metadata.title == variable_1.metadata.title
         assert metadata.description == variable_1.metadata.description
