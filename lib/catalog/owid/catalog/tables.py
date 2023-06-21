@@ -841,7 +841,7 @@ def _flatten_multiindex_column_names(table: Table, join_column_levels_with: str)
     new_columns = []
     for column in table.columns:
         if isinstance(column, tuple):
-            levels = [level for level in column if len(level) > 0]
+            levels = [str(level) for level in column if len(str(level)) > 0]
             new_column = join_column_levels_with.join(levels)
         else:
             new_column = column
@@ -873,15 +873,16 @@ def pivot(
     # Update variable metadata in the new table.
     for column in table.columns:
         if isinstance(values, str):
-            variables_to_combine = [data[values]]
+            column_name = values
         else:
-            variables_to_combine = [data[column[0]]]
+            column_name = column[0]
+        variables_to_combine = [data[column_name]]
         # "column" is a tuple with all column index levels.
         # For now, I assume the only metadata we want to propagate is the one of the upper level.
         # Alternatively, we could combine the metadata of the upper level variable with the metadata of the original
         # variable of all subsequent levels.
         column_metadata = variables.combine_variables_metadata(
-            variables=variables_to_combine, operation="pivot", name=column[0]
+            variables=variables_to_combine, operation="pivot", name=column_name
         )
         # Assign metadata of the original variable in the upper level to the new multiindex column.
         # NOTE: This allows accessing the metadata via, e.g. `table[("level_0", "level_1", "level_2")].metadata`,
