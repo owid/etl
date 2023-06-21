@@ -139,7 +139,8 @@ class Table(pd.DataFrame):
             raise ValueError(f"could not detect a suitable format to read from: {path}")
 
         # If each variable does not have sources, load them from the dataset.
-        table = assign_dataset_sources_and_licenses_to_each_variable(table=table)
+        # TODO: I think this is not a good idea, consider removing.
+        # table = assign_dataset_sources_and_licenses_to_each_variable(table=table)
 
         # Add processing log to the metadata of each variable in the table.
         # TODO: For some reason, the snapshot loading entry gets repeated.
@@ -675,40 +676,84 @@ class Table(pd.DataFrame):
         return cast("Table", tb)
 
 
-def merge(left, right, *args, **kwargs) -> Table:
-    # TODO: This function needs further logic. For example, to handle "on"/"left_on"/"right_on" columns,
-    #  or suffixes, or overlapping columns (that will end in "_x" and "_y" by default), or indexes.
-    tb = Table(pd.merge(left, right, *args, **kwargs))
-    columns_that_were_in_left = set(tb.columns) & set(left.columns)
-    columns_that_were_in_right = set(tb.columns) & set(right.columns)
+def merge(left, right, how="inner", on=None, left_on=None, right_on=None, suffixes=("_x", "_y"), **kwargs) -> Table:
+    if ("left_index" in kwargs) or ("right_index" in kwargs):
+        # TODO: Arguments left_index/right_index are not implemented.
+        raise NotImplementedError(
+            "Arguments 'left_index' and 'right_index' currently not implemented in function 'merge'."
+        )
+    # Create merged table.
+    tb = Table(
+        pd.merge(
+            left=left, right=right, how=how, on=on, left_on=left_on, right_on=right_on, suffixes=suffixes, **kwargs
+        )
+    )
 
-    for column in columns_that_were_in_left:
-        tb[column].metadata = variables.combine_variables_metadata([left[column]], operation="merge", name=column)
-    for column in columns_that_were_in_right:
-        tb[column].metadata = variables.combine_variables_metadata([right[column]], operation="merge", name=column)
+    if (on is None) and (left_on is None):
+        # By construction, either "on" is passed, or both "left_on" and "right_on".
+        # Any other possibility will raise a MergeError, and hence doesn't need to be considered.
+        # If none of them is not specified, assume we are joining on common columns.
+        on = list(set(left.all_columns) & set(right.all_columns))
+        left_on = []
+        right_on = []
+    elif left_on is not None:
+        # By construction, right_on must also be given.
+        on = []
+    else:
+        # Here, "on" is given, but not "left_on".
+        left_on = []
+        right_on = []
+
+    # Find columns that existed in both left and right tables whose name will be modified with suffixes.
+    overlapping_columns = ((set(left.all_columns) - set(left_on)) & (set(right.all_columns) - set(right_on))) - set(on)
+
+    # Find columns that existed in both left and right tables that will preserve their names (since they are columns to join on).
+    common_columns = on or (set(left_on) & set(right_on))
+
+    columns_from_left = set(left.all_columns) - set(common_columns)
+    columns_from_right = set(right.all_columns) - set(common_columns)
+
+    for column in columns_from_left:
+        if column in overlapping_columns:
+            new_column = f"{column}{suffixes[0]}"
+        else:
+            new_column = column
+        tb[new_column].metadata = variables.combine_variables_metadata([left[column]], operation="merge", name=column)
+
+    for column in columns_from_right:
+        if column in overlapping_columns:
+            new_column = f"{column}{suffixes[1]}"
+        else:
+            new_column = column
+        tb[new_column].metadata = variables.combine_variables_metadata([right[column]], operation="merge", name=column)
+
+    for column in common_columns:
+        tb[column].metadata = variables.combine_variables_metadata(
+            [left[column], right[column]], operation="merge", name=column
+        )
 
     return tb
 
 
-def concat(objs: List[Table], *, axis: int = 0, join: str = "outer", ignore_index: bool = False, **kwargs) -> Table:
+def concat(
+    objs: List[Table], *, axis: Union[int, str] = 0, join: str = "outer", ignore_index: bool = False, **kwargs
+) -> Table:
     # TODO: Add more logic to this function to handle indexes and possibly other arguments.
     table = Table(pd.concat(objs=objs, axis=axis, join=join, ignore_index=ignore_index, **kwargs))  # type: ignore
 
-    if axis == 1:
-        # Assign to each variable its original metadata.
-        original_variables = [table_i[column] for table_i in objs for column in table_i]
-        for i, column in enumerate(table.columns):
-            assert column == original_variables[i].name
-            table[column].metadata = original_variables[i].metadata
-            table[column].update_log(variable_name=column, parents=[column], operation="concat", inplace=True)
-    elif axis == 0:
-        # Add to each column either the metadata of the original variable (if the variable appeared only in one of the input
-        # tables) or the combination of the metadata from different tables (if the variable appeared in various tables).
-        for column in table.columns:
-            variables_to_combine = [table_i[column] for table_i in objs if column in table_i.columns]
-            table[column].metadata = variables.combine_variables_metadata(
-                variables=variables_to_combine, operation="concat", name=column
-            )
+    if (axis == 1) or (axis == "columns"):
+        # Original function pd.concat allows returning a dataframe with multiple columns with the same name.
+        # But this should not be allowed (and metadata cannot be stored for different variables if they have the same name).
+        repeated_columns = table.columns[table.columns.duplicated()].tolist()
+        if len(repeated_columns) > 0:
+            raise KeyError(f"Concatenated table contains repeated columns: {repeated_columns}")
+    # Add to each column either the metadata of the original variable (if the variable appeared only in one of the input
+    # tables) or the combination of the metadata from different tables (if the variable appeared in various tables).
+    for column in table.all_columns:
+        variables_to_combine = [table_i[column] for table_i in objs if column in table_i.all_columns]
+        table._fields[column] = variables.combine_variables_metadata(
+            variables=variables_to_combine, operation="concat", name=column
+        )
 
     return table
 
@@ -855,9 +900,6 @@ def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[
         for column in list(table.all_columns):
             table._fields[column].sources = metadata.dataset.sources  # type: ignore
             table._fields[column].licenses = metadata.dataset.licenses  # type: ignore
-        # for column in table.columns:
-        #     table[column].metadata.sources = metadata.dataset.sources  # type: ignore
-        #     table[column].metadata.licenses = metadata.dataset.licenses  # type: ignore
     table = update_processing_logs_when_loading_or_creating_table(table=table)
 
     return table
