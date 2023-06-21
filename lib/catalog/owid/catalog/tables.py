@@ -20,7 +20,7 @@ from pandas._typing import FilePath, ReadCsvBuffer  # type: ignore
 from pandas.util._decorators import rewrite_axis_style_signature
 
 from . import variables
-from .meta import Source, TableMeta, VariableMeta
+from .meta import DatasetMeta, License, Source, TableMeta, VariableMeta
 
 log = structlog.get_logger()
 
@@ -732,6 +732,13 @@ def merge(left, right, how="inner", on=None, left_on=None, right_on=None, suffix
             [left[column], right[column]], operation="merge", name=column
         )
 
+    # Update table metadata.
+    tb.metadata.title = combine_tables_titles(tables=[left, right])
+    tb.metadata.description = combine_tables_descriptions(tables=[left, right])
+    tb.metadata.dataset = DatasetMeta(
+        sources=get_unique_sources_from_table(table=tb), licenses=get_unique_licenses_from_table(table=tb)
+    )
+
     return tb
 
 
@@ -754,6 +761,13 @@ def concat(
         table._fields[column] = variables.combine_variables_metadata(
             variables=variables_to_combine, operation="concat", name=column
         )
+
+    # Update table metadata.
+    table.metadata.title = combine_tables_titles(tables=objs)
+    table.metadata.description = combine_tables_descriptions(tables=objs)
+    table.metadata.dataset = DatasetMeta(
+        sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
+    )
 
     return table
 
@@ -780,9 +794,6 @@ def melt(
             **kwargs,
         )
     )
-
-    # Copy the original table metadata to the new table.
-    table.metadata = copy.deepcopy(frame.metadata)
 
     # Get the list of column names used as id variables.
     if id_vars is None:
@@ -815,6 +826,13 @@ def melt(
         table[variable].metadata = variables.combine_variables_metadata(
             variables=[frame[variable]], operation="melt", name=variable
         )
+
+    # Update table metadata.
+    table.metadata.title = frame.metadata.title
+    table.metadata.description = frame.metadata.description
+    table.metadata.dataset = DatasetMeta(
+        sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
+    )
 
     return table
 
@@ -851,8 +869,6 @@ def pivot(
             **kwargs,
         )
     )
-    # Copy the original table metadata to the new table.
-    table.metadata = copy.deepcopy(data.metadata)
 
     # Update variable metadata in the new table.
     for column in table.columns:
@@ -890,6 +906,13 @@ def pivot(
         # Assign the gathered metadata for indexes and columns to the corresponding new columns.
         for i, column in enumerate(table.columns):
             table[column].metadata = (index_metadata + columns_metadata)[i]
+
+    # Update table metadata.
+    table.metadata.title = data.metadata.title
+    table.metadata.description = data.metadata.description
+    table.metadata.dataset = DatasetMeta(
+        sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
+    )
 
     return table
 
@@ -1121,3 +1144,48 @@ def amend_log(
 
     if not inplace:
         return table
+
+
+def get_unique_sources_from_table(table: Table) -> List[Source]:
+    # Make a list of all sources of all variables in table.
+    sources = sum([table._fields[column].sources for column in list(table.all_columns)], [])
+
+    # Get unique array of tuples of source fields (respecting the order).
+    unique_sources_array = pd.unique([tuple(source.to_dict().items()) for source in sources])
+
+    # Make a list of unique sources.
+    unique_sources = [Source.from_dict(dict(source)) for source in unique_sources_array]  # type: ignore
+
+    return unique_sources
+
+
+def get_unique_licenses_from_table(table: Table) -> List[License]:
+    # Make a list of all licenses of all variables in table.
+    licenses = sum([table._fields[column].licenses for column in list(table.all_columns)], [])
+
+    # Get unique array of tuples of license fields (respecting the order).
+    unique_licenses_array = pd.unique([tuple(license.to_dict().items()) for license in licenses])
+
+    # Make a list of unique licenses.
+    unique_licenses = [License.from_dict(dict(license)) for license in unique_licenses_array]  # type: ignore
+
+    return unique_licenses
+
+
+def _combine_tables_titles_and_descriptions(tables: List[Table], title_or_description: str) -> Optional[str]:
+    # Keep the title only if all tables have exactly the same title.
+    # Otherwise we assume that the table has a different meaning, and its title should be manually handled.
+    title_or_description_combined = None
+    titles_or_descriptions = pd.unique([getattr(table.metadata, title_or_description) for table in tables])
+    if len(titles_or_descriptions) == 1:
+        title_or_description_combined = titles_or_descriptions[0]
+
+    return title_or_description_combined
+
+
+def combine_tables_titles(tables: List[Table]) -> Optional[str]:
+    return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="title")
+
+
+def combine_tables_descriptions(tables: List[Table]) -> Optional[str]:
+    return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="description")
