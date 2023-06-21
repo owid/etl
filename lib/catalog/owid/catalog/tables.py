@@ -813,7 +813,7 @@ def melt(
     for variable in id_vars_list:
         # Combine metadata of id variables and assign the combination to the new "id" variable.
         table[variable].metadata = variables.combine_variables_metadata(
-            variables=[frame[var] for var in id_vars_list], operation="melt", name=variable
+            variables=[frame[variable]], operation="melt", name=variable
         )
 
     return table
