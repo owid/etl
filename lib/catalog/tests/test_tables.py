@@ -567,3 +567,37 @@ def test_melt(table_1, sources, licenses) -> None:
 
     # Specify fixed columns; all other columns will be melted.
     tb = tables.melt(table_1, id_vars=["country", "year"])
+    assert tb["country"].metadata.title == table_1["country"].metadata.title
+    assert tb["country"].metadata.description == table_1["country"].metadata.description
+    assert tb["year"].metadata.title is None
+    assert tb["year"].metadata.description is None
+    # The new "variable" and "value" columns should combine the sources and licenses of "a" and "b".
+    for column in ["variable", "value"]:
+        assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
+        assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+
+    # Repeat the same operation, but specifying different names for variable and value columns.
+    # Specify fixed columns; all other columns will be melted.
+    tb = tables.melt(table_1, id_vars=["country", "year"], var_name="var", value_name="val")
+    assert tb["country"].metadata.title == table_1["country"].metadata.title
+    assert tb["country"].metadata.description == table_1["country"].metadata.description
+    assert tb["year"].metadata.title is None
+    assert tb["year"].metadata.description is None
+    # The new "variable" and "value" columns should combine the sources and licenses of "a" and "b".
+    for column in ["var", "val"]:
+        assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
+        assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+
+    # Specify fixed columns and variable columns.
+    # Specify fixed columns; all other columns will be melted.
+    tb = tables.melt(table_1, id_vars=["country", "year"], value_vars=["b"])
+    assert tb["country"].metadata.title == table_1["country"].metadata.title
+    assert tb["country"].metadata.description == table_1["country"].metadata.description
+    assert tb["year"].metadata.title is None
+    assert tb["year"].metadata.description is None
+    # The new "variable" and "value" columns should have the same metadata as the original "b".
+    for column in ["variable", "value"]:
+        assert tb[column].metadata.title == table_1["b"].metadata.title
+        assert tb[column].metadata.description == table_1["b"].metadata.description
+        assert tb[column].metadata.sources == table_1["b"].metadata.sources
+        assert tb[column].metadata.licenses == table_1["b"].metadata.licenses
