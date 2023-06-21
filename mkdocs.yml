@@ -1,4 +1,4 @@
-site_name: OWID data pipeline
+site_name: ETL documentation
 
 repo_name: owid/etl
 repo_url: https://github.com/owid/etl
@@ -65,16 +65,21 @@ nav:
 theme:
   # logo: assets/logo.png
   favicon: assets/images/favicon.png
+  # icon:
+    # logo: material/library-outline
+  logo: "assets/site-logo.svg"
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: blue-grey
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: blue-grey
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
