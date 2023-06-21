@@ -1,4 +1,4 @@
-site_name: ETL documentation
+site_name: Data pipeline
 
 repo_name: owid/etl
 repo_url: https://github.com/owid/etl
