@@ -1,0 +1,42 @@
+dataset:
+  title: PPPs and exchange rates (2023)
+  description: OECD provides data on Purchasing Power Parities (actual individual
+    consumption, private consumption and GDP) and Exchange rates (period-average and
+    end of period data) between 2000-2022.
+  licenses:
+  - name: Reproduction allowed with proper citation
+    url: https://www.oecd.org/termsandconditions/
+  sources:
+  - name: OECD (2023)
+    description: OECD provides data on Purchasing Power Parities (actual individual
+      consumption, private consumption and GDP) and Exchange rates (period-average
+      and end of period data) between 2000-2022.
+    url: https://stats.oecd.org/viewhtml.aspx?datasetcode=SNA_TABLE4&lang=en
+    date_accessed: '2023-06-20'
+    publication_year: 2023
+    published_by: 'OECD (2023), Exchange rates and PPP. doi: 10.1787/037ed317-en (Accessed
+      on 20 June 2023)'
+tables:
+  ppp_exchange_rates:
+    variables:
+      measure:
+        title: measure
+        unit: ''
+      unit:
+        title: unit
+        unit: ''
+      exchange_rates__end_of_period:
+        title: Exchange rates, end of period
+        unit: ''
+      exchange_rates__period_average:
+        title: Exchange rates, period-average
+        unit: ''
+      purchasing_power_parities_for_gdp:
+        title: Purchasing Power Parities for GDP
+        unit: ''
+      purchasing_power_parities_for_actual_individual_consumption:
+        title: Purchasing Power Parities for actual individual consumption
+        unit: ''
+      purchasing_power_parities_for_private_consumption:
+        title: Purchasing Power Parities for private consumption
+        unit: ''
