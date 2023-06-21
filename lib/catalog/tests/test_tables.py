@@ -673,5 +673,58 @@ def test_pivot(table_1, sources) -> None:
     # To better test the expected behaviour, I will add a source to the "country" column.
     table_1["country"].metadata.sources = [sources[4]]
     tb = tables.pivot(table_1, columns="country")
+    # Column "a" with all its sublevels should keep the metadata of the original "a".
+    # By construction, the metadata of "country" is currently lost when pivoting.
+    # Alternatively we could combine the metadata of "a" and "country".
+    # Note: Currently, tb[("a", "France")].metadata shows the original metadata, but tb["a"]["France"].metadata doesn't.
+    assert tb[("a", "France")].metadata == table_1["a"].metadata
+    assert tb[("a", "Spain")].metadata == table_1["a"].metadata
+    assert tb[("b", "France")].metadata == table_1["b"].metadata
+    assert tb[("b", "Spain")].metadata == table_1["b"].metadata
+    # Now check that table metadata is identical.
+    assert tb.metadata == table_1.metadata
+
+    # Add a new column to pivot.
+    tb = tables.pivot(table_1, columns=["country", "year"])
+    assert tb[("a", "Spain", 2020)].metadata == table_1["a"].metadata
+    # Now check that table metadata is identical.
+    assert tb.metadata == table_1.metadata
+
+    # Choose one of the columns as index.
+    tb = tables.pivot(table_1, index="country", columns=["year"])
+    assert tb[("a", 2020)].metadata == table_1["a"].metadata
+    # Now check that table metadata is identical.
+    assert tb.metadata == table_1.metadata
+
+    # Specify argument "value" as a column name.
+    # When doing so, the new columns will be 2020 and 2021 (without the name "a" at any level).
+    tb = tables.pivot(table_1, index="country", columns=["year"], values="a")
+    assert tb[2020].metadata == table_1["a"].metadata
+    assert tb[2021].metadata == table_1["a"].metadata
+    # Now check that table metadata is identical.
+    assert tb.metadata == table_1.metadata
+
+    # Specify argument "value" as a list.
+    # When doing so, the new columns will have two levels, one for "a" and another for 2020 and 2021.
+    tb = tables.pivot(table_1, index="country", columns=["year"], values=["a"])
+    assert tb[("a", 2020)].metadata == table_1["a"].metadata
+    assert tb[("a", 2021)].metadata == table_1["a"].metadata
+    # Now check that table metadata is identical.
+    assert tb.metadata == table_1.metadata
+
+    # Specify argument "value" as a list and flatten levels.
+    tb = tables.pivot(table_1, index="country", columns=["year"], values=["a"], join_column_levels_with="_")
+    assert tb["a_2020"].metadata == table_1["a"].metadata
+    assert tb["a_2021"].metadata == table_1["a"].metadata
+    assert tb["country"].metadata == table_1["country"].metadata
+    # Now check that table metadata is identical.
+    assert tb.metadata == table_1.metadata
+
+    # Specify argument "value" as a column name and attempt to flatten levels.
+    # The flattening is actually irrelevant, given that "value" is passed as a string and "a" is therefore not a level.
+    tb = tables.pivot(table_1, index="country", columns=["year"], values="a", join_column_levels_with="_")
+    assert tb[2020].metadata == table_1["a"].metadata
+    assert tb[2021].metadata == table_1["a"].metadata
+    assert tb["country"].metadata == table_1["country"].metadata
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
