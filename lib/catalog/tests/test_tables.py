@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from owid.catalog import tables
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
 from owid.catalog.tables import SCHEMA, Table
@@ -372,3 +373,197 @@ def test_set_index_keeps_metadata_inplace() -> None:
     # metadata should be preserved
     assert tb_new["a"].metadata.title == "A"
     assert tb_new["b"].metadata.title == "B"
+
+
+def test_assign_dataset_sources_and_licenses_to_each_variable(table_1, sources) -> None:
+    tb = table_1.copy()
+    # Create a new variable without metadata.
+    tb["c"] = 1
+    tb = tables.assign_dataset_sources_and_licenses_to_each_variable(tb)
+    # Check that variables that did not have sources now have the dataset of the dataset.
+    assert tb["c"].metadata.sources == [sources[1], sources[2], sources[3]]
+    # Check that variables that did have sources were not affected.
+    assert tb["a"].metadata.sources == [sources[2], sources[1]]
+    # Note: This function will also add all sources to columns "country" and "year", which may not be a desired effect.
+
+
+def test_merge_without_any_on_arguments(table_1, table_2, sources, licenses) -> None:
+    # If "on", "left_on" and "right_on" are not specified, the join is performed on common columns.
+    # In this case, "country", "year", "a".
+    tb = tables.merge(table_1, table_2)
+    # Check that non-overlapping columns preserve metadata.
+    assert tb["c"].metadata == table_2["c"].metadata
+    # Check that "on" columns combine the metadata of left and right tables.
+    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
+    # with table_2, title should be preserved, but description will be lost.
+    assert tb["country"].metadata.title == "Country Title"
+    assert tb["country"].metadata.description is None
+    # Column "year" has no metadata in either table.
+    assert tb["year"].metadata.title is None
+    assert tb["year"].metadata.description is None
+    # Column "a" should combine the sources and licenses of of both tables (not title and description, since they are
+    # different in left and right tables).
+    assert tb["a"].metadata.title is None
+    assert tb["a"].metadata.description is None
+    assert tb["a"].metadata.sources == [sources[2], sources[1]]
+    assert tb["a"].metadata.licenses == [licenses[1], licenses[2]]
+    # Column "b" appears only in table_1, so it should keep its original metadata.
+    assert tb["b"].metadata == table_1["b"].metadata
+    # Column "c" appears only in table_2, so it should keep its original metadata.
+    assert tb["c"].metadata == table_2["c"].metadata
+
+
+def test_merge_with_on_argument(table_1, table_2) -> None:
+    tb = tables.merge(table_1, table_2, on=["country", "year"])
+    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
+    # with table_2, title should be preserved, but description will be lost.
+    assert tb["country"].metadata.title == "Country Title"
+    assert tb["country"].metadata.description is None
+    # Idem for "year".
+    assert tb["year"].metadata.title is None
+    assert tb["year"].metadata.description is None
+    # Given that there is a column "a" in both left and right tables, they will be renamed as "a_x" and "a_y" in the
+    # merged table. Then, "a_x" should have the metadata of the left table, and "a_y" should have the metadata of the
+    # right table.
+    assert tb["a_x"].metadata == table_1["a"].metadata
+    assert tb["a_y"].metadata == table_2["a"].metadata
+    # Column "b" appears only in table_1, so it should keep its original metadata.
+    assert tb["b"].metadata == table_1["b"].metadata
+    # Column "c" appears only in table_2, so it should keep its original metadata.
+    assert tb["c"].metadata == table_2["c"].metadata
+    # Idem but specifying suffixes.
+    tb = tables.merge(table_1, table_2, on=["country", "year"], suffixes=("_left", "_right"))
+    assert tb["a_left"].metadata == table_1["a"].metadata
+    assert tb["a_right"].metadata == table_2["a"].metadata
+
+
+def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, licenses) -> None:
+    # Join on columns "country" and "year" (in this case, the result should be identical to simply defining
+    # on=["country", "year"]).
+    tb = tables.merge(table_1, table_2, left_on=["country", "year"], right_on=["country", "year"])
+    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
+    # with table_2, title should be preserved, but description will be lost.
+    assert tb["country"].metadata.title == "Country Title"
+    assert tb["country"].metadata.description is None
+    # Idem for "year".
+    assert tb["year"].metadata.title is None
+    assert tb["year"].metadata.description is None
+    # Given that there is a column "a" in both left and right tables, they will be renamed as "a_x" and "a_y" in the
+    # merged table. Then, "a_x" should have the metadata of the left table, and "a_y" should have the metadata of the
+    # right table.
+    assert tb["a_x"].metadata == table_1["a"].metadata
+    assert tb["a_y"].metadata == table_2["a"].metadata
+    # Column "b" appears only in table_1, so it should keep its original metadata.
+    assert tb["b"].metadata == table_1["b"].metadata
+    # Column "c" appears only in table_2, so it should keep its original metadata.
+    assert tb["c"].metadata == table_2["c"].metadata
+
+    # Repeat the same merge, but specifying suffixes.
+    tb = tables.merge(
+        table_1, table_2, left_on=["country", "year"], right_on=["country", "year"], suffixes=("_left", "_right")
+    )
+    assert tb["a_left"].metadata == table_1["a"].metadata
+    assert tb["a_right"].metadata == table_2["a"].metadata
+
+    # Now do a merge where left_on and right_on have one column different.
+    tb = tables.merge(table_1, table_2, left_on=["country", "year", "b"], right_on=["country", "year", "c"])
+    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
+    # with table_2, title should be preserved, but description will be lost.
+    assert tb["country"].metadata.title == "Country Title"
+    assert tb["country"].metadata.description is None
+    # Idem for "year".
+    assert tb["year"].metadata.title is None
+    assert tb["year"].metadata.description is None
+    # Given that there is a column "a" in both left and right tables, they will be renamed as "a_x" and "a_y" in the
+    # merged table. Then, "a_x" should have the metadata of the left table, and "a_y" should have the metadata of the
+    # right table.
+    assert tb["a_x"].metadata == table_1["a"].metadata
+    assert tb["a_y"].metadata == table_2["a"].metadata
+    # Column "b" appears only in table_1, so it should keep its original metadata.
+    assert tb["b"].metadata == table_1["b"].metadata
+    # Column "c" appears only in table_2, so it should keep its original metadata.
+    assert tb["c"].metadata == table_2["c"].metadata
+
+    # Now do a merge where column "a" is included both on left_on and right_on.
+    tb = tables.merge(table_1, table_2, left_on=["country", "year", "a"], right_on=["country", "year", "a"])
+    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
+    # with table_2, title should be preserved, but description will be lost.
+    assert tb["country"].metadata.title == "Country Title"
+    assert tb["country"].metadata.description is None
+    # Idem for "year".
+    assert tb["year"].metadata.title is None
+    assert tb["year"].metadata.description is None
+    # Column "a" should now combine metadata from left and right tables.
+    # Given that they have differring titles and description, the combined title and description should disappear.
+    assert tb["a"].metadata.title is None
+    assert tb["a"].metadata.description is None
+    # Sources and licenses should be the combination from the two tables.
+    assert tb["a"].metadata.sources == [sources[2], sources[1]]
+    assert tb["a"].metadata.licenses == [licenses[1], licenses[2]]
+    # Column "b" appears only in table_1, so it should keep its original metadata.
+    assert tb["b"].metadata == table_1["b"].metadata
+    # Column "c" appears only in table_2, so it should keep its original metadata.
+    assert tb["c"].metadata == table_2["c"].metadata
+
+
+def test_concat_with_axis_0(table_1, table_2, sources, licenses) -> None:
+    tb = tables.concat([table_1, table_2])
+    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
+    # with table_2, title should be preserved, but description will be lost.
+    assert tb["country"].metadata.title == "Country Title"
+    assert tb["country"].metadata.description is None
+    # Column "year" has no title and no description in any of the tables.
+    assert tb["year"].metadata.title is None
+    assert tb["year"].metadata.description is None
+    # Column "a" appears in both tables, so the resulting "a" columns should combine sources and licenses.
+    assert tb["a"].metadata.title is None
+    assert tb["a"].metadata.description is None
+    assert tb["a"].metadata.sources == [sources[2], sources[1]]
+    assert tb["a"].metadata.licenses == [licenses[1], licenses[2]]
+    # Column "b" appears only in table_1, so it should keep its original metadata.
+    assert tb["b"].metadata == table_1["b"].metadata
+    # Column "c" appears only in table_2, so it should keep its original metadata.
+    assert tb["c"].metadata == table_2["c"].metadata
+
+
+def test_concat_with_axis_1(table_1, table_2) -> None:
+    # TODO: Assert that concat raises an error if the resulting table has multiple columns with the same name.
+    # tb = tables.concat([table_1, table_2], axis=1)
+    # Rename columns in table_2 so that they don't coincide with names in table_1.
+    tb = tables.concat(
+        [table_1, table_2.rename(columns={"country": "country_right", "year": "year_right", "a": "a_right"})], axis=1
+    )
+    # Argument axis=1 implies that columns are added in parallel, so they should all keep their original metadata.
+    assert tb["country"].metadata == table_1["country"].metadata
+    assert tb["year"].metadata == table_1["year"].metadata
+    assert tb["a"].metadata == table_1["a"].metadata
+    assert tb["b"].metadata == table_1["b"].metadata
+    assert tb["country_right"].metadata == table_2["country"].metadata
+    assert tb["year_right"].metadata == table_2["year"].metadata
+    assert tb["a_right"].metadata == table_2["a"].metadata
+    assert tb["c"].metadata == table_2["c"].metadata
+
+
+def test_melt(table_1, sources, licenses) -> None:
+    # If nothing specified, all columns are melted.
+    tb = tables.melt(table_1)
+    for column in ["variable", "value"]:
+        # Given that titles and descriptions are different, they should not be propagated.
+        assert tb[column].metadata.title is None
+        assert tb[column].metadata.description is None
+        # Sources and licenses should be the combination of sources and licenses of all columns in table_1.
+        assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
+        assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+
+    # Repeat the same operation, but specifying different names for variable and value columns.
+    tb = tables.melt(table_1, var_name="var", value_name="val")
+    for column in ["var", "val"]:
+        # Given that titles and descriptions are different, they should not be propagated.
+        assert tb[column].metadata.title is None
+        assert tb[column].metadata.description is None
+        # Sources and licenses should be the combination of sources and licenses of all columns in table_1.
+        assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
+        assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+
+    # Specify fixed columns; all other columns will be melted.
+    tb = tables.melt(table_1, id_vars=["country", "year"])

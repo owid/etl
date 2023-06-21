@@ -2,14 +2,16 @@
 #  test_variables
 #
 
-from collections import defaultdict
-
 import pandas as pd
 import pytest
 
-from owid.catalog.meta import TableMeta, VariableMeta
-from owid.catalog.tables import Table
-from owid.catalog.variables import License, Source, Variable, combine_variables_metadata
+from owid.catalog.meta import VariableMeta
+from owid.catalog.variables import (
+    Variable,
+    combine_variables_metadata,
+    get_unique_licenses_from_variables,
+    get_unique_sources_from_variables,
+)
 
 
 def test_create_empty_variable() -> None:
@@ -55,78 +57,6 @@ def test_variable_can_be_type_cast() -> None:
     assert v2.name == v.name
     assert v2.metadata == v.metadata
     assert (v == v2).all()
-
-
-@pytest.fixture
-def sources():
-    sources = {
-        1: Source(name="Name of Source 1", description="Description of Source 1"),
-        2: Source(name="Name of Source 2", description="Description of Source 2"),
-        3: Source(name="Name of Source 3", description="Description of Source 3"),
-        4: Source(name="Name of Source 4", description="Description of Source 4"),
-    }
-    return sources
-
-
-@pytest.fixture
-def licenses():
-    licenses = {
-        1: License(name="Name of License 1", url="URL of License 1"),
-        2: License(name="Name of License 2", url="URL of License 2"),
-        3: License(name="Name of License 3", url="URL of License 3"),
-        4: License(name="Name of License 4", url="URL of License 4"),
-    }
-    return licenses
-
-
-@pytest.fixture
-def table_1(sources, licenses):
-    tb1 = Table({"country": ["Spain", "Spain", "France"], "year": [2020, 2021, 2021], "a": [1, 2, 3], "b": [4, 5, 6]})
-    tb1.metadata = TableMeta(title="Title of Table 1", description="Description of Table 1")
-    tb1._fields = defaultdict(
-        VariableMeta,
-        {
-            "a": VariableMeta(
-                title="Title of Table 1 Variable a",
-                description="Description of Table 1 Variable a",
-                sources=[sources[2], sources[1]],
-                licenses=[licenses[1]],
-            ),
-            "b": VariableMeta(
-                title="Title of Table 1 Variable b",
-                description="Description of Table 1 Variable b",
-                sources=[sources[2], sources[3]],
-                licenses=[licenses[2], licenses[3]],
-            ),
-        },
-    )
-    return tb1
-
-
-@pytest.fixture
-def table_2(sources, licenses):
-    tb2 = Table(
-        {"country": ["Spain", "France", "France"], "year": [2020, 2021, 2022], "a": [10, 20, 30], "c": [40, 50, 60]}
-    )
-    tb2.metadata = TableMeta(title="Title of Table 2", description="Description of Table 2")
-    tb2._fields = defaultdict(
-        VariableMeta,
-        {
-            "a": VariableMeta(
-                title="Title of Table 2 Variable a",
-                description="Description of Table 2 Variable a",
-                sources=[sources[2]],
-                licenses=[licenses[2]],
-            ),
-            "c": VariableMeta(
-                title="Title of Table 2 Variable c",
-                description="Description of Table 2 Variable c",
-                sources=[sources[2], sources[4]],
-                licenses=[licenses[4], licenses[2]],
-            ),
-        },
-    )
-    return tb2
 
 
 def _assert_untouched_data_and_metadata_did_not_change(tb1, tb1_expected):
@@ -246,53 +176,43 @@ def test_create_new_variables_as_another_variable_to_the_power_of_another_variab
     assert tb1["k"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
 
-@pytest.fixture
-def variable_1(sources, licenses):
-    v1 = Variable(pd.Series([1, 2, 3]), name="Variable 1")
-    v1.metadata.title = "Title of Variable 1"
-    v1.metadata.description = "Description of Variable 1"
-    v1.metadata.unit = "Unit of Variable 1"
-    v1.metadata.unit = "Short unit of Variable 1"
-    v1.metadata.sources = [sources[2], sources[1]]
-    v1.metadata.licenses = [licenses[1]]
-    return v1
+def test_get_unique_sources_from_variables(variable_1, variable_2, sources):
+    assert get_unique_sources_from_variables([variable_1, variable_2]) == [sources[2], sources[1], sources[3]]
+    # Ensure that the function respects the order in which sources appear.
+    assert get_unique_sources_from_variables([variable_2, variable_1]) == [sources[2], sources[3], sources[1]]
 
 
-@pytest.fixture
-def variable_2(sources, licenses):
-    v2 = Variable(pd.Series([4, 5, 6]), name="Variable 2")
-    v2.metadata.title = "Title of Variable 2"
-    v2.metadata.description = "Description of Variable 2"
-    v2.metadata.unit = "Unit of Variable 2"
-    v2.metadata.unit = "Short unit of Variable 2"
-    v2.metadata.sources = [sources[2], sources[3]]
-    v2.metadata.licenses = [licenses[2], licenses[3]]
-    return v2
+def test_get_unique_licenses_from_variables(variable_1, variable_2, licenses):
+    assert get_unique_licenses_from_variables([variable_1, variable_2]) == [licenses[1], licenses[2], licenses[3]]
+    # Ensure that the function respects the order in which sources appear.
+    assert get_unique_licenses_from_variables([variable_2, variable_1]) == [licenses[2], licenses[3], licenses[1]]
 
 
-def test_combine_variables_metadata_sum_with_different_fields(variable_1, variable_2, sources, licenses) -> None:
+def test_combine_variables_metadata_with_different_fields(variable_1, variable_2, sources, licenses) -> None:
     variable_1 = variable_1.copy()
     variable_2 = variable_2.copy()
-    # TODO: Assert this raises a warning because units are different.
-    metadata = combine_variables_metadata([variable_1, variable_2], operation="+")
-    # If titles/descriptions/units/short_units are different, they should not be propagated.
-    assert metadata.title is None
-    assert metadata.description is None
-    assert metadata.unit is None
-    assert metadata.short_unit is None
-    assert metadata.sources == [sources[2], sources[1], sources[3]]
-    assert metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    for operation in ["+", "-", "melt", "pivot", "concat"]:
+        # TODO: Assert this raises a warning because units are different.
+        metadata = combine_variables_metadata([variable_1, variable_2], operation=operation)
+        # If titles/descriptions/units/short_units are different, they should not be propagated.
+        assert metadata.title is None
+        assert metadata.description is None
+        assert metadata.unit is None
+        assert metadata.short_unit is None
+        assert metadata.sources == [sources[2], sources[1], sources[3]]
+        assert metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
 
-def test_combine_variables_metadata_sum_with_equal_fields(variable_1, variable_2) -> None:
+def test_combine_variables_metadata_with_equal_fields(variable_1, variable_2) -> None:
     variable_1 = variable_1.copy()
     # Impose that variable 2 is identical to 1.
     variable_2 = variable_1.copy()
-    metadata = combine_variables_metadata([variable_1, variable_2], operation="+")
-    # If titles/descriptions/units/short_units are identical, they should be propagated.
-    assert metadata.title == variable_1.metadata.title
-    assert metadata.description == variable_1.metadata.description
-    assert metadata.unit == variable_1.metadata.unit
-    assert metadata.short_unit == variable_1.metadata.short_unit
-    assert metadata.sources == variable_1.metadata.sources
-    assert metadata.licenses == variable_2.metadata.licenses
+    for operation in ["+", "-", "melt", "pivot", "concat"]:
+        metadata = combine_variables_metadata([variable_1, variable_2], operation=operation)
+        # If titles/descriptions/units/short_units are identical, they should be propagated.
+        assert metadata.title == variable_1.metadata.title
+        assert metadata.description == variable_1.metadata.description
+        assert metadata.unit == variable_1.metadata.unit
+        assert metadata.short_unit == variable_1.metadata.short_unit
+        assert metadata.sources == variable_1.metadata.sources
+        assert metadata.licenses == variable_2.metadata.licenses
