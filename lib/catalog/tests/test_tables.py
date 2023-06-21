@@ -411,9 +411,16 @@ def test_merge_without_any_on_arguments(table_1, table_2, sources, licenses) -> 
     assert tb["b"].metadata == table_1["b"].metadata
     # Column "c" appears only in table_2, so it should keep its original metadata.
     assert tb["c"].metadata == table_2["c"].metadata
+    # Now check the table metadata.
+    # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
+    assert tb.metadata.title is None
+    assert tb.metadata.description is None
+    # Sources and licenses should be all sources and licenses of the resulting variables.
+    assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]
+    assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]
 
 
-def test_merge_with_on_argument(table_1, table_2) -> None:
+def test_merge_with_on_argument(table_1, table_2, sources, licenses) -> None:
     tb = tables.merge(table_1, table_2, on=["country", "year"])
     # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
     # with table_2, title should be preserved, but description will be lost.
@@ -435,6 +442,13 @@ def test_merge_with_on_argument(table_1, table_2) -> None:
     tb = tables.merge(table_1, table_2, on=["country", "year"], suffixes=("_left", "_right"))
     assert tb["a_left"].metadata == table_1["a"].metadata
     assert tb["a_right"].metadata == table_2["a"].metadata
+    # Now check the table metadata.
+    # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
+    assert tb.metadata.title is None
+    assert tb.metadata.description is None
+    # Sources and licenses should be all sources and licenses of the resulting variables.
+    assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]
+    assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]
 
 
 def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, licenses) -> None:
@@ -457,6 +471,13 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     assert tb["b"].metadata == table_1["b"].metadata
     # Column "c" appears only in table_2, so it should keep its original metadata.
     assert tb["c"].metadata == table_2["c"].metadata
+    # Now check the table metadata.
+    # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
+    assert tb.metadata.title is None
+    assert tb.metadata.description is None
+    # Sources and licenses should be all sources and licenses of the resulting variables.
+    assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]
+    assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]
 
     # Repeat the same merge, but specifying suffixes.
     tb = tables.merge(
@@ -464,6 +485,13 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     )
     assert tb["a_left"].metadata == table_1["a"].metadata
     assert tb["a_right"].metadata == table_2["a"].metadata
+    # Now check the table metadata.
+    # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
+    assert tb.metadata.title is None
+    assert tb.metadata.description is None
+    # Sources and licenses should be all sources and licenses of the resulting variables.
+    assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]
+    assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]
 
     # Now do a merge where left_on and right_on have one column different.
     tb = tables.merge(table_1, table_2, left_on=["country", "year", "b"], right_on=["country", "year", "c"])
@@ -483,6 +511,13 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     assert tb["b"].metadata == table_1["b"].metadata
     # Column "c" appears only in table_2, so it should keep its original metadata.
     assert tb["c"].metadata == table_2["c"].metadata
+    # Now check the table metadata.
+    # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
+    assert tb.metadata.title is None
+    assert tb.metadata.description is None
+    # Sources and licenses should be all sources and licenses of the resulting variables.
+    assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]
+    assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]
 
     # Now do a merge where column "a" is included both on left_on and right_on.
     tb = tables.merge(table_1, table_2, left_on=["country", "year", "a"], right_on=["country", "year", "a"])
@@ -504,6 +539,13 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     assert tb["b"].metadata == table_1["b"].metadata
     # Column "c" appears only in table_2, so it should keep its original metadata.
     assert tb["c"].metadata == table_2["c"].metadata
+    # Now check the table metadata.
+    # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
+    assert tb.metadata.title is None
+    assert tb.metadata.description is None
+    # Sources and licenses should be all sources and licenses of the resulting variables.
+    assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]
+    assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]
 
 
 def test_concat_with_axis_0(table_1, table_2, sources, licenses) -> None:
@@ -524,9 +566,16 @@ def test_concat_with_axis_0(table_1, table_2, sources, licenses) -> None:
     assert tb["b"].metadata == table_1["b"].metadata
     # Column "c" appears only in table_2, so it should keep its original metadata.
     assert tb["c"].metadata == table_2["c"].metadata
+    # Now check the table metadata.
+    # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
+    assert tb.metadata.title is None
+    assert tb.metadata.description is None
+    # Sources and licenses should be all sources and licenses of the resulting variables.
+    assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]
+    assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]
 
 
-def test_concat_with_axis_1(table_1, table_2) -> None:
+def test_concat_with_axis_1(table_1, table_2, sources, licenses) -> None:
     # TODO: Assert that concat raises an error if the resulting table has multiple columns with the same name.
     # tb = tables.concat([table_1, table_2], axis=1)
     # Rename columns in table_2 so that they don't coincide with names in table_1.
@@ -542,6 +591,13 @@ def test_concat_with_axis_1(table_1, table_2) -> None:
     assert tb["year_right"].metadata == table_2["year"].metadata
     assert tb["a_right"].metadata == table_2["a"].metadata
     assert tb["c"].metadata == table_2["c"].metadata
+    # Now check the table metadata.
+    # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
+    assert tb.metadata.title is None
+    assert tb.metadata.description is None
+    # Sources and licenses should be all sources and licenses of the resulting variables.
+    assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]
+    assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]
 
 
 def test_melt(table_1, sources, licenses) -> None:
@@ -554,6 +610,8 @@ def test_melt(table_1, sources, licenses) -> None:
         # Sources and licenses should be the combination of sources and licenses of all columns in table_1.
         assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    # Now check that table metadata is identical.
+    assert tb.metadata == table_1.metadata
 
     # Repeat the same operation, but specifying different names for variable and value columns.
     tb = tables.melt(table_1, var_name="var", value_name="val")
@@ -564,6 +622,8 @@ def test_melt(table_1, sources, licenses) -> None:
         # Sources and licenses should be the combination of sources and licenses of all columns in table_1.
         assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    # Now check that table metadata is identical.
+    assert tb.metadata == table_1.metadata
 
     # Specify fixed columns; all other columns will be melted.
     tb = tables.melt(table_1, id_vars=["country", "year"])
@@ -575,6 +635,8 @@ def test_melt(table_1, sources, licenses) -> None:
     for column in ["variable", "value"]:
         assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    # Now check that table metadata is identical.
+    assert tb.metadata == table_1.metadata
 
     # Repeat the same operation, but specifying different names for variable and value columns.
     # Specify fixed columns; all other columns will be melted.
@@ -587,6 +649,8 @@ def test_melt(table_1, sources, licenses) -> None:
     for column in ["var", "val"]:
         assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    # Now check that table metadata is identical.
+    assert tb.metadata == table_1.metadata
 
     # Specify fixed columns and variable columns.
     # Specify fixed columns; all other columns will be melted.
@@ -601,3 +665,13 @@ def test_melt(table_1, sources, licenses) -> None:
         assert tb[column].metadata.description == table_1["b"].metadata.description
         assert tb[column].metadata.sources == table_1["b"].metadata.sources
         assert tb[column].metadata.licenses == table_1["b"].metadata.licenses
+    # Now check that table metadata is identical.
+    assert tb.metadata == table_1.metadata
+
+
+def test_pivot(table_1, sources) -> None:
+    # To better test the expected behaviour, I will add a source to the "country" column.
+    table_1["country"].metadata.sources = [sources[4]]
+    tb = tables.pivot(table_1, columns="country")
+    # Now check that table metadata is identical.
+    assert tb.metadata == table_1.metadata
