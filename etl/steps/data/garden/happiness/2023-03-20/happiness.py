@@ -42,7 +42,6 @@ def run(dest_dir: str) -> None:
     # The report give values from survey data of the three previous years, which we report as the last survey year - consistently 1 year prior to the publication year
     df["year"] = df["report_year"] - 1
     df = df.drop(columns=["report_year"])
-    # tb_backport = backport["dataset_235_world_happiness_report__2022"].reset_index()
     # Create a dataframe with data from the table.
     #
     # Process data.
