@@ -153,6 +153,22 @@ class SnapshotMeta:
             # exclude `outs` with md5, we reset it when saving new metadata
             d.pop("outs", None)
 
+            # remove is_public if it's True
+            if d["is_public"]:
+                del d["is_public"]
+
+            # remove namespace/version/short_name/file_extension if they match path
+            if _parse_snapshot_path(self.path) == (
+                d["namespace"],
+                str(d["version"]),
+                d["short_name"],
+                d["file_extension"],
+            ):
+                del d["namespace"]
+                del d["version"]
+                del d["short_name"]
+                del d["file_extension"]
+
             yaml_dump({"meta": d}, ostream)
 
     @property
@@ -289,5 +305,7 @@ def _parse_snapshot_path(path: Path) -> tuple[str, str, str, str]:
     """Parse snapshot path into namespace, short_name, file_extension."""
     version = path.parent.name
     namespace = path.parent.parent.name
-    short_name, ext = path.stem.split(".")
+
+    short_name, ext = path.stem.split(".", 1)
+    assert "." not in ext, f"{path.name} cannot contain `.`"
     return namespace, version, short_name, ext
