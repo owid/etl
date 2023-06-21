@@ -2,7 +2,7 @@ meta:
   namespace: excess_mortality
   short_name: wmd
   file_extension: csv
-  date_accessed: 2023-06-20
+  date_accessed: 2023-06-21
   name: World Mortality Dataset
   description: |-
     World Mortality Dataset: international data on all-cause mortality.
