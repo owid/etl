@@ -391,6 +391,8 @@ def test_merge_without_any_on_arguments(table_1, table_2, sources, licenses) -> 
     # If "on", "left_on" and "right_on" are not specified, the join is performed on common columns.
     # In this case, "country", "year", "a".
     tb = tables.merge(table_1, table_2)
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.merge(table_2))
     # Check that non-overlapping columns preserve metadata.
     assert tb["c"].metadata == table_2["c"].metadata
     # Check that "on" columns combine the metadata of left and right tables.
@@ -422,6 +424,8 @@ def test_merge_without_any_on_arguments(table_1, table_2, sources, licenses) -> 
 
 def test_merge_with_on_argument(table_1, table_2, sources, licenses) -> None:
     tb = tables.merge(table_1, table_2, on=["country", "year"])
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.merge(table_2, on=["country", "year"]))
     # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
     # with table_2, title should be preserved, but description will be lost.
     assert tb["country"].metadata.title == "Country Title"
@@ -455,6 +459,8 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     # Join on columns "country" and "year" (in this case, the result should be identical to simply defining
     # on=["country", "year"]).
     tb = tables.merge(table_1, table_2, left_on=["country", "year"], right_on=["country", "year"])
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.merge(table_2, left_on=["country", "year"], right_on=["country", "year"]))
     # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
     # with table_2, title should be preserved, but description will be lost.
     assert tb["country"].metadata.title == "Country Title"
@@ -483,6 +489,10 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     tb = tables.merge(
         table_1, table_2, left_on=["country", "year"], right_on=["country", "year"], suffixes=("_left", "_right")
     )
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(
+        table_1.merge(table_2, left_on=["country", "year"], right_on=["country", "year"], suffixes=("_left", "_right"))
+    )
     assert tb["a_left"].metadata == table_1["a"].metadata
     assert tb["a_right"].metadata == table_2["a"].metadata
     # Now check the table metadata.
@@ -495,6 +505,8 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
 
     # Now do a merge where left_on and right_on have one column different.
     tb = tables.merge(table_1, table_2, left_on=["country", "year", "b"], right_on=["country", "year", "c"])
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.merge(table_2, left_on=["country", "year", "b"], right_on=["country", "year", "c"]))
     # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
     # with table_2, title should be preserved, but description will be lost.
     assert tb["country"].metadata.title == "Country Title"
@@ -521,6 +533,8 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
 
     # Now do a merge where column "a" is included both on left_on and right_on.
     tb = tables.merge(table_1, table_2, left_on=["country", "year", "a"], right_on=["country", "year", "a"])
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.merge(table_2, left_on=["country", "year", "a"], right_on=["country", "year", "a"]))
     # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
     # with table_2, title should be preserved, but description will be lost.
     assert tb["country"].metadata.title == "Country Title"
@@ -603,6 +617,8 @@ def test_concat_with_axis_1(table_1, table_2, sources, licenses) -> None:
 def test_melt(table_1, sources, licenses) -> None:
     # If nothing specified, all columns are melted.
     tb = tables.melt(table_1)
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.melt())
     for column in ["variable", "value"]:
         # Given that titles and descriptions are different, they should not be propagated.
         assert tb[column].metadata.title is None
@@ -615,6 +631,8 @@ def test_melt(table_1, sources, licenses) -> None:
 
     # Repeat the same operation, but specifying different names for variable and value columns.
     tb = tables.melt(table_1, var_name="var", value_name="val")
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.melt(var_name="var", value_name="val"))
     for column in ["var", "val"]:
         # Given that titles and descriptions are different, they should not be propagated.
         assert tb[column].metadata.title is None
@@ -627,6 +645,8 @@ def test_melt(table_1, sources, licenses) -> None:
 
     # Specify fixed columns; all other columns will be melted.
     tb = tables.melt(table_1, id_vars=["country", "year"])
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.melt(id_vars=["country", "year"]))
     assert tb["country"].metadata.title == table_1["country"].metadata.title
     assert tb["country"].metadata.description == table_1["country"].metadata.description
     assert tb["year"].metadata.title is None
@@ -641,6 +661,8 @@ def test_melt(table_1, sources, licenses) -> None:
     # Repeat the same operation, but specifying different names for variable and value columns.
     # Specify fixed columns; all other columns will be melted.
     tb = tables.melt(table_1, id_vars=["country", "year"], var_name="var", value_name="val")
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.melt(id_vars=["country", "year"], var_name="var", value_name="val"))
     assert tb["country"].metadata.title == table_1["country"].metadata.title
     assert tb["country"].metadata.description == table_1["country"].metadata.description
     assert tb["year"].metadata.title is None
@@ -655,6 +677,8 @@ def test_melt(table_1, sources, licenses) -> None:
     # Specify fixed columns and variable columns.
     # Specify fixed columns; all other columns will be melted.
     tb = tables.melt(table_1, id_vars=["country", "year"], value_vars=["b"])
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.melt(id_vars=["country", "year"], value_vars=["b"]))
     assert tb["country"].metadata.title == table_1["country"].metadata.title
     assert tb["country"].metadata.description == table_1["country"].metadata.description
     assert tb["year"].metadata.title is None
@@ -673,6 +697,8 @@ def test_pivot(table_1, sources) -> None:
     # To better test the expected behaviour, I will add a source to the "country" column.
     table_1["country"].metadata.sources = [sources[4]]
     tb = tables.pivot(table_1, columns="country")
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.pivot(columns="country"))
     # Column "a" with all its sublevels should keep the metadata of the original "a".
     # By construction, the metadata of "country" is currently lost when pivoting.
     # Alternatively we could combine the metadata of "a" and "country".
@@ -686,12 +712,16 @@ def test_pivot(table_1, sources) -> None:
 
     # Add a new column to pivot.
     tb = tables.pivot(table_1, columns=["country", "year"])
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.pivot(columns=["country", "year"]))
     assert tb[("a", "Spain", 2020)].metadata == table_1["a"].metadata
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
     # Choose one of the columns as index.
     tb = tables.pivot(table_1, index="country", columns=["year"])
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.pivot(index="country", columns=["year"]))
     assert tb[("a", 2020)].metadata == table_1["a"].metadata
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
@@ -699,6 +729,8 @@ def test_pivot(table_1, sources) -> None:
     # Specify argument "value" as a column name.
     # When doing so, the new columns will be 2020 and 2021 (without the name "a" at any level).
     tb = tables.pivot(table_1, index="country", columns=["year"], values="a")
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.pivot(index="country", columns=["year"], values="a"))
     assert tb[2020].metadata == table_1["a"].metadata
     assert tb[2021].metadata == table_1["a"].metadata
     # Now check that table metadata is identical.
@@ -707,6 +739,8 @@ def test_pivot(table_1, sources) -> None:
     # Specify argument "value" as a list.
     # When doing so, the new columns will have two levels, one for "a" and another for 2020 and 2021.
     tb = tables.pivot(table_1, index="country", columns=["year"], values=["a"])
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.pivot(index="country", columns=["year"], values=["a"]))
     assert tb[("a", 2020)].metadata == table_1["a"].metadata
     assert tb[("a", 2021)].metadata == table_1["a"].metadata
     # Now check that table metadata is identical.
@@ -714,6 +748,8 @@ def test_pivot(table_1, sources) -> None:
 
     # Specify argument "value" as a list and flatten levels.
     tb = tables.pivot(table_1, index="country", columns=["year"], values=["a"], join_column_levels_with="_")
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.pivot(index="country", columns=["year"], values=["a"], join_column_levels_with="_"))
     assert tb["a_2020"].metadata == table_1["a"].metadata
     assert tb["a_2021"].metadata == table_1["a"].metadata
     assert tb["country"].metadata == table_1["country"].metadata
@@ -723,6 +759,8 @@ def test_pivot(table_1, sources) -> None:
     # Specify argument "value" as a column name and attempt to flatten levels.
     # The flattening is actually irrelevant, given that "value" is passed as a string and "a" is therefore not a level.
     tb = tables.pivot(table_1, index="country", columns=["year"], values="a", join_column_levels_with="_")
+    # Check that the result is identical to using the table method.
+    assert tb.equals_table(table_1.pivot(index="country", columns=["year"], values="a", join_column_levels_with="_"))
     assert tb[2020].metadata == table_1["a"].metadata
     assert tb[2021].metadata == table_1["a"].metadata
     assert tb["country"].metadata == table_1["country"].metadata
