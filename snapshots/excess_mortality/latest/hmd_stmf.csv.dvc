@@ -14,7 +14,7 @@ meta:
     For citing STMF data, please follow the HMD data citation guidelines (https://www.mortality.org/Research/CitationGuidelines).
 
     HMD provides an online STMF visualization toolkit (https://mpidr.shinyapps.io/stmortality).
-  source_name: HMD
+  source_name: Human Mortality Database (2023)
   url: https://www.mortality.org/Data/STMF
   source_published_by: HMD. Human Mortality Database. Max Planck Institute for Demographic
     Research (Germany), University of California, Berkeley (USA), and French Institute

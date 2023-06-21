@@ -9,7 +9,7 @@ This step merges the two datasets into one single dataset, combining metrics fro
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 
 from .input import build_df
 from .process import process_df
@@ -42,17 +42,17 @@ def run(dest_dir: str) -> None:
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=paths.short_name)
 
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = Dataset.create_empty(dest_dir)
+    # Create dataset
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden])
 
-    # Add table of processed data to the new dataset.
-    ds_garden.add(tb_garden)
+    # Add all sources from dependencies to dataset
+    ds_garden.metadata.sources = ds_hmd.metadata.sources + ds_wmd.metadata.sources + ds_kobak.metadata.sources
 
-    # Update dataset and table metadata using the adjacent yaml file.
-    ds_garden.update_metadata(paths.metadata_path)
+    # Source in YAML file only have name, load them from dataset.
+    tb_garden = ds_garden[paths.short_name]  # need to reload it to get updated metadata
+    source_by_name = {source.name: source for source in ds_garden.metadata.sources}
+    for col in tb_garden.columns:
+        tb_garden[col].metadata.sources = [source_by_name[source.name] for source in tb_garden[col].metadata.sources]
 
     # Save changes in the new garden dataset.
     ds_garden.save()
