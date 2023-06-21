@@ -369,7 +369,9 @@ class Table(pd.DataFrame):
         return (
             isinstance(table, Table)
             and self.metadata == table.metadata
-            and self.to_dict() == table.to_dict()
+            # By simply doing self.to_dict() == table.to_dict() may return False if the dictionaries are identical but
+            # contain nans.
+            and self.fillna(123456.789).to_dict() == table.fillna(123456.789).to_dict()
             and self._fields == table._fields
         )
 
