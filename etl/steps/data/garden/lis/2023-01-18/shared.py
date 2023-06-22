@@ -175,7 +175,7 @@ equivalence_scales_dict = {
 }
 
 # Details for each relative poverty line
-rel_dict = {40: "40% of dhi median", 50: "50% of dhi median", 60: "60% of dhi median"}
+rel_dict = {40: "40% of the median", 50: "50% of the median", 60: "60% of the median"}
 
 # Details for each absolute poverty line
 abs_dict = {

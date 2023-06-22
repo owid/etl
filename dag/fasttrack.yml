@@ -70,3 +70,7 @@ steps:
   - snapshot://fasttrack/latest/whm_treatment_gap_anxiety_disorders.csv
   data://grapher/fasttrack/2023-05-31/cholera:
   - snapshot://fasttrack/2023-05-31/cholera.csv
+  data://grapher/fasttrack/2023-06-16/guinea_worm:
+  - snapshot://fasttrack/2023-06-16/guinea_worm.csv
+  data-private://grapher/fasttrack/2023-06-19/world_population_comparison:
+  - snapshot-private://fasttrack/2023-06-19/world_population_comparison.csv
