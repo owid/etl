@@ -830,6 +830,7 @@ def melt(
         )
 
     # Update table metadata.
+    table.metadata.short_name = frame.metadata.short_name
     table.metadata.title = frame.metadata.title
     table.metadata.description = frame.metadata.description
     table.metadata.dataset = DatasetMeta(
@@ -911,6 +912,7 @@ def pivot(
             table[column].metadata = (index_metadata + columns_metadata)[i]
 
     # Update table metadata.
+    table.metadata.short_name = data.metadata.short_name
     table.metadata.title = data.metadata.title
     table.metadata.description = data.metadata.description
     table.metadata.dataset = DatasetMeta(
