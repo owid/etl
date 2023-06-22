@@ -691,6 +691,14 @@ def merge(left, right, how="inner", on=None, left_on=None, right_on=None, suffix
         )
     )
 
+    # If arguments "on", "left_on", or "right_on" are given as strings, convert them to lists.
+    if isinstance(on, str):
+        on = [on]
+    if isinstance(left_on, str):
+        left_on = [left_on]
+    if isinstance(right_on, str):
+        right_on = [right_on]
+
     if (on is None) and (left_on is None):
         # By construction, either "on" is passed, or both "left_on" and "right_on".
         # Any other possibility will raise a MergeError, and hence doesn't need to be considered.
