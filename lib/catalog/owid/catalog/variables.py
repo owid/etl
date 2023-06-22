@@ -132,7 +132,7 @@ class Variable(pd.Series):
         return cast(Variable, v)
 
     def __add__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        variable = Variable(super().__add__(other), name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__add__(other), name=UNNAMED_VARIABLE)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="+", name=UNNAMED_VARIABLE)
         return variable
 
@@ -140,7 +140,7 @@ class Variable(pd.Series):
         return self.__add__(other)
 
     def __sub__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        variable = Variable(super().__sub__(other), name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__sub__(other), name=UNNAMED_VARIABLE)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="-", name=UNNAMED_VARIABLE)
         return variable
 
@@ -148,7 +148,7 @@ class Variable(pd.Series):
         return self.__sub__(other)
 
     def __mul__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        variable = Variable(super().__mul__(other), name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__mul__(other), name=UNNAMED_VARIABLE)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="*", name=UNNAMED_VARIABLE)
         return variable
 
@@ -156,7 +156,7 @@ class Variable(pd.Series):
         return self.__mul__(other)
 
     def __truediv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        variable = Variable(super().__truediv__(other), name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__truediv__(other), name=UNNAMED_VARIABLE)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="/", name=UNNAMED_VARIABLE)
         return variable
 
@@ -164,7 +164,7 @@ class Variable(pd.Series):
         return self.__truediv__(other)
 
     def __floordiv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        variable = Variable(super().__floordiv__(other), name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__floordiv__(other), name=UNNAMED_VARIABLE)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="//", name=UNNAMED_VARIABLE)
         return variable
 
@@ -172,7 +172,7 @@ class Variable(pd.Series):
         return self.__floordiv__(other)
 
     def __mod__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        variable = Variable(super().__mod__(other), name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__mod__(other), name=UNNAMED_VARIABLE)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="%", name=UNNAMED_VARIABLE)
         return variable
 
@@ -180,7 +180,7 @@ class Variable(pd.Series):
         return self.__mod__(other)
 
     def __pow__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        variable = Variable(super().__pow__(other), name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__pow__(other), name=UNNAMED_VARIABLE)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="**", name=UNNAMED_VARIABLE)
         return variable
 
@@ -193,7 +193,7 @@ class Variable(pd.Series):
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
             log.warning("Avoid using fillna(inplace=True), which may not handle metadata as expected.")
-        variable = Variable(super().fillna(value, *args, **kwargs), name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().fillna(value, *args, **kwargs), name=UNNAMED_VARIABLE)
         variable.metadata = combine_variables_metadata(
             variables=[self, value], operation="fillna", name=UNNAMED_VARIABLE
         )
@@ -204,7 +204,7 @@ class Variable(pd.Series):
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
             log.warning("Avoid using dropna(inplace=True), which may not handle metadata as expected.")
-        variable = Variable(super().dropna(*args, **kwargs), name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().dropna(*args, **kwargs), name=UNNAMED_VARIABLE)
         variable.metadata = combine_variables_metadata(variables=[self], operation="dropna", name=UNNAMED_VARIABLE)
         return variable
 
