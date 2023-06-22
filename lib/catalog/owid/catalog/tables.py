@@ -362,6 +362,17 @@ class Table(pd.DataFrame):
                     #  variable.
                     variables.update_variable_name(variable=value, name=key)
                 self._fields[key] = value.metadata
+                # TODO: The only reason why we have to check if variables.PROCESSING_LOG is true is the test
+                #   "test_field_access_can_be_typecast". Consider adapting the test and then remove this check.
+                if variables.PROCESSING_LOG and len(value.metadata.processing_log) > 0:
+                    # If a new variable is added to a table, check its last entry in the processing log.
+                    # If the last variable name is different to the name of the new column, add an entry to the log,
+                    # stating that the variable has changed name (from the old to the current one).
+                    last_variable_name = value.metadata.processing_log[-1]["variable"]
+                    if last_variable_name != key:
+                        value.update_log(
+                            parents=[last_variable_name], operation="rename", variable_name=key, inplace=True
+                        )
             else:
                 self._fields[key] = VariableMeta()
 
