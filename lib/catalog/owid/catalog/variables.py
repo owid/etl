@@ -132,8 +132,7 @@ class Variable(pd.Series):
         return cast(Variable, v)
 
     def __add__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        # variable = super().__add__(other)
-        variable = Variable(self.values + other, name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__add__(other), name=UNNAMED_VARIABLE)  # type: ignore
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="+", name=UNNAMED_VARIABLE)
         return variable
 
@@ -141,8 +140,7 @@ class Variable(pd.Series):
         return self.__add__(other)
 
     def __sub__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        # variable = super().__sub__(other)
-        variable = Variable(self.values - other, name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__sub__(other), name=UNNAMED_VARIABLE)  # type: ignore
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="-", name=UNNAMED_VARIABLE)
         return variable
 
@@ -150,8 +148,7 @@ class Variable(pd.Series):
         return self.__sub__(other)
 
     def __mul__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        # variable = super().__mul__(other)
-        variable = Variable(self.values * other, name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__mul__(other), name=UNNAMED_VARIABLE)  # type: ignore
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="*", name=UNNAMED_VARIABLE)
         return variable
 
@@ -159,8 +156,7 @@ class Variable(pd.Series):
         return self.__mul__(other)
 
     def __truediv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        # variable = super().__truediv__(other)
-        variable = Variable(self.values / other, name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__truediv__(other), name=UNNAMED_VARIABLE)  # type: ignore
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="/", name=UNNAMED_VARIABLE)
         return variable
 
@@ -168,8 +164,7 @@ class Variable(pd.Series):
         return self.__truediv__(other)
 
     def __floordiv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        # variable = super().__floordiv__(other)
-        variable = Variable(self.values // other, name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__floordiv__(other), name=UNNAMED_VARIABLE)  # type: ignore
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="//", name=UNNAMED_VARIABLE)
         return variable
 
@@ -177,8 +172,7 @@ class Variable(pd.Series):
         return self.__floordiv__(other)
 
     def __mod__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        # variable = super().__mod__(other)
-        variable = Variable(self.values % other, name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__mod__(other), name=UNNAMED_VARIABLE)  # type: ignore
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="%", name=UNNAMED_VARIABLE)
         return variable
 
@@ -186,10 +180,7 @@ class Variable(pd.Series):
         return self.__mod__(other)
 
     def __pow__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
-        # For some reason, the following line modifies the metadata of the original variable.
-        # variable = super().__pow__(other)
-        # So, instead, we define a new variable.
-        variable = Variable(self.values**other, name=UNNAMED_VARIABLE)  # type: ignore
+        variable = Variable(super().__pow__(other), name=UNNAMED_VARIABLE)  # type: ignore
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="**", name=UNNAMED_VARIABLE)
         return variable
 
