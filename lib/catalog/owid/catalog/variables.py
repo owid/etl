@@ -188,14 +188,15 @@ class Variable(pd.Series):
         return self.__pow__(other)
 
     def fillna(self, value=None, *args, **kwargs) -> "Variable":
-        # variable = super().fillna(value)
         # NOTE: Argument "inplace" will modify the original variable's data, but not its metadata.
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
             log.warning("Avoid using fillna(inplace=True), which may not handle metadata as expected.")
-        variable = Variable(super().fillna(value, *args, **kwargs), name=UNNAMED_VARIABLE)
-        variable.metadata = combine_variables_metadata(
-            variables=[self, value], operation="fillna", name=UNNAMED_VARIABLE
+        variable_name = self.name or UNNAMED_VARIABLE
+        variable = Variable(super().fillna(value, *args, **kwargs), name=variable_name)
+        variable._fields = copy.deepcopy(self._fields)
+        variable._fields[variable_name] = combine_variables_metadata(
+            variables=[self, value], operation="fillna", name=variable_name
         )
         return variable
 
@@ -206,7 +207,10 @@ class Variable(pd.Series):
             log.warning("Avoid using dropna(inplace=True), which may not handle metadata as expected.")
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().dropna(*args, **kwargs), name=variable_name)
-        variable.metadata = combine_variables_metadata(variables=[self], operation="dropna", name=variable_name)
+        variable._fields = copy.deepcopy(self._fields)
+        variable._fields[variable_name] = combine_variables_metadata(
+            variables=[self], operation="dropna", name=variable_name
+        )
         return variable
 
     def add(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":
