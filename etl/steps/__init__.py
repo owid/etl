@@ -409,7 +409,7 @@ class DataStep(Step):
             # the pandas library is so important to the output that we include it in the checksum
             "__pandas__": pd.__version__,
             # if the epoch changes, rebuild everything
-            # "__etl_epoch__": str(config.ETL_EPOCH),
+            "__etl_epoch__": str(config.ETL_EPOCH),
         }
         for d in self.dependencies:
             checksums[d.path] = d.checksum_output()
