@@ -216,3 +216,16 @@ def test_combine_variables_metadata_with_equal_fields(variable_1, variable_2) ->
         assert metadata.short_unit == variable_1.metadata.short_unit
         assert metadata.sources == variable_1.metadata.sources
         assert metadata.licenses == variable_2.metadata.licenses
+
+
+def test_dropna(table_1) -> None:
+    tb1 = table_1.copy()
+    tb1.loc[1, "b"] = pd.NA
+    new_var = tb1["b"].dropna()
+    assert (new_var == pd.Series([4, 6], index=[0, 2])).all()
+    # Check that metadata of the new variable coincides with that of the original.
+    assert new_var.metadata == tb1["b"].metadata
+    # Check that table's metadata is not affected.
+    assert tb1.metadata == table_1.metadata
+    # Check that the original variable's metadata is not affected.
+    assert tb1["b"].metadata == table_1["b"].metadata
