@@ -92,7 +92,7 @@ def create_pip_inequality_table(tb_pip: pd.DataFrame) -> pd.DataFrame:
     tb_pip_inequality = tb_pip[inequality_vars]
 
     # Remove regions, because they don't have inequality data
-    tb_pip_inequality = tb_pip_inequality[~tb_pip_inequality["country"].str.contains("\(PIP\)")]
+    tb_pip_inequality = tb_pip_inequality[~tb_pip_inequality["country"].str.contains("\\(PIP\\)")]
 
     # Verify index and sort
     tb_pip_inequality = tb_pip_inequality.set_index(["country", "year"], verify_integrity=True).sort_index()
