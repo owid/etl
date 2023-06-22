@@ -28,7 +28,7 @@ FileFormat = Literal["csv", "feather", "parquet"]
 SUPPORTED_FORMATS: List[FileFormat] = ["feather", "parquet", "csv"]
 
 # the formats we generate by default
-DEFAULT_FORMATS: List[FileFormat] = ["feather", "parquet"]
+DEFAULT_FORMATS: List[FileFormat] = ["feather"]
 
 # the format we use by default if we only need one
 PREFERRED_FORMAT: FileFormat = "feather"
