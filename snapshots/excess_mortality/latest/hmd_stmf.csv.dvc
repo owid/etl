@@ -1,7 +1,4 @@
 meta:
-  namespace: excess_mortality
-  short_name: hmd_stmf
-  file_extension: csv
   date_accessed: 2023-06-22
   name: Short-Term Mortality Fluctuations (HMD, 2023)
   description: |-
@@ -23,7 +20,6 @@ meta:
   license_url: https://www.mortality.org/Data/UserAgreement
   license_name: Creative Commons BY 4.0
   is_public: true
-  version: latest
   publication_year: 2023
   publication_date: 2023-06-19
 wdir: ../../../data/snapshots/excess_mortality/latest
