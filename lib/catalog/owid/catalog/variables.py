@@ -40,7 +40,6 @@ OPERATION = Literal[
     "pivot",
     "concat",
     "sort",
-    "clip",
 ]
 
 # Environment variable such that, if True, the processing log will be updated, if False, the log will always be empty.
@@ -221,19 +220,6 @@ class Variable(pd.Series):
         )
         return variable
 
-    def clip(self, *args, **kwargs) -> "Variable":
-        # NOTE: Argument "inplace" will modify the original variable's data, but not its metadata.
-        #  But we should not use "inplace" anyway.
-        if "inplace" in kwargs and kwargs["inplace"] is True:
-            log.warning("Avoid using clip(inplace=True), which may not handle metadata as expected.")
-        variable_name = self.name or UNNAMED_VARIABLE
-        variable = Variable(super().clip(*args, **kwargs), name=variable_name)
-        variable._fields = copy.deepcopy(self._fields)
-        variable._fields[variable_name] = combine_variables_metadata(
-            variables=[self], operation="clip", name=variable_name
-        )
-        return variable
-
     def add(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
@@ -335,7 +321,7 @@ def _combine_variables_titles_and_descriptions(
     # Keep the title only if all variables have exactly the same title.
     # Otherwise we assume that the variable has a different meaning, and its title should be manually handled.
     title_or_description_combined = None
-    if operation in ["+", "-", "fillna", "dropna", "merge", "melt", "pivot", "concat", "clip"]:
+    if operation in ["+", "-", "fillna", "dropna", "merge", "melt", "pivot", "concat"]:
         titles_or_descriptions = pd.unique([getattr(variable.metadata, title_or_description) for variable in variables])
         if len(titles_or_descriptions) == 1:
             title_or_description_combined = titles_or_descriptions[0]
