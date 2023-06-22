@@ -204,8 +204,9 @@ class Variable(pd.Series):
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
             log.warning("Avoid using dropna(inplace=True), which may not handle metadata as expected.")
-        variable = Variable(super().dropna(*args, **kwargs), name=UNNAMED_VARIABLE)
-        variable.metadata = combine_variables_metadata(variables=[self], operation="dropna", name=UNNAMED_VARIABLE)
+        variable_name = self.name or UNNAMED_VARIABLE
+        variable = Variable(super().dropna(*args, **kwargs), name=variable_name)
+        variable.metadata = combine_variables_metadata(variables=[self], operation="dropna", name=variable_name)
         return variable
 
     def add(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":
