@@ -27,11 +27,12 @@ steps:
     - snapshot://war/2023-03-14/cow.inter_state.csv
     - snapshot://war/2023-03-14/cow.intra_state.zip
     - snapshot://war/2023-03-14/cow.non_state.csv
-  data://meadow/war/2023-06-09/war_ucdp:
-    - snapshot://war/2023-03-14/ucdp.one_sided.zip
-    - snapshot://war/2023-03-14/ucdp.non_state.zip
-    - snapshot://war/2023-03-14/ucdp.battle_related_conflict.zip
-    - snapshot://war/2023-03-14/ucdp.battle_related_dyadic.zip
+  data://meadow/war/2023-06-22/ucdp:
+    - snapshot://war/2023-06-22/ucdp.one_sided.zip
+    - snapshot://war/2023-06-22/ucdp.non_state.zip
+    - snapshot://war/2023-06-22/ucdp.battle_related_conflict.zip
+    - snapshot://war/2023-06-22/ucdp.battle_related_dyadic.zip
+    - snapshot://war/2023-06-22/ucdp.geo.zip
   data://meadow/war/2023-06-09/war_mars:
     - snapshot://war/2023-06-09/war_mars.xls
   data://meadow/war/2023-06-09/cow_mid:
