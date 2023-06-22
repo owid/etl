@@ -315,7 +315,8 @@ class TestHarmonizeCountries:
             {"country": ["country_02", "country_03", "country_05", "country_06"], "some_variable": [1, 2, 3, 4]}
         )
         with warnings.catch_warnings():
-            warnings.simplefilter("error")
+            warnings.filterwarnings("error")
+            warnings.filterwarnings("default", category=DeprecationWarning)
             geo.harmonize_countries(
                 df=df_in,
                 countries_file="MOCK_COUNTRIES_FILE",
