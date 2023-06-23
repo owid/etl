@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import cast
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -230,6 +232,8 @@ def run(dest_dir: str) -> None:
 
     merged_df_concat_transf = merged_df_concat_transf.drop(columns_to_exclude, axis=1)
 
+    merg_inbound_exp_oecd = add_ppp_and_cpi(merged_df_concat_transf)
+
     # Create a new table with the processed data.
     tb_garden = Table(merged_df_concat_transf, short_name="unwto")
     # Save outputs.
@@ -241,6 +245,51 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("unwto.end")
+
+
+def add_ppp_and_cpi(df_tourism):
+    ds_wdi = cast(Dataset, paths.load_dependency("wdi"))
+    tb_wdi = ds_wdi["wdi"]
+
+    # Assume country and year are multi-index
+    df_wdi_cpi = tb_wdi[["fp_cpi_totl"]]
+    df_wdi_cpi.reset_index(inplace=True)
+
+    # Load WDI
+    ds_oecd = cast(Dataset, paths.load_dependency("ppp_exchange_rates"))
+
+    tb_oecd = ds_oecd["ppp_exchange_rates"]
+    # Filter the dataframe for the year 2021
+    df_2021 = tb_oecd[tb_oecd["year"] == 2021]
+    # Merge the 2021 values with the original dataframe based on the 'country' column
+    df = pd.merge(
+        tb_oecd,
+        df_2021[["country", "fp_cpi_totl", "purchasing_power_parities_for_private_consumption"]],
+        on="country",
+        suffixes=("", "_2021"),
+    )
+    df["fp_cpi_totl_normalized"] = 100 * df["fp_cpi_totl"] / df["fp_cpi_totl_2021"]
+
+    # Assume country and year are multi-index
+    inboud_exp = df_tourism[["country", "year", "in_to_ex_tr"]]
+
+    merg_inbound_exp = pd.merge(inboud_exp, df_wdi_cpi, on=["country", "year"], how="inner")
+    merg_inbound_exp_oecd = pd.merge(merg_inbound_exp, inboud_exp, on=["country", "year"], how="inner")
+
+    merg_inbound_exp_oecd["adjust_ppp_2021"] = (
+        merg_inbound_exp_oecd["in_to_ex_tr"] * merg_inbound_exp_oecd["exchange_rates__period_average"]
+    )
+    merg_inbound_exp_oecd["adjust_ppp_2021"] = 100 * (
+        merg_inbound_exp_oecd["adjust_ppp_2021"] / merg_inbound_exp_oecd["fp_cpi_totl_normalized"]
+    )
+    merg_inbound_exp_oecd["adjust_ppp_2021"] = (
+        merg_inbound_exp_oecd["adjust_ppp_2021"]
+        / merg_inbound_exp_oecd["purchasing_power_parities_for_private_consumption_2021"]
+    )
+
+    print(merg_inbound_exp_oecd)
+
+    return merg_inbound_exp_oecd
 
 
 def shorten_name(name):

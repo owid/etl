@@ -71,7 +71,7 @@ tables:
           numDecimalPlaces: 0
       in_to_ex_tr:
         title: Inbound tourism-expenditure
-        unit: 'US million dollars'
+        unit: 'US million $'
         short_unit: 'US million $'
         display:
           numDecimalPlaces: 0
@@ -100,8 +100,8 @@ tables:
         display:
           numDecimalPlaces: 0
       ou_to_ex_tr:
-        title: Outbound tourism-expenditure (travel)
-        unit: US million dollar
+        title: Outbound tourism-expenditure
+        unit: US million $
         short_unit: US million $
         display:
           numDecimalPlaces: 0
@@ -188,34 +188,34 @@ tables:
         unit: ''
         short_unit: ''
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       inb_outb_tour:
         title: Inbound/Outbound (tourists)
         unit: ''
         short_unit: ''
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       same_tourist_ratio:
         title: Same Day/Overnight visitors
         unit: ''
         short_unit: ''
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       outbound_exp_per_tourist:
         title: Expenditure for each tourist on outbound tourism
-        unit: US dollars
+        unit: US $
         short_unit: 'US $'
         display:
           numDecimalPlaces: 0
       inb_exp_per_tourist:
         title: Expenditure for each tourist on inbound tourism
-        unit: US dollars
+        unit: US $
         short_unit: 'US $'
         display:
           numDecimalPlaces: 0
       ou_to_ex_tr_per_capita:
         title: Outbound tourism expenditure per capita
-        unit:  US dollars
+        unit:  US $
         short_unit: US $
         display:
           numDecimalPlaces: 0
