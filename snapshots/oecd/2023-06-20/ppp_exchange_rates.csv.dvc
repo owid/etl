@@ -18,6 +18,6 @@ meta:
     OECD provides data on Purchasing Power Parities (actual individual consumption, private consumption and GDP) and Exchange rates (period-average and end of period data) between 2000-2022. 
 wdir: ../../../data/snapshots/oecd/2023-06-20
 outs:
-- md5: 948dc529861cf0959d941f223b5a064f
-  size: 954790
+- md5: 50ea96e4b29a88a99e8c6aaebaee1f21
+  size: 1179935
   path: ppp_exchange_rates.csv

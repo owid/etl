@@ -232,10 +232,11 @@ def run(dest_dir: str) -> None:
 
     merged_df_concat_transf = merged_df_concat_transf.drop(columns_to_exclude, axis=1)
 
-    merg_inbound_exp_oecd = add_ppp_and_cpi(merged_df_concat_transf)
+    df_inflation_adjusted = add_ppp_and_cpi(merged_df_concat_transf)
+    df_final = pd.merge(merged_df_concat_transf, df_inflation_adjusted, on=["country", "year"], how="outer")
 
     # Create a new table with the processed data.
-    tb_garden = Table(merged_df_concat_transf, short_name="unwto")
+    tb_garden = Table(df_final, short_name="unwto")
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -248,48 +249,64 @@ def run(dest_dir: str) -> None:
 
 
 def add_ppp_and_cpi(df_tourism):
+    # Load WDI CPI for adjusting inflation
     ds_wdi = cast(Dataset, paths.load_dependency("wdi"))
     tb_wdi = ds_wdi["wdi"]
 
-    # Assume country and year are multi-index
     df_wdi_cpi = tb_wdi[["fp_cpi_totl"]]
     df_wdi_cpi.reset_index(inplace=True)
 
-    # Load WDI
+    # Load OECD exchange rates
     ds_oecd = cast(Dataset, paths.load_dependency("ppp_exchange_rates"))
-
     tb_oecd = ds_oecd["ppp_exchange_rates"]
-    # Filter the dataframe for the year 2021
-    df_2021 = tb_oecd[tb_oecd["year"] == 2021]
+
+    # Extract tourism expenditure
+    inboud_exp = df_tourism[["country", "year", "in_to_ex_tr", "ou_to_ex_tr"]]
+
+    # Merge expenditure, inflation and exchange rates
+    merg_inbound_exp = pd.merge(inboud_exp, df_wdi_cpi, on=["country", "year"], how="inner")
+    merg_inbound_exp_oecd = pd.merge(merg_inbound_exp, tb_oecd, on=["country", "year"], how="inner")
+
+    # Filter the dataframe for year 2021
+    df_2021 = merg_inbound_exp_oecd[merg_inbound_exp_oecd["year"] == 2021]
+
     # Merge the 2021 values with the original dataframe based on the 'country' column
     df = pd.merge(
-        tb_oecd,
+        merg_inbound_exp_oecd,
         df_2021[["country", "fp_cpi_totl", "purchasing_power_parities_for_private_consumption"]],
         on="country",
         suffixes=("", "_2021"),
     )
+    # CPI from 2021 instead of 2010
     df["fp_cpi_totl_normalized"] = 100 * df["fp_cpi_totl"] / df["fp_cpi_totl_2021"]
 
-    # Assume country and year are multi-index
-    inboud_exp = df_tourism[["country", "year", "in_to_ex_tr"]]
+    # Convert to inbound expenditure to local currency, adjust for local inflation and convert back to international dollars
 
-    merg_inbound_exp = pd.merge(inboud_exp, df_wdi_cpi, on=["country", "year"], how="inner")
-    merg_inbound_exp_oecd = pd.merge(merg_inbound_exp, inboud_exp, on=["country", "year"], how="inner")
+    df["inbound_ppp_cpi_adj_2021"] = (
+        100 * (df["in_to_ex_tr"] * df["exchange_rates__period_average"]) / df["fp_cpi_totl_normalized"]
+    ) / df["purchasing_power_parities_for_private_consumption_2021"]
+    df["inbound_ppp_cpi_adj_2021"] = (
+        100 * (df["in_to_ex_tr"] * df["exchange_rates__period_average"]) / df["fp_cpi_totl_normalized"]
+    ) / df["purchasing_power_parities_for_private_consumption_2021"]
 
-    merg_inbound_exp_oecd["adjust_ppp_2021"] = (
-        merg_inbound_exp_oecd["in_to_ex_tr"] * merg_inbound_exp_oecd["exchange_rates__period_average"]
-    )
-    merg_inbound_exp_oecd["adjust_ppp_2021"] = 100 * (
-        merg_inbound_exp_oecd["adjust_ppp_2021"] / merg_inbound_exp_oecd["fp_cpi_totl_normalized"]
-    )
-    merg_inbound_exp_oecd["adjust_ppp_2021"] = (
-        merg_inbound_exp_oecd["adjust_ppp_2021"]
-        / merg_inbound_exp_oecd["purchasing_power_parities_for_private_consumption_2021"]
-    )
+    # Adjust outbound by US inflaton (2021)
 
-    print(merg_inbound_exp_oecd)
+    # Filter the dataframe for the United States
+    us_df = df[df["country"] == "United States"]
 
-    return merg_inbound_exp_oecd
+    # Get the US value in 2021 for fp_cpi_totl
+    us_cpi_2021 = us_df.loc[us_df["year"] == 2021, "fp_cpi_totl"].values[0]
+
+    # Normalize the 'fp_cpi_totl' column by dividing it by the US value in 2021
+    us_df_copy = us_df.copy()
+    us_df_copy.loc[:, "US_cpi"] = (us_df_copy["fp_cpi_totl"] / us_cpi_2021) * 100
+
+    # Merge the normalized values with the original dataframe based on the 'year' column
+    df_us_inflation = pd.merge(df, us_df_copy[["year", "US_cpi"]], on="year", how="left")
+    df_us_inflation["us_cpi_adjust"] = 100 * df_us_inflation["ou_to_ex_tr"] / (df_us_inflation["US_cpi"])
+    df_inflation_var = df_us_inflation[["country", "year", "us_cpi_adjust", "inbound_ppp_cpi_adj_2021"]]
+
+    return df_inflation_var
 
 
 def shorten_name(name):
