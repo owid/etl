@@ -303,9 +303,14 @@ def add_ppp_and_cpi(df_tourism):
 
     # Merge the normalized values with the original dataframe based on the 'year' column
     df_us_inflation = pd.merge(df, us_df_copy[["year", "US_cpi"]], on="year", how="left")
-    df_us_inflation["us_cpi_adjust"] = 100 * df_us_inflation["ou_to_ex_tr"] / (df_us_inflation["US_cpi"])
-    df_inflation_var = df_us_inflation[["country", "year", "us_cpi_adjust", "inbound_ppp_cpi_adj_2021"]]
+    df_us_inflation["outbound_us_cpi_adjust"] = 100 * df_us_inflation["ou_to_ex_tr"] / (df_us_inflation["US_cpi"])
 
+    df_inflation_var = pd.merge(
+        df[["country", "year", "inbound_ppp_cpi_adj_2021"]],
+        df_us_inflation[["country", "year", "outbound_us_cpi_adjust"]],
+        on=["country", "year"],
+        how="inner",
+    )
     return df_inflation_var
 
 
