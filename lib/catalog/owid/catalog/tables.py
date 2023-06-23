@@ -382,7 +382,7 @@ class Table(pd.DataFrame):
             and self.metadata == table.metadata
             # By simply doing self.to_dict() == table.to_dict() may return False if the dictionaries are identical but
             # contain nans.
-            and self.fillna(123456.789).to_dict() == table.fillna(123456.789).to_dict()
+            and self.fillna(123456).to_dict() == table.fillna(123456).to_dict()
             and self._fields == table._fields
         )
 
