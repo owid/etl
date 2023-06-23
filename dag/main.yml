@@ -476,6 +476,12 @@ steps:
   data://garden/papers/2023-06-07/commodity_prices:
   - snapshot://papers/2023-06-07/commodity_prices.xlsx
 
+# OECD exchange rates
+  data://meadow/oecd/2023-06-20/ppp_exchange_rates:
+  - snapshot://oecd/2023-06-20/ppp_exchange_rates.csv
+  data://garden/oecd/2023-06-20/ppp_exchange_rates:
+  - data://meadow/oecd/2023-06-20/ppp_exchange_rates
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
