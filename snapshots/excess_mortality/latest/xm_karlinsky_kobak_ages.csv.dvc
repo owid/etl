@@ -1,7 +1,4 @@
 meta:
-  namespace: excess_mortality
-  short_name: xm_karlinsky_kobak_ages
-  file_extension: csv
   date_accessed: 2023-06-22
   name: Excess mortality during the COVID-19 pandemic
   description: |-
@@ -13,13 +10,12 @@ meta:
   source_published_by: Karlinsky & Kobak, 2021, Tracking excess mortality across countries
     during the COVID-19 pandemic with the World Mortality Dataset. eLife 10:e69336.
     https://elifesciences.org/articles/69336
-  source_data_url: 
+  source_data_url:
     https://raw.githubusercontent.com/dkobak/excess-mortality/main/baselines-stmf.csv
   license_url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
   license_name: GPL-3.0
   access_notes: Contains data by age.
   is_public: true
-  version: latest
   publication_year: 2021
   publication_date: 2021-06-30
 wdir: ../../../data/snapshots/excess_mortality/latest

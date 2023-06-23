@@ -1,7 +1,4 @@
 meta:
-  namespace: excess_mortality
-  short_name: wmd
-  file_extension: csv
   date_accessed: 2023-06-22
   name: World Mortality Dataset
   description: |-
@@ -18,12 +15,11 @@ meta:
   url: https://github.com/akarlinsky/world_mortality/
   source_published_by: Karlinsky & Kobak 2021, Tracking excess mortality across countries
     during the COVID-19 pandemic with the World Mortality Dataset, eLife https://doi.org/10.7554/eLife.69336
-  source_data_url: 
+  source_data_url:
     https://raw.githubusercontent.com/akarlinsky/world_mortality/main/world_mortality.csv
   license_url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
   license_name: MIT License
   is_public: true
-  version: latest
   publication_year: 2021
   publication_date: 2021-06-30
 wdir: ../../../data/snapshots/excess_mortality/latest

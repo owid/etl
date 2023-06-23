@@ -172,6 +172,7 @@ def _snapshot_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> 
     return SnapshotMeta(
         namespace="backport",
         short_name=f"{short_name}_values",
+        version="latest",
         name=ds.name,
         date_accessed=dt.datetime.utcnow(),
         description=ds.description,

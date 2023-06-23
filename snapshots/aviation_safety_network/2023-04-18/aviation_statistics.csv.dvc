@@ -7,7 +7,8 @@ meta:
   source_name: Aviation Safety Network
   source_published_by: The Flight Safety Foundation's Aviation Safety Network (ASN)
   url: https://aviation-safety.net/statistics/
-  source_data_url: https://docs.google.com/spreadsheets/d/1SDp7p1y6m7N5xD5_fpOkYOrJvd68V7iy6etXy2cetb8/gviz/tq?tqx=out:csv&sheet=Accidents+and+fatalities+per+year
+  source_data_url: 
+    https://docs.google.com/spreadsheets/d/1SDp7p1y6m7N5xD5_fpOkYOrJvd68V7iy6etXy2cetb8/gviz/tq?tqx=out:csv&sheet=Accidents+and+fatalities+per+year
   file_extension: csv
   license_url: https://aviation-safety.net/about/usage33.php
   license_name: Copyright Aviation Safety Network
