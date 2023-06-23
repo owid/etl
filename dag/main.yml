@@ -520,6 +520,14 @@ steps:
   - data://meadow/oecd/2023-06-20/ppp_exchange_rates
 
 
+  # Artificial Intelligence (EPOCH)
+  data://meadow/artificial_intelligence/2023-06-21/epoch:
+  - snapshot://artificial_intelligence/2023-06-21/epoch.csv
+  data://garden/artificial_intelligence/2023-06-21/epoch:
+  - data://meadow/artificial_intelligence/2023-06-21/epoch
+  data://grapher/artificial_intelligence/2023-06-21/epoch:
+  - data://garden/artificial_intelligence/2023-06-21/epoch
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml

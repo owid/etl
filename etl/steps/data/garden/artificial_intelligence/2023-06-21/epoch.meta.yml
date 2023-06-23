@@ -1,0 +1,92 @@
+dataset:
+  title: Parameter, Compute and Data Trends in Machine Learning (Epoch, 2023)
+  description: &desc |
+    We update this chart with the latest available data from our source every month.
+
+    The authors selected the AI systems for inclusion based on the following necessary criteria:
+    — Have an explicit learning component
+    — Showcase experimental results
+    — Advance the state of the art
+
+    In addition, the systems had to meet at least one of the following notability criteria:
+    — Paper has more than 1000 citations
+    — Historical importance
+    — Important state-of-the-art advance
+    — Deployed in a notable context
+
+    The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models.'"
+  licenses:
+  - name: Public domain
+  sources:
+  - name: Epoch (2023)
+    description: *desc
+    url: https://epochai.org/mlinputs/visualization
+    date_accessed: '2023-06-21'
+    publication_date: '2023-06-06'
+    publication_year: 2023
+    published_by: 'Epoch, Parameter, Compute and Data Trends in Machine Learning.
+      Published online at epochai.org. Retrieved from: https://epochai.org/mlinputs/visualization'
+tables:
+  epoch:
+    variables:
+      system:
+        title: Name of the model
+        unit: ''
+      domain:
+        title: Domain
+        unit: ''
+      organization_categorization:
+        title: Researcher affiliation
+        unit: ''
+      training_hardware:
+        title: Training hardware
+        unit: ''
+      compute_sponsor_categorization:
+        title: Compute Sponsor Categorization
+        unit: ''
+      parameters:
+        title: Number of parameters
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '1949-01-01'
+          yearIsDay: true
+      training_compute__flop:
+        title: Training compute (FLOP)
+        unit: 'FLOP'
+        display:
+          title: Training compute
+          numDecimalPlaces: 0
+          zeroDay: '1949-01-01'
+          yearIsDay: true
+      training_dataset_size__datapoints:
+        title: Training dataset size
+        unit: 'datapoints'
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '1949-01-01'
+          yearIsDay: true
+      training_time__hours:
+        title: Training time
+        unit: 'hours'
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '1949-01-01'
+          yearIsDay: true
+      equivalent_training_time__hours:
+        title: Equivalent training time
+        unit: 'hours'
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '1949-01-01'
+          yearIsDay: true
+      training_computation_petaflop:
+        title: Training compute (petaFLOP)
+        unit: 'petaFLOP'
+        display:
+            title: Training compute
+            numDecimalPlaces: 0
+            zeroDay: '1949-01-01'
+            yearIsDay: true
+
+
