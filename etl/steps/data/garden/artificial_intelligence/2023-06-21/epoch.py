@@ -37,26 +37,37 @@ def run(dest_dir: str) -> None:
         "Industry - Academia Collaboration (Academia Leaning)": "Collaboration, majority academia",
         "Industry - Academia Collaboration (Industry Leaning)": "Collaboration, majority industry",
         "Industry - Academia Collaboration (Industry leaning)": "Collaboration, majority industry",
-        "Research collective": "Research collective",
+        "Research Collective": "Research collective",
     }
-    tb["organization_categorization"] = tb["organization_categorization"].replace(category_mapping)
+    df["organization_categorization"] = df["organization_categorization"].replace(category_mapping)
 
     # Convert FLOP to petaFLOP
-    df["training_computation_petaflop"] = tb["training_compute__flop"] / 10e14
+    df["training_computation_petaflop"] = df["training_compute__flop"] / 10e14
 
+    # apply the function to 'publication_date'
+    df["publication_date"] = df["publication_date"].apply(convert_date)
+
+    # then, calculate 'days_since_1949'
+    df["days_since_1949"] = (df["publication_date"] - pd.to_datetime("1949-01-01")).dt.days
     # Create a date since column
-    df["days_since_1949"] = (
-        pd.to_datetime(df["publication_date"].astype(str), format="%Y-%m-%d") - pd.to_datetime("1949-01-01")
-    ).dt.days
+    # df["days_since_1949"] = (
+    #    pd.to_datetime(df["publication_date"].astype(str), format="%Y-%m-%d") - pd.to_datetime("1949-01-01")
+    # ).dt.days
     df.dropna(subset=["days_since_1949", "system"], inplace=True)
     df = df.reset_index(drop=True)
-    df.drop("publication_date", axis=1, inplace=True)
+    # df.drop("publication_date", axis=1, inplace=True)
     df["days_since_1949"] = df["days_since_1949"].astype(int)
 
     df = clean_non_unique_year_model(df)
 
+    df.replace({"VIsion": "Vision"}, inplace=True)
+
+    df_not_nan = df[df["inclusion_criteria"].notna()].reset_index(drop=True)
+    df_not_nan.drop("inclusion_criteria", axis=1, inplace=True)
+    print(df_not_nan.columns)
+
     # Create table
-    tb = Table(df, short_name="epoch", underscore=True)
+    tb = Table(df_not_nan, short_name="epoch", underscore=True)
     #
     # Save outputs.
     #
@@ -67,6 +78,19 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("epoch.end")
+
+
+def convert_date(date_string):
+    try:
+        # try to parse date in the format "%Y-%m-%d"
+        return pd.to_datetime(date_string, format="%Y-%m-%d")
+    except ValueError:
+        try:
+            # if the above fails, try to parse date in the format "%m/%d/%Y"
+            return pd.to_datetime(date_string, format="%m/%d/%Y")
+        except ValueError:
+            # if both formats fail, return NaT
+            return pd.NaT
 
 
 def clean_non_unique_year_model(df):

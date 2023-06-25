@@ -35,14 +35,11 @@ tables:
       domain:
         title: Domain
         unit: ''
+      publication_date:
+        title: Publication date
+        unit: 'date'
       organization_categorization:
         title: Researcher affiliation
-        unit: ''
-      training_hardware:
-        title: Training hardware
-        unit: ''
-      compute_sponsor_categorization:
-        title: Compute Sponsor Categorization
         unit: ''
       parameters:
         title: Number of parameters

@@ -1,0 +1,107 @@
+dataset:
+  title: Researcher Affiliation and Domain type in Notable AI Systems Data (Epoch, 2023)
+  description: &desc |
+    The affiliation of the research team building a particular notable AI system was classified according to the following:
+    — Academia: 100% of researchers affiliated with academia
+    — Collaboration, Academia-majority: 71–99% affiliated with academia
+    — Collaboration: 30–70% affiliated with academia
+    — Collaboration, Industry-majority: 71–99% affiliated with industry
+    — Industry: 100% of researchers affiliated with industry
+
+    This data corresponds to the "Organization Categorization" and "Domain" columns in the primary source data spreadsheet.
+
+    The authors selected the AI systems for inclusion based on the following necessary criteria:
+    — Have an explicit learning component
+    — Showcase experimental results
+    — Advance the state of the art
+
+    In addition, the systems had to meet at least one of the following notability criteria:
+    — Paper has more than 1000 citations
+    — Historical importance
+    — Important state-of-the-art advance
+    — Deployed in a notable context
+
+    The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models.'"
+  licenses:
+  - name: Public domain
+  sources:
+  - name: Epoch (2023)
+    description: *desc
+    url: https://epochai.org/mlinputs/visualization
+    date_accessed: '2023-06-21'
+    publication_date: '2023-06-06'
+    publication_year: 2023
+    published_by: 'Epoch, Parameter, Compute and Data Trends in Machine Learning.
+      Published online at epochai.org. Retrieved from: https://epochai.org/mlinputs/visualization'
+tables:
+  epoch_aggregates:
+    variables:
+      _3d_reconstruction:
+        title: 3D reconstruction
+        unit: ''
+      audio:
+        title: Audio
+        unit: ''
+      drawing:
+        title: Drawing
+        unit: ''
+      driving:
+        title: Driving
+        unit: ''
+      games:
+        title: Games
+        unit: ''
+      language:
+        title: Language
+        unit: ''
+      multimodal:
+        title: Multimodal
+        unit: ''
+      other:
+        title: Other
+        unit: ''
+      reading:
+        title: Reading
+        unit: ''
+      recommendation:
+        title: Recommendation
+        unit: ''
+      robotics:
+        title: Robotics
+        unit: ''
+      search:
+        title: Search
+        unit: ''
+      speech:
+        title: Speech
+        unit: ''
+      text_to_video:
+        title: Text-to-Video
+        unit: ''
+      video:
+        title: Video
+        unit: ''
+      vision:
+        title: Vision
+        unit: ''
+      academia:
+        title: Academia
+        unit: ''
+      industry:
+        title: Industry
+        unit: ''
+      collaboration:
+        title: Collaboration
+        unit: ''
+      collaboration__majority_academia:
+        title: Collaboration, majority academia
+        unit: ''
+      collaboration__majority_industry:
+        title: Collaboration, majority industry
+        unit: ''
+      non_profit:
+        title: Non-profit
+        unit: ''
+      research_collective:
+        title: Research collective
+        unit: ''

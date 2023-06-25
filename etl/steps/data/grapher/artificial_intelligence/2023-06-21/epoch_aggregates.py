@@ -15,13 +15,12 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("epoch"))
+    ds_garden = cast(Dataset, paths.load_dependency("epoch_aggregates"))
 
     # Read table from garden dataset.
-    tb = ds_garden["epoch"]
+    tb = ds_garden["epoch_aggregates"]
     # Rename for plotting model name as country in grapher
-    tb = tb.rename(columns={"system": "country", "days_since_1949": "year"})
-    tb.drop("publication_date", axis=1, inplace=True)
+    tb["country"] = "Total"
 
     #
     # Process data.
