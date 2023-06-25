@@ -19,4 +19,8 @@ meta:
     Achieving comparability in this field is a challenge, as national practices differ widely in terms of concepts, measures, and statistical sources. In order to maximise international comparability as well as inter-temporal consistency of data, the IDD data collection and compilation process is based on a common set of statistical conventions (e.g. on income concepts and components). The information obtained by the OECD through a network of national data providers, via a standardized questionnaire, is based on national sources that are deemed to be most representative for each country.
 
     Small changes in estimates between years should be treated with caution as they may not be statistically significant.
-
+wdir: ../../../data/snapshots/oecd/2023-06-06
+outs:
+- md5: 475da98f3f67e8a349af4114dcae2125
+  size: 1026173
+  path: income_distribution_database.csv
