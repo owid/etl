@@ -68,7 +68,7 @@ def run(dest_dir: str) -> None:
     # Set index, check that it's unique and reset index
     assert not merged_df_concat[["country", "year"]].duplicated().any(), "Index is not well constructed"
 
-    # Aggregate data by region
+    # Aggregate data by region (decided not to do for now)
     # Africa, Oceania, and income level categories
     # regions_ = ["North America",
     #     "South America",
@@ -136,13 +136,8 @@ def run(dest_dir: str) -> None:
         "in_to_ar_to_ar",
         "in_to_ar_ov_vi_to",
         "in_to_ar_sa_da_vi_ex",
-        "em_ac_se_fo_vi_ho_an_si_es",
         "em_fo_an_be_se_ac",
-        "em_ot_ac_se",
-        "em_ot_to_in",
-        "em_pa_tr",
         "em_to",
-        "em_tr_ag_an_ot_re_se_ac",
     ]
 
     for col in columns_to_transform:
@@ -158,26 +153,14 @@ def run(dest_dir: str) -> None:
         merged_df_concat_transf["in_to_ar_ov_vi_to"] / merged_df_concat_transf["ou_to_de_ov_vi_to"]
     )
 
-    # Calculate the Inbound/Outbound Ratio (total) column
-    merged_df_concat_transf["inb_outb_tot"] = (
-        merged_df_concat_transf["in_to_ar_to_ar"] / merged_df_concat_transf["ou_to_de_to_de"]
-    )
     # Calculate same-day by tourist trips ratio
     merged_df_concat_transf["same_tourist_ratio"] = (
         merged_df_concat_transf["in_to_ar_sa_da_vi_ex"] / merged_df_concat_transf["in_to_ar_ov_vi_to"]
     )
 
-    merged_df_concat_transf["outbound_exp_per_tourist"] = (
-        merged_df_concat_transf["ou_to_ex_tr"] * 1e6
-    ) / merged_df_concat_transf["ou_to_de_ov_vi_to"]
-
-    merged_df_concat_transf["inb_exp_per_tourist"] = (
-        merged_df_concat_transf["in_to_ex_tr"] * 1e6
-    ) / merged_df_concat_transf["in_to_ar_ov_vi_to"]
-
-    merged_df_concat_transf["ou_to_ex_tr_per_capita"] = (
-        merged_df_concat_transf["ou_to_ex_tr"] * 1e6
-    ) / merged_df_concat_transf["population"]
+    # Convert US million to number
+    merged_df_concat_transf["ou_to_ex_tr"] = merged_df_concat_transf["ou_to_ex_tr"] * 1e6
+    merged_df_concat_transf["in_to_ex_tr"] = merged_df_concat_transf["in_to_ex_tr"] * 1e6
 
     merged_df_concat_transf.reset_index(inplace=True)  # reset index
 
@@ -222,14 +205,7 @@ def run(dest_dir: str) -> None:
         "to_in_av_ca_be_pl_pe_10_in",
         "to_in_oc_ra_ro",
         "population",
-        "em_ac_se_fo_vi_ho_an_si_es_per_1000",
-        "em_ot_ac_se_per_1000",
-        "em_ot_to_in_per_1000",
-        "em_pa_tr_per_1000",
-        "em_tr_ag_an_ot_re_se_ac_per_1000",
-        "inb_outb_tot",
     ]
-
     merged_df_concat_transf = merged_df_concat_transf.drop(columns_to_exclude, axis=1)
 
     df_inflation_adjusted = add_ppp_and_cpi(merged_df_concat_transf)
@@ -281,16 +257,11 @@ def add_ppp_and_cpi(df_tourism):
     df["fp_cpi_totl_normalized"] = 100 * df["fp_cpi_totl"] / df["fp_cpi_totl_2021"]
 
     # Convert to inbound expenditure to local currency, adjust for local inflation and convert back to international dollars
-
-    df["inbound_ppp_cpi_adj_2021"] = (
-        100 * (df["in_to_ex_tr"] * df["exchange_rates__period_average"]) / df["fp_cpi_totl_normalized"]
-    ) / df["purchasing_power_parities_for_private_consumption_2021"]
     df["inbound_ppp_cpi_adj_2021"] = (
         100 * (df["in_to_ex_tr"] * df["exchange_rates__period_average"]) / df["fp_cpi_totl_normalized"]
     ) / df["purchasing_power_parities_for_private_consumption_2021"]
 
     # Adjust outbound by US inflaton (2021)
-
     # Filter the dataframe for the United States
     us_df = df[df["country"] == "United States"]
 

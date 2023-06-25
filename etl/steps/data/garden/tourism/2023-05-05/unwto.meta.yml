@@ -54,7 +54,7 @@ tables:
         title: Employment (total)
         unit: ''
         display:
-          name: Total number of people employed in tourism related industry
+          name: Total number of people employed in tourism related industries
           numDecimalPlaces: 0
       in_to_ac_ho_an_si_es_gu:
         title: Foreign guests in tourism-accommodation (hotels and similar establishments)
@@ -64,8 +64,8 @@ tables:
           numDecimalPlaces: 0
       in_to_ex_tr:
         title: Inbound tourism-expenditure
-        unit: US million $
-        short_unit: US million $
+        unit: US dollars
+        short_unit: $
         display:
           numDecimalPlaces: 0
       in_to_pu_bu_an_pr:
@@ -90,8 +90,8 @@ tables:
           numDecimalPlaces: 0
       ou_to_ex_tr:
         title: Outbound tourism-expenditure
-        unit: US million $
-        short_unit: US million $
+        unit: US dollars
+        short_unit: $
         display:
           numDecimalPlaces: 0
       to_in_av_le_of_st:
@@ -174,28 +174,17 @@ tables:
         unit: ''
         display:
           numDecimalPlaces: 1
-      outbound_exp_per_tourist:
-        title: Expenditure for each tourist on outbound tourism
-        unit: US $
-        short_unit: US $
-        display:
-          numDecimalPlaces: 0
-      inb_exp_per_tourist:
-        title: Expenditure for each tourist on inbound tourism
-        unit: US $
-        short_unit: US $
-        display:
-          numDecimalPlaces: 0
-      ou_to_ex_tr_per_capita:
-        title: Outbound tourism expenditure per capita
-        unit: US $
-        short_unit: US $
-        display:
-          numDecimalPlaces: 0
       inbound_ppp_cpi_adj_2021:
         title: Inbound Tourism Expenditure (adjusted for inflation and cost of living)
-        unit: US million $
+        unit: US dollars
+        short_unit: $
+        display:
+          title: Inbound tourism expenditure
+          numDecimalPlaces: 0
       outbound_us_cpi_adjust:
         title: Outbound Tourism Expenditure (adjusted for US 2021 inflation)
-        unit: US million $
-
+        unit: US dollars
+        short_unit: $
+        display:
+          title: Outbound tourism expenditure
+          numDecimalPlaces: 0
