@@ -64,7 +64,6 @@ def run(dest_dir: str) -> None:
 
     df_not_nan = df[df["inclusion_criteria"].notna()].reset_index(drop=True)
     df_not_nan.drop("inclusion_criteria", axis=1, inplace=True)
-    print(df_not_nan.columns)
 
     # Create table
     tb = Table(df_not_nan, short_name="epoch", underscore=True)

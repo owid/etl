@@ -79,6 +79,7 @@ def run(dest_dir: str) -> None:
     df.replace("", np.nan, inplace=True)
 
     df["Training compute (FLOP)"] = df["Training compute (FLOP)"].astype(float)
+
     #
     # Create a new table and ensure all columns are snake-case.
     #

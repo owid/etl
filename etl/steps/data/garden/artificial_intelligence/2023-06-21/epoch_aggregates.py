@@ -25,7 +25,6 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["epoch"]
-    print("K")
     df = pd.DataFrame(tb)
     df["publication_date"] = pd.to_datetime(df["publication_date"])
     df["year"] = df["publication_date"].dt.year
