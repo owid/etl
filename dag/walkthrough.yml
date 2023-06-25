@@ -8,3 +8,7 @@ steps:
   - data://garden/dummy/2020-01-01/dummy
   data://explorers/dummy/2020-01-01/dummy:
   - data://garden/dummy/2020-01-01/dummy
+  data-private://meadow/wvs/2023-06-25/longitudinal_wvs:
+  - snapshot-private://wvs/2023-06-25/longitudinal_wvs.csv
+  data://garden/wvs/2023-06-25/longitudinal_wvs:
+  - data://meadow/wvs/2023-06-25/longitudinal_wvs
