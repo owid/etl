@@ -17,7 +17,7 @@ meta:
     list of the publication (citation format available for downloading in the Documentation
     section).'
   date_accessed: 2023-06-25
-  is_public: false
+  is_public: true
   description: |-
     The WVS comprises survey data conducted across 64 countries and societies around the world and more than 80,000 respondents. This dataset comprises integrated files for the 1981-2022 period for all survey questions.
 wdir: ../../../data/snapshots/wvs/2023-06-25
