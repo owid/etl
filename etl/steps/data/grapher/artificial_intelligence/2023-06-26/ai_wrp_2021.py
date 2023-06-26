@@ -19,7 +19,8 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["ai_wrp_2021"]
-
+    tb = tb[["country", "year", "yes_no_ratio", "help_harm_ratio"]]
+    tb.dropna(subset=["country"], inplace=True)
     #
     # Process data.
     #
