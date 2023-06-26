@@ -1,0 +1,50 @@
+dataset:
+  title: World Risk Poll (2021)
+  description: &desc |
+    Spread across four themed reports, the 2021 World Risk Poll covers the biggest
+    risks facing people and communities globally, ranging from road crashes, severe
+    weather, climate change and disaster resilience, to work-related harm, violence
+    and harassment at work, and use of personal data. It will be repeated at least two more times, in 2023 and 2025.
+
+    This data includes aggregates of survey responses to the following two questions:
+    1) Will artificial intelligence help or harm people in the next 20 years?
+    2) Would you feel safe in a car driven by computer without a human driver?
+
+  licenses:
+  - name: Lloyd’s Register Foundation 2018
+    url: https://wrp.lrfoundation.org.uk/terms-of-use/
+  sources:
+  - name: Lloyd’s Register Foundation (2022)
+    description: *desc
+    url: https://wrp.lrfoundation.org.uk/data-resources/
+    source_data_url: https://wrp.lrfoundation.org.uk/wp-content/uploads/2023/05/lrf_wrp_2021_full_data.zip
+    date_accessed: '2023-06-26'
+    publication_year: 2022
+    published_by: World Risk Poll 2021, Lloyd’s Register Foundation (2022)
+tables:
+  ai_wrp_2021:
+    variables:
+      help_harm_ratio:
+        title: Artificial Intelligence Will Help or Harm People in Next 20 Years (help/harm ratio)
+        unit: ''
+      gender:
+        title: Gender
+        unit: ''
+      education:
+        title: Education
+        unit: ''
+      income_5:
+        title: Income percentile
+        unit: ''
+      emp_2010:
+        title: Employment status
+        unit: ''
+      agegroups4:
+        title: Age group
+        unit: ''
+      globalregion:
+        title: Region
+        unit: ''
+      yes_no_ratio:
+        title: Feel Safe in Car Driven by Computer Without a Human Driver (yes/no ratio)
+        unit: ''
