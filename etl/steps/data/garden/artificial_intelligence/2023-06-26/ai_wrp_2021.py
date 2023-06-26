@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
     log.info("wrp_2021.harmonize_countries")
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     df = pd.DataFrame(tb)
+    # List of column names to keep in DataFrame (q8 and q9 are AI related)
     select_cols = [
         "country",
         "year",
@@ -46,27 +47,40 @@ def run(dest_dir: str) -> None:
         "q9",
     ]
 
+    # Filter DataFrame to keep only the AI related columns
     df = df[select_cols]
 
+    # Map numerical values to categorical for certain columns in the DataFrame
     df = map_values(df)
+
+    # List of columns to split the DataFrame by when calculating question responses
     columns_to_split_by = ["country", "gender", "education", "income_5", "emp_2010", "agegroups4", "globalregion"]
+
+    # Dictionary to map response codes to labels for question 9
     dict_q9 = {1: "Mostly help", 2: "Mostly Harm", 3: "Don't have an opinion", 4: "Neither", 98: "DK", 99: "Refused"}
+
+    # Dictionary to map response codes to labels for question 8
     dict_q8 = {1: "Yes, would feel safe", 2: "No, would not feel safe", 98: "DK", 99: "Refused"}
 
+    # Create a list of DataFrames for each column_to_split_by for question 8
     df_q8_list = []
     for column in columns_to_split_by:
-        df_q8_list.append(question_8("q8", df, column, dict_q8))
+        df_q8_list.append(question_extract("q8", df, column, dict_q8))
 
+    # Concatenate all the q8 DataFrames in the list to create a combined DataFrame
     df_q8_c = pd.concat(df_q8_list)
     df_q8_c.reset_index(drop=True, inplace=True)
 
+    # Create a list of DataFrames for each column_to_split_by for question 9
     df_q9_list = []
     for column in columns_to_split_by:
-        df_q9_list.append(question_8("q9", df, column, dict_q9))
+        df_q9_list.append(question_extract("q9", df, column, dict_q9))
 
+    # Concatenate all the q9 DataFrames in the list to create a combined DataFrame
     df_q9_c = pd.concat(df_q9_list)
     df_q9_c.reset_index(drop=True, inplace=True)
 
+    # Merge the two combined DataFrames on common columns
     df_merge = pd.merge(df_q9_c, df_q8_c, on=columns_to_split_by + ["year"], how="outer")
 
     tb = Table(df_merge, short_name="ai_wrp_2021", underscore=True)
@@ -84,13 +98,14 @@ def run(dest_dir: str) -> None:
 
 def calculate_percentage(df, column, valid_responses_dict, column_to_split_by):
     """
-    Calculates the percentage of valid responses for a given column in a DataFrame.
+    Calculates the percentage of valid responses for a given column in a DataFrame, split by another column.
     Args:
         df (DataFrame): The input DataFrame.
-        column (str): The column name.
+        column (str): The column name to calculate the percentage.
         valid_responses_dict (dict): A dictionary mapping valid response codes to their corresponding labels.
+        column_to_split_by (str): The column name to split by.
     Returns:
-        DataFrame: A DataFrame with columns: "country", "year", "column", "count", and "percentage".
+        DataFrame: A DataFrame with columns: the column_to_split_by, "year", "column", "count", and "percentage".
     """
     # Filter out invalid responses
     valid_responses = df[column].isin(valid_responses_dict.keys())
@@ -113,16 +128,17 @@ def calculate_percentage(df, column, valid_responses_dict, column_to_split_by):
     return counts
 
 
-def question_8(q, df, column_to_split_by, dict_q):
+def question_extract(q, df, column_to_split_by, dict_q):
     """
-    Computes the ratio of responses indicating a great deal or very much worry about terrorist attacks
-    to responses indicating not at all or not much worry.
+    Computes the ratio of responses for a given column in a DataFrame, split by another column.
     Args:
+        q (str): The question column name.
         df (DataFrame): The input DataFrame.
+        column_to_split_by (str): The column name to split by.
+        dict_q (dict): A dictionary mapping valid response codes to their corresponding labels.
     Returns:
-        DataFrame: A DataFrame with columns: "country", "year", and "great_deal_or_very_much_not_at_all_or_not_much_ratio".
+        DataFrame: A DataFrame with columns: "year", column_to_split_by, and either "help_harm_ratio" or "yes_no_ratio" depending on the question column.
     """
-
     # Calculate percentage for worries about a terrorist attack
     counts_q = calculate_percentage(df, q, dict_q, column_to_split_by)
 
@@ -156,6 +172,13 @@ def question_8(q, df, column_to_split_by, dict_q):
 
 
 def map_values(df):
+    """
+    Maps numerical values to categorical for certain columns in the DataFrame.
+    Args:
+        df (DataFrame): The input DataFrame.
+    Returns:
+        DataFrame: The DataFrame with mapped values for "gender", "education", "income_5", "emp_2010", "agegroups4", "globalregion" columns.
+    """
     gender = {1: "Male", 2: "Female"}
 
     education_level = {
