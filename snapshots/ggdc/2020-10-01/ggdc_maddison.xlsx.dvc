@@ -1,8 +1,6 @@
 meta:
   # Institution name: The Groningen Growth and Development Centre (GGDC), from the Faculty of Economics and
   # Business of the University of Groningen.
-  namespace: ggdc
-  short_name: ggdc_maddison
   name: Maddison Project Database (GGDC, 2020)
   source_name: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
   publication_year: 2020
@@ -14,7 +12,6 @@ meta:
   url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020
   # Url to download the dataset.
   source_data_url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx
-  file_extension: xlsx
   # License is defined in the main page of the project.
   license_url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020
   license_name: Creative Commons BY 4.0

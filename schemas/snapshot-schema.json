@@ -62,12 +62,9 @@
           }
         },
         "required": [
-          "namespace",
-          "short_name",
           "name",
           "source_name",
           "url",
-          "file_extension",
           "date_accessed",
           "description"
         ]

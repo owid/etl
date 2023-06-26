@@ -2,12 +2,12 @@
 
 Loads the latest WID and LIS data from garden and stores a table (as a csv file) to use for a comparison explorer.
 It also loads World Bank Poverty and Inequality Platform (PIP) data, currently outside the ETL (notebooks repo).
-This data will be replaced in May 2023 by a PIP step inside the ETL
+This data will be replaced in 2023-2 by a PIP step inside the ETL
 
 """
 
 import pandas as pd
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -45,6 +45,8 @@ def add_pip_data(PIP_PATH: str):
         "reporting_pce",
         "mld",
         "polarization",
+        "reporting_level",
+        "welfare_type",
     ]
 
     tb_pip = tb_pip.drop(columns=drop_list)
@@ -72,6 +74,30 @@ def add_pip_data(PIP_PATH: str):
     )
 
     return tb_pip
+
+
+def create_pip_inequality_table(tb_pip: pd.DataFrame) -> pd.DataFrame:
+    # Create a table with only PIP inequality data (NOTE: this will be removed when PIP steps are created)
+    # Define list of variables
+    inequality_vars = [
+        "country",
+        "year",
+        "gini",
+        "decile10_share",
+        "bottom50_share",
+        "palma_ratio",
+        "headcount_ratio_50_median",
+    ]
+
+    tb_pip_inequality = tb_pip[inequality_vars]
+
+    # Remove regions, because they don't have inequality data
+    tb_pip_inequality = tb_pip_inequality[~tb_pip_inequality["country"].str.contains("\\(PIP\\)")]
+
+    # Verify index and sort
+    tb_pip_inequality = tb_pip_inequality.set_index(["country", "year"], verify_integrity=True).sort_index()
+
+    return tb_pip_inequality
 
 
 def run(dest_dir: str) -> None:
@@ -102,6 +128,11 @@ def run(dest_dir: str) -> None:
 
     tb_explorer.metadata.short_name = "poverty_inequality"
 
+    # Add a table that only includes PIP inequality data (NOTE: this will be removed when PIP steps are created)
+    tb_pip_inequality = create_pip_inequality_table(tb_pip)
+    # Create Table from tb_pip_inequality
+    tb_pip_inequality = Table(tb_pip_inequality, short_name="pip_inequality", underscore=True)
+
     # Create explorer dataset with merged table in csv format
-    ds_explorer = create_dataset(dest_dir, tables=[tb_explorer], formats=["csv"])
+    ds_explorer = create_dataset(dest_dir, tables=[tb_explorer, tb_pip_inequality], formats=["csv"])
     ds_explorer.save()

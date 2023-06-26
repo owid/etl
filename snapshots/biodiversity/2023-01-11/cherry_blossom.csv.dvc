@@ -1,13 +1,10 @@
 meta:
-  namespace: biodiversity
-  short_name: cherry_blossom
   name: Peak Cherry Tree Blossom at Kyoto City (2022)
   source_name: Multiple datasets compiled by Aono (2021)
   publication_year: 2021
   publication_date: 2021-03-26
   url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
   source_data_url:
-  file_extension: csv
   license_url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
   license_name:
   date_accessed: 2023-01-11
