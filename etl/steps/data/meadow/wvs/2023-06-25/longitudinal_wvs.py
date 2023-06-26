@@ -28,12 +28,16 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     df = pd.read_csv(snap.path)
+    #
+    # Process data.
+    #
     terrorism_columns = ["COUNTRY_ALPHA", "S020", "H006_04", "G057", "F114E"]
     df = df[terrorism_columns]
-    # replace keys where question was not asked with nan
+    # Replace keys where question was not asked with nan
     cols_to_update = ["H006_04", "G057", "F114E"]
     valid_resp = list(range(11)) + [-1, -2]
     df[cols_to_update] = df[cols_to_update].applymap(lambda x: x if x in valid_resp else np.nan)
+    # Rename columns to more informative names
     dictionary_keys = {
         "COUNTRY_ALPHA": "code",
         "S020": "year",
@@ -42,17 +46,14 @@ def run(dest_dir: str) -> None:
         "F114E": "Justifiable: Terrorism as a political, ideological or religious mean",
     }
     df.rename(columns=dictionary_keys, inplace=True)
-
+    # Load the countries and ISO 3166-1 alpha-3 codes dataset to get the country names based on the  ISO 3166-1 alpha-3 codes in the datagrame
     countries_regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
     iso_match = countries_regions.reset_index()[["code", "name"]]
-
     match_code_df = pd.merge(iso_match, df, on="code", how="right")
+    # Drop the country column code and rename the country 'name' column to 'country' column
     match_code_df.drop("code", axis=1, inplace=True)
     match_code_df.rename(columns={"name": "country"}, inplace=True)
 
-    #
-    # Process data.
-    #
     # Create a new table and ensure all columns are snake-case.
     tb = Table(match_code_df, short_name=paths.short_name, underscore=True)
 
