@@ -619,10 +619,10 @@ class Table(pd.DataFrame):
             **kwargs,
         )
 
-    def underscore(self) -> "Table":
+    def underscore(self, **kwargs) -> "Table":
         from .utils import underscore_table
 
-        return underscore_table(self, inplace=False)
+        return underscore_table(self, inplace=False, **kwargs)
 
     def dropna(self, *args, **kwargs) -> "Table":
         tb = super().dropna(*args, **kwargs).copy()
