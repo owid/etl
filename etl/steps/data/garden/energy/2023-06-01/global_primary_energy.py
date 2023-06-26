@@ -126,6 +126,8 @@ def combine_bp_and_smil_data(tb_bp: Table, tb_smil: Table) -> Table:
     combined.loc[missing_years_mask, "traditional_biomass__twh_substituted_energy"] = combined[missing_years_mask][
         "traditional_biomass__twh_substituted_energy"
     ].ffill()
+    for source in ["hydropower", "nuclear", "other_renewables", "solar", "wind"]:
+        combined[f"{source}__twh_substituted_energy"].metadata.description = 'Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.'
 
     # Create an index and sort conveniently.
     combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
