@@ -343,9 +343,11 @@ steps:
   # Terrorism questions in World Values Survey (longitudinal)
   data://meadow/wvs/2023-06-25/longitudinal_wvs:
   - snapshot://wvs/2023-06-25/longitudinal_wvs.csv
+  - data://garden/regions/2023-01-01/regions
   data://garden/wvs/2023-06-25/longitudinal_wvs:
   - data://meadow/wvs/2023-06-25/longitudinal_wvs
-
+  data://grapher/wvs/2023-06-25/longitudinal_wvs:
+  - data://garden/wvs/2023-06-25/longitudinal_wvs
 
   # USA consumer prices (US Bureau of Labor Statistics)
   data://meadow/bls/2023-03-10/us_consumer_prices:
