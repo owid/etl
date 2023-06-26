@@ -1922,7 +1922,6 @@ tables:
         schema_version: 2
         origins:  # Going forward this will usually come from snapshots in this form but you could also set it here
         - dataset_title_owid: World Development Indicators
-          dataset_title_producer: World Development Indicators
           dataset_description_owid:
           dataset_description_producer: >
             The World Development Indicators (WDI) is the primary
@@ -1933,19 +1932,18 @@ tables:
             global estimates.
           producer: International Telecommunication Union (via World Bank) # This is an override that we would want to do for many indicators in the WDI especially
           citation_producer:
-          citation_owid:
           dataset_url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
           dataset_url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
           date_accessed: 2023-05-29
           date_published: '2023-05-11'
           year_published: 2023
-        processing_level: minimal
+        processing_level: minor
         presentation:
-          titlePublic: Share of the population using the Internet
-          titleFragmentProducer: Share of the population using the Internet
-          producers_inline_citation: # defaults to origin[*].producer so does not have to be set here
+          title_public: Share of the population using the Internet
+          title_variant: WDI
+          citation_inline: # defaults to origin[*].producer so does not have to be set here
           description_short: Share of the population who used the Internet in the last three months.
-          description_from_producer_content: >
+          description_from_producer: >
             Internet users are individuals who have used the Internet (from any location)
             in the last 3 months. The Internet can be used via a computer, mobile phone,
             personal digital assistant, games machine, digital TV etc.
@@ -1978,7 +1976,6 @@ tables:
             https://www.itu.int/en/ITU-D/Statistics/Pages/stat/default.aspx
 
             [Text from World Bank World Development Indicators metadata]
-          description_from_source_title: This is how the data provider - the World Bank - describes this data?
           topic_tags_links:
           - technological-change
           - internet
@@ -1991,7 +1988,6 @@ tables:
             who has accessed the Internet from any location in the last three months.
           - This can be from any type of device, including a computer, mobile phone, personal digital
             assistant, games machine, digital TV, and other technological devices.
-
           grapher_config:
             title: Share of the population using the Internet
             subtitle: 'Share of the population who [used the Internet](#dod:internetuser) in the last three months.'
