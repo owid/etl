@@ -74,7 +74,6 @@ pdfplumber = "^0.9.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"
-mypy = ">=0.982"
 flake8 = ">=3.9.2"
 watchdog = ">=2.1.5"
 PyYAML = ">=5.4.1"
@@ -93,6 +92,7 @@ hydra-core = ">=1.3.0"
 mkdocs-material = "<9.0.0"
 pywebio = ">=1.8.2"
 black = {version = "22.3.0", extras = ["jupyter"]}
+boto3-stubs = { extras = ["s3"], version = ">=1.21.16" }
 # unpinning pandas-stubs would introduce tons of type errors
 pandas-stubs = "1.2.0.62"
 notebook = {version = "^7.0.0a1", allow-prereleases = true}
