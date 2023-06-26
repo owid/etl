@@ -37,6 +37,7 @@ steps:
     - snapshot://war/2023-06-09/war_mars.xls
   data://meadow/war/2023-06-09/cow_mid:
     - snapshot://war/2023-06-09/cow_mid.zip
+
   # Garden
   data://garden/war/2023-01-18/bouthoul_carrere_1978:
     - data://meadow/war/2023-01-10/bouthoul_carrere_1978
@@ -52,3 +53,9 @@ steps:
     - data://meadow/war/2023-01-10/sorokin_1937
   data://garden/war/2023-01-18/sutton_1971:
     - data://meadow/war/2023-01-10/sutton_1971
+  data://garden/war/2023-06-22/ucdp:
+    - data://meadow/war/2023-06-22/ucdp
+
+  # Grapher
+  data://grapher/war/2023-06-26/ucdp:
+    - data://garden/war/2023-06-22/ucdp
