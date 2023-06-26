@@ -1,6 +1,7 @@
 from owid import catalog
 
 from etl.paths import DATA_DIR
+from etl.helpers import create_dataset
 
 # Path to input garden dataset.
 GARDEN_DATASET_PATH = DATA_DIR / "garden/andrew/2019-12-03/co2_mitigation_curves"
@@ -12,19 +13,17 @@ def run(dest_dir: str) -> None:
     garden_dataset = catalog.Dataset(GARDEN_DATASET_PATH)
     # Load necessary table from garden dataset.
     table = garden_dataset[GARDEN_TABLE_NAME].reset_index()
-    # Use dataset metadata to match the metadata of the specific table we need.
-    garden_dataset.metadata.short_name = GARDEN_TABLE_NAME
-    garden_dataset.metadata.title = table.metadata.title
-    garden_dataset.metadata.description = table.metadata.description
     # Convert units conveniently.
+    old_title = table["emissions"].metadata.title
+    old_description = table["emissions"].metadata.description
     table["emissions"] *= 1e9
     table["emissions"].metadata.unit = "tonnes"
     table["emissions"].metadata.short_unit = "t"
-    # Create a new grapher dataset.
-    dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
+    table["emissions"].metadata.title = old_title
+    table["emissions"].metadata.description = old_description
     # Load table from dataset and change the "origin" column to act as if it was the country name.
     # This is a workaround to be able to visualize all curves of origin together in a line chart.
     table = table.rename(columns={"origin": "country"})
-    # Add table to grapher dataset and save it.
-    dataset.add(table)
-    dataset.save()
+    # Create a new grapher dataset.
+    ds_grapher = create_dataset(dest_dir=dest_dir, tables=[table], default_metadata=garden_dataset.metadata)
+    ds_grapher.save()
