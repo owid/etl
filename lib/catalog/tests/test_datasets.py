@@ -84,7 +84,6 @@ def test_add_table():
         # check that it's really on disk
         table_files = [
             join(dirname, t.metadata.checked_name + ".feather"),
-            join(dirname, t.metadata.checked_name + ".parquet"),
             join(dirname, t.metadata.checked_name + ".meta.json"),
         ]
         for filename in table_files:

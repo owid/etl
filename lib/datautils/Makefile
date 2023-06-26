@@ -16,7 +16,7 @@ report: report-coverage report-linting report-server-launch
 
 check-typing: .venv
 	@echo '==> Checking types'
-	poetry run mypy --strict -p owid -p tests
+	poetry run pyright owid tests
 
 report-coverage: .venv
 	@echo '==> Unit testing with coverage'
@@ -37,7 +37,3 @@ watch: .venv
 bump: .venv
 	@echo '==> Bumping version'
 	poetry run bump2version --no-tag  --no-commit $(filter-out $@, $(MAKECMDGOALS))
-
-lab: .venv
-	@echo '==> Starting Jupyter server'
-	poetry run jupyter lab

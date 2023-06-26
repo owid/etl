@@ -53,8 +53,8 @@ dataset:
   sources:
     - name: Luxembourg Income Study (LIS) (2023)
       url: https://www.lisdatacenter.org/our-data/lis-database/
-      date_accessed: "2023-06-14"
-      publication_date: "2023-06-14"
+      date_accessed: "2023-06-21"
+      publication_date: "2023-06-21"
       publication_year: 2023
       published_by:
         Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org

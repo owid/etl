@@ -26,9 +26,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the snapshot.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], default_metadata=ds_meadow.metadata, formats=["csv", "parquet", "feather"]
-    )
+    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata, formats=["csv", "feather"])
 
     # Save changes in the new garden dataset.
     ds_garden.save()
