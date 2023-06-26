@@ -1,8 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-# import re
-# from openpyxl import load_workbook
-
 from typing import cast
 
 import numpy as np
@@ -31,32 +28,6 @@ def run(dest_dir: str) -> None:
 
     # Now read the file with pandas
     df = pd.read_excel(snap.path, sheet_name="ALL ML SYSTEMS")
-    # index_not_nan = df.dropna(how="all").index
-
-    # # Load your workbook
-    # wb = load_workbook(filename=snap.path, data_only=False)
-    # # Select your sheet
-    # ws = wb["NOTABLE ML SYSTEMS"]  # replace with your sheet name
-
-    # # Initialize an empty list to store the numbers
-    # notable_index = []
-
-    # # Find which rows are selected for Notable AI systems spreadsheet
-    # for cell in ws["A"]:  # replace 'A' with your column letter if different
-    #     value = cell.value
-    #     if isinstance(value, str):
-    #         # Find all numbers in the string
-    #         numbers = re.findall(r"\d+", value)
-    #         # Append each number found to the list
-    #         for number in numbers:
-    #             notable_index.append(int(number))
-
-    # # Intersect notable_index and index_not_nan to get indices present in both lists
-    # final_indices = list(set(notable_index) & set(index_not_nan.tolist()))
-
-    # # Select only notable
-    # df = df.loc[final_indices].reset_index(drop=True)
-
     #
     # Process data.
     #

@@ -49,10 +49,7 @@ def run(dest_dir: str) -> None:
 
     # then, calculate 'days_since_1949'
     df["days_since_1949"] = (df["publication_date"] - pd.to_datetime("1949-01-01")).dt.days
-    # Create a date since column
-    # df["days_since_1949"] = (
-    #    pd.to_datetime(df["publication_date"].astype(str), format="%Y-%m-%d") - pd.to_datetime("1949-01-01")
-    # ).dt.days
+
     df.dropna(subset=["days_since_1949", "system"], inplace=True)
     df = df.reset_index(drop=True)
     # df.drop("publication_date", axis=1, inplace=True)
