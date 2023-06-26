@@ -59,7 +59,7 @@ def _load_population(tmp_dir: str) -> pd.DataFrame:
 
 def _load_fertility(tmp_dir: str) -> pd.DataFrame:
     """Load fertility dataset (CSV)"""
-    (filename,) = [f for f in filter(lambda x: "Fertility" in x, sorted(os.listdir(tmp_dir)) if "notes" not in f])
+    (filename,) = [f for f in filter(lambda x: "Fertility" in x, sorted(os.listdir(tmp_dir))) if "notes" not in f]
     dtype = {
         "SortOrder": "category",
         "LocID": "category",
@@ -87,7 +87,7 @@ def _load_fertility(tmp_dir: str) -> pd.DataFrame:
 
 def _load_demographics(tmp_dir: str) -> pd.DataFrame:
     """Load demographics dataset (CSV)"""
-    filenames = [f for f in filter(lambda x: "Demographic" in x, sorted(os.listdir(tmp_dir)) if "notes" not in f])
+    filenames = [f for f in filter(lambda x: "Demographic" in x, sorted(os.listdir(tmp_dir))) if "notes" not in f]
     dtype = {
         "SortOrder": "category",
         "LocID": "category",
