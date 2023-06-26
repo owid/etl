@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "owid-datautils"
-version = "0.5.2"
+version = "0.5.3"
 description = "Data utils library by the Data Team at Our World in Data"
 authors = ["Our World In Data <tech@ourworldindata.org>"]
 license = "MIT"
