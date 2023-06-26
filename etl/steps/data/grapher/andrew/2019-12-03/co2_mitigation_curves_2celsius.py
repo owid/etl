@@ -1,7 +1,7 @@
 from owid import catalog
 
-from etl.paths import DATA_DIR
 from etl.helpers import create_dataset
+from etl.paths import DATA_DIR
 
 # Path to input garden dataset.
 GARDEN_DATASET_PATH = DATA_DIR / "garden/andrew/2019-12-03/co2_mitigation_curves"

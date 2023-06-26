@@ -1,5 +1,3 @@
-from owid.catalog import Dataset
-
 from etl.helpers import PathFinder, create_dataset
 
 # naming conventions
@@ -50,5 +48,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_1p5celsius, tb_2celsius], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir=dest_dir, tables=[tb_1p5celsius, tb_2celsius], default_metadata=ds_meadow.metadata
+    )
     ds_garden.save()
