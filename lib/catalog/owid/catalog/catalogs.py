@@ -37,7 +37,7 @@ S3_OWID_URI = "s3://owid-catalog"
 REMOTE_CATALOG: Optional["RemoteCatalog"] = None
 
 # what formats should we for our index of available datasets?
-INDEX_FORMATS: List[FileFormat] = ["feather", "parquet"]
+INDEX_FORMATS: List[FileFormat] = ["feather"]
 
 
 class CatalogMixin:
