@@ -237,3 +237,43 @@ class TableMeta:
     @staticmethod
     def from_dict(dict: Dict[str, Any]) -> "TableMeta":
         ...
+
+    def _repr_html_(self):
+        # Render a nice display of the table metadata
+        record = self.to_dict()
+        short_name = record.pop("short_name")
+        return """
+             <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
+             <p style="font-variant: small-caps; font-family: sans-serif; font-size: 170%; color: grey; margin-top: -0.2em;">metadata</p>
+             {}
+        """.format(
+            short_name, to_html(record)
+        )
+
+
+def to_html(record: Any) -> Optional[str]:
+    if isinstance(record, dict):
+        rows = []
+        for k, v in record.items():
+            if not v:
+                continue
+            v_str = to_html(v)
+            rows.append(
+                """<tr><th style="text-align: right; font-family: sans-serif; vertical-align: top; padding: 0.2em 1em;"><strong>{}</strong></th><td style="text-align: left; padding: 0.2em 1em;">{}</td></tr>""".format(
+                    k, v_str
+                )
+            )
+        return '<table style="margin: 0em"><tbody>{}</tbody></table>'.format("".join(rows))
+
+    elif isinstance(record, list):
+        record = list(filter(None, record))
+        if not record:
+            return None
+
+        rows = []
+        for item in record:
+            rows.append("<li>{}</li>".format(to_html(item)))
+        return '<ul style="text-align: left; margin-top: 0em; margin-bottom: 0em">{}</ul>'.format("".join(rows))
+
+    else:
+        return str(record)
