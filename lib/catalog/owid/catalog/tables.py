@@ -535,7 +535,7 @@ class Table(pd.DataFrame):
         html = super()._repr_html_()
         return """
              <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
-             <p style="font-variant: small-caps; font-size: 1.2em; color: grey; margin-top: 0em; margin-bottom: 0.1em">DATA</p>
+             <p style="font-variant: small-caps; font-size: 1.5em; font-family: sans-serif; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">table</p>
              {}
         """.format(
             self.metadata.short_name, html

@@ -77,6 +77,9 @@ class License:
     def from_dict(d: Dict[str, Any]) -> "License":
         ...
 
+    def __bool__(self):
+        return bool(self.name or self.url)
+
 
 @pruned_json
 @dataclass_json
@@ -112,6 +115,17 @@ class VariableMeta:
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> "VariableMeta":
         ...
+
+    def _repr_html_(self):
+        # Render a nice display of the table metadata
+        record = self.to_dict()
+        return """
+             <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
+             <p style="font-variant: small-caps; font-family: sans-serif; font-size: 1.5em; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">variable meta</p>
+             {}
+        """.format(
+            getattr(self, "_name", None), to_html(record)
+        )
 
 
 @pruned_json
@@ -244,7 +258,7 @@ class TableMeta:
         short_name = record.pop("short_name")
         return """
              <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
-             <p style="font-variant: small-caps; font-family: sans-serif; font-size: 170%; color: grey; margin-top: -0.2em;">metadata</p>
+             <p style="font-variant: small-caps; font-family: sans-serif; font-size: 1.5em; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">table meta</p>
              {}
         """.format(
             short_name, to_html(record)
