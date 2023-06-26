@@ -115,7 +115,7 @@ def add_entity_code_and_name(engine: Engine, df: pd.DataFrame) -> pd.DataFrame:
     WHERE id in %(entity_ids)s
     """
     entities = pd.read_sql(q, engine, params={"entity_ids": list(df["entityId"].unique())})
-    return df.merge(entities, on="entityId")
+    return pd.DataFrame(df).merge(entities, on="entityId")
 
 
 def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
