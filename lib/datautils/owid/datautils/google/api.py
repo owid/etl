@@ -77,7 +77,7 @@ class GoogleApi:
 
     @classmethod
     def download_file(
-        self,
+        cls,
         output: str,
         url: Optional[str] = None,
         file_id: Optional[str] = None,

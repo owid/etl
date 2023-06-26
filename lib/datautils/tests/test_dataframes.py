@@ -8,9 +8,8 @@ from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
-from pytest import raises, warns
-
 from owid.datautils import dataframes
+from pytest import raises, warns
 
 
 class TestCompareDataFrames:
@@ -693,7 +692,7 @@ class TestGroupbyAggregate:
                 frac_allowed_nans=None,
             ),
             df2=df_out,
-        )
+        )  # type: ignore
 
     def test_categorical_agg(self):
         # Make sure grouped object only contains observed combinations of categories
@@ -748,7 +747,7 @@ class TestMultiMerge:
         assert dataframes.are_equal(
             df1=dataframes.multi_merge([df1, df2, df3], how="inner", on="col_01"),
             df2=df_out,
-        )
+        )  # type: ignore
 
     def test_outer_join_with_non_overlapping_dataframes(self):
         df1 = self.df1.copy()
