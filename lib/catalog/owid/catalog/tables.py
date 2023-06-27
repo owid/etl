@@ -20,7 +20,7 @@ from pandas._typing import FilePath, ReadCsvBuffer  # type: ignore
 from pandas.util._decorators import rewrite_axis_style_signature
 
 from . import variables
-from .meta import DatasetMeta, License, Source, TableMeta, VariableMeta
+from .meta import License, Source, TableMeta, VariableMeta
 
 log = structlog.get_logger()
 
@@ -766,9 +766,9 @@ def merge(left, right, how="inner", on=None, left_on=None, right_on=None, suffix
     # Update table metadata.
     tb.metadata.title = combine_tables_titles(tables=[left, right])
     tb.metadata.description = combine_tables_descriptions(tables=[left, right])
-    tb.metadata.dataset = DatasetMeta(
-        sources=get_unique_sources_from_table(table=tb), licenses=get_unique_licenses_from_table(table=tb)
-    )
+    # tb.metadata.dataset = DatasetMeta(
+    #     sources=get_unique_sources_from_table(table=tb), licenses=get_unique_licenses_from_table(table=tb)
+    # )
 
     return tb
 
@@ -796,9 +796,9 @@ def concat(
     # Update table metadata.
     table.metadata.title = combine_tables_titles(tables=objs)
     table.metadata.description = combine_tables_descriptions(tables=objs)
-    table.metadata.dataset = DatasetMeta(
-        sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
-    )
+    # table.metadata.dataset = DatasetMeta(
+    #     sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
+    # )
 
     return table
 
@@ -862,9 +862,9 @@ def melt(
     table.metadata.short_name = frame.metadata.short_name
     table.metadata.title = frame.metadata.title
     table.metadata.description = frame.metadata.description
-    table.metadata.dataset = DatasetMeta(
-        sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
-    )
+    # table.metadata.dataset = DatasetMeta(
+    #     sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
+    # )
 
     return table
 
@@ -944,9 +944,9 @@ def pivot(
     table.metadata.short_name = data.metadata.short_name
     table.metadata.title = data.metadata.title
     table.metadata.description = data.metadata.description
-    table.metadata.dataset = DatasetMeta(
-        sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
-    )
+    # table.metadata.dataset = DatasetMeta(
+    #     sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
+    # )
 
     return table
 
