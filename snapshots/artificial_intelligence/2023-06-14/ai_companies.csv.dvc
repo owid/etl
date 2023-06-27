@@ -1,0 +1,26 @@
+meta:
+  namespace: artificial_intelligence
+  short_name: ai_companies
+  name: Number of Newly Funded AI Companies in China, EU+UK and US (AI Index, 2023)
+  version: '2023-06-14'
+  publication_year: 2023
+  publication_date: '2023-03-20'
+  source_name: NetBase Quid (2022) via AI Index (2023)
+  source_published_by: NetBase Quid (2022) via the AI Index 2023 Annual Report,” AI
+    Index Steering Committee, Institute for Human-Centered AI, Stanford University,
+    Stanford, CA, April 2023
+  url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
+  source_data_url: https://drive.google.com/uc?export=download&id=1tYRyfFT1fK0v3-qacm2ORgbvvqsSYC4s
+  file_extension: csv
+  license_url: 
+    https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  license_name: Public domain
+  date_accessed: 2023-06-19
+  is_public: true
+  description: |
+    Data from NetBase Quid via AI Index (2023) on newly funded AI companies in China, EU+UK and US.
+wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
+outs:
+- md5: 0dccac8cb4d2251d9d73cc4874d28d96
+  size: 833
+  path: ai_companies.csv
