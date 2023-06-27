@@ -100,11 +100,13 @@ class Dataset:
         for col in list(table.columns) + list(table.index.names):
             utils.validate_underscore(col, "Variable's name")
 
-        # make an assert from this
+        # non-unique index might be causing problems down the line and is typically a mistake
         if not table.index.is_unique:
-            warnings.warn(
-                f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
-            )
+            # regions are the only exception where this is acceptable (though not ideal)
+            if "garden/regions/2023-01-01/regions" not in self.path:
+                warnings.warn(
+                    f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
+                )
 
         # check Float64 and Int64 columns for np.nan
         for col, dtype in table.dtypes.items():
