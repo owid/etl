@@ -268,7 +268,7 @@ def get_remote_checksum(s3: Any, bucket: str, path: str) -> Optional[str]:
 
 
 def connect_s3(s3_config: Optional[Config] = None, r2=False) -> Any:
-    # TODO: use https://github.com/owid/data-utils-py/blob/main/owid/datautils/io/s3.py
+    # TODO: use lib/datautils/owid/datautils/s3.py
     session = boto3.Session()
     if r2:
         assert config.R2_ACCESS_KEY, "R2_ACCESS_KEY not set in environment"
