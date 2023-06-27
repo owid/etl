@@ -68,7 +68,7 @@ GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
 
 # increment this to force a full rebuild of all datasets
-ETL_EPOCH = 1
+ETL_EPOCH = 2
 
 
 def enable_bugsnag() -> None:

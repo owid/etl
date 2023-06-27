@@ -8,7 +8,7 @@ import json
 from collections import defaultdict
 from os.path import dirname, join, splitext
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union, cast, overload
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union, cast, overload
 
 import pandas as pd
 import pyarrow
@@ -16,10 +16,11 @@ import pyarrow.parquet as pq
 import structlog
 import yaml
 from owid.repack import repack_frame
+from pandas._typing import FilePath, ReadCsvBuffer  # type: ignore
 from pandas.util._decorators import rewrite_axis_style_signature
 
 from . import variables
-from .meta import Source, TableMeta, VariableMeta
+from .meta import License, Source, TableMeta, VariableMeta
 
 log = structlog.get_logger()
 
@@ -102,6 +103,9 @@ class Table(pd.DataFrame):
         """
         Save this table in one of our SUPPORTED_FORMATS.
         """
+        # Add entry in the processing log about operation "save".
+        self = update_processing_logs_when_saving_table(table=self, path=path)
+
         if isinstance(path, Path):
             path = path.as_posix()
 
@@ -124,15 +128,25 @@ class Table(pd.DataFrame):
             path = path.as_posix()
 
         if path.endswith(".csv"):
-            return cls.read_csv(path)
+            table = cls.read_csv(path)
 
         elif path.endswith(".feather"):
-            return cls.read_feather(path)
+            table = cls.read_feather(path)
 
         elif path.endswith(".parquet"):
-            return cls.read_parquet(path)
+            table = cls.read_parquet(path)
+        else:
+            raise ValueError(f"could not detect a suitable format to read from: {path}")
 
-        raise ValueError(f"could not detect a suitable format to read from: {path}")
+        # If each variable does not have sources, load them from the dataset.
+        # TODO: I think this is not a good idea, consider removing.
+        # table = assign_dataset_sources_and_licenses_to_each_variable(table=table)
+
+        # Add processing log to the metadata of each variable in the table.
+        # TODO: For some reason, the snapshot loading entry gets repeated.
+        table = update_processing_logs_when_loading_or_creating_table(table=table)
+
+        return table
 
     # Mypy complaints about this not matching the defintiion of NDFrame.to_csv but I don't understand why
     def to_csv(self, path: Any, **kwargs: Any) -> None:  # type: ignore
@@ -340,12 +354,37 @@ class Table(pd.DataFrame):
                 # variable needs to be assigned name to make VariableMeta work
                 if not value.name:
                     value.name = key
+                if value.name == variables.UNNAMED_VARIABLE:
+                    # Update the variable name, if it had the unnamed variable tag.
+                    # Replace all instances of unnamed variables in the processing log by the actual name of the new
+                    # variable.
+                    # WARNING: This process assumes that all instances of unnamed variable tag correspond to the new
+                    #  variable.
+                    variables.update_variable_name(variable=value, name=key)
                 self._fields[key] = value.metadata
+                # TODO: The only reason why we have to check if variables.PROCESSING_LOG is true is the test
+                #   "test_field_access_can_be_typecast". Consider adapting the test and then remove this check.
+                if variables.PROCESSING_LOG and len(value.metadata.processing_log) > 0:
+                    # If a new variable is added to a table, check its last entry in the processing log.
+                    # If the last variable name is different to the name of the new column, add an entry to the log,
+                    # stating that the variable has changed name (from the old to the current one).
+                    last_variable_name = value.metadata.processing_log[-1]["variable"]
+                    if last_variable_name != key:
+                        value.update_log(
+                            parents=[last_variable_name], operation="rename", variable_name=key, inplace=True
+                        )
             else:
                 self._fields[key] = VariableMeta()
 
-    def equals_table(self, rhs: "Table") -> bool:
-        return isinstance(rhs, Table) and self.metadata == rhs.metadata and self.to_dict() == rhs.to_dict()
+    def equals_table(self, table: "Table") -> bool:
+        return (
+            isinstance(table, Table)
+            and self.metadata == table.metadata
+            # By simply doing self.to_dict() == table.to_dict() may return False if the dictionaries are identical but
+            # contain nans.
+            and self.fillna(123456).to_dict() == table.fillna(123456).to_dict()
+            and self._fields == table._fields
+        )
 
     @rewrite_axis_style_signature(
         "mapper",
@@ -361,12 +400,21 @@ class Table(pd.DataFrame):
             new_table = self
 
         # construct new _fields attribute
-        fields = {
-            new_col: self._fields[old_col] if inplace
-            # avoid deepcopy if inplace to make it faster
-            else copy.deepcopy(self._fields[old_col])
-            for old_col, new_col in zip(old_cols, new_table.all_columns)
-        }
+        fields = {}
+        for old_col, new_col in zip(old_cols, new_table.all_columns):
+            if inplace:
+                fields[new_col] = self._fields[old_col]
+            else:
+                fields[new_col] = copy.deepcopy(self._fields[old_col])
+
+            # Update processing log.
+            if old_col != new_col:
+                fields[new_col].processing_log = variables.add_entry_to_processing_log(
+                    processing_log=fields[new_col].processing_log,
+                    variable_name=new_col,
+                    parents=[old_col],
+                    operation="rename",
+                )
 
         new_table._fields = defaultdict(VariableMeta, fields)
 
@@ -540,3 +588,638 @@ class Table(pd.DataFrame):
         """.format(
             self.metadata.short_name, html
         )
+
+    def merge(self, right, *args, **kwargs) -> "Table":
+        return merge(left=self, right=right, *args, **kwargs)
+
+    def melt(
+        self,
+        id_vars: Optional[Union[Tuple[str], List[str], str]] = None,
+        value_vars: Optional[Union[Tuple[str], List[str], str]] = None,
+        var_name: str = "variable",
+        value_name: str = "value",
+        *args,
+        **kwargs,
+    ) -> "Table":
+        return melt(
+            frame=self,
+            id_vars=id_vars,
+            value_vars=value_vars,
+            var_name=var_name,
+            value_name=value_name,
+            *args,
+            **kwargs,
+        )
+
+    def pivot(
+        self,
+        *,
+        index: Optional[Union[str, List[str]]] = None,
+        columns: Optional[Union[str, List[str]]] = None,
+        values: Optional[Union[str, List[str]]] = None,
+        join_column_levels_with: Optional[str] = None,
+        **kwargs,
+    ) -> "Table":
+        return pivot(
+            data=self,
+            index=index,
+            columns=columns,
+            values=values,
+            join_column_levels_with=join_column_levels_with,
+            **kwargs,
+        )
+
+    def underscore(self, **kwargs) -> "Table":
+        from .utils import underscore_table
+
+        return underscore_table(self, inplace=False, **kwargs)
+
+    def dropna(self, *args, **kwargs) -> "Table":
+        tb = super().dropna(*args, **kwargs).copy()
+        for column in list(tb.all_columns):
+            tb._fields[column].processing_log = variables.add_entry_to_processing_log(
+                processing_log=tb._fields[column].processing_log,
+                variable_name=column,
+                parents=[column],
+                operation="dropna",
+            )
+
+        return cast("Table", tb)
+
+    def copy_metadata(
+        self, from_table: "Table", include_missing_variables: bool = False, inplace: bool = False
+    ) -> Optional["Table"]:
+        return copy_metadata(
+            to_table=self, from_table=from_table, include_missing_variables=include_missing_variables, inplace=inplace
+        )
+
+    def update_log(
+        self,
+        operation: str,
+        parents: Optional[List[Any]] = None,
+        variable_names: Optional[List[str]] = None,
+        comment: Optional[str] = None,
+        inplace: bool = False,
+    ) -> Optional["Table"]:
+        return update_log(
+            table=self,
+            operation=operation,
+            parents=parents,
+            variable_names=variable_names,
+            comment=comment,
+            inplace=inplace,
+        )
+
+    def amend_log(
+        self,
+        operation: str,
+        parents: Optional[List[Any]] = None,
+        variable_names: Optional[List[str]] = None,
+        comment: Optional[str] = None,
+        entry_num: Optional[int] = -1,
+        inplace: bool = False,
+    ) -> Optional["Table"]:
+        return amend_log(
+            table=self,
+            operation=operation,
+            parents=parents,
+            variable_names=variable_names,
+            comment=comment,
+            entry_num=entry_num,
+            inplace=inplace,
+        )
+
+    def sort_values(self, by: str, *args, **kwargs) -> "Table":
+        tb = super().sort_values(by=by, *args, **kwargs).copy()
+        for column in list(tb.all_columns):
+            tb._fields[column].processing_log = variables.add_entry_to_processing_log(
+                processing_log=tb._fields[column].processing_log, variable_name=column, parents=[by], operation="sort"
+            )
+
+        return cast("Table", tb)
+
+
+def merge(left, right, how="inner", on=None, left_on=None, right_on=None, suffixes=("_x", "_y"), **kwargs) -> Table:
+    if ("left_index" in kwargs) or ("right_index" in kwargs):
+        # TODO: Arguments left_index/right_index are not implemented.
+        raise NotImplementedError(
+            "Arguments 'left_index' and 'right_index' currently not implemented in function 'merge'."
+        )
+    # Create merged table.
+    tb = Table(
+        pd.merge(
+            left=left, right=right, how=how, on=on, left_on=left_on, right_on=right_on, suffixes=suffixes, **kwargs
+        )
+    )
+
+    # If arguments "on", "left_on", or "right_on" are given as strings, convert them to lists.
+    if isinstance(on, str):
+        on = [on]
+    if isinstance(left_on, str):
+        left_on = [left_on]
+    if isinstance(right_on, str):
+        right_on = [right_on]
+
+    if (on is None) and (left_on is None):
+        # By construction, either "on" is passed, or both "left_on" and "right_on".
+        # Any other possibility will raise a MergeError, and hence doesn't need to be considered.
+        # If none of them is not specified, assume we are joining on common columns.
+        on = list(set(left.all_columns) & set(right.all_columns))
+        left_on = []
+        right_on = []
+    elif left_on is not None:
+        # By construction, right_on must also be given.
+        on = []
+    else:
+        # Here, "on" is given, but not "left_on".
+        left_on = []
+        right_on = []
+
+    # Find columns that existed in both left and right tables whose name will be modified with suffixes.
+    overlapping_columns = ((set(left.all_columns) - set(left_on)) & (set(right.all_columns) - set(right_on))) - set(on)  # type: ignore
+
+    # Find columns that existed in both left and right tables that will preserve their names (since they are columns to join on).
+    common_columns = on or (set(left_on) & set(right_on))  # type: ignore
+
+    columns_from_left = set(left.all_columns) - set(common_columns)
+    columns_from_right = set(right.all_columns) - set(common_columns)
+
+    for column in columns_from_left:
+        if column in overlapping_columns:
+            new_column = f"{column}{suffixes[0]}"
+        else:
+            new_column = column
+        tb[new_column].metadata = variables.combine_variables_metadata([left[column]], operation="merge", name=column)
+
+    for column in columns_from_right:
+        if column in overlapping_columns:
+            new_column = f"{column}{suffixes[1]}"
+        else:
+            new_column = column
+        tb[new_column].metadata = variables.combine_variables_metadata([right[column]], operation="merge", name=column)
+
+    for column in common_columns:
+        tb[column].metadata = variables.combine_variables_metadata(
+            [left[column], right[column]], operation="merge", name=column
+        )
+
+    # Update table metadata.
+    tb.metadata.title = combine_tables_titles(tables=[left, right])
+    tb.metadata.description = combine_tables_descriptions(tables=[left, right])
+    # tb.metadata.dataset = DatasetMeta(
+    #     sources=get_unique_sources_from_table(table=tb), licenses=get_unique_licenses_from_table(table=tb)
+    # )
+
+    return tb
+
+
+def concat(
+    objs: List[Table], *, axis: Union[int, str] = 0, join: str = "outer", ignore_index: bool = False, **kwargs
+) -> Table:
+    # TODO: Add more logic to this function to handle indexes and possibly other arguments.
+    table = Table(pd.concat(objs=objs, axis=axis, join=join, ignore_index=ignore_index, **kwargs))  # type: ignore
+
+    if (axis == 1) or (axis == "columns"):
+        # Original function pd.concat allows returning a dataframe with multiple columns with the same name.
+        # But this should not be allowed (and metadata cannot be stored for different variables if they have the same name).
+        repeated_columns = table.columns[table.columns.duplicated()].tolist()
+        if len(repeated_columns) > 0:
+            raise KeyError(f"Concatenated table contains repeated columns: {repeated_columns}")
+    # Add to each column either the metadata of the original variable (if the variable appeared only in one of the input
+    # tables) or the combination of the metadata from different tables (if the variable appeared in various tables).
+    for column in table.all_columns:
+        variables_to_combine = [table_i[column] for table_i in objs if column in table_i.all_columns]
+        table._fields[column] = variables.combine_variables_metadata(
+            variables=variables_to_combine, operation="concat", name=column
+        )
+
+    # Update table metadata.
+    table.metadata.title = combine_tables_titles(tables=objs)
+    table.metadata.description = combine_tables_descriptions(tables=objs)
+    # table.metadata.dataset = DatasetMeta(
+    #     sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
+    # )
+
+    return table
+
+
+def melt(
+    frame: Table,
+    id_vars: Optional[Union[Tuple[str], List[str], str]] = None,
+    value_vars: Optional[Union[Tuple[str], List[str], str]] = None,
+    var_name: str = "variable",
+    value_name: str = "value",
+    *args,
+    **kwargs,
+) -> Table:
+    # TODO: We may need to implement some mor logic here to handle multi-index dataframes.
+    # Get the new melt table.
+    table = Table(
+        pd.melt(
+            frame=frame,
+            id_vars=id_vars,
+            value_vars=value_vars,
+            var_name=var_name,
+            value_name=value_name,
+            *args,
+            **kwargs,
+        )
+    )
+
+    # Get the list of column names used as id variables.
+    if id_vars is None:
+        id_vars_list = []
+    elif isinstance(id_vars, str):
+        id_vars_list: List[str] = [id_vars]
+    else:
+        id_vars_list = id_vars  # type: ignore
+
+    # Get the list of column names used as id and value variables.
+    if value_vars is None:
+        value_vars_list = [column for column in frame.columns if column not in id_vars_list]
+    elif isinstance(value_vars, str):
+        value_vars_list = [value_vars]
+    else:
+        value_vars_list = value_vars  # type: ignore
+
+    # Combine metadata of value variables and assign the combination to the new "value" column.
+    table[value_name].metadata = variables.combine_variables_metadata(
+        variables=[frame[var] for var in value_vars_list], operation="melt", name=value_name
+    )
+
+    # Assign that combined metadata also to the new "variable" column.
+    table[var_name].metadata = variables.combine_variables_metadata(
+        variables=[frame[var] for var in value_vars_list], operation="melt", name=var_name
+    )
+
+    for variable in id_vars_list:
+        # Combine metadata of id variables and assign the combination to the new "id" variable.
+        table[variable].metadata = variables.combine_variables_metadata(
+            variables=[frame[variable]], operation="melt", name=variable
+        )
+
+    # Update table metadata.
+    table.metadata.short_name = frame.metadata.short_name
+    table.metadata.title = frame.metadata.title
+    table.metadata.description = frame.metadata.description
+    # table.metadata.dataset = DatasetMeta(
+    #     sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
+    # )
+
+    return table
+
+
+def _flatten_multiindex_column_names(table: Table, join_column_levels_with: str) -> List[str]:
+    new_columns = []
+    for column in table.columns:
+        if isinstance(column, tuple):
+            levels = [str(level) for level in column if len(str(level)) > 0]
+            new_column = join_column_levels_with.join(levels)
+        else:
+            new_column = column
+        new_columns.append(new_column)
+
+    return new_columns
+
+
+def pivot(
+    data: Table,
+    *,
+    index: Optional[Union[str, List[str]]] = None,
+    columns: Optional[Union[str, List[str]]] = None,
+    values: Optional[Union[str, List[str]]] = None,
+    join_column_levels_with: Optional[str] = None,
+    **kwargs,
+) -> Table:
+    # Get the new pivot table.
+    table = Table(
+        pd.pivot(
+            data=data,
+            index=index,
+            columns=columns,
+            values=values,
+            **kwargs,
+        )
+    )
+
+    # Update variable metadata in the new table.
+    for column in table.columns:
+        if isinstance(values, str):
+            column_name = values
+        else:
+            column_name = column[0]
+        variables_to_combine = [data[column_name]]
+        # "column" is a tuple with all column index levels.
+        # For now, I assume the only metadata we want to propagate is the one of the upper level.
+        # Alternatively, we could combine the metadata of the upper level variable with the metadata of the original
+        # variable of all subsequent levels.
+        column_metadata = variables.combine_variables_metadata(
+            variables=variables_to_combine, operation="pivot", name=column_name
+        )
+        # Assign metadata of the original variable in the upper level to the new multiindex column.
+        # NOTE: This allows accessing the metadata via, e.g. `table[("level_0", "level_1", "level_2")].metadata`,
+        # but not via, e.g. `table["level_0"]["level_1"]["level_2"].metadata`.
+        # There may be a way to allow for both.
+        table[column].metadata = column_metadata
+
+    # Transfer also the metadata of the index columns.
+    # Note: This metadata will only be accessible if columns are reset and flattened to one level.
+    for index_column in list(table.index.names):
+        table._fields[index_column] = data._fields[index_column]
+
+    if join_column_levels_with is not None:
+        # Gather metadata of index columns.
+        index_metadata = [table._fields[index_column] for index_column in table.index.names]
+        # Gather metadata of each multiindex column.
+        columns_metadata = [table[column].metadata for column in table.columns]
+        # Reset index (which can create multi-index columns).
+        table = table.reset_index()
+        # Join column levels with a certain string, e.g. ("level_0", "level_1", "level_2") -> "level_0-level_1-level_2".
+        table.columns = _flatten_multiindex_column_names(table, join_column_levels_with=join_column_levels_with)
+        # Assign the gathered metadata for indexes and columns to the corresponding new columns.
+        for i, column in enumerate(table.columns):
+            table[column].metadata = (index_metadata + columns_metadata)[i]
+
+    # Update table metadata.
+    table.metadata.short_name = data.metadata.short_name
+    table.metadata.title = data.metadata.title
+    table.metadata.description = data.metadata.description
+    # table.metadata.dataset = DatasetMeta(
+    #     sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
+    # )
+
+    return table
+
+
+def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[TableMeta]) -> Table:
+    if metadata is not None:
+        table.metadata = metadata
+        for column in list(table.all_columns):
+            table._fields[column].sources = metadata.dataset.sources  # type: ignore
+            table._fields[column].licenses = metadata.dataset.licenses  # type: ignore
+    table = update_processing_logs_when_loading_or_creating_table(table=table)
+
+    return table
+
+
+def read_csv(
+    filepath_or_buffer: Union[FilePath, ReadCsvBuffer[bytes], ReadCsvBuffer[str]],
+    metadata: Optional[TableMeta] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    return table
+
+
+def read_excel(*args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs) -> Table:
+    table = Table(pd.read_excel(*args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    return table
+
+
+def update_processing_logs_when_loading_or_creating_table(table: Table) -> Table:
+    # Add entry to processing log, specifying that each variable was loaded from this table.
+    try:
+        # If the table comes from an ETL dataset, generate a URI for the table.
+        table_uri = f"{table.metadata.dataset.uri}/{table.metadata.short_name}"  # type: ignore
+        parents = [table_uri]
+        operation = "load"
+    except (AssertionError, AttributeError):
+        # The table doesn't have an uri, which means it was probably created from scratch.
+        parents = []
+        operation = "create"
+
+    table = _add_processing_log_entry_to_each_variable(table=table, parents=parents, operation=operation)
+
+    return table
+
+
+def update_processing_logs_when_saving_table(table: Table, path: Union[str, Path]) -> Table:
+    # Infer the ETL uri from the path where the table will be saved.
+    # Note: If the path does not fit the expected format, the result will be an arbitrary path, but it will not raise an
+    # error, as long as path is a Path.
+    path = Path(path)
+    uri = "/".join(path.absolute().parts[-5:-1] + tuple([path.stem]))
+    table = _add_processing_log_entry_to_each_variable(table=table, parents=[uri], operation="save")
+
+    return table
+
+
+def _add_processing_log_entry_to_each_variable(
+    table: Table, parents: List[Any], operation: variables.OPERATION
+) -> Table:
+    # Add a processing log entry to each column, including index columns.
+    for column in list(table.all_columns):
+        # New entry to add to the processing log.
+        # Note: The function add_entry_to_processing_log receives the argument variable_name, but in the processing log,
+        # the entry has the field "variable" (for simplicity).
+        log_new_entry = {"variable_name": column, "parents": parents, "operation": operation}
+
+        if log_new_entry not in table._fields[column].processing_log:
+            # If the processing log is not empty but the last entry is identical to the one we want to insert, skip, to
+            # avoid storing the same entry multiple times.
+            # This happens for example when saving tables, given that tables are stored in different formats.
+            # Otherwise, append a new entry to the processing log.
+            table._fields[column].processing_log = variables.add_entry_to_processing_log(
+                processing_log=table._fields[column].processing_log, **log_new_entry
+            )
+
+    return table
+
+
+def assign_dataset_sources_and_licenses_to_each_variable(table: Table) -> Table:
+    # Get sources and licenses from the table dataset.
+    sources = []
+    licenses = []
+    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
+        sources = table.metadata.dataset.sources  # type: ignore
+    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
+        licenses = table.metadata.dataset.licenses  # type: ignore
+
+    if len(sources) == len(licenses) == 0:
+        # There are no default sources/licenses to assign to each variable.
+        return table
+
+    # If a variable does not have sources/licenses defined, assign the ones from the dataset.
+    # Do this for all columns, including index columns.
+    for column in list(table.all_columns):
+        if len(table._fields[column].sources) == 0:
+            table._fields[column].sources = sources
+        if len(table._fields[column].licenses) == 0:
+            table._fields[column].licenses = licenses
+
+    return table
+
+
+@overload
+def copy_metadata(
+    from_table: Table, to_table: Table, include_missing_variables: bool = False, inplace: bool = False
+) -> Table:
+    ...
+
+
+@overload
+def copy_metadata(
+    from_table: Table, to_table: Table, include_missing_variables: bool = False, inplace: bool = True
+) -> None:
+    ...
+
+
+def copy_metadata(
+    from_table: Table, to_table: Table, include_missing_variables: bool = False, inplace: bool = False
+) -> Optional[Table]:
+    if not inplace:
+        to_table = to_table.copy()
+
+    # Copy the table metadata.
+    to_table.metadata = copy.deepcopy(from_table.metadata)
+
+    if include_missing_variables:
+        # Copy metadata from all variables (in case you may need them later).
+        to_table._fields = copy.deepcopy(from_table._fields)
+    else:
+        # Find variables in the destination table that had metadata in the reference table.
+        existing_variables = set(to_table.all_columns) & set(from_table._fields.keys())
+        # Copy the metadata of those variables from the reference table to the destination table.
+        to_table._fields = copy.deepcopy(
+            defaultdict(VariableMeta, {variable: from_table._fields[variable] for variable in existing_variables})
+        )
+
+    if not inplace:
+        return to_table
+
+
+@overload
+def update_log(
+    table: Table,
+    operation: str,
+    parents: Optional[List[Any]] = None,
+    variable_names: Optional[List[str]] = None,
+    comment: Optional[str] = None,
+    inplace: bool = True,
+) -> None:
+    ...
+
+
+@overload
+def update_log(
+    table: Table,
+    operation: str,
+    parents: Optional[List[Any]] = None,
+    variable_names: Optional[List[str]] = None,
+    comment: Optional[str] = None,
+    inplace: bool = False,
+) -> Table:
+    ...
+
+
+def update_log(
+    table: Table,
+    operation: str,
+    parents: Optional[List[Any]] = None,
+    variable_names: Optional[List[str]] = None,
+    comment: Optional[str] = None,
+    inplace: bool = False,
+) -> Optional[Table]:
+    if not inplace:
+        table = table.copy()
+
+    # Append a new entry to the processing log of the required variables.
+    if variable_names is None:
+        # If no variable is specified, assume all (including index columns).
+        variable_names = list(table.all_columns)
+    for column in variable_names:
+        # If parents is not defined, assume the parents are simply the current variable.
+        _parents = parents or [column]
+        # Update (in place) the processing log of current variable.
+        table._fields[column].processing_log = variables.add_entry_to_processing_log(
+            processing_log=table._fields[column].processing_log,
+            variable_name=column,
+            parents=_parents,
+            operation=operation,
+            comment=comment,
+        )
+
+    if not inplace:
+        return table
+
+
+def amend_log(
+    table: Table,
+    operation: str,
+    parents: Optional[List[Any]] = None,
+    variable_names: Optional[List[str]] = None,
+    comment: Optional[str] = None,
+    entry_num: Optional[int] = -1,
+    inplace: bool = False,
+) -> Optional[Table]:
+    if not inplace:
+        table = table.copy()
+
+    # Append a new entry to the processing log of the required variables.
+    if variable_names is None:
+        # If no variable is specified, assume all (including index columns).
+        variable_names = list(table.all_columns)
+    for column in variable_names:
+        # If parents is not defined, assume the parents are simply the current variable.
+        _parents = parents or [column]
+        # Update (in place) the processing log of current variable.
+        table._fields[column].processing_log = variables.amend_entry_in_processing_log(
+            processing_log=table._fields[column].processing_log,
+            variable_name=column,
+            parents=_parents,
+            operation=operation,
+            comment=comment,
+            entry_num=entry_num,
+        )
+
+    if not inplace:
+        return table
+
+
+def get_unique_sources_from_table(table: Table) -> List[Source]:
+    # Make a list of all sources of all variables in table.
+    sources = sum([table._fields[column].sources for column in list(table.all_columns)], [])
+
+    # Get unique array of tuples of source fields (respecting the order).
+    unique_sources_array = pd.unique([tuple(source.to_dict().items()) for source in sources])
+
+    # Make a list of unique sources.
+    unique_sources = [Source.from_dict(dict(source)) for source in unique_sources_array]  # type: ignore
+
+    return unique_sources
+
+
+def get_unique_licenses_from_table(table: Table) -> List[License]:
+    # Make a list of all licenses of all variables in table.
+    licenses = sum([table._fields[column].licenses for column in list(table.all_columns)], [])
+
+    # Get unique array of tuples of license fields (respecting the order).
+    unique_licenses_array = pd.unique([tuple(license.to_dict().items()) for license in licenses])
+
+    # Make a list of unique licenses.
+    unique_licenses = [License.from_dict(dict(license)) for license in unique_licenses_array]  # type: ignore
+
+    return unique_licenses
+
+
+def _combine_tables_titles_and_descriptions(tables: List[Table], title_or_description: str) -> Optional[str]:
+    # Keep the title only if all tables have exactly the same title.
+    # Otherwise we assume that the table has a different meaning, and its title should be manually handled.
+    title_or_description_combined = None
+    titles_or_descriptions = pd.unique([getattr(table.metadata, title_or_description) for table in tables])
+    if len(titles_or_descriptions) == 1:
+        title_or_description_combined = titles_or_descriptions[0]
+
+    return title_or_description_combined
+
+
+def combine_tables_titles(tables: List[Table]) -> Optional[str]:
+    return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="title")
+
+
+def combine_tables_descriptions(tables: List[Table]) -> Optional[str]:
+    return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="description")

@@ -200,11 +200,15 @@ def convert_units(table: catalog.Table) -> catalog.Table:
     # Check units and convert to more convenient ones.
     for column in table.columns:
         unit = table[column].metadata.unit
+        short_unit = table[column].metadata.short_unit
+        title = table[column].metadata.title
+        description = table[column].metadata.description
         if unit in list(UNITS):
             table[column] *= UNITS[unit]["conversion"]
-            table[column].metadata.description = table[column].metadata.description.replace(
-                unit, UNITS[unit]["new_unit"]
-            )
+            table[column].metadata.unit = unit
+            table[column].metadata.short_unit = short_unit
+            table[column].metadata.title = title
+            table[column].metadata.description = description.replace(unit, UNITS[unit]["new_unit"])
 
     return table
 

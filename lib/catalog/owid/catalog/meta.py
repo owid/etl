@@ -108,6 +108,7 @@ class VariableMeta:
     short_unit: Optional[str] = None
     display: Optional[Dict[str, Any]] = None
     additional_info: Optional[Dict[str, Any]] = None
+    processing_log: List[Dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         ...
