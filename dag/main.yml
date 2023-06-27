@@ -522,33 +522,6 @@ steps:
   data://garden/oecd/2023-06-20/ppp_exchange_rates:
   - data://meadow/oecd/2023-06-20/ppp_exchange_rates
 
-  # Artificial Intelligence Conference Attendance
-  data://meadow/artificial_intelligence/2023-06-14/ai_conferences_total:
-  - snapshot://artificial_intelligence/2023-06-14/ai_conferences_total.csv
-  data://meadow/artificial_intelligence/2023-06-14/ai_small_conferences:
-  - snapshot://artificial_intelligence/2023-06-14/ai_small_conferences.csv
-  data://meadow/artificial_intelligence/2023-06-14/ai_large_conferences:
-  - snapshot://artificial_intelligence/2023-06-14/ai_large_conferences.csv
-  data://garden/artificial_intelligence/2023-06-14/ai_all_conferences:
-  - data://meadow/artificial_intelligence/2023-06-14/ai_conferences_total
-  - data://meadow/artificial_intelligence/2023-06-14/ai_small_conferences
-  - data://meadow/artificial_intelligence/2023-06-14/ai_large_conferences
-  data://grapher/artificial_intelligence/2023-06-14/ai_all_conferences:
-  -  data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
-
-  # Artificial Intelligence Image Net Accuracy
-  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet_top1:
-  - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet_top1.html
-  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet_top5:
-  - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet_top5.html
-  data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet_top5:
-  - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet_top5
-  data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet_top1:
-  - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet_top1
-  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_imagenet_top5:
-  - data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet_top5
-  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_imagenet_top1:
-  - data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet_top1
 
 # Sub-dags to import
 include:
