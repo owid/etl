@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 
 import requests
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.ssl_ import create_urllib3_context
+from requests.packages.urllib3.util.ssl_ import create_urllib3_context  # type: ignore
 
 
 def get_base_url(url: str, include_scheme: bool = True) -> str:
@@ -102,5 +102,5 @@ def download_file_from_url(
 
     # Save the requested data into a local file.
     with open(local_path, "wb") as output_file:
-        for chunk in response.iter_content(chunk_size=chunk_size):
+        for chunk in response.iter_content(chunk_size=chunk_size):  # type: ignore
             output_file.write(chunk)

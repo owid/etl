@@ -1,0 +1,52 @@
+dataset:
+  title: AI Effects on Job Market (YouGov Survey, 2023)
+  description: Survey conducted on 2000 U.S. adults between March 9 - 16, 2023 on
+    what people think the effects of AI will be on job markets.
+  licenses:
+  - name: Public domain
+  sources:
+  - name: YouGov (2023)
+    description: Survey conducted on 2000 U.S. adults between March 9 - 16, 2023 on
+      what people think the effects of AI will be on job markets.
+    url: https://docs.cdn.yougov.com/0jv1wfqlmo/results_AI%20Effects%20on%20Job%20Market.pdf
+    source_data_url: https://docs.cdn.yougov.com/0jv1wfqlmo/results_AI%20Effects%20on%20Job%20Market.pdf
+    date_accessed: '2023-06-08'
+    publication_date: '2023-03-16'
+    publication_year: 2023
+    published_by: AI Effects on Job Market (YouGov Survey, 2023)
+tables:
+  yougov_jobs:
+    variables:
+      ai__will_increase_or_decrease_the_number_of_jobs_available:
+        title: Do you think that advances in artificial intelligence (AI) will increase
+          or decrease the number of jobs available in the U.S. for the following people?
+        unit: ''
+      increase:
+        title: Increase
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      have_no_effect:
+        title: Have no effect
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      decrease:
+        title: Decrease
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      not_sure:
+        title: Not sure
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      do_you_believe_it_will_increase_or_decrease_each_of_the_following:
+        title: Thinking about the effects artificial intelligence (AI) will have on
+          businesses and their employees, do you believe it will increase or decrease
+          each of the following. . . ?
+        unit: ''

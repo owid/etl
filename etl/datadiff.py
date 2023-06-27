@@ -13,6 +13,8 @@ import structlog
 from owid.catalog import Dataset, DatasetMeta, LocalCatalog, RemoteCatalog, Table, find
 from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
+from rich.panel import Panel
+from rich.syntax import Syntax
 
 from etl.files import yaml_dump
 from etl.tempcompare import series_equals
@@ -34,10 +36,12 @@ class DatasetDiff:
         verbose: bool = False,
         cols: Optional[str] = None,
         print: Callable = rich.print,
+        snippet: bool = False,
     ):
         """
         :param cols: Only compare columns matching pattern
         :param print: Function to print the diff summary. Defaults to rich.print.
+        :param snippet: Print snippet for loading both tables
         """
         assert ds_a or ds_b, "At least one Dataset must be provided"
         self.ds_a = ds_a
@@ -45,6 +49,7 @@ class DatasetDiff:
         self.p = print
         self.verbose = verbose
         self.cols = cols
+        self.snippet = snippet
 
     def _diff_datasets(self, ds_a: Optional[Dataset], ds_b: Optional[Dataset]):
         if ds_a and ds_b:
@@ -70,7 +75,31 @@ class DatasetDiff:
                 for col in ds_b[table_name].columns:
                     self.p(f"\t\t[green]+ Column [b]{col}[/b]")
 
+    def _snippet(self, ds_a: Dataset, ds_b: Dataset, table_name: str) -> Panel:
+        """Print code for loading both tables."""
+
+        def _snippet_dataset(ds: Dataset, table_name: str) -> str:
+            m = ds.metadata
+            if isinstance(ds, RemoteDataset):
+                return f'RemoteCatalog(channels=["{m.channel}"]).find_one(table="{table_name}", dataset="{m.short_name}", version="{m.version}", namespace="{m.namespace}", channel="{m.channel}")'
+            else:
+                return f'Dataset(DATA_DIR / "{m.uri}")["{table_name}"]'
+
+        code = f"""
+from owid.catalog import RemoteCatalog, Dataset
+from etl.paths import DATA_DIR
+
+ta = {_snippet_dataset(ds_a, table_name)}
+tb = {_snippet_dataset(ds_b, table_name)}
+""".strip()
+
+        syntax = Syntax(code, "python", theme="monokai")
+        return Panel(syntax, title="Python Code", border_style="blue")
+
     def _diff_tables(self, ds_a: Dataset, ds_b: Dataset, table_name: str):
+        if self.snippet:
+            self.p(self._snippet(ds_a, ds_b, table_name))
+
         if table_name not in ds_b.table_names:
             self.p(f"\t[red]- Table [b]{table_name}[/b]")
             for col in ds_a[table_name].columns:
@@ -231,6 +260,11 @@ class RemoteDataset:
     is_flag=True,
     help="Print detailed differences",
 )
+@click.option(
+    "--snippet",
+    is_flag=True,
+    help="Print code snippet for loading both tables, useful for debugging in notebook",
+)
 def cli(
     path_a: str,
     path_b: str,
@@ -239,6 +273,7 @@ def cli(
     cols: Optional[str],
     exclude: Optional[str],
     verbose: bool,
+    snippet: bool,
 ) -> None:
     """Compare all datasets from two catalogs (`a` and `b`) and print out summary of their differences. This is
     different from `compare` tool which compares two specific datasets and prints out more detailed output. This
@@ -282,7 +317,7 @@ def cli(
             console.print(x)
 
         try:
-            differ = DatasetDiff(ds_a, ds_b, cols=cols, print=_append_and_print, verbose=verbose)
+            differ = DatasetDiff(ds_a, ds_b, cols=cols, print=_append_and_print, verbose=verbose, snippet=snippet)
             differ.summary()
         except DatasetError as e:
             # soft fail and continue with another dataset
@@ -294,7 +329,7 @@ def cli(
             any_error = True
             continue
 
-        if any("~" in line for line in lines):
+        if any("~" in line for line in lines if isinstance(line, str)):
             any_diff = True
 
     console.print()
@@ -312,7 +347,7 @@ def cli(
         "[b]Legend[/b]: [green]+New[/green]  [yellow]~Modified[/yellow]  [red]-Removed[/red]  [white]=Identical[/white]  [violet]Details[/violet]"
     )
     console.print(
-        "[b]Hint[/b]: Run this locally with [cyan][b]etl-datadiff REMOTE data/ --include yourdataset --verbose[/b][/cyan]"
+        "[b]Hint[/b]: Run this locally with [cyan][b]etl-datadiff REMOTE data/ --include yourdataset --verbose --snippet[/b][/cyan]"
     )
     console.print(
         "[b]Hint[/b]: Get detailed comparison with [cyan][b]compare --show-values channel namespace version short_name --values[/b][/cyan]"
@@ -370,7 +405,7 @@ def _data_diff(
             lines.append(f"- {dim}: {detail}")
 
     # changes in values
-    if table_a[col].dtype in ("category", "object") or _is_datetime(table_a[col].dtype):
+    if table_a[col].dtype in ("category", "object", "string") or _is_datetime(table_a[col].dtype):
         vals_a = set(table_a.loc[~eq, col].dropna())
         vals_b = set(table_b.loc[~eq, col].dropna())
         if vals_a - vals_b:

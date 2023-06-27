@@ -119,7 +119,12 @@ class Variable(pd.Series):
 
     @property
     def metadata(self) -> VariableMeta:
-        return self._fields[self.checked_name]
+        vm = self._fields[self.checked_name]
+
+        # pass this as a hidden attribute to the metadata object for display only
+        vm._name = self.name  # type: ignore
+
+        return vm
 
     @metadata.setter
     def metadata(self, meta: VariableMeta) -> None:
@@ -130,6 +135,16 @@ class Variable(pd.Series):
         v = super().astype(*args, **kwargs)
         v.name = self.name
         return cast(Variable, v)
+
+    def _repr_html_(self):
+        html = str(self)
+        return """
+             <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
+             <p style="font-variant: small-caps; font-size: 1.5em; font-family: sans-serif; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">variable</p>
+             <pre>{}</pre>
+        """.format(
+            self.name, html
+        )
 
     def __add__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
         variable_name = self.name or UNNAMED_VARIABLE
