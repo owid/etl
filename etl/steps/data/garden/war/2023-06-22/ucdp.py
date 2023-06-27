@@ -45,13 +45,14 @@ def run(dest_dir: str) -> None:
     # Get number of ongoing conflicts, and deaths in ongoing conflicts
     log.info("ucdp: get number of ongoing conflicts and deaths in ongoing conflicts")
     columns_idx = ["year", "region", "conflict_type"]
-    df_ongoing = df.groupby(columns_idx)[["best"]].agg(["sum", "count"]).reset_index()
+    df_ongoing = df.groupby(columns_idx).agg({"best": "sum", "conflict_new_id": "nunique"}).reset_index()
     df_ongoing.columns = columns_idx + ["number_deaths_ongoing_conflicts", "number_ongoing_conflicts"]
 
     # Get number of new conflicts every year
     log.info("ucdp: get number of new conflicts every year")
     columns_idx = ["year_start", "region", "conflict_type"]
-    df_new = df.groupby(columns_idx).size().reset_index(name="number_new_conflicts")
+    df_new = df.groupby(columns_idx)[["conflict_new_id"]].nunique().reset_index()
+    df_new.columns = columns_idx + ["number_new_conflicts"]
 
     # Combine and build single table
     log.info("ucdp: combine and build single table")
