@@ -479,7 +479,7 @@ steps:
   - snapshot://papers/2023-06-07/commodity_prices.xlsx
 
 # AI polls
-# Monmoth University Poll
+# Monmouth University Poll
   data://meadow/artificial_intelligence/2023-06-07/monmouth_poll:
   - snapshot://artificial_intelligence/2023-06-07/monmouth_poll.pdf
   data://garden/artificial_intelligence/2023-06-07/monmouth_poll:

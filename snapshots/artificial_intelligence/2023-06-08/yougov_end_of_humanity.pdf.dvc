@@ -8,7 +8,7 @@ meta:
   source_name: YouGov
   source_published_by: YouGov
   url:
-    https://today.yougov.com/topics/technology/articles-reports/2023/04/14/ai-nuclear-weapons-world-war-humanity-poll?utm_source=80,000%20Hours%20mailing%20list&utm_campaign=3bb3a9cbc0-EMAIL_CAMPAIGN_2023_05_25_07_19&utm_medium=email&utm_term=0_43bc1ae55c-fcdb5a40fb-%5BLIST_EMAIL_ID%5D
+    https://today.yougov.com/topics/technology/articles-reports/2023/04/14/ai-nuclear-weapons-world-war-humanity-poll
   source_data_url:
     https://docs.cdn.yougov.com/bfoyxp7p28/results_AI%20and%20the%20End%20of%20Humanity.pdf
   file_extension: pdf

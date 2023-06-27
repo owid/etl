@@ -233,8 +233,8 @@ def question3_df(snap: Snapshot, column_names: list, question: str) -> pd.DataFr
         "Somewhat concerned",
         "Not very concerned",
         "Not at all concerned",
-        "Not Sure",
-        "Considers Impossible",
+        "Not sure",
+        "Considers impossible",
     ]
     question3 = question3[14:33]
 
@@ -291,8 +291,8 @@ def question3_split_by_age(snap: Snapshot, risks: list) -> pd.DataFrame:
             "Somewhat concerned",
             "Not very concerned",
             "Not at all concerned",
-            "Not Sure",
-            "Considers Impossible",
+            "Not sure",
+            "Considers impossible",
         ]
         df_age_only.reset_index(inplace=True, drop=True)
         df_age.append(df_age_only)
