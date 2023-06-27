@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import cast
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -66,7 +68,7 @@ def run(dest_dir: str) -> None:
     # Set index, check that it's unique and reset index
     assert not merged_df_concat[["country", "year"]].duplicated().any(), "Index is not well constructed"
 
-    # Aggregate data by region
+    # Aggregate data by region (decided not to do for now)
     # Africa, Oceania, and income level categories
     # regions_ = ["North America",
     #     "South America",
@@ -134,13 +136,8 @@ def run(dest_dir: str) -> None:
         "in_to_ar_to_ar",
         "in_to_ar_ov_vi_to",
         "in_to_ar_sa_da_vi_ex",
-        "em_ac_se_fo_vi_ho_an_si_es",
         "em_fo_an_be_se_ac",
-        "em_ot_ac_se",
-        "em_ot_to_in",
-        "em_pa_tr",
         "em_to",
-        "em_tr_ag_an_ot_re_se_ac",
     ]
 
     for col in columns_to_transform:
@@ -156,26 +153,14 @@ def run(dest_dir: str) -> None:
         merged_df_concat_transf["in_to_ar_ov_vi_to"] / merged_df_concat_transf["ou_to_de_ov_vi_to"]
     )
 
-    # Calculate the Inbound/Outbound Ratio (total) column
-    merged_df_concat_transf["inb_outb_tot"] = (
-        merged_df_concat_transf["in_to_ar_to_ar"] / merged_df_concat_transf["ou_to_de_to_de"]
-    )
     # Calculate same-day by tourist trips ratio
     merged_df_concat_transf["same_tourist_ratio"] = (
         merged_df_concat_transf["in_to_ar_sa_da_vi_ex"] / merged_df_concat_transf["in_to_ar_ov_vi_to"]
     )
 
-    merged_df_concat_transf["outbound_exp_per_tourist"] = (
-        merged_df_concat_transf["ou_to_ex_tr"] * 1e6
-    ) / merged_df_concat_transf["ou_to_de_ov_vi_to"]
-
-    merged_df_concat_transf["inb_exp_per_tourist"] = (
-        merged_df_concat_transf["in_to_ex_tr"] * 1e6
-    ) / merged_df_concat_transf["in_to_ar_ov_vi_to"]
-
-    merged_df_concat_transf["ou_to_ex_tr_per_capita"] = (
-        merged_df_concat_transf["ou_to_ex_tr"] * 1e6
-    ) / merged_df_concat_transf["population"]
+    # Convert US million to number
+    merged_df_concat_transf["ou_to_ex_tr"] = merged_df_concat_transf["ou_to_ex_tr"] * 1e6
+    merged_df_concat_transf["in_to_ex_tr"] = merged_df_concat_transf["in_to_ex_tr"] * 1e6
 
     merged_df_concat_transf.reset_index(inplace=True)  # reset index
 
@@ -220,18 +205,14 @@ def run(dest_dir: str) -> None:
         "to_in_av_ca_be_pl_pe_10_in",
         "to_in_oc_ra_ro",
         "population",
-        "em_ac_se_fo_vi_ho_an_si_es_per_1000",
-        "em_ot_ac_se_per_1000",
-        "em_ot_to_in_per_1000",
-        "em_pa_tr_per_1000",
-        "em_tr_ag_an_ot_re_se_ac_per_1000",
-        "inb_outb_tot",
     ]
-
     merged_df_concat_transf = merged_df_concat_transf.drop(columns_to_exclude, axis=1)
 
+    df_inflation_adjusted = add_ppp_and_cpi(merged_df_concat_transf)
+    df_final = pd.merge(merged_df_concat_transf, df_inflation_adjusted, on=["country", "year"], how="outer")
+
     # Create a new table with the processed data.
-    tb_garden = Table(merged_df_concat_transf, short_name="unwto")
+    tb_garden = Table(df_final, short_name="unwto")
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -241,6 +222,67 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("unwto.end")
+
+
+def add_ppp_and_cpi(df_tourism):
+    # Load WDI CPI for adjusting inflation
+    ds_wdi = cast(Dataset, paths.load_dependency("wdi"))
+    tb_wdi = ds_wdi["wdi"]
+
+    df_wdi_cpi = tb_wdi[["fp_cpi_totl"]]
+    df_wdi_cpi.reset_index(inplace=True)
+
+    # Load OECD exchange rates
+    ds_oecd = cast(Dataset, paths.load_dependency("ppp_exchange_rates"))
+    tb_oecd = ds_oecd["ppp_exchange_rates"]
+
+    # Extract tourism expenditure
+    inboud_exp = df_tourism[["country", "year", "in_to_ex_tr", "ou_to_ex_tr"]]
+
+    # Merge expenditure, inflation and exchange rates
+    merg_inbound_exp = pd.merge(inboud_exp, df_wdi_cpi, on=["country", "year"], how="inner")
+    merg_inbound_exp_oecd = pd.merge(merg_inbound_exp, tb_oecd, on=["country", "year"], how="inner")
+
+    # Filter the dataframe for year 2021
+    df_2021 = merg_inbound_exp_oecd[merg_inbound_exp_oecd["year"] == 2021]
+
+    # Merge the 2021 values with the original dataframe based on the 'country' column
+    df = pd.merge(
+        merg_inbound_exp_oecd,
+        df_2021[["country", "fp_cpi_totl", "purchasing_power_parities_for_private_consumption"]],
+        on="country",
+        suffixes=("", "_2021"),
+    )
+    # CPI from 2021 instead of 2010
+    df["fp_cpi_totl_normalized"] = 100 * df["fp_cpi_totl"] / df["fp_cpi_totl_2021"]
+
+    # Convert to inbound expenditure to local currency, adjust for local inflation and convert back to international dollars
+    df["inbound_ppp_cpi_adj_2021"] = (
+        100 * (df["in_to_ex_tr"] * df["exchange_rates__period_average"]) / df["fp_cpi_totl_normalized"]
+    ) / df["purchasing_power_parities_for_private_consumption_2021"]
+
+    # Adjust outbound by US inflaton (2021)
+    # Filter the dataframe for the United States
+    us_df = df[df["country"] == "United States"]
+
+    # Get the US value in 2021 for fp_cpi_totl
+    us_cpi_2021 = us_df.loc[us_df["year"] == 2021, "fp_cpi_totl"].values[0]
+
+    # Normalize the 'fp_cpi_totl' column by dividing it by the US value in 2021
+    us_df_copy = us_df.copy()
+    us_df_copy.loc[:, "US_cpi"] = (us_df_copy["fp_cpi_totl"] / us_cpi_2021) * 100
+
+    # Merge the normalized values with the original dataframe based on the 'year' column
+    df_us_inflation = pd.merge(df, us_df_copy[["year", "US_cpi"]], on="year", how="left")
+    df_us_inflation["outbound_us_cpi_adjust"] = 100 * df_us_inflation["ou_to_ex_tr"] / (df_us_inflation["US_cpi"])
+
+    df_inflation_var = pd.merge(
+        df[["country", "year", "inbound_ppp_cpi_adj_2021"]],
+        df_us_inflation[["country", "year", "outbound_us_cpi_adjust"]],
+        on=["country", "year"],
+        how="inner",
+    )
+    return df_inflation_var
 
 
 def shorten_name(name):

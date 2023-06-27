@@ -395,6 +395,8 @@ steps:
   data://garden/tourism/2023-05-05/unwto:
   - data://meadow/tourism/2023-05-05/unwto
   - data://garden/owid/latest/key_indicators
+  - data://garden/worldbank_wdi/2022-05-26/wdi
+  - data://garden/oecd/2023-06-20/ppp_exchange_rates
   data://grapher/tourism/2023-05-11/unwto:
   - data://garden/tourism/2023-05-05/unwto
   # Environment Tables Implementations
@@ -475,6 +477,12 @@ steps:
   - data://garden/papers/2023-06-07/commodity_prices
   data://garden/papers/2023-06-07/commodity_prices:
   - snapshot://papers/2023-06-07/commodity_prices.xlsx
+
+# OECD exchange rates
+  data://meadow/oecd/2023-06-20/ppp_exchange_rates:
+  - snapshot://oecd/2023-06-20/ppp_exchange_rates.csv
+  data://garden/oecd/2023-06-20/ppp_exchange_rates:
+  - data://meadow/oecd/2023-06-20/ppp_exchange_rates
 
 # Sub-dags to import
 include:

@@ -21,201 +21,170 @@ tables:
       in_to_ar_ov_vi_to:
         title: Inbound arrivals (tourists)
         unit: ''
-        short_unit: ''
         display:
           name: International tourist arrivals
           numDecimalPlaces: 0
       in_to_ar_sa_da_vi_ex:
         title: Inbound arrivals (same day)
         description: Note that before 2006, the US counted same-day trips from Canada
-            only. After 2006, day trips from Mexico were also included.
+          only. After 2006, day trips from Mexico were also included.
         unit: ''
-        short_unit: ''
         display:
           name: International same-day arrivals
           numDecimalPlaces: 0
       do_to_ac_ho_an_si_es_gu:
         title: Domestic guests in tourism-accommodation (hotels and similar establishments)
         unit: ''
-        short_unit: ''
         display:
           name: Local guests in hotels and similar establishments
           numDecimalPlaces: 0
       do_to_tr_ov_vi_to:
         title: Domestic trips (tourists)
         unit: ''
-        short_unit: ''
         display:
           name: Domestic trips
           numDecimalPlaces: 0
       em_fo_an_be_se_ac:
         title: Employment (food and beverage serving activities)
         unit: ''
-        short_unit: ''
         display:
           name: Number of people employed in food and beverage serving activities
           numDecimalPlaces: 0
       em_to:
         title: Employment (total)
         unit: ''
-        short_unit: ''
         display:
-          name: Total number of people employed in tourism related industry
+          name: Total number of people employed in tourism related industries
           numDecimalPlaces: 0
       in_to_ac_ho_an_si_es_gu:
         title: Foreign guests in tourism-accommodation (hotels and similar establishments)
         unit: ''
-        short_unit: ''
         display:
           name: Foreign guests in hotels and similar establishments
           numDecimalPlaces: 0
       in_to_ex_tr:
         title: Inbound tourism-expenditure
-        unit: 'US million dollars'
-        short_unit: 'US million $'
+        unit: US dollars
+        short_unit: $
         display:
           numDecimalPlaces: 0
       in_to_pu_bu_an_pr:
         title: Inbound tourism purpose (business and professional)
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       in_to_pu_pe:
         title: Inbound tourism purpose (personal)
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       ou_to_de_ov_vi_to:
         title: Outbound departures (tourists)
         unit: departures
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       ou_to_de_sa_da_vi_ex:
         title: Outbound departures (same day)
         unit: departures
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       ou_to_ex_tr:
-        title: Outbound tourism-expenditure (travel)
-        unit: US million dollar
-        short_unit: US million $
+        title: Outbound tourism-expenditure
+        unit: US dollars
+        short_unit: $
         display:
           numDecimalPlaces: 0
       to_in_av_le_of_st:
         title: Average length of stay
         unit: nights
-        short_unit: ''
         display:
           numDecimalPlaces: 1
       inb_tour_region:
         title: International tourist arrivals by region
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       ou_to_de_to_de_per_1000:
         title: Outbound departures (total) per 1000
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       ou_to_de_ov_vi_to_per_1000:
         title: Outbound departures (tourists) per 1000
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       ou_to_de_sa_da_vi_ex_per_1000:
         title: Outbound departures (same day) per 1000
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       do_to_tr_to_tr_per_1000:
         title: Domestic trips (total) per 1000 people
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       do_to_tr_ov_vi_to_per_1000:
         title: Domestic trips (tourists) per 1000 people
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       do_to_tr_sa_da_vi_ex_per_1000:
         title: Domestic trips (same day) per 1000 people
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       in_to_ar_to_ar_per_1000:
         title: Inbound arrivals (total) per 1000 people
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       in_to_ar_ov_vi_to_per_1000:
         title: Inbound arrivals (same night) per 1000 people
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       in_to_ar_sa_da_vi_ex_per_1000:
         title: Inbound arrivals (tourists) per 1000 people
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       em_fo_an_be_se_ac_per_1000:
         title: Employment (food and beverage serving activities) per 1000 people
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       em_to_per_1000:
         title: Employment (total) per 1000 people
         unit: ''
-        short_unit: ''
         display:
           numDecimalPlaces: 0
       bus_pers:
         title: Business/Personal Ratio of Purpose of Travel
         unit: ''
-        short_unit: ''
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       inb_outb_tour:
         title: Inbound/Outbound (tourists)
         unit: ''
-        short_unit: ''
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       same_tourist_ratio:
         title: Same Day/Overnight visitors
         unit: ''
-        short_unit: ''
         display:
-          numDecimalPlaces: 0
-      outbound_exp_per_tourist:
-        title: Expenditure for each tourist on outbound tourism
+          numDecimalPlaces: 1
+      inbound_ppp_cpi_adj_2021:
+        title: Inbound Tourism Expenditure (adjusted for inflation and cost of living)
         unit: US dollars
-        short_unit: 'US $'
+        short_unit: $
         display:
+          title: Inbound tourism expenditure
           numDecimalPlaces: 0
-      inb_exp_per_tourist:
-        title: Expenditure for each tourist on inbound tourism
+      outbound_us_cpi_adjust:
+        title: Outbound Tourism Expenditure (adjusted for US 2021 inflation)
         unit: US dollars
-        short_unit: 'US $'
+        short_unit: $
         display:
-          numDecimalPlaces: 0
-      ou_to_ex_tr_per_capita:
-        title: Outbound tourism expenditure per capita
-        unit:  US dollars
-        short_unit: US $
-        display:
+          title: Outbound tourism expenditure
           numDecimalPlaces: 0
