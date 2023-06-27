@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2023-06-26
+  date_accessed: 2023-06-27
   name: Short-Term Mortality Fluctuations (HMD, 2023)
   description: >-
     In response to the COVID-19 pandemic, the HMD team decided to establish a new
@@ -36,9 +36,9 @@ meta:
   license_url: https://www.mortality.org/Data/UserAgreement
   license_name: Creative Commons BY 4.0
   publication_year: 2023
-  publication_date: 2023-06-19
+  publication_date: 2023-06-27
 wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: b712d42e4d82bd2d6f1af190353ddaa9
-  size: 19890319
+- md5: 9599bd3b5ede28f463c5b2bbeb84a8d9
+  size: 19890318
   path: hmd_stmf.csv
