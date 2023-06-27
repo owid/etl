@@ -34,6 +34,8 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
+    # TODO: Create region aggregates.
+
     #
     # Save outputs.
     #

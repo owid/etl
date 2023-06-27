@@ -211,6 +211,15 @@ steps:
     - data://garden/irena/2023-01-04/renewable_power_generation_costs
   data://grapher/energy/2023-01-04/photovoltaic_cost_and_capacity:
     - data://garden/energy/2023-01-04/photovoltaic_cost_and_capacity
+  #
+  # Energy Institute - Statistical Review of World Energy (2023).
+  #
+  data://meadow/energy_institute/2023-06-26/statistical_review_of_world_energy:
+    - snapshot://energy_institute/2023-06-26/statistical_review_of_world_energy.csv
+  data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy:
+    - data://meadow/energy_institute/2023-06-26/statistical_review_of_world_energy
+  data://grapher/energy_institute/2023-06-26/statistical_review_of_world_energy:
+    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
