@@ -93,8 +93,9 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
     ds.metadata.update_from_yaml(metadata_path, if_source_exists="replace")
     tb.update_metadata_from_yaml(metadata_path, f"{dataset}")
     tb.reset_index(drop=True, inplace=True)
+    non_val_cols = [c for c in tb.columns if c != "value"]
     # add table to a dataset
-    ds.add(tb)
+    ds.add(tb.set_index(non_val_cols))
 
     # finally save the dataset
     ds.save()
