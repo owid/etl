@@ -2,7 +2,6 @@
 
 from typing import cast
 
-import numpy as np
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
@@ -24,10 +23,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("epoch.xlsx"))
+    snap = cast(Snapshot, paths.load_dependency("epoch.csv"))
 
     # Now read the file with pandas
-    df = pd.read_excel(snap.path, sheet_name="ALL ML SYSTEMS")
+    df = pd.read_csv(snap.path)
     #
     # Process data.
     #
@@ -46,8 +45,8 @@ def run(dest_dir: str) -> None:
     ]
 
     df = df[cols]
-    df.replace("#REF!", np.nan, inplace=True)
-    df.replace("", np.nan, inplace=True)
+    # df.replace("#REF!", np.nan, inplace=True)
+    # df.replace("", np.nan, inplace=True)
 
     df["Training compute (FLOP)"] = df["Training compute (FLOP)"].astype(float)
 

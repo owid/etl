@@ -19,8 +19,12 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
+    """Script to create a snapshot of dataset Parameter, Compute and Data Trends in Machine Learning (Epoch, 2023)'.
+    - Visit https://epochai.org/mlinputs/visualization
+    - In top right corner click on download
+    - Click on "CSV" """
     # Create a new snapshot.
-    snap = Snapshot(f"artificial_intelligence/{SNAPSHOT_VERSION}/epoch.xlsx")
+    snap = Snapshot(f"artificial_intelligence/{SNAPSHOT_VERSION}/epoch.csv")
 
     # Ensure destination folder exists.
     snap.path.parent.mkdir(exist_ok=True, parents=True)

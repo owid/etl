@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
     df = pd.DataFrame(tb)
     #
     # Process data.
-    # Clean up researcher affiliation
+    # Clean up researcher affiliation in column 'organization_categorization'
     category_mapping = {
         "Industry - Academia Collaboration": "Collaboration",
         "Industry - Academia collaboration": "Collaboration",
@@ -42,10 +42,8 @@ def run(dest_dir: str) -> None:
     df["organization_categorization"] = df["organization_categorization"].replace(category_mapping)
 
     # Convert FLOP to petaFLOP
-    df["training_computation_petaflop"] = df["training_compute__flop"] / 10e14
-
-    # apply the function to 'publication_date'
-    df["publication_date"] = df["publication_date"].apply(convert_date)
+    df["training_computation_petaflop"] = df["training_compute__flop"] / 1e15
+    df["publication_date"] = pd.to_datetime(df["publication_date"])
 
     # then, calculate 'days_since_1949'
     df["days_since_1949"] = (df["publication_date"] - pd.to_datetime("1949-01-01")).dt.days
@@ -56,9 +54,10 @@ def run(dest_dir: str) -> None:
     df["days_since_1949"] = df["days_since_1949"].astype(int)
 
     df = clean_non_unique_year_model(df)
-
+    # There is a typo in the domain name "VIsion"
     df.replace({"VIsion": "Vision"}, inplace=True)
 
+    # Filter notable systems by selecting rows where 'inclusion_criteria' is not nan
     df_not_nan = df[df["inclusion_criteria"].notna()].reset_index(drop=True)
     df_not_nan.drop("inclusion_criteria", axis=1, inplace=True)
 
@@ -74,19 +73,6 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("epoch.end")
-
-
-def convert_date(date_string):
-    try:
-        # try to parse date in the format "%Y-%m-%d"
-        return pd.to_datetime(date_string, format="%Y-%m-%d")
-    except ValueError:
-        try:
-            # if the above fails, try to parse date in the format "%m/%d/%Y"
-            return pd.to_datetime(date_string, format="%m/%d/%Y")
-        except ValueError:
-            # if both formats fail, return NaT
-            return pd.NaT
 
 
 def clean_non_unique_year_model(df):
