@@ -33,10 +33,10 @@ def run(dest_dir: str) -> None:
     log.info("ucdp: add field `conflict_type`")
     df_geo = ds_meadow["geo"]
     df_conflict = ds_meadow["battle_related_conflict"]
+    # Preserve only active conflicts
+    df_geo = df_geo[df_geo["active_year"] == 1]
     df = add_conflict_type(df_geo, df_conflict)
 
-    # Preserve only active conflicts
-    df = df[df["active_year"] == 1]
     # Add `year_start`, which denotes the year when the conflict corresponding to the event started (only considering events with `active_year` == 1)
     df_start_year = df.groupby("conflict_new_id", as_index=False)[["year"]].min()
     df = df.merge(df_start_year, on="conflict_new_id", how="left", suffixes=("", "_start"))
@@ -185,10 +185,12 @@ def add_conflict_type(df_geo: pd.DataFrame, df_conflict: pd.DataFrame) -> pd.Dat
        - intrastate
        - internationalized intrastate
     """
+    df_conflict_relevant = df_conflict[["conflict_id", "year", "type_of_conflict"]].drop_duplicates()
+    assert df_conflict_relevant.groupby(["conflict_id", "year"]).size().max() == 1, "Some conflict_id-year pairs are duplicated!"
     # Add `type_of_conflict` to `df_geo`.
     # This column contains the type of state-based conflict (1: inter-state, 2: intra-state, 3: extra-state, 4: internationalized intrastate)
     df_geo = df_geo.merge(
-        df_conflict[["conflict_id", "type_of_conflict"]], left_on="conflict_new_id", right_on="conflict_id", how="outer"
+        df_conflict_relevant, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
     )
     # Assert that `type_of_conflict` was only added for state-based events
     assert df_geo[df_geo["type_of_violence"] != 1].type_of_conflict.isna().all()
