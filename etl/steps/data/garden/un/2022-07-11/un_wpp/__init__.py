@@ -142,9 +142,10 @@ def run(dest_dir: str) -> None:
             )
         )
     # add dataset with single-year age group population
+    non_val_cols = [c for c in df_population_granular.columns if c != "value"]
     tables.append(
         df_to_table(
-            df_population_granular,
+            df_population_granular.set_index(non_val_cols),
             short_name="population_granular",
             description=(
                 "UN WPP dataset by OWID. Contains only metrics corresponding to population for all dimensions (age and"
