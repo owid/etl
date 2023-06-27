@@ -86,10 +86,8 @@ def run(dest_dir: str) -> None:
                 tb_combined.metadata.short_name = table_short_name
                 tb_combined.metadata.title = table_title
 
-                # Add combined tables to the new dataset.
-                tb_combined = tb_combined.reset_index()
                 # Save also as a csv format for the website
-                ds_garden.add(tb_combined, formats=["csv", "feather"])
+                ds_garden.add(tb_combined.set_index(["country", "year"]), formats=["csv", "feather"])
 
 
 def get_population() -> pd.DataFrame:
