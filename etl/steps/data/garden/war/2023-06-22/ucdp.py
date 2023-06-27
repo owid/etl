@@ -186,7 +186,9 @@ def add_conflict_type(df_geo: pd.DataFrame, df_conflict: pd.DataFrame) -> pd.Dat
        - internationalized intrastate
     """
     df_conflict_relevant = df_conflict[["conflict_id", "year", "type_of_conflict"]].drop_duplicates()
-    assert df_conflict_relevant.groupby(["conflict_id", "year"]).size().max() == 1, "Some conflict_id-year pairs are duplicated!"
+    assert (
+        df_conflict_relevant.groupby(["conflict_id", "year"]).size().max() == 1
+    ), "Some conflict_id-year pairs are duplicated!"
     # Add `type_of_conflict` to `df_geo`.
     # This column contains the type of state-based conflict (1: inter-state, 2: intra-state, 3: extra-state, 4: internationalized intrastate)
     df_geo = df_geo.merge(
