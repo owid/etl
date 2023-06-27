@@ -110,9 +110,18 @@ class Dataset:
 
         if not table.primary_key:
             if "OWID_STRICT" in environ:
-                raise PrimaryKeyMissing(f"Table `{table.metadata.short_name}` does not have a primary_key set")
+                raise PrimaryKeyMissing(
+                    f"Table `{table.metadata.short_name}` does not have a primary_key set -- please use set_index() to indicate dimensions"
+                )
             else:
-                warnings.warn(f"Table `{table.metadata.short_name}` does not have a primary_key set")
+                warnings.warn(
+                    f"Table `{table.metadata.short_name}` does not have a primary_key set -- please use set_index() to indicate dimensions"
+                )
+
+        if not table.index.is_unique and "OWID_STRICT" in environ:
+            raise NonUniqueIndex(
+                f"Table `{table.metadata.short_name}` has duplicate values in the index -- could you have made a mistake?"
+            )
 
         # check Float64 and Int64 columns for np.nan
         for col, dtype in table.dtypes.items():
@@ -290,4 +299,8 @@ def checksum_file(filename: str) -> Any:
 
 
 class PrimaryKeyMissing(Exception):
+    pass
+
+
+class NonUniqueIndex(Exception):
     pass
