@@ -19,6 +19,8 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["ai_bills"]
+    # Years actually span 2016-2022
+    tb["year"] = 2022
 
     #
     # Save outputs.
