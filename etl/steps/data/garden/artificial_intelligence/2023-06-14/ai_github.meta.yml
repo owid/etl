@@ -1,5 +1,5 @@
 dataset:
-  title: (AI Index, 2023)
+  title:  GitHub Survey 2022 (AI Index, 2023)
   description:  &desc |
     To evaluate the impact of Copilot on productivity, well-being, and
     workflow, GitHub conducted a survey in 2022. Over 2,000 developers who were using
@@ -10,7 +10,7 @@ dataset:
   - name: Public domain
     url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   sources:
-  - name: GitHub Survey (2022) via AI Index ReportAI Index (2023)
+  - name: GitHub Survey (2022) via AI Index Report (2023)
     description: *desc
     url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
     source_data_url: https://drive.google.com/uc?export=download&id=1mr6AIE89K_sA_xhIN89DueSMuf5f7f6e
