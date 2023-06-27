@@ -153,7 +153,7 @@ def clean_participants(
     # String to list of elements
     ds = ds.str.split(default_separator)
     # List back to string, but with fixed names (remove spaces)
-    ds = ds.apply(lambda x: new_separator.join([_clean_participant_name(xx) for xx in set(x)]))
+    ds = ds.apply(lambda x: new_separator.join([_clean_participant_name(xx) for xx in sorted(set(x))]))
 
     return df.assign(conflict_participants=ds)
 
