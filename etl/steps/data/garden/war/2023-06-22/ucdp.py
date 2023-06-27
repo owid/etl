@@ -6,7 +6,6 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
@@ -56,18 +55,24 @@ def run(dest_dir: str) -> None:
 
     # Combine and build single table
     log.info("ucdp: combine and build single table")
-    df = df_ongoing.merge(df_new, left_on=["year", "region", "conflict_type"], right_on=["year_start", "region", "conflict_type"])
+    df = df_ongoing.merge(
+        df_new, left_on=["year", "region", "conflict_type"], right_on=["year_start", "region", "conflict_type"]
+    )
     df = df.drop(columns=["year_start"])
 
     # Add data for World
     log.info("ucdp: add data for World")
-    df_world = df.groupby(["year", "conflict_type"], as_index=False)[["number_deaths_ongoing_conflicts", "number_ongoing_conflicts", "number_new_conflicts"]].sum()
+    df_world = df.groupby(["year", "conflict_type"], as_index=False)[
+        ["number_deaths_ongoing_conflicts", "number_ongoing_conflicts", "number_new_conflicts"]
+    ].sum()
     df_world["region"] = "World"
     df = pd.concat([df, df_world], ignore_index=True)
 
     # Add data for "all conflicts"
     log.info("ucdp: add data for 'all conflicts'")
-    df_all = df.groupby(["year", "region"], as_index=False)[["number_deaths_ongoing_conflicts", "number_ongoing_conflicts", "number_new_conflicts"]].sum()
+    df_all = df.groupby(["year", "region"], as_index=False)[
+        ["number_deaths_ongoing_conflicts", "number_ongoing_conflicts", "number_new_conflicts"]
+    ].sum()
     df_all["conflict_type"] = "all"
     df = pd.concat([df, df_all], ignore_index=True)
 
@@ -111,9 +116,13 @@ def _sanity_checks(ds: Dataset) -> None:
         .sort_values(["conflict_new_id", "year"])
     )
     conflict_deaths = df_conflict[["conflict_id", "year", "bd_best"]].sort_values(["conflict_id", "year"])
-    res = geo_deaths.merge(conflict_deaths, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer")
+    res = geo_deaths.merge(
+        conflict_deaths, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
+    )
     assert res.isna().sum().sum() == 0, "Check NaNs in conflict_new_id or conflict_id"
-    assert len(res[res["best"] - res["bd_best"] != 0]) <= 1, "Dicrepancy between number of deaths in conflict (Geo vs. Non-state datasets)"
+    assert (
+        len(res[res["best"] - res["bd_best"] != 0]) <= 1
+    ), "Dicrepancy between number of deaths in conflict (Geo vs. Non-state datasets)"
 
     # Non-state #
     # Check IDs
@@ -122,11 +131,22 @@ def _sanity_checks(ds: Dataset) -> None:
     res = geo_ids.merge(nonstate_ids, left_on="conflict_new_id", right_on="conflict_id", how="outer")
     assert res.isna().sum().sum() == 0, "Check NaNs in conflict_new_id or conflict_id"
     # Check number of deaths
-    geo_deaths = df_geo.loc[(df_geo["type_of_violence"] == 2) & (df_geo["active_year"] == 1)].groupby(["conflict_new_id", "year"], as_index=False)[["best"]].sum().sort_values(["conflict_new_id", "year"])
-    nonstate_deaths = df_nonstate[["conflict_id", "year", "best_fatality_estimate"]].sort_values(["conflict_id", "year"])
-    res = geo_deaths.merge(nonstate_deaths, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer")
+    geo_deaths = (
+        df_geo.loc[(df_geo["type_of_violence"] == 2) & (df_geo["active_year"] == 1)]
+        .groupby(["conflict_new_id", "year"], as_index=False)[["best"]]
+        .sum()
+        .sort_values(["conflict_new_id", "year"])
+    )
+    nonstate_deaths = df_nonstate[["conflict_id", "year", "best_fatality_estimate"]].sort_values(
+        ["conflict_id", "year"]
+    )
+    res = geo_deaths.merge(
+        nonstate_deaths, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
+    )
     assert res.isna().sum().sum() == 0, "Check NaNs in conflict_new_id or conflict_id"
-    assert len(res[res["best"] - res["best_fatality_estimate"] != 0]) == 0, "Dicrepancy between number of deaths in conflict (Geo vs. Non-state datasets)"
+    assert (
+        len(res[res["best"] - res["best_fatality_estimate"] != 0]) == 0
+    ), "Dicrepancy between number of deaths in conflict (Geo vs. Non-state datasets)"
 
     # One-sided #
     # Check IDs
@@ -135,11 +155,22 @@ def _sanity_checks(ds: Dataset) -> None:
     res = geo_ids.merge(onesided_ids, left_on="conflict_new_id", right_on="conflict_id", how="outer")
     assert res.isna().sum().sum() == 0, "Check NaNs in conflict_new_id or conflict_id"
     # Check number of deaths
-    geo_deaths = df_geo.loc[(df_geo["type_of_violence"] == 3) & (df_geo["active_year"] == 1)].groupby(["conflict_new_id", "year"], as_index=False)[["best"]].sum().sort_values(["conflict_new_id", "year"])
-    onesided_deaths = df_onesided[["conflict_id", "year", "best_fatality_estimate"]].sort_values(["conflict_id", "year"])
-    res = geo_deaths.merge(onesided_deaths, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer")
+    geo_deaths = (
+        df_geo.loc[(df_geo["type_of_violence"] == 3) & (df_geo["active_year"] == 1)]
+        .groupby(["conflict_new_id", "year"], as_index=False)[["best"]]
+        .sum()
+        .sort_values(["conflict_new_id", "year"])
+    )
+    onesided_deaths = df_onesided[["conflict_id", "year", "best_fatality_estimate"]].sort_values(
+        ["conflict_id", "year"]
+    )
+    res = geo_deaths.merge(
+        onesided_deaths, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
+    )
     assert res.isna().sum().sum() == 0, "Check NaNs in conflict_new_id or conflict_id"
-    assert len(res[res["best"] - res["best_fatality_estimate"] != 0]) <= 3, "Dicrepancy between number of deaths in conflict (Geo vs. Non-state datasets)"
+    assert (
+        len(res[res["best"] - res["best_fatality_estimate"] != 0]) <= 3
+    ), "Dicrepancy between number of deaths in conflict (Geo vs. Non-state datasets)"
 
 
 def add_conflict_type(df_geo: pd.DataFrame, df_conflict: pd.DataFrame) -> pd.DataFrame:
@@ -155,7 +186,9 @@ def add_conflict_type(df_geo: pd.DataFrame, df_conflict: pd.DataFrame) -> pd.Dat
     """
     # Add `type_of_conflict` to `df_geo`.
     # This column contains the type of state-based conflict (1: inter-state, 2: intra-state, 3: extra-state, 4: internationalized intrastate)
-    df_geo = df_geo.merge(df_conflict[["conflict_id", "type_of_conflict"]], left_on="conflict_new_id", right_on="conflict_id", how="outer")
+    df_geo = df_geo.merge(
+        df_conflict[["conflict_id", "type_of_conflict"]], left_on="conflict_new_id", right_on="conflict_id", how="outer"
+    )
     # Assert that `type_of_conflict` was only added for state-based events
     assert df_geo[df_geo["type_of_violence"] != 1].type_of_conflict.isna().all()
 
@@ -171,7 +204,8 @@ def add_conflict_type(df_geo: pd.DataFrame, df_conflict: pd.DataFrame) -> pd.Dat
         4: "internationalized intrastate",
     }
     df_geo["conflict_type"] = (
-        df_geo["type_of_conflict"].replace(type_of_conflict_mapping)
+        df_geo["type_of_conflict"]
+        .replace(type_of_conflict_mapping)
         .fillna(df_geo["type_of_violence"].replace(type_of_violence_mapping))
     )
 
