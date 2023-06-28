@@ -32,6 +32,12 @@ def test_create_unnamed_variable_fails() -> None:
         v.description = "Hello"
 
 
+def test_operations_on_unnamed_variables_succeed() -> None:
+    # we currently rely on this for interim logic in the ETL
+    v = Variable([1, 2, 3])
+    v2 = v + 1  # noqa
+
+
 def test_create_non_empty_variable() -> None:
     v = Variable([1, 2, 3], name="dog")
     assert list(v) == [1, 2, 3]

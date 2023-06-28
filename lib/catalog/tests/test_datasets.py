@@ -3,6 +3,7 @@
 #
 
 import json
+import os
 import random
 import shutil
 import tempfile
@@ -12,11 +13,13 @@ from os import rmdir
 from os.path import exists, join
 from pathlib import Path
 from typing import Any, Iterator, Optional, Union
+from unittest.mock import patch
 
 import pytest
 import yaml
 
 from owid.catalog import Dataset, DatasetMeta
+from owid.catalog.datasets import PrimaryKeyMissing
 
 from .mocking import mock
 from .test_tables import mock_table
@@ -102,6 +105,26 @@ def test_add_table():
         assert t2.metadata.primary_key == t.metadata.primary_key
         assert t2.equals_table(t)
         assert t2.metadata.dataset == ds.metadata
+
+
+@patch.dict(os.environ, {})
+def test_add_table_without_primary_key():
+    t = mock_table().reset_index()
+
+    with temp_dataset_dir() as dirname:
+        ds = Dataset.create_empty(dirname)
+        with pytest.warns(UserWarning):
+            ds.add(t)
+
+
+@patch.dict(os.environ, {"OWID_STRICT": "1"})
+def test_add_table_without_primary_key_strict_mode():
+    t = mock_table().reset_index()
+
+    with temp_dataset_dir() as dirname:
+        ds = Dataset.create_empty(dirname)
+        with pytest.raises(PrimaryKeyMissing):
+            ds.add(t)
 
 
 def test_add_table_csv():

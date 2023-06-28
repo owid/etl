@@ -8,7 +8,7 @@ import shutil
 import warnings
 from dataclasses import dataclass
 from glob import glob
-from os import mkdir
+from os import environ, mkdir
 from os.path import join
 from pathlib import Path
 from typing import Any, Iterator, List, Literal, Optional, Union
@@ -107,6 +107,12 @@ class Dataset:
                 warnings.warn(
                     f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
                 )
+
+        if not table.primary_key:
+            if "OWID_STRICT" in environ:
+                raise PrimaryKeyMissing(f"Table `{table.metadata.short_name}` does not have a primary_key set")
+            else:
+                warnings.warn(f"Table `{table.metadata.short_name}` does not have a primary_key set")
 
         # check Float64 and Int64 columns for np.nan
         for col, dtype in table.dtypes.items():
@@ -281,3 +287,7 @@ def checksum_file(filename: str) -> Any:
             chunk = istream.read(chunk_size)
 
     return checksum
+
+
+class PrimaryKeyMissing(Exception):
+    pass

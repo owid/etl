@@ -553,8 +553,9 @@ def combine_variables_metadata(
     # Initialise an empty metadata.
     metadata = VariableMeta()
 
-    # Skip other objects passed in variables that may not contain metadata (e.g. a scalar).
-    variables_only = [variable for variable in variables if hasattr(variable, "metadata")]
+    # Skip other objects passed in variables that may not contain metadata (e.g. a scalar),
+    # and skip unnamed variables that cannot have metadata
+    variables_only = [v for v in variables if hasattr(v, "name") and v.name and hasattr(v, "metadata")]
 
     # Combine each metadata field using the logic of the specified operation.
     metadata.title = combine_variables_titles(variables=variables_only, operation=operation)
