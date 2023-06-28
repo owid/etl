@@ -1,84 +1,78 @@
-"""
-
-Harmonize country names:
-
-    $ harmonize data/meadow/worldbank_wdi/{version}/wdi/wdi.feather country etl/steps/data/garden/worldbank_wdi/{version}/wdi.country_mapping.json
-"""
-
 import json
 import re
 import zipfile
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional
 
 import pandas as pd
 import structlog
-from owid.catalog import Dataset, Source, Table, VariableMeta
+from owid.catalog import Source, Table, VariableMeta
 from owid.catalog.utils import underscore
-from owid.walden import Catalog
 
-from etl.paths import DATA_DIR
-
-from .variable_matcher import VariableMatcher
-
-COUNTRY_MAPPING_PATH = (Path(__file__).parent / "wdi.country_mapping.json").as_posix()
+from etl.data_helpers import geo
+from etl.helpers import PathFinder, create_dataset
 
 log = structlog.get_logger()
 
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
 
 def run(dest_dir: str) -> None:
-    version = Path(__file__).parent.parent.stem
-    fname = Path(__file__).parent.stem
-    namespace = Path(__file__).parent.parent.parent.stem
-    ds_meadow = Dataset((DATA_DIR / f"meadow/{namespace}/{version}/{fname}").as_posix())
+    log.info("wdi.start")
 
-    assert len(ds_meadow.table_names) == 1, "Expected meadow dataset to have only one table, but found > 1 table names."
-    tb_meadow = ds_meadow[fname]
-    df = pd.DataFrame(tb_meadow).reset_index()
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset.
+    ds_meadow = paths.load_dataset_dependency()
 
-    # harmonize entity names
-    country_mapping = load_country_mapping()
-    excluded_countries = load_excluded_countries()  # noqa: F841
-    df = df.query("country not in @excluded_countries").copy()
-    assert df["country"].notnull().all()
-    countries = df["country"].apply(lambda x: country_mapping.get(x, None))
-    if countries.isnull().any():
-        missing_countries = [x for x in df["country"].drop_duplicates() if x not in country_mapping]
-        raise RuntimeError(
-            "The following raw country names have not been harmonized. "
-            f"Please: (a) edit {COUNTRY_MAPPING_PATH} to include these country "
-            "names; or (b) remove these country names from the raw table."
-            f"Raw country names: {missing_countries}"
-        )
+    #
+    # Process data.
+    #
+    tb_meadow = ds_meadow["wdi"]
+    df = pd.DataFrame(ds_meadow["wdi"]).reset_index()
 
-    df["country"] = countries
-    df.set_index(tb_meadow.metadata.primary_key, inplace=True)
+    df = geo.harmonize_countries(
+        df=df,
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
+    ).set_index(
+        ["country", "year"], verify_integrity=True
+    )  # type: ignore
 
     df_cust = mk_custom_entities(df)
     assert all([col in df.columns for col in df_cust.columns])
     df = pd.concat([df, df_cust], axis=0)
 
-    ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata
+    tb_garden = Table(df, metadata=tb_meadow.metadata)
 
-    tb_garden = Table(df)
-    tb_garden.metadata = tb_meadow.metadata
-
-    tb_garden = add_variable_metadata(tb_garden)
+    log.info("wdi.add_variable_metadata")
+    tb_garden = add_variable_metadata(tb_garden, ds_meadow.metadata.sources[0])
 
     tb_omm = mk_omms(tb_garden)
-    tb_garden2 = tb_garden.join(tb_omm, how="outer")
-    tb_garden2.metadata = tb_garden.metadata
-    for col in tb_garden2.columns:
-        if col in tb_garden:
-            tb_garden2[col].metadata = tb_garden[col].metadata
-        else:
-            tb_garden2[col].metadata = tb_omm[col].metadata
+    tb_garden = tb_garden.join(tb_omm, how="outer")
 
-    ds_garden.add(tb_garden2)
+    # add empty strings to all columns without units
+    for col in tb_garden.columns:
+        if tb_garden[col].metadata.unit is None:
+            tb_garden[col].metadata.unit = ""
 
+    # validate that all columns have title
+    for col in tb_garden.columns:
+        assert tb_garden[col].metadata.title is not None, 'Variable "{}" has no title'.format(col)
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
+
+    # Save changes in the new garden dataset.
     ds_garden.save()
+
+    log.info("wdi.end")
 
 
 def mk_omms(table: Table) -> Table:
@@ -345,99 +339,52 @@ def mk_custom_entities(df: pd.DataFrame) -> pd.DataFrame:
     return df_cust
 
 
-def add_variable_metadata(table: Table) -> Table:
-    var_codes = table.columns.tolist()
-
-    # retrieves raw data from walden
-    version = Path(__file__).parent.parent.stem
-    fname = Path(__file__).parent.stem
-    namespace = Path(__file__).parent.parent.parent.stem
-    walden_ds = Catalog().find_one(namespace=namespace, short_name=fname, version=version)
-    local_file = walden_ds.ensure_downloaded()
-    zf = zipfile.ZipFile(local_file)
+def load_variable_metadata() -> pd.DataFrame:
+    snap = paths.load_snapshot_dependency()
+    zf = zipfile.ZipFile(snap.path)
     df_vars = pd.read_csv(zf.open("WDISeries.csv"))
+
     df_vars.dropna(how="all", axis=1, inplace=True)
     df_vars.columns = df_vars.columns.map(underscore)
     df_vars.rename(columns={"series_code": "indicator_code"}, inplace=True)
     df_vars["indicator_code"] = df_vars["indicator_code"].apply(underscore)
-    df_vars = df_vars.query("indicator_code in @var_codes").set_index("indicator_code", verify_integrity=True)
 
-    df_vars["indicator_name"].str.replace(r"\s+", " ", regex=True)
+    df_vars["indicator_name"] = df_vars["indicator_name"].str.replace(r"\s+", " ", regex=True)
+
+    return df_vars.set_index("indicator_code")
+
+
+def add_variable_metadata(table: Table, ds_source: Source) -> Table:
+    var_codes = table.columns.tolist()
+
+    df_vars = load_variable_metadata()
+
     clean_source_mapping = load_clean_source_mapping()
 
+    table.update_metadata_from_yaml(paths.metadata_path, "wdi", extra_variables="ignore")
+
     # construct metadata for each variable
-    vm = VariableMatcher()
     for var_code in var_codes:
         var = df_vars.loc[var_code].to_dict()
-
-        # retrieves unit + display metadata from the most recently updated
-        # WDI grapher variable that matches this variable's name
-        unit = ""
-        short_unit = ""
-        display = {}
-        grapher_vars = vm.find_grapher_variables(var["indicator_name"])
-        if grapher_vars:
-            found_unit_metadata = False
-            gvar = None
-            while len(grapher_vars) and not found_unit_metadata:
-                gvar = grapher_vars.pop(0)
-                found_unit_metadata = bool(gvar["unit"] or gvar["shortUnit"])
-
-            if found_unit_metadata and gvar:
-                if pd.notnull(gvar["unit"]):
-                    unit = gvar["unit"]
-                if pd.notnull(gvar["shortUnit"]):
-                    short_unit = gvar["shortUnit"]
-                if pd.notnull(gvar["display"]):
-                    display = json.loads(gvar["display"])
-
-                year_regex = re.compile(r"\b([1-2]\d{3})\b")
-                regex_res = year_regex.search(var["indicator_name"])
-                if regex_res:
-                    assert len(regex_res.groups()) == 1
-                    year = regex_res.groups()[0]
-                    unit = replace_years(unit, year)
-                    short_unit = replace_years(short_unit, year)
-                    for k in ["name", "unit", "shortUnit"]:
-                        if pd.notnull(display.get(k)):
-                            display[k] = replace_years(display[k], year)
-        else:
-            log.warning(
-                f"Variable does not match an existing {fname} variable name in the grapher",
-                variable_name=var["indicator_name"],
-            )
 
         # retrieve clean source name, then construct source.
         source_raw_name = var["source"]
         clean_source = clean_source_mapping.get(source_raw_name)
         assert clean_source, f'`rawName` "{source_raw_name}" not found in wdi.sources.json'
-        assert table[var_code].metadata.to_dict() == {}, (
-            f"Expected metadata for variable {var_code} to be empty, but "
-            f"metadata is: {table[var_code].metadata.to_dict()}."
-        )
         source = Source(
             name=clean_source["name"],
             description=None,
-            url=walden_ds.metadata["url"],
-            source_data_url=walden_ds.metadata["source_data_url"],
-            owid_data_url=walden_ds.metadata["owid_data_url"],
-            date_accessed=walden_ds.metadata["date_accessed"],
-            publication_date=walden_ds.metadata["publication_date"],
-            publication_year=walden_ds.metadata["publication_year"],
-            published_by=walden_ds.metadata["name"],
+            url=ds_source.url,
+            source_data_url=ds_source.source_data_url,
+            date_accessed=str(ds_source.date_accessed),
+            publication_date=str(ds_source.publication_date),
+            publication_year=ds_source.publication_year,
+            published_by=ds_source.name,
             publisher_source=clean_source["dataPublisherSource"],
         )
 
-        table[var_code].metadata = VariableMeta(
-            title=df_vars.loc[var_code, "indicator_name"],
-            description=create_description(var),
-            sources=[source],
-            unit=unit,
-            short_unit=short_unit,
-            display=display,
-            additional_info=None
-            # licenses=[var['license_type']]
-        )
+        table[var_code].metadata.description = create_description(var)
+        table[var_code].metadata.sources = [source]
 
     if not all([len(table[var_code].sources) == 1 for var_code in var_codes]):
         missing = [var_code for var_code in var_codes if len(table[var_code].sources) != 1]
@@ -450,21 +397,8 @@ def add_variable_metadata(table: Table) -> Table:
     return table
 
 
-def load_country_mapping() -> Dict[str, str]:
-    with open(COUNTRY_MAPPING_PATH, "r") as f:
-        mapping = json.load(f)
-        assert isinstance(mapping, dict)
-    return mapping
-
-
-def load_excluded_countries() -> List[str]:
-    with open(Path(__file__).parent / "wdi.country_exclude.json", "r") as f:
-        data = json.load(f)
-        assert isinstance(data, list)
-    return data
-
-
 def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:
+    # TODO: say something about how it was created
     with open(Path(__file__).parent / "wdi.sources.json", "r") as f:
         sources = json.load(f)
         source_mapping = {source["rawName"]: source for source in sources}
@@ -498,16 +432,3 @@ def create_description(var: Dict[str, Any]) -> Optional[str]:
         return None
 
     return desc
-
-
-def replace_years(s: str, year: Union[int, str]) -> str:
-    """replaces all years in string with {year}.
-
-    Example:
-
-        >>> replace_years("GDP (constant 2010 US$)", 2015)
-        "GDP (constant 2015 US$)"
-    """
-    year_regex = re.compile(r"\b([1-2]\d{3})\b")
-    s_new = year_regex.sub(str(year), s)
-    return s_new
