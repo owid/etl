@@ -527,6 +527,7 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
     # decrypt URLs if private
     for meta in metas:
         if not meta.is_public:
+            assert meta.source
             assert meta.source.source_data_url
             meta.source.source_data_url = _decrypt(meta.source.source_data_url)
 

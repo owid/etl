@@ -6,19 +6,10 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "namespace": {
-            "type": "string"
-          },
-          "short_name": {
-            "type": "string"
-          },
           "title": {
             "type": "string"
           },
           "description": {
-            "type": "string"
-          },
-          "version": {
             "type": "string"
           },
           "licenses": {

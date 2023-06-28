@@ -13,6 +13,7 @@ from owid.catalog.utils import underscore
 
 from etl.db import get_connection, get_engine
 from etl.db_utils import DBUtils
+from etl.steps.data.converters import convert_origin_to_source, convert_source_to_origin
 
 log = structlog.get_logger()
 
@@ -371,6 +372,15 @@ def _adapt_dataset_metadata_for_grapher(
         Adapted dataset metadata, ready to be inserted into grapher.
 
     """
+    # Add origins to sources to stay backward compatible.
+    if metadata.origins:
+        metadata.sources = _add_origins_to_sources(metadata.sources, metadata.origins)
+    else:
+        warnings.warn(
+            "Dataset has sources instead of origins. This is deprecated and will be removed in the future. "
+            "Please use origins instead."
+        )
+
     # Combine metadata sources into one.
     metadata.sources = [combine_metadata_sources(metadata.sources)]
 
@@ -437,11 +447,58 @@ def _adapt_table_for_grapher(
 
     table = table.set_index(["entity_id", "year"] + dim_names)
 
+    # Add dataset origins to variables if they don't have an origin.
+    # TODO: In the future, all variables should have their origins and dataset origins will be union of their origins.
+    table = _add_dataset_origins_to_variables(table)
+
+    # Convert sources to origins to stay backward compatible. Note that this happens before we combine all sources into
+    # one source which is needed by MySQL.
+    assert table.metadata.dataset
+    for col in table.columns:
+        table[col].origins = _add_sources_to_origins(
+            table[col].origins, table.metadata.dataset.sources + table[col].sources
+        )
+
+    # NOTE: We already convert origins to sources in snapshot. This would be needed only if we added
+    # origins in meadow / garden through YAML file.
+    # Convert origins to sources to stay backward compatible.
+    # for col in table.columns:
+    #     table[col].sources = _add_origins_to_sources(
+    #         table[col].sources, table.metadata.dataset.sources + table[col].sources
+    #     )
+
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).
     table = _ensure_source_per_variable(table)
 
     return cast(catalog.Table, table)
+
+
+def _add_sources_to_origins(origins: List[catalog.Origin], sources: List[catalog.Source]) -> List[catalog.Origin]:
+    """Add sources to origins. Don't add sources with `name` that already exists as `producer` in origins."""
+    origins = list(origins)
+    for source in sources:
+        if source.name not in [origin.producer for origin in origins]:
+            origins.append(convert_source_to_origin(source))
+    return origins
+
+
+def _add_origins_to_sources(sources: List[catalog.Source], origins: List[catalog.Origin]) -> List[catalog.Source]:
+    """Add origins to sources. Don't add origins with `producer` that already exists as `name` in sources."""
+    sources = list(sources)
+    for origin in origins:
+        if origin.producer not in [source.name for source in sources]:
+            sources.append(convert_origin_to_source(origin))
+    return sources
+
+
+def _add_dataset_origins_to_variables(table: catalog.Table) -> catalog.Table:
+    assert table.metadata.dataset
+    for col in table.columns:
+        variable_meta = table[col].metadata
+        if not variable_meta.origins:
+            variable_meta.origins = table.metadata.dataset.origins
+    return table
 
 
 def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:

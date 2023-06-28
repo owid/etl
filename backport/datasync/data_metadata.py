@@ -131,10 +131,7 @@ def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
     return data  # type: ignore
 
 
-def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
-    """Fetch metadata for a single variable from database.
-    This function is similar to Variables.getVariableData in owid-grapher repository
-    """
+def _load_variable(engine: Engine, variable_id: int) -> Dict[str, Any]:
     sql = """
     SELECT
         variables.*,
@@ -149,8 +146,25 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
     """
     df = pd.read_sql(sql, engine, params={"variable_id": variable_id})
     assert not df.empty, f"variableId `{variable_id}` not found"
+    return df.iloc[0].to_dict()
 
-    row = df.iloc[0].to_dict()
+
+def _load_origins_df(engine: Engine, variable_id: int) -> pd.DataFrame:
+    sql = """
+    SELECT
+        origins.*
+    FROM origins
+    JOIN origins_variables ON origins.id = origins_variables.originId
+    WHERE origins_variables.variableId = %(variable_id)s
+    """
+    return pd.read_sql(sql, engine, params={"variable_id": variable_id})
+
+
+def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
+    """Fetch metadata for a single variable from database.
+    This function is similar to Variables.getVariableData in owid-grapher repository
+    """
+    row = _load_variable(engine, variable_id)
 
     variable = row
     sourceId = row.pop("sourceId")
@@ -208,6 +222,10 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
     time_format = "%Y-%m-%dT%H:%M:%S.000Z"
     for col in ("createdAt", "updatedAt"):
         variableMetadata[col] = variableMetadata[col].strftime(time_format)  # type: ignore
+
+    # add origins
+    origins_df = _load_origins_df(engine, variable_id)
+    variableMetadata["origins"] = [_omit_nullable_values(d) for d in origins_df.to_dict(orient="records")]  # type: ignore
 
     return variableMetadata
 
