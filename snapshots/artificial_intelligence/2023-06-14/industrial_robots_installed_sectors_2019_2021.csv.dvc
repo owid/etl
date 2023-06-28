@@ -1,0 +1,5 @@
+wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
+outs:
+- md5: 40fe3a39fd4cd9ebf53791b63a934e0d
+  size: 575
+  path: industrial_robots_installed_sectors_2019_2021.csv

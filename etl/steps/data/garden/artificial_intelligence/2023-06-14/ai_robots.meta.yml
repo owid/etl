@@ -1,0 +1,58 @@
+dataset:
+  title: AI Industrial Robots
+  description: &desc |
+    The dataset comprises several key statistics related to industrial robotics, professional service robots, and AI adoption.
+  licenses:
+  - name: Public domain
+    url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  sources:
+  - name: International Federation of Robotics (IFR) via AI Index (2023)
+    description: *desc
+    url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
+    date_accessed: '2023-06-19'
+    publication_date: '2023-03-20'
+    publication_year: 2023
+    published_by: International Federation of Robotics (IFR) via the AI Index 2023
+      Annual Report,” AI Index Steering Committee, Institute for Human-Centered AI,
+      Stanford University, Stanford, CA, April 2023
+tables:
+  ai_robots:
+    variables:
+      annual_count__number_of_industrial_robots_installed:
+        title: Annual Count of Industrial Robots Installed
+        description: Annual count of industrial robots installed worldwide from 2011 to 2021.
+        unit: ''
+      cumulative_operational__number_of_industrial_robots:
+        title: Cumulative  Number of Operational Industrial Robots
+        description: Cumulative number of industrial robots that were operational in the world from 2011 to 2021.
+        unit: ''
+      installed_countries__number_of_industrial_robots_installed:
+        title:  Number of Industrial Robots Installed
+        description: Number of industrial robots installed in various countries specifically for the year 2021.
+        unit: ''
+      new_robots_installed__number_of_industrial_robots_installed:
+        title:  Number of Industrial Robots Installed (in Thousands)
+        description: Number of new industrial robots installed in top countries from 2011 to 2021.
+        unit: ''
+      professional_service_robots__number_of_professional_service_robots_installed:
+        title:  Number of Professional Service Robots
+          Installed (in Thousands)
+        description: Number of professional service robots installed worldwide across different application areas for the years 2020 and 2021.
+        unit: ''
+      professional_service_robots__application_area:
+        title: Application area (professional service robots)
+        description: Number of professional service robots installed worldwide across different application areas for the years 2020 and 2021.
+        unit: ''
+      installed_sectors__number_of_industrial_robots_installed:
+        title:  Number of Industrial Robots Installed by sector
+        unit: Number of industrial robots installed in various sectors globally from 2019 to 2021.
+      installed_sectors__sector:
+        title: Sector
+        unit: ''
+      installed_application__number_of_industrial_robots_installed:
+        title: Number of Industrial Robots Installed by application
+        description: Number of industrial robots installed worldwide categorized by application, covering the period from 2019 to 2021.
+        unit: ''
+      installed_application__application:
+        title: Application
+        unit: ''

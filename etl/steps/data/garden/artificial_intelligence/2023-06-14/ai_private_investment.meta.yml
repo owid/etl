@@ -1,0 +1,108 @@
+dataset:
+  title: Private Investment in AI by Focus Area and Geographic Area, 2017–22 (AI Index,
+    2023)
+  description: &desc |
+    Data on AI private investment by focus area over time within select
+    geographic regions, highlighting how private investment priorities in AI differ
+    across geographies.
+  licenses:
+  - name: Public domain
+    url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  sources:
+  - name: NetBase Quid (2022) via AI Index (2023)
+    description: *desc
+    url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
+    source_data_url: https://drive.google.com/uc?export=download&id=1dRiv5KHWnfp-N3xpC2MfcYkqDPKhF7sQ
+    date_accessed: '2023-06-28'
+    publication_date: '2023-03-20'
+    publication_year: 2023
+    published_by: NetBase Quid (2022) via AI Index 2023 Annual Report,” AI Index Steering
+      Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA,
+      April 2023
+tables:
+  ai_private_investment:
+    variables:
+      cpi_adj_2021:
+        title: cpi_adj_2021
+        unit: ''
+      geographic_area:
+        title: Geographic Area
+        unit: ''
+      data_management__processing__cloud:
+        title: Data Management, Processing, Cloud
+        unit: ''
+      medical_and_healthcare:
+        title: Medical and Healthcare
+        unit: ''
+      fintech:
+        title: Fintech
+        unit: ''
+      av:
+        title: AV
+        unit: ''
+      semiconductor:
+        title: Semiconductor
+        unit: ''
+      industrial_automation__network:
+        title: Industrial Automation, Network
+        unit: ''
+      retail:
+        title: Retail
+        unit: ''
+      fitness_and_wellness:
+        title: Fitness and Wellness
+        unit: ''
+      nlp__customer_support:
+        title: NLP, Customer Support
+        unit: ''
+      energy__oil__and_gas:
+        title: Energy, Oil, and Gas
+        unit: ''
+      cybersecurity__data_protection:
+        title: Cybersecurity, Data Protection
+        unit: ''
+      drones:
+        title: Drones
+        unit: ''
+      marketing__digital_ads:
+        title: Marketing, Digital Ads
+        unit: ''
+      hr_tech:
+        title: HR Tech
+        unit: ''
+      facial_recognition:
+        title: Facial Recognition
+        unit: ''
+      insurtech:
+        title: Insurtech
+        unit: ''
+      agritech:
+        title: Agritech
+        unit: ''
+      sales_enablement:
+        title: Sales Enablement
+        unit: ''
+      ar_vr:
+        title: AR/VR
+        unit: ''
+      ed_tech:
+        title: Ed Tech
+        unit: ''
+      geospatial:
+        title: Geospatial
+        unit: ''
+      legal_tech:
+        title: Legal Tech
+        unit: ''
+      entertainment:
+        title: Entertainment
+        unit: ''
+      music__video_content:
+        title: Music, Video Content
+        unit: ''
+      vc:
+        title: VC
+        unit: ''
+      total:
+        title: Total
+        unit: ''

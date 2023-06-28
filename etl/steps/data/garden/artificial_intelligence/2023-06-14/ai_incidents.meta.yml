@@ -1,0 +1,31 @@
+dataset:
+  title: Number of AI Incidents and Controversies, 2012–2021 (AI Index, 2023)
+  description: &desc |
+    The AI, Algorithmic, and Automation Incidents and Controversies (AIAAIC)
+    Repository is an independent, open, and public dataset of recent incidents and
+    controversies driven by or relating to AI, algorithms, and automation. It was
+    launched in 2019 as a private project to better understand some of the reputational
+    risks of artificial intelligence and has evolved into a comprehensive initiative
+    that tracks the ethical issues associated with AI technology. This dataset does
+    not include AI incidents reported in 2022 yet, as the incidents submitted to the
+    AIAAIC database undergo a lengthy vetting process before they are fully added.
+  licenses:
+  - name: Public domain
+    url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  sources:
+  - name: AIAAIC Repository (2022) via AI Index (2023)
+    description: *desc
+    url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
+    source_data_url: https://drive.google.com/uc?export=download&id=1eObHVTEOg0qDKBNMEZ6o5eGhFm8C2kPG
+    date_accessed: '2023-06-27'
+    publication_date: '2023-03-20'
+    publication_year: 2023
+    published_by: AIAAIC Repository (2022) via 2023 AI Index Reportvia the AI Index
+      2023 Annual Report,” AI Index Steering Committee, Institute for Human-Centered
+      AI, Stanford University, Stanford, CA, April 2023
+tables:
+  ai_incidents:
+    variables:
+      number_of_ai_incidents_and_controversies:
+        title: Number of AI Incidents and Controversies (2012-2021)
+        unit: ''

@@ -1,0 +1,5 @@
+wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
+outs:
+- md5: 5d6067d15ff60fb184cffab1042776f8
+  size: 356
+  path: professional_service_robots_application_2020_2021.csv
