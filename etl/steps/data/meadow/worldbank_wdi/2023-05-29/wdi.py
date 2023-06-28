@@ -50,26 +50,29 @@ def run(dest_dir: str) -> None:
         df.groupby("indicator_name")["indicator_code"].apply(lambda gp: gp.nunique()) == 1
     ).all(), "A variable name in `WDIData.csv` has multiple variable codes."
 
-    # reshapes data from `country indicator 1960 1961 ...` format
-    # to `country year EG.CFT.ACCS.ZS SH.HIV.INCD.YG ...` format
-    df_reshaped = (
+    # reshapes data from `country indicator 1960 1961 ...` format to long format `country indicator_code year value`
+    df_long = (
         df.set_index(["country_name", "indicator_code"])[years]
         .stack()
         .sort_index()
         .reset_index()
         .rename(columns={"country_name": "country", "level_2": "year", 0: "value"})
-        .set_index(["country", "year", "indicator_code"], verify_integrity=True)
+    )
+
+    # reshape from long format to wide `country year EG.CFT.ACCS.ZS SH.HIV.INCD.YG ...`
+    df_wide = (
+        df_long.set_index(["country", "year", "indicator_code"], verify_integrity=True)
         .squeeze()
         .unstack("indicator_code")
         .dropna(how="all")
     )
-    assert not df_reshaped.isnull().all(axis=1).any(), "Unexpected state: One or more rows contains only NaN values."
+    assert not df_wide.isnull().all(axis=1).any(), "Unexpected state: One or more rows contains only NaN values."
 
     #
     # Process data.
     #
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df_reshaped, short_name=paths.short_name, underscore=True)
+    tb = Table(df_wide, short_name=paths.short_name, underscore=True)
 
     #
     # Save outputs.
