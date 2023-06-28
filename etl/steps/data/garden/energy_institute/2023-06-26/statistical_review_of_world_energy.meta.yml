@@ -1,2 +1,439 @@
 tables:
-  {}
+  statistical_review_of_world_energy:
+    variables:
+      biodiesel_cons_kboed:
+        title: 'Biofuels Consumption - Kboed - Biodiesel'
+        unit: 'Thousand barrels of oil equivalent per day'
+        short_unit: 'KBOED'
+      biodiesel_cons_pj:
+        title: 'Biofuels Consumption - PJ - Biodiesel'
+        unit: 'Petajoules'
+        short_unit: 'PJ'
+      biodiesel_cons_twh:  # Added by OWID.
+        title: 'Biofuels Consumption - TWh - Biodiesel'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+      biodiesel_prod_kboed:
+        title: 'Biofuels Production - Kboed - Biodiesel'
+        unit: 'Thousand barrels of oil equivalent per day'
+        short_unit: 'KBOED'
+        description: |
+          Biodiesel production includes biojet which is currently <1 KBOED globally but more than doubled relative to 2019.
+      biodiesel_prod_pj:
+        title: 'Biofuels Production - PJ - Biodiesel'
+        unit: 'Petajoules'
+        short_unit: 'PJ'
+        description: |
+          Biodiesel production includes biojet which is currently <1 KBOED globally but more than doubled relative to 2019.
+      biodiesel_prod_twh:  # Added by OWID.
+        title: 'Biofuels Production - TWh - Biodiesel'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Biodiesel production includes biojet which is currently <1 KBOED globally but more than doubled relative to 2019.
+      biofuels_cons_kboed:
+        title: 'Biofuels Consumption - Kboed - Total'
+        unit: 'Thousand barrels of oil equivalent per day'
+        short_unit: 'KBOED'
+        description: |
+          Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
+      biofuels_cons_pj:
+        title: 'Biofuels Consumption - PJ - Total'
+        unit: 'Petajoules'
+        short_unit: 'PJ'
+        description: |
+          Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
+      biofuels_cons_twh:  # Added by OWID.
+        title: 'Biofuels Consumption - TWh - Total'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
+      biofuels_prod_kboed:
+        title: 'Biofuels Production - Kboed - Total'
+        unit: 'Thousand barrels of oil equivalent per day'
+        short_unit: 'KBOED'
+        description: |
+          Includes biogasoline (such as ethanol), biodiesel and biojet. Volumes have been adjusted for energy content.
+      biofuels_prod_pj:
+        title: 'Biofuels Production - PJ - Total'
+        unit: 'Petajoules'
+        short_unit: 'PJ'
+        description: |
+          Includes biogasoline (such as ethanol), biodiesel and biojet. Volumes have been adjusted for energy content.
+      biofuels_prod_twh:  # Added by OWID.
+        title: 'Biofuels Production - TWh - Total'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Includes biogasoline (such as ethanol), biodiesel and biojet. Volumes have been adjusted for energy content.
+      biogeo_ej:
+        title: 'Geo Biomass Other - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      biogeo_twh:
+        title: 'Geo Biomass Other - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply.
+      co2_mtco2:
+        title: 'Carbon Dioxide Emissions'
+        unit: 'Million tonnes of carbon dioxide'
+        short_unit: ''
+        description: |
+          Figure only reflect carbon emissions through consumption of oil, gas and coal for combustion-related activities, and are based on "Default CO2 Emissions Factors for Combustion" listed by the IPCC in its Guidelines for National Greenhouse Gas Inventories (2006). This does not allow for any carbon that is sequestered, for other sources of carbon emissions, or for emissions of other greenhouse gases. Our data is therefore not comparable to official national emissions data.
+      coalcons_ej:
+        title: 'Coal Consumption - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Includes commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous) coal, and other commercial solid fuels. Excludes coal converted to liquid or gaseous fuels, but includes coal consumed in transformation processes. Differences between the consumption figures and the world production statistics are accounted for by stock changes, and unavoidable disparities in the definition, measurement or conversion of coal supply and demand data.
+      coalcons_twh:  # Added by OWID.
+        title: 'Coal Consumption - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Includes commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous) coal, and other commercial solid fuels. Excludes coal converted to liquid or gaseous fuels, but includes coal consumed in transformation processes. Differences between the consumption figures and the world production statistics are accounted for by stock changes, and unavoidable disparities in the definition, measurement or conversion of coal supply and demand data.
+      coalprod_ej:
+        title: 'Coal Production - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Includes commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous) coal, and other commercial solid fuels. Includes coal produced for Coal-to-Liquids and Coal-to-Gas transformations.
+      coalprod_twh:  # Added by OWID.
+        title: 'Coal Production - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Includes commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous) coal, and other commercial solid fuels. Includes coal produced for Coal-to-Liquids and Coal-to-Gas transformations.
+      coalprod_mt:
+        title: 'Coal Production - Tonnes'
+        unit: 'Million tonnes'
+        short_unit: 'MT'
+        description: |
+          Includes commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous) coal, and other commercial solid fuels. Includes coal produced for Coal-to-Liquids and Coal-to-Gas transformations.
+      cobalt_kt:
+        title: 'Cobalt Production-Reserves'
+        unit: 'Thousand tonnes'
+        short_unit: 'KT'
+      elect_twh:
+        title: 'Electricity Generation'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross output.
+      electbyfuel_coal:
+        title: 'Elec Gen from Coal'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross output.
+      electbyfuel_gas:
+        title: 'Elec Gen from Gas'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross output.
+      electbyfuel_oil:
+        title: 'Elec Gen from Oil'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross output.
+      gascons_bcfd:
+        title: 'Gas Consumption - Bcf'
+        unit: 'Billion cubic feet per day'
+        short_unit: 'BCFD'
+        description: |
+          Excludes natural gas converted to liquid fuels but includes derivatives of coal as well as natural gas consumed in Gas-to-Liquids transformation. The difference between the world consumption figures and the world production statistics is due to variations in stocks at storage facilities and liquefaction plants, together with unavoidable disparities in the definition, measurement or conversion of gas supply and demand data.
+      gascons_bcm:
+        title: 'Gas Consumption - Bcm'
+        unit: 'Billion cubic metres'
+        short_unit: 'BCM'
+        description: |
+          Excludes natural gas converted to liquid fuels but includes derivatives of coal as well as natural gas consumed in Gas-to-Liquids transformation. As far as possible, the data represent standard cubic metres (measured at 15C and 1013 mbar); as they are derived directly from measures of energy content using an average conversion factor and have been standardized using a Gross Calorific Value (GCV) of 40 MJ/m3, they do not necessarily equate with gas volumes expressed in specific national terms. The difference between the world consumption figures and the world production statistics is due to variations in stocks at storage facilities and liquefaction plants, together with unavoidable disparities in the definition, measurement or conversion of gas supply and demand data.
+      gascons_ej:
+        title: 'Gas Consumption - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Excludes natural gas converted to liquid fuels but includes derivatives of coal as well as natural gas consumed in Gas-to-Liquids transformation. The difference between the world consumption figures and the world production statistics is due to variations in stocks at storage facilities and liquefaction plants, together with unavoidable disparities in the definition, measurement or conversion of gas supply and demand data.
+      gascons_twh:  # Added by OWID.
+        title: 'Gas Consumption - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Excludes natural gas converted to liquid fuels but includes derivatives of coal as well as natural gas consumed in Gas-to-Liquids transformation. The difference between the world consumption figures and the world production statistics is due to variations in stocks at storage facilities and liquefaction plants, together with unavoidable disparities in the definition, measurement or conversion of gas supply and demand data.
+      gasprod_bcfd:
+        title: 'Gas Production - Bcf'
+        unit: 'Billion cubic feet per day'
+        short_unit: 'BCFD'
+        description: |
+          Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation. As the data are derived directly from measures of energy content, they do not necessarily equate with gas volumes expressed in specific national terms.
+      gasprod_bcm:
+        title: 'Gas Production - Bcm'
+        unit: 'Billion cubic metres'
+        short_unit: 'BCM'
+        description: |
+          Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation. As far as possible, the data represents standard cubic metres (measured at 15C and 1013 mbar); as they are derived directly from measures of energy content using an average conversion factor and have been standardized using a Gross Calorific Value (GCV) of 40 MJ/m3, they do not necessarily equate with gas volumes expressed in specific national terms.
+      gasprod_ej:
+        title: 'Gas Production - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+      gasprod_twh:  # Added by OWID.
+        title: 'Gas Production - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+      gasreserves_tcm:
+        title: 'Gas - Proved reserves'
+        unit: 'Trillion cubic metres'
+        short_unit: 'TCM'
+        description: |
+          Total proved reserves of natural gas is generally taken to be those quantities that geological and engineering information indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and operating conditions. The data series for total proved natural gas does not necessarily meet the definitions, guidelines and practices used for determining proved reserves at company level, for instance as published by the US Securities and Exchange Commission, nor does it necessarily represent BP's view of proved reserves by country. Reserves-to-production (R/P) ratio: If the reserves remaining at the end of any year are divided by the production in that year, the result is the length of time that those remaining reserves would last if production were to continue at that rate. As far as possible, the data represents standard cubic metres (measured at 15C and 1013 mbar) and has been standardized using a gross calorific value (GCV) of 40 MJ/m3.
+      graphite_kt:
+        title: 'Graphite Production-Reserves'
+        unit: 'Thousand tonnes'
+        short_unit: 'KT'
+      hydro_ej:
+        title: 'Hydro Consumption - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      hydro_cons_twh:  # Added by OWID.
+        title: 'Hydro Consumption - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      hydro_twh:
+        title: 'Hydro Generation - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross primary hydroelectric generation and do not account for cross-border electricity supply.
+      liqcons_kbd:
+        title: 'Total Liquids - Consumption'
+        unit: 'Thousand barrels per day'
+        short_unit: 'KBD'
+        description: |
+          Includes inland demand plus international aviation and marine bunkers and refinery fuel and loss. Consumption of biogasoline (such as ethanol), biodiesel and derivatives of coal and natural gas are also included. Differences between the world consumption figures and world production statistics are accounted for by stock changes, consumption of non-petroleum additives and substitute fuels and unavoidable disparities in the definition, measurement or conversion of oil supply and demand data.
+      lithium_kt:
+        title: 'Lithium Production-Reserves'
+        unit: 'Thousand tonnes'
+        short_unit: 'KT'
+      nuclear_ej:
+        title: 'Nuclear Consumption - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      nuclear_cons_twh:  # Added by OWID.
+        title: 'Nuclear Consumption - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      nuclear_twh:
+        title: 'Nuclear Generation - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply.
+      oilcons_ej:
+        title: 'Oil Consumption - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Includes inland demand plus international aviation and marine bunkers and refinery fuel and loss. Consumption of biogasoline (such as ethanol) and biodiesel are excluded while derivatives of coal and natural gas are included. Differences between the world consumption figures and world production statistics are accounted for by stock changes, consumption of non-petroleum additives and substitute fuels and unavoidable disparities in the definition, measurement or conversion of oil supply and demand data.
+      oilcons_twh:  # Added by OWID.
+        title: 'Oil Consumption - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Includes inland demand plus international aviation and marine bunkers and refinery fuel and loss. Consumption of biogasoline (such as ethanol) and biodiesel are excluded while derivatives of coal and natural gas are included. Differences between the world consumption figures and world production statistics are accounted for by stock changes, consumption of non-petroleum additives and substitute fuels and unavoidable disparities in the definition, measurement or conversion of oil supply and demand data.
+      oilcons_kbd:
+        title: 'Oil Consumption - Barrels'
+        unit: 'Thousand barrels per day'
+        short_unit: 'KBD'
+        description: |
+          Includes inland demand plus international aviation and marine bunkers and refinery fuel and loss. Consumption of biogasoline (such as ethanol) and biodiesel are excluded while derivatives of coal and natural gas are included. Differences between the world consumption figures and world production statistics are accounted for by stock changes, consumption of non-petroleum additives and substitute fuels and unavoidable disparities in the definition, measurement or conversion of oil supply and demand data.
+      oilcons_mt:
+        title: 'Oil Consumption - Tonnes'
+        unit: 'Million tonnes'
+        short_unit: 'MT'
+        description: |
+          Includes inland demand plus international aviation and marine bunkers and refinery fuel and loss. Consumption of biogasoline (such as ethanol) and biodiesel are excluded while derivatives of coal and natural gas are included. Differences between the world consumption figures and world production statistics are accounted for by stock changes, consumption of non-petroleum additives and substitute fuels and unavoidable disparities in the definition, measurement or conversion of oil supply and demand data.
+      oilprod_crudecond_kbd:
+        title: 'Oil Production - Crude Conds'
+        unit: 'Thousand barrels per day'
+        short_unit: 'KBD'
+        description: |
+          Includes crude oil, shale/tight oil, oil sands, lease condensate or gas condensates that require further refining. Excludes liquid fuels from other sources such as biomass and synthetic derivatives of coal and natural gas.
+      oilprod_kbd:
+        title: 'Oil Production - Barrels'
+        unit: 'Thousand barrels per day'
+        short_unit: 'KBD'
+        description: |
+          Includes crude oil, shale oil, oil sands, condensates (lease condensate or gas condensates that require further refining) and NGLs (natural gas liquids - ethane, LPG and naphtha separated from the production of natural gas). Excludes liquid fuels from other sources such as biofuels and synthetic derivatives of coal and natural gas. This also excludes liquid fuel adjustment factors such as refinery processing gain. Excludes oil shales/kerogen extracted in solid form.
+      oilprod_mt:
+        title: 'Oil Production - Tonnes'
+        unit: 'Million tonnes'
+        short_unit: 'MT'
+        description: |
+          Includes crude oil, shale oil, oil sands, condensates (lease condensate or gas condensates that require further refining) and NGLs (natural gas liquids - ethane, LPG and naphtha separated from the production of natural gas). Excludes liquid fuels from other sources such as biofuels and synthetic derivatives of coal and natural gas. This also excludes liquid fuel adjustment factors such as refinery processing gain. Excludes oil shales/kerogen extracted in solid form.
+      oilprod_twh:  # Added by OWID.
+        title: 'Oil Production - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Includes crude oil, shale oil, oil sands, condensates (lease condensate or gas condensates that require further refining) and NGLs (natural gas liquids - ethane, LPG and naphtha separated from the production of natural gas). Excludes liquid fuels from other sources such as biofuels and synthetic derivatives of coal and natural gas. This also excludes liquid fuel adjustment factors such as refinery processing gain. Excludes oil shales/kerogen extracted in solid form.
+      oilprod_ngl_kbd:
+        title: 'Oil Production - NGLs'
+        unit: 'Thousand barrels per day'
+        short_unit: 'KBD'
+        description: |
+          Includes ethane, LPG and naphtha separated from the production of natural gas. Excludes condensates.
+      oilreserves_bbl:
+        title: 'Oil - Proved reserves'
+        unit: 'Barrels'
+        short_unit: 'BBL'
+        description: |
+          Estimates have been compiled using a combination of primary official sources, third-party data from the OPEC Secretariat, World Oil, Oil & Gas Journal and Chinese reserves based on official data and information in the public domain. Canadian oil sands "under active development" are an official estimate. Venezuelan Orinoco Belt reserves are based on the OPEC Secretariat and government announcements. Reserves and R/P ratio for Canada includes Canadian oil sands. Reserves and R/P ratio for Venezuela includes the Orinoco Belt. Saudi Arabia's oil reserves include NGLs from 2017. Total proved reserves of oil are generally taken to be those quantities that geological and engineering information indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and operating conditions. The data series for total proved oil reserves does not necessarily meet the definitions, guidelines and practices used for determining proved reserves at company level, for instance as published by the US Securities and Exchange Commission, nor does it necessarily represent BP's view of proved reserves by country. Reserves-to-production (R/P) ratio: If the reserves remaining at the end of any year are divided by the production in that year, the result is the length of time that those remaining reserves would last if production were to continue at that rate. Reserves include gas condensate and natural gas liquids (NGLs) as well as crude oil.
+      primary_ej:
+        title: 'Primary Energy Consumption - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Primary energy comprises commercially-traded fuels, including modern renewables used to generate electricity. Energy from all sources of non-fossil power generation is accounted for on an input-equivalent basis.
+      primary_twh:  # Added by OWID.
+        title: 'Primary Energy Consumption - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Primary energy comprises commercially-traded fuels, including modern renewables used to generate electricity. Energy from all sources of non-fossil power generation is accounted for on an input-equivalent basis.
+      primary_ej_pc:
+        title: 'Primary Energy - Cons capita'
+        unit: 'Gigajoules per capita'
+        short_unit: ''
+        description: |
+          Primary energy comprises commercially-traded fuels, including modern renewables used to generate electricity. Energy from all sources of non-fossil power generation is accounted for on an input-equivalent basis.
+      rareearths_kt:
+        title: 'Rare Earth Production-Reserves'
+        unit: 'Thousand tonnes'
+        short_unit: 'KT'
+        description: |
+          Figures are measured in terms of thousand tonnes of rare earth oxide equivalent.
+      refcap_kbd:
+        title: 'Oil - Refining capacity'
+        unit: 'Thousand barrels per day'
+        short_unit: 'KBD'
+        description: |
+          Atmospheric distillation capacity is measured at year end on a calendar-day basis.
+      refthru_kbd:
+        title: 'Oil - Refinery throughput'
+        unit: 'Thousand barrels per day'
+        short_unit: 'KBD'
+        description: |
+          Atmospheric distillation capacity is measured at year end on a calendar-day basis.
+      ren_power_ej:
+        title: 'Renewables Power - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Renewable power is based on gross generation from renewable sources including wind, geothermal, solar, biomass and waste, and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      ren_power_twh:
+        title: 'Renewables power - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Renewable power is based on gross generation from renewable sources including wind, geothermal, solar, biomass and waste, and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      renewables_ej:
+        title: 'Renewables Consumption - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Includes renewable power (apart from hydro, which is reported seperately) and biofuels. Renewable power is based on gross generation and does not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      renewables_twh:  # Added by OWID.
+        title: 'Renewables Consumption - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Includes renewable power (apart from hydro, which is reported seperately) and biofuels. Renewable power is based on gross generation and does not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      solar_ej:
+        title: 'Solar Consumption - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      solar_cons_twh:  # Added by OWID.
+        title: 'Solar Consumption - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      solar_twh:
+        title: 'Solar Generation - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply.
+      wind_ej:
+        title: 'Wind Consumption - EJ'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      wind_cons_twh:  # Added by OWID.
+        title: 'Wind Consumption - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      wind_twh:
+        title: 'Wind Generation - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply.
+      coal_price:  # Added by OWID.
+        title: 'Coal - Prices'
+        unit: 'US dollars per tonne'
+        short_unit: ''
+      coal_reserves_anthracite_bituminous:  # Added by OWID.
+        title: 'Coal - Reserves - Anthracite and bituminous'
+        unit: 'Million tonnes'
+        short_unit: 'MT'
+      coal_reserves_subbituminous_and_lignite:  # Added by OWID.
+        title: 'Coal - Reserves - Sub-bituminous and lignite'
+        unit: 'Million tonnes'
+        short_unit: 'MT'
+      coal_reserves_total:  # Added by OWID.
+        title: 'Coal - Reserves - Total'
+        unit: 'Million tonnes'
+        short_unit: 'MT'
+        description: |
+          Total proved reserves of coal are generally taken to be those quantities that geological and engineering information indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and operating conditions. The data series for total proved coal reserves does not necessarily meet the definitions, guidelines and practices used for determining proved reserves at company level, for instance as published by the US Securities and Exchange Commission, nor does it necessarily represent BP's view of proved reserves by country. Reserves-to-production (R/P) ratio: If the reserves remaining at the end of any year are divided by the production in that year, the result is the length of time that those remaining reserves would last if production were to continue at that rate.
+      gas_price:  # Added by OWID.
+        title: 'Gas - Prices'
+        unit: 'US dollars per million BTU'
+        short_unit: ''
+      oil_spot_crude_price:  # Added by OWID.
+        title: 'Oil - Spot crude prices'
+        unit: 'US dollars per barrel'
+        short_unit: ''
+      oil_crude_price_current_dollars:  # Added by OWID.
+        title: 'Oil - Crude prices since 1861 (current $)'
+        unit: 'US dollars per barrel (current $)'
+        short_unit: ''
+      oil_crude_price:  # Added by OWID.
+        title: 'Oil - Crude prices since 1861 (2021 $)'
+        unit: 'US dollars per barrel (2021 $)'
+        short_unit: ''

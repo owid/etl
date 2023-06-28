@@ -2,6 +2,7 @@
 
 from typing import cast
 
+import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
@@ -20,10 +21,8 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load meadow dataset and read its main table.
     ds_meadow = cast(Dataset, paths.load_dependency("statistical_review_of_world_energy"))
-
-    # Read table from meadow dataset.
     tb = ds_meadow["statistical_review_of_world_energy"]
 
     #

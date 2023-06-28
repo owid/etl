@@ -1,30 +1,5 @@
 steps:
   #
-  # BP - Statistical review 2021.
-  #
-  # NOTE: This dataset is not used in grapher. It exists only to fill gaps in the 2022 version.
-  data://garden/bp/2022-07-11/statistical_review:
-    - backport://backport/owid/latest/dataset_5347_statistical_review_of_world_energy__bp__2021
-    - data://garden/owid/latest/key_indicators
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-  #
-  # BP - Statistical review 2022.
-  #
-  # NOTE: For the moment this is not the full processing (which is still done in importers).
-  #  This garden step loads the dataset and adds region aggregates properly, plus some other minor improvements.
-  #  Here, we also remove some regions that had misleading data (BP regions like "Other *").
-  data://garden/bp/2022-12-28/statistical_review:
-    # The backported 2022 release is the main source of data of this step.
-    - backport://backport/owid/latest/dataset_5650_statistical_review_of_world_energy__bp__2022
-    # The 2021 release is loaded just to fill missing data in the current version (and to get a missing column).
-    - data://garden/bp/2022-07-11/statistical_review
-    - data://garden/owid/latest/key_indicators
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/bp/2022-12-28/statistical_review:
-    - data://garden/bp/2022-12-28/statistical_review
-  #
   # BP - Energy mix 2023.
   #
   data://garden/bp/2023-02-20/energy_mix:
@@ -218,6 +193,7 @@ steps:
   #
   data://meadow/energy_institute/2023-06-26/statistical_review_of_world_energy:
     - snapshot://energy_institute/2023-06-26/statistical_review_of_world_energy.csv
+    - snapshot://energy_institute/2023-06-26/statistical_review_of_world_energy.xlsx
   data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy:
     - data://meadow/energy_institute/2023-06-26/statistical_review_of_world_energy
   data://grapher/energy_institute/2023-06-26/statistical_review_of_world_energy:
@@ -234,5 +210,29 @@ steps:
     - data://meadow/irena/2023-01-04/renewable_electricity_capacity_and_generation
   data://grapher/irena/2023-01-04/renewable_electricity_capacity_by_technology:
     - data://garden/irena/2023-01-04/renewable_electricity_capacity
-
+  #
+  # BP - Statistical review 2021.
+  #
+  # NOTE: This dataset is not used in grapher. It exists only to fill gaps in the 2022 version.
+  data://garden/bp/2022-07-11/statistical_review:
+    - backport://backport/owid/latest/dataset_5347_statistical_review_of_world_energy__bp__2021
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+  #
+  # BP - Statistical review 2022.
+  #
+  # NOTE: For the moment this is not the full processing (which is still done in importers).
+  #  This garden step loads the dataset and adds region aggregates properly, plus some other minor improvements.
+  #  Here, we also remove some regions that had misleading data (BP regions like "Other *").
+  data://garden/bp/2022-12-28/statistical_review:
+    # The backported 2022 release is the main source of data of this step.
+    - backport://backport/owid/latest/dataset_5650_statistical_review_of_world_energy__bp__2022
+    # The 2021 release is loaded just to fill missing data in the current version (and to get a missing column).
+    - data://garden/bp/2022-07-11/statistical_review
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/bp/2022-12-28/statistical_review:
+    - data://garden/bp/2022-12-28/statistical_review
   ######################################################################################################################
