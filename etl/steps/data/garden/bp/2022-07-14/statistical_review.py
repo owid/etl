@@ -361,7 +361,6 @@ def run(dest_dir: str) -> None:
     # Add table to the dataset.
     table.metadata.title = dataset.metadata.title
     table.metadata.description = dataset.metadata.description
-    table.metadata.dataset = dataset.metadata
     table.metadata.short_name = dataset.metadata.short_name
     table.metadata.primary_key = list(table.index.names)
     dataset.add(table, repack=True)
