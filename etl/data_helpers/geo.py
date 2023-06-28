@@ -590,12 +590,21 @@ def list_members_of_region(
     )
 
     if ds_income_groups is not None:
-        # Get the main table from the income groups dataset.
-        df_income = pd.DataFrame(ds_income_groups["wb_income_group"]).reset_index()
+        if "wb_income_group" in ds_income_groups.table_names:
+            # TODO: Remove this block once the old income groups dataset has been archived.
+            # Get the main table from the income groups dataset.
+            df_income = (
+                pd.DataFrame(ds_income_groups["wb_income_group"])
+                .reset_index()
+                .rename(columns={"income_group": "classification"})
+            )
+        elif "income_groups_latest" in ds_income_groups.table_names:
+            # Get the table with the current definitions of income groups.
+            df_income = ds_income_groups["income_groups_latest"].reset_index()
 
         # Create a dataframe of countries in each income group.
         df_countries_in_income_group = (
-            df_income.rename(columns={"income_group": "region", "country": "members"})
+            df_income.rename(columns={"classification": "region", "country": "members"})
             .groupby("region", as_index=True, observed=True)
             .agg({"members": list})
         )
