@@ -169,14 +169,16 @@ steps:
   data://grapher/irena/2023-01-04/renewable_power_generation_costs:
     - data://garden/irena/2023-01-04/renewable_power_generation_costs
   #
-  # IRENA - Renewable electricity capacity (and generation, although the generation part is ignored for now, 2022).
+  # IRENA - Renewable electricity capacity (2023).
   #
-  data://meadow/irena/2023-01-04/renewable_electricity_capacity_and_generation:
-    - walden://irena/2022-10-07/renewable_electricity_capacity_and_generation
-  data://garden/irena/2023-01-04/renewable_electricity_capacity:
-    - data://meadow/irena/2023-01-04/renewable_electricity_capacity_and_generation
-  data://grapher/irena/2023-01-04/renewable_electricity_capacity_by_technology:
-    - data://garden/irena/2023-01-04/renewable_electricity_capacity
+  data://meadow/irena/2023-06-26/renewable_electricity_capacity:
+    - snapshot://irena/2023-06-26/renewable_electricity_capacity_and_generation.xlsm
+  data://garden/irena/2023-06-26/renewable_electricity_capacity:
+    - data://meadow/irena/2023-06-26/renewable_electricity_capacity
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/irena/2023-06-26/renewable_electricity_capacity_by_technology:
+    - data://garden/irena/2023-06-26/renewable_electricity_capacity
   #
   # IRENA - Renewable energy patents (2021).
   #
@@ -223,5 +225,14 @@ steps:
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
+  #
+  # IRENA - Renewable electricity capacity (and generation, although the generation part is ignored for now, 2022).
+  #
+  data://meadow/irena/2023-01-04/renewable_electricity_capacity_and_generation:
+    - walden://irena/2022-10-07/renewable_electricity_capacity_and_generation
+  data://garden/irena/2023-01-04/renewable_electricity_capacity:
+    - data://meadow/irena/2023-01-04/renewable_electricity_capacity_and_generation
+  data://grapher/irena/2023-01-04/renewable_electricity_capacity_by_technology:
+    - data://garden/irena/2023-01-04/renewable_electricity_capacity
 
   ######################################################################################################################

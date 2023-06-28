@@ -1,0 +1,22 @@
+meta:
+  name: Renewable Electricity Capacity and Generation Statistics
+  publication_year: 2023
+
+  publication_date: '2023-03-01'
+  source_name: International Renewable Energy Agency (IRENA)
+  source_published_by: International Renewable Energy Agency (IRENA)
+  url: https://www.irena.org/Statistics/Download-query-tools
+  source_data_url: 
+    https://www.irena.org/IRENADocuments/IRENA_RE_electricity_statistics_-_Query_tool.xlsm
+  license_url: 
+    https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2023/Mar/IRENA_RE_Capacity_Statistics_2023.pdf
+  license_name: Copyright © IRENA 2023
+  date_accessed: 2023-06-28
+  is_public: true
+  description: |
+    The data in this link may be freely used, shared, copied, reproduced, printed and/or stored, provided that all such material is clearly attributed to IRENA and bears a notation of copyright (© IRENA) with the year of copyright. Unless otherwise stated, the data provided are the property of the International Renewable Energy Agency (IRENA) and are subject to copyright by IRENA. Data attributed to third parties may be subject to third-party copyright and separate terms of use and restrictions, including restrictions in relation to any commercial use.
+wdir: ../../../data/snapshots/irena/2023-06-26
+outs:
+- md5: bc4b45cda6fa828e2ad8d1773ad1d46d
+  size: 2531832
+  path: renewable_electricity_capacity_and_generation.xlsm
