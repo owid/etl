@@ -119,8 +119,10 @@ class Dataset:
                 )
 
         if not table.index.is_unique and "OWID_STRICT" in environ:
+            [(k, dups)] = table.index.value_counts().head(1).to_dict().items()
             raise NonUniqueIndex(
-                f"Table `{table.metadata.short_name}` has duplicate values in the index -- could you have made a mistake?"
+                f"Table `{table.metadata.short_name}` has duplicate values in the index -- could you have made a mistake?\n\n"
+                f"e.g. key {k} is repeated {dups} times in the index"
             )
 
         # check Float64 and Int64 columns for np.nan
