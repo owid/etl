@@ -28,40 +28,16 @@ tables:
           Institution that introduced a certain definition. For example, if a certain region was found in a dataset of a certain institution, this variable will contain the name of the institution (in a short, snake_case form, e.g. "owid").
 
   aliases:
-    variables:
-      alias: &ref_alias
-        title: "Alias"
-        description: |
-          Alternative name for a region. For example, "U.S" is a common alias of region "United States".
+    variables: {}
 
   members:
-    variables:
-      member: &ref_member
-        title: "Member"
-        description: |
-          Member of a region.
+    variables: {}
 
   related:
-    variables:
-      member: &ref_related
-        title: "Possible member"
-        description: |
-          Possible member of a region. Here, membership is defined rather vaguely: A member can be a sub-region of a country, an overseas territory, a country inside a continent, etc.
-
-          The status of many regions is unclear or contested, and by defining these dependencies we are not making any political statement. We simply define possible overlaps between geographical regions that can be found in datasets, to ensure we never double-count the contribution from those regions when creating aggregate data.
+    variables: {}
 
   transitions:
-    variables:
-      end_year:
-        title: "End year"
-        description: |
-          Final year a region existed.
-      successor:
-        title: "Successor"
-        description: |
-          Successor of a historical region.
-
-          A successor is defined as a region that starts existing after a certain historical region stops existing, occupying (partially or totally) the same geographic area.
+    variables: {}
 
   regions:
     variables:
@@ -70,6 +46,17 @@ tables:
       region_type: *ref_region_type
       is_historical: *ref_is_historical
       defined_by: *ref_defined_by
-      members: *ref_member
-      aliases: *ref_alias
-      related: *ref_related
+      members:
+        title: "Member"
+        description: |
+          Member of a region.
+      aliases:
+        title: "Alias"
+        description: |
+          Alternative name for a region. For example, "U.S" is a common alias of region "United States".
+      related:
+        title: "Possible member"
+        description: |
+          Possible member of a region. Here, membership is defined rather vaguely: A member can be a sub-region of a country, an overseas territory, a country inside a continent, etc.
+
+          The status of many regions is unclear or contested, and by defining these dependencies we are not making any political statement. We simply define possible overlaps between geographical regions that can be found in datasets, to ensure we never double-count the contribution from those regions when creating aggregate data.

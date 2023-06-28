@@ -193,6 +193,11 @@ def run(dest_dir: str) -> None:
         short_name="regions",
     )
 
+    tb_aliases = tb_aliases.reset_index().set_index(["code", "alias"])
+    tb_members = tb_members.reset_index().set_index(["code", "member"])
+    tb_related = tb_related.reset_index().set_index(["code", "member"])
+    tb_transitions = tb_transitions.reset_index().set_index(["code", "end_year", "successor"])
+
     #
     # Save outputs.
     #
