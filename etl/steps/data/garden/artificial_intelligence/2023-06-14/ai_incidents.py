@@ -24,15 +24,16 @@ def run(dest_dir: str) -> None:
     # Load Snapshot
     snap = cast(Snapshot, paths.load_dependency("ai_incidents.csv"))
     df = pd.read_csv(snap.path)
-    tb = Table(df, short_name="ai_incidents", underscore=True)
+    tb = Table(df, short_name=paths.short_name, underscore=True)
 
     #
     # Save outputs.
     #
+    print(paths.short_name)
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-    log.info("ai_bills.end")
+    log.info("ai_incidents.end")
