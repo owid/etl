@@ -26,4 +26,5 @@ def run(dest_dir: str) -> None:
     table = table.rename(columns={"origin": "country"})
     # Create a new grapher dataset.
     ds_grapher = create_dataset(dest_dir=dest_dir, tables=[table], default_metadata=garden_dataset.metadata)
+    ds_grapher.metadata.title = table.metadata.title
     ds_grapher.save()
