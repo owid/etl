@@ -324,7 +324,6 @@ def _backporting_steps(private: bool, filter_steps: Optional[Set[str]] = None) -
 
     # load all backported snapshots
     for snap in snapshot_catalog(match):
-
         # skip private backported steps
         if not private and not snap.metadata.is_public:
             continue

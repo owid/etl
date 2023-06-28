@@ -1,12 +1,11 @@
 from datetime import datetime
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
-from etl.steps.data.converters import convert_snapshot_metadata
 
 log = get_logger()
 
@@ -23,21 +22,15 @@ def run(dest_dir: str) -> None:
 
     # clean and transform data
     df = clean_data(df)
-
     df = convert_date(df)
-    # create new dataset and reuse walden metadata
-    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
-    ds.metadata.version = "2023-01-11"
 
-    df = df.reset_index(drop=True)
-    # # create table with metadata from dataframe and underscore all columns
-    tb = Table(df, short_name=snap.metadata.short_name, underscore=True)
+    tb = Table(df.reset_index(drop=True), short_name=paths.short_name)
 
-    # add table to a dataset
-    ds.add(tb)
-
-    # update metadata
-    ds.update_metadata(paths.metadata_path)
+    #
+    # Save outputs.
+    #
+    # Create a new grapher dataset with the same metadata as the garden dataset.
+    ds = create_dataset(dest_dir, tables=[tb.set_index(["country", "year"])], default_metadata=snap.metadata)
 
     # finally save the dataset
     ds.save()

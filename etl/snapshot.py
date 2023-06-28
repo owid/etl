@@ -10,7 +10,14 @@ from typing import Any, Dict, List, Optional, Union
 import pandas as pd
 import yaml
 from dataclasses_json import dataclass_json
-from owid.catalog.meta import DatasetMeta, License, Source, TableMeta, pruned_json
+from owid.catalog.meta import (
+    DatasetMeta,
+    License,
+    Origin,
+    Source,
+    TableMeta,
+    pruned_json,
+)
 from owid.datautils import dataframes
 from owid.walden import files
 from tenacity import Retrying
@@ -78,6 +85,7 @@ class Snapshot:
 
     def download_from_source(self) -> None:
         """Download file from source_data_url."""
+        assert self.metadata.source
         assert self.metadata.source.source_data_url, "source_data_url is not set"
         self.path.parent.mkdir(exist_ok=True, parents=True)
         files.download(self.metadata.source.source_data_url, str(self.path))
@@ -131,15 +139,16 @@ class SnapshotMeta:
     namespace: str  # a short source name (usually institution name)
     version: str  # date, `latest` or year (discouraged)
     short_name: str  # a slug, ideally unique, snake_case, no spaces
-
-    # how to get the data file
     file_extension: str
 
-    # fields that are meant to be shown to humans
-    name: str
-    description: str
+    # NOTE: origin should actually never be None, it's here for backward compatibility
+    origin: Optional[Origin] = None
+    source: Optional[Source] = None  # source is being slowly deprecated, use origin instead
 
-    source: Source
+    # name and description are usually part of origin or source, they are here only for backward compatibility
+    name: Optional[str] = None
+    description: Optional[str] = None
+
     license: Optional[License] = None
 
     access_notes: Optional[str] = None
@@ -176,6 +185,15 @@ class SnapshotMeta:
             del d["short_name"]
             del d["file_extension"]
 
+        # remove empty fields, these should be removed by pruned_json decorator, but
+        # it doesn't work for nested fields
+        # it would work if we replaced `pruned_json` by this mixin
+        # https://github.com/lidatong/dataclasses-json/issues/187#issuecomment-919992503
+        if "license" in d:
+            d["license"] = _prune_none(d["license"])
+        if "origin" in d:
+            d["origin"] = _prune_none(d["origin"])
+
         return yaml_dump({"meta": d})  # type: ignore
 
     def save(self) -> None:
@@ -206,8 +224,15 @@ class SnapshotMeta:
             if "file_extension" not in meta:
                 meta["file_extension"] = _parse_snapshot_path(Path(filename))[3]
 
-            # convert legacy fields to source
-            if "source" not in meta:
+            # we can have either source or origin in YAML
+            if "origin" in meta and "source" in meta:
+                raise ValueError("Cannot have both `origin` and `source` in metadata")
+            elif "origin" in meta:
+                meta["origin"] = Origin.from_dict(meta["origin"])
+            elif "source" in meta:
+                meta["source"] = Source.from_dict(meta["source"])
+            else:
+                # convert legacy fields to source
                 publication_date = meta.pop("publication_date", None)
                 meta["source"] = Source(
                     name=meta.pop("source_name", None),
@@ -219,6 +244,7 @@ class SnapshotMeta:
                     publication_date=str(publication_date) if publication_date else None,
                     publication_year=meta.pop("publication_year", None),
                 )
+            assert meta.get("origin") or meta.get("source")
 
             if "license" not in meta:
                 if "license_name" in meta or "license_url" in meta:
@@ -227,7 +253,20 @@ class SnapshotMeta:
                         url=meta.pop("license_url", None),
                     )
 
-            return cls.from_dict(dict(**meta, outs=yml.get("outs", [])))
+            # use both source and origin for backwards compatibility
+            from etl.steps.data.converters import (
+                convert_origin_to_source,
+                convert_source_to_origin,
+            )
+
+            if meta.get("origin"):
+                meta["source"] = convert_origin_to_source(meta["origin"])
+            elif meta.get("source"):
+                meta["origin"] = convert_source_to_origin(meta["source"])
+
+            snap_meta = cls.from_dict(dict(**meta, outs=yml.get("outs", [])))
+
+            return snap_meta
 
     @property
     def md5(self) -> str:
@@ -344,3 +383,7 @@ def _parse_snapshot_path(path: Path) -> tuple[str, str, str, str]:
     short_name, ext = path.stem.split(".", 1)
     assert "." not in ext, f"{path.name} cannot contain `.`"
     return namespace, version, short_name, ext
+
+
+def _prune_none(d: dict) -> dict[str, Any]:
+    return {k: v for k, v in d.items() if v is not None}

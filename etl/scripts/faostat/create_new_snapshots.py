@@ -188,6 +188,7 @@ def is_dataset_already_up_to_date(
     """
     dataset_up_to_date = False
     for snapshot in existing_snapshots:
+        assert snapshot.metadata.source
         snapshot_source_data_url = snapshot.metadata.source.source_data_url
         snapshot_date_accessed = parser.parse(str(snapshot.metadata.source.date_accessed)).date()
         if (snapshot_source_data_url == source_data_url) and (snapshot_date_accessed > source_modification_date):

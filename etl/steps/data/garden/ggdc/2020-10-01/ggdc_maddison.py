@@ -24,12 +24,6 @@ N = PathFinder(__file__)
 GDP_COLUMN = "gdp"
 # Column name for GDP per capita in output dataset.
 GDP_PER_CAPITA_COLUMN = "gdp_per_capita"
-# Additional description to be prepended to the description given in walden.
-ADDITIONAL_DESCRIPTION = """Notes:
-- Tanzania refers only to Mainland Tanzania.
-- Time series for former countries and territories are calculated forward in time by estimating values based on their last official borders.
-
-"""
 
 
 def load_countries() -> Dict[str, str]:
@@ -213,7 +207,6 @@ def run(dest_dir: str) -> None:
 
     # Create a new dataset.
     ds = create_dataset(dest_dir, tables=[Table(df, short_name="maddison_gdp")], default_metadata=snap.metadata)
-    ds.metadata.description = ADDITIONAL_DESCRIPTION + ds.metadata.description  # type: ignore
 
     # Save dataset to garden.
     ds.save()

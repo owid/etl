@@ -2,7 +2,9 @@
 #  converters.py
 #
 
-from owid.catalog import DatasetMeta, License, Source, VariableMeta
+import datetime as dt
+
+from owid.catalog import DatasetMeta, License, Origin, Source, VariableMeta
 from owid.walden import Dataset as WaldenDataset
 
 from etl import grapher_model as gm
@@ -37,15 +39,19 @@ def convert_walden_metadata(wd: WaldenDataset) -> DatasetMeta:
 
 def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
     """
-    Copy metadata for a dataset directly from what we have in Walden.
+    Copy metadata for a dataset directly from what we have in Snapshot.
     """
+    assert snap.origin
+    assert snap.source
     return DatasetMeta(
         short_name=snap.short_name,
         namespace=snap.namespace,
-        title=snap.name,
         version=snap.version,
-        description=snap.description,
+        # dataset title and description are filled from origin
+        title=snap.origin.dataset_title_owid,
+        description=snap.origin.dataset_description_owid,
         sources=[snap.source],
+        origins=[snap.origin],
         licenses=[snap.license] if snap.license else [],
     )
 
@@ -134,3 +140,41 @@ def convert_grapher_variable(g: gm.Variable, s: gm.Source) -> VariableMeta:
         # TODO: can we get unit from `display` or not?
         # licenses: List[Source] = field(default_factory=list)
     )
+
+
+def convert_origin_to_source(o: Origin) -> Source:
+    # `dataset_title` isn't used, but it is assigned to DatasetMeta.title
+    # when propagating Snapshot to meadow dataset. Same for `dataset_description`,
+    # though that one is used here as `Source.description`.
+    return Source(
+        name=o.producer,
+        description=o.dataset_description_owid,
+        url=o.dataset_url_main,
+        source_data_url=o.dataset_url_download,
+        date_accessed=str(o.date_accessed) if o.date_accessed else None,
+        publication_date=str(o.date_published) if o.date_published else None,
+        published_by=o.citation_producer,
+        # excluded fields
+        # owid_data_url
+        # publication_year
+    )
+
+
+def convert_source_to_origin(s: Source) -> Origin:
+    """Inverse of `convert_origin_to_source`."""
+    return Origin(
+        producer=s.name,
+        dataset_description_owid=s.description,
+        dataset_url_main=s.url,
+        dataset_url_download=s.source_data_url,
+        date_accessed=s.date_accessed if s.date_accessed else None,  # type: ignore
+        date_published=s.publication_date if s.publication_date else None,  # type: ignore
+        citation_producer=s.published_by,
+    )
+
+
+def _string_to_date(s: str) -> dt.date:
+    """Convert string to date, or raise ValueError."""
+    if isinstance(s, dt.date):
+        return s
+    return dt.datetime.strptime(s, "%Y-%m-%d").date()

@@ -150,7 +150,10 @@ class Dataset:
         for format in SUPPORTED_FORMATS:
             path = stem.with_suffix(f".{format}")
             if path.exists():
-                return tables.Table.read(path)
+                t = tables.Table.read(path)
+                # dataset metadata might have been updated, refresh it
+                t.metadata.dataset = self.metadata
+                return t
 
         raise KeyError(f"Table `{name}` not found, available tables: {', '.join(self.table_names)}")
 

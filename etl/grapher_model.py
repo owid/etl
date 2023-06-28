@@ -5,7 +5,7 @@ sqlacodegen --generator sqlmodels mysql://root@localhost:3306/owid
 It has been slightly modified since then.
 """
 import json
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Dict, List, Optional, TypedDict
 from urllib.parse import quote
 
@@ -699,6 +699,13 @@ class Dimensions(TypedDict):
     filters: List[DimensionFilter]
 
 
+class OriginsVariablesLink(SQLModel, table=True):
+    __tablename__: str = "origins_variables"  # type: ignore
+
+    originId: Optional[int] = Field(default=None, foreign_key="origins.id", primary_key=True)
+    variableId: Optional[int] = Field(default=None, foreign_key="variables.id", primary_key=True)
+
+
 class Variable(SQLModel, table=True):
     """Example:
     {
@@ -765,6 +772,7 @@ class Variable(SQLModel, table=True):
     sources: Optional["Source"] = Relationship(back_populates="variables")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="variables")
     data_values: List["DataValues"] = Relationship(back_populates="variables")
+    origins: List["Origin"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
 
     def upsert(self, session: Session) -> "Variable":
         assert self.shortName
@@ -931,3 +939,76 @@ class DataValues(SQLModel, table=True):
 
     entities: Optional["Entity"] = Relationship(back_populates="data_values")
     variables: Optional["Variable"] = Relationship(back_populates="data_values")
+
+
+class Origin(SQLModel, table=True):
+    """Get CREATE TABLE statement for origins table with
+    ```
+    from sqlalchemy.schema import CreateTable
+    from etl.grapher_model import Origin
+    print(str(CreateTable(Origin.__table__).compile(engine)))
+    ```
+    """
+
+    __tablename__: str = "origins"  # type: ignore
+    __table_args__ = (Index("dataset_title_owid_unique", "datasetTitleOwid", unique=True),)
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    datasetTitleOwid: Optional[str] = Field(default=None, index=True)
+    datasetDescriptionOwid: Optional[str] = None
+    datasetDescriptionProducer: Optional[str] = None
+    producer: Optional[str] = None
+    citationProducer: Optional[str] = None
+    datasetUrlMain: Optional[str] = None
+    datasetUrlDownload: Optional[str] = None
+    dateAccessed: Optional[date] = None
+    datePublished: Optional[date] = None
+    variables: list["Variable"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
+
+    @classmethod
+    def from_origin(
+        cls,
+        origin: catalog.Origin,
+    ) -> "Origin":
+        return cls(
+            producer=origin.producer,
+            citationProducer=origin.citation_producer,
+            datasetTitleOwid=origin.dataset_title_owid,
+            datasetUrlMain=origin.dataset_url_main,
+            datasetUrlDownload=origin.dataset_url_download,
+            datasetDescriptionOwid=origin.dataset_description_owid,
+            datasetDescriptionProducer=origin.dataset_description_producer,
+            datePublished=origin.date_published,
+            dateAccessed=origin.date_accessed,
+        )
+
+    @property
+    def _upsert_select(self) -> SelectOfScalar["Origin"]:
+        # match on all fields for now, otherwise we could get an origin from a different dataset
+        # and modify it, which would make it out of sync with origin from its recipe
+        cls = self.__class__
+        return select(cls).where(
+            cls.producer == self.producer,
+            cls.citationProducer == self.citationProducer,
+            cls.datasetTitleOwid == self.datasetTitleOwid,
+            cls.datasetUrlMain == self.datasetUrlMain,
+            cls.datasetUrlDownload == self.datasetUrlDownload,
+            cls.datasetDescriptionOwid == self.datasetDescriptionOwid,
+            cls.datasetDescriptionProducer == self.datasetDescriptionProducer,
+            cls.datePublished == self.datePublished,
+            cls.dateAccessed == self.dateAccessed,
+        )  # type: ignore
+
+    def upsert(self, session: Session) -> "Origin":
+        origin = session.exec(self._upsert_select).one_or_none()
+        if origin is None:
+            # create new origin
+            origin = self
+        else:
+            # we match on all fields, so there's nothing to update
+            pass
+
+        session.add(origin)
+
+        # select added object to get its id
+        return session.exec(self._upsert_select).one()

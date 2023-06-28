@@ -40,6 +40,7 @@ def modify_metadata(snap: Snapshot) -> Snapshot:
     snap.metadata.source.date_accessed = date.today()
     # Set publication date
     publication_date = _get_publication_date()
+    assert snap.metadata.source
     snap.metadata.source.publication_date = publication_date
     # Set publication year
     snap.metadata.source.publication_year = publication_date.year

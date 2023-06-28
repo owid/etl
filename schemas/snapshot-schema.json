@@ -7,16 +7,7 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "namespace": {
-            "type": "string"
-          },
-          "short_name": {
-            "type": "string"
-          },
           "name": {
-            "type": "string"
-          },
-          "version": {
             "type": "string"
           },
           "source_name": {
@@ -38,9 +29,6 @@
           "source_published_by": {
             "type": "string"
           },
-          "file_extension": {
-            "type": "string"
-          },
           "license_url": {
             "type": ["string", "null"]
           },
@@ -59,15 +47,56 @@
           },
           "is_public": {
             "type": "boolean"
+          },
+          "origin": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "dataset_title_owid": {
+                "type": "string"
+              },
+              "dataset_description_owid": {
+                "type": "string"
+              },
+              "dataset_description_producer": {
+                "type": "string"
+              },
+              "producer": {
+                "type": "string"
+              },
+              "citation_producer": {
+                "type": "string"
+              },
+              "dataset_url_main": {
+                "type": "string"
+              },
+              "dataset_url_download": {
+                "type": "string"
+              },
+              "date_accessed": {
+                "type": "string",
+                "format": "date"
+              },
+              "date_published": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          "license": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
           }
         },
-        "required": [
-          "name",
-          "source_name",
-          "url",
-          "date_accessed",
-          "description"
-        ]
+        "required": []
       },
       "wdir": {
         "type": "string"

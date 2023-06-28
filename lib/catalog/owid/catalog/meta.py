@@ -4,6 +4,7 @@
 #  Metadata helpers.
 #
 
+import datetime as dt
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -29,6 +30,7 @@ def pruned_json(cls: T) -> T:
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 
 
+# DEPRECATED: use Origin instead
 @pruned_json
 @dataclass_json
 @dataclass
@@ -54,6 +56,47 @@ class Source:
     published_by: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
+        ...
+
+    @staticmethod
+    def from_dict(d: Dict[str, Any]) -> "Source":
+        ...
+
+    def update(self, **kwargs: Dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if value is not None:
+                setattr(self, key, value)
+
+
+@pruned_json
+@dataclass_json
+@dataclass
+class Origin:
+    # Original title from the source
+    dataset_title_owid: Optional[str] = None
+    # Our description of the dataset
+    dataset_description_owid: Optional[str] = None
+    # The description for this dataset used by the producer
+    dataset_description_producer: Optional[str] = None
+    # The name of the institution (without a year) or the main authors of the paper
+    producer: Optional[str] = None
+    # The full citation that the producer asks for
+    citation_producer: Optional[str] = None
+    # The authorative URL of the dataset
+    dataset_url_main: Optional[str] = None
+    # Direct URL to download the dataset
+    dataset_url_download: Optional[str] = None
+    # The URL of the dataset on our website
+    date_accessed: Optional[dt.date] = None
+    # TODO: we're not clear yet whether to have both `date_published` and `year_published`
+    # year_published: Optional[str] = None
+    date_published: Optional[dt.date] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        ...
+
+    @staticmethod
+    def from_dict(d: Dict[str, Any]) -> "Origin":
         ...
 
     def update(self, **kwargs: Dict[str, Any]) -> None:
@@ -102,6 +145,7 @@ class VariableMeta:
     title: Optional[str] = None
     description: Optional[str] = None
     sources: List[Source] = field(default_factory=list)
+    origins: List[Origin] = field(default_factory=list)
     licenses: List[License] = field(default_factory=list)
     unit: Optional[str] = None
     short_unit: Optional[str] = None
@@ -147,6 +191,8 @@ class DatasetMeta:
     short_name: Optional[str] = None
     title: Optional[str] = None
     description: Optional[str] = None
+    origins: List[Origin] = field(default_factory=list)
+    # sources is deprecated, use origins instead
     sources: List[Source] = field(default_factory=list)
     licenses: List[License] = field(default_factory=list)
     is_public: bool = True
