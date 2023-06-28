@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2023-06-27
+  date_accessed: 2023-06-28
   name: World Mortality Dataset
   description: >-
     World Mortality Dataset: international data on all-cause mortality.
@@ -31,6 +31,6 @@ meta:
   publication_date: 2021-06-30
 wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: 5a70e0bbe91d50be48017ca8be0739a4
-  size: 941348
+- md5: d368e01bec87b2ce75fce9d9121b5fc9
+  size: 942867
   path: wmd.csv
