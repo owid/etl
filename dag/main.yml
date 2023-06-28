@@ -374,7 +374,6 @@ steps:
   - data://meadow/happiness/2016-03-20/happiness
   - data://meadow/happiness/2015-03-20/happiness
   - data://meadow/happiness/2012-03-20/happiness
-  - backport://backport/owid/latest/dataset_235_world_happiness_report__2022
   data://grapher/happiness/2023-03-20/happiness:
   - data://garden/happiness/2023-03-20/happiness
 
