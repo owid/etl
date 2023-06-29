@@ -29,9 +29,9 @@ dataset:
 
     2020: Table 1a: https://web.archive.org/web/20230226162934/https://apps.who.int/iris/bitstream/handle/10665/341529/WER9621-173-194-eng-fre.pdf?sequence=1&isAllowed=y
 
-    2021: Table 1a https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
+    2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
 
-    2022: Table 1a /web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
+    2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
 
 
     Global totals are calculated yearly as the sum of the number of reported cases in each country.
@@ -40,6 +40,11 @@ dataset:
     published_by: WHO
     date_accessed: 2023-06-28
     url: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
+  - name: World Health Organization
+    published_by: WHO
+    publication_year: 2022
+    date_accessed: 2023-06-29
+    url: https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
 tables:
   guinea_worm:
     variables:
