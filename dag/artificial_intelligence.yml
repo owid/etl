@@ -5,7 +5,7 @@ steps:
   data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021:
   - data://meadow/world_risk_poll/2023-06-26/wrp_2021
   data://grapher/artificial_intelligence/2023-06-26/ai_wrp_2021:
-  - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021steps:
+  - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021
 
   # Artificial Intelligence Papers with Code (benchmarks)
   # ImageNet

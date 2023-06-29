@@ -19,8 +19,10 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["ai_wrp_2021"]
-    tb = tb[["country", "year", "yes_no_ratio", "help_harm_ratio"]]
-    tb.dropna(subset=["country"], inplace=True)
+    # Drop rows with missing values in the 'country' column (used for other ways of grouping things - gender, socio-economic status etc)
+    tb = tb[["country", "year", "yes_no_ratio", "help_harm_ratio"]].dropna(subset=["country"]).copy()
+    tb.set_index(["country", "year"], inplace=True)
+
     #
     # Process data.
     #
