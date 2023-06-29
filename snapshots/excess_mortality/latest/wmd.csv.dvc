@@ -1,13 +1,13 @@
 meta:
-  date_accessed: 2023-06-27
+  date_accessed: 2023-06-29
   name: World Mortality Dataset
   description: >-
     World Mortality Dataset: international data on all-cause mortality.
 
 
     This dataset contains country-level data on all-cause mortality in 2015–2022 collected
-    from various sources. They are currently providing data for 122 countries and
-    territories.
+    from various sources. They are
+    currently providing data for 122 countries and territories.
 
 
     For a complete and up-to-date list of notes on the dataset, please refer to their
@@ -31,6 +31,6 @@ meta:
   publication_date: 2021-06-30
 wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: 5a70e0bbe91d50be48017ca8be0739a4
-  size: 941348
+- md5: d368e01bec87b2ce75fce9d9121b5fc9
+  size: 942867
   path: wmd.csv

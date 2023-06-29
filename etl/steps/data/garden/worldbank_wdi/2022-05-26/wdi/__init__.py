@@ -369,6 +369,7 @@ def add_variable_metadata(table: Table) -> Table:
     vm = VariableMatcher()
     for var_code in var_codes:
         var = df_vars.loc[var_code].to_dict()
+
         # retrieves unit + display metadata from the most recently updated
         # WDI grapher variable that matches this variable's name
         unit = ""

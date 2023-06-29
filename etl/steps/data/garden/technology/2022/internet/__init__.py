@@ -56,8 +56,11 @@ def load_key_indicators() -> Table:
 
 def make_combined(table_internet: Table, table_population: Table) -> Table:
     # Merge
-    table = table_population.merge(table_internet, left_index=True, right_index=True)
-    # Estimate number of internet users
+    table = (
+        table_population.reset_index()
+        .merge(table_internet.reset_index(), on=["country", "year"])
+        .set_index(["country", "year"])
+    )  # Estimate number of internet users
     num_internet_users = (table.population * table.it_net_user_zs / 100).round().astype(int)
     # Add to table
     var_name = "num_internet_users"

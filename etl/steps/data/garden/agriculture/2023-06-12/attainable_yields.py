@@ -70,7 +70,6 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-
     # Load attainable yields data from Mueller et al. (2012), and read its main table.
     ds_mueller: Dataset = paths.load_dependency("mueller_et_al_2012")
     tb_mueller = ds_mueller["mueller_et_al_2012"].reset_index()
@@ -96,7 +95,7 @@ def run(dest_dir: str) -> None:
         column.replace("_attainable_yield", "") for column in tb.columns if column.endswith("_attainable_yield")
     ]:
         # Clip the series at zero (negative values mean that the yield has been attained).
-        tb[f"{item}_yield_gap"] = (tb[f"{item}_attainable_yield"] - tb[f"{item}_yield"]).clip(0)
+        tb[f"{item}_yield_gap"] = pd.Series(tb[f"{item}_attainable_yield"] - tb[f"{item}_yield"]).clip(0)
 
     # Update table and variable metadata.
     tb = add_table_and_variable_metadata(tb=tb)
