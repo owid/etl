@@ -45,6 +45,9 @@ TNAME_WB_INCOME = "wb_income_group"
 
 @functools.lru_cache
 def _load_population() -> pd.DataFrame:
+    ####################################################################################################################
+    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    ####################################################################################################################
     population = Dataset(DATASET_POPULATION)[TNAME_KEY_INDICATORS]
     population = population.reset_index()
     return cast(pd.DataFrame, population)
@@ -52,12 +55,18 @@ def _load_population() -> pd.DataFrame:
 
 @functools.lru_cache
 def _load_countries_regions() -> pd.DataFrame:
+    ####################################################################################################################
+    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    ####################################################################################################################
     countries_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"]
     return cast(pd.DataFrame, countries_regions)
 
 
 @functools.lru_cache
 def _load_income_groups() -> pd.DataFrame:
+    ####################################################################################################################
+    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    ####################################################################################################################
     income_groups = Dataset(DATASET_WB_INCOME)[TNAME_WB_INCOME]
     return cast(pd.DataFrame, income_groups)
 
@@ -72,6 +81,10 @@ def list_countries_in_region(
     income_groups: Optional[pd.DataFrame] = None,
 ) -> List[str]:
     """List countries that are members of a region.
+
+    ####################################################################################################################
+    WARNING: This function is deprecated, use list_members_of_region instead.
+    ####################################################################################################################
 
     Parameters
     ----------
