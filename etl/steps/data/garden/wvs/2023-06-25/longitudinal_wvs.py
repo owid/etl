@@ -38,6 +38,7 @@ def run(dest_dir: str) -> None:
     q2 = question_2(tb)
     # Compute the average response to the question on justifiability of terrorism as a political, ideological, or religious mean.
     q3 = question_3(tb)
+
     merge_q1_q2 = pd.merge(q1, q2, on=["country", "year"], how="outer")
     # Merge all 3 questions
     merge_q1_q2_q3 = pd.merge(merge_q1_q2, q3, on=["country", "year"], how="outer")
@@ -107,9 +108,10 @@ def question_1(df):
 
     # Select relevant columns
     select_df = counts_q1[["country", "year", "percentage", "worries__a_terrorist_attack"]]
-
     # Pivot the DataFrame
-    pivoted_df = select_df.pivot(index=["country", "year"], columns="worries__a_terrorist_attack", values="percentage")
+    pivoted_df = pd.pivot(
+        select_df, index=["country", "year"], columns="worries__a_terrorist_attack", values="percentage"
+    )
     pivoted_df.reset_index(inplace=True)
     pivoted_df.columns.name = None
 
@@ -119,8 +121,9 @@ def question_1(df):
     pivoted_df["great_deal_or_very_much_not_at_all_or_not_much_ratio"] = (
         pivoted_df["great_deal_or_very_much"] / pivoted_df["not_at_all_or_not_much"]
     )
+    pivoted_df = pivoted_df[["country", "year", "great_deal_or_very_much_not_at_all_or_not_much_ratio"]]
 
-    return pivoted_df[["country", "year", "great_deal_or_very_much_not_at_all_or_not_much_ratio"]]
+    return pivoted_df
 
 
 def question_2(df):
@@ -151,7 +154,8 @@ def question_2(df):
     ]
 
     # Pivot the DataFrame
-    pivoted_df = select_df.pivot(
+    pivoted_df = pd.pivot(
+        select_df,
         index=["country", "year"],
         columns="effects_of_immigrants_on_the_development_of__your_country__increase_the_risks_of_terrorism",
         values="percentage",
