@@ -19,7 +19,7 @@ var_dict = {
         "description": "This is the income or consumption of the {pct_dict[pct]['decile10']} (tenth of the population) as a share of total income or consumption.",
         "unit": "%",
         "short_unit": "%",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 1,
     },
     "thr": {
         "title": "Threshold",
