@@ -112,6 +112,10 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/ai_robots:
     - data://garden/artificial_intelligence/2023-06-14/ai_robots
 
+  # AI Robots
+  data://garden/artificial_intelligence/2023-06-14/ai_gender_representation:
+    - snapshot://artificial_intelligence/2023-06-14/ai_gender_representation.csv
+
   # AI polls
   # Monmouth University Poll
   data://meadow/artificial_intelligence/2023-06-07/monmouth_poll:
