@@ -1,0 +1,27 @@
+meta:
+  date_accessed: 2023-06-29
+  name: Guinea worm cases (WHO, 2023)
+  description: >-
+    Reported cases of guinea worm disease (dracunculiasis) as recorded by WHO.
+
+
+    The data is compiled from three WHO sources:
+
+
+    1980-2020: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
+
+    2021: Table 1a https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
+
+    2022: Table 1a /web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
+  source_name: Google Sheet
+  url: 
+    https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
+  source_published_by: Google Sheet
+  source_data_url: 
+    https://docs.google.com/spreadsheets/d/e/2PACX-1vQgcPHJ-cSJIozbnDh8I9NNYolbBaYMIaeJ2cdjCRx_keLpPxDuthEK_ZJYZx_grLkYqgF9PxcI6F1i/pub?output=csv
+  is_public: false
+wdir: ../../../data/snapshots/fasttrack/2023-06-28
+outs:
+- md5: cbd4368a6db9cb423358d6460c979c12
+  size: 13235
+  path: guinea_worm.csv
