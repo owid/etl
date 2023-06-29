@@ -1,6 +1,6 @@
 dataset:
   title: World Risk Poll (2021)
-  description: &desc |
+  description: &desc >
     Spread across four themed reports, the 2021 World Risk Poll covers the biggest
     risks facing people and communities globally, ranging from road crashes, severe
     weather, climate change and disaster resilience, to work-related harm, violence
@@ -15,7 +15,6 @@ dataset:
     url: https://wrp.lrfoundation.org.uk/terms-of-use/
   sources:
   - name: Lloyd’s Register Foundation (2022)
-    description: *desc
     url: https://wrp.lrfoundation.org.uk/data-resources/
     source_data_url: https://wrp.lrfoundation.org.uk/wp-content/uploads/2023/05/lrf_wrp_2021_full_data.zip
     date_accessed: '2023-06-26'
