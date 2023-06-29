@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = cast(Dataset, paths.load_dependency("guinea_worm"))
-
+    ds_meadow = cast(Dataset, paths.load_dependency(short_name="guinea_worm", version="2023-06-28", channel="grapher"))
     # Read table from meadow dataset.
     tb = ds_meadow["guinea_worm"]
 

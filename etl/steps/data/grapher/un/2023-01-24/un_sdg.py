@@ -121,7 +121,6 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, ds_garden: Dataset
         publication_date=ds_garden.metadata.sources[0].publication_date,
         publication_year=ds_garden.metadata.sources[0].publication_year,
         published_by=ds_garden.metadata.sources[0].published_by,
-        publisher_source=df_gr["source"].iloc[0],
     )
 
     df_gr["meta"] = VariableMeta(
@@ -144,7 +143,6 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, ds_garden: Dataset
 
 
 def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFrame:
-
     cols_keep = [
         "country",
         "year",
@@ -204,7 +202,6 @@ def load_clean_source_mapping() -> Dict[str, str]:
 
 @cache
 def get_metadata_link(indicator: str) -> str:
-
     """
     This fetches the link to the metadata pdf. Firstly it tests if the standard expected link works e.g.:
     https://unstats.un.org/sdgs/metadata/files/Metadata-10-01-01.pdf

@@ -26,7 +26,7 @@ dataset:
     -
       name: Alkire, Kanagaratnam and Suppa (2022), The global Multidimensional Poverty Index (MPI) 2022
       published_by: Alkire, S., Kanagaratnam, U., and Suppa, N. (2022). ‘The global Multidimensional Poverty Index (MPI) 2022 country results and methodological note’, OPHI MPI Methodological Note 52, Oxford Poverty and Human Development Initiative, University of Oxford.
-      publisher_source: Demographic and Health Surveys (DHS), Multiple Indicator Cluster Surveys (MICS), and national surveys
+      description: Data comes from Demographic and Health Surveys (DHS), Multiple Indicator Cluster Surveys (MICS), and national surveys
       publication_year: 2022
       date_accessed: 2022-10-26
       publication_date: 2021-06-18

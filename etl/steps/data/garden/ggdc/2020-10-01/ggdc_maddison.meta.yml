@@ -3,9 +3,7 @@ dataset:
     -
       name: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
       published_by: Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update“.
-      publisher_source: |
-        The Maddison Project Database is based on the work of many researchers that have produced estimates of
-        economic growth for individual countries. The full list of sources for this historical data is given for each country below.
+
 
 tables:
   maddison_gdp:
