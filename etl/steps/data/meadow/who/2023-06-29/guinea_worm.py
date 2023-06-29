@@ -26,8 +26,8 @@ def run(dest_dir: str) -> None:
     snap = cast(Snapshot, paths.load_dependency("guinea_worm.csv"))
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
-
+    df = pd.read_csv(snap.path, skiprows=2)
+    df = clean_certification_table(df).reset_index(drop=True)
     #
     # Process data.
     #
@@ -44,3 +44,21 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
     log.info("guinea_worm.end")
+
+
+def clean_certification_table(df: pd.DataFrame) -> pd.DataFrame:
+    df.columns.values[0] = "country"
+    df.columns.values[24] = "year_certified"
+    df.year_certified = df.year_certified.str.replace(r"Countries certified in", "", regex=True)
+
+    df = df.replace(
+        {
+            "year_certified": {
+                "Countries at precertification stage": "Pre-certification",
+                "Countries currently endemic for dracunculiasis": "Endemic",
+                "Countries not known to have dracunculiasis but yet to be certified": "Pending surveillance",
+            }
+        }
+    )
+
+    return df
