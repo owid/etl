@@ -1,11 +1,8 @@
 dataset:
   title: UNWTO Tourism Statistics Database
-  description: The United Nations World Tourism Organization (UNWTO) collects data
-    from countries through annual questionnaires that follow the International Recommendations
-    for Tourism Statistics (IRTS 2008) standard, a framework approved by the United
-    Nations.
+  description: The United Nations World Tourism Organization (UNWTO) collects data from countries through annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008) standard, a framework approved by the United Nations.
   licenses:
-  - name: Permissioned obtained from UNWTO
+  - name: Permission obtained from UNWTO
     url: https://www.unwto.org/copyright
   sources:
   - name: United Nations World Tourism Organization (UNWTO, 2023)
@@ -14,36 +11,39 @@ dataset:
     date_accessed: '2023-05-04'
     publication_date: '2023-01-25'
     publication_year: 2023
-    published_by: UNWTO, 2023
+    published_by: World Tourism Organization (2023), UNWTO Tourism Statistics Database, Madrid, data updated on 25/01/2023.
 tables:
   unwto:
     variables:
       in_to_ar_ov_vi_to:
         title: Inbound arrivals (tourists)
         unit: ''
-        description: 'When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
-                      Tourist arrivals data pertains to international visitors entering the economic territory of the referenced country and includes visits by people who stay overnight. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments.
+        description: >
+          When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
 
-                      Note that before 2006, the US did not distinguish between same-day and tourist arrivals from Mexico.'
+
+          Tourist arrivals data pertain to international visitors entering the economic territory of the referenced country and include visits by people who stay overnight. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments.
         display:
           name: International tourist arrivals
           numDecimalPlaces: 0
 
       in_to_ar_sa_da_vi_ex:
         title: Inbound arrivals (same day)
-        description: 'When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
-                      Same-day arrivals data pertains to international visitors entering the economic territory of the referenced country and only staying for the day. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments.
-
-                      Note that before 2006, the US counted same-day trips from Canada only. After 2006, day trips from Mexico were also included.'
         unit: ''
+        description: >
+          When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
+
+
+          Same-day arrivals data pertain to international visitors entering the economic territory of the referenced country and only staying for the day. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments.
         display:
           name: International same-day arrivals
           numDecimalPlaces: 0
 
       do_to_ac_ho_an_si_es_gu:
-        title: Domestic guests in tourism-accommodation (hotels and similar establishments)
+        title: Domestic guests in tourism accommodation (hotels and similar establishments)
         unit: ''
-        description: 'The indicator refers to the count or number of domestic guests who stay in tourism-accommodation establishments such as hotels and similar accommodations. This measurement focuses specifically on individuals from the same country as the location of the accommodation.'
+        description: >
+          The indicator refers to the number of domestic guests who stay in tourism accommodation establishments such as hotels and similar accommodations. This indicator focuses specifically on individuals from the same country as the location of the accommodation.
         display:
           name: Local guests in hotels and similar establishments
           numDecimalPlaces: 0
@@ -51,7 +51,8 @@ tables:
       do_to_tr_ov_vi_to:
         title: Domestic trips (tourists)
         unit: ''
-        description: 'A domestic tourism trip refers to the travel of a visitor from the time of leaving his/her usual residence until he/she returns : it refers to a roundtrip.'
+        description: >
+          A domestic tourism trip refers to the travel of a visitor from the time of leaving their usual residence until they return: it refers to a round trip.
         display:
           name: Domestic tourist trips
           numDecimalPlaces: 0
@@ -59,7 +60,8 @@ tables:
       em_fo_an_be_se_ac:
         title: Employment (food and beverage serving activities)
         unit: ''
-        description: 'The category of persons employed in the food and beverege industries can be either employees (persons who work for an enterprise in return for remuneration in cash or in kind as agreed) or self-employed (own-account workers who hold the type of job defined as “self- employment job” and have not engaged on a continuous basis any “employees” during the reference period ).  Some employed persons may have more than one job ; consequently, the number of jobs ( demand side ) and the number of persons employed (supply side) are dissimilar categories and therefore usually do not match.'
+        description: >
+          Persons employed in the food and beverage industries can be either employees or self-employed. Some employed persons may have more than one job.
         display:
           name: Number of people employed in food and beverage serving activities
           numDecimalPlaces: 0
@@ -67,27 +69,30 @@ tables:
       em_to:
         title: Employment (total)
         unit: ''
-        description: 'The category of persons employed in the tourism industries can be either employees (persons who work for an enterprise in return for remuneration in cash or in kind as agreed) or self-employed (own-account workers who hold the type of job defined as “self- employment job” and have not engaged on a continuous basis any “employees” during the reference period ).  Some employed persons may have more than one job ; consequently, the number of jobs ( demand side ) and the number of persons employed (supply side) are dissimilar categories and therefore usually do not match.'
+        description: >
+          Persons employed in tourism industries can be either employees or self-employed. Some employed persons may have more than one job.
         display:
-          name: Total number of people employed in tourism related industries
+          name: Total number of people employed in tourism-related industries
           numDecimalPlaces: 0
 
       in_to_ac_ho_an_si_es_gu:
-        title: Foreign guests in tourism-accommodation (hotels and similar establishments)
+        title: Foreign guests in tourism accommodation (hotels and similar establishments)
         unit: ''
-        description: 'This indicator refers to the count or number of foreign guests who stay in hotels and similar establishments. This metric focuses specifically on individuals from countries other than the host country where the accommodation is situated.'
+        description: >
+          This indicator refers to the number of foreign guests who stay in hotels and similar establishments. This indicator focuses specifically on individuals from countries other than the host country where the accommodation is situated.
         display:
           name: Foreign guests in hotels and similar establishments
           numDecimalPlaces: 0
 
       in_to_ex_tr:
-        title: Inbound tourism-expenditure
+        title: Inbound tourism expenditure
         unit: US dollars
-        description: 'Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). For inbound tourism, these expenses are recorded as "credits" in the BOP and referred to as "travel receipts”.
-                      It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
-
-                      The data published by UNWTO correspond to those published by the International Monetary Fund (IMF) ( and provided by the Central Banks ).'
         short_unit: $
+        description: >
+          Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). For inbound tourism, these expenses are recorded as "credits" in the BOP and referred to as "travel receipts".
+
+
+          It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
         display:
           name: International tourist expenditure within the country they visit
           numDecimalPlaces: 0
@@ -95,7 +100,8 @@ tables:
       in_to_pu_bu_an_pr:
         title: Inbound tourism purpose (business and professional)
         unit: ''
-        description: 'The main purpose of a trip is defined as the purpose in the absence of which the trip would not have taken place.'
+        description: >
+          The main purpose of a trip is defined as the purpose in the absence of which the trip would not have taken place.
         display:
           name: International arrivals for business and professional reasons
           numDecimalPlaces: 0
@@ -103,8 +109,8 @@ tables:
       in_to_pu_pe:
         title: Inbound tourism purpose (personal)
         unit: ''
-        description: 'The main purpose of a trip is defined as the purpose in the absence of which the trip would not have taken place. Visits for personal reasons include holidays, leisure, and recreation; visiting friends and relatives; education and
-                      training; health and medical care; religion/pilgrimages; shopping; transit; and other miscellaneous reasons.'
+        description: >
+          The main purpose of a trip is defined as the purpose in the absence of which the trip would not have taken place. Visits for personal reasons include holidays, leisure, and recreation; visiting friends and relatives; education and training; health and medical care; religion/pilgrimages; shopping; transit; and other miscellaneous reasons.
         display:
           name: International arrivals for personal reasons
           numDecimalPlaces: 0
@@ -112,7 +118,8 @@ tables:
       ou_to_de_ov_vi_to:
         title: Outbound departures (tourists)
         unit: ''
-        description: 'Tourist departures refer to the number of trips by people who travel abroad and stay overnight. Departures data measure the flows of resident visitors leaving the country of reference. Departures are not necessarily equal to the number of arrivals reported by international destinations for the country of reference.'
+        description: >
+          Tourist departures refer to the number of trips by people who travel abroad and stay overnight. Departures data measure the flows of resident visitors leaving the country of reference.
         display:
           name: International tourist departures
           numDecimalPlaces: 0
@@ -120,19 +127,21 @@ tables:
       ou_to_de_sa_da_vi_ex:
         title: Outbound departures (same day)
         unit: ''
-        description: 'Departures by same-day vistitors refer to the number of trips by people who travel abroad and come back on the same day. Departures data measure the flows of resident visitors leaving the country of reference. Departures are not necessarily equal to the number of arrivals reported by international destinations for the country of reference.'
+        description: >
+          Departures by same-day visitors refer to the number of trips by people who travel abroad and come back on the same day. Departures data measure the flows of resident visitors leaving the country of reference.
         display:
-          name: International departures by same-day vistitors
+          name: International departures by same-day visitors
           numDecimalPlaces: 0
 
       ou_to_ex_tr:
-        title: Outbound tourism-expenditure
+        title: Outbound tourism expenditure
         unit: US dollars
         short_unit: $
-        description: 'Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). For inbound tourism, these expenses are recorded as "credits" in the BOP and referred to as "travel receipts”.
-                      It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
+        description: >
+          Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). In the case of outbound tourism, those expenditures associated with resident visitors are registered as “debits” in the BOP and refers to “travel expenditure”.
 
-                      The data published by UNWTO correspond to those published by the International Monetary Fund (IMF) ( and provided by the Central Banks ).'
+
+          It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
         display:
           name: International tourist expenditure abroad
           numDecimalPlaces: 0
@@ -140,21 +149,24 @@ tables:
       to_in_av_le_of_st:
         title: Average length of stay
         unit: nights
-        description: 'This indicator refers to the duration of trips abroad by outbound visitors ( expressed as number of days ) and reflects the total average using border surveys and/or household information.'
+        description: >
+          This indicator refers to the duration of trips abroad by outbound visitors (expressed as the number of days) and reflects the total average using border surveys and/or household information.
         display:
           numDecimalPlaces: 1
 
       inb_tour_region:
         title: International tourist arrivals by region
         unit: ''
-        description: 'The underlying premise behind this indicator is that the country linked to the arrival should correspond to the individual's country of residence. However, it is worth noting that certain countries deviate from UNWTO recommendations and classify their nationals residing abroad as a distinct category, rather than considering them as residents of those countries.'
+        description: >
+          The underlying premise behind this indicator is that the country linked to the arrival should correspond to the individual's country of residence. However, it is worth noting that certain countries deviate from UNWTO recommendations and classify their nationals residing abroad as a distinct category, rather than considering them as residents of those countries.
         display:
           numDecimalPlaces: 0
 
       ou_to_de_to_de_per_1000:
         title: Outbound departures (total) per 1000
         unit: ''
-        decription: International departures include the number of trips made by tourists and same-day visitors. Departures data measure the flows of resident visitors leaving the country of reference. Departures are not necessarily equal to the number of arrivals reported by international destinations for the country of reference.'
+        description: >
+          International departures include the number of trips made by tourists and same-day visitors. Departures data measure the flows of resident visitors leaving the country of reference. Departures are not necessarily equal to the number of arrivals reported by international destinations for the country of reference.
         display:
           name: Total international departures per 1000 people
           numDecimalPlaces: 0
@@ -162,7 +174,8 @@ tables:
       ou_to_de_ov_vi_to_per_1000:
         title: Outbound departures (tourists) per 1000
         unit: ''
-        description: 'Tourist departures refer to the number of trips by people who travel abroad and stay overnight. Departures data measure the flows of resident visitors leaving the country of reference. Departures are not necessarily equal to the number of arrivals reported by international destinations for the country of reference.'
+        description: >
+          Tourist departures refer to the number of trips by people who travel abroad and stay overnight. Departures data measure the flows of resident visitors leaving the country of reference. Departures are not necessarily equal to the number of arrivals reported by international destinations for the country of reference.
         display:
           name: International tourist departures per 1000 people
           numDecimalPlaces: 0
@@ -170,15 +183,17 @@ tables:
       ou_to_de_sa_da_vi_ex_per_1000:
         title: Outbound departures (same day) per 1000
         unit: ''
-        description: 'Departures by same-day vistitors refer to the number of trips by people who travel abroad and come back on the same day. Departures data measure the flows of resident visitors leaving the country of reference. Departures are not necessarily equal to the number of arrivals reported by international destinations for the country of reference.'
+        description: >
+          Departures by same-day visitors refer to the number of trips by people who travel abroad and come back on the same day. Departures data measure the flows of resident visitors leaving the country of reference. Departures are not necessarily equal to the number of arrivals reported by international destinations for the country of reference.
         display:
-          name: International departures by same-day vistitors per 1000 people
+          name: International departures by same-day visitors per 1000 people
           numDecimalPlaces: 0
 
       do_to_tr_to_tr_per_1000:
         title: Domestic trips (total) per 1000
         unit: ''
-        description: 'A domestic trip refers to the travel of a visitor from the time of leaving his/her usual residence until he/she returns : it refers to a roundtrip. This indicator does not distinguish between trips made for tourism versus business and professional purposes.'
+        description: >
+          A domestic trip refers to the travel of a visitor from the time of leaving his/her usual residence until he/she returns: it refers to a round trip. This indicator does not distinguish between trips made for tourism versus business and professional purposes.
         display:
           name: Domestic trips per 1000 people
           numDecimalPlaces: 0
@@ -186,7 +201,8 @@ tables:
       do_to_tr_ov_vi_to_per_1000:
         title: Domestic trips (tourists) per 1000
         unit: ''
-        description: A domestic tourist trip entails the journey of a visitor who spends at least one night away from their usual residence, starting from the moment of departure until their return. This definition encompasses roundtrip travel within the domestic territory.
+        description: >
+          A domestic tourist trip entails the journey of a visitor who spends at least one night away from their usual residence, starting from the moment of departure until their return. This definition encompasses roundtrip travel within the domestic territory.
         display:
           name: Domestic tourist trips per 1000 people
           numDecimalPlaces: 0
@@ -194,7 +210,8 @@ tables:
       do_to_tr_sa_da_vi_ex_per_1000:
         title: Domestic trips (same day) per 1000 people
         unit: ''
-        description: 'A domestic same-day trip refers to the travel of a visitor who departs from their usual residence and returns on the same day. This definition encompasses roundtrip travel, where the visitor's journey starts and ends at their primary residence within a single day.'
+        description: >
+          A domestic same-day trip refers to the travel of a visitor who departs from their usual residence and returns on the same day. This definition encompasses roundtrip travel, where the visitor's journey starts and ends at their primary residence within a single day.
         display:
           name: Domestic same-day trips per 1000 people
           numDecimalPlaces: 0
@@ -202,8 +219,9 @@ tables:
       in_to_ar_to_ar_per_1000:
         title: Inbound arrivals (total) per 1000 people
         unit: ''
-        description: 'When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
-                      Tourist arrivals data pertains to international visitors entering the economic territory of the referenced country and includes visits by people who stay overnight. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments. This indicator does not distinguish between tourists and same-day visitors.'
+        description: >
+          When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
+          Tourist arrivals data pertain to international visitors entering the economic territory of the referenced country and include visits by people who stay overnight. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments. This indicator does not distinguish between tourists and same-day visitors.
         display:
           name: International arrivals per 1000 people
           numDecimalPlaces: 0
@@ -211,10 +229,11 @@ tables:
       in_to_ar_ov_vi_to_per_1000:
         title: Inbound arrivals (same night) per 1000 people
         unit: ''
-        description: 'When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
-                      Tourist arrivals data pertains to international visitors entering the economic territory of the referenced country and includes visits by people who stay overnight. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments.
+        description: >
+          When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
+          Tourist arrivals data pertain to international visitors entering the economic territory of the referenced country and include visits by people who stay overnight. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments.
 
-                      Note that before 2006, the US did not distinguish between same-day and tourist arrivals from Mexico.'
+          Note that before 2006, the US did not distinguish between same-day and tourist arrivals from Mexico.
         display:
           name: International tourist arrivals per 1000 people
           numDecimalPlaces: 0
@@ -222,10 +241,11 @@ tables:
       in_to_ar_sa_da_vi_ex_per_1000:
         title: Inbound arrivals (tourists) per 1000 people
         unit: ''
-        description: 'When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
-                      Same-day arrivals data pertains to international visitors entering the economic territory of the referenced country and only staying for the day. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments.
+        description: >
+          When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
+          Same-day arrivals data pertain to international visitors entering the economic territory of the referenced country and only staying for the day. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments.
 
-                      Note that before 2006, the US counted same-day trips from Canada only. After 2006, day trips from Mexico were also included.'
+          Note that before 2006, the US counted same-day trips from Canada only. After 2006, day trips from Mexico were also included.
         display:
           name: International same-day arrivals per 1000 people
           numDecimalPlaces: 0
@@ -233,7 +253,8 @@ tables:
       em_fo_an_be_se_ac_per_1000:
         title: Employment (food and beverage serving activities) per 1000 people
         unit: ''
-        description: 'The category of persons employed in the food and beverege industries can be either employees (persons who work for an enterprise in return for remuneration in cash or in kind as agreed) or self-employed (own-account workers who hold the type of job defined as “self- employment job” and have not engaged on a continuous basis any “employees” during the reference period ).  Some employed persons may have more than one job ; consequently, the number of jobs ( demand side ) and the number of persons employed (supply side) are dissimilar categories and therefore usually do not match.'
+        description: >
+          Persons employed in the food and beverage industries can be either employees or self-employed. Some employed persons may have more than one job.
         display:
           name: Number of people employed in food and beverage serving activities per 1000 population
           numDecimalPlaces: 0
@@ -241,7 +262,8 @@ tables:
       em_to_per_1000:
         title: Employment (total) per 1000 people
         unit: ''
-        description: 'The category of persons employed in the tourism industries can be either employees (persons who work for an enterprise in return for remuneration in cash or in kind as agreed) or self-employed (own-account workers who hold the type of job defined as “self- employment job” and have not engaged on a continuous basis any “employees” during the reference period ).  Some employed persons may have more than one job ; consequently, the number of jobs ( demand side ) and the number of persons employed (supply side) are dissimilar categories and therefore usually do not match.'
+        description: >
+          Persons employed in the food and beverage industries can be either employees or self-employed. Some employed persons may have more than one job.
         display:
           name: Number of people employed in all tourism-related industries per 1000 people
           numDecimalPlaces: 0
@@ -249,7 +271,8 @@ tables:
       bus_pers:
         title: Business/Personal Ratio of Purpose of Travel
         unit: ''
-        description: 'The ratio of arrivals for business and professional purposes to personal purposes provides a measure of the relative proportion of trips undertaken for work-related or professional reasons compared to those taken for personal reasons. This ratio offers insights into the travel behavior and motivations of individuals, helping to understand the balance between travel undertaken for business purposes and travel for leisure, recreation, or personal visits.'
+        description: >
+          The ratio of arrivals for business and professional purposes to personal purposes provides a measure of the relative proportion of trips undertaken for work-related or professional reasons compared to those taken for personal reasons. This ratio offers insights into the travel behavior and motivations of individuals, helping to understand the balance between travel undertaken for business purposes and travel for leisure, recreation, or personal visits.
         display:
           name: Ratio of arrivals for business and professional to personal purposes
           numDecimalPlaces: 1
@@ -257,7 +280,8 @@ tables:
       inb_outb_tour:
         title: Inbound/Outbound (tourists)
         unit: ''
-        description: 'The ratio of inbound to outbound tourists compares the number of tourist arrivals in a country with the number of tourist departures from the same country. Tourist arrivals and departures refer to the number of trips by people who travel abroad and stay overnight.'
+        description: >
+          The ratio of inbound to outbound tourists compares the number of tourist arrivals in a country with the number of tourist departures from the same country. Tourist arrivals and departures refer to the number of trips by people who travel abroad and stay overnight.
         display:
           name: Ratio of inbound to outbound tourists
           numDecimalPlaces: 1
@@ -265,7 +289,8 @@ tables:
       same_tourist_ratio:
         title: Same Day/Overnight visitors
         unit: ''
-        description: 'The ratio of same day to tourist arrivals provides a measure of the relative number of visitors who engage in same-day trips compared to those who choose to stay overnight at a destination. This ratio offers insights into the composition and preferences of visitors in terms of the duration of their visits.'
+        description: >
+          The ratio of same-day to tourist arrivals provides a measure of the relative number of visitors who engage in same-day trips compared to those who choose to stay overnight at a destination. This ratio offers insights into the composition and preferences of visitors in terms of the duration of their visits.
         display:
           name: Ratio of same-day to tourist arrivals
           numDecimalPlaces: 1
@@ -274,12 +299,11 @@ tables:
         title: Inbound Tourism Expenditure (adjusted for inflation and cost of living)
         unit: international dollars
         short_unit: $
-        description: 'Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). For inbound tourism, these expenses are recorded as "credits" in the BOP and referred to as "travel receipts”.
-                      It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
+        description: >
+          Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). For inbound tourism, these expenses are recorded as "credits" in the BOP and referred to as "travel receipts". It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
 
-                      In the context of this specific indicator, adjustments have been made to account for inflation and differences in the cost of living in the destination countries where tourists spend their money. To achieve this, the expenditure data has been converted from US dollars to the local currency of each respective country. The inflation adjustment is based on the Consumer Price Index (CPI) for the year 2021 specific to each country. Finally, the data is expressed in international 2021 US dollars, enabling consistent and comparable analysis across different destinations and time periods. Following the adjustment, in countries where the cost of living is lower, the adjusted total expenditure will reflect a higher value. This indicates that tourist money holds greater purchasing power in terms of acquiring goods and services, allowing tourists to obtain more with their expenditures in these destinations.
 
-                      The data published by UNWTO correspond to those published by the International Monetary Fund (IMF) ( and provided by the Central Banks ).'
+          In the context of this specific indicator, adjustments have been made to account for inflation and differences in the cost of living in the destination countries where tourists spend their money. To achieve this, the expenditure data has been converted from US dollars to the local currency of each respective country. The inflation adjustment is based on the Consumer Price Index (CPI) for the year 2021 specific to each country. Finally, the data is expressed in international 2021 US dollars, enabling consistent and comparable analysis across different destinations and time periods. Following the adjustment, in countries where the cost of living is lower, the adjusted total expenditure will reflect a higher value. This indicates that tourist money holds greater purchasing power in terms of acquiring goods and services, allowing tourists to obtain more with their expenditures in these destinations.
         display:
           name: International tourist expenditure within the country they visit
           numDecimalPlaces: 0
@@ -288,12 +312,12 @@ tables:
         title: Outbound Tourism Expenditure (adjusted for US 2021 inflation)
         unit: US dollars
         short_unit: $
-        description: 'Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). For inbound tourism, these expenses are recorded as "credits" in the BOP and referred to as "travel receipts”.
-                      It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
+        description: >
+          Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). In the case of outbound tourism, those expenditures associated with resident visitors are registered as “debits” in the BOP and refers to “travel expenditure”. It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
 
-                      When reporting a time series of expenditure, comparing observations across time without adjusting for inflation may not yield meaningful results. This is because prices change over time due to factors such as inflation. In order to enable comparisons across different time periods, it is necessary to consider the impact of price changes. In the context of this indicator, where there is no breakdown of the destinations where tourists spend their money on travel activities, the data has been adjusted for inflation using the US Consumer Price Index (CPI).
 
-                      The data published by UNWTO correspond to those published by the International Monetary Fund (IMF) ( and provided by the Central Banks ).'
+          When reporting a time series of expenditure, comparing observations across time without adjusting for inflation may not yield meaningful results. This is because prices change over time due to factors such as inflation. In order to enable comparisons across different time periods, it is necessary to consider the impact of price changes. In the context of this indicator, where there is no breakdown of the destinations where tourists spend their money on travel activities, the data has been adjusted for inflation using the US Consumer Price Index (CPI).
         display:
           name: International tourist expenditure abroad
           numDecimalPlaces: 0
+
