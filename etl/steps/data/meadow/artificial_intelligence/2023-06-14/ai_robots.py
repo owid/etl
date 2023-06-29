@@ -59,8 +59,11 @@ def run(dest_dir: str) -> None:
     # Fill missing values in 'Year' column with 2021 (corresponds to the year in the dataset)
     df["Year"].fillna(2021, inplace=True)
 
+    df["country"].fillna("World", inplace=True)
+
     # Convert 'Year' column to integer
     df["Year"] = df["Year"].astype(int)
+    df["country"] = df["country"].astype(str)
 
     # Create a new table with snake-case column names
     tb = Table(df, short_name=paths.short_name, underscore=True)

@@ -109,6 +109,8 @@ steps:
     - snapshot://artificial_intelligence/2023-06-14/ai_robots.csv
   data://garden/artificial_intelligence/2023-06-14/ai_robots:
     - data://meadow/artificial_intelligence/2023-06-14/ai_robots
+  data://grapher/artificial_intelligence/2023-06-14/ai_robots:
+    - data://garden/artificial_intelligence/2023-06-14/ai_robots
 
   # AI polls
   # Monmouth University Poll

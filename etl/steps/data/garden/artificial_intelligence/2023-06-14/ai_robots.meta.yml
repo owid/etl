@@ -1,7 +1,7 @@
 dataset:
   title: AI Industrial Robots
   description: &desc |
-    The dataset comprises several key statistics related to industrial robotics, professional service robots, and AI adoption.
+        By monitoring the installation of industrial robots, which often incorporate AI-based software technologies, it becomes feasible to gather valuable information about the implementation of AI-ready infrastructure in real-world scenarios. This data is sourced from the International Federation of Robotics (IFR), a nonprofit organization dedicated to the advancement and safeguarding of the robotics industry. Annually, the IFR publishes the World Robotics Report, which provides comprehensive insights into global trends concerning robot installations.
   licenses:
   - name: Public domain
     url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
@@ -18,41 +18,54 @@ dataset:
 tables:
   ai_robots:
     variables:
-      annual_count__number_of_industrial_robots_installed:
-        title: Annual Count of Industrial Robots Installed
-        description: Annual count of industrial robots installed worldwide from 2011 to 2021.
-        unit: ''
+      combined_robots_installed:
+        title: Number of industrial robots installed from 2011 to 2021
+        description: Industrial robots are defined as automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications.
+        unit: 'robots'
+        display:
+          name: Number of industrial robots installed
+
       cumulative_operational__number_of_industrial_robots:
-        title: Cumulative  Number of Operational Industrial Robots
-        description: Cumulative number of industrial robots that were operational in the world from 2011 to 2021.
-        unit: ''
-      installed_countries__number_of_industrial_robots_installed:
-        title:  Number of Industrial Robots Installed
-        description: Number of industrial robots installed in various countries specifically for the year 2021.
-        unit: ''
-      new_robots_installed__number_of_industrial_robots_installed:
-        title:  Number of Industrial Robots Installed (in Thousands)
-        description: Number of new industrial robots installed in top countries from 2011 to 2021.
-        unit: ''
+        title: Operational stock of industrial robots in the world
+        unit: 'robots'
+        description: Industrial robots are defined as automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications.
+        display:
+          name: Cummulative operational stock of industrial robots
+
+      number_of_industrial_robots_installed_2021:
+        title:  Number of industrial robots installed in 2021
+        unit: 'robots'
+        description: Industrial robots are defined as automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications.
+        display:
+          name: Number of industrial robots installed
+
       professional_service_robots__number_of_professional_service_robots_installed:
-        title:  Number of Professional Service Robots
-          Installed (in Thousands)
-        description: Number of professional service robots installed worldwide across different application areas for the years 2020 and 2021.
+        title: Number of professional service robots installed by application area
         unit: ''
+        display:
+
       professional_service_robots__application_area:
         title: Application area (professional service robots)
-        description: Number of professional service robots installed worldwide across different application areas for the years 2020 and 2021.
         unit: ''
+        display:
+          name: Application area
+
       installed_sectors__number_of_industrial_robots_installed:
-        title:  Number of Industrial Robots Installed by sector
-        unit: Number of industrial robots installed in various sectors globally from 2019 to 2021.
+        title:  Number of industrial robots installed in various sectors
+        unit: ''
+
       installed_sectors__sector:
-        title: Sector
+        title: Sector (industrial robots)
         unit: ''
+        display:
+          name: Sector
+
       installed_application__number_of_industrial_robots_installed:
-        title: Number of Industrial Robots Installed by application
-        description: Number of industrial robots installed worldwide categorized by application, covering the period from 2019 to 2021.
+        title: Number of industrial Robots installed by application
         unit: ''
+
       installed_application__application:
-        title: Application
+        title: Application (industrial robots)
         unit: ''
+        display:
+          name: Application
