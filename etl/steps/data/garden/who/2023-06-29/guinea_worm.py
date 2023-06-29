@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
     time_series_tb = create_time_series(tb)
     time_series_tb = update_time_series_with_latest_information(time_series_tb)
     # Combine datasets
-
+    tb = combine_datasets(tb, time_series_tb)
     #
     # Save outputs.
     #
@@ -119,5 +119,5 @@ def combine_datasets(tb: Table, time_series_tb: Table) -> Table:
     tb = tb[["country", "year", "year_certified"]]
 
     tb_combined = pd.merge(tb, time_series_tb, on=["country", "year"], how="outer")
-
+    tb_combined = Table(tb_combined, short_name=paths.short_name)
     return tb_combined

@@ -1,35 +1,14 @@
-# (Inherited from meadow, remove if not different.)
-all_sources:
-  - source_testing: &source-testing
-      name: # Example: Testing Short Citation
-      published_by: # (if different to short citation). Example: Testing Full Citation
-      url: # Example: https://url_of_testing_source.com/
-      date_accessed: # Example: 2023-01-01
-      publication_date: # Example: 2023-01-01
-      publication_year: # (if publication_date is not given). Example: 2023
-      # description: Source description.
-
-# (Inherited from meadow, remove if not different.)
 dataset:
-  title: # Example: Testing Dataset Name (Institution, 2023)
-  # description: Dataset description.
+  title: Certification status of dracunculiasis eradication (WHO, 2018)
+  description: ''
   licenses:
-    - name: # Example: Testing License Name
-      url: # Example: https://url_of_testing_source.com/license
+  - name: CC BY-NC-SA 3.0 IGO
+    url: https://www.who.int/about/policies/publishing/copyright
   sources:
-    - *source-testing
-
-tables:
-  guinea_worm:
-    # (Inherited from meadow, remove if not different.)
-    variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description: Full description of testing variable.
-      #   sources:
-      #     - *source-testing
-      #   display:
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
+  - name: WHO (2018)
+    url: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
+    date_accessed: '2023-06-29'
+    publication_year: 2018
+    published_by: 'Certification status of dracunculiasis eradication: World Health Organization; 2018. Licence: CC BY-NC-SA
+      3.0 IGO'
+tables: {}
