@@ -54,5 +54,5 @@ def run(dest_dir: str) -> None:
     # Get the rest of the metadata from the yaml file.
     ds_garden.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
     # Create dataset.
-    ds_garden.add(tb_num)
+    ds_garden.add(tb_num.set_index(["country", "year"]))
     ds_garden.save()

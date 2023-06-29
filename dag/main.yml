@@ -54,12 +54,6 @@ steps:
     - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
   data://grapher/ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
-  data://meadow/worldbank_wdi/2022-05-26/wdi:
-    - walden://worldbank_wdi/2022-05-26/wdi
-  data://garden/worldbank_wdi/2022-05-26/wdi:
-    - data://meadow/worldbank_wdi/2022-05-26/wdi
-  data://grapher/worldbank_wdi/2022-05-26/wdi:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/owid/latest/key_indicators:
     - data://garden/owid/latest/key_indicators
   data://meadow/oecd/2016-06-01/regional_wellbeing:
@@ -69,6 +63,22 @@ steps:
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://meadow/un/2022-07-11/un_wpp
+
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2023-05-29/wdi:
+    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
+  data://garden/worldbank_wdi/2023-05-29/wdi:
+    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
+    - data://meadow/worldbank_wdi/2023-05-29/wdi
+  data://grapher/worldbank_wdi/2023-05-29/wdi:
+    - data://garden/worldbank_wdi/2023-05-29/wdi
+
+  data://meadow/worldbank_wdi/2022-05-26/wdi:
+    - walden://worldbank_wdi/2022-05-26/wdi
+  data://garden/worldbank_wdi/2022-05-26/wdi:
+    - data://meadow/worldbank_wdi/2022-05-26/wdi
+  data://grapher/worldbank_wdi/2022-05-26/wdi:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Homicide - WHO
   data://meadow/homicide/2023-01-03/who_mort_db:

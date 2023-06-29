@@ -217,6 +217,12 @@
                       "zeroDay": {
                         "type": "string",
                         "format": "date"
+                      },
+                      "tolerance": {
+                        "type": "number"
+                      },
+                      "isProjection": {
+                        "type": "boolean"
                       }
                     }
                   }
