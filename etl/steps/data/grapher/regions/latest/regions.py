@@ -7,6 +7,7 @@ This dataset is not meant to be imported to MySQL and is excluded from automatic
 import ast
 import re
 
+import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -257,6 +258,7 @@ def run(dest_dir: str) -> None:
 
     # Read tables from regions dataset.
     regions = ds_garden["regions"][["name", "short_name", "region_type", "is_historical", "defined_by"]]
+    members = ds_garden["regions"][["members"]]
     legacy_codes = ds_garden["regions"][
         [
             "cow_code",
@@ -274,17 +276,6 @@ def run(dest_dir: str) -> None:
             "wikidata_code",
         ]
     ]
-
-    members_expanded = Table(
-        ds_garden["regions"][["members"]]
-        .dropna()
-        .astype(str)["members"]
-        .apply(ast.literal_eval)
-        .explode()
-        .rename("member")
-        .to_frame(),
-        short_name="members",
-    )
 
     #
     # Process data.
@@ -305,7 +296,9 @@ def run(dest_dir: str) -> None:
     regions["short_code"] = legacy_codes["iso_alpha2"]
 
     # Add members
-    regions["members"] = members_expanded.reset_index().groupby("code").agg(";".join)
+    regions["members"] = (
+        members["members"].astype(object).apply(lambda x: ";".join(ast.literal_eval(x)) if pd.notna(x) else "")
+    )
 
     #
     # Save outputs.
