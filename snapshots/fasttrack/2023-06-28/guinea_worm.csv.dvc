@@ -40,7 +40,6 @@ meta:
   source_published_by: Google Sheet
   source_data_url: 
     https://docs.google.com/spreadsheets/d/e/2PACX-1vQgcPHJ-cSJIozbnDh8I9NNYolbBaYMIaeJ2cdjCRx_keLpPxDuthEK_ZJYZx_grLkYqgF9PxcI6F1i/pub?output=csv
-  is_public: false
 wdir: ../../../data/snapshots/fasttrack/2023-06-28
 outs:
 - md5: cbd4368a6db9cb423358d6460c979c12
