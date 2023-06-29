@@ -100,6 +100,12 @@ IPDB_ENABLED = False
 # number of workers for grapher inserts
 GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 
+# number of workers for checking ditry steps
+DIRTY_STEPS_WORKERS = int(env.get("DIRTY_STEPS_WORKERS", 5))
+
+# number of processes for running steps
+RUN_STEPS_WORKERS = int(env.get("RUN_STEPS_WORKERS", 1))
+
 # only upsert indicators matching this filter, this is useful for fast development
 # of data pages for a single indicator
 GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
