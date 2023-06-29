@@ -74,5 +74,5 @@ steps:
   - snapshot://fasttrack/2023-06-16/guinea_worm.csv
   data-private://grapher/fasttrack/2023-06-19/world_population_comparison:
   - snapshot-private://fasttrack/2023-06-19/world_population_comparison.csv
-  data-private://grapher/fasttrack/2023-06-28/guinea_worm:
-  - snapshot-private://fasttrack/2023-06-28/guinea_worm.csv
+  data://grapher/fasttrack/2023-06-28/guinea_worm:
+  - snapshot://fasttrack/2023-06-28/guinea_worm.csv
