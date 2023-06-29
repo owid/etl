@@ -1583,6 +1583,8 @@ tables:
           It is based on the V-Dem variable v2x_genpp_codehigh, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most equal).
+
+          Many countries in recent years receive high scores even though they are far from equal participation because the index scores them relative to the historical average across countries.
       wom_pol_par_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which women are represented in the legislature and have an equal share of political power.
@@ -1590,6 +1592,8 @@ tables:
           It is based on the V-Dem variable v2x_genpp_codelow, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most equal).
+
+          Many countries in recent years receive high scores even though they are far from equal participation because the index scores them relative to the historical average across countries.
       wom_pol_par_vdem_owid:
         description: |-
           The variable denotes the best estimate of the extent to which women are represented in the legislature and have an equal share of political power.
@@ -1597,3 +1601,5 @@ tables:
           It is based on the V-Dem variable v2x_genpp, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most equal).
+
+          Many countries in recent years receive high scores even though they are far from equal participation because the index scores them relative to the historical average across countries.
