@@ -11,10 +11,9 @@ import numpy as np
 import pandas as pd
 import requests
 import yaml
-from structlog import get_logger
-
 from owid.walden import add_to_catalog
 from owid.walden.catalog import Dataset
+from structlog import get_logger
 
 BASE_URL = "https://unstats.un.org/sdgapi"
 log = get_logger()
@@ -226,7 +225,6 @@ def dimensions_description() -> dict:
 
 
 def get_goal_codes() -> List[int]:
-
     # retrieves all goal codes
     url = f"{BASE_URL}/v1/sdg/Goal/List"
     res = requests.get(url)
