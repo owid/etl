@@ -66,13 +66,15 @@ def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
 
 
 def convert_grapher_source(s: gm.Source) -> Source:
+    # append publisher source to description
+    description = f"{s.description.get('additionalInfo')}\nPublisher source: {s.description.get('dataPublisherSource')}"
+
     return Source(
         name=s.name,
-        description=s.description.get("additionalInfo"),
+        description=description,
         url=s.description.get("link"),
         date_accessed=s.description.get("retrievedDate"),
         published_by=s.description.get("dataPublishedBy"),
-        publisher_source=s.description.get("dataPublisherSource"),
     )
 
 

@@ -3,7 +3,6 @@ dataset: {}
   # sources:
   #   - name: World Values Survey (2022)
   #     published_by: 'Inglehart, R., C. Haerpfer, A. Moreno, C. Welzel, K. Kizilova, J. Diez-Medrano, M. Lagos, P. Norris, E. Ponarin & B. Puranen (eds.). 2022. World Values Survey: All Rounds - Country-Pooled Datafile. Madrid, Spain & Vienna, Austria: JD Systems Institute & WVSA Secretariat. Dataset Version 4.0. doi:10.14281/18241.17'
-  #     publisher_source: "Nationally representative household surveys"
 
 tables:
   wvs_trust:

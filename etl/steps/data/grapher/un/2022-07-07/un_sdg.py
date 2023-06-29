@@ -90,7 +90,6 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenD
         publication_date=walden_ds.metadata["publication_date"],
         publication_year=walden_ds.metadata["publication_year"],
         published_by=walden_ds.metadata["name"],
-        publisher_source=df_gr["source"].iloc[0],
     )
 
     df_gr["meta"] = VariableMeta(
@@ -113,7 +112,6 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenD
 
 
 def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFrame:
-
     cols_keep = [
         "country",
         "year",
@@ -170,7 +168,6 @@ def load_clean_source_mapping() -> Dict[str, str]:
 
 @cache
 def get_metadata_link(indicator: str) -> str:
-
     url = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%s.pdf") % "-".join(
         [part.rjust(2, "0") for part in indicator.split(".")]
     )

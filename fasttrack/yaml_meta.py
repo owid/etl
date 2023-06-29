@@ -12,7 +12,6 @@ class YAMLSourceMeta(BaseModel):
 
     name: str
     published_by: str
-    publisher_source: Optional[str] = None
     publication_year: Optional[int] = None
     date_accessed: dt.date = Field(default_factory=dt.date.today)
     url: Optional[str] = None

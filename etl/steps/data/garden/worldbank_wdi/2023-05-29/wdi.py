@@ -94,8 +94,7 @@ def mk_omms(table: Table) -> Table:
         date_accessed=source.date_accessed,
         publication_date=source.publication_date,
         publication_year=source.publication_year,
-        published_by="Our World in Data",
-        publisher_source=f"Our World in Data based on {source.published_by}",
+        published_by=f"Our World in Data based on {source.published_by}",
     )
 
     # omm: urban population living in slums
@@ -380,7 +379,6 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
             publication_date=str(ds_source.publication_date),
             publication_year=ds_source.publication_year,
             published_by=ds_source.name,
-            publisher_source=clean_source["dataPublisherSource"],
         )
 
         table[var_code].metadata.description = create_description(var)
