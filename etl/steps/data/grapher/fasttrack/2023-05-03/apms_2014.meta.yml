@@ -14,7 +14,7 @@ dataset:
     published_by: '"McManus S, Bebbington P, Jenkins R, Brugha T. (eds.) (2016) Mental
       health and wellbeing in England: Adult Psychiatric Morbidity Survey 2014. Leeds:
       NHS Digital"'
-    publisher_source: Surveys of individuals in randomly-selected private households
+    description: Surveys of individuals in randomly-selected private households
       in England
     publication_year: 2016
     date_accessed: 2022-12-01

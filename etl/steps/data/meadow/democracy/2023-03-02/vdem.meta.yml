@@ -2,7 +2,7 @@ all_sources:
   - source_vdem: &source-vdem
       name: OWID based on V-Dem (v13) and Lührmann et al. (2018)
       published_by: Our World in Data, Bastian Herre
-      publisher_source: Data comes from the Varieties of Democracy project (v13), sometimes using Lührmann et al's (2018) Regimes of the World classification, and own expansions and refinements.
+      description: Data comes from the Varieties of Democracy project (v13), sometimes using Lührmann et al's (2018) Regimes of the World classification, and own expansions and refinements.
       url: http://v-dem.net/vdemds.html
       date_accessed: 2023-03-02
 

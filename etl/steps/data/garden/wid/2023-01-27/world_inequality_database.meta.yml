@@ -84,7 +84,7 @@ dataset:
       date_accessed: "2023-06-12"
       publication_year: 2023
       published_by: World Inequality Database (WID), https://wid.world
-      publisher_source: National income surveys, tax records and national accounts
+      description: Data comes from national income surveys, tax records and national accounts
 tables:
   world_inequality_database:
     variables: {}

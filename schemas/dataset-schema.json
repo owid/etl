@@ -75,9 +75,6 @@
                   },
                   "published_by": {
                     "type": "string"
-                  },
-                  "publisher_source": {
-                    "type": ["string", "null"]
                   }
                 },
                 "required": [
@@ -159,9 +156,6 @@
                           },
                           "published_by": {
                             "type": "string"
-                          },
-                          "publisher_source": {
-                            "type": ["string", "null"]
                           }
                         },
                         "required": [

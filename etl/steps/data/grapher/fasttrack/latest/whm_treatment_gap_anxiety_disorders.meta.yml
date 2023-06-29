@@ -33,7 +33,7 @@ dataset:
   - name: Treatment gap for anxiety disorders - World Mental Health Surveys - Alonso
       et al. 2017
     published_by: Alonso et al. (2017)
-    publisher_source: Community surveys of the general population
+    description: Data comes from Community surveys of the general population
     publication_year: 2017
     date_accessed: 2023-05-11
     url: https://pubmed.ncbi.nlm.nih.gov/29356216/

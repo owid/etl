@@ -4,11 +4,10 @@ dataset:
     -
       name: Global Carbon Project (2021)
       published_by: Global Carbon Budget - Global Carbon Project (2021)
-      publisher_source: Global Carbon Project
       description: |
         The Global Carbon Budget dataset is available <a href="https://www.icos-cp.eu/science-and-impact/global-carbon-budget/2021">here</a> and <a href="https://doi.org/10.5281/zenodo.5569235">here</a>.
 
-        Variables include each country, region and World Bank income group's share of the global population; production-based (territorial); and consumption-based (trade-adjusted) carbon dioxide emissions. 
+        Variables include each country, region and World Bank income group's share of the global population; production-based (territorial); and consumption-based (trade-adjusted) carbon dioxide emissions.
 
         This was calculated by Our World in Data based on CO₂ figures produced by the Global Carbon Project. This is given as production (territorial) emissions in addition to trade-adjusted consumption-based emissions. Consumption-based emissions are national or regional emissions which have been adjusted for trade (i.e. territorial/production emissions minus emissions embedded in exports, plus emissions embedded in imports). If a country's consumption-based emissions are higher than its production emissions it is a net importer of carbon dioxide.
 
