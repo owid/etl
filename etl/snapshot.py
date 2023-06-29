@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Literal, Optional, Union
 import pandas as pd
 import yaml
 from dataclasses_json import dataclass_json
-from owid.catalog.meta import pruned_json
+from owid.catalog.meta import DatasetMeta, License, Source, TableMeta, pruned_json
 from owid.datautils import dataframes
 from owid.walden import files
 from tenacity import Retrying
@@ -99,6 +99,43 @@ class Snapshot:
                 ):
                     with attempt:
                         dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
+
+    def to_table_metadata(self):
+        table_meta = TableMeta.from_dict(
+            {
+                "short_name": self.metadata.short_name,
+                "title": self.metadata.name,
+                "description": self.metadata.description,
+                "dataset": DatasetMeta.from_dict(
+                    {
+                        "channel": "snapshots",
+                        "description": self.metadata.description,
+                        "is_public": self.metadata.is_public,
+                        "namespace": self.metadata.namespace,
+                        "short_name": self.metadata.short_name,
+                        "title": self.metadata.name,
+                        "version": self.metadata.version,
+                        "sources": [
+                            Source(
+                                name=self.metadata.source_name,
+                                published_by=self.metadata.source_published_by,
+                                source_data_url=self.metadata.source_data_url,
+                                url=self.metadata.url,
+                                date_accessed=self.metadata.date_accessed,
+                                publication_date=str(self.metadata.publication_date)
+                                if self.metadata.publication_date
+                                else None,
+                                publication_year=self.metadata.publication_year,
+                            )
+                        ],
+                        "licenses": [License(name=self.metadata.license_name, url=self.metadata.license_url)]
+                        if self.metadata.license_name or self.metadata.license_url
+                        else [],
+                    }
+                ),
+            }
+        )
+        return table_meta
 
 
 @pruned_json

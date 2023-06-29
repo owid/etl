@@ -54,12 +54,6 @@ steps:
     - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
   data://grapher/ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
-  data://meadow/worldbank_wdi/2022-05-26/wdi:
-    - walden://worldbank_wdi/2022-05-26/wdi
-  data://garden/worldbank_wdi/2022-05-26/wdi:
-    - data://meadow/worldbank_wdi/2022-05-26/wdi
-  data://grapher/worldbank_wdi/2022-05-26/wdi:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/owid/latest/key_indicators:
     - data://garden/owid/latest/key_indicators
   data://meadow/oecd/2016-06-01/regional_wellbeing:
@@ -69,6 +63,22 @@ steps:
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://meadow/un/2022-07-11/un_wpp
+
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2023-05-29/wdi:
+    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
+  data://garden/worldbank_wdi/2023-05-29/wdi:
+    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
+    - data://meadow/worldbank_wdi/2023-05-29/wdi
+  data://grapher/worldbank_wdi/2023-05-29/wdi:
+    - data://garden/worldbank_wdi/2023-05-29/wdi
+
+  data://meadow/worldbank_wdi/2022-05-26/wdi:
+    - walden://worldbank_wdi/2022-05-26/wdi
+  data://garden/worldbank_wdi/2022-05-26/wdi:
+    - data://meadow/worldbank_wdi/2022-05-26/wdi
+  data://grapher/worldbank_wdi/2022-05-26/wdi:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Homicide - WHO
   data://meadow/homicide/2023-01-03/who_mort_db:
@@ -478,49 +488,13 @@ steps:
   data://garden/papers/2023-06-07/commodity_prices:
   - snapshot://papers/2023-06-07/commodity_prices.xlsx
 
-# AI polls
-# Monmouth University Poll
-  data://meadow/artificial_intelligence/2023-06-07/monmouth_poll:
-  - snapshot://artificial_intelligence/2023-06-07/monmouth_poll.pdf
-  data://garden/artificial_intelligence/2023-06-07/monmouth_poll:
-  - data://meadow/artificial_intelligence/2023-06-07/monmouth_poll
-  data://grapher/artificial_intelligence/2023-06-07/monmouth_poll:
-  - data://garden/artificial_intelligence/2023-06-07/monmouth_poll
-
-# YouGov AI surveys
-  data://meadow/artificial_intelligence/2023-06-08/yougov_robots:
-  - snapshot://artificial_intelligence/2023-06-08/yougov_robots.xlsx
-  data://garden/artificial_intelligence/2023-06-08/yougov_robots:
-  - data://meadow/artificial_intelligence/2023-06-08/yougov_robots
-  data://grapher/artificial_intelligence/2023-06-08/yougov_robots:
-  - data://garden/artificial_intelligence/2023-06-08/yougov_robots
-
-  data://meadow/artificial_intelligence/2023-06-08/yougov_job_automation:
-  - snapshot://artificial_intelligence/2023-06-08/yougov_job_automation.xlsx
-  data://garden/artificial_intelligence/2023-06-08/yougov_job_automation:
-  - data://meadow/artificial_intelligence/2023-06-08/yougov_job_automation
-  data://grapher/artificial_intelligence/2023-06-08/yougov_job_automation:
-  - data://garden/artificial_intelligence/2023-06-08/yougov_job_automation
-
-  data://meadow/artificial_intelligence/2023-06-08/yougov_jobs:
-  - snapshot://artificial_intelligence/2023-06-08/yougov_jobs.pdf
-  data://garden/artificial_intelligence/2023-06-08/yougov_jobs:
-  - data://meadow/artificial_intelligence/2023-06-08/yougov_jobs
-  data://grapher/artificial_intelligence/2023-06-08/yougov_jobs:
-  - data://garden/artificial_intelligence/2023-06-08/yougov_jobs
-
-  data://meadow/artificial_intelligence/2023-06-08/yougov_end_of_humanity:
-  - snapshot://artificial_intelligence/2023-06-08/yougov_end_of_humanity.pdf
-  data://garden/artificial_intelligence/2023-06-08/yougov_end_of_humanity:
-  - data://meadow/artificial_intelligence/2023-06-08/yougov_end_of_humanity
-  data://grapher/artificial_intelligence/2023-06-08/yougov_end_of_humanity:
-  - data://garden/artificial_intelligence/2023-06-08/yougov_end_of_humanity
 
 # OECD exchange rates
   data://meadow/oecd/2023-06-20/ppp_exchange_rates:
   - snapshot://oecd/2023-06-20/ppp_exchange_rates.csv
   data://garden/oecd/2023-06-20/ppp_exchange_rates:
   - data://meadow/oecd/2023-06-20/ppp_exchange_rates
+
 
 # Sub-dags to import
 include:
@@ -541,3 +515,5 @@ include:
   - dag/environment.yml
   - dag/agriculture.yml
   - dag/space.yml
+  - dag/artificial_intelligence.yml
+

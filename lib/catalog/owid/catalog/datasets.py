@@ -8,7 +8,7 @@ import shutil
 import warnings
 from dataclasses import dataclass
 from glob import glob
-from os import mkdir
+from os import environ, mkdir
 from os.path import join
 from pathlib import Path
 from typing import Any, Iterator, List, Literal, Optional, Union
@@ -107,6 +107,23 @@ class Dataset:
                 warnings.warn(
                     f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
                 )
+
+        if not table.primary_key:
+            if "OWID_STRICT" in environ:
+                raise PrimaryKeyMissing(
+                    f"Table `{table.metadata.short_name}` does not have a primary_key set -- please use set_index() to indicate dimensions"
+                )
+            else:
+                warnings.warn(
+                    f"Table `{table.metadata.short_name}` does not have a primary_key set -- please use set_index() to indicate dimensions"
+                )
+
+        if not table.index.is_unique and "OWID_STRICT" in environ:
+            [(k, dups)] = table.index.value_counts().head(1).to_dict().items()
+            raise NonUniqueIndex(
+                f"Table `{table.metadata.short_name}` has duplicate values in the index -- could you have made a mistake?\n\n"
+                f"e.g. key {k} is repeated {dups} times in the index"
+            )
 
         # check Float64 and Int64 columns for np.nan
         for col, dtype in table.dtypes.items():
@@ -281,3 +298,11 @@ def checksum_file(filename: str) -> Any:
             chunk = istream.read(chunk_size)
 
     return checksum
+
+
+class PrimaryKeyMissing(Exception):
+    pass
+
+
+class NonUniqueIndex(Exception):
+    pass

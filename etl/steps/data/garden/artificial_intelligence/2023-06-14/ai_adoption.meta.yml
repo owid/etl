@@ -1,0 +1,26 @@
+dataset:
+  title: AI Adoption by Organizations in the World, 2021 Vs. 2022 (AI Index, 2023)
+  description: &desc |
+    Data from McKinsey & Company Survey via AI Index (2023) on AI adoption
+    by organisations in Developing Markets (incl. India, Latin America, MENA), Greater
+    China (incl. Hong Kong, Taiwan), North America, Europe and Asia-PaciǇc.
+  licenses:
+  - name: Public domain
+    url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  sources:
+  - name: McKinsey & Company Survey (2022) via AI Index (2023)
+    description: *desc
+    url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
+    source_data_url: https://drive.google.com/uc?export=download&id=1dqEzwMBXVol7bt_ScuLdMpJ4GhGGuR7e
+    date_accessed: '2023-06-19'
+    publication_date: '2023-03-20'
+    publication_year: 2023
+    published_by: McKinsey & Company Survey (2022) via the AI Index 2023 Annual Report,”
+      AI Index Steering Committee, Institute for Human-Centered AI, Stanford University,
+      Stanford, CA, April 2023
+tables:
+  ai_adoption:
+    variables:
+      pct_of_respondents:
+        title: '% of Respondents'
+        unit: ''

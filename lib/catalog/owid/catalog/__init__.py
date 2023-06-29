@@ -1,6 +1,6 @@
 __version__ = "0.1.0"
 
-from . import utils
+from . import processing, utils
 from .catalogs import CHANNEL, LocalCatalog, RemoteCatalog, find, find_latest, find_one
 from .datasets import Dataset
 from .meta import DatasetMeta, License, Source, TableMeta, VariableMeta
@@ -23,4 +23,5 @@ __all__ = [
     "License",
     "utils",
     "CHANNEL",
+    "processing",
 ]
