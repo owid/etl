@@ -34,6 +34,9 @@ meta:
 
     Global totals are calculated yearly as the sum of the number of reported cases
     in each country.
+
+
+    The end 5.
   source_name: Google Sheet
   url: 
     https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
