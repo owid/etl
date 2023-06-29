@@ -1,6 +1,6 @@
 dataset:
   title: AI Adoption by Organizations in the World, 2021 Vs. 2022 (AI Index, 2023)
-  description: &desc |
+  description: &desc >
     Data from McKinsey & Company Survey via AI Index (2023) on AI adoption
     by organisations in Developing Markets (incl. India, Latin America, MENA), Greater
     China (incl. Hong Kong, Taiwan), North America, Europe and Asia-PaciǇc.
