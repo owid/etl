@@ -8,8 +8,6 @@ meta:
   publication_date: '2022-05-01'
   source_name: UNICEF (2022)
   source_published_by: Diarrhea treatment (UNICEF, 2022)
-  source_publisher_source: Several health and multiple indicator cluster surveys compiled
-    by UNICEF.
   url: https://data.unicef.org/resources/dataset/diarrhoea/
   source_data_url:
     https://data.unicef.org/wp-content/uploads/2018/06/Child-Health-Coverage-Database-May-2022.xlsx
