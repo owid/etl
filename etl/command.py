@@ -7,22 +7,34 @@ import re
 import resource
 import sys
 import time
+from concurrent.futures import Future, ProcessPoolExecutor, wait
 from contextlib import contextmanager
-from os import environ
+from os import cpu_count, environ
 from pathlib import Path
 from typing import Any, Callable, Iterator, List, Optional, Set
 
 import click
+import structlog
 from ipdb import launch_ipdb_on_exception
 
 from etl import config, paths
 from etl.snapshot import snapshot_catalog
-from etl.steps import DAG, DataStep, Step, compile_steps, load_dag, select_dirty_steps
+from etl.steps import (
+    DAG,
+    DataStep,
+    Step,
+    compile_steps,
+    load_dag,
+    parse_step,
+    select_dirty_steps,
+)
 
 config.enable_bugsnag()
 
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
+
+log = structlog.get_logger()
 
 
 @click.command()
@@ -68,8 +80,8 @@ LIMIT_NOFILE = 4096
 @click.option(
     "--workers",
     type=int,
-    help="Thread workers to parallelize which steps need rebuilding (steps execution is not parallelized)",
-    default=5,
+    help=f"Thread workers to parallelize which steps need rebuilding (steps execution is not parallelized) [{cpu_count()}]",
+    default=cpu_count(),
 )
 @click.option(
     "--strict/--no-strict",
@@ -91,7 +103,7 @@ def main_cli(
     only: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
-    workers: int = 5,
+    workers: int = cpu_count(),
     strict: Optional[bool] = None,
 ) -> None:
     _update_open_file_limit()
@@ -141,7 +153,7 @@ def main(
     only: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
-    workers: int = 5,
+    workers: int = cpu_count(),
     strict: Optional[bool] = None,
 ) -> None:
     """
@@ -214,8 +226,9 @@ def run_dag(
     downstream: bool = False,
     only: bool = False,
     excludes: Optional[List[str]] = None,
-    workers: int = 1,
+    workers: int = cpu_count(),
     strict: Optional[bool] = None,
+    parallel: bool = False,
 ) -> None:
     """
     Run the selected steps, and anything that needs updating based on them. An empty
@@ -252,14 +265,70 @@ def run_dag(
         return
 
     print(f"Running {len(steps)} steps:")
+    if dry_run:
+        return enumerate_steps(steps)
+
+    if workers > 1:
+        return exec_steps_parallel(steps, workers, strict=strict)
+
+    return exec_steps(steps, strict=strict)
+
+
+def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
     for i, step in enumerate(steps, 1):
         print(f"{i}. {step}...")
-        if not dry_run:
-            strict = _detect_strictness_level(step, strict)
-            with strictness_level(strict):
-                time_taken = timed_run(lambda: step.run())
-                click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.0f}s)")
-                print()
+        strict = _detect_strictness_level(step, strict)
+        with strictness_level(strict):
+            time_taken = timed_run(lambda: step.run())
+            click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.0f}s)")
+            print()
+
+
+def exec_steps_parallel(steps: List[Step], workers: int, strict: Optional[bool] = None) -> None:
+    futures = {}
+
+    seen = set()
+    all_steps = set([str(step) for step in steps])
+    for step in steps:
+        print(step)
+        seen.add(str(step))
+        for dep in step.dependencies:
+            dep_str = str(dep)
+            if dep_str in all_steps:
+                assert dep_str in seen, (str(step), dep_str)
+
+    with ProcessPoolExecutor(max_workers=workers) as executor:
+        for step in steps:
+            step_str = str(step)
+
+            # this step will have to wait for these futures before it can run
+            # (thanks to topological ordering they will all be in the dict by now)
+            dep_futures = [futures[str(dep)] for dep in step.dependencies if str(dep) in all_steps]
+            wait(dep_futures)
+
+            futures[step_str] = executor.submit(_exec_step_job, step_str, strict=strict)
+
+        wait(futures.values())
+
+    errors = [f.exception() for f in futures.values() if f.exception()]
+    if errors:
+        raise errors[0]
+
+
+def _exec_step_job(step_name: str, strict: Optional[bool] = None) -> None:
+    print(f"Starting {step_name}", flush=True)
+    dag = load_dag()
+    step = parse_step(step_name, dag)
+    strict = _detect_strictness_level(step, strict)
+    with strictness_level(strict):
+        time_taken = timed_run(lambda: step.run())
+
+    print(f"Finished {step_name} ({time_taken:.0f}s)", flush=True)
+
+
+def enumerate_steps(steps: List[Step]) -> None:
+    for i, step in enumerate(steps, 1):
+        print(f"{i}. {step}...")
 
 
 def _detect_strictness_level(step: Step, strict: Optional[bool] = None) -> bool:

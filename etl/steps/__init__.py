@@ -2,7 +2,6 @@
 #  __init__.py
 #  steps
 #
-import concurrent.futures
 import graphlib
 import hashlib
 import os
@@ -12,6 +11,7 @@ import sys
 import tempfile
 import warnings
 from collections import defaultdict
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from dataclasses import dataclass, field
 from glob import glob
 from pathlib import Path
@@ -307,8 +307,9 @@ class Step(Protocol):
     path: str
     is_public: bool = True
     version: str
+    dependencies: List[str]
 
-    def run(self, strict: bool = False) -> None:
+    def run(self) -> None:
         ...
 
     def is_dirty(self) -> bool:
@@ -327,7 +328,6 @@ class DataStep(Step):
     """
 
     path: str
-    dependencies: List[Step]
 
     def __init__(self, path: str, dependencies: List[Step]) -> None:
         self.path = path
@@ -523,6 +523,7 @@ class DataStep(Step):
 @dataclass
 class WaldenStep(Step):
     path: str
+    dependencies = []
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -728,7 +729,7 @@ class GrapherStep(Step):
             # insert data in parallel, this speeds it up considerably and is even faster than loading
             # data with LOAD DATA INFILE
             if config.GRAPHER_INSERT_WORKERS > 1:
-                with concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as executor:
+                with ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as executor:
                     results = executor.map(upsert, tables)
             else:
                 results = map(upsert, tables)
@@ -834,6 +835,8 @@ class ETagStep(Step):
 
 
 class BackportStep(DataStep):
+    dependencies = []
+
     def __str__(self) -> str:
         return f"backport://{self.path}"
 
@@ -876,6 +879,7 @@ class DataStepPrivate(PrivateMixin, DataStep):
 
 class WaldenStepPrivate(WaldenStep):
     is_public = False
+    dependencies = []
 
     def __str__(self) -> str:
         return f"walden-private://{self.path}"
@@ -888,7 +892,7 @@ class BackportStepPrivate(PrivateMixin, BackportStep):
         return f"backport-private://{self.path}"
 
 
-def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
+def select_dirty_steps(steps: List[Step], workers: int = 1) -> List[Step]:
     """Select dirty steps using threadpool."""
     # dynamically add cached version of `is_dirty` to all steps to avoid re-computing
     # this is a bit hacky, but it's the easiest way to only cache it here without
@@ -897,13 +901,17 @@ def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
     for s in steps:
         _add_is_dirty_cached(s, cache_is_dirty)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        steps_dirty = executor.map(lambda s: s.is_dirty(), steps)  # type: ignore
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        steps_dirty = executor.map(_step_is_dirty, steps)  # type: ignore
         steps = [s for s, is_dirty in zip(steps, steps_dirty) if is_dirty]
 
     cache_is_dirty.clear()
 
     return steps
+
+
+def _step_is_dirty(s: Step) -> bool:
+    return s.is_dirty()
 
 
 def _cached_is_dirty(self: Step, cache: files.RuntimeCache) -> bool:
