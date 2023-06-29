@@ -252,6 +252,9 @@ def app(dummy_data: bool, commit: bool) -> None:
         grapher=True,
         private=form.is_private,
         workers=1,
+        # NOTE: force is necessary because we are caching checksums with files.CACHE_CHECKSUM_FILE
+        # we could have cleared the cache, but this is cleaner
+        force=True,
     )
     po.put_success("Import to MySQL successful!")
 
