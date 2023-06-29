@@ -11,9 +11,10 @@ import numpy as np
 import pandas as pd
 import requests
 import yaml
+from structlog import get_logger
+
 from owid.walden import add_to_catalog
 from owid.walden.catalog import Dataset
-from structlog import get_logger
 
 BASE_URL = "https://unstats.un.org/sdgapi"
 log = get_logger()
