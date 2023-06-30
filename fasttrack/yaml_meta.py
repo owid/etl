@@ -62,4 +62,15 @@ class YAMLMeta(BaseModel):
     tables: dict[str, YAMLTableMeta]
 
     def to_yaml(self) -> str:
-        return yaml_dump(self.dict(exclude_none=True, exclude_unset=True))  # type: ignore
+        d = self.dict(exclude_none=True, exclude_unset=True)
+
+        # exclude fields that are inferred from path
+        d["dataset"].pop("namespace")
+        d["dataset"].pop("version")
+        d["dataset"].pop("short_name")
+
+        # description and title is already in the snapshot
+        d["dataset"].pop("title", None)
+        d["dataset"].pop("description", None)
+
+        return yaml_dump(d)  # type: ignore

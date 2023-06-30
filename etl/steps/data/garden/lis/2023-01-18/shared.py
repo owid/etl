@@ -12,7 +12,7 @@ var_dict = {
         "description": "This is the mean income or consumption per year within the {pct_dict[pct]['decile10']} (tenth of the population).",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "share": {
         "title": "Share",
@@ -26,14 +26,14 @@ var_dict = {
         "description": "This is the level of income or consumption per year below which {str(pct)}% of the population falls.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "avg_shortfall": {
         "title": "Average shortfall ($)",
         "description": "This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the poverty line of {povline}, averaged across the population in poverty.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "headcount": {
         "title": "Number in poverty",
@@ -68,7 +68,7 @@ var_dict = {
         "description": "This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {povline}.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "gini": {
         "title": "Gini coefficient",
@@ -82,14 +82,14 @@ var_dict = {
         "description": "Mean income or consumption.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "median": {
         "title": "Median",
         "description": "Median income or consumption.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "palma_ratio": {
         "title": "Palma ratio",

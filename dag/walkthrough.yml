@@ -8,7 +8,3 @@ steps:
   - data://garden/dummy/2020-01-01/dummy
   data://explorers/dummy/2020-01-01/dummy:
   - data://garden/dummy/2020-01-01/dummy
-  data://meadow/who/2023-06-29/guinea_worm:
-  - snapshot://who/2023-06-29/guinea_worm.csv
-  data://garden/who/2023-06-29/guinea_worm:
-  - data://meadow/who/2023-06-29/guinea_worm
