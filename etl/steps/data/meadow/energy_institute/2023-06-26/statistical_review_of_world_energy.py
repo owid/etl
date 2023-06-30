@@ -76,6 +76,144 @@ def parse_coal_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
     return tb
 
 
+def parse_oil_spot_crude_prices(data: pr.ExcelFile, metadata: TableMeta):
+    sheet_name = "Oil - Spot crude prices"
+    # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
+    tb = data.parse(sheet_name, skiprows=0, metadata=metadata, na_values=["-"])
+
+    # Re-create the original column names, assuming the zeroth column is for years.
+    tb.columns = ["year"] + [
+        "Oil spot crude prices - " + " ".join(tb[column].iloc[0:2].fillna("").astype(str).tolist()).strip()
+        for column in tb.columns[1:]
+    ]
+
+    # The units should be written in the header of the first column.
+    assert tb.iloc[2][0] == "US dollars per barrel", f"Units (or sheet format) may have changed in sheet {sheet_name}"
+
+    # Drop header rows.
+    tb = tb.drop([0, 1, 2, 3]).reset_index(drop=True)
+
+    # Drop empty columns and rows.
+    tb = tb.dropna(axis=1, how="all")
+    tb = tb.dropna(how="all").reset_index(drop=True)
+
+    # There are many rows of footers at the end, occupying values of the zeroth column.
+    # Remove all those rows, for which all columns are nan except the country column.
+    tb = tb.dropna(subset=tb.drop(columns=tb.columns[0]).columns, how="all")
+
+    # Ensure index columns are not repeated, and sort rows and columns conveniently.
+    tb = tb.set_index(["year"], verify_integrity=True).sort_index().reset_index()
+
+    # Make column names snake case.
+    tb = tb.underscore()
+
+    return tb
+
+
+def parse_oil_crude_prices(data: pr.ExcelFile, metadata: TableMeta):
+    sheet_name = "Oil crude prices since 1861"
+    # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
+    tb = data.parse(sheet_name, skiprows=3, metadata=metadata, na_values=["-"])
+
+    # Rename columns.
+    tb.columns = ["year"] + ["Oil crude prices - " + column for column in tb.columns[1:]]
+
+    # Drop empty columns and rows.
+    tb = tb.dropna(axis=1, how="all")
+    tb = tb.dropna(how="all").reset_index(drop=True)
+
+    # There are many rows of footers at the end, occupying values of the zeroth column.
+    # Remove all those rows, for which all columns are nan except the country column.
+    tb = tb.dropna(subset=tb.drop(columns=tb.columns[0]).columns, how="all")
+
+    # Make column names snake case.
+    tb = tb.underscore()
+
+    # Ensure index columns are not repeated, and sort rows and columns conveniently.
+    tb = tb.set_index(["year"], verify_integrity=True).sort_index().reset_index()
+
+    return tb
+
+
+def parse_gas_prices(data: pr.ExcelFile, metadata: TableMeta) -> Table:
+    sheet_name = "Gas Prices "
+    # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
+    tb = data.parse(sheet_name, skiprows=1, metadata=metadata, na_values="-")
+
+    # Re-create the original column names, assuming the zeroth column is for countries.
+    tb.iloc[0] = tb.iloc[0].ffill()
+    tb.columns = ["year"] + [
+        "  - ".join(tb[column].iloc[0:3].fillna("").astype(str).tolist()).strip() for column in tb.columns[1:]
+    ]
+
+    # Remove numbers from column names (they are references to footnotes).
+    tb.columns = [re.sub("\d", "", column).strip() for column in tb.columns]
+
+    # Drop header rows.
+    tb = tb.drop([0, 1, 2]).reset_index(drop=True)
+
+    # Drop empty columns and rows.
+    tb = tb.dropna(axis=1, how="all")
+    tb = tb.dropna(how="all").reset_index(drop=True)
+
+    # There are many rows of footers at the end, occupying values of the zeroth column.
+    # Remove all those rows, for which all columns are nan except the country column.
+    tb = tb.dropna(subset=tb.drop(columns=tb.columns[0]).columns, how="all")
+
+    # Ensure index columns are not repeated, and sort rows and columns conveniently.
+    tb = tb.set_index(["year"], verify_integrity=True).sort_index().reset_index()
+
+    # Make column names snake case.
+    tb = tb.underscore()
+
+    return tb
+
+
+def parse_coal_prices(data: pr.ExcelFile, metadata: TableMeta) -> Table:
+    sheet_name = "Coal Prices"
+    # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
+    tb = data.parse(sheet_name, skiprows=1, metadata=metadata, na_values=["-"])
+
+    # Remove spurious columns.
+    tb = tb.drop(columns=[column for column in tb.columns if column.startswith("Unnamed:") or len(column.strip()) == 0])
+
+    assert tb.columns[0] == "US dollars per tonne", f"Units (or sheet format) may have changed in sheet {sheet_name}"
+
+    # Rename year column and remove spurious symbols used to signal footnotes.
+    tb.columns = ["year"] + tb.columns[1:].tolist()
+    tb.columns = [re.sub(r"\†|\‡|\^|\*|\#", "", column).strip() for column in tb.columns]
+
+    # Drop empty columns and rows.
+    tb = tb.dropna(axis=1, how="all")
+    tb = tb.dropna(how="all").reset_index(drop=True)
+
+    # There are many rows of footers at the end, occupying values of the zeroth column.
+    # Remove all those rows, for which all columns are nan except the country column.
+    tb = tb.dropna(subset=tb.drop(columns=tb.columns[0]).columns, how="all")
+
+    # Ensure index columns are not repeated, and sort rows and columns conveniently.
+    tb = tb.set_index(["year"], verify_integrity=True).sort_index().reset_index()
+
+    # Make column names snake case.
+    tb = tb.underscore()
+
+    return tb
+
+
+def create_table_of_fossil_fuel_prices(
+    tb_oil_spot_crude_prices: Table, tb_oil_crude_prices: Table, tb_gas_prices: Table, tb_coal_prices: Table
+) -> Table:
+    # Combine additional tables of fossil fuel prices.
+    tb_prices = tb_oil_spot_crude_prices.copy()
+    for tb_additional in [tb_oil_crude_prices, tb_gas_prices, tb_coal_prices]:
+        tb_prices = tb_prices.merge(tb_additional, how="outer", on=["year"]).copy_metadata(from_table=tb_prices)
+    # Rename table appropriately.
+    tb_prices.metadata.short_name += "_fossil_fuel_prices"
+    tb_prices = tb_prices.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    return tb_prices
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -94,15 +232,37 @@ def run(dest_dir: str) -> None:
     # Parse coal reserves sheet.
     tb_coal_reserves = parse_coal_reserves(data=data_additional, metadata=snap_additional.to_table_metadata())
 
-    # Combine main and additional data tables.
+    # Parse oil spot crude prices.
+    tb_oil_spot_crude_prices = parse_oil_spot_crude_prices(
+        data=data_additional, metadata=snap_additional.to_table_metadata()
+    )
+
+    # Parse oil crude prices.
+    tb_oil_crude_prices = parse_oil_crude_prices(data=data_additional, metadata=snap_additional.to_table_metadata())
+
+    # Parse gas prices.
+    tb_gas_prices = parse_gas_prices(data=data_additional, metadata=snap_additional.to_table_metadata())
+
+    # Parse coal prices.
+    tb_coal_prices = parse_coal_prices(data=data_additional, metadata=snap_additional.to_table_metadata())
+
+    # Combine main table and coal reserves.
     tb = tb.merge(tb_coal_reserves, how="outer", on=["country", "year"]).copy_metadata(from_table=tb)
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
+    # Create combined table of fossil fuel prices.
+    tb_prices = create_table_of_fossil_fuel_prices(
+        tb_oil_spot_crude_prices=tb_oil_spot_crude_prices,
+        tb_oil_crude_prices=tb_oil_crude_prices,
+        tb_gas_prices=tb_gas_prices,
+        tb_coal_prices=tb_coal_prices,
+    )
+
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb, tb_prices], default_metadata=snap.metadata)
     ds_meadow.save()
