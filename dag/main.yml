@@ -262,10 +262,6 @@ steps:
   data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
 
-  # Long-term homicide rates in Europe - Eisner (2014)
-  data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
-    - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
-
   #Luxembourg Income Study
   data://meadow/lis/2023-01-18/luxembourg_income_study:
     - snapshot://lis/2023-01-18/lis_keyvars.csv
