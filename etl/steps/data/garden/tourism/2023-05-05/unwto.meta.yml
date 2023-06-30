@@ -16,7 +16,12 @@ dataset:
               Inbound Tourism – Arrivals (Overnights visitors (tourists and same-day visitors (excursionists)
               Inbound Tourism – Arrivals by region
               Inbound Tourism – Arrivals by main purpose
-              Inbound Tourism – Accommodation (guests) Domestic Tourism – Overnights visitors (tourists) Domestic Tourism – Accommodation (guests) Outbound Tourism – Overnights visitors (tourists) Outbound Tourism – Expenditure (travel) Inbound Tourism – Expenditure (travel)
+              Inbound Tourism – Accommodation (guests)
+              Domestic Tourism – Overnights visitors (tourists)
+              Domestic Tourism – Accommodation (guests)
+              Outbound Tourism – Overnights visitors (tourists)
+              Outbound Tourism – Expenditure (travel)
+              Inbound Tourism – Expenditure (travel)
               Tourism Industries – Average length of stay
               Employment – Food and beverage serving activities and Total
 tables:
