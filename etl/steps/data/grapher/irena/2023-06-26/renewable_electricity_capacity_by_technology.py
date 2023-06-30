@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Get the human-readable names of the technologies from the variable metadata.
-    rename_technologies = {variable: tb[variable].metadata.title for variable in tb.columns}
+    rename_technologies = {variable: tb[variable].metadata.title.replace(" capacity", "") for variable in tb.columns}
 
     # Simplify table to consider only the World.
     # Here we use "country" to refer to a technology.

@@ -2,115 +2,115 @@ tables:
   renewable_electricity_capacity:
     variables:
       bagasse:
-        title: Bagasse
+        title: Bagasse capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       bioenergy:
-        title: Bioenergy
+        title: Bioenergy capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       biogas:
-        title: Biogas
+        title: Biogas capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       concentrated_solar_power:
-        title: Concentrated solar power
+        title: Concentrated solar power capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       geothermal_energy:
-        title: Geothermal energy
+        title: Geothermal energy capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       hydropower:
-        title: Hydropower
+        title: Hydropower capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       liquid_biofuels:
-        title: Liquid biofuels
+        title: Liquid biofuels capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       marine_energy:
-        title: Marine energy
+        title: Marine energy capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       offshore_wind_energy:
-        title: Offshore wind energy
+        title: Offshore wind energy capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       onshore_wind_energy:
-        title: Onshore wind energy
+        title: Onshore wind energy capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       other_solid_biofuels:
-        title: Other solid biofuels
+        title: Other solid biofuels capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       pure_pumped_storage:
-        title: Pure pumped storage
+        title: Pure pumped storage capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       renewable_hydropower_including_mixed_plants:
-        title: Renewable hydropower including mixed plants
+        title: Renewable hydropower including mixed plants capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       renewable_municipal_waste:
-        title: Renewable municipal waste
+        title: Renewable municipal waste capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       solar_energy:
-        title: Solar energy
+        title: Solar energy capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       solar_photovoltaic:
-        title: Solar photovoltaic
+        title: Solar photovoltaic capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       solid_biofuels_and_renewable_waste:
-        title: Solid biofuels and renewable waste
+        title: Solid biofuels and renewable waste capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       total_renewable_energy:
-        title: Total renewable energy
+        title: Total renewable energy capacity
         short_unit: MW
         unit: megawatts
         display:
           numDecimalPlaces: 0
       wind_energy:
-        title: Wind energy
+        title: Wind energy capacity
         short_unit: MW
         unit: megawatts
         display:
