@@ -1,8 +1,8 @@
 descriptions:
   certification: &certification_description |
-    The current and historical values for the status of Guinea worm disease (Dracunculiasis) as certified by the WHO. To be certified as free of guinea worm disease, a countrymust have reported zero indigenous cases through activesurveillance for at least 3 consecutive years.
+    The current and historical values for the status of Guinea worm disease (Dracunculiasis) as certified by the WHO. To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
 
-    Data regarding certification is taken from:
+    Data regarding certification status is taken from:
 
     https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
 
