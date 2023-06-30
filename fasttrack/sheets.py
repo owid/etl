@@ -77,6 +77,10 @@ def parse_metadata_from_sheets(
     sources_dict = cast(Dict[str, Any], sources_meta_df.set_index("short_name").to_dict())
     sources_dict = {k: _prune_empty(v) for k, v in sources_dict.items()}
 
+    # publisher_source is not used anymore
+    for source in sources_dict.values():
+        source.pop("publisher_source", None)
+
     dataset_dict = _prune_empty(dataset_meta_df.set_index(0)[1].to_dict())  # type: ignore
     dataset_dict["namespace"] = "fasttrack"  # or should it be owid? or institution specific?
     dataset_dict.pop("updated")

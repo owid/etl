@@ -1,0 +1,24 @@
+meta:
+  name: World Risk Poll (2021)
+  publication_year: 2022
+  source_name: Lloyd’s Register Foundation (2022)
+  source_published_by: 'World Risk Poll 2021, Lloyd’s Register Foundation (2022) '
+  url: https://wrp.lrfoundation.org.uk/data-resources/
+  source_data_url:
+    https://wrp.lrfoundation.org.uk/wp-content/uploads/2023/05/lrf_wrp_2021_full_data.zip
+  license_url: https://wrp.lrfoundation.org.uk/terms-of-use/
+  license_name: ' Lloyd’s Register Foundation 2018'
+  date_accessed: 2023-06-26
+  is_public: true
+  description: |
+    Spread across four themed reports, the 2021 World Risk Poll covers the biggest risks facing people and communities globally, ranging from road crashes, severe weather, climate change and disaster resilience, to work-related harm, violence and harassment at work, and use of personal data.
+
+    The 2021 World Risk Poll builds on the results from the inaugural Poll in 2019 and explores how the relationship between perception and experience of risk may have shifted over time, including differences before and after the start of the Covid-19 pandemic. The Poll also allows us to understand how demographic factors contribute to different groups of people worrying about, and experiencing risks, in different ways.
+
+    It will be repeated at least two more times, in 2023 and 2025.
+
+wdir: ../../../data/snapshots/world_risk_poll/2023-06-26
+outs:
+- md5: 2fba71249275d42350426aa8f447eb98
+  size: 36621707
+  path: wrp_2021.zip
