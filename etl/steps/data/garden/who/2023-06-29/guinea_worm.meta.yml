@@ -1,27 +1,64 @@
+descriptions:
+  certification: &certification_description |
+    Certification...
+  reported_cases: &reported_cases_description |
+    Reported cases of guinea worm disease (dracunculiasis) as recorded by WHO.
+
+    For Cameroon, Central African Republic, Cote d'Ivoire, Mauritania, Senegal and Yemen data is gathered from:
+
+    1986-2017: https://web.archive.org/web/20220208133814/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_i2.html
+    2018: Table 1a: https://web.archive.org/web/20230629130727/https://apps.who.int/iris/bitstream/handle/10665/324786/WER9420-233-251.pdf?sequence=1&isAllowed=y
+    2019: Table 1a: https://web.archive.org/web/20230629130619/https://apps.who.int/iris/bitstream/handle/10665/332086/WER9520-209-227-eng-fre.pdf?sequence=1&isAllowed=y
+    2020: Table 1a: https://web.archive.org/web/20230226162934/https://apps.who.int/iris/bitstream/handle/10665/341529/WER9621-173-194-eng-fre.pdf?sequence=1&isAllowed=y
+    2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
+    2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
+
+    For all other countries data is gathered from the following sources:
+
+    1980-2020: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
+    2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
+    2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
+
+    Global totals are calculated yearly as the sum of the number of reported cases in each country.
+all_sources:
+  - source_certification: &source_certification
+      name: World Health Organization
+      published_by: 'Certification status of dracunculiasis eradication: World Health Organization; 2018. Licence: CC BY-NC-SA
+      3.0 IGO'
+      url: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
+      date_accessed: '2023-06-29'
+      publication_year: 2018
+  - source_reported_cases: &source_reported_cases
+      name: World Health Organization
+      published_by: Dracunculiasis Eradication Portal
+      date_accessed: '2023-06-28'
+      url: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
 dataset:
-  title: Certification status of dracunculiasis eradication (WHO, 2018)
-  description: ''
+  title: Guinea worm reported cases and certification (WHO)
+  description:
   licenses:
   - name: CC BY-NC-SA 3.0 IGO
     url: https://www.who.int/about/policies/publishing/copyright
   sources:
-  - name: WHO
-    url: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
-    date_accessed: '2023-06-29'
-    publication_year: 2018
-    published_by: 'Certification status of dracunculiasis eradication: World Health Organization; 2018. Licence: CC BY-NC-SA
-      3.0 IGO'
+  - *source_certification
+  - *source_reported_cases
 tables:
   guinea_worm:
     variables:
       year_certified:
         title: Year country is certified free from guinea worm
         unit: ''
+        description:
+        - *certification_description
       certification_status:
         title: Certification status in the most recent year
         unit: ''
+        description:
+        - *certification_description
       guinea_worm_reported_cases:
         title: Reported cases of guinea worm disease in humans
         unit: 'reported cases'
+        description:
+        - *reported_cases_description
         display:
           numDecimalPlaces: 0
