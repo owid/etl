@@ -25,6 +25,7 @@ def run(dest_dir: str) -> None:
     tb["year_certified"] = tb["year_certified"].replace({"Pre-certification": 3000, "Endemic": 4000})
     tb["year_certified"] = tb["year_certified"].astype("float64")
     tb["guinea_worm_reported_cases"] = tb["guinea_worm_reported_cases"].astype("float64")
+    # tb["certification_status"] = tb["certification_status"].replace("nan", "")
     tb = tb.sort_values(["country", "year"])
 
     #

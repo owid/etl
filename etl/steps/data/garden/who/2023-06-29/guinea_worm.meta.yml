@@ -62,7 +62,7 @@ tables:
         description:
           *certification_description
       certification_status:
-        title: Certification status in the most recent year
+        title: Certification status over time
         unit: ''
         description:
           *certification_description

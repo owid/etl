@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from itertools import product
 from typing import cast
 
 import pandas as pd
@@ -44,9 +45,8 @@ def run(dest_dir: str) -> None:
     tb = combine_datasets(tb, tb_time_series, tb_fasttrack)
 
     tb["year_certified"] = tb["year_certified"].astype("str")
-    tb["certification_status"] = tb["certification_status"].astype("str")
-    tb["guinea_worm_reported_cases"] = tb["guinea_worm_reported_cases"].astype("float64")
-
+    # tb = tb.dropna(axis=0, subset=["year_certified", "certification_status", "guinea_worm_reported_cases"], how="all")
+    tb = add_missing_years(tb)
     # Fill na with 0
     tb["guinea_worm_reported_cases"] = tb["guinea_worm_reported_cases"].fillna(0)
     tb = tb.set_index(["country", "year"])
@@ -60,6 +60,19 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("guinea_worm.end")
+
+
+def add_missing_years(df: Table) -> Table:
+    """
+    Add full spectrum of year-country combinations to fast-track dataset so we have zeros where there is missing data
+    """
+    years = df["year"].drop_duplicates().to_list()
+    countries = df["country"].drop_duplicates().to_list()
+    comb_df = pd.DataFrame(list(product(countries, years)), columns=["country", "year"])
+
+    df = Table(pd.merge(df, comb_df, on=["country", "year"], how="outer"), short_name=paths.short_name)
+
+    return df
 
 
 def update_with_latest_status(df: Table) -> Table:
