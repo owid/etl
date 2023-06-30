@@ -19,13 +19,13 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["guinea_worm"]
+    #
+    # Process data.
+    #
     tb["year_certified"] = tb["year_certified"].replace({"Pre-certification": 3000, "Endemic": 4000})
     tb["year_certified"] = tb["year_certified"].astype("float64")
     tb["guinea_worm_reported_cases"] = tb["guinea_worm_reported_cases"].astype("float64")
     tb = tb.sort_values(["country", "year"])
-    #
-    # Process data.
-    #
 
     #
     # Save outputs.
