@@ -43,7 +43,7 @@ tables:
         title: Domestic guests in tourism accommodation (hotels and similar establishments)
         unit: ''
         description: >
-          The indicator refers to the number of domestic guests who stay in tourism accommodation establishments such as hotels and similar accommodations. This indicator focuses specifically on individuals from the same country as the location of the accommodation.
+          The indicator refers to the number of domestic guests who stay in tourism accommodation establishments such as hotels and similar accommodations. This indicator focuses specifically on individuals from the same country as the location of the accommodation. Every instance of an individual traveling within a country will be considered as a distinct guest.
         display:
           name: Local guests in hotels and similar establishments
           numDecimalPlaces: 0
@@ -52,7 +52,7 @@ tables:
         title: Domestic trips (tourists)
         unit: ''
         description: >
-          A domestic tourism trip refers to the travel of a visitor from the time of leaving their usual residence until they return: it refers to a round trip.
+          When an individual travels domestically multiple times within a year, each journey is counted as a separate trip. A domestic tourism trip refers to the travel of a visitor from the time of leaving their usual residence until they return: it refers to a round trip.
         display:
           name: Domestic tourist trips
           numDecimalPlaces: 0
@@ -167,6 +167,8 @@ tables:
         unit: ''
         description: >
           International departures include the number of trips made by tourists and same-day visitors. Departures data measure the flows of resident visitors leaving the country of reference. Departures are not necessarily equal to the number of arrivals reported by international destinations for the country of reference.
+
+          Per "1000 people" means that the measurement or statistic is expressed in relation to a specific quantity of 1000 individuals within the population. It provides a standardised way of comparing data or rates based on a consistent population size. For example, if a statistic is stated as "10 per 1000 people," it means that out of every 1000 individuals in the population, there are 10 instances or occurrences of the measured phenomenon. It allows for easier comparison and understanding of data across different population sizes.
         display:
           name: Total international departures per 1000 people
           numDecimalPlaces: 0
@@ -176,6 +178,8 @@ tables:
         unit: ''
         description: >
           Tourist departures refer to the number of trips by people who travel abroad and stay overnight. Departures data measure the flows of resident visitors leaving the country of reference. Departures are not necessarily equal to the number of arrivals reported by international destinations for the country of reference.
+
+          Per "1000 people" means that the measurement or statistic is expressed in relation to a specific quantity of 1000 individuals within the population. It provides a standardised way of comparing data or rates based on a consistent population size. For example, if a statistic is stated as "10 per 1000 people," it means that out of every 1000 individuals in the population, there are 10 instances or occurrences of the measured phenomenon. It allows for easier comparison and understanding of data across different population sizes.
         display:
           name: International tourist departures per 1000 people
           numDecimalPlaces: 0
@@ -185,6 +189,8 @@ tables:
         unit: ''
         description: >
           Departures by same-day visitors refer to the number of trips by people who travel abroad and come back on the same day. Departures data measure the flows of resident visitors leaving the country of reference. Departures are not necessarily equal to the number of arrivals reported by international destinations for the country of reference.
+
+          Per "1000 people" means that the measurement or statistic is expressed in relation to a specific quantity of 1000 individuals within the population. It provides a standardised way of comparing data or rates based on a consistent population size. For example, if a statistic is stated as "10 per 1000 people," it means that out of every 1000 individuals in the population, there are 10 instances or occurrences of the measured phenomenon. It allows for easier comparison and understanding of data across different population sizes.
         display:
           name: International departures by same-day visitors per 1000 people
           numDecimalPlaces: 0
@@ -193,7 +199,9 @@ tables:
         title: Domestic trips (total) per 1000
         unit: ''
         description: >
-          A domestic trip refers to the travel of a visitor from the time of leaving his/her usual residence until he/she returns: it refers to a round trip. This indicator does not distinguish between trips made for tourism versus business and professional purposes.
+           When an individual travels domestically multiple times within a year, each journey is counted as a separate trip. A domestic trip refers to the travel of a visitor from the time of leaving his/her usual residence until he/she returns: it refers to a round trip. This indicator does not distinguish between trips made for tourism versus business and professional purposes.
+
+           Per "1000 people" means that the measurement or statistic is expressed in relation to a specific quantity of 1000 individuals within the population. It provides a standardised way of comparing data or rates based on a consistent population size. For example, if a statistic is stated as "10 per 1000 people," it means that out of every 1000 individuals in the population, there are 10 instances or occurrences of the measured phenomenon. It allows for easier comparison and understanding of data across different population sizes.
         display:
           name: Domestic trips per 1000 people
           numDecimalPlaces: 0
@@ -202,68 +210,84 @@ tables:
         title: Domestic trips (tourists) per 1000
         unit: ''
         description: >
-          A domestic tourist trip entails the journey of a visitor who spends at least one night away from their usual residence, starting from the moment of departure until their return. This definition encompasses roundtrip travel within the domestic territory.
+          When an individual travels domestically multiple times within a year, each journey is counted as a separate trip. A domestic tourist trip entails the journey of a visitor who spends at least one night away from their usual residence, starting from the moment of departure until their return. This definition encompasses roundtrip travel within the domestic territory.
+
+          Per "1000 people" means that the measurement or statistic is expressed in relation to a specific quantity of 1000 individuals within the population. It provides a standardised way of comparing data or rates based on a consistent population size. For example, if a statistic is stated as "10 per 1000 people," it means that out of every 1000 individuals in the population, there are 10 instances or occurrences of the measured phenomenon. It allows for easier comparison and understanding of data across different population sizes.
         display:
           name: Domestic tourist trips per 1000 people
           numDecimalPlaces: 0
 
       do_to_tr_sa_da_vi_ex_per_1000:
-        title: Domestic trips (same day) per 1000 people
+        title: Domestic trips (same day) per 1000
         unit: ''
         description: >
-          A domestic same-day trip refers to the travel of a visitor who departs from their usual residence and returns on the same day. This definition encompasses roundtrip travel, where the visitor's journey starts and ends at their primary residence within a single day.
+          A domestic same-day trip refers to the travel of a visitor who departs from their usual residence and returns on the same day.  When an individual travels domestically multiple times within a year, each journey is counted as a separate trip. This definition encompasses roundtrip travel, where the visitor's journey starts and ends at their primary residence within a single day.
+
+          Per "1000 people" means that the measurement or statistic is expressed in relation to a specific quantity of 1000 individuals within the population. It provides a standardised way of comparing data or rates based on a consistent population size. For example, if a statistic is stated as "10 per 1000 people," it means that out of every 1000 individuals in the population, there are 10 instances or occurrences of the measured phenomenon. It allows for easier comparison and understanding of data across different population sizes.
         display:
           name: Domestic same-day trips per 1000 people
           numDecimalPlaces: 0
 
       in_to_ar_to_ar_per_1000:
-        title: Inbound arrivals (total) per 1000 people
+        title: Inbound arrivals (total) per 1000
         unit: ''
         description: >
           When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
           Tourist arrivals data pertain to international visitors entering the economic territory of the referenced country and include visits by people who stay overnight. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments. This indicator does not distinguish between tourists and same-day visitors.
+
+          Per "1000 people" means that the measurement or statistic is expressed in relation to a specific quantity of 1000 individuals within the population. It provides a standardised way of comparing data or rates based on a consistent population size. For example, if a statistic is stated as "10 per 1000 people," it means that out of every 1000 individuals in the population, there are 10 instances or occurrences of the measured phenomenon. It allows for easier comparison and understanding of data across different population sizes.
         display:
           name: International arrivals per 1000 people
           numDecimalPlaces: 0
 
       in_to_ar_ov_vi_to_per_1000:
-        title: Inbound arrivals (same night) per 1000 people
+        title: Inbound arrivals (same night) per 1000
         unit: ''
         description: >
           When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
           Tourist arrivals data pertain to international visitors entering the economic territory of the referenced country and include visits by people who stay overnight. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments.
 
           Note that before 2006, the US did not distinguish between same-day and tourist arrivals from Mexico.
+
+          Per "1000 people" means that the measurement or statistic is expressed in relation to a specific quantity of 1000 individuals within the population. It provides a standardised way of comparing data or rates based on a consistent population size. For example, if a statistic is stated as "10 per 1000 people," it means that out of every 1000 individuals in the population, there are 10 instances or occurrences of the measured phenomenon. It allows for easier comparison and understanding of data across different population sizes.
+
         display:
           name: International tourist arrivals per 1000 people
           numDecimalPlaces: 0
 
       in_to_ar_sa_da_vi_ex_per_1000:
-        title: Inbound arrivals (tourists) per 1000 people
+        title: Inbound arrivals (tourists) per 1000
         unit: ''
         description: >
           When an individual visits a country multiple times within a year, each visit is counted as a separate arrival. Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually. As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
           Same-day arrivals data pertain to international visitors entering the economic territory of the referenced country and only staying for the day. These data can be obtained from various sources, including administrative records such as police, immigration, and traffic controls, as well as border surveys and registrations at accommodation establishments.
 
           Note that before 2006, the US counted same-day trips from Canada only. After 2006, day trips from Mexico were also included.
+
+          Per "1000 people" means that the measurement or statistic is expressed in relation to a specific quantity of 1000 individuals within the population. It provides a standardised way of comparing data or rates based on a consistent population size. For example, if a statistic is stated as "10 per 1000 people," it means that out of every 1000 individuals in the population, there are 10 instances or occurrences of the measured phenomenon. It allows for easier comparison and understanding of data across different population sizes.
+
         display:
           name: International same-day arrivals per 1000 people
           numDecimalPlaces: 0
 
       em_fo_an_be_se_ac_per_1000:
-        title: Employment (food and beverage serving activities) per 1000 people
+        title: Employment (food and beverage serving activities) per 1000
         unit: ''
         description: >
           Persons employed in the food and beverage industries can be either employees or self-employed. Some employed persons may have more than one job.
+
+          Per "1000 people" means that the measurement or statistic is expressed in relation to a specific quantity of 1000 individuals within the population. It provides a standardised way of comparing data or rates based on a consistent population size. For example, if a statistic is stated as "10 per 1000 people," it means that out of every 1000 individuals in the population, there are 10 instances or occurrences of the measured phenomenon. It allows for easier comparison and understanding of data across different population sizes.
         display:
-          name: Number of people employed in food and beverage serving activities per 1000 population
+          name: Number of people employed in food and beverage serving activities per 1000 people
           numDecimalPlaces: 0
 
       em_to_per_1000:
-        title: Employment (total) per 1000 people
+        title: Employment (total) per 1000
         unit: ''
         description: >
           Persons employed in the food and beverage industries can be either employees or self-employed. Some employed persons may have more than one job.
+
+          Per "1000 people" means that the measurement or statistic is expressed in relation to a specific quantity of 1000 individuals within the population. It provides a standardised way of comparing data or rates based on a consistent population size. For example, if a statistic is stated as "10 per 1000 people," it means that out of every 1000 individuals in the population, there are 10 instances or occurrences of the measured phenomenon. It allows for easier comparison and understanding of data across different population sizes.
         display:
           name: Number of people employed in all tourism-related industries per 1000 people
           numDecimalPlaces: 0
@@ -300,10 +324,10 @@ tables:
         unit: international dollars
         short_unit: $
         description: >
+          In the context of this specific indicator, adjustments have been made to account for inflation and differences in the cost of living in the destination countries where tourists spend their money. To achieve this, the expenditure data has been converted from US dollars to the local currency of each respective country. The inflation adjustment is based on the Consumer Price Index (CPI) for the year 2021 specific to each country. Finally, the data is expressed in international 2021 US dollars, enabling consistent and comparable analysis across different destinations and time periods. Following the adjustment, in countries where the cost of living is lower, the adjusted total expenditure will reflect a higher value. This indicates that tourist money holds greater purchasing power in terms of acquiring goods and services, allowing tourists to obtain more with their expenditures in these destinations.
+
           Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). For inbound tourism, these expenses are recorded as "credits" in the BOP and referred to as "travel receipts". It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
 
-
-          In the context of this specific indicator, adjustments have been made to account for inflation and differences in the cost of living in the destination countries where tourists spend their money. To achieve this, the expenditure data has been converted from US dollars to the local currency of each respective country. The inflation adjustment is based on the Consumer Price Index (CPI) for the year 2021 specific to each country. Finally, the data is expressed in international 2021 US dollars, enabling consistent and comparable analysis across different destinations and time periods. Following the adjustment, in countries where the cost of living is lower, the adjusted total expenditure will reflect a higher value. This indicates that tourist money holds greater purchasing power in terms of acquiring goods and services, allowing tourists to obtain more with their expenditures in these destinations.
         display:
           name: International tourist expenditure within the country they visit
           numDecimalPlaces: 0
@@ -313,10 +337,9 @@ tables:
         unit: US dollars
         short_unit: $
         description: >
-          Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). In the case of outbound tourism, those expenditures associated with resident visitors are registered as “debits” in the BOP and refers to “travel expenditure”. It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
-
-
           When reporting a time series of expenditure, comparing observations across time without adjusting for inflation may not yield meaningful results. This is because prices change over time due to factors such as inflation. In order to enable comparisons across different time periods, it is necessary to consider the impact of price changes. In the context of this indicator, where there is no breakdown of the destinations where tourists spend their money on travel activities, the data has been adjusted for inflation using the US Consumer Price Index (CPI).
+
+          Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). In the case of outbound tourism, those expenditures associated with resident visitors are registered as “debits” in the BOP and refers to “travel expenditure”. It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
         display:
           name: International tourist expenditure abroad
           numDecimalPlaces: 0
