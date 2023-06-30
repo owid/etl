@@ -61,7 +61,7 @@ var_dict = {
         "description": "The Palma ratio is the share of total income or wealth of the top 10% divided by the share of the bottom 40%.",
         "unit": "",
         "short_unit": "",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "s80_s20_ratio": {
         "title": "S80/S20 ratio",
