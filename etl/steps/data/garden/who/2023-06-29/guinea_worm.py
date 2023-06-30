@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     )
     # Read table from meadow dataset.
     tb = ds_meadow["guinea_worm"]
-
+    tb_fasttrack = ds_fasttrack["guinea_worm"]
     #
     # Process data.
     #
@@ -38,10 +38,16 @@ def run(dest_dir: str) -> None:
     )
     tb = update_with_latest_status(tb)
     # Create time-series of certification
-    time_series_tb = create_time_series(tb)
-    time_series_tb = update_time_series_with_latest_information(time_series_tb)
+    tb_time_series = create_time_series(tb)
+    tb_time_series = update_time_series_with_latest_information(tb_time_series)
     # Combine datasets
-    tb = combine_datasets(tb, time_series_tb)
+    tb = combine_datasets(tb, tb_time_series, tb_fasttrack)
+
+    tb["year_certified"] = tb["year_certified"].astype("str")
+    tb["certification_status"] = tb["certification_status"].astype("str")
+    tb["guinea_worm_reported_cases"] = tb["guinea_worm_reported_cases"].astype("Int64")
+
+    tb = tb.set_index(["country", "year"])
     #
     # Save outputs.
     #
@@ -116,10 +122,11 @@ def update_time_series_with_latest_information(df: Table) -> Table:
     return df
 
 
-def combine_datasets(tb: Table, time_series_tb: Table) -> Table:
+def combine_datasets(tb: Table, tb_time_series: Table, tb_fasttrack: Table) -> Table:
     tb["year"] = 2022
     tb = tb[["country", "year", "year_certified"]]
 
-    tb_combined = pd.merge(tb, time_series_tb, on=["country", "year"], how="outer")
+    tb_combined = pd.merge(tb, tb_time_series, on=["country", "year"], how="outer")
+    tb_combined = pd.merge(tb_combined, tb_fasttrack, on=["country", "year"], how="outer")
     tb_combined = Table(tb_combined, short_name=paths.short_name)
     return tb_combined
