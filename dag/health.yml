@@ -202,3 +202,5 @@ steps:
   data://garden/who/2023-06-29/guinea_worm:
   - data://meadow/who/2023-06-29/guinea_worm
   - data://grapher/fasttrack/2023-06-28/guinea_worm
+  data://grapher/who/2023-06-30/guinea_worm:
+  - data://garden/who/2023-06-29/guinea_worm
