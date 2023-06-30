@@ -2,33 +2,26 @@
 
 from typing import cast
 
-import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
-from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("statistical_review_of_world_energy.start")
-
     #
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
     ds_meadow = cast(Dataset, paths.load_dependency("statistical_review_of_world_energy"))
-    tb = ds_meadow["statistical_review_of_world_energy"]
+    tb = ds_meadow["statistical_review_of_world_energy"].reset_index()
 
     #
     # Process data.
     #
-    log.info("statistical_review_of_world_energy.harmonize_countries")
     tb: Table = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
@@ -43,5 +36,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-    log.info("statistical_review_of_world_energy.end")
