@@ -8,24 +8,22 @@ dataset:
     url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   sources:
   - name: CRA Taulbee Survey (2022) via AI Index (2023)
-    description: The CRA Taulbee Survey is the principal source of information on the enrollment, production, and employment
-      of Ph.D.s in information, computer science and computer engineering (I, CS & CE) and in providing salary and demographic
-      data for faculty in I, CS & CE in North America. Statistics given include gender and ethnicity breakdowns.
     url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
     date_accessed: '2023-06-28'
     publication_date: '2023-03-20'
     publication_year: 2023
-    published_by: CRA Taulbee Survey (2022) via AI Index 2023 Annual Report,” AI Index Steering Committee, Institute for Human-Centered
-      AI, Stanford University, Stanford, CA, April 2023
+    published_by: CRA Taulbee Survey (2022) via AI Index 2023 Annual Report,” AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2023
 tables:
   ai_gender_representation:
     variables:
       new_ai_phd_graduates__pct_of_total:
-        title: New AI PhD Graduates (% of Total)
-        unit: ''
+        title: New AI PhD graduates
+        unit: '%'
+        short_unit: '%'
       label:
         title: Gender
         unit: ''
       new_cs_phd_graduates__pct_of_total:
-        title: New CS PhD Graduates (% of Total)
-        unit: ''
+        title: New CS PhD graduates
+        unit: '%'
+        short_unit: '%'
