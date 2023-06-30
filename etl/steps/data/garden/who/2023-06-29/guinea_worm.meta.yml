@@ -11,4 +11,15 @@ dataset:
     publication_year: 2018
     published_by: 'Certification status of dracunculiasis eradication: World Health Organization; 2018. Licence: CC BY-NC-SA
       3.0 IGO'
-tables: {}
+tables:
+  guinea_worm:
+    variables:
+      year_certified:
+        title: year_certified
+        unit: ''
+      certification_status:
+        title: certification_status
+        unit: ''
+      guinea_worm_reported_cases:
+        title: guinea_worm_reported_cases
+        unit: ''

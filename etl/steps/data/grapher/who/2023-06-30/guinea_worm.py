@@ -2,7 +2,8 @@
 
 from typing import cast
 
-from owid.catalog import Dataset
+import pandas as pd
+from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
 
@@ -19,9 +20,8 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["guinea_worm"]
-    tb["year_certified"] = tb["year_certified"].replace(
-        {"Year Certified Guinea Worm Free": {"Pre-certification": 3000, "Endemic": 4000}}
-    )
+    tb["year_certified"] = tb["year_certified"].replace({"Pre-certification": 3000, "Endemic": 4000})
+    tb["year_certified"] = tb["year_certified"].astype("Int64")
     #
     # Process data.
     #
