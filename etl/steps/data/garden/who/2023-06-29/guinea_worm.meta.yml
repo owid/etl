@@ -5,7 +5,7 @@ dataset:
   - name: CC BY-NC-SA 3.0 IGO
     url: https://www.who.int/about/policies/publishing/copyright
   sources:
-  - name: WHO (2018)
+  - name: WHO
     url: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
     date_accessed: '2023-06-29'
     publication_year: 2018
@@ -15,11 +15,13 @@ tables:
   guinea_worm:
     variables:
       year_certified:
-        title: year_certified
+        title: Year country is certified free from guinea worm
         unit: ''
       certification_status:
-        title: certification_status
+        title: Certification status in the most recent year
         unit: ''
       guinea_worm_reported_cases:
-        title: guinea_worm_reported_cases
-        unit: ''
+        title: Reported cases of guinea worm disease in humans
+        unit: 'reported cases'
+        display:
+          numDecimalPlaces: 0

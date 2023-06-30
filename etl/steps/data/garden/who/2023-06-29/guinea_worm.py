@@ -47,6 +47,9 @@ def run(dest_dir: str) -> None:
     tb["certification_status"] = tb["certification_status"].astype("str")
     tb["guinea_worm_reported_cases"] = tb["guinea_worm_reported_cases"].astype("Int64")
 
+    # Fill na with 0
+    tb["guinea_worm_reported_cases"] = tb["guinea_worm_reported_cases"].fillna(0)
+
     tb = tb.set_index(["country", "year"])
     #
     # Save outputs.
