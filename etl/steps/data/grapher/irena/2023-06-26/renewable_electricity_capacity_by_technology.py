@@ -7,10 +7,16 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
     # Load dataset from Garden and read its main table.
     ds_garden: catalog.Dataset = paths.load_dependency("renewable_electricity_capacity")
     tb = ds_garden["renewable_electricity_capacity"]
 
+    #
+    # Process data.
+    #
     # Get the human-readable names of the technologies from the variable metadata.
     rename_technologies = {variable: tb[variable].metadata.title for variable in tb.columns}
 
@@ -26,7 +32,15 @@ def run(dest_dir: str) -> None:
     tb["capacity"].metadata.title = "Capacity"
     tb["capacity"].metadata.display = {"numDecimalPlaces": 0}
 
+    # Set an appropriate index and sort conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+
+    #
+    # Save outputs.
+    #
     # Create new dataset.
     ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb], default_metadata=None)
-    ds_grapher.metadata.title = f"Renewable electricity capacity by technology (IRENA, {paths.version.split('-')[0]})"
+    ds_grapher.metadata.title = f"Renewable electricity capacity by technology (IRENA, {paths.version})"
+    # Gather all sources in variables and assign them to the dataset.
+    ds_grapher.metadata.sources = catalog.tables.get_unique_sources_from_table(tb)
     ds_grapher.save()
