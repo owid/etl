@@ -1,5 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
+from pathlib import Path
 from typing import cast
 
 import owid.catalog.processing as pr
@@ -53,7 +54,7 @@ def extract_capacity_from_sheet(excel_object: pr.ExcelFile, sheet_name: str, met
     return tb
 
 
-def extract_capacity_from_all_sheets(data_file: str, metadata: TableMeta) -> Table:
+def extract_capacity_from_all_sheets(data_file: Path, metadata: TableMeta) -> Table:
     # Select sheets that contain data (their names are numbers).
     excel_object = pr.ExcelFile(data_file)
     sheet_names = [sheet for sheet in excel_object.sheet_names if sheet.strip().isdigit()]

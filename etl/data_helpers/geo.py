@@ -613,7 +613,7 @@ def list_members_of_region(
                 .reset_index()
                 .rename(columns={"income_group": "classification"})
             )
-        elif "income_groups_latest" in ds_income_groups.table_names:
+        else:
             # Get the table with the current definitions of income groups.
             df_income = ds_income_groups["income_groups_latest"].reset_index()
 
