@@ -120,17 +120,22 @@ class FAODataset:
             "short_name": self.short_name,
             "name": (f"{self._dataset_metadata['DatasetName']} - FAO" f" ({self.publication_year})"),
             "description": self._dataset_metadata["DatasetDescription"],
-            "source_name": SOURCE_NAME,
-            "source_published_by": SOURCE_NAME,
-            "publication_year": self.publication_year,
-            "publication_date": str(self.publication_date),
-            "date_accessed": VERSION,
+            "source": {
+                "name": SOURCE_NAME,
+                "description": self._dataset_metadata["DatasetDescription"],
+                "published_by": SOURCE_NAME,
+                "publication_year": self.publication_year,
+                "publication_date": str(self.publication_date),
+                "date_accessed": VERSION,
+                "source_data_url": self.source_data_url,
+            },
             "version": VERSION,
             "url": f"{FAO_DATA_URL}/{self._dataset_metadata['DatasetCode']}",
-            "source_data_url": self.source_data_url,
             "file_extension": "zip",
-            "license_url": LICENSE_URL,
-            "license_name": LICENSE_NAME,
+            "license": {
+                "name": LICENSE_NAME,
+                "url": LICENSE_URL,
+            },
             "is_public": True,
         }
 
@@ -183,7 +188,7 @@ def is_dataset_already_up_to_date(
     """
     dataset_up_to_date = False
     for snapshot in existing_snapshots:
-        snapshot_source_data_url = snapshot.metadata.source_data_url
+        snapshot_source_data_url = snapshot.metadata.source.source_data_url
         snapshot_date_accessed = parser.parse(str(snapshot.metadata.date_accessed)).date()
         if (snapshot_source_data_url == source_data_url) and (snapshot_date_accessed > source_modification_date):
             dataset_up_to_date = True
@@ -207,17 +212,21 @@ class FAOAdditionalMetadata:
             "short_name": f"{NAMESPACE}_metadata",
             "name": f"Metadata and identifiers - FAO ({self.publication_year})",
             "description": "Metadata and identifiers used in FAO datasets",
-            "source_name": SOURCE_NAME,
-            "source_published_by": SOURCE_NAME,
-            "publication_year": self.publication_year,
-            "publication_date": str(self.publication_date),
-            "date_accessed": VERSION,
+            "source": {
+                "name": SOURCE_NAME,
+                "published_by": SOURCE_NAME,
+                "publication_year": self.publication_year,
+                "publication_date": str(self.publication_date),
+                "date_accessed": VERSION,
+                "source_data_url": None,
+            },
             "version": VERSION,
             "url": FAO_DATA_URL,
-            "source_data_url": None,
             "file_extension": "json",
-            "license_url": LICENSE_URL,
-            "license_name": LICENSE_NAME,
+            "license": {
+                "name": LICENSE_NAME,
+                "url": LICENSE_URL,
+            },
             "is_public": True,
         }
 

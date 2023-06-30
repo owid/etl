@@ -16,7 +16,7 @@ import pywebio
 import structlog
 from cryptography.fernet import Fernet
 from git.repo import Repo
-from owid.catalog import Dataset
+from owid.catalog import Dataset, License, Source
 from owid.catalog.utils import underscore, validate_underscore
 from owid.datautils import dataframes
 from pydantic import BaseModel
@@ -138,15 +138,19 @@ class FasttrackImport:
             version=str(self.meta.dataset.version),
             file_extension="csv",
             description=self.meta.dataset.description,
-            url=self.partial_snapshot_meta.url,
-            source_name=source_name,
-            source_published_by=source_name,
-            source_data_url=sheets_url,
+            source=Source(
+                url=self.partial_snapshot_meta.url,
+                name=source_name,
+                published_by=source_name,
+                source_data_url=sheets_url,
+                date_accessed=str(dt.date.today()),
+                publication_year=self.partial_snapshot_meta.publication_year,
+            ),
+            license=License(
+                url=self.partial_snapshot_meta.license_url,
+                name=self.partial_snapshot_meta.license_name,
+            ),
             is_public=not self.is_private,
-            date_accessed=dt.date.today(),
-            publication_year=self.partial_snapshot_meta.publication_year,
-            license_url=self.partial_snapshot_meta.license_url,
-            license_name=self.partial_snapshot_meta.license_name,
         )
 
     def snapshot_exists(self) -> bool:
@@ -516,11 +520,11 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
     # decrypt URLs if private
     for meta in metas:
         if not meta.is_public:
-            assert meta.source_data_url
-            meta.source_data_url = _decrypt(meta.source_data_url)
+            assert meta.source.source_data_url
+            meta.source.source_data_url = _decrypt(meta.source.source_data_url)
 
     # extract their name and url
-    return [{"label": f"{meta.name} / {meta.version}", "value": meta.source_data_url, "is_public": meta.is_public} for meta in metas]  # type: ignore
+    return [{"label": f"{meta.name} / {meta.version}", "value": meta.source.source_data_url, "is_public": meta.is_public} for meta in metas]  # type: ignore
 
 
 def _infer_metadata(

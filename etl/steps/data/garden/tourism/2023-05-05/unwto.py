@@ -4,7 +4,7 @@ from typing import cast
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, TableMeta
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -210,9 +210,12 @@ def run(dest_dir: str) -> None:
 
     df_inflation_adjusted = add_ppp_and_cpi(merged_df_concat_transf)
     df_final = pd.merge(merged_df_concat_transf, df_inflation_adjusted, on=["country", "year"], how="outer")
+    df_final.set_index(["country", "year"], verify_integrity=True, inplace=True)
 
     # Create a new table with the processed data.
-    tb_garden = Table(df_final, short_name="unwto")
+    tb_garden = Table(df_final, short_name=paths.short_name)
+
+    tb_garden.metadata = TableMeta(short_name=paths.short_name, primary_key=list(df_final.index.names))
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
