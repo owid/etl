@@ -38,7 +38,7 @@ tables:
         title: Allision/collision causes
         display:
           numDecimalPlaces: 0
-          name: Allision/collision
+          name: Collision
         unit: causes
         short_unit: ''
       equipment_failure_causes:
@@ -96,7 +96,7 @@ tables:
         title: Bunkering operations
         display:
           numDecimalPlaces: 0
-          name: Bunkering
+          name: Refueling
         unit: operations
         short_unit: ''
       other_operations_ops:
