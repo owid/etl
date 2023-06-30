@@ -97,7 +97,7 @@ tables:
           numDecimalPlaces: 0
       int_inb_out_per_capita:
         title: Per capita CO2 emissions from international flights, international tourism-adjusted
-        sources:  Clarke et al. (2022) via OECD (2023);  United Nations World Tourism Organization (UNWTO, 2023)
+        source:  Clarke et al. (2022) via OECD (2023);  United Nations World Tourism Organization (UNWTO, 2023)
         description: >
           International aviation emissions are assigned to the country of departure. The term "per capita" indicates that the emissions are calculated on a per-person basis, taking into account the total population of the country. By using this measurement, we can understand the average amount of CO2 emissions attributed to each individual as a result of domestic air travel.
 

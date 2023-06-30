@@ -365,7 +365,7 @@ tables:
         title: Inbound Tourism Expenditure (adjusted for inflation and cost of living)
         unit: international dollars
         short_unit: $
-        sources:  United Nations World Tourism Organization (UNWTO, 2023); OECD (2023); World Bank (2022)
+        source:  United Nations World Tourism Organization (UNWTO, 2023); OECD (2023); World Bank (2022)
         description: >
           Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). For inbound tourism, these expenses are recorded as "credits" in the BOP and referred to as "travel receipts". It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
 
@@ -379,7 +379,7 @@ tables:
         title: Outbound Tourism Expenditure (adjusted for US 2021 inflation)
         unit: US dollars
         short_unit: $
-        sources:  United Nations World Tourism Organization (UNWTO, 2023); World Bank (2022)
+        source:  United Nations World Tourism Organization (UNWTO, 2023); World Bank (2022)
         description: >
           When reporting a time series of expenditure, comparing observations across time without adjusting for inflation may not yield meaningful results. This is because prices change over time due to factors such as inflation. In order to enable comparisons across different time periods, it is necessary to consider the impact of price changes. In the context of this indicator, where there is no breakdown of the destinations where tourists spend their money on travel activities, the data has been adjusted for inflation using the US Consumer Price Index (CPI).
 
