@@ -1,7 +1,6 @@
 dataset:
-  title: Private Investment in AI by Focus Area and Geographic Area, 2017–22 (AI Index,
-    2023)
-  description: &desc |
+  title: Private Investment in AI by Focus Area and Geographic Area, 2017–2022 (AI Index, 2023)
+  description: >
     Data on AI private investment by focus area over time within select
     geographic regions, highlighting how private investment priorities in AI differ
     across geographies.
@@ -10,15 +9,12 @@ dataset:
     url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   sources:
   - name: NetBase Quid (2022) via AI Index (2023)
-    description: *desc
     url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
     source_data_url: https://drive.google.com/uc?export=download&id=1dRiv5KHWnfp-N3xpC2MfcYkqDPKhF7sQ
     date_accessed: '2023-06-28'
     publication_date: '2023-03-20'
     publication_year: 2023
-    published_by: NetBase Quid (2022) via AI Index 2023 Annual Report,” AI Index Steering
-      Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA,
-      April 2023
+    published_by: NetBase Quid (2022) via AI Index 2023 Annual Report,” AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2023
 tables:
   ai_private_investment:
     variables:

@@ -17,7 +17,6 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     log.info("ai_incidents.start")
-
     #
     # Load inputs.
     #
@@ -29,7 +28,6 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    print(paths.short_name)
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
