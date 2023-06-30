@@ -57,6 +57,8 @@ tables:
       year_certified:
         title: Year country is certified free from guinea worm
         unit: ''
+        display:
+          numDecimalPlaces: 0
         description:
           *certification_description
       certification_status:
