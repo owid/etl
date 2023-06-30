@@ -10,7 +10,7 @@ dataset:
   - name: Creative Commons BY 4.0
     url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
   sources:
-  - name: Clarke et al. (2022)
+  - name: Clarke et al. (2022) via OECD (2023)
     published_by: "Clarke, D., et al. (2022), CO2 Emissions from air transport: A near-real-time global database for policy analysis, OECD Statistics Working Papers, No. 2022/04, OECD Publishing, Paris, https://doi.org/10.1787/ecc9f16b-en."
     url: https://stats.oecd.org/Index.aspx?DataSetCode=AIRTRANS_CO2#
     date_accessed: '2023-05-18'
@@ -56,7 +56,7 @@ tables:
           numDecimalPlaces: 0
       south_america:
         title: South America
-        description: Total CO2 emissions from international aviation
+        description: Total CO2 emissions from international aviation.
         unit: tonnes
         short_unit: t
         display:
@@ -70,6 +70,7 @@ tables:
           numDecimalPlaces: 0
       ter_dom_a:
         title: Annual CO2 emissions from domestic aviation
+        description: Domestic aviation represents flights which depart and arrive within the same country.
         unit: tonnes
         short_unit: t
         display:
@@ -83,17 +84,31 @@ tables:
       per_capita_ter_dom_a:
         title: Per capita CO2 emissions from domestic aviation
         unit: kilograms
+        description: Domestic aviation represents flights which depart and arrive within the same country.  The term "per capita" indicates that the emissions are calculated on a per-person basis, taking into account the total population of the country. By using this measurement, we can understand the average amount of CO2 emissions attributed to each individual as a result of domestic air travel.
         short_unit: kg
         display:
           numDecimalPlaces: 0
       per_capita_ter_int_a:
-        title: Per capita CO2 emissions from international aviation
+        title: Per capita CO2 emissions from international aviation.
+        descripton: International aviation emissions are assigned to the country of departure. The term "per capita" indicates that the emissions are calculated on a per-person basis, taking into account the total population of the country. By using this measurement, we can understand the average amount of CO2 emissions attributed to each individual as a result of domestic air travel.
         unit: kilograms
         short_unit: kg
         display:
           numDecimalPlaces: 0
       int_inb_out_per_capita:
         title: Per capita CO2 emissions from international flights, international tourism-adjusted
+        sources:  Clarke et al. (2022) via OECD (2023);  United Nations World Tourism Organization (UNWTO, 2023)
+        description: >
+          International aviation emissions are assigned to the country of departure. The term "per capita" indicates that the emissions are calculated on a per-person basis, taking into account the total population of the country. By using this measurement, we can understand the average amount of CO2 emissions attributed to each individual as a result of domestic air travel.
+
+          Data on carbon dioxide emissions from aviation are sourced from the OECD Air Transport CO2 Emissions database.
+
+          Our World in Data has calculated per capita aviation emissions by dividing these values by population figures for each country.
+
+          These per capita footprints do not necessarily reflect the amount of travel by locals in a given location. This is especially true if a country has high tourist volumes: much of the departures will result from travellers rather than local residents. We have therefore also calculated 'adjusted' aviation footprints by multiplying per capita international CO2 emissions by an adjustment factor.
+          This adjustment factor is taken as the ratio between outbound and inbound tourist trips sourced from United Nations World Tourism Organization (UNWTO, 2023).  A high ratio of outbound-to-inbound tourist trips indicates that a country receives less visitors than its residents travel abroad. This results in a relatively lower burden of emissions from international flights being allocated to the country whose residents don't travel internationally as frequently.
+
+          Note that when an individual visits/leaves a country multiple times within a year, each visit is counted as a separate trip.
         unit: kilograms
         short_unit: kg
         display:
@@ -106,6 +121,7 @@ tables:
           numDecimalPlaces: 0
       ter_dom_m:
         title: Monthly CO2 emissions from domestic aviation
+        description: Domestic aviation represents flights which depart and arrive within the same country.
         unit: tonnes
         short_unit: t
         display:
@@ -199,7 +215,9 @@ tables:
         title: Monthly CO2 emissions from international aviation
         unit: tonnes
         short_unit: t
+        description: International aviation emissions are assigned to the country of departure.
         display:
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
+
