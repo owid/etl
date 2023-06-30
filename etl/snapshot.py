@@ -182,31 +182,35 @@ class SnapshotMeta:
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
+    def to_yaml(self) -> str:
+        """Convert to YAML string."""
+        d = self.to_dict()
+
+        # exclude `outs` with md5, we reset it when saving new metadata
+        d.pop("outs", None)
+
+        # remove is_public if it's True
+        if d["is_public"]:
+            del d["is_public"]
+
+        # remove namespace/version/short_name/file_extension if they match path
+        if _parse_snapshot_path(self.path) == (
+            d["namespace"],
+            str(d["version"]),
+            d["short_name"],
+            d["file_extension"],
+        ):
+            del d["namespace"]
+            del d["version"]
+            del d["short_name"]
+            del d["file_extension"]
+
+        return yaml_dump({"meta": d})  # type: ignore
+
     def save(self) -> None:
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        with open(self.path, "w") as ostream:
-            d = self.to_dict()
-
-            # exclude `outs` with md5, we reset it when saving new metadata
-            d.pop("outs", None)
-
-            # remove is_public if it's True
-            if d["is_public"]:
-                del d["is_public"]
-
-            # remove namespace/version/short_name/file_extension if they match path
-            if _parse_snapshot_path(self.path) == (
-                d["namespace"],
-                str(d["version"]),
-                d["short_name"],
-                d["file_extension"],
-            ):
-                del d["namespace"]
-                del d["version"]
-                del d["short_name"]
-                del d["file_extension"]
-
-            yaml_dump({"meta": d}, ostream)
+        with open(self.path, "w") as f:
+            f.write(self.to_yaml())
 
     @property
     def uri(self):

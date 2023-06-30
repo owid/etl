@@ -124,24 +124,14 @@ class FasttrackImport:
     def snapshot(self) -> Snapshot:
         return Snapshot(f"{self.meta.dataset.namespace}/{self.meta.dataset.version}/{self.meta.dataset.short_name}.csv")
 
-    def snapshot_exists(self) -> bool:
-        try:
-            self.snapshot
-            return True
-        except FileNotFoundError:
-            return False
-
-    def save_metadata(self) -> None:
-        with open(self.metadata_path, "w") as f:
-            f.write(self.meta.to_yaml())
-
-    def upload_snapshot(self) -> Path:
+    @property
+    def snapshot_meta(self) -> SnapshotMeta:
         # since sheets url is accessible with link, we have to encrypt it when storing in metadata
         sheets_url = _encrypt(self.sheets_url) if self.is_private else self.sheets_url
 
         source_name = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
 
-        snap_meta = SnapshotMeta(
+        return SnapshotMeta(
             namespace=self.meta.dataset.namespace,
             short_name=self.meta.dataset.short_name,
             name=self.meta.dataset.title,
@@ -158,9 +148,24 @@ class FasttrackImport:
             license_url=self.partial_snapshot_meta.license_url,
             license_name=self.partial_snapshot_meta.license_name,
         )
-        snap_meta.save()
 
-        snap = Snapshot(snap_meta.uri)
+    def snapshot_exists(self) -> bool:
+        try:
+            self.snapshot
+            return True
+        except FileNotFoundError:
+            return False
+
+    def save_metadata(self) -> None:
+        with open(self.metadata_path, "w") as f:
+            f.write(self.meta.to_yaml())
+
+    def upload_snapshot(self) -> Path:
+        # save snapshotmeta YAML file
+        self.snapshot_meta.save()
+
+        # upload snapshot
+        snap = self.snapshot
         dataframes.to_file(self.data, file_path=snap.path)
         snap.dvc_add(upload=True)
 
@@ -663,8 +668,16 @@ def _metadata_diff(fast_import: FasttrackImport, meta: YAMLMeta) -> bool:
     with open(fast_import.metadata_path, "r") as f:
         existing_meta = f.read()
 
+    # load old snapshot metadata from path
+    old_snapshot_yaml = fast_import.snapshot.metadata.to_yaml()
+    # create new snapshot metadata
+    new_snapshot_yaml = fast_import.snapshot_meta.to_yaml()
+
+    # combine snapshot YAML and grapher YAML file
     diff = difflib.HtmlDiff()
-    html_diff = diff.make_table(existing_meta.split("\n"), meta.to_yaml().split("\n"), context=True)
+    html_diff = diff.make_table(
+        (existing_meta + old_snapshot_yaml).split("\n"), (meta.to_yaml() + new_snapshot_yaml).split("\n"), context=True
+    )
     if "No Differences Found" in html_diff:
         po.put_success("No metadata differences found.")
         return False
