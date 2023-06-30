@@ -24,7 +24,8 @@ tables:
   ai_wrp_2021:
     variables:
       help_harm_ratio:
-        title: Artificial Intelligence Will Help or Harm People in Next 20 Years (help/harm ratio)
+        title: Help to harm ratio
+        description: Artificial Intelligence Will Help or Harm People in Next 20 Years
         unit: ''
       gender:
         title: Gender
@@ -45,5 +46,6 @@ tables:
         title: Region
         unit: ''
       yes_no_ratio:
-        title: Feel Safe in Car Driven by Computer Without a Human Driver (yes/no ratio)
+        title: Yes to no ratio
+        description: Feel Safe in Car Driven by Computer Without a Human Driver
         unit: ''
