@@ -45,7 +45,7 @@ def run(dest_dir: str) -> None:
 
     tb["year_certified"] = tb["year_certified"].astype("str")
     tb["certification_status"] = tb["certification_status"].astype("str")
-    tb["guinea_worm_reported_cases"] = tb["guinea_worm_reported_cases"].astype("Int64")
+    tb["guinea_worm_reported_cases"] = tb["guinea_worm_reported_cases"].astype("float64")
 
     # Fill na with 0
     tb["guinea_worm_reported_cases"] = tb["guinea_worm_reported_cases"].fillna(0)

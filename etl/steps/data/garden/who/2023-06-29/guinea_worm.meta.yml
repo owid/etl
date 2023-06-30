@@ -1,8 +1,19 @@
 descriptions:
   certification: &certification_description |
-    Certification...
+    The current and historical values for the status of Guinea worm disease (Dracunculiasis) as certified by the WHO. To be certified as free of guinea worm disease, a countrymust have reported zero indigenous cases through activesurveillance for at least 3 consecutive years.
+
+    Data regarding certification is taken from:
+
+    https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
+
+    This is supplmented with more recent changes to Guinea worm disease certification:
+
+    - Angola has had endemic status since 2020:  https://www.who.int/news/item/23-09-2020-eradicating-dracunculiasis-human-cases-and-animal-infections-decline-as-angola-becomes-endemic
+    - Kenya was certified guinea worm free in 2018: https://www.who.int/news/item/21-03-2018-dracunculiasis-eradication-south-sudan-claims-interruption-of-transmission-in-humans
+    - DRC was certified guinea worm free in 2022: https://www.who.int/news/item/15-12-2022-the-democratic-republic-of-the-congo-certified-free-of-dracunculiasis-transmission-by-who
+
   reported_cases: &reported_cases_description |
-    Reported cases of guinea worm disease (dracunculiasis) as recorded by WHO.
+    Reported cases of guinea worm disease (Dracunculiasis) as recorded by WHO.
 
     For Cameroon, Central African Republic, Cote d'Ivoire, Mauritania, Senegal and Yemen data is gathered from:
 
@@ -23,19 +34,17 @@ descriptions:
 all_sources:
   - source_certification: &source_certification
       name: World Health Organization
-      published_by: 'Certification status of dracunculiasis eradication: World Health Organization; 2018. Licence: CC BY-NC-SA
-      3.0 IGO'
+      published_by: World Health Organization
       url: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
       date_accessed: '2023-06-29'
       publication_year: 2018
   - source_reported_cases: &source_reported_cases
       name: World Health Organization
-      published_by: Dracunculiasis Eradication Portal
+      published_by: Dracunculiasis Eradication Portal, World Health Organization
       date_accessed: '2023-06-28'
       url: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
 dataset:
   title: Guinea worm reported cases and certification (WHO)
-  description:
   licenses:
   - name: CC BY-NC-SA 3.0 IGO
     url: https://www.who.int/about/policies/publishing/copyright
@@ -49,16 +58,16 @@ tables:
         title: Year country is certified free from guinea worm
         unit: ''
         description:
-        - *certification_description
+          *certification_description
       certification_status:
         title: Certification status in the most recent year
         unit: ''
         description:
-        - *certification_description
+          *certification_description
       guinea_worm_reported_cases:
         title: Reported cases of guinea worm disease in humans
         unit: 'reported cases'
         description:
-        - *reported_cases_description
+          *reported_cases_description
         display:
           numDecimalPlaces: 0
