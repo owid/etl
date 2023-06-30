@@ -191,7 +191,7 @@ tables:
           numDecimalPlaces: 0
 
       ou_to_de_to_de_per_1000:
-        title: Outbound departures (total) per 1000
+        title: Outbound departures (total) per 1000 people
         unit: ''
         description: >
           International departures include the number of trips made by tourists and same-day visitors.
@@ -203,7 +203,7 @@ tables:
           numDecimalPlaces: 0
 
       ou_to_de_ov_vi_to_per_1000:
-        title: Outbound departures (tourists) per 1000
+        title: Outbound departures (tourists) per 1000 people
         unit: ''
         description: >
           International tourist departures refer to the number of trips by people who travel abroad and stay overnight.
@@ -215,7 +215,7 @@ tables:
           numDecimalPlaces: 0
 
       ou_to_de_sa_da_vi_ex_per_1000:
-        title: Outbound departures (same day) per 1000
+        title: Outbound departures (same day) per 1000 people
         unit: ''
         description: >
           International departures by same-day visitors refer to the number of trips by people who travel abroad and come back on the same day.
@@ -226,7 +226,7 @@ tables:
           numDecimalPlaces: 0
 
       do_to_tr_to_tr_per_1000:
-        title: Domestic trips (total) per 1000
+        title: Domestic trips (total) per 1000 people
         unit: ''
         description: >
           A domestic trip refers to the travel of a visitor from the time of leaving his/her usual residence until he/she returns: it refers to a round trip. This indicator does not distinguish between trips made for tourism versus business and professional purposes. When an individual travels domestically multiple times within a year, each journey is counted as a separate trip.
@@ -237,7 +237,7 @@ tables:
           numDecimalPlaces: 0
 
       do_to_tr_ov_vi_to_per_1000:
-        title: Domestic trips (tourists) per 1000
+        title: Domestic trips (tourists) per 1000 people
         unit: ''
         description: >
           A domestic tourist trip entails the journey of a visitor who spends at least one night away from their usual residence, starting from the moment of departure until their return. When an individual travels domestically multiple times within a year, each journey is counted as a separate trip.
@@ -248,7 +248,7 @@ tables:
           numDecimalPlaces: 0
 
       do_to_tr_sa_da_vi_ex_per_1000:
-        title: Domestic trips (same day) per 1000
+        title: Domestic trips (same day) per 1000 people
         unit: ''
         description: >
           A domestic same-day trip refers to the travel of a visitor who departs from their usual residence and returns on the same day.  When an individual travels domestically multiple times within a year, each journey is counted as a separate trip. This definition encompasses roundtrip travel, where the visitor's journey starts and ends at their primary residence within a single day.
@@ -259,7 +259,7 @@ tables:
           numDecimalPlaces: 0
 
       in_to_ar_to_ar_per_1000:
-        title: Inbound arrivals (total) per 1000
+        title: Inbound arrivals (total) per 1000 people
         unit: ''
         description: >
           International arrivals data track the movement of international visitors to the country who stay overnight or arrive and depart the same day.
@@ -276,7 +276,7 @@ tables:
           numDecimalPlaces: 0
 
       in_to_ar_ov_vi_to_per_1000:
-        title: Inbound arrivals (tourists) per 1000
+        title: Inbound arrivals (tourists) per 1000 people
         unit: ''
         description: >
           International tourist arrivals data track the movement of international visitors to the country who stay overnight.
@@ -296,7 +296,7 @@ tables:
           numDecimalPlaces: 0
 
       in_to_ar_sa_da_vi_ex_per_1000:
-        title: Inbound arrivals (same-night) per 1000
+        title: Inbound arrivals (same-night) per 1000 people
         unit: ''
         description: >
           International same-day arrivals data track the movement of international visitors to the country who arrive and depart the same day.
@@ -316,7 +316,7 @@ tables:
           numDecimalPlaces: 0
 
       em_fo_an_be_se_ac_per_1000:
-        title: Employment (food and beverage serving activities) per 1000
+        title: Employment (food and beverage serving activities) per 1000 people
         unit: ''
         description: >
           Persons employed in the food and beverage industries can be either employees or self-employed. Some employed persons may have more than one job.
@@ -328,7 +328,7 @@ tables:
           numDecimalPlaces: 0
 
       em_to_per_1000:
-        title: Employment (total) per 1000
+        title: Employment (total) per 1000 people
         unit: ''
         description: >
           Persons employed in tourism industries can be either employees or self-employed. Some employed persons may have more than one job.
