@@ -37,7 +37,7 @@ def main(upload: bool) -> None:
 def modify_metadata(snap: Snapshot) -> Snapshot:
     """Modify metadata"""
     # Get access date
-    snap.metadata.date_accessed = date.today()
+    snap.metadata.source.date_accessed = date.today()
     # Set publication date
     publication_date = _get_publication_date()
     snap.metadata.source.publication_date = publication_date
