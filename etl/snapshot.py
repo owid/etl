@@ -185,15 +185,6 @@ class SnapshotMeta:
             del d["short_name"]
             del d["file_extension"]
 
-        # remove empty fields, these should be removed by pruned_json decorator, but
-        # it doesn't work for nested fields
-        # it would work if we replaced `pruned_json` by this mixin
-        # https://github.com/lidatong/dataclasses-json/issues/187#issuecomment-919992503
-        if "license" in d:
-            d["license"] = _prune_none(d["license"])
-        if "origin" in d:
-            d["origin"] = _prune_none(d["origin"])
-
         return yaml_dump({"meta": d})  # type: ignore
 
     def save(self) -> None:
@@ -385,7 +376,3 @@ def _parse_snapshot_path(path: Path) -> tuple[str, str, str, str]:
     short_name, ext = path.stem.split(".", 1)
     assert "." not in ext, f"{path.name} cannot contain `.`"
     return namespace, version, short_name, ext
-
-
-def _prune_none(d: dict) -> dict[str, Any]:
-    return {k: v for k, v in d.items() if v is not None}
