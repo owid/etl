@@ -253,16 +253,18 @@ class SnapshotMeta:
                         url=meta.pop("license_url", None),
                     )
 
+            # NOTE: we used to keep both origin and source, but it's better
+            # to keep them separated and only convert them before saving to MySQL
             # use both source and origin for backwards compatibility
-            from etl.steps.data.converters import (
-                convert_origin_to_source,
-                convert_source_to_origin,
-            )
+            # from etl.steps.data.converters import (
+            #     convert_origin_to_source,
+            #     convert_source_to_origin,
+            # )
 
-            if meta.get("origin"):
-                meta["source"] = convert_origin_to_source(meta["origin"])
-            elif meta.get("source"):
-                meta["origin"] = convert_source_to_origin(meta["source"])
+            # if meta.get("origin"):
+            #     meta["source"] = convert_origin_to_source(meta["origin"])
+            # elif meta.get("source"):
+            #     meta["origin"] = convert_source_to_origin(meta["source"])
 
             snap_meta = cls.from_dict(dict(**meta, outs=yml.get("outs", [])))
 
