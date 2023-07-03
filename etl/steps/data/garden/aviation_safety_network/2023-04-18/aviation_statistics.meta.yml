@@ -8,8 +8,7 @@ dataset:
     -
       name: Aviation Safety Network (2023)
       published_by: The Flight Safety Foundation's Aviation Safety Network (ASN)
-      publisher_source: |
-        Information contained in the Aviation Safety Network database is based on information from official sources (authorities, safety boards).
+      description: Information contained in the Aviation Safety Network database is based on information from official sources (authorities, safety boards).
       publication_year: 2023
       date_accessed: 2023-04-18
       url: "https://aviation-safety.net/statistics/"

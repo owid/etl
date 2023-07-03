@@ -138,6 +138,17 @@ def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
     """
     dag_yml = _load_dag_yaml(str(filename))
     curr_dag = _parse_dag_yaml(dag_yml)
+
+    # make sure there are no fast-track steps in the DAG
+    if "fasttrack.yml" not in str(filename):
+        fast_track_steps = {step for step in curr_dag if "/fasttrack/" in step}
+        if fast_track_steps:
+            raise ValueError(f"Fast-track steps detected in DAG {filename}: {fast_track_steps}")
+
+    duplicate_steps = prev_dag.keys() & curr_dag.keys()
+    if duplicate_steps:
+        raise ValueError(f"Duplicate steps detected in DAG {filename}: {duplicate_steps}")
+
     curr_dag.update(prev_dag)
 
     for sub_dag_filename in dag_yml.get("include", []):
