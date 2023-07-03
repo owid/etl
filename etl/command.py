@@ -7,15 +7,17 @@ import re
 import resource
 import sys
 import time
+from contextlib import contextmanager
+from os import environ
 from pathlib import Path
-from typing import Any, Callable, List, Optional, Set
+from typing import Any, Callable, Iterator, List, Optional, Set
 
 import click
 from ipdb import launch_ipdb_on_exception
 
 from etl import config, paths
 from etl.snapshot import snapshot_catalog
-from etl.steps import DAG, compile_steps, load_dag, select_dirty_steps
+from etl.steps import DAG, DataStep, Step, compile_steps, load_dag, select_dirty_steps
 
 config.enable_bugsnag()
 
@@ -69,6 +71,12 @@ LIMIT_NOFILE = 4096
     help="Thread workers to parallelize which steps need rebuilding (steps execution is not parallelized)",
     default=5,
 )
+@click.option(
+    "--strict/--no-strict",
+    is_flag=True,
+    help="Force strict or lax validation on DAG steps, e.g. checks for primary keys in data steps.",
+    default=None,
+)
 @click.argument("steps", nargs=-1)
 def main_cli(
     steps: List[str],
@@ -84,6 +92,7 @@ def main_cli(
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 5,
+    strict: Optional[bool] = None,
 ) -> None:
     _update_open_file_limit()
 
@@ -103,6 +112,7 @@ def main_cli(
         exclude=exclude,
         dag_path=dag_path,
         workers=workers,
+        strict=strict,
     )
 
     # propagate workers to grapher upserts
@@ -132,6 +142,7 @@ def main(
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 5,
+    strict: Optional[bool] = None,
 ) -> None:
     """
     Execute all ETL steps listed in dag file.
@@ -155,6 +166,7 @@ def main(
         only=only,
         excludes=excludes,
         workers=workers,
+        strict=strict,
     )
 
 
@@ -203,6 +215,7 @@ def run_dag(
     only: bool = False,
     excludes: Optional[List[str]] = None,
     workers: int = 1,
+    strict: Optional[bool] = None,
 ) -> None:
     """
     Run the selected steps, and anything that needs updating based on them. An empty
@@ -242,9 +255,40 @@ def run_dag(
     for i, step in enumerate(steps, 1):
         print(f"{i}. {step}...")
         if not dry_run:
-            time_taken = timed_run(lambda: step.run())
-            click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.0f}s)")
-            print()
+            strict = _detect_strictness_level(step, strict)
+            with strictness_level(strict):
+                time_taken = timed_run(lambda: step.run())
+                click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.0f}s)")
+                print()
+
+
+def _detect_strictness_level(step: Step, strict: Optional[bool] = None) -> bool:
+    # honour the command-line argument over anything else
+    if strict is not None:
+        return strict
+
+    # only data steps can be strict, and only after meadow
+    if not isinstance(step, DataStep) or step.channel in ("meadow", "open_numbers"):
+        return False
+
+    # now it depends on the version
+    # TODO fix the "latest" cases as well
+    return step.version != "latest" and step.version >= config.STRICT_AFTER
+
+
+@contextmanager
+def strictness_level(strict: bool) -> Iterator[None]:
+    # start from a clean slate
+    if "OWID_STRICT" in environ:
+        del environ["OWID_STRICT"]
+
+    if strict:
+        # enable strict mode
+        environ["OWID_STRICT"] = "true"
+
+    yield
+
+    # no need to clean up
 
 
 def timed_run(f: Callable[[], Any]) -> float:

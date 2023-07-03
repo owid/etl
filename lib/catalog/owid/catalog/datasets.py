@@ -111,11 +111,11 @@ class Dataset:
         if not table.primary_key:
             if "OWID_STRICT" in environ:
                 raise PrimaryKeyMissing(
-                    f"Table `{table.metadata.short_name}` does not have a primary_key set -- please use set_index() to indicate dimensions"
+                    f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
                 )
             else:
                 warnings.warn(
-                    f"Table `{table.metadata.short_name}` does not have a primary_key set -- please use set_index() to indicate dimensions"
+                    f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
                 )
 
         if not table.index.is_unique and "OWID_STRICT" in environ:
