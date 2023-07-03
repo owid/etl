@@ -250,35 +250,36 @@
                   "processing_level": { "type": "string", "enum": ["minor", "medium", "major"] },
                   "presentation": {
                     "type": "object",
+                    "additionalProperties": false,
                     "properties": {
                       "title_public": { "type": "string" },
                       "title_variant": { "type": "string" },
                       "citation_inline": { "type": "string" },
                       "description_short": { "type": "string" },
-                      "description_from_producer": { "type": "string" }
-                    }
-                  },
-                  "topic_tags_links": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  },
-                  "faqs": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "gdoc_id": { "type": "string" },
-                        "fragment_id": { "type": "string" }
+                      "description_from_producer": { "type": "string" },
+                      "topic_tags_links": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                      },
+                      "faqs": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "gdoc_id": { "type": "string" },
+                            "fragment_id": { "type": "string" }
+                          }
+                        }
+                      },
+                      "key_info_text": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                      },
+                      "grapher_config": {
+                        "type": "object",
+                        "additionalProperties": true
                       }
                     }
-                  },
-                  "key_info_text": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  },
-                  "grapher_config": {
-                    "type": "object",
-                    "additionalProperties": true
                   }
                 }
               }
