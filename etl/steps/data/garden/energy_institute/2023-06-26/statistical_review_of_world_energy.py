@@ -8,10 +8,18 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# +
+# Unit conversion factors.
+# Exajoules to terawatt-hours.
+EJ_TO_TWH = 1e6 / 3600
+# Petajoules to terawatt-hours.
+PJ_TO_TWH = 1e3 / 3600
+# Million tonnes of oil equivalent to petajoules (from the "Approximate conversion factors" sheet in the additional excel data file).
+MTOE_TO_PJ = 41.868
+# Million tonnes of oil equivalent to terawatt-hours.
+MTOE_TO_TWH = MTOE_TO_PJ * PJ_TO_TWH
+
 # TODO: Compare BP and EI definitions of regions in their methodology document.
 
-# +
 # Columns to use from the main data file, and how to rename them.
 COLUMNS = {
     # Index columns.
@@ -25,9 +33,9 @@ COLUMNS = {
     # Coal electricity generation.
     "electbyfuel_coal": "coal_electricity_generation_twh",
     # Coal reserves.
-    "coal_reserves__total": "coal_reserves",
-    "coal_reserves__anthracite_and_bituminous": "coal_anthracite_and_bituminous_reserves_mt",
-    "coal_reserves__sub_bituminous_and_lignite": "coal_subbituminous_and_lignite_reserves_mt",
+    "coal_reserves__total": "coal_reserves_mt",
+    "coal_reserves__anthracite_and_bituminous": "coal_reserves_anthracite_and_bituminous_mt",
+    "coal_reserves__sub_bituminous_and_lignite": "coal_reserves_subbituminous_and_lignite_mt",
     # 'coal_reserves__share_of_total': 'coal_reserves_share',
     # 'coal_reserves__r_p_ratio': 'coal_reserves_to_production_ratio',
     # Gas production.
@@ -40,6 +48,8 @@ COLUMNS = {
     "gascons_ej": "gas_consumption_ej",
     # Gas electricity generation.
     "electbyfuel_gas": "gas_electricity_generation_twh",
+    # Gas reserves.
+    "gas_reserves_tcm": "gas_reserves_tcm",
     # Cobalt production.
     "cobalt_kt": "cobalt_production_kt",
     # Cobalt reserves.
@@ -75,7 +85,7 @@ COLUMNS = {
     "biogeo_twh": "other_renewables_electricity_generation_twh",
     # 'biogeo_twh_net': 'biogeo_twh_net',
     # Primary energy consumption (non-fossil is given in input-equivalent).
-    "primary_ej": "primary_energy_consumption_ej",
+    "primary_ej": "primary_energy_consumption_equivalent_ej",
     # Solar consumption (input-equivalent).
     "solar_ej": "solar_consumption_equivalent_ej",
     # Solar electricity generation.
@@ -119,11 +129,12 @@ COLUMNS = {
     "oilcons_mt": "oil_consumption_mt",
     # Oil electricity generation.
     "electbyfuel_oil": "oil_electricity_generation_twh",
-    # Oil - Kerosene consumption.
-    "kerosene_cons_kbd": "kerosene_consumption_kbd",
+    # Oil reserves.
+    "oil_reserves_bbl": "oil_reserves_bbl",
     # CO2 and methane emissions.
     "co2_mtco2": "total_co2_emissions_mtco2",
     # Other unused columns.
+    # "kerosene_cons_kbd": "kerosene_consumption_kbd",
     # 'oilprod_crudecond_kbd': 'oil_crude_oil_production_kbd',
     # 'oilprod_ngl_kbd': 'oil_production_ngl_kbd',
     # 'other_oil_cons_kbd': 'oil_other_consumption_kbd',
@@ -245,7 +256,20 @@ def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Data
     return tb
 
 
+def add_columns_in_twh(tb: Table) -> Table:
+    for column in tb.columns:
+        if column.endswith("_ej"):
+            tb[column.replace("_ej", "_twh")] = tb[column] * EJ_TO_TWH
+        if column.endswith("_pj"):
+            tb[column.replace("_pj", "_twh")] = tb[column] * PJ_TO_TWH
+        if column.endswith("_mt"):
+            tb[column.replace("_mt", "_twh")] = tb[column] * MTOE_TO_TWH
+
+    return tb
+
+
 def run(dest_dir: str) -> None:
+
     #
     # Load inputs.
     #
@@ -271,18 +295,22 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
+    # Add columns in TWh.
+    tb = add_columns_in_twh(tb=tb)
+
     # Add region aggregates.
     tb = add_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Copy metadata from original table.
     tb = tb.copy_metadata(from_table=tb_meadow)
 
+    # Set an appropriate index to main table and sort conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
     # Rename columns from the additional data file related to prices.
     tb_prices = tb_meadow_prices.rename(columns=COLUMNS_PRICES, errors="raise").copy()
 
-    # Set an appropriate index to each table and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-
+    # Set an appropriate index to prices table and sort conveniently.
     tb_prices = tb_prices.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     #

@@ -90,6 +90,122 @@ def parse_coal_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
     return tb
 
 
+def parse_oil_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
+    sheet_name = "Oil - Proved reserves history"
+    # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
+    tb = data.parse(sheet_name, skiprows=2, metadata=metadata)
+
+    # Check that units are the expected ones.
+    assert (
+        tb.columns[0] == "Thousand million barrels"
+    ), f"Units (or sheet format) may have changed in sheet {sheet_name}"
+    # Check that zeroth column should correspond to countries.
+    assert "Total World" in tb[tb.columns[0]].tolist()
+
+    # Rename country column.
+    tb.columns = ["country"] + tb.columns[1:].tolist()
+
+    # The last few columns show growth rate and share of reserves; they will be parsed with a name that does not correspond to a year.
+    # To remove them, drop all columns that are not either "country" or a year.
+    tb = tb.drop(
+        columns=[column for column in tb.columns if re.match(r"^\d{4}$", str(column)) is None if column != "country"]
+    )
+
+    # Drop empty columns and rows.
+    tb = tb.dropna(axis=1, how="all")
+    tb = tb.dropna(how="all").reset_index(drop=True)
+
+    # There are many rows of footers at the end, occupying values of the zeroth column.
+    # Remove all those rows, for which all columns are nan except the country column.
+    tb = tb.dropna(subset=tb.drop(columns="country").columns, how="all")
+
+    # Clean country names (remove spurious spaces and "of which: " in one of the last rows).
+    tb["country"] = tb["country"].str.replace("of which:", "").str.strip()
+
+    # For consistency with all other tables, rename some countries to their most common names in the dataset.
+    # Their names will be properly harmonized in the garden step.
+    # For consistency with all other tables, rename some countries to their most common names in the dataset.
+    # Their names will be properly harmonized in the garden step.
+    country_mapping = {
+        "European Union #": "Total EU",
+        "Non-OECD": "Total Non-OECD",
+        "Non-OPEC": "Total Non-OPEC",
+        "OECD": "Total OECD",
+        "OPEC": "Total OPEC",
+    }
+    tb["country"] = map_series(tb["country"], country_mapping, warn_on_unused_mappings=True, show_full_warning=True)
+
+    # Transpose table to have a year column.
+    tb = tb.melt(id_vars=["country"], var_name="year", value_name="oil_reserves_bbl")
+
+    # Ensure numeric column has the right format.
+    tb = tb.astype({"oil_reserves_bbl": float})
+
+    # Ensure index columns are not repeated, and sort rows and columns conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().reset_index()
+
+    # Ensure column names are snake case.
+    tb = tb.underscore()
+
+    return tb
+
+
+def parse_gas_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
+    sheet_name = "Gas - Proved reserves history "
+    # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
+    tb = data.parse(sheet_name, skiprows=2, metadata=metadata)
+
+    # Check that units are the expected ones.
+    assert tb.columns[0] == "Trillion cubic metres", f"Units (or sheet format) may have changed in sheet {sheet_name}"
+    # Check that zeroth column should correspond to countries.
+    assert "Total World" in tb[tb.columns[0]].tolist()
+
+    # Rename country column.
+    tb.columns = ["country"] + tb.columns[1:].tolist()
+
+    # The last few columns show growth rate and share of reserves; they will be parsed with a name that does not correspond to a year.
+    # To remove them, drop all columns that are not either "country" or a year.
+    tb = tb.drop(
+        columns=[column for column in tb.columns if re.match(r"^\d{4}$", str(column)) is None if column != "country"]
+    )
+
+    # Drop empty columns and rows.
+    tb = tb.dropna(axis=1, how="all")
+    tb = tb.dropna(how="all").reset_index(drop=True)
+
+    # There are many rows of footers at the end, occupying values of the zeroth column.
+    # Remove all those rows, for which all columns are nan except the country column.
+    tb = tb.dropna(subset=tb.drop(columns="country").columns, how="all")
+
+    # Clean country names (remove spurious spaces and "of which: " in one of the last rows).
+    tb["country"] = tb["country"].str.replace("of which:", "").str.strip()
+
+    # For consistency with all other tables, rename some countries to their most common names in the dataset.
+    # Their names will be properly harmonized in the garden step.
+    # For consistency with all other tables, rename some countries to their most common names in the dataset.
+    # Their names will be properly harmonized in the garden step.
+    country_mapping = {
+        "European Union": "Total EU",
+        "Non-OECD": "Total Non-OECD",
+        "OECD": "Total OECD",
+    }
+    tb["country"] = map_series(tb["country"], country_mapping, warn_on_unused_mappings=True, show_full_warning=True)
+
+    # Transpose table to have a year column.
+    tb = tb.melt(id_vars=["country"], var_name="year", value_name="gas_reserves_tcm")
+
+    # Ensure numeric column has the right format.
+    tb = tb.astype({"gas_reserves_tcm": float})
+
+    # Ensure index columns are not repeated, and sort rows and columns conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().reset_index()
+
+    # Ensure column names are snake case.
+    tb = tb.underscore()
+
+    return tb
+
+
 def parse_oil_spot_crude_prices(data: pr.ExcelFile, metadata: TableMeta):
     sheet_name = "Oil - Spot crude prices"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
@@ -247,6 +363,12 @@ def run(dest_dir: str) -> None:
     # Parse coal reserves sheet.
     tb_coal_reserves = parse_coal_reserves(data=data_additional, metadata=snap_additional.to_table_metadata())
 
+    # Parse gas reserves sheeet.
+    tb_gas_reserves = parse_gas_reserves(data=data_additional, metadata=snap_additional.to_table_metadata())
+
+    # Parse oil reserves sheeet.
+    tb_oil_reserves = parse_oil_reserves(data=data_additional, metadata=snap_additional.to_table_metadata())
+
     # Parse oil spot crude prices.
     tb_oil_spot_crude_prices = parse_oil_spot_crude_prices(
         data=data_additional, metadata=snap_additional.to_table_metadata()
@@ -261,8 +383,9 @@ def run(dest_dir: str) -> None:
     # Parse coal prices.
     tb_coal_prices = parse_coal_prices(data=data_additional, metadata=snap_additional.to_table_metadata())
 
-    # Combine main table and coal reserves.
-    tb = tb.merge(tb_coal_reserves, how="outer", on=["country", "year"]).copy_metadata(from_table=tb)
+    # Combine main table and coal, gas, and oil reserves.
+    for tb_reserves in [tb_coal_reserves, tb_gas_reserves, tb_oil_reserves]:
+        tb = tb.merge(tb_reserves, how="outer", on=["country", "year"]).copy_metadata(from_table=tb)
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
@@ -280,5 +403,4 @@ def run(dest_dir: str) -> None:
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(dest_dir, tables=[tb, tb_prices], default_metadata=snap.metadata)
-
     ds_meadow.save()
