@@ -20,6 +20,7 @@ from typing import cast
 
 import owid.catalog.processing as pr
 from owid.catalog import Table, TableMeta
+from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
@@ -35,7 +36,7 @@ def parse_coal_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
 
     # The year of the data is written in the header of the sheet.
     # Extract it using a regular expression.
-    _year = re.findall(r"\d{4}", tb.columns[0])
+    _year = re.findall(r"\d{4}", tb.columns[0])  # type: ignore
     assert len(_year) == 1, f"Year could not be extracted from the header of the sheet {sheet_name}."
     year = int(_year[0])
 
@@ -63,6 +64,19 @@ def parse_coal_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
 
     # Clean country names (remove spurious spaces and "of which: " in one of the last rows).
     tb["country"] = tb["country"].str.replace("of which:", "").str.strip()
+
+    # For consistency with all other tables, rename some countries to their most common names in the dataset.
+    # Their names will be properly harmonized in the garden step.
+    # For consistency with all other tables, rename some countries to their most common names in the dataset.
+    # Their names will be properly harmonized in the garden step.
+    country_mapping = {
+        "European Union": "Total EU",
+        "Middle East": "Total Middle East",
+        "Non-OECD": "Total Non-OECD",
+        "OECD": "Total OECD",
+        "Turkey": "Turkiye",
+    }
+    tb["country"] = map_series(tb["country"], country_mapping)
 
     # Add a column for the year of the data.
     tb = tb.assign(**{"year": year})
@@ -147,7 +161,7 @@ def parse_gas_prices(data: pr.ExcelFile, metadata: TableMeta) -> Table:
     ]
 
     # Remove numbers from column names (they are references to footnotes).
-    tb.columns = [re.sub("\d", "", column).strip() for column in tb.columns]
+    tb.columns = [re.sub(r"\d", "", column).strip() for column in tb.columns]
 
     # Drop header rows.
     tb = tb.drop([0, 1, 2]).reset_index(drop=True)
@@ -206,6 +220,7 @@ def create_table_of_fossil_fuel_prices(
     # Combine additional tables of fossil fuel prices.
     tb_prices = tb_oil_spot_crude_prices.copy()
     for tb_additional in [tb_oil_crude_prices, tb_gas_prices, tb_coal_prices]:
+        # Add current table to combined table.
         tb_prices = tb_prices.merge(tb_additional, how="outer", on=["year"]).copy_metadata(from_table=tb_prices)
     # Rename table appropriately.
     tb_prices.metadata.short_name += "_fossil_fuel_prices"
@@ -265,4 +280,5 @@ def run(dest_dir: str) -> None:
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(dest_dir, tables=[tb, tb_prices], default_metadata=snap.metadata)
+
     ds_meadow.save()

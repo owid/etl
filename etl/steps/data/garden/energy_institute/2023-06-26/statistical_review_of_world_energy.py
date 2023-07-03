@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
@@ -12,9 +10,9 @@ paths = PathFinder(__file__)
 
 # +
 # TODO: Compare BP and EI definitions of regions in their methodology document.
-# -
 
-# Columns to use, and how to rename them.
+# +
+# Columns to use from the main data file, and how to rename them.
 COLUMNS = {
     # Index columns.
     "country": "country",
@@ -156,6 +154,32 @@ COLUMNS = {
     # 'refthru_kbd': 'refthru_kbd',
 }
 
+# Columns to use from the additional data file related to prices, and how to rename them.
+COLUMNS_PRICES = {
+    "asian_marker_price": "coal_price_asian_marker",
+    "china_qinhuangdao_spot_price": "coal_price_china_qinhuangdao_spot",
+    "japan_coking_coal_import_cif_price": "coal_price_japan_coking_coal_import_cif",
+    "japan_steam_coal_import_cif_price": "coal_price_japan_steam_coal_import_cif",
+    "japan_steam_spot_cif_price": "coal_price_japan_steam_spot_cif",
+    "lng__japan__cif": "gas_price_lng_japan_cif",
+    "lng__japan_korea_marker__jkm": "gas_price_lng_japan_korea_marker",
+    "natural_gas__average_german__import_price": "gas_price_average_german_import",
+    "natural_gas__canada__alberta": "gas_price_canada_alberta",
+    "natural_gas__netherlands_ttf__da_icis__heren_ttf_index": "gas_price_netherlands_ttf_index",
+    "natural_gas__uk_nbp__icis_nbp_index": "gas_price_uk_nbp_index",
+    "natural_gas__us__henry_hub": "gas_price_us_henry_hub",
+    "newcastle_thermal_coal_fob": "coal_price_newcastle_thermal_coal_fob",
+    "northwest_europe": "coal_price_northwest_europe",
+    "oil_crude_prices__dollar_2022": "oil_price_crude_dollar_2022",
+    "oil_crude_prices__dollar_money_of_the_day": "oil_price_crude_dollar_money_of_the_day",
+    "oil_spot_crude_prices__brent": "oil_price_crude_spot_brent",
+    "oil_spot_crude_prices__dubai": "oil_price_crude_spot_dubai",
+    "oil_spot_crude_prices__nigerian_forcados": "oil_price_crude_spot_nigerian_forcados",
+    "oil_spot_crude_prices__west_texas_intermediate": "oil_price_crude_spot_west_texas_intermediate",
+    "us_central_appalachian_coal_spot_price_index": "coal_price_us_central_appalachian_spot_price_index",
+}
+# -
+
 REGIONS = {
     "Africa": {
         "additional_members": [
@@ -201,6 +225,26 @@ REGIONS = {
 }
 
 
+def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+    # Add region aggregates.
+    for region in REGIONS:
+        members = geo.list_members_of_region(
+            region=region,
+            ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
+            additional_members=REGIONS[region].get("additional_members"),
+        )
+        tb = geo.add_region_aggregates(
+            df=tb,
+            region=region,
+            countries_in_region=members,
+            countries_that_must_have_data=[],
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.9999,
+        )
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -227,34 +271,19 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
-    # TODO: Move to a function.
     # Add region aggregates.
-    for region in REGIONS:
-        members = geo.list_members_of_region(
-            region=region,
-            ds_regions=ds_regions,
-            ds_income_groups=ds_income_groups,
-            additional_members=REGIONS[region].get("additional_members"),
-        )
-        tb = geo.add_region_aggregates(
-            df=tb,
-            region=region,
-            countries_in_region=members,
-            countries_that_must_have_data=[],
-            num_allowed_nans_per_year=None,
-            frac_allowed_nans_per_year=0.9999,
-        )
+    tb = add_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+
     # Copy metadata from original table.
     tb = tb.copy_metadata(from_table=tb_meadow)
 
-    # TODO: Rename columns in tb_prices appropriately.
-    tb_prices = tb_meadow.copy()
+    # Rename columns from the additional data file related to prices.
+    tb_prices = tb_meadow_prices.rename(columns=COLUMNS_PRICES, errors="raise").copy()
 
-    # Set an appropriate index and sort conveniently.
-    # TODO: Fix duplicates.
-    # tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-    tb = tb.set_index(["country", "year"]).sort_index().sort_index(axis=1)
-    tb_prices = tb_prices.set_index(["year"]).sort_index().sort_index(axis=1)
+    # Set an appropriate index to each table and sort conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    tb_prices = tb_prices.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     #
     # Save outputs.
