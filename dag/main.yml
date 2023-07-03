@@ -54,12 +54,6 @@ steps:
     - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
   data://grapher/ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
-  data://meadow/worldbank_wdi/2022-05-26/wdi:
-    - walden://worldbank_wdi/2022-05-26/wdi
-  data://garden/worldbank_wdi/2022-05-26/wdi:
-    - data://meadow/worldbank_wdi/2022-05-26/wdi
-  data://grapher/worldbank_wdi/2022-05-26/wdi:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/owid/latest/key_indicators:
     - data://garden/owid/latest/key_indicators
   data://meadow/oecd/2016-06-01/regional_wellbeing:
@@ -69,6 +63,22 @@ steps:
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://meadow/un/2022-07-11/un_wpp
+
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2023-05-29/wdi:
+    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
+  data://garden/worldbank_wdi/2023-05-29/wdi:
+    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
+    - data://meadow/worldbank_wdi/2023-05-29/wdi
+  data://grapher/worldbank_wdi/2023-05-29/wdi:
+    - data://garden/worldbank_wdi/2023-05-29/wdi
+
+  data://meadow/worldbank_wdi/2022-05-26/wdi:
+    - walden://worldbank_wdi/2022-05-26/wdi
+  data://garden/worldbank_wdi/2022-05-26/wdi:
+    - data://meadow/worldbank_wdi/2022-05-26/wdi
+  data://grapher/worldbank_wdi/2022-05-26/wdi:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Homicide - WHO
   data://meadow/homicide/2023-01-03/who_mort_db:
@@ -252,10 +262,6 @@ steps:
   data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
 
-  # Long-term homicide rates in Europe - Eisner (2014)
-  data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
-    - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
-
   #Luxembourg Income Study
   data://meadow/lis/2023-01-18/luxembourg_income_study:
     - snapshot://lis/2023-01-18/lis_keyvars.csv
@@ -422,6 +428,8 @@ steps:
   data://garden/tourism/2023-05-05/unwto:
   - data://meadow/tourism/2023-05-05/unwto
   - data://garden/owid/latest/key_indicators
+  - data://garden/worldbank_wdi/2022-05-26/wdi
+  - data://garden/oecd/2023-06-20/ppp_exchange_rates
   data://grapher/tourism/2023-05-11/unwto:
   - data://garden/tourism/2023-05-05/unwto
   # Environment Tables Implementations
@@ -503,6 +511,14 @@ steps:
   data://garden/papers/2023-06-07/commodity_prices:
   - snapshot://papers/2023-06-07/commodity_prices.xlsx
 
+
+# OECD exchange rates
+  data://meadow/oecd/2023-06-20/ppp_exchange_rates:
+  - snapshot://oecd/2023-06-20/ppp_exchange_rates.csv
+  data://garden/oecd/2023-06-20/ppp_exchange_rates:
+  - data://meadow/oecd/2023-06-20/ppp_exchange_rates
+
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
@@ -522,3 +538,5 @@ include:
   - dag/environment.yml
   - dag/agriculture.yml
   - dag/space.yml
+  - dag/artificial_intelligence.yml
+

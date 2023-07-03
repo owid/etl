@@ -13,7 +13,6 @@ dataset:
   licenses:
     - name: JSTOR
       url: https://about.jstor.org/terms/
-  version: "2022-11-04"
   sources:
     - name: Riley (2005)
       url: https://doi.org/10.1111/j.1728-4457.2005.00083.x

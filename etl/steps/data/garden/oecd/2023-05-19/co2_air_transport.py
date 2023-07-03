@@ -111,6 +111,7 @@ def run(dest_dir: str) -> None:
 
     merged_df = pd.merge(df_pivoted, merge_df, on=["country", "year"], how="outer")
     merged_df = merged_df.drop(["population"], axis=1)
+    merged_df.set_index(["country", "year"], inplace=True)
 
     # Create a new table with the processed data.
     tb_garden = Table(merged_df, short_name="co2_air_transport")
@@ -205,6 +206,8 @@ def add_inbound_outbound_tour(df, df_tr):
 
     """
     # Extract relevant columns from the tourism DataFrame
+    df_tr.reset_index(inplace=True)
+
     just_inb_ratio = df_tr[["country", "year", "inb_outb_tour"]]
 
     # Merge the CO2 transport DataFrame with the tourism DataFrame based on 'year' and 'country'

@@ -51,12 +51,12 @@ dataset:
     All LIS income and consumption variables are originally reported in annual amounts and in units of the national currency in use today. In Our World in Data, we use international-$ in 2017 prices to account for inflation and for differences in the cost of living between countries. LIS provides conversion tables in its platform.
   version: "2023-01-18"
   sources:
-    - name: Luxembourg Income Study (LIS) (2023)
+    - name: Luxembourg Income Study (2023)
       url: https://www.lisdatacenter.org/our-data/lis-database/
-      date_accessed: "2023-06-14"
-      publication_date: "2023-06-14"
+      date_accessed: "2023-07-02"
+      publication_date: "2023-06-21"
       publication_year: 2023
       published_by:
         Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org
         (multiple countries; 1967-2021). Luxembourg, LIS.
-      publisher_source: National income surveys
+      description: Data comes from national income surveys

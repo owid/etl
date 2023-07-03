@@ -35,7 +35,7 @@ SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 class Source:
     """Notes on importing sources to grapher:
     - Field `source.description` gets mapped to `Internal notes`, but we rather use it for `additional_info`
-    - The most important fields are `published_by`, `publisher_source` and `additional_info`
+    - The most important fields are `published_by` and `additional_info`
     - In admin for dataset (i.e. /admin/datasets/1234) only the first source of a dataset is shown and
         can be edited. The other ones are not visible.
     """
@@ -52,7 +52,6 @@ class Source:
     # NOTE: it's not clear how to map description & name to fields in grapher, so
     # we're keeping both for the time being. We might consolidate them in the future
     published_by: Optional[str] = None
-    publisher_source: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         ...
@@ -76,6 +75,9 @@ class License:
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> "License":
         ...
+
+    def __bool__(self):
+        return bool(self.name or self.url)
 
 
 @pruned_json
@@ -105,6 +107,7 @@ class VariableMeta:
     short_unit: Optional[str] = None
     display: Optional[Dict[str, Any]] = None
     additional_info: Optional[Dict[str, Any]] = None
+    processing_log: List[Dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         ...
@@ -112,6 +115,17 @@ class VariableMeta:
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> "VariableMeta":
         ...
+
+    def _repr_html_(self):
+        # Render a nice display of the table metadata
+        record = self.to_dict()
+        return """
+             <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
+             <p style="font-variant: small-caps; font-family: sans-serif; font-size: 1.5em; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">variable meta</p>
+             {}
+        """.format(
+            getattr(self, "_name", None), to_html(record)
+        )
 
 
 @pruned_json
@@ -237,3 +251,43 @@ class TableMeta:
     @staticmethod
     def from_dict(dict: Dict[str, Any]) -> "TableMeta":
         ...
+
+    def _repr_html_(self):
+        # Render a nice display of the table metadata
+        record = self.to_dict()
+        short_name = record.pop("short_name")
+        return """
+             <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
+             <p style="font-variant: small-caps; font-family: sans-serif; font-size: 1.5em; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">table meta</p>
+             {}
+        """.format(
+            short_name, to_html(record)
+        )
+
+
+def to_html(record: Any) -> Optional[str]:
+    if isinstance(record, dict):
+        rows = []
+        for k, v in record.items():
+            if not v:
+                continue
+            v_str = to_html(v)
+            rows.append(
+                """<tr><th style="text-align: right; font-family: sans-serif; vertical-align: top; padding: 0.2em 1em;"><strong>{}</strong></th><td style="text-align: left; padding: 0.2em 1em;">{}</td></tr>""".format(
+                    k, v_str
+                )
+            )
+        return '<table style="margin: 0em"><tbody>{}</tbody></table>'.format("".join(rows))
+
+    elif isinstance(record, list):
+        record = list(filter(None, record))
+        if not record:
+            return None
+
+        rows = []
+        for item in record:
+            rows.append("<li>{}</li>".format(to_html(item)))
+        return '<ul style="text-align: left; margin-top: 0em; margin-bottom: 0em">{}</ul>'.format("".join(rows))
+
+    else:
+        return str(record)

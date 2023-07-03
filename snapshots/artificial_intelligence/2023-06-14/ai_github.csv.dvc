@@ -1,0 +1,26 @@
+meta:
+  namespace: artificial_intelligence
+  short_name: ai_github
+  name: (AI Index, 2023)
+  version: '2023-06-14'
+  publication_year: 2023
+  publication_date: '2023-03-20'
+  source_name: GitHub Survey (2022) via AI Index ReportAI Index (2023)
+  source_published_by: GitHub Survey (2022) AI Index 2023 Annual Report,” AI Index
+    Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford,
+    CA, April 2023
+  url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
+  source_data_url: https://drive.google.com/uc?export=download&id=1mr6AIE89K_sA_xhIN89DueSMuf5f7f6e
+  file_extension: csv
+  license_url: 
+    https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  license_name: Public domain
+  date_accessed: 2023-06-19
+  is_public: true
+  description: |-
+    To evaluate the impact of Copilot on productivity, well-being, and workflow, GitHub conducted a survey in 2022. Over 2,000 developers who were using Copilot participated in the survey. Additionally, GitHub recruited 95 developers and randomly split them into two groups, one of which used Copilot as part of a coding task and the other which did not.
+wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
+outs:
+- md5: 67acedb09a9e4bd7122ec0ed27b0193e
+  size: 573
+  path: ai_github.csv

@@ -2,7 +2,7 @@
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, TableMeta
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -61,9 +61,12 @@ def run(dest_dir: str) -> None:
             df[col] = df[col].round(0)
 
     df["country"] = df["country"].str.replace(",", "")  # to avoid double ,,
+    df.set_index(["country", "year"], verify_integrity=True, inplace=True)
 
     # Create a new table with the processed data.
-    tb_garden = Table(df, short_name="oil_spills")
+    tb_garden = Table(df, short_name=paths.short_name)
+
+    tb_garden.metadata = TableMeta(short_name=paths.short_name, primary_key=list(df.index.names))
 
     # Save outputs.
     #

@@ -118,7 +118,6 @@ def run(dest_dir: str) -> None:
     ds_garden.add(make_hist_events_table())
     ds_garden.save()
 
-    print(ds_garden.metadata)
     log.info("life_expectancy.end")
 
 

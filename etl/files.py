@@ -93,9 +93,15 @@ class _MyDumper(Dumper):
 
 
 def _str_presenter(dumper: Any, data: Any) -> Any:
-    if len(data.splitlines()) > 1:  # check for multiline string
-        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
-    return dumper.represent_scalar("tag:yaml.org,2002:str", data)
+    lines = data.splitlines()
+    if len(lines) > 1:  # check for multiline string
+        max_line_length = max([len(line) for line in lines])
+        if max_line_length > 120:
+            return dumper.represent_scalar("tag:yaml.org,2002:str", data, style=">")
+        else:
+            return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+    else:
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data)
 
 
 # dump multi-line strings correctly in YAML and add support for OrderedDict
@@ -113,7 +119,7 @@ def yaml_dump(d: Dict[str, Any], stream: Optional[TextIO] = None, strip_lines: b
     # strip lines, otherwise YAML won't output strings in literal format
     if strip_lines:
         d = _strip_lines_in_dict(d)
-    return yaml.dump(d, stream=stream, sort_keys=False, allow_unicode=True, Dumper=_MyDumper)
+    return yaml.dump(d, stream=stream, sort_keys=False, allow_unicode=True, Dumper=_MyDumper, width=120)
 
 
 def _strip_lines(s: str) -> str:

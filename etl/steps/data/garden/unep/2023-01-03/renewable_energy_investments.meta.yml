@@ -1,6 +1,4 @@
 dataset:
-  namespace: unep
-  short_name: renewable_energy_investments
   title: Investment in renewable energy by technology (UNEP, 2019)
   description: |
     Renewable energy investments, extracted from Fig. 21 of the Global Trends in Renewable Energy Investment 2019 report, by UN Environment, Frankfurt School-UNEP Centre, BNEF.
@@ -9,7 +7,6 @@ dataset:
   licenses:
   - name: Copyright © Frankfurt School of Finance & Management gGmbH 2019
     url: https://wedocs.unep.org/bitstream/handle/20.500.11822/29752/GTR2019.pdf
-  version: '2023-01-03'
   sources:
   - name: UN Environment, Frankfurt School-UNEP Centre, BNEF
     url: https://www.unep.org/resources/report/global-trends-renewable-energy-investment-2019

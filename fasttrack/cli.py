@@ -16,7 +16,7 @@ import pywebio
 import structlog
 from cryptography.fernet import Fernet
 from git.repo import Repo
-from owid.catalog import Dataset
+from owid.catalog import Dataset, License, Source
 from owid.catalog.utils import underscore, validate_underscore
 from owid.datautils import dataframes
 from pydantic import BaseModel
@@ -124,6 +124,35 @@ class FasttrackImport:
     def snapshot(self) -> Snapshot:
         return Snapshot(f"{self.meta.dataset.namespace}/{self.meta.dataset.version}/{self.meta.dataset.short_name}.csv")
 
+    @property
+    def snapshot_meta(self) -> SnapshotMeta:
+        # since sheets url is accessible with link, we have to encrypt it when storing in metadata
+        sheets_url = _encrypt(self.sheets_url) if self.is_private else self.sheets_url
+
+        source_name = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
+
+        return SnapshotMeta(
+            namespace=self.meta.dataset.namespace,
+            short_name=self.meta.dataset.short_name,
+            name=self.meta.dataset.title,
+            version=str(self.meta.dataset.version),
+            file_extension="csv",
+            description=self.meta.dataset.description,
+            source=Source(
+                url=self.partial_snapshot_meta.url,
+                name=source_name,
+                published_by=source_name,
+                source_data_url=sheets_url,
+                date_accessed=str(dt.date.today()),
+                publication_year=self.partial_snapshot_meta.publication_year,
+            ),
+            license=License(
+                url=self.partial_snapshot_meta.license_url,
+                name=self.partial_snapshot_meta.license_name,
+            ),
+            is_public=not self.is_private,
+        )
+
     def snapshot_exists(self) -> bool:
         try:
             self.snapshot
@@ -136,31 +165,11 @@ class FasttrackImport:
             f.write(self.meta.to_yaml())
 
     def upload_snapshot(self) -> Path:
-        # since sheets url is accessible with link, we have to encrypt it when storing in metadata
-        sheets_url = _encrypt(self.sheets_url) if self.is_private else self.sheets_url
+        # save snapshotmeta YAML file
+        self.snapshot_meta.save()
 
-        source_name = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
-
-        snap_meta = SnapshotMeta(
-            namespace=self.meta.dataset.namespace,
-            short_name=self.meta.dataset.short_name,
-            name=self.meta.dataset.title,
-            version=str(self.meta.dataset.version),
-            file_extension="csv",
-            description=self.meta.dataset.description,
-            url=self.partial_snapshot_meta.url,
-            source_name=source_name,
-            source_published_by=source_name,
-            source_data_url=sheets_url,
-            is_public=not self.is_private,
-            date_accessed=dt.date.today(),
-            publication_year=self.partial_snapshot_meta.publication_year,
-            license_url=self.partial_snapshot_meta.license_url,
-            license_name=self.partial_snapshot_meta.license_name,
-        )
-        snap_meta.save()
-
-        snap = Snapshot(snap_meta.uri)
+        # upload snapshot
+        snap = self.snapshot
         dataframes.to_file(self.data, file_path=snap.path)
         snap.dvc_add(upload=True)
 
@@ -252,6 +261,9 @@ def app(dummy_data: bool, commit: bool) -> None:
         grapher=True,
         private=form.is_private,
         workers=1,
+        # NOTE: force is necessary because we are caching checksums with files.CACHE_CHECKSUM_FILE
+        # we could have cleared the cache, but this is cleaner
+        force=True,
     )
     po.put_success("Import to MySQL successful!")
 
@@ -500,19 +512,19 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
     metas = [SnapshotMeta.load_from_yaml(path) for path in (SNAPSHOTS_DIR / "fasttrack").rglob("*.dvc")]
 
     # sort them by date accessed
-    metas.sort(key=lambda meta: meta.date_accessed, reverse=True)
+    metas.sort(key=lambda meta: meta.source.date_accessed, reverse=True)  # type: ignore
 
     # exclude local CSVs
-    metas = [m for m in metas if m.source_name != "Local CSV"]
+    metas = [m for m in metas if m.source.name != "Local CSV"]
 
     # decrypt URLs if private
     for meta in metas:
         if not meta.is_public:
-            assert meta.source_data_url
-            meta.source_data_url = _decrypt(meta.source_data_url)
+            assert meta.source.source_data_url
+            meta.source.source_data_url = _decrypt(meta.source.source_data_url)
 
     # extract their name and url
-    return [{"label": f"{meta.name} / {meta.version}", "value": meta.source_data_url, "is_public": meta.is_public} for meta in metas]  # type: ignore
+    return [{"label": f"{meta.name} / {meta.version}", "value": meta.source.source_data_url, "is_public": meta.is_public} for meta in metas]  # type: ignore
 
 
 def _infer_metadata(
@@ -660,8 +672,16 @@ def _metadata_diff(fast_import: FasttrackImport, meta: YAMLMeta) -> bool:
     with open(fast_import.metadata_path, "r") as f:
         existing_meta = f.read()
 
+    # load old snapshot metadata from path
+    old_snapshot_yaml = fast_import.snapshot.metadata.to_yaml()
+    # create new snapshot metadata
+    new_snapshot_yaml = fast_import.snapshot_meta.to_yaml()
+
+    # combine snapshot YAML and grapher YAML file
     diff = difflib.HtmlDiff()
-    html_diff = diff.make_table(existing_meta.split("\n"), meta.to_yaml().split("\n"), context=True)
+    html_diff = diff.make_table(
+        (existing_meta + old_snapshot_yaml).split("\n"), (meta.to_yaml() + new_snapshot_yaml).split("\n"), context=True
+    )
     if "No Differences Found" in html_diff:
         po.put_success("No metadata differences found.")
         return False

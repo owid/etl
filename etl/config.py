@@ -65,7 +65,10 @@ GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 
 # forbid any individual step from consuming more than this much memory
 # (only enforced on Linux)
-MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 20 GB
+MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
+
+# increment this to force a full rebuild of all datasets
+ETL_EPOCH = 2
 
 
 def enable_bugsnag() -> None:

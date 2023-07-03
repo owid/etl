@@ -8,7 +8,7 @@ import shutil
 import warnings
 from dataclasses import dataclass
 from glob import glob
-from os import mkdir
+from os import environ, mkdir
 from os.path import join
 from pathlib import Path
 from typing import Any, Iterator, List, Literal, Optional, Union
@@ -28,7 +28,7 @@ FileFormat = Literal["csv", "feather", "parquet"]
 SUPPORTED_FORMATS: List[FileFormat] = ["feather", "parquet", "csv"]
 
 # the formats we generate by default
-DEFAULT_FORMATS: List[FileFormat] = ["feather", "parquet"]
+DEFAULT_FORMATS: List[FileFormat] = ["feather"]
 
 # the format we use by default if we only need one
 PREFERRED_FORMAT: FileFormat = "feather"
@@ -100,10 +100,29 @@ class Dataset:
         for col in list(table.columns) + list(table.index.names):
             utils.validate_underscore(col, "Variable's name")
 
-        # make an assert from this
+        # non-unique index might be causing problems down the line and is typically a mistake
         if not table.index.is_unique:
-            warnings.warn(
-                f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
+            # regions are the only exception where this is acceptable (though not ideal)
+            if "garden/regions/2023-01-01/regions" not in self.path:
+                warnings.warn(
+                    f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
+                )
+
+        if not table.primary_key:
+            if "OWID_STRICT" in environ:
+                raise PrimaryKeyMissing(
+                    f"Table `{table.metadata.short_name}` does not have a primary_key set -- please use set_index() to indicate dimensions"
+                )
+            else:
+                warnings.warn(
+                    f"Table `{table.metadata.short_name}` does not have a primary_key set -- please use set_index() to indicate dimensions"
+                )
+
+        if not table.index.is_unique and "OWID_STRICT" in environ:
+            [(k, dups)] = table.index.value_counts().head(1).to_dict().items()
+            raise NonUniqueIndex(
+                f"Table `{table.metadata.short_name}` has duplicate values in the index -- could you have made a mistake?\n\n"
+                f"e.g. key {k} is repeated {dups} times in the index"
             )
 
         # check Float64 and Int64 columns for np.nan
@@ -279,3 +298,11 @@ def checksum_file(filename: str) -> Any:
             chunk = istream.read(chunk_size)
 
     return checksum
+
+
+class PrimaryKeyMissing(Exception):
+    pass
+
+
+class NonUniqueIndex(Exception):
+    pass

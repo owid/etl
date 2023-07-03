@@ -1,0 +1,25 @@
+dataset:
+  title: &desc |
+    Number of AI-Related Bills Passed Into Law by Country, 2016–22 (AI Index,
+    2023)
+  description: The AI Index data on number of laws passed by legislative bodies in
+    127 countries that contain the words “artificial intelligence” from 2016 to 2022.
+  licenses:
+  - name: Public domain
+    url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  sources:
+  - name: AI Index (2023)
+    description: *desc
+    url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
+    source_data_url: https://drive.google.com/uc?export=download&id=1fpjGF3CFRH88_7LR7BB_8vdFWUcRJeEn
+    date_accessed: '2023-06-19'
+    publication_date: '2023-04-01'
+    publication_year: 2023
+    published_by: AI Index 2023 Annual Report,” AI Index Steering Committee, Institute
+      for Human-Centered AI, Stanford University, Stanford, CA, April 2023
+tables:
+  ai_bills:
+    variables:
+      number_of_ai_related_bills_passed_into_law:
+        title: Number of AI-Related Bills Passed Into Law
+        unit: ''

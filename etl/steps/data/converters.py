@@ -45,34 +45,21 @@ def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
         title=snap.name,
         version=snap.version,
         description=snap.description,
-        sources=[
-            Source(
-                name=snap.source_name,  # Short source citation.
-                published_by=snap.source_published_by,  # Full source citation.
-                description=snap.description,
-                url=snap.url,
-                source_data_url=snap.source_data_url,
-                # XXX owid_data_url is not a thing for snapshots, but it could be possibly added
-                # owid_data_url=snap.owid_data_url,
-                date_accessed=snap.date_accessed,
-                publication_date=str(snap.publication_date) if snap.publication_date else None,
-                publication_year=snap.publication_year,
-            )
-        ],
-        licenses=[License(name=snap.license_name, url=snap.license_url)]
-        if snap.license_name or snap.license_url
-        else [],
+        sources=[snap.source],
+        licenses=[snap.license] if snap.license else [],
     )
 
 
 def convert_grapher_source(s: gm.Source) -> Source:
+    # append publisher source to description
+    description = f"{s.description.get('additionalInfo')}\nPublisher source: {s.description.get('dataPublisherSource')}"
+
     return Source(
         name=s.name,
-        description=s.description.get("additionalInfo"),
+        description=description,
         url=s.description.get("link"),
         date_accessed=s.description.get("retrievedDate"),
         published_by=s.description.get("dataPublishedBy"),
-        publisher_source=s.description.get("dataPublisherSource"),
     )
 
 
