@@ -1,13 +1,16 @@
 import pandas as pd
 from owid import catalog
+from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
 
 P = PathFinder(__file__)
+log = get_logger()
 
 
 def run(dest_dir: str) -> None:
+    log.info("world_population_comparison: start")
     # load snapshot
     data = pd.read_csv(Snapshot("fasttrack/2023-06-19/world_population_comparison.csv").path)
 
@@ -24,10 +27,12 @@ def run(dest_dir: str) -> None:
     # add table, update metadata from *.meta.yml and save
     ds = create_dataset(dest_dir, tables=[tb])
     ds.save()
+    log.info("world_population_comparison: end")
 
 
 def get_hyde_32() -> catalog.Table:
     """Load HYDE 3.2 data and format accordingly."""
+    log.info("world_population_comparison: load hyde")
     ds = P.load_dataset_dependency("garden/hyde/2017/baseline")
     tb = ds["population"].reset_index()
     # Get only World data, add source name
@@ -41,6 +46,7 @@ def get_hyde_32() -> catalog.Table:
 
 def get_gapminder_v7() -> catalog.Table:
     """Load Gapminder v7 data and format accordingly."""
+    log.info("world_population_comparison: load gapminder")
     ds = P.load_dataset_dependency("garden/gapminder/2023-03-31/population")
     tb = ds["population"].reset_index()
     # Get only World data, add source name
@@ -57,6 +63,7 @@ def get_un_2022() -> catalog.Table:
 
     Both historical estimates and medium variant projections are loaded.
     """
+    log.info("world_population_comparison: load un wpp")
     ds = P.load_dataset_dependency("garden/un/2022-07-11/un_wpp")
     tb = ds["population"].reset_index()
     # Get estimates: only World data, all sexes and ages, add source name
@@ -90,6 +97,7 @@ def get_un_2022() -> catalog.Table:
 
 def get_owid() -> catalog.Table:
     """Load Gapminder v7 data and format accordingly."""
+    log.info("world_population_comparison: load owid")
     ds = P.load_dataset_dependency("garden/demography/2023-03-31/population")
     tb = ds["population"].reset_index()
     # Get only World data, add source name
