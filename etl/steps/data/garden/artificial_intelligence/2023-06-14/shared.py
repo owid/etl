@@ -83,7 +83,7 @@ def check_improvement(df, column_name):
     """
 
     # Create a new column with the same values as the input column
-    df[column_name + "_improved"] = "NaN"
+    df[column_name + "_improved"] = "Not applicable"
 
     # Initialize previous value and days_since with the first row values
 
@@ -99,7 +99,7 @@ def check_improvement(df, column_name):
 
             # Check if the value is NaN and assign the corresponding improvement status
             if pd.isnull(value):
-                df.at[i, column_name + "_improved"] = "NaN"
+                df.at[i, column_name + "_improved"] = "Not applicable"
 
             # Check if the value is greater than the previous value and meets the condition of days_since
             elif pd.notnull(previous_value) and value > previous_value and days_since >= previous_days_since:
@@ -132,7 +132,7 @@ def check_improvement(df, column_name):
 
             # Check if the value is NaN and assign the corresponding improvement status
             if pd.isnull(value):
-                df.at[i, column_name + "_improved"] = "NaN"
+                df.at[i, column_name + "_improved"] = "Not applicable"
             elif pd.notnull(previous_value) and value > previous_value and days_since >= previous_days_since:
                 df.at[i, column_name + "_improved"] = "State of the art"
                 previous_value = value

@@ -31,7 +31,6 @@ def run(dest_dir: str) -> None:
     # Assuming your DataFrame is called "df"
     corresponding_columns = []
     selected_data = {}
-
     for col in tb.columns:
         if col.endswith("_improved"):
             corresponding_col = col[:-9]
