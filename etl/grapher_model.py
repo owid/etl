@@ -6,9 +6,10 @@ It has been slightly modified since then.
 """
 import json
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Annotated, Any, Dict, List, Optional, TypedDict
 from urllib.parse import quote
 
+import humps
 import pandas as pd
 import structlog
 from owid import catalog
@@ -771,6 +772,10 @@ class Variable(SQLModel, table=True):
     metadataPath: Optional[str] = Field(default=None, sa_column=Column("metadataPath", LONGTEXT))
     dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=True))
 
+    schemaVersion: Optional[int] = Field(default=None)
+    processingLevel: Optional[Optional[Annotated[str, catalog.meta.OWID_PROCESSING_LEVELS]]] = Field(default=None)
+    presentation: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("presentation", JSON))
+
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="variables")
@@ -819,6 +824,9 @@ class Variable(SQLModel, table=True):
             ds.dataPath = self.dataPath
             ds.metadataPath = self.metadataPath
             ds.dimensions = self.dimensions
+            ds.schemaVersion = self.schemaVersion
+            ds.processingLevel = self.processingLevel
+            ds.presentation = self.presentation
             ds.updatedAt = datetime.utcnow()
             # do not update these fields unless they're specified
             if self.columnOrder is not None:
@@ -852,6 +860,14 @@ class Variable(SQLModel, table=True):
     ) -> "Variable":
         # `unit` can be an empty string, but cannot be null
         assert metadata.unit is not None
+
+        if metadata.presentation:
+            presentation_dict = metadata.presentation.to_dict()  # type: ignore
+            # convert all fields from snake_case to camelCase
+            presentation_dict = humps.camelize(presentation_dict)
+        else:
+            presentation_dict = None
+
         return cls(
             shortName=short_name,
             name=metadata.title,
@@ -865,6 +881,9 @@ class Variable(SQLModel, table=True):
             display=metadata.display or {},
             catalogPath=catalog_path,
             dimensions=dimensions,
+            schemaVersion=metadata.schema_version,
+            processingLevel=metadata.processing_level,
+            presentation=presentation_dict,
         )
 
     @classmethod

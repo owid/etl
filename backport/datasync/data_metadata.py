@@ -173,6 +173,11 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
     nonRedistributable = row.pop("nonRedistributable")
     displayJson = row.pop("display")
 
+    schemaVersion = row.pop("schemaVersion", None)
+    processingLevel = row.pop("processingLevel", None)
+    presentationJson = row.pop("presentation", None)
+
+    presentation = json.loads(presentationJson) if presentationJson else None
     display = json.loads(displayJson)
     partialSource = json.loads(sourceDescription)
     variableMetadata = dict(
@@ -180,6 +185,9 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         type="mixed",  # precise type will be updated further down
         nonRedistributable=bool(nonRedistributable),
         display=display,
+        schemaVersion=schemaVersion,
+        processingLevel=processingLevel,
+        presentation=presentation,
         source=dict(
             id=sourceId,
             name=sourceName,
@@ -190,6 +198,8 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
             additionalInfo=partialSource.get("additionalInfo") or "",
         ),
     )
+
+    variableMetadata = _omit_nullable_values(variableMetadata)
 
     entityArray = (
         variable_data[["entityId", "entityName", "entityCode"]]
