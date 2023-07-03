@@ -170,6 +170,42 @@ def run(dest_dir: str) -> None:
         ],
     )
 
+    # Retrieve snapshot with extrapolations
+    snap: Snapshot = paths.load_dependency("world_inequality_database_with_extrapolations.csv")
+    # Load data from snapshot.
+    # `keep_default_na` and `na_values` are included because there is a country labeled NA, Namibia, which becomes null without the parameters
+    df_extrapolations = pd.read_csv(
+        snap.path,
+        keep_default_na=False,
+        na_values=[
+            "-1.#IND",
+            "1.#QNAN",
+            "1.#IND",
+            "-1.#QNAN",
+            "#N/A N/A",
+            "#N/A",
+            "N/A",
+            "n/a",
+            "",
+            "#NA",
+            "NULL",
+            "null",
+            "NaN",
+            "-NaN",
+            "nan",
+            "-nan",
+            "",
+        ],
+    )
+
+    # Filter df_extrapolations to the country and year different to the ones in df
+    df_extrapolations = df_extrapolations[
+        ~df_extrapolations["country"].isin(df["country"]) & ~df_extrapolations["year"].isin(df["year"])
+    ]
+
+    df = pd.merge(df, df_extrapolations, on=["country", "year"], how="outer", suffixes=("", "_extrapolated"))
+    # When values repeat, transform extrapolated to null
+
     #
     # Process data.
     #

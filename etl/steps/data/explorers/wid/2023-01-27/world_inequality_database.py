@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     tb_garden = ds_garden["world_inequality_database"]
 
     # Drop welfare variables not used in the explorers
-    drop_list = ["posttax_dis"]
+    drop_list = ["posttax_dis", "wealth", "_extrapolated"]
 
     for var in drop_list:
         tb_garden = tb_garden[tb_garden.columns.drop(list(tb_garden.filter(like=var)))]
