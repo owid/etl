@@ -16,7 +16,7 @@ dataset:
       (2020). Global burden of 369 diseases and injuries in 204 countries and territories,
       1990–2019: A systematic analysis for the Global Burden of Disease Study 2019.
       The Lancet, 396(10258), 1204–1222.'
-    publisher_source: Country-level prevalence data
+    description: Country-level prevalence data
     publication_year: 2020
     date_accessed: 2023-05-05
     url: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)30925-9/fulltext

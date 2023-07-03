@@ -12,7 +12,7 @@ var_dict = {
         "description": "This is the mean income or wealth within the {pct_dict[pct]['decile10_extra'].lower()}.",
         "unit": "international-$ in 2021 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "share": {
         "title": "Share",
@@ -33,7 +33,7 @@ var_dict = {
         "description": "This is the level of income or wealth per year below which {str(pct_dict[pct]['thr_number'])}% of the population falls.",
         "unit": "international-$ in 2021 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "p0p100_gini": {
         "title": "Gini coefficient",
@@ -47,21 +47,21 @@ var_dict = {
         "description": "Mean income or wealth.",
         "unit": "international-$ in 2021 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "median": {
         "title": "Median",
         "description": "Median income or wealth.",
         "unit": "international-$ in 2021 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "palma_ratio": {
         "title": "Palma ratio",
         "description": "The Palma ratio is the share of total income or wealth of the top 10% divided by the share of the bottom 40%.",
         "unit": "",
         "short_unit": "",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "s80_s20_ratio": {
         "title": "S80/S20 ratio",

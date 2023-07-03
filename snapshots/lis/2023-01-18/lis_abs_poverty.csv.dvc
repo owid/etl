@@ -13,7 +13,7 @@ meta:
   file_extension: csv
   license_url:
   license_name:
-  date_accessed: 2023-06-21
+  date_accessed: 2023-07-02
   is_public: true
   description: |
     The Luxembourg Income Study Database (LIS) is the largest available income database of harmonized microdata collected from about 50 countries in Europe, North America, Latin America, Africa, Asia, and Australasia spanning five decades.
@@ -21,6 +21,6 @@ meta:
     Harmonized into a common framework, LIS datasets contain household- and person-level data on labor income, capital income, pensions, public social benefits (excl. pensions) and private transfers, as well as taxes and contributions, demography, employment, and expenditures.
 wdir: ../../../data/snapshots/lis/2023-01-18
 outs:
-- md5: 3d7c9b46640d8b8ae237e3bbefcd87f5
-  size: 3381940
+- md5: 5a7c2b3068ccbaba6bebbe4544655256
+  size: 3298740
   path: lis_abs_poverty.csv

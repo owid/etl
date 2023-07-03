@@ -11,8 +11,7 @@ dataset:
     -
       name: Aviation Safety Network
       published_by: Aviation Safety Network
-      publisher_source: |
-        Information contained in the Aviation Safety Network database is based on information from official sources (authorities, safety boards).
+      description: Information contained in the Aviation Safety Network database is based on information from official sources (authorities, safety boards).
       publication_year: 2022
       date_accessed: 2022-10-14
       url: "https://aviation-safety.net/statistics/"

@@ -8,6 +8,7 @@ import click
 import requests
 import structlog
 from bs4 import BeautifulSoup
+from owid.catalog import License
 
 from etl.snapshot import Snapshot
 
@@ -52,7 +53,7 @@ def load_external_metadata() -> dict:
         "description": description,
         "publication_year": pub_date.year,
         "publication_date": pub_date,
-        "license_name": meta_orig.get("constraints").get("license").get("license_id"),
+        "license": License(name=meta_orig.get("constraints").get("license").get("license_id")),
     }
     return meta
 

@@ -303,7 +303,6 @@ def combine_metadata_sources(sources: List[catalog.Source]) -> catalog.Source:
         "publication_date",
         "publication_year",
         "published_by",
-        "publisher_source",
     ]
     # Combine sources' attributes into the first source (which is the only one that grapher will interpret).
     for attribute in attributes:

@@ -3,7 +3,6 @@ dataset:
     -
       name: WHO/UNICEF
       published_by: World Health Organization (2022)
-      publisher_source: WHO/UNICEF
 
 tables:
   who_vaccination:
@@ -181,4 +180,3 @@ tables:
         title: Number of one-year-olds not vaccinated with yellow fever vaccine
         unit: unvaccinated one-year-olds
 
-      

@@ -14,8 +14,7 @@ def test_convert_grapher_source():
 
     etl_source = convert_grapher_source(db_source)
     assert etl_source.to_dict() == {
-        "description": "Mortality data was compiled...",
+        "description": "Mortality data was compiled...\nPublisher source: Census data, IARC data",
         "url": "https://www.gapminder.org/data/",
         "date_accessed": "15/11/2017",
-        "publisher_source": "Census data, IARC data",
     }
