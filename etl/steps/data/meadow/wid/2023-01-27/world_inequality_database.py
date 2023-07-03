@@ -20,14 +20,15 @@ paths = PathFinder(__file__)
 def combine_extrapolated(df: pd.DataFrame, df_extrapolations: pd.DataFrame) -> pd.DataFrame:
     """Combine extrapolated and non-extrapolated values in the dataset."""
 
-    # Get the list of columns in the dataset
-    dataset_columns = [col for col in df.columns if col not in ["country", "year"]]
+    # NOTE: I am commenting for now the code, because grapher joins the points before and after the estimated values
+    # # Get the list of columns in the dataset
+    # dataset_columns = [col for col in df.columns if col not in ["country", "year"]]
 
     # Combine both datasets
     df = pd.merge(df, df_extrapolations, on=["country", "year"], how="outer", suffixes=("", "_extrapolated"))
-    # When p0p100_gini equals p0p100_gini_extrapolated, make the latter null
-    for col in dataset_columns:
-        df[f"{col}_extrapolated"] = np.where(df[col] == df[f"{col}_extrapolated"], np.nan, df[f"{col}_extrapolated"])
+    # # When p0p100_gini equals p0p100_gini_extrapolated, make the latter null
+    # for col in dataset_columns:
+    #     df[f"{col}_extrapolated"] = np.where(df[col] == df[f"{col}_extrapolated"], np.nan, df[f"{col}_extrapolated"])
 
     return df
 
