@@ -83,15 +83,17 @@ def check_improvement(df, column_name):
     """
 
     # Create a new column with the same values as the input column
-    df[column_name + "_improved"] = df[column_name]
+    df[column_name + "_improved"] = "NaN"
 
     # Initialize previous value and days_since with the first row values
-    previous_value = df[column_name].iloc[0]
-    previous_days_since = df["days_since"].iloc[0]
 
     # Check if 'training_data' column exists in the DataFrame
     if "training_data" in df.columns:
-        for i, value in enumerate(df[column_name].iloc[1:], start=1):
+        first_non_nan_index = df[column_name].first_valid_index()
+        previous_value = df[column_name].iloc[first_non_nan_index]
+        previous_days_since = df["days_since"].iloc[first_non_nan_index]
+
+        for i, value in enumerate(df[column_name].iloc[first_non_nan_index + 1 :], start=first_non_nan_index + 1):
             days_since = df["days_since"].iloc[i]
             with_without = df["training_data"].iloc[i]
 
@@ -115,35 +117,31 @@ def check_improvement(df, column_name):
                 else:
                     df.at[i, column_name + "_improved"] = "Others (without extra data)"
 
-        # Handle the case of the first value being NaN or set it as the initial improvement status
-        if pd.isnull(df.iloc[0][column_name]):
-            df.at[0, column_name + "_improved"] = "NaN"
-        elif df["training_data"].iloc[0] == "Without extra data":
+        if df["training_data"].iloc[0] == "Without extra data":
             df.at[0, column_name + "_improved"] = "State of the art (without extra training data)"
         else:
             df.at[0, column_name + "_improved"] = "State of the art (with extra training data)"
     else:
-        for i, value in enumerate(df[column_name].iloc[1:], start=1):
+        first_non_nan_index = df[column_name].first_valid_index()
+        previous_value = df[column_name].iloc[first_non_nan_index]
+        previous_days_since = df["days_since"].iloc[first_non_nan_index]
+
+        # Iterate over the remaining values in the column
+        for i, value in enumerate(df[column_name].iloc[first_non_nan_index + 1 :], start=first_non_nan_index + 1):
             days_since = df["days_since"].iloc[i]
 
             # Check if the value is NaN and assign the corresponding improvement status
             if pd.isnull(value):
                 df.at[i, column_name + "_improved"] = "NaN"
-
-            # Check if the value is greater than the previous value and meets the condition of days_since
             elif pd.notnull(previous_value) and value > previous_value and days_since >= previous_days_since:
                 df.at[i, column_name + "_improved"] = "State of the art"
-
-                # Update the previous value and days_since
                 previous_value = value
                 previous_days_since = days_since
             else:
                 df.at[i, column_name + "_improved"] = "Others"
 
         # Handle the case of the first value being NaN or set it as the initial improvement status
-        if pd.isnull(df.iloc[0][column_name]):
-            df.at[0, column_name + "_improved"] = "NaN"
-        else:
-            df.at[0, column_name + "_improved"] = "State of the art"
+
+        df[column_name + "_improved"] = df[column_name + "_improved"].astype(str)
 
     return df

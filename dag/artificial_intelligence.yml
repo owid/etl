@@ -28,6 +28,11 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
 
+  data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
+  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art
+
   # AI Index report
 
   # Artificial Intelligence Conference Attendance
