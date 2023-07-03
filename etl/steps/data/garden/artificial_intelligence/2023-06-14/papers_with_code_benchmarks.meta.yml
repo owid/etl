@@ -123,56 +123,56 @@ tables:
           yearIsDay: true
 
       performance_code_any_competition_improved:
-        title: Coding performance on competitions - state of the art
+        title: Coding performance on competitions - state of the art color code
         unit: ''
         display:
           zeroDay: '2019-01-01'
           yearIsDay: true
 
       performance_code_any_interview_improved:
-        title: Coding performance on interviews - state of the art
+        title: Coding performance on interviews - state of the art color code
         unit: ''
         display:
           zeroDay: '2019-01-01'
           yearIsDay: true
 
       performance_humanities_improved:
-        title: Accuracy on Humanities subjects - state of the art
+        title: Accuracy on Humanities subjects - state of the art color code
         unit: ''
         display:
           zeroDay: '2019-01-01'
           yearIsDay: true
 
       performance_language_average_improved:
-        title:  Average accuracy on all knowledge tests - state of the art
+        title:  Average accuracy on all knowledge tests - state of the art color code
         unit: ''
         display:
           zeroDay: '2019-01-01'
           yearIsDay: true
 
       performance_math_improved:
-        title: Performance on math and problem-solving tasks - state of the art
+        title: Performance on math and problem-solving tasks - state of the art color code
         unit: ''
         display:
           zeroDay: '2019-01-01'
           yearIsDay: true
 
       performance_other_improved:
-        title: Accuracy on other knowledge tests - state of the art
+        title: Accuracy on other knowledge tests - state of the art color code
         unit: ''
         display:
           zeroDay: '2019-01-01'
           yearIsDay: true
 
       performance_social_sciences_improved:
-        title:  Accuracy on Social Sciences knowledge tests - state of the art- state of the art
+        title:  Accuracy on Social Sciences knowledge tests - state of the art- state of the art color code
         unit: ''
         display:
           zeroDay: '2019-01-01'
           yearIsDay: true
 
       performance_stem_improved:
-        title: Accuracy on STEM subjects knowledge tests - state of the art
+        title: Accuracy on STEM subjects knowledge tests - state of the art color code
         unit: ''
         display:
           zeroDay: '2019-01-01'
@@ -189,7 +189,7 @@ tables:
           yearIsDay: true
 
       performance_atari_improved:
-        title: Average score on Atari games relative to humans - state of the art
+        title: Average score on Atari games relative to humans - state of the art color code
         unit: ''
         display:
           zeroDay: '2019-01-01'
@@ -246,7 +246,7 @@ tables:
           yearIsDay: true
 
       papers_with_code_imagenet_top5_improved:
-        title: Top-5 accuracy - state of the art
+        title: Top-5 accuracy - state of the art color code
         unit: '%'
         short_unit:  '%'
         display:
@@ -255,7 +255,7 @@ tables:
           yearIsDay: true
 
       papers_with_code_imagenet_top1_improved:
-        title: Top-1 accuracy - state of the art
+        title: Top-1 accuracy - state of the art color code
         unit: '%'
         short_unit:  '%'
         display:
