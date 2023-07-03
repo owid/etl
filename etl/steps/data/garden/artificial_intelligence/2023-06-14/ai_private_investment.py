@@ -16,6 +16,35 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
+    cols_to_adjust_for_infaltion = [
+        "Data Management, Processing, Cloud",
+        "Medical and Healthcare",
+        "Fintech",
+        "AV",
+        "Semiconductor",
+        "Industrial Automation, Network",
+        "Retail",
+        "Fitness and Wellness",
+        "NLP, Customer Support",
+        "Energy, Oil, and Gas",
+        "Cybersecurity, Data Protection",
+        "Drones",
+        "Marketing, Digital Ads",
+        "HR Tech",
+        "Facial Recognition",
+        "Insurtech",
+        "Agritech",
+        "Sales Enablement",
+        "AR/VR",
+        "Ed Tech",
+        "Geospatial",
+        "Legal Tech",
+        "Entertainment",
+        "Music, Video Content",
+        "VC",
+        "Total",
+    ]
+
     log.info("ai_private_investment.start")
     #
     # Load inputs.
@@ -54,11 +83,10 @@ def run(dest_dir: str) -> None:
     df_wdi_cpi_us.drop("fp_cpi_totl", axis=1, inplace=True)
     df_cpi_inv = pd.merge(df_wdi_cpi_us, df, on="year", how="inner")
 
-    exclude_for_inflation = ["Year", "Geographic Area", "cpi_adj_2021"]
-    for col in df_cpi_inv.columns:
-        if col not in exclude_for_inflation:
-            df_cpi_inv[col] = round(100 * df_cpi_inv[col] / df_cpi_inv["cpi_adj_2021"])
+    for col in df_cpi_inv[cols_to_adjust_for_infaltion]:
+        df_cpi_inv[col] = round(100 * df_cpi_inv[col] / df_cpi_inv["cpi_adj_2021"])
 
+    df_cpi_inv.drop("cpi_adj_2021", axis=1, inplace=True)
     tb = Table(df_cpi_inv, short_name=paths.short_name, underscore=True)
     #
     # Save outputs.

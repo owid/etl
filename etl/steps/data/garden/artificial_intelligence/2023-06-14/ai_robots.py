@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
         # Check if the column includes "in_thousands"
         if "__in_thousands" in column:
             # Multiply the values by 1000
-            tb[column] = tb[column].apply(lambda x: x * 1000)
+            tb[column] *= 1000
             new_column_name = column.replace("__in_thousands", "")
 
             # Rename the column
