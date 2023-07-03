@@ -2,7 +2,7 @@
 #  converters.py
 #
 
-import datetime as dt
+import warnings
 
 from owid.catalog import DatasetMeta, License, Origin, Source, VariableMeta
 from owid.walden import Dataset as WaldenDataset
@@ -41,19 +41,31 @@ def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
     """
     Copy metadata for a dataset directly from what we have in Snapshot.
     """
-    assert snap.origin
-    assert snap.source
-    return DatasetMeta(
-        short_name=snap.short_name,
-        namespace=snap.namespace,
-        version=snap.version,
-        # dataset title and description are filled from origin
-        title=snap.origin.dataset_title_owid,
-        description=snap.origin.dataset_description_owid,
-        sources=[snap.source],
-        origins=[snap.origin],
-        licenses=[snap.license] if snap.license else [],
-    )
+    if snap.origin:
+        assert not snap.source
+        return DatasetMeta(
+            short_name=snap.short_name,
+            namespace=snap.namespace,
+            version=snap.version,
+            # dataset title and description are filled from origin
+            title=snap.origin.dataset_title_owid,
+            description=snap.origin.dataset_description_owid,
+            origins=[snap.origin],
+            licenses=[snap.license] if snap.license else [],
+        )
+    elif snap.source:
+        assert not snap.origin
+        return DatasetMeta(
+            short_name=snap.short_name,
+            namespace=snap.namespace,
+            title=snap.name,
+            version=snap.version,
+            description=snap.description,
+            sources=[snap.source],
+            licenses=[snap.license] if snap.license else [],
+        )
+    else:
+        raise ValueError("Snapshot must have either origin or source")
 
 
 def convert_grapher_source(s: gm.Source) -> Source:
@@ -162,6 +174,7 @@ def convert_origin_to_source(o: Origin) -> Source:
 
 def convert_source_to_origin(s: Source) -> Origin:
     """Inverse of `convert_origin_to_source`."""
+    warnings.warn("Converting sourcs to origins is highly discouraged.")
     return Origin(
         producer=s.name,
         dataset_description_owid=s.description,

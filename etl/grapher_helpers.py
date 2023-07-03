@@ -451,21 +451,19 @@ def _adapt_table_for_grapher(
     # TODO: In the future, all variables should have their origins and dataset origins will be union of their origins.
     table = _add_dataset_origins_to_variables(table)
 
+    # NOTE: We want to avoid converting sources to origins, ideally we'd convert sources to origins at snapshot level
     # Convert sources to origins to stay backward compatible. Note that this happens before we combine all sources into
     # one source which is needed by MySQL.
+    # assert table.metadata.dataset
+    # for col in table.columns:
+    #     table[col].origins = _add_sources_to_origins(
+    #         table[col].origins, table.metadata.dataset.sources + table[col].sources
+    #     )
+
+    # Convert origins to sources to stay backward compatible.
     assert table.metadata.dataset
     for col in table.columns:
-        table[col].origins = _add_sources_to_origins(
-            table[col].origins, table.metadata.dataset.sources + table[col].sources
-        )
-
-    # NOTE: We already convert origins to sources in snapshot. This would be needed only if we added
-    # origins in meadow / garden through YAML file.
-    # Convert origins to sources to stay backward compatible.
-    # for col in table.columns:
-    #     table[col].sources = _add_origins_to_sources(
-    #         table[col].sources, table.metadata.dataset.sources + table[col].sources
-    #     )
+        table[col].sources = _add_origins_to_sources(table[col].sources, table[col].origins)
 
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).

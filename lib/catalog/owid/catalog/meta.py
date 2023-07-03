@@ -4,6 +4,7 @@
 #  Metadata helpers.
 #
 
+import datetime as dt
 import json
 import re
 from dataclasses import dataclass, field
@@ -92,8 +93,13 @@ class Origin:
     date_published: Optional[str] = None
 
     def __post_init__(self):
-        if self.date_published and self.date_published != "latest" and not is_year_or_date(self.date_published):
-            raise ValueError("date_published should be either a year or a date or latest")
+        if self.date_published:
+            # convert date to string
+            if isinstance(self.date_published, dt.date):
+                self.date_published = str(self.date_published)
+
+            if self.date_published != "latest" and not is_year_or_date(self.date_published):
+                raise ValueError("date_published should be either a year or a date or latest")
 
     def to_dict(self) -> Dict[str, Any]:
         ...
