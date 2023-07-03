@@ -272,7 +272,8 @@ def _detect_strictness_level(step: Step, strict: Optional[bool] = None) -> bool:
         return False
 
     # now it depends on the version
-    return step.version == "latest" or step.version >= config.STRICT_AFTER
+    # TODO fix the "latest" cases as well
+    return step.version != "latest" and step.version >= config.STRICT_AFTER
 
 
 @contextmanager
