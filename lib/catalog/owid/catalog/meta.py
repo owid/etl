@@ -4,7 +4,6 @@
 #  Metadata helpers.
 #
 
-import datetime as dt
 import json
 import re
 from dataclasses import dataclass, field
