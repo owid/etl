@@ -51,7 +51,6 @@ def run(dest_dir: str) -> None:
     #
     # Load AI corporate investment snapshot
     snap = cast(Snapshot, paths.load_dependency("ai_private_investment.csv"))
-    print(snap.path)
     df = pd.read_csv(snap.path)
 
     exclude_columns = ["Year", "Geographic Area"]
@@ -87,7 +86,12 @@ def run(dest_dir: str) -> None:
         df_cpi_inv[col] = round(100 * df_cpi_inv[col] / df_cpi_inv["cpi_adj_2021"])
 
     df_cpi_inv.drop("cpi_adj_2021", axis=1, inplace=True)
+
+    df_cpi_inv.rename(columns={"Geographic Area": "country"}, inplace=True)
+    df_cpi_inv["country"] = df_cpi_inv["country"].replace("CN", "China")
+
     tb = Table(df_cpi_inv, short_name=paths.short_name, underscore=True)
+
     #
     # Save outputs.
     #
