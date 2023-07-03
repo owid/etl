@@ -4,7 +4,7 @@
 
 import datetime as dt
 import random
-from typing import Any, Union
+from typing import Any, Literal, Union
 
 _MOCK_STRINGS = [
     "alpha",
@@ -74,6 +74,9 @@ def mock(_type: type) -> Any:
 
     elif getattr(_type, "__name__", None) == "YearDateLatest":
         return str(_random_date())
+
+    elif getattr(_type, "__origin__", None) == Literal:
+        return random.choice(_type.__args__)  # type: ignore
 
     raise ValueError(f"don't know how to mock type: {_type}")
 
