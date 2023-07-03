@@ -103,7 +103,7 @@ def series_equals(
     assert all(s1.index == s2.index), "Indices must be the same"
 
     # Union categories of categorical columns to enable comparison
-    if s1.dtype == "category":
+    if s1.dtype == "category" and s2.dtype == "category":
         s1, s2 = align_categoricals(s1, s2)
 
     # Eq above does not take tolerance into account so compare again with tolerance
