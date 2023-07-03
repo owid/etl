@@ -16,6 +16,22 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
+def combine_extrapolated(df: pd.DataFrame, df_extrapolations: pd.DataFrame) -> pd.DataFrame:
+    """Combine extrapolated and non-extrapolated values in the dataset."""
+
+    # Get the list of columns in the dataset
+    dataset_columns = [col for col in df.columns if col not in ["country", "year"]]
+
+    # Combine both datasets
+    df = pd.merge(df, df_extrapolations, on=["country", "year"], how="outer", suffixes=("", "_extrapolated"))
+    # When p0p100_gini equals p0p100_gini_extrapolated, make the latter null
+    for col in dataset_columns:
+        df[f"{col}_extrapolated"] = np.where(df[col] == df[f"{col}_extrapolated"], np.nan, df[f"{col}_extrapolated"])
+
+    return df
+
+
 # List of countries/regions not included in the ISO2 standard, but added by WID
 iso2_missing = {
     "CN-RU": "China - rural",
@@ -198,13 +214,7 @@ def run(dest_dir: str) -> None:
         ],
     )
 
-    # Filter df_extrapolations to the country and year different to the ones in df
-    df_extrapolations = df_extrapolations[
-        ~df_extrapolations["country"].isin(df["country"]) & ~df_extrapolations["year"].isin(df["year"])
-    ]
-
-    df = pd.merge(df, df_extrapolations, on=["country", "year"], how="outer", suffixes=("", "_extrapolated"))
-    # When values repeat, transform extrapolated to null
+    df = combine_extrapolated(df, df_extrapolations)
 
     #
     # Process data.
