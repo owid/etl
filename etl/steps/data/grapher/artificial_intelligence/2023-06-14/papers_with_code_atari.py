@@ -19,12 +19,12 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["papers_with_code_atari"]
-
+    tb.reset_index(inplace=True)
     #
     # Process data.
     #
-    tb = tb.rename(columns={"name": "country"})
-    tb = tb.rename(columns={"days_since": "year"})
+    tb = tb.rename(columns={"name": "country", "days_since": "year"})
+    tb.set_index(["country", "year"], inplace=True)
 
     #
     # Save outputs.

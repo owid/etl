@@ -11,28 +11,22 @@ steps:
   # ImageNet
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet.html
-  data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
-    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet
-  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
-    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet
-
   # Math & Code and Language
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_math.html
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_coding.html
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_language.html
-  data://garden/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
-    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
-  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
-    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
-
   # Atari
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari:
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_atari.html
-  data://garden/artificial_intelligence/2023-06-14/papers_with_code_atari:
+
+  # All benchmarks combined
+  data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
     - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari
-  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_atari:
-    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_atari
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet
+  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
 
   # AI Index report
 

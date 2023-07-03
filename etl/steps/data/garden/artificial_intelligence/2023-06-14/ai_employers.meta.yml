@@ -1,6 +1,6 @@
 dataset:
   title: Employment of New AI PhDs (SCRA Taulbee Survey via AI Index Report)
-  description: &desc |
+  description: >
     Employment of New AI PhDs (% of Total) in North America by Sector (industry,
     government, academia), 2010–21.
   licenses:
@@ -8,7 +8,6 @@ dataset:
     url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   sources:
   - name: SCRA Taulbee Survey (2022) via AI Index Report
-    description: *desc
     url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
     source_data_url: https://drive.google.com/uc?export=download&id=1wgyixa8ai8M1X2EpAMu2IWTMgRuOxcn1
     date_accessed: '2023-06-19'

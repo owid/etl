@@ -5,8 +5,13 @@ dataset:
     ranging from road crashes, severe weather, climate change and disaster resilience, to work-related harm, violence and
     harassment at work, and use of personal data. It will be repeated at least two more times, in 2023 and 2025.
 
+
     This data includes aggregates of survey responses to the following two questions:
+
+
     1) Will artificial intelligence help or harm people in the next 20 years?
+
+
     2) Would you feel safe in a car driven by computer without a human driver?
   licenses:
     - name: Lloyd’s Register Foundation 2018

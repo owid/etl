@@ -1,7 +1,8 @@
 dataset:
   title: Global Corporate Investment in AI by Investment Activity, 2013–22 (AI Index,
     2023)
-  description: Data from NetBase Quid via AI Index (2023) on global corporate investment
+  description: >
+    Data from NetBase Quid via AI Index (2023) on global corporate investment
     in AI from 2013 to 2022. Corporate investment includes mergers and acquisitions,
     minority stakes, private investment, and public offerings.
   licenses:
@@ -9,9 +10,6 @@ dataset:
     url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   sources:
   - name: NetBase Quid (2022) via AI Index (2023)
-    description: Data from NetBase Quid via AI Index (2023) on global corporate investment
-      in AI from 2013 to 2022. Corporate investment includes mergers and acquisitions,
-      minority stakes, private investment, and public offerings.
     url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
     source_data_url: https://drive.google.com/uc?export=download&id=1Vqc-L9XlaPgghNZGbAGpU23d9Pn5ZuHh
     date_accessed: '2023-06-19'
@@ -30,8 +28,8 @@ tables:
         title: cpi_adj_2021
         unit: ''
       total_investment:
-        title: Total Investment
-        unit: 'U.S. Dollars'
+        title: Total investment
+        unit: 'US dollars'
         short_unit: '$'
       type:
         title: type

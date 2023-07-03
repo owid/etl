@@ -15,19 +15,16 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("papers_with_code_imagenet"))
+    ds_garden = cast(Dataset, paths.load_dependency("papers_with_code_benchmarks"))
 
     # Read table from garden dataset.
-    tb = ds_garden["papers_with_code_imagenet"]
+    tb = ds_garden["papers_with_code_benchmarks"]
     tb.reset_index(inplace=True)
-
     #
     # Process data.
     #
-    tb = tb.rename(columns={"days_since": "year", "name": "country"})
+    tb = tb.rename(columns={"name": "country", "days_since": "year"})
     tb.set_index(["country", "year"], inplace=True)
-
-    # Print the rows where the index is not unique
 
     #
     # Save outputs.

@@ -1,6 +1,6 @@
 dataset:
   title:  Number of Newly Funded AI Companies in China, EU+UK and US (AI Index, 2023)
-  description: &desc >
+  description: >
      Data from NetBase Quid via AI Index (2023) on newly funded AI companies in China, EU+UK and US.
      The AI Index is an independent initiative at the Stanford University Institute for Human-Centered Artificial Intelligence.
      The mission of the AI Index is “to provide unbiased, rigorously vetted, and globally sourced data for policymakers, researchers, executives, journalists, and the general public to develop intuitions about the complex field of AI.”
@@ -10,7 +10,6 @@ dataset:
     url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   sources:
   - name: NetBase Quid (2022) via AI Index (2023)
-    description: *desc
     url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
     source_data_url: https://drive.google.com/uc?export=download&id=1tYRyfFT1fK0v3-qacm2ORgbvvqsSYC4s
     date_accessed: '2023-06-19'
