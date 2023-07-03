@@ -512,10 +512,10 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
     metas = [SnapshotMeta.load_from_yaml(path) for path in (SNAPSHOTS_DIR / "fasttrack").rglob("*.dvc")]
 
     # sort them by date accessed
-    metas.sort(key=lambda meta: meta.date_accessed, reverse=True)
+    metas.sort(key=lambda meta: meta.source.date_accessed, reverse=True)  # type: ignore
 
     # exclude local CSVs
-    metas = [m for m in metas if m.source_name != "Local CSV"]
+    metas = [m for m in metas if m.source.name != "Local CSV"]
 
     # decrypt URLs if private
     for meta in metas:

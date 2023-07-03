@@ -260,11 +260,13 @@ class SnapshotMeta:
         assert len(js["sources"]) == 1
         s = js["sources"][0]
         self.name = js["dataset"]["name"]
-        self.source_name = s["name"]
-        self.description = s["description"].get("additionalInfo")
-        self.url = s["description"].get("link")
-        self.date_accessed = pd.to_datetime(s["description"].get("retrievedDate")).date()
-        self.source_published_by = s["description"].get("dataPublishedBy")
+        self.source = Source(
+            name=s["name"],
+            description=s["description"].get("additionalInfo"),
+            url=s["description"].get("link"),
+            published_by=s["description"].get("dataPublishedBy"),
+            date_accessed=pd.to_datetime(s["description"].get("retrievedDate")).date(),
+        )
 
 
 def add_snapshot(
