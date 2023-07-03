@@ -1,6 +1,6 @@
 dataset:
   title: Researcher Affiliation and Domain type in Notable AI Systems Data (Epoch, 2023)
-  description: &desc |
+  description: >
     The affiliation of the research team building a particular notable AI system was classified according to the following:
     — Academia: 100% of researchers affiliated with academia
     — Collaboration, Academia-majority: 71–99% affiliated with academia
@@ -26,7 +26,6 @@ dataset:
   - name: Public domain
   sources:
   - name: Epoch (2023)
-    description: *desc
     url: https://epochai.org/mlinputs/visualization
     date_accessed: '2023-06-21'
     publication_date: '2023-06-06'

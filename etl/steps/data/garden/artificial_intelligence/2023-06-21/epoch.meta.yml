@@ -1,6 +1,6 @@
 dataset:
   title: Parameter, Compute and Data Trends in Machine Learning (Epoch, 2023)
-  description: &desc |
+  description: >-
     We update this chart with the latest available data from our source every month.
 
     The authors selected the AI systems for inclusion based on the following necessary criteria:
@@ -19,7 +19,6 @@ dataset:
   - name: Public domain
   sources:
   - name: Epoch (2023)
-    description: *desc
     url: https://epochai.org/mlinputs/visualization
     date_accessed: '2023-06-21'
     publication_date: '2023-06-06'
