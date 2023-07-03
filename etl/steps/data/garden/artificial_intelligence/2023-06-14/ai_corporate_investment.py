@@ -58,6 +58,7 @@ def run(dest_dir: str) -> None:
     df_cpi_inv["total_corporate_investment_by_activity_inflation_adjusted"] = round(
         100 * df_cpi_inv["Total Investment"] / df_cpi_inv["cpi_adj_2021"]
     )
+    df_cpi_inv.drop(["cpi_adj_2021", "fp_cpi_totl"], axis=1, inplace=True)
 
     tb = Table(df_cpi_inv, short_name="ai_corporate_investment", underscore=True)
     #

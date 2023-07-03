@@ -1,17 +1,17 @@
 dataset:
   title: Attendance at Conferences (AI Index, 2023)
-  description: &desc |
-      Data from AI Index report on annual conference attendance. It should be interpreted with caution given that many conferences
-      in the last few years have had virtual or hybrid formats. Conference organisers
-      report that measuring the exact attendance numbers at virtual conferences is
-      difficult, as virtual conferences allow for higher attendance of researchers
-      from around the world.
+  description: >
+     Data from AI Index report on annual conference attendance. It should be interpreted with caution given that many conferences in the last few years have had virtual or hybrid formats. Conference organisers report that measuring the exact attendance numbers at virtual conferences is difficult, as virtual conferences allow for higher attendance of researchers from around the world.
+
+
+     The AI Index is an independent initiative at the Stanford University Institute for Human-Centered Artificial Intelligence.
+     The mission of the AI Index is “to provide unbiased, rigorously vetted, and globally sourced data for policymakers, researchers, executives, journalists, and the general public to develop intuitions about the complex field of AI.”
+     Their flagship output is the annual AI Index Report, which has been published since 2017.
   licenses:
   - name: Public domain
     url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   sources:
   - name: AI Index (2023)
-    description: *desc
     url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
     source_data_url: https://drive.google.com/uc?export=download&id=1LlEwGnFxr8WDITu4uh6GYoUojvC4mSm-
     date_accessed: '2023-06-14'
@@ -24,7 +24,7 @@ tables:
     variables:
       number_of_attendees__in_thousands:
         title: Number of attendees
-        unit: ''
+        unit: 'attendees'
         display:
           numDecimalPlaces: 0
       conference:
