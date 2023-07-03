@@ -1,5 +1,0 @@
-wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
-outs:
-- md5: cf175e66b047207c2a45e3e105400c4d
-  size: 335
-  path: industrial_robots_installed_countries_2021.csv

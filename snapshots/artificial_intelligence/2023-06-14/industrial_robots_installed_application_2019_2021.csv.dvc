@@ -1,5 +1,0 @@
-wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
-outs:
-- md5: 5ab1f6c7c0a49b4538158f45163b0c52
-  size: 454
-  path: industrial_robots_installed_application_2019_2021.csv

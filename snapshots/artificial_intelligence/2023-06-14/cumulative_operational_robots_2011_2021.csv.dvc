@@ -1,5 +1,0 @@
-wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
-outs:
-- md5: d4651368d1bf8b86bf838cc4e196e637
-  size: 158
-  path: cumulative_operational_robots_2011_2021.csv

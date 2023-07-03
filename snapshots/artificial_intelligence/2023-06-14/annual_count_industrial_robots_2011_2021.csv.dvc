@@ -1,5 +1,0 @@
-wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
-outs:
-- md5: ebdc7f88cc6e74739a503b25762f4f1e
-  size: 157
-  path: annual_count_industrial_robots_2011_2021.csv
