@@ -1,0 +1,12 @@
+dataset:
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-07-03
+tables:
+  fiscal_top1_shares_country_standardized:
+    variables:
+      fiscal_top1:
+        title: fiscal_top1
+        unit: ''
