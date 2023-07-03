@@ -25,9 +25,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "url"
-                ]
+                "required": ["url"]
               }
             ]
           },
@@ -68,9 +66,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name"
-                ]
+                "required": ["name"]
               }
             ]
           }
@@ -149,9 +145,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "name"
-                        ]
+                        "required": ["name"]
                       }
                     ]
                   },
@@ -168,9 +162,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "url"
-                        ]
+                        "required": ["url"]
                       }
                     ]
                   },
@@ -210,6 +202,46 @@
                         "type": "boolean"
                       }
                     }
+                  },
+                  "origins": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "dataset_title_owid": {
+                            "type": "string"
+                          },
+                          "dataset_description_owid": {
+                            "type": "string"
+                          },
+                          "dataset_description_producer": {
+                            "type": "string"
+                          },
+                          "producer": {
+                            "type": "string"
+                          },
+                          "citation_producer": {
+                            "type": "string"
+                          },
+                          "dataset_url_main": {
+                            "type": "string"
+                          },
+                          "dataset_url_download": {
+                            "type": "string"
+                          },
+                          "date_accessed": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "date_published": {
+                            "type": "string",
+                            "format": "date"
+                          }
+                        }
+                      }
+                    ]
                   }
                 }
               }
