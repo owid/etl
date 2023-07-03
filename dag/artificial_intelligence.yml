@@ -19,7 +19,6 @@ steps:
   # Atari
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari:
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_atari.html
-
   # All benchmarks combined
   data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
     - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari
@@ -27,7 +26,6 @@ steps:
     - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet
   data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
-
   data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
   data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
@@ -78,6 +76,8 @@ steps:
   data://garden/artificial_intelligence/2023-06-14/ai_private_investment:
     - snapshot://artificial_intelligence/2023-06-14/ai_private_investment.csv
     - data://garden/worldbank_wdi/2022-05-26/wdi
+  data://grapher/artificial_intelligence/2023-06-14/ai_private_investment:
+    - data://garden/artificial_intelligence/2023-06-14/ai_private_investment
 
   # AI bills passed into law
   data://garden/artificial_intelligence/2023-06-14/ai_bills:
@@ -111,9 +111,12 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/ai_robots:
     - data://garden/artificial_intelligence/2023-06-14/ai_robots
 
-  # AI Robots
+  # AI gender representation
   data://garden/artificial_intelligence/2023-06-14/ai_gender_representation:
     - snapshot://artificial_intelligence/2023-06-14/ai_gender_representation.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_gender_representation:
+    - data://garden/artificial_intelligence/2023-06-14/ai_gender_representation
+
 
   # AI polls
   # Monmouth University Poll
