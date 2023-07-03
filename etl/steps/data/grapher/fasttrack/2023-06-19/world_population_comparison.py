@@ -9,11 +9,14 @@ P = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     # load snapshot
-    data = pd.read_csv(Snapshot("fasttrack/2023-06-19/world_population_comparison.csv").path)
+    snap = Snapshot("fasttrack/2023-06-19/world_population_comparison.csv")
+
+    # load data
+    data = pd.read_csv(snap.path)
 
     # create empty dataframe and table
     tb = catalog.Table(data, short_name=P.short_name)
 
     # add table, update metadata from *.meta.yml and save
-    ds = create_dataset(dest_dir, tables=[tb])
+    ds = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
     ds.save()
