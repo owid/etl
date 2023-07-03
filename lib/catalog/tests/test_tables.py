@@ -10,7 +10,6 @@ import jsonschema
 import numpy as np
 import pandas as pd
 import pytest
-
 from owid.catalog import tables
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
@@ -186,7 +185,11 @@ def test_tables_always_list_fields_in_metadata():
         m = json.load(open(join(temp_dir, "example.meta.json")))
 
     assert m["primary_key"] == ["country"]
-    assert m["fields"] == {"country": {}, "gdp": {}, "french_fries": {}}
+    assert m["fields"] == {
+        'country': {'schema_version': 1},
+        'french_fries': {'schema_version': 1},
+        'gdp': {'schema_version': 1}
+    }
 
 
 def test_field_access_can_be_typecast():

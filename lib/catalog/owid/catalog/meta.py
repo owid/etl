@@ -142,6 +142,9 @@ class License:
 OWID_PROCESSING_LEVELS = Literal["minor", "medium", "major"]
 
 
+@pruned_json
+@dataclass_json
+@dataclass
 class FaqLink:
     gdoc_id: str
     fragment_id: str
