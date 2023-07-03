@@ -8,7 +8,6 @@ from typing import Any, Dict, Optional
 import pytest
 import yaml
 from dataclasses_json import dataclass_json
-
 from owid.catalog import meta
 
 
@@ -25,6 +24,28 @@ def test_dict_mixin():
 
     assert Dog(name="fred").to_dict() == {"name": "fred"}
     assert Dog(age=10).to_dict() == {"age": 10}
+
+
+def test_dict_mixin_nested():
+    @meta.pruned_json
+    @dataclass_json
+    @dataclass
+    class Cat:
+        name: Optional[str] = None
+        age: Optional[int] = None
+
+    @meta.pruned_json
+    @dataclass_json
+    @dataclass
+    class Dog:
+        name: Optional[str] = None
+        age: Optional[int] = None
+        cat: Optional[Cat] = None
+
+        def to_dict(self) -> Dict[str, Any]:
+            ...
+
+    assert Dog(name="fred", cat=Cat(name="cred")).to_dict() == {"name": "fred", "cat": {"name": "cred"}}
 
 
 def test_empty_dataset_metadata():

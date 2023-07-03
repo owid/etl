@@ -21,8 +21,11 @@ def pruned_json(cls: T) -> T:
     orig = cls.to_dict  # type: ignore
 
     # only keep non-null public variables
+    # make sure to call `to_dict` of nested objects as well
     cls.to_dict = lambda self, **kwargs: {  # type: ignore
-        k: v for k, v in orig(self, **kwargs).items() if not k.startswith("_") and v not in [None, [], {}]
+        k: getattr(self, k).to_dict(**kwargs) if hasattr(getattr(self, k), "to_dict") else v
+        for k, v in orig(self, **kwargs).items()
+        if not k.startswith("_") and v not in [None, [], {}]
     }
 
     return cls
