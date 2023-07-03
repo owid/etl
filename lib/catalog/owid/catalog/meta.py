@@ -5,6 +5,7 @@
 #
 
 import json
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
@@ -87,9 +88,12 @@ class Origin:
     dataset_url_download: Optional[str] = None
     # The URL of the dataset on our website
     date_accessed: Optional[str] = None
-    # TODO: we're not clear yet whether to have both `date_published` and `year_published`
-    # year_published: Optional[str] = None
+    # Either date or year of publication
     date_published: Optional[str] = None
+
+    def __post_init__(self):
+        if self.date_published and self.date_published != "latest" and not is_year_or_date(self.date_published):
+            raise ValueError("date_published should be either a year or a date or latest")
 
     def to_dict(self) -> Dict[str, Any]:
         ...
@@ -346,3 +350,14 @@ def to_html(record: Any) -> Optional[str]:
 
     else:
         return str(record)
+
+
+def is_year_or_date(s: str) -> bool:
+    """Matches dates in "yyyy-mm-dd" format or years in "yyyy" format."""
+    date_pattern = r"^\d{4}-\d{2}-\d{2}$"
+    year_pattern = r"^\d{4}$"
+
+    if re.match(date_pattern, s) or re.match(year_pattern, s):
+        return True
+    else:
+        return False

@@ -152,7 +152,7 @@ def convert_origin_to_source(o: Origin) -> Source:
         url=o.dataset_url_main,
         source_data_url=o.dataset_url_download,
         date_accessed=str(o.date_accessed) if o.date_accessed else None,
-        publication_date=str(o.date_published) if o.date_published else None,
+        publication_date=o.date_published,
         published_by=o.citation_producer,
         # excluded fields
         # owid_data_url
@@ -171,10 +171,3 @@ def convert_source_to_origin(s: Source) -> Origin:
         date_published=s.publication_date if s.publication_date else None,  # type: ignore
         citation_producer=s.published_by,
     )
-
-
-def _string_to_date(s: str) -> dt.date:
-    """Convert string to date, or raise ValueError."""
-    if isinstance(s, dt.date):
-        return s
-    return dt.datetime.strptime(s, "%Y-%m-%d").date()
