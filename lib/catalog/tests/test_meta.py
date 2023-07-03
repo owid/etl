@@ -8,7 +8,6 @@ from typing import Any, Dict, Optional
 import pytest
 import yaml
 from dataclasses_json import dataclass_json
-
 from owid.catalog import meta
 
 
@@ -77,3 +76,11 @@ def test_load_license_from_dict():
     }
     license = meta.License.from_dict(d)
     assert license.url == d["url"]
+
+
+def test_Origin_date_published():
+    assert meta.Origin(date_published="2020-01-01").date_published == "2020-01-01"  # type: ignore
+    assert meta.Origin(date_published="2020").date_published == "2020"  # type: ignore
+    assert meta.Origin(date_published="latest").date_published == "latest"  # type: ignore
+    with pytest.raises(ValueError):
+        assert meta.Origin(date_published="nope")  # type: ignore
