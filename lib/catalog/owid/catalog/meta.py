@@ -9,7 +9,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, TypeVar, Union
 
 import yaml
 from dataclasses_json import dataclass_json
@@ -29,6 +29,9 @@ def pruned_json(cls: T) -> T:
 
 
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
+
+
+YearDateLatest = NewType("YearDateLatest", str)
 
 
 # DEPRECATED: use Origin instead
@@ -90,13 +93,13 @@ class Origin:
     # The URL of the dataset on our website
     date_accessed: Optional[str] = None
     # Either date or year of publication
-    date_published: Optional[str] = None
+    date_published: Optional[YearDateLatest] = None
 
     def __post_init__(self):
         if self.date_published:
             # convert date to string
             if isinstance(self.date_published, dt.date):
-                self.date_published = str(self.date_published)
+                self.date_published = YearDateLatest(self.date_published)
 
             if self.date_published != "latest" and not is_year_or_date(self.date_published):
                 raise ValueError("date_published should be either a year or a date or latest")

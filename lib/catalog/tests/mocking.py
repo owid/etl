@@ -50,7 +50,7 @@ def mock(_type: type) -> Any:
         return 10 * random.random() / random.random()
 
     elif _type == dt.date:
-        return dt.date.fromordinal(dt.date.today().toordinal() - random.randint(0, 1000))
+        return _random_date()
 
     elif _type == str:
         # some strings in the frictionless standard must be lowercase with no spaces
@@ -72,4 +72,11 @@ def mock(_type: type) -> Any:
     elif _type == Any:
         return mock(random.choice([str, int, float]))
 
+    elif getattr(_type, "__name__", None) == "YearDateLatest":
+        return str(_random_date())
+
     raise ValueError(f"don't know how to mock type: {_type}")
+
+
+def _random_date() -> dt.date:
+    return dt.date.fromordinal(dt.date.today().toordinal() - random.randint(0, 1000))
