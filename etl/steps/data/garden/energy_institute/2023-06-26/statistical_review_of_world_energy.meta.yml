@@ -1,10 +1,10 @@
 tables:
   statistical_review_of_world_energy:
     variables:
-      biodiesel_consumption_kboed:
-        title: 'Biofuels Consumption - Kboed - Biodiesel'
-        unit: 'Thousand barrels of oil equivalent per day'
-        short_unit: 'KBOED'
+      # biodiesel_consumption_kboed:
+      #   title: 'Biofuels Consumption - Kboed - Biodiesel'
+      #   unit: 'Thousand barrels of oil equivalent per day'
+      #   short_unit: 'KBOED'
       biodiesel_consumption_pj:
         title: 'Biofuels Consumption - PJ - Biodiesel'
         unit: 'Petajoules'
@@ -13,12 +13,12 @@ tables:
         title: 'Biofuels Consumption - TWh - Biodiesel'
         unit: 'Terawatt-hours'
         short_unit: 'TWh'
-      biodiesel_production_kboed:
-        title: 'Biofuels Production - Kboed - Biodiesel'
-        unit: 'Thousand barrels of oil equivalent per day'
-        short_unit: 'KBOED'
-        description: |
-          Biodiesel production includes biojet which is currently <1 KBOED globally but more than doubled relative to 2019.
+      # biodiesel_production_kboed:
+      #   title: 'Biofuels Production - Kboed - Biodiesel'
+      #   unit: 'Thousand barrels of oil equivalent per day'
+      #   short_unit: 'KBOED'
+      #   description: |
+      #     Biodiesel production includes biojet which is currently <1 KBOED globally but more than doubled relative to 2019.
       biodiesel_production_pj:
         title: 'Biofuels Production - PJ - Biodiesel'
         unit: 'Petajoules'
@@ -31,16 +31,16 @@ tables:
         short_unit: 'TWh'
         description: |
           Biodiesel production includes biojet which is currently <1 KBOED globally but more than doubled relative to 2019.
-      biofuels_consumption_kboed:
-        title: 'Biofuels Consumption - Kboed - Total'
-        unit: 'Thousand barrels of oil equivalent per day'
-        short_unit: 'KBOED'
-        description: |
-          Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
-      biofuels_consumption_pj:
-        title: 'Biofuels Consumption - PJ - Total'
-        unit: 'Petajoules'
-        short_unit: 'PJ'
+      # biofuels_consumption_kboed:
+      #   title: 'Biofuels Consumption - Kboed - Total'
+      #   unit: 'Thousand barrels of oil equivalent per day'
+      #   short_unit: 'KBOED'
+      #   description: |
+      #     Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
+      biofuels_consumption_ej:
+        title: 'Biofuels Consumption - EJ - Total'
+        unit: 'Exajoules'
+        short_unit: 'EJ'
         description: |
           Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
       biofuels_consumption_twh:  # Added by OWID.
@@ -49,12 +49,12 @@ tables:
         short_unit: 'TWh'
         description: |
           Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
-      biofuels_production_kboed:
-        title: 'Biofuels Production - Kboed - Total'
-        unit: 'Thousand barrels of oil equivalent per day'
-        short_unit: 'KBOED'
-        description: |
-          Includes biogasoline (such as ethanol), biodiesel and biojet. Volumes have been adjusted for energy content.
+      # biofuels_production_kboed:
+      #   title: 'Biofuels Production - Kboed - Total'
+      #   unit: 'Thousand barrels of oil equivalent per day'
+      #   short_unit: 'KBOED'
+      #   description: |
+      #     Includes biogasoline (such as ethanol), biodiesel and biojet. Volumes have been adjusted for energy content.
       biofuels_production_pj:
         title: 'Biofuels Production - PJ - Total'
         unit: 'Petajoules'
@@ -71,6 +71,12 @@ tables:
         title: 'Geo Biomass Other - EJ'
         unit: 'Exajoules'
         short_unit: 'EJ'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      other_renewables_consumption_equivalent_twh:
+        title: 'Geo Biomass Other - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
       other_renewables_electricity_generation_twh:
@@ -198,7 +204,11 @@ tables:
         description: |
           Total proved reserves of natural gas is generally taken to be those quantities that geological and engineering information indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and operating conditions. The data series for total proved natural gas does not necessarily meet the definitions, guidelines and practices used for determining proved reserves at company level, for instance as published by the US Securities and Exchange Commission, nor does it necessarily represent BP's view of proved reserves by country. Reserves-to-production (R/P) ratio: If the reserves remaining at the end of any year are divided by the production in that year, the result is the length of time that those remaining reserves would last if production were to continue at that rate. As far as possible, the data represents standard cubic metres (measured at 15C and 1013 mbar) and has been standardized using a gross calorific value (GCV) of 40 MJ/m3.
       graphite_production_kt:
-        title: 'Graphite Production-Reserves'
+        title: 'Graphite Production'
+        unit: 'Thousand tonnes'
+        short_unit: 'KT'
+      graphite_reserves_kt:
+        title: 'Graphite Reserves'
         unit: 'Thousand tonnes'
         short_unit: 'KT'
       hydro_consumption_equivalent_ej:
@@ -226,7 +236,11 @@ tables:
       #   description: |
       #     Includes inland demand plus international aviation and marine bunkers and refinery fuel and loss. Consumption of biogasoline (such as ethanol), biodiesel and derivatives of coal and natural gas are also included. Differences between the world consumption figures and world production statistics are accounted for by stock changes, consumption of non-petroleum additives and substitute fuels and unavoidable disparities in the definition, measurement or conversion of oil supply and demand data.
       lithium_production_kt:
-        title: 'Lithium Production-Reserves'
+        title: 'Lithium Production'
+        unit: 'Thousand tonnes'
+        short_unit: 'KT'
+      lithium_reserves_kt:
+        title: 'Lithium Reserves'
         unit: 'Thousand tonnes'
         short_unit: 'KT'
       nuclear_consumption_equivalent_ej:
@@ -277,12 +291,12 @@ tables:
       #   short_unit: 'KBD'
       #   description: |
       #     Includes crude oil, shale/tight oil, oil sands, lease condensate or gas condensates that require further refining. Excludes liquid fuels from other sources such as biomass and synthetic derivatives of coal and natural gas.
-      oil_production_kbd:
-        title: 'Oil Production - Barrels'
-        unit: 'Thousand barrels per day'
-        short_unit: 'KBD'
-        description: |
-          Includes crude oil, shale oil, oil sands, condensates (lease condensate or gas condensates that require further refining) and NGLs (natural gas liquids - ethane, LPG and naphtha separated from the production of natural gas). Excludes liquid fuels from other sources such as biofuels and synthetic derivatives of coal and natural gas. This also excludes liquid fuel adjustment factors such as refinery processing gain. Excludes oil shales/kerogen extracted in solid form.
+      # oil_production_kbd:
+      #   title: 'Oil Production - Barrels'
+      #   unit: 'Thousand barrels per day'
+      #   short_unit: 'KBD'
+      #   description: |
+      #     Includes crude oil, shale oil, oil sands, condensates (lease condensate or gas condensates that require further refining) and NGLs (natural gas liquids - ethane, LPG and naphtha separated from the production of natural gas). Excludes liquid fuels from other sources such as biofuels and synthetic derivatives of coal and natural gas. This also excludes liquid fuel adjustment factors such as refinery processing gain. Excludes oil shales/kerogen extracted in solid form.
       oil_production_mt:
         title: 'Oil Production - Tonnes'
         unit: 'Million tonnes'
@@ -367,6 +381,12 @@ tables:
       #   short_unit: 'TWh'
       #   description: |
       #     Includes renewable power (apart from hydro, which is reported separately) and biofuels. Renewable power is based on gross generation and does not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      renewables_electricity_generation_twh:  # Added by OWID.
+        title: 'Renewables Electricity Generation - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Renewable power is based on gross generation from renewable sources including wind, geothermal, solar, biomass and waste, and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
       solar_consumption_equivalent_ej:
         title: 'Solar Consumption - EJ'
         unit: 'Exajoules'
@@ -403,6 +423,10 @@ tables:
         short_unit: 'TWh'
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply.
+      cobalt_reserves_kt:
+        title: 'Cobalt - Reserves - kT'
+        unit: 'Thousand tonnes'
+        short_unit: 'kT'
       coal_reserves_anthracite_and_bituminous_mt:
         title: 'Coal - Reserves - Anthracite and bituminous'
         unit: 'Million tonnes'

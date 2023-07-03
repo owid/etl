@@ -66,7 +66,7 @@ COLUMNS = {
     "elect_twh": "electricity_generation_twh",
     # 'electbyfuel_total': 'electricity_generation_twh',
     # Other electricity generation.
-    "electbyfuel_other": "other_electricity_generation_twh",
+    # "electbyfuel_other": "other_electricity_generation_twh",
     # Nuclear electricity consumption (input-equivalent).
     "nuclear_ej": "nuclear_consumption_equivalent_ej",
     # Nuclear electricity generation.
@@ -106,22 +106,22 @@ COLUMNS = {
     # 'ren_power_twh': 'renewables_electricity_generation_twh',
     # 'ren_power_twh_net': 'renewables_electricity_generation_net_twh',
     # Biodiesel production.
-    "biodiesel_prod_kboed": "biodiesel_production_kboed",
+    # "biodiesel_prod_kboed": "biodiesel_production_kboed",
     "biodiesel_prod_pj": "biodiesel_production_pj",
     # Biodiesel consumption.
-    "biodiesel_cons_kboed": "biodiesel_consumption_kboed",
+    # "biodiesel_cons_kboed": "biodiesel_consumption_kboed",
     "biodiesel_cons_pj": "biodiesel_consumption_pj",
     # Biofuels production.
-    "biofuels_prod_kbd": "biofuels_production_kbd",
-    "biofuels_prod_kboed": "biofuels_production_kboed",
+    # "biofuels_prod_kbd": "biofuels_production_kbd",
+    # "biofuels_prod_kboed": "biofuels_production_kboed",
     "biofuels_prod_pj": "biofuels_production_pj",
     # Biofuels consumption.
     "biofuels_cons_ej": "biofuels_consumption_ej",
-    "biofuels_cons_kbd": "biofuels_consumption_kbd",
-    "biofuels_cons_kboed": "biofuels_consumption_kboed",
-    "biofuels_cons_pj": "biofuels_consumption_pj",
+    # "biofuels_cons_kbd": "biofuels_consumption_kbd",
+    # "biofuels_cons_kboed": "biofuels_consumption_kboed",
+    # "biofuels_cons_pj": "biofuels_consumption_pj",
     # Oil production.
-    "oilprod_kbd": "oil_production_kbd",
+    # "oilprod_kbd": "oil_production_kbd",
     "oilprod_mt": "oil_production_mt",
     # Oil consumption.
     "oilcons_ej": "oil_consumption_ej",
@@ -262,7 +262,7 @@ def add_columns_in_twh(tb: Table) -> Table:
             tb[column.replace("_ej", "_twh")] = tb[column] * EJ_TO_TWH
         if column.endswith("_pj"):
             tb[column.replace("_pj", "_twh")] = tb[column] * PJ_TO_TWH
-        if column.endswith("_mt"):
+        if column in ["oil_consumption_mt", "oil_production_mt"]:
             tb[column.replace("_mt", "_twh")] = tb[column] * MTOE_TO_TWH
 
     return tb
