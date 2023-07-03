@@ -4,7 +4,6 @@
 #  Metadata helpers.
 #
 
-import datetime as dt
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -87,10 +86,10 @@ class Origin:
     # Direct URL to download the dataset
     dataset_url_download: Optional[str] = None
     # The URL of the dataset on our website
-    date_accessed: Optional[dt.date] = None
+    date_accessed: Optional[str] = None
     # TODO: we're not clear yet whether to have both `date_published` and `year_published`
     # year_published: Optional[str] = None
-    date_published: Optional[dt.date] = None
+    date_published: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         ...

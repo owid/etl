@@ -522,7 +522,7 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
     metas.sort(key=lambda meta: str(meta.source.date_accessed), reverse=True)  # type: ignore
 
     # exclude local CSVs
-    metas = [m for m in metas if m.source.name != "Local CSV"]
+    metas = [m for m in metas if m.source.name != "Local CSV"]  # type: ignore
 
     # decrypt URLs if private
     for meta in metas:
