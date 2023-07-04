@@ -317,8 +317,9 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
 class Step(Protocol):
     path: str
     is_public: bool = True
+    version: str
 
-    def run(self) -> None:
+    def run(self, strict: bool = False) -> None:
         ...
 
     def is_dirty(self) -> bool:
@@ -345,6 +346,23 @@ class DataStep(Step):
 
     def __str__(self) -> str:
         return f"data://{self.path}"
+
+    @property
+    def channel(self) -> str:
+        return self.path.split("/")[0]
+
+    @property
+    def namespace(self) -> str:
+        return self.path.split("/")[1]
+
+    @property
+    def version(self) -> str:
+        # channel / namspace / version / dataset
+        return self.path.split("/")[2]
+
+    @property
+    def dataset(self) -> str:
+        return self.path.split("/")[3]
 
     def _dataset_index_mtime(self) -> Optional[float]:
         try:
@@ -483,7 +501,7 @@ class DataStep(Step):
         )
 
         try:
-            subprocess.check_call(args)
+            subprocess.check_call(args, env=os.environ.copy())
         except subprocess.CalledProcessError:
             # swallow this exception and just exit -- the important stack trace
             # will already have been printed to stderr
@@ -569,6 +587,11 @@ class WaldenStep(Step):
 
         return dataset
 
+    @property
+    def version(self) -> str:
+        # namspace / version / dataset
+        return self.path.split("/")[1]
+
 
 @dataclass
 class SnapshotStep(Step):
@@ -616,6 +639,11 @@ class SnapshotStep(Step):
     def _path(self) -> str:
         return f"{paths.DATA_DIR}/snapshots/{self.path}"
 
+    @property
+    def version(self) -> str:
+        # namspace / version / filename
+        return self.path.split("/")[1]
+
 
 class SnapshotStepPrivate(SnapshotStep):
     def __str__(self) -> str:
@@ -649,6 +677,11 @@ class GrapherStep(Step):
 
     def __str__(self) -> str:
         return f"grapher://{self.path}"
+
+    @property
+    def version(self) -> str:
+        # channel / namspace / version / dataset
+        return self.path.split("/")[2]
 
     @property
     def dataset(self) -> catalog.Dataset:
@@ -756,8 +789,8 @@ class GithubStep(Step):
     """
 
     path: str
-
     gh_repo: git.GithubRepo = field(repr=False)
+    version: str = "latest"
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -795,6 +828,7 @@ class ETagStep(Step):
     """
 
     path: str
+    version: str = "latest"
 
     def __init__(self, path: str) -> None:
         self.path = path

@@ -15,16 +15,17 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("papers_with_code_imagenet"))
-
+    ds_garden = cast(Dataset, paths.load_dependency("ai_wrp_2021_grouped"))
     # Read table from garden dataset.
-    tb = ds_garden["papers_with_code_imagenet"]
+    tb = ds_garden["ai_wrp_2021_grouped"]
+    tb.reset_index(inplace=True)
+
+    tb.rename(columns={"group": "country"}, inplace=True)
+    tb.set_index(["year", "country"], inplace=True)
 
     #
     # Process data.
     #
-    tb = tb.rename(columns={"name": "country"})
-    tb = tb.rename(columns={"days_since": "year"})
 
     #
     # Save outputs.

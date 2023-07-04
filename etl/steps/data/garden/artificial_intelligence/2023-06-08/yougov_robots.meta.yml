@@ -19,7 +19,7 @@ tables:
       question:
         title: Which one, if any, of the following statements do you most agree with?
       days_since_2021:
-        title: Number of Days since 2021-01-01
+        title: Number of days since 2021-01-01
         unit: days
       answers_age_18_29:
         title: 18-29 years old

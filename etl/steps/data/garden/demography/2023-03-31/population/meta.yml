@@ -12,6 +12,11 @@ dataset:
     • HYDE (v3.2): Mostly covers the period 10,000 BCE - 1799. In addition, it complements the dataset with population for some countries
     outside of this year period. E.g. it provides data for "Svalbard and Jan Mayen" (until 2017) and "Netherlands Antilles" (until 2010).
 
+    • Gapminder (v7): Mostly covers the period 1800-1949. In addition, it complements the dataset with population data for the "Vatican" until 2100 (it is missing in UN WPP's estimates).
+
+    • HYDE (v3.2): Mostly covers the period 10,000 BCE - 1799. In addition, it complements the dataset with population for
+    some countries outside of this year period. E.g. it provides data for "Svalbard and Jan Mayen" (until 2017) and "Netherlands Antilles" (until 2010).
+
     • Gapminder (Systema Globalis): Covers the period 1555-2008. It complements the dataset with former countries and other data points not present in the other sources.
   sources: &population-sources
     - name: Gapminder (2022)

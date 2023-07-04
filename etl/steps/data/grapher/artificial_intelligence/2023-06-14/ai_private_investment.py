@@ -15,18 +15,12 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("papers_with_code_atari"))
+    ds_garden = cast(Dataset, paths.load_dependency("ai_private_investment"))
 
     # Read table from garden dataset.
-    tb = ds_garden["papers_with_code_atari"]
+    tb = ds_garden["ai_private_investment"]
+    tb = tb.rename(columns={"type": "country"})
 
-    #
-    # Process data.
-    #
-    tb = tb.rename(columns={"name": "country"})
-    tb = tb.rename(columns={"days_since": "year"})
-
-    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.

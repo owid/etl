@@ -19,7 +19,7 @@ tables:
       question:
         title: How worried are you, if at all, that your type of work could be automated within your lifetime?
       days_since_2021:
-        title: Number of Days since 2021-01-01
+        title: Number of days since 2021-01-01
         unit: days
       answers_age_18_29:
         title: 18-29 years old

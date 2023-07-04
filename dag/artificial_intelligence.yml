@@ -7,32 +7,34 @@ steps:
   data://grapher/artificial_intelligence/2023-06-26/ai_wrp_2021:
   - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021
 
+  data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped:
+  - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021
+  data://grapher/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped:
+  - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped
+
   # Artificial Intelligence Papers with Code (benchmarks)
   # ImageNet
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet.html
-  data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
-    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet
-  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
-    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet
-
   # Math & Code and Language
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_math.html
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_coding.html
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_language.html
-  data://garden/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
-    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
-  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
-    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
-
   # Atari
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari:
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_atari.html
-  data://garden/artificial_intelligence/2023-06-14/papers_with_code_atari:
+  # All benchmarks combined
+  data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
     - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari
-  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_atari:
-    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_atari
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet
+  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
+  data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
+  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art
 
   # AI Index report
 
@@ -75,6 +77,13 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/ai_corporate_investment:
     - data://garden/artificial_intelligence/2023-06-14/ai_corporate_investment
 
+  # AI private investment
+  data://garden/artificial_intelligence/2023-06-14/ai_private_investment:
+    - snapshot://artificial_intelligence/2023-06-14/ai_private_investment.csv
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+  data://grapher/artificial_intelligence/2023-06-14/ai_private_investment:
+    - data://garden/artificial_intelligence/2023-06-14/ai_private_investment
+
   # AI bills passed into law
   data://garden/artificial_intelligence/2023-06-14/ai_bills:
     - snapshot://artificial_intelligence/2023-06-14/ai_bills.csv
@@ -93,8 +102,29 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/ai_github:
     - data://garden/artificial_intelligence/2023-06-14/ai_github
 
-# AI polls
-# Monmouth University Poll
+  # AI Incidents
+  data://garden/artificial_intelligence/2023-06-14/ai_incidents:
+    - snapshot://artificial_intelligence/2023-06-14/ai_incidents.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_incidents:
+    - data://garden/artificial_intelligence/2023-06-14/ai_incidents
+
+  # AI Robots
+  data://meadow/artificial_intelligence/2023-06-14/ai_robots:
+    - snapshot://artificial_intelligence/2023-06-14/ai_robots.csv
+  data://garden/artificial_intelligence/2023-06-14/ai_robots:
+    - data://meadow/artificial_intelligence/2023-06-14/ai_robots
+  data://grapher/artificial_intelligence/2023-06-14/ai_robots:
+    - data://garden/artificial_intelligence/2023-06-14/ai_robots
+
+  # AI gender representation
+  data://garden/artificial_intelligence/2023-06-14/ai_gender_representation:
+    - snapshot://artificial_intelligence/2023-06-14/ai_gender_representation.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_gender_representation:
+    - data://garden/artificial_intelligence/2023-06-14/ai_gender_representation
+
+
+  # AI polls
+  # Monmouth University Poll
   data://meadow/artificial_intelligence/2023-06-07/monmouth_poll:
   - snapshot://artificial_intelligence/2023-06-07/monmouth_poll.pdf
   data://garden/artificial_intelligence/2023-06-07/monmouth_poll:
@@ -102,7 +132,7 @@ steps:
   data://grapher/artificial_intelligence/2023-06-07/monmouth_poll:
   - data://garden/artificial_intelligence/2023-06-07/monmouth_poll
 
-# YouGov AI surveys
+  # YouGov AI surveys
   data://meadow/artificial_intelligence/2023-06-08/yougov_robots:
   - snapshot://artificial_intelligence/2023-06-08/yougov_robots.xlsx
   data://garden/artificial_intelligence/2023-06-08/yougov_robots:

@@ -1,17 +1,18 @@
 dataset:
   title: Global Corporate Investment in AI by Investment Activity, 2013–22 (AI Index,
     2023)
-  description: Data from NetBase Quid via AI Index (2023) on global corporate investment
-    in AI from 2013 to 2022. Corporate investment includes mergers and acquisitions,
-    minority stakes, private investment, and public offerings.
+  description: >
+    Data from NetBase Quid via AI Index (2023) on global corporate investment in AI from 2013 to 2022. Corporate investment includes mergers and acquisitions, minority stakes, private investment, and public offerings.
+
+
+    The AI Index is an independent initiative at the Stanford University Institute for Human-Centered Artificial Intelligence.
+    The mission of the AI Index is “to provide unbiased, rigorously vetted, and globally sourced data for policymakers, researchers, executives, journalists, and the general public to develop intuitions about the complex field of AI.”
+    Their flagship output is the annual AI Index Report, which has been published since 2017.
   licenses:
   - name: Public domain
     url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   sources:
   - name: NetBase Quid (2022) via AI Index (2023)
-    description: Data from NetBase Quid via AI Index (2023) on global corporate investment
-      in AI from 2013 to 2022. Corporate investment includes mergers and acquisitions,
-      minority stakes, private investment, and public offerings.
     url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
     source_data_url: https://drive.google.com/uc?export=download&id=1Vqc-L9XlaPgghNZGbAGpU23d9Pn5ZuHh
     date_accessed: '2023-06-19'
@@ -23,19 +24,14 @@ dataset:
 tables:
   ai_corporate_investment:
     variables:
-      fp_cpi_totl:
-        title: fp_cpi_totl
-        unit: ''
-      cpi_adj_2021:
-        title: cpi_adj_2021
-        unit: ''
       total_investment:
-        title: Total Investment
-        unit: 'U.S. Dollars'
+        title: Total investment
+        unit: 'US dollars'
         short_unit: '$'
       type:
-        title: type
+        title: Type of investment
         unit: ''
       total_corporate_investment_by_activity_inflation_adjusted:
-        title: total_corporate_investment_by_activity_inflation_adjusted
-        unit: ''
+        title: Total corporate investment - inflation adjusted
+        unit: 'US dollars'
+        short_unit: '$'

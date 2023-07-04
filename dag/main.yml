@@ -279,6 +279,7 @@ steps:
   data://meadow/wid/2023-01-27/world_inequality_database:
     - data://garden/regions/2023-01-01/regions
     - snapshot://wid/2023-01-27/world_inequality_database.csv
+    - snapshot://wid/2023-01-27/world_inequality_database_with_extrapolations.csv
   data://garden/wid/2023-01-27/world_inequality_database:
     - data://meadow/wid/2023-01-27/world_inequality_database
   data://grapher/wid/2023-01-27/world_inequality_database:
