@@ -7,6 +7,11 @@ steps:
   data://grapher/artificial_intelligence/2023-06-26/ai_wrp_2021:
   - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021
 
+  data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped:
+  - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021
+  data://grapher/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped:
+  - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped
+
   # Artificial Intelligence Papers with Code (benchmarks)
   # ImageNet
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
