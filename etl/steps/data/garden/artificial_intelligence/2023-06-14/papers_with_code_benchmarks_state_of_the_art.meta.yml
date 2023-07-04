@@ -27,7 +27,7 @@ tables:
 
           The coding tasks included in this benchmark are sourced from open-access coding websites such as Codeforces and Kattis. These tasks span a range of difficulty levels, from introductory to collegiate competition level. The benchmark evaluates the accuracy of models in solving programming tasks specifically designed for coding competitions.
         display:
-          name: Coding - competitions
+          name: Coding competitions
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -40,7 +40,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          name: Coding - interviews
+          name: Coding interviews
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -68,7 +68,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          name: Average
+          name: All knowledge tests
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -96,7 +96,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          name: Other
+          name: Other subjects
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -143,7 +143,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          name: Top-1
+          name: Top-1 accuracy
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -172,7 +172,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          name: Top-5
+          name: Top-5 accuracy
 
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
@@ -184,7 +184,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          name: Atari
+          name: Average score relative to humans (100%)
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true

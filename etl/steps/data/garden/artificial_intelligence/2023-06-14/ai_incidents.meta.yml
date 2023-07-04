@@ -31,5 +31,5 @@ tables:
   ai_incidents:
     variables:
       number_of_ai_incidents_and_controversies:
-        title: Number of AI Incidents and Controversies (2012-2021)
+        title: Number of AI incidents and controversies
         unit: ''
