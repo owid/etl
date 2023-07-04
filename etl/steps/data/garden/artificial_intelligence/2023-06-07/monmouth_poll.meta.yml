@@ -1,6 +1,6 @@
 dataset:
   title: Monmouth (“Mon-muth”) University Poll (2023)
-  description: &description-monmouth |
+  description: >
     The Monmouth University Poll was sponsored and conducted by the Monmouth
     University Polling Institute from January 26 to 30, 2023 with a probability-based
     national random sample of 805 adults age 18 and older. This includes 281 contacted
@@ -21,7 +21,6 @@ dataset:
     the findings of opinion polls.
   sources:
   - name: Monmouth University Poll
-    description: *description-monmouth
     url: https://www.monmouth.edu/polling-institute/reports/monmouthpoll_us_021523
     source_data_url: https://www.monmouth.edu/polling-institute/documents/monmouthpoll_us_021523.pdf
     date_accessed: '2023-06-07'
@@ -133,6 +132,7 @@ tables:
         short_unit: '%'
       q18:
         title: Self-driven local delivery trucks
+        description: Would be a good idea or bad idea to use machines with artificial intelligence to do this task?
         unit: '%'
         short_unit: '%'
       q19:

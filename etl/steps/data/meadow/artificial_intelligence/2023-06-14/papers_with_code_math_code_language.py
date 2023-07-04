@@ -5,7 +5,6 @@ from typing import cast
 
 import numpy as np
 import pandas as pd
-import shared
 from bs4 import BeautifulSoup
 from owid.catalog import Table
 from structlog import get_logger
@@ -44,7 +43,7 @@ def run(dest_dir: str) -> None:
 
     with open(snap_math.path, "r") as file:
         html_content = file.read()
-    df_math = shared.extract_data_papers_with_code(html_content, "math")
+    df_math = extract_math_data_papers_with_code(html_content, "math")
     df_math.drop("additional_data", axis=1, inplace=True)
 
     df_code_math = pd.merge(df_code, df_math, on=["date", "name"], how="outer")
@@ -113,7 +112,7 @@ def language_extract(html_content):
         entry_str = entry.decode("utf-8")
 
         # Extract the desired fields using regex
-        method_short_match = re.search(r'"method_short":\s*"([^"]*)"', entry_str)
+        method_short_match = re.search(r'"method":\s*"([^"]*)"', entry_str)
         average_match = re.search(r'"Average \(%\)":\s*"([^"]*)"', entry_str)
         humanities_match = re.search(r'"Humanities":\s*([^,]*)', entry_str)
         stem_match = re.search(r'"STEM":\s*([^,]*)', entry_str)
@@ -205,7 +204,7 @@ def code_extract(html_content):
         entry_str = entry.decode("utf-8")
 
         # Extract the desired fields using regex
-        method_short_match = re.search(r'"method_short":\s*"([^"]*)"', entry_str)
+        method_short_match = re.search(r'"method":\s*"([^"]*)"', entry_str)
         competition_match = re.search(r'"Competition Pass@any":\s*"([^"]*)"', entry_str)
         interview_match = re.search(r'"Interview Pass@any":\s*"([^"]*)"', entry_str)
         evaluation_date_match = re.search(r'"evaluation_date":\s*"([^"]*)"', entry_str)
@@ -240,5 +239,29 @@ def code_extract(html_content):
 
     df = df.replace('"', "", regex=True)
     df = df.replace("%", "", regex=True)
+
+    return df
+
+
+def extract_math_data_papers_with_code(html_content, metric):
+    # Define the regex pattern to match the table information
+    pattern = r'\{"x": "(.*?)", "y": (.*?), "name": "(.*?)", "nameShort": "(.*?)", "nameDetails": "(.*?)", "paperSlug": "(.*?)", "usesAdditionalData": (.*?)\}'
+
+    # Find all matches of the pattern
+    matches = re.findall(pattern, html_content)
+
+    # Process the matches
+    data = []
+    for match in matches:
+        x = match[0]
+        y = match[1]
+        name = match[2]
+        uses_additional_data = match[6]
+
+        # Append the extracted information to the data list
+        data.append({"date": x, "performance_" + metric: y, "name": name, "additional_data": uses_additional_data})
+
+    # Create the DataFrame from the data list
+    df = pd.DataFrame(data)
 
     return df
