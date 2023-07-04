@@ -58,5 +58,3 @@ steps:
   # Grapher
   data://grapher/demography/2023-07-03/population_doubling_times:
     - data://garden/demography/2023-07-03/population_doubling_times
-  data://grapher/demography/2023-07-03/population_doubling_times_pivot:
-    - data://garden/demography/2023-07-03/population_doubling_times
