@@ -186,9 +186,9 @@ def test_tables_always_list_fields_in_metadata():
 
     assert m["primary_key"] == ["country"]
     assert m["fields"] == {
-        'country': {'schema_version': 1},
-        'french_fries': {'schema_version': 1},
-        'gdp': {'schema_version': 1}
+        "country": {"schema_version": 1},
+        "french_fries": {"schema_version": 1},
+        "gdp": {"schema_version": 1},
     }
 
 
