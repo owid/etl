@@ -24,8 +24,25 @@ tables:
     variables:
       area_under_curve_score__auc:
         title: Area Under Curve Score (AUC)
-        unit: 'AUC'
-        display:
+        description: >-
+            The Area Under Curve Score (AUC), also known as the AUC-ROC (Receiver Operating Characteristic) score, is a popular evaluation metric used in machine learning and statistics to assess the performance of binary classification models.
+
+            In binary classification, we aim to predict whether an instance belongs to one class (positive) or another (negative) based on its features. The ROC curve is created by plotting the true positive rate (TPR) against the false positive rate (FPR) at various classification thresholds. The TPR is the ratio of true positives to the total number of actual positives, while the FPR is the ratio of false positives to the total number of actual negatives.
+
+            The AUC is a measure of the overall performance of the classifier across all possible classification thresholds. It represents the probability that a randomly chosen positive instance will be ranked higher than a randomly chosen negative instance according to the classifier's predicted probabilities. The AUC score ranges from 0 to 1, where a score of 1 indicates a perfect classifier, and a score of 0.5 represents a classifier with no discriminatory power (equivalent to random guessing).
+
+            Interpreting the AUC score:
+
+            AUC = 1: Perfect classifier. The model has a clear separation between the positive and negative classes, correctly ranking all instances.
+            AUC > 0.5: Better than random guessing. The model has some discriminatory power and performs better than a random classifier.
+            AUC = 0.5: Random classifier. The model performs no better than flipping a coin and has no ability to distinguish between the classes.
+            AUC < 0.5: Inverted classifier. The model performs worse than random guessing, meaning it is making incorrect predictions.
+            The AUC score is widely used because it is insensitive to class imbalance and classification thresholds. It provides a single scalar value to compare different classifiers or evaluate the performance of a single classifier. Higher AUC scores generally indicate better classifier performance in terms of the trade-off between true positives and false positives.
+
+            It's important to note that the AUC score is specific to binary classification problems and cannot be directly applied to multi-class classification tasks without modification.
+
+        unit: 'Area under curve'
+          display:
           numDecimalPlaces: 0
 
 
