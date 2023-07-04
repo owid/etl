@@ -15,11 +15,12 @@ from the main excel file.
 
 """
 
+import copy
 import re
 from typing import cast
 
 import owid.catalog.processing as pr
-from owid.catalog import Table, TableMeta
+from owid.catalog import License, Source, Table, TableMeta
 from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder, create_dataset
@@ -331,7 +332,12 @@ def parse_coal_prices(data: pr.ExcelFile, metadata: TableMeta) -> Table:
 
 
 def create_table_of_fossil_fuel_prices(
-    tb_oil_spot_crude_prices: Table, tb_oil_crude_prices: Table, tb_gas_prices: Table, tb_coal_prices: Table
+    tb_oil_spot_crude_prices: Table,
+    tb_oil_crude_prices: Table,
+    tb_gas_prices: Table,
+    tb_coal_prices: Table,
+    prices_data_source: Source,
+    prices_data_license: License,
 ) -> Table:
     # Combine additional tables of fossil fuel prices.
     tb_prices = tb_oil_spot_crude_prices.copy()
@@ -340,6 +346,13 @@ def create_table_of_fossil_fuel_prices(
         tb_prices = tb_prices.merge(tb_additional, how="outer", on=["year"]).copy_metadata(from_table=tb_prices)
     # Rename table appropriately.
     tb_prices.metadata.short_name += "_fossil_fuel_prices"
+
+    # Add sources and licenses to prices variables.
+    for column in tb_prices.columns:
+        tb_prices[column].metadata.sources = [prices_data_source]
+        tb_prices[column].metadata.licenses = [prices_data_license]
+
+    # Set an appropriate index and sort conveniently.
     tb_prices = tb_prices.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     return tb_prices
@@ -390,12 +403,23 @@ def run(dest_dir: str) -> None:
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
+    # Adapt source and license for prices data, which is based on S&P Global Platts.
+    prices_data_license = copy.deepcopy(snap.metadata.license)
+    prices_data_license.name = "© S&P Global Inc. 2023"  # type: ignore
+    prices_data_source = copy.deepcopy(snap.metadata.source)
+    prices_data_source.name = "Energy Institute Statistical Review of World Energy based on S&P Global Platts (2023)"
+    prices_data_source.published_by = (
+        "Energy Institute Statistical Review of World Energy based on S&P Global Platts (2023)"
+    )
+
     # Create combined table of fossil fuel prices.
     tb_prices = create_table_of_fossil_fuel_prices(
         tb_oil_spot_crude_prices=tb_oil_spot_crude_prices,
         tb_oil_crude_prices=tb_oil_crude_prices,
         tb_gas_prices=tb_gas_prices,
         tb_coal_prices=tb_coal_prices,
+        prices_data_source=prices_data_source,
+        prices_data_license=prices_data_license,
     )
 
     #

@@ -18,8 +18,6 @@ MTOE_TO_PJ = 41.868
 # Million tonnes of oil equivalent to terawatt-hours.
 MTOE_TO_TWH = MTOE_TO_PJ * PJ_TO_TWH
 
-# TODO: Compare BP and EI definitions of regions in their methodology document.
-
 # Columns to use from the main data file, and how to rename them.
 COLUMNS = {
     # Index columns.
@@ -242,6 +240,8 @@ REGIONS = {
 
 
 def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+    tb_regions = tb.copy()
+
     # Add region aggregates.
     for region in REGIONS:
         members = geo.list_members_of_region(
@@ -250,14 +250,17 @@ def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Data
             ds_income_groups=ds_income_groups,
             additional_members=REGIONS[region].get("additional_members"),
         )
-        tb = geo.add_region_aggregates(
-            df=tb,
+        tb_regions = geo.add_region_aggregates(
+            df=tb_regions,
             region=region,
             countries_in_region=members,
             countries_that_must_have_data=[],
             num_allowed_nans_per_year=None,
             frac_allowed_nans_per_year=0.9999,
         )
+    # Copy metadata of original table.
+    tb_regions.copy_metadata(from_table=tb)
+
     return tb
 
 
@@ -274,7 +277,6 @@ def add_columns_in_twh(tb: Table) -> Table:
 
 
 def run(dest_dir: str) -> None:
-
     #
     # Load inputs.
     #
@@ -305,9 +307,6 @@ def run(dest_dir: str) -> None:
 
     # Add region aggregates.
     tb = add_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-
-    # Copy metadata from original table.
-    tb = tb.copy_metadata(from_table=tb_meadow)
 
     # Set an appropriate index to main table and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
