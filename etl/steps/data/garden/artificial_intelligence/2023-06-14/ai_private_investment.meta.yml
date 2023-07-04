@@ -23,9 +23,6 @@ dataset:
 tables:
   ai_private_investment:
     variables:
-      geographic_area:
-        title: Geographic Area
-        unit: ''
       data_management__processing__cloud:
         title: Data Management, Processing, Cloud
         unit: ''

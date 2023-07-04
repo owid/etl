@@ -27,6 +27,7 @@ tables:
 
           The coding tasks included in this benchmark are sourced from open-access coding websites such as Codeforces and Kattis. These tasks span a range of difficulty levels, from introductory to collegiate competition level. The benchmark evaluates the accuracy of models in solving programming tasks specifically designed for coding competitions.
         display:
+          name: Coding - competitions
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -39,6 +40,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
+          name: Coding - interviews
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -52,6 +54,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
+          name: Humanities
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -65,6 +68,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
+          name: Average
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -78,6 +82,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
+          name: Math
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -91,6 +96,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
+          name: Other
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -104,6 +110,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
+          name: Social Sciences
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -117,6 +124,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
+          name: STEM
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -135,6 +143,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
+          name: Top-1
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -163,6 +172,8 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
+          name: Top-5
+
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
@@ -173,6 +184,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
+          name: Atari
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true

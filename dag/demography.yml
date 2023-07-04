@@ -58,3 +58,13 @@ steps:
   # Grapher
   data://grapher/demography/2023-07-03/population_doubling_times:
     - data://garden/demography/2023-07-03/population_doubling_times
+
+  # Population comparison
+  data://garden/demography/2023-06-27/world_population_comparison:
+    - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
+    - data://garden/demography/2023-03-31/population
+    - data://garden/hyde/2017/baseline
+    - data://garden/gapminder/2023-03-31/population
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/demography/2023-07-03/world_population_comparison:
+    - data://garden/demography/2023-06-27/world_population_comparison
