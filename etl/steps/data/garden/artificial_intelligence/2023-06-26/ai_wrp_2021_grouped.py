@@ -78,7 +78,7 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-    log.info("ai_wrp_2021_grouped..end")
+    log.info("ai_wrp_2021_grouped.end")
 
 
 # Function to melt and clean dataframe based on column name
