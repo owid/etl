@@ -62,6 +62,10 @@ class Source:
     # we're keeping both for the time being. We might consolidate them in the future
     published_by: Optional[str] = None
 
+    # This tracks if the source was created from the modern Origin class
+    # This is done to avoid duplicating information
+    is_copy_of_origin: bool = False
+
     def to_dict(self) -> Dict[str, Any]:
         ...
 

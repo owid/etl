@@ -2,9 +2,11 @@
 #  converters.py
 #
 
+import re
 import warnings
 
 from owid.catalog import DatasetMeta, License, Origin, Source, VariableMeta
+from owid.catalog.meta import YearDateLatest
 from owid.walden import Dataset as WaldenDataset
 
 from etl import grapher_model as gm
@@ -155,6 +157,15 @@ def convert_grapher_variable(g: gm.Variable, s: gm.Source) -> VariableMeta:
 
 
 def convert_origin_to_source(o: Origin) -> Source:
+    publication_year = None
+    if o.date_published == "latest":
+        publication_year = None
+    elif o.date_published is not None:
+        try:
+            publication_year = int(o.date_published.split("-")[0])
+        except ValueError:
+            pass
+
     # `dataset_title` isn't used, but it is assigned to DatasetMeta.title
     # when propagating Snapshot to meadow dataset. Same for `dataset_description`,
     # though that one is used here as `Source.description`.
@@ -165,7 +176,9 @@ def convert_origin_to_source(o: Origin) -> Source:
         source_data_url=o.dataset_url_download,
         date_accessed=str(o.date_accessed) if o.date_accessed else None,
         publication_date=o.date_published,
+        publication_year=publication_year,
         published_by=o.citation_producer,
+        is_copy_of_origin=True,
         # excluded fields
         # owid_data_url
         # publication_year
