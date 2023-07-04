@@ -1,16 +1,12 @@
 meta:
-  namespace: wid
-  short_name: world_inequality_database
-  name: World Inequality Database (WID, 2023)
-  version: 2023-01-27
+  name: World Inequality Database - With extrapolations (WID, 2023)
   publication_year: 2023
   source_name: World Inequality Database (WID.world) (2023)
   source_published_by: World Inequality Database (WID), https://wid.world
   url: https://wid.world/
   source_data_url:
-  file_extension: csv
   license_url:
-  license_name:
+  license_name: ''
   date_accessed: 2023-07-03
   is_public: true
   description: |
@@ -81,8 +77,9 @@ meta:
     Finally, income components are rescaled to SNA aggregates. Several levels of aggregation may be used depending on the quality and the precision of the data.
 
     More information is available at https://wid.world/methodology/
+
 wdir: ../../../data/snapshots/wid/2023-01-27
 outs:
-- md5: 0445f5fda104258721c5b284a6f6c86c
-  size: 10388137
-  path: world_inequality_database.csv
+- md5: e4fd89c393d093c24a317ec6e8c6a616
+  size: 15163348
+  path: world_inequality_database_with_extrapolations.csv

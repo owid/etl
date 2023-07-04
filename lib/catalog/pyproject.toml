@@ -34,6 +34,9 @@ argh = ">=0.26.2"
 isort = ">=5.10.1"
 pyright = ">=1.1.278"
 
+[tool.poetry.group.dev.dependencies]
+isort = ">=5.12.0"
+
 [tool.isort]
 profile = "black"
 

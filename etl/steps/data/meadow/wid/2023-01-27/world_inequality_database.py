@@ -16,6 +16,23 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
+def combine_extrapolated(df: pd.DataFrame, df_extrapolations: pd.DataFrame) -> pd.DataFrame:
+    """Combine extrapolated and non-extrapolated values in the dataset."""
+
+    # NOTE: I am commenting for now the code, because grapher joins the points before and after the estimated values
+    # # Get the list of columns in the dataset
+    # dataset_columns = [col for col in df.columns if col not in ["country", "year"]]
+
+    # Combine both datasets
+    df = pd.merge(df, df_extrapolations, on=["country", "year"], how="outer", suffixes=("", "_extrapolated"))
+    # # When p0p100_gini equals p0p100_gini_extrapolated, make the latter null
+    # for col in dataset_columns:
+    #     df[f"{col}_extrapolated"] = np.where(df[col] == df[f"{col}_extrapolated"], np.nan, df[f"{col}_extrapolated"])
+
+    return df
+
+
 # List of countries/regions not included in the ISO2 standard, but added by WID
 iso2_missing = {
     "CN-RU": "China - rural",
@@ -169,6 +186,36 @@ def run(dest_dir: str) -> None:
             "",
         ],
     )
+
+    # Retrieve snapshot with extrapolations
+    snap: Snapshot = paths.load_dependency("world_inequality_database_with_extrapolations.csv")
+    # Load data from snapshot.
+    # `keep_default_na` and `na_values` are included because there is a country labeled NA, Namibia, which becomes null without the parameters
+    df_extrapolations = pd.read_csv(
+        snap.path,
+        keep_default_na=False,
+        na_values=[
+            "-1.#IND",
+            "1.#QNAN",
+            "1.#IND",
+            "-1.#QNAN",
+            "#N/A N/A",
+            "#N/A",
+            "N/A",
+            "n/a",
+            "",
+            "#NA",
+            "NULL",
+            "null",
+            "NaN",
+            "-NaN",
+            "nan",
+            "-nan",
+            "",
+        ],
+    )
+
+    df = combine_extrapolated(df, df_extrapolations)
 
     #
     # Process data.
