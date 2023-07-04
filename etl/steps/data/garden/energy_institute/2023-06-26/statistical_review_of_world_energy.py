@@ -264,16 +264,26 @@ def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Data
     return tb
 
 
-def add_columns_in_twh(tb: Table) -> Table:
-    # For convenience, we convert all variables given in exajoules, petajoules, or megatonnes of oil equivalent into
-    # terawatt-hours.
+def create_additional_variables(tb: Table) -> Table:
+    tb = tb.copy()
+
     for column in tb.columns:
         if column.endswith("_ej"):
+            # Convert all variables given in exajoules into terawatt-hours.
             tb[column.replace("_ej", "_twh")] = tb[column] * EJ_TO_TWH
         if column.endswith("_pj"):
+            # Convert all variables given in petajoules into terawatt-hours.
             tb[column.replace("_pj", "_twh")] = tb[column] * PJ_TO_TWH
-        if column in ["oil_consumption_mt", "oil_production_mt"]:
+        if column in ["oil_production_mt"]:
+            # Oil consumption is given in exajoules, which is already converted to twh (previous lines).
+            # Oil production, however, is given in million tonnes, which we convert now to terawatt-hours.
             tb[column.replace("_mt", "_twh")] = tb[column] * MTOE_TO_TWH
+
+    for column in tb.columns:
+        if ("_equivalent_twh" in column) and ("primary_energy" not in column):
+            # Add direct consumption (for columns of non-fossil sources, which were given in input-equivalents).
+            # Skip primary energy, since this has a mix of both fossil and non-fossil sources.
+            tb[column.replace("_equivalent_twh", "_direct_twh")] = tb[column] * tb["efficiency_factor"]
 
     return tb
 
@@ -282,10 +292,11 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset and read its main table and the fossil fuel prices table.
+    # Load meadow dataset and read its tables.
     ds_meadow: Dataset = paths.load_dependency("statistical_review_of_world_energy")
     tb_meadow = ds_meadow["statistical_review_of_world_energy"].reset_index()
     tb_meadow_prices = ds_meadow["statistical_review_of_world_energy_fossil_fuel_prices"].reset_index()
+    tb_efficiency = ds_meadow["statistical_review_of_world_energy_efficiency_factors"].reset_index()
 
     # Load regions dataset.
     ds_regions: Dataset = paths.load_dependency("regions")
@@ -304,9 +315,11 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
-    # Add primary energy consumption in TWh.
-    # For non-fossil electricity sources, this will be given in input-equivalents.
-    tb = add_columns_in_twh(tb=tb)
+    # Add column for thermal equivalent efficiency factors.
+    tb = tb.merge(tb_efficiency, how="left", on="year").copy_metadata(from_table=tb)
+
+    # Create additional variables, like primary energy consumption in TWh (both direct and in input-equivalents).
+    tb = create_additional_variables(tb=tb)
 
     # Add region aggregates.
     tb = add_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)

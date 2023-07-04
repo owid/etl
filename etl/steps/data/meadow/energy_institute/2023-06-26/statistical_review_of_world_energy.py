@@ -20,7 +20,7 @@ import re
 from typing import cast
 
 import owid.catalog.processing as pr
-from owid.catalog import License, Source, Table, TableMeta
+from owid.catalog import License, Source, Table, TableMeta, VariableMeta
 from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder, create_dataset
@@ -358,6 +358,71 @@ def create_table_of_fossil_fuel_prices(
     return tb_prices
 
 
+def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, metadata: TableMeta) -> Table:
+    sheet_name = "Approximate conversion factors"
+    # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
+    tb = data.parse(sheet_name, skiprows=1, metadata=metadata, na_values=["-"])
+
+    # In the "Approximate conversion factors" sheet, there is a table, called
+    # "Thermal equivalent efficiency factors used to convert non-fossil electricity to primary energy."
+    # Find the row where that table starts.
+    table_start_row = tb[tb.iloc[:, 0].astype(str).str.startswith("Year")].index
+
+    assert (
+        len(table_start_row) == 1
+    ), "Table of thermal equivalent efficiency factors not found, format may have changed."
+
+    # Select relevant rows and drop empty columns.
+    tb = tb.iloc[table_start_row[0] :].dropna(axis=1, how="all").reset_index(drop=True)
+
+    # Use the first row to name columns, and clean column names.
+    tb.columns = [column.replace("*", "").strip() for column in tb.iloc[0].values]
+    tb = tb.drop(0).reset_index(drop=True)
+
+    # Attempt to get the efficiency of the range of years 1965 - 2000 from the last row.
+    older_efficiency_value = tb.iloc[-1].dropna().values[0]
+    year_start, year_end, efficiency_factor = re.findall(r"(\d{4}).*(\d{4}).*([\d\.]{4})%.*", older_efficiency_value)[0]
+
+    # Create a table of old efficiencies.
+    years = list(range(int(year_start), int(year_end) + 1))
+    older_efficiency = Table({"year": years, "efficiency_factor": [float(efficiency_factor) * 0.01] * len(years)})
+
+    # Drop the final row, that includes the efficiency of older years.
+    tb = tb.drop(tb.iloc[-1].name).reset_index(drop=True)
+
+    # The data is given in two columns, extract both and put together into one column.
+    efficiency = tb[["Year"]].melt()[["value"]].rename(columns={"value": "year"})
+    efficiency["efficiency_factor"] = tb[["Efficiency Factor"]].melt()["value"]
+
+    # Concatenate older and curren values of efficiency.
+    efficiency = pr.concat([older_efficiency, efficiency], ignore_index=True)
+
+    # Sanity checks.
+    assert efficiency["year"].diff().dropna().unique().tolist() == [
+        1
+    ], "Year columns for efficiency factors was not well extracted."
+    assert (
+        efficiency["efficiency_factor"].diff().dropna() >= 0
+    ).all(), "Efficiency is expected to be monotonically increasing."
+    assert (efficiency["efficiency_factor"] > 0.35).all() & (
+        efficiency["efficiency_factor"] < 0.5
+    ).all(), "Efficiency out of expected range."
+
+    # Set an appropriate index and sort conveniently.
+    efficiency = efficiency.set_index(["year"], verify_integrity=True).sort_index()
+
+    # Prepare table and variable metadata.
+    efficiency.metadata.short_name = "statistical_review_of_world_energy_efficiency_factors"
+    efficiency["efficiency_factor"].metadata = VariableMeta(
+        title="Thermal equivalent efficiency factors",
+        description="Thermal equivalent efficiency factors used to convert non-fossil electricity to primary energy.",
+        sources=metadata.dataset.sources,
+        licenses=metadata.dataset.licenses,
+    )
+
+    return efficiency
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -396,6 +461,11 @@ def run(dest_dir: str) -> None:
     # Parse coal prices.
     tb_coal_prices = parse_coal_prices(data=data_additional, metadata=snap_additional.to_table_metadata())
 
+    # Parse thermal equivalent efficiency factors.
+    tb_efficiency_factors = parse_thermal_equivalent_efficiency(
+        data=data_additional, metadata=snap_additional.to_table_metadata()
+    )
+
     # Combine main table and coal, gas, and oil reserves.
     for tb_reserves in [tb_coal_reserves, tb_gas_reserves, tb_oil_reserves]:
         tb = tb.merge(tb_reserves, how="outer", on=["country", "year"]).copy_metadata(from_table=tb)
@@ -426,5 +496,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb, tb_prices], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb, tb_prices, tb_efficiency_factors], default_metadata=snap.metadata)
     ds_meadow.save()

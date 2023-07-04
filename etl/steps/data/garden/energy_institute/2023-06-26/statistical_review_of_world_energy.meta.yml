@@ -79,6 +79,12 @@ tables:
         short_unit: 'TWh'
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      other_renewables_consumption_direct_twh:  # Added by OWID.
+        title: 'Geo Biomass Other (direct) - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply.
       other_renewables_electricity_generation_twh:
         title: 'Geo Biomass Other Electricity Generation - TWh'
         unit: 'Terawatt-hours'
@@ -223,6 +229,12 @@ tables:
         short_unit: 'TWh'
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      hydro_consumption_direct_twh:  # Added by OWID.
+        title: 'Hydro Consumption (direct) - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply.
       hydro_electricity_generation_twh:
         title: 'Hydro Generation - TWh'
         unit: 'Terawatt-hours'
@@ -255,6 +267,12 @@ tables:
         short_unit: 'TWh'
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      nuclear_consumption_direct_twh:  # Added by OWID.
+        title: 'Nuclear Consumption (direct) - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply.
       nuclear_electricity_generation_twh:
         title: 'Nuclear Generation - TWh'
         unit: 'Terawatt-hours'
@@ -399,6 +417,12 @@ tables:
         short_unit: 'TWh'
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      solar_consumption_direct_twh:  # Added by OWID.
+        title: 'Solar Consumption (direct) - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply.
       solar_electricity_generation_twh:
         title: 'Solar Generation - TWh'
         unit: 'Terawatt-hours'
@@ -417,6 +441,12 @@ tables:
         short_unit: 'TWh'
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
+      wind_consumption_direct_twh:  # Added by OWID.
+        title: 'Wind Consumption (direct) - TWh'
+        unit: 'Terawatt-hours'
+        short_unit: 'TWh'
+        description: |
+          Figures are based on gross generation and do not account for cross-border electricity supply.
       wind_electricity_generation_twh:
         title: 'Wind Generation - TWh'
         unit: 'Terawatt-hours'
@@ -441,6 +471,12 @@ tables:
         short_unit: 'MT'
         description: |
           Total proved reserves of coal are generally taken to be those quantities that geological and engineering information indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and operating conditions. The data series for total proved coal reserves does not necessarily meet the definitions, guidelines and practices used for determining proved reserves at company level, for instance as published by the US Securities and Exchange Commission, nor does it necessarily represent BP's view of proved reserves by country. Reserves-to-production (R/P) ratio: If the reserves remaining at the end of any year are divided by the production in that year, the result is the length of time that those remaining reserves would last if production were to continue at that rate.
+      efficiency_factor:
+        title: Thermal equivalent efficiency factors
+        unit: ''
+        short_unit: ''
+        description: |
+          Thermal equivalent efficiency factors used to convert non-fossil electricity in input-equivalent to direct primary energy.
   statistical_review_of_world_energy_fossil_fuel_prices:
     variables:
       gas_price_us_henry_hub:
