@@ -14,9 +14,10 @@ meta:
   date_accessed: 2023-06-28
   is_public: true
   description: |
+    The Energy Institute Statistical Review of World Energy analyses data on world energy markets from the prior year. Previously produced by BP, the Review has been providing timely, comprehensive and objective data to the energy community since 1952.
 
 wdir: ../../../data/snapshots/energy_institute/2023-06-26
 outs:
-- md5: 9a8ed1ad5cfeda55fc9a0e4483c2bd18
-  size: 2137750
+- md5: 9c309c8a3e003e18a615124753c0d50c
+  size: 2113482
   path: statistical_review_of_world_energy.xlsx
