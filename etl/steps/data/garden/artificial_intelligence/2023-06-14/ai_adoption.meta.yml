@@ -29,5 +29,12 @@ tables:
     variables:
       pct_of_respondents:
         title: 'Organizations reporting having adopted AI'
+        description: >
+          This indicator represents the share of respondents who reported that their organizations have adopted AI in at least one function, with a breakdown by region. The regional groupings, as defined by McKinsey & Company, classify countries into specific categories. The "Developing Markets" grouping includes countries such as India, Latin America, and the Middle East and North Africa (MENA). The "Greater China" grouping includes Hong Kong and Taiwan.
         unit: '%'
         short_unit: '%'
+        display:
+          name: "AI adoption"
+          numDecimalPlaces: 0
+
+

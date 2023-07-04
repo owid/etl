@@ -104,6 +104,11 @@ def run(dest_dir: str) -> None:
     # Merge all benchmark dataframes
     all_benchmarks = pd.merge(merged_df_math_code_lang, merged_df_imagenet, on=["name", "days_since"], how="outer")
     all_benchmarks = pd.merge(all_benchmarks, new_df_atari, on=["name", "days_since"], how="outer")
+
+    columns_to_replace = [col for col in all_benchmarks.columns if "_improved" in col]
+    all_benchmarks[columns_to_replace] = all_benchmarks[columns_to_replace].fillna("Not applicable")
+    all_benchmarks[columns_to_replace] = all_benchmarks[columns_to_replace].astype(str)
+
     all_benchmarks.set_index(["days_since", "name"], inplace=True)
     tb = Table(all_benchmarks, short_name=paths.short_name)
 
