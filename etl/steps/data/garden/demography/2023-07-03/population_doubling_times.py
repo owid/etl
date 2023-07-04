@@ -53,7 +53,9 @@ def run(dest_dir: str) -> None:
 
     # Estimate number of years passed since population was half
     def _get_year_half_population(population: int, tb: Table):
-        year = tb.loc[(tb["population"] <= population) & (tb["population"] <= population / 2), "year"].max()
+        tb_ = tb.loc[(tb["population"] <= population)]
+        idx = (tb_["population"] - population / 2).abs().argmin()
+        year = tb_.iloc[idx]["year"]
         return year
 
     log.info("population_doubling_times: estimate years since half population")
