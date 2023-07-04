@@ -98,7 +98,7 @@ def imagenet_html_extract(html_content):
         entry_str = entry.decode("utf-8")
 
         # Extract the desired fields using regex
-        method_short_match = re.search(r'"method_short":\s*"([^"]*)"', entry_str)
+        method_short_match = re.search(r'"method":\s*"([^"]*)"', entry_str)
         top_1_accuracy_match = re.search(r'"Top 1 Accuracy":\s*"([^"]*)"', entry_str)
         top_5_accuracy_match = re.search(r'"Top 5 Accuracy":\s*"([^"]*)"', entry_str)
         uses_additional_data_match = re.search(r'"uses_additional_data":\s*(true|false)', entry_str)
@@ -116,13 +116,7 @@ def imagenet_html_extract(html_content):
     # Convert the table data to a DataFrame
     df = pd.DataFrame(
         table_data,
-        columns=[
-            "name",
-            "papers_with_code_imagenet_top1",
-            "papers_with_code_imagenet_top5",
-            "training_data",
-            "date",
-        ],
+        columns=["name", "papers_with_code_imagenet_top1", "papers_with_code_imagenet_top5", "training_data", "date"],
     )
     df = df.replace("%", "", regex=True)
     df["training_data"] = df["training_data"].replace("false", "Without extra data")

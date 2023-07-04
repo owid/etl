@@ -10,7 +10,7 @@ var_dict = {
     "avg": {
         "title": "Average",
         "description": "This is the mean income or wealth within the {pct_dict[pct]['decile10_extra'].lower()}.",
-        "unit": "international-$ in 2021 prices",
+        "unit": "international-$ in 2022 prices",
         "short_unit": "$",
         "numDecimalPlaces": 2,
     },
@@ -31,7 +31,7 @@ var_dict = {
     "thr": {
         "title": "Threshold",
         "description": "This is the level of income or wealth per year below which {str(pct_dict[pct]['thr_number'])}% of the population falls.",
-        "unit": "international-$ in 2021 prices",
+        "unit": "international-$ in 2022 prices",
         "short_unit": "$",
         "numDecimalPlaces": 2,
     },
@@ -45,14 +45,14 @@ var_dict = {
     "p0p100_avg": {
         "title": "Mean",
         "description": "Mean income or wealth.",
-        "unit": "international-$ in 2021 prices",
+        "unit": "international-$ in 2022 prices",
         "short_unit": "$",
         "numDecimalPlaces": 2,
     },
     "median": {
         "title": "Median",
         "description": "Median income or wealth.",
-        "unit": "international-$ in 2021 prices",
+        "unit": "international-$ in 2022 prices",
         "short_unit": "$",
         "numDecimalPlaces": 2,
     },
@@ -198,6 +198,9 @@ pct_dict = {
     },
 }
 
+# Details for extrapolations or estimations
+extrapolation_dict = {"": "Estimated", "_extrapolated": "Extrapolated"}
+
 
 def add_metadata_vars(tb_garden: Table) -> Table:
 
@@ -206,46 +209,47 @@ def add_metadata_vars(tb_garden: Table) -> Table:
 
     for var in var_dict:
         for wel in inc_cons_dict:
+            for ext in extrapolation_dict:
 
-            # For variables that use income variable
-            col_name = f"{var}_{wel}"
-
-            if col_name in cols:
-
-                # Create metadata for these variables
-                tb_garden[col_name].metadata = var_metadata_income(var, wel)
-
-            for pct in pct_dict:
-
-                # For variables that use income variable and percentiles (deciles)
-                col_name = f"{pct}_{var}_{wel}"
+                # For variables that use income variable
+                col_name = f"{var}_{wel}{ext}"
 
                 if col_name in cols:
 
                     # Create metadata for these variables
-                    tb_garden[col_name].metadata = var_metadata_income_percentiles(var, wel, pct)
+                    tb_garden[col_name].metadata = var_metadata_income(var, wel, ext)
 
-                    # Replace values in description according to `pct`, depending on `var`
-                    if var == "thr":
+                for pct in pct_dict:
 
-                        tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
-                            "{str(pct_dict[pct]['thr_number'])}", str(pct_dict[pct]["thr_number"])
-                        )
+                    # For variables that use income variable and percentiles (deciles)
+                    col_name = f"{pct}_{var}_{wel}{ext}"
 
-                    else:
+                    if col_name in cols:
 
-                        tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
-                            "{pct_dict[pct]['decile10_extra'].lower()}",
-                            pct_dict[pct]["decile10_extra"].lower(),
-                        )
+                        # Create metadata for these variables
+                        tb_garden[col_name].metadata = var_metadata_income_percentiles(var, wel, pct, ext)
+
+                        # Replace values in description according to `pct`, depending on `var`
+                        if var == "thr":
+
+                            tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                                "{str(pct_dict[pct]['thr_number'])}", str(pct_dict[pct]["thr_number"])
+                            )
+
+                        else:
+
+                            tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                                "{pct_dict[pct]['decile10_extra'].lower()}",
+                                pct_dict[pct]["decile10_extra"].lower(),
+                            )
 
     return tb_garden
 
 
 # Metadata functions to show a clearer main code
-def var_metadata_income(var, wel) -> VariableMeta:
+def var_metadata_income(var, wel, ext) -> VariableMeta:
     meta = VariableMeta(
-        title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']})",
+        title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
         description=f"{var_dict[var]['description']}\n\n{inc_cons_dict[wel]['description']}",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
@@ -257,11 +261,11 @@ def var_metadata_income(var, wel) -> VariableMeta:
     return meta
 
 
-def var_metadata_income_percentiles(var, wel, pct) -> VariableMeta:
+def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
     if var == "thr":
 
         meta = VariableMeta(
-            title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']})",
+            title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
             description=f"{var_dict[var]['description']}\n\n{inc_cons_dict[wel]['description']}",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
@@ -273,7 +277,7 @@ def var_metadata_income_percentiles(var, wel, pct) -> VariableMeta:
 
     else:
         meta = VariableMeta(
-            title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']})",
+            title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
             description=f"{var_dict[var]['description']}\n\n{inc_cons_dict[wel]['description']}",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
