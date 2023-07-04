@@ -1,15 +1,21 @@
 dataset:
   title: AI Adoption by Organizations in the World, 2021 Vs. 2022 (AI Index, 2023)
-  description: &desc |
-    Data from McKinsey & Company Survey via AI Index (2023) on AI adoption
-    by organisations in Developing Markets (incl. India, Latin America, MENA), Greater
-    China (incl. Hong Kong, Taiwan), North America, Europe and Asia-PaciǇc.
+  description: >
+    Data from McKinsey & Company survey via AI Index (2023) on AI adoption by organisations in Developing Markets (incl. India, Latin America, MENA), Greater China (incl. Hong Kong, Taiwan), North America, Europe and Asia-PaciǇc.
+
+
+    The online survey was in the field from May 3 to May 27, 2022, and from August 15 to August 17, 2022, and garnered responses from 1,492 participants representing the full range of regions, industries, company sizes, functional specialties, and tenures. Of those respondents, 744 said their organizations had adopted AI in at least one function and were asked questions about their organizations’ AI use. To adjust for differences in response rates, the data are weighted by the contribution of each respondent’s nation to global GDP.
+
+
+    The AI Index is an independent initiative at the Stanford University Institute for Human-Centered Artificial Intelligence.
+    The mission of the AI Index is “to provide unbiased, rigorously vetted, and globally sourced data for policymakers, researchers, executives, journalists, and the general public to develop intuitions about the complex field of AI.”
+    Their flagship output is the annual AI Index Report, which has been published since 2017.
+
   licenses:
   - name: Public domain
     url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   sources:
   - name: McKinsey & Company Survey (2022) via AI Index (2023)
-    description: *desc
     url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
     source_data_url: https://drive.google.com/uc?export=download&id=1dqEzwMBXVol7bt_ScuLdMpJ4GhGGuR7e
     date_accessed: '2023-06-19'
@@ -22,5 +28,6 @@ tables:
   ai_adoption:
     variables:
       pct_of_respondents:
-        title: '% of Respondents'
-        unit: ''
+        title: 'Organizations reporting having adopted AI'
+        unit: '%'
+        short_unit: '%'

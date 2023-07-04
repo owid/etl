@@ -83,7 +83,31 @@ def run(dest_dir: str) -> None:
     # Merge the two combined DataFrames on common columns
     df_merge = pd.merge(df_q9_c, df_q8_c, on=columns_to_split_by + ["year"], how="outer")
 
-    tb = Table(df_merge, short_name="ai_wrp_2021", underscore=True)
+    # Now split categories (gender, income etc) into separate columns
+    # Copy df without categories (gender, income etc)
+    df_without_categories = (
+        df_merge[["country", "year", "yes_no_ratio", "help_harm_ratio"]].dropna(subset=["country"]).copy()
+    )
+    # Select rows with categories (NaN country rows)
+    world_df = df_merge[df_merge["country"].isna()].copy()
+    world_df.reset_index(drop=True, inplace=True)
+
+    # Set country as World
+    world_df["country"] = world_df["country"].astype(str)
+    world_df.loc[world_df["country"] == "nan", "country"] = "World"
+    # Calculates the percentage of valid responses for a help-harm ratio column in a DataFrame, split by gender, income etc.
+    conc_df_help_harm = pivot_by_category(world_df, "help_harm_ratio")
+
+    # Calculates the percentage of valid responses for a yes-no ratio column in a DataFrame, split by gender, income etc.
+    conc_df_yes_no = pivot_by_category(world_df, "yes_no_ratio")
+
+    # Merge  all dataframes into one
+    merge_categorized = pd.merge(conc_df_yes_no, conc_df_help_harm, on=["year", "country"], how="outer")
+    merge_rest = pd.merge(df_without_categories, merge_categorized, on=["year", "country"], how="outer")
+    merge_rest.set_index(["year", "country"], inplace=True)
+
+    tb = Table(merge_rest, short_name=paths.short_name, underscore=True)
+
     #
     # Save outputs.
     #
@@ -227,3 +251,35 @@ def map_values(df):
     df["globalregion"] = df["globalregion"].map(region)
 
     return df
+
+
+def pivot_by_category(df, question):
+    """
+    Pivot the input DataFrame by categories and a specific question.
+
+    Parameters:
+        df (DataFrame): Input DataFrame to pivot.
+        question (str): The specific question to pivot on.
+
+    Returns:
+        DataFrame: Concatenated pivot tables with suffixed column names.
+
+    """
+    # Create an empty list to store the pivot tables
+    pivot_tables = []
+    cols_pivot = ["gender", "education", "income_5", "emp_2010", "agegroups4", "globalregion"]
+
+    # Iterate over each pivot column
+    for pivot_col in cols_pivot:
+        # Pivot the dataframe for the current pivot column
+        pivoted_df = pd.pivot_table(df, values=question, index=["country", "year"], columns=pivot_col)
+        # Append the pivot table to the list
+        pivot_tables.append(pivoted_df)
+
+    # Concatenate all the pivot tables along the columns
+    conc_df = pd.concat(pivot_tables, axis=1)
+
+    # Add suffix to column names
+    conc_df = conc_df.add_suffix("_" + question)
+
+    return conc_df
