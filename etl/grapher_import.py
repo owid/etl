@@ -227,7 +227,7 @@ def upsert_table(
     with Session(engine) as session:
         # For easy retrieveal of the value series we store the name
         column_name = table.columns[0]
-        variable_meta = table[column_name].metadata
+        variable_meta: catalog.VariableMeta = table[column_name].metadata
 
         years = table.index.unique(level="year").values
         if len(years) == 0:
@@ -247,7 +247,7 @@ def upsert_table(
             session.commit()
 
         db_variable = gm.Variable.from_variable_metadata(
-            table[column_name].metadata,
+            variable_meta,
             short_name=column_name,
             timespan=timespan,
             dataset_id=dataset_upsert_result.dataset_id,
@@ -267,7 +267,7 @@ def upsert_table(
         df = add_entity_code_and_name(engine, df)
 
         # delete all previous relationships
-        session.query(gm.OriginsVariablesLink).filter(gm.OriginsVariablesLink.variableId == db_variable.id).delete()
+        db_variable.delete_links(session)
 
         # TODO: is this necessary?
         session.add(db_variable)
@@ -276,9 +276,9 @@ def upsert_table(
         # have to if we used ORM instead
         session.commit()
 
-        # establish relationships between variables and origins, we need to do it after we commit deleted relationships above
-        session.add_all(
-            [gm.OriginsVariablesLink(originId=db_origin.id, variableId=db_variable.id) for db_origin in db_origins]
+        # create links, we need to do it after we commit deleted relationships above
+        db_variable.create_links(
+            session, db_origins, faqs=variable_meta.presentation.faqs if variable_meta.presentation else []
         )
         session.commit()
 

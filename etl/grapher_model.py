@@ -24,7 +24,14 @@ from sqlalchemy import (
     Table,
     text,
 )
-from sqlalchemy.dialects.mysql import LONGBLOB, LONGTEXT, MEDIUMTEXT, TINYINT, VARCHAR
+from sqlalchemy.dialects.mysql import (
+    ENUM,
+    LONGBLOB,
+    LONGTEXT,
+    MEDIUMTEXT,
+    TINYINT,
+    VARCHAR,
+)
 from sqlalchemy.future import Engine as _FutureEngine
 from sqlmodel import JSON as _JSON
 from sqlmodel import (
@@ -703,11 +710,46 @@ class Dimensions(TypedDict):
     filters: List[DimensionFilter]
 
 
+class PostsGdocs(SQLModel, table=True):
+    __tablename__ = "posts_gdocs"  # type: ignore
+
+    id: Optional[str] = Field(default=None, sa_column=Column("id", VARCHAR(255), primary_key=True))
+    slug: str = Field(sa_column=Column("slug", VARCHAR(255), nullable=False))
+    content: dict = Field(sa_column=Column("content", JSON, nullable=False))
+    published: int = Field(sa_column=Column("published", TINYINT, nullable=False))
+    createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
+    publicationContext: str = Field(
+        sa_column=Column(
+            "publicationContext", ENUM("unlisted", "listed"), nullable=False, server_default=text("'unlisted'")
+        )
+    )
+    publishedAt: Optional[datetime] = Field(default=None, sa_column=Column("publishedAt", DateTime))
+    updatedAt: Optional[datetime] = Field(default=None, sa_column=Column("updatedAt", DateTime))
+    revisionId: Optional[str] = Field(default=None, sa_column=Column("revisionId", VARCHAR(255)))
+
+
 class OriginsVariablesLink(SQLModel, table=True):
     __tablename__: str = "origins_variables"  # type: ignore
 
     originId: Optional[int] = Field(default=None, foreign_key="origins.id", primary_key=True)
     variableId: Optional[int] = Field(default=None, foreign_key="variables.id", primary_key=True)
+
+
+class PostsGdocsVariablesLink(SQLModel, table=True):
+    __tablename__ = "posts_gdocs_variables"  # type: ignore
+    __table_args__ = (
+        ForeignKeyConstraint(["gdocId"], ["posts_gdocs.id"], name="posts_gdocs_variables_ibfk_1"),
+        ForeignKeyConstraint(["variableId"], ["variables.id"], name="posts_gdocs_variables_ibfk_2"),
+        Index("variableId", "variableId"),
+    )
+
+    gdocId: Optional[str] = Field(
+        default=None, sa_column=Column("gdocId", VARCHAR(255), primary_key=True, nullable=False)
+    )
+    variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
+    fragmentId: Optional[str] = Field(
+        default=None, sa_column=Column("fragmentId", String(255), primary_key=True, nullable=False)
+    )
 
 
 class Variable(SQLModel, table=True):
@@ -772,15 +814,28 @@ class Variable(SQLModel, table=True):
     metadataPath: Optional[str] = Field(default=None, sa_column=Column("metadataPath", LONGTEXT))
     dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=True))
 
-    schemaVersion: Optional[int] = Field(default=None)
+    schemaVersion: Optional[int] = Field(default=None, sa_column=Column("schemaVersion", Integer))
+    # processingLevel: Optional[str] = Field(
+    #     default=None, sa_column=Column("processingLevel", ENUM("minor", "medium", "major"))
+    # )
     processingLevel: Optional[Optional[Annotated[str, catalog.meta.OWID_PROCESSING_LEVELS]]] = Field(default=None)
-    presentation: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("presentation", JSON))
+    processingLog: Optional[dict] = Field(default=None, sa_column=Column("processingLog", JSON))
+    titlePublic: Optional[str] = Field(default=None, sa_column=Column("titlePublic", LONGTEXT))
+    titleVariant: Optional[str] = Field(default=None, sa_column=Column("titleVariant", LONGTEXT))
+    producerShort: Optional[str] = Field(default=None, sa_column=Column("producerShort", LONGTEXT))
+    citationInline: Optional[str] = Field(default=None, sa_column=Column("citationInline", LONGTEXT))
+    descriptionShort: Optional[str] = Field(default=None, sa_column=Column("descriptionShort", LONGTEXT))
+    descriptionFromProducer: Optional[str] = Field(default=None, sa_column=Column("descriptionFromProducer", LONGTEXT))
+    keyInfoText: Optional[str] = Field(default=None, sa_column=Column("keyInfoText", LONGTEXT))
+    processingInfo: Optional[str] = Field(default=None, sa_column=Column("processingInfo", LONGTEXT))
+    licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="variables")
     data_values: List["DataValues"] = Relationship(back_populates="variables")
     origins: List["Origin"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
+    posts_gdocs: List["PostsGdocs"] = Relationship(back_populates="posts_gdocs", link_model=PostsGdocsVariablesLink)
 
     def upsert(self, session: Session) -> "Variable":
         assert self.shortName
@@ -826,7 +881,16 @@ class Variable(SQLModel, table=True):
             ds.dimensions = self.dimensions
             ds.schemaVersion = self.schemaVersion
             ds.processingLevel = self.processingLevel
-            ds.presentation = self.presentation
+            ds.processingLog = self.processingLog
+            ds.titlePublic = self.titlePublic
+            ds.titleVariant = self.titleVariant
+            ds.producerShort = self.producerShort
+            ds.citationInline = self.citationInline
+            ds.descriptionShort = self.descriptionShort
+            ds.descriptionFromProducer = self.descriptionFromProducer
+            ds.keyInfoText = self.keyInfoText
+            ds.processingInfo = self.processingInfo
+            ds.licenses = self.licenses
             ds.updatedAt = datetime.utcnow()
             # do not update these fields unless they're specified
             if self.columnOrder is not None:
@@ -866,7 +930,16 @@ class Variable(SQLModel, table=True):
             # convert all fields from snake_case to camelCase
             presentation_dict = humps.camelize(presentation_dict)
         else:
-            presentation_dict = None
+            presentation_dict = {}
+
+        # TODO: implement `topicTagsLinks`
+        presentation_dict.pop("topicTagsLinks", None)
+
+        if "keyInfoText" in presentation_dict:
+            # join list of bullet points to make a text from it
+            presentation_dict["keyInfoText"] = "\n".join(
+                presentation_dict["keyInfoText"]
+            )
 
         return cls(
             shortName=short_name,
@@ -883,7 +956,8 @@ class Variable(SQLModel, table=True):
             dimensions=dimensions,
             schemaVersion=metadata.schema_version,
             processingLevel=metadata.processing_level,
-            presentation=presentation_dict,
+            licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
+            **presentation_dict,
         )
 
     @classmethod
@@ -893,6 +967,33 @@ class Variable(SQLModel, table=True):
     @classmethod
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
         return session.exec(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
+
+    def delete_links(self, session: Session):
+        """
+        Deletes all previous relationships with origins and gdoc posts for this variable.
+        """
+        session.query(OriginsVariablesLink).filter(OriginsVariablesLink.variableId == self.id).delete()
+        session.query(PostsGdocsVariablesLink).filter(PostsGdocsVariablesLink.variableId == self.id).delete()
+
+    def create_links(self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink]):
+        """
+        Establishes relationships between the current variable and a list of origins and a list of posts.
+        """
+        assert self.id
+
+        # establish relationships between variables and origins
+        if db_origins:
+            session.add_all(
+                [OriginsVariablesLink(originId=db_origin.id, variableId=self.id) for db_origin in db_origins]
+            )
+        # establish relationships between variables and posts
+        if faqs:
+            session.add_all(
+                [
+                    PostsGdocsVariablesLink(gdocId=faq.gdoc_id, variableId=self.id, fragmentId=faq.fragment_id)
+                    for faq in faqs
+                ]
+            )
 
     def s3_data_path(self) -> str:
         """Path to S3 with data in JSON format for Grapher. Typically
