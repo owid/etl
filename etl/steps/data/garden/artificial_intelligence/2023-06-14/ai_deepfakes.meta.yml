@@ -24,7 +24,7 @@ tables:
     variables:
       area_under_curve_score__auc:
         title: Area Under Curve Score (AUC)
-        description: >-
+        description: >
             The Area Under Curve Score (AUC), also known as the AUC-ROC (Receiver Operating Characteristic) score, is a popular evaluation metric used in machine learning and statistics to assess the performance of binary classification models.
 
             In binary classification, we aim to predict whether an instance belongs to one class (positive) or another (negative) based on its features. The ROC curve is created by plotting the true positive rate (TPR) against the false positive rate (FPR) at various classification thresholds. The TPR is the ratio of true positives to the total number of actual positives, while the FPR is the ratio of false positives to the total number of actual negatives.
@@ -42,7 +42,7 @@ tables:
             It's important to note that the AUC score is specific to binary classification problems and cannot be directly applied to multi-class classification tasks without modification.
 
         unit: 'Area under curve'
-          display:
+        display:
           numDecimalPlaces: 0
 
 
