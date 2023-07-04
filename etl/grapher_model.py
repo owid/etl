@@ -937,9 +937,7 @@ class Variable(SQLModel, table=True):
 
         if "keyInfoText" in presentation_dict:
             # join list of bullet points to make a text from it
-            presentation_dict["keyInfoText"] = "\n".join(
-                presentation_dict["keyInfoText"]
-            )
+            presentation_dict["keyInfoText"] = "\n".join(presentation_dict["keyInfoText"])
 
         return cls(
             shortName=short_name,
