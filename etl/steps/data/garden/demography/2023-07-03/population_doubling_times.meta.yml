@@ -1,15 +1,3 @@
-# (Inherited from meadow, remove if not different.)
-all_sources:
-  - source_testing: &source-testing
-      name: # Example: Testing Short Citation
-      published_by: # (if different to short citation). Example: Testing Full Citation
-      url: # Example: https://url_of_testing_source.com/
-      date_accessed: # Example: 2023-01-01
-      publication_date: # Example: 2023-01-01
-      publication_year: # (if publication_date is not given). Example: 2023
-      # description: Source description.
-
-# (Inherited from meadow, remove if not different.)
 dataset:
   title: Population doubling times (various sources, 2023.1)
   description: >-
@@ -34,13 +22,3 @@ tables:
         unit: people
         description:
           Population of a country or region for a given year. It is measured in 10^8 precision. That means that, e.g. 521,000,000 gets rounded to 500,000,000.
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description: Full description of testing variable.
-      #   sources:
-      #     - *source-testing
-      #   display:
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
