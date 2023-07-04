@@ -80,7 +80,7 @@ tables:
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
       other_renewables_electricity_generation_twh:
-        title: 'Geo Biomass Other - TWh'
+        title: 'Geo Biomass Other Electricity Generation - TWh'
         unit: 'Terawatt-hours'
         short_unit: 'TWh'
         description: |
@@ -88,7 +88,7 @@ tables:
       total_co2_emissions_mtco2:
         title: 'Carbon Dioxide Emissions'
         unit: 'Million tonnes of carbon dioxide'
-        short_unit: ''
+        short_unit: 'Mt'
         description: |
           Figure only reflect carbon emissions through consumption of oil, gas and coal for combustion-related activities, and are based on "Default CO2 Emissions Factors for Combustion" listed by the IPCC in its Guidelines for National Greenhouse Gas Inventories (2006). This does not allow for any carbon that is sequestered, for other sources of carbon emissions, or for emissions of other greenhouse gases. Our data is therefore not comparable to official national emissions data.
       coal_consumption_ej:
@@ -336,7 +336,7 @@ tables:
       # primary_energy_consumption_ej_pc:
       #   title: 'Primary Energy - Cons capita'
       #   unit: 'Gigajoules per capita'
-      #   short_unit: ''
+      #   short_unit: 'GJ'
       #   description: |
       #     Primary energy comprises commercially-traded fuels, including modern renewables used to generate electricity. Energy from all sources of non-fossil power generation is accounted for on an input-equivalent basis.
       # rareearths_kt:
@@ -444,86 +444,86 @@ tables:
   statistical_review_of_world_energy_fossil_fuel_prices:
     variables:
       gas_price_us_henry_hub:
-        title: Gas - Prices - US Henry Hub
+        title: Gas price - US Henry Hub
         unit: 'US dollars per million BTU'
         short_unit: 'US$'
       gas_price_netherlands_ttf_index:
-        title: Gas - Prices - Netherlands TTF index (DA ICIS - Heren TTF index)
+        title: Gas price - Netherlands TTF index (DA ICIS Heren TTF index)
         unit: 'US dollars per million BTU'
         short_unit: 'US$'
       coal_price_us_central_appalachian_spot_price_index:
-        title: 'Coal - Prices - US Central Appalachian spot price index'
+        title: Coal price - US Central Appalachian coal spot price index
         unit: 'US dollars per tonne'
-        short_unit: ''
+        short_unit: 'US$'
       coal_price_newcastle_thermal_coal_fob:
-        title: Coal - Prices - Newcastle Thermal Coal FOB
+        title: Coal price - Newcastle Thermal Coal FOB
         unit: 'US dollars per tonne'
         short_unit: 'US$'
       gas_price_canada_alberta:
-        title: Gas - Prices - Canada (Alberta)
+        title: Gas price - Canada (Alberta)
         unit: 'US dollars per million BTU'
         short_unit: 'US$'
       coal_price_japan_coking_coal_import_cif:
-        title: Coal - Prices - Japan coking coal import CIF price
+        title: Coal price - Japan coking coal import CIF price
         unit: 'US dollars per tonne'
         short_unit: 'US$'
       gas_price_average_german_import:
-        title: Gas - Prices - Average German import price
+        title: Gas price - Average German import price
         unit: 'US dollars per million BTU'
         short_unit: 'US$'
-      oil_price_crude_spot_brent:
-        title: 'Oil - Prices - Brent spot crude prices'
+      oil_spot_crude_price_brent:
+        title: Oil spot crude price - Brent
         unit: 'US dollars per barrel'
-        short_unit: ''
-      oil_price_crude_spot_dubai:
-        title: 'Oil - Prices - Dubai spot crude prices'
+        short_unit: 'US$'
+      oil_spot_crude_price_dubai:
+        title: Oil spot crude price - Dubai
         unit: 'US dollars per barrel'
-        short_unit: ''
-      oil_price_crude_spot_nigerian_forcados:
-        title: 'Oil - Prices - Nigerian Forcados spot crude prices'
+        short_unit: 'US$'
+      oil_spot_crude_price_nigerian_forcados:
+        title: Oil spot crude price - Nigerian Forcados
         unit: 'US dollars per barrel'
-        short_unit: ''
-      oil_price_crude_spot_west_texas_intermediate:
-        title: 'Oil - Prices - West Texas Intermediate spot crude prices'
+        short_unit: 'US$'
+      oil_spot_crude_price_west_texas_intermediate:
+        title: Oil spot crude price - West Texas Intermediate
         unit: 'US dollars per barrel'
-        short_unit: ''
+        short_unit: 'US$'
       gas_price_lng_japan_cif:
-        title: Gas - Prices - LNG Japan CIF
+        title: Gas price - LNG Japan CIF
         unit: 'US dollars per million BTU'
         short_unit: 'US$'
       coal_price_china_qinhuangdao_spot:
-        title: Coal - Prices - China Qinhuangdao spot price
+        title: Coal price - China Qinhuangdao spot price
         unit: 'US dollars per tonne'
         short_unit: 'US$'
       coal_price_japan_steam_spot_cif:
-        title: Coal - Prices - Japan steam spot CIF price
+        title: Coal price - Japan steam spot CIF price
         unit: 'US dollars per tonne'
         short_unit: 'US$'
       coal_price_northwest_europe:
-        title: Coal - Prices - Northwest Europe
+        title: Coal price - Northwest Europe
         unit: 'US dollars per tonne'
         short_unit: 'US$'
       gas_price_uk_nbp_index:
-        title: Gas - Prices - UK NBP (ICIS NBP Index)
+        title: Gas price - UK NBP (ICIS NBP Index)
         unit: 'US dollars per million BTU'
         short_unit: 'US$'
       oil_price_crude_dollar_money_of_the_day:
-        title: 'Oil - Prices - Crude prices since 1861 (current $)'
+        title: 'Oil price - Crude prices since 1861 (current $)'
         unit: 'US dollars per barrel (current $)'
-        short_unit: ''
+        short_unit: 'US$'
       coal_price_japan_steam_coal_import_cif:
-        title: Coal - Prices - Japan steam coal import CIF price
+        title: Coal price - Japan steam coal import CIF price
         unit: 'US dollars per tonne'
         short_unit: 'US$'
       oil_price_crude_dollar_2022:
-        title: 'Oil - Prices - Crude prices since 1861 (2022 $)'
+        title: 'Oil price - Crude prices since 1861 (2022 $)'
         unit: 'US dollars per barrel (2022 $)'
-        short_unit: ''
+        short_unit: 'US$'
       coal_price_asian_marker:
-        title: Coal - Prices - Asian marker price
+        title: Coal price - Asian marker price
         unit: 'US dollars per tonne'
         short_unit: 'US$'
       gas_price_lng_japan_korea_marker:
-        title: Gas - Prices - LNG Japan Korea Marker (JKM)
+        title: Gas price - LNG Japan Korea Marker (JKM)
         unit: 'US dollars per million BTU'
         short_unit: 'US$'

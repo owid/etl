@@ -183,14 +183,14 @@ COLUMNS_PRICES = {
     "northwest_europe": "coal_price_northwest_europe",
     "oil_crude_prices__dollar_2022": "oil_price_crude_dollar_2022",
     "oil_crude_prices__dollar_money_of_the_day": "oil_price_crude_dollar_money_of_the_day",
-    "oil_spot_crude_prices__brent": "oil_price_crude_spot_brent",
-    "oil_spot_crude_prices__dubai": "oil_price_crude_spot_dubai",
-    "oil_spot_crude_prices__nigerian_forcados": "oil_price_crude_spot_nigerian_forcados",
-    "oil_spot_crude_prices__west_texas_intermediate": "oil_price_crude_spot_west_texas_intermediate",
+    "oil_spot_crude_prices__brent": "oil_spot_crude_price_brent",
+    "oil_spot_crude_prices__dubai": "oil_spot_crude_price_dubai",
+    "oil_spot_crude_prices__nigerian_forcados": "oil_spot_crude_price_nigerian_forcados",
+    "oil_spot_crude_prices__west_texas_intermediate": "oil_spot_crude_price_west_texas_intermediate",
     "us_central_appalachian_coal_spot_price_index": "coal_price_us_central_appalachian_spot_price_index",
 }
-# -
 
+# Regions to use to create aggregates.
 REGIONS = {
     "Africa": {
         "additional_members": [
@@ -233,6 +233,11 @@ REGIONS = {
     # This means that we may be underestimating Oceania by a significant amount, but EI does not provide unambiguous
     # data to avoid this.
     "Oceania": {},
+    # Income groups.
+    "Low-income countries": {},
+    "Lower-middle-income countries": {},
+    "Upper-middle-income countries": {},
+    "High-income countries": {},
 }
 
 
