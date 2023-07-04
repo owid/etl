@@ -265,6 +265,8 @@ def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Data
 
 
 def add_columns_in_twh(tb: Table) -> Table:
+    # For convenience, we convert all variables given in exajoules, petajoules, or megatonnes of oil equivalent into
+    # terawatt-hours.
     for column in tb.columns:
         if column.endswith("_ej"):
             tb[column.replace("_ej", "_twh")] = tb[column] * EJ_TO_TWH
@@ -302,11 +304,16 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
-    # Add columns in TWh.
+    # Add primary energy consumption in TWh.
+    # For non-fossil electricity sources, this will be given in input-equivalents.
     tb = add_columns_in_twh(tb=tb)
 
     # Add region aggregates.
     tb = add_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+
+    # Remove "Other *" regions, since they mean different set of countries for different variables.
+    # NOTE: They have to be removed *after* creating region aggregates, otherwise those regions would be underestimated.
+    tb = tb[~tb["country"].str.startswith("Other ")].reset_index(drop=True)
 
     # Set an appropriate index to main table and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
