@@ -735,11 +735,11 @@ class OriginsVariablesLink(SQLModel, table=True):
     variableId: Optional[int] = Field(default=None, foreign_key="variables.id", primary_key=True)
 
 
-class PostsGdocsVariablesLink(SQLModel, table=True):
-    __tablename__ = "posts_gdocs_variables"  # type: ignore
+class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
+    __tablename__ = "posts_gdocs_variables_faqs"  # type: ignore
     __table_args__ = (
-        ForeignKeyConstraint(["gdocId"], ["posts_gdocs.id"], name="posts_gdocs_variables_ibfk_1"),
-        ForeignKeyConstraint(["variableId"], ["variables.id"], name="posts_gdocs_variables_ibfk_2"),
+        ForeignKeyConstraint(["gdocId"], ["posts_gdocs.id"], name="posts_gdocs_variables_faqs_ibfk_1"),
+        ForeignKeyConstraint(["variableId"], ["variables.id"], name="posts_gdocs_variables_faqs_ibfk_2"),
         Index("variableId", "variableId"),
     )
 
@@ -835,7 +835,7 @@ class Variable(SQLModel, table=True):
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="variables")
     data_values: List["DataValues"] = Relationship(back_populates="variables")
     origins: List["Origin"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
-    posts_gdocs: List["PostsGdocs"] = Relationship(back_populates="posts_gdocs", link_model=PostsGdocsVariablesLink)
+    posts_gdocs: List["PostsGdocs"] = Relationship(back_populates="posts_gdocs", link_model=PostsGdocsVariablesFaqsLink)
 
     def upsert(self, session: Session) -> "Variable":
         assert self.shortName
@@ -973,7 +973,7 @@ class Variable(SQLModel, table=True):
         Deletes all previous relationships with origins and gdoc posts for this variable.
         """
         session.query(OriginsVariablesLink).filter(OriginsVariablesLink.variableId == self.id).delete()
-        session.query(PostsGdocsVariablesLink).filter(PostsGdocsVariablesLink.variableId == self.id).delete()
+        session.query(PostsGdocsVariablesFaqsLink).filter(PostsGdocsVariablesFaqsLink.variableId == self.id).delete()
 
     def create_links(self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink]):
         """
@@ -990,7 +990,7 @@ class Variable(SQLModel, table=True):
         if faqs:
             session.add_all(
                 [
-                    PostsGdocsVariablesLink(gdocId=faq.gdoc_id, variableId=self.id, fragmentId=faq.fragment_id)
+                    PostsGdocsVariablesFaqsLink(gdocId=faq.gdoc_id, variableId=self.id, fragmentId=faq.fragment_id)
                     for faq in faqs
                 ]
             )
