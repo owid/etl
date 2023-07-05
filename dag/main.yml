@@ -231,12 +231,12 @@ steps:
     - data://meadow/ggdc/2022-12-23/maddison_database
 
   #Multidimensional Poverty Index
-  data://meadow/ophi/2022-12-13/multidimensional_poverty_index:
-    - snapshot://ophi/2022-12-13/multidimensional_poverty_index.csv
-  data://garden/ophi/2022-12-13/multidimensional_poverty_index:
-    - data://meadow/ophi/2022-12-13/multidimensional_poverty_index
-  data://grapher/ophi/2022-12-13/multidimensional_poverty_index:
-    - data://garden/ophi/2022-12-13/multidimensional_poverty_index
+  data://meadow/ophi/2023-07-05/multidimensional_poverty_index:
+    - snapshot://ophi/2023-07-05/multidimensional_poverty_index.csv
+  data://garden/ophi/2023-07-05/multidimensional_poverty_index:
+    - data://meadow/ophi/2023-07-05/multidimensional_poverty_index
+  data://grapher/ophi/2023-07-05/multidimensional_poverty_index:
+    - data://garden/ophi/2023-07-05/multidimensional_poverty_index
 
   #Penn World Table
   data://meadow/ggdc/2022-11-28/penn_world_table:
