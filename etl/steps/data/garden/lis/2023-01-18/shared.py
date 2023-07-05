@@ -12,7 +12,7 @@ var_dict = {
         "description": "This is the mean income or consumption per year within the {pct_dict[pct]['decile10']} (tenth of the population).",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 0,
     },
     "share": {
         "title": "Share",
@@ -26,7 +26,7 @@ var_dict = {
         "description": "This is the level of income or consumption per year below which {str(pct)}% of the population falls.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 0,
     },
     "avg_shortfall": {
         "title": "Average shortfall ($)",
@@ -82,14 +82,14 @@ var_dict = {
         "description": "Mean income or consumption.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 0,
     },
     "median": {
         "title": "Median",
         "description": "Median income or consumption.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 0,
     },
     "palma_ratio": {
         "title": "Palma ratio",
