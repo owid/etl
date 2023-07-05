@@ -52,16 +52,13 @@ def run(dest_dir: str) -> None:
     # Load AI corporate investment snapshot
     snap = cast(Snapshot, paths.load_dependency("ai_private_investment.csv"))
     df = pd.read_csv(snap.path)
+    snap_total = cast(Snapshot, paths.load_dependency("ai_private_investment_total.csv"))
+    df_total = pd.read_csv(snap_total.path)
+    df_total.rename(columns={"Total Investment (in Billions of U.S. Dollars)": "Total"}, inplace=True)
+    df = pd.merge(df, df_total, on="Year")
 
-    exclude_columns = ["Year", "Geographic Area"]
-    df.loc[:, ~df.columns.isin(exclude_columns)] *= 1e9
-    df["Total"] = df.loc[:, ~df.columns.isin(exclude_columns)].sum(axis=1)
-    # Calculate the yearly sum countries
-    yearly_sum = df.groupby("Year")[df.columns[2:]].sum().reset_index()
-    yearly_sum["Geographic Area"] = "Total"
-    # Add the yearly sum rows to the DataFrame
-    df = pd.concat([df, yearly_sum], ignore_index=True)
     df.rename(columns={"Year": "year"}, inplace=True)
+    df.loc[:, df.columns.isin(cols_to_adjust_for_infaltion)] *= 1e9
 
     # Load WDI
     ds_wdi = cast(Dataset, paths.load_dependency("wdi"))

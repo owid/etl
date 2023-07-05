@@ -30,7 +30,6 @@ def run(dest_dir: str) -> None:
         # Check if the column includes "in_thousands"
         if "__in_thousands" in column:
             # Multiply the values by 1000
-            print(tb[column].astype)
             tb[column] = tb[column].astype(float) * 1000
             new_column_name = column.replace("__in_thousands", "")
 
