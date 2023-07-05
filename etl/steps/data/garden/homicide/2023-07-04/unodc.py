@@ -8,6 +8,7 @@ from owid.catalog.utils import underscore
 from structlog import get_logger
 
 from etl.data_helpers import geo
+from etl.data_helpers.population import add_population
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
@@ -243,6 +244,8 @@ def calculate_share_of_homicides(total_table: Table, perp_table: Table) -> Table
     * The perpertrator is a family member
     * The perpertrator is unknown
     """
+    df = perp_table.reset_index()
+    add_population(df, country_col="country", year_col="year", age_col=None)
     merge_table = pd.merge(total_table, perp_table, on=["country", "year"])
 
     sexes = ["both_sexes", "female", "male"]
