@@ -18,6 +18,7 @@ def add_population(
     age_col: Optional[str] = None,
     age_group_mapping: Optional[Dict[str, Optional[Any]]] = None,
 ) -> pd.DataFrame:
+
     """Add population to dataframe.
 
     Currently uses population from UN WPP 2022, as this dataset contains dissagregated data by age and sex groups.
@@ -48,6 +49,9 @@ def add_population(
             "age_group_name_in_input_dataframe": [min_age, max_age],
             ...
         }
+
+        Population within the range [min_age, max_age] will be assigned to the age group `age_group_name_in_input_dataframe`.
+        To get single-year values, use max_age = min_age + 1.
 
     Returns
     -------
@@ -104,9 +108,10 @@ def add_population(
             # Define min and max age range in group
             age_min = age_ranges[0] if age_ranges[0] is not None else -1
             age_max = age_ranges[1] if age_ranges[1] is not None else 1000
-            # Keep ages in group
-            pop_g = pop[(pop["age"] >= age_min) & (pop["age"] < age_max)].copy()
-            # Group by dimensions, replace age group name
+            # Keep ages in group - allows for selection of single years in group
+            pop_g = pop[
+                (pop["age"] >= age_min) & (pop["age"] <= age_max)
+            ].copy()  # Group by dimensions, replace age group name
             pop_g = (
                 pop_g.drop(columns=["age"])
                 .groupby(["location", "year", "sex"], as_index=False, observed=True)
