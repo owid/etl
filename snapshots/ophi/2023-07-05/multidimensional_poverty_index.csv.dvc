@@ -1,17 +1,15 @@
 meta:
-  namespace: ophi
-  short_name: multidimensional_poverty_index
-  name: Multidimensional Poverty Index (MPI) (OPHI, 2022)
+  name: Multidimensional Poverty Index (MPI) (OPHI, 2023)
+  publication_date: '2023-07-11'
   source_name: Alkire, Kanagaratnam and Suppa (2022), The global Multidimensional
     Poverty Index (MPI) 2022
-  publication_year: 2022
-  publication_date: 2022-10-17
+  source_published_by: Alkire, Kanagaratnam and Suppa (2022), The global Multidimensional
+    Poverty Index (MPI) 2022
   url: https://ophi.org.uk/multidimensional-poverty-index/
   source_data_url:
-  file_extension: csv
   license_url:
   license_name:
-  date_accessed: 2022-12-13
+  date_accessed: 2023-07-05
   is_public: true
   description: |
     The global Multidimensional Poverty Index (MPI) is an international measure of acute multidimensional poverty covering over 100 developing countries. It complements traditional monetary poverty measures by capturing the acute deprivations in health, education, and living standards that a person faces simultaneously.
@@ -32,6 +30,6 @@ meta:
     The global MPI was developed by OPHI with the UN Development Programme (UNDP) for inclusion in UNDP’s flagship Human Development Report in 2010. It has been published annually by OPHI and in the HDRs ever since.
 wdir: ../../../data/snapshots/ophi/2023-07-05
 outs:
-- md5: 76a02b8fe08da13f466cc1015cb87e11
-  size: 6663759
+- md5: 6ff326b5974b28c9a39e1542e8895fc1
+  size: 6772259
   path: multidimensional_poverty_index.csv
