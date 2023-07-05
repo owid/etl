@@ -14,7 +14,7 @@ paths = PathFinder(__file__)
 def prepare_item_prices_table(tb_prices: Table, item_name: str) -> Table:
     if item_name == "oil_price":
         tb_item_prices = (
-            tb_prices[["oil_price_crude_dollar_money_of_the_day", "oil_price_crude_dollar_2022"]]
+            tb_prices[["oil_price_crude_current_dollars_per_m3", "oil_price_crude_2022_dollars_per_m3"]]
             .reset_index()
             .assign(**{"country": "World"})
         )
@@ -50,6 +50,7 @@ def run(dest_dir: str) -> None:
     ds_garden = cast(Dataset, paths.load_dependency("statistical_review_of_world_energy"))
     tb = ds_garden["statistical_review_of_world_energy"]
     tb_prices = ds_garden["statistical_review_of_world_energy_fossil_fuel_prices"]
+    tb_price_index = ds_garden["statistical_review_of_world_energy_fossil_fuel_price_index"]
 
     #
     # Process data.
@@ -79,13 +80,27 @@ def run(dest_dir: str) -> None:
     tb_oil_spot_crude_prices = prepare_item_prices_table(tb_prices=tb_prices, item_name="oil_spot_crude_price")
     tb_oil_prices = prepare_item_prices_table(tb_prices=tb_prices, item_name="oil_price")
 
+    # Prepare price index tables.
+    tb_coal_price_index = prepare_item_prices_table(tb_prices=tb_price_index, item_name="coal_price_index")
+    tb_gas_price_index = prepare_item_prices_table(tb_prices=tb_price_index, item_name="gas_price_index")
+    tb_oil_price_index = prepare_item_prices_table(tb_prices=tb_price_index, item_name="oil_spot_crude_price_index")
+
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
         dest_dir,
-        tables=[tb, tb_coal_prices, tb_gas_prices, tb_oil_spot_crude_prices, tb_oil_prices],
+        tables=[
+            tb,
+            tb_coal_prices,
+            tb_gas_prices,
+            tb_oil_spot_crude_prices,
+            tb_oil_prices,
+            tb_coal_price_index,
+            tb_gas_price_index,
+            tb_oil_price_index,
+        ],
         default_metadata=ds_garden.metadata,
     )
 

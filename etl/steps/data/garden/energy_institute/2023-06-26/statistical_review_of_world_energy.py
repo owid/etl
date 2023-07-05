@@ -17,6 +17,15 @@ PJ_TO_TWH = 1e3 / 3600
 MTOE_TO_PJ = 41.868
 # Million tonnes of oil equivalent to terawatt-hours.
 MTOE_TO_TWH = MTOE_TO_PJ * PJ_TO_TWH
+# Barrels to cubic meters.
+BARRELS_TO_CUBIC_METERS = 1 / 6.2898
+# Thousand barrels per day to cubic meters per day
+KBD_TO_CUBIC_METERS_PER_DAY = 1000 * BARRELS_TO_CUBIC_METERS
+# Million British thermal units to megawatt-hours.
+MILLION_BTU_TO_MWH = 1e3 / 3412
+
+# Reference year to use for table of price indexes.
+PRICE_INDEX_REFERENCE_YEAR = 2018
 
 # Columns to use from the main data file, and how to rename them.
 COLUMNS = {
@@ -165,27 +174,30 @@ COLUMNS = {
 
 # Columns to use from the additional data file related to prices, and how to rename them.
 COLUMNS_PRICES = {
-    "asian_marker_price": "coal_price_asian_marker",
-    "china_qinhuangdao_spot_price": "coal_price_china_qinhuangdao_spot",
-    "japan_coking_coal_import_cif_price": "coal_price_japan_coking_coal_import_cif",
-    "japan_steam_coal_import_cif_price": "coal_price_japan_steam_coal_import_cif",
-    "japan_steam_spot_cif_price": "coal_price_japan_steam_spot_cif",
-    "lng__japan__cif": "gas_price_lng_japan_cif",
-    "lng__japan_korea_marker__jkm": "gas_price_lng_japan_korea_marker",
-    "natural_gas__average_german__import_price": "gas_price_average_german_import",
-    "natural_gas__canada__alberta": "gas_price_canada_alberta",
-    "natural_gas__netherlands_ttf__da_icis__heren_ttf_index": "gas_price_netherlands_ttf_index",
-    "natural_gas__uk_nbp__icis_nbp_index": "gas_price_uk_nbp_index",
-    "natural_gas__us__henry_hub": "gas_price_us_henry_hub",
-    "newcastle_thermal_coal_fob": "coal_price_newcastle_thermal_coal_fob",
-    "northwest_europe": "coal_price_northwest_europe",
-    "oil_crude_prices__dollar_2022": "oil_price_crude_dollar_2022",
-    "oil_crude_prices__dollar_money_of_the_day": "oil_price_crude_dollar_money_of_the_day",
-    "oil_spot_crude_prices__brent": "oil_spot_crude_price_brent",
-    "oil_spot_crude_prices__dubai": "oil_spot_crude_price_dubai",
-    "oil_spot_crude_prices__nigerian_forcados": "oil_spot_crude_price_nigerian_forcados",
-    "oil_spot_crude_prices__west_texas_intermediate": "oil_spot_crude_price_west_texas_intermediate",
-    "us_central_appalachian_coal_spot_price_index": "coal_price_us_central_appalachian_spot_price_index",
+    # Coal prices.
+    "asian_marker_price": "coal_price_asian_marker_current_dollars_per_tonne",
+    "china_qinhuangdao_spot_price": "coal_price_china_qinhuangdao_spot_current_dollars_per_tonne",
+    "japan_coking_coal_import_cif_price": "coal_price_japan_coking_coal_import_cif_current_dollars_per_tonne",
+    "japan_steam_coal_import_cif_price": "coal_price_japan_steam_coal_import_cif_current_dollars_per_tonne",
+    "japan_steam_spot_cif_price": "coal_price_japan_steam_spot_cif_current_dollars_per_tonne",
+    "us_central_appalachian_coal_spot_price_index": "coal_price_us_central_appalachian_spot_price_index_current_dollars_per_tonne",
+    "newcastle_thermal_coal_fob": "coal_price_newcastle_thermal_coal_fob_current_dollars_per_tonne",
+    "northwest_europe": "coal_price_northwest_europe_current_dollars_per_tonne",
+    # Gas prices.
+    "lng__japan__cif": "gas_price_lng_japan_cif_current_dollars_per_million_btu",
+    "lng__japan_korea_marker__jkm": "gas_price_lng_japan_korea_marker_current_dollars_per_million_btu",
+    "natural_gas__average_german__import_price": "gas_price_average_german_import_current_dollars_per_million_btu",
+    "natural_gas__canada__alberta": "gas_price_canada_alberta_current_dollars_per_million_btu",
+    "natural_gas__netherlands_ttf__da_icis__heren_ttf_index": "gas_price_netherlands_ttf_index_current_dollars_per_million_btu",
+    "natural_gas__uk_nbp__icis_nbp_index": "gas_price_uk_nbp_index_current_dollars_per_million_btu",
+    "natural_gas__us__henry_hub": "gas_price_us_henry_hub_current_dollars_per_million_btu",
+    # Oil prices.
+    "oil_crude_prices__dollar_2022": "oil_price_crude_2022_dollars_per_barrel",
+    "oil_crude_prices__dollar_money_of_the_day": "oil_price_crude_current_dollars_per_barrel",
+    "oil_spot_crude_prices__brent": "oil_spot_crude_price_brent_current_dollars_per_barrel",
+    "oil_spot_crude_prices__dubai": "oil_spot_crude_price_dubai_current_dollars_per_barrel",
+    "oil_spot_crude_prices__nigerian_forcados": "oil_spot_crude_price_nigerian_forcados_current_dollars_per_barrel",
+    "oil_spot_crude_prices__west_texas_intermediate": "oil_spot_crude_price_west_texas_intermediate_current_dollars_per_barrel",
 }
 
 # Regions to use to create aggregates.
@@ -278,6 +290,9 @@ def create_additional_variables(tb: Table) -> Table:
             # Oil consumption is given in exajoules, which is already converted to twh (previous lines).
             # Oil production, however, is given in million tonnes, which we convert now to terawatt-hours.
             tb[column.replace("_mt", "_twh")] = tb[column] * MTOE_TO_TWH
+        if column in ["oil_consumption_kbd"]:
+            # Convert oil consumption given in thousand barrels per day to cubic meters per day.
+            tb[column.replace("_kbd", "_m3d")] = tb[column] * KBD_TO_CUBIC_METERS_PER_DAY
 
     for column in tb.columns:
         if ("_equivalent_twh" in column) and ("primary_energy" not in column):
@@ -286,6 +301,73 @@ def create_additional_variables(tb: Table) -> Table:
             tb[column.replace("_equivalent_twh", "_direct_twh")] = tb[column] * tb["efficiency_factor"]
 
     return tb
+
+
+def convert_price_units(tb_prices: Table) -> Table:
+    tb_prices = tb_prices.copy()
+
+    for column in tb_prices.columns:
+        if column.endswith("_per_barrel"):
+            # Convert variables given in dollars per barrel to dollars per cubic meter.
+            tb_prices[column.replace("_per_barrel", "_per_m3")] = tb_prices[column] / BARRELS_TO_CUBIC_METERS
+            tb_prices = tb_prices.drop(columns=[column])
+        if column.endswith("_per_million_btu"):
+            # Convert variables given in dollars per million BTU to dollars per kilocalorie.
+            tb_prices[column.replace("_per_million_btu", "_per_mwh")] = tb_prices[column] / MILLION_BTU_TO_MWH
+            tb_prices = tb_prices.drop(columns=[column])
+
+    return tb_prices
+
+
+def prepare_prices_index_table(tb_prices: Table) -> Table:
+    # Select all price columns except for (global) oil crude prices.
+    tb_prices_index = tb_prices[
+        [
+            column
+            for column in tb_prices.columns
+            if column.startswith(("coal_price_", "gas_price_", "oil_spot_crude_price_"))
+        ]
+    ].copy()
+
+    # Find all years for which different price columns have data, and ensure that the reference year is among them.
+    years = set(tb_prices.reset_index()["year"])
+    for column in tb_prices_index.columns:
+        years = years & set(tb_prices_index[[column]].dropna().reset_index()["year"])
+        # Normalize prices so that they were exactly 100 on the reference year.
+        new_column = (
+            column.replace("coal_price_", "coal_price_index_")
+            .replace("gas_price_", "gas_price_index_")
+            .replace("oil_spot_crude_price_", "oil_spot_crude_price_index_")
+        )
+        tb_prices_index[new_column] = (
+            tb_prices_index[column] * 100 / tb_prices_index.loc[PRICE_INDEX_REFERENCE_YEAR][column]
+        )
+        tb_prices_index = tb_prices_index.drop(columns=[column])
+
+        # Update metadata.
+        tb_prices_index[
+            new_column
+        ].metadata.description = (
+            f"Average price measured as an energy index where prices in {PRICE_INDEX_REFERENCE_YEAR} = 100."
+        )
+
+    # Sanity check.
+    assert (
+        PRICE_INDEX_REFERENCE_YEAR in years
+    ), f"The chosen reference year {PRICE_INDEX_REFERENCE_YEAR} does not have data for all variables; either change this year, or remove this assertion (and some prices will be dropped)."
+
+    # Remove empty rows and columns.
+    tb_prices_index = tb_prices_index.dropna(axis=1, how="all").dropna(how="all")
+
+    # Sanity check.
+    assert tb_prices_index.loc[PRICE_INDEX_REFERENCE_YEAR].round(2).unique().tolist() == [
+        100
+    ], "Price index is not well constructed."
+
+    # Update table metadata.
+    tb_prices_index.metadata.short_name = "statistical_review_of_world_energy_fossil_fuel_price_index"
+
+    return tb_prices_index
 
 
 def run(dest_dir: str) -> None:
@@ -334,12 +416,18 @@ def run(dest_dir: str) -> None:
     # Rename columns from the additional data file related to prices.
     tb_prices = tb_meadow_prices.rename(columns=COLUMNS_PRICES, errors="raise").copy()
 
+    # Convert units of price variables.
+    tb_prices = convert_price_units(tb_prices=tb_prices)
+
     # Set an appropriate index to prices table and sort conveniently.
     tb_prices = tb_prices.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    # Create table of index prices (similar to tb_prices, but normalized so that prices are 100 in a reference year).
+    tb_prices_index = prepare_prices_index_table(tb_prices=tb_prices)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_prices], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb, tb_prices, tb_prices_index], default_metadata=ds_meadow.metadata)
     ds_garden.save()
