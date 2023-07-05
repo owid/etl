@@ -75,7 +75,7 @@ var_dict = {
         "description": "The Gini coefficient is a measure of the inequality of the income distribution in a population. Higher values indicate a higher level of inequality.",
         "unit": "",
         "short_unit": "",
-        "numDecimalPlaces": 3,
+        "numDecimalPlaces": 2,
     },
     "mean": {
         "title": "Mean",
