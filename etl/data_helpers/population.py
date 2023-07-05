@@ -122,7 +122,7 @@ def add_population(
             df_pop.append(pop_g)
         df_pop = pd.concat(df_pop, ignore_index=True)
     else:
-        df_pop = pop.groupby(["location", "year", "sex"], as_index=False).sum().drop(columns=["age"])
+        df_pop = pop.groupby(["location", "year", "sex"], as_index=False).sum().drop(columns=["age"], errors = 'ignore')
 
     # Merge
     columns_input = list(df.columns)
