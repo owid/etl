@@ -18,7 +18,6 @@ def add_population(
     age_col: Optional[str] = None,
     age_group_mapping: Optional[Dict[str, Optional[Any]]] = None,
 ) -> pd.DataFrame:
-
     """Add population to dataframe.
 
     Currently uses population from UN WPP 2022, as this dataset contains dissagregated data by age and sex groups.
