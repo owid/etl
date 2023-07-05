@@ -1,0 +1,47 @@
+meta:
+  namespace: fasttrack
+  short_name: treatment_gap_anxiety_disorders_world_mental_health_surveys
+  file_extension: csv
+  date_accessed: 2023-05-12
+  name: Treatment gap for anxiety disorders - World Mental Health Surveys - Alonso
+    et al. 2017
+  description: 'This dataset comes from the World Mental Health surveys, which conducted
+    national studies in 21 countries, using validated structured interviews to survey
+    members of the general population about symptoms of mental illnesses they had
+    in the past 12 months and their lifetime so far. The source describes the dataset:
+    "Data came from 24 community epidemiological surveys administered in 21 countries
+    as part of the WMH surveys (Kessler & Ustun, 2004). These included 12 surveys
+    carried out in high-income countries, 6 surveys in upper-middle-income countries
+    and 6 in low or lower-middle income countries (see table 1). The majority of surveys
+    were based on nationally representative household samples. Three were representative
+    of urban areas in their countries (Colombia, Mexico, and Peru). Three were representative
+    of selected regions in their countries (Japan, Nigeria, and Murcia, Spain). Four
+    were representative of selected Metropolitan Areas (Sao Paulo, Brazil; Medellin,
+    Colombia; and Beijing-Shanghai and Shenzhen in the People’s Republic of China
+    (PRC)). Trained lay interviewers conducted face-to-face interviews with respondents,
+    aged 18 years and over. The interviews took place within the households of the
+    respondents. To reduce respondent burden, the interview was divided into two parts.
+    Part I assessed core mental disorders and was administered to all respondents.
+    Part II, which assessed additional disorders and correlates, was administered
+    to all Part I respondents who met lifetime criteria for any disorder plus a probability
+    subsample of other Part I respondents. Part II data, the focus of this report,
+    were weighted by the inverse of their probabilities of selection into Part II
+    and additionally weighted to adjust samples to match population distributions
+    on the cross-classification of key socio-demographic and geographic variables.
+    Further details about WMH sampling and weighting are available elsewhere(Heeringa
+    et al., 2008). Response rates ranged between 45.9% and 97.2% and had a weighted
+    average of 70.1% across all surveys."'
+  source_name: Google Sheet
+  url: https://pubmed.ncbi.nlm.nih.gov/29356216/
+  source_published_by: Google Sheet
+  source_data_url: https://docs.google.com/spreadsheets/d/e/2PACX-1vQtKZYhI1TbqVZILdDFZuSYJcew8xyYKc9Euyzfzwz6g8O28Qfapc-QJfVetZqJF2N8mNLItaErz63_/pub?output=csv
+  license_url: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6008788/
+  license_name: Made freely available by authors
+  is_public: true
+  version: latest
+  publication_year: 2017
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 24b2bc09a23fe8ed5ab7e8a37df42c4d
+  size: 1297
+  path: treatment_gap_anxiety_disorders_world_mental_health_surveys.csv

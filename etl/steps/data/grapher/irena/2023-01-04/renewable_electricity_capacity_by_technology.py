@@ -27,6 +27,8 @@ def run(dest_dir: str) -> None:
     table = table.replace(rename_technologies)
 
     # Set appropriate metadata.
+    table["country"].metadata.unit = None
+    table["country"].metadata.short_unit = None
     table["capacity"].metadata.title = "Capacity"
     table["capacity"].metadata.unit = "megawatts"
     table["capacity"].metadata.short_unit = "MW"

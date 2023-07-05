@@ -1,27 +1,23 @@
 """Load a snapshot and create a meadow dataset."""
 
+from typing import cast
+
 import pandas as pd
 from owid.catalog import Table
-from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
-
-# Initialize logger.
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("dummy.start")
-
     #
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("dummy.csv")
+    snap = cast(Snapshot, paths.load_dependency("dummy.csv"))
 
     # Load data from snapshot.
     df = pd.read_csv(snap.path)
@@ -40,5 +36,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
-
-    log.info("dummy.end")

@@ -148,6 +148,7 @@ def etl_catalog(
 
     try:
         local_catalog = catalog.LocalCatalog("data")
+        local_catalog.reindex(table)
         try:
             local_df = local_catalog.find_latest(
                 table=table,

@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
+from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("wgm_mental_health")
+    ds_meadow = cast(Dataset, paths.load_dependency("wgm_mental_health"))
 
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["wgm_mental_health"]
@@ -62,12 +62,13 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
-    ds_garden.update_metadata(paths.metadata_path)
+
     # Add explanation to dataset description
-    ds_garden.metadata.description += (
+    ds_garden.metadata.sources[0].description += (
         "\n\nNote 1: Data for answers where the demographic group had less than 100 participants are filtered out."
         "\n\nNote 2: Empty answers have been filtered out. Empty answers may appear because the question was not applicable to the respondent or the respondent did not answer the question."
     )
+
     # Save changes in the new garden dataset.
     ds_garden.save()
 
@@ -250,7 +251,7 @@ def map_ids_to_labels(df: pd.DataFrame) -> pd.DataFrame:
     _sanity_check_age_ids(df)
 
     # Question ID to Question label mapping
-    question_id_to_label = {k: v["title"] for k, v in MAPPING_QUESTION_VALUES.items()}
+    question_id_to_label = {k: f"{k} - {v['title']}" for k, v in MAPPING_QUESTION_VALUES.items()}
 
     # Map IDs to Labels (Question, Answer, Gender, Age group)
     log.info("wgm_mental_health: mapping ids to labels}")

@@ -1,0 +1,25 @@
+meta:
+  namespace: wb
+  short_name: women_business_law_additional
+  name: Women, Business and the Law - Additional Data (World Bank, 2021)
+  version: '2023-05-12'
+  publication_date: '2021-05-14'
+  source_name: World Bank (2021)
+  source_published_by: 'World Bank. 2023. Women, Business and the Law 2023. Washington,
+    DC: World Bank.'
+  url: https://wbl.worldbank.org/en/wbl-data
+  source_data_url: https://wbl.worldbank.org/content/dam/sites/wbl/documents/2021/02/WBLAdditionalData_14Apr2021.xlsx
+  file_extension: xlsx
+  license_url:
+  license_name: ''
+  date_accessed: 2023-05-12
+  is_public: true
+  description: |
+    By developing a time series and further researching the interaction between inequality of opportunity for women and labor market dynamics, Women, Business and the Law strengthens insights into how women’s employment and entrepreneurship are affected by legal gender discrimination, and in turn how this affects economic outcomes.
+
+    This specific dataset is an additional file provided by the World Bank, which contains a set of 14 non-scored questions (years 2017, 2019, and 2020), including data on child marriage, customary law, citizenship, sexual harassment, and access to ID cards.
+wdir: ../../../data/snapshots/wb/2023-05-12
+outs:
+- md5: 15c80d47547a9851784ecd6f59061b96
+  size: 126232
+  path: women_business_law_additional.xlsx

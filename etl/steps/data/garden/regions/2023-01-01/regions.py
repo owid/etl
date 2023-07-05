@@ -4,6 +4,8 @@ Find more details in the README in `docs/data/regions.md`.
 
 """
 
+import json
+
 import pandas as pd
 import yaml
 from owid.catalog import Table
@@ -88,6 +90,31 @@ def run_sanity_checks(df: pd.DataFrame) -> None:
     assert len(aliases_duplicated) == 0, error
 
 
+def _merge_tables(
+    tb_definitions: Table,
+    tb_aliases: Table,
+    tb_members: Table,
+    tb_related: Table,
+    tb_legacy_codes: Table,
+) -> Table:
+    """Merge all regions tables into a single one. 1:n relationships are merged as JSON lists."""
+    tb_regions = tb_definitions.copy()
+
+    # add members as JSON
+    tb_regions["members"] = tb_members["member"].groupby("code").agg(lambda x: json.dumps(list(x)))
+
+    # add aliass as JSON
+    tb_regions["aliases"] = tb_aliases["alias"].groupby("code").agg(lambda x: json.dumps(list(x)))
+
+    # add related as JSON
+    tb_regions["related"] = tb_related["member"].groupby("code").agg(lambda x: json.dumps(list(x)))
+
+    # add legacy codes
+    tb_regions = tb_regions.join(tb_legacy_codes, how="left")
+
+    return tb_regions
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -98,7 +125,14 @@ def run(dest_dir: str) -> None:
         df = pd.DataFrame.from_dict(yaml.safe_load(_file))
 
     # Load file of region codes.
-    df_codes = pd.read_csv(REGION_CODES_FILE)
+    # NOTE: Namibia has iso_code "NA" which would be interpreted as NaN without extra arguments.
+    df_codes = pd.read_csv(
+        REGION_CODES_FILE,
+        keep_default_na=False,
+        na_values=[
+            "",
+        ],
+    )
 
     #
     # Process data.
@@ -153,12 +187,19 @@ def run(dest_dir: str) -> None:
         short_name="legacy_codes",
     )
 
+    # Create merged flat table with useful columns.
+    tb_regions = Table(
+        _merge_tables(tb_definitions, tb_aliases, tb_members, tb_related, tb_legacy_codes),
+        short_name="regions",
+    )
+
     #
     # Save outputs.
     #
     # Create a new garden dataset.
     ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[tb_definitions, tb_aliases, tb_members, tb_related, tb_transitions, tb_legacy_codes]
+        dest_dir=dest_dir,
+        tables=[tb_regions, tb_definitions, tb_aliases, tb_members, tb_related, tb_transitions, tb_legacy_codes],
     )
 
     # Save changes in the new garden dataset.

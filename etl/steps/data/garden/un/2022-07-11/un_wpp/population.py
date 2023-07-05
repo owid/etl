@@ -79,6 +79,8 @@ def process(df: pd.DataFrame, country_std: str) -> Tuple[pd.DataFrame, pd.DataFr
     df_base = process_base(df, country_std)
     # Add metrics
     df = add_metrics(df_base.copy())
+    # Remove potential outliers
+    df = remove_outliers(df)
     return df_base, df
 
 
@@ -99,6 +101,22 @@ def add_metrics(df: pd.DataFrame) -> pd.DataFrame:
     # Remove infs
     msk = np.isinf(df["value"])
     df.loc[msk, "value"] = np.nan
+    return df
+
+
+def remove_outliers(df: pd.DataFrame) -> pd.DataFrame:
+    """Remove outliers from the population table.
+
+    So far, detected ones are:
+        - Sex ratio for Sint Maarten
+    """
+    df = df.loc[
+        ~(
+            (df["location"] == "Sint Maarten (Dutch part)")
+            & (df["metric"] == "sex_ratio")
+            & (df["age"].isin(["5", "10", "30", "40"]))
+        )
+    ]
     return df
 
 

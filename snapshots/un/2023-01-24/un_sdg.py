@@ -64,7 +64,7 @@ def main(upload: bool) -> None:
         add_snapshot("un/2023-01-24/un_sdg_dimension.json", filename=dim_file, upload=upload)  # type: ignore
 
         # fetch the file locally
-        assert metadata.source_data_url is not None
+        assert metadata.source.source_data_url is not None
         log.info("Downloading data...")
         all_data = download_data(snap)
         log.info("Adding data to catalog...")
@@ -76,9 +76,9 @@ def create_metadata(snap: Snapshot) -> SnapshotMeta:
     meta = snap.metadata
     meta_update = load_external_metadata()
     meta.name = meta_update["name"]
-    meta.publication_year = meta_update["publication_year"]
-    meta.publication_date = meta_update["publication_date"]
-    meta.date_accessed = dt.datetime.now().date()
+    meta.source.publication_year = meta_update["publication_year"]
+    meta.source.publication_date = meta_update["publication_date"]
+    meta.source.date_accessed = str(dt.datetime.now().date())
     return meta
 
 
@@ -105,7 +105,7 @@ def load_external_metadata() -> dict:
 def download_data(snap: Snapshot) -> pd.DataFrame:
     # retrieves all goal codes
     print("Retrieving SDG goal codes...")
-    url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/List"
+    url = f"{snap.metadata.source.source_data_url}/v1/sdg/Goal/List"
     res = requests.get(url)
     assert res.ok
 
@@ -114,14 +114,14 @@ def download_data(snap: Snapshot) -> pd.DataFrame:
 
     # retrieves all area codes
     print("Retrieving area codes...")
-    url = f"{snap.metadata.source_data_url}/v1/sdg/GeoArea/List"
+    url = f"{snap.metadata.source.source_data_url}/v1/sdg/GeoArea/List"
     res = requests.get(url)
     assert res.ok
     areas = res.json()
     area_codes = [str(area["geoAreaCode"]) for area in areas]
     # retrieves csv with data for all codes and areas
     print("Retrieving data...")
-    url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/DataCSV"
+    url = f"{snap.metadata.source.source_data_url}/v1/sdg/Goal/DataCSV"
     all_data = []
     for goal in goal_codes:
         content = download_file(url=url, goal=goal, area_codes=area_codes, max_retries=MAX_RETRIES)
@@ -193,7 +193,7 @@ def attributes_description(snap: Snapshot) -> Dict[Any, Any]:
     goal_codes = get_goal_codes(snap)
     a = []
     for goal in goal_codes:
-        url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/{goal}/Attributes"
+        url = f"{snap.metadata.source.source_data_url}/v1/sdg/Goal/{goal}/Attributes"
         res = requests.get(url)
         assert res.ok
         attr = res.json()
@@ -215,7 +215,7 @@ def dimensions_description(snap: Snapshot) -> dict:
     goal_codes = get_goal_codes(snap)
     d = []
     for goal in goal_codes:
-        url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/{goal}/Dimensions"
+        url = f"{snap.metadata.source.source_data_url}/v1/sdg/Goal/{goal}/Dimensions"
         res = requests.get(url)
         assert res.ok
         dims = res.json()
@@ -236,9 +236,8 @@ def dimensions_description(snap: Snapshot) -> dict:
 
 
 def get_goal_codes(snap: Snapshot) -> List[int]:
-
     # retrieves all goal codes
-    url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/List"
+    url = f"{snap.metadata.source.source_data_url}/v1/sdg/Goal/List"
     res = requests.get(url)
     assert res.ok
     goals = res.json()

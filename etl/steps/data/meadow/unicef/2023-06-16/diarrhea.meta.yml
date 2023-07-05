@@ -1,0 +1,25 @@
+dataset:
+  title: Diarrhea treatment (UNICEF, 2022)
+  description: ''
+  licenses:
+  - name: Creative Commons Attribution-NonCommercial 3.0 IGO license
+    url: https://data.unicef.org/about-us/
+  sources:
+  - name: UNICEF (2022)
+    url: https://data.unicef.org/resources/dataset/diarrhoea/
+    source_data_url: https://data.unicef.org/wp-content/uploads/2018/06/Child-Health-Coverage-Database-May-2022.xlsx
+    date_accessed: '2023-06-16'
+    publication_date: '2022-05-01'
+    publication_year: 2022
+    published_by: Several health and multiple indicator cluster surveys compiled by
+      UNICEF
+tables:
+  diarrhea:
+    variables:
+      value:
+        title: value
+        unit: '%'
+        short_unit: '%'
+      indicator:
+        title: indicator
+        unit: ''

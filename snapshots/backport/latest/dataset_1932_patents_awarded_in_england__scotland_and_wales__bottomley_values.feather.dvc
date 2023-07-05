@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1932_patents_awarded_in_england__scotland_and_wales__bottomley_values
   file_extension: feather
-  date_accessed: 2023-02-23 15:07:53.536264
+  date_accessed: 2023-05-05 09:41:42.170394
   name: Patents awarded in England, Scotland and Wales - Bottomley
   description: ''
   source_name: Our World in Data catalog backport

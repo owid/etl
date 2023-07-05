@@ -1,0 +1,168 @@
+dataset:
+  title: Oil Spills
+  description: >
+    ITOPF maintains a database of oil spills from tank vessels, including combined carriers, FPSOs and barges. This
+    contains information on accidental spillages of persistent and non-persistent hydrocarbon oil since 1970, except
+    those resulting from acts of war.
+  licenses:
+  - name: ITOPF Limited, 2019
+    url: https://www.itopf.org/terms-conditions/
+  sources:
+  - name: International Tanker Owners Pollution Federation (ITOPF)
+    url: https://www.itopf.org/knowledge-resources/data-statistics/statistics/
+    date_accessed: '2023-05-18'
+    publication_date: January 2023
+    publication_year: 2023
+tables:
+  oil_spills:
+    variables:
+      bel_700t:
+        title: Medium oil spills (7-700 tonnes)
+        unit: spills
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      ab_700t:
+        title: Large oil spills (>700 tonnes)
+        unit: spills
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      oil_spilled:
+        title: Quantity of oil spilled
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+      allision_collision_causes:
+        title: Allision/collision causes
+        display:
+          numDecimalPlaces: 0
+          name: Collision
+        unit: causes
+        short_unit: ''
+      equipment_failure_causes:
+        title: Equipment failure causes
+        display:
+          numDecimalPlaces: 0
+          name: Equipment failure
+        unit: causes
+        short_unit: ''
+      fire_explosion_causes:
+        title: Fire/explosion causes
+        display:
+          numDecimalPlaces: 0
+          name: Fire/explosion
+        unit: causes
+        short_unit: ''
+      grounding_causes:
+        title: Grounding causes
+        display:
+          numDecimalPlaces: 0
+          name: Grounding
+        unit: causes
+        short_unit: ''
+      hull_failure_causes:
+        title: Hull failure causes
+        display:
+          numDecimalPlaces: 0
+          name: Hull failure
+        unit: causes
+        short_unit: ''
+      other_causes:
+        title: Other causes
+        description: Events such as heavy weather damage and human error have been categorised as 'Other'.
+        display:
+          numDecimalPlaces: 0
+          name: Other
+        unit: causes
+        short_unit: ''
+      unknown_causes:
+        title: Unknown causes
+        description: Spills where the relevant information is not available have been designated as 'Unknown'
+        display:
+          numDecimalPlaces: 0
+          name: Unknown
+        unit: causes
+        short_unit: ''
+      loading_discharing_ops:
+        title: Loading/discharging operations
+        display:
+          numDecimalPlaces: 0
+          name: Loading/discharging
+        unit: operations
+        short_unit: ''
+      bunkering_ops:
+        title: Bunkering operations
+        display:
+          numDecimalPlaces: 0
+          name: Refueling
+        unit: operations
+        short_unit: ''
+      other_operations_ops:
+        title: Other operations
+        description: Other include operations such as ballisting, de-ballasting, tank cleaning and when the vessel is underway.
+        display:
+          numDecimalPlaces: 0
+          name: Other
+        unit: operations
+        short_unit: ''
+      uknown_ops:
+        title: Unknown operations
+        display:
+          numDecimalPlaces: 0
+          name: Unknown
+        unit: operations
+        short_unit: ''
+      at_anchor_inland_ops:
+        title: At anchor (inland) operations
+        display:
+          numDecimalPlaces: 0
+          name: At anchor (inland)
+        unit: operations
+        short_unit: ''
+      at_anchor_open_water_ops:
+        title: At anchor (open water) operations
+        display:
+          numDecimalPlaces: 0
+          name: At anchor (open water)
+        unit: operations
+        short_unit: ''
+      underway_inland_ops:
+        title: Underway (inland) operations
+        display:
+          numDecimalPlaces: 0
+          name: Underway (inland)
+        unit: operations
+        short_unit: ''
+      underway_open_water_ops:
+        title: Underway (open water) operations
+        display:
+          numDecimalPlaces: 0
+          name: Underway (open water)
+        unit: operations
+        short_unit: ''
+      biggest_spills_size:
+        title: Spill size
+        display:
+          numDecimalPlaces: 0
+        short_unit: 't'
+        unit: 'tonnes'
+      decadal_bel_700t:
+        title: Decadal medium oil spills (7-700 tonnes)
+        display:
+          numDecimalPlaces: 0
+        unit: spills
+        short_unit: ''
+      decadal_ab_700t:
+        title: Decadal large oil spills (>700 tonnes)
+        unit: spills
+        display:
+          numDecimalPlaces: 0
+        short_unit: ''
+      decadal_oil_spilled:
+        title: Decadal quantity of oil spilled
+        unit: tonnes
+        display:
+          numDecimalPlaces: 0
+        short_unit: t

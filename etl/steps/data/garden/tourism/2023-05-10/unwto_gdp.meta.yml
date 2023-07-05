@@ -1,0 +1,36 @@
+dataset:
+  title: UNWTO GDP from Tourism
+  description: >
+    UNWTO Department of Statistics data on the Sustainable Development
+    Goals indicators 8.9.1 and 12.b.1, included in the Global Indicator Framework.
+    Data collection started in 2019 and provides data from 2008 onwards, the latest
+    update took place on 15 March 2023. Indicator 8.9.1 on Tourism Direct GDP helps
+    to monitor Target 8.9 which calls on countries “to promote sustainable tourism”
+    under Goal 8 on decent Work and Economic Growth. The data collection is done in
+    cooperation with the OECD.
+  licenses:
+  - name: Creative Commons BY 4.0
+    url: https://www.unwto.org/copyright
+  sources:
+  - name: UNWTO and OECD
+    description: >
+      The United Nations World Tourism Organization (UNWTO) collects data from countries through
+      annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008)
+      standard, a framework approved by the United Nations.
+    url: https://www.unwto.org/tourism-statistics/economic-contribution-SDG
+    source_data_url: https://webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2023-03/indicator_12.b.1_march2023_update.xlsx
+    date_accessed: '2023-05-09'
+    publication_date: '2023-03-15'
+    publication_year: 2023
+    published_by: World Tourism Organization, 2023
+tables:
+  unwto_gdp:
+    variables:
+      gdp:
+        title: Tourism GDP as a proportion of Total
+        short_unit: ''
+        unit: ''
+      source:
+        title: source
+        short_unit: ''
+        unit: ''

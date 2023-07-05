@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Optional, cast
 
 import numpy as np
 import pandas as pd
@@ -49,15 +49,26 @@ def load_config(short_name: str) -> GrapherConfig:
     return GrapherConfig.parse_file(snap.path)
 
 
-def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConfig) -> Table:
-    """Convert backported table from long to wide format."""
+def long_to_wide(df: pd.DataFrame, prune: bool = True) -> pd.DataFrame:
+    """Convert backported table from long to wide format.
+
+    :params prune: Drop columnd entity_id, entity_code and rename entity_name to country.
+    """
     # convert to wide format
-    long_mem_usage_mb = values.memory_usage().sum() / 1e6
-    df = values.pivot(
-        index=["year", "entity_name", "entity_id", "entity_code"],
-        columns="variable_name",
-        values="value",
-    )
+    long_mem_usage_mb = df.memory_usage().sum() / 1e6
+
+    if prune:
+        df = df.rename(columns={"entity_name": "country"}).pivot(
+            index=["year", "country"],
+            columns="variable_name",
+            values="value",
+        )
+    else:
+        df = df.pivot(
+            index=["year", "entity_name", "entity_id", "entity_code"],
+            columns="variable_name",
+            values="value",
+        )
 
     # report compression ratio if the file is larger than >1MB
     # NOTE: memory usage can further drop later after repack_frame is called
@@ -65,15 +76,18 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
     if wide_mem_usage_mb > 1:
         log.info(
             "create_wide_table",
-            short_name=short_name,
             wide_mb=wide_mem_usage_mb,
             long_mb=long_mem_usage_mb,
             density=f"{df.notnull().sum().sum() / (df.shape[0] * df.shape[1]):.1%}",
             compression=f"{wide_mem_usage_mb / long_mem_usage_mb:.1%}",
         )
 
-    t = Table(df)
-    t.metadata.short_name = short_name
+    return df
+
+
+def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConfig) -> Table:
+    """Convert backported table from long to wide format."""
+    t = Table(long_to_wide(values, prune=False), short_name=short_name)
 
     # add variables metadata
     # NOTE: some datasets such as `dataset_5438_global_health_observatory__world_health_organization__2021_12`
@@ -91,9 +105,11 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
     return underscore_table(t, collision="rename")
 
 
-def create_dataset(dest_dir: str, short_name: str) -> Dataset:
-    """Create Dataset from backported dataset in walden. Convert
+def create_dataset(dest_dir: str, short_name: str, new_short_name: Optional[str] = None) -> Dataset:
+    """Create Dataset from backported dataset in Snapshot. Convert
     it into wide format and add metadata."""
+    new_short_name = new_short_name or short_name
+
     values = load_values(short_name)
     config = load_config(short_name)
 
@@ -136,7 +152,7 @@ def create_dataset(dest_dir: str, short_name: str) -> Dataset:
             )
             tables.append(t)
     else:
-        t = create_wide_table(values, short_name, config)
+        t = create_wide_table(values, new_short_name, config)
         tables.append(t)
 
     # create tables

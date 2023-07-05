@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5781_seasonal_influenza_mortality__glamor__2019_values
   file_extension: feather
-  date_accessed: 2023-04-24 13:54:43.041942
+  date_accessed: 2023-06-01 12:44:48.727196
   name: Seasonal influenza mortality – GLaMOR (2019)
   description: This dataset has higher estimates for seasonal influenza mortality
     for Eastern European countries than the CDC dataset.
@@ -14,6 +14,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 476563b556cb1ef31a32e5fab7e06a0b
+- md5: a022ac3f12a4f850db24a0de0c53ec19
   size: 19738
   path: dataset_5781_seasonal_influenza_mortality__glamor__2019_values.feather

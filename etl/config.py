@@ -30,6 +30,12 @@ S3_HOST = "nyc3.digitaloceanspaces.com"
 S3_ACCESS_KEY = env.get("OWID_ACCESS_KEY")
 S3_SECRET_KEY = env.get("OWID_SECRET_KEY")
 
+# publishing to R2 public data catalog
+R2_REGION_NAME = "auto"
+R2_ENDPOINT_URL = env.get("R2_ENDPOINT_URL")
+R2_ACCESS_KEY = env.get("R2_ACCESS_KEY")
+R2_SECRET_KEY = env.get("R2_SECRET_KEY")
+
 # publishing to grapher's MySQL db
 GRAPHER_USER_ID = env.get("GRAPHER_USER_ID")
 DB_NAME = env.get("DB_NAME", "grapher")
@@ -43,14 +49,12 @@ def get_username():
     return pwd.getpwuid(os.getuid())[0]
 
 
-# if running against live or staging, use s3://owid-catalog that has CDN
-# otherwise use s3://owid-test/baked-variables/<username> for local development
-# it might be better to save things locally instead of S3, but that would require
-# a lot of changes to the codebase (and even grapher one)
-if DB_NAME in ("live_grapher", "staging_grapher"):
-    DEFAULT_BAKED_VARIABLES_PATH = f"s3://owid-catalog/baked-variables/{DB_NAME}"
+# if running against live, use s3://owid-api, otherwise use s3://owid-api-staging
+# Cloudflare workers running on https://api.ourworldindata.org/ and https://api-staging.owid.io/ will use them
+if DB_NAME == "live_grapher":
+    DEFAULT_BAKED_VARIABLES_PATH = "s3://owid-api/v1/indicators"
 else:
-    DEFAULT_BAKED_VARIABLES_PATH = f"s3://owid-test/baked-variables/{get_username()}"
+    DEFAULT_BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{get_username()}/v1/indicators"
 BAKED_VARIABLES_PATH = env.get("BAKED_VARIABLES_PATH", DEFAULT_BAKED_VARIABLES_PATH)
 
 # run ETL steps with debugger on exception
@@ -61,7 +65,13 @@ GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 
 # forbid any individual step from consuming more than this much memory
 # (only enforced on Linux)
-MAX_VIRTUAL_MEMORY_LINUX = 16 * 2**30  # 16 GB
+MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
+
+# increment this to force a full rebuild of all datasets
+ETL_EPOCH = 2
+
+# any garden or grapher dataset after this date will have strict mode enabled
+STRICT_AFTER = "2023-06-25"
 
 
 def enable_bugsnag() -> None:

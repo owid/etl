@@ -1,9 +1,10 @@
 """Utils for key_indicators module."""
 import pandas as pd
-from owid.datautils import geo
+
+from etl.data_helpers import geo
 
 
-def add_regions(df: pd.DataFrame) -> pd.DataFrame:
+def add_regions(df: pd.DataFrame, population: pd.DataFrame) -> pd.DataFrame:
     """Add continents and income groups."""
     regions = [
         "Europe",
@@ -20,5 +21,8 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = df.loc[-df.country.isin(regions)]
     for region in regions:
-        df = geo.add_region_aggregates(df=df, region=region)
+        # TODO: this should be ideally
+        # countries_in_region = geo.list_members_of_region(region=region, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+        # df = geo.add_region_aggregates(df=df, region=region, countries_in_region=countries_in_region, population=population)
+        df = geo.add_region_aggregates(df=df, region=region, population=population)
     return df

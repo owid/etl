@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5413_covid_19__deaths_by_vaccination_status__united_states_config
   file_extension: json
-  date_accessed: 2023-03-31 15:11:57.600875
+  date_accessed: 2023-05-02 13:02:47.399411
   name: Grapher metadata for dataset_5413_covid_19__deaths_by_vaccination_status__united_states
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8ba03223e3ed4d04b640a70f20bff51c
+- md5: 0b7f74fa254c05a7585a3e4bd039a642
   size: 3331
   path: dataset_5413_covid_19__deaths_by_vaccination_status__united_states_config.json

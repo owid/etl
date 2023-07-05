@@ -1,0 +1,8 @@
+tables:
+  space_track:
+    variables:
+      objects:
+        title: Objects in space
+        unit: objects
+        display:
+          numDecimalPlaces: 0

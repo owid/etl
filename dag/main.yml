@@ -16,7 +16,7 @@ steps:
     - data://garden/demography/2022-12-08/population
     - data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators
     - data://garden/wb/2021-07-01/wb_income
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   # UN WPP (2022)
   data://meadow/un/2022-07-11/un_wpp:
     - snapshot://un/2022-07-11/un_wpp.zip
@@ -35,6 +35,7 @@ steps:
   # Others
   data://grapher/who/2021-07-01/ghe:
     - data://garden/who/2021-07-01/ghe
+    - data://garden/regions/2023-01-01/regions
   data://meadow/living_planet/2020-09-10/lpd:
     - walden://living_planet/2020-09-10/lpd
   data://garden/living_planet/2020-09-10/lpd:
@@ -53,12 +54,6 @@ steps:
     - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
   data://grapher/ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
-  data://meadow/worldbank_wdi/2022-05-26/wdi:
-    - walden://worldbank_wdi/2022-05-26/wdi
-  data://garden/worldbank_wdi/2022-05-26/wdi:
-    - data://meadow/worldbank_wdi/2022-05-26/wdi
-  data://grapher/worldbank_wdi/2022-05-26/wdi:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/owid/latest/key_indicators:
     - data://garden/owid/latest/key_indicators
   data://meadow/oecd/2016-06-01/regional_wellbeing:
@@ -69,11 +64,28 @@ steps:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://meadow/un/2022-07-11/un_wpp
 
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2023-05-29/wdi:
+    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
+  data://garden/worldbank_wdi/2023-05-29/wdi:
+    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
+    - data://meadow/worldbank_wdi/2023-05-29/wdi
+  data://grapher/worldbank_wdi/2023-05-29/wdi:
+    - data://garden/worldbank_wdi/2023-05-29/wdi
+
+  data://meadow/worldbank_wdi/2022-05-26/wdi:
+    - walden://worldbank_wdi/2022-05-26/wdi
+  data://garden/worldbank_wdi/2022-05-26/wdi:
+    - data://meadow/worldbank_wdi/2022-05-26/wdi
+  data://grapher/worldbank_wdi/2022-05-26/wdi:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+
   # Homicide - WHO
   data://meadow/homicide/2023-01-03/who_mort_db:
     - snapshot://homicide/2023-01-03/who_mort_db.csv
   data://garden/homicide/2023-01-03/who_mort_db:
     - data://meadow/homicide/2023-01-03/who_mort_db
+    - data://garden/un/2022-07-11/un_wpp
   data://grapher/homicide/2023-01-03/who_mort_db:
     - data://garden/homicide/2023-01-03/who_mort_db
 
@@ -108,12 +120,19 @@ steps:
   data://grapher/un/2023-01-24/un_sdg:
     - data://garden/un/2023-01-24/un_sdg
 
+# IHME SDG
+  data-private://meadow/ihme/2023-05-09/sdg:
+  - snapshot-private://ihme/2023-05-05/sdg.csv
+  data-private://garden/ihme/2023-05-09/sdg:
+  - data-private://meadow/ihme/2023-05-09/sdg
+  data-private://grapher/ihme/2023-05-09/sdg:
+  - data-private://garden/ihme/2023-05-09/sdg
 
   # Internet
   data://garden/technology/2022/internet:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://garden/owid/latest/key_indicators
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   data://grapher/technology/2022/internet:
     - data://garden/technology/2022/internet
 
@@ -173,7 +192,7 @@ steps:
     - data://meadow/emdat/2022-11-24/natural_disasters
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
     - data://garden/worldbank_wdi/2022-05-26/wdi
   # The following dataset has all (yearly and decadal) variables together.
   data://grapher/emdat/2022-11-24/natural_disasters:
@@ -193,10 +212,10 @@ steps:
     - backport://backport/owid/latest/dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources
     - data://garden/demography/2023-02-03/life_expectancy
     - data://garden/owid/latest/key_indicators
-    - data://garden/gcp/2022-11-11/global_carbon_budget
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/gcp/2023-04-28/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
-    # The following step is not the latest version available.
-    - data://garden/bp/2022-07-14/energy_mix
+    - data://garden/bp/2023-02-20/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Global GDP in the long run
@@ -224,7 +243,7 @@ steps:
     - walden://ggdc/2021-06-18/penn_world_table
   data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts:
     - walden://ggdc/2021-06-18/penn_world_table_national_accounts
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   data://garden/ggdc/2022-11-28/penn_world_table:
     - data://meadow/ggdc/2022-11-28/penn_world_table
     - data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts
@@ -243,15 +262,12 @@ steps:
   data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
 
-  # Long-term homicide rates in Europe - Eisner (2014)
-  data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
-    - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
-
   #Luxembourg Income Study
   data://meadow/lis/2023-01-18/luxembourg_income_study:
     - snapshot://lis/2023-01-18/lis_keyvars.csv
     - snapshot://lis/2023-01-18/lis_abs_poverty.csv
     - snapshot://lis/2023-01-18/lis_distribution.csv
+    - data://garden/regions/2023-01-01/regions
   data://garden/lis/2023-01-18/luxembourg_income_study:
     - data://meadow/lis/2023-01-18/luxembourg_income_study
   data://grapher/lis/2023-01-18/luxembourg_income_study:
@@ -261,7 +277,9 @@ steps:
 
   # World Inequality Database
   data://meadow/wid/2023-01-27/world_inequality_database:
+    - data://garden/regions/2023-01-01/regions
     - snapshot://wid/2023-01-27/world_inequality_database.csv
+    - snapshot://wid/2023-01-27/world_inequality_database_with_extrapolations.csv
   data://garden/wid/2023-01-27/world_inequality_database:
     - data://meadow/wid/2023-01-27/world_inequality_database
   data://grapher/wid/2023-01-27/world_inequality_database:
@@ -287,6 +305,8 @@ steps:
   # Regions - Regions (2023).
   #
   data://garden/regions/2023-01-01/regions:
+  data://grapher/regions/latest/regions:
+  - data://garden/regions/2023-01-01/regions
 
   # Democracy and Human rights - V-Dem index
   data://meadow/democracy/2023-03-02/vdem:
@@ -328,14 +348,177 @@ steps:
   data://grapher/technology/2023-03-16/hcctad:
   - data://garden/technology/2023-03-16/hcctad
 
-# Happiness report
+  # Happiness report
   data://meadow/happiness/2023-03-20/happiness:
   - snapshot://happiness/2023-03-20/happiness.xls
+  data://meadow/happiness/2022-03-20/happiness:
+  - snapshot://happiness/2022-03-20/happiness.xls
+  data://meadow/happiness/2021-03-20/happiness:
+  - snapshot://happiness/2021-03-20/happiness.xls
+  data://meadow/happiness/2020-03-20/happiness:
+  - snapshot://happiness/2020-03-20/happiness.xls
+  data://meadow/happiness/2019-03-20/happiness:
+  - snapshot://happiness/2019-03-20/happiness.xls
+  data://meadow/happiness/2018-03-20/happiness:
+  - snapshot://happiness/2018-03-20/happiness.xls
+  data://meadow/happiness/2017-03-20/happiness:
+  - snapshot://happiness/2017-03-20/happiness.xlsx
+  data://meadow/happiness/2016-03-20/happiness:
+  - snapshot://happiness/2016-03-20/happiness.xlsx
+  data://meadow/happiness/2015-03-20/happiness:
+  - snapshot://happiness/2015-03-20/happiness.xlsx
+  data://meadow/happiness/2012-03-20/happiness:
+  - snapshot://happiness/2012-03-20/happiness.xlsx
+
   data://garden/happiness/2023-03-20/happiness:
   - data://meadow/happiness/2023-03-20/happiness
-  - backport://backport/owid/latest/dataset_235_world_happiness_report__2022
+  - data://meadow/happiness/2022-03-20/happiness
+  - data://meadow/happiness/2021-03-20/happiness
+  - data://meadow/happiness/2020-03-20/happiness
+  - data://meadow/happiness/2019-03-20/happiness
+  - data://meadow/happiness/2018-03-20/happiness
+  - data://meadow/happiness/2017-03-20/happiness
+  - data://meadow/happiness/2016-03-20/happiness
+  - data://meadow/happiness/2015-03-20/happiness
+  - data://meadow/happiness/2012-03-20/happiness
   data://grapher/happiness/2023-03-20/happiness:
   - data://garden/happiness/2023-03-20/happiness
+
+# Equaldex dataset
+  data://meadow/lgbt_rights/2023-04-13/equaldex:
+  - snapshot://lgbt_rights/2023-04-13/equaldex.csv
+  - snapshot://lgbt_rights/2023-04-13/equaldex_current.csv
+  data://garden/lgbt_rights/2023-04-13/equaldex:
+  - data://meadow/lgbt_rights/2023-04-13/equaldex
+  data://grapher/lgbt_rights/2023-04-13/equaldex:
+  - data://garden/lgbt_rights/2023-04-13/equaldex
+
+# LGBTI Policy Index (Velasco, 2020)
+  data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
+  - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
+  data://garden/lgbt_rights/2023-04-27/lgbti_policy_index:
+  - data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index
+  - data://garden/demography/2023-03-31/population
+  - data://garden/wb/2021-07-01/wb_income
+  data://grapher/lgbt_rights/2023-04-27/lgbti_policy_index:
+  - data://garden/lgbt_rights/2023-04-27/lgbti_policy_index
+
+  # Ethnic Power Relations Dataset
+  data://meadow/eth/2023-03-15/growup:
+  - snapshot://eth/2023-03-15/growup.csv
+  data://garden/eth/2023-03-15/ethnic_power_relations:
+  - data://meadow/eth/2023-03-15/growup
+  - data://garden/demography/2023-03-31/population
+  - data://garden/wb/2021-07-01/wb_income
+  - data://garden/regions/2023-01-01/regions
+  data://grapher/eth/2023-03-15/ethnic_power_relations:
+  - data://garden/eth/2023-03-15/ethnic_power_relations
+
+# Oil Spills
+  data://meadow/itopf/2023-05-18/oil_spills:
+  - snapshot://itopf/2023-05-18/oil_spills.pdf
+  data://garden/itopf/2023-05-18/oil_spills:
+  - data://meadow/itopf/2023-05-18/oil_spills
+  data://grapher/itopf/2023-05-18/oil_spills:
+  - data://garden/itopf/2023-05-18/oil_spills
+
+# UNWTO tourism
+    # Key indicators
+  data://meadow/tourism/2023-05-05/unwto:
+  - snapshot://tourism/2023-05-04/unwto.xlsx
+  data://garden/tourism/2023-05-05/unwto:
+  - data://meadow/tourism/2023-05-05/unwto
+  - data://garden/owid/latest/key_indicators
+  - data://garden/worldbank_wdi/2022-05-26/wdi
+  - data://garden/oecd/2023-06-20/ppp_exchange_rates
+  data://grapher/tourism/2023-05-11/unwto:
+  - data://garden/tourism/2023-05-05/unwto
+  # Environment Tables Implementations
+  data://meadow/tourism/2023-05-09/unwto_environment:
+  - snapshot://tourism/2023-05-09/unwto_environment.xlsx
+  data://garden/tourism/2023-05-10/unwto_environment:
+  - data://meadow/tourism/2023-05-09/unwto_environment
+  data://grapher/tourism/2023-05-23/unwto_environment:
+  - data://garden/tourism/2023-05-10/unwto_environment
+
+  # GDP
+  data://meadow/tourism/2023-05-09/unwto_gdp:
+  - snapshot://tourism/2023-05-09/unwto_gdp.xlsx
+  data://garden/tourism/2023-05-10/unwto_gdp:
+  - data://meadow/tourism/2023-05-09/unwto_gdp
+  data://grapher/tourism/2023-05-23/unwto_gdp:
+  - data://garden/tourism/2023-05-10/unwto_gdp
+
+# CO2 emissions from air transport (OECD)
+  data://meadow/oecd/2023-05-18/co2_air_transport:
+  - snapshot://oecd/2023-05-18/co2_air_transport.csv
+  data://garden/oecd/2023-05-19/co2_air_transport:
+  - data://garden/tourism/2023-05-05/unwto
+  - data://meadow/oecd/2023-05-18/co2_air_transport
+  data://grapher/oecd/2023-05-19/co2_air_transport:
+  - data://garden/oecd/2023-05-19/co2_air_transport
+
+
+  # WB income groups
+  data://meadow/wb/2023-04-30/income_groups:
+    - snapshot://wb/2023-04-30/income_groups.xlsx
+  data://garden/wb/2023-04-30/income_groups:
+    - data://meadow/wb/2023-04-30/income_groups
+  data://grapher/wb/2023-04-30/income_groups:
+    - data://garden/wb/2023-04-30/income_groups
+
+# International Monetary Fund, World Economic Outlook
+  data://meadow/imf/2023-05-02/world_economic_outlook:
+  - snapshot://imf/2023-05-02/world_economic_outlook.xls
+  data://garden/imf/2023-05-02/world_economic_outlook:
+  - data://meadow/imf/2023-05-02/world_economic_outlook
+  data://grapher/imf/2023-05-02/world_economic_outlook:
+  - data://garden/imf/2023-05-02/world_economic_outlook
+
+  # Patents & journal articles (World Bank, United Nations)
+  data://garden/research_development/2023-05-05/patents_articles:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/demography/2023-03-31/population
+  data://grapher/research_development/2023-05-05/patents_articles:
+    - data://garden/research_development/2023-05-05/patents_articles
+
+  # World Bank's Women, Business and the Law additional data
+  data://meadow/wb/2023-05-12/women_business_law_additional:
+  - snapshot://wb/2023-05-12/women_business_law_additional.xlsx
+  data://garden/wb/2023-05-12/women_business_law_additional:
+  - data://meadow/wb/2023-05-12/women_business_law_additional
+  data://grapher/wb/2023-05-12/women_business_law_additional:
+  - data://garden/wb/2023-05-12/women_business_law_additional
+
+  # U.S. patent activity since 1790 (USPTO)
+  data://meadow/research_development/2023-05-24/us_patents:
+  - snapshot://research_development/2023-05-24/us_patents.htm
+  data://garden/research_development/2023-05-25/us_patents:
+  - data://meadow/research_development/2023-05-24/us_patents
+  data://grapher/research_development/2023-05-25/us_patents:
+  - data://garden/research_development/2023-05-25/us_patents
+
+  # OECD Income Distribution Database
+  data://meadow/oecd/2023-06-06/income_distribution_database:
+  - snapshot://oecd/2023-06-06/income_distribution_database.csv
+  data://garden/oecd/2023-06-06/income_distribution_database:
+  - data://meadow/oecd/2023-06-06/income_distribution_database
+  data://grapher/oecd/2023-06-06/income_distribution_database:
+  - data://garden/oecd/2023-06-06/income_distribution_database
+
+  # Real commodity prices
+  data://grapher/papers/2023-06-07/commodity_prices:
+  - data://garden/papers/2023-06-07/commodity_prices
+  data://garden/papers/2023-06-07/commodity_prices:
+  - snapshot://papers/2023-06-07/commodity_prices.xlsx
+
+
+# OECD exchange rates
+  data://meadow/oecd/2023-06-20/ppp_exchange_rates:
+  - snapshot://oecd/2023-06-20/ppp_exchange_rates.csv
+  data://garden/oecd/2023-06-20/ppp_exchange_rates:
+  - data://meadow/oecd/2023-06-20/ppp_exchange_rates
+
 
 # Sub-dags to import
 include:
@@ -349,8 +532,12 @@ include:
   - dag/demography.yml
   - dag/war.yml
   - dag/fasttrack.yml
+  - dag/migrated.yml
   - dag/biodiversity.yml
   - dag/health.yml
   - dag/excess_mortality.yml
   - dag/environment.yml
   - dag/agriculture.yml
+  - dag/space.yml
+  - dag/artificial_intelligence.yml
+

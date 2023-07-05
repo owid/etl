@@ -16,8 +16,8 @@ from MySQLdb import OperationalError
 from pywebio import input as pi
 from pywebio import output as po
 
-from etl.chart_revision.deprecated import ChartRevisionSuggester
-from etl.chart_revision.revision import (
+from etl.chart_revision.v1.deprecated import ChartRevisionSuggester
+from etl.chart_revision.v1.revision import (
     ChartVariableUpdateRevision,
     get_charts_to_update,
     submit_revisions_to_grapher,
@@ -43,8 +43,7 @@ with open(CURRENT_DIR / "charts.styles.css", "r") as f:
     pywebio.config(css_style=f.read())
 
 
-def app(run_checks: bool, dummy_data: bool) -> None:
-
+def app(run_checks: bool) -> None:
     nav = Navigation()
     # show live banner alert
     nav.show_live_banner()

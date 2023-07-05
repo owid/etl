@@ -15,10 +15,7 @@ import pandas as pd
 from owid.catalog import Dataset
 from rapidfuzz import process
 
-from etl.paths import REFERENCE_DATASET, STEP_DIR
-
-# Path to latest regions definitions file. We update aliases from harmonize
-REGION_DEFINITIONS_FILE = sorted((STEP_DIR / "data/garden/regions/").glob("*/regions.yml"))[-1]
+from etl.paths import LATEST_REGIONS_DATASET_PATH, LATEST_REGIONS_YML
 
 
 @click.command()
@@ -116,8 +113,7 @@ def interactive_harmonize(
             mapping[region] = name
 
             if picker.save_alias:
-                # update the reference dataset to include this alias
-                save_alias_to_countries_regions(name, region)
+                # update the regions dataset to include this alias
                 save_alias_to_regions_yaml(name, region)
                 print(f'Saved alias: "{region}" -> "{name}"')
         else:
@@ -137,15 +133,18 @@ class CountryRegionMapper:
     valid_names: Set[str]
 
     def __init__(self) -> None:
-        rc = Dataset(REFERENCE_DATASET)["countries_regions"]
+        ds_regions = Dataset(LATEST_REGIONS_DATASET_PATH)
+        rc_df = ds_regions["definitions"]
+        aliases_s = ds_regions["aliases"]["alias"]
         aliases = {}
         valid_names = set()
-        for _, row in rc.iterrows():
-            name = row["name"]
+        for row in rc_df.itertuples():
+            name = row.name  # type: ignore
+            code = row.Index  # type: ignore
             valid_names.add(name)
-            aliases[row["name"].lower()] = name
-            if not pd.isnull(row.aliases):
-                for alias in json.loads(row.aliases):
+            aliases[name.lower()] = name
+            if code in aliases_s.index:
+                for alias in aliases_s.loc[[code]]:
                     aliases[alias.lower()] = name
 
         self.aliases = aliases
@@ -230,7 +229,7 @@ class GeoPickerCmd(cmd.Cmd):
                 self.save_alias = input_bool("Save this alias")
             else:
                 # it's a manual entry that does not correspond to any known country
-                print(f"Using custom entry '{choice}' that does not match a country/region from the reference set")
+                print(f"Using custom entry '{choice}' that does not match a country/region from the regions set")
                 self.match = choice
 
         return True
@@ -266,35 +265,15 @@ def input_bool(query: str, default: str = "y") -> bool:
     return (c.lower() or default) == "y"
 
 
-def save_alias_to_countries_regions(name: str, alias: str) -> None:
-    """
-    Update the reference country/region dataset to include this alias.
-    """
-    # load it
-    ref = Dataset(REFERENCE_DATASET)
-    rc = ref["countries_regions"]
-
-    # get the existing aliases for this country/region
-    aliases_json = rc.loc[rc.name == name, "aliases"].iloc[0]
-    aliases = set(json.loads(aliases_json if not pd.isnull(aliases_json) else "[]"))
-
-    # add our new one
-    aliases.add(alias)
-
-    # pack up and save
-    rc.loc[rc.name == name, "aliases"] = json.dumps(sorted(aliases))
-    ref.add(rc, formats=["csv"])
-
-
 def save_alias_to_regions_yaml(name: str, alias: str) -> None:
     """
     Save alias to regions.yml definitions. It doesn't modify original formatting of the file, but assumes
     that `alias` is always the last element in the region block.
     """
-    with open(REGION_DEFINITIONS_FILE, "r") as f:
+    with open(LATEST_REGIONS_YML, "r") as f:
         yaml_content = f.read()
 
-    with open(REGION_DEFINITIONS_FILE, "w") as f:
+    with open(LATEST_REGIONS_YML, "w") as f:
         f.write(_add_alias_to_regions(yaml_content, name, alias))
 
 
@@ -318,7 +297,7 @@ def _add_alias_to_regions(yaml_content, target_name, new_alias):
             aliases = f'  aliases:\n    - "{new_alias}"\n'
             yaml_content = yaml_content[: match.end()] + aliases + yaml_content[match.end() :]
     else:
-        raise ValueError(f"Could not find region {target_name} in {REGION_DEFINITIONS_FILE}")
+        raise ValueError(f"Could not find region {target_name} in {LATEST_REGIONS_YML}")
 
     return yaml_content
 

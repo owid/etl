@@ -23,7 +23,6 @@ from owid.datautils import dataframes
 from shared import add_population, gather_sources_from_tables
 
 from etl.helpers import PathFinder, create_dataset
-from etl.paths import DATA_DIR
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -136,10 +135,6 @@ def run(dest_dir: str) -> None:
     ds_electricity_mix: Dataset = paths.load_dependency("electricity_mix")
     ds_population: Dataset = paths.load_dependency("population")
     ds_ggdc: Dataset = paths.load_dependency("ggdc_maddison")
-    # This won't work until we use the new regions dataset, because of the special dag line of the reference dataset.
-    # ds_regions: Dataset = paths.load_dependency("reference")
-    # Instead, load directly the old reference dataset.
-    ds_regions = Dataset(DATA_DIR / "garden/reference")
 
     # Gather all required tables from all datasets.
     tb_energy_mix = ds_energy_mix["energy_mix"].reset_index()
@@ -147,7 +142,7 @@ def run(dest_dir: str) -> None:
     tb_primary_energy = ds_primary_energy["primary_energy_consumption"].reset_index()
     tb_electricity_mix = ds_electricity_mix["electricity_mix"].reset_index()
     tb_population = ds_population["population"].reset_index()
-    tb_regions = ds_regions["countries_regions"].reset_index()[["name", "iso_alpha3"]]
+    tb_regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
     tb_ggdc = ds_ggdc["maddison_gdp"].reset_index()[["country", "year", "gdp"]].dropna()
 
     # Load mapping from variable names in the component dataset to the final variable name in the output dataset.

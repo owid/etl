@@ -199,11 +199,12 @@ def map_ids_to_labels(df: pd.DataFrame) -> pd.DataFrame:
     _sanity_check_gender(df)
 
     # Question ID to Question label mapping
-    question_id_to_label = {k: v["title"] for k, v in MAPPING_QUESTION_VALUES.items()}
+    question_id_to_label = {k: f"{k} - {v['title']}" for k, v in MAPPING_QUESTION_VALUES.items()}
 
     # Map IDs to Labels (Question, Answer, Gender, Age group)
     log.info("wgm_2018: mapping ids to labels}")
-    df["question"] = df["question"].replace(question_id_to_label)
+    df["question_code"] = df["question"]
+    df["question"] = df["question_code"].replace(question_id_to_label)
     df["answer"] = df["question__answer"].map(question_answer_id_to_label).fillna("Unknown")
     df["gender"] = df["gender"].replace(MAPPING_GENDER_VALUES)
     return df
@@ -238,7 +239,7 @@ def create_agree_and_disagree_categories(df: pd.DataFrame) -> pd.DataFrame:
     }
     for q in questions_merge_agree_disagree:
         # Keep only rows of affected questions
-        df_ = df[df["question"] == MAPPING_QUESTION_VALUES[q]["title"]].copy()
+        df_ = df[df["question_code"] == q].copy()
         # Keep only affected answers
         df_ = df_[df_["answer"].isin(list(mapping.keys()))]
         # Map categories to new categories
@@ -247,12 +248,12 @@ def create_agree_and_disagree_categories(df: pd.DataFrame) -> pd.DataFrame:
             numeric_only=True
         )
         # Sanity check
-        set(df_.answer) == {
+        answers = set(df_["answer"])
+        answers_expected = {
             "Agree",
             "Disagree",
-            "Don't know/Refused",
-            "Neither agree nor disagree",
-        }, "Unknown or unexpected answers!"
+        }
+        assert answers == answers_expected, f"Unknown or unexpected answers! {answers.difference(answers_expected)}"
         # Add to main dataframe
         df = pd.concat([df, df_], ignore_index=True)
     return df

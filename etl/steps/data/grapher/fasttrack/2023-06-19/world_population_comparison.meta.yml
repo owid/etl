@@ -1,0 +1,11 @@
+dataset:
+  sources:
+  - name: Multiple sources compiled by Our World in Data (2019)
+    published_by: Multiple sources compiled by Our World in Data (2019)
+tables:
+  world_population_comparison:
+    variables:
+      world_population:
+        title: World population
+        unit: people
+        description: Total world population

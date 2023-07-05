@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 399.89 202.97">
+  <defs>
+    <style>
+      .cls-1 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-2 {
+        font-family: Lato-Regular, Lato;
+        font-size: 80px;
+      }
+
+      .cls-2, .cls-3 {
+        fill: #fff;
+      }
+
+      .cls-4 {
+        letter-spacing: 0em;
+      }
+
+      .cls-5 {
+        letter-spacing: 0em;
+      }
+
+      .cls-6 {
+        letter-spacing: -.01em;
+      }
+
+      .cls-7 {
+        letter-spacing: -.06em;
+      }
+
+      .cls-8 {
+        letter-spacing: -.01em;
+      }
+    </style>
+  </defs>
+  <rect class="cls-3" y="172.97" width="399.89" height="30"/>
+  <text class="cls-2" transform="translate(12.66 68.66)"><tspan class="cls-5" x="0" y="0">O</tspan><tspan x="63.44" y="0">u</tspan><tspan class="cls-1" x="108.04" y="0">r</tspan><tspan class="cls-6" x="135.48" y="0"> </tspan><tspan class="cls-7" x="154.88" y="0">W</tspan><tspan x="233.2" y="0">orld</tspan><tspan x="59.78" y="80">in </tspan><tspan class="cls-8" x="144.1" y="80">D</tspan><tspan class="cls-4" x="203.9" y="80">a</tspan><tspan x="243.14" y="80">ta</tspan></text>
+</svg>

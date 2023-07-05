@@ -2,6 +2,12 @@ steps:
   #
   # BP - Statistical review 2022.
   #
+  data://garden/bp/2022-07-14/statistical_review:
+    - backport://backport/owid/latest/dataset_5650_statistical_review_of_world_energy__bp__2022
+    - data://garden/bp/2022-07-11/statistical_review
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
   data://grapher/bp/2022-07-14/statistical_review:
     - data://garden/bp/2022-07-14/statistical_review
   #
@@ -41,7 +47,7 @@ steps:
     - data://garden/energy/2022-07-29/primary_energy_consumption
     - data://garden/energy/2022-12-13/electricity_mix
     - data://garden/owid/latest/key_indicators
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   #
   # Energy - Global primary energy (2022).
   #
@@ -92,7 +98,7 @@ steps:
     - data://garden/energy/2022-12-28/primary_energy_consumption
     - data://garden/energy/2022-12-28/electricity_mix
     - data://garden/owid/latest/key_indicators
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   #
   # Ember yearly electricity 2022.
   #
@@ -101,7 +107,7 @@ steps:
   data://garden/ember/2022-12-13/yearly_electricity:
     - data://meadow/ember/2022-12-13/yearly_electricity
     - data://garden/owid/latest/key_indicators
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   #
   # Ember combined electricity 2022.
   #
@@ -161,3 +167,90 @@ steps:
     - data://garden/wb/2021-07-01/wb_income
   data://grapher/bp/2022-12-28/energy_mix:
     - data://garden/bp/2022-12-28/energy_mix
+  #
+  # Energy - Primary energy consumption 2022b.
+  #
+  data://garden/energy/2022-07-29/primary_energy_consumption:
+    - data://garden/bp/2022-07-14/statistical_review
+    - data://garden/eia/2022-07-27/energy_consumption
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/owid/latest/key_indicators
+  #
+  # Energy - OWID Energy dataset (2023).
+  #
+  data://garden/energy/2023-02-20/owid_energy:
+    - data://garden/bp/2023-02-20/energy_mix
+    - data://garden/energy/2023-02-20/fossil_fuel_production
+    - data://garden/energy/2023-02-20/primary_energy_consumption
+    - data://garden/energy/2023-02-20/electricity_mix
+    - data://garden/demography/2022-12-08/population
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Ember - Yearly electricity data 2023.
+  #
+  data://meadow/ember/2023-02-20/yearly_electricity:
+    - snapshot://ember/2023-02-20/yearly_electricity.csv
+  data://garden/ember/2023-02-20/yearly_electricity:
+    - data://meadow/ember/2023-02-20/yearly_electricity
+    - data://garden/demography/2022-12-08/population
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Ember - Combined electricity 2023.
+  #
+  # We still use EER 2022 for data from 1990-1999, which is not included in the 2023 version.
+  data://garden/ember/2023-02-20/combined_electricity:
+    - data://garden/ember/2022-08-01/european_electricity_review
+    - data://garden/ember/2023-02-20/yearly_electricity
+  #
+  # Energy - Electricity mix (BP & Ember, 2023).
+  #
+  data://garden/energy/2023-02-20/electricity_mix:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/ember/2023-02-20/combined_electricity
+    - data://garden/demography/2022-12-08/population
+  data://grapher/energy/2023-02-20/electricity_mix:
+    - data://garden/energy/2023-02-20/electricity_mix
+  #
+  # Energy - Fossil Fuel Production 2023.
+  #
+  data://garden/energy/2023-02-20/fossil_fuel_production:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/shift/2022-07-18/fossil_fuel_production
+    - data://garden/demography/2022-12-08/population
+  data://grapher/energy/2023-02-20/fossil_fuel_production:
+    - data://garden/energy/2023-02-20/fossil_fuel_production
+  #
+  # Energy - Primary energy consumption 2023.
+  #
+  data://garden/energy/2023-02-20/primary_energy_consumption:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/eia/2022-07-27/energy_consumption
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/demography/2022-12-08/population
+  data://grapher/energy/2023-02-20/primary_energy_consumption:
+    - data://garden/energy/2023-02-20/primary_energy_consumption
+  #
+  # Energy - Global primary energy (2023).
+  #
+  data://garden/energy/2023-02-20/global_primary_energy:
+    - data://garden/smil/2017-01-01/global_primary_energy
+    - data://garden/bp/2022-12-28/statistical_review
+  data://grapher/energy/2023-02-20/global_primary_energy:
+    - data://garden/energy/2023-02-20/global_primary_energy
+  #
+  # Energy - UK historical electricity (2023).
+  #
+  data://garden/energy/2023-02-20/uk_historical_electricity:
+    - data://garden/uk_beis/2022-07-28/uk_historical_electricity
+    - data://garden/energy/2023-02-20/electricity_mix
+  data://grapher/energy/2023-02-20/uk_historical_electricity:
+    - data://garden/energy/2023-02-20/uk_historical_electricity
+  #
+  # BP - Energy mix (2022).
+  #
+  data://garden/bp/2022-07-14/energy_mix:
+    - data://garden/bp/2022-07-14/statistical_review
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income

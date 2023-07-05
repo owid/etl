@@ -8,6 +8,7 @@ from owid.catalog import s3_utils
 from pydantic import BaseModel
 from pywebio import input as pi
 from pywebio import output as po
+from pywebio.session import go_app
 
 from . import utils
 
@@ -15,13 +16,11 @@ CURRENT_DIR = Path(__file__).parent
 
 
 class Options(Enum):
-
     IS_PRIVATE = "Make dataset private"
     DATASET_MANUAL_IMPORT = "Import dataset from local file"
 
 
 class SnapshotForm(BaseModel):
-
     namespace: str
     snapshot_version: str
     short_name: str
@@ -50,8 +49,8 @@ class SnapshotForm(BaseModel):
         return self.snapshot_version or self.publication_year or self.publication_date  # type: ignore
 
 
-def app(run_checks: bool, dummy_data: bool) -> None:
-    dummies = utils.DUMMY_DATA if dummy_data else {}
+def app(run_checks: bool) -> None:
+    state = utils.APP_STATE
 
     with open(CURRENT_DIR / "snapshot.md", "r") as f:
         po.put_markdown(f.read())
@@ -70,7 +69,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="namespace",
                 placeholder="institution",
                 required=True,
-                value=dummies.get("namespace"),
+                value=state.get("namespace"),
                 help_text="Institution name. Example: emdat",
             ),
             pi.input(
@@ -78,7 +77,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="snapshot_version",
                 placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("snapshot_version", str(dt.date.today())),
+                value=state.get("snapshot_version", str(dt.date.today())),
                 help_text="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.input(
@@ -86,7 +85,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="short_name",
                 placeholder="testing_dataset_name",
                 required=True,
-                value=dummies.get("short_name"),
+                value=state.get("short_name"),
                 validate=utils.validate_short_name,
                 help_text="Underscored dataset short name. Example: natural_disasters",
             ),
@@ -95,7 +94,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="name",
                 placeholder="Testing Dataset Name (Institution, 2023)",
                 required=True,
-                value=dummies.get("name"),
+                value=state.get("name"),
                 help_text="Human-readable dataset name, followed by (Institution, Year of version). Example: Natural disasters (EMDAT, 2022)",
             ),
             pi.input(
@@ -103,7 +102,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="source_name",
                 placeholder="Testing Short Citation",
                 required=True,
-                value=dummies.get("source_name"),
+                value=state.get("source_name"),
                 help_text="Short source citation (to show in charts). Example: EM-DAT",
             ),
             pi.input(
@@ -111,14 +110,14 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="source_published_by",
                 placeholder="Testing Full Citation",
                 required=True,
-                value=dummies.get("source_published_by"),
+                value=state.get("source_published_by"),
                 help_text="Testing Full Citation, as recommended by the source. Example: EM-DAT, CRED / UCLouvain, Brussels, Belgium",
             ),
             pi.input(
                 "Publication date",
                 name="publication_date",
                 placeholder="",
-                value=dummies.get("publication_date"),
+                value=state.get("publication_date"),
                 help_text="Date when the dataset was published by the source. Example: 2023-01-01",
             ),
             pi.input(
@@ -133,21 +132,21 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="url",
                 placeholder=("https://url_of_testing_source.com/"),
                 required=True,
-                value=dummies.get("url"),
+                value=state.get("url"),
                 help_text="URL to the main page of the project.",
             ),
             pi.input(
                 "Dataset download URL",
                 name="source_data_url",
                 placeholder="https://url_of_testing_source.com/data.csv",
-                value=dummies.get("source_data_url"),
+                value=state.get("source_data_url"),
                 help_text="URL to download the data file.",
             ),
             pi.input(
                 "File extension",
                 name="file_extension",
                 placeholder="csv",
-                value=dummies.get("file_extension"),
+                value=state.get("file_extension"),
                 help_text="File extension (without the '.') of the file to be downloaded. Example: csv",
             ),
             pi.input(
@@ -163,7 +162,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 help_text="Name of the dataset license. Example: 'Creative Commons BY 4.0'",
             ),
             pi.textarea(
-                "Description", name="description", value=dummies.get("description"), help_text="Dataset description."
+                "Description", name="description", value=state.get("description"), help_text="Dataset description."
             ),
             pi.checkbox(
                 "Other options",
@@ -176,6 +175,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         ],
     )
     form = SnapshotForm(**data)
+
+    # save form data to global state for next steps
+    state.update(form.dict())
 
     # use multi-line description
     form.description = form.description.replace("\n", "\n  ")
@@ -199,8 +201,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 python snapshots/{form.namespace}/{form.version}/{form.short_name}.py
 ```
 
-3. Exit the process and run next step with `poetry run walkthrough meadow`
-
+3. Continue to the meadow step
+"""
+    )
+    po.put_buttons(["Go to meadow"], [lambda: go_app("meadow", new_window=False)])
+    po.put_markdown(
+        """
 ## Generated files
 """
     )

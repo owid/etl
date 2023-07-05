@@ -92,7 +92,7 @@
   name: "Aland Islands"
   aliases:
     - "\u00c3\u0081EEland Islands"
-    - "\u00c5land Islands"
+    - "Åland Islands"
 
 - code: "ALB"
   name: "Albania"
@@ -114,6 +114,7 @@
 
 - code: "ATA"
   name: "Antarctica"
+  region_type: "other"
 
 - code: "ATG"
   name: "Antigua and Barbuda"
@@ -190,6 +191,7 @@
     - "UZB"
     - "VNM"
     - "YEM"
+    - "OWID_CYN"
 
 - code: "AUS"
   name: "Australia"
@@ -448,6 +450,7 @@
   name: "Denmark"
   related:
     - "FRO"
+    - "GRL"
 
 - code: "DJI"
   name: "Djibouti"
@@ -473,7 +476,6 @@
 - code: "TLS"
   name: "East Timor"
   aliases:
-    - "East Timor"
     - "Timor-Leste"
 
 - code: "ECU"
@@ -496,10 +498,11 @@
   name: "Eritrea"
 
 - code: "OWID_ERE"
-  name: "Eritrea and Ethiopia"
+  name: "Ethiopia (former)"
   is_historical: True
   aliases:
     - "Ethiopia PDR"
+    - "Eritrea and Ethiopia"
   end_year: 1993
   successors:
     - "ERI"
@@ -618,9 +621,9 @@
     - "SWE"
 
 - code: "FRO"
-  name: "Faeroe Islands"
+  name: "Faroe Islands"
   aliases:
-    - "Faroe Islands"
+    - "Faeroe Islands"
     - "Faroe Islands (the)"
 
 - code: "FLK"
@@ -982,6 +985,8 @@
   name: "New Zealand"
   related:
     - "TKL"
+    - "NIU"
+    - "COK"
 
 - code: "NIC"
   name: "Nicaragua"
@@ -1213,9 +1218,8 @@
 - code: "BLM"
   name: "Saint Barthelemy"
   aliases:
-    - "Saint Barthlemy"
-    - "Saint Barth\u00e9lemy"
     - "St Barth"
+    - "Saint Barthélemy"
 
 - code: "SHN"
   name: "Saint Helena"
@@ -1523,7 +1527,9 @@
     - "VGB"
 
 - code: "OWID_KRU"
-  name: "United Korea"
+  name: "Korea (former)"
+  aliases:
+    - "United Korea"
   is_historical: True
   end_year: 1948
   successors:
@@ -1653,6 +1659,7 @@
 
 - code: "OWID_ZAN"
   name: "Zanzibar"
+  region_type: "other"
 
 - code: "ZWE"
   name: "Zimbabwe"

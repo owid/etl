@@ -3,7 +3,6 @@ dataset:
     -
       name: WHO/UNICEF
       published_by: World Health Organization (2022)
-      publisher_source: WHO/UNICEF
 
 tables:
   who_vaccination:
@@ -36,5 +35,4 @@ tables:
       coverage:
         title: Coverage
         description: Share of target population immunised
-      
-      
+

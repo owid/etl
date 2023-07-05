@@ -1,14 +1,14 @@
 meta:
   namespace: war
   short_name: war_ucdp
-  name: Non-State Conflict Dataset version 22.1 (UCDP, 1989 - 2021)
+  name: Non-State Conflict Dataset version 22.1 (UCDP, 2023)
   version: 2023-03-14
   publication_year: 2022
   publication_date: 2022-06-27
-  source_name: Brecke
+  source_name: UCDP (2023)
   source_published_by: Davies, Shawn, Therese Pettersson & Magnus Öberg (2022). Organized
     violence 1989-2021 and drone warfare. Journal of Peace Research 59(4).
-  url: hhttps://ucdp.uu.se/downloads/index.html
+  url: https://ucdp.uu.se/downloads/index.html
   source_data_url: https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-221-csv.zip
   file_extension: zip
   license_url:

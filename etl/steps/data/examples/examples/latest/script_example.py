@@ -4,7 +4,10 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.walden import Catalog as WaldenCatalog
 
-from etl.paths import DATA_DIR, REFERENCE_DATASET
+from etl.helpers import PathFinder
+from etl.paths import DATA_DIR
+
+paths = PathFinder(__file__)
 
 
 def load_wb_income() -> pd.DataFrame:
@@ -18,8 +21,7 @@ def run(dest_dir: str) -> None:
     df = load_wb_income()
 
     # Convert iso codes to country names
-    reference_dataset = Dataset(REFERENCE_DATASET)
-    countries_regions = reference_dataset["countries_regions"]
+    countries_regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
     df["country"] = df.Code.map(countries_regions.name)
 
     # NOTE: For simplicity we are loading population from Maddison, but in practive

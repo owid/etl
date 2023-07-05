@@ -8,10 +8,10 @@ from typing import List, cast
 import numpy as np
 import pandas as pd
 from owid import catalog
-from owid.catalog.utils import underscore_table
 from structlog import get_logger
 
 from etl.data_helpers import geo
+from etl.helpers import create_dataset
 from etl.paths import DATA_DIR
 
 log = get_logger()
@@ -406,20 +406,14 @@ def run(dest_dir: str) -> None:
     # Prepare output data.
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
 
+    # Create a new table.
+    tb_garden = catalog.Table(df, short_name=DATASET_SHORT_NAME, underscore=True)
+
     #
     # Save outputs.
     #
     # Create a new garden dataset (with the same metadata as the meadow version).
-    ds_garden = catalog.Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
     ds_garden.save()
-    ds_garden.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
-
-    # Create a new table.
-    tb_garden = underscore_table(catalog.Table(df))
-    tb_garden.metadata = tb_meadow.metadata
-    tb_garden.update_metadata_from_yaml(METADATA_PATH, DATASET_SHORT_NAME)
-    # Add table to dataset.
-    ds_garden.add(tb_garden)
 
     log.info(f"{DATASET_SHORT_NAME}.end")

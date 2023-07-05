@@ -17,13 +17,11 @@ ETL_DIR = Path(etl.__file__).parent.parent
 
 
 class Options(Enum):
-
     ADD_TO_DAG = "Add steps into dag.yml file"
     IS_PRIVATE = "Make dataset private"
 
 
 class ExplorersForm(BaseModel):
-
     short_name: str
     namespace: str
     version: str
@@ -37,8 +35,8 @@ class ExplorersForm(BaseModel):
         super().__init__(**data)
 
 
-def app(run_checks: bool, dummy_data: bool) -> None:
-    dummies = utils.DUMMY_DATA if dummy_data else {}
+def app(run_checks: bool) -> None:
+    state = utils.APP_STATE
 
     with open(CURRENT_DIR / "explorers.md", "r") as f:
         po.put_markdown(f.read())
@@ -51,7 +49,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="namespace",
                 placeholder="institution",
                 required=True,
-                value=dummies.get("namespace"),
+                value=state.get("namespace"),
                 help_text="Institution name. Example: emdat",
             ),
             pi.input(
@@ -59,7 +57,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="version",
                 placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version", str(dt.date.today())),
+                value=state.get("version", str(dt.date.today())),
                 help_text="Version of the explorers dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.input(
@@ -67,7 +65,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="short_name",
                 placeholder="testing_dataset_name",
                 required=True,
-                value=dummies.get("short_name"),
+                value=state.get("short_name"),
                 validate=utils.validate_short_name,
                 help_text="Underscored dataset short name. Example: natural_disasters",
             ),
@@ -85,6 +83,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         ],
     )
     form = ExplorersForm(**data)
+
+    # save form data to global state for next steps
+    state.update(form.dict())
 
     private_suffix = "-private" if form.is_private else ""
 

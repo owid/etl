@@ -23,7 +23,7 @@ dataset:
 
 tables:
   sutton_1971:
-    variables:
+    variables: {}
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5096_covid_19_model_estimates__ihme__2022_config
   file_extension: json
-  date_accessed: 2023-02-23 18:58:26.996858
+  date_accessed: 2023-06-01 13:18:02.921895
   name: Grapher metadata for dataset_5096_covid_19_model_estimates__ihme__2022
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8583c1e23cd82c996ab02813b057ceb6
+- md5: d2313eef5a0becddc805300c4d79f10a
   size: 3655
   path: dataset_5096_covid_19_model_estimates__ihme__2022_config.json

@@ -2,7 +2,7 @@ all_sources:
   - source_vdem: &source-vdem
       name: OWID based on V-Dem (v13) and Lührmann et al. (2018)
       published_by: Our World in Data, Bastian Herre
-      publisher_source: Data comes from the Varieties of Democracy project (v13), sometimes using Lührmann et al's (2018) Regimes of the World classification, and own expansions and refinements.
+      description: Data comes from the Varieties of Democracy project (v13), sometimes using Lührmann et al's (2018) Regimes of the World classification, and own expansions and refinements.
       url: http://v-dem.net/vdemds.html
       date_accessed: 2023-03-02
 
@@ -454,21 +454,21 @@ tables:
           The variable ranges from 0 to 1 (most free).
       freeexpr_vdem_high_owid:
         description: |-
-          The variable denotes the upper-bound estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and present different political perspectives, and the freedom of academic and cultural expression.
+          The variable denotes the upper-bound estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and can present different political perspectives, and the freedom of academic and cultural expression.
 
           It is based on the V-Dem variable v2x_freexp_altinf_codehigh, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most free).
       freeexpr_vdem_low_owid:
         description: |-
-          The variable denotes the lower-bound estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and present different political perspectives, and the freedom of academic and cultural expression.
+          The variable denotes the lower-bound estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and can present different political perspectives, and the freedom of academic and cultural expression.
 
           It is based on the V-Dem variable v2x_freexp_altinf_codelow, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most free).
       freeexpr_vdem_owid:
         description: |-
-          The variable denotes the best estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and present different political perspectives, and the freedom of academic and cultural expression.
+          The variable denotes the best estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and can present different political perspectives, and the freedom of academic and cultural expression.
 
           It is based on the V-Dem variable v2x_freexp_altinf, and we expand it to cover more years for some countries.
 
@@ -1285,6 +1285,8 @@ tables:
           It is based on the V-Dem variable v2x_genpp_codehigh, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most equal).
+
+          Many countries in recent years receive high scores even though they are far from equal participation because the index scores them relative to the historical average across countries.
       popw_wom_pol_par_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which women are represented in the legislature and have an equal share of political power, weighted by population.
@@ -1292,6 +1294,8 @@ tables:
           It is based on the V-Dem variable v2x_genpp_codelow, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most equal).
+
+          Many countries in recent years receive high scores even though they are far from equal participation because the index scores them relative to the historical average across countries.
       popw_wom_pol_par_vdem_owid:
         description: |-
           The variable denotes the best estimate of the extent to which women are represented in the legislature and have an equal share of political power, weighted by population.
@@ -1299,6 +1303,8 @@ tables:
           It is based on the V-Dem variable v2x_genpp, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most equal).
+
+          Many countries in recent years receive high scores even though they are far from equal participation because the index scores them relative to the historical average across countries.
       priv_libs_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of  the extent to which people are free from forced labor, have property rights, and enjoy the freedoms of movement and religion.
@@ -1577,6 +1583,8 @@ tables:
           It is based on the V-Dem variable v2x_genpp_codehigh, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most equal).
+
+          Many countries in recent years receive high scores even though they are far from equal participation because the index scores them relative to the historical average across countries.
       wom_pol_par_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which women are represented in the legislature and have an equal share of political power.
@@ -1584,6 +1592,8 @@ tables:
           It is based on the V-Dem variable v2x_genpp_codelow, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most equal).
+
+          Many countries in recent years receive high scores even though they are far from equal participation because the index scores them relative to the historical average across countries.
       wom_pol_par_vdem_owid:
         description: |-
           The variable denotes the best estimate of the extent to which women are represented in the legislature and have an equal share of political power.
@@ -1591,3 +1601,5 @@ tables:
           It is based on the V-Dem variable v2x_genpp, and we expand it to cover more years for some countries.
 
           The variable ranges from 0 to 1 (most equal).
+
+          Many countries in recent years receive high scores even though they are far from equal participation because the index scores them relative to the historical average across countries.

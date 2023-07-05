@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple, cast
 import pandas as pd
 from pydantic import BaseModel
 
-from etl.grapher_import import INT_TYPES
+from etl.grapher_helpers import INT_TYPES
 
 from .yaml_meta import YAMLMeta
 
@@ -15,7 +15,6 @@ class ValidationError(Exception):
 
 
 class PartialSnapshotMeta(BaseModel):
-
     url: str
     publication_year: Optional[int]
     license_url: Optional[str]
@@ -78,14 +77,19 @@ def parse_metadata_from_sheets(
     sources_dict = cast(Dict[str, Any], sources_meta_df.set_index("short_name").to_dict())
     sources_dict = {k: _prune_empty(v) for k, v in sources_dict.items()}
 
+    # publisher_source is not used anymore
+    for source in sources_dict.values():
+        source.pop("publisher_source", None)
+
     dataset_dict = _prune_empty(dataset_meta_df.set_index(0)[1].to_dict())  # type: ignore
     dataset_dict["namespace"] = "fasttrack"  # or should it be owid? or institution specific?
     dataset_dict.pop("updated")
-    dataset_dict.pop("data_url")
+    dataset_dict.pop("external_csv", None)
     dataset_dict.setdefault("description", "")
 
     try:
-        dt.datetime.strptime(dataset_dict["version"], "%Y-%m-%d")
+        if dataset_dict["version"] != "latest":
+            dt.datetime.strptime(dataset_dict["version"], "%Y-%m-%d")
     except ValueError:
         raise ValidationError(f"Version `{dataset_dict['version']}` is not in YYYY-MM-DD format")
 
@@ -164,9 +168,9 @@ def _prune_empty(d: Dict[str, Any]) -> Dict[str, Any]:
 
 def _get_data_url(dataset_meta: pd.DataFrame, url: str) -> str:
     """Get data url from dataset_meta field or use data sheet if dataset_meta is empty."""
-    data_url = dataset_meta.set_index(0)[1].to_dict().get("data_url")
+    data_url = dataset_meta.set_index(0)[1].to_dict().get("external_csv")
 
-    if data_url:
+    if data_url and not pd.isnull(data_url):
         # files on Google Drive need modified link for downloading raw csv
         if "drive.google.com" in data_url:
             data_url = data_url.replace("file/d/", "uc?id=").replace("/view?usp=share_link", "&export=download")

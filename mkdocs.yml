@@ -1,4 +1,4 @@
-site_name: OWID data pipeline
+site_name: Data pipeline
 
 repo_name: owid/etl
 repo_url: https://github.com/owid/etl
@@ -43,7 +43,10 @@ nav:
       - Walkthrough: "tutorials/adding-data/walkthrough.md"
       - Manually add: "tutorials/adding-data/manual.md"
       - Fast-track: "tutorials/adding-data/fast-track.md"
-    - Updating charts: "tutorials/updating-charts.md"
+    - Updating charts:
+      - Submitting chart revisions: "tutorials/charts/updating-charts.md"
+      - Reviewing chart revisions: "tutorials/charts/reviewing-charts.md"
+      - Using chatGPT: "tutorials/charts/chatgpt.md"
     - Harmonize country names: "tutorials/harmonize-countries.md"
     - Backporting Grapher datasets to ETL: "tutorials/backport.md"
     - Importing a private dataset to ETL: "tutorials/private-import.md"
@@ -62,16 +65,21 @@ nav:
 theme:
   # logo: assets/logo.png
   favicon: assets/images/favicon.png
+  # icon:
+    # logo: material/library-outline
+  logo: "assets/site-logo.svg"
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: blue-grey
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: blue-grey
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -89,6 +97,7 @@ theme:
     # - navigation.sections
     # - toc.follow
     - navigation.top
+  custom_dir: docs/overrides
 
 markdown_extensions:
   - admonition

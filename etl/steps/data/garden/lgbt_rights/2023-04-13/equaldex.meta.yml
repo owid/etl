@@ -1,0 +1,478 @@
+all_sources:
+  - equaldex: &source-equaldex
+      name: Equaldex (2023)
+      published_by: LGBT Rights by Country & Travel Guide | Equaldex. (2023). https://www.equaldex.com/
+      url: https://www.equaldex.com/
+      date_accessed: 2023-06-08
+      publication_year: 2023
+      description: |
+        Equaldex is a collaborative knowledge base for the LGBT (lesbian, gay, bisexual, transgender) movement. The site aims to crowdsource every law related to LGBT rights to provide a comprehensive and global view of the LGBT rights movement.
+
+
+dataset:
+  title: Equaldex dataset (Equaldex, 2023)
+  short_name: equaldex
+  sources:
+    - *source-equaldex
+
+tables:
+  equaldex:
+    variables:
+      homosexuality:
+        title: Homosexual activity (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legislation status of homosexual activity, consensual sexual activity between individuals of the same sex.
+
+          These statuses are possible:
+            <ol type = "1"><li>Legal</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Male illegal, female legal or uncertain</li>
+            <li>Illegal, prison or other penalty</li>
+            <li>Illegal (death penalty as punishment)</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Homosexual activity
+      changing_gender:
+        title: Right to change legal gender (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legislation status of the right to change legal gender. This is the legal recognition of sex reassignment by permitting a change of legal gender on an individual's birth certificate.
+
+          These statuses are possible:
+            <ol type = "1"><li>Legal, surgery not required</li>
+            <li>Legal, but requires surgery</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Illegal</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Right to change legal gender
+      marriage:
+        title: Same-sex marriage (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex and/or gender identity.
+
+          These statuses are possible:
+            <ol type = "1"><li>Legal</li>
+            <li>Civil union or other partnership</li>
+            <li>Foreign same-sex marriages recognized only</li>
+            <li>Unregistered cohabitation</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Unrecognized</li>
+            <li>Unrecognized, same-sex marriage and civil unions banned</li>
+            <li>Not legal</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Same-sex marriage
+      adoption:
+        title: Same-sex adoption (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legislation status of same-sex adoption. This is the ability for same-sex couples to legally adopt a child.
+
+          These statuses are possible:
+            <ol type = "1"><li>Legal</li>
+            <li>Married couples only</li>
+            <li>Step-child adoption only</li>
+            <li>Single only</li>
+            <li>Ambiguous</li>
+            <li>Illegal</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Same-sex adoption
+      age_of_consent:
+        title: Equal age of consent (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the difference between legal age of consent for homosexual sex and heterosexual sex.
+
+          These statuses are possible:
+            <ol type = "1"><li>Equal</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Unequal</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Equal age of consent
+      blood:
+        title: Blood donations by MSMs (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the ability for MSMs (men who have sex with men) to donate blood or tissue for organ transplants. A deferral period refers to a waiting time before a man can donate after having sex.
+
+          These statuses are possible:
+            <ol type = "1"><li>Legal</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Banned (3-month deferral)</li>
+            <li>Banned (6-month deferral)</li>
+            <li>Banned (1-year deferral)</li>
+            <li>Banned (5-year deferral)</li>
+            <li>Banned (indefinite deferral)</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Blood donations by MSMs
+      censorship:
+        title: Censorship of LGBT issues (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes censorship or prohibition of discussing, promoting, or teaching LGBTQ+ topics in media, schools, and in the general public.
+
+          These statuses are possible:
+            <ol type = "1"><li>No censorship</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Other punishment</li>
+            <li>Fine as punishment</li>
+            <li>State-enforced</li>
+            <li>Imprisonment as punishment</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Censorship of LGBT issues
+      conversion_therapy:
+        title: Conversion therapy (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legal status of conducting sexual orientation changing therapy.
+
+          These statuses are possible:
+            <ol type = "1"><li>Banned</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Not banned</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Conversion therapy
+      discrimination:
+        title: LGBT discrimination (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the prohibition of discrimination based on sexual orientation and/or gender identity.
+
+          These statuses are possible:
+            <ol type = "1"><li>Illegal</li>
+            <li>Illegal in some contexts</li>
+            <li>Varies by region</li>
+            <li>No protections</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: LGBT discrimination
+      employment_discrimination:
+        title: LGBT employment discrimination (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the prohibition of discrimination based on sexual orientation and/or gender identity in employment, including hiring, promotion, termination, harassment, etc.
+
+          These statuses are possible:
+            <ol type = "1"><li>Sexual orientation and gender identity</li>
+            <li>Sexual orientation only</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>No protections</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: LGBT employment discrimination
+      housing_discrimination:
+        title: LGBT housing discrimination (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the prohibition of discrimination based on sexual orientation and/or gender identity when applying for housing or discrimination by landlords / property owners.
+
+          These statuses are possible:
+            <ol type = "1"><li>Sexual orientation and gender identity</li>
+            <li>Sexual orientation only</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>No protections</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: LGBT housing discrimination
+      military:
+        title: Serving openly in the military (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the ability for homosexuals to serve in the military and be open about their sexuality.
+
+          These statuses are possible:
+            <ol type = "1"><li>Legal</li>
+            <li>"Don't Ask, Don't Tell"</li>
+            <li>Lesbians, gays, bisexuals permitted, transgender people banned</li>
+            <li>Ambiguous</li>
+            <li>Illegal</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Serving openly in the military
+      non_binary_gender_recognition:
+        title: Legal recognition of non-binary gender (historical)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legal recognition of non-binary, genderqueer, or third gender identities.
+
+          These statuses are possible:
+            <ol type = "1"><li>Recognized</li>
+            <li>Intersex only</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Not legally recognized</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Legal recognition of non-binary gender
+      homosexuality_current:
+        title: Homosexual activity (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legislation status of homosexual activity, consensual sexual activity between individuals of the same sex.
+
+          These statuses are possible:
+            <ol type = "1"><li>Legal</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Male illegal, female legal or uncertain</li>
+            <li>Illegal, prison or other penalty</li>
+            <li>Illegal (death penalty as punishment)</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Homosexual activity
+      changing_gender_current:
+        title: Right to change legal gender (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legislation status of the right to change legal gender. This is the legal recognition of sex reassignment by permitting a change of legal gender on an individual's birth certificate.
+
+          These statuses are possible:
+            <ol type = "1"><li>Legal, surgery not required</li>
+            <li>Legal, but requires surgery</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Illegal</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Right to change legal gender
+      marriage_current:
+        title: Same-sex marriage (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex and/or gender identity.
+
+          These statuses are possible:
+            <ol type = "1"><li>Legal</li>
+            <li>Civil union or other partnership</li>
+            <li>Foreign same-sex marriages recognized only</li>
+            <li>Unregistered cohabitation</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Unrecognized</li>
+            <li>Unrecognized, same-sex marriage and civil unions banned</li>
+            <li>Not legal</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Same-sex marriage
+      adoption_current:
+        title: Same-sex adoption (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legislation status of same-sex adoption. This is the ability for same-sex couples to legally adopt a child.
+
+          These statuses are possible:
+            <ol type = "1"><li>Legal</li>
+            <li>Married couples only</li>
+            <li>Step-child adoption only</li>
+            <li>Single only</li>
+            <li>Ambiguous</li>
+            <li>Illegal</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Same-sex adoption
+      age_of_consent_current:
+        title: Equal age of consent (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the difference between legal age of consent for homosexual sex and heterosexual sex.
+
+          These statuses are possible:
+            <ol type = "1"><li>Equal</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Unequal</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Equal age of consent
+      blood_current:
+        title: Blood donations by MSMs (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the ability for MSMs (men who have sex with men) to donate blood or tissue for organ transplants. A deferral period refers to a waiting time before a man can donate after having sex.
+
+          These statuses are possible:
+            <ol type = "1"><li>Legal</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Banned (3-month deferral)</li>
+            <li>Banned (6-month deferral)</li>
+            <li>Banned (1-year deferral)</li>
+            <li>Banned (5-year deferral)</li>
+            <li>Banned (indefinite deferral)</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Blood donations by MSMs
+      censorship_current:
+        title: Censorship of LGBT issues (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes censorship or prohibition of discussing, promoting, or teaching LGBTQ+ topics in media, schools, and in the general public.
+
+          These statuses are possible:
+            <ol type = "1"><li>No censorship</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Other punishment</li>
+            <li>Fine as punishment</li>
+            <li>State-enforced</li>
+            <li>Imprisonment as punishment</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Censorship of LGBT issues
+      conversion_therapy_current:
+        title: Conversion therapy (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legal status of conducting sexual orientation changing therapy.
+
+          These statuses are possible:
+            <ol type = "1"><li>Banned</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Not banned</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Conversion therapy
+      discrimination_current:
+        title: LGBT discrimination (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the prohibition of discrimination based on sexual orientation and/or gender identity.
+
+          These statuses are possible:
+            <ol type = "1"><li>Illegal</li>
+            <li>Illegal in some contexts</li>
+            <li>Varies by region</li>
+            <li>No protections</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: LGBT discrimination
+      employment_discrimination_current:
+        title: LGBT employment discrimination (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the prohibition of discrimination based on sexual orientation and/or gender identity in employment, including hiring, promotion, termination, harassment, etc.
+
+          These statuses are possible:
+            <ol type = "1"><li>Sexual orientation and gender identity</li>
+            <li>Sexual orientation only</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>No protections</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: LGBT employment discrimination
+      housing_discrimination_current:
+        title: LGBT housing discrimination (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the prohibition of discrimination based on sexual orientation and/or gender identity when applying for housing or discrimination by landlords / property owners.
+
+          These statuses are possible:
+            <ol type = "1"><li>Sexual orientation and gender identity</li>
+            <li>Sexual orientation only</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>No protections</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: LGBT housing discrimination
+      military_current:
+        title: Serving openly in the military (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the ability for homosexuals to serve in the military and be open about their sexuality.
+
+          These statuses are possible:
+            <ol type = "1"><li>Legal</li>
+            <li>"Don't Ask, Don't Tell"</li>
+            <li>Lesbians, gays, bisexuals permitted, transgender people banned</li>
+            <li>Ambiguous</li>
+            <li>Illegal</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Serving openly in the military
+      non_binary_gender_recognition_current:
+        title: Legal recognition of non-binary gender (current)
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legal recognition of non-binary, genderqueer, or third gender identities.
+
+          These statuses are possible:
+            <ol type = "1"><li>Recognized</li>
+            <li>Intersex only</li>
+            <li>Varies by region</li>
+            <li>Ambiguous</li>
+            <li>Not legally recognized</li></ol>
+        sources:
+          - *source-equaldex
+        display:
+          name: Legal recognition of non-binary gender

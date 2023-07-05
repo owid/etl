@@ -16,6 +16,9 @@ tables:
       dalys__disability_adjusted_life_years__percent:
         title: DALYs (percent)
         unit: "%"
+      dalys__disability_adjusted_life_years__share_of_the_population:
+        title: DALYs (share of the population)
+        unit: DALYs per 100 people
       deaths__number:
         title: Deaths (number)
         unit: deaths
@@ -24,4 +27,7 @@ tables:
         unit: deaths per 100,000 people
       deaths__percent:
         title: Deaths (percent)
+        unit: "%"
+      deaths__share_of_the_population:
+        title: Deaths per 100 people
         unit: "%"

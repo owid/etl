@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5776_seasonal_influenza_mortality__cdc__2018_config
   file_extension: json
-  date_accessed: 2023-02-23 18:34:48.597906
+  date_accessed: 2023-06-01 15:01:18.910698
   name: Grapher metadata for dataset_5776_seasonal_influenza_mortality__cdc__2018
   description: https://github.com/owid/notebooks/tree/cdc_flu/FionaSpooner/cdc_influenza
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8b80eddd4f15a5e7ef87bdca68e37bcb
-  size: 6390
+- md5: e83ed1e8cd3bf3d9291b48437dae96a7
+  size: 8059
   path: dataset_5776_seasonal_influenza_mortality__cdc__2018_config.json

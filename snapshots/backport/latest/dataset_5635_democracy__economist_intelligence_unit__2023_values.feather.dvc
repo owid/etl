@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5635_democracy__economist_intelligence_unit__2023_values
   file_extension: feather
-  date_accessed: 2023-03-09 16:27:55.105182
+  date_accessed: 2023-06-01 15:12:41.616672
   name: Democracy - Economist Intelligence Unit (2023)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 58e8657cf2915d3981c15bdfad249157
+- md5: 4e0402ec0ae033519deed64a1a868a82
   size: 130842
   path: dataset_5635_democracy__economist_intelligence_unit__2023_values.feather

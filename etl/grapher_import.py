@@ -43,13 +43,6 @@ source_table_lock = Lock()
 CURRENT_DIR = os.path.dirname(__file__)
 
 
-INT_TYPES = (
-    "int",
-    "uint64",
-    "Int64",
-)
-
-
 @dataclass
 class DatasetUpsertResult:
     dataset_id: int
@@ -175,8 +168,10 @@ def upsert_table(
         "Tables to be upserted must have no null values. Instead they" f" have:\n{table.loc[table.iloc[:, 0].isnull()]}"
     )
     table = table.reorder_levels(["year", "entity_id"])
-    assert table.index.dtypes[0] in INT_TYPES, f"year must be of an integer type but was: {table.index.dtypes[0]}"
-    assert table.index.dtypes[1] in INT_TYPES, f"entity_id must be of an integer type but was: {table.index.dtypes[1]}"
+    assert table.index.dtypes[0] in gh.INT_TYPES, f"year must be of an integer type but was: {table.index.dtypes[0]}"
+    assert (
+        table.index.dtypes[1] in gh.INT_TYPES
+    ), f"entity_id must be of an integer type but was: {table.index.dtypes[1]}"
     utils.validate_underscore(table.metadata.short_name, "Table's short_name")
     utils.validate_underscore(table.columns[0], "Variable's name")
 
@@ -252,7 +247,7 @@ def upsert_table(
 
         # process and upload data to S3
         var_data = variable_data(df)
-        data_path = upload_gzip_dict(var_data, variable.s3_data_path())
+        data_path = upload_gzip_dict(var_data, variable.s3_data_path(), r2=True)
 
         # we need to commit changes because we use SQL command in `variable_metadata`. We wouldn't
         # have to if we used ORM instead
@@ -261,7 +256,7 @@ def upsert_table(
 
         # process and upload metadata to S3
         var_metadata = variable_metadata(engine, variable_id, df)
-        metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path())
+        metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path(), r2=True)
 
         variable.dataPath = data_path
         variable.metadataPath = metadata_path
@@ -345,6 +340,14 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], w
         if rows:
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
             raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
+
+        # there might still be some data_values for old variables
+        db.cursor.execute(
+            """
+            DELETE FROM data_values WHERE variableId IN %(variable_ids)s
+        """,
+            {"variable_ids": variable_ids_to_delete},
+        )
 
         # then variables themselves with related data in other tables
         db.cursor.execute(

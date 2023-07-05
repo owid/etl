@@ -2,8 +2,9 @@ import difflib
 import os
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional
+from typing import Any, Callable, Dict, Iterable, List, Optional, cast
 
+import numpy as np
 import pandas as pd
 import requests
 import rich
@@ -12,30 +13,43 @@ import structlog
 from owid.catalog import Dataset, DatasetMeta, LocalCatalog, RemoteCatalog, Table, find
 from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
+from rich.panel import Panel
+from rich.syntax import Syntax
 
-from etl import config
 from etl.files import yaml_dump
-from etl.tempcompare import df_equals
+from etl.tempcompare import series_equals
 
 log = structlog.get_logger()
 
-config.enable_bugsnag()
+
+class DatasetError(Exception):
+    pass
 
 
 class DatasetDiff:
     """Compare two datasets and print a summary of the differences."""
 
     def __init__(
-        self, ds_a: Optional[Dataset], ds_b: Optional[Dataset], verbose: bool = False, print: Callable = rich.print
+        self,
+        ds_a: Optional[Dataset],
+        ds_b: Optional[Dataset],
+        verbose: bool = False,
+        cols: Optional[str] = None,
+        print: Callable = rich.print,
+        snippet: bool = False,
     ):
         """
+        :param cols: Only compare columns matching pattern
         :param print: Function to print the diff summary. Defaults to rich.print.
+        :param snippet: Print snippet for loading both tables
         """
         assert ds_a or ds_b, "At least one Dataset must be provided"
         self.ds_a = ds_a
         self.ds_b = ds_b
         self.p = print
         self.verbose = verbose
+        self.cols = cols
+        self.snippet = snippet
 
     def _diff_datasets(self, ds_a: Optional[Dataset], ds_b: Optional[Dataset]):
         if ds_a and ds_b:
@@ -61,7 +75,31 @@ class DatasetDiff:
                 for col in ds_b[table_name].columns:
                     self.p(f"\t\t[green]+ Column [b]{col}[/b]")
 
+    def _snippet(self, ds_a: Dataset, ds_b: Dataset, table_name: str) -> Panel:
+        """Print code for loading both tables."""
+
+        def _snippet_dataset(ds: Dataset, table_name: str) -> str:
+            m = ds.metadata
+            if isinstance(ds, RemoteDataset):
+                return f'RemoteCatalog(channels=["{m.channel}"]).find_one(table="{table_name}", dataset="{m.short_name}", version="{m.version}", namespace="{m.namespace}", channel="{m.channel}")'
+            else:
+                return f'Dataset(DATA_DIR / "{m.uri}")["{table_name}"]'
+
+        code = f"""
+from owid.catalog import RemoteCatalog, Dataset
+from etl.paths import DATA_DIR
+
+ta = {_snippet_dataset(ds_a, table_name)}
+tb = {_snippet_dataset(ds_b, table_name)}
+""".strip()
+
+        syntax = Syntax(code, "python", theme="monokai")
+        return Panel(syntax, title="Python Code", border_style="blue")
+
     def _diff_tables(self, ds_a: Dataset, ds_b: Dataset, table_name: str):
+        if self.snippet:
+            self.p(self._snippet(ds_a, ds_b, table_name))
+
         if table_name not in ds_b.table_names:
             self.p(f"\t[red]- Table [b]{table_name}[/b]")
             for col in ds_a[table_name].columns:
@@ -74,13 +112,27 @@ class DatasetDiff:
             table_a = ds_a[table_name]
             table_b = ds_b[table_name]
 
-            # only sort index if different to avoid unnecessary sorting for huge datasets such as ghe
-            if not _index_equals(table_a, table_b):
-                table_a = _sort_index(table_a)
-                table_b = _sort_index(table_b)
+            # set default index for datasets that don't have one
+            if table_a.index.names == [None] and table_b.index.names == [None]:
+                candidates = {"entity", "date", "country", "year"}
+                new_index = list(candidates & set(table_a.columns) & set(table_b.columns))
+                if new_index:
+                    table_a = table_a.set_index(new_index)
+                    table_b = table_b.set_index(new_index)
 
-            table_a = table_a.reset_index()
-            table_b = table_b.reset_index()
+            # only sort index if different to avoid unnecessary sorting for huge datasets such as ghe
+            if len(table_a) != len(table_b) or not _index_equals(table_a, table_b):
+                index_diff = True
+                table_a, table_b, eq_index = _align_tables(table_a, table_b)
+            else:
+                index_diff = False
+                eq_index = pd.Series(True, index=table_a.index)
+
+            # resetting index will make comparison easier
+            dims = table_a.index.names
+            table_a: Table = table_a.reset_index()
+            table_b: Table = table_b.reset_index()
+            eq_index = eq_index.reset_index(drop=True)
 
             # compare table metadata
             diff = _dict_diff(_table_metadata_dict(table_a), _table_metadata_dict(table_b), tabs=3)
@@ -94,16 +146,10 @@ class DatasetDiff:
 
             # compare columns
             all_cols = sorted(set(table_a.columns) | set(table_b.columns))
-            shared_cols = sorted(set(table_a.columns) & set(table_b.columns))
-
-            if table_a[shared_cols].shape == table_b[shared_cols].shape:
-                # align dataframes by their primary key and compare
-                eq = df_equals(table_a[shared_cols], table_b[shared_cols])
-                data_differs = (~eq).any().to_dict()
-            else:
-                data_differs = {col: False for col in shared_cols}
-
             for col in all_cols:
+                if self.cols and not re.search(self.cols, col):
+                    continue
+
                 if col not in table_a.columns:
                     self.p(f"\t\t[green]+ Column [b]{col}[/b]")
                 elif col not in table_b.columns:
@@ -111,8 +157,11 @@ class DatasetDiff:
                 else:
                     col_a = table_a[col]
                     col_b = table_b[col]
-                    shape_diff = col_a.shape != col_b.shape
-                    data_diff = data_differs.get(col)
+
+                    # equality on index and series
+                    eq_data = series_equals(table_a[col], table_b[col])
+                    data_diff = (~eq_data).any()
+                    eq = eq_index & eq_data
 
                     col_a_meta = col_a.metadata.to_dict()
                     col_b_meta = col_b.metadata.to_dict()
@@ -122,13 +171,20 @@ class DatasetDiff:
                     changed = (
                         (["data"] if data_diff else [])
                         + (["metadata"] if meta_diff else [])
-                        + (["shape"] if shape_diff else [])
+                        + (["index"] if index_diff else [])
                     )
 
                     if changed:
                         self.p(f"\t\t[yellow]~ Column [b]{col}[/b] (changed [u]{' & '.join(changed)}[/u])")
-                        if self.verbose and meta_diff:
-                            self.p(_dict_diff(col_a_meta, col_b_meta, tabs=4))
+                        if self.verbose:
+                            if meta_diff:
+                                self.p(_dict_diff(col_a_meta, col_b_meta, tabs=4))
+                            if data_diff or index_diff:
+                                if meta_diff:
+                                    self.p("")
+                                out = _data_diff(table_a, table_b, col, dims, tabs=4, eq=eq)
+                                if out:
+                                    self.p(out)
                     else:
                         # do not print identical columns
                         pass
@@ -189,6 +245,11 @@ class RemoteDataset:
     help="Compare only datasets matching pattern",
 )
 @click.option(
+    "--cols",
+    type=str,
+    help="Compare only columns matching pattern",
+)
+@click.option(
     "--exclude",
     "-e",
     type=str,
@@ -199,13 +260,20 @@ class RemoteDataset:
     is_flag=True,
     help="Print detailed differences",
 )
+@click.option(
+    "--snippet",
+    is_flag=True,
+    help="Print code snippet for loading both tables, useful for debugging in notebook",
+)
 def cli(
     path_a: str,
     path_b: str,
     channel: Iterable[CHANNEL],
     include: Optional[str],
+    cols: Optional[str],
     exclude: Optional[str],
     verbose: bool,
+    snippet: bool,
 ) -> None:
     """Compare all datasets from two catalogs (`a` and `b`) and print out summary of their differences. This is
     different from `compare` tool which compares two specific datasets and prints out more detailed output. This
@@ -231,6 +299,7 @@ def cli(
     path_to_ds_b = _load_catalog_datasets(path_b, channel, include, exclude)
 
     any_diff = False
+    any_error = False
 
     for path in sorted(set(path_to_ds_a.keys()) | set(path_to_ds_b.keys())):
         ds_a = _match_dataset(path_to_ds_a, path)
@@ -247,15 +316,27 @@ def cli(
             lines.append(x)
             console.print(x)
 
-        differ = DatasetDiff(ds_a, ds_b, print=_append_and_print, verbose=verbose)
-        differ.summary()
+        try:
+            differ = DatasetDiff(ds_a, ds_b, cols=cols, print=_append_and_print, verbose=verbose, snippet=snippet)
+            differ.summary()
+        except DatasetError as e:
+            # soft fail and continue with another dataset
+            _append_and_print(f"[bold red]⚠ Error: {e}[/bold red]")
+            continue
+        except Exception as e:
+            # soft fail and continue with another dataset
+            log.exception(e)
+            any_error = True
+            continue
 
-        if any("~" in line for line in lines):
+        if any("~" in line for line in lines if isinstance(line, str)):
             any_diff = True
 
     console.print()
     if not path_to_ds_a and not path_to_ds_b:
         console.print("[yellow]❓ No datasets found[/yellow]")
+    elif any_error:
+        console.print("[bold red]⚠ Found errors, create an issue please[/bold red]")
     elif any_diff:
         console.print("[red]❌ Found differences[/red]")
     else:
@@ -266,7 +347,7 @@ def cli(
         "[b]Legend[/b]: [green]+New[/green]  [yellow]~Modified[/yellow]  [red]-Removed[/red]  [white]=Identical[/white]  [violet]Details[/violet]"
     )
     console.print(
-        "[b]Hint[/b]: Run this locally with [cyan][b]etl-datadiff REMOTE data/ --include yourdataset --verbose[/b][/cyan]"
+        "[b]Hint[/b]: Run this locally with [cyan][b]etl-datadiff REMOTE data/ --include yourdataset --verbose --snippet[/b][/cyan]"
     )
     console.print(
         "[b]Hint[/b]: Get detailed comparison with [cyan][b]compare --show-values channel namespace version short_name --values[/b][/cyan]"
@@ -283,7 +364,7 @@ def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 10
         index_a = table_a.sample(sample, random_state=0).index
         index_b = table_b.sample(sample, random_state=0).index
 
-    return (index_a == index_b).all()  # type: ignore
+    return index_a.equals(index_b)
 
 
 def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
@@ -303,6 +384,84 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
     else:
         # add tabs
         return "\t" * tabs + "".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
+
+
+def _data_diff(
+    table_a: Table, table_b: Table, col: str, dims: list[str], tabs: int, eq: Optional[pd.Series] = None
+) -> str:
+    """Return summary of data differences."""
+    if eq is None:
+        eq = series_equals(table_a[col], table_b[col])
+
+    lines = [
+        f"- Changed values: {(~eq).sum()} / {len(eq)} ({(~eq).sum() / len(eq) * 100:.2f}%)",
+    ]
+
+    # changes in index
+    for dim in dims:
+        if dim is not None:
+            diff_elements = table_a.loc[~eq, dim].dropna().astype(str).sort_values().unique().tolist()
+            detail = f"{len(diff_elements)} affected" if len(diff_elements) > 5 else ", ".join(diff_elements)
+            lines.append(f"- {dim}: {detail}")
+
+    # changes in values
+    if table_a[col].dtype in ("category", "object", "string") or _is_datetime(table_a[col].dtype):
+        vals_a = set(table_a.loc[~eq, col].dropna())
+        vals_b = set(table_b.loc[~eq, col].dropna())
+        if vals_a - vals_b:
+            lines.append(f"- Removed values: {', '.join(vals_a - vals_b)}")
+        if vals_b - vals_a:
+            lines.append(f"- New values: {', '.join(vals_b - vals_a)}")
+    else:
+        mean_a = table_a.loc[~eq, col].mean()
+        mean_b = table_b.loc[~eq, col].mean()
+        abs_diff = mean_b - mean_a
+        mean = (mean_a + mean_b) / 2
+
+        rel_diff = abs_diff / mean if not pd.isnull(mean) and mean != 0 else np.nan
+
+        lines.append(f"- Avg. change: {abs_diff:.2f} ({rel_diff:.0%})")
+
+    # add color
+    lines = ["[violet]" + line for line in lines]
+
+    if not lines:
+        return ""
+    else:
+        # add tabs
+        return "\t" * tabs + "\n".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
+
+
+def _is_datetime(dtype: Any) -> bool:
+    try:
+        return np.issubdtype(dtype, np.datetime64)
+    except Exception:
+        return False
+
+
+def _align_tables(table_a: Table, table_b: Table) -> tuple[Table, Table, pd.Series]:
+    if not table_a.index.is_unique or not table_b.index.is_unique:
+        raise DatasetError("Index must be unique.")
+
+    if len(table_a.index.names) * len(table_a) >= 2 * 10**8:
+        # table_a.align is very memory intensive for large tables as doesn't handle
+        # categorical indexes well. We'd have to convert all categories to codes first,
+        # align them and then convert back to categories.
+        raise DatasetError("Cannot run datadiff for an index of such size.")
+
+    table_a = _sort_index(table_a)
+    table_b = _sort_index(table_b)
+
+    # align tables by index
+    table_a["_x"] = 1
+    table_b["_x"] = 1
+    table_a, table_b = table_a.align(table_b, join="outer", copy=False)
+
+    eq_index = table_a["_x"].notnull() & table_b["_x"].notnull()
+    table_a.drop(columns="_x", inplace=True)
+    table_b.drop(columns="_x", inplace=True)
+
+    return cast(Table, table_a), cast(Table, table_b), eq_index
 
 
 def _sort_index(df: Table) -> Table:
@@ -374,7 +533,7 @@ def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
 
     # sort sources by name
     if "sources" in d:
-        d["sources"] = sorted(d["sources"], key=lambda x: x["name"])
+        d["sources"] = sorted(d["sources"], key=lambda x: x["name"] or "")
 
     d.pop("source_checksum", None)
     return d

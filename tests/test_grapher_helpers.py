@@ -1,3 +1,5 @@
+from unittest import mock
+
 import numpy as np
 import pandas as pd
 from owid.catalog import DatasetMeta, Source, Table, TableMeta, VariableMeta
@@ -169,17 +171,20 @@ def _sample_table() -> Table:
 
 
 def test_adapt_table_for_grapher_multiindex():
-    table = _sample_table()
-    out_table = gh._adapt_table_for_grapher(table)
-    assert out_table.index.names == ["entity_id", "year"]
-    assert out_table.columns.tolist() == ["deaths", "sex"]
+    with mock.patch("etl.grapher_helpers._get_entities_from_db") as mock_get_entities_from_db:
+        mock_get_entities_from_db.return_value = {"Poland": 1, "France": 2}
 
-    table = _sample_table().set_index(["country", "year", "sex"])
-    out_table = gh._adapt_table_for_grapher(table)
-    assert out_table.index.names == ["entity_id", "year", "sex"]
-    assert out_table.columns.tolist() == ["deaths"]
+        table = _sample_table()
+        out_table = gh._adapt_table_for_grapher(table)
+        assert out_table.index.names == ["entity_id", "year"]
+        assert out_table.columns.tolist() == ["deaths", "sex"]
 
-    table = _sample_table().set_index(["sex"])
-    out_table = gh._adapt_table_for_grapher(table)
-    assert out_table.index.names == ["entity_id", "year", "sex"]
-    assert out_table.columns.tolist() == ["deaths"]
+        table = _sample_table().set_index(["country", "year", "sex"])
+        out_table = gh._adapt_table_for_grapher(table)
+        assert out_table.index.names == ["entity_id", "year", "sex"]
+        assert out_table.columns.tolist() == ["deaths"]
+
+        table = _sample_table().set_index(["sex"])
+        out_table = gh._adapt_table_for_grapher(table)
+        assert out_table.index.names == ["entity_id", "year", "sex"]
+        assert out_table.columns.tolist() == ["deaths"]

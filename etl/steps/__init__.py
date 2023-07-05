@@ -23,33 +23,15 @@ import pandas as pd
 import requests
 import structlog
 import yaml
-from dvc.dvcfile import Dvcfile
-from dvc.repo import Repo
-
-from etl.db import get_engine
-
-# smother deprecation warnings by papermill
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    import papermill as pm
-
 from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Dataset as WaldenDataset
 
-from etl import backport_helpers, config, files, git
+from etl import config, files, git
 from etl import grapher_helpers as gh
 from etl import paths
-from etl.grapher_import import (
-    DatasetUpsertResult,
-    VariableUpsertResult,
-    cleanup_ghost_sources,
-    cleanup_ghost_variables,
-    fetch_db_checksum,
-    set_dataset_checksum_and_editedAt,
-    upsert_dataset,
-    upsert_table,
-)
+from etl.db import get_engine
+from etl.snapshot import _unignore_backports
 
 log = structlog.get_logger()
 
@@ -57,8 +39,6 @@ Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
 dvc_lock = Lock()
-
-DVC_REPO = Repo(paths.BASE_DIR)
 
 
 def compile_steps(
@@ -158,6 +138,17 @@ def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
     """
     dag_yml = _load_dag_yaml(str(filename))
     curr_dag = _parse_dag_yaml(dag_yml)
+
+    # make sure there are no fast-track steps in the DAG
+    if "fasttrack.yml" not in str(filename):
+        fast_track_steps = {step for step in curr_dag if "/fasttrack/" in step}
+        if fast_track_steps:
+            raise ValueError(f"Fast-track steps detected in DAG {filename}: {fast_track_steps}")
+
+    duplicate_steps = prev_dag.keys() & curr_dag.keys()
+    if duplicate_steps:
+        raise ValueError(f"Duplicate steps detected in DAG {filename}: {duplicate_steps}")
+
     curr_dag.update(prev_dag)
 
     for sub_dag_filename in dag_yml.get("include", []):
@@ -209,10 +200,7 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     step: Step
     if step_type == "data":
-        if path == "garden/reference":
-            step = ReferenceStep(path)
-        else:
-            step = DataStep(path, dependencies)
+        step = DataStep(path, dependencies)
 
     elif step_type == "walden":
         step = WaldenStep(path)
@@ -304,16 +292,6 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
 
         # Define an identifier for this step, that is identical for all versions.
         identifier = f"{channel}/{namespace}/{name}"
-    elif root == "garden/reference":
-        # This is a special step that does not have a namespace or a version.
-        # We should probably get rid of this special step soon. But for now, define its properties manually.
-        channel = "garden"
-        namespace = "owid"
-        version = "latest"
-        name = "reference"
-
-        # Define an identifier for this step, that is identical for all versions.
-        identifier = f"{channel}/{namespace}/{name}"
     else:
         # Regular data steps.
 
@@ -339,8 +317,9 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
 class Step(Protocol):
     path: str
     is_public: bool = True
+    version: str
 
-    def run(self) -> None:
+    def run(self, strict: bool = False) -> None:
         ...
 
     def is_dirty(self) -> bool:
@@ -367,6 +346,23 @@ class DataStep(Step):
 
     def __str__(self) -> str:
         return f"data://{self.path}"
+
+    @property
+    def channel(self) -> str:
+        return self.path.split("/")[0]
+
+    @property
+    def namespace(self) -> str:
+        return self.path.split("/")[1]
+
+    @property
+    def version(self) -> str:
+        # channel / namspace / version / dataset
+        return self.path.split("/")[2]
+
+    @property
+    def dataset(self) -> str:
+        return self.path.split("/")[3]
 
     def _dataset_index_mtime(self) -> Optional[float]:
         try:
@@ -441,6 +437,8 @@ class DataStep(Step):
         checksums = {
             # the pandas library is so important to the output that we include it in the checksum
             "__pandas__": pd.__version__,
+            # if the epoch changes, rebuild everything
+            "__etl_epoch__": str(config.ETL_EPOCH),
         }
         for d in self.dependencies:
             checksums[d.path] = d.checksum_output()
@@ -503,7 +501,7 @@ class DataStep(Step):
         )
 
         try:
-            subprocess.check_call(args)
+            subprocess.check_call(args, env=os.environ.copy())
         except subprocess.CalledProcessError:
             # swallow this exception and just exit -- the important stack trace
             # will already have been printed to stderr
@@ -512,6 +510,11 @@ class DataStep(Step):
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
+        # smother deprecation warnings by papermill
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            import papermill as pm
+
         notebook_path = self._search_path.with_suffix(".ipynb")
         with tempfile.TemporaryDirectory() as tmp_dir:
             notebook_out = Path(tmp_dir) / "notebook.ipynb"
@@ -526,27 +529,6 @@ class DataStep(Step):
                     stderr_file=ostream,
                     cwd=notebook_path.parent.as_posix(),
                 )
-
-
-@dataclass
-class ReferenceStep(DataStep):
-    """
-    A step that marks a dependency on a local dataset. It never runs, but it will checksum
-    the local dataset and trigger rebuilds if the local dataset changes.
-    """
-
-    def __init__(self, path: str) -> None:
-        self.path = path
-        self.dependencies = []
-
-    def is_dirty(self) -> bool:
-        return False
-
-    def can_execute(self) -> bool:
-        return True
-
-    def run(self) -> None:
-        return
 
 
 @dataclass
@@ -605,6 +587,11 @@ class WaldenStep(Step):
 
         return dataset
 
+    @property
+    def version(self) -> str:
+        # namspace / version / dataset
+        return self.path.split("/")[1]
+
 
 @dataclass
 class SnapshotStep(Step):
@@ -617,17 +604,24 @@ class SnapshotStep(Step):
         return f"snapshot://{self.path}"
 
     def run(self) -> None:
-        DVC_REPO.pull(self._path, remote="public-read", force=True)
+        from dvc.repo import Repo
+
+        with _unignore_backports(Path(self._path)):
+            Repo(paths.BASE_DIR).pull(self._path, remote="public-read", force=True)
 
     def is_dirty(self) -> bool:
         # check if the snapshot has been added to DVC
+        from dvc.dvcfile import load_file
+        from dvc.repo import Repo
+
         with open(self._dvc_path) as istream:
             if "outs:\n" not in istream.read():
                 raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
 
-        with dvc_lock:
-            dvc_file = Dvcfile(DVC_REPO, self._dvc_path)
-            with DVC_REPO.lock:
+        with _unignore_backports(Path(self._dvc_path)), dvc_lock:
+            repo = Repo(paths.BASE_DIR)
+            dvc_file = load_file(repo, self._dvc_path)
+            with repo.lock:
                 # DVC returns empty dictionary if file is up to date
                 return dvc_file.stage.status() != {}
 
@@ -645,13 +639,21 @@ class SnapshotStep(Step):
     def _path(self) -> str:
         return f"{paths.DATA_DIR}/snapshots/{self.path}"
 
+    @property
+    def version(self) -> str:
+        # namspace / version / filename
+        return self.path.split("/")[1]
+
 
 class SnapshotStepPrivate(SnapshotStep):
     def __str__(self) -> str:
         return f"snapshot-private://{self.path}"
 
     def run(self) -> None:
-        DVC_REPO.pull(self._path, remote="private", force=True)
+        from dvc.repo import Repo
+
+        with _unignore_backports(Path(self._path)):
+            Repo(paths.BASE_DIR).pull(self._path, remote="private", force=True)
 
 
 class GrapherStep(Step):
@@ -677,19 +679,28 @@ class GrapherStep(Step):
         return f"grapher://{self.path}"
 
     @property
+    def version(self) -> str:
+        # channel / namspace / version / dataset
+        return self.path.split("/")[2]
+
+    @property
     def dataset(self) -> catalog.Dataset:
         """Grapher dataset we are upserting."""
         return self.data_step._output_dataset
 
     def is_dirty(self) -> bool:
+        import etl.grapher_import as gi
+
         if self.data_step.is_dirty():
             return True
 
         # dataset exists, but it is possible that we haven't inserted everything into DB
         dataset = self.dataset
-        return fetch_db_checksum(dataset) != self.data_step.checksum_input()
+        return gi.fetch_db_checksum(dataset) != self.data_step.checksum_input()
 
     def run(self) -> None:
+        import etl.grapher_import as gi
+
         # save dataset to grapher DB
         dataset = self.dataset
 
@@ -698,7 +709,7 @@ class GrapherStep(Step):
         engine = get_engine()
 
         assert dataset.metadata.namespace
-        dataset_upsert_results = upsert_dataset(
+        dataset_upsert_results = gi.upsert_dataset(
             engine,
             dataset,
             dataset.metadata.namespace,
@@ -717,7 +728,7 @@ class GrapherStep(Step):
 
             # generate table with entity_id, year and value for every column
             tables = gh._yield_wide_table(table, na_action="drop")
-            upsert = lambda t: upsert_table(  # noqa: E731
+            upsert = lambda t: gi.upsert_table(  # noqa: E731
                 engine,
                 t,
                 dataset_upsert_results,
@@ -738,32 +749,36 @@ class GrapherStep(Step):
         self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
         # set checksum and updatedAt timestamps after all data got inserted
-        set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
+        gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
 
     def checksum_output(self) -> str:
         raise NotImplementedError("GrapherStep should not be used as an input")
 
     @classmethod
     def _cleanup_ghost_resources(
-        cls, dataset_upsert_results: DatasetUpsertResult, variable_upsert_results: List[VariableUpsertResult]
+        cls,
+        dataset_upsert_results,
+        variable_upsert_results: List[Any],
     ) -> None:
         """
         Cleanup all ghost variables and sources that weren't upserted
         NOTE: we can't just remove all dataset variables before starting this step because
         there could be charts that use them and we can't remove and recreate with a new ID
         """
+        import etl.grapher_import as gi
+
         upserted_variable_ids = [r.variable_id for r in variable_upsert_results]
         upserted_source_ids = list(dataset_upsert_results.source_ids.values()) + [
             r.source_id for r in variable_upsert_results
         ]
         # Try to cleanup ghost variables, but make sure to raise an error if they are used
         # in any chart
-        cleanup_ghost_variables(
+        gi.cleanup_ghost_variables(
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
             workers=config.GRAPHER_INSERT_WORKERS,
         )
-        cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
+        gi.cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
 
 
 @dataclass
@@ -774,8 +789,8 @@ class GithubStep(Step):
     """
 
     path: str
-
     gh_repo: git.GithubRepo = field(repr=False)
+    version: str = "latest"
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -813,6 +828,7 @@ class ETagStep(Step):
     """
 
     path: str
+    version: str = "latest"
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -833,6 +849,8 @@ class BackportStep(DataStep):
         return f"backport://{self.path}"
 
     def run(self) -> None:
+        from etl import backport_helpers
+
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 

@@ -4,7 +4,7 @@ Much of how the ETL is designed falls out of its design goals.
 
 To ensure that members of the public can run and audit our code, we have designed the ETL to be a standalone Python program that operates on flat files and fetches what it needs on demand.
 
-It should not need any special hardware or services, and individual ETL steps may use no more than 16GB memory.
+It should not need any special hardware or services, and individual ETL steps may use no more than 32GB memory.
 
 It should be possible to run the ETL on MacOS, Linux and Windows (via WSL).
 

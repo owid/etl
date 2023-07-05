@@ -1,13 +1,15 @@
+import os
 from collections.abc import Iterable
 from typing import Literal
 
 import click
 from pywebio import start_server
+from pywebio.session import go_app
 from rich import print
 
-from . import charts, explorers, garden, grapher, meadow, snapshot, walden
+from . import charts, explorers, garden, grapher, meadow, snapshot, utils
 
-PHASES = Literal["walden", "snapshot", "meadow", "garden", "grapher", "explorers", "charts"]
+PHASES = Literal["all", "snapshot", "meadow", "garden", "grapher", "explorers", "charts", "charts-old"]
 
 
 @click.command()
@@ -40,29 +42,43 @@ PHASES = Literal["walden", "snapshot", "meadow", "garden", "grapher", "explorers
 )
 def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, auto_open: bool, port: int) -> None:
     print(f"Walkthrough has been opened at http://localhost:{port}/")
-    if phase == "walden":
-        phase_func = walden.app
-    elif phase == "snapshot":
-        phase_func = snapshot.app
-    elif phase == "meadow":
-        phase_func = meadow.app
-    elif phase == "garden":
-        phase_func = garden.app
-    elif phase == "grapher":
-        phase_func = grapher.app
-    elif phase == "explorers":
-        phase_func = explorers.app
-    elif phase == "charts":
-        phase_func = charts.app
-    else:
-        raise NotImplementedError(f"{phase} is not implemented yet.")
+    if phase == "charts":
+        import sys
 
-    start_server(
-        lambda: phase_func(run_checks=run_checks, dummy_data=dummy_data),
-        port=port,
-        debug=True,
-        auto_open_webbrowser=auto_open,
-    )
+        from streamlit.web import cli as stcli
+
+        script_path = os.path.join(os.path.dirname(__file__), "charts_v2/__main__.py")
+        sys.argv = ["streamlit", "run", script_path, "--server.port", str(port)]
+        sys.exit(stcli.main())
+    else:
+        apps = {
+            "snapshot": snapshot.app,
+            "meadow": meadow.app,
+            "garden": garden.app,
+            "grapher": grapher.app,
+            "explorers": explorers.app,
+            "charts-old": charts.app,
+        }
+
+        # prefill state with dummy data
+        if dummy_data:
+            utils.APP_STATE = utils.DUMMY_DATA
+
+        apps_to_start = {app_name: lambda app=app: app(run_checks=run_checks) for app_name, app in apps.items()}
+
+        def index():
+            go_app(phase, new_window=False)
+
+        # start only one app if given phase, otherwise show default index page
+        if phase != "all":
+            apps_to_start["index"] = index  # type: ignore
+
+        start_server(
+            apps_to_start,
+            port=port,
+            debug=True,
+            auto_open_webbrowser=True,
+        )
 
 
 if __name__ == "__main__":

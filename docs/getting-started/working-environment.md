@@ -52,7 +52,7 @@ You will need Python 3.9+, basic build tools, and MySQL client libraries.
     You can install most things you need with `apt`:
 
     ```bash
-    sudo apt install python3-dev python3-virtualenv python3-setuptools mysql-client
+    sudo apt install python3-dev python3-virtualenv python3-setuptools mysql-client libmysqlclient-dev
     ```
 
     However, the version of Poetry that ships with Ubuntu is too old, so we need to install a more recent version.
@@ -157,7 +157,7 @@ First of all, you need to have the [ETL project](https://github.com/owid/etl) in
 git clone https://github.com/owid/etl.git
 ```
 
-Along with various directories and files, the project also has two submodules in the `vendor/` folder: [owid-catalog-py](https://github.com/owid/owid-catalog-py) and [walden](https://github.com/owid/walden) (deprecated), both in-house developed libraries, which simplify the interaction with our datasets.
+Along with various directories and files, the project also has sub-packages in the `lib/` folder: `catalog`, `walden` (deprecated), `repack` and `datautils`. These redistributable in-house libraries simplify access to data.
 
 ## Check your environment
 
@@ -173,7 +173,7 @@ The best way to check if your environment is healthy is to run:
 make test
 ```
 
-This will update the two submodules in the `vendor/` folder, install the project, and then run all CI checks.
+This will install the project, and then run all CI checks.
 
 If `make test` succeeds, then you should be able to build any dataset you like, including the entire catalog. If it fails, please raise a [Github issue](https://github.com/owid/etl/issues) (if OWID staff, you can also ask using the `#tech-issues` Slack channel).
 
@@ -201,9 +201,13 @@ This will list all the folders and directories in the project. Find a brief expl
 | `schemas/`    | Metadata schemas for ETL datasets. |
 | `scripts/`    | Various scripts. |
 | `tests/`    | ETL library tests. |
-| `vendor/`    | Dependencies of other OWID git projects. |
+| `lib/`    | Other OWID sub-packages. |
 | `docs/`, `.readthedocs.yaml`, `mkdocs.yml`    | Project documentation config files and directory. |
 | `.dvc/`, `.dvcignore`       | DVC config folder and file.  |
 | `Makefile`, `default.mk`    | `make`-related files. |
 
 *[DVC]: Data Version Control
+
+## Grapher
+
+To test import datasets to the Grapher locally, you need to set your Grapher working environment first. For this, follow this [guide](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).

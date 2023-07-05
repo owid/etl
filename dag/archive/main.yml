@@ -62,6 +62,7 @@ steps:
 # Include all active steps plus all archive steps.
 include:
   - dag/main.yml
+  - dag/archive/agriculture.yml
   # - dag/archive/open_numbers.yml
   - dag/archive/faostat.yml
   - dag/archive/energy.yml
@@ -71,6 +72,6 @@ include:
   # - dag/archive/papers.yml
   - dag/archive/demography.yml
   # - dag/archive/war.yml
-  # - dag/archive/fasttrack.yml
+  - dag/archive/fasttrack.yml
   # - dag/archive/biodiversity.yml
   # - dag/archive/health.yml

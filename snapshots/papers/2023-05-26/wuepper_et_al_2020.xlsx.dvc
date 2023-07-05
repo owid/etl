@@ -1,0 +1,30 @@
+meta:
+  namespace: papers
+  short_name: wuepper_et_al_2020
+  name: Countries influence the trade-off between crop yields and nitrogen pollution
+    - Wuepper et al. (2020)
+  version: '2023-05-26'
+  publication_year: 2014
+
+  publication_date: '2020-11-11'
+  source_name: Wuepper et al. (2020)
+  source_published_by: Wuepper, D., Le Clech, S., Zilberman, D. et al. Countries influence
+    the trade-off between crop yields and nitrogen pollution. Nat Food 1, 713–719
+    (2020). https://doi.org/10.1038/s43016-020-00185-6
+  url: https://www.nature.com/articles/s43016-020-00185-6
+  source_data_url:
+  file_extension: xlsx
+  license_url: https://www.research-collection.ethz.ch/handle/20.500.11850/430354
+  license_name: Creative Commons Attribution 4.0 International
+  date_accessed: 2023-05-26
+  is_public: true
+  description: |
+    The dataset for this paper can be accessed at:
+    https://www.research-collection.ethz.ch/handle/20.500.11850/430354
+    Via the ETH Zürich Research Collection. However, the data is in Stata format.
+    Therefore, the data uploaded here is an xlsx file kindly provided by the authors.
+wdir: ../../../data/snapshots/papers/2023-05-26
+outs:
+- md5: 7eed4e5d625e66520819dc91d476f9d5
+  size: 23975
+  path: wuepper_et_al_2020.xlsx

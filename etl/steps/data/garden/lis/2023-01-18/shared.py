@@ -12,7 +12,7 @@ var_dict = {
         "description": "This is the mean income or consumption per year within the {pct_dict[pct]['decile10']} (tenth of the population).",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "share": {
         "title": "Share",
@@ -26,14 +26,14 @@ var_dict = {
         "description": "This is the level of income or consumption per year below which {str(pct)}% of the population falls.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "avg_shortfall": {
         "title": "Average shortfall ($)",
         "description": "This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the poverty line of {povline}, averaged across the population in poverty.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "headcount": {
         "title": "Number in poverty",
@@ -68,7 +68,7 @@ var_dict = {
         "description": "This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {povline}.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "gini": {
         "title": "Gini coefficient",
@@ -82,21 +82,21 @@ var_dict = {
         "description": "Mean income or consumption.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "median": {
         "title": "Median",
         "description": "Median income or consumption.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "palma_ratio": {
         "title": "Palma ratio",
         "description": "The Palma ratio is the share of total income or consumption of the top 10% divided by the share of the bottom 40%.",
         "unit": "",
         "short_unit": "",
-        "numDecimalPlaces": 1,
+        "numDecimalPlaces": 2,
     },
     "s80_s20_ratio": {
         "title": "S80/S20 ratio",
@@ -175,13 +175,15 @@ equivalence_scales_dict = {
 }
 
 # Details for each relative poverty line
-rel_dict = {40: "40% of dhi median", 50: "50% of dhi median", 60: "60% of dhi median"}
+rel_dict = {40: "40% of the median", 50: "50% of the median", 60: "60% of the median"}
 
 # Details for each absolute poverty line
 abs_dict = {
     100: "$1 a day",
+    200: "$2 a day",
     215: "$2.15 a day",
     365: "$3.65 a day",
+    500: "$5 a day",
     685: "$6.85 a day",
     1000: "$10 a day",
     2000: "$20 a day",

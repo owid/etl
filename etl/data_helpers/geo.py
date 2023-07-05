@@ -4,16 +4,18 @@ import functools
 import json
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Optional, TypeVar, Union, cast
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Table
 from owid.datautils.common import ExceptionFromDocstring, warn_on_list_of_entities
 from owid.datautils.dataframes import groupby_agg, map_series
 from owid.datautils.io.json import load_json
 
-from etl.paths import DATA_DIR, REFERENCE_DATASET
+from etl.paths import DATA_DIR, LATEST_REGIONS_DATASET_PATH
+
+TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 
 # When creating region aggregates for a certain variable in a certain year, some mandatory countries must be
 # informed, otherwise the aggregate will be nan (since we consider that there is not enough information).
@@ -31,26 +33,26 @@ NUM_ALLOWED_NANS_PER_YEAR = None
 
 # Paths to datasets used in this module. Feel free to update the versions or paths whenever there is a
 # new version of the datasets.
-# Path to Key Indicators dataset
-DATASET_KEY_INDICATORS = DATA_DIR / "garden" / "owid" / "latest" / "key_indicators"
+# Path to Key Indicators dataset (TODO: should change it)
+# DATASET_POPULATION = DATA_DIR / "garden" / "demography" / "2023-03-31" / "population"
+DATASET_POPULATION = DATA_DIR / "garden" / "owid" / "latest" / "key_indicators"
 TNAME_KEY_INDICATORS = "population"
 # Path to Key Indicators dataset
+# TODO: we should update it to latest garden/wb/*/income_groups dataset
 DATASET_WB_INCOME = DATA_DIR / "garden" / "wb" / "2021-07-01" / "wb_income"
 TNAME_WB_INCOME = "wb_income_group"
-# Path to Key Indicators dataset
-TNAME_REFERENCE = "countries_regions"
 
 
 @functools.lru_cache
 def _load_population() -> pd.DataFrame:
-    population = Dataset(DATASET_KEY_INDICATORS)[TNAME_KEY_INDICATORS]
+    population = Dataset(DATASET_POPULATION)[TNAME_KEY_INDICATORS]
     population = population.reset_index()
     return cast(pd.DataFrame, population)
 
 
 @functools.lru_cache
 def _load_countries_regions() -> pd.DataFrame:
-    countries_regions = Dataset(REFERENCE_DATASET)[TNAME_REFERENCE]
+    countries_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"]
     return cast(pd.DataFrame, countries_regions)
 
 
@@ -159,12 +161,15 @@ def list_countries_in_region_that_must_have_data(
         Countries that are expected to have the largest contribution.
 
     """
+    # TODO: we should be passing countries_regions explicitly and get rid of `_load_countries_regions`
     if countries_regions is None:
         countries_regions = _load_countries_regions()
 
+    # TODO: we should be passing population explicitly and get rid of `_load_population`
     if population is None:
         population = _load_population()
 
+    # TODO: we should be passing income groups explicitly and get rid of `_load_income_groups`
     if income_groups is None:
         income_groups = _load_income_groups().reset_index()
 
@@ -345,15 +350,16 @@ def add_region_aggregates(
 
 
 def harmonize_countries(
-    df: pd.DataFrame,
+    df: TableOrDataFrame,
     countries_file: Union[Path, str],
     excluded_countries_file: Optional[Union[Path, str]] = None,
     country_col: str = "country",
     warn_on_missing_countries: bool = True,
     make_missing_countries_nan: bool = False,
     warn_on_unused_countries: bool = True,
+    warn_on_unknown_excluded_countries: bool = True,
     show_full_warning: bool = True,
-) -> pd.DataFrame:
+) -> TableOrDataFrame:
     """Harmonize country names in dataframe, following the mapping given in a file.
 
     Countries in dataframe that are not in mapping will left unchanged (or converted to nan, if
@@ -379,6 +385,9 @@ def harmonize_countries(
     warn_on_unused_countries : bool
         True to warn about countries that appear in countries file but are useless (since they do not appear in original
         dataframe).
+    warn_on_unknown_excluded_countries : bool
+        True to warn about countries that appear in the list of non-harmonized countries to ignore, but are not found in
+        the data.
     show_full_warning : bool
         True to display list of countries in warning messages.
 
@@ -399,7 +408,7 @@ def harmonize_countries(
 
         # Check that all countries to be excluded exist in the data.
         unknown_excluded_countries = set(excluded_countries) - set(df[country_col])
-        if len(unknown_excluded_countries) > 0:
+        if warn_on_unknown_excluded_countries and (len(unknown_excluded_countries) > 0):
             warn_on_list_of_entities(
                 list_of_entities=unknown_excluded_countries,
                 warning_message="Unknown country names in excluded countries file:",
@@ -419,16 +428,19 @@ def harmonize_countries(
         show_full_warning=show_full_warning,
     )
 
-    return df_harmonized
+    return df_harmonized  # type: ignore
 
 
 def add_population_to_dataframe(
     df: pd.DataFrame,
+    ds_population: Optional[Dataset] = None,
     country_col: str = "country",
     year_col: str = "year",
     population_col: str = "population",
     warn_on_missing_countries: bool = True,
     show_full_warning: bool = True,
+    interpolate_missing_population: bool = False,
+    expected_countries_without_population: Optional[List[str]] = None,
 ) -> pd.DataFrame:
     """Add column of population to a dataframe.
 
@@ -436,6 +448,8 @@ def add_population_to_dataframe(
     ----------
     df : pd.DataFrame
         Original dataframe that contains a column of country names and years.
+    ds_population : Dataset or None
+        Population dataset.
     country_col : str
         Name of column in original dataframe with country names.
     year_col : str
@@ -446,6 +460,13 @@ def add_population_to_dataframe(
         True to warn about countries that appear in original dataframe but not in population dataset.
     show_full_warning : bool
         True to display list of countries in warning messages.
+    interpolate_missing_population : bool
+        True to linearly interpolate population on years that are presented in df, but for which we do not have
+        population data; otherwise False to keep missing population data as nans.
+        For example, if interpolate_missing_population is True and df has data for all years between 1900 and 1910,
+        but population is only given for 1900 and 1910, population will be linearly interpolated between those years.
+    expected_countries_without_population : list
+        Countries that are expected to not have population (that should be ignored if warnings are activated).
 
     Returns
     -------
@@ -454,7 +475,11 @@ def add_population_to_dataframe(
 
     """
     # Load population data.
-    population = _load_population().rename(
+    if ds_population is not None:
+        population = ds_population["population"].reset_index()
+    else:
+        population = _load_population()
+    population = population.rename(
         columns={
             "country": country_col,
             "year": year_col,
@@ -462,21 +487,148 @@ def add_population_to_dataframe(
         }
     )[[country_col, year_col, population_col]]
 
-    # Check if there is any missing country.
+    # Check if there is any unexpected missing country.
     missing_countries = set(df[country_col]) - set(population[country_col])
-    if len(missing_countries) > 0:
-        if warn_on_missing_countries:
-            warn_on_list_of_entities(
-                list_of_entities=missing_countries,
-                warning_message=(
-                    f"{len(missing_countries)} countries not found in population"
-                    " dataset. They will remain in the dataset, but have nan"
-                    " population."
-                ),
-                show_list=show_full_warning,
-            )
+    if expected_countries_without_population is not None:
+        missing_countries = missing_countries - set(expected_countries_without_population)
+    if (len(missing_countries) > 0) and warn_on_missing_countries:
+        warn_on_list_of_entities(
+            list_of_entities=missing_countries,
+            warning_message=(
+                f"{len(missing_countries)} countries not found in population"
+                " dataset. They will remain in the dataset, but have nan"
+                " population."
+            ),
+            show_list=show_full_warning,
+        )
+
+    if interpolate_missing_population:
+        # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
+        # Optionally fill missing years linearly.
+        countries_in_data = df[country_col].unique()
+        years_in_data = df[year_col].unique()
+
+        population = population.set_index([country_col, year_col]).reindex(
+            pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, year_col])
+        )
+
+        population = population.groupby(country_col).transform(
+            lambda x: x.interpolate(method="linear", limit_direction="both")
+        )
 
     # Add population to original dataframe.
     df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
 
     return df_with_population
+
+
+def list_members_of_region(
+    region: str,
+    ds_regions: Dataset,
+    ds_income_groups: Optional[Dataset] = None,
+    additional_regions: Optional[List[str]] = None,
+    excluded_regions: Optional[List[str]] = None,
+    additional_members: Optional[List[str]] = None,
+    excluded_members: Optional[List[str]] = None,
+) -> List[str]:
+    """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
+
+    NOTE: This function should replace list_countries_in_region once we have new functions to create region aggregates.
+
+    Parameters
+    ----------
+    region : str
+        Region name (e.g. "Africa", or "Europe (excl. EU-27)"). If the region is a known region in ds_regions, its
+        members will be listed.
+    ds_regions : Dataset
+        Regions dataset.
+    ds_income_groups : Dataset or None
+        Income groups dataset. It must be given if region is an income group.
+    additional_regions: list or None
+        Additional regions whose members should be included in the list.
+    excluded_regions: list or None
+        Regions whose members should be excluded from the list.
+    additional_members : list or None
+        Additional individual members to include in the list.
+    excluded_members : list
+        Individual members to exclude from the list.
+
+    Returns
+    -------
+    countries : list
+        List of countries in the specified region.
+
+    """
+    if additional_regions is None:
+        additional_regions = []
+    if excluded_regions is None:
+        excluded_regions = []
+    if additional_members is None:
+        additional_members = []
+    if excluded_members is None:
+        excluded_members = []
+
+    # Get main tables from the regions dataset.
+    df_region_definitions = pd.DataFrame(ds_regions["definitions"]).reset_index()
+    df_region_members = pd.DataFrame(ds_regions["members"]).reset_index()
+
+    # Get a mapping from region code to name.
+    region_names = df_region_definitions.set_index("code").to_dict()["name"]
+
+    # Map each region code to its name, and each member code to its name.
+    df_countries_in_region = df_region_members.copy()
+    df_countries_in_region["region"] = map_series(
+        df_countries_in_region["code"], mapping=region_names, warn_on_missing_mappings=True
+    )
+    df_countries_in_region["member"] = map_series(
+        df_countries_in_region["member"], mapping=region_names, warn_on_missing_mappings=True
+    )
+
+    # Create a column with the list of members in each region
+    df_countries_in_region = (
+        df_countries_in_region.rename(columns={"member": "members"})
+        .groupby("region", as_index=True, observed=True)
+        .agg({"members": list})
+    )
+
+    if ds_income_groups is not None:
+        # Get the main table from the income groups dataset.
+        df_income = pd.DataFrame(ds_income_groups["wb_income_group"]).reset_index()
+
+        # Create a dataframe of countries in each income group.
+        df_countries_in_income_group = (
+            df_income.rename(columns={"income_group": "region", "country": "members"})
+            .groupby("region", as_index=True, observed=True)
+            .agg({"members": list})
+        )
+
+        # Create a dataframe of members in regions, including income groups.
+        df_countries_in_region = pd.concat([df_countries_in_region, df_countries_in_income_group], ignore_index=False)
+
+    # Get list of default members for the given region, if it's known.
+    if region in df_countries_in_region.index.tolist():
+        countries_set = set(df_countries_in_region.loc[region]["members"])
+    else:
+        # Initialise an empty set of members.
+        countries_set = set()
+
+    # List countries from the list of regions included.
+    countries_set |= set(
+        sum([df_countries_in_region.loc[region_included]["members"] for region_included in additional_regions], [])
+    )
+
+    # Remove all countries from the list of regions excluded.
+    countries_set -= set(
+        sum([df_countries_in_region.loc[region_excluded]["members"] for region_excluded in excluded_regions], [])
+    )
+
+    # Add the list of individual countries to be included.
+    countries_set |= set(additional_members)
+
+    # Remove the list of individual countries to be excluded.
+    countries_set -= set(excluded_members)
+
+    # Convert set of countries into a sorted list.
+    countries = sorted(countries_set)
+
+    return countries

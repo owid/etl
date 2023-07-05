@@ -278,7 +278,7 @@ def add_cum_metrics(df: pd.DataFrame) -> pd.DataFrame:
 def add_population(df: pd.DataFrame) -> pd.DataFrame:
     # Load population data
     df["year"] = df["date"].dt.year
-    df = geo.add_population_to_dataframe(df, "entity", "year")
+    df = geo.add_population_to_dataframe(df, country_col="entity", year_col="year")
     df = df.drop(columns=["year"])
     # Get per million metrics
     df["excess_per_million_proj_all_ages"] = df["excess_proj_all_ages"] / (df["population"] / 1e6)

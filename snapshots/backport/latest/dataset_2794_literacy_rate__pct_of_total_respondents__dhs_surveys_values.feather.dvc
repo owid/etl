@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys_values
   file_extension: feather
-  date_accessed: 2023-02-23 19:23:02.217708
+  date_accessed: 2023-06-01 13:10:42.916312
   name: Literacy rate (% of total respondents) - DHS Surveys
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dc74264fc32e7e106b3c42f4ed2eb3f5
-  size: 11530
+- md5: 1f98156f3a2c7a80cdc182603285da76
+  size: 11538
   path: dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys_values.feather

@@ -9,3 +9,6 @@ vendor/
 .cachedir/
 .venv/
 !data/snapshots/
+# this folder contains thousands of .dvc files which slows it down, we dynamically comment it when working with
+# backported snapshots (see _unignore_backports)
+snapshots/backport/

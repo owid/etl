@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: owid_upload_top1_percent_compare_1980
+  file_extension: csv
+  date_accessed: 2023-05-09
+  name: DRAFT owid_upload_top1_percent_compare_1980
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: gAAAAABkWsFSIIN-EgbQN4cULmWnbIWlxMQhMg-1xt1meoIo6FtsqFaWJd8F4NO1llZAUQTiA7kH-xGq4qA25fbHHTxgvARBvw==
+  is_public: false
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 33fb0ebbca08babec0b87601fdd5ad82
+  size: 15665
+  path: owid_upload_top1_percent_compare_1980.csv

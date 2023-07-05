@@ -27,11 +27,11 @@ steps:
     - walden://who/2022-09-30/ghe
   data://garden/who/2021-07-01/ghe:
     - data://meadow/who/2021-07-01/ghe
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   data://garden/who/2022-09-30/ghe:
     - data://meadow/who/2022-09-30/ghe
     - data://garden/un/2022-07-11/un_wpp
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   data://grapher/who/2022-09-30/ghe:
     - data://garden/who/2022-09-30/ghe
 
@@ -79,6 +79,18 @@ steps:
     - data://garden/ihme_gbd/2019/gbd_prevalence
   data://grapher/ihme_gbd/2019/gbd_child_mortality:
     - data://garden/ihme_gbd/2019/gbd_child_mortality
+  data://meadow/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
+    - snapshot://ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate.zip
+  data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
+    - data://meadow/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
+  data://grapher/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
+    - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
+  # DALYs vs Prevalence
+  data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world:
+    - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
+    - data://garden/ihme_gbd/2019/gbd_cause
+  data://grapher/ihme_gbd/2023-06-14/prevalence_dalys_world:
+    - data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world
 
   # Temporary additional to add Drug Disorders to grapher
   data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders:
@@ -137,7 +149,7 @@ steps:
     - snapshot://health/2023-04-18/wgm_mental_health.zip
   data://garden/health/2023-04-18/wgm_mental_health:
     - data://meadow/health/2023-04-18/wgm_mental_health
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2021-07-01/wb_income
   data://grapher/health/2023-04-19/wgm_mental_health:
     - data://garden/health/2023-04-18/wgm_mental_health
@@ -146,7 +158,49 @@ steps:
     - snapshot://health/2023-04-25/wgm_2018.xlsx
   data://garden/health/2023-04-25/wgm_2018:
     - data://meadow/health/2023-04-25/wgm_2018
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2021-07-01/wb_income
   data://grapher/health/2023-04-26/wgm_2018:
     - data://garden/health/2023-04-25/wgm_2018
+
+  # OECD: Pharmaceutical Market
+  data://meadow/oecd/2023-05-01/health_pharma_market:
+    - snapshot://oecd/2023-05-01/health_pharma_market.csv
+  data://garden/oecd/2023-05-01/health_pharma_market:
+    - data://meadow/oecd/2023-05-01/health_pharma_market
+  data://grapher/oecd/2023-05-01/health_pharma_market:
+    - data://garden/oecd/2023-05-01/health_pharma_market
+
+  # Global Wellbeing Initiative (2020)
+  data://meadow/health/2023-05-04/global_wellbeing:
+    - snapshot://health/2023-05-04/global_wellbeing.xlsx
+  data://garden/health/2023-05-04/global_wellbeing:
+    - data://meadow/health/2023-05-04/global_wellbeing
+  data://grapher/health/2023-05-04/global_wellbeing:
+    - data://garden/health/2023-05-04/global_wellbeing
+
+  # Cholera
+  data://garden/who/2023-06-01/cholera:
+    - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
+    - snapshot://fasttrack/2023-05-31/cholera.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2021-07-01/wb_income
+  data://grapher/who/2023-06-01/cholera:
+    - data://garden/who/2023-06-01/cholera
+
+  # Diarrhea treatment
+  data://meadow/unicef/2023-06-16/diarrhea:
+    - snapshot://unicef/2023-06-16/diarrhea.xlsx
+  data://garden/unicef/2023-06-16/diarrhea:
+    - data://meadow/unicef/2023-06-16/diarrhea
+  data://grapher/unicef/2023-06-16/diarrhea:
+    - data://garden/unicef/2023-06-16/diarrhea
+
+# Guinea worm
+  data://meadow/who/2023-06-29/guinea_worm:
+  - snapshot://who/2023-06-29/guinea_worm.csv
+  data://garden/who/2023-06-29/guinea_worm:
+  - data://meadow/who/2023-06-29/guinea_worm
+  - data://grapher/fasttrack/2023-06-28/guinea_worm
+  data://grapher/who/2023-06-30/guinea_worm:
+  - data://garden/who/2023-06-29/guinea_worm

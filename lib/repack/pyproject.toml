@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "owid-repack"
+version = "0.1.2"
+description = "Pack Pandas data frames into smaller, more memory-efficient data types."
+authors = ["Our World In Data <tech@ourworldindata.org>"]
+license = "MIT"
+packages = [{ include = "owid" }]
+readme = "README.md"
+repository = "https://github.com/owid/owid-catalog-py"
+homepage = "https://github.com/owid/owid-catalog-py"
+
+[tool.poetry.dependencies]
+python = ">=3.8.1"
+numpy = ">=1.24.0"
+pandas = ">=1.5.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.2.0"
+pyright = ">=1.1.285"
+black = ">=22.12.0"
+flake8 = ">=6.0.0"
+isort = ">=5.11.4"
+
+[tool.pyright]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

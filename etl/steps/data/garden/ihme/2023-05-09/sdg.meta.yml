@@ -1,0 +1,921 @@
+dataset:
+  title: Sustainable Development Goals (IHME, 2022)
+  description: |
+    IHME produced estimates and forecasts for 13 of the SDG indicators included in the Goalkeepers Report.
+
+    IHME provides estimated data for the years 1990-2021 and projections for three different scenarios for the years 2021-2023.
+
+    The scenarios provided are: a reference case, best case and worst case.
+
+    The full description of the methods used to produce the data can be found here: https://www.gatesfoundation.org/goalkeepers/report/2022-report/data-sources/#ExploretheIndicatorPages
+  licenses:
+  - name: IHME Free-of-charge non-commercial user agreement
+    url: https://www.healthdata.org/data-tools-practices/data-practices/terms-and-conditions
+  sources:
+  - name: Institute of Health Metrics and Evaluation (2022)
+    url: https://api.healthdata.org/sdg/v1/docs & https://api.healthdata.org/sdg/v1/docs
+    date_accessed: '2023-05-05'
+    publication_date: '2022-09-12'
+    publication_year: 2022
+    published_by: 'Institute for Health Metrics and Evaluation (IHME). Health-related
+      SDGs. Seattle, WA: IHME, University of Washington, 2022. Available from https://api.healthdata.org/sdg/v1/docs'
+tables:
+  sdg:
+    variables:
+      mean_estimate_prevalence_of_child_stunting_under_5_both_sexes_reference_estimate:
+        title: Prevalence of child stunting - Both Sexes - Estimate
+        description: |
+          Prevalence of stunting among children under 5 years.
+
+          IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_child_stunting_under_5_females_reference_estimate:
+        title: Prevalence of child stunting - Female - Estimate
+        description: |
+          Prevalence of stunting among female children under 5 years.
+
+          IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_child_stunting_under_5_males_reference_estimate:
+        title: Prevalence of child stunting - Male - Estimate
+        description: |
+          Prevalence of stunting among male children under 5 years.
+
+          IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_maternal_mortality_ratio__who__15_49_years_females_reference_estimate:
+        title: Maternal mortality ratio - Estimate
+        description: |
+          Maternal mortality ratio (maternal deaths among women aged 15-49 years per 100,000 live births) without late cause deaths.
+
+          It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of death in a single pregnancy or a single live birth.
+        unit: 'per 100,000 live births'
+      mean_estimate_under_5_mortality_rate_under_5_both_sexes_reference_estimate:
+        title: Under-5 mortality rate - Both Sexes - Estimate
+        description: |
+          Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
+
+          IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
+
+        unit: 'per 1,000 live births'
+      mean_estimate_under_5_mortality_rate_under_5_females_reference_estimate:
+        title:  Under-5 mortality rate - Female - Estimate
+        description: |
+          Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
+
+          IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
+
+        unit: 'per 1,000 live births'
+      mean_estimate_under_5_mortality_rate_under_5_males_reference_estimate:
+        title: Under-5 mortality rate - Male - Estimate
+        description: |
+          Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
+
+          IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
+
+        unit: 'per 1,000 live births'
+      mean_estimate_neonatal_mortality_rate_neonatal_both_sexes_reference_estimate:
+        title: Neonatal mortality rate - Both Sexes - Estimate
+        description: |
+          Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
+
+          IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_neonatal_mortality_rate_neonatal_females_reference_estimate:
+        title: Neonatal mortality rate - Female - Estimate
+        description: |
+          Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
+
+          IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_neonatal_mortality_rate_neonatal_males_reference_estimate:
+        title: Neonatal mortality rate - Male - Estimate
+        description: |
+          Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
+
+          IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
+
+        unit: 'per 1,000 live births'
+      mean_estimate_hiv_incidence_rate_all_ages_both_sexes_reference_estimate:
+        title: HIV incidence rate - Both Sexes - Estimate
+        description: |
+          Age-standardized rate of new HIV infections (per 1,000).
+
+          IHME estimates the HIV rate as new HIV infections per 1,000 population.
+        unit: 'per 1,000 people'
+      mean_estimate_hiv_incidence_rate_all_ages_females_reference_estimate:
+        title: HIV incidence rate - Female - Estimate
+        description: |
+          Age-standardized rate of new HIV infections (per 1,000).
+
+          IHME estimates the HIV rate as new HIV infections per 1,000 population.
+        unit: 'per 1,000 people'
+      mean_estimate_hiv_incidence_rate_all_ages_males_reference_estimate:
+        title: HIV incidence rate - Male - Estimate
+        description: |
+          Age-standardized rate of new HIV infections (per 1,000).
+
+          IHME estimates the HIV rate as new HIV infections per 1,000 population.
+        unit: 'per 1,000 people'
+      mean_estimate_tuberculosis_incidence_rate_all_ages_both_sexes_reference_estimate:
+        title: Tuberculosis incidence rate - Both Sexes - Estimate
+        description: |
+          Age-standardized rate of tuberculosis cases (per 100,000).
+
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
+        unit: 'new cases per 100,000 people'
+      mean_estimate_tuberculosis_incidence_rate_all_ages_females_reference_estimate:
+        title: Tuberculosis incidence rate - Female - Estimate
+        description: |
+          Age-standardized rate of tuberculosis cases (per 100,000).
+
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
+        unit: 'new cases per 100,000 people'
+      mean_estimate_tuberculosis_incidence_rate_all_ages_males_reference_estimate:
+        title: Tuberculosis incidence rate - Male - Estimate
+        description: |
+          Age-standardized rate of tuberculosis cases (per 100,000).
+
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
+        unit: 'new cases per 100,000 people'
+      mean_estimate_malaria_incidence_rate_all_ages_both_sexes_reference_estimate:
+        title: Malaria incidence rate - Both Sexes - Estimate
+        description: |
+          Age-standardized rate of malaria cases (per 1,000).
+
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
+        unit: 'new cases per 1,000 people'
+      mean_estimate_malaria_incidence_rate_all_ages_females_reference_estimate:
+        title: Malaria incidence rate - Female - Estimate
+        description: |
+          Age-standardized rate of malaria cases (per 1,000).
+
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
+        unit: 'new cases per 1,000 people'
+      mean_estimate_malaria_incidence_rate_all_ages_males_reference_estimate:
+        title: Malaria incidence rate - Male - Estimate
+        description: |
+          Age-standardized rate of malaria cases (per 1,000).
+
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
+        unit: 'new cases per 1,000 people'
+      mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_both_sexes_reference_estimate:
+        title: Prevalence of 15 neglected tropical diseases - Both Sexes - Estimate
+        description: |
+          Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
+
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
+        unit: 'cases of 15 NTDs per 100,000 people'
+      mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_females_reference_estimate:
+        title: Prevalence of 15 neglected tropical diseases - Female - Estimate
+        description: |
+          Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
+
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
+        unit: 'cases of 15 NTDs per 100,000 people'
+      mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_males_reference_estimate:
+        title: Prevalence of 15 neglected tropical diseases - Male - Estimate
+        description: |
+          Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
+
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
+        unit: 'cases of 15 NTDs per 100,000 people'
+      mean_estimate_met_need_for_family_planning_with_modern_contraception_methods_15_49_years_females_reference_estimate:
+        title: Met need for family planning with modern contraception methods, 15-49 years females - Estimate
+        description: |
+          Proportion of women of reproductive age (15 to 49 years) who have their need for family planning met with modern contraception methods.
+
+          IHME estimates the proportion of women of reproductive age (15–49 years) who have their need for family planning satisfied with modern contraceptive methods. Modern contraceptive methods include the current use of male and female sterilization, male and female condoms, diaphragms, cervical caps, sponges, spermicidal agents, oral hormonal pills, patches, rings, implants, injections, intrauterine devices (IUDs), and emergency contraceptives.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_essential_health_services__as_defined_by_the_uhc_service_coverage_index_all_ages_both_sexes_reference_estimate:
+        title: Coverage of essential health services, as defined by the UHC service coverage index - Both Sexes - Estimate
+        description: Coverage of essential health services, as defined by a universal health coverage (UHC) service coverage index of based on 9 tracer interventions and risk-standardized death rates or mortality-to-incidence ratios from 32 causes amenable to healthcare.
+        unit: 'index'
+      mean_estimate_prevalence_of_daily_smoking_age_standardized_both_sexes_reference_estimate:
+        title: Age-standardized prevalence of daily smoking - Both Sexes - Estimate
+        description: |
+          Age-standardized prevalence of daily smoking among populations aged 15 years and older.
+
+          IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
+
+          IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_daily_smoking_age_standardized_females_reference_estimate:
+        title: Age-standardized prevalence of daily smoking - Female - Estimate
+        description: |
+          Age-standardized prevalence of daily smoking among populations aged 15 years and older.
+
+          IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
+
+          IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_daily_smoking_age_standardized_males_reference_estimate:
+        title: Age-standardized prevalence of daily smoking - Male - Estimate
+        description: |
+          Age-standardized prevalence of daily smoking among populations aged 15 years and older.
+
+          IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
+
+          IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_dpt3_all_ages_both_sexes_reference_estimate:
+        title: Coverage of DTP3 - Both Sexes - Estimate
+        description: |
+          Diphtheria tetanus toxoid and pertussis third dose (DTP3) vaccine.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_measles__two_doses__all_ages_both_sexes_reference_estimate:
+        title: Coverage of MCV2 - Both Sexes - Estimate
+        description: |
+          Coverage of measles second dose (MCV2) vaccine.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_pneumococcal_conjugate_all_ages_both_sexes_reference_estimate:
+        title: Coverage of PCV3 - Both Sexes - Estimate
+        description: |
+          Coverage of pneumococcal conjugate vaccine third dose (PCV3) vaccine.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_risk_weighted_prevalence_of_populations_using_unsafe_sanitation_all_ages_both_sexes_reference_estimate:
+        title: Risk-weighted prevalence of populations using unsafe sanitation - Both Sexes - Estimate
+        description: |
+          Risk-weighted prevalence of populations using unsafe or unimproved sanitation, as measured by the summary exposure value (SEV) for unsafe sanitation.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_child_stunting_under_5_both_sexes_worse_projection:
+        title: Prevalence of child stunting - Both Sexes - Worse Projection
+        description: |
+          Prevalence of stunting among children under 5 years.
+
+          IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_child_stunting_under_5_both_sexes_reference_projection:
+        title: Prevalence of child stunting - Both Sexes - Reference Projection
+        description: |
+          Prevalence of stunting among children under 5 years.
+
+          IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_child_stunting_under_5_both_sexes_better_projection:
+        title: Prevalence of child stunting - Both Sexes - Better Projection
+        description: |
+          Prevalence of stunting among children under 5 years.
+
+          IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_child_stunting_under_5_females_worse_projection:
+        title: Prevalence of child stunting - Female - Worse Projection
+        description: |
+          Prevalence of stunting among children under 5 years.
+
+          IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_child_stunting_under_5_females_reference_projection:
+        title: Prevalence of child stunting - Female - Reference Projection
+        description: |
+          Prevalence of stunting among children under 5 years.
+
+          IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_child_stunting_under_5_females_better_projection:
+        title: Prevalence of child stunting - Female - Better Projection
+        description: |
+          Prevalence of stunting among children under 5 years.
+
+          IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_child_stunting_under_5_males_worse_projection:
+        title: Prevalence of child stunting - Male - Worse Projection
+        description: |
+          Prevalence of stunting among children under 5 years.
+
+          IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_child_stunting_under_5_males_reference_projection:
+        title: Prevalence of child stunting - Male - Reference Projection
+        description: |
+          Prevalence of stunting among children under 5 years.
+
+          IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_child_stunting_under_5_males_better_projection:
+        title: Prevalence of child stunting - Male - Better Projection
+        description: |
+          Prevalence of stunting among children under 5 years.
+
+          IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_maternal_mortality_ratio__who__15_49_years_females_worse_projection:
+        title: Maternal mortality ratio - Worse Projection
+        description: |
+          Maternal mortality ratio (maternal deaths among women aged 15-49 years per 100,000 live births) without late cause deaths.
+
+          It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of death in a single pregnancy or a single live birth.
+        unit: 'per 100,000 live births'
+      mean_estimate_maternal_mortality_ratio__who__15_49_years_females_reference_projection:
+        title: Maternal mortality ratio - Reference Projection
+        description: |
+          Maternal mortality ratio (maternal deaths among women aged 15-49 years per 100,000 live births) without late cause deaths.
+
+          It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of death in a single pregnancy or a single live birth.
+        unit: 'per 100,000 live births'
+      mean_estimate_maternal_mortality_ratio__who__15_49_years_females_better_projection:
+        title: Maternal mortality ratio - Better Projection
+        description: |
+          Maternal mortality ratio (maternal deaths among women aged 15-49 years per 100,000 live births) without late cause deaths.
+
+          It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of death in a single pregnancy or a single live birth.
+        unit: 'per 100,000 live births'
+      mean_estimate_under_5_mortality_rate_under_5_both_sexes_worse_projection:
+        title: Under-5 mortality rate - Both Sexes - Worse Projection
+        description: |
+          Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
+
+          IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_under_5_mortality_rate_under_5_both_sexes_reference_projection:
+        title: Under-5 mortality rate - Both Sexes - Reference Projection
+        description: |
+          Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
+
+          IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_under_5_mortality_rate_under_5_both_sexes_better_projection:
+        title: Under-5 mortality rate - Both Sexes - Better Projection
+        description: |
+          Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
+
+          IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_under_5_mortality_rate_under_5_females_worse_projection:
+        title: Under-5 mortality rate - Female - Worse Projection
+        description: |
+          Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
+
+          IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_under_5_mortality_rate_under_5_females_reference_projection:
+        title: Under-5 mortality rate - Female - Reference Projection
+        description: |
+          Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
+
+          IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_under_5_mortality_rate_under_5_females_better_projection:
+        title: Under-5 mortality rate - Female - Better Projection
+        description: |
+          Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
+
+          IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_under_5_mortality_rate_under_5_males_worse_projection:
+        title: Under-5 mortality rate - Male - Worse Projection
+        description: |
+          Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
+
+          IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_under_5_mortality_rate_under_5_males_reference_projection:
+        title: Under-5 mortality rate - Male - Reference Projection
+        description: |
+          Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
+
+          IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_under_5_mortality_rate_under_5_males_better_projection:
+        title: Under-5 mortality rate - Male - Better Projection
+        description: |
+          Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
+
+          IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_neonatal_mortality_rate_neonatal_both_sexes_worse_projection:
+        title: Neonatal mortality rate - Both Sexes - Worse Projection
+        description: |
+          Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
+
+          IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_neonatal_mortality_rate_neonatal_both_sexes_reference_projection:
+        title: Neonatal mortality rate - Both Sexes - Reference Projection
+        description: |
+          Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
+
+          IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_neonatal_mortality_rate_neonatal_both_sexes_better_projection:
+        title: Neonatal mortality rate - Both Sexes - Better Projection
+        description: |
+          Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
+
+          IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_neonatal_mortality_rate_neonatal_females_worse_projection:
+        title: Neonatal mortality rate - Female - Worse Projection
+        description: |
+          Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
+
+          IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_neonatal_mortality_rate_neonatal_females_reference_projection:
+        title: Neonatal mortality rate - Female - Reference Projection
+        description: |
+          Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
+
+          IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_neonatal_mortality_rate_neonatal_females_better_projection:
+        title: Neonatal mortality rate - Female - Better Projection
+        description: |
+          Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
+
+          IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_neonatal_mortality_rate_neonatal_males_worse_projection:
+        title: Neonatal mortality rate - Male - Worse Projection
+        description: |
+          Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
+
+          IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_neonatal_mortality_rate_neonatal_males_reference_projection:
+        title: Neonatal mortality rate - Male - Reference Projection
+        description: |
+          Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
+
+          IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_neonatal_mortality_rate_neonatal_males_better_projection:
+        title: Neonatal mortality rate - Male - Better Projection
+        description: |
+          Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
+
+          IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
+        unit: 'per 1,000 live births'
+      mean_estimate_hiv_incidence_rate_all_ages_both_sexes_worse_projection:
+        title: HIV incidence rate - Both Sexes - Worse Projection
+        description: |
+          Age-standardized rate of new HIV infections (per 1,000).
+
+          IHME estimates the HIV rate as new HIV infections per 1,000 population.
+        unit: 'per 1,000 people'
+      mean_estimate_hiv_incidence_rate_all_ages_both_sexes_reference_projection:
+        title: HIV incidence rate - Both Sexes - Reference Projection
+        description: |
+          Age-standardized rate of new HIV infections (per 1,000).
+
+          IHME estimates the HIV rate as new HIV infections per 1,000 population.
+        unit: 'per 1,000 people'
+      mean_estimate_hiv_incidence_rate_all_ages_both_sexes_better_projection:
+        title: HIV incidence rate - Both Sexes - Better Projection
+        description: |
+          Age-standardized rate of new HIV infections (per 1,000).
+
+          IHME estimates the HIV rate as new HIV infections per 1,000 population.
+        unit: 'per 1,000 people'
+      mean_estimate_hiv_incidence_rate_all_ages_females_worse_projection:
+        title: HIV incidence rate - Female - Worse Projection
+        description: |
+          Age-standardized rate of new HIV infections (per 1,000).
+
+          IHME estimates the HIV rate as new HIV infections per 1,000 population.
+        unit: 'per 1,000 people'
+      mean_estimate_hiv_incidence_rate_all_ages_females_reference_projection:
+        title: HIV incidence rate - Female - Reference Projection
+        description: |
+          Age-standardized rate of new HIV infections (per 1,000).
+
+          IHME estimates the HIV rate as new HIV infections per 1,000 population.
+        unit: 'per 1,000 people'
+      mean_estimate_hiv_incidence_rate_all_ages_females_better_projection:
+        title: HIV incidence rate - Female - Better Projection
+        description: |
+          Age-standardized rate of new HIV infections (per 1,000).
+
+          IHME estimates the HIV rate as new HIV infections per 1,000 population.
+        unit: 'per 1,000 people'
+      mean_estimate_hiv_incidence_rate_all_ages_males_worse_projection:
+        title: HIV incidence rate - Male - Worse Projection
+        description: |
+          Age-standardized rate of new HIV infections (per 1,000).
+
+          IHME estimates the HIV rate as new HIV infections per 1,000 population.
+        unit: 'per 1,000 people'
+      mean_estimate_hiv_incidence_rate_all_ages_males_reference_projection:
+        title: HIV incidence rate - Male - Reference Projection
+        description: |
+          Age-standardized rate of new HIV infections (per 1,000).
+
+          IHME estimates the HIV rate as new HIV infections per 1,000 population.
+        unit: 'per 1,000 people'
+      mean_estimate_hiv_incidence_rate_all_ages_males_better_projection:
+        title: HIV incidence rate - Male - Better Projection
+        description: |
+          Age-standardized rate of new HIV infections (per 1,000).
+
+          IHME estimates the HIV rate as new HIV infections per 1,000 population.
+        unit: 'per 1,000 people'
+      mean_estimate_tuberculosis_incidence_rate_all_ages_both_sexes_worse_projection:
+        title: Tuberculosis incidence rate - Both Sexes - Worse Projection
+        description: |
+          Age-standardized rate of tuberculosis cases (per 100,000).
+
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
+        unit: 'new cases per 100,000 people'
+      mean_estimate_tuberculosis_incidence_rate_all_ages_both_sexes_reference_projection:
+        title: Tuberculosis incidence rate - Both Sexes - Reference Projection
+        description: |
+          Age-standardized rate of tuberculosis cases (per 100,000).
+
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
+        unit: 'new cases per 100,000 people'
+      mean_estimate_tuberculosis_incidence_rate_all_ages_both_sexes_better_projection:
+        title: Tuberculosis incidence rate - Both Sexes - Better Projection
+        description: |
+          Age-standardized rate of tuberculosis cases (per 100,000).
+
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
+        unit: 'new cases per 100,000 people'
+      mean_estimate_tuberculosis_incidence_rate_all_ages_females_worse_projection:
+        title: Tuberculosis incidence rate - Female - Worse Projection
+        description: |
+          Age-standardized rate of tuberculosis cases (per 100,000).
+
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
+        unit: 'new cases per 100,000 people'
+      mean_estimate_tuberculosis_incidence_rate_all_ages_females_reference_projection:
+        title: Tuberculosis incidence rate - Female - Reference Projection
+        description: |
+          Age-standardized rate of tuberculosis cases (per 100,000).
+
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
+        unit: 'new cases per 100,000 people'
+      mean_estimate_tuberculosis_incidence_rate_all_ages_females_better_projection:
+        title: Tuberculosis incidence rate - Female - Better Projection
+        description: |
+          Age-standardized rate of tuberculosis cases (per 100,000).
+
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
+        unit: 'new cases per 100,000 people'
+      mean_estimate_tuberculosis_incidence_rate_all_ages_males_worse_projection:
+        title: Tuberculosis incidence rate - Male - Worse Projection
+        description: |
+          Age-standardized rate of tuberculosis cases (per 100,000).
+
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
+        unit: 'new cases per 100,000 people'
+      mean_estimate_tuberculosis_incidence_rate_all_ages_males_reference_projection:
+        title: Tuberculosis incidence rate - Male - Reference Projection
+        description: |
+          Age-standardized rate of tuberculosis cases (per 100,000).
+
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
+        unit: 'new cases per 100,000 people'
+      mean_estimate_tuberculosis_incidence_rate_all_ages_males_better_projection:
+        title: Tuberculosis incidence rate - Male - Better Projection
+        description: |
+          Age-standardized rate of tuberculosis cases (per 100,000).
+
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
+        unit: 'new cases per 100,000 people'
+      mean_estimate_malaria_incidence_rate_all_ages_both_sexes_worse_projection:
+        title: Malaria incidence rate - Both Sexes - Worse Projection
+        description: |
+          Age-standardized rate of malaria cases (per 1,000).
+
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
+        unit: 'new cases per 1,000 people'
+      mean_estimate_malaria_incidence_rate_all_ages_both_sexes_reference_projection:
+        title: Malaria incidence rate - Both Sexes - Reference Projection
+        description: |
+          Age-standardized rate of malaria cases (per 1,000).
+
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
+        unit: 'new cases per 1,000 people'
+      mean_estimate_malaria_incidence_rate_all_ages_both_sexes_better_projection:
+        title: Malaria incidence rate - Both Sexes - Better Projection
+        description: |
+          Age-standardized rate of malaria cases (per 1,000).
+
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
+        unit: 'new cases per 1,000 people'
+      mean_estimate_malaria_incidence_rate_all_ages_females_worse_projection:
+        title: Malaria incidence rate - Female - Worse Projection
+        description: |
+          Age-standardized rate of malaria cases (per 1,000).
+
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
+        unit: 'new cases per 1,000 people'
+      mean_estimate_malaria_incidence_rate_all_ages_females_reference_projection:
+        title: Malaria incidence rate - Female - Reference Projection
+        description: |
+          Age-standardized rate of malaria cases (per 1,000).
+
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
+        unit: 'new cases per 1,000 people'
+      mean_estimate_malaria_incidence_rate_all_ages_females_better_projection:
+        title: Malaria incidence rate - Female - Better Projection
+        description: |
+          Age-standardized rate of malaria cases (per 1,000).
+
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
+        unit: 'new cases per 1,000 people'
+      mean_estimate_coverage_of_dpt3_all_ages_both_sexes_worse_projection:
+        title: Coverage of DTP3 - Both Sexes - Worse Projection
+        description: |
+          Diphtheria tetanus toxoid and pertussis third dose (DTP3) vaccine.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_dpt3_all_ages_both_sexes_reference_projection:
+        title: Coverage of DTP3 - Both Sexes - Reference Projection
+        description: |
+          Diphtheria tetanus toxoid and pertussis third dose (DTP3) vaccine.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_dpt3_all_ages_both_sexes_better_projection:
+        title: Coverage of DTP3 - Both Sexes - Better Projection
+        description: |
+          Diphtheria tetanus toxoid and pertussis third dose (DTP3) vaccine.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_measles__two_doses__all_ages_both_sexes_better_projection:
+        title: Coverage of MCV2 - Both Sexes - Better Projection
+        description: |
+          Coverage of measles second dose (MCV2) vaccine.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_measles__two_doses__all_ages_both_sexes_reference_projection:
+        title: Coverage of MCV2 - Both Sexes - Reference Projection
+        description: |
+          Coverage of measles second dose (MCV2) vaccine.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_measles__two_doses__all_ages_both_sexes_worse_projection:
+        title: Coverage of MCV2 - Both Sexes - Worse Projection
+        description: |
+          Coverage of measles second dose (MCV2) vaccine.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_pneumococcal_conjugate_all_ages_both_sexes_worse_projection:
+        title: Coverage of PCV3 - Both Sexes - Worse Projection
+        description: |
+          Coverage of pneumococcal conjugate vaccine third dose (PCV3) vaccine.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_pneumococcal_conjugate_all_ages_both_sexes_reference_projection:
+        title: Coverage of PCV3 - Both Sexes - Reference Projection
+        description: |
+          Coverage of pneumococcal conjugate vaccine third dose (PCV3) vaccine.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_pneumococcal_conjugate_all_ages_both_sexes_better_projection:
+        title: Coverage of PCV3 - Both Sexes - Better Projection
+        description: |
+          Coverage of pneumococcal conjugate vaccine third dose (PCV3) vaccine.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_risk_weighted_prevalence_of_populations_using_unsafe_sanitation_all_ages_both_sexes_worse_projection:
+        title: Risk-weighted prevalence of populations using unsafe sanitation - Both Sexes - Worse Projection
+        description: |
+          Risk-weighted prevalence of populations using unsafe or unimproved sanitation, as measured by the summary exposure value (SEV) for unsafe sanitation.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_risk_weighted_prevalence_of_populations_using_unsafe_sanitation_all_ages_both_sexes_reference_projection:
+        title: Risk-weighted prevalence of populations using unsafe sanitation - Both Sexes - Reference Projection
+        description: |
+          Risk-weighted prevalence of populations using unsafe or unimproved sanitation, as measured by the summary exposure value (SEV) for unsafe sanitation.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_risk_weighted_prevalence_of_populations_using_unsafe_sanitation_all_ages_both_sexes_better_projection:
+        title: Risk-weighted prevalence of populations using unsafe sanitation - Both Sexes - Better Projection
+        description: |
+          Risk-weighted prevalence of populations using unsafe or unimproved sanitation, as measured by the summary exposure value (SEV) for unsafe sanitation.
+        unit: '%'
+        short_unit: '%'
+      mean_estimate_malaria_incidence_rate_all_ages_males_worse_projection:
+        title: Malaria incidence rate - Male - Worse Projection
+        description: |
+          Age-standardized rate of malaria cases (per 1,000).
+
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
+        unit: 'new cases per 1,000 people'
+      mean_estimate_malaria_incidence_rate_all_ages_males_reference_projection:
+        title: Malaria incidence rate - Male - Reference Projection
+        description: |
+          Age-standardized rate of malaria cases (per 1,000).
+
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
+        unit: 'new cases per 1,000 people'
+      mean_estimate_malaria_incidence_rate_all_ages_males_better_projection:
+        title: Malaria incidence rate - Male - Better Projection
+        description: |
+          Age-standardized rate of malaria cases (per 1,000).
+
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
+        unit: 'new cases per 1,000 people'
+      mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_both_sexes_worse_projection:
+        title: Prevalence of 15 neglected tropical diseases - Both Sexes - Worse Projection
+        description: |
+          Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
+
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
+        unit: 'cases of 15 NTDs per 100,000 people'
+      mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_both_sexes_reference_projection:
+        title: Prevalence of 15 neglected tropical diseases - Both Sexes - Reference Projection
+        description: |
+          Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
+
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
+        unit: 'cases of 15 NTDs per 100,000 people'
+      mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_both_sexes_better_projection:
+        title: Prevalence of 15 neglected tropical diseases - Both Sexes - Better Projection
+        description: |
+          Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
+
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
+        unit: 'cases of 15 NTDs per 100,000 people'
+      mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_females_worse_projection:
+        title: Prevalence of 15 neglected tropical diseases - Female - Worse Projection
+        description: |
+          Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
+
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
+        unit: 'cases of 15 NTDs per 100,000 people'
+      mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_females_reference_projection:
+        title: Prevalence of 15 neglected tropical diseases - Female - Reference Projection
+        description: |
+          Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
+
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
+        unit: 'cases of 15 NTDs per 100,000 people'
+      mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_females_better_projection:
+        title: Prevalence of 15 neglected tropical diseases - Female - Better Projection
+        description: |
+          Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
+
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
+        unit: 'cases of 15 NTDs per 100,000 people'
+      mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_males_worse_projection:
+        title: Prevalence of 15 neglected tropical diseases - Male - Worse Projection
+        description: |
+          Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
+
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
+        unit: 'cases of 15 NTDs per 100,000 people'
+      mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_males_reference_projection:
+        title: Prevalence of 15 neglected tropical diseases - Male - Reference Projection
+        description: |
+          Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
+
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
+        unit: 'cases of 15 NTDs per 100,000 people'
+      mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_males_better_projection:
+        title: Prevalence of 15 neglected tropical diseases - Male - Better Projection
+        description: |
+          Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
+
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
+        unit: 'cases of 15 NTDs per 100,000 people'
+      mean_estimate_met_need_for_family_planning_with_modern_contraception_methods_15_49_years_females_worse_projection:
+        title: Met need for family planning with modern contraception methods, 15-49 years females - Worse Projection
+        description: |
+          Proportion of women of reproductive age (15 to 49 years) who have their need for family planning met with modern contraception methods.
+
+          IHME estimates the proportion of women of reproductive age (15–49 years) who have their need for family planning satisfied with modern contraceptive methods. Modern contraceptive methods include the current use of male and female sterilization, male and female condoms, diaphragms, cervical caps, sponges, spermicidal agents, oral hormonal pills, patches, rings, implants, injections, intrauterine devices (IUDs), and emergency contraceptives.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_met_need_for_family_planning_with_modern_contraception_methods_15_49_years_females_reference_projection:
+        title: Met need for family planning with modern contraception methods, 15-49 years females - Reference Projection
+        description: |
+          Proportion of women of reproductive age (15 to 49 years) who have their need for family planning met with modern contraception methods.
+
+          IHME estimates the proportion of women of reproductive age (15–49 years) who have their need for family planning satisfied with modern contraceptive methods. Modern contraceptive methods include the current use of male and female sterilization, male and female condoms, diaphragms, cervical caps, sponges, spermicidal agents, oral hormonal pills, patches, rings, implants, injections, intrauterine devices (IUDs), and emergency contraceptives.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_met_need_for_family_planning_with_modern_contraception_methods_15_49_years_females_better_projection:
+        title: Met need for family planning with modern contraception methods, 15-49 years females - Better Projection
+        description: |
+          Proportion of women of reproductive age (15 to 49 years) who have their need for family planning met with modern contraception methods.
+
+          IHME estimates the proportion of women of reproductive age (15–49 years) who have their need for family planning satisfied with modern contraceptive methods. Modern contraceptive methods include the current use of male and female sterilization, male and female condoms, diaphragms, cervical caps, sponges, spermicidal agents, oral hormonal pills, patches, rings, implants, injections, intrauterine devices (IUDs), and emergency contraceptives.
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_coverage_of_essential_health_services__as_defined_by_the_uhc_service_coverage_index_all_ages_both_sexes_worse_projection:
+        title: Coverage of essential health services, as defined by the UHC service coverage index - Both Sexes - Worse Projection
+        description: Coverage of essential health services, as defined by a universal health coverage (UHC) service coverage index of based on 9 tracer interventions and risk-standardized death rates or mortality-to-incidence ratios from 32 causes amenable to healthcare.
+        unit: 'index'
+      mean_estimate_coverage_of_essential_health_services__as_defined_by_the_uhc_service_coverage_index_all_ages_both_sexes_reference_projection:
+        title: Coverage of essential health services, as defined by the UHC service coverage index - Both Sexes - Reference Projection
+        description: Coverage of essential health services, as defined by a universal health coverage (UHC) service coverage index of based on 9 tracer interventions and risk-standardized death rates or mortality-to-incidence ratios from 32 causes amenable to healthcare.
+        unit: 'index'
+      mean_estimate_coverage_of_essential_health_services__as_defined_by_the_uhc_service_coverage_index_all_ages_both_sexes_better_projection:
+        title: Coverage of essential health services, as defined by the UHC service coverage index - Both Sexes - Better Projection
+        description: Coverage of essential health services, as defined by a universal health coverage (UHC) service coverage index of based on 9 tracer interventions and risk-standardized death rates or mortality-to-incidence ratios from 32 causes amenable to healthcare.
+        unit: 'index'
+      mean_estimate_prevalence_of_daily_smoking_age_standardized_both_sexes_worse_projection:
+        title: Age-standardized prevalence of daily smoking prevalence of daily smoking - Both Sexes - Worse Projection
+        description: |
+          Age-standardized prevalence of daily smoking among populations aged 15 years and older.
+
+          IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
+
+          IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_daily_smoking_age_standardized_both_sexes_reference_projection:
+        title: Age-standardized prevalence of daily smoking prevalence of daily smoking - Both Sexes - Reference Projection
+        description: |
+          Age-standardized prevalence of daily smoking among populations aged 15 years and older.
+
+          IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
+
+          IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_daily_smoking_age_standardized_both_sexes_better_projection:
+        title: Age-standardized prevalence of daily smoking prevalence of daily smoking - Both Sexes - Better Projection
+        description: |
+          Age-standardized prevalence of daily smoking among populations aged 15 years and older.
+
+          IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
+
+          IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_daily_smoking_age_standardized_females_worse_projection:
+        title: Age-standardized prevalence of daily smoking prevalence of daily smoking - Female - Worse Projection
+        description: |
+          Age-standardized prevalence of daily smoking among populations aged 15 years and older.
+
+          IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
+
+          IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_daily_smoking_age_standardized_females_reference_projection:
+        title: Age-standardized prevalence of daily smoking prevalence of daily smoking - Female - Reference Projection
+        description: |
+          Age-standardized prevalence of daily smoking among populations aged 15 years and older.
+
+          IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
+
+          IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_daily_smoking_age_standardized_females_better_projection:
+        title: Age-standardized prevalence of daily smoking prevalence of daily smoking - Female - Better Projection
+        description: |
+          Age-standardized prevalence of daily smoking among populations aged 15 years and older.
+
+          IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
+
+          IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_daily_smoking_age_standardized_males_worse_projection:
+        title: Age-standardized prevalence of daily smoking prevalence of daily smoking - Male - Worse Projection
+        description: |
+          Age-standardized prevalence of daily smoking among populations aged 15 years and older.
+
+          IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
+
+          IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_daily_smoking_age_standardized_males_reference_projection:
+        title: Age-standardized prevalence of daily smoking prevalence of daily smoking - Male - Reference Projection
+        description: |
+          Age-standardized prevalence of daily smoking among populations aged 15 years and older.
+
+          IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
+
+          IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
+        short_unit: '%'
+        unit: '%'
+      mean_estimate_prevalence_of_daily_smoking_age_standardized_males_better_projection:
+        title: Age-standardized prevalence of daily smoking prevalence of daily smoking - Male - Better Projection
+        description: |
+          Age-standardized prevalence of daily smoking among populations aged 15 years and older.
+
+          IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
+
+          IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
+        short_unit: '%'
+        unit: '%'
+

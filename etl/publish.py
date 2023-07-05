@@ -105,8 +105,12 @@ def is_catalog_up_to_date(s3: Any, bucket: str, catalog: Path, channel: CHANNEL)
     return remote == local
 
 
-def sync_datasets(s3: Any, bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False) -> None:
-    "Go dataset by dataset and check if each one needs updating."
+def sync_datasets(
+    s3: Any, bucket: str, catalog: Path, channel: CHANNEL, delete_datasets: bool = False, dry_run: bool = False
+) -> None:
+    """Go dataset by dataset and check if each one needs updating.
+    :param delete_datasets: if True, delete datasets from S3 that are not in the local catalog
+    """
     existing = get_published_checksums(bucket, channel)
 
     to_delete = set(existing)
@@ -129,11 +133,12 @@ def sync_datasets(s3: Any, bucket: str, catalog: Path, channel: CHANNEL, dry_run
         if not dry_run:
             sync_folder(s3, bucket, catalog, catalog / path, path, public=ds.metadata.is_public)
 
-    print("Datasets to delete:")
-    for path in to_delete:
-        print("-", path)
-        if not dry_run:
-            delete_dataset(s3, bucket, path)
+    if delete_datasets:
+        print("Datasets to delete:")
+        for path in to_delete:
+            print("-", path)
+            if not dry_run:
+                delete_dataset(s3, bucket, path)
 
 
 def sync_folder(
@@ -262,24 +267,36 @@ def get_remote_checksum(s3: Any, bucket: str, path: str) -> Optional[str]:
     return object_md5(s3, bucket, path, obj)
 
 
-def connect_s3(s3_config: Optional[Config] = None) -> Any:
-    # TODO: use https://github.com/owid/data-utils-py/blob/main/owid/datautils/io/s3.py
+def connect_s3(s3_config: Optional[Config] = None, r2=False) -> Any:
+    # TODO: use lib/datautils/owid/datautils/s3.py
     session = boto3.Session()
-    return session.client(
-        "s3",
-        region_name=config.S3_REGION_NAME,
-        endpoint_url=config.S3_ENDPOINT_URL,
-        aws_access_key_id=config.S3_ACCESS_KEY,
-        aws_secret_access_key=config.S3_SECRET_KEY,
-        config=s3_config,
-    )
+    if r2:
+        assert config.R2_ACCESS_KEY, "R2_ACCESS_KEY not set in environment"
+        assert config.R2_SECRET_KEY, "R2_SECRET_KEY not set in environment"
+        return session.client(
+            "s3",
+            region_name=config.R2_REGION_NAME,
+            endpoint_url=config.R2_ENDPOINT_URL,
+            aws_access_key_id=config.R2_ACCESS_KEY,
+            aws_secret_access_key=config.R2_SECRET_KEY,
+            config=s3_config,
+        )
+    else:
+        return session.client(
+            "s3",
+            region_name=config.S3_REGION_NAME,
+            endpoint_url=config.S3_ENDPOINT_URL,
+            aws_access_key_id=config.S3_ACCESS_KEY,
+            aws_secret_access_key=config.S3_SECRET_KEY,
+            config=s3_config,
+        )
 
 
 @lru_cache(maxsize=None)
-def connect_s3_cached(s3_config: Optional[Config] = None) -> Any:
+def connect_s3_cached(s3_config: Optional[Config] = None, r2=False) -> Any:
     """Connect to S3, but cache the connection for subsequent calls. This is more efficient than
     creating a new connection for every request."""
-    return connect_s3(s3_config)
+    return connect_s3(s3_config=s3_config, r2=r2)
 
 
 def _channel_path(channel: CHANNEL, format: FileFormat) -> Path:

@@ -9,6 +9,7 @@ from owid.catalog import Dataset
 from pydantic import BaseModel
 from pywebio import input as pi
 from pywebio import output as po
+from pywebio.session import go_app
 
 import etl
 from etl.paths import DATA_DIR
@@ -21,7 +22,6 @@ ETL_DIR = Path(etl.__file__).parent.parent
 
 
 class Options(Enum):
-
     ADD_TO_DAG = "Add steps into dag.yml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
     GENERATE_NOTEBOOK = "Generate playground notebook"
@@ -31,7 +31,6 @@ class Options(Enum):
 
 
 class GardenForm(BaseModel):
-
     short_name: str
     namespace: str
     version: str
@@ -54,8 +53,8 @@ class GardenForm(BaseModel):
         super().__init__(**data)
 
 
-def app(run_checks: bool, dummy_data: bool) -> None:
-    dummies = utils.DUMMY_DATA if dummy_data else {}
+def app(run_checks: bool) -> None:
+    state = utils.APP_STATE
 
     with open(CURRENT_DIR / "garden.md", "r") as f:
         po.put_markdown(f.read())
@@ -68,7 +67,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="namespace",
                 placeholder="institution",
                 required=True,
-                value=dummies.get("namespace"),
+                value=state.get("namespace") or "",
                 help_text="Institution name. Example: emdat",
             ),
             pi.input(
@@ -76,7 +75,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="version",
                 placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version", str(dt.date.today())),
+                value=state.get("version", str(dt.date.today())),
                 help_text="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.input(
@@ -84,7 +83,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="short_name",
                 placeholder="testing_dataset_name",
                 required=True,
-                value=dummies.get("short_name"),
+                value=state.get("short_name") or "",
                 validate=utils.validate_short_name,
                 help_text="Underscored dataset short name. Example: natural_disasters",
             ),
@@ -93,7 +92,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="meadow_version",
                 placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version", str(dt.date.today())),
+                value=state.get("version", str(dt.date.today())),
                 help_text="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.checkbox(
@@ -117,6 +116,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     )
     form = GardenForm(**data)
 
+    # save form data to global state for next steps
+    state.update(form.dict())
+
     if run_checks:
         _check_dataset_in_meadow(form)
 
@@ -127,7 +129,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         if form.load_population:
             deps.append(utils.DATASET_POPULATION_URI)
         if form.load_countries_regions:
-            deps.append(utils.DATASET_REFERENCE_URI)
+            deps.append(utils.DATASET_REGIONS_URI)
         dag_content = utils.add_to_dag(
             {f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps}
         )
@@ -146,7 +148,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     if not form.include_metadata_yaml:
         os.remove(metadata_path)
 
-    if dummies:
+    if form.namespace == "dummy":
         _fill_dummy_metadata_yaml(metadata_path)
 
     po.put_markdown(
@@ -169,19 +171,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
 2. (Optional) Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
 
-3. (Optional) Loading the dataset is also possible with this snippet:
-
-    ```python
-    from owid.catalog import Dataset
-    from etl.paths import DATA_DIR
-
-    ds = Dataset(DATA_DIR / "garden" / "{form.namespace}" / "{form.version}" / "{form.short_name}")
-    print(ds.table_names)
-
-    df = ds["{form.short_name}"]
-    ```
-
-4. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
+3. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
 
     ```
     poetry run etl-metadata-export data/garden/{form.namespace}/{form.version}/{form.short_name} -o etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.meta.yml
@@ -195,11 +185,11 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
     Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
 
-5. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
+4. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
 
-6. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+5. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
 
-7. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
+6. (Optional) Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
 
     ```python
     from owid.catalog import find_one
@@ -208,7 +198,15 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     print(tab.head())
     ```
 
-8. If you are an internal OWID member and want to push data to our Grapher DB, continue with `poetry run walkthrough grapher`. Alternatively, to create explorers dataset continue with `poetry run walkthrough explorers`.
+7. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
+"""
+    )
+    po.put_buttons(
+        ["Go to grapher", "Go to explorers"],
+        [lambda: go_app("grapher", new_window=False), lambda: go_app("explorers", new_window=False)],
+    )
+    po.put_markdown(
+        """
 
 ## Generated files
 """

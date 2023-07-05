@@ -1,17 +1,23 @@
 dataset:
-  namespace: demography
-  short_name: population
   title: Population (various sources, 2023.1)
-  description: |
+  description: >-
     This dataset has been created using multiple sources:
 
+
     • UN WPP (2022): Covers the period 1950-2100. Future projections are based on the Medium variant.
+
+    • Gapminder (v7): Mostly covers the period 1800-1949. In addition, it complements the dataset with population data for the
+    "Vatican" until 2100 (it is missing in UN WPP's estimates).
+
+    • HYDE (v3.2): Mostly covers the period 10,000 BCE - 1799. In addition, it complements the dataset with population for some countries
+    outside of this year period. E.g. it provides data for "Svalbard and Jan Mayen" (until 2017) and "Netherlands Antilles" (until 2010).
+
     • Gapminder (v7): Mostly covers the period 1800-1949. In addition, it complements the dataset with population data for the "Vatican" until 2100 (it is missing in UN WPP's estimates).
+
     • HYDE (v3.2): Mostly covers the period 10,000 BCE - 1799. In addition, it complements the dataset with population for
     some countries outside of this year period. E.g. it provides data for "Svalbard and Jan Mayen" (until 2017) and "Netherlands Antilles" (until 2010).
-    • Gapminder (Systema Globalis): Covers the period 1555-2008. It complements the dataset with former countries and other data points not present in the other sources.
 
-  version: "2022-12-08"
+    • Gapminder (Systema Globalis): Covers the period 1555-2008. It complements the dataset with former countries and other data points not present in the other sources.
   sources: &population-sources
     - name: Gapminder (2022)
       published_by: Gapminder (v7)
@@ -46,19 +52,24 @@ dataset:
 tables:
   population:
     title: Population (various sources)
-    description: |
+    description: >-
       Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on three key sources: HYDE, Gapminder, and the UN World Population Prospects.
+
       You can find more information on these sources and how our time series is constructed on this page: <a href="https://ourworldindata.org/population-sources">What sources do we rely on for population estimates?</a>
 
     variables:
       population:
         title: Population
-        description: |
+        description: >-
           Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
 
+
           • 10,000 BCE - 1799: Historical estimates by HYDE (v3.2). Includes some datapoints from Gapminder (Systema Globalis).
+
           • 1800-1949: Historical estimates by Gapminder. Includes some datapoints from HYDE (v3.2) and Gapminder (Systema Globalis).
+
           • 1950-2021: Population records by the UN World Population Prospects (2022 revision). Includes some datapoints from HYDE (v3.2), Gapminder (Systema Globalis) and Gapminder (v7).
+
           • 2022-2100: Projections based on Medium variant by the UN World Population Prospects (2022 revision).
         unit: persons
         display:
@@ -67,12 +78,16 @@ tables:
         sources: *population-sources
       world_pop_share:
         title: Share of world population
-        description: |
+        description: >-
           Share of the world's population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
 
+
           • 10,000 BCE - 1799: Historical estimates by HYDE (v3.2). Includes some datapoints Gapminder (Systema Globalis).
+
           • 1800-1949: Historical estimates by Gapminder. Includes some datapoints from HYDE (v3.2) and Gapminder (Systema Globalis).
+
           • 1950-2021: Population records by the UN World Population Prospects (2022 revision). Includes some datapoints from HYDE (v3.2), Gapminder (Systema Globalis) and Gapminder (v7).
+
           • 2022-2100: Projections based on Medium variant by the UN World Population Prospects (2022 revision).
         unit: "%"
         short_unit: "%"

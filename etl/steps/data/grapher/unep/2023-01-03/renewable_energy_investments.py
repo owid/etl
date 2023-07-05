@@ -25,7 +25,11 @@ def run(dest_dir: str) -> None:
     #
     # Convert billion dollars to dollars, and adapt metadata units accordingly.
     for column in table.columns:
+        old_title = table[column].metadata.title
+        old_description = table[column].metadata.description
         table[column] *= BILLION_DOLLARS_TO_DOLLARS
+        table[column].metadata.title = old_title
+        table[column].metadata.description = old_description
         table[column].metadata.unit = "US dollars"
         table[column].metadata.short_unit = "$"
 

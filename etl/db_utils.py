@@ -117,19 +117,11 @@ class DBUtils:
         rows = self.fetch_many(
             """
             SELECT
-                LOWER(country_name),
                 LOWER(entities.name),
-                entities.id AS id
+                id
             FROM entities
-            LEFT JOIN
-                country_name_tool_countrydata
-                ON country_name_tool_countrydata.owid_name = entities.name
-            LEFT JOIN
-                country_name_tool_countryname
-                ON country_name_tool_countryname.owid_country = country_name_tool_countrydata.id
             WHERE
-                LOWER(country_name) IN %(country_names)s
-                OR LOWER(entities.name) IN %(country_names)s
+                LOWER(entities.name) IN %(country_names)s
             ORDER BY entities.id ASC
         """,
             {"country_names": [normalize_entity_name(x) for x in names]},
@@ -138,9 +130,6 @@ class DBUtils:
         self.entity_id_by_normalised_name.update(
             {
                 # entityName → entityId
-                **dict((row[1], row[2]) for row in rows if row[1]),
-                # country_tool_name → entityId
-                # the country tool name should take precedence
-                **dict((row[0], row[2]) for row in rows if row[0]),
+                **dict((row[0], row[1]) for row in rows if row[1]),
             }
         )

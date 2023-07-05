@@ -10,8 +10,8 @@ steps:
     - snapshot://war/2023-01-09/dunnigan_martel_1987.csv
   data://meadow/war/2023-01-10/eckhardt_1991:
     - snapshot://war/2023-01-09/eckhardt_1991.csv
-  data://meadow/war/2023-01-10/orae_1985:
-    - snapshot://war/2023-01-09/orae_1985.csv
+  data://meadow/war/2023-01-10/kaye_1985:
+    - snapshot://war/2023-01-09/kaye_1985.csv
   data://meadow/war/2023-01-10/sorokin_1937:
     - snapshot://war/2023-01-09/sorokin_1937.csv
   data://meadow/war/2023-01-10/sutton_1971:
@@ -20,6 +20,22 @@ steps:
     - snapshot://war/2023-02-03/war_brecke.xlsx
   data://meadow/war/2023-02-03/prio_v31:
     - snapshot://war/2023-02-02/prio_v31.xls
+  data://meadow/war/2023-06-07/prio_v1:
+    - snapshot://war/2023-02-03/prio_v1.zip
+  data://meadow/war/2023-06-07/cow:
+    - snapshot://war/2023-03-14/cow.extra_state.csv
+    - snapshot://war/2023-03-14/cow.inter_state.csv
+    - snapshot://war/2023-03-14/cow.intra_state.zip
+    - snapshot://war/2023-03-14/cow.non_state.csv
+  data://meadow/war/2023-06-09/war_ucdp:
+    - snapshot://war/2023-03-14/ucdp.one_sided.zip
+    - snapshot://war/2023-03-14/ucdp.non_state.zip
+    - snapshot://war/2023-03-14/ucdp.battle_related_conflict.zip
+    - snapshot://war/2023-03-14/ucdp.battle_related_dyadic.zip
+  data://meadow/war/2023-06-09/war_mars:
+    - snapshot://war/2023-06-09/war_mars.xls
+  data://meadow/war/2023-06-09/cow_mid:
+    - snapshot://war/2023-06-09/cow_mid.zip
   # Garden
   data://garden/war/2023-01-18/bouthoul_carrere_1978:
     - data://meadow/war/2023-01-10/bouthoul_carrere_1978
@@ -29,8 +45,8 @@ steps:
     - data://meadow/war/2023-01-10/dunnigan_martel_1987
   data://garden/war/2023-01-18/eckhardt_1991:
     - data://meadow/war/2023-01-10/eckhardt_1991
-  data://garden/war/2023-01-18/orae_1985:
-    - data://meadow/war/2023-01-10/orae_1985
+  data://garden/war/2023-01-18/kaye_1985:
+    - data://meadow/war/2023-01-10/kaye_1985
   data://garden/war/2023-01-18/sorokin_1937:
     - data://meadow/war/2023-01-10/sorokin_1937
   data://garden/war/2023-01-18/sutton_1971:

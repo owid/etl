@@ -2,7 +2,6 @@ all_sources:
    - maddison_project: &source_maddison_project
       name: Bolt and van Zanden (2020)
       published_by: Bolt, J. and van Zanden, J.L. (2020). "Maddison style estimates of the evolution of the world economy. A new 2020 update."
-      publisher_source:
       publication_year: 2020
       date_accessed: 2022-04-12
       publication_date: 2020-10-01
@@ -10,7 +9,6 @@ all_sources:
    - maddison_database: &source_maddison_database
       name: Maddison (2009)
       published_by: Maddison, A. (2009). "Maddison Database".
-      publisher_source:
       publication_year: 2009
       date_accessed: 2022-12-23
       publication_date:
@@ -18,7 +16,6 @@ all_sources:
    - wdi: &source_wdi
       name: World Bank (2022)
       published_by: World Bank (2022). "World Development Indicators."
-      publisher_source:
       publication_year: 2022
       date_accessed: 2022-06-02
       publication_date:

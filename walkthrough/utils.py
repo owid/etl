@@ -12,18 +12,21 @@ from pywebio import output as po
 
 from etl import config
 from etl.files import apply_black_formatter_to_files
-from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
+from etl.paths import (
+    DAG_DIR,
+    LATEST_POPULATION_VERSION,
+    LATEST_REGIONS_VERSION,
+    SNAPSHOTS_DIR,
+    STEP_DIR,
+)
 from etl.steps import DAG
 
 DAG_WALKTHROUGH_PATH = DAG_DIR / "walkthrough.yml"
 WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
 
-# Load latest population version
-POPULATION_LATEST_VERSION = (
-    sorted((STEP_DIR / "data/garden/demography").glob("*/population/"))[-1].as_posix().split("/")[-2]
-)
-DATASET_POPULATION_URI = f"data://garden/demography/{POPULATION_LATEST_VERSION}/population"
-DATASET_REFERENCE_URI = "data://garden/reference"
+# Load latest dataset versions
+DATASET_POPULATION_URI = f"data://garden/demography/{LATEST_POPULATION_VERSION}/population"
+DATASET_REGIONS_URI = f"data://garden/regions/{LATEST_REGIONS_VERSION}/regions"
 
 DUMMY_DATA = {
     "namespace": "dummy",
@@ -40,6 +43,9 @@ DUMMY_DATA = {
     "source_published_by": "Dummy full source citation",
     "url": "https://www.url-dummy.com/",
 }
+
+# state shared between steps
+APP_STATE = {}
 
 
 def validate_short_name(short_name: str) -> Optional[str]:
@@ -195,7 +201,7 @@ class OWIDEnv:
 
     def detect_env_type(self) -> OWIDEnvType:
         # live
-        if config.DB_NAME == "live_grapher" and config.DB_USER == "etl_grapher":
+        if config.DB_NAME == "live_grapher":
             return "live"
         # staging
         elif config.DB_NAME == "staging_grapher" and config.DB_USER == "staging_grapher":

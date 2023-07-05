@@ -1,26 +1,41 @@
-import datetime as dt
+import json
 import re
 import shutil
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
 import yaml
 from dataclasses_json import dataclass_json
-from dvc.repo import Repo
-from owid.catalog.meta import pruned_json
+from owid.catalog.meta import DatasetMeta, License, Source, TableMeta, pruned_json
 from owid.datautils import dataframes
 from owid.walden import files
+from tenacity import Retrying
+from tenacity.retry import retry_if_exception_type
+from tenacity.stop import stop_after_attempt
 
 from etl import paths
 from etl.files import yaml_dump
 
-dvc = Repo(paths.BASE_DIR)
+dvc = None
 
 # DVC is not thread-safe, so we need to lock it
 dvc_lock = Lock()
+unignore_backports_lock = Lock()
+
+
+def get_dvc():
+    from dvc.repo import Repo
+
+    global dvc
+
+    if dvc is None:
+        dvc = Repo(paths.BASE_DIR)
+
+    return dvc
 
 
 @dataclass
@@ -49,9 +64,10 @@ class Snapshot:
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
-    def pull(self) -> None:
+    def pull(self, force=True) -> None:
         """Pull file from S3."""
-        dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private")
+        with _unignore_backports(self.path):
+            get_dvc().pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -62,84 +78,110 @@ class Snapshot:
 
     def download_from_source(self) -> None:
         """Download file from source_data_url."""
-        assert self.metadata.source_data_url, "source_data_url is not set"
+        assert self.metadata.source.source_data_url, "source_data_url is not set"
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        files.download(self.metadata.source_data_url, str(self.path))
+        files.download(self.metadata.source.source_data_url, str(self.path))
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
-        with dvc_lock:
+        from dvc.exceptions import UploadError
+
+        dvc = get_dvc()
+
+        with dvc_lock, _unignore_backports(self.path):
             dvc.add(str(self.path), fname=str(self.metadata_path))
             if upload:
-                dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
+                # DVC sometimes returns UploadError, retry a few times
+                for attempt in Retrying(
+                    stop=stop_after_attempt(3),
+                    retry=retry_if_exception_type(UploadError),
+                ):
+                    with attempt:
+                        dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
+
+    def to_table_metadata(self):
+        table_meta = TableMeta.from_dict(
+            {
+                "short_name": self.metadata.short_name,
+                "title": self.metadata.name,
+                "description": self.metadata.description,
+                "dataset": DatasetMeta.from_dict(
+                    {
+                        "channel": "snapshots",
+                        "description": self.metadata.description,
+                        "is_public": self.metadata.is_public,
+                        "namespace": self.metadata.namespace,
+                        "short_name": self.metadata.short_name,
+                        "title": self.metadata.name,
+                        "version": self.metadata.version,
+                        "sources": [self.metadata.source],
+                        "licenses": [self.metadata.license],
+                    }
+                ),
+            }
+        )
+        return table_meta
 
 
 @pruned_json
 @dataclass_json
 @dataclass
 class SnapshotMeta:
-    # how we identify the dataset
+    # how we identify the dataset, determined automatically from snapshot path
     namespace: str  # a short source name (usually institution name)
+    version: str  # date, `latest` or year (discouraged)
     short_name: str  # a slug, ideally unique, snake_case, no spaces
 
     # how to get the data file
     file_extension: str
 
-    # usually today
-    date_accessed: dt.date
-
     # fields that are meant to be shown to humans
     name: str
     description: str
-    source_name: str  # Short source citation.
-    url: str
-    source_published_by: Optional[str] = None  # Full source citation.
 
-    # URL with file, use `download_and_create(metadata)` for uploading to walden
-    source_data_url: Optional[str] = None
+    source: Source
+    license: Optional[License] = None
 
-    # license
-    # NOTE: license_url should be ideally required, but we don't have it for backported datasets
-    # so we have to relax this condition
-    license_url: Optional[str] = None
-    license_name: Optional[str] = None
     access_notes: Optional[str] = None
 
     is_public: Optional[bool] = True
 
-    # use either publication_year or publication_date as dataset version if not given explicitly
-    version: Optional[str] = None
-    publication_year: Optional[int] = None
-    publication_date: Union[Optional[dt.date], Literal["latest"]] = None
-
     outs: Any = None
-
-    def __post_init__(self) -> None:
-        if self.version is None:
-            if self.publication_date:
-                self.version = str(self.publication_date)
-            elif self.publication_year:
-                self.version = str(self.publication_year)
-            else:
-                raise ValueError("no versioning field found")
-        else:
-            # version can be loaded as datetime.date, but it has to be string
-            self.version = str(self.version)
 
     @property
     def path(self) -> Path:
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
+    def to_yaml(self) -> str:
+        """Convert to YAML string."""
+        d = self.to_dict()
+
+        # exclude `outs` with md5, we reset it when saving new metadata
+        d.pop("outs", None)
+
+        # remove is_public if it's True
+        if d["is_public"]:
+            del d["is_public"]
+
+        # remove namespace/version/short_name/file_extension if they match path
+        if _parse_snapshot_path(self.path) == (
+            d["namespace"],
+            str(d["version"]),
+            d["short_name"],
+            d["file_extension"],
+        ):
+            del d["namespace"]
+            del d["version"]
+            del d["short_name"]
+            del d["file_extension"]
+
+        return yaml_dump({"meta": d})  # type: ignore
+
     def save(self) -> None:
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        with open(self.path, "w") as ostream:
-            d = self.to_dict()
-
-            # exclude `outs` with md5, we reset it when saving new metadata
-            d.pop("outs", None)
-
-            yaml_dump({"meta": d}, ostream)
+        with open(self.path, "w") as f:
+            f.write(self.to_yaml())
 
     @property
     def uri(self):
@@ -152,7 +194,40 @@ class SnapshotMeta:
             yml = yaml.safe_load(istream)
             if "meta" not in yml:
                 raise ValueError("Metadata YAML should be stored under `meta` key")
-            return cls.from_dict(dict(**yml["meta"], outs=yml.get("outs", [])))
+            meta = yml["meta"]
+
+            # fill metadata that can be inferred from path
+            if "namespace" not in meta:
+                meta["namespace"] = _parse_snapshot_path(Path(filename))[0]
+            if "version" not in meta:
+                meta["version"] = _parse_snapshot_path(Path(filename))[1]
+            if "short_name" not in meta:
+                meta["short_name"] = _parse_snapshot_path(Path(filename))[2]
+            if "file_extension" not in meta:
+                meta["file_extension"] = _parse_snapshot_path(Path(filename))[3]
+
+            # convert legacy fields to source
+            if "source" not in meta:
+                publication_date = meta.pop("publication_date", None)
+                meta["source"] = Source(
+                    name=meta.pop("source_name", None),
+                    description=meta.get("description", None),
+                    published_by=meta.pop("source_published_by", None),
+                    source_data_url=meta.pop("source_data_url", None),
+                    url=meta.pop("url", None),
+                    date_accessed=meta.pop("date_accessed", None),
+                    publication_date=str(publication_date) if publication_date else None,
+                    publication_year=meta.pop("publication_year", None),
+                )
+
+            if "license" not in meta:
+                if "license_name" in meta or "license_url" in meta:
+                    meta["license"] = License(
+                        name=meta.pop("license_name", None),
+                        url=meta.pop("license_url", None),
+                    )
+
+            return cls.from_dict(dict(**meta, outs=yml.get("outs", [])))
 
     @property
     def md5(self) -> str:
@@ -167,6 +242,31 @@ class SnapshotMeta:
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> "SnapshotMeta":
         ...
+
+    def fill_from_backport_snapshot(self, snap_config_path: Path) -> None:
+        """Load metadat from backported snapshot.
+
+        Usage:
+            snap_config = Snapshot(
+                "backport/latest/dataset_3222_wheat_prices__long_run__in_england__makridakis_et_al__1997_config.json"
+            )
+            snap_config.pull()
+            meta.fill_from_backport_snapshot(snap_config.path)
+        """
+        with open(snap_config_path) as f:
+            js = json.load(f)
+
+        # NOTE: this is similar to `convert_grapher_source`, DRY it when possible
+        assert len(js["sources"]) == 1
+        s = js["sources"][0]
+        self.name = js["dataset"]["name"]
+        self.source = Source(
+            name=s["name"],
+            description=s["description"].get("additionalInfo"),
+            url=s["description"].get("link"),
+            published_by=s["description"].get("dataPublishedBy"),
+            date_accessed=pd.to_datetime(s["description"].get("retrievedDate")).date(),
+        )
 
 
 def add_snapshot(
@@ -209,3 +309,38 @@ def snapshot_catalog(match: str = r".*") -> List[Snapshot]:
         if re.search(match, uri):
             catalog.append(Snapshot(uri))
     return catalog
+
+
+@contextmanager
+def _unignore_backports(path: Path):
+    """Folder snapshots/backports contains thousands of .dvc files which adds significant overhead
+    to running DVC commands (+8s overhead). That is why we ignore this folder in .dvcignore. This
+    context manager checks if the path is in snapshots/backports and if so, temporarily removes
+    this folder from .dvcignore.
+    This makes non-backport DVC operations run under 1s and backport DVC operations at ~8s.
+    Changing .dvcignore in-place is not great, but no other way was working (tried monkey-patching
+    DVC and subrepos).
+    """
+    if "backport/" in str(path):
+        with unignore_backports_lock:
+            with open(".dvcignore") as f:
+                s = f.read()
+            try:
+                with open(".dvcignore", "w") as f:
+                    f.write(s.replace("snapshots/backport/", "# snapshots/backport/"))
+                yield
+            finally:
+                with open(".dvcignore", "w") as f:
+                    f.write(s)
+    else:
+        yield
+
+
+def _parse_snapshot_path(path: Path) -> tuple[str, str, str, str]:
+    """Parse snapshot path into namespace, short_name, file_extension."""
+    version = path.parent.name
+    namespace = path.parent.parent.name
+
+    short_name, ext = path.stem.split(".", 1)
+    assert "." not in ext, f"{path.name} cannot contain `.`"
+    return namespace, version, short_name, ext

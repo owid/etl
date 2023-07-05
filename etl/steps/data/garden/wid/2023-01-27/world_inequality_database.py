@@ -12,13 +12,14 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
 # Data processing function (cleaning and small transformations)
 def data_processing(df: pd.DataFrame) -> pd.DataFrame:
     # Multiply shares by 100
     df[list(df.filter(like="share"))] *= 100
 
     # Delete age and pop, two one-value variables
-    df = df.drop(columns=["age", "pop"])
+    df = df.drop(columns=["age", "pop", "age_extrapolated", "pop_extrapolated"])
 
     # Delete some share ratios we are not using, and also the p0p40 (share) variable only available for pretax
     drop_list = ["s90_s10_ratio", "s90_s50_ratio", "p0p40"]

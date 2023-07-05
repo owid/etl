@@ -1,7 +1,6 @@
 import datetime as dt
 import difflib
 import functools
-import json
 import os
 import urllib.error
 from enum import Enum
@@ -17,7 +16,7 @@ import pywebio
 import structlog
 from cryptography.fernet import Fernet
 from git.repo import Repo
-from owid.catalog import Dataset
+from owid.catalog import Dataset, License, Source
 from owid.catalog.utils import underscore, validate_underscore
 from owid.datautils import dataframes
 from pydantic import BaseModel
@@ -35,7 +34,13 @@ from etl.command import main as etl_main
 from etl.compare import diff_print
 from etl.db import get_engine
 from etl.files import apply_black_formatter_to_files
-from etl.paths import BASE_DIR, DAG_DIR, REFERENCE_DATASET, SNAPSHOTS_DIR, STEP_DIR
+from etl.paths import (
+    BASE_DIR,
+    DAG_DIR,
+    LATEST_REGIONS_DATASET_PATH,
+    SNAPSHOTS_DIR,
+    STEP_DIR,
+)
 from etl.snapshot import Snapshot, SnapshotMeta
 from walkthrough import utils as walkthrough_utils
 
@@ -119,6 +124,35 @@ class FasttrackImport:
     def snapshot(self) -> Snapshot:
         return Snapshot(f"{self.meta.dataset.namespace}/{self.meta.dataset.version}/{self.meta.dataset.short_name}.csv")
 
+    @property
+    def snapshot_meta(self) -> SnapshotMeta:
+        # since sheets url is accessible with link, we have to encrypt it when storing in metadata
+        sheets_url = _encrypt(self.sheets_url) if self.is_private else self.sheets_url
+
+        source_name = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
+
+        return SnapshotMeta(
+            namespace=self.meta.dataset.namespace,
+            short_name=self.meta.dataset.short_name,
+            name=self.meta.dataset.title,
+            version=str(self.meta.dataset.version),
+            file_extension="csv",
+            description=self.meta.dataset.description,
+            source=Source(
+                url=self.partial_snapshot_meta.url,
+                name=source_name,
+                published_by=source_name,
+                source_data_url=sheets_url,
+                date_accessed=str(dt.date.today()),
+                publication_year=self.partial_snapshot_meta.publication_year,
+            ),
+            license=License(
+                url=self.partial_snapshot_meta.license_url,
+                name=self.partial_snapshot_meta.license_name,
+            ),
+            is_public=not self.is_private,
+        )
+
     def snapshot_exists(self) -> bool:
         try:
             self.snapshot
@@ -131,31 +165,11 @@ class FasttrackImport:
             f.write(self.meta.to_yaml())
 
     def upload_snapshot(self) -> Path:
-        # since sheets url is accessible with link, we have to encrypt it when storing in metadata
-        sheets_url = _encrypt(self.sheets_url) if self.is_private else self.sheets_url
+        # save snapshotmeta YAML file
+        self.snapshot_meta.save()
 
-        source_name = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
-
-        snap_meta = SnapshotMeta(
-            namespace=self.meta.dataset.namespace,
-            short_name=self.meta.dataset.short_name,
-            name=self.meta.dataset.title,
-            version=str(self.meta.dataset.version),
-            file_extension="csv",
-            description=self.meta.dataset.description,
-            url=self.partial_snapshot_meta.url,
-            source_name=source_name,
-            source_published_by=source_name,
-            source_data_url=sheets_url,
-            is_public=not self.is_private,
-            date_accessed=dt.date.today(),
-            publication_year=self.partial_snapshot_meta.publication_year,
-            license_url=self.partial_snapshot_meta.license_url,
-            license_name=self.partial_snapshot_meta.license_name,
-        )
-        snap_meta.save()
-
-        snap = Snapshot(snap_meta.uri)
+        # upload snapshot
+        snap = self.snapshot
         dataframes.to_file(self.data, file_path=snap.path)
         snap.dvc_add(upload=True)
 
@@ -233,8 +247,6 @@ def app(dummy_data: bool, commit: bool) -> None:
         """
     ## Uploading Snapshot...
 
-    This may take up to a minute, please be patient. Performance fix is in the works.
-
     """
     )
     snapshot_path = fast_import.upload_snapshot()
@@ -249,6 +261,9 @@ def app(dummy_data: bool, commit: bool) -> None:
         grapher=True,
         private=form.is_private,
         workers=1,
+        # NOTE: force is necessary because we are caching checksums with files.CACHE_CHECKSUM_FILE
+        # we could have cleared the cache, but this is cleaner
+        force=True,
     )
     po.put_success("Import to MySQL successful!")
 
@@ -280,13 +295,11 @@ def app(dummy_data: bool, commit: bool) -> None:
 
 
 class Options(Enum):
-
     INFER_METADATA = "Infer missing metadata (instead of raising an error)"
     IS_PRIVATE = "Make dataset private (your metadata will be still public!)"
 
 
 class FasttrackForm(BaseModel):
-
     new_sheets_url: str
     existing_sheets_url: Optional[str]
     infer_metadata: bool
@@ -499,19 +512,19 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
     metas = [SnapshotMeta.load_from_yaml(path) for path in (SNAPSHOTS_DIR / "fasttrack").rglob("*.dvc")]
 
     # sort them by date accessed
-    metas.sort(key=lambda meta: meta.date_accessed, reverse=True)
+    metas.sort(key=lambda meta: str(meta.source.date_accessed), reverse=True)  # type: ignore
 
     # exclude local CSVs
-    metas = [m for m in metas if m.source_name != "Local CSV"]
+    metas = [m for m in metas if m.source.name != "Local CSV"]
 
     # decrypt URLs if private
     for meta in metas:
         if not meta.is_public:
-            assert meta.source_data_url
-            meta.source_data_url = _decrypt(meta.source_data_url)
+            assert meta.source.source_data_url
+            meta.source.source_data_url = _decrypt(meta.source.source_data_url)
 
     # extract their name and url
-    return [{"label": f"{meta.name} / {meta.version}", "value": meta.source_data_url, "is_public": meta.is_public} for meta in metas]  # type: ignore
+    return [{"label": f"{meta.name} / {meta.version}", "value": meta.source.source_data_url, "is_public": meta.is_public} for meta in metas]  # type: ignore
 
 
 def _infer_metadata(
@@ -578,12 +591,8 @@ def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
     """Check if all countries are harmonized."""
     po.put_markdown("""## Harmonizing countries...""")
 
-    alias_to_country = (
-        Dataset(REFERENCE_DATASET)["countries_regions"][["name", "aliases"]]
-        .assign(aliases=lambda df: df.aliases.map(lambda s: json.loads(s) if isinstance(s, str) else None))
-        .explode("aliases")
-        .set_index("aliases")["name"]
-    )
+    ds_regions = Dataset(LATEST_REGIONS_DATASET_PATH)
+    alias_to_country = ds_regions["definitions"].join(ds_regions["aliases"], how="left").set_index("alias")["name"]
 
     df = df.reset_index()
 
@@ -663,8 +672,16 @@ def _metadata_diff(fast_import: FasttrackImport, meta: YAMLMeta) -> bool:
     with open(fast_import.metadata_path, "r") as f:
         existing_meta = f.read()
 
+    # load old snapshot metadata from path
+    old_snapshot_yaml = fast_import.snapshot.metadata.to_yaml()
+    # create new snapshot metadata
+    new_snapshot_yaml = fast_import.snapshot_meta.to_yaml()
+
+    # combine snapshot YAML and grapher YAML file
     diff = difflib.HtmlDiff()
-    html_diff = diff.make_table(existing_meta.split("\n"), meta.to_yaml().split("\n"), context=True)
+    html_diff = diff.make_table(
+        (existing_meta + old_snapshot_yaml).split("\n"), (meta.to_yaml() + new_snapshot_yaml).split("\n"), context=True
+    )
     if "No Differences Found" in html_diff:
         po.put_success("No metadata differences found.")
         return False
@@ -740,7 +757,12 @@ def _encrypt(s: str) -> str:
 
 def _decrypt(s: str) -> str:
     fernet = _get_secret_key()
-    return fernet.decrypt(s.encode()).decode() if fernet else s
+    # content is not encrypted, this is to keep it backward compatible with old datasets
+    # that weren't using encryption
+    if "docs.google.com" in s:
+        return s
+    else:
+        return fernet.decrypt(s.encode()).decode() if fernet else s
 
 
 if __name__ == "__main__":

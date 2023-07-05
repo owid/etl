@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast
 
 import pandas as pd
-import requests
 import structlog
 from owid import catalog
 from owid.catalog import CHANNEL
@@ -22,7 +21,6 @@ from owid.walden import Dataset as WaldenDataset
 from etl import paths
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import extract_step_attributes, load_dag, reverse_graph
-from etl.steps.data.converters import convert_snapshot_metadata
 
 log = structlog.get_logger()
 
@@ -32,6 +30,8 @@ def downloaded(url: str) -> Iterator[str]:
     """
     Download the url to a temporary file and yield the filename.
     """
+    import requests
+
     with tempfile.NamedTemporaryFile() as tmp:
         with requests.get(url, stream=True) as r:
             r.raise_for_status()
@@ -51,6 +51,8 @@ def get_latest_github_sha(org: str, repo: str, branch: str) -> str:
 
 
 def _get_github_branches(org: str, repo: str) -> List[Any]:
+    import requests
+
     url = f"https://api.github.com/repos/{org}/{repo}/branches?per_page=100"
     resp = requests.get(url, headers={"Accept": "application/vnd.github.v3+json"})
     if resp.status_code != 200:
@@ -65,8 +67,15 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
 
 def grapher_checks(ds: catalog.Dataset) -> None:
     """Check that the table is in the correct format for Grapher."""
+    from etl import grapher_helpers as gh
+
+    assert ds.metadata.title, "Dataset must have a title."
+
     for tab in ds:
         assert {"year", "country"} <= set(tab.reset_index().columns), "Table must have columns country and year."
+        assert (
+            tab.reset_index()["year"].dtype in gh.INT_TYPES
+        ), f"year must be of an integer type but was: {tab['country'].dtype}"
         for col in tab:
             if col in ("year", "country"):
                 continue
@@ -80,6 +89,7 @@ def create_dataset(
     tables: Iterable[catalog.Table],
     default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,
     underscore_table: bool = True,
+    camel_to_snake: bool = False,
     formats: List[FileFormat] = DEFAULT_FORMATS,
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
@@ -94,11 +104,14 @@ def create_dataset(
     :param tables: A list of tables to add to the dataset.
     :param default_metadata: The default metadata to use for the dataset, could be either SnapshotMeta or DatasetMeta.
     :param underscore_table: Whether to underscore the table name before adding it to the dataset.
+    :param camel_to_snake: Whether to convert camel case to snake case for the table name.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
         ds.save()
     """
+    from etl.steps.data.converters import convert_snapshot_metadata
+
     # convert snapshot SnapshotMeta to DatasetMeta
     if isinstance(default_metadata, SnapshotMeta):
         default_metadata = convert_snapshot_metadata(default_metadata)
@@ -109,7 +122,7 @@ def create_dataset(
     # add tables to dataset
     for table in tables:
         if underscore_table:
-            table = catalog.utils.underscore_table(table)
+            table = catalog.utils.underscore_table(table, camel_to_snake=camel_to_snake)
         ds.add(table, formats=formats)
 
     # set metadata from dest_dir
@@ -144,6 +157,104 @@ def create_dataset(
     return ds
 
 
+def create_dataset_with_combined_metadata(
+    dest_dir: Union[str, Path],
+    datasets: List[catalog.Dataset],
+    tables: List[catalog.Table],
+    default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,  # type: ignore
+    underscore_table: bool = True,
+    formats: List[FileFormat] = DEFAULT_FORMATS,
+) -> catalog.Dataset:
+    """Create a new catalog Dataset with the combination of sources and licenses of a list of datasets.
+
+    This function will:
+    * Gather all sources and licenses of a list of datasets (`datasets`).
+    * Assign the combined sources and licenses to all variables in a list of tables (`tables`).
+    * Create a new dataset (using the function `create_dataset`) with the combined sources and licenses.
+
+    NOTES:
+      * The sources and licenses of the default_metadata will be ignored (and the combined sources and licenses of all
+        `datasets` will be used instead).
+      * If a metadata yaml file exists and contains sources and licenses, the content of the metadata file will
+        override the combined sources and licenses.
+
+    Parameters
+    ----------
+    dest_dir : Union[str, Path]
+        Destination directory for the dataset, usually argument of `run` function.
+    datasets : List[catalog.Dataset]
+        Datasets whose sources and licenses will be gathered and passed on to the new dataset.
+    tables : List[catalog.Table]
+        Tables to add to the new dataset.
+    default_metadata : Optional[Union[SnapshotMeta, catalog.DatasetMeta]]
+        Default metadata for the new dataset. If it contains sources and licenses, they will be ignored (and the
+        combined sources of the list of datasets passed will be used).
+    underscore_table : bool
+        Whether to underscore the table name before adding it to the dataset.
+
+    Returns
+    -------
+    catalog.Dataset
+        New dataset with combined metadata.
+
+    """
+    from etl.steps.data.converters import convert_snapshot_metadata
+
+    # Gather unique sources from the original datasets.
+    sources = []
+    licenses = []
+    for dataset_i in datasets:
+        # Get metadata from this dataset or snapshot.
+        if isinstance(dataset_i.metadata, SnapshotMeta):
+            metadata = convert_snapshot_metadata(dataset_i.metadata)
+        else:
+            metadata = dataset_i.metadata
+
+        # Gather sources and licenses from this dataset or snapshot.
+        for source in metadata.sources:
+            if source.name not in [known_source.name for known_source in sources]:
+                sources.append(source)
+        for license in metadata.licenses:
+            if license.name not in [known_license.name for known_license in licenses]:
+                licenses.append(license)
+
+    # Assign combined sources and licenses to each of the variables in each of the tables.
+    for table in tables:
+        index_columns = table.metadata.primary_key
+        # If the table has an index, reset it, so that sources and licenses can also be assigned to index columns.
+        if len(index_columns) > 0:
+            table = table.reset_index()
+        # Assign sources and licenses to the metadata of each variable in the table.
+        for variable in table.columns:
+            table[variable].metadata.sources = sources
+            table[variable].metadata.licenses = licenses
+        # Bring original index back.
+        if len(index_columns) > 0:
+            table = table.set_index(index_columns)
+
+    if default_metadata is None:
+        # If no default metadata is passed, create new empty dataset metadata.
+        default_metadata = catalog.DatasetMeta()
+    elif isinstance(default_metadata, SnapshotMeta):
+        # If a snapshot metadata is passed as default metadata, convert it to a dataset metadata.
+        default_metadata: catalog.DatasetMeta = convert_snapshot_metadata(default_metadata)
+
+    # Assign combined sources and licenses to the new dataset metadata.
+    default_metadata.sources = sources
+    default_metadata.licenses = licenses
+
+    # Create a new dataset.
+    ds = create_dataset(
+        dest_dir=dest_dir,
+        tables=tables,
+        default_metadata=default_metadata,
+        underscore_table=underscore_table,
+        formats=formats,
+    )
+
+    return ds
+
+
 class CurrentFileMustBeAStep(ExceptionFromDocstring):
     """Current file must be an ETL step."""
 
@@ -161,7 +272,7 @@ class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstring):
 
 
 class UnknownChannel(ExceptionFromDocstring):
-    """Unknown channel name. Valid channels are 'walden', 'snapshot', 'meadow', 'garden', or 'grapher'."""
+    """Unknown channel name. Valid channels are 'examples', 'walden', 'snapshot', 'meadow', 'garden', or 'grapher'."""
 
 
 class WrongStepName(ExceptionFromDocstring):
@@ -272,9 +383,12 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if channel in ["meadow", "garden", "grapher", "explorers"]:
+        if channel in ["meadow", "garden", "grapher", "explorers", "examples"]:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
-        elif channel in ["snapshot", "walden"]:
+        elif channel == "snapshot":
+            # match also on snapshot short_names without extension
+            step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
+        elif channel == "walden":
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
         elif channel is None:
             step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}$"
@@ -404,6 +518,18 @@ class PathFinder:
             )
             dataset = catalog.Dataset(dataset_path)
 
+        return dataset
+
+    def load_snapshot_dependency(self) -> Snapshot:
+        """Load snapshot dependency with the same name."""
+        snap = self.load_dependency(channel="snapshot", short_name=self.short_name)
+        assert isinstance(snap, Snapshot)
+        return snap
+
+    def load_dataset_dependency(self) -> catalog.Dataset:
+        """Load dataset dependency with the same name."""
+        dataset = self.load_dependency(short_name=self.short_name)
+        assert isinstance(dataset, catalog.Dataset)
         return dataset
 
 
@@ -702,8 +828,7 @@ class VersionTracker:
                 & (self.step_attributes_df["channel"].isin(["meadow", "garden"]))
             ]["step"]
         )
-        # The only main data step that is not explicitly in the DAG is the reference dataset (which should be removed soon).
-        missing_steps = latest_data_steps - set(list(self.dag_active) + ["data://garden/reference"])
+        missing_steps = latest_data_steps - set(list(self.dag_active))
         if len(missing_steps) > 0:
             for missing_step in missing_steps:
                 print(f"Step {missing_step} is the latest version of a step and hence should be in the dag.")

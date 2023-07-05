@@ -1,8 +1,6 @@
 meta:
   # Institution name: The Groningen Growth and Development Centre (GGDC), from the Faculty of Economics and
   # Business of the University of Groningen.
-  namespace: ggdc
-  short_name: ggdc_maddison
   name: Maddison Project Database (GGDC, 2020)
   source_name: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
   publication_year: 2020
@@ -14,7 +12,6 @@ meta:
   url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020
   # Url to download the dataset.
   source_data_url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx
-  file_extension: xlsx
   # License is defined in the main page of the project.
   license_url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020
   license_name: Creative Commons BY 4.0
@@ -23,7 +20,8 @@ meta:
     Full citation:
     Maddison Project Database, version 2020. Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update”.
 
-    The database draws on the following work for individual countries:
+    The Maddison Project Database is based on the work of many researchers that have produced estimates of
+    economic growth for individual countries. The full list of sources for this historical data is given for each country below.
 
     Argentina
     1800 - 1870 	Prados de la Escosura, L. (2009). “Lost Decades? Economic Performance in Post-Independence Latin America,” Journal of Latin America Studies 41: 279–307 (updated data)

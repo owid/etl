@@ -8,7 +8,18 @@ DAG_ARCHIVE_FILE = DAG_DIR / "archive" / "main.yml"
 DATA_DIR = BASE_DIR / "data"
 SNAPSHOTS_DIR = BASE_DIR / "snapshots"
 STEP_DIR = BASE_DIR / "etl" / "steps"
-REFERENCE_DATASET = DATA_DIR / "garden" / "reference"
+
+# Regions paths
+LATEST_REGIONS_VERSION = sorted((STEP_DIR / "data/garden/regions/").glob("*/regions.yml"))[-1].parts[-2]
+LATEST_REGIONS_YML = STEP_DIR / "data/garden/regions" / LATEST_REGIONS_VERSION / "regions.yml"
+LATEST_REGIONS_DATASET_PATH = BASE_DIR / "data/garden/regions" / LATEST_REGIONS_VERSION / "regions"
+
+# WB Income
+LATEST_INCOME_VERSION = sorted((STEP_DIR / "data/garden/wb/").glob("*/income_groups.py"))[-1].parts[-2]
+LATEST_INCOME_DATASET_PATH = BASE_DIR / "data/garden/wb" / LATEST_INCOME_VERSION / "income_groups"
+
+# Population
+LATEST_POPULATION_VERSION = sorted((STEP_DIR / "data/garden/demography/").glob("*/population"))[-1].parts[-2]
 
 # NOTE: this is useful when your steps are defined in a different package
 BASE_PACKAGE = os.environ.get("BASE_PACKAGE", "etl")

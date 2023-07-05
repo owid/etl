@@ -15,7 +15,7 @@ from MySQLdb import IntegrityError
 from owid.catalog import Dataset
 from structlog import get_logger
 
-from etl.chart_revision.revision import create_and_submit_charts_revisions
+from etl.chart_revision.v1.revision import create_and_submit_charts_revisions
 from etl.paths import DATA_DIR
 from etl.scripts.faostat.create_chart_revisions import (
     extract_variables_from_dataset,

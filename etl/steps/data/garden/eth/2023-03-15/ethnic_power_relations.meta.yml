@@ -1,0 +1,720 @@
+all_sources:
+  - epr: &source-epr
+      name: Ethnic Power Relations Dataset (2021)
+      published_by: 'Vogt, M., N.-C. Bormann, S. Ruegger, L.-E. Cederman, P. Hunziker, and L. Girardin. (2015). Integrating Data on Ethnicity, Geography, and Conflict: The Ethnic Power Relations Dataset Family. Journal of Conflict Resolution 59 (7).'
+      url: https://growup.ethz.ch/
+      date_accessed: 2023-03-15
+      publication_date: 2021-06-08
+      description: The Ethnic Power Relations (EPR) Dataset identifies all politically relevant ethnic groups and their access to state power in every country of the world from 1946 to 2020. It includes annual data on over 800 groups and codes the degree to which their representatives held executive-level state power—from total control of the government to overt political discrimination.
+  - acd2epr: &source-acd2epr
+      name: ACD2EPR Docking Dataset (2021)
+      published_by: 'Wucherpfennig, J., N. Metternich, L.-E. Cederman, and K. S. Gleditsch (2012). Ethnicity, the state and the duration of civil war. World Politics 64 (1).'
+      url: https://growup.ethz.ch/
+      date_accessed: 2023-03-15
+      publication_date: 2021-06-08
+      description: The ACD2EPR 2021 dataset links ACD (Armed Conflict Database) 20.1 conflicts to Ethnic Power Relations-Core 2021 groups.
+
+definitions:
+  - ethnic_group:
+      description: &description_ethnic_group |
+        The Ethnic Power Relations dataset defines ethnicity as any subjectively experienced sense of commonality based on the belief in common ancestry and shared culture. Given this definition, an ethnic group (i.e. a group of individuals sharing a common ethnicity) is included in the EPR Core dataset if it is politically relevant at least once in the sample period. An ethnic group is classified as politically relevant if at least one political organization claims to represent it in national politics or if its members are subjected to state-led political discrimination.
+  - group_relevance: &description_group_relevance |
+      An ethnic group is deemed relevant in a given group-year if at least one political organization claims to represent it in national politics or if its members are subjected to state-led political discrimination.
+  - egip:
+      description: &description_egip |
+        An ethnic group in power (EGIP) is a politically relevant ethnic group which has access to power, in one of these options:
+          <ol>
+            <li>The group rules alone:</li><ul><li>Monopoly: Elite members hold power in the executive to the exclusion of members of all other ethnic groups.</li>
+                <li>Dominance: Elite members hold dominant power in the executive, but there is some limited inclusion of "token" members of other groups who however do not have real influence on decision making.</li>
+              </ul><li>The group shares power:</li><ul><li>Senior Partner: Representatives of the group participate as senior partners in a formal or informal power-sharing arrangement. By power sharing means any arrangement that divides executive power among leaders who claim to represent particular ethnic groups and who have real influence on political decision making.</li>
+                <li>Junior Partner: Representatives participate as junior partners in government, reflected in the number and importance of the positions controlled by group members.</li>
+              </ul>
+          </ol>
+  - meg:
+      description: &description_meg |
+        An ethnic group is marginalized (MEG) if it is politically relevant but does not have access to power. Marginalization can take one of the following forms:
+          <ul>
+            <li>Powerless: Elite representatives hold no political power (or do not have influence on decision making) at the national level of executive power - although without being explicitly discriminated against.</li>
+            <li>Discrimination: Group members are subjected to active, intentional, and targeted discrimination by the state, with the intent of excluding them from political power. Such active discrimination can be either formal or informal, but always refers to the domain of public politics (excluding discrimination in the socio-economic sphere).</li>
+            <li>Self-exclusion: Applies to groups that have excluded themselves from central state power, in the sense that they control a particular territory of the state which they have declared independent from the central government.</li>
+          </ul>
+  - autonomy:
+      description: &description_autonomy |
+        For a group to be coded as regionally autonomous, two conditions must be jointly satisfied:
+          1. There is a meaningful and active regional executive organ of some type that operates below the state level (for example, the departmental, provincial, or district level) but above the local administrative level.
+          2. Group representation is not token: group members exert actual influence on the decisions of this entity and their representatives act in line with the group’s local interests.
+
+        The term “meaningful” here refers to executive organs that carry out core competencies of the state, involving, for example, cultural rights (language and education) and/or significant economic autonomy (for example, the right to levy taxes, or very substantial spending autonomy).
+  - acd_conflict:
+      description: &description_acd_conflict |
+        An ACD (Armed Conflict Database) conflict for this dataset includes:
+            <ul>
+              <li>Intrastate conflict: A conflict between a government and a non-governmental party, with no interference from other countries.</li>
+              <li>Intrastate conflict internationalized: An armed conflict between a government and a non-government party where the government side, the opposing side, or both sides, receive troop support from other governments that actively participate in the conflict.</li>
+            </ul>Each conflict is assigned a unique UCDP (Uppsala Conflict Data Program) ID. ACD conflicts are merged with the Ethnic Power Relations country-level data by assigning each country-year observation one or several UCDP IDs if the ACD dataset reports an ongoing conflict in the respective country and year.
+  - conflict_onset:
+      description: &description_conflict_onset |
+        A conflict onset occurs if a country experiences an intrastate conflict in a given year, and the respective conflict (as identified via its UCDP ID) has been inactive in the given country in the previous two calendar years.
+        The dataset also offers conflict onset variables that distinguish between ethnic and non-ethnic conflicts. Conflict onsets are coded as ethnic if at least one ethnic group is linked to the respective ACD conflict in the onset year.
+
+        The KO option refers to "Keep Ongoing". Conflict onset variables with the KO option take the value of 1 for country-years in which a country experiences conflict onset, and 0 in all other years.
+        The DO option refers to "Drop Ongoing". Conflict onset variables with the DO option indicate conflict in the same manner as the KO variables, but are censored if a given country has experienced any conflict in the previous two calendar years.
+  - conflict_incidence:
+      description: &description_conflict_incidence |
+        This variable assumes the value of 1 in years when at least one ACD conflict episode is ongoing, and 0 in all other years.
+
+dataset:
+  short_name: ethnic_power_relations
+  title: Ethnic Power Relations Dataset (ETH, 2021)
+  sources:
+    - *source-epr
+    - *source-acd2epr
+
+tables:
+  ethnic_power_relations:
+    variables:
+      egip_groups_count:
+        title: Number of ethnic groups in power (EGIP)
+        description:
+         - Count variable indicating the number of EGIP groups in this country.<br>
+         - *description_ethnic_group
+         - *description_egip
+        unit: ""
+        short_unit: ""
+        display:
+          name: Number of ethnic groups in power (EGIP)
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      excl_groups_count:
+        title: Number of marginalized ethnic groups (MEG)
+        description:
+          - Count variable indicating the number of MEG groups in this country.<br>
+          - *description_ethnic_group
+          - *description_meg
+        unit: ""
+        short_unit: ""
+        display:
+          name: Number of marginalized ethnic groups (MEG)
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      regaut_groups_count:
+        title: Number of groups with regional autonomy
+        description:
+          - Count variable indicating number of groups with regional autonomy in this country.<br>
+          - *description_autonomy
+        unit: ""
+        short_unit: ""
+        display:
+          name: Number of groups with regional autonomy
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      regaut_excl_groups_count:
+        title: Number of marginalized ethnic groups (MEG) with regional autonomy
+        description:
+          - Count variable indicating number of MEG groups with regional autonomy in this country.<br>
+          - *description_ethnic_group
+          - *description_meg
+          - *description_autonomy
+        unit: ""
+        short_unit: ""
+        display:
+          name: Number of MEG groups with regional autonomy
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      regaut_egip_groups_count:
+        title: Number of ethnic groups in power (EGIP) with regional autonomy
+        description:
+          - Count variable indicating number of EGIP groups with regional autonomy in this country.<br>
+          - *description_ethnic_group
+          - *description_egip
+          - *description_autonomy
+        unit: ""
+        short_unit: ""
+        display:
+          name: Number of EGIP groups with regional autonomy
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      rlvt_groups_count:
+        title: Number of relevant groups
+        description:
+          - Count variable indicating the number of relevant groups in this country.<br>
+          - *description_group_relevance
+        unit: ""
+        short_unit: ""
+        display:
+          name: Number of relevant groups
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      actv_groups_count:
+        title: Number of active groups
+        description:
+          - Count variable indicating the number of active groups in this country.<br>
+          - A group is considered active if it is phisically present in a country and is not currently represented by an active ancestor or descendant.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Number of active groups
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      lpop:
+        title: Share of population ethnically relevant
+        description:
+          - Sum of the ethnically relevant population in this country (as a fraction of total population).<br>
+          - *description_ethnic_group
+          - *description_group_relevance
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of population ethnically relevant
+          numDecimalPlaces: 1
+      egippop:
+        title: Share of population in ethnic groups in power (EGIP)
+        description:
+          - Sum of the population of all EGIP groups in this country (as a fraction of total population).<br>
+          - *description_ethnic_group
+          - *description_egip
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of population in EGIP groups
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
+      legippop:
+        title: Share of ethnically relevant population in ethnic groups in power (EGIP)
+        description:
+          - EGIP population as a fraction of ethnically relevant population in this country.<br>
+          - *description_ethnic_group
+          - *description_group_relevance
+          - *description_egip
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of ethnically relevant population in EGIP groups
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
+      exclpop:
+        title: Share of population in marginalized ethnic groups (MEG)
+        description:
+          - Sum of the population of all MEG groups in this country (as a fraction of total population).<br>
+          - *description_ethnic_group
+          - *description_meg
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of population in MEG groups
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
+      restpop:
+        title: Share of the population not belonging to an ethnically relevant group
+        description:
+          - Share of the population that is not part of an ethnic group in power (EGIP) or a marginalized ethnic group (MEG).<br>
+          - *description_ethnic_group
+          - *description_egip
+          - *description_meg
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of the population not belonging to an ethnically relevant group
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
+      lexclpop:
+        title: Share of ethnically relevant population in marginalized ethnic groups (MEG)
+        description:
+          - MEG population as a fraction of ethnically relevant population in this country.<br>
+          - *description_ethnic_group
+          - *description_group_relevance
+          - *description_meg
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of ethnically relevant population in MEG groups
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
+      discrimpop:
+        title: Share of population discriminated
+        description:
+          - Sum of discriminated population in this country (as a fraction of total population).<br>
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of population discriminated
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
+      ldiscrimpop:
+        title: Share of ethnically relevant population which is discriminated
+        description:
+          - Sum of discriminated population as a fraction of ethnically relevant population in this country.<br>
+          - *description_ethnic_group
+          - *description_group_relevance
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of ethnically relevant population which is discriminated
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
+      maxexclpop:
+        title: Share of population of the largest marginalized ethnic group (MEG)
+        description:
+          - Size of the largest MEG group in this country (as a fraction of total population).<br>
+          - *description_ethnic_group
+          - *description_meg
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of population of the largest MEG group
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
+      lmaxexclpop:
+        title: Share of ethnically relevant population in the largest marginalized ethnic group (MEG)
+        description:
+          - Size of the largest MEG group in this country as a fraction of ethnically relevant population.<br>
+          - *description_ethnic_group
+          - *description_group_relevance
+          - *description_meg
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of ethnically relevant population in the largest MEG group
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
+      regautpop:
+        title: Share of population with regional autonomy
+        description:
+          - Sum of population with regional autonomy in this country (as a fraction of total population).<br>
+          - *description_autonomy
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of population with regional autonomy
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
+      regautexclpop:
+        title: Share of population with regional autonomy and in a marginalized ethnic group (MEG)
+        description:
+          - Sum of population with regional autonomy and excluded (MEG) in this country (as a fraction of total population).<br>
+          - *description_ethnic_group
+          - *description_meg
+          - *description_autonomy
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of population with regional autonomy and in a MEG group
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
+      regautegippop:
+        title: Share of population with regional autonomy and in an ethnic group in power (EGIP)
+        description:
+          - Sum of population with regional autonomy and included (EGIP) in this country (as a fraction of total population)<br>
+          - *description_ethnic_group
+          - *description_egip
+          - *description_autonomy
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of population with regional autonomy and in an EGIP group
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
+      lpop_headcount:
+        title: Population ethnically relevant
+        description:
+          - Sum of the ethnically relevant population in this country.<br>
+          - *description_ethnic_group
+          - *description_group_relevance
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population ethnically relevant
+          numDecimalPlaces: 0
+      egippop_headcount:
+        title: Population in ethnic groups in power (EGIP)
+        description:
+          - Population of all EGIP groups in this country.<br>
+          - *description_ethnic_group
+          - *description_egip
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population in EGIP groups
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      exclpop_headcount:
+        title: Population in marginalized ethnic groups (MEG)
+        description:
+          - Population of all MEG groups in this country.<br>
+          - *description_ethnic_group
+          - *description_meg
+        unit: ""
+        short_unit: ""
+        display:
+          name: Share of population in MEG groups
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      restpop_headcount:
+        title: Population not belonging to an ethnically relevant group
+        description:
+          - Population that is not part of an ethnic group in power (EGIP) or a marginalized ethnic group (MEG).<br>
+          - *description_ethnic_group
+          - *description_egip
+          - *description_meg
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population not belonging to an ethnically relevant group
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      discrimpop_headcount:
+        title: Population discriminated
+        description:
+          - Discriminated population in this country.<br>
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population discriminated
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      maxexclpop_headcount:
+        title: Population of the largest marginalized ethnic group (MEG)
+        description:
+          - Size of the largest MEG group in this country.<br>
+          - *description_ethnic_group
+          - *description_meg
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population of the largest MEG group
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      regautpop_headcount:
+        title: Population with regional autonomy
+        description:
+          - Sum of population with regional autonomy in this country.<br>
+          - *description_autonomy
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population with regional autonomy
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      regautexclpop_headcount:
+        title: Population with regional autonomy and in a marginalized ethnic group (MEG)
+        description:
+          - Sum of population with regional autonomy and excluded (MEG) in this country.<br>
+          - *description_ethnic_group
+          - *description_meg
+          - *description_autonomy
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population with regional autonomy and in a MEG group
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      regautegippop_headcount:
+        title: Population with regional autonomy and in an ethnic group in power (EGIP)
+        description:
+          - Sum of population with regional autonomy and included (EGIP) in this country<br>
+          - *description_ethnic_group
+          - *description_egip
+          - *description_autonomy
+        unit: ""
+        short_unit: ""
+        display:
+          name: Population with regional autonomy and in an EGIP group
+          numDecimalPlaces: 0
+        sources:
+          - *source-epr
+      cntr_relevance:
+        title: Relevance
+        description:
+          - '"R" indicates countries where ethnicity is coded as being relevant at least once in the sample period; "P" indicates countries where only a placeholder group is coded.<br>'
+          - *description_ethnic_group
+          - *description_group_relevance
+        unit: ""
+        short_unit: ""
+        display:
+          name: Relevance
+        sources:
+          - *source-epr
+      nstar:
+        title: Index N* of ethnonationalist exclusiveness
+        description:
+         - "N*(0.5; 5);  see Cederman L.-E. and L. Girardin (2007). Beyond fractionalization: Mapping ethnicity onto nationalist insurgencies. The American Political Science Review 101(1): pp. 173-185."
+        unit: ""
+        short_unit: ""
+        display:
+          name: N*
+        sources:
+          - *source-epr
+      onset_ko_eth_flag:
+        title: Ethnic conflict onset (KO)
+        description:
+          - Binary flag indicating ethnic conflict onset / ko option.<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_onset
+        unit: ""
+        short_unit: ""
+        display:
+          name: Ethnic conflict onset (KO)
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      onset_ko_noneth_flag:
+        title: Nonethnic conflict onset (KO)
+        description:
+          - Binary flag indicating nonethnic conflict onset / ko option<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_onset
+        unit: ""
+        short_unit: ""
+        display:
+          name: Nonethnic conflict onset (KO)
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      onset_ko_terr_eth_flag:
+        title: Territorial ethnic conflict onset (KO)
+        description:
+          - Binary flag indicating territorial ethnic conflict onset / ko option<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_onset
+        unit: ""
+        short_unit: ""
+        display:
+          name: Territorial ethnic conflict onset (KO)
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      onset_ko_gov_eth_flag:
+        title: Governmental ethnic conflict onset (KO)
+        description:
+          - Binary flag indicating governmental ethnic conflict onset / ko option<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_onset
+        unit: ""
+        short_unit: ""
+        display:
+          name: Governmental ethnic conflict onset (KO)
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      onset_ko_terr_noneth_flag:
+        title: Territorial nonethnic conflict onset (KO)
+        description:
+          - Binary flag indicating territorial nonethnic conflict onset / ko option<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_onset
+        unit: ""
+        short_unit: ""
+        display:
+          name: Territorial nonethnic conflict onset (KO)
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      onset_ko_gov_noneth_flag:
+        title: Governmental nonethnic conflict onset (KO)
+        description:
+          - Binary flag indicating governmental nonethnic conflict onset / ko option<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_onset
+        unit: ""
+        short_unit: ""
+        display:
+          name: Governmental nonethnic conflict onset (KO)
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      incidence_eth_flag:
+        title: Ongoing ethnic conflict
+        description:
+          - Binary flag indicating ongoing ethnic conflict<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_incidence
+        unit: ""
+        short_unit: ""
+        display:
+          name: Ongoing ethnic conflict
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      incidence_noneth_flag:
+        title: Ongoing non-ethnic conflict
+        description:
+          - Binary flag indicating ongoing non-ethnic conflict<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_incidence
+        unit: ""
+        short_unit: ""
+        display:
+          name: Ongoing non-ethnic conflict
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      incidence_terr_eth_flag:
+        title: Ongoing territorial ethnic conflict
+        description:
+          - Binary flag indicating ongoing territorial ethnic conflict<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_incidence
+        unit: ""
+        short_unit: ""
+        display:
+          name: Ongoing territorial ethnic conflict
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      incidence_gov_eth_flag:
+        title: Ongoing governmental ethnic conflict
+        description:
+          - Binary flag indicating ongoing governmental ethnic conflict<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_incidence
+        unit: ""
+        short_unit: ""
+        display:
+          name: Ongoing governmental ethnic conflict
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      incidence_terr_noneth_flag:
+        title: Ongoing territorial nonethnic conflict
+        description:
+          - Binary flag indicating ongoing territorial nonethnic conflict<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_incidence
+        unit: ""
+        short_unit: ""
+        display:
+          name: Ongoing territorial nonethnic conflict
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      incidence_gov_noneth_flag:
+        title: Ongoing governmental nonethnic conflict
+        description:
+          - Binary flag indicating ongoing governmental nonethnic conflict<br>
+          - *description_acd_conflict
+          - *description_conflict_incidence
+        unit: ""
+        short_unit: ""
+        display:
+          name: Ongoing governmental nonethnic conflict
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      onset_do_eth_flag:
+        title: Ethnic conflict onset (DO)
+        description:
+          - Binary flag indicating ethnic conflict onset / do option<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_onset
+        unit: ""
+        short_unit: ""
+        display:
+          name: Ethnic conflict onset (DO)
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      onset_do_noneth_flag:
+        title: Nonethnic conflict onset (DO)
+        description:
+          - Binary flag indicating nonethnic conflict onset / do option<br>
+          - *description_acd_conflict
+          - *description_conflict_onset
+        unit: ""
+        short_unit: ""
+        display:
+          name: Nonethnic conflict onset (DO)
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      onset_do_terr_eth_flag:
+        title: Territorial ethnic conflict onset (DO)
+        description:
+          - Binary flag indicating territorial ethnic conflict onset / do option<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_onset
+        unit: ""
+        short_unit: ""
+        display:
+          name: Territorial ethnic conflict onset (DO)
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      onset_do_gov_eth_flag:
+        title: Governmental ethnic conflict onset (DO)
+        description:
+          - Binary flag indicating governmental ethnic conflict onset / do option<br>
+          - *description_ethnic_group
+          - *description_acd_conflict
+          - *description_conflict_onset
+        unit: ""
+        short_unit: ""
+        display:
+          name: Governmental ethnic conflict onset (DO)
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      onset_do_terr_noneth_flag:
+        title: Territorial nonethnic conflict onset (DO)
+        description:
+          - Binary flag indicating territorial nonethnic conflict onset / do option<br>
+          - *description_acd_conflict
+          - *description_conflict_onset
+        unit: ""
+        short_unit: ""
+        display:
+          name: Territorial nonethnic conflict onset (DO)
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr
+      onset_do_gov_noneth_flag:
+        title: Governmental nonethnic conflict onset (DO)
+        description:
+          - Binary flag indicating governmental nonethnic conflict onset / do option<br>
+          - *description_acd_conflict
+          - *description_conflict_onset
+        unit: ""
+        short_unit: ""
+        display:
+          name: Governmental nonethnic conflict onset (DO)
+          numDecimalPlaces: 0
+        sources:
+          - *source-acd2epr

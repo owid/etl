@@ -1,4 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
+from datetime import datetime
 
 import pandas as pd
 from owid.catalog import Table
@@ -25,8 +26,10 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     df = pd.read_excel(snap.path)
-    df = df.rename(columns={"Country name": "country"})
-    df = df[["country", "Ladder score", "Standard error of ladder score", "upperwhisker", "lowerwhisker"]]
+    df["report_year"] = datetime.strptime(paths.version, "%Y-%m-%d").year
+    df = df[["Country name", "report_year", "Ladder score"]]
+    df = df.rename(columns={"Country name": "country", "Ladder score": "cantril_ladder_score"})
+    df = df.dropna(subset="cantril_ladder_score")
 
     #
     # Process data.

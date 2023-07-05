@@ -112,7 +112,8 @@ def cli(
                 "max_attempts": 10,
                 "mode": "adaptive",
             }
-        )
+        ),
+        r2=True,
     )
 
     for n, ds in enumerate(datasets):
@@ -170,8 +171,8 @@ def _sync_variable_data_metadata(engine: Engine, variable_id: int, dry_run: bool
 
         if not dry_run:
             # upload data and metadata to S3
-            data_path = upload_gzip_dict(var_data, variable.s3_data_path(), private)
-            metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path(), private)
+            data_path = upload_gzip_dict(var_data, variable.s3_data_path(), private, r2=True)
+            metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path(), private, r2=True)
 
             # update dataPath and metadataPath of a variable if different
             if variable.dataPath != data_path or variable.metadataPath != metadata_path:
@@ -183,13 +184,19 @@ def _sync_variable_data_metadata(engine: Engine, variable_id: int, dry_run: bool
     log.info("datasync.upload", t=f"{time.time() - t:.2f}s", variable_id=variable_id)
 
 
-def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False) -> str:
+def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False, r2: bool = False) -> str:
     """Upload compressed dictionary to S3 and return its URL."""
     body_gzip = gzip.compress(json.dumps(d, default=str).encode())  # type: ignore
 
     bucket, key = s3_utils.s3_bucket_key(s3_path)
 
-    client = connect_s3_cached()
+    client = connect_s3_cached(r2=r2)
+
+    if r2:
+        assert not private, "r2 does not support private files yet"
+        extra_args = {}
+    else:
+        extra_args = {"ACL": "private" if private else "public-read"}
 
     for attempt in Retrying(
         wait=wait_exponential(min=5, max=100),
@@ -203,14 +210,20 @@ def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False) -> 
                 Key=key,
                 ContentEncoding="gzip",
                 ContentType="application/json",
-                ACL="private" if private else "public-read",
+                **extra_args,
             )
 
     # bucket owid-catalog is behind Cloudflare
     if bucket == "owid-catalog":
         return f"https://catalog.ourworldindata.org/{key}"
-    else:
+    elif bucket == "owid-api":
+        return f"https://api.ourworldindata.org/{key}"
+    elif bucket == "owid-api-staging":
+        return f"https://api-staging.owid.io/{key}"
+    elif not r2:
         return f"https://{bucket}.nyc3.digitaloceanspaces.com/{key}"
+    else:
+        raise NotImplementedError()
 
 
 @dataclass_json
