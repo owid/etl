@@ -613,9 +613,12 @@ def list_members_of_region(
                 .reset_index()
                 .rename(columns={"income_group": "classification"})
             )
-        else:
+        elif "income_groups_latest" in ds_income_groups.table_names:
             # Get the table with the current definitions of income groups.
             df_income = ds_income_groups["income_groups_latest"].reset_index()
+        else:
+            raise KeyError(f"Table 'income_groups_latest' not found. "
+                           "You may not be using the right version of the income groups dataset ds_income_groups.")
 
         # Create a dataframe of countries in each income group.
         df_countries_in_income_group = (
