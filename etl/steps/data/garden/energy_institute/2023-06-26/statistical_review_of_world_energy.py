@@ -271,7 +271,7 @@ def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Data
             frac_allowed_nans_per_year=0.9999,
         )
     # Copy metadata of original table.
-    tb_regions.copy_metadata(from_table=tb)
+    tb_regions = tb_regions.copy_metadata(from_table=tb)
 
     return tb_regions
 
