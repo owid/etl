@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     df = pd.read_csv(snap.path)
 
     df["AI Job Postings (% of All Job Postings)"] *= 100
-    df.rename(columns={"Label": "country"}, inplace=True)
+    df.rename(columns={"Label": "country"}, inplace=True, errors="raise")
 
     tb = Table(df, short_name="ai_job_postings", underscore=True)
     #

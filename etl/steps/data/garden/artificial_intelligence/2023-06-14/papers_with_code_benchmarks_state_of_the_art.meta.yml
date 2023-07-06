@@ -28,9 +28,10 @@ tables:
           The coding tasks included in this benchmark are sourced from open-access coding websites such as Codeforces and Kattis. These tasks span a range of difficulty levels, from introductory to collegiate competition level. The benchmark evaluates the accuracy of models in solving programming tasks specifically designed for coding competitions.
         display:
           name: Coding competitions
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
+
       performance_code_any_interview_state_of_the_art:
         title: Coding performance on interviews - state of the art
         description: >
@@ -41,7 +42,7 @@ tables:
         short_unit: '%'
         display:
           name: Coding interviews
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -55,7 +56,7 @@ tables:
         short_unit: '%'
         display:
           name: Humanities
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -69,7 +70,7 @@ tables:
         short_unit: '%'
         display:
           name: All knowledge tests
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -83,7 +84,7 @@ tables:
         short_unit: '%'
         display:
           name: Math
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -97,7 +98,7 @@ tables:
         short_unit: '%'
         display:
           name: Other subjects
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -111,7 +112,7 @@ tables:
         short_unit: '%'
         display:
           name: Social Sciences
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -125,7 +126,7 @@ tables:
         short_unit: '%'
         display:
           name: STEM
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -144,7 +145,7 @@ tables:
         short_unit: '%'
         display:
           name: Top-1 accuracy
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -174,7 +175,7 @@ tables:
         display:
           name: Top-5 accuracy
 
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -185,7 +186,7 @@ tables:
         short_unit: '%'
         display:
           name: Average score relative to humans (100%)
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 

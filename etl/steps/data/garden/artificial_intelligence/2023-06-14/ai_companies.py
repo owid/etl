@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
     df_total["country"] = "World"
 
     df_merged = pd.concat([df, df_total])
-    df_merged.reset_index(inplace=True)
+    df_merged.reset_index(inplace=True, drop=True)
     tb = Table(df_merged, short_name=paths.short_name, underscore=True)
     #
     # Save outputs.

@@ -6,6 +6,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
@@ -25,6 +26,8 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["ai_robots"]
+    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
     # Iterate over the columns
     for column in tb.columns:
         # Check if the column includes "in_thousands"
@@ -98,9 +101,6 @@ def run(dest_dir: str) -> None:
 
     # Merge pivot table for professional service robots, application area and sector with aggregates
     merge_all = pd.merge(merge_service, df_agg_clean, on=["year", "country"], how="outer")
-
-    # Rename Chinese Taipei to Taiwan
-    merge_all.loc[merge_all["country"] == "Chinese Taipei", "country"] = "Taiwan"
 
     # Set the index as 'country' and 'year'
     merge_all.set_index(["country", "year"], inplace=True)

@@ -18,7 +18,7 @@ dataset:
     date_accessed: '2023-06-19'
     publication_date: '2023-04-01'
     publication_year: 2023
-    published_by: AI Index 2023 Annual Report,” AI Index Steering Committee, Institute
+    published_by: AI Index 2023 Annual Report, AI Index Steering Committee, Institute
       for Human-Centered AI, Stanford University, Stanford, CA, April 2023
 tables:
   ai_bills:
@@ -26,3 +26,6 @@ tables:
       number_of_ai_related_bills_passed_into_law:
         title: Number of AI-related bills passed into law
         unit: 'bills'
+        display:
+          numDecimalPlaces: 0
+
