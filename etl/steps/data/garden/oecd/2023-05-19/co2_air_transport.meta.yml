@@ -1,9 +1,11 @@
 dataset:
   title: Air Transport CO2 Emissions
-  description: The OECD Air Transport CO2 Emissions database includes annual, quarterly, and monthly information on
+  description: >
+    The OECD Air Transport CO2 Emissions database includes annual, quarterly, and monthly information on
     CO2 emissions related to commercial passenger, freight, and general aviation flights,
     on both a territory and a residence basis, for 186 countries. These CO2 emissions
     are estimated by the OECD, based on a consistent methodology across countries.
+
 
     OECD database is updated by the end of the first month of each quarter with new data from the previous quarter.
   licenses:
