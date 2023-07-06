@@ -50,7 +50,7 @@ tables:
         unit: ''
       parameters:
         title: Number of parameters
-        description: >-
+        description: >
           The number of parameters in AI models refers to the total count of learnable variables or weights that the model contains. Parameters are the internal variables that the model adjusts during the training process to optimize its performance and make predictions based on the input data.
 
 
@@ -101,17 +101,14 @@ tables:
       training_computation_petaflop:
         title: Training compute (petaFLOP)
         unit: 'petaFLOP'
-        description: >-
-          Training compute, often measured in petaFLOPs (peta floating-point operations per second), refers to the computational power or performance required to train machine learning models. It represents the speed at which a system can perform mathematical operations, particularly floating-point operations, which are commonly used in machine learning computations.
+        description: >
+          Training computation, often measured in total FLOP (floating-point operations), refers to the total number of computer operations used to train an AI system. One FLOP is equivalent to one addition, subtraction, multiplication, or division of two decimal numbers, and one petaFLOP equals one quadrillion (10^15) FLOP.
 
 
-          Machine learning models, especially deep learning models, involve complex mathematical calculations that require significant computational resources. Training these models involves feeding large amounts of data through various layers and nodes, adjusting weights and parameters, and optimizing the model's performance through iterations of forward and backward propagation.
+          The AI systems shown here were built using machine learning and deep learning methods. These involve complex mathematical calculations that require significant computational resources. Training these systems generally involves feeding large amounts of data through various layers and nodes and adjusting internal system parameters over numerous iterations to optimize the system’s performance.
 
 
-          The petaFLOP metric is used to quantify the number of floating-point operations that a system can perform in one second. One petaFLOP is equal to one quadrillion (10^15) floating-point operations per second. It provides an estimation of the computational power available to process large datasets and perform the intensive calculations required during the training phase of machine learning models.
-
-
-          The training compute requirements can vary depending on factors such as the size of the dataset, complexity of the model architecture, and the level of parallelism utilized during the training process. Large-scale deep learning models often require substantial training compute, with the compute requirements measured in petaFLOPs.
+          The training computation used can vary depending on factors such as the size of the dataset, size and complexity of the system architecture, and the level of parallelism used during training, among other reasons.
         display:
             title: Training compute
             numDecimalPlaces: 0

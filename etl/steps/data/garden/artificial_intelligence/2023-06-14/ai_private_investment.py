@@ -55,7 +55,7 @@ def run(dest_dir: str) -> None:
     snap_total = cast(Snapshot, paths.load_dependency("ai_private_investment_total.csv"))
     df_total = pd.read_csv(snap_total.path)
     df_total.rename(columns={"Total Investment (in Billions of U.S. Dollars)": "Total"}, inplace=True)
-    df = pd.merge(df, df_total, on="Year")
+    df = pd.merge(df, df_total, on="Year", how="outer")
 
     df.rename(columns={"Year": "year"}, inplace=True)
     df.loc[:, df.columns.isin(cols_to_adjust_for_infaltion)] *= 1e9
