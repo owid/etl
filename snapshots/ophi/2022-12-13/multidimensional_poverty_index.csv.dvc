@@ -32,6 +32,6 @@ meta:
     The global MPI was developed by OPHI with the UN Development Programme (UNDP) for inclusion in UNDP’s flagship Human Development Report in 2010. It has been published annually by OPHI and in the HDRs ever since.
 wdir: ../../../data/snapshots/ophi/2022-12-13
 outs:
-- md5: 6ff326b5974b28c9a39e1542e8895fc1
-  size: 6772259
+- md5: 76a02b8fe08da13f466cc1015cb87e11
+  size: 6663759
   path: multidimensional_poverty_index.csv
