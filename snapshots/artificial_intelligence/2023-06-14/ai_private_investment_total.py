@@ -45,8 +45,9 @@ def get_data() -> pd.DataFrame:
 
         if "Label" not in df_add.columns:
             df_add["Label"] = "World"
-        # Sometimes Label is actually Year --> so change it
+        # In the Total Investment by area spreadsheet Label is actually Year --> so change it
         elif df_add["Label"].isin([2021, 2020]).any():
+            # Also rename Total Investment (in Billions of U.S. Dollars) so it's a separate column to the by country indicator
             df_add.rename(
                 columns={"Label": "Year", "Total Investment (in Billions of U.S. Dollars)": "Total (focus area)"},
                 inplace=True,
