@@ -21,7 +21,7 @@ dataset:
     date_accessed: '2023-06-19'
     publication_date: '2023-03-20'
     publication_year: 2023
-    published_by: GitHub Survey (2022) AI Index 2023 Annual Report,” AI Index Steering
+    published_by: GitHub Survey (2022) AI Index 2023 Annual Report, AI Index Steering
       Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA,
       April 2023
 tables:
@@ -31,6 +31,8 @@ tables:
         title: '% of participants that agreed or strongly agreed'
         unit: '%'
         short_unit: '%'
+        display:
+          numDecimalPlaces: 0
       dimension_of_developer_productivity:
         title: Dimension of developer productivity
         unit: ''

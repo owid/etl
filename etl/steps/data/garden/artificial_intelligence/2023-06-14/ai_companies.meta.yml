@@ -16,7 +16,7 @@ dataset:
     date_accessed: '2023-06-19'
     publication_date: '2023-03-20'
     publication_year: 2023
-    published_by: NetBase Quid (2022) via the AI Index 2023 Annual Report,” AI Index
+    published_by: NetBase Quid (2022) via the AI Index 2023 Annual Report, AI Index
       Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford,
       CA, April 2023
 tables:
@@ -27,3 +27,6 @@ tables:
         description: >
           According to the AI Index: "NetBase Quid... aggregates over 6 million global public and private company profiles, updated on a weekly basis, including metadata on investments, location of headquarters, and more. NetBase Quid also applies natural language processing technology to search, analyze, and identify patterns in large, unstructured datasets, like aggregated blogs, company and patent databases.
         unit: 'companies'
+        display:
+          numDecimalPlaces: 0
+

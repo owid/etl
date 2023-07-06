@@ -32,6 +32,15 @@ def run(dest_dir: str) -> None:
         columns={"Label": "type", "Year": "year", "Total Investment (in Billions of U.S. Dollars)": "Total Investment"},
         inplace=True,
     )
+    # Add Total Investment
+    total_investment = df.groupby("year")["Total Investment"].sum()
+    # Create a DataFrame from the total investment series
+    total_df = pd.DataFrame(
+        {"year": total_investment.index, "Total Investment": total_investment.values, "type": "Total"}
+    )
+
+    # Merge the total investment DataFrame with the original DataFrame
+    df = pd.merge(df, total_df, on=["year", "type", "Total Investment"], how="outer")
 
     # Load WDI
     ds_wdi = cast(Dataset, paths.load_dependency("wdi"))

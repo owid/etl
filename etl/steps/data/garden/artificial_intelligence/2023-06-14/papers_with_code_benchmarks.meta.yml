@@ -26,7 +26,7 @@ tables:
           The coding tasks included in this benchmark are sourced from open-access coding websites such as Codeforces and Kattis. These tasks span a range of difficulty levels, from introductory to collegiate competition level. The benchmark evaluates the accuracy of models in solving programming tasks specifically designed for coding competitions.
 
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -40,7 +40,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -53,7 +53,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -66,7 +66,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -79,7 +79,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -92,7 +92,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -105,7 +105,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -118,7 +118,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 

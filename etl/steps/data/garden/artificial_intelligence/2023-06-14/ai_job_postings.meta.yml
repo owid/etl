@@ -18,7 +18,7 @@ dataset:
     date_accessed: '2023-06-19'
     publication_date: '2023-03-20'
     publication_year: 2023
-    published_by: Lightcast (2022) via the AI Index 2023 Annual Report,” AI Index
+    published_by: Lightcast (2022) via the AI Index 2023 Annual Report, AI Index
       Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford,
       CA, April 2023
 tables:
@@ -28,3 +28,7 @@ tables:
         title: AI job postings (% of all job postings)
         unit: '% from total'
         short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
+

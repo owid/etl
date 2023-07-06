@@ -28,7 +28,7 @@ tables:
         unit: ''
         display:
           name: Gini coefficient
-          numDecimalPlaces: 3
+          numDecimalPlaces: 2
       stdg:
         title: Standard error of Gini coefficient (post taxes and transfers)
         description: Standard error of Gini coefficient (post taxes and transfers)
@@ -49,7 +49,7 @@ tables:
         unit: ''
         display:
           name: Gini coefficient
-          numDecimalPlaces: 3
+          numDecimalPlaces: 2
       gini_reduction:
         title: Percentage reduction in Gini coefficient (before vs. after tax)
         description: This is the percentage difference between the Gini coefficient before taxes and benefits and the Gini coefficient after taxes and benefits.
@@ -70,7 +70,7 @@ tables:
         unit: ''
         display:
           name: Gini coefficient
-          numDecimalPlaces: 3
+          numDecimalPlaces: 2
       palma:
         title: Palma ratio
         description:
