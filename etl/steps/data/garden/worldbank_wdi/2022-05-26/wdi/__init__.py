@@ -100,8 +100,7 @@ def mk_omms(table: Table) -> Table:
         date_accessed=source.date_accessed,
         publication_date=source.publication_date,
         publication_year=source.publication_year,
-        published_by="Our World in Data",
-        publisher_source=f"Our World in Data based on {source.published_by}",
+        published_by=f"Our World in Data based on {source.published_by}",
     )
 
     # omm: urban population living in slums
@@ -369,6 +368,7 @@ def add_variable_metadata(table: Table) -> Table:
     vm = VariableMatcher()
     for var_code in var_codes:
         var = df_vars.loc[var_code].to_dict()
+
         # retrieves unit + display metadata from the most recently updated
         # WDI grapher variable that matches this variable's name
         unit = ""
@@ -424,7 +424,6 @@ def add_variable_metadata(table: Table) -> Table:
             publication_date=walden_ds.metadata["publication_date"],
             publication_year=walden_ds.metadata["publication_year"],
             published_by=walden_ds.metadata["name"],
-            publisher_source=clean_source["dataPublisherSource"],
         )
 
         table[var_code].metadata = VariableMeta(

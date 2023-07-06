@@ -1,0 +1,25 @@
+dataset:
+  sources:
+  - name: World Health Organization
+    published_by: Dracunculiasis Eradication Portal
+    date_accessed: 2023-06-28
+    url: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
+tables:
+  guinea_worm:
+    variables:
+      guinea_worm_reported_cases:
+        title: guinea_worm_reported_cases
+        unit: ''
+        description: >-
+          The number of reported cases of guinea worm disease (dracunculiasis) as reported by the WHO.
+
+
+          The WHO defines a case of guinea worm disease as the following:
+
+
+          "A case of guinea-worm disease is a person exhibiting a skin lesion with emergence of a Guinea worm, and in which
+          the worm is confirmed in laboratory tests to be Dracunculus medinensis. That person is counted as a case only once
+          during the calendar year, i.e. when the first worm emerges from that person. All worm specimens should be obtained
+          from each case patient for laboratory confirmation and sent to the United States Centers for Disease Control and
+          Prevention (CDC). All cases should be monitored at least twice per month during the remainder of the calendar year
+          for prompt detection of possible emergence of additional guinea worms."

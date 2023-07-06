@@ -405,7 +405,7 @@ def _data_diff(
             lines.append(f"- {dim}: {detail}")
 
     # changes in values
-    if table_a[col].dtype in ("category", "object") or _is_datetime(table_a[col].dtype):
+    if table_a[col].dtype in ("category", "object", "string") or _is_datetime(table_a[col].dtype):
         vals_a = set(table_a.loc[~eq, col].dropna())
         vals_b = set(table_b.loc[~eq, col].dropna())
         if vals_a - vals_b:

@@ -244,8 +244,6 @@ def run(dest_dir: str) -> None:
     data_table_long.metadata = TableMeta(short_name=DATASET_SHORT_NAME)
     data_table_long.metadata.title = dataset_garden_metadata.title
     data_table_long.metadata.description = dataset_garden_metadata.description
-    data_table_long.metadata.primary_key = list(data_table_long.index.names)
-    data_table_long.metadata.dataset = dataset_garden_metadata
     # Add long table to the dataset (no need to repack, since columns already have optimal dtypes).
     dataset_garden.add(data_table_long, repack=False)
 

@@ -1,0 +1,275 @@
+dataset:
+  title: Performance on Coding, Math, Language, Image Classification and Atari tasks (Papers With Code, 2023)
+  description: The goal of Papers With Code website is to compile a comprehensive collection of ML papers, code implementations, datasets, methods, and evaluation tables, all made freely available.
+  licenses:
+    - name: CC BY-SA 4.0
+      url: https://creativecommons.org/licenses/by-sa/4.0/
+  sources:
+    - name: Papers With Code (2023)
+      description: The goal of Papers With Code website is to compile a comprehensive collection of ML papers, code implementations, datasets, methods, and evaluation tables, all made freely available.
+      url: https://paperswithcode.com/
+      source_data_url: https://paperswithcode.com/
+      date_accessed: '2023-06-14'
+      publication_year: 2023
+      published_by: Papers With Code
+
+tables:
+  papers_with_code_benchmarks:
+    variables:
+      performance_code_any_competition:
+        title: Coding performance on competitions
+        unit: '%'
+        short_unit: '%'
+        description: >
+          This benchmark measures the accuracy of models in coding competitions based on the APPS benchmark. The APPS benchmark focuses on coding ability and problem-solving in a natural language context. It aims to replicate the evaluation process used for human programmers by presenting coding problems in unrestricted natural language and assessing the correctness of solutions.
+
+
+          The coding tasks included in this benchmark are sourced from open-access coding websites such as Codeforces and Kattis. These tasks span a range of difficulty levels, from introductory to collegiate competition level. The benchmark evaluates the accuracy of models in solving programming tasks specifically designed for coding competitions.
+
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+
+      performance_code_any_interview:
+        title: Coding performance on interviews
+        description: >
+          This benchmark assesses the accuracy of models in coding interviews based on the APPS benchmark. The APPS benchmark focuses on coding ability and problem-solving in a natural language context, simulating the evaluation process employed during human programmer interviews. It presents coding problems in unrestricted natural language and evaluates the correctness of solutions.
+
+
+          The coding tasks within this benchmark are sourced from open-access coding websites such as Codeforces and Kattis. These tasks cover a spectrum of difficulty levels, ranging from introductory to collegiate competition level. The benchmark measures the accuracy of models in solving programming tasks specifically tailored for coding interviews.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_humanities:
+        title: Accuracy on Humanities knowledge tests
+        description: >
+            This benchmark assesses the accuracy of models in humanities knowledge based on the MMLU benchmark.
+
+
+            The MMLU benchmark covers a wide range of 57 subjects, including STEM, humanities, social sciences, and more. It encompasses subjects of varying difficulty levels, spanning from elementary concepts to advanced professional topics. This comprehensive benchmark assesses not only world knowledge but also problem-solving abilities.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_language_average:
+        title: Average accuracy on all knowledge tests
+        description: >
+          This benchmark assesses the average accuracy of models across all subjects based on the MMLU benchmark.
+
+
+          The MMLU benchmark covers a wide range of 57 subjects, including STEM, humanities, social sciences, and more. It encompasses subjects of varying difficulty levels, spanning from elementary concepts to advanced professional topics. This comprehensive benchmark assesses not only world knowledge but also problem-solving abilities.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_math:
+        title: Performance on math and problem-solving tasks
+        description: >
+          This benchmark assesses the accuracy of models on math and problem solving tasks based on the MATH benchmark.
+
+
+          The MATH benchmark consists of 12,500 challenging competition mathematics problems. Each problem in MATH has a full step-by-step solution which can be used to teach models to generate answer derivations and explanations.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_other:
+        title: Accuracy on other knowledge tests
+        description: >
+          This benchmark assesses the average accuracy of models across subjects other than STEM, humanities, social sciences based on the MMLU benchmark.
+
+
+          The MMLU benchmark covers a wide range of 57 subjects, including STEM, humanities, social sciences, and more. It encompasses subjects of varying difficulty levels, spanning from elementary concepts to advanced professional topics. This comprehensive benchmark assesses not only world knowledge but also problem-solving abilities.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_social_sciences:
+        title: Accuracy on Social Sciences knowledge tests
+        description: >
+          This benchmark assesses the accuracy of models in social sciences knowledge based on the MMLU benchmark.
+
+
+          The MMLU benchmark covers a wide range of 57 subjects, including STEM, humanities, social sciences, and more. It encompasses subjects of varying difficulty levels, spanning from elementary concepts to advanced professional topics. This comprehensive benchmark assesses not only world knowledge but also problem-solving abilities.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_stem:
+        title: Accuracy on STEM subjects knowledge tests
+        description: >
+          This benchmark assesses the accuracy of models in STEM subjects knowledge based on the MMLU benchmark.
+
+          The MMLU benchmark covers a wide range of 57 subjects, including STEM, humanities, social sciences, and more. It encompasses subjects of varying difficulty levels, spanning from elementary concepts to advanced professional topics. This comprehensive benchmark assesses not only world knowledge but also problem-solving abilities.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_code_any_competition_improved:
+        title: Coding performance on competitions - state of the art color code
+        unit: ''
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_code_any_interview_improved:
+        title: Coding performance on interviews - state of the art color code
+        unit: ''
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_humanities_improved:
+        title: Accuracy on Humanities subjects - state of the art color code
+        unit: ''
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_language_average_improved:
+        title:  Average accuracy on all knowledge tests - state of the art color code
+        unit: ''
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_math_improved:
+        title: Performance on math and problem-solving tasks - state of the art color code
+        unit: ''
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_other_improved:
+        title: Accuracy on other knowledge tests - state of the art color code
+        unit: ''
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_social_sciences_improved:
+        title:  Accuracy on Social Sciences knowledge tests - state of the art- state of the art color code
+        unit: ''
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_stem_improved:
+        title: Accuracy on STEM subjects knowledge tests - state of the art color code
+        unit: ''
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_atari:
+        title: Average score on Atari games relative to humans (100%)
+        description:  Average performance across 57 Atari 2600 games, such as Frogger and Pac-Man. Measured relative to human performance.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      performance_atari_improved:
+        title: Average score on Atari games relative to humans - state of the art color code
+        unit: ''
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      training_data:
+        title: With/without extra training data (ImageNet)
+        unit: ''
+
+      papers_with_code_imagenet_top1:
+        title: Top-1 accuracy
+        description: >
+          The top-1 accuracy measure is used to assess how frequently a model's absolute top prediction matches the correct answer from a given set of options.  Here's an example to illustrate what this benchmark tests:
+
+
+          Imagine an image classification model that is presented with an image of an animal. The model assigns probabilities to each potential label and generates its highest-confidence prediction. For instance, when analyzing an image, the model might predict "Cat" as the most probable label. To evaluate the model's accuracy using the top-1 measure, researchers compare this prediction with the correct label. If the model's top prediction matches the correct label (e.g., if the actual animal in the image is indeed a cat), then the model's prediction is considered correct according to the top-1 accuracy metric. On the other hand, if the model's top prediction does not match the correct label (e.g., if the image shows a dog, but the model predicts a cat), then the model's prediction is considered incorrect based on the top-1 accuracy measure. To calculate the top-1 accuracy, researchers analyze the model's performance on a large dataset where the correct labels are known. They determine the percentage of examples in the dataset where the model's highest-confidence prediction matches the actual label.
+
+
+          This measure provides a focused evaluation of the model's ability to make accurate predictions by considering only its absolute top guess.
+
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      papers_with_code_imagenet_top5:
+        title: Top-5 accuracy
+        description: >
+          The top-5 accuracy measure is used to assess how frequently a model's top five predictions include the correct answer from a list of 1000 options. Here's an example to illustrate what this benchmark tests:
+
+
+          When an image classification model is presented with an image of an animal, it will assign probabilities to each possible label. Based on these probabilities, the model generates its top five predictions out of a total of 1000 animal labels. For instance, the model might output the following predictions as its top five guesses:
+          * 		Cat
+
+          * 		Dog
+
+          * 		Elephant
+
+          * 		Lion
+
+          * 		Tiger
+
+
+          Suppose the correct label for the image is "dog." If "dog" appears among the model's top five predictions, then the model's prediction is considered correct according to the top-5 accuracy metric.
+
+
+          On the other hand, if the correct label is "giraffe" and "giraffe" is not included in the model's top five predictions, then the model's prediction would be considered incorrect based on the top-5 accuracy measure.
+
+
+          To calculate the top-5 accuracy, researchers evaluate the model's performance on a large dataset with known labels. They compute the percentage of examples in the dataset where the correct label is present within the model's top five predictions out of the 1000 possible options. This measure provides a broader perspective on the model's performance by considering whether the correct answer is among its top guesses, even if it's not the model's absolute top prediction.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      papers_with_code_imagenet_top5_improved:
+        title: Top-5 accuracy - state of the art color code
+        unit: '%'
+        short_unit:  '%'
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      papers_with_code_imagenet_top1_improved:
+        title: Top-1 accuracy - state of the art color code
+        unit: '%'
+        short_unit:  '%'
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '2019-01-01'
+          yearIsDay: true

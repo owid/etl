@@ -1,0 +1,21 @@
+meta:
+  name: Certification status of dracunculiasis eradication (WHO, 2018)
+  publication_year: 2018
+  source_name: WHO (2018)
+  source_published_by: 'Certification status of dracunculiasis eradication: World
+    Health Organization; 2018. Licence: CC BY-NC-SA 3.0 IGO'
+  url: 
+    https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
+  source_data_url:
+  license_url: https://www.who.int/about/policies/publishing/copyright
+  license_name: CC BY-NC-SA 3.0 IGO
+  date_accessed: 2023-06-29
+  file_extension: csv
+  is_public: true
+  description: |
+
+wdir: ../../../data/snapshots/who/2023-06-29
+outs:
+- md5: 00fe995cf57cead2f8f435f9bab29501
+  size: 186834
+  path: guinea_worm.csv

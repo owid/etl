@@ -28,7 +28,7 @@ def load_data(tmp_dir: str) -> Tuple[pd.DataFrame, ...]:
 
 def _load_population(tmp_dir: str) -> pd.DataFrame:
     """Load population dataset (CSV)"""
-    filenames = list(filter(lambda x: "PopulationBySingleAgeSex" in x, os.listdir(tmp_dir)))
+    filenames = list(filter(lambda x: "PopulationBySingleAgeSex" in x, sorted(os.listdir(tmp_dir))))
     dtype = {
         "SortOrder": "category",
         "LocID": "category",
@@ -59,7 +59,7 @@ def _load_population(tmp_dir: str) -> pd.DataFrame:
 
 def _load_fertility(tmp_dir: str) -> pd.DataFrame:
     """Load fertility dataset (CSV)"""
-    (filename,) = [f for f in filter(lambda x: "Fertility" in x, os.listdir(tmp_dir)) if "notes" not in f]
+    (filename,) = [f for f in filter(lambda x: "Fertility" in x, sorted(os.listdir(tmp_dir))) if "notes" not in f]
     dtype = {
         "SortOrder": "category",
         "LocID": "category",
@@ -87,7 +87,7 @@ def _load_fertility(tmp_dir: str) -> pd.DataFrame:
 
 def _load_demographics(tmp_dir: str) -> pd.DataFrame:
     """Load demographics dataset (CSV)"""
-    filenames = [f for f in filter(lambda x: "Demographic" in x, os.listdir(tmp_dir)) if "notes" not in f]
+    filenames = [f for f in filter(lambda x: "Demographic" in x, sorted(os.listdir(tmp_dir))) if "notes" not in f]
     dtype = {
         "SortOrder": "category",
         "LocID": "category",
@@ -129,7 +129,7 @@ def _load_demographics(tmp_dir: str) -> pd.DataFrame:
 
 def _load_deaths(tmp_dir: str) -> Any:
     """Load deaths dataset (XLSX)"""
-    filenames = list(filter(lambda x: "DEATHS" in x, os.listdir(tmp_dir)))
+    filenames = list(filter(lambda x: "DEATHS" in x, sorted(os.listdir(tmp_dir))))
     # Load
     dfs = [_read_xlsx_file(tmp_dir, filename) for filename in filenames]
     return pd.concat(dfs, ignore_index=True)
@@ -137,7 +137,7 @@ def _load_deaths(tmp_dir: str) -> Any:
 
 def _load_dependency_ratio(tmp_dir: str) -> Any:
     """Load dependency ratio dataset (XLSX)"""
-    filenames = list(filter(lambda x: "DEPENDENCY_RATIOS" in x, os.listdir(tmp_dir)))
+    filenames = list(filter(lambda x: "DEPENDENCY_RATIOS" in x, sorted(os.listdir(tmp_dir))))
     # Load
     dfs = [_read_xlsx_file(tmp_dir, filename) for filename in filenames]
     return pd.concat(dfs, ignore_index=True)

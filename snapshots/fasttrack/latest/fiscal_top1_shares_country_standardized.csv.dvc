@@ -1,0 +1,23 @@
+meta:
+  name: DRAFT fiscal_top1_shares_country_standardized
+  description: ''
+  source:
+    name: Local CSV
+    description:
+    url: ''
+    source_data_url: 
+      gAAAAABkoy7Ww0CimrPWnSQnAfYKS1DNb882YE14PLX26Nvz9cTCSqmYQH_V_MCwkUOEJI2yFduLLJqaNRxDzyS3f68wHqS-1A==
+    owid_data_url:
+    date_accessed: '2023-07-03'
+    publication_date:
+    publication_year:
+    published_by: Local CSV
+  license:
+    name:
+    url:
+  is_public: false
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 7889d1d69bc774b99a8b57869609dbc0
+  size: 21508
+  path: fiscal_top1_shares_country_standardized.csv

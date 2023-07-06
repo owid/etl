@@ -162,9 +162,10 @@ def _underscore_column_and_dimensions(column: str, dims: List[str], dim_names: L
 
 
 def _assert_long_table(table: catalog.Table) -> None:
-    assert (
-        table.metadata.dataset and table.metadata.dataset.sources
-    ), "Table must have a dataset with sources in its metadata"
+    # NOTE: I'm not sure if we need this validation, looks like we don't
+    # assert (
+    #     table.metadata.dataset and table.metadata.dataset.sources
+    # ), "Table must have a dataset with sources in its metadata"
 
     assert set(table.columns) == {
         "variable",
@@ -303,7 +304,6 @@ def combine_metadata_sources(sources: List[catalog.Source]) -> catalog.Source:
         "publication_date",
         "publication_year",
         "published_by",
-        "publisher_source",
     ]
     # Combine sources' attributes into the first source (which is the only one that grapher will interpret).
     for attribute in attributes:

@@ -44,7 +44,11 @@ def load_key_indicators() -> Table:
 
 def make_combined(table_wdi: Table, table_population: Table) -> Table:
     # Merge
-    table = table_population.merge(table_wdi, left_index=True, right_index=True)
+    table = (
+        table_population.reset_index()
+        .merge(table_wdi.reset_index(), on=["country", "year"])
+        .set_index(["country", "year"])
+    )
 
     # Calculate new variables
     patents_per_million = table.ip_pat_resd / table.population * 1000000

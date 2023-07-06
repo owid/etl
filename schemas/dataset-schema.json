@@ -75,9 +75,6 @@
                   },
                   "published_by": {
                     "type": "string"
-                  },
-                  "publisher_source": {
-                    "type": ["string", "null"]
                   }
                 },
                 "required": [
@@ -159,9 +156,6 @@
                           },
                           "published_by": {
                             "type": "string"
-                          },
-                          "publisher_source": {
-                            "type": ["string", "null"]
                           }
                         },
                         "required": [
@@ -217,6 +211,12 @@
                       "zeroDay": {
                         "type": "string",
                         "format": "date"
+                      },
+                      "tolerance": {
+                        "type": "number"
+                      },
+                      "isProjection": {
+                        "type": "boolean"
                       }
                     }
                   }

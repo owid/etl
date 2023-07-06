@@ -4,21 +4,15 @@ from typing import cast
 
 import pandas as pd
 from owid.catalog import Table
-from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
-
-# Initialize logger.
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("{{cookiecutter.short_name}}.start")
-
     #
     # Load inputs.
     #
@@ -42,5 +36,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
-
-    log.info("{{cookiecutter.short_name}}.end")

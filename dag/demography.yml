@@ -12,6 +12,8 @@ steps:
     - data://garden/gapminder/2023-03-31/population
     - data://garden/un/2022-07-11/un_wpp
     - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2021-07-01/wb_income
   data://grapher/demography/2023-03-31/population:
     - data://garden/demography/2023-03-31/population
   ## Population by education group (Wittgenstein centre)
@@ -48,3 +50,21 @@ steps:
   ## Grapher
   data://grapher/demography/2022-11-30/life_expectancy:
     - data://garden/demography/2023-02-03/life_expectancy
+
+  # Population doubling times
+  # Garden
+  data://garden/demography/2023-07-03/population_doubling_times:
+    - data://garden/demography/2023-03-31/population
+  # Grapher
+  data://grapher/demography/2023-07-03/population_doubling_times:
+    - data://garden/demography/2023-07-03/population_doubling_times
+
+  # Population comparison
+  data://garden/demography/2023-06-27/world_population_comparison:
+    - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
+    - data://garden/demography/2023-03-31/population
+    - data://garden/hyde/2017/baseline
+    - data://garden/gapminder/2023-03-31/population
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/demography/2023-07-03/world_population_comparison:
+    - data://garden/demography/2023-06-27/world_population_comparison

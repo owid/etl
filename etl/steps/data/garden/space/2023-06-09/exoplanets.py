@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
     tb["discoverymethod"] = tb.discoverymethod.str.capitalize()
 
     # Count discoveries by year and method
-    tb = tb.groupby(["disc_year", "discoverymethod"], as_index=False).size()
+    tb = tb.groupby(["disc_year", "discoverymethod"], as_index=False).size().copy()
 
     # Pivot then melt dataset to ensure all combinations of year & method are present
     tb = (
