@@ -27,6 +27,8 @@ tables:
         short_unit: '%'
         display:
           numDecimalPlaces: 0
+          name: Artificial intelligence
+
 
       label:
         title: Gender
@@ -37,4 +39,5 @@ tables:
         short_unit: '%'
         display:
           numDecimalPlaces: 0
+          name: Computer science
 

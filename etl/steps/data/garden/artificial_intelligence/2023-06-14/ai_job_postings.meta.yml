@@ -29,6 +29,6 @@ tables:
         unit: '% from total'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
 

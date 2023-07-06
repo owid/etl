@@ -187,7 +187,7 @@ tables:
             numDecimalPlaces: 0
 
       number_of_industrial_robots_installed_2021:
-        title: Total number of industrial robots installed in the world
+        title: Total number of industrial robots installed by contry, 2021
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
@@ -195,7 +195,7 @@ tables:
           numDecimalPlaces: 0
 
       annual_count__number_of_industrial_robots_installed:
-        title: Annual number of industrial robots installed in top five countries
+        title: Annual number of industrial robots installed in the world 2011-2021
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
@@ -203,7 +203,7 @@ tables:
           numDecimalPlaces: 0
 
       new_robots_installed__number_of_industrial_robots_installed:
-        title: Total number of industrial robots installed by country in 2021
+        title: Total number of industrial robots installed in top five countries 2011-2021
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
