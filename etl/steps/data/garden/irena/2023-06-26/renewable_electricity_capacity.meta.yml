@@ -5,6 +5,8 @@ tables:
         title: Bagasse capacity
         short_unit: MW
         unit: megawatts
+        description: |
+          Bagasse is a byproduct from the process of sugar cane refining, often used as a biofuel for the production of heat, energy, and electricity.
         display:
           numDecimalPlaces: 0
       bioenergy:
