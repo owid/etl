@@ -1,4 +1,4 @@
-"""Script to create a snapshot of dataset 'Energy Institute Statistical Review of World Energy 2023'."""
+"""Script to create a snapshot of dataset 'Energy Institute Statistical Review of World Energy (2023)'."""
 
 from pathlib import Path
 
