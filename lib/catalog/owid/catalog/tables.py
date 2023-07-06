@@ -16,7 +16,6 @@ import pyarrow.parquet as pq
 import structlog
 import yaml
 from owid.repack import repack_frame
-from pandas._typing import FilePath, ReadCsvBuffer  # type: ignore
 from pandas.util._decorators import rewrite_axis_style_signature
 
 from . import variables
@@ -963,21 +962,48 @@ def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[
 
 
 def read_csv(
-    filepath_or_buffer: Union[FilePath, ReadCsvBuffer[bytes], ReadCsvBuffer[str]],
+    path: Union[str, Path],
     metadata: Optional[TableMeta] = None,
     underscore: bool = False,
     *args,
     **kwargs,
 ) -> Table:
-    table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
+    table = Table(pd.read_csv(filepath_or_buffer=path, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
-    return table
+    table = update_log(table=table, operation="load", parents=[path])
+
+    return cast(Table, table)
 
 
-def read_excel(*args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs) -> Table:
-    table = Table(pd.read_excel(*args, **kwargs), underscore=underscore)
+def read_excel(
+    path: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
+) -> Table:
+    table = Table(pd.read_excel(path, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
-    return table
+    # Note: Maybe we should include the sheet name in parents.
+    table = update_log(table=table, operation="load", parents=[path], inplace=False)
+
+    return cast(Table, table)
+
+
+class ExcelFile(pd.ExcelFile):
+    def parse(
+        self,
+        sheet_name: Union[str, int] = 0,
+        *args,
+        metadata: Optional[TableMeta] = None,
+        underscore: bool = False,
+        **kwargs,
+    ):
+        # Note: Maybe we should include the sheet name in parents.
+        df = super().parse(sheet_name=sheet_name, *args, **kwargs)  # type: ignore
+        table = Table(df, underscore=underscore, short_name=str(sheet_name))
+        if metadata is not None:
+            table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+        # Note: Maybe we should include the sheet name in parents.
+        table = update_log(table=table, operation="load", parents=[self.io], inplace=False)
+
+        return table
 
 
 def update_processing_logs_when_loading_or_creating_table(table: Table) -> Table:

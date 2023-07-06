@@ -45,6 +45,9 @@ TNAME_WB_INCOME = "wb_income_group"
 
 @functools.lru_cache
 def _load_population() -> pd.DataFrame:
+    ####################################################################################################################
+    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    ####################################################################################################################
     population = Dataset(DATASET_POPULATION)[TNAME_KEY_INDICATORS]
     population = population.reset_index()
     return cast(pd.DataFrame, population)
@@ -52,12 +55,18 @@ def _load_population() -> pd.DataFrame:
 
 @functools.lru_cache
 def _load_countries_regions() -> pd.DataFrame:
+    ####################################################################################################################
+    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    ####################################################################################################################
     countries_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"]
     return cast(pd.DataFrame, countries_regions)
 
 
 @functools.lru_cache
 def _load_income_groups() -> pd.DataFrame:
+    ####################################################################################################################
+    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    ####################################################################################################################
     income_groups = Dataset(DATASET_WB_INCOME)[TNAME_WB_INCOME]
     return cast(pd.DataFrame, income_groups)
 
@@ -72,6 +81,10 @@ def list_countries_in_region(
     income_groups: Optional[pd.DataFrame] = None,
 ) -> List[str]:
     """List countries that are members of a region.
+
+    ####################################################################################################################
+    WARNING: This function is deprecated, use list_members_of_region instead.
+    ####################################################################################################################
 
     Parameters
     ----------
@@ -592,12 +605,26 @@ def list_members_of_region(
     )
 
     if ds_income_groups is not None:
-        # Get the main table from the income groups dataset.
-        df_income = pd.DataFrame(ds_income_groups["wb_income_group"]).reset_index()
+        if "wb_income_group" in ds_income_groups.table_names:
+            # TODO: Remove this block once the old income groups dataset has been archived.
+            # Get the main table from the income groups dataset.
+            df_income = (
+                pd.DataFrame(ds_income_groups["wb_income_group"])
+                .reset_index()
+                .rename(columns={"income_group": "classification"})
+            )
+        elif "income_groups_latest" in ds_income_groups.table_names:
+            # Get the table with the current definitions of income groups.
+            df_income = ds_income_groups["income_groups_latest"].reset_index()
+        else:
+            raise KeyError(
+                "Table 'income_groups_latest' not found. "
+                "You may not be using the right version of the income groups dataset ds_income_groups."
+            )
 
         # Create a dataframe of countries in each income group.
         df_countries_in_income_group = (
-            df_income.rename(columns={"income_group": "region", "country": "members"})
+            df_income.rename(columns={"classification": "region", "country": "members"})
             .groupby("region", as_index=True, observed=True)
             .agg({"members": list})
         )
