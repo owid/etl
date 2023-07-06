@@ -273,7 +273,7 @@ def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Data
     # Copy metadata of original table.
     tb_regions.copy_metadata(from_table=tb)
 
-    return tb
+    return tb_regions
 
 
 def create_additional_variables(tb: Table) -> Table:
