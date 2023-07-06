@@ -18,7 +18,6 @@ def add_population(
     age_col: Optional[str] = None,
     age_group_mapping: Optional[Dict[str, Optional[Any]]] = None,
 ) -> pd.DataFrame:
-
     """Add population to dataframe.
 
     Currently uses population from UN WPP 2022, as this dataset contains dissagregated data by age and sex groups.
@@ -122,7 +121,7 @@ def add_population(
             df_pop.append(pop_g)
         df_pop = pd.concat(df_pop, ignore_index=True)
     else:
-        df_pop = pop.groupby(["location", "year", "sex"], as_index=False).sum().drop(columns=["age"])
+        df_pop = pop.groupby(["location", "year", "sex"], as_index=False).sum().drop(columns=["age"], errors="ignore")
 
     # Merge
     columns_input = list(df.columns)

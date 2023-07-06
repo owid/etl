@@ -45,7 +45,6 @@ def run(dest_dir: str) -> None:
 
         for var_name, df_var in var_gr:
             df_tab = add_metadata_and_prepare_for_grapher(df_var, walden_ds)
-            df_tab.metadata.dataset = dataset.metadata
 
             # NOTE: long format is quite inefficient, we're creating a table for every variable
             # converting it to wide format would be too sparse, but we could move dimensions from

@@ -24,7 +24,11 @@ def run(dest_dir: str) -> None:
     # Load Snapshot
     snap = cast(Snapshot, paths.load_dependency("ai_gender_representation.csv"))
     df = pd.read_csv(snap.path)
+    df["New AI PhD Graduates (% of Total)"] *= 100
+    df["New CS PhD Graduates (% of Total)"] *= 100
+
     tb = Table(df, short_name=paths.short_name, underscore=True)
+
     #
     # Save outputs.
     #

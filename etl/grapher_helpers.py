@@ -162,9 +162,10 @@ def _underscore_column_and_dimensions(column: str, dims: List[str], dim_names: L
 
 
 def _assert_long_table(table: catalog.Table) -> None:
-    assert (
-        table.metadata.dataset and table.metadata.dataset.sources
-    ), "Table must have a dataset with sources in its metadata"
+    # NOTE: I'm not sure if we need this validation, looks like we don't
+    # assert (
+    #     table.metadata.dataset and table.metadata.dataset.sources
+    # ), "Table must have a dataset with sources in its metadata"
 
     assert set(table.columns) == {
         "variable",

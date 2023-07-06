@@ -1,4 +1,18 @@
 steps:
+  # Artificial Intelligence (EPOCH)
+  data://meadow/artificial_intelligence/2023-06-21/epoch:
+  - snapshot://artificial_intelligence/2023-06-21/epoch.csv
+  data://garden/artificial_intelligence/2023-06-21/epoch:
+  - data://meadow/artificial_intelligence/2023-06-21/epoch
+  data://grapher/artificial_intelligence/2023-06-21/epoch:
+  - data://garden/artificial_intelligence/2023-06-21/epoch
+
+ # Artificial Intelligence (EPOCH aggregates by domain and reseach affiliation)
+  data://garden/artificial_intelligence/2023-06-21/epoch_aggregates:
+  - data://garden/artificial_intelligence/2023-06-21/epoch
+  data://grapher/artificial_intelligence/2023-06-21/epoch_aggregates:
+  - data://garden/artificial_intelligence/2023-06-21/epoch_aggregates
+
   # World Risk Poll
   data://meadow/world_risk_poll/2023-06-26/wrp_2021:
   - snapshot://world_risk_poll/2023-06-26/wrp_2021.zip
@@ -55,6 +69,8 @@ steps:
   # AI companies
   data://garden/artificial_intelligence/2023-06-14/ai_companies:
     - snapshot://artificial_intelligence/2023-06-14/ai_companies.csv
+    - snapshot://artificial_intelligence/2023-06-14/ai_companies_total.csv
+
   data://grapher/artificial_intelligence/2023-06-14/ai_companies:
     - data://garden/artificial_intelligence/2023-06-14/ai_companies
 
@@ -80,6 +96,7 @@ steps:
   # AI private investment
   data://garden/artificial_intelligence/2023-06-14/ai_private_investment:
     - snapshot://artificial_intelligence/2023-06-14/ai_private_investment.csv
+    - snapshot://artificial_intelligence/2023-06-14/ai_private_investment_total.csv
     - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/artificial_intelligence/2023-06-14/ai_private_investment:
     - data://garden/artificial_intelligence/2023-06-14/ai_private_investment
@@ -121,6 +138,14 @@ steps:
     - snapshot://artificial_intelligence/2023-06-14/ai_gender_representation.csv
   data://grapher/artificial_intelligence/2023-06-14/ai_gender_representation:
     - data://garden/artificial_intelligence/2023-06-14/ai_gender_representation
+
+  # AI national strategy
+  data://meadow/artificial_intelligence/2023-06-14/ai_national_strategy:
+  - snapshot://artificial_intelligence/2023-06-14/ai_national_strategy.csv
+  data://garden/artificial_intelligence/2023-06-14/ai_national_strategy:
+  - data://meadow/artificial_intelligence/2023-06-14/ai_national_strategy
+  data://grapher/artificial_intelligence/2023-06-14/ai_national_strategy:
+  - data://garden/artificial_intelligence/2023-06-14/ai_national_strategy
 
 
   # AI polls

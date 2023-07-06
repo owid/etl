@@ -52,16 +52,19 @@ def run(dest_dir: str) -> None:
     # Load AI corporate investment snapshot
     snap = cast(Snapshot, paths.load_dependency("ai_private_investment.csv"))
     df = pd.read_csv(snap.path)
+    df["Geographic Area"] = df["Geographic Area"].replace(
+        {"CN": "China", "US": "United States", "EU/UK": "European Union and United Kingdom", "World": "World"}
+    )
 
-    exclude_columns = ["Year", "Geographic Area"]
-    df.loc[:, ~df.columns.isin(exclude_columns)] *= 1e9
-    df["Total"] = df.loc[:, ~df.columns.isin(exclude_columns)].sum(axis=1)
-    # Calculate the yearly sum countries
-    yearly_sum = df.groupby("Year")[df.columns[2:]].sum().reset_index()
-    yearly_sum["Geographic Area"] = "Total"
-    # Add the yearly sum rows to the DataFrame
-    df = pd.concat([df, yearly_sum], ignore_index=True)
+    snap_total = cast(Snapshot, paths.load_dependency("ai_private_investment_total.csv"))
+    df_total = pd.read_csv(snap_total.path)
+    df_total.rename(
+        columns={"Total Investment (in Billions of U.S. Dollars)": "Total", "Label": "Geographic Area"}, inplace=True
+    )
+    df = pd.concat([df, df_total])
+
     df.rename(columns={"Year": "year"}, inplace=True)
+    df.loc[:, df.columns.isin(cols_to_adjust_for_infaltion)] *= 1e9
 
     # Load WDI
     ds_wdi = cast(Dataset, paths.load_dependency("wdi"))
@@ -88,7 +91,7 @@ def run(dest_dir: str) -> None:
     df_cpi_inv.drop("cpi_adj_2021", axis=1, inplace=True)
 
     df_cpi_inv.rename(columns={"Geographic Area": "country"}, inplace=True)
-    df_cpi_inv["country"] = df_cpi_inv["country"].replace("CN", "China")
+    df_cpi_inv["country"] = df_cpi_inv["country"].fillna("World")
 
     tb = Table(df_cpi_inv, short_name=paths.short_name, underscore=True)
 

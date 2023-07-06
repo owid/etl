@@ -7,12 +7,12 @@ meta:
   publication_date: '2023-03-20'
   source_name: McKinsey & Company Survey (2022) via AI Index (2023)
   source_published_by: McKinsey & Company Survey (2022) via the AI Index 2023 Annual
-    Report,” AI Index Steering Committee, Institute for Human-Centered AI, Stanford
+    Report, AI Index Steering Committee, Institute for Human-Centered AI, Stanford
     University, Stanford, CA, April 2023
   url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
   source_data_url: https://drive.google.com/uc?export=download&id=1dqEzwMBXVol7bt_ScuLdMpJ4GhGGuR7e
   file_extension: csv
-  license_url: 
+  license_url:
     https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   license_name: Public domain
   date_accessed: 2023-06-19
