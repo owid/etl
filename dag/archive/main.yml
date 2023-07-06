@@ -26,6 +26,15 @@ steps:
   data://grapher/met_office_hadley_centre/2023-01-02/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature
 
+
+  # Homicide - UNODC - to archive
+  data://meadow/homicide/2023-01-27/unodc:
+  - snapshot://homicide/2023-01-27/unodc.xlsx
+  data://garden/homicide/2023-01-27/unodc:
+  - data://meadow/homicide/2023-01-27/unodc
+  data://grapher/homicide/2023-01-27/unodc:
+  - data://garden/homicide/2023-01-27/unodc
+
   # SDG dataset assmebled from https://sdg-tracker.org/
   # This is commented now to avoid `etl.helpers.LatestVersionOfStepShouldBeActive` error
   # data://garden/sdg/latest/sdg:
