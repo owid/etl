@@ -33,7 +33,7 @@ tables:
   longitudinal_wvs:
     variables:
       great_deal_or_very_much_not_at_all_or_not_much_ratio:
-        title:  Great deal" or "Very much"/ "Not much" or "Not at all
+        title:  Great deal or Very much/ Not much or Not at all
         description: To what degree are you worried about a terrorist attack?
         unit: ''
         display:
@@ -70,7 +70,7 @@ tables:
           numDecimalPlaces: 0
 
       great_deal_or_very_much:
-        title:  Great deal" or "Very much"
+        title:  Great deal or Very much
         description: To what degree are you worried about a terrorist attack?
         unit: "%"
         short_unit: "%"
@@ -78,7 +78,7 @@ tables:
           numDecimalPlaces: 0
 
       not_at_all_or_not_much:
-        title:  "Not much" or "Not at all
+        title:  Not much or Not at all
         description: To what degree are you worried about a terrorist attack?
         unit: "%"
         short_unit: "%"
