@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     tb_meadow = ds_meadow["unodc"]
 
     df = pd.DataFrame(tb_meadow)
-
+    df = df.reset_index()
     log.info("unodc.exclude_countries")
     df = exclude_countries(df)
 

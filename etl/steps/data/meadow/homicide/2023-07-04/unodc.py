@@ -1,10 +1,9 @@
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
-from etl.steps.data.converters import convert_snapshot_metadata
 
 log = get_logger()
 
@@ -24,22 +23,14 @@ def run(dest_dir: str) -> None:
     df = clean_data(df)
 
     # reset index so the data can be saved in feather format
-    df = df.reset_index().drop(columns="index")
+    df = df.reset_index(drop=True)
 
-    # create new dataset and reuse walden metadata
-    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
-    ds.metadata.version = paths.version
-
-    # # create table with metadata from dataframe and underscore all columns
-    tb = Table(df, short_name=snap.metadata.short_name, underscore=True)
-
-    # add table to a dataset
-    ds.add(tb)
-
-    # update metadata
-    ds.update_metadata(paths.metadata_path)
-
-    # finally save the dataset
+    tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = tb.set_index(
+        ["country", "region", "subregion", "dimension", "category", "sex", "age", "year", "unit_of_measurement"],
+        verify_integrity=True,
+    )
+    ds = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
     ds.save()
 
     log.info("unodc.end")
@@ -58,6 +49,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         columns={
             "Country": "country",
             "Year": "year",
-        }
+        },
+        errors="raise",
     ).drop(columns=["Iso3_code"])
     return df
