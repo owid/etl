@@ -8,7 +8,19 @@ import json
 from collections import defaultdict
 from os.path import dirname, join, splitext
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union, cast, overload, IO
+from typing import (
+    IO,
+    Any,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 import pandas as pd
 import pyarrow
@@ -25,6 +37,9 @@ log = structlog.get_logger()
 
 SCHEMA = json.load(open(join(dirname(__file__), "schemas", "table.json")))
 METADATA_FIELDS = list(SCHEMA["properties"])
+
+# New type required for pandas reading functions.
+AnyStr = TypeVar("AnyStr", str, bytes)
 
 
 class Table(pd.DataFrame):
@@ -962,7 +977,7 @@ def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[
 
 
 def read_csv(
-    filepath_or_buffer: Union[str, Path, IO[Union[str, bytes]]],
+    filepath_or_buffer: Union[str, Path, IO[AnyStr]],
     metadata: Optional[TableMeta] = None,
     underscore: bool = False,
     *args,
@@ -979,12 +994,12 @@ def read_csv(
 
 
 def read_excel(
-    path: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
+    io: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
 ) -> Table:
-    table = Table(pd.read_excel(path, *args, **kwargs), underscore=underscore)
+    table = Table(pd.read_excel(io=io, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
     # Note: Maybe we should include the sheet name in parents.
-    table = update_log(table=table, operation="load", parents=[path], inplace=False)
+    table = update_log(table=table, operation="load", parents=[io], inplace=False)
 
     return cast(Table, table)
 
