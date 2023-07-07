@@ -17,7 +17,7 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("war_mars.start")
+    log.info("mars.start")
 
     #
     # Load inputs.
@@ -51,4 +51,4 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_meadow.save()
 
-    log.info("war_mars.end")
+    log.info("mars.end")
