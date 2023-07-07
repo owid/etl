@@ -8,7 +8,7 @@ import json
 from collections import defaultdict
 from os.path import dirname, join, splitext
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union, cast, overload
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union, cast, overload, IO
 
 import pandas as pd
 import pyarrow
@@ -962,15 +962,18 @@ def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[
 
 
 def read_csv(
-    path: Union[str, Path],
+    filepath_or_buffer: Union[str, Path, IO[Union[str, bytes]]],
     metadata: Optional[TableMeta] = None,
     underscore: bool = False,
     *args,
     **kwargs,
 ) -> Table:
-    table = Table(pd.read_csv(filepath_or_buffer=path, *args, **kwargs), underscore=underscore)
+    table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
-    table = update_log(table=table, operation="load", parents=[path])
+    if isinstance(filepath_or_buffer, (str, Path)):
+        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
+    else:
+        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_csv.")
 
     return cast(Table, table)
 
