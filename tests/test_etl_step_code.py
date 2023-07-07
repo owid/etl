@@ -11,6 +11,9 @@ def test_no_table_dataset_assignment():
 
 def iter_steps():
     for root, dirs, files in os.walk("etl/steps/data"):
+        # Exclude hidden folders (starting with "."), to avoid hidden jupyter notebook files.
+        dirs[:] = [d for d in dirs if not d.startswith(".") and os.path.isdir(os.path.join(root, d))]
+
         for filename in files:
             if filename.endswith(".py"):
                 yield os.path.join(root, filename)
