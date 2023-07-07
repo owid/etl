@@ -307,6 +307,9 @@ tables:
         unit: international-$ in 2017 prices per hour
         short_unit: $/h
         description: It is the GDP (output, multiple price benchmarks) divided by the Annual working hours per worker and the Number of people in work.
+        display:
+           name: Productivity
+           numDecimalPlaces: 1
       trade_openness:
         title: Trade openness (share of exports and imports in GDP)
         unit: "%"
