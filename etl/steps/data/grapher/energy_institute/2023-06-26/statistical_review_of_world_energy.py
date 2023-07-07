@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import copy
 from typing import cast
 
 from owid.catalog import Dataset, Table
@@ -55,25 +54,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # For visualization purposes, fill missing values with zeros in variables used in stacked area charts.
-    for column in [
-        "biofuels_consumption_twh",
-        "coal_consumption_twh",
-        "gas_consumption_twh",
-        "other_renewables_consumption_equivalent_twh",
-        "hydro_consumption_equivalent_twh",
-        "nuclear_consumption_equivalent_twh",
-        "oil_consumption_twh",
-        "solar_consumption_equivalent_twh",
-        "wind_consumption_equivalent_twh",
-    ]:
-        new_column = f"{column}_zero_filled"
-        tb[new_column] = tb[column].fillna(0)
-        # Note: The following line may not be necessary once "fillna" properly propagates metadata.
-        tb[new_column].metadata = copy.deepcopy(tb[column].metadata)
-        tb[new_column].metadata.title += " (zero filled)"
-        tb[new_column].metadata.description += " Missing values have been filled with zeros for visualization purposes."
-
     # Prepare price tables.
     tb_coal_prices = prepare_item_prices_table(tb_prices=tb_prices, item_name="coal_price")
     tb_gas_prices = prepare_item_prices_table(tb_prices=tb_prices, item_name="gas_price")
