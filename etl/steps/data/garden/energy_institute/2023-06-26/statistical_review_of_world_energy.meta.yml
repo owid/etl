@@ -485,144 +485,144 @@ tables:
       # Coal prices.
       coal_price_us_central_appalachian_spot_price_index_current_dollars_per_tonne:
         title: Coal price - US Central Appalachian coal spot price index
-        unit: 'US dollars per tonne'
-        short_unit: 'US$'
+        unit: 'current US$ per tonne'
+        short_unit: '$'
       coal_price_newcastle_thermal_coal_fob_current_dollars_per_tonne:
         title: Coal price - Newcastle Thermal Coal FOB
-        unit: 'US dollars per tonne'
-        short_unit: 'US$'
+        unit: 'current US$ per tonne'
+        short_unit: '$'
       coal_price_japan_coking_coal_import_cif_current_dollars_per_tonne:
         title: Coal price - Japan coking coal import CIF price
-        unit: 'US dollars per tonne'
-        short_unit: 'US$'
+        unit: 'current US$ per tonne'
+        short_unit: '$'
       coal_price_china_qinhuangdao_spot_current_dollars_per_tonne:
         title: Coal price - China Qinhuangdao spot price
-        unit: 'US dollars per tonne'
-        short_unit: 'US$'
+        unit: 'current US$ per tonne'
+        short_unit: '$'
       coal_price_japan_steam_spot_cif_current_dollars_per_tonne:
         title: Coal price - Japan steam spot CIF price
-        unit: 'US dollars per tonne'
-        short_unit: 'US$'
+        unit: 'current US$ per tonne'
+        short_unit: '$'
       coal_price_northwest_europe_current_dollars_per_tonne:
         title: Coal price - Northwest Europe
-        unit: 'US dollars per tonne'
-        short_unit: 'US$'
+        unit: 'current US$ per tonne'
+        short_unit: '$'
       coal_price_japan_steam_coal_import_cif_current_dollars_per_tonne:
         title: Coal price - Japan steam coal import CIF price
-        unit: 'US dollars per tonne'
-        short_unit: 'US$'
+        unit: 'current US$ per tonne'
+        short_unit: '$'
       coal_price_asian_marker_current_dollars_per_tonne:
         title: Coal price - Asian marker price
-        unit: 'US dollars per tonne'
-        short_unit: 'US$'
+        unit: 'current US$ per tonne'
+        short_unit: '$'
 
       # Gas prices.
       # gas_price_us_henry_hub_current_dollars_per_million_btu:
       #   title: Gas price - US Henry Hub
-      #   unit: 'US dollars per million BTU'
-      #   short_unit: 'US$'
+      #   unit: 'current US$ per million BTU'
+      #   short_unit: '$'
       # gas_price_netherlands_ttf_index_current_dollars_per_million_btu:
       #   title: Gas price - Netherlands TTF index (DA ICIS Heren TTF index)
-      #   unit: 'US dollars per million BTU'
-      #   short_unit: 'US$'
+      #   unit: 'current US$ per million BTU'
+      #   short_unit: '$'
       # gas_price_canada_alberta_current_dollars_per_million_btu:
       #   title: Gas price - Canada (Alberta)
-      #   unit: 'US dollars per million BTU'
-      #   short_unit: 'US$'
+      #   unit: 'current US$ per million BTU'
+      #   short_unit: '$'
       # gas_price_average_german_import_current_dollars_per_million_btu:
       #   title: Gas price - Average German import price
-      #   unit: 'US dollars per million BTU'
-      #   short_unit: 'US$'
+      #   unit: 'current US$ per million BTU'
+      #   short_unit: '$'
       # gas_price_lng_japan_cif_current_dollars_per_million_btu:
       #   title: Gas price - LNG Japan CIF
-      #   unit: 'US dollars per million BTU'
-      #   short_unit: 'US$'
+      #   unit: 'current US$ per million BTU'
+      #   short_unit: '$'
       # gas_price_uk_nbp_index_current_dollars_per_million_btu:
       #   title: Gas price - UK NBP (ICIS NBP Index)
-      #   unit: 'US dollars per million BTU'
-      #   short_unit: 'US$'
+      #   unit: 'current US$ per million BTU'
+      #   short_unit: '$'
       # gas_price_lng_japan_korea_marker_current_dollars_per_million_btu:
       #   title: Gas price - LNG Japan Korea Marker (JKM)
-      #   unit: 'US dollars per million BTU'
-      #   short_unit: 'US$'
+      #   unit: 'current US$ per million BTU'
+      #   short_unit: '$'
       gas_price_us_henry_hub_current_dollars_per_mwh:
         title: Gas price - US Henry Hub
-        unit: 'US dollars per megawatt-hour'
-        short_unit: 'US$'
+        unit: 'current US$ per megawatt-hour'
+        short_unit: '$'
       gas_price_netherlands_ttf_index_current_dollars_per_mwh:
         title: Gas price - Netherlands TTF index (DA ICIS Heren TTF index)
-        unit: 'US dollars per megawatt-hour'
-        short_unit: 'US$'
+        unit: 'current US$ per megawatt-hour'
+        short_unit: '$'
       gas_price_canada_alberta_current_dollars_per_mwh:
         title: Gas price - Canada (Alberta)
-        unit: 'US dollars per megawatt-hour'
-        short_unit: 'US$'
+        unit: 'current US$ per megawatt-hour'
+        short_unit: '$'
       gas_price_average_german_import_current_dollars_per_mwh:
         title: Gas price - Average German import price
-        unit: 'US dollars per megawatt-hour'
-        short_unit: 'US$'
+        unit: 'current US$ per megawatt-hour'
+        short_unit: '$'
       gas_price_lng_japan_cif_current_dollars_per_mwh:
         title: Gas price - LNG Japan CIF
-        unit: 'US dollars per megawatt-hour'
-        short_unit: 'US$'
+        unit: 'current US$ per megawatt-hour'
+        short_unit: '$'
       gas_price_uk_nbp_index_current_dollars_per_mwh:
         title: Gas price - UK NBP (ICIS NBP Index)
-        unit: 'US dollars per megawatt-hour'
-        short_unit: 'US$'
+        unit: 'current US$ per megawatt-hour'
+        short_unit: '$'
       gas_price_lng_japan_korea_marker_current_dollars_per_mwh:
         title: Gas price - LNG Japan Korea Marker (JKM)
-        unit: 'US dollars per megawatt-hour'
-        short_unit: 'US$'
+        unit: 'current US$ per megawatt-hour'
+        short_unit: '$'
 
       # Oil prices.
       # oil_price_crude_current_dollars_per_barrel:
-      #   title: 'Oil price - Crude prices since 1861 (current $)'
-      #   unit: 'US dollars per barrel (current $)'
-      #   short_unit: 'US$'
+      #   title: 'Oil price - Crude prices since 1861 (current US$)'
+      #   unit: 'current US$ per barrel'
+      #   short_unit: '$'
       # oil_price_crude_2022_dollars_per_barrel:
-      #   title: 'Oil price - Crude prices since 1861 (2022 $)'
-      #   unit: 'US dollars per barrel (2022 $)'
-      #   short_unit: 'US$'
+      #   title: 'Oil price - Crude prices since 1861 (constant 2022 US$)'
+      #   unit: 'constant 2022 US$ per barrel'
+      #   short_unit: '$'
       oil_price_crude_current_dollars_per_m3:
-        title: 'Oil price - Crude prices since 1861 (current $)'
-        unit: 'US dollars per cubic meter (current $)'
-        short_unit: 'US$'
+        title: 'Oil price - Crude prices since 1861 (current US$)'
+        unit: 'current US$ per cubic meter'
+        short_unit: '$'
       oil_price_crude_2022_dollars_per_m3:
-        title: 'Oil price - Crude prices since 1861 (2022 $)'
-        unit: 'US dollars per cubic meter (2022 $)'
-        short_unit: 'US$'
+        title: 'Oil price - Crude prices since 1861 (constant 2022 US$)'
+        unit: 'constant 2022 US$ per cubic meter'
+        short_unit: '$'
       # oil_spot_crude_price_brent_current_dollars_per_barrel:
       #   title: Oil spot crude price - Brent
-      #   unit: 'US dollars per barrel'
-      #   short_unit: 'US$'
+      #   unit: 'current US$ per barrel'
+      #   short_unit: '$'
       # oil_spot_crude_price_dubai_current_dollars_per_barrel:
       #   title: Oil spot crude price - Dubai
-      #   unit: 'US dollars per barrel'
-      #   short_unit: 'US$'
+      #   unit: 'current US$ per barrel'
+      #   short_unit: '$'
       # oil_spot_crude_price_nigerian_forcados_current_dollars_per_barrel:
       #   title: Oil spot crude price - Nigerian Forcados
-      #   unit: 'US dollars per barrel'
-      #   short_unit: 'US$'
+      #   unit: 'current US$ per barrel'
+      #   short_unit: '$'
       # oil_spot_crude_price_west_texas_intermediate_current_dollars_per_barrel:
       #   title: Oil spot crude price - West Texas Intermediate
-      #   unit: 'US dollars per barrel'
-      #   short_unit: 'US$'
+      #   unit: 'current US$ per barrel'
+      #   short_unit: '$'
       oil_spot_crude_price_brent_current_dollars_per_m3:
         title: Oil spot crude price - Brent
-        unit: 'US dollars per cubic meter'
-        short_unit: 'US$'
+        unit: 'current US$ per cubic meter'
+        short_unit: '$'
       oil_spot_crude_price_dubai_current_dollars_per_m3:
         title: Oil spot crude price - Dubai
-        unit: 'US dollars per cubic meter'
-        short_unit: 'US$'
+        unit: 'current US$ per cubic meter'
+        short_unit: '$'
       oil_spot_crude_price_nigerian_forcados_current_dollars_per_m3:
         title: Oil spot crude price - Nigerian Forcados
-        unit: 'US dollars per cubic meter'
-        short_unit: 'US$'
+        unit: 'current US$ per cubic meter'
+        short_unit: '$'
       oil_spot_crude_price_west_texas_intermediate_current_dollars_per_m3:
         title: Oil spot crude price - West Texas Intermediate
-        unit: 'US dollars per cubic meter'
-        short_unit: 'US$'
+        unit: 'current US$ per cubic meter'
+        short_unit: '$'
 
   statistical_review_of_world_energy_fossil_fuel_price_index:
     variables:
