@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import copy
 from typing import cast
 
 from owid.catalog import Dataset, Table
