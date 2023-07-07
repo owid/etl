@@ -254,6 +254,11 @@ REGIONS = {
 def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     tb_regions = tb.copy()
 
+    # Create region aggregates for all columns (with a simple sum) except for the column of efficiency factors.
+    aggregations = {
+        column: "sum" for column in tb_regions.columns if column not in ["country", "year", "efficiency_factor"]
+    }
+
     # Add region aggregates.
     for region in REGIONS:
         members = geo.list_members_of_region(
@@ -265,6 +270,7 @@ def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Data
         tb_regions = geo.add_region_aggregates(
             df=tb_regions,
             region=region,
+            aggregations=aggregations,
             countries_in_region=members,
             countries_that_must_have_data=[],
             num_allowed_nans_per_year=None,
