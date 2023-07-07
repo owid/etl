@@ -125,7 +125,7 @@ tables:
         description: This is the number of people working in the country (employees and self-employed).
       avh:
         title: Annual working hours per worker
-        unit: Hours per worker
+        unit: hours per worker
         description: It is the average sum of hours worked by employees and self-employed people during each year in a country.
       hc:
         title: Human capital index, based on years of schooling and returns to education
