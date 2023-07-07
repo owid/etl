@@ -58,10 +58,11 @@ def run(dest_dir: str) -> None:
 
     snap_total = cast(Snapshot, paths.load_dependency("ai_private_investment_total.csv"))
     df_total = pd.read_csv(snap_total.path)
+
     df_total.rename(
         columns={"Total Investment (in Billions of U.S. Dollars)": "Total", "Label": "Geographic Area"}, inplace=True
     )
-    df = pd.concat([df, df_total])
+    df = pd.merge(df, df_total, on=["Year", "Geographic Area"], how="outer")
 
     df.rename(columns={"Year": "year"}, inplace=True)
     df.loc[:, df.columns.isin(cols_to_adjust_for_infaltion)] *= 1e9
@@ -94,6 +95,7 @@ def run(dest_dir: str) -> None:
     df_cpi_inv["country"] = df_cpi_inv["country"].fillna("World")
 
     tb = Table(df_cpi_inv, short_name=paths.short_name, underscore=True)
+    tb.set_index(["year", "country", "focus_area"], inplace=True)
 
     #
     # Save outputs.

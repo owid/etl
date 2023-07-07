@@ -2,7 +2,6 @@
 
 from typing import cast
 
-import numpy as np
 from owid.catalog import Dataset
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
@@ -16,17 +15,16 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("ai_private_investment"))
+    ds_garden = cast(Dataset, paths.load_dependency("semiconductors_cset"))
 
     # Read table from garden dataset.
-    tb = ds_garden["ai_private_investment"]
-    tb.reset_index(inplace=True)
+    tb = ds_garden["semiconductors_cset"]
 
-    # For plotting in grapher add focus area to country and then drop focus_area column
-    tb["country"] = np.where(tb["focus_area"].notna(), tb["focus_area"], tb["country"])
-    tb.drop("focus_area", axis=1, inplace=True)
-    tb.set_index(["country", "year"], inplace=True)
+    #
+    # Process data.
+    #
 
+    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.

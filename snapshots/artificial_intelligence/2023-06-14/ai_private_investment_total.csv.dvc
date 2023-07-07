@@ -22,6 +22,6 @@ meta:
 
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
 outs:
-- md5: 6c50883d181e8d79130a6e60f5ca1424
-  size: 1436
+- md5: 3cea03c465b77b81f2c5810299e512c1
+  size: 3438
   path: ai_private_investment_total.csv
