@@ -185,3 +185,11 @@ steps:
   - data://meadow/artificial_intelligence/2023-06-08/yougov_end_of_humanity
   data://grapher/artificial_intelligence/2023-06-08/yougov_end_of_humanity:
   - data://garden/artificial_intelligence/2023-06-08/yougov_end_of_humanity
+
+ # CSET data on semiconductor supply chain
+  data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset:
+  - snapshot://artificial_intelligence/2023-07-07/semiconductors_cset.csv
+  data://garden/artificial_intelligence/2023-07-07/semiconductors_cset:
+  - data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset
+  data://grapher/artificial_intelligence/2023-07-07/semiconductors_cset:
+  - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset

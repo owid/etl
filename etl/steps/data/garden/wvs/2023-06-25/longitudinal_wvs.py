@@ -43,6 +43,7 @@ def run(dest_dir: str) -> None:
     # Merge all 3 questions
     merge_q1_q2_q3 = pd.merge(merge_q1_q2, q3, on=["country", "year"], how="outer")
     tb = Table(merge_q1_q2_q3, short_name=paths.short_name, underscore=True)
+    tb.set_index(["country", "year"], inplace=True)
 
     #
     # Save outputs.
@@ -121,7 +122,15 @@ def question_1(df):
     pivoted_df["great_deal_or_very_much_not_at_all_or_not_much_ratio"] = (
         pivoted_df["great_deal_or_very_much"] / pivoted_df["not_at_all_or_not_much"]
     )
-    pivoted_df = pivoted_df[["country", "year", "great_deal_or_very_much_not_at_all_or_not_much_ratio"]]
+    pivoted_df = pivoted_df[
+        [
+            "country",
+            "year",
+            "great_deal_or_very_much",
+            "not_at_all_or_not_much",
+            "great_deal_or_very_much_not_at_all_or_not_much_ratio",
+        ]
+    ]
 
     return pivoted_df
 
@@ -166,7 +175,7 @@ def question_2(df):
     # Compute the ratio of agree to disagree
     pivoted_df["agree_disagree"] = pivoted_df["Agree"] / pivoted_df["Disagree"]
 
-    return pivoted_df[["country", "year", "agree_disagree"]]
+    return pivoted_df[["country", "year", "Agree", "Disagree", "agree_disagree"]]
 
 
 def question_3(df):
