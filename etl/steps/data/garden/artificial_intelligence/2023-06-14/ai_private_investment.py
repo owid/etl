@@ -43,6 +43,7 @@ def run(dest_dir: str) -> None:
         "Music, Video Content",
         "VC",
         "Total",
+        "Total (focus area)",
     ]
 
     log.info("ai_private_investment.start")
