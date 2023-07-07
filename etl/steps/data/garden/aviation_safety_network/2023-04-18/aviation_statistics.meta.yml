@@ -23,45 +23,45 @@ tables:
     variables:
       accidents_per_million_flights:
         title: Fatal accidents per million commercial flights
-        short_unit:
+        short_unit: ''
         unit: accidents
       accidents_with_passenger_and_cargo_flights_including_hijacking_etc:
         title: Fatal accidents from commercial airliners
-        short_unit:
+        short_unit: ''
         unit: accidents
       departures_worldwide:
         title: Number of flight departures
-        short_unit:
+        short_unit: ''
         unit: departures
       fatalities_per_million_flights:
         title: Fatalities per million flights
-        short_unit:
+        short_unit: ''
         unit: fatalities
       fatalities_per_million_passengers:
         title: Fatalities per million passengers
-        short_unit:
+        short_unit: ''
         unit: fatalities
       fatalities_with_passenger_and_cargo_flights_including_hijacking_etc:
         title: Fatalities from commercial airliners
-        short_unit:
+        short_unit: ''
         unit: fatalities
       hijacking_fatalities:
         title: Hijacking fatalities
-        short_unit:
+        short_unit:  ''
         unit: fatalities
       hijacking_incidents:
         title: Hijacking incidents
-        short_unit:
+        short_unit: ''
         unit: incidents
       million_flights_per_accident:
         title: Million flights per fatal accident
-        short_unit:
+        short_unit: ''
         unit: million flights
       million_passengers_per_fatality:
         title: Million passengers per fatality
-        short_unit:
+        short_unit: ''
         unit: million passengers
       passengers_carried:
         title: Passengers per year
-        short_unit:
+        short_unit:  ''
         unit: passengers
