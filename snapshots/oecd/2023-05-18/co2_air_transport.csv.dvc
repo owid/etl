@@ -6,7 +6,7 @@ meta:
   publication_year: 2023
   publication_date: March 2023
   source_name: OECD
-  source_published_by: OECD (2023), Air Transport CO2 Emissions , https://stats.oecd.org/Index.aspx?DataSetCode=AIRTRANS_CO2#,
+  source_published_by: OECD (2023), Air Transport CO₂ Emissions , https://stats.oecd.org/Index.aspx?DataSetCode=AIRTRANS_CO2#,
     accessed on 18 May 2023
   url: https://stats.oecd.org/Index.aspx?DataSetCode=AIRTRANS_CO2#
   source_data_url:
@@ -16,7 +16,7 @@ meta:
   date_accessed: 2023-05-18
   is_public: true
   description: >
-    This database includes annual, quarterly and monthly information on CO2 emissions related to commercial passenger,
+    This database includes annual, quarterly and monthly information on CO₂ emissions related to commercial passenger,
     freight, and general aviation flights, on both a territory and a residence basis, for 186 countries.
 
     These CO2 emissions are estimated by the OECD, based on a consistent methodology across countries.
