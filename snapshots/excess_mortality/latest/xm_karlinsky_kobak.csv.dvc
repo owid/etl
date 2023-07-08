@@ -32,7 +32,7 @@ meta:
     source_data_url: 
       https://raw.githubusercontent.com/dkobak/excess-mortality/main/baselines-per-year.csv
     owid_data_url:
-    date_accessed: 2023-07-07
+    date_accessed: 2023-07-08
     publication_date: '2021-06-30'
     publication_year: 2021
     published_by: Karlinsky & Kobak, 2021, Tracking excess mortality across countries
@@ -44,6 +44,6 @@ meta:
   access_notes: Contains data by age.
 wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: 1ded1d252c481225cd7f40caf2c254cd
+- md5: 606a4477dfc676f803056a9543e23669
   size: 379570
   path: xm_karlinsky_kobak.csv
