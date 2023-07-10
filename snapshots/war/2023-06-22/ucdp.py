@@ -33,6 +33,7 @@ def main(upload: bool) -> None:
         f"war/{SNAPSHOT_VERSION}/ucdp.battle_related_conflict.zip",
         f"war/{SNAPSHOT_VERSION}/ucdp.battle_related_dyadic.zip",
         f"war/{SNAPSHOT_VERSION}/ucdp.geo.zip",
+        f"war/{SNAPSHOT_VERSION}/ucdp.prio_armed_conflict.zip",
     ]
     for path in snapshot_paths:
         snap = Snapshot(path)
