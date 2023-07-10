@@ -33,6 +33,7 @@ steps:
     - snapshot://war/2023-06-22/ucdp.battle_related_conflict.zip
     - snapshot://war/2023-06-22/ucdp.battle_related_dyadic.zip
     - snapshot://war/2023-06-22/ucdp.geo.zip
+    - snapshot://war/2023-06-22/ucdp.prio_armed_conflict.zip
   data://meadow/war/2023-06-09/war_mars:
     - snapshot://war/2023-06-09/war_mars.xls
   data://meadow/war/2023-06-09/cow_mid:
