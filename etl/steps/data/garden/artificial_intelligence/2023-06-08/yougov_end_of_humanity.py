@@ -57,7 +57,7 @@ def run(dest_dir: str) -> None:
     pivot_df_all_age_groups["age_group"] = "All adults"
 
     merged = pd.concat([pivot_df_all_age_groups, df])
-    merged.reset_index(inplace=True)
+    merged.reset_index(drop=True, inplace=True)
     tb_garden = Table(merged, short_name=paths.short_name, underscore=True)
     tb_garden.set_index(["options", "age_group"], inplace=True)
 
@@ -94,8 +94,9 @@ def reshape_survey_data(df):
     )
 
     # Extract 'Age Group' and the rest of the string 'Topic'
-    melted_df["age_group"] = melted_df["melted_columns"].apply(lambda x: re.search(r"\d{2}", x).group())
-    melted_df["cause"] = melted_df["melted_columns"].apply(lambda x: re.search(r"\D+$", x).group())
+
+    melted_df["age_group"] = melted_df["melted_columns"].apply(extract_age_group)
+    melted_df["cause"] = melted_df["melted_columns"].apply(exctrac_cause_group)
 
     # Define a dictionary with the values to replace and their new values
     replacements = {
@@ -138,3 +139,19 @@ def reshape_survey_data(df):
 
     # Return the reshaped DataFrame
     return pivot_df
+
+
+def extract_age_group(text):
+    match = re.search(r"\d{2}", text)
+    if match:
+        return match.group()
+    else:
+        return None
+
+
+def exctrac_cause_group(text):
+    match = re.search(r"\D+$", text)
+    if match:
+        return match.group()
+    else:
+        return None
