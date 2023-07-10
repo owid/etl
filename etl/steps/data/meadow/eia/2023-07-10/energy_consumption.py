@@ -110,11 +110,11 @@ def run(dest_dir: str) -> None:
     )
 
     # Create a table with no metadata.
-    tb = Table(df, metadata=snap.metadata, underscore=True)
+    tb = Table(df, metadata=snap.to_table_metadata(), underscore=True)
 
     # Add sources and licenses to the main variable of the long-format table.
-    tb["values"].metadata.sources = snap.metadata.source
-    tb["values"].metadata.licenses = snap.metadata.license
+    tb["values"].metadata.sources = [snap.metadata.source]
+    tb["values"].metadata.licenses = [snap.metadata.license]
 
     #
     # Save outputs.
