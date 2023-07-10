@@ -113,13 +113,6 @@ steps:
   data://grapher/energy/2023-06-01/global_primary_energy:
     - data://garden/energy/2023-06-01/global_primary_energy
   #
-  # BP - Fossil fuel reserves/production ratio (2022).
-  #
-  data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-12-28/statistical_review
-  data://grapher/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio
-  #
   # UK BEIS - UK historical electricity (2022).
   #
   data://meadow/uk_beis/2022-07-28/uk_historical_electricity:
@@ -202,6 +195,13 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
   data://grapher/energy_institute/2023-06-26/statistical_review_of_world_energy:
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
+  #
+  # Energy - Fossil fuel reserves/production ratio (2023).
+  #
+  data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
+  data://grapher/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -239,4 +239,12 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/bp/2022-12-28/statistical_review:
     - data://garden/bp/2022-12-28/statistical_review
+  #
+  # BP - Fossil fuel reserves/production ratio (2022).
+  #
+  data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
+    - data://garden/bp/2022-12-28/statistical_review
+  data://grapher/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
+    - data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio
+
   ######################################################################################################################
