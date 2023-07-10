@@ -169,15 +169,15 @@ def add_conflict_type(tb_geo: Table, tb_conflict: Table) -> Table:
        - intrastate
        - internationalized intrastate
     """
-    tb_conflict_relevant = tb_conflict[["conflict_id", "year", "type_of_conflict"]].drop_duplicates()
+    tb_conflict = tb_conflict[["conflict_id", "year", "type_of_conflict"]].drop_duplicates()
     assert (
-        tb_conflict_relevant.groupby(["conflict_id", "year"]).size().max() == 1
+        tb_conflict.groupby(["conflict_id", "year"]).size().max() == 1
     ), "Some conflict_id-year pairs are duplicated!"
 
     # Add `type_of_conflict` to `tb_geo`.
     # This column contains the type of state-based conflict (1: inter-state, 2: intra-state, 3: extra-state, 4: internationalized intrastate)
     tb_geo = tb_geo.merge(
-        tb_conflict_relevant, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
+        tb_conflict, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
     )
     # Fill unknown types of violence
     msk = tb_geo["type_of_violence"] == 1
