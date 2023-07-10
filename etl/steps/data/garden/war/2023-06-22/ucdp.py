@@ -14,6 +14,27 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Mapping for Geo-referenced datase
+TYPE_OF_VIOLENCE_MAPPING = {
+    2: "non-state conflict",
+    3: "one-sided violence",
+}
+# Mapping for armed conflicts dataset (inc PRIO/UCDP)
+TYPE_OF_CONFLICT_MAPPING = {
+    1: "extrasystemic",
+    2: "interstate",
+    3: "intrastate",
+    4: "internationalized intrastate",
+}
+# Regions mapping (for PRIO/UCDP dataset)
+REGIONS_MAPPING = {
+    1: "Europe",
+    2: "Middle East",
+    3: "Asia",
+    4: "Africa",
+    5: "Americas",
+}
+
 
 def run(dest_dir: str) -> None:
     log.info("war_ucdp.start")
@@ -33,17 +54,24 @@ def run(dest_dir: str) -> None:
     # Load relevant tables
     tb_geo = ds_meadow["geo"]
     tb_conflict = ds_meadow["battle_related_conflict"]
+    tb_prio = ds_meadow["prio_armed_conflict"]
 
     # Create `conflict_type` column
     log.info("ucdp: add field `conflict_type`")
     tb_geo = tb_geo[tb_geo["active_year"] == 1]
     tb = add_conflict_type(tb_geo, tb_conflict)
+
     # Add `year_start`, which denotes the year when the conflict corresponding to the event started (only considering events with `active_year` == 1)
     log.info("ucdp: add conflict year start to each event")
     tb = add_year_start(tb)
 
     # Add number of new conflicts and ongoing conflicts
     tb = add_number_conflicts_and_deaths(tb)
+
+    # Add table from UCDP/PRIO
+    log.info("ucdp: add data from ucdp/prio table")
+    tb = add_prio_data(tb, tb_prio)
+
     # Add data for World
     log.info("ucdp: add data for World")
     tb = add_world(tb)
@@ -56,7 +84,10 @@ def run(dest_dir: str) -> None:
     tb = add_conflict_all_intrastate(tb)
 
     # Filter datapoints in 1989 for `number_new_conflicts`
-    tb.loc[tb["year"] == 1989, "number_new_conflicts"] = np.nan
+    tb.loc[
+        (tb["year"] == 1989) & (tb["conflict_type"].isin(list(TYPE_OF_VIOLENCE_MAPPING.values()) + ["all"])),
+        "number_new_conflicts",
+    ] = np.nan
 
     # Force types
     # tb = tb.astype({"conflict_type": "category", "region": "category"})
@@ -189,25 +220,19 @@ def add_conflict_type(tb_geo: Table, tb_conflict: Table) -> Table:
     ), "Could not find the type of conflict for some state-based conflicts!"
 
     # Create `conflict_type` column as a combination of `type_of_violence` and `type_of_conflict`.
-    type_of_violence_mapping = {
-        2: "non-state conflict",
-        3: "one-sided violence",
-    }
-    type_of_conflict_mapping = {
-        1: "extrasystemic",
-        2: "interstate",
-        3: "intrastate",
-        4: "internationalized intrastate",
-    }
     tb_geo["conflict_type"] = (
         tb_geo["type_of_conflict"]
-        .replace(type_of_conflict_mapping)
-        .fillna(tb_geo["type_of_violence"].replace(type_of_violence_mapping))
+        .replace(TYPE_OF_CONFLICT_MAPPING)
+        .fillna(tb_geo["type_of_violence"].replace(TYPE_OF_VIOLENCE_MAPPING))
     )
 
     # Sanity check
     assert tb_geo["conflict_type"].isna().sum() == 0, "Check NaNs in conflict_type (i.e. conflicts without a type)!"
     return tb_geo
+
+
+def add_prio_table(tb: Table, tb_prio: Table):
+    return tb
 
 
 def add_year_start(tb: Table) -> Table:
@@ -259,6 +284,76 @@ def _add_number_new_conflicts(tb: Table) -> Table:
     return tb_new
 
 
+def add_prio_data(tb: Table, tb_prio: Table) -> Table:
+    """Combine main table with data from UCDP/PRIO.
+
+    UCDP/PRIO table provides estimates for dates earlier then 1989.
+
+    It only includes state-based conflicts!
+    """
+    # Prepare and adapt table from UCDP/PRIO
+    tb_prio = _prepare_prio_table(tb_prio)
+    tb_prio = _prio_add_metrics(tb_prio)
+
+    # Combine main table with UCDP/PRIO
+    tb = pd.concat([tb, tb_prio], ignore_index=True)
+
+    return tb
+
+
+def _prepare_prio_table(tb: Table) -> Table:
+    # Select relevant columns
+    tb = tb[["conflict_id", "year", "region", "type_of_conflict", "start_date"]]
+
+    # Flatten (some entries have multiple regions, e.g. `1, 2`). This should be flattened to multiple rows.
+    # https://stackoverflow.com/a/42168328/5056599
+    tb["region"] = tb["region"].str.split(", ")
+    cols = tb.columns[tb.columns != "region"].tolist()
+    tb = tb[cols].join(tb["region"].apply(pd.Series))
+    tb = tb.set_index(cols).stack().reset_index()
+    tb = tb.drop(tb.columns[-2], axis=1).rename(columns={0: "region"})
+    tb["region"] = tb["region"].astype(int)
+
+    # Obtain start year of the conflict
+    tb["year_start"] = pd.to_datetime(tb["start_date"]).dt.year
+
+    # Rename regions
+    tb["region"] = tb["region"].map(REGIONS_MAPPING)
+
+    # Create conflict_type
+    tb["conflict_type"] = tb["type_of_conflict"].map(TYPE_OF_CONFLICT_MAPPING)
+
+    # Checks
+    assert tb["conflict_type"].isna().sum() == 0, "Some unknown conflict type ids were found!"
+    assert tb["region"].isna().sum() == 0, "Some unknown region ids were found!"
+
+    return tb
+
+
+def _prio_add_metrics(tb: Table) -> Table:
+    # Get number of ongoing conflicts
+    cols_idx = ["year", "region", "conflict_type"]
+    tb_ongoing = tb.groupby(cols_idx, as_index=False)["conflict_id"].nunique()
+    tb_ongoing.columns = cols_idx + ["number_ongoing_conflicts"]
+    # Keep only until 1989
+    tb_ongoing = tb_ongoing[tb_ongoing["year"] < 1989]
+
+    # Get number of ongoing conflicts
+    cols_idx = ["year_start", "region", "conflict_type"]
+    tb_new = tb.groupby(cols_idx, as_index=False)["conflict_id"].nunique()
+    tb_new.columns = cols_idx + ["number_new_conflicts"]
+    # Keep only until 1989 (inc)
+    tb_new = tb_new[tb_new["year_start"] <= 1989]
+
+    # Combine and build single table
+    tb = tb_ongoing.merge(
+        tb_new, left_on=["year", "region", "conflict_type"], right_on=["year_start", "region", "conflict_type"]
+    )
+    tb = tb.drop(columns=["year_start"])
+
+    return tb
+
+
 def add_world(tb: Table) -> Table:
     """Add metrics for country = 'World'."""
     tb_world = tb.groupby(["year", "conflict_type"], as_index=False)[
@@ -276,7 +371,10 @@ def add_world(tb: Table) -> Table:
 
 
 def add_conflict_all(tb: Table) -> Table:
-    """Add metrics for conflict_type = 'all'."""
+    """Add metrics for conflict_type = 'all'.
+
+    Note that this should only be added for years after 1989, since prior to that year we are missing data on 'one-sided' and 'non-state'.
+    """
     tb_all = tb.groupby(["year", "region"], as_index=False)[
         [
             "number_deaths_ongoing_conflicts",
@@ -287,6 +385,7 @@ def add_conflict_all(tb: Table) -> Table:
         ]
     ].sum()
     tb_all["conflict_type"] = "all"
+    tb_all = tb_all[tb_all["year"] >= 1989]
     tb = pd.concat([tb, tb_all], ignore_index=True)
     return tb
 
