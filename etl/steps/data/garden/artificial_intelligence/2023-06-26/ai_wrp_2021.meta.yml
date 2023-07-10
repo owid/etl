@@ -35,7 +35,11 @@ tables:
            numDecimalPlaces: 1
 
       mostly_help:
+<<<<<<< HEAD
         title: Help
+=======
+        title: Help versus harm
+>>>>>>> b9122963f (changed to percentages of yes or help rather than ratios)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
         unit:  "%"
         short_unit: "%"
@@ -600,7 +604,11 @@ tables:
           numDecimalPlaces: 1
 
       eastern_europe_mostly_help:
+<<<<<<< HEAD
         title: Help  (Eastern Europe)
+=======
+        title: Help versus harm (Eastern Europe)
+>>>>>>> b9122963f (changed to percentages of yes or help rather than ratios)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Eastern Europe.
         unit:  "%"
         short_unit: "%"
@@ -609,7 +617,11 @@ tables:
           numDecimalPlaces: 1
 
       latin_america__and__caribbean_mostly_help:
+<<<<<<< HEAD
         title: Help  (Latin America & Caribbean)
+=======
+        title: Help versus harm (Latin America & Caribbean)
+>>>>>>> b9122963f (changed to percentages of yes or help rather than ratios)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Latin America & Caribbean.
         unit:  "%"
         short_unit: "%"
@@ -618,7 +630,11 @@ tables:
           numDecimalPlaces: 1
 
       middle_east_mostly_help:
+<<<<<<< HEAD
         title: Help  (Middle East)
+=======
+        title: Help versus harm (Middle East)
+>>>>>>> b9122963f (changed to percentages of yes or help rather than ratios)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from the Middle East.
         unit:  "%"
         short_unit: "%"
@@ -627,7 +643,11 @@ tables:
           numDecimalPlaces: 1
 
       north_africa_mostly_help:
+<<<<<<< HEAD
         title: Help  (North Africa)
+=======
+        title: Help versus harm (North Africa)
+>>>>>>> b9122963f (changed to percentages of yes or help rather than ratios)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from North Africa.
         unit:  "%"
         short_unit: "%"
