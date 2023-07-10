@@ -1,7 +1,7 @@
 meta:
   origin:
-    producer: Multiple datasets compiled by Aono (2021)
-    dataset_title_owid: Peak Cherry Tree Blossom at Kyoto City (2022)
+    producer: Yasuyuki Aono
+    dataset_title_owid: Peak Cherry Tree Blossom at Kyoto City
     dataset_url_main: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
     dataset_description_owid: |-
       Multiple sources compiled by Aono (2021):

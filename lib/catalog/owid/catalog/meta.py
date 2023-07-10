@@ -79,7 +79,7 @@ class Source:
 @dataclass_json
 @dataclass
 class Origin:
-    # Original title from the source
+    # Dataset title written by OWID (without a year)
     dataset_title_owid: Optional[str] = None
     # Our description of the dataset
     dataset_description_owid: Optional[str] = None
@@ -93,9 +93,9 @@ class Origin:
     dataset_url_main: Optional[str] = None
     # Direct URL to download the dataset
     dataset_url_download: Optional[str] = None
-    # The URL of the dataset on our website
+    # Date when the dataset was accessed
     date_accessed: Optional[str] = None
-    # Either date or year of publication
+    # Publication date or, if the exact date is not known, publication year
     date_published: Optional[YearDateLatest] = None
 
     def __post_init__(self):

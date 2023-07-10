@@ -1,6 +1,6 @@
 meta:
   origin:
-    dataset_title_owid: Maddison Project Database (GGDC, 2020)
+    dataset_title_owid: Maddison Project Database (GGDC)
     dataset_description_owid: |
       The Maddison Project Database is based on the work of many researchers that have produced estimates of
       economic growth for individual countries. The full list of sources for this historical data is given for each country below.
@@ -221,7 +221,7 @@ meta:
 
       South Africa
       1700–1900 (Cape Colony)	Fourie, J. and Van Zanden, J.L. (2013). GDP in the Dutch Cape Colony: the Nationals Accounts of a Slave-Based Society, South African Journal of Economics, vol. 81 (4): 467 - 490
-    producer: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
+    producer: Bolt and van Zanden
     citation_producer: Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update“.
     dataset_url_main: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020
     dataset_url_download: https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx
