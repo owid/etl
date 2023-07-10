@@ -1,0 +1,30 @@
+meta:
+  name: 'World Bank Education Statistics: Learning Outcomes'
+  publication_year: 2018
+  source_name: OECD and World Bank EdStats (2023)
+  source_published_by: 'World Bank Education Statistics: Learning Outcomes, OECD and
+    World Bank EdStats (2023)'
+  url: https://databank.worldbank.org/source/education-statistics:-learning-outcomes#
+  source_data_url:
+  license_url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+  license_name: Creative Commons Attribution 4.0
+  date_accessed: 2023-07-10
+  is_public: true
+  description: >
+    PISA dataset includes data on the educational attainment of 15-year-olds and their
+    ability to use their reading, mathematics and science knowledge and skills to
+    meet real-life challenges.
+
+
+    The Harmonized Learning Outcomes (HLO) database addresses the need for globally
+    comparable learning metrics to track human capital formation. While international
+    achievement tests are mainly administered in high-income countries, limiting insights
+    into low- and middle-income nations, the HLO database fills this gap. It provides
+    a comprehensive and regularly updated dataset covering 164 countries from 2000
+    to 2017. The dataset encompasses 98% of the global population, with a focus on
+    developing economies, which make up two-thirds of the included countries.
+wdir: ../../../data/snapshots/worldbank_education/2023-07-10
+outs:
+- md5: 5e9471283678b0876cbe78f212721a7e
+  size: 1191564
+  path: worldbank_pisa.csv
