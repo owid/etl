@@ -305,17 +305,23 @@ for k in VariableMeta.__dataclass_fields__:
 
 def _combine_variable_units_or_short_units(variables: List[Variable], operation, unit_or_short_unit) -> Optional[str]:
     # Gather units (or short units) of all variables.
-    units_or_short_units = pd.unique([getattr(variable.metadata, unit_or_short_unit) for variable in variables])
+    units_or_short_units = pd.unique(
+        [
+            getattr(variable.metadata, unit_or_short_unit)
+            for variable in variables
+            if getattr(variable.metadata, unit_or_short_unit) is not None
+        ]
+    )
     # Initialise the unit (or short unit) of the output variable.
     unit_or_short_unit_combined = None
-    if operation in ["+", "-", "melt", "pivot", "concat"]:
-        # If units (or short units) do not coincide among all variables, raise a warning and assign None.
-        if len(units_or_short_units) != 1:
-            log.warning(f"Different values of '{unit_or_short_unit}' detected among variables: {units_or_short_units}")
-            unit_or_short_unit_combined = None
-        else:
-            # Otherwise, assign the common unit.
+    if operation in ["+", "-", "melt", "pivot", "concat", "fillna"]:
+        if len(units_or_short_units) == 1:
+            # If (short) units coincide among all variables, assign the common unit.
             unit_or_short_unit_combined = units_or_short_units[0]
+        elif len(units_or_short_units) > 1:
+            # If there are multiple (short) units among variables, raise a warning (and keep combined unit as None).
+            log.warning(f"Different values of '{unit_or_short_unit}' detected among variables: {units_or_short_units}")
+        # In any other case, none of the variables have units, therefore keep combined unit as None.
 
     return unit_or_short_unit_combined
 
