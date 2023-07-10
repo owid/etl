@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
 
     # Creating a list of columns not to melt
 
-    # Applying the function for 'yes_no_ratio' and 'help_harm_ratio'
+    # Applying the function for 'yes__would_feel_safe_value' and 'mostly_help'
     melted_yes_no = melt_and_clean(df, "yes__would_feel_safe").dropna(subset=["yes__would_feel_safe_value"])
     melted_yes_no.reset_index(inplace=True, drop=True)
     melted_help_harm = melt_and_clean(df, "mostly_help").dropna(subset=["mostly_help_value"])
