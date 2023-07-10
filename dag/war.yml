@@ -32,7 +32,7 @@ steps:
     - snapshot://war/2023-03-14/ucdp.non_state.zip
     - snapshot://war/2023-03-14/ucdp.battle_related_conflict.zip
     - snapshot://war/2023-03-14/ucdp.battle_related_dyadic.zip
-  data://meadow/war/2023-06-09/war_mars:
+  data://meadow/war/2023-06-09/mars:
     - snapshot://war/2023-06-09/war_mars.xls
   data://meadow/war/2023-06-09/cow_mid:
     - snapshot://war/2023-06-09/cow_mid.zip
@@ -51,3 +51,5 @@ steps:
     - data://meadow/war/2023-01-10/sorokin_1937
   data://garden/war/2023-01-18/sutton_1971:
     - data://meadow/war/2023-01-10/sutton_1971
+  data://garden/war/2023-07-07/mars:
+    - data://meadow/war/2023-06-09/mars
