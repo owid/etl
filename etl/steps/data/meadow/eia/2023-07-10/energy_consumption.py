@@ -109,8 +109,9 @@ def run(dest_dir: str) -> None:
         raw_data=data_raw, variable_name=VARIABLE_NAME, unit_name=UNIT_NAME, data_time_interval=DATE_TIME_INTERVAL
     )
 
-    # Create a table with no metadata.
+    # Create a table with metadata from snapshot (and update its short name).
     tb = Table(df, metadata=snap.to_table_metadata(), underscore=True)
+    tb.metadata.short_name = paths.short_name
 
     # Add sources and licenses to the main variable of the long-format table.
     tb["values"].metadata.sources = [snap.metadata.source]

@@ -26,25 +26,6 @@ steps:
   data://grapher/energy/2023-06-01/fossil_fuel_production:
     - data://garden/energy/2023-06-01/fossil_fuel_production
   #
-  # EIA - Energy consumption 2022.
-  #
-  data://meadow/eia/2022-07-27/energy_consumption:
-    - walden://eia/2022-07-27/international_energy_data
-  data://garden/eia/2022-07-27/energy_consumption:
-    - data://meadow/eia/2022-07-27/energy_consumption
-    - data://garden/owid/latest/key_indicators
-    - data://garden/regions/2023-01-01/regions
-  #
-  # Energy - Primary energy consumption 2023.
-  #
-  data://garden/energy/2023-06-01/primary_energy_consumption:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/eia/2022-07-27/energy_consumption
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/demography/2023-03-31/population
-  data://grapher/energy/2023-06-01/primary_energy_consumption:
-    - data://garden/energy/2023-06-01/primary_energy_consumption
-  #
   # Ember - Yearly electricity data 2023.
   #
   data://meadow/ember/2023-06-01/yearly_electricity:
@@ -202,6 +183,25 @@ steps:
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
   data://grapher/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
     - data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio
+  #
+  # EIA - Energy consumption 2023.
+  #
+  data://meadow/eia/2023-07-10/energy_consumption:
+    - snapshot://eia/2023-07-10/international_energy_data.zip
+  data://garden/eia/2023-07-10/energy_consumption:
+    - data://meadow/eia/2023-07-10/energy_consumption
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Energy - Primary energy consumption 2023.
+  #
+  data://garden/energy/2023-07-10/primary_energy_consumption:
+    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
+    - data://garden/eia/2023-07-10/energy_consumption
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/demography/2023-03-31/population
+  data://grapher/energy/2023-07-10/primary_energy_consumption:
+    - data://garden/energy/2023-07-10/primary_energy_consumption
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -246,5 +246,24 @@ steps:
     - data://garden/bp/2022-12-28/statistical_review
   data://grapher/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
     - data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio
+  #
+  # Energy - Primary energy consumption 2023.
+  #
+  data://garden/energy/2023-06-01/primary_energy_consumption:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/eia/2022-07-27/energy_consumption
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/demography/2023-03-31/population
+  data://grapher/energy/2023-06-01/primary_energy_consumption:
+    - data://garden/energy/2023-06-01/primary_energy_consumption
+  #
+  # EIA - Energy consumption 2022.
+  #
+  data://meadow/eia/2022-07-27/energy_consumption:
+    - walden://eia/2022-07-27/international_energy_data
+  data://garden/eia/2022-07-27/energy_consumption:
+    - data://meadow/eia/2022-07-27/energy_consumption
+    - data://garden/owid/latest/key_indicators
+    - data://garden/regions/2023-01-01/regions
 
   ######################################################################################################################
