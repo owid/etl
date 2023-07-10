@@ -26,7 +26,7 @@ dataset:
 tables:
  ai_wrp_2021_grouped:
   variables:
-    age_help_harm_ratio:
+    age_mostly_help:
       title: Age - Help Harm Ratio
       description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents grouped by age.
       unit: ratio
@@ -35,7 +35,7 @@ tables:
        numDecimalPlaces: 1
 
 
-    education_help_harm_ratio:
+    education_mostly_help:
       title: Education - Help Harm Ratio
       description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents grouped by education level.
       unit: ratio
@@ -44,7 +44,7 @@ tables:
        numDecimalPlaces: 1
 
 
-    employment_help_harm_ratio:
+    employment_mostly_help:
       title: Employment - Help Harm Ratio
       description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents grouped by employment status.
       unit: ratio
@@ -52,7 +52,7 @@ tables:
         name: Employment
         numDecimalPlaces: 1
 
-    gender_help_harm_ratio:
+    gender_mostly_help:
       title: Gender - Help Harm Ratio
       description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents grouped by gender.
       unit: ratio
@@ -61,7 +61,7 @@ tables:
         numDecimalPlaces: 1
 
 
-    income_help_harm_ratio:
+    income_mostly_help:
       title: Income - Help Harm Ratio
       description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents grouped by income level.
       unit: ratio
@@ -70,7 +70,7 @@ tables:
         numDecimalPlaces: 1
 
 
-    region_help_harm_ratio:
+    region_mostly_help:
       title: Region - Help Harm Ratio
       description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents grouped by region.
       unit: ratio
@@ -79,7 +79,7 @@ tables:
         numDecimalPlaces: 1
 
 
-    age_yes_no_ratio:
+    age_yes__would_feel_safe:
       title: Age - Yes No Ratio
       description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?" Answers by respondents grouped by age.
       unit: ratio
@@ -88,7 +88,7 @@ tables:
         numDecimalPlaces: 1
 
 
-    education_yes_no_ratio:
+    education_yes__would_feel_safe:
       title: Education - Yes No Ratio
       description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?" Answers by respondents grouped by education level.
       unit: ratio
@@ -97,7 +97,7 @@ tables:
         numDecimalPlaces: 1
 
 
-    employment_yes_no_ratio:
+    employment_yes__would_feel_safe:
       title: Employment - Yes No Ratio
       description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?" Answers by respondents grouped by employment status.
       unit: ratio
@@ -106,7 +106,7 @@ tables:
         numDecimalPlaces: 1
 
 
-    gender_yes_no_ratio:
+    gender_yes__would_feel_safe:
       title: Gender - Yes No Ratio
       description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?" Answers by respondents grouped by gender.
       unit: ratio
@@ -115,7 +115,7 @@ tables:
         numDecimalPlaces: 1
 
 
-    income_yes_no_ratio:
+    income_yes__would_feel_safe:
       title: Income - Yes No Ratio
       description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?" Answers by respondents grouped by income level.
       unit: ratio
@@ -124,7 +124,7 @@ tables:
         numDecimalPlaces: 1
 
 
-    region_yes_no_ratio:
+    region_yes__would_feel_safe:
       title: Region - Yes No Ratio
       description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?" Answers by respondents grouped by region.
       unit: ratio
