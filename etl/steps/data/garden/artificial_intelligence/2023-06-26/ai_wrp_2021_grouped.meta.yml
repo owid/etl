@@ -32,7 +32,7 @@ tables:
       unit: ratio
       display:
        name: Age
-       numDecimalPlaces: 1
+       numDecimalPlaces: 0
 
 
     education_mostly_help:
@@ -41,7 +41,7 @@ tables:
       unit: ratio
       display:
        name: Education
-       numDecimalPlaces: 1
+       numDecimalPlaces: 0
 
 
     employment_mostly_help:
@@ -50,7 +50,7 @@ tables:
       unit: ratio
       display:
         name: Employment
-        numDecimalPlaces: 1
+        numDecimalPlaces: 0
 
     gender_mostly_help:
       title: Gender - Help
@@ -58,7 +58,7 @@ tables:
       unit: ratio
       display:
         name: Gender
-        numDecimalPlaces: 1
+        numDecimalPlaces: 0
 
 
     income_mostly_help:
@@ -67,7 +67,7 @@ tables:
       unit: ratio
       display:
         name: Income
-        numDecimalPlaces: 1
+        numDecimalPlaces: 0
 
 
     region_mostly_help:
@@ -76,7 +76,7 @@ tables:
       unit: ratio
       display:
         name: Region
-        numDecimalPlaces: 1
+        numDecimalPlaces: 0
 
 
     age_yes__would_feel_safe:
@@ -85,7 +85,7 @@ tables:
       unit: ratio
       display:
         name: Age
-        numDecimalPlaces: 1
+        numDecimalPlaces: 0
 
 
     education_yes__would_feel_safe:
@@ -94,7 +94,7 @@ tables:
       unit: ratio
       display:
         name: Education
-        numDecimalPlaces: 1
+        numDecimalPlaces: 0
 
 
     employment_yes__would_feel_safe:
@@ -103,7 +103,7 @@ tables:
       unit: ratio
       display:
         name: Employment
-        numDecimalPlaces: 1
+        numDecimalPlaces: 0
 
 
     gender_yes__would_feel_safe:
@@ -112,7 +112,7 @@ tables:
       unit: ratio
       display:
         name: Gender
-        numDecimalPlaces: 1
+        numDecimalPlaces: 0
 
 
     income_yes__would_feel_safe:
@@ -121,7 +121,7 @@ tables:
       unit: ratio
       display:
         name: Income
-        numDecimalPlaces: 1
+        numDecimalPlaces: 0
 
 
     region_yes__would_feel_safe:
@@ -130,4 +130,4 @@ tables:
       unit: ratio
       display:
         name: Region
-        numDecimalPlaces: 1
+        numDecimalPlaces: 0
