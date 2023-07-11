@@ -9,15 +9,6 @@ steps:
   data://grapher/bp/2023-02-20/energy_mix:
     - data://garden/bp/2023-02-20/energy_mix
   #
-  # Energy - Fossil Fuel Production 2023.
-  #
-  data://garden/energy/2023-06-01/fossil_fuel_production:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/shift/2022-07-18/fossil_fuel_production
-    - data://garden/demography/2023-03-31/population
-  data://grapher/energy/2023-06-01/fossil_fuel_production:
-    - data://garden/energy/2023-06-01/fossil_fuel_production
-  #
   # Ember - Yearly electricity data 2023.
   #
   data://meadow/ember/2023-06-01/yearly_electricity:
@@ -203,6 +194,15 @@ steps:
     - data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels
     - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
+  #
+  # Energy - Fossil Fuel Production 2023.
+  #
+  data://garden/energy/2023-07-10/fossil_fuel_production:
+    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
+    - data://garden/shift/2023-07-10/energy_production_from_fossil_fuels
+    - data://garden/demography/2023-03-31/population
+  data://grapher/energy/2023-07-10/fossil_fuel_production:
+    - data://garden/energy/2023-07-10/fossil_fuel_production
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -274,5 +274,14 @@ steps:
   data://garden/shift/2022-07-18/fossil_fuel_production:
     - data://meadow/shift/2022-07-18/fossil_fuel_production
     - data://garden/regions/2023-01-01/regions
+  #
+  # Energy - Fossil Fuel Production 2023.
+  #
+  data://garden/energy/2023-06-01/fossil_fuel_production:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/shift/2022-07-18/fossil_fuel_production
+    - data://garden/demography/2023-03-31/population
+  data://grapher/energy/2023-06-01/fossil_fuel_production:
+    - data://garden/energy/2023-06-01/fossil_fuel_production
 
   ######################################################################################################################

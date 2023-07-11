@@ -109,7 +109,7 @@ def combine_statistical_review_and_eia_data(tb_review: Table, tb_eia: Table) -> 
     # On coincident rows, prioritize Statistical Review data.
     index_columns = ["country", "year"]
     combined = pr.concat(
-        [tb_eia, tb_review], ignore_index=True, short_name="primary_energy_consumption"
+        [tb_eia, tb_review], ignore_index=True, short_name=paths.short_name
     ).drop_duplicates(subset=index_columns, keep="last")
 
     # Sort conveniently.
@@ -136,6 +136,7 @@ def add_annual_change(tb: Table) -> Table:
 
     # Calculate annual change.
     combined = combined.sort_values(["country", "year"]).reset_index(drop=True)
+    # NOTE: Currently, groupby pct_change doesn't propagate metadata properly. This has to be done manually.
     combined["Annual change in primary energy consumption (%)"] = (
         combined.groupby("country")["Primary energy consumption (TWh)"].pct_change() * 100
     ).copy_metadata(combined["Primary energy consumption (TWh)"])

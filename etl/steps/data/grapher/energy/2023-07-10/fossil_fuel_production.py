@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset and read its main table
     ds_garden: Dataset = paths.load_dependency("fossil_fuel_production")
-    tb_garden = ds_garden["fossil_fuel_production"].reset_index()
+    tb_garden = ds_garden["fossil_fuel_production"]
 
     #
     # Save outputs.
