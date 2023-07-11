@@ -535,6 +535,108 @@ def add_population_to_dataframe(
     return df_with_population
 
 
+def add_population_to_table(
+    tb: Table,
+    ds_population: Dataset,
+    country_col: str = "country",
+    year_col: str = "year",
+    population_col: str = "population",
+    warn_on_missing_countries: bool = True,
+    show_full_warning: bool = True,
+    interpolate_missing_population: bool = False,
+    expected_countries_without_population: Optional[List[str]] = None,
+) -> Table:
+    """Add column of population to a table with metadata.
+
+    Parameters
+    ----------
+    tb : Table
+        Original table that contains a column of country names and years.
+    ds_population : Dataset
+        Population dataset.
+    country_col : str
+        Name of column in original table with country names.
+    year_col : str
+        Name of column in original table with years.
+    population_col : str
+        Name of new column to be created with population values.
+    warn_on_missing_countries : bool
+        True to warn about countries that appear in original table but not in the population dataset.
+    show_full_warning : bool
+        True to display list of countries in warning messages.
+    interpolate_missing_population : bool
+        True to linearly interpolate population on years that are presented in tb, but for which we do not have
+        population data; otherwise False to keep missing population data as nans.
+        For example, if interpolate_missing_population is True and tb has data for all years between 1900 and 1910,
+        but population is only given for 1900 and 1910, population will be linearly interpolated between those years.
+    expected_countries_without_population : list
+        Countries that are expected to not have population (that should be ignored if warnings are activated).
+
+    Returns
+    -------
+    tb_with_population : Table
+        Original table after adding a column with population values.
+
+    """
+    # Create a dataframe with an additional population column.
+    df_with_population = add_population_to_dataframe(df=tb, ds_population=ds_population, country_col=country_col, year_col=year_col, population_col=population_col, warn_on_missing_countries=warn_on_missing_countries, show_full_warning=show_full_warning, interpolate_missing_population=interpolate_missing_population, expected_countries_without_population=expected_countries_without_population)
+
+    # Convert the dataframe into a table, with the metadata of the original table.
+    tb_with_population = Table(df_with_population).copy_metadata(tb)
+
+    # Add metadata to the new population column.
+    tb_with_population[population_col] = tb_with_population[population_col].copy_metadata(ds_population["population"]["population"])
+
+    return tb_with_population
+
+
+def add_gdp_to_table(tb: Table, ds_gdp: Dataset, country_col: str = "country", year_col: str = "year", gdp_col: str = "gdp") -> Table:
+    """Add column of GDP to a table with metadata.
+
+    Parameters
+    ----------
+    tb : Table
+        Original table that contains a column of country names and years.
+    ds_gdp : Dataset
+        Population dataset.
+    country_col : str
+        Name of column in original table with country names.
+    year_col : str
+        Name of column in original table with years.
+    gdp_col : str
+        Name of new column to be created with GDP values.
+
+    Returns
+    -------
+    tb_with_gdo : Table
+        Original table after adding a column with GDP values.
+
+    """
+    tb_with_gdp = tb.copy()
+
+    # Read main table from GDP dataset.
+    tb_gdp = ds_gdp["maddison_gdp"].reset_index()
+
+    # Add metadata sources and licenses to the main GDP variable.
+    tb_gdp["gdp"].metadata.sources = ds_gdp.metadata.sources
+    tb_gdp["gdp"].metadata.licenses = ds_gdp.metadata.licenses
+
+    gdp_columns = {
+        "country": country_col,
+        "year": year_col,
+        "gdp": gdp_col,
+    }
+    tb_gdp = tb_gdp[list(gdp_columns)].rename(columns=gdp_columns)
+
+    # Drop rows with missing values.
+    tb_gdp = tb_gdp.dropna(how="any").reset_index(drop=True)
+
+    # Add GDP column to original table.
+    tb_with_gdp = tb_with_gdp.merge(tb_gdp, on=[country_col, year_col], how="left")
+
+    return tb_with_gdp
+
+
 def list_members_of_region(
     region: str,
     ds_regions: Dataset,
