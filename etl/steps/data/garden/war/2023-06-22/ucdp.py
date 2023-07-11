@@ -325,8 +325,8 @@ def _add_number_ongoing_conflicts_and_deaths(tb: Table) -> Table:
     tb_ongoing_world["region"] = "World"
 
     # Combine
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_world], ignore_index=True).sort_values(
-        ["year", "region", "conflict_type"]
+    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_world], ignore_index=True).sort_values(  # type: ignore
+        by=["year", "region", "conflict_type"]
     )
     return tb_ongoing
 
@@ -344,7 +344,9 @@ def _add_number_new_conflicts(tb: Table) -> Table:
     tb_new_world["region"] = "World"
 
     # Combine
-    tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True).sort_values(["year_start", "region", "conflict_type"])
+    tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True).sort_values(  # type: ignore
+        by=["year_start", "region", "conflict_type"]
+    )
 
     return tb_new
 
