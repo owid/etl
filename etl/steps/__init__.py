@@ -716,7 +716,8 @@ class GrapherStep(Step):
             dataset.metadata.sources,
         )
 
-        variable_upsert_results = []
+        thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS)
+        futures = []
 
         # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
         # is fetching the whole dataset from data-api as they would receive all tables merged in a single
@@ -727,7 +728,6 @@ class GrapherStep(Step):
             table = gh._adapt_table_for_grapher(table)
 
             # generate table with entity_id, year and value for every column
-            tables = gh._yield_wide_table(table, na_action="drop")
             upsert = lambda t: gi.upsert_table(  # noqa: E731
                 engine,
                 t,
@@ -736,15 +736,10 @@ class GrapherStep(Step):
                 dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
             )
 
-            # insert data in parallel, this speeds it up considerably and is even faster than loading
-            # data with LOAD DATA INFILE
-            if config.GRAPHER_INSERT_WORKERS > 1:
-                with concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as executor:
-                    results = executor.map(upsert, tables)
-            else:
-                results = map(upsert, tables)
+            for t in gh._yield_wide_table(table, na_action="drop"):
+                futures.append(thread_pool.submit(upsert, t))
 
-            variable_upsert_results += list(results)
+        variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
 
         self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 

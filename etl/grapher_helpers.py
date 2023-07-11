@@ -131,12 +131,6 @@ def _yield_wide_table(
             else:
                 title_with_dims = None
 
-            log.info(
-                "yield_wide_table.create_variable",
-                short_name=short_name,
-                title=title_with_dims,
-            )
-
             # Keep only entity_id and year in index
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
 
