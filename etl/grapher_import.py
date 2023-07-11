@@ -192,8 +192,6 @@ def upsert_table(
     _update_variables_display(table)
 
     with Session(engine) as session:
-        log.info("upsert_table.upsert_variable", variable=table.columns[0])
-
         # For easy retrieveal of the value series we store the name
         column_name = table.columns[0]
 
@@ -263,7 +261,7 @@ def upsert_table(
         session.add(variable)
         session.commit()
 
-        log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=variable_id)
+        log.info("upsert_table.upserted_variable", size=len(table), id=variable_id, title=variable.name)
 
         return VariableUpsertResult(variable_id, source_id)  # type: ignore
 

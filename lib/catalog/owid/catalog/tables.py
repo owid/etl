@@ -287,6 +287,7 @@ class Table(pd.DataFrame):
         df.metadata = TableMeta.from_dict(metadata)
         df._set_fields_from_dict(fields)
 
+        # NOTE: setting index is really slow for large datasets
         if primary_key:
             df.set_index(primary_key, inplace=True)
 
