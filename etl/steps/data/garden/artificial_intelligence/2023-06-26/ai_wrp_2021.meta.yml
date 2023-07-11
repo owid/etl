@@ -601,11 +601,6 @@ tables:
           numDecimalPlaces: 0
 
       eastern_europe_mostly_help:
-<<<<<<< HEAD
-        title: Help  (Eastern Europe)
-=======
-        title: Help versus harm (Eastern Europe)
->>>>>>> b9122963f (changed to percentages of yes or help rather than ratios)
         title: Help  (Eastern Europe)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Eastern Europe.
         unit:  "%"
