@@ -58,7 +58,7 @@ tables:
         short_unit: "%"
         display:
           name: Male
-           numDecimalPlaces: 0
+          numDecimalPlaces: 0
 
       dk_refused_yes__would_feel_safe:
         title: DK/Refused
