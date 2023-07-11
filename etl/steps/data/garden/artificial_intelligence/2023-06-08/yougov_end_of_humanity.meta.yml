@@ -24,42 +24,40 @@ tables:
         short_unit: '%'
 
       alien_invasion:
-        title: Alien Invasion
+        title: Alien invasion
         description: Respondents were asked "How concerned are you that an alien invasion would be the cause fot the end of the human race on Earth?"
         unit: '%'
         short_unit: '%'
 
       artificial_intelligence:
-        title: Artificial Intelligence
+        title: Artificial intelligence
         description: Respondents were asked "How concerned are you that artificial intelligence would be the cause fot the end of the human race on Earth?"
         unit: '%'
         short_unit: '%'
 
       asteroid_impact:
-        title: Asteroid Impact
+        title: Asteroid impact
         description: Respondents were asked "How concerned are you that an asteroid impact would be the cause fot the end of the human race on Earth?"
         unit: '%'
         short_unit: '%'
 
       climate_change:
-        title: Climate Change
+        title: Climate change
         description: Respondents were asked "How concerned are you that climate would be the cause fot the end of the human race on Earth?"
         unit: '%'
         short_unit: '%'
 
       global_inability_to_have_children:
-        title: Global Inability to Have Children
+        title: Global inability to have children
         description: Respondents were asked "How concerned are you that inability to have children would be the cause fot the end of the human race on Earth?"
         unit: '%'
         short_unit: '%'
 
-
       nuclear_weapons:
-        title: Nuclear Weapons
+        title: Nuclear weapons
         description: Respondents were asked "How concerned are you that nuclear weapons would be the cause fot the end of the human race on Earth?"
         unit: '%'
         short_unit: '%'
-
 
       a_pandemic:
         title: Pandemic
@@ -67,9 +65,8 @@ tables:
         unit: '%'
         short_unit: '%'
 
-
       world_war:
-        title: World War
+        title: World war
         description: Respondents were asked "How concerned are you that a world war would be the cause fot the end of the human race on Earth?"
         unit: '%'
         short_unit: '%'
