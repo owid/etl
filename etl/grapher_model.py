@@ -955,6 +955,7 @@ class Origin(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     datasetTitleOwid: Optional[str] = Field(default=None, index=True)
+    datasetTitleProducer: Optional[str] = Field(default=None, index=True)
     datasetDescriptionOwid: Optional[str] = None
     datasetDescriptionProducer: Optional[str] = None
     producer: Optional[str] = None
@@ -974,6 +975,7 @@ class Origin(SQLModel, table=True):
             producer=origin.producer,
             citationProducer=origin.citation_producer,
             datasetTitleOwid=origin.dataset_title_owid,
+            datasetTitleProducer=origin.dataset_title_producer,
             datasetUrlMain=origin.dataset_url_main,
             datasetUrlDownload=origin.dataset_url_download,
             datasetDescriptionOwid=origin.dataset_description_owid,
@@ -991,6 +993,7 @@ class Origin(SQLModel, table=True):
             cls.producer == self.producer,
             cls.citationProducer == self.citationProducer,
             cls.datasetTitleOwid == self.datasetTitleOwid,
+            cls.datasetTitleProducer == self.datasetTitleProducer,
             cls.datasetUrlMain == self.datasetUrlMain,
             cls.datasetUrlDownload == self.datasetUrlDownload,
             cls.datasetDescriptionOwid == self.datasetDescriptionOwid,
