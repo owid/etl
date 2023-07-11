@@ -111,6 +111,7 @@ def run(dest_dir: str) -> None:
 
     merged_df = pd.merge(df_pivoted, merge_df, on=["country", "year"], how="outer")
     merged_df = merged_df.drop(["population"], axis=1)
+    merged_df["total_monthly_emissions"] = merged_df["TER_INT_m"] + merged_df["TER_DOM_m"]
     merged_df.set_index(["country", "year"], inplace=True)
 
     # Create a new table with the processed data.

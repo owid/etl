@@ -1,9 +1,10 @@
 meta:
-  name: The Semiconductor Supply Chain Assessing National Competitiveness (CSET, 2019)
+  name: The Semiconductor Supply Chain Assessing National Competitiveness (CSET, 2022)
   publication_year: 2021
-  source_name: CSET (2019)
-  source_published_by: 'The Semiconductor Supply Chain: Assessing National Competitiveness
-    (Center for Security and Emerging Technology, January 2021).'
+  source_name: CSET (2022)
+  source_published_by: >
+    "Emerging Technology Observatory Advanced Semiconductor Supply Chain Dataset (2022
+    release)"
   url: https://chipexplorer.eto.tech/
   source_data_url: 
     https://raw.githubusercontent.com/georgetown-cset/eto-supply-chain/main/data/provision.csv
@@ -11,16 +12,23 @@ meta:
   license_name: Creative Commons BY 4.0
   date_accessed: 2023-07-07
   is_public: true
-  description: |
-    Data on supplier countries of semiconductors, broken down by three stages of production -  Design, Fabrication and Assembly.
+  description: >-
+    The Advanced Semiconductor Supply Chain Dataset includes manually compiled, high-level
+    information about the tools, materials, processes, countries, and firms involved
+    in the production of advanced logic chips. The current version of the dataset
+    reflects how researchers understood this supply chain in early 2021. It uses a
+    wide variety of sources, such as corporate websites and disclosures, specialized
+    market research, and industry group publications.
 
-    The Design phase encompasses the specification, logic design, physical design, along with validation and verification. The specification outlines the intended operation of the chip within its target system. The logic design phase constructs a schematic model featuring interconnected electrical components. The physical design converts this schematic into a tangible layout of these components and their interconnecting wires. Finally, the design undergoes a validation and verification process to ensure its functionality.
 
-    The Fabrication stage morphs these designs into tangible chips. Semiconductor manufacturing plants, known as 'fabs', process the wafers in two primary steps: forming transistors and other electrical devices within silicon wafer layers and creating metallic interconnections among the electrical devices in the insulating layers above the silicon.
+    Most of the data is taken from the CSET report The Semiconductor Supply Chain:
+    Assessing National Competitiveness, published in 2021. In 2022, ETO researchers
+    augmented the company profiles in the data with information manually collected
+    from producer websites and the open internet.
 
-    The completion of the fabrication process yields a finished wafer housing numerous chips in a grid pattern. The subsequent stage is Assembly, which involves testing and packaging. The wafer undergoes division into individual chips or 'dies.' Each chip is mounted on a frame, wired to facilitate connection with external devices, and housed within a protective case. This stage results in the familiar image of a rectangular, dark grey chip with metal pins around the periphery. The chip also undergoes testing to confirm its operational capacity.
 
-    Historically, Assembly, Test, and Packaging (ATP) was considered a lower value stage. However, with the exponential rise in transistor densities within logic chips, packaging has progressively become a key determinant of chip performance.
+    The data can be accessed here: https://eto.tech/dataset-docs/chipexplorer/
+
 wdir: ../../../data/snapshots/artificial_intelligence/2023-07-07
 outs:
 - md5: 6f54d4db643ec96a2da82f5b6daeaf14

@@ -1,20 +1,5 @@
 dataset:
-  title: The Semiconductor Supply Chain Assessing National Competitiveness (CSET, 2019)
-  description: >-
-    Data on supplier countries of semiconductors, broken down by three stages of production -  Design, Fabrication and Assembly.
-  licenses:
-  - name: Creative Commons BY 4.0
-    url: https://eto.tech/tou/
-  sources:
-  - name: CSET (2019)
-    description: >-
-      Data on supplier countries of semiconductors, broken down by three stages of production -  Design, Fabrication and Assembly.
-    url: https://chipexplorer.eto.tech/
-    source_data_url: https://raw.githubusercontent.com/georgetown-cset/eto-supply-chain/main/data/provision.csv
-    date_accessed: '2023-07-07'
-    publication_year: 2021
-    published_by: 'The Semiconductor Supply Chain: Assessing National Competitiveness (Center for Security and Emerging Technology,
-      January 2021).'
+  title: The Semiconductor Supply Chain Assessing National Competitiveness (CSET, 2022)
 tables:
   semiconductors_cset:
     variables:
