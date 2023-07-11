@@ -35,11 +35,6 @@ tables:
            numDecimalPlaces: 0
 
       mostly_help:
-<<<<<<< HEAD
-        title: Help
-=======
-        title: Help versus harm
->>>>>>> b9122963f (changed to percentages of yes or help rather than ratios)
         title: Help
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
         unit:  "%"
