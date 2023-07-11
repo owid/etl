@@ -5,7 +5,10 @@ Statistical Review dataset and Shift data on fossil fuel production.
 
 import numpy as np
 from owid.catalog import Dataset, Table
-from owid.catalog.tables import get_unique_licenses_from_tables, get_unique_sources_from_tables
+from owid.catalog.tables import (
+    get_unique_licenses_from_tables,
+    get_unique_sources_from_tables,
+)
 from owid.datautils import dataframes
 
 from etl.data_helpers.geo import add_population_to_table

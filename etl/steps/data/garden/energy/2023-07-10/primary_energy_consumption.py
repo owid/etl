@@ -108,9 +108,9 @@ def combine_statistical_review_and_eia_data(tb_review: Table, tb_eia: Table) -> 
     # Combine EIA data (which goes further back in the past) with Statistical Review data (which is more up-to-date).
     # On coincident rows, prioritize Statistical Review data.
     index_columns = ["country", "year"]
-    combined = pr.concat(
-        [tb_eia, tb_review], ignore_index=True, short_name=paths.short_name
-    ).drop_duplicates(subset=index_columns, keep="last")
+    combined = pr.concat([tb_eia, tb_review], ignore_index=True, short_name=paths.short_name).drop_duplicates(
+        subset=index_columns, keep="last"
+    )
 
     # Sort conveniently.
     combined = combined.sort_values(index_columns).reset_index(drop=True)
