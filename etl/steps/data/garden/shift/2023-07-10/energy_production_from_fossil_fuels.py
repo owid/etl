@@ -1,10 +1,11 @@
-"""Garden step for EIA total energy consumption.
+"""Garden step for Shift data on energy production from fossil fuels.
 
 """
 
 from typing import Dict, List, Optional, Union
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -18,13 +19,7 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Conversion factor from terajoules to terawatt-hours.
-TJ_TO_TWH = 1 / 3600
 
-# Columns to use from meadow table, and how to rename them.
-COLUMNS = {"country": "country", "year": "year", "values": "energy_consumption"}
-
-# Aggregate regions to add, following OWID definitions.
 REGIONS_TO_ADD = [
     "North America",
     "South America",
@@ -39,14 +34,11 @@ REGIONS_TO_ADD = [
     "High-income countries",
 ]
 
-# Additional countries to include in region aggregates.
-ADDITIONAL_COUNTRIES_IN_REGIONS: Dict[str, List[str]] = {}
-
 # When creating region aggregates, decide how to distribute historical regions.
-# TODO: Once the regions dataset is refactored, the following information could be extracted directly from ds_regions.
 # The following decisions are based on the current location of the countries that succeeded the region, and their income
-# group.
-HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
+# group. Continent and income group assigned corresponds to the continent and income group of the majority of the
+# population in the member countries.
+HISTORIC_TO_CURRENT_REGION = {
     "Czechoslovakia": {
         "members": [
             # Europe - High-income countries.
@@ -60,13 +52,6 @@ HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
             "Aruba",
             "Curacao",
             "Sint Maarten (Dutch part)",
-        ],
-    },
-    "Serbia and Montenegro": {
-        "members": [
-            # Europe - Upper-middle-income countries.
-            "Serbia",
-            "Montenegro",
         ],
     },
     "USSR": {
@@ -106,54 +91,6 @@ HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
         ],
     },
 }
-
-# List of known overlaps between regions and member countries (or successor countries).
-OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = [
-    {
-        "region": "Netherlands Antilles",
-        "member": "Aruba",
-        "entity_to_make_nan": "region",
-        "years": [
-            1986,
-            1987,
-            1988,
-            1989,
-            1990,
-            1991,
-            1992,
-            1993,
-            1994,
-            1995,
-            1996,
-            1997,
-            1998,
-            1999,
-            2000,
-            2001,
-            2002,
-            2003,
-            2004,
-            2005,
-            2006,
-            2007,
-            2008,
-            2009,
-            2010,
-            2011,
-            2012,
-            2013,
-            2014,
-            2015,
-            2016,
-            2017,
-            2018,
-            2019,
-            2020,
-            2021,
-        ],
-        "variable": "energy_consumption",
-    }
-]
 
 
 def detect_overlapping_data_for_regions_and_members(
@@ -381,7 +318,7 @@ def add_region_aggregates(
         # Check that there are no other overlaps in the data (after having removed the known ones).
         detect_overlapping_data_for_regions_and_members(
             df=data_for_region,
-            regions_and_members=HISTORIC_TO_CURRENT_REGION,
+            regions_and_members=HISTORIC_TO_CURRENT_REGION,  # type: ignore
             index_columns=index_columns,
             known_overlaps=known_overlaps,
         )
@@ -415,13 +352,95 @@ def add_region_aggregates(
     return data_with_regions
 
 
+def split_ussr_and_russia(tb: Table) -> Table:
+    """Split data for USSR & Russia into two separate entities (given that Shift treats them as the same entity).
+
+    Parameters
+    ----------
+    tb : Table
+        Shift data after harmonizing country names.
+
+    Returns
+    -------
+    tb: Table
+        Shift data after separating data for USSR and Russia as separate entities.
+
+    """
+    tb = tb.copy()
+
+    # Name that The Shift Data Portal uses for Russia and USSR.
+    shift_ussr_russia_name = "Russian Federation & USSR (Shift)"
+    # The relevant part of the data is originally from EIA, who have the first data point for Russia in 1992.
+    # Therefore we use this year to split USSR and Russia.
+    russia_start_year = 1992
+    # Filter to select rows of USSR & Russia data.
+    ussr_russia_filter = tb["country"] == shift_ussr_russia_name
+    ussr_data = (
+        tb[ussr_russia_filter & (tb["year"] < russia_start_year)]
+        .replace({shift_ussr_russia_name: "USSR"})
+        .reset_index(drop=True)
+    )
+    russia_data = (
+        tb[ussr_russia_filter & (tb["year"] >= russia_start_year)]
+        .replace({shift_ussr_russia_name: "Russia"})
+        .reset_index(drop=True)
+    )
+    # Remove rows where Russia and USSR are combined.
+    tb = tb[~ussr_russia_filter].reset_index(drop=True)
+    # Combine original data (without USSR and Russia as one entity) with USSR and Russia as separate entities.
+    tb = (
+        pr.concat([tb, ussr_data, russia_data], ignore_index=True)
+        .sort_values(["country", "year"])
+        .reset_index(drop=True)
+    )
+
+    return tb
+
+
+def correct_historical_regions(data: Table) -> Table:
+    """Correct some issues in Shift data involving historical regions.
+
+    Parameters
+    ----------
+    data : Table
+        Shift data after harmonization of country names.
+
+    Returns
+    -------
+    data : Table
+        Shift data after doing some corrections related to historical regions.
+
+    """
+    data = data.copy()
+
+    # For coal and oil, Czechoslovakia's data become Czechia and Slovakia in 1993.
+    # However, for gas, Czechia appear at an earlier date.
+    # We correct those rows to be part of Czechoslovakia.
+    data_to_add = pr.merge(
+        data[(data["year"] < 1980) & (data["country"] == "Czechoslovakia")]
+        .reset_index(drop=True)
+        .drop(columns=["gas"]),
+        data[(data["year"] < 1980) & (data["country"] == "Czechia")].reset_index(drop=True)[["year", "gas"]],
+        how="left",
+        on="year",
+    )
+    select_rows_to_correct = (data["country"].isin(["Czechia", "Czechoslovakia"])) & (data["year"] < 1980)
+    data = (
+        pr.concat([data[~select_rows_to_correct], data_to_add], ignore_index=True)
+        .sort_values(["country", "year"])
+        .reset_index(drop=True)
+    )
+
+    return data
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Load EIA dataset and read its main table.
-    ds_meadow: Dataset = paths.load_dependency("energy_consumption")
-    tb_meadow = ds_meadow["energy_consumption"].reset_index()
+    # Load meadow dataset and read its main table.
+    ds_meadow: Dataset = paths.load_dependency("energy_production_from_fossil_fuels")
+    tb_meadow = ds_meadow["energy_production_from_fossil_fuels"].reset_index()
 
     # Load regions dataset.
     ds_regions: Dataset = paths.load_dependency("regions")
@@ -432,14 +451,19 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Select and rename columns conveniently.
-    tb = tb_meadow[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
-
     # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = geo.harmonize_countries(
+        df=tb_meadow, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
 
-    # Convert terajoules to terawatt-hours.
-    tb["energy_consumption"] *= TJ_TO_TWH
+    # Remove rows that only have nans.
+    tb = tb.dropna(subset=["coal", "oil", "gas"], how="all").reset_index(drop=True)
+
+    # Treat USSR and Russia as separate entities.
+    tb = split_ussr_and_russia(tb=tb)
+
+    # Correct gas data where Czechia and Czechoslovakia overlap.
+    tb = correct_historical_regions(data=tb)
 
     # Create aggregate regions.
     tb = add_region_aggregates(
@@ -448,10 +472,10 @@ def run(dest_dir: str) -> None:
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         index_columns=["country", "year"],
-        known_overlaps=OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES,  # type: ignore
+        known_overlaps=[],  # type: ignore
     )
 
-    # Set an appropriate index and sort conveniently.
+    # Prepare output data.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
