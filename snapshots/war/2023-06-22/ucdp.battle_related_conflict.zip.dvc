@@ -19,7 +19,7 @@ meta:
   description: |
     This file contains a dyad-year dataset with information on the number of battle-related deaths in the conflicts from 1989-2021 that appear in the UCDP/PRIO Armed Conflict Dataset.
 
-    You can find more notes at https://ucdp.uu.se/downloads/brd/ucdp-brd-codebook-231.pdf
+    You can find more notes at https://web.archive.org/web/20230624051617/https://ucdp.uu.se/downloads/brd/ucdp-brd-codebook-231.pdf
 wdir: ../../../data/snapshots/war/2023-06-22
 outs:
 - md5: 14bf0a417eeef6855b91872cb4f1b03e

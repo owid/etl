@@ -19,7 +19,7 @@ meta:
   description: |
     An actor-year dataset with information of intentional attacks on civilians by governments and formally organized armed groups.
 
-    You can find more notes at https://ucdp.uu.se/downloads/nsos/ucdp-onesided-231.pdf
+    You can find more notes at https://web.archive.org/web/20230624043806/https://ucdp.uu.se/downloads/nsos/ucdp-onesided-231.pdf
 wdir: ../../../data/snapshots/war/2023-06-22
 outs:
 - md5: f5ee6899b08c23c432c13f1e49074803

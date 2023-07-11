@@ -18,7 +18,7 @@ meta:
     A conflict-year dataset with information on armed conflict where at least one party is the government of a state in the time period 1946-2022.
 
 
-    You can find more notes at https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-231.pdf
+    You can find more notes at https://web.archive.org/web/20230624120457/https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-231.pdf
 wdir: ../../../data/snapshots/war/2023-06-22
 outs:
 - md5: eb0e84b14a5380db07fa3ac2ea6dd9a6
