@@ -349,6 +349,7 @@ class Dataset(SQLModel, table=True):
     sourceChecksum: Optional[str] = Field(
         default=None, sa_column=Column("sourceChecksum", String(64, "utf8mb4_0900_as_cs"))
     )
+    updatePeriod: str = Field(sa_column=Column("updatePeriod", String(255, "utf8mb4_0900_as_cs"), nullable=False))
 
     users: Optional["User"] = Relationship(back_populates="datasets")
     users_: Optional["User"] = Relationship(back_populates="datasets_")
@@ -374,6 +375,7 @@ class Dataset(SQLModel, table=True):
             ds.dataEditedByUserId = self.dataEditedByUserId
             ds.createdByUserId = self.createdByUserId
             ds.isPrivate = self.isPrivate
+            ds.updatePeriod = self.updatePeriod
             ds.updatedAt = datetime.utcnow()
             ds.metadataEditedAt = datetime.utcnow()
             ds.dataEditedAt = datetime.utcnow()
@@ -404,6 +406,7 @@ class Dataset(SQLModel, table=True):
             createdByUserId=user_id,
             description=metadata.description or "",
             isPrivate=not metadata.is_public,
+            updatePeriod=metadata.update_period,
         )
 
     @classmethod

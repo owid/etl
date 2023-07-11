@@ -12,6 +12,9 @@
           "description": {
             "type": "string"
           },
+          "update_period": {
+            "type": "string"
+          },
           "licenses": {
             "type": "array",
             "items": [
