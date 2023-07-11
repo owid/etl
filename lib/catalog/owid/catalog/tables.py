@@ -1210,9 +1210,9 @@ def amend_log(
         return table
 
 
-def get_unique_sources_from_table(table: Table) -> List[Source]:
-    # Make a list of all sources of all variables in table.
-    sources = sum([table._fields[column].sources for column in list(table.all_columns)], [])
+def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
+    # Make a list of all sources of all variables in all tables.
+    sources = sum([table._fields[column].sources for table in tables for column in list(table.all_columns)], [])
 
     # Get unique array of tuples of source fields (respecting the order).
     unique_sources_array = pd.unique([tuple(source.to_dict().items()) for source in sources])
@@ -1222,10 +1222,9 @@ def get_unique_sources_from_table(table: Table) -> List[Source]:
 
     return unique_sources
 
-
-def get_unique_licenses_from_table(table: Table) -> List[License]:
-    # Make a list of all licenses of all variables in table.
-    licenses = sum([table._fields[column].licenses for column in list(table.all_columns)], [])
+def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
+    # Make a list of all licenses of all variables in all tables.
+    licenses = sum([table._fields[column].licenses for table in tables for column in list(table.all_columns)], [])
 
     # Get unique array of tuples of license fields (respecting the order).
     unique_licenses_array = pd.unique([tuple(license.to_dict().items()) for license in licenses])
