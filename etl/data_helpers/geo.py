@@ -579,18 +579,32 @@ def add_population_to_table(
 
     """
     # Create a dataframe with an additional population column.
-    df_with_population = add_population_to_dataframe(df=tb, ds_population=ds_population, country_col=country_col, year_col=year_col, population_col=population_col, warn_on_missing_countries=warn_on_missing_countries, show_full_warning=show_full_warning, interpolate_missing_population=interpolate_missing_population, expected_countries_without_population=expected_countries_without_population)
+    df_with_population = add_population_to_dataframe(
+        df=tb,
+        ds_population=ds_population,
+        country_col=country_col,
+        year_col=year_col,
+        population_col=population_col,
+        warn_on_missing_countries=warn_on_missing_countries,
+        show_full_warning=show_full_warning,
+        interpolate_missing_population=interpolate_missing_population,
+        expected_countries_without_population=expected_countries_without_population,
+    )
 
     # Convert the dataframe into a table, with the metadata of the original table.
     tb_with_population = Table(df_with_population).copy_metadata(tb)
 
     # Add metadata to the new population column.
-    tb_with_population[population_col] = tb_with_population[population_col].copy_metadata(ds_population["population"]["population"])
+    tb_with_population[population_col] = tb_with_population[population_col].copy_metadata(
+        ds_population["population"]["population"]
+    )
 
     return tb_with_population
 
 
-def add_gdp_to_table(tb: Table, ds_gdp: Dataset, country_col: str = "country", year_col: str = "year", gdp_col: str = "gdp") -> Table:
+def add_gdp_to_table(
+    tb: Table, ds_gdp: Dataset, country_col: str = "country", year_col: str = "year", gdp_col: str = "gdp"
+) -> Table:
     """Add column of GDP to a table with metadata.
 
     Parameters
