@@ -23,6 +23,9 @@ tables:
               min: 70
             selectedEntityNames:
             - Japan
+          key_info_text:
+            - "A"
+            - "B"
 
       average_20_years:
         title: Twenty-year average day of the year with peak cherry blossom

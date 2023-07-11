@@ -830,7 +830,7 @@ class Variable(SQLModel, table=True):
     citationInline: Optional[str] = Field(default=None, sa_column=Column("citationInline", LONGTEXT))
     descriptionShort: Optional[str] = Field(default=None, sa_column=Column("descriptionShort", LONGTEXT))
     descriptionFromProducer: Optional[str] = Field(default=None, sa_column=Column("descriptionFromProducer", LONGTEXT))
-    keyInfoText: Optional[str] = Field(default=None, sa_column=Column("keyInfoText", LONGTEXT))
+    keyInfoText: Optional[List[dict]] = Field(default=None, sa_column=Column("keyInfoText", JSON))
     processingInfo: Optional[str] = Field(default=None, sa_column=Column("processingInfo", LONGTEXT))
     licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
 
@@ -941,8 +941,7 @@ class Variable(SQLModel, table=True):
         presentation_dict.pop("topicTagsLinks", None)
 
         if "keyInfoText" in presentation_dict:
-            # join list of bullet points to make a text from it
-            presentation_dict["keyInfoText"] = "\n".join(presentation_dict["keyInfoText"])
+            assert isinstance(presentation_dict["keyInfoText"], list), "keyInfoText should be a list of bullet points"
 
         # rename grapherConfig to grapherConfigETL
         if "grapherConfig" in presentation_dict:
