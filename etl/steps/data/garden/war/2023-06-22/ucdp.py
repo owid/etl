@@ -456,6 +456,7 @@ def add_conflict_all(tb: Table) -> Table:
 
     Note that this should only be added for years after 1989, since prior to that year we are missing data on 'one-sided' and 'non-state'.
     """
+    # Estimate number of all conflicts
     tb_all = tb.groupby(["year", "region"], as_index=False)[
         [
             "number_deaths_ongoing_conflicts",
@@ -466,8 +467,14 @@ def add_conflict_all(tb: Table) -> Table:
         ]
     ].sum()
     tb_all["conflict_type"] = "all"
+
+    # Only append values after 1989 (before that we don't have 'one-sided' or 'non-state' counts)
     tb_all = tb_all[tb_all["year"] >= 1989]
     tb = pd.concat([tb, tb_all], ignore_index=True)
+
+    # Set `number_new_conflicts` to NaN for 1989
+    tb.loc[(tb["year"] == 1989) & (tb["conflict_type"] == "all"), "number_new_conflicts"] = np.nan
+
     return tb
 
 
