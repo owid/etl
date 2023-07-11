@@ -809,6 +809,7 @@ class Variable(SQLModel, table=True):
     shortUnit: Optional[str] = Field(default=None, sa_column=Column("shortUnit", String(255, "utf8mb4_0900_as_cs")))
     originalMetadata: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("originalMetadata", JSON))
     grapherConfig: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfig", JSON))
+    grapherConfigETL: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfigETL", JSON))
     catalogPath: Optional[str] = Field(default=None, sa_column=Column("catalogPath", LONGTEXT))
     dataPath: Optional[str] = Field(default=None, sa_column=Column("dataPath", LONGTEXT))
     metadataPath: Optional[str] = Field(default=None, sa_column=Column("metadataPath", LONGTEXT))
@@ -899,8 +900,9 @@ class Variable(SQLModel, table=True):
                 ds.code = self.code
             if self.originalMetadata is not None:
                 ds.originalMetadata = self.originalMetadata
-            if self.grapherConfig is not None:
-                ds.grapherConfig = self.grapherConfig
+            if self.grapherConfigETL is not None:
+                ds.grapherConfigETL = self.grapherConfigETL
+            assert self.grapherConfig is None, "grapherConfigETL should be used instead of grapherConfig"
 
         session.add(ds)
 
@@ -938,6 +940,10 @@ class Variable(SQLModel, table=True):
         if "keyInfoText" in presentation_dict:
             # join list of bullet points to make a text from it
             presentation_dict["keyInfoText"] = "\n".join(presentation_dict["keyInfoText"])
+
+        # rename grapherConfig to grapherConfigETL
+        if "grapherConfig" in presentation_dict:
+            presentation_dict["grapherConfigETL"] = presentation_dict.pop("grapherConfig")
 
         return cls(
             shortName=short_name,
