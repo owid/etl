@@ -610,11 +610,6 @@ tables:
           numDecimalPlaces: 0
 
       latin_america__and__caribbean_mostly_help:
-<<<<<<< HEAD
-        title: Help  (Latin America & Caribbean)
-=======
-        title: Help versus harm (Latin America & Caribbean)
->>>>>>> b9122963f (changed to percentages of yes or help rather than ratios)
         title: Help  (Latin America & Caribbean)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Latin America & Caribbean.
         unit:  "%"
@@ -624,11 +619,6 @@ tables:
           numDecimalPlaces: 0
 
       middle_east_mostly_help:
-<<<<<<< HEAD
-        title: Help  (Middle East)
-=======
-        title: Help versus harm (Middle East)
->>>>>>> b9122963f (changed to percentages of yes or help rather than ratios)
         title: Help  (Middle East)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from the Middle East.
         unit:  "%"
@@ -638,11 +628,6 @@ tables:
           numDecimalPlaces: 0
 
       north_africa_mostly_help:
-<<<<<<< HEAD
-        title: Help  (North Africa)
-=======
-        title: Help versus harm (North Africa)
->>>>>>> b9122963f (changed to percentages of yes or help rather than ratios)
         title: Help  (North Africa)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from North Africa.
         unit:  "%"
