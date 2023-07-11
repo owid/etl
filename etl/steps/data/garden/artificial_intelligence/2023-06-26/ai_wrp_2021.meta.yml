@@ -32,7 +32,7 @@ tables:
         unit:  "%"
         short_unit: "%"
         display:
-           numDecimalPlaces: 1
+           numDecimalPlaces: 0
 
       mostly_help:
         title: Help
@@ -40,7 +40,7 @@ tables:
         unit:  "%"
         short_unit: "%"
         display:
-          numDecimalPlaces: 1
+           numDecimalPlaces: 0
 
       female_yes__would_feel_safe:
         title:  Feel safe (Female)
@@ -49,7 +49,7 @@ tables:
         short_unit: "%"
         display:
           name: Female
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       male_yes__would_feel_safe:
         title: Feel safe (Male)
@@ -58,7 +58,7 @@ tables:
         short_unit: "%"
         display:
           name: Male
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       dk_refused_yes__would_feel_safe:
         title: DK/Refused
@@ -67,7 +67,7 @@ tables:
         short_unit: "%"
         display:
           name: Refused
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       primary__0_8_years__yes__would_feel_safe:
         title: Feel safe (Primary Education, 0-8 years)
@@ -76,7 +76,7 @@ tables:
         short_unit: "%"
         display:
           name: Primary Education
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       secondary__9_15_years__yes__would_feel_safe:
         title: Feel safe (Secondary Education, 9-15 years)
@@ -85,7 +85,7 @@ tables:
         short_unit: "%"
         display:
           name: Secondary Education
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       tertiary__16_years_or_more__yes__would_feel_safe:
         title: Feel safe (Tertiary Education (16 years or more))
@@ -94,7 +94,7 @@ tables:
         short_unit: "%"
         display:
           name: Tertiary Education
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       fourth_20pct_yes__would_feel_safe:
         title: Feel safe (Income quantile (Fourth 20%))
@@ -103,7 +103,7 @@ tables:
         short_unit: "%"
         display:
           name: Fourth 20% income quantile
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       middle_20pct_yes__would_feel_safe:
         title: Feel safe (Income quantile - Middle 20%)
@@ -112,7 +112,7 @@ tables:
         short_unit: "%"
         display:
           name: Middle 20% income quantile
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       poorest_20pct_yes__would_feel_safe:
         title: Feel safe (Income quantile - Poorest 20%)
@@ -121,7 +121,7 @@ tables:
         short_unit: "%"
         display:
           name: Poorest 20% income quantile
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       richest_20pct_yes__would_feel_safe:
         title: Feel safe (Income quantile - Richest 20%)
@@ -130,7 +130,7 @@ tables:
         short_unit: "%"
         display:
           name: Richest 20% income quantile
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       second_20pct_yes__would_feel_safe:
         title: Feel safe (Income quantile - Second 20%)
@@ -139,7 +139,7 @@ tables:
         short_unit: "%"
         display:
           name: Second 20% income quantile
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       employed_full_time_for_an_employer_yes__would_feel_safe:
         title: Feel safe (Employed Full Time for an Employer)
@@ -148,7 +148,7 @@ tables:
         short_unit: "%"
         display:
           name: Employed Full Time for an Employer
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       employed_full_time_for_self_yes__would_feel_safe:
         title: Feel safe(Employed Full Time for Self)
@@ -157,7 +157,7 @@ tables:
         short_unit: "%"
         display:
           name: Employed Full Time for Self
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       employed_part_time_do_not_want_full_time_yes__would_feel_safe:
         title: Feel safe (Employed Part Time, Do Not Want Full Time)
@@ -166,7 +166,7 @@ tables:
         short_unit: "%"
         display:
           name: Employed Part Time, Do Not Want Full Time
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       employed_part_time_want_full_time_yes__would_feel_safe:
         title: Feel safe (Employed Part Time, Want Full Time)
@@ -175,7 +175,7 @@ tables:
         short_unit: "%"
         display:
           name: Employed Part Time, Want Full Time
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       out_of_workforce_yes__would_feel_safe:
         title: Feel safe (Out of Workforce)
@@ -184,7 +184,7 @@ tables:
         short_unit: "%"
         display:
           name: Out of Workforce
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       unemployed_yes__would_feel_safe:
         title: Feel safe (Unemployed)
@@ -193,7 +193,7 @@ tables:
         short_unit: "%"
         display:
           name: Unemployed
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       _15_29_yes__would_feel_safe:
         title: Feel safe (Age 15-29)
@@ -202,7 +202,7 @@ tables:
         short_unit: "%"
         display:
           name: Age 15-29
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       _30_49_yes__would_feel_safe:
         title: Feel safe (Age 30-49)
@@ -211,7 +211,7 @@ tables:
         short_unit: "%"
         display:
           name: Age 30-49
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       _50_64_yes__would_feel_safe:
         title: Feel safe (Age 50-64)
@@ -220,7 +220,7 @@ tables:
         short_unit: "%"
         display:
           name: Age 50-64
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       _65plus_yes__would_feel_safe:
         title: Feel safe (Age 65+)
@@ -229,7 +229,7 @@ tables:
         short_unit: "%"
         display:
           name: Age 65+
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       australia_and_new_zealand_yes__would_feel_safe:
         title: Feel safe (Australia and New Zealand)
@@ -238,7 +238,7 @@ tables:
         short_unit: "%"
         display:
           name: Australia and New Zealand
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       central_asia_yes__would_feel_safe:
         title: Feel safe (Central Asia)
@@ -247,7 +247,7 @@ tables:
         short_unit: "%"
         display:
           name: Central Asia
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       central_western_africa_yes__would_feel_safe:
         title: Feel safe (Central/Western Africa)
@@ -255,8 +255,8 @@ tables:
         unit:  "%"
         short_unit: "%"
         display:
-          name: Central/Western Africa
-          numDecimalPlaces: 1
+          name: Central and Western Africa
+          numDecimalPlaces: 0
 
       east_asia_yes__would_feel_safe:
         title: Feel safe (East Asia)
@@ -274,7 +274,7 @@ tables:
         short_unit: "%"
         display:
           name: Eastern Africa
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       eastern_europe_yes__would_feel_safe:
         title: Feel safe (Eastern Europe)
@@ -283,7 +283,7 @@ tables:
         short_unit: "%"
         display:
           name: Eastern Europe
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       latin_america__and__caribbean_yes__would_feel_safe:
         title: Feel safe (Latin America & Caribbean)
@@ -292,7 +292,7 @@ tables:
         short_unit: "%"
         display:
           name: Latin America & Caribbean
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       middle_east_yes__would_feel_safe:
         title: Feel safe (Middle East)
@@ -301,7 +301,7 @@ tables:
         short_unit: "%"
         display:
           name: Middle East
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       north_africa_yes__would_feel_safe:
         title: Feel safe (North Africa)
@@ -310,7 +310,7 @@ tables:
         short_unit: "%"
         display:
           name: North Africa
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       northern_america_yes__would_feel_safe:
         title: Feel safe (Northern America)
@@ -319,7 +319,7 @@ tables:
         short_unit: "%"
         display:
           name: Northern America
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       northern_western_europe_yes__would_feel_safe:
         title: Feel safe (Northern/Western Europe)
@@ -328,7 +328,7 @@ tables:
         short_unit: "%"
         display:
           name: Northern/Western Europe
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       south_asia_yes__would_feel_safe:
         title: Feel safe (South Asia)
@@ -337,7 +337,7 @@ tables:
         short_unit: "%"
         display:
           name: South Asia
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       south_eastern_asia_yes__would_feel_safe:
         title: Feel safe (South-eastern Asia)
@@ -346,7 +346,7 @@ tables:
         short_unit: "%"
         display:
           name: South-eastern Asia
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       southern_africa_yes__would_feel_safe:
         title: Feel safe (Southern Africa)
@@ -355,7 +355,7 @@ tables:
         short_unit: "%"
         display:
           name: Southern Africa
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       southern_europe_yes__would_feel_safe:
         title: Feel safe versus not safe (Southern Europe)
@@ -373,7 +373,7 @@ tables:
         short_unit: "%"
         display:
           name: Female
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       male_mostly_help:
         title: Help (Male)
@@ -382,6 +382,7 @@ tables:
         short_unit: "%"
         display:
           name: Male
+          numDecimalPlaces: 0
 
       dk_refused_mostly_help:
         title: Help (DK/Refused)
@@ -390,7 +391,7 @@ tables:
         short_unit: "%"
         display:
           name: DK/Refused
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       primary__0_8_years__mostly_help:
         title: Help (Primary Education, 0-8 years)
@@ -399,7 +400,7 @@ tables:
         short_unit: "%"
         display:
           name: Primary Education
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       secondary__9_15_years__mostly_help:
         title: Help (Secondary Education, 9-15 years)
@@ -408,7 +409,7 @@ tables:
         short_unit: "%"
         display:
           name: Secondary Education
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       tertiary__16_years_or_more__mostly_help:
         title: Help (Tertiary Education, 16 years or more)
@@ -417,7 +418,7 @@ tables:
         short_unit: "%"
         display:
           name: Tertiary Education
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       fourth_20pct_mostly_help:
         title: Help (Fourth 20%)
@@ -426,7 +427,7 @@ tables:
         short_unit: "%"
         display:
           name: Fourth 20%
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       middle_20pct_mostly_help:
         title: Help (Middle 20%)
@@ -435,7 +436,7 @@ tables:
         short_unit: "%"
         display:
           name: Middle 20%
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       poorest_20pct_mostly_help:
         title: Help (Poorest 20%)
@@ -444,7 +445,7 @@ tables:
         short_unit: "%"
         display:
           name: Poorest 20%
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       richest_20pct_mostly_help:
         title: Help (Richest 20%)
@@ -453,7 +454,7 @@ tables:
         short_unit: "%"
         display:
           name: Richest 20%
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       second_20pct_mostly_help:
         title: Help (Second 20%)
@@ -462,7 +463,7 @@ tables:
         short_unit: "%"
         display:
           name: Second 20%
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       employed_full_time_for_an_employer_mostly_help:
         title: Help (Employed Full Time for an Employer)
@@ -471,7 +472,7 @@ tables:
         short_unit: "%"
         display:
           name: Employed Full Time for an Employer
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       employed_full_time_for_self_mostly_help:
         title: Help (Employed Full Time for Self)
@@ -480,7 +481,7 @@ tables:
         short_unit: "%"
         display:
           name: Employed Full Time for Self
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       employed_part_time_do_not_want_full_time_mostly_help:
         title: Help (Employed Part Time, Do Not Want Full Time)
@@ -489,7 +490,7 @@ tables:
         short_unit: "%"
         display:
           name: Employed Part Time, Do Not Want Full Time
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       employed_part_time_want_full_time_mostly_help:
         title: Help (Employed Part Time, Want Full Time)
@@ -498,7 +499,7 @@ tables:
         short_unit: "%"
         display:
           name: Employed Part Time, Want Full Time
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       out_of_workforce_mostly_help:
         title: Help (Out of Workforce)
@@ -507,7 +508,7 @@ tables:
         short_unit: "%"
         display:
           name: Out of Workforce
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       unemployed_mostly_help:
         title: Help (Unemployed)
@@ -516,7 +517,7 @@ tables:
         short_unit: "%"
         display:
           name: Unemployed
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       _15_29_mostly_help:
         title: Help (Age 15-29)
@@ -525,7 +526,7 @@ tables:
         short_unit: "%"
         display:
           name: Age 15-29
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       _30_49_mostly_help:
         title: Help (Age 30-49)
@@ -534,7 +535,7 @@ tables:
         short_unit: "%"
         display:
           name: Age 30-49
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       _50_64_mostly_help:
         title: Help (Age 50-64)
@@ -543,7 +544,7 @@ tables:
         short_unit: "%"
         display:
           name: Age 50-64
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       _65plus_mostly_help:
         title: Help (Age 65+)
@@ -552,7 +553,7 @@ tables:
         short_unit: "%"
         display:
           name: Age 65+
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       australia_and_new_zealand_mostly_help:
         title: Help (Australia and New Zealand)
@@ -561,7 +562,7 @@ tables:
         short_unit: "%"
         display:
           name: Australia and New Zealand
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       central_asia_mostly_help:
         title: Help (Central Asia)
@@ -570,7 +571,7 @@ tables:
         short_unit: "%"
         display:
           name: Central Asia
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       central_western_africa_mostly_help:
         title: Help (Central/Western Africa)
@@ -579,7 +580,7 @@ tables:
         short_unit: "%"
         display:
           name: Central/Western Africa
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       east_asia_mostly_help:
         title: Help (East Asia)
@@ -588,7 +589,7 @@ tables:
         short_unit: "%"
         display:
           name: East Asia
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       eastern_africa_mostly_help:
         title: Help (Eastern Africa)
@@ -597,7 +598,7 @@ tables:
         short_unit: "%"
         display:
           name: Eastern Africa
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       eastern_europe_mostly_help:
         title: Help  (Eastern Europe)
@@ -606,7 +607,7 @@ tables:
         short_unit: "%"
         display:
           name: Eastern Europe
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       latin_america__and__caribbean_mostly_help:
         title: Help  (Latin America & Caribbean)
@@ -615,7 +616,7 @@ tables:
         short_unit: "%"
         display:
           name: Latin America & Caribbean
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       middle_east_mostly_help:
         title: Help  (Middle East)
@@ -624,7 +625,7 @@ tables:
         short_unit: "%"
         display:
           name: Middle East
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       north_africa_mostly_help:
         title: Help  (North Africa)
@@ -633,7 +634,7 @@ tables:
         short_unit: "%"
         display:
           name: North Africa
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       northern_america_mostly_help:
         title: Help (Northern America)
@@ -642,7 +643,7 @@ tables:
         short_unit: "%"
         display:
           name: Northern America
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       northern_western_europe_mostly_help:
         title: Help (Northern/Western Europe)
@@ -651,7 +652,7 @@ tables:
         short_unit: "%"
         display:
           name: Northern/Western Europe
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       south_asia_mostly_help:
         title: Help (South Asia)
@@ -660,7 +661,7 @@ tables:
         short_unit: "%"
         display:
           name: South Asia
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       south_eastern_asia_mostly_help:
         title: Help (South-eastern Asia)
@@ -669,7 +670,7 @@ tables:
         short_unit: "%"
         display:
           name: South-eastern Asia
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       southern_africa_mostly_help:
         title: Help (Southern Africa)
@@ -678,7 +679,7 @@ tables:
         short_unit: "%"
         display:
           name: Southern Africa
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       southern_europe_mostly_help:
         title: Help (Southern Europe)
@@ -687,4 +688,4 @@ tables:
         short_unit: "%"
         display:
           name: Southern Europe
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
