@@ -9,7 +9,7 @@ import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
-from etl.data_helpers.geo import add_population_to_table, add_gdp_to_table
+from etl.data_helpers.geo import add_gdp_to_table, add_population_to_table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -108,7 +108,9 @@ def combine_statistical_review_and_eia_data(tb_review: Table, tb_eia: Table) -> 
     # Combine EIA data (which goes further back in the past) with Statistical Review data (which is more up-to-date).
     # On coincident rows, prioritize Statistical Review data.
     index_columns = ["country", "year"]
-    combined = pr.concat([tb_eia, tb_review], ignore_index=True, short_name="primary_energy_consumption").drop_duplicates(subset=index_columns, keep="last")
+    combined = pr.concat(
+        [tb_eia, tb_review], ignore_index=True, short_name="primary_energy_consumption"
+    ).drop_duplicates(subset=index_columns, keep="last")
 
     # Sort conveniently.
     combined = combined.sort_values(index_columns).reset_index(drop=True)
