@@ -35,7 +35,7 @@ tables:
            numDecimalPlaces: 1
 
       mostly_help:
-        title: Help versus harm
+        title: Help
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
         unit:  "%"
         short_unit: "%"
@@ -600,7 +600,7 @@ tables:
           numDecimalPlaces: 1
 
       eastern_europe_mostly_help:
-        title: Help versus harm (Eastern Europe)
+        title: Help  (Eastern Europe)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Eastern Europe.
         unit:  "%"
         short_unit: "%"
@@ -609,7 +609,7 @@ tables:
           numDecimalPlaces: 1
 
       latin_america__and__caribbean_mostly_help:
-        title: Help versus harm (Latin America & Caribbean)
+        title: Help  (Latin America & Caribbean)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Latin America & Caribbean.
         unit:  "%"
         short_unit: "%"
@@ -618,7 +618,7 @@ tables:
           numDecimalPlaces: 1
 
       middle_east_mostly_help:
-        title: Help versus harm (Middle East)
+        title: Help  (Middle East)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from the Middle East.
         unit:  "%"
         short_unit: "%"
@@ -627,7 +627,7 @@ tables:
           numDecimalPlaces: 1
 
       north_africa_mostly_help:
-        title: Help versus harm (North Africa)
+        title: Help  (North Africa)
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from North Africa.
         unit:  "%"
         short_unit: "%"

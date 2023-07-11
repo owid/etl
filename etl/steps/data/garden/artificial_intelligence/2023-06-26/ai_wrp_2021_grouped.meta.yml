@@ -27,7 +27,7 @@ tables:
  ai_wrp_2021_grouped:
   variables:
     age_mostly_help:
-      title: Age - Help Harm Ratio
+      title: Age - Help
       description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents grouped by age.
       unit: ratio
       display:
@@ -36,7 +36,7 @@ tables:
 
 
     education_mostly_help:
-      title: Education - Help Harm Ratio
+      title: Education - Help
       description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents grouped by education level.
       unit: ratio
       display:
@@ -45,7 +45,7 @@ tables:
 
 
     employment_mostly_help:
-      title: Employment - Help Harm Ratio
+      title: Employment - Help
       description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents grouped by employment status.
       unit: ratio
       display:
@@ -53,7 +53,7 @@ tables:
         numDecimalPlaces: 1
 
     gender_mostly_help:
-      title: Gender - Help Harm Ratio
+      title: Gender - Help
       description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents grouped by gender.
       unit: ratio
       display:
@@ -62,7 +62,7 @@ tables:
 
 
     income_mostly_help:
-      title: Income - Help Harm Ratio
+      title: Income - Help
       description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents grouped by income level.
       unit: ratio
       display:
@@ -71,7 +71,7 @@ tables:
 
 
     region_mostly_help:
-      title: Region - Help Harm Ratio
+      title: Region - Help
       description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents grouped by region.
       unit: ratio
       display:
@@ -80,7 +80,7 @@ tables:
 
 
     age_yes__would_feel_safe:
-      title: Age - Yes No Ratio
+      title: Age - Yes
       description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?" Answers by respondents grouped by age.
       unit: ratio
       display:
@@ -89,7 +89,7 @@ tables:
 
 
     education_yes__would_feel_safe:
-      title: Education - Yes No Ratio
+      title: Education - Yes
       description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?" Answers by respondents grouped by education level.
       unit: ratio
       display:
@@ -98,7 +98,7 @@ tables:
 
 
     employment_yes__would_feel_safe:
-      title: Employment - Yes No Ratio
+      title: Employment - Yes
       description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?" Answers by respondents grouped by employment status.
       unit: ratio
       display:
@@ -107,7 +107,7 @@ tables:
 
 
     gender_yes__would_feel_safe:
-      title: Gender - Yes No Ratio
+      title: Gender - Yes
       description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?" Answers by respondents grouped by gender.
       unit: ratio
       display:
@@ -116,7 +116,7 @@ tables:
 
 
     income_yes__would_feel_safe:
-      title: Income - Yes No Ratio
+      title: Income - Yes
       description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?" Answers by respondents grouped by income level.
       unit: ratio
       display:
@@ -125,7 +125,7 @@ tables:
 
 
     region_yes__would_feel_safe:
-      title: Region - Yes No Ratio
+      title: Region - Yes
       description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?" Answers by respondents grouped by region.
       unit: ratio
       display:
