@@ -23,8 +23,8 @@ TYPE_OF_VIOLENCE_MAPPING = {
 TYPE_OF_CONFLICT_MAPPING = {
     1: "extrasystemic",
     2: "interstate",
-    3: "intrastate",
-    4: "internationalized intrastate",
+    3: "intrastate (non-internationalized)",
+    4: "intrastate (internationalized)",
 }
 # Regions mapping (for PRIO/UCDP dataset)
 REGIONS_MAPPING = {
@@ -62,9 +62,10 @@ def run(dest_dir: str) -> None:
     tb_geo = tb_geo[tb_geo["active_year"] == 1]
     tb = add_conflict_type(tb_geo, tb_conflict)
 
-    # Add `year_start`, which denotes the year when the conflict corresponding to the event started (only considering events with `active_year` == 1)
-    log.info("ucdp: add conflict year start to each event")
-    tb = add_year_start(tb)
+    # Sanity check conflict_type transitions
+    ## Only consider transitions between intrastate and intl intrastate
+    _sanity_check_conflict_types(tb)
+    _sanity_check_prio_conflict_types(tb_prio)
 
     # Add number of new conflicts and ongoing conflicts (also adds data for the World)
     log.info("ucdp: get metrics for main dataset (also estimate values for 'World')")
@@ -230,6 +231,40 @@ def add_conflict_type(tb_geo: Table, tb_conflict: Table) -> Table:
     return tb_geo
 
 
+def _sanity_check_conflict_types(tb: Table) -> Table:
+    # Define expected combinations of conflicT_types for a conflict. Typically, only in the intrastate domain
+    TRANSITION_EXPECTED = {"intrastate (internationalized)", "intrastate (non-internationalized)"}
+    # Get conflicts with more than one conflict type assigned to them over their lifetime
+    conflict_type_transitions = tb.groupby("conflict_new_id")["conflict_type"].apply(set)
+    transitions = conflict_type_transitions[conflict_type_transitions.apply(len) > 1].drop_duplicates()
+    # Extract unique combinations of conflict_types for a conflict
+    print(transitions)
+    assert (len(transitions) == 1) & (transitions.iloc[0] == TRANSITION_EXPECTED), "Error"
+
+    # Check if different regions categorise the conflict differently in the same year
+    assert not (
+        tb.groupby(["conflict_id", "year"])["type_of_conflict"].nunique() > 1
+    ).any(), "Seems like the conflict hast multiple types for a single year! Is it categorised differently depending on the region?"
+
+
+def _sanity_check_prio_conflict_types(tb: Table) -> Table:
+    # Define expected combinations of conflicT_types for a conflict. Typically, only in the intrastate domain
+    TRANSITIONS_EXPECTED = {"{3, 4}"}
+    # Get conflicts with more than one conflict type assigned to them over their lifetime
+    conflict_type_transitions = tb.groupby("conflict_id")["type_of_conflict"].apply(set)
+    transitions = conflict_type_transitions[conflict_type_transitions.apply(len) > 1].drop_duplicates()
+    # Extract unique combinations of conflict_types for a conflict
+    transitions = set(transitions.astype(str))
+    transitions_unk = transitions - TRANSITIONS_EXPECTED
+
+    # Check if different regions categorise the conflict differently in the same year
+    assert not (
+        tb.groupby(["conflict_id", "year"])["type_of_conflict"].nunique() > 1
+    ).any(), "Seems like the conflict hast multiple types for a single year! Is it categorised differently depending on the region?"
+
+    assert not transitions_unk, f"Unknown transitions found: {transitions_unk}"
+
+
 def replace_missing_data_with_zeros(tb: Table) -> Table:
     """Replace missing data with zeros.
 
@@ -264,14 +299,6 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     return tb
 
 
-def add_year_start(tb: Table) -> Table:
-    """Add year of conflict start."""
-    tb_start_year = tb.groupby("conflict_new_id", as_index=False)[["year"]].min()
-    tb = tb.merge(tb_start_year, on="conflict_new_id", how="left", suffixes=("", "_start"))
-    assert tb.year_start.isna().sum() == 0, "Check NaNs in year_start!"
-    return tb
-
-
 def add_number_conflicts_and_deaths(tb: Table) -> Table:
     """Add number of ongoing and new conflicts.
 
@@ -289,9 +316,12 @@ def add_number_conflicts_and_deaths(tb: Table) -> Table:
     # Combine and build single table
     log.info("ucdp: combine and build single table")
     tb = tb_ongoing.merge(
-        tb_new, left_on=["year", "region", "conflict_type"], right_on=["year_start", "region", "conflict_type"]
+        tb_new,
+        left_on=["year", "region", "conflict_type"],
+        right_on=["year", "region", "conflict_type"],
+        suffixes=("", "_start"),
     )
-    tb = tb.drop(columns=["year_start"])
+    # tb = tb.drop(columns=["year_start"])
     return tb
 
 
@@ -332,20 +362,29 @@ def _add_number_ongoing_conflicts_and_deaths(tb: Table) -> Table:
 
 
 def _add_number_new_conflicts(tb: Table) -> Table:
+    # Reduce table to only preserve first appearing event
+    tb = (
+        tb[["conflict_new_id", "year", "region", "conflict_type"]]
+        .sort_values("year")
+        .drop_duplicates(subset=["conflict_new_id", "region"], keep="first")
+    )
+
     # For each region
-    columns_idx = ["year_start", "region", "conflict_type"]
+    columns_idx = ["year", "region", "conflict_type"]
     tb_new = tb.groupby(columns_idx)[["conflict_new_id"]].nunique().reset_index()
     tb_new.columns = columns_idx + ["number_new_conflicts"]
 
     # For the World
-    columns_idx = ["year_start", "conflict_type"]
+    ## Consider first start globally (a conflict may have started in region A in year X and in region B later in year X + 1)
+    tb = tb.sort_values("year").drop_duplicates(subset=["conflict_new_id"], keep="first")
+    columns_idx = ["year", "conflict_type"]
     tb_new_world = tb.groupby(columns_idx)[["conflict_new_id"]].nunique().reset_index()
     tb_new_world.columns = columns_idx + ["number_new_conflicts"]
     tb_new_world["region"] = "World"
 
     # Combine
     tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True).sort_values(  # type: ignore
-        by=["year_start", "region", "conflict_type"]
+        by=["year", "region", "conflict_type"]
     )
 
     return tb_new
@@ -420,34 +459,35 @@ def _prio_add_metrics(tb: Table) -> Table:
     # Keep only until 1989
     tb_ongoing = tb_ongoing[tb_ongoing["year"] < 1989]
 
-    # Get number of ongoing conflicts for all regions
-    cols_idx = ["year_start", "region", "conflict_type"]
+    # Get number of new conflicts for all regions
+    ## Reduce table to only preserve first appearing event
+    tb = (
+        tb[["conflict_id", "year", "region", "conflict_type"]]
+        .sort_values("year")
+        .drop_duplicates(subset=["conflict_type", "year", "region"], keep="first")
+    )
+    # Groupby operation
+    cols_idx = ["year", "region", "conflict_type"]
     tb_new = tb.groupby(cols_idx, as_index=False)["conflict_id"].nunique()
     tb_new.columns = cols_idx + ["number_new_conflicts"]
-    # Get number of ongoing conflicts for 'World'
-    cols_idx = ["year_start", "conflict_type"]
+    # Get number of new conflicts for 'World'
+    tb = tb.sort_values("year").drop_duplicates(subset=["conflict_type", "year"], keep="first")
+    cols_idx = ["year", "conflict_type"]
     tb_new_world = tb.groupby(cols_idx, as_index=False)["conflict_id"].nunique()
     tb_new_world.columns = cols_idx + ["number_new_conflicts"]
     tb_new_world["region"] = "World"
     # Combine regions & world
     tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True)
     # Keep only until 1989 (inc)
-    tb_new = tb_new[tb_new["year_start"] <= 1989]
+    tb_new = tb_new[tb_new["year"] <= 1989]
 
     # Combine and build single table
     tb = tb_ongoing.merge(
-        tb_new,
-        left_on=["year", "region", "conflict_type"],
-        right_on=["year_start", "region", "conflict_type"],
-        how="outer",
+        tb_new, left_on=["year", "region", "conflict_type"], right_on=["year", "region", "conflict_type"], how="outer"
     )
-    tb["year"] = tb["year"].fillna(tb["year_start"])
 
     # Dtypes
     tb = tb.astype({"year": "uint64", "region": "category"})
-
-    # Drop unused column
-    tb = tb.drop(columns=["year_start"])
 
     return tb
 
@@ -460,17 +500,18 @@ def _combine_main_with_prio(tb: Table, tb_prio: Table) -> Table:
     tb = tb_prio.merge(tb, on=["year", "region", "conflict_type"], suffixes=("_prio", "_main"), how="outer")
 
     # Sanity checks
-    assert tb[-tb["number_ongoing_conflicts_prio"].isna()]["year"].max() == 1988
+    ## Data from PRIO/UCDP for `number_ongoing_conflicts` goes from 1946 to 1988 (inc)
     assert tb[-tb["number_ongoing_conflicts_prio"].isna()]["year"].min() == 1946
-
-    assert tb[-tb["number_ongoing_conflicts_main"].isna()]["year"].max() == 2022
+    assert tb[-tb["number_ongoing_conflicts_prio"].isna()]["year"].max() == 1988
+    ## Data from GEO for `number_ongoing_conflicts` goes from 1989 to 2022 (inc)
     assert tb[-tb["number_ongoing_conflicts_main"].isna()].year.min() == 1989
-
+    assert tb[-tb["number_ongoing_conflicts_main"].isna()]["year"].max() == 2022
+    ## Data from PRIO/UCDP for `number_new_conflicts` goes from 1939 to 1989 (inc)
+    assert tb[-tb["number_new_conflicts_prio"].isna()]["year"].min() == 1946
     assert tb[-tb["number_new_conflicts_prio"].isna()]["year"].max() == 1989
-    assert tb[-tb["number_new_conflicts_prio"].isna()]["year"].min() == 1939
-
-    assert tb[-tb["number_new_conflicts_main"].isna()]["year"].max() == 2022
+    ## Data from GEO for `number_new_conflicts` goes from 1990 to 2022 (inc)
     assert tb[-tb["number_new_conflicts_main"].isna()]["year"].min() == 1990
+    assert tb[-tb["number_new_conflicts_main"].isna()]["year"].max() == 2022
 
     # Actually combine timeseries from UCDP/PRIO and GEO
     tb["number_ongoing_conflicts"] = tb["number_ongoing_conflicts_prio"].fillna(tb["number_ongoing_conflicts_main"])
@@ -511,10 +552,12 @@ def add_conflict_all(tb: Table) -> Table:
 
 
 def add_conflict_all_intrastate(tb: Table) -> Table:
-    """Add metrics for conflict_type = 'all intrastate'."""
-    tb_intra = tb[tb["conflict_type"].isin(["intrastate", "internationalized intrastate"])].copy()
+    """Add metrics for conflict_type = 'intrastate'."""
+    tb_intra = tb[
+        tb["conflict_type"].isin(["intrastate (non-internationalized)", "intrastate (internationalized)"])
+    ].copy()
     tb_intra = tb_intra.groupby(["year", "region"], as_index=False).sum(numeric_only=True)
-    tb_intra["conflict_type"] = "all intrastate"
+    tb_intra["conflict_type"] = "intrastate"
     tb = pd.concat([tb, tb_intra], ignore_index=True)
     return tb
 
