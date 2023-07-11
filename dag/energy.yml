@@ -62,21 +62,6 @@ steps:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/regions/2023-01-01/regions
   #
-  # Smil - Global primary energy (2017).
-  #
-  data://meadow/smil/2017-01-01/global_primary_energy:
-    - walden://smil/2017-01-01/global_primary_energy
-  data://garden/smil/2017-01-01/global_primary_energy:
-    - data://meadow/smil/2017-01-01/global_primary_energy
-  #
-  # Energy - Global primary energy (2023).
-  #
-  data://garden/energy/2023-06-01/global_primary_energy:
-    - data://garden/smil/2017-01-01/global_primary_energy
-    - data://garden/bp/2022-12-28/statistical_review
-  data://grapher/energy/2023-06-01/global_primary_energy:
-    - data://garden/energy/2023-06-01/global_primary_energy
-  #
   # UK BEIS - UK historical electricity (2022).
   #
   data://meadow/uk_beis/2022-07-28/uk_historical_electricity:
@@ -203,6 +188,21 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/energy/2023-07-10/fossil_fuel_production:
     - data://garden/energy/2023-07-10/fossil_fuel_production
+  #
+  # Smil - Global primary energy (2017).
+  #
+  data://meadow/papers/2023-07-10/smil_2017:
+    - snapshot://papers/2023-07-10/smil_2017.csv
+  data://garden/papers/2023-07-10/smil_2017:
+    - data://meadow/papers/2023-07-10/smil_2017
+  #
+  # Energy - Global primary energy (2023).
+  #
+  data://garden/energy/2023-07-10/global_primary_energy:
+    - data://garden/papers/2023-07-10/smil_2017
+    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
+  data://grapher/energy/2023-07-10/global_primary_energy:
+    - data://garden/energy/2023-07-10/global_primary_energy
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -283,5 +283,20 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/energy/2023-06-01/fossil_fuel_production:
     - data://garden/energy/2023-06-01/fossil_fuel_production
+  #
+  # Smil - Global primary energy (2017).
+  #
+  data://meadow/smil/2017-01-01/global_primary_energy:
+    - walden://smil/2017-01-01/global_primary_energy
+  data://garden/smil/2017-01-01/global_primary_energy:
+    - data://meadow/smil/2017-01-01/global_primary_energy
+  #
+  # Energy - Global primary energy (2023).
+  #
+  data://garden/energy/2023-06-01/global_primary_energy:
+    - data://garden/smil/2017-01-01/global_primary_energy
+    - data://garden/bp/2022-12-28/statistical_review
+  data://grapher/energy/2023-06-01/global_primary_energy:
+    - data://garden/energy/2023-06-01/global_primary_energy
 
   ######################################################################################################################

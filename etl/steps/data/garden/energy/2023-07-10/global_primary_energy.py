@@ -1,18 +1,20 @@
-"""Garden step that combines Vaclav Smil's Global Primary Energy with BP's Statistical Review of World Energy.
+"""Garden step that combines Vaclav Smil's data on global primary energy with the Energy Institute Statistical Review of
+World Energy.
 
 """
 
 import numpy as np
 from owid.catalog import Dataset, Table
+from owid.catalog.tables import (
+    get_unique_licenses_from_tables,
+    get_unique_sources_from_tables,
+)
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
-from etl.helpers import PathFinder, create_dataset_with_combined_metadata
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-# Exajoules to terawatt-hours.
-EJ_TO_TWH = 1e6 / 3600
 
 # Average efficiency factor assumed to convert direct energy to input-equivalent energy of Smil's data.
 # This factor will be used for hydropower, nuclear, other renewables, solar and wind
@@ -22,10 +24,10 @@ EJ_TO_TWH = 1e6 / 3600
 EFFICIENCY_FACTOR = 0.36
 
 
-def prepare_bp_data(tb_bp: Table) -> Table:
-    tb_bp = tb_bp.reset_index()
+def prepare_statistical_review_data(tb_review: Table) -> Table:
+    tb_review = tb_review.reset_index()
 
-    # BP gives generation of direct energy in TWh, and, for non-fossil sources of electricity,
+    # The Statistical Review gives generation of energy in TWh, and, for non-fossil sources of electricity,
     # consumption of input-equivalent energy in EJ.
     # The input-equivalent energy is the amount of energy that would be required to generate a given amount of (direct)
     # electricity if non-fossil sources were as inefficient as a standard thermal power plant.
@@ -33,63 +35,63 @@ def prepare_bp_data(tb_bp: Table) -> Table:
     # On the other hand, direct and substituted energy are different for non-fossil electricity sources, namely
     # Hydropower, Nuclear, Solar, Other renewables, and Wind.
     # The difference is of a factor of ~38%, which is roughly the efficiency of a standard power plant.
-    # More specifically, BP assumes (for Biofuels, Coal, Gas and Oil) an efficiency factor that grows from 36%
-    # (until year 2000) to 40.6% (in 2021), to better reflect changes in efficiency over time.
+    # More specifically, the Statistical Review assumes (for Biofuels, Coal, Gas and Oil) an efficiency factor that
+    # grows from 36% (until year 2000) to 40.6% (in 2021), to better reflect changes in efficiency over time.
     # In the case of biomass used in electricity (included in 'Other renewables'),
-    # BP assumes a constant factor of 32% for all years.
+    # the Statistical Review assumes a constant factor of 32% for all years.
     # For more details:
-    # https://www.bp.com/content/dam/bp/business-sites/en/global/corporate/pdfs/energy-economics/statistical-review/bp-stats-review-2022-methodology.pdf
-    bp_columns = {
+    # https://www.energyinst.org/statistical-review/about
+    # https://www.energyinst.org/__data/assets/pdf_file/0003/1055541/Methodology.pdf
+    # NOTES:
+    # * We already converted input-equivalent energy from EJ to TWh in the garden step of the Statistical Review.
+    # * We included estimates of direct energy (by multiplying by the efficiency factors of the table in the appendix
+    #   of the Statistical Review), however, we will use the electricity generation instead, as an estimate for direct
+    #   primary energy. The estimated direct energy and electricity generation are almost identical, except for other
+    #   renewables, where there the estimated direct primary energy is about 24% larger than electricity generation.
+    columns = {
         "country": "country",
         "year": "year",
         # Fossil sources (direct energy).
-        "biofuels_consumption__twh__total": "biofuels__twh_direct_energy",
-        "coal_consumption__twh": "coal__twh_direct_energy",
-        "gas_consumption__twh": "gas__twh_direct_energy",
-        "oil_consumption__twh": "oil__twh_direct_energy",
+        "biofuels_consumption_twh": "biofuels__twh_direct_energy",
+        "coal_consumption_twh": "coal__twh_direct_energy",
+        "gas_consumption_twh": "gas__twh_direct_energy",
+        "oil_consumption_twh": "oil__twh_direct_energy",
         # Non-fossil electricity sources (direct energy).
-        "geo_biomass_other__twh": "other_renewables__twh_direct_energy",
-        "hydro_generation__twh": "hydropower__twh_direct_energy",
-        "nuclear_generation__twh": "nuclear__twh_direct_energy",
-        "solar_generation__twh": "solar__twh_direct_energy",
-        "wind_generation__twh": "wind__twh_direct_energy",
+        "other_renewables_electricity_generation_twh": "other_renewables__twh_direct_energy",
+        "hydro_electricity_generation_twh": "hydropower__twh_direct_energy",
+        "nuclear_electricity_generation_twh": "nuclear__twh_direct_energy",
+        "solar_electricity_generation_twh": "solar__twh_direct_energy",
+        "wind_electricity_generation_twh": "wind__twh_direct_energy",
         # Non-fossil electricity sources (substituted energy).
-        "geo_biomass_other__ej": "other_renewables__ej_substituted_energy",
-        "hydro_consumption__ej": "hydropower__ej_substituted_energy",
-        "nuclear_consumption__ej": "nuclear__ej_substituted_energy",
-        "solar_consumption__ej": "solar__ej_substituted_energy",
-        "wind_consumption__ej": "wind__ej_substituted_energy",
+        "other_renewables_consumption_equivalent_twh": "other_renewables__twh_substituted_energy",
+        "hydro_consumption_equivalent_twh": "hydropower__twh_substituted_energy",
+        "nuclear_consumption_equivalent_twh": "nuclear__twh_substituted_energy",
+        "solar_consumption_equivalent_twh": "solar__twh_substituted_energy",
+        "wind_consumption_equivalent_twh": "wind__twh_substituted_energy",
     }
-    tb_bp = tb_bp[list(bp_columns)].rename(columns=bp_columns)
-    # Convert all units to TWh.
-    for column in tb_bp.columns:
-        if "_ej_" in column:
-            # Create a new column in TWh instead of EJ.
-            tb_bp[column.replace("_ej_", "_twh_")] = tb_bp[column] * EJ_TO_TWH
-            # Remove the column in EJ.
-            tb_bp = tb_bp.drop(columns=column)
+    tb_review = tb_review[list(columns)].rename(columns=columns, errors="raise")
     # For completeness, create columns of substituted energy for fossil sources (even if they would coincide with
     # direct energy).
     for fossil_source in ["biofuels", "coal", "gas", "oil"]:
-        tb_bp[f"{fossil_source}__twh_substituted_energy"] = tb_bp[f"{fossil_source}__twh_direct_energy"]
+        tb_review[f"{fossil_source}__twh_substituted_energy"] = tb_review[f"{fossil_source}__twh_direct_energy"]
 
     # Select only data for the World (which is the only region informed in Smil's data).
-    tb_bp = tb_bp[tb_bp["country"] == "World"].reset_index(drop=True)
+    tb_review = tb_review[tb_review["country"] == "World"].reset_index(drop=True)
 
-    return tb_bp
+    return tb_review
 
 
 def prepare_smil_data(tb_smil: Table) -> Table:
     tb_smil = tb_smil.reset_index()
 
     # Create columns for input-equivalent energy.
-    # To do this, we follow a similar approach to BP:
+    # To do this, we follow a similar approach to the Statistical Review:
     # We create input-equivalent energy by dividing direct energy consumption of non-fossil electricity sources
     # (hydropower, nuclear, other renewables, solar and wind) by a factor of 36%
     # (called EFFICIENCY_FACTOR, defined above).
-    # This is the efficiency factor of a typical thermal plant assumed by BP between 1965 and 2000, and we assume this
-    # factor also applies for the period 1800 to 1965.
-    # For biomass power (included in other renewables), BP assumed a constant factor of 32%.
+    # This is the efficiency factor of a typical thermal plant assumed by the Statistical Review between 1965 and 2000,
+    # and we assume this factor also applies for the period 1800 to 1965.
+    # For biomass power (included in other renewables), the Statistical Review assumed a constant factor of 32%.
     # However, since we cannot separate biomass from the rest of sources in 'other renewables',
     # we use the same 36% factor as all other non-fossil sources.
     for source in ["hydropower", "nuclear", "other_renewables", "solar", "wind"]:
@@ -101,22 +103,34 @@ def prepare_smil_data(tb_smil: Table) -> Table:
     return tb_smil
 
 
-def combine_bp_and_smil_data(tb_bp: Table, tb_smil: Table) -> Table:
-    tb_bp = tb_bp.copy()
+def combine_statistical_review_and_smil_data(tb_review: Table, tb_smil: Table) -> Table:
+    tb_review = tb_review.copy()
     tb_smil = tb_smil.copy()
 
-    # Add a new column that informs of the source of the data.
-    tb_bp["data_source"] = "BP"
+    # Add a new column that informs of the source of the data (either the Energy Institute or Smil (2017)).
+    tb_review["data_source"] = "EI"
     tb_smil["data_source"] = "Smil"
-    # Combine both tables, prioritizing BP's data on overlapping rows.
-    combined = combine_two_overlapping_dataframes(
-        df1=tb_bp, df2=tb_smil, index_columns=["country", "year"]
-    ).sort_values(["year"])
+    # Combine both tables, prioritizing the Statistical Review's data on overlapping rows.
+    # NOTE: Currently, function combine_two_overlapping_dataframes does not properly propagate metadata.
+    #  For now, sources and licenses have to be combined manually.
+    index_columns = ["country", "year"]
+    combined = combine_two_overlapping_dataframes(df1=tb_review, df2=tb_smil, index_columns=index_columns).sort_values(
+        ["year"]
+    )
+    # Combine metadata of the two tables.
+    sources = get_unique_sources_from_tables([tb_review, tb_smil])
+    licenses = get_unique_licenses_from_tables([tb_review, tb_smil])
+    for column in combined.drop(columns=index_columns).columns:
+        combined[column].metadata.sources = sources
+        combined[column].metadata.licenses = licenses
+
+    # Update the name of the new combined table.
+    combined.metadata.short_name = paths.short_name
 
     # Replace <NA> by numpy nans.
     combined = combined.fillna(np.nan)
 
-    # We do not have data for traditional biomass after 2015 (BP does not provide it).
+    # We do not have data for traditional biomass after 2015 (the Statistical Review does not provide it).
     # So, to be able to visualize the complete mix of global energy consumption,
     # we extrapolate Smil's data for traditional biomass from 2015 onwards, by repeating its last value.
     missing_years_mask = combined["year"] >= tb_smil["year"].max()
@@ -126,10 +140,6 @@ def combine_bp_and_smil_data(tb_bp: Table, tb_smil: Table) -> Table:
     combined.loc[missing_years_mask, "traditional_biomass__twh_substituted_energy"] = combined[missing_years_mask][
         "traditional_biomass__twh_substituted_energy"
     ].ffill()
-    for source in ["hydropower", "nuclear", "other_renewables", "solar", "wind"]:
-        combined[
-            f"{source}__twh_substituted_energy"
-        ].metadata.description = 'Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.'
 
     # Create an index and sort conveniently.
     combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
@@ -139,13 +149,25 @@ def combine_bp_and_smil_data(tb_bp: Table, tb_smil: Table) -> Table:
 
 def add_total_consumption_and_percentages(combined: Table) -> Table:
     # Create a column with the total direct energy (ensuring there is at least one non-nan value).
-    combined["total_consumption__twh_direct_energy"] = combined[
-        [column for column in combined.columns if "direct_energy" in column]
-    ].sum(axis=1, min_count=1)
+    direct_energy_columns = [column for column in combined.columns if "direct_energy" in column]
+    combined["total_consumption__twh_direct_energy"] = combined[direct_energy_columns].sum(axis=1, min_count=1)
     # Create a column with the total substituted energy (ensuring there is at least one non-nan value).
-    combined["total_consumption__twh_substituted_energy"] = combined[
-        [column for column in combined.columns if "substituted_energy" in column]
-    ].sum(axis=1, min_count=1)
+    equivalent_energy_columns = [column for column in combined.columns if "substituted_energy" in column]
+    combined["total_consumption__twh_substituted_energy"] = combined[equivalent_energy_columns].sum(axis=1, min_count=1)
+    # The previous operations do not propagate metadata; do it manually.
+    combined["total_consumption__twh_direct_energy"].metadata.sources = get_unique_sources_from_tables(
+        [combined[direct_energy_columns]]
+    )
+    combined["total_consumption__twh_direct_energy"].metadata.licenses = get_unique_licenses_from_tables(
+        [combined[direct_energy_columns]]
+    )
+    combined["total_consumption__twh_substituted_energy"].metadata.sources = get_unique_sources_from_tables(
+        [combined[equivalent_energy_columns]]
+    )
+    combined["total_consumption__twh_substituted_energy"].metadata.licenses = get_unique_licenses_from_tables(
+        [combined[equivalent_energy_columns]]
+    )
+
     # Add share variables.
     sources = [
         "biofuels",
@@ -176,35 +198,32 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Load BP statistical review dataset and read its main table.
-    ds_bp: Dataset = paths.load_dependency("statistical_review")
-    tb_bp = ds_bp["statistical_review"]
+    # Load Statistical Review dataset and read its main table.
+    ds_review: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    tb_review = ds_review["statistical_review_of_world_energy"]
 
     # Load Smil dataset and read its main table.
-    ds_smil: Dataset = paths.load_dependency("global_primary_energy")
-    tb_smil = ds_smil["global_primary_energy"]
+    ds_smil: Dataset = paths.load_dependency("smil_2017")
+    tb_smil = ds_smil["smil_2017"]
 
     #
     # Process data.
     #
-    # Prepare BP data.
-    tb_bp = prepare_bp_data(tb_bp=tb_bp)
+    # Prepare Statistical Review data.
+    tb_review = prepare_statistical_review_data(tb_review=tb_review)
 
     # Prepare Smil data.
     tb_smil = prepare_smil_data(tb_smil=tb_smil)
 
-    # Combine BP and Smil data.
-    combined = combine_bp_and_smil_data(tb_bp=tb_bp, tb_smil=tb_smil)
+    # Combine Statistical Review and Smil data.
+    combined = combine_statistical_review_and_smil_data(tb_review=tb_review, tb_smil=tb_smil)
 
     # Add variables for total consumption and variables of % share of each source.
     combined = add_total_consumption_and_percentages(combined=combined)
-
-    # Update table name.
-    combined.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
     #
     # Save garden dataset.
-    ds_garden = create_dataset_with_combined_metadata(dest_dir, datasets=[ds_bp, ds_smil], tables=[combined])
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[combined], default_metadata=ds_review.metadata)
     ds_garden.save()
