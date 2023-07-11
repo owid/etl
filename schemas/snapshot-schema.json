@@ -55,6 +55,9 @@
               "dataset_title_owid": {
                 "type": "string"
               },
+              "dataset_title_producer": {
+                "type": "string"
+              },
               "dataset_description_owid": {
                 "type": "string"
               },
