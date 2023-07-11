@@ -66,20 +66,17 @@ def run(dest_dir: str) -> None:
     log.info("ucdp: add conflict year start to each event")
     tb = add_year_start(tb)
 
-    # Add number of new conflicts and ongoing conflicts
+    # Add number of new conflicts and ongoing conflicts (also adds data for the World)
+    log.info("ucdp: get metrics for main dataset (also estimate values for 'World')")
     tb = add_number_conflicts_and_deaths(tb)
 
     # Add table from UCDP/PRIO
-    log.info("ucdp: add data from ucdp/prio table")
+    log.info("ucdp: add data from ucdp/prio table (also estimate values for 'World')")
     tb = add_prio_data(tb, tb_prio)
 
     # Replace missing data with zeros (where applicable)
     log.info("ucdp: replace missing data with zeros (where applicable)")
     tb = replace_missing_data_with_zeros(tb)
-
-    # Add data for World
-    log.info("ucdp: add data for World")
-    tb = add_world(tb)
 
     # Add data for "all conflicts" conflict type
     log.info("ucdp: add data for 'all conflicts'")
@@ -276,7 +273,12 @@ def add_year_start(tb: Table) -> Table:
 
 
 def add_number_conflicts_and_deaths(tb: Table) -> Table:
-    """Add number of ongoing and new conflicts."""
+    """Add number of ongoing and new conflicts.
+
+    It also estimates the values for 'World', otherwise this can't be estimated later on.
+    This is because some conflicts occur in multiple regions, and hence would be double counted. To overcome this,
+    we need to access the actual conflict_id field to find the number of unique values. This can only be done here.
+    """
     # Get number of ongoing conflicts, and deaths in ongoing conflicts
     log.info("ucdp: get number of ongoing conflicts and deaths in ongoing conflicts")
     tb_ongoing = _add_number_ongoing_conflicts_and_deaths(tb)
@@ -294,6 +296,7 @@ def add_number_conflicts_and_deaths(tb: Table) -> Table:
 
 
 def _add_number_ongoing_conflicts_and_deaths(tb: Table) -> Table:
+    # For each region
     columns_idx = ["year", "region", "conflict_type"]
     tb_ongoing = (
         tb.groupby(columns_idx)
@@ -306,13 +309,43 @@ def _add_number_ongoing_conflicts_and_deaths(tb: Table) -> Table:
         "number_deaths_ongoing_conflicts_low",
         "number_ongoing_conflicts",
     ]
+    # For the World
+    columns_idx = ["year", "conflict_type"]
+    tb_ongoing_world = (
+        tb.groupby(columns_idx)
+        .agg({"best": "sum", "high": "sum", "low": "sum", "conflict_new_id": "nunique"})
+        .reset_index()
+    )
+    tb_ongoing_world.columns = columns_idx + [
+        "number_deaths_ongoing_conflicts",
+        "number_deaths_ongoing_conflicts_high",
+        "number_deaths_ongoing_conflicts_low",
+        "number_ongoing_conflicts",
+    ]
+    tb_ongoing_world["region"] = "World"
+
+    # Combine
+    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_world], ignore_index=True).sort_values(
+        ["year", "region", "conflict_type"]
+    )
     return tb_ongoing
 
 
 def _add_number_new_conflicts(tb: Table) -> Table:
+    # For each region
     columns_idx = ["year_start", "region", "conflict_type"]
     tb_new = tb.groupby(columns_idx)[["conflict_new_id"]].nunique().reset_index()
     tb_new.columns = columns_idx + ["number_new_conflicts"]
+
+    # For the World
+    columns_idx = ["year_start", "conflict_type"]
+    tb_new_world = tb.groupby(columns_idx)[["conflict_new_id"]].nunique().reset_index()
+    tb_new_world.columns = columns_idx + ["number_new_conflicts"]
+    tb_new_world["region"] = "World"
+
+    # Combine
+    tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True).sort_values(["year_start", "region", "conflict_type"])
+
     return tb_new
 
 
@@ -371,18 +404,31 @@ def _prio_add_metrics(tb: Table) -> Table:
     that started this year. We can solve this for 'state-based' conflicts, for which we can get data earlier than 1989 from
     the UCDP/PRIO Armed Conflicts dataset.
     """
-    # Get number of ongoing conflicts
+    # Get number of ongoing conflicts for all regions
     cols_idx = ["year", "region", "conflict_type"]
     tb_ongoing = tb.groupby(cols_idx, as_index=False)["conflict_id"].nunique()
     tb_ongoing.columns = cols_idx + ["number_ongoing_conflicts"]
+    # Get number of ongoing conflicts for 'World'
+    cols_idx = ["year", "conflict_type"]
+    tb_ongoing_world = tb.groupby(cols_idx, as_index=False)["conflict_id"].nunique()
+    tb_ongoing_world.columns = cols_idx + ["number_ongoing_conflicts"]
+    tb_ongoing_world["region"] = "World"
+    # Combine regions & world
+    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_world], ignore_index=True)
     # Keep only until 1989
     tb_ongoing = tb_ongoing[tb_ongoing["year"] < 1989]
 
-    # Get number of ongoing conflicts
+    # Get number of ongoing conflicts for all regions
     cols_idx = ["year_start", "region", "conflict_type"]
     tb_new = tb.groupby(cols_idx, as_index=False)["conflict_id"].nunique()
     tb_new.columns = cols_idx + ["number_new_conflicts"]
-
+    # Get number of ongoing conflicts for 'World'
+    cols_idx = ["year_start", "conflict_type"]
+    tb_new_world = tb.groupby(cols_idx, as_index=False)["conflict_id"].nunique()
+    tb_new_world.columns = cols_idx + ["number_new_conflicts"]
+    tb_new_world["region"] = "World"
+    # Combine regions & world
+    tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True)
     # Keep only until 1989 (inc)
     tb_new = tb_new[tb_new["year_start"] <= 1989]
 
@@ -432,22 +478,6 @@ def _combine_main_with_prio(tb: Table, tb_prio: Table) -> Table:
     columns_remove = tb.filter(regex=r"(_prio|_main)").columns
     tb = tb[[col for col in tb.columns if col not in columns_remove]]
 
-    return tb
-
-
-def add_world(tb: Table) -> Table:
-    """Add metrics for country = 'World'."""
-    tb_world = tb.groupby(["year", "conflict_type"], as_index=False)[
-        [
-            "number_deaths_ongoing_conflicts",
-            "number_deaths_ongoing_conflicts_high",
-            "number_deaths_ongoing_conflicts_low",
-            "number_ongoing_conflicts",
-            "number_new_conflicts",
-        ]
-    ].sum()
-    tb_world["region"] = "World"
-    tb = pd.concat([tb, tb_world], ignore_index=True)
     return tb
 
 
