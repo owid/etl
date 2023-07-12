@@ -7,6 +7,13 @@ steps:
   data://grapher/artificial_intelligence/2023-06-21/epoch:
   - data://garden/artificial_intelligence/2023-06-21/epoch
 
+  # Large Language Models and Compute  (EPOCH)
+  data://garden/artificial_intelligence/2023-07-12/epoch_llms:
+  - snapshot://artificial_intelligence/2023-07-12/epoch_llms.csv
+  data://grapher/artificial_intelligence/2023-07-12/epoch_llms:
+  - data://garden/artificial_intelligence/2023-07-12/epoch_llms
+
+
  # Artificial Intelligence (EPOCH aggregates by domain and reseach affiliation)
   data://garden/artificial_intelligence/2023-06-21/epoch_aggregates:
   - data://garden/artificial_intelligence/2023-06-21/epoch
@@ -138,6 +145,12 @@ steps:
     - snapshot://artificial_intelligence/2023-06-14/ai_gender_representation.csv
   data://grapher/artificial_intelligence/2023-06-14/ai_gender_representation:
     - data://garden/artificial_intelligence/2023-06-14/ai_gender_representation
+
+# AI PhDs
+  data://garden/artificial_intelligence/2023-06-14/ai_phds:
+    - snapshot://artificial_intelligence/2023-06-14/ai_phds.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_phds:
+    - data://garden/artificial_intelligence/2023-06-14/ai_phds
 
   # AI national strategy
   data://meadow/artificial_intelligence/2023-06-14/ai_national_strategy:
