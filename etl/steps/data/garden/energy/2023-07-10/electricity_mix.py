@@ -8,8 +8,8 @@ from typing import Dict, List
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
-from etl.data_helpers.geo import add_population_to_dataframe
-from etl.helpers import PathFinder, create_dataset_with_combined_metadata
+from etl.data_helpers.geo import add_population_to_table
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -21,7 +21,7 @@ TWH_TO_KWH = 1e9
 MT_TO_G = 1e12
 
 
-def process_bp_data(table_bp: Table) -> Table:
+def process_statistical_review_data(tb_review: Table) -> Table:
     """Load necessary columns from BP's Statistical Review dataset, and create some new variables (e.g. electricity
     generation from fossil fuels).
 
@@ -38,18 +38,18 @@ def process_bp_data(table_bp: Table) -> Table:
     """
     # Columns to load from BP dataset.
     columns = {
-        "electricity_generation": "total_generation__twh",
-        "primary_energy_consumption__twh": "primary_energy_consumption__twh",
-        "hydro_generation__twh": "hydro_generation__twh",
-        "nuclear_generation__twh": "nuclear_generation__twh",
-        "solar_generation__twh": "solar_generation__twh",
-        "wind_generation__twh": "wind_generation__twh",
-        "geo_biomass_other__twh": "other_renewables_including_bioenergy_generation__twh",
-        "elec_gen_from_oil": "oil_generation__twh",
-        "elec_gen_from_coal": "coal_generation__twh",
-        "elec_gen_from_gas": "gas_generation__twh",
+        "electricity_generation_twh": "total_generation__twh",
+        "primary_energy_consumption_equivalent_twh": "primary_energy_consumption__twh",
+        "hydro_electricity_generation_twh": "hydro_generation__twh",
+        "nuclear_electricity_generation_twh": "nuclear_generation__twh",
+        "solar_electricity_generation_twh": "solar_generation__twh",
+        "wind_electricity_generation_twh": "wind_generation__twh",
+        "other_renewables_electricity_generation_twh": "other_renewables_including_bioenergy_generation__twh",
+        "oil_electricity_generation_twh": "oil_generation__twh",
+        "coal_electricity_generation_twh": "coal_generation__twh",
+        "gas_electricity_generation_twh": "gas_generation__twh",
     }
-    table_bp = table_bp[list(columns)].rename(columns=columns, errors="raise")
+    tb_review = tb_review[list(columns)].rename(columns=columns, errors="raise")
     # New columns to be created by summing other columns.
     aggregates: Dict[str, List[str]] = {
         "fossil_generation__twh": [
@@ -74,16 +74,16 @@ def process_bp_data(table_bp: Table) -> Table:
     }
 
     # Create a table with a dummy index.
-    tb_bp = table_bp.reset_index()
+    tb_review = tb_review.reset_index()
 
     # Create new columns, by adding up other columns (and allowing for only one nan in each sum).
     for new_column in aggregates:
-        tb_bp[new_column] = tb_bp[aggregates[new_column]].sum(axis=1, min_count=len(aggregates[new_column]) - 1)
+        tb_review[new_column] = tb_review[aggregates[new_column]].sum(axis=1, min_count=len(aggregates[new_column]) - 1)
 
-    return tb_bp
+    return tb_review
 
 
-def process_ember_data(table_ember: Table) -> Table:
+def process_ember_data(tb_ember: Table) -> Table:
     """Load necessary columns from the Combined Electricity dataset and prepare a dataframe with the required variables.
 
     Parameters
@@ -117,13 +117,13 @@ def process_ember_data(table_ember: Table) -> Table:
         "emissions__co2_intensity__gco2_kwh": "co2_intensity__gco2_kwh",
         "imports__total_net_imports__twh": "total_net_imports__twh",
     }
-    table_ember = table_ember[list(columns)].rename(columns=columns, errors="raise")
+    tb_ember = tb_ember[list(columns)].rename(columns=columns, errors="raise")
 
     # Create a table with a dummy index.
-    tb_ember = table_ember.reset_index()
+    tb_ember = tb_ember.reset_index()
 
     # In BP data, there is a variable "Geo Biomass Other", which combines all other renewables.
-    # In Ember data, "other rewenables" excludes bioenergy.
+    # In Ember data, "other renewables" excludes bioenergy.
     # To be able to combine both datasets, create a new variable for generation of other renewables including bioenergy.
     tb_ember["other_renewables_including_bioenergy_generation__twh"] = (
         tb_ember["other_renewables_excluding_bioenergy_generation__twh"] + tb_ember["bioenergy_generation__twh"]
@@ -175,7 +175,7 @@ def add_per_capita_variables(combined: Table, ds_population: Dataset) -> Table:
         "solar_and_wind_generation__twh",
     ]
     # Add a column for population (only for harmonized countries).
-    combined = add_population_to_dataframe(df=combined, ds_population=ds_population, warn_on_missing_countries=False)
+    combined = add_population_to_table(tb=combined, ds_population=ds_population, warn_on_missing_countries=False)
 
     for variable in per_capita_variables:
         assert "twh" in variable, f"Variables are assumed to be in TWh, but {variable} is not."
@@ -253,12 +253,12 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load BP's statistical review dataset and read its main table.
-    ds_bp: Dataset = paths.load_dependency("statistical_review")
-    table_bp = ds_bp["statistical_review"]
+    ds_review: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    tb_review = ds_review["statistical_review_of_world_energy"]
 
     # Load Ember's combined electricity dataset and read its main table.
     ds_ember: Dataset = paths.load_dependency("combined_electricity")
-    table_ember = ds_ember["combined_electricity"]
+    tb_ember = ds_ember["combined_electricity"]
 
     # Load population dataset.
     ds_population: Dataset = paths.load_dependency("population")
@@ -267,11 +267,26 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Prepare BP and Ember data.
-    tb_bp = process_bp_data(table_bp=table_bp)
-    tb_ember = process_ember_data(table_ember=table_ember)
+    tb_review = process_statistical_review_data(tb_review=tb_review)
+    tb_ember = process_ember_data(tb_ember=tb_ember)
 
     # Combine both tables, giving priority to Ember data (on overlapping values).
-    combined = combine_two_overlapping_dataframes(df1=tb_ember, df2=tb_bp, index_columns=["country", "year"])
+    combined = combine_two_overlapping_dataframes(df1=tb_ember, df2=tb_review, index_columns=["country", "year"])
+    ####################################################################################################################
+    # NOTE: The previous operation does not propagate metadata properly, so we do it manually.
+    for column in combined.columns:
+        sources = []
+        licenses = []
+        # Gather all sources and licenses for this column.
+        for table in [tb_ember, tb_review]:
+            if column in table.columns:
+                sources.extend(table[column].metadata.sources)
+                licenses.extend(table[column].metadata.licenses)
+        # Assign the gathered sources and licenses to the new column.
+        combined[column].sources = sources
+        combined[column].licenses = licenses
+    combined.metadata.short_name = paths.short_name
+    ####################################################################################################################
 
     # Add carbon intensities.
     # There is already a variable for this in the Ember dataset, but now that we have combined
@@ -289,12 +304,9 @@ def run(dest_dir: str) -> None:
     # Set an appropriate index and sort rows and columns conveniently.
     combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
-    # Set a table name.
-    combined.metadata.short_name = paths.short_name
-
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset_with_combined_metadata(dest_dir=dest_dir, datasets=[ds_bp, ds_ember], tables=[combined])
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[combined], default_metadata=ds_ember.metadata)
     ds_garden.save()
