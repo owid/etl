@@ -106,7 +106,7 @@ def create_dataset(
     :param default_metadata: The default metadata to use for the dataset, could be either SnapshotMeta or DatasetMeta.
     :param underscore_table: Whether to underscore the table name before adding it to the dataset.
     :param camel_to_snake: Whether to convert camel case to snake case for the table name.
-    :param check_variables_metadata: Check that all variables in tables have at least one source and one license; raise a warning otherwise.
+    :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
