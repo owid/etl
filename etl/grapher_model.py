@@ -349,7 +349,7 @@ class Dataset(SQLModel, table=True):
     sourceChecksum: Optional[str] = Field(
         default=None, sa_column=Column("sourceChecksum", String(64, "utf8mb4_0900_as_cs"))
     )
-    updatePeriod: str = Field(sa_column=Column("updatePeriod", String(255, "utf8mb4_0900_as_cs"), nullable=False))
+    updatePeriod: Optional[str] = Field(sa_column=Column("updatePeriod", String(255, "utf8mb4_0900_as_cs"), nullable=True))
 
     users: Optional["User"] = Relationship(back_populates="datasets")
     users_: Optional["User"] = Relationship(back_populates="datasets_")

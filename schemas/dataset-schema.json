@@ -281,7 +281,6 @@
                       }
                     ]
                   },
-                  "schema_version": { "type": "integer" },
                   "processing_level": { "type": "string", "enum": ["minor", "medium", "major"] },
                   "presentation": {
                     "type": "object",

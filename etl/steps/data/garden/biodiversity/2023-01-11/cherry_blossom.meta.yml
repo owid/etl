@@ -1,3 +1,5 @@
+dataset:
+  update_period: "yearly"
 tables:
   cherry_blossom:
     variables:
@@ -7,7 +9,6 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
-        schema_version: 2
         processing_level: minor
         presentation:
           topic_tags_links:
