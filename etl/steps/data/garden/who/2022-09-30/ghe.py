@@ -99,7 +99,7 @@ def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
             "sex": "category",
             "daly_count": "float32",
             "daly_rate100k": "float32",
-            "death_count": "int32",
+            "death_count": "float32",
             "death_rate100k": "float32",
         }
     )
@@ -222,7 +222,7 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     df_age_group_ihme = build_custom_age_groups(df, age_groups=age_groups_ihme)
     df_age_group_self_harm = build_custom_age_groups(df, age_groups=age_groups_self_harm, select_causes=["Self-harm"])
     df = remove_granular_age_groups(df, age_groups_to_keep=["ALLAges", "Age-standardized"])
-    df_combined = pd.concat([df, df_age_group_ihme, df_age_group_self_harm], ignore_index=True).drop(columns=["index"])
+    df_combined = pd.concat([df, df_age_group_ihme, df_age_group_self_harm], ignore_index=True)
 
     return df_combined
 
