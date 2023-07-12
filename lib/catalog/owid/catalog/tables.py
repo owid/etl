@@ -1263,3 +1263,12 @@ def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = Non
     metadata = TableMeta(title=title, description=description, short_name=short_name)
 
     return metadata
+
+
+def check_all_variables_have_metadata(tables: List[Table], fields: Tuple[str] = ("sources", "licenses")) -> None:
+    for table in tables:
+        table_name = table.metadata.short_name
+        for column in table.columns:
+            for field in fields:
+                if not getattr(table[column].metadata, field):
+                    log.warning(f"Table {table_name}, column {column} has no {field}.")
