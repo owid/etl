@@ -13,3 +13,8 @@ meta:
   description: >
     World bank data on governmental spending in education and indicators related to
     teachers.
+wdir: ../../../data/snapshots/wb/2023-07-10
+outs:
+- md5: aef2ec914bc094a2abbffdbb9d356740
+  size: 1657867
+  path: education_expenditure_and_teachers.csv

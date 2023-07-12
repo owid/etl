@@ -22,6 +22,7 @@ def main(path_to_file: str, upload: bool) -> None:
     """
     Instructions:
     1. Visit the following URL:  https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
+
     2. Select the following indicators:
 
     4. Choose the "CSV" format and initiate the download.

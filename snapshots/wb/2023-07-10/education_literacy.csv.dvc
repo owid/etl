@@ -13,3 +13,8 @@ meta:
   description: >
     World bank data on literacy rates amongst adults (15+), youth (15-24), 25-64 year
     olds, and eldery (65+) split by gender.
+wdir: ../../../data/snapshots/wb/2023-07-10
+outs:
+- md5: 5f7e8cb84f3a6df17140cb04159386ca
+  size: 1498568
+  path: education_literacy.csv

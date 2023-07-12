@@ -12,3 +12,8 @@ meta:
   is_public: true
   description: >
     World bank data on tertiary school education.
+wdir: ../../../data/snapshots/wb/2023-07-10
+outs:
+- md5: 73cac5d9f207818b5d6c48d7273b16a9
+  size: 1920441
+  path: education_tertiary.csv

@@ -35,17 +35,20 @@ def run(dest_dir: str) -> None:
     """
 
     # Define a list of snapshots to be loaded
-    snaps = ["education_learning_outcomes.csv", "education_pre_primary.csv"]
-    #     "education_literacy.csv"
-    #     "education_primary.csv",
-    #     "education_secondary.csv",
-    #     "education_tertiary.csv",
-    #     "education_expenditure_and_teachers.csv",
-    # ]
+    snaps = [
+        "education_learning_outcomes.csv",
+        "education_pre_primary.csv",
+        "education_primary.csv",
+        "education_secondary.csv",
+        "education_tertiary.csv",
+        "education_literacy.csv",
+        "education_expenditure_and_teachers.csv",
+    ]
 
     # Load and process data from each snapshot
     df_list = []
     for snap in snaps:
+        print(snap)
         snapshot = cast(Snapshot, paths.load_dependency(snap))
         df = load_and_select_data(snapshot)
         # Create indicator group colum excluding .csv at the end
@@ -75,9 +78,7 @@ def run(dest_dir: str) -> None:
 
     tb.set_index(["country", "year", "indicator_name"], inplace=True)
 
-    # Create a new dataset using the same metadata as the snapshot for the 'worldbank_pisa.csv' data
-    snap_attainment = cast(Snapshot, paths.load_dependency("worldbank_pisa.csv"))
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap_attainment.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=None)
 
     # Save the dataset
     ds_meadow.save()

@@ -23,32 +23,6 @@ def main(path_to_file: str, upload: bool) -> None:
     Instructions:
     1. Visit the following URL:  https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
     2. Select the following indicators:
-        'Proportion of teachers with the minimum required qualifications in pre-primary education, both sexes (%)'
-        'Percentage of qualified teachers in pre-primary education, both sexes (%)'
-        'Pupil-trained teacher ratio in pre-primary education (headcount basis)'
-        'Percentage of qualified teachers in primary education, both sexes (%)'
-        'Proportion of teachers with the minimum required qualifications in primary education, both sexes (%)'
-        'Pupil-trained teacher ratio in primary education (headcount basis)'
-        'Pupil-trained teacher ratio in secondary education (headcount basis)'
-        'Pupil-qualified teacher ratio in secondary (headcount basis)'
-        'Teachers in secondary education, both sexes (number)'
-        'Teachers in primary education, both sexes (number)'
-        'Teachers in pre-primary education, both sexes (number)'
-        'Percentage of qualified teachers in secondary education, both sexes (%)'
-        'Proportion of teachers with the minimum required qualifications in secondary education, both sexes (%)'
-        'Annual statutory teacher salaries in public institutions in USD. Pre-Primary. Starting salary'
-        'Annual statutory teacher salaries in public institutions in USD. Primary. Starting salary'
-        'Annual statutory teacher salaries in public institutions in USD. Upper Secondary. Starting salary'
-        'Annual statutory teacher salaries in public institutions in USD. Lower Secondary. Starting salary'
-        'Teaching staff compensation as a percentage of total expenditure in public institutions (%)'
-        'Government expenditure on education as % of GDP (%)'
-        'Expenditure on education as % of total government expenditure (%)'
-        'Government expenditure on pre-primary education as % of GDP (%)'
-        'Government expenditure on primary education as % of GDP (%)'
-        'Government expenditure on secondary education as % of GDP (%)'
-        'Government expenditure on tertiary education as % of GDP (%)'
-        'Pupil-qualified teacher ratio in primary education (headcount basis)'
-        'Pupil-qualified teacher ratio in pre-primary education (headcount basis)'
 
     3. In the top right corner, click on the "Download" button.
     4. Choose the "CSV" format and initiate the download.
@@ -56,7 +30,7 @@ def main(path_to_file: str, upload: bool) -> None:
     Note: Ensure that the downloaded dataset contains the desired PISA scores and associated information.
     """
     # Create a new snapshot.
-    snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/worldbank_expenditure_and_teachers.csv")
+    snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/education_expenditure_and_teachers.csv")
 
     # Ensure destination folder exists.
     snap.path.parent.mkdir(exist_ok=True, parents=True)
