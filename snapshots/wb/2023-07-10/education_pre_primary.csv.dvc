@@ -1,8 +1,8 @@
 meta:
-  name: 'World Bank Education Statistics: Secondary Education'
+  name: 'World Bank Education Statistics: Pre-Primary Education'
   publication_year: 2018
   source_name: World Bank EdStats (2023)
-  source_published_by: 'World Bank Education Statistics: Secondary Education, World
+  source_published_by: 'World Bank Education Statistics: Pre-Primary Education, World
     Bank EdStats (2023)'
   url: https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
   source_data_url:
@@ -11,9 +11,9 @@ meta:
   date_accessed: 2023-07-10
   is_public: true
   description: >
-    World bank data on secondary school education.
-wdir: ../../../data/snapshots/worldbank_education/2023-07-10
+    World bank data on pre-primary school education.
+wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
-- md5: 917473443aadaf55da60cff4c1b63e3e
-  size: 3555341
-  path: worldbank_secondary.csv
+- md5: e380b1b89e3964567890654eff08245c
+  size: 2581485
+  path: education_pre_primary.csv

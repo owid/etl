@@ -55,7 +55,7 @@ def main(path_to_file: str, upload: bool) -> None:
     Note: Ensure that the downloaded dataset contains the desired PISA scores and associated information.
     """
     # Create a new snapshot.
-    snap = Snapshot(f"worldbank_education/{SNAPSHOT_VERSION}/worldbank_primary.csv")
+    snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/worldbank_primary.csv")
 
     # Ensure destination folder exists.
     snap.path.parent.mkdir(exist_ok=True, parents=True)
