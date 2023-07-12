@@ -37,13 +37,6 @@ steps:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/regions/2023-01-01/regions
   #
-  # UK BEIS - UK historical electricity (2022).
-  #
-  data://meadow/uk_beis/2022-07-28/uk_historical_electricity:
-    - walden://uk_beis/2022-07-28/uk_historical_electricity
-  data://garden/uk_beis/2022-07-28/uk_historical_electricity:
-    - data://meadow/uk_beis/2022-07-28/uk_historical_electricity
-  #
   # Energy - UK historical electricity (2023).
   #
   data://garden/energy/2023-06-01/uk_historical_electricity:
@@ -204,6 +197,13 @@ steps:
   data://garden/ember/2023-07-10/combined_electricity:
     - data://garden/ember/2022-08-01/european_electricity_review
     - data://garden/ember/2023-07-10/yearly_electricity
+  #
+  # UK BEIS - UK historical electricity (2023).
+  #
+  data://meadow/uk_beis/2023-07-10/uk_historical_electricity:
+    - snapshot://uk_beis/2023-07-10/uk_historical_electricity.xls
+  data://garden/uk_beis/2023-07-10/uk_historical_electricity:
+    - data://meadow/uk_beis/2023-07-10/uk_historical_electricity
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -325,5 +325,12 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/energy/2023-06-01/electricity_mix:
     - data://garden/energy/2023-06-01/electricity_mix
+  #
+  # UK BEIS - UK historical electricity (2022).
+  #
+  data://meadow/uk_beis/2022-07-28/uk_historical_electricity:
+    - walden://uk_beis/2022-07-28/uk_historical_electricity
+  data://garden/uk_beis/2022-07-28/uk_historical_electricity:
+    - data://meadow/uk_beis/2022-07-28/uk_historical_electricity
 
   ######################################################################################################################
