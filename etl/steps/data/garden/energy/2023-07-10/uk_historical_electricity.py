@@ -7,7 +7,7 @@ import numpy as np
 from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
 
-from etl.helpers import PathFinder, create_dataset_with_combined_metadata
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -186,5 +186,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset_with_combined_metadata(dest_dir, datasets=[ds_beis, ds_elec], tables=[tb_combined])
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_combined], default_metadata=ds_beis.metadata, check_variables_metadata=True)
     ds_garden.save()

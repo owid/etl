@@ -404,7 +404,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Add column for thermal equivalent efficiency factors.
-    tb = tb.merge(tb_efficiency, how="left", on="year").copy_metadata(from_table=tb)
+    tb = tb.merge(tb_efficiency, how="left", on="year")
 
     # Create additional variables, like primary energy consumption in TWh (both direct and in input-equivalents).
     tb = create_additional_variables(tb=tb)
@@ -435,5 +435,10 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_prices, tb_prices_index], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir,
+        tables=[tb, tb_prices, tb_prices_index],
+        default_metadata=ds_meadow.metadata,
+        check_variables_metadata=True,
+    )
     ds_garden.save()

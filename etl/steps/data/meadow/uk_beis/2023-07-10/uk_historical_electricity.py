@@ -59,12 +59,12 @@ def prepare_data(tb: Table, expected_content: Dict[int, List[str]], columns: Dic
     # Make all columns float (except year column).
     tb.astype({column: float for column in tb.columns if column != "year"})
 
+    # Update table short name.
+    tb.metadata.short_name = table_name
+
     # Set an appropriate index and sort conveniently.
     # NOTE: We do not verify integrity because there are duplicated rows, that will be handled in the garden step.
     tb = tb.set_index(["year"], verify_integrity=False).sort_index().sort_index(axis=1)
-
-    # Update table short name.
-    tb.metadata.short_name = table_name
 
     return tb
 

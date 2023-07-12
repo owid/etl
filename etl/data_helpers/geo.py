@@ -599,6 +599,11 @@ def add_population_to_table(
         ds_population["population"]["population"]
     )
 
+    ####################################################################################################################
+    # NOTE: Currently, column "population" in table "population" does not have licenses. Manually add them.
+    tb_with_population[population_col].metadata.licenses = ds_population.metadata.licenses
+    ####################################################################################################################
+
     return tb_with_population
 
 

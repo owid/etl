@@ -482,5 +482,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset (with the same metadata as the meadow version).
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], default_metadata=ds_meadow.metadata, check_variables_metadata=True)
     ds_garden.save()

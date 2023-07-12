@@ -82,6 +82,7 @@ def run(dest_dir: str) -> None:
             tb_oil_price_index,
         ],
         default_metadata=ds_garden.metadata,
+        check_variables_metadata=True,
     )
 
     #

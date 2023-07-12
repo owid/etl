@@ -112,6 +112,10 @@ def combine_statistical_review_and_eia_data(tb_review: Table, tb_eia: Table) -> 
         subset=index_columns, keep="last"
     )
 
+    # Add metadata to the new "source" column.
+    combined["source"].metadata.sources = combined["Primary energy consumption (TWh)"].metadata.sources
+    combined["source"].metadata.licenses = combined["Primary energy consumption (TWh)"].metadata.licenses
+
     # Sort conveniently.
     combined = combined.sort_values(index_columns).reset_index(drop=True)
 
@@ -284,5 +288,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_review.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_review.metadata, check_variables_metadata=True)
     ds_garden.save()

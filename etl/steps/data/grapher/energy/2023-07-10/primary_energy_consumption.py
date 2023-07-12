@@ -28,5 +28,5 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb], default_metadata=ds_garden.metadata, check_variables_metadata=True)
     ds_grapher.save()
