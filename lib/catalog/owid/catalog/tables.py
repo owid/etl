@@ -69,6 +69,7 @@ class Table(pd.DataFrame):
         metadata: Optional[TableMeta] = None,
         short_name: Optional[str] = None,
         underscore=False,
+        camel_to_snake=False,
         like: Optional["Table"] = None,
         **kwargs: Any,
     ) -> None:
@@ -77,6 +78,7 @@ class Table(pd.DataFrame):
         :param short_name: Use empty TableMeta and fill it with `short_name`. This is a shorter version
             of `Table(df, metadata=TableMeta(short_name="my_name"))`
         :param underscore: Underscore table columns and indexes. See `underscore_table` for help
+        :param camel_to_snake: Convert camelCase column names to snake_case.
         :param like: Use metadata from Table given in this argument (including columns). This is a shorter version of
             new_t = Table(df, metadata=old_t.metadata)
             for col in new_t.columns:
@@ -103,7 +105,7 @@ class Table(pd.DataFrame):
         if underscore:
             from .utils import underscore_table
 
-            underscore_table(self, inplace=True)
+            underscore_table(self, inplace=True, camel_to_snake=camel_to_snake)
 
         # reuse metadata from a different table
         if like is not None:
