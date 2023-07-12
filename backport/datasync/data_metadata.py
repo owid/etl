@@ -178,9 +178,14 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
     schemaVersion = row.pop("schemaVersion", None)
     processingLevel = row.pop("processingLevel", None)
     presentationJson = row.pop("presentation", None)
+    grapherConfigETLJson = row.pop("grapherConfigETL", None)
+    grapherConfigJson = row.pop("grapherConfig", None)
 
     presentation = json.loads(presentationJson) if presentationJson else None
     display = json.loads(displayJson)
+    grapherConfigETL = json.loads(grapherConfigETLJson) if grapherConfigETLJson else None
+    grapherConfig = json.loads(grapherConfigJson) if grapherConfigJson else None
+
     variableMetadata = dict(
         **_omit_nullable_values(variable),
         type="mixed",  # precise type will be updated further down
@@ -189,6 +194,8 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         schemaVersion=schemaVersion,
         processingLevel=processingLevel,
         presentation=presentation,
+        grapherConfigETL=grapherConfigETL,
+        grapherConfig=grapherConfig,
     )
 
     # add source
