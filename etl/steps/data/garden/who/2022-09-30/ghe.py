@@ -83,10 +83,12 @@ def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
 
     # Combine substance and alcohol abuse
     df = combine_drug_and_alcohol(df)
-    # Add broader age groups
-    df = add_age_groups(df)
     # Add global and regional values
     df = add_regional_and_global_aggregates(df, regions)
+    # Add age-standardized metric
+    df = add_age_standardized_metric(df)
+    # Add broader age groups
+    df = add_age_groups(df)
     # Set indices
     df = df.astype(
         {
@@ -103,6 +105,68 @@ def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
     )
     df = df.drop(columns=["population"])
     return df.set_index(["country", "year", "age_group", "sex", "cause"], verify_integrity=True)
+
+
+def add_age_standardized_metric(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Using the WHO's standard population we can calculate the age-standardized metric
+    Values from : https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/gpe_discussion_paper_series_paper31_2001_age_standardization_rates.pdf
+    """
+    age_groups_who_standard = {
+        "YEARS0-1": "YEARS0-4",
+        "YEARS1-4": "YEARS0-4",
+        "YEARS5-9": "YEARS5-9",
+        "YEARS10-14": "YEARS10-14",
+        "YEARS15-19": "YEARS15-19",
+        "YEARS20-24": "YEARS20-24",
+        "YEARS25-29": "YEARS25-29",
+        "YEARS30-34": "YEARS30-34",
+        "YEARS35-39": "YEARS35-39",
+        "YEARS40-44": "YEARS40-44",
+        "YEARS45-49": "YEARS45-49",
+        "YEARS50-54": "YEARS50-54",
+        "YEARS55-59": "YEARS54-59",
+        "YEARS60-64": "YEARS60-64",
+        "YEARS65-69": "YEARS65-69",
+        "YEARS70-74": "YEARS70-74",
+        "YEARS75-79": "YEARS75-79",
+        "YEARS80-84": "YEARS80-84",
+        "YEARS85PLUS": "YEARS85PLUS",
+    }
+
+    who_age_distribution = {
+        "YEARS0-4": 0.0886,
+        "YEARS5-9": 0.0869,
+        "YEARS10-14": 0.0860,
+        "YEARS15-19": 0.0847,
+        "YEARS20-24": 0.0822,
+        "YEARS25-29": 0.0793,
+        "YEARS30-34": 0.0761,
+        "YEARS35-39": 0.0715,
+        "YEARS40-44": 0.0659,
+        "YEARS45-49": 0.0604,
+        "YEARS50-54": 0.0537,
+        "YEARS55-59": 0.0455,
+        "YEARS60-64": 0.0372,
+        "YEARS65-69": 0.0296,
+        "YEARS70-74": 0.0221,
+        "YEARS75-79": 0.0152,
+        "YEARS80-84": 0.0091,
+        "YEARS85PLUS": 0.00635,
+    }
+
+    who_df = build_custom_age_groups(df, age_groups=age_groups_who_standard)
+    # df = df.drop(columns="index")
+    df_as = who_df[["country", "year", "cause", "age_group", "sex", "death_rate100k"]]
+    df_as = df_as[df_as["sex"] == "Both sexes"]
+    df_as["multiplier"] = df_as["age_group"].map(who_age_distribution, na_action="ignore")
+    df_as["death_rate100k"] = df_as["death_rate100k"] * df_as["multiplier"]
+    df_as["age_group"] = "Age-standardized"
+    df_as = (
+        df_as.groupby(["country", "year", "cause", "age_group", "sex"]).sum().drop(columns="multiplier").reset_index()
+    )
+    df = pd.concat([df, df_as])
+    return df
 
 
 def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
@@ -157,7 +221,7 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
 
     df_age_group_ihme = build_custom_age_groups(df, age_groups=age_groups_ihme)
     df_age_group_self_harm = build_custom_age_groups(df, age_groups=age_groups_self_harm, select_causes=["Self-harm"])
-    df = remove_granular_age_groups(df, age_groups_to_keep=["ALLAges"])
+    df = remove_granular_age_groups(df, age_groups_to_keep=["ALLAges", "Age-standardized"])
     df_combined = pd.concat([df, df_age_group_ihme, df_age_group_self_harm], ignore_index=True).drop(columns=["index"])
 
     return df_combined
@@ -212,6 +276,7 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: A
         df_age.groupby(["country", "year", "age_group", "sex", "cause"], as_index=False, observed=True)
         .agg({"death_count": "sum", "daly_count": "sum", "population": "sum"})
         .reset_index()
+        .drop(columns="index")
     )
     df_age = calculate_rates(df_age)
 
