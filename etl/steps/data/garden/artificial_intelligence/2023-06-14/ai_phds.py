@@ -27,6 +27,7 @@ def run(dest_dir: str) -> None:
     df["New AI PhD Students (% of Total)"] *= 100
 
     tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb.set_index("year", inplace=True)
 
     #
     # Save outputs.

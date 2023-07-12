@@ -22,6 +22,8 @@ tables:
   ai_phds:
     variables:
       new_ai_phd_students__pct_of_total:
-        title: New AI PhD Students (% of Total)
+        title: New AI PhD students
         unit: '%'
         short_unit: '%'
+        display:
+          numDecimalPlaces: 0
