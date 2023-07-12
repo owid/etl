@@ -1,0 +1,1078 @@
+dataset:
+  title: Combined Electricity Data (Ember, 2023c)
+
+tables:
+  european_electricity_review:
+    title: European electricity review
+    variables:
+      demand__total_demand__twh:
+        title: Demand - Total demand (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total demand
+      demand__total_demand_per_capita__kwh:
+        title: Demand - Total demand per capita (kWh)
+        short_unit: kWh
+        unit: kilowatt-hours
+        display:
+          name: Total per capita demand
+      emissions__co2_intensity__gco2_kwh:
+        title: Emissions - CO2 intensity (gCO2/kWh)
+        short_unit: gCO2/kWh
+        unit: grams of CO2 equivalent per kilowatt-hour
+        display:
+          name: CO2 intensity
+      emissions__total_emissions__mtco2:
+        title: Emissions - Total emissions (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Total emissions
+      generation__bioenergy__pct:
+        title: Generation - Bioenergy (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Bioenergy generation
+      generation__bioenergy__twh:
+        title: Generation - Bioenergy (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Bioenergy generation
+      generation__clean__pct:
+        title: Generation - Clean (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Clean generation
+      generation__clean__twh:
+        title: Generation - Clean (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Clean generation
+      generation__coal__pct:
+        title: Generation - Coal (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Coal generation
+      generation__coal__twh:
+        title: Generation - Coal (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Coal generation
+      generation__fossil__pct:
+        title: Generation - Fossil (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Fossil generation
+      generation__fossil__twh:
+        title: Generation - Fossil (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Fossil generation
+      generation__gas__pct:
+        title: Generation - Gas (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Gas generation
+      generation__gas__twh:
+        title: Generation - Gas (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Gas generation
+      generation__gas_and_other_fossil__pct:
+        title: Generation - Gas and other fossil (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Gas and other fossil generation
+      generation__gas_and_other_fossil__twh:
+        title: Generation - Gas and other fossil (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Gas and other fossil generation
+      generation__hard_coal__pct:
+        title: Generation - Hard coal (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Hard coal generation
+      generation__hard_coal__twh:
+        title: Generation - Hard coal (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Hard coal generation
+      generation__hydro__bioenergy_and_other_renewables__pct:
+        title: Generation - Hydro bioenergy and other renewables (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Hydro bioenergy and other renewables generation
+      generation__hydro__bioenergy_and_other_renewables__twh:
+        title: Generation - Hydro bioenergy and other renewables (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Hydro bioenergy and other renewables generation
+      generation__hydro__pct:
+        title: Generation - Hydro (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Hydro generation
+      generation__hydro__twh:
+        title: Generation - Hydro (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Hydro generation
+      generation__lignite__pct:
+        title: Generation - Lignite (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Lignite generation
+      generation__lignite__twh:
+        title: Generation - Lignite (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Lignite generation
+      generation__nuclear__pct:
+        title: Generation - Nuclear (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Nuclear generation
+      generation__nuclear__twh:
+        title: Generation - Nuclear (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Nuclear generation
+      generation__other_fossil__pct:
+        title: Generation - Other fossil (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Other fossil generation
+      generation__other_fossil__twh:
+        title: Generation - Other fossil (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Other fossil generation
+      generation__other_renewables__pct:
+        title: Generation - Other renewables (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Other renewables generation
+      generation__other_renewables__twh:
+        title: Generation - Other renewables (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Other renewables generation
+      generation__renewables__pct:
+        title: Generation - Renewables (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Renewables generation
+      generation__renewables__twh:
+        title: Generation - Renewables (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Renewables generation
+      generation__solar__pct:
+        title: Generation - Solar (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Solar generation
+      generation__solar__twh:
+        title: Generation - Solar (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Solar generation
+      generation__total_generation__twh:
+        title: Generation - Total
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total  generation
+      generation__wind__pct:
+        title: Generation - Wind (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Wind generation
+      generation__wind__twh:
+        title: Generation - Wind (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Wind generation
+      generation__wind_and_solar__pct:
+        title: Generation - Wind and solar (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Wind and solar generation
+      generation__wind_and_solar__twh:
+        title: Generation - Wind and solar (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Wind and solar generation
+      imports__total_net_imports__twh:
+        title: Imports - Total net imports (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total net imports
+  yearly_electricity:
+    title: Yearly Electricity Data
+    variables:
+      capacity__bioenergy__gw:
+        title: Capacity - Bioenergy (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Bioenergy capacity
+      capacity__clean__gw:
+        title: Capacity - Clean (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Clean capacity
+      capacity__coal__gw:
+        title: Capacity - Coal (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Coal capacity
+      capacity__fossil__gw:
+        title: Capacity - Fossil (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Fossil capacity
+      capacity__gas__gw:
+        title: Capacity - Gas (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Gas capacity
+      capacity__gas_and_other_fossil__gw:
+        title: Capacity - Gas and other fossil (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Gas and other fossil capacity
+      capacity__hydro__bioenergy_and_other_renewables__gw:
+        title: Capacity - Hydro bioenergy and other renewables (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Hydro bioenergy and other renewables capacity
+      capacity__hydro__gw:
+        title: Capacity - Hydro (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Hydro capacity
+      capacity__nuclear__gw:
+        title: Capacity - Nuclear (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Nuclear capacity
+      capacity__other_fossil__gw:
+        title: Capacity - Other fossil (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Other fossil capacity
+      capacity__other_renewables__gw:
+        title: Capacity - Other renewables (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Other renewables capacity
+      capacity__renewables__gw:
+        title: Capacity - Renewables (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Renewables capacity
+      capacity__solar__gw:
+        title: Capacity - Solar (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Solar capacity
+      capacity__wind__gw:
+        title: Capacity - Wind (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Wind capacity
+      capacity__wind_and_solar__gw:
+        title: Capacity - Wind and solar (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Wind and solar capacity
+      demand__total_demand__twh:
+        title: Demand - Total demand (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total demand
+      demand__total_demand_per_capita__kwh:
+        title: Demand - Total demand per capita (kWh)
+        short_unit: kWh
+        unit: kilowatt-hours
+        display:
+          name: Total per capita demand
+      emissions__bioenergy__mtco2:
+        title: Emissions - Bioenergy (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Bioenergy emissions
+      emissions__clean__mtco2:
+        title: Emissions - Clean (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Clean emissions
+      emissions__co2_intensity__gco2_kwh:
+        title: Emissions - CO2 intensity (gCO2/kWh)
+        short_unit: gCO2/kWh
+        unit: grams of CO2 equivalent per kilowatt-hour
+        display:
+          name: CO2 intensity
+      emissions__coal__mtco2:
+        title: Emissions - Coal (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Coal emissions
+      emissions__fossil__mtco2:
+        title: Emissions - Fossil (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Fossil emissions
+      emissions__gas__mtco2:
+        title: Emissions - Gas (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Gas emissions
+      emissions__gas_and_other_fossil__mtco2:
+        title: Emissions - Gas and other fossil (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Gas and other fossil emissions
+      emissions__hydro__bioenergy_and_other_renewables__mtco2:
+        title: Emissions - Hydro bioenergy and other renewables (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Hydro bioenergy and other renewables emissions
+      emissions__hydro__mtco2:
+        title: Emissions - Hydro (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Hydro emissions
+      emissions__nuclear__mtco2:
+        title: Emissions - Nuclear (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Nuclear emissions
+      emissions__other_fossil__mtco2:
+        title: Emissions - Other fossil (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Other fossil emissions
+      emissions__other_renewables__mtco2:
+        title: Emissions - Other renewables (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Other renewables emissions
+      emissions__renewables__mtco2:
+        title: Emissions - Renewables (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Renewables emissions
+      emissions__solar__mtco2:
+        title: Emissions - Solar (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Solar emissions
+      emissions__total_emissions__mtco2:
+        title: Emissions - Total
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Total  emissions
+      emissions__wind__mtco2:
+        title: Emissions - Wind (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Wind emissions
+      emissions__wind_and_solar__mtco2:
+        title: Emissions - Wind and solar (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Wind and solar emissions
+      generation__bioenergy__pct:
+        title: Generation - Bioenergy (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Bioenergy generation
+      generation__bioenergy__twh:
+        title: Generation - Bioenergy (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Bioenergy generation
+      generation__clean__pct:
+        title: Generation - Clean (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Clean generation
+      generation__clean__twh:
+        title: Generation - Clean (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Clean generation
+      generation__coal__pct:
+        title: Generation - Coal (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Coal generation
+      generation__coal__twh:
+        title: Generation - Coal (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Coal generation
+      generation__fossil__pct:
+        title: Generation - Fossil (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Fossil generation
+      generation__fossil__twh:
+        title: Generation - Fossil (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Fossil generation
+      generation__gas__pct:
+        title: Generation - Gas (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Gas generation
+      generation__gas__twh:
+        title: Generation - Gas (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Gas generation
+      generation__gas_and_other_fossil__pct:
+        title: Generation - Gas and other fossil (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Gas and other fossil generation
+      generation__gas_and_other_fossil__twh:
+        title: Generation - Gas and other fossil (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Gas and other fossil generation
+      generation__hydro__bioenergy_and_other_renewables__pct:
+        title: Generation - Hydro bioenergy and other renewables (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Hydro bioenergy and other renewables generation
+      generation__hydro__bioenergy_and_other_renewables__twh:
+        title: Generation - Hydro bioenergy and other renewables (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Hydro bioenergy and other renewables generation
+      generation__hydro__pct:
+        title: Generation - Hydro (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Hydro generation
+      generation__hydro__twh:
+        title: Generation - Hydro (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Hydro generation
+      generation__nuclear__pct:
+        title: Generation - Nuclear (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Nuclear generation
+      generation__nuclear__twh:
+        title: Generation - Nuclear (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Nuclear generation
+      generation__other_fossil__pct:
+        title: Generation - Other fossil (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Other fossil generation
+      generation__other_fossil__twh:
+        title: Generation - Other fossil (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Other fossil generation
+      generation__other_renewables__pct:
+        title: Generation - Other renewables (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Other renewables generation
+      generation__other_renewables__twh:
+        title: Generation - Other renewables (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Other renewables generation
+      generation__renewables__pct:
+        title: Generation - Renewables (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Renewables generation
+      generation__renewables__twh:
+        title: Generation - Renewables (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Renewables generation
+      generation__solar__pct:
+        title: Generation - Solar (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Solar generation
+      generation__solar__twh:
+        title: Generation - Solar (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Solar generation
+      generation__total_generation__twh:
+        title: Generation - Total
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total  generation
+      generation__wind__pct:
+        title: Generation - Wind (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Wind generation
+      generation__wind__twh:
+        title: Generation - Wind (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Wind generation
+      generation__wind_and_solar__pct:
+        title: Generation - Wind and solar (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Wind and solar generation
+      generation__wind_and_solar__twh:
+        title: Generation - Wind and solar (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Wind and solar generation
+      imports__total_net_imports__twh:
+        title: Imports - Total net imports (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total net imports
+  combined_electricity:
+    title: Electricity
+    variables:
+      capacity__bioenergy__gw:
+        title: Capacity - Bioenergy (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Bioenergy capacity
+      capacity__clean__gw:
+        title: Capacity - Clean (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Clean capacity
+      capacity__coal__gw:
+        title: Capacity - Coal (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Coal capacity
+      capacity__fossil__gw:
+        title: Capacity - Fossil (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Fossil capacity
+      capacity__gas__gw:
+        title: Capacity - Gas (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Gas capacity
+      capacity__gas_and_other_fossil__gw:
+        title: Capacity - Gas and other fossil (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Gas and other fossil capacity
+      capacity__hydro__bioenergy_and_other_renewables__gw:
+        title: Capacity - Hydro bioenergy and other renewables (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Hydro bioenergy and other renewables capacity
+      capacity__hydro__gw:
+        title: Capacity - Hydro (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Hydro capacity
+      capacity__nuclear__gw:
+        title: Capacity - Nuclear (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Nuclear capacity
+      capacity__other_fossil__gw:
+        title: Capacity - Other fossil (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Other fossil capacity
+      capacity__other_renewables__gw:
+        title: Capacity - Other renewables (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Other renewables capacity
+      capacity__renewables__gw:
+        title: Capacity - Renewables (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Renewables capacity
+      capacity__solar__gw:
+        title: Capacity - Solar (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Solar capacity
+      capacity__wind__gw:
+        title: Capacity - Wind (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Wind capacity
+      capacity__wind_and_solar__gw:
+        title: Capacity - Wind and solar (GW)
+        short_unit: GW
+        unit: gigawatts
+        display:
+          name: Wind and solar capacity
+      demand__total_demand__twh:
+        title: Demand - Total demand (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total demand
+      demand__total_demand_per_capita__kwh:
+        title: Demand - Total demand per capita (kWh)
+        short_unit: kWh
+        unit: kilowatt-hours
+        display:
+          name: Total per capita demand
+      emissions__bioenergy__mtco2:
+        title: Emissions - Bioenergy (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Bioenergy emissions
+      emissions__clean__mtco2:
+        title: Emissions - Clean (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Clean emissions
+      emissions__co2_intensity__gco2_kwh:
+        title: Emissions - CO2 intensity (gCO2/kWh)
+        short_unit: gCO2/kWh
+        unit: grams of CO2 equivalent per kilowatt-hour
+        display:
+          name: CO2 intensity
+      emissions__coal__mtco2:
+        title: Emissions - Coal (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Coal emissions
+      emissions__fossil__mtco2:
+        title: Emissions - Fossil (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Fossil emissions
+      emissions__gas__mtco2:
+        title: Emissions - Gas (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Gas emissions
+      emissions__gas_and_other_fossil__mtco2:
+        title: Emissions - Gas and other fossil (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Gas and other fossil emissions
+      emissions__hydro__bioenergy_and_other_renewables__mtco2:
+        title: Emissions - Hydro bioenergy and other renewables (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Hydro bioenergy and other renewables emissions
+      emissions__hydro__mtco2:
+        title: Emissions - Hydro (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Hydro emissions
+      emissions__nuclear__mtco2:
+        title: Emissions - Nuclear (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Nuclear emissions
+      emissions__other_fossil__mtco2:
+        title: Emissions - Other fossil (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Other fossil emissions
+      emissions__other_renewables__mtco2:
+        title: Emissions - Other renewables (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Other renewables emissions
+      emissions__renewables__mtco2:
+        title: Emissions - Renewables (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Renewables emissions
+      emissions__solar__mtco2:
+        title: Emissions - Solar (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Solar emissions
+      emissions__total_emissions__mtco2:
+        title: Emissions - Total
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Total  emissions
+      emissions__wind__mtco2:
+        title: Emissions - Wind (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Wind emissions
+      emissions__wind_and_solar__mtco2:
+        title: Emissions - Wind and solar (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Wind and solar emissions
+      generation__bioenergy__pct:
+        title: Generation - Bioenergy (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Bioenergy generation
+      generation__bioenergy__twh:
+        title: Generation - Bioenergy (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Bioenergy generation
+      generation__clean__pct:
+        title: Generation - Clean (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Clean generation
+      generation__clean__twh:
+        title: Generation - Clean (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Clean generation
+      generation__coal__pct:
+        title: Generation - Coal (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Coal generation
+      generation__coal__twh:
+        title: Generation - Coal (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Coal generation
+      generation__fossil__pct:
+        title: Generation - Fossil (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Fossil generation
+      generation__fossil__twh:
+        title: Generation - Fossil (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Fossil generation
+      generation__gas__pct:
+        title: Generation - Gas (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Gas generation
+      generation__gas__twh:
+        title: Generation - Gas (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Gas generation
+      generation__gas_and_other_fossil__pct:
+        title: Generation - Gas and other fossil (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Gas and other fossil generation
+      generation__gas_and_other_fossil__twh:
+        title: Generation - Gas and other fossil (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Gas and other fossil generation
+      generation__hard_coal__pct:
+        title: Generation - Hard coal (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Hard coal generation
+      generation__hard_coal__twh:
+        title: Generation - Hard coal (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Hard coal generation
+      generation__hydro__bioenergy_and_other_renewables__pct:
+        title: Generation - Hydro bioenergy and other renewables (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Hydro bioenergy and other renewables generation
+      generation__hydro__bioenergy_and_other_renewables__twh:
+        title: Generation - Hydro bioenergy and other renewables (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Hydro bioenergy and other renewables generation
+      generation__hydro__pct:
+        title: Generation - Hydro (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Hydro generation
+      generation__hydro__twh:
+        title: Generation - Hydro (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Hydro generation
+      generation__lignite__pct:
+        title: Generation - Lignite (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Lignite generation
+      generation__lignite__twh:
+        title: Generation - Lignite (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Lignite generation
+      generation__nuclear__pct:
+        title: Generation - Nuclear (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Nuclear generation
+      generation__nuclear__twh:
+        title: Generation - Nuclear (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Nuclear generation
+      generation__other_fossil__pct:
+        title: Generation - Other fossil (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Other fossil generation
+      generation__other_fossil__twh:
+        title: Generation - Other fossil (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Other fossil generation
+      generation__other_renewables__pct:
+        title: Generation - Other renewables (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Other renewables generation
+      generation__other_renewables__twh:
+        title: Generation - Other renewables (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Other renewables generation
+      generation__renewables__pct:
+        title: Generation - Renewables (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Renewables generation
+      generation__renewables__twh:
+        title: Generation - Renewables (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Renewables generation
+      generation__solar__pct:
+        title: Generation - Solar (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Solar generation
+      generation__solar__twh:
+        title: Generation - Solar (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Solar generation
+      generation__total_generation__twh:
+        title: Generation - Total
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total  generation
+      generation__wind__pct:
+        title: Generation - Wind (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Wind generation
+      generation__wind__twh:
+        title: Generation - Wind (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Wind generation
+      generation__wind_and_solar__pct:
+        title: Generation - Wind and solar (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Wind and solar generation
+      generation__wind_and_solar__twh:
+        title: Generation - Wind and solar (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Wind and solar generation
+      imports__total_net_imports__twh:
+        title: Imports - Total net imports (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total net imports
+  net_flows:
+    title: Net flows
+    variables:
+      net_flow__twh:
+        title: Net flow (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Net flow
