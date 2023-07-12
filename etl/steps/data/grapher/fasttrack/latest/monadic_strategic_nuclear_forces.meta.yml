@@ -1,8 +1,8 @@
 dataset:
   sources:
-  - name: 'Suh, Kyungwon. 2023. Nuclear balance and the initiation of nuclear crises: Does superiority matter? Journal of
-      Peace Research 60(2): 337–351.'
-    published_by: Kyungwon Suh
+  - name: Suh (2023)
+    published_by: 'Kyungwon, Suh. 2023. Nuclear balance and the initiation of nuclear crises: Does superiority matter? Journal
+      of Peace Research 60(2): 337–351.'
     publication_year: 2023
     date_accessed: 2023-05-08
     url: https://kyungwon-suh.github.io/datasets/
