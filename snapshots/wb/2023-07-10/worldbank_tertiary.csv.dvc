@@ -1,0 +1,19 @@
+meta:
+  name: 'World Bank Education Statistics: Tertiary Education'
+  publication_year: 2018
+  source_name: World Bank EdStats (2023)
+  source_published_by: 'World Bank Education Statistics: Tertiary Education, World
+    Bank EdStats (2023)'
+  url: https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
+  source_data_url:
+  license_url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+  license_name: Creative Commons Attribution 4.0
+  date_accessed: 2023-07-10
+  is_public: true
+  description: >
+    World bank data on tertiary school education.
+wdir: ../../../data/snapshots/worldbank_education/2023-07-10
+outs:
+- md5: d942ba26a0dbf1e44c735258267b1c1c
+  size: 971012
+  path: worldbank_tertiary.csv
