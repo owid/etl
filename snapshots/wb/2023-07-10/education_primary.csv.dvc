@@ -12,3 +12,8 @@ meta:
   is_public: true
   description: >
     World bank data on primary school education.
+wdir: ../../../data/snapshots/wb/2023-07-10
+outs:
+- md5: 50f6f874c59a74890c6121b6a6f5ade0
+  size: 2693339
+  path: education_primary.csv

@@ -23,18 +23,6 @@ def main(path_to_file: str, upload: bool) -> None:
     Instructions:
     1. Visit the following URL:  https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
     2. Select the following indicators:
-            PISA: Mean performance on the mathematics scale
-            PISA: Mean performance on the mathematics scale. Female
-            PISA: Mean performance on the mathematics scale. Male
-            PISA: Mean performance on the reading scale
-            PISA: Mean performance on the reading scale. Female
-            PISA: Mean performance on the reading scale. Male
-            PISA: Mean performance on the science scale
-            PISA: Mean performance on the science scale. Female
-            PISA: Mean performance on the science scale. Male
-            Harmonized Test Scores, Female
-            Harmonized Test Scores, Male
-            Harmonized Test Scores, Total
     3. In the top right corner, click on the "Download" button.
     4. Choose the "CSV" format and initiate the download.
 

@@ -10,5 +10,10 @@ meta:
   license_name: Creative Commons Attribution 4.0
   date_accessed: 2023-07-10
   is_public: true
-  description: >
+  description: >-
     World bank data on secondary school education.
+wdir: ../../../data/snapshots/wb/2023-07-10
+outs:
+- md5: b6869fa3dd2d3bb44107a376bb2a3549
+  size: 4153462
+  path: education_secondary.csv
