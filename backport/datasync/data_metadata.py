@@ -138,6 +138,7 @@ def _load_variable(engine: Engine, variable_id: int) -> Dict[str, Any]:
         datasets.name AS datasetName,
         datasets.nonRedistributable AS nonRedistributable,
         datasets.updatePeriod,
+        datasets.version as datasetVersion,
         sources.name AS sourceName,
         sources.description AS sourceDescription
     FROM variables
@@ -177,7 +178,6 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
     schemaVersion = row.pop("schemaVersion", None)
     processingLevel = row.pop("processingLevel", None)
     presentationJson = row.pop("presentation", None)
-    updatePeriod = row.pop("updatePeriod", None)
 
     presentation = json.loads(presentationJson) if presentationJson else None
     display = json.loads(displayJson)
@@ -189,7 +189,6 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         schemaVersion=schemaVersion,
         processingLevel=processingLevel,
         presentation=presentation,
-        updatePeriod=updatePeriod,
     )
 
     # add source
