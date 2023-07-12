@@ -111,6 +111,7 @@ def add_age_standardized_metric(df: pd.DataFrame) -> pd.DataFrame:
     """
     Using the WHO's standard population we can calculate the age-standardized metric
     Values from : https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/gpe_discussion_paper_series_paper31_2001_age_standardization_rates.pdf
+    We multiply each death rate by five-year age-group by the average world population and then sum the values to create the age-standardized rate
     """
     age_groups_who_standard = {
         "YEARS0-1": "YEARS0-4",
