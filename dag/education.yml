@@ -1,0 +1,10 @@
+steps:
+  # World Bank EdStats
+  data://meadow/wb/2023-07-10/worldbank_education:
+  - snapshot://wb/2023-07-10/worldbank_pisa.csv
+  - snapshot://wb/2023-07-10/worldbank_literacy.csv
+  - snapshot://wb/2023-07-10/worldbank_pre_primary.csv
+  - snapshot://wb/2023-07-10/worldbank_primary.csv
+  - snapshot://wb/2023-07-10/worldbank_secondary.csv
+  - snapshot://wb/2023-07-10/worldbank_tertiary.csv
+  - snapshot://wb/2023-07-10/worldbank_expenditure_and_teachers.csv
