@@ -136,7 +136,11 @@ def _upsert_source_to_db(session: Session, source: catalog.Source, dataset_id: i
 
 def _add_or_update_source(
     session: Session, variable_meta: catalog.VariableMeta, column_name: str, dataset_upsert_result: DatasetUpsertResult
-) -> int:
+) -> Optional[int]:
+    if not variable_meta.sources:
+        assert variable_meta.origins, "Variable must have either sources or origins"
+        return None
+
     # Every variable must have exactly one source
     if len(variable_meta.sources) != 1:
         raise NotImplementedError(

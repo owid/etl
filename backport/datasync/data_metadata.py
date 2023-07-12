@@ -141,7 +141,7 @@ def _load_variable(engine: Engine, variable_id: int) -> Dict[str, Any]:
         sources.description AS sourceDescription
     FROM variables
     JOIN datasets ON variables.datasetId = datasets.id
-    JOIN sources ON variables.sourceId = sources.id
+    LEFT JOIN sources ON variables.sourceId = sources.id
     WHERE variables.id = %(variable_id)s
     """
     df = pd.read_sql(sql, engine, params={"variable_id": variable_id})
@@ -179,7 +179,6 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
 
     presentation = json.loads(presentationJson) if presentationJson else None
     display = json.loads(displayJson)
-    partialSource = json.loads(sourceDescription)
     variableMetadata = dict(
         **_omit_nullable_values(variable),
         type="mixed",  # precise type will be updated further down
@@ -188,7 +187,12 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         schemaVersion=schemaVersion,
         processingLevel=processingLevel,
         presentation=presentation,
-        source=dict(
+    )
+
+    # add source
+    if sourceId:
+        partialSource = json.loads(sourceDescription)
+        variableMetadata["source"] = dict(
             id=sourceId,
             name=sourceName,
             dataPublishedBy=partialSource.get("dataPublishedBy") or "",
@@ -196,8 +200,7 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
             link=partialSource.get("link") or "",
             retrievedDate=partialSource.get("retrievedDate") or "",
             additionalInfo=partialSource.get("additionalInfo") or "",
-        ),
-    )
+        )
 
     variableMetadata = _omit_nullable_values(variableMetadata)
 

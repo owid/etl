@@ -803,7 +803,7 @@ class Variable(SQLModel, table=True):
     )
     coverage: str = Field(sa_column=Column("coverage", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     timespan: str = Field(sa_column=Column("timespan", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    sourceId: int = Field(sa_column=Column("sourceId", Integer, nullable=False))
+    sourceId: Optional[int] = Field(sa_column=Column("sourceId", Integer, nullable=True))
     display: Dict[str, Any] = Field(sa_column=Column("display", JSON, nullable=False))
     columnOrder: int = Field(
         default=0, sa_column=Column("columnOrder", Integer, nullable=False, server_default=text("'0'"))
@@ -923,7 +923,7 @@ class Variable(SQLModel, table=True):
         short_name: str,
         timespan: str,
         dataset_id: int,
-        source_id: int,
+        source_id: Optional[int],
         catalog_path: Optional[str],
         dimensions: Optional[Dimensions],
     ) -> "Variable":

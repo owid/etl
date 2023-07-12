@@ -374,7 +374,9 @@ def _adapt_dataset_metadata_for_grapher(
     """
     # Add origins to sources to stay backward compatible.
     if metadata.origins:
-        metadata.sources = _add_origins_to_sources(metadata.sources, metadata.origins)
+        # NOTE: we disabled source <-> origin conversion
+        # metadata.sources = _add_origins_to_sources(metadata.sources, metadata.origins)
+        pass
     else:
         warnings.warn(
             "Dataset has sources instead of origins. This is deprecated and will be removed in the future. "
@@ -382,19 +384,20 @@ def _adapt_dataset_metadata_for_grapher(
         )
 
     # Combine metadata sources into one.
-    metadata.sources = [combine_metadata_sources(metadata.sources)]
+    if metadata.sources:
+        metadata.sources = [combine_metadata_sources(metadata.sources)]
 
-    # Add the dataset description as if it was a source's description.
-    if metadata.description is not None:
-        if metadata.sources[0].description:
-            # If descriptions are not subsets of each other (or equal), add them together
-            if (
-                metadata.sources[0].description not in metadata.description
-                and metadata.description not in metadata.sources[0].description
-            ):
-                metadata.sources[0].description = metadata.description + "\n" + metadata.sources[0].description
-        else:
-            metadata.sources[0].description = metadata.description
+        # Add the dataset description as if it was a source's description.
+        if metadata.description is not None:
+            if metadata.sources[0].description:
+                # If descriptions are not subsets of each other (or equal), add them together
+                if (
+                    metadata.sources[0].description not in metadata.description
+                    and metadata.description not in metadata.sources[0].description
+                ):
+                    metadata.sources[0].description = metadata.description + "\n" + metadata.sources[0].description
+            else:
+                metadata.sources[0].description = metadata.description
 
     # Empty dataset description (otherwise it will appear in `Internal notes` in the admin UI).
     metadata.description = ""
@@ -460,10 +463,11 @@ def _adapt_table_for_grapher(
     #         table[col].origins, table.metadata.dataset.sources + table[col].sources
     #     )
 
+    # NOTE: we try to keep origins and sources separate and never convert between them
     # Convert origins to sources to stay backward compatible.
-    assert table.metadata.dataset
-    for col in table.columns:
-        table[col].sources = _add_origins_to_sources(table[col].sources, table[col].origins)
+    # assert table.metadata.dataset
+    # for col in table.columns:
+    #     table[col].sources = _add_origins_to_sources(table[col].sources, table[col].origins)
 
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).
@@ -504,6 +508,12 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
     dataset_meta = table.metadata.dataset
     for column in table.columns:
         variable_meta: catalog.VariableMeta = table[column].metadata
+
+        # If neither variable and dataset has no sources, we're using origins instead.
+        if len(variable_meta.sources) == 0 and len(dataset_meta.sources) == 0:
+            assert len(variable_meta.origins) > 0, f"Variable `{column}` has no sources or origins."
+            continue
+
         if len(variable_meta.sources) == 0:
             # Take the metadata sources from the dataset's metadata (after combining them into one).
             assert (
