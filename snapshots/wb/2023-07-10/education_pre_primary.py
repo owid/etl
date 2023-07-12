@@ -23,22 +23,14 @@ def main(path_to_file: str, upload: bool) -> None:
     Instructions:
     1. Visit the following URL:  https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
     2. Select the following indicators:
-        'Gross enrolment ratio for tertiary education, female (%)'
-        'Gross enrolment ratio for tertiary education, male (%)'
-        'Gross enrolment ratio for tertiary education, both sexes (%)'
-        'Gross enrolment ratio for tertiary education, adjusted gender parity index (GPIA)'
-        'Outbound mobility ratio, all regions, both sexes (%)'
-        'Gross graduation ratio from first degree programmes (ISCED 6 and 7) in tertiary education, male (%)'
-        'Gross graduation ratio from first degree programmes (ISCED 6 and 7) in tertiary education, female (%)'
-        'Gross graduation ratio from first degree programmes (ISCED 6 and 7) in tertiary education, both sexes (%)'
-        'Gross graduation ratio from first degree programmes (ISCED 6 and 7) in tertiary education, gender parity index (GPI)'
+
     3. In the top right corner, click on the "Download" button.
     4. Choose the "CSV" format and initiate the download.
 
     Note: Ensure that the downloaded dataset contains the desired PISA scores and associated information.
     """
     # Create a new snapshot.
-    snap = Snapshot(f"worldbank_education/{SNAPSHOT_VERSION}/worldbank_tertiary.csv")
+    snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/education_pre_primary.csv")
 
     # Ensure destination folder exists.
     snap.path.parent.mkdir(exist_ok=True, parents=True)

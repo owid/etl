@@ -1,8 +1,8 @@
 meta:
-  name: 'World Bank Education Statistics: Pre-Primary Education'
+  name: 'World Bank Education Statistics: Literacy'
   publication_year: 2018
   source_name: World Bank EdStats (2023)
-  source_published_by: 'World Bank Education Statistics: Pre-Primary Education, World Bank EdStats
+  source_published_by: 'World Bank Education Statistics: Literacy, World Bank EdStats
     (2023)'
   url: https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
   source_data_url:
@@ -11,9 +11,5 @@ meta:
   date_accessed: 2023-07-10
   is_public: true
   description: >
-    World bank data on pre-primary school education.
-wdir: ../../../data/snapshots/worldbank_education/2023-07-10
-outs:
-- md5: 5d970367c79faa07233f110f1b4cb715
-  size: 2455947
-  path: worldbank_pre_primary.csv
+    World bank data on literacy rates amongst adults (15+), youth (15-24), 25-64 year
+    olds, and eldery (65+) split by gender.

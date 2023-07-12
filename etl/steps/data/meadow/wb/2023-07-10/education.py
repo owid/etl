@@ -35,15 +35,13 @@ def run(dest_dir: str) -> None:
     """
 
     # Define a list of snapshots to be loaded
-    snaps = [
-        "worldbank_pisa.csv",
-        "worldbank_literacy.csv",
-        "worldbank_pre_primary.csv",
-        "worldbank_primary.csv",
-        "worldbank_secondary.csv",
-        "worldbank_tertiary.csv",
-        "worldbank_expenditure_and_teachers.csv",
-    ]
+    snaps = ["education_learning_outcomes.csv", "education_pre_primary.csv"]
+    #     "education_literacy.csv"
+    #     "education_primary.csv",
+    #     "education_secondary.csv",
+    #     "education_tertiary.csv",
+    #     "education_expenditure_and_teachers.csv",
+    # ]
 
     # Load and process data from each snapshot
     df_list = []
@@ -52,6 +50,7 @@ def run(dest_dir: str) -> None:
         df = load_and_select_data(snapshot)
         # Create indicator group colum excluding .csv at the end
         df["Indicator Group"] = snap[:-4]
+        print(df["Series"].unique())
         df_list.append(df)
 
     # Concatenate all processed dataframes

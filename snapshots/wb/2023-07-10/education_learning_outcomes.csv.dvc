@@ -1,5 +1,5 @@
 meta:
-  name: 'World Bank Education Statistics: Learning Outcomes'
+  name: 'World Bank Education Statistics: Learning Outcomes, Attainment'
   publication_year: 2018
   source_name: OECD and World Bank EdStats (2023)
   source_published_by: 'World Bank Education Statistics: Learning Outcomes, OECD and
@@ -23,8 +23,8 @@ meta:
     a comprehensive and regularly updated dataset covering 164 countries from 2000
     to 2017. The dataset encompasses 98% of the global population, with a focus on
     developing economies, which make up two-thirds of the included countries.
-wdir: ../../../data/snapshots/worldbank_education/2023-07-10
+wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
-- md5: 5e9471283678b0876cbe78f212721a7e
-  size: 1191564
-  path: worldbank_pisa.csv
+- md5: 27127b0381ed44e4fabaccdf94e9a585
+  size: 1792258
+  path: education_learning_outcomes.csv
