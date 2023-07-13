@@ -369,7 +369,7 @@ def split_ussr_and_russia(tb: Table) -> Table:
     tb = tb.copy()
 
     # Name that The Shift Data Portal uses for Russia and USSR.
-    shift_ussr_russia_name = "Russian Federation & USSR (Shift)"
+    shift_ussr_russia_name = "Russian Federation and USSR (Shift)"
     # The relevant part of the data is originally from EIA, who have the first data point for Russia in 1992.
     # Therefore we use this year to split USSR and Russia.
     russia_start_year = 1992
