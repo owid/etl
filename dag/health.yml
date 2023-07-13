@@ -208,3 +208,7 @@ steps:
 # Autopsies WHO-Europe
   data://meadow/who/2023-07-13/autopsy:
   - snapshot://who/2022-09-01/autopsy.csv
+  data://garden/who/2023-07-13/autopsy:
+  - data://meadow/who/2023-07-13/autopsy
+  data://grapher/who/2023-07-13/autopsy:
+  - data://garden/who/2023-07-13/autopsy
