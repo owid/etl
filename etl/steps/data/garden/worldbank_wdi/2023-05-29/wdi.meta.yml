@@ -2610,6 +2610,9 @@ tables:
         title: GNI per capita, PPP (constant 2017 international $)
         short_unit: $
         unit: international-$ in 2017 prices
+        display:
+          name: GNI per capita
+          numDecimalPlaces: 0
       ny_gns_ictr_cd:
         title: Gross savings (current US$)
         short_unit: $
