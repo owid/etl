@@ -418,6 +418,9 @@ def prepare_output_table(primary_energy: Table) -> Table:
     # Set a new table short name.
     table.metadata.short_name = paths.short_name
 
+    # Underescore table.
+    table = table.underscore()
+
     return table
 
 
