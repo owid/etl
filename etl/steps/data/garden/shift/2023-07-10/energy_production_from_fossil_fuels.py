@@ -304,7 +304,10 @@ def add_region_aggregates(
     for region in regions:
         # List of countries in region.
         countries_in_region = geo.list_members_of_region(
-            region=region, ds_regions=ds_regions, ds_income_groups=ds_income_groups
+            region=region,
+            ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
+            include_historical_regions_in_income_groups=True,
         )
         # Select rows of data for member countries.
         data_for_region = data_with_regions[data_with_regions[country_column].isin(countries_in_region)]

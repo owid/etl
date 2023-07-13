@@ -266,6 +266,7 @@ def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Data
             ds_regions=ds_regions,
             ds_income_groups=ds_income_groups,
             additional_members=REGIONS[region].get("additional_members"),
+            include_historical_regions_in_income_groups=True,
         )
         tb_regions = geo.add_region_aggregates(
             df=tb_regions,

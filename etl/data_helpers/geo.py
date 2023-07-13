@@ -664,6 +664,7 @@ def list_members_of_region(
     excluded_regions: Optional[List[str]] = None,
     additional_members: Optional[List[str]] = None,
     excluded_members: Optional[List[str]] = None,
+    include_historical_regions_in_income_groups: bool = False,
 ) -> List[str]:
     """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
 
@@ -686,6 +687,8 @@ def list_members_of_region(
         Additional individual members to include in the list.
     excluded_members : list
         Individual members to exclude from the list.
+    include_historical_regions_in_income_groups : bool
+        True to include historical regions in income groups.
 
     Returns
     -------
@@ -742,6 +745,24 @@ def list_members_of_region(
                 "Table 'income_groups_latest' not found. "
                 "You may not be using the right version of the income groups dataset ds_income_groups."
             )
+
+        if include_historical_regions_in_income_groups:
+            # Since "income_groups_latest" does not include historical regions, optionally we take their latest
+            # classification from "income_groups" and add them to df_income.
+            historical_regions = ds_income_groups["income_groups"].reset_index()
+            # Keep only countries that are not in "income_groups_latest".
+            # NOTE: This not only includes historical regions, but also countries that don't appear in
+            # "income_groups_latest", like Venezuela.
+            historical_regions = historical_regions[~historical_regions["country"].isin(df_income["country"])]
+            # Keep only the latest income group classification of each historical region.
+            historical_regions = (
+                historical_regions.sort_values(["country", "year"], ascending=True)
+                .drop_duplicates(subset="country", keep="last")
+                .drop(columns="year")
+                .reset_index(drop=True)
+            )
+            # Append historical regions to latest income group classifications.
+            df_income = pd.concat([df_income, historical_regions], ignore_index=True)
 
         # Create a dataframe of countries in each income group.
         df_countries_in_income_group = (
