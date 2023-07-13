@@ -1,14 +1,5 @@
 steps:
   #
-  # BP - Energy mix 2023.
-  #
-  data://garden/bp/2023-02-20/energy_mix:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/demography/2022-12-08/population
-    - data://garden/wb/2021-07-01/wb_income
-  data://grapher/bp/2023-02-20/energy_mix:
-    - data://garden/bp/2023-02-20/energy_mix
-  #
   # Ember - European electricity review 2022.
   #
   # We still use this version for data from 1990-1999, which is not included in the 2023 version.
@@ -204,6 +195,15 @@ steps:
     - data://garden/energy/2023-07-10/electricity_mix
   data://grapher/energy/2023-07-10/uk_historical_electricity:
     - data://garden/energy/2023-07-10/uk_historical_electricity
+  #
+  # Energy - Energy mix (2023).
+  #
+  data://garden/energy/2023-07-10/energy_mix:
+    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
+    - data://garden/demography/2023-03-31/population
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/energy/2023-07-10/energy_mix:
+    - data://garden/energy/2023-07-10/energy_mix
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -340,5 +340,14 @@ steps:
     - data://garden/energy/2023-06-01/electricity_mix
   data://grapher/energy/2023-06-01/uk_historical_electricity:
     - data://garden/energy/2023-06-01/uk_historical_electricity
+  #
+  # BP - Energy mix 2023.
+  #
+  data://garden/bp/2023-02-20/energy_mix:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/demography/2022-12-08/population
+    - data://garden/wb/2021-07-01/wb_income
+  data://grapher/bp/2023-02-20/energy_mix:
+    - data://garden/bp/2023-02-20/energy_mix
 
   ######################################################################################################################
