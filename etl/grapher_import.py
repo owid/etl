@@ -282,7 +282,10 @@ def upsert_table(
 
         # create links, we need to do it after we commit deleted relationships above
         db_variable.create_links(
-            session, db_origins, faqs=variable_meta.presentation.faqs if variable_meta.presentation else []
+            session,
+            db_origins,
+            faqs=variable_meta.presentation.faqs if variable_meta.presentation else [],
+            tag_names=variable_meta.presentation.topic_tags_links if variable_meta.presentation else [],
         )
         session.commit()
 

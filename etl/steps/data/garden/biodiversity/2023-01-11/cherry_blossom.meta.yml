@@ -12,7 +12,7 @@ tables:
         processing_level: minor
         presentation:
           topic_tags_links:
-          - biodiversity
+          - Biodiversity
           grapher_config:
             title: Day of the year with peak cherry tree blossom in Kyoto, Japan
             subtitle: >
@@ -27,6 +27,8 @@ tables:
           key_info_text:
             - "A"
             - "B"
+        presentation_license:
+          url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
 
       average_20_years:
         title: Twenty-year average day of the year with peak cherry blossom

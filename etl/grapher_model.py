@@ -168,7 +168,7 @@ t_post_tags = Table(
 
 
 class Tag(SQLModel, table=True):
-    __tablename__: "tags"  # type: ignore
+    __tablename__: str = "tags"  # type: ignore
     __table_args__ = (
         ForeignKeyConstraint(["parentId"], ["tags.id"], name="tags_ibfk_1"),
         Index("dataset_subcategories_name_fk_dst_cat_id_6ce1cc36_uniq", "name", "parentId", unique=True),
@@ -349,9 +349,7 @@ class Dataset(SQLModel, table=True):
     sourceChecksum: Optional[str] = Field(
         default=None, sa_column=Column("sourceChecksum", String(64, "utf8mb4_0900_as_cs"))
     )
-    updatePeriod: Optional[int] = Field(
-        sa_column=Column("updatePeriod", Integer, nullable=True)
-    )
+    updatePeriod: Optional[int] = Field(sa_column=Column("updatePeriod", Integer, nullable=True))
 
     users: Optional["User"] = Relationship(back_populates="datasets")
     users_: Optional["User"] = Relationship(back_populates="datasets_")
@@ -757,6 +755,18 @@ class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
     )
 
 
+class TagsVariablesTopicTagsLink(SQLModel, table=True):
+    __tablename__ = "tags_variables_topic_tags"  # type: ignore
+    __table_args__ = (
+        ForeignKeyConstraint(["tagId"], ["tags.id"], name="tags_variables_topic_tags_ibfk_1"),
+        ForeignKeyConstraint(["variableId"], ["variables.id"], name="tags_variables_topic_tags_ibfk_2"),
+        Index("variableId", "variableId"),
+    )
+
+    tagId: Optional[str] = Field(default=None, sa_column=Column("tagId", Integer, primary_key=True, nullable=False))
+    variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
+
+
 class Variable(SQLModel, table=True):
     """Example:
     {
@@ -835,6 +845,7 @@ class Variable(SQLModel, table=True):
     keyInfoText: Optional[List[dict]] = Field(default=None, sa_column=Column("keyInfoText", JSON))
     processingInfo: Optional[str] = Field(default=None, sa_column=Column("processingInfo", LONGTEXT))
     licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
+    presentationLicense: Optional[dict] = Field(default=None, sa_column=Column("presentationLicense", JSON))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
@@ -897,6 +908,7 @@ class Variable(SQLModel, table=True):
             ds.keyInfoText = self.keyInfoText
             ds.processingInfo = self.processingInfo
             ds.licenses = self.licenses
+            ds.presentationLicense = self.presentationLicense
             ds.updatedAt = datetime.utcnow()
             # do not update these fields unless they're specified
             if self.columnOrder is not None:
@@ -964,7 +976,10 @@ class Variable(SQLModel, table=True):
             dimensions=dimensions,
             schemaVersion=metadata.schema_version,
             processingLevel=metadata.processing_level,
+            descriptionShort=metadata.description_short,
+            descriptionFromProducer=metadata.description_from_producer,
             licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
+            presentationLicense=metadata.presentation_license.to_dict() if metadata.presentation_license else None,
             **presentation_dict,
         )
 
@@ -982,8 +997,11 @@ class Variable(SQLModel, table=True):
         """
         session.query(OriginsVariablesLink).filter(OriginsVariablesLink.variableId == self.id).delete()
         session.query(PostsGdocsVariablesFaqsLink).filter(PostsGdocsVariablesFaqsLink.variableId == self.id).delete()
+        session.query(TagsVariablesTopicTagsLink).filter(TagsVariablesTopicTagsLink.variableId == self.id).delete()
 
-    def create_links(self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink]):
+    def create_links(
+        self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
+    ):
         """
         Establishes relationships between the current variable and a list of origins and a list of posts.
         """
@@ -1002,6 +1020,18 @@ class Variable(SQLModel, table=True):
                     for faq in faqs
                 ]
             )
+        # establish relationships between variables and tags
+        if tag_names:
+            # get tags by their name
+            tags = session.exec(select(Tag).where(Tag.name.in_(tag_names))).all()  # type: ignore
+
+            # raise a warning if some tags were not found
+            if len(tags) != len(tag_names):
+                found_tags = [tag.name for tag in tags]
+                missing_tags = [tag for tag in tag_names if tag not in found_tags]
+                log.warning("create_links.missing_tags", tags=missing_tags)
+
+            session.add_all([TagsVariablesTopicTagsLink(tagId=tag.id, variableId=self.id) for tag in tags])  # type: ignore
 
     def s3_data_path(self) -> str:
         """Path to S3 with data in JSON format for Grapher. Typically
@@ -1090,10 +1120,15 @@ class Origin(SQLModel, table=True):
     datasetDescriptionProducer: Optional[str] = None
     producer: Optional[str] = None
     citationProducer: Optional[str] = None
+    attribution: Optional[str] = None
+    attributionShort: Optional[str] = None
+    version: Optional[str] = None
     datasetUrlMain: Optional[str] = None
     datasetUrlDownload: Optional[str] = None
     dateAccessed: Optional[date] = None
     datePublished: Optional[date] = None
+    license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
+
     variables: list["Variable"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
 
     @classmethod
@@ -1106,6 +1141,10 @@ class Origin(SQLModel, table=True):
             citationProducer=origin.citation_producer,
             datasetTitleOwid=origin.dataset_title_owid,
             datasetTitleProducer=origin.dataset_title_producer,
+            attribution=origin.attribution,
+            attributionShort=origin.attribution_short,
+            version=origin.version,
+            license=origin.license.to_dict() if origin.license else None,
             datasetUrlMain=origin.dataset_url_main,
             datasetUrlDownload=origin.dataset_url_download,
             datasetDescriptionOwid=origin.dataset_description_owid,
@@ -1118,12 +1157,16 @@ class Origin(SQLModel, table=True):
     def _upsert_select(self) -> SelectOfScalar["Origin"]:
         # match on all fields for now, otherwise we could get an origin from a different dataset
         # and modify it, which would make it out of sync with origin from its recipe
+        # NOTE: we don't match on license because it's JSON and hard to compare
         cls = self.__class__
         return select(cls).where(
             cls.producer == self.producer,
             cls.citationProducer == self.citationProducer,
             cls.datasetTitleOwid == self.datasetTitleOwid,
             cls.datasetTitleProducer == self.datasetTitleProducer,
+            cls.attribution == self.attribution,
+            cls.attributionShort == self.attributionShort,
+            cls.version == self.version,
             cls.datasetUrlMain == self.datasetUrlMain,
             cls.datasetUrlDownload == self.datasetUrlDownload,
             cls.datasetDescriptionOwid == self.datasetDescriptionOwid,

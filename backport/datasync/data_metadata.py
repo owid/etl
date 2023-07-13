@@ -159,7 +159,9 @@ def _load_origins_df(engine: Engine, variable_id: int) -> pd.DataFrame:
     JOIN origins_variables ON origins.id = origins_variables.originId
     WHERE origins_variables.variableId = %(variable_id)s
     """
-    return pd.read_sql(sql, engine, params={"variable_id": variable_id})
+    df = pd.read_sql(sql, engine, params={"variable_id": variable_id})
+    df["license"] = df["license"].map(lambda x: json.loads(x) if x else None)
+    return df
 
 
 def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
@@ -180,11 +182,13 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
     presentationJson = row.pop("presentation", None)
     grapherConfigETLJson = row.pop("grapherConfigETL", None)
     grapherConfigJson = row.pop("grapherConfig", None)
+    presentationLicenseJson = row.pop("presentationLicense", None)
 
     presentation = json.loads(presentationJson) if presentationJson else None
     display = json.loads(displayJson)
     grapherConfigETL = json.loads(grapherConfigETLJson) if grapherConfigETLJson else None
     grapherConfig = json.loads(grapherConfigJson) if grapherConfigJson else None
+    presentationLicense = json.loads(presentationLicenseJson) if presentationLicenseJson else None
 
     variableMetadata = dict(
         **_omit_nullable_values(variable),
@@ -196,6 +200,7 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         presentation=presentation,
         grapherConfigETL=grapherConfigETL,
         grapherConfig=grapherConfig,
+        presentationLicense=presentationLicense,
     )
 
     # add source

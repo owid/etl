@@ -37,6 +37,24 @@ SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 YearDateLatest = NewType("YearDateLatest", str)
 
 
+@pruned_json
+@dataclass_json
+@dataclass
+class License:
+    name: Optional[str] = None
+    url: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        ...
+
+    @staticmethod
+    def from_dict(d: Dict[str, Any]) -> "License":
+        ...
+
+    def __bool__(self):
+        return bool(self.name or self.url)
+
+
 # DEPRECATED: use Origin instead
 @pruned_json
 @dataclass_json
@@ -91,6 +109,12 @@ class Origin:
     producer: Optional[str] = None
     # The full citation that the producer asks for
     citation_producer: Optional[str] = None
+    # These will be often empty and then producer is used instead, but for the (relatively common) cases
+    # where the data product is more famous than the authors we would use this (e.g. VDEM instead of the first authors)
+    attribution: Optional[str] = None
+    attribution_short: Optional[str] = None
+    # This is also often empty but if not then it will be part of the short citation (e.g. for VDEM)
+    version: Optional[str] = None
     # The authorative URL of the dataset
     dataset_url_main: Optional[str] = None
     # Direct URL to download the dataset
@@ -99,6 +123,8 @@ class Origin:
     date_accessed: Optional[str] = None
     # Publication date or, if the exact date is not known, publication year
     date_published: Optional[YearDateLatest] = None
+    # License of the dataset
+    license: Optional[License] = None
 
     def __post_init__(self):
         if self.date_published:
@@ -122,25 +148,7 @@ class Origin:
                 setattr(self, key, value)
 
 
-@pruned_json
-@dataclass_json
-@dataclass
-class License:
-    name: Optional[str] = None
-    url: Optional[str] = None
-
-    def to_dict(self) -> Dict[str, Any]:
-        ...
-
-    @staticmethod
-    def from_dict(d: Dict[str, Any]) -> "License":
-        ...
-
-    def __bool__(self):
-        return bool(self.name or self.url)
-
-
-OWID_PROCESSING_LEVELS = Literal["minor", "medium", "major"]
+OWID_PROCESSING_LEVELS = Literal["minor", "major"]
 
 
 @pruned_json
@@ -168,10 +176,6 @@ class VariablePresentationMeta:
     producer_short: Optional[str] = None
     # A short text to use to credit the source e.g. at the bottom of charts. Autofilled from the list of origins (see below). Semicolon separated if there are multiple.
     citation_inline: Optional[str] = None
-    # A 1-2 sentence description - used internally or as fallback for key_info_text
-    description_short: Optional[str] = None
-    # How did the origin describe this variable?
-    description_from_producer: Optional[str] = None
     # List of topic tags
     topic_tags_links: List[str] = field(default_factory=list)
 
@@ -210,6 +214,10 @@ class VariableMeta:
 
     title: Optional[str] = None
     description: Optional[str] = None
+    # A 1-2 sentence description - used internally or as fallback for key_info_text
+    description_short: Optional[str] = None
+    # How did the origin describe this variable?
+    description_from_producer: Optional[str] = None
     origins: List[Origin] = field(default_factory=list)  # Origins is the new replacement for sources
     licenses: List[License] = field(default_factory=list)
     unit: Optional[str] = None
@@ -224,6 +232,11 @@ class VariableMeta:
     processing_log: List[Dict[str, Any]] = field(default_factory=list)
 
     presentation: Optional[VariablePresentationMeta] = None
+
+    # This one is the license that we give the data. Normally it will be empty and then it will
+    # be our usual license (CC-BY) but in cases where special restriction apply this is where
+    # we would capture this.
+    presentation_license: Optional[License] = None
 
     # This is the old sources that we keep for compatibility. Use is strongly discouraged going forward
     sources: List[Source] = field(default_factory=list)

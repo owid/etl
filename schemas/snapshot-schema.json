@@ -70,6 +70,15 @@
               "citation_producer": {
                 "type": "string"
               },
+              "attribution": {
+                "type": "string"
+              },
+              "attribution_short": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              },
               "dataset_url_main": {
                 "type": "string"
               },
@@ -83,6 +92,18 @@
               "date_published": {
                 "type": "string",
                 "format": "date"
+              },
+              "license": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
               }
             }
           },
