@@ -1,0 +1,24 @@
+meta:
+  name: A systematic review of global autopsy rates in all-cause mortality and young
+    sudden death, Paratz et al (2023)
+  description: ''
+  source:
+    name: Google Sheet
+    description:
+    url: https://www.heartrhythmjournal.com/article/S1547-5271(23)00027-9/fulltext
+    source_data_url: 
+      gAAAAABksAEa44g58DeKb9uzohhLgOYkIfIDsgbscHKOa_7QlprJKgoUH_ZfQ2vH1YwOmz3ibh49jkXt-Q2ZEbA8efC5snkbvlTrZvN9UlTpC8Jeb9cPLmXmA-p1kFB_CdXDJWIEYSfuJLEAzD5FE9DI70wNUFlJxYZN-XA2vAIKWa9S6AJsA5H2Dm33P4Nz94iDhT3XxSlq-zINfF9BpebPcrI-qnT8N6m3k1vE8U3LOKdxHSK0xD7j16OD6xHcFTHo8CFbN-fi
+    owid_data_url:
+    date_accessed: '2023-07-13'
+    publication_date:
+    publication_year: 2023
+    published_by: Google Sheet
+  license:
+    name:
+    url:
+  is_public: false
+wdir: ../../../data/snapshots/fasttrack/2023-04-30
+outs:
+- md5: 451f57cd7bcd3572c7e5d9cecd378cd8
+  size: 1094
+  path: paratz.csv

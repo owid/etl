@@ -1,0 +1,25 @@
+dataset:
+  sources:
+  - name: 'Paratz ED, Rowe SJ, Stub D, Pflaumer A, La Gerche A. A systematic review of global autopsy rates in all-cause mortality
+      and young sudden death. Heart Rhythm. 2023 Apr;20(4):607-613. doi: 10.1016/j.hrthm.2023.01.008. Epub 2023 Jan 11. PMID:
+      36640854.'
+    published_by: Heart Rhythm
+    publication_year: 2023
+    date_accessed: 2023-07-13
+    url: https://www.heartrhythmjournal.com/article/S1547-5271(23)00027-9/fulltext
+tables:
+  paratz:
+    variables:
+      autopsy_rate:
+        title: autopsy_rate
+        short_unit: '%'
+        unit: '%'
+        description: Autopsy rates reported in all-cause death.
+        sources:
+        - name: 'Paratz ED, Rowe SJ, Stub D, Pflaumer A, La Gerche A. A systematic review of global autopsy rates in all-cause
+            mortality and young sudden death. Heart Rhythm. 2023 Apr;20(4):607-613. doi: 10.1016/j.hrthm.2023.01.008. Epub
+            2023 Jan 11. PMID: 36640854.'
+          published_by: Heart Rhythm
+          publication_year: 2023
+          date_accessed: 2023-07-13
+          url: https://www.heartrhythmjournal.com/article/S1547-5271(23)00027-9/fulltext
