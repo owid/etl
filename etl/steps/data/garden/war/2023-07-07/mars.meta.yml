@@ -1,35 +1,85 @@
-# (Inherited from meadow, remove if not different.)
-all_sources:
-  - source_testing: &source-testing
-      name: # Example: Testing Short Citation
-      published_by: # (if different to short citation). Example: Testing Full Citation
-      url: # Example: https://url_of_testing_source.com/
-      date_accessed: # Example: 2023-01-01
-      publication_date: # Example: 2023-01-01
-      publication_year: # (if publication_date is not given). Example: 2023
-      # description: Source description.
-
-# (Inherited from meadow, remove if not different.)
 dataset:
-  title: # Example: Testing Dataset Name (Institution, 2023)
-  # description: Dataset description.
-  licenses:
-    - name: # Example: Testing License Name
-      url: # Example: https://url_of_testing_source.com/license
-  sources:
-    - *source-testing
+  title: History of war (Project Mars, 2020)
+  description: >-
+    This dataset contains information on armed conflicts, both internal and external, in the period of 1800 and 2011.
+
+
+    It has been constructed using the Project Mars dataset by Lyall, Jason.
+
+
+    More details about Project Mars:
+
 
 tables:
-  mars:
+  ucdp:
     # (Inherited from meadow, remove if not different.)
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description: Full description of testing variable.
-      #   sources:
-      #     - *source-testing
-      #   display:
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
+      number_deaths_ongoing_conflicts:
+        title: Number of deaths in ongoing conflicts (best estimate)
+        unit: deaths
+        description: >-
+          The best (most likely) estimate of total fatalities in ongoing (active) conflicts in a given year.
+          It includes deaths from both sides in the conflict, civilians and from persons of "unknown status".
+
+
+          Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
+        display:
+          numDecimalPlaces: 0
+      number_deaths_ongoing_conflicts_high:
+        title: Number of deaths in ongoing conflicts (high estimate)
+        unit: deaths
+        description: >-
+          The highest reliable estimate of total fatalities in ongoing (active) conflicts in a given year.
+          It includes deaths from both sides in the conflict, civilians and from persons of "unknown status".
+
+
+          Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
+        display:
+          numDecimalPlaces: 0
+      number_deaths_ongoing_conflicts_low:
+        title: Number of deaths in ongoing conflicts (low estimate)
+        unit: deaths
+        description: >-
+          The lowest reliable estimate of total fatalities in ongoing (active) conflicts in a given year.
+          It includes deaths from both sides in the conflict, civilians and from persons of "unknown status".
+
+
+          Note that UCDP attempts to distinguish and not include unreasonable
+          claims in the high estimate of fatalities, and tends to be highly conservative when counting
+          fatalities
+
+
+          Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
+        display:
+          numDecimalPlaces: 0
+
+      number_ongoing_conflicts:
+        title: Number of ongoing conflicts
+        unit: deaths
+        description: >-
+          Number of ongoing (active) conflicts in a given year.
+
+
+          The same conflict might develop in different regions. Therefore, it might be counted in more than one
+          region. Consequently, adding all the values for all regions might provide an over-estimate of the global value. Instead,
+          use region='World'.
+
+
+          Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
+        display:
+          numDecimalPlaces: 0
+      number_new_conflicts:
+        title: Number of new conflicts
+        unit: deaths
+        description: >-
+          Number of new (active) conflicts in a given year.
+
+
+          The same conflict might start in different regions in different years. Therefore, it might be counted in more than one
+          region. Consequently, adding all the values for all regions might provide an over-estimate of the global value. Instead,
+          use region='World'.
+
+
+          Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
+        display:
+          numDecimalPlaces: 0
