@@ -14,6 +14,6 @@ meta:
     World bank data on secondary school education.
 wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
-- md5: b6869fa3dd2d3bb44107a376bb2a3549
-  size: 4153462
+- md5: 0378b25c0f164b2340cf10a55a8069bc
+  size: 3298104
   path: education_secondary.csv

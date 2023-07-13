@@ -23,7 +23,24 @@ def main(path_to_file: str, upload: bool) -> None:
     Instructions:
     1. Visit the following URL:  https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
     2. Select the following indicators:
-
+        'Gross enrolment ratio for tertiary education, adjusted gender parity index (GPIA)'
+        'Gross enrolment ratio for tertiary education, female (%)'
+        'Gross enrolment ratio for tertiary education, both sexes (%)'
+        'Gross enrolment ratio for tertiary education, male (%)'
+        'Percentage of graduates from programmes other than Science, Technology, Engineering and Mathematics in tertiary education, both sexes (%)'
+        'Percentage of graduates from Science, Technology, Engineering and Mathematics programmes in tertiary education, both sexes (%)'
+        'Percentage of graduates from tertiary education graduating from Agriculture, Forestry, Fisheries and Veterinary programmes, both sexes (%)'
+        'Percentage of graduates from tertiary education graduating from Arts and Humanities programmes, both sexes (%)'
+        'Percentage of graduates from tertiary education graduating from Business, Administration and Law programmes, both sexes (%)'
+        'Percentage of graduates from tertiary education graduating from Education programmes, both sexes (%)'
+        'Percentage of graduates from tertiary education graduating from Engineering, Manufacturing and Construction programmes, both sexes (%)'
+        'Percentage of graduates from tertiary education graduating from Health and Welfare programmes, both sexes (%)'
+        'Percentage of graduates from tertiary education graduating from Information and Communication Technologies programmes, both sexes (%)'
+        'Percentage of graduates from tertiary education graduating from Natural Sciences, Mathematics and Statistics programmes, both sexes (%)'
+        'Percentage of graduates from tertiary education graduating from programmes in unspecified fields, both sexes (%)'
+        'Percentage of graduates from tertiary education graduating from Services programmes, both sexes (%)'
+        'Percentage of graduates from tertiary education graduating from Social Sciences, Journalism and Information programmes, both sexes (%)'
+        'Outbound mobility ratio, all regions, both sexes (%)'
     3. In the top right corner, click on the "Download" button.
     4. Choose the "CSV" format and initiate the download.
 

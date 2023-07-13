@@ -14,6 +14,6 @@ meta:
     World bank data on pre-primary school education.
 wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
-- md5: 81e8ac0918c1c6bb7d639301ed4ffb24
-  size: 1792619
+- md5: 83f702a63c88066cad4adbbd6f338e0c
+  size: 1296419
   path: education_pre_primary.csv

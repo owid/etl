@@ -22,9 +22,24 @@ def main(path_to_file: str, upload: bool) -> None:
     """
     Instructions:
     1. Visit the following URL:  https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
-
     2. Select the following indicators:
-
+        'Youth literacy rate, population 15-24 years, adjusted gender parity index (GPIA)'
+        'Youth literacy rate, population 15-24 years, both sexes (%)'
+        'Youth literacy rate, population 15-24 years, female (%)'
+        'Youth literacy rate, population 15-24 years, male (%)'
+        'Adult literacy rate, population 15+ years, male (%)'
+        'Adult literacy rate, population 15+ years, female (%)'
+        'Adult literacy rate, population 15+ years, both sexes (%)'
+        'Adult literacy rate, population 15+ years, adjusted gender parity index (GPIA)'
+        'Elderly literacy rate, population 65+ years, male (%)'
+        'Elderly literacy rate, population 65+ years, female (%)'
+        'Elderly literacy rate, population 65+ years, both sexes (%)'
+        'Elderly literacy rate, population 65+ years, adjusted gender parity index (GPIA)'
+        'Literacy rate, population 25-64 years, female (%)'
+        'Literacy rate, population 25-64 years, male (%)'
+        'Literacy rate, population 25-64 years, adjusted gender parity index (GPIA)'
+        'Literacy rate, population 25-64 years, both sexes (%)']
+    3. In the top right corner, click on the "Download" button.
     4. Choose the "CSV" format and initiate the download.
 
     Note: Ensure that the downloaded dataset contains the desired PISA scores and associated information.

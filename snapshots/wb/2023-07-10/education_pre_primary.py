@@ -23,7 +23,22 @@ def main(path_to_file: str, upload: bool) -> None:
     Instructions:
     1. Visit the following URL:  https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
     2. Select the following indicators:
-
+        'Adjusted net enrolment rate, one year before the official primary entry age, adjusted gender parity index (GPIA)'
+        'Adjusted net enrolment rate, one year before the official primary entry age, female (%)'
+        'Adjusted net enrolment rate, one year before the official primary entry age, both sexes (%)'
+        'Adjusted net enrolment rate, one year before the official primary entry age, male (%)'
+        'Percentage of enrolment in early childhood education programmes in private institutions (%)'
+        'Gross enrolment ratio, pre-primary, both sexes (%)'
+        'Out-of-school rate for children one year younger than official primary entrance age, both sexes (%)'
+        'Out-of-school rate for children one year younger than official primary entrance age, male (%)'
+        'Out-of-school rate for children one year younger than official primary entrance age, female (%)'
+        'Out-of-school rate for children one year younger than official age, adjusted gender parity index (GPIA)'
+        'Number of years of free pre-primary education guaranteed in legal frameworks'
+        'Official entrance age to pre-primary education (years)'
+        'School life expectancy, pre-primary, gender parity index (GPI)'
+        'School life expectancy, pre-primary, both sexes (years)'
+        'School life expectancy, pre-primary, female (years)'
+        'School life expectancy, pre-primary, male (years)'
     3. In the top right corner, click on the "Download" button.
     4. Choose the "CSV" format and initiate the download.
 

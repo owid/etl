@@ -8,3 +8,7 @@ steps:
   - snapshot://wb/2023-07-10/education_tertiary.csv
   - snapshot://wb/2023-07-10/education_literacy.csv
   - snapshot://wb/2023-07-10/education_expenditure_and_teachers.csv
+  data://garden/wb/2023-07-10/education:
+  - data://meadow/wb/2023-07-10/education
+  - data://garden/regions/2023-01-01/regions
+  - data://garden/wb/2023-04-30/income_groups

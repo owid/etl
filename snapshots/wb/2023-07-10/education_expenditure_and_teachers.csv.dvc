@@ -15,6 +15,6 @@ meta:
     teachers.
 wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
-- md5: aef2ec914bc094a2abbffdbb9d356740
-  size: 1657867
+- md5: 63a3afd2504b5fa358bd714989921a3e
+  size: 1736012
   path: education_expenditure_and_teachers.csv

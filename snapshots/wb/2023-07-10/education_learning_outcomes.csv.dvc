@@ -25,6 +25,6 @@ meta:
     developing economies, which make up two-thirds of the included countries.
 wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
-- md5: 27127b0381ed44e4fabaccdf94e9a585
-  size: 1792258
+- md5: 8bd80f74710f1ef47ef9e58b6fec6a3c
+  size: 1988951
   path: education_learning_outcomes.csv

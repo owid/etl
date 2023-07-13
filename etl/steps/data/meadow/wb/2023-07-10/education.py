@@ -13,7 +13,7 @@ paths = PathFinder(__file__)
 
 def load_and_select_data(snap: Snapshot) -> pd.DataFrame:
     """
-    Loads a CSV file from a snapshot and selects data up to the first row containing all NaN values.
+    Loads a CSV file from a snapshot and selects data up to the first row containing all NaN values (including country and year).
 
     Parameters:
     snap: Snapshot - The snapshot from which the CSV file is to be loaded
@@ -48,11 +48,8 @@ def run(dest_dir: str) -> None:
     # Load and process data from each snapshot
     df_list = []
     for snap in snaps:
-        print(snap)
         snapshot = cast(Snapshot, paths.load_dependency(snap))
         df = load_and_select_data(snapshot)
-        # Create indicator group colum excluding .csv at the end
-        df["Indicator Group"] = snap[:-4]
         print(df["Series"].unique())
         df_list.append(df)
 
@@ -65,17 +62,14 @@ def run(dest_dir: str) -> None:
     df.drop(["Country Code", "Series Code"], axis=1, inplace=True)
 
     # Clean up year columns (original columns are in the format xxxx [YRxxxx])
-    df.columns = df.columns.to_series().apply(
-        lambda x: x.split(" ")[0] if x not in ["Country Name", "Series", "Indicator Group"] else x
-    )
+    df.columns = df.columns.to_series().apply(lambda x: x.split(" ")[0] if x not in ["Country Name", "Series"] else x)
 
     # Melt years into a single column
-    df_melted = pd.melt(df, id_vars=["Country Name", "Series", "Indicator Group"], var_name="Year", value_name="Value")
+    df_melted = pd.melt(df, id_vars=["Country Name", "Series"], var_name="Year", value_name="Value")
     df_melted["Value"] = df_melted["Value"].astype(float)
     df_melted.rename(columns={"Country Name": "country", "Series": "indicator_name"}, inplace=True)
 
     tb = Table(df_melted, short_name=paths.short_name, underscore=True)
-
     tb.set_index(["country", "year", "indicator_name"], inplace=True)
 
     ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=None)
