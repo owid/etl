@@ -2583,7 +2583,7 @@ tables:
       ny_gnp_mktp_pp_kd:
         title: GNI, PPP (constant 2017 international $)
         short_unit: $
-        unit: constant 2017 international $
+        unit: international-$ in 2017 prices
       ny_gnp_pcap_cd:
         title: GNI per capita, Atlas method (current US$)
         short_unit: $
@@ -2609,7 +2609,7 @@ tables:
       ny_gnp_pcap_pp_kd:
         title: GNI per capita, PPP (constant 2017 international $)
         short_unit: $
-        unit: constant 2017 international $
+        unit: international-$ in 2017 prices
       ny_gns_ictr_cd:
         title: Gross savings (current US$)
         short_unit: $
