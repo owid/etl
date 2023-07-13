@@ -1222,6 +1222,7 @@ def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
 
     return unique_sources
 
+
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     # Make a list of all licenses of all variables in all tables.
     licenses = sum([table._fields[column].licenses for table in tables for column in list(table.all_columns)], [])
@@ -1265,7 +1266,10 @@ def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = Non
     return metadata
 
 
-def check_all_variables_have_metadata(tables: List[Table], fields: Tuple[str] = ("sources", "licenses")) -> None:
+def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List[str]] = None) -> None:
+    if fields is None:
+        fields = ["sources", "licenses"]
+
     for table in tables:
         table_name = table.metadata.short_name
         for column in table.columns:
