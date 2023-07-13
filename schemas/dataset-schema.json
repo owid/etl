@@ -13,7 +13,7 @@
             "type": "string"
           },
           "update_period": {
-            "type": "string"
+            "type": "integer"
           },
           "licenses": {
             "type": "array",

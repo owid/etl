@@ -1,5 +1,5 @@
 dataset:
-  update_period: "yearly"
+  update_period: 365
 tables:
   cherry_blossom:
     variables:

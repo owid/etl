@@ -284,6 +284,7 @@ class DatasetMeta:
     is_public: bool = True
     additional_info: Optional[Dict[str, Any]] = None
     version: Optional[str] = None
+    # update period in days
     update_period: Optional[str] = None
 
     # an md5 checksum of the ingredients used to make this dataset
