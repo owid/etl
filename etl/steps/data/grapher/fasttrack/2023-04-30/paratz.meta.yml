@@ -11,7 +11,7 @@ tables:
   paratz:
     variables:
       autopsy_rate:
-        title: autopsy_rate
+        title: Autopsy rate
         short_unit: '%'
         unit: '%'
         description: Autopsy rates reported in all-cause death.

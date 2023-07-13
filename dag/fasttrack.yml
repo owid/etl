@@ -82,5 +82,5 @@ steps:
   - snapshot-private://fasttrack/latest/fiscal_top1_shares_country_standardized.csv
   data://grapher/fasttrack/latest/monadic_strategic_nuclear_forces:
   - snapshot://fasttrack/latest/monadic_strategic_nuclear_forces.csv
-  data-private://grapher/fasttrack/2023-04-30/paratz:
-  - snapshot-private://fasttrack/2023-04-30/paratz.csv
+  data://grapher/fasttrack/2023-04-30/paratz:
+  - snapshot://fasttrack/2023-04-30/paratz.csv
