@@ -477,6 +477,7 @@ def run(dest_dir: str) -> None:
     # Adapt source and license for prices data, which is based on S&P Global Platts.
     prices_data_license = copy.deepcopy(snap.metadata.license)
     prices_data_license.name = "© S&P Global Inc. 2023"  # type: ignore
+    assert snap.metadata.source
     prices_data_source = copy.deepcopy(snap.metadata.source)
     prices_data_source.name = "Energy Institute Statistical Review of World Energy based on S&P Global Platts (2023)"
     prices_data_source.published_by = (
