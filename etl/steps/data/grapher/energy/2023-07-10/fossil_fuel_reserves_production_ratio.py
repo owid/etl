@@ -19,5 +19,7 @@ def run(dest_dir: str) -> None:
     tb_garden = ds_garden["fossil_fuel_reserves_production_ratio"]
 
     # Create new grapher dataset.
-    dataset = create_dataset(dest_dir=dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata, check_variables_metadata=True)
+    dataset = create_dataset(
+        dest_dir=dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata, check_variables_metadata=True
+    )
     dataset.save()

@@ -225,5 +225,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Save garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[combined], default_metadata=ds_review.metadata, check_variables_metadata=True)
+    ds_garden = create_dataset(
+        dest_dir=dest_dir, tables=[combined], default_metadata=ds_review.metadata, check_variables_metadata=True
+    )
     ds_garden.save()

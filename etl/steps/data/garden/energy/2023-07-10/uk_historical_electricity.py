@@ -186,5 +186,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_combined], default_metadata=ds_beis.metadata, check_variables_metadata=True)
+    ds_garden = create_dataset(
+        dest_dir=dest_dir, tables=[tb_combined], default_metadata=ds_beis.metadata, check_variables_metadata=True
+    )
     ds_garden.save()
