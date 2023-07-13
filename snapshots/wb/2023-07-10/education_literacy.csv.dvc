@@ -15,6 +15,6 @@ meta:
     olds, and eldery (65+) split by gender.
 wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
-- md5: 5f7e8cb84f3a6df17140cb04159386ca
-  size: 1498568
+- md5: b5ccc67189de68773d025a41c9de0b87
+  size: 1113354
   path: education_literacy.csv

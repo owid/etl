@@ -21,8 +21,37 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 def main(path_to_file: str, upload: bool) -> None:
     """
     Instructions:
-    1. Visit the following URL:  https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
+    1. Visit the following URL: https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
     2. Select the following indicators:
+        'Human Capital Index (HCI): Learning-Adjusted Years of School, Female'
+        'Human Capital Index (HCI): Learning-Adjusted Years of School, Total'
+        'Human Capital Index (HCI): Learning-Adjusted Years of School, Male'
+        'PISA: Mean performance on the mathematics scale. Female'
+        'PISA: Mean performance on the reading scale'
+        'PISA: Mean performance on the reading scale. Male'
+        'PISA: Mean performance on the science scale. Female'
+        'PISA: Mean performance on the mathematics scale. Male'
+        'PISA: Mean performance on the mathematics scale'
+        'PISA: Mean performance on the reading scale. Female'
+        'PISA: Mean performance on the science scale'
+        'PISA: Mean performance on the science scale. Male'
+        'TIMSS: Mean performance on the science scale for fourth grade students, total'
+        'TIMSS: Mean performance on the science scale for fourth grade students, female'
+        'TIMSS: Mean performance on the science scale for eighth grade students, male'
+        'TIMSS: Mean performance on the mathematics scale for fourth grade students, total'
+        'TIMSS: Mean performance on the mathematics scale for fourth grade students, female'
+        'TIMSS: Mean performance on the mathematics scale for eighth grade students, male'
+        'TIMSS: Mean performance on the mathematics scale for eighth grade students, female'
+        'TIMSS: Mean performance on the mathematics scale for eighth grade students, total'
+        'TIMSS: Mean performance on the mathematics scale for fourth grade students, male'
+        'TIMSS: Mean performance on the science scale for eighth grade students, female'
+        'TIMSS: Mean performance on the science scale for eighth grade students, total'
+        'TIMSS: Mean performance on the science scale for fourth grade students, male'
+        'Harmonized Test Scores, Female' 'Harmonized Test Scores, Total'
+        'Harmonized Test Scores, Male'
+        'PIRLS: Mean performance on the reading scale, male'
+        'PIRLS: Mean performance on the reading scale, female'
+        'PIRLS: Mean performance on the reading scale, total'
     3. In the top right corner, click on the "Download" button.
     4. Choose the "CSV" format and initiate the download.
 

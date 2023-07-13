@@ -23,7 +23,29 @@ def main(path_to_file: str, upload: bool) -> None:
     Instructions:
     1. Visit the following URL:  https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
     2. Select the following indicators:
-
+        'Percentage of qualified teachers in pre-primary education, both sexes (%)'
+        'Proportion of teachers with the minimum required qualifications in pre-primary education, both sexes (%)'
+        'Pupil-trained teacher ratio in pre-primary education (headcount basis)'
+        'Pupil-qualified teacher ratio in pre-primary education (headcount basis)'
+        'Percentage of qualified teachers in primary education, both sexes (%)'
+        'Proportion of teachers with the minimum required qualifications in primary education, both sexes (%)'
+        'Pupil-qualified teacher ratio in primary education (headcount basis)'
+        'Pupil-trained teacher ratio in primary education (headcount basis)'
+        'Percentage of qualified teachers in secondary education, both sexes (%)'
+        'Proportion of teachers with the minimum required qualifications in secondary education, both sexes (%)'
+        'Pupil-qualified teacher ratio in secondary (headcount basis)'
+        'Pupil-trained teacher ratio in secondary education (headcount basis)'
+        'Annual statutory teacher salaries in public institutions in USD. Upper Secondary. Starting salary'
+        'Annual statutory teacher salaries in public institutions in USD. Primary. Starting salary'
+        'Annual statutory teacher salaries in public institutions in USD. Pre-Primary. Starting salary'
+        'Annual statutory teacher salaries in public institutions in USD. Lower Secondary. Starting salary'
+        'Expenditure on education as % of total government expenditure (%)'
+        'Government expenditure on education as % of GDP (%)'
+        'Government expenditure on pre-primary education as % of GDP (%)'
+        'Government expenditure on primary education as % of GDP (%)'
+        'Government expenditure on secondary education as % of GDP (%)'
+        'Government expenditure on tertiary education as % of GDP (%)'
+        'Volume of official development assistance flows for scholarships by sector and type of study, constant US$
     3. In the top right corner, click on the "Download" button.
     4. Choose the "CSV" format and initiate the download.
 
