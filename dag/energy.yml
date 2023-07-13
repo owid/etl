@@ -17,17 +17,6 @@ steps:
   data://garden/ember/2023-02-20/european_electricity_review:
     - data://meadow/ember/2023-02-20/european_electricity_review
   #
-  # Energy - OWID Energy dataset (2023).
-  #
-  data://garden/energy/2023-06-01/owid_energy:
-    - data://garden/bp/2023-02-20/energy_mix
-    - data://garden/energy/2023-06-01/fossil_fuel_production
-    - data://garden/energy/2023-06-01/primary_energy_consumption
-    - data://garden/energy/2023-06-01/electricity_mix
-    - data://garden/demography/2023-03-31/population
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/regions/2023-01-01/regions
-  #
   # IRENA - Renewable power generation costs (2022).
   #
   data://meadow/irena/2023-01-04/renewable_power_generation_costs:
@@ -204,6 +193,17 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
   data://grapher/energy/2023-07-10/energy_mix:
     - data://garden/energy/2023-07-10/energy_mix
+  #
+  # Energy - OWID Energy dataset (2023).
+  #
+  data://garden/energy/2023-07-10/owid_energy:
+    - data://garden/energy/2023-07-10/energy_mix
+    - data://garden/energy/2023-07-10/fossil_fuel_production
+    - data://garden/energy/2023-07-10/primary_energy_consumption
+    - data://garden/energy/2023-07-10/electricity_mix
+    - data://garden/demography/2023-03-31/population
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/regions/2023-01-01/regions
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -349,5 +349,16 @@ steps:
     - data://garden/wb/2021-07-01/wb_income
   data://grapher/bp/2023-02-20/energy_mix:
     - data://garden/bp/2023-02-20/energy_mix
+  #
+  # Energy - OWID Energy dataset (2023).
+  #
+  data://garden/energy/2023-06-01/owid_energy:
+    - data://garden/bp/2023-02-20/energy_mix
+    - data://garden/energy/2023-06-01/fossil_fuel_production
+    - data://garden/energy/2023-06-01/primary_energy_consumption
+    - data://garden/energy/2023-06-01/electricity_mix
+    - data://garden/demography/2023-03-31/population
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/regions/2023-01-01/regions
 
   ######################################################################################################################
