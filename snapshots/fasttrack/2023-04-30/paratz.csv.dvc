@@ -1,9 +1,18 @@
 meta:
   name: A systematic review of global autopsy rates in all-cause mortality and young
     sudden death, Paratz et al (2023)
-  description: 'Paratz ED, Rowe SJ, Stub D, Pflaumer A, La Gerche A. A systematic
-    review of global autopsy rates in all-cause mortality and young sudden death.
-    Heart Rhythm. 2023 Apr;20(4):607-613. doi: 10.1016/j.hrthm.2023.01.008.'
+  description: >-
+    The data for this indicator is taken from: Paratz ED, Rowe SJ, Stub D, Pflaumer
+    A, La Gerche A. A systematic review of
+    global autopsy rates in all-cause mortality and young sudden death. Heart Rhythm.
+    2023 Apr;20(4):607-613. doi: 10.1016/j.hrthm.2023.01.008.
+
+
+    The data is collated from a number of published papers and databases. The year
+    shown reflects the date given in the database
+    or the year of the publication. For Spain and Australia the data is only representative
+    of a region of each country, Catalonia
+    and Victoria, respectively.
   source:
     name: Google Sheet
     description:
@@ -20,6 +29,6 @@ meta:
     url:
 wdir: ../../../data/snapshots/fasttrack/2023-04-30
 outs:
-- md5: 451f57cd7bcd3572c7e5d9cecd378cd8
-  size: 1094
+- md5: 14f4576ea63fda9388db9f2c3f596990
+  size: 1110
   path: paratz.csv
