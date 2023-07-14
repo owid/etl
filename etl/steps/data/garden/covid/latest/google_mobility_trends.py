@@ -1,7 +1,4 @@
-import datetime as dt
-
 import pandas as pd
-import pytz
 from owid.catalog import Table
 from structlog import get_logger
 
