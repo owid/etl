@@ -2,6 +2,7 @@
 
 from typing import cast
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 
@@ -22,7 +23,7 @@ def run(dest_dir: str) -> None:
     ds_regions = cast(Dataset, paths.load_dependency("regions"))
     countries_national_ai = pd.DataFrame(ds_regions["regions"]["name"])
     countries_national_ai.reset_index(drop=True, inplace=True)
-    countries_national_ai["released"] = 0
+    countries_national_ai["released"] = np.NaN
     # Generate the column names from "2017" to "2022"
     column_names = [str(year) for year in range(2017, 2023)]
 
@@ -51,7 +52,6 @@ def run(dest_dir: str) -> None:
     )
     df_merged = pd.merge(countries_national_ai, tb, on=["country", "year"], how="outer")
 
-    # Make sure that we only fill NaNs with not released where there hasn't been a strategy released at any point
     grouped = df_merged.groupby("country", group_keys=False)
 
     # Loop through each group
@@ -60,7 +60,7 @@ def run(dest_dir: str) -> None:
         if group["released_national_strategy_on_ai"].isna().all():
             # Fill NaN values with "Not Released"
             group["released_national_strategy_on_ai"].fillna("Not Released", inplace=True)
-    df_merged = grouped.apply(lambda x: x)
+        df_merged.loc[group.index] = group
 
     df_merged.drop("released", axis=1, inplace=True)
     tb = Table(df_merged, short_name=paths.short_name, underscore=True)
