@@ -1,5 +1,5 @@
 dataset:
-  title: European Health Information Gateway (WHO, 2022)
+  title: WHO European Health Information Gateway (WHO, 2022)
   description: &dataset-description >-
     Since the mid-1980s, Member States of the WHO European Region have been reporting essential health-related statistics
     to the Health for All (HFA) family of databases, making it one of WHO’s oldest sources of data. As it is based on reported
