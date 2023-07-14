@@ -15,9 +15,8 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load WHO Europe meadow dataset.
     ds_meadow = cast(Dataset, paths.load_dependency("autopsy"))
-
     # Read table from meadow dataset.
     tb = ds_meadow["autopsy"]
 
