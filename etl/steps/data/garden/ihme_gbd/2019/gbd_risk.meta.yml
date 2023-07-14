@@ -29,6 +29,8 @@ tables:
       deaths__percent:
         title: Deaths attributed to risk (percent)
         unit: "%"
+        short_unit: "%"
       deaths__rate:
         title: Deaths attributed to risk (share of the populaton)
         unit: "%"
+        short_unit: "%"

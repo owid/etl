@@ -16,3 +16,4 @@ tables:
       prevalence__share_of_the_population:
         title: Current number of cases in the population per 100 people
         unit: "%"
+        short_unit: "%"
