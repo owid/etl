@@ -461,25 +461,23 @@ def _prio_add_metrics(tb: Table) -> Table:
 
     # Get number of new conflicts for all regions
     ## Reduce table to only preserve first appearing event
-    tb = (
-        tb[["conflict_id", "year", "region", "conflict_type"]]
-        .sort_values("year")
-        .drop_duplicates(subset=["conflict_type", "year", "region"], keep="first")
-    )
+    tb = tb.sort_values("year").drop_duplicates(subset=["conflict_id", "year_start", "region"], keep="first")
     # Groupby operation
-    cols_idx = ["year", "region", "conflict_type"]
+    cols_idx = ["year_start", "region", "conflict_type"]
     tb_new = tb.groupby(cols_idx, as_index=False)["conflict_id"].nunique()
     tb_new.columns = cols_idx + ["number_new_conflicts"]
     # Get number of new conflicts for 'World'
-    tb = tb.sort_values("year").drop_duplicates(subset=["conflict_type", "year"], keep="first")
-    cols_idx = ["year", "conflict_type"]
+    tb = tb.sort_values("year").drop_duplicates(subset=["conflict_id", "year_start"], keep="first")
+    cols_idx = ["year_start", "conflict_type"]
     tb_new_world = tb.groupby(cols_idx, as_index=False)["conflict_id"].nunique()
     tb_new_world.columns = cols_idx + ["number_new_conflicts"]
     tb_new_world["region"] = "World"
     # Combine regions & world
     tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True)
     # Keep only until 1989 (inc)
-    tb_new = tb_new[tb_new["year"] <= 1989]
+    tb_new = tb_new[tb_new["year_start"] <= 1989]
+    # Rename column
+    tb_new = tb_new.rename(columns={"year_start": "year"})
 
     # Combine and build single table
     tb = tb_ongoing.merge(
