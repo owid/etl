@@ -1,69 +1,21 @@
 dataset:
-  title: Parameter, Compute and Data Trends in Machine Learning (Epoch, 2023)
-  description: >-
-    The affiliation of the research team building a particular notable AI system was classified according to the following:
-
-    — Academia: 100% of researchers affiliated with academia
-
-    — Collaboration, Academia-majority: 71–99% affiliated with academia
-
-    — Collaboration: 30–70% affiliated with academia
-
-    — Collaboration, Industry-majority: 71–99% affiliated with industry
-
-    — Industry: 100% of researchers affiliated with industry
-
-
-    This data corresponds to the "Organization Categorization" and "Domain" columns in the primary source data spreadsheet.
-
-
-    The authors selected the AI systems for inclusion based on the following necessary criteria:
-
-    — Have an explicit learning component
-
-    — Showcase experimental results
-
-    — Advance the state of the art
-
-
-    In addition, the systems had to meet at least one of the following notability criteria:
-
-    — Paper has more than 1000 citations
-
-    — Historical importance
-
-    — Important state-of-the-art advance
-
-    — Deployed in a notable context
-
-
-    The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models.'"
+  title: Large Language Model performance and compute, EPOCH (2023)
+  description: EPOCH dataset on how performance on a MMLU language benchmark scales with computational resources.
   licenses:
-  - name: Public domain
+  - name: Creative Commons BY 4.0
   sources:
-  - name: Epoch (2023)
-    url: https://epochai.org/mlinputs/visualization
-    date_accessed: '2023-06-21'
-    publication_date: '2023-06-06'
-    publication_year: 2023
-    published_by: 'Epoch, Parameter, Compute and Data Trends in Machine Learning.
-      Published online at epochai.org. Retrieved from: https://epochai.org/mlinputs/visualization'
+  - name: EPOCH (2023)
+    description: EPOCH dataset on how performance on a MMLU language benchmark scales with computational resources.
+    url: provided directly by the source
+    date_accessed: '2023-07-12'
+    publication_date: '2023-07-12'
+    publication_year: 1994
+    published_by: 'David Owen (2023), Extrapolating performance in language modeling benchmarks. Published online at epochai.org.
+      Retrieved from: ''https://epochai.org/blog/extrapolating-performance-in-language-modelling-benchmarks'' [online resource]'
 tables:
-  epoch:
+  epoch_llms:
     variables:
-      system:
-        title: Name of the model
-        unit: ''
-      domain:
-        title: Domain
-        unit: ''
-      publication_date:
-        title: Publication date
-        unit: 'date'
-      organization_categorization:
-        title: Researcher affiliation
-        unit: ''
-      parameters:
+      model_size__parameters:
         title: Number of parameters
         description: >
           The number of parameters in AI models refers to the total count of learnable variables or weights that the model contains. Parameters are the internal variables that the model adjusts during the training process to optimize its performance and make predictions based on the input data.
@@ -82,17 +34,8 @@ tables:
         unit: ''
         display:
           numDecimalPlaces: 0
-          zeroDay: '1949-01-01'
-          yearIsDay: true
-      training_compute__flop:
-        title: Training compute (FLOP)
-        unit: 'FLOP'
-        display:
-          title: Training compute
-          numDecimalPlaces: 0
-          zeroDay: '1949-01-01'
-          yearIsDay: true
-      training_dataset_size__datapoints:
+
+      dataset_size__tokens:
         title: Training dataset size
         unit: 'datapoints'
         description: >
@@ -102,22 +45,19 @@ tables:
           Imagine you're teaching a computer to recognize different types of fruits. The training data size would refer to the number of fruit images you show to the computer during the training process. If you show it 100 images of various fruits, then the training data size would be 100. The more training data you provide, the better the computer can learn to identify different fruits accurately.
         display:
           numDecimalPlaces: 0
-          zeroDay: '1949-01-01'
-          yearIsDay: true
-      training_time__hours:
-        title: Training time
-        unit: 'hours'
+
+      mmlu_avg:
+        title: MMLU avg
+        unit: ''
+        description: >
+          The MMLU benchmark covers a wide range of 57 subjects, including STEM, humanities, social sciences, and more. It encompasses subjects of varying difficulty levels, spanning from elementary concepts to advanced professional topics. This comprehensive benchmark assesses not only world knowledge but also problem-solving abilities.
         display:
-          numDecimalPlaces: 0
-          zeroDay: '1949-01-01'
-          yearIsDay: true
-      equivalent_training_time__hours:
-        title: Equivalent training time
-        unit: 'hours'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '1949-01-01'
-          yearIsDay: true
+            title: Accuracy
+            numDecimalPlaces: 1
+
+      organisation:
+        title: Organisation
+        unit: ''
       training_computation_petaflop:
         title: Training compute (petaFLOP)
         unit: 'petaFLOP'
@@ -132,7 +72,3 @@ tables:
         display:
             title: Training compute
             numDecimalPlaces: 0
-            zeroDay: '1949-01-01'
-            yearIsDay: true
-
-

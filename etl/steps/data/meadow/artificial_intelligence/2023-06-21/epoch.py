@@ -34,6 +34,7 @@ def run(dest_dir: str) -> None:
     cols = [
         "System",
         "Domain",
+        "Organization",
         "Organization Categorization",
         "Publication date",
         "Parameters",
@@ -50,6 +51,8 @@ def run(dest_dir: str) -> None:
 
     df["Training compute (FLOP)"] = df["Training compute (FLOP)"].astype(float)
 
+    df.loc[df["System"].isna(), "System"] = df.loc[df["System"].isna(), "Organization"]
+    df.drop("Organization", axis=1, inplace=True)
     #
     # Create a new table and ensure all columns are snake-case.
     #

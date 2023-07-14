@@ -28,7 +28,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
-          name: Data management, processing and cloud
+          name: Data management
           numDecimalPlaces: 0
 
       medical_and_healthcare:
@@ -106,7 +106,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
-          display: Cybersecurity and data protection
+          display: Cybersecurity
           numDecimalPlaces: 0
 
       drones:

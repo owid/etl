@@ -15,18 +15,16 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("epoch"))
-
+    ds_garden = cast(Dataset, paths.load_dependency("epoch_llms"))
     # Read table from garden dataset.
-    tb = ds_garden["epoch"]
-    # Rename for plotting model name as country in grapher
-    tb = tb.rename(columns={"system": "country", "days_since_1949": "year"})
-    tb.set_index(["country", "year"], inplace=True)
+    tb = ds_garden["epoch_llms"]
 
     #
     # Process data.
     #
-
+    tb.reset_index(inplace=True)
+    tb.rename(columns={"architecture": "country"}, inplace=True)
+    tb.set_index(["country", "year"], inplace=True)
     #
     # Save outputs.
     #
