@@ -35,7 +35,7 @@ def cli(
     if output:
         os.makedirs(os.path.dirname(output), exist_ok=True)
         with open(output, "w") as f:
-            f.write(yaml_dump(meta_str))  # type: ignore
+            f.write(yaml_dump(meta_str, replace_confusing_ascii=True))  # type: ignore
     else:
         print(meta_str)
 
