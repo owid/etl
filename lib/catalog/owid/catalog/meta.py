@@ -12,8 +12,6 @@ from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 import pandas as pd
 from dataclasses_json import dataclass_json
 
-from . import utils
-
 T = TypeVar("T")
 
 
@@ -195,6 +193,8 @@ class DatasetMeta:
 
     def update_from_yaml(self, path: Union[Path, str], if_source_exists: SOURCE_EXISTS_OPTIONS = "fail") -> None:
         """The main reason for wanting to do this is to manually override what goes into Grapher before an export."""
+        from owid.catalog import utils
+
         annot = utils.dynamic_yaml_load(path, self._params_yaml())
 
         dataset_sources = annot.get("dataset", {}).get("sources", []) or []
