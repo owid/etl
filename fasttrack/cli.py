@@ -503,8 +503,14 @@ def _dataset_id(meta_ds: YAMLDatasetMeta) -> int:
 
 
 def _last_updated_before_minutes(dataset_meta: pd.DataFrame) -> int:
-    td = pd.Timestamp.utcnow() - pd.to_datetime(dataset_meta.set_index(0)[1].loc["updated"], dayfirst=True, utc=True)
-    return int(td.total_seconds() / 60)
+    updated = dataset_meta.set_index(0)[1].loc["updated"]
+    if pd.isnull(updated):
+        return 0
+    else:
+        td = pd.Timestamp.utcnow() - pd.to_datetime(
+            dataset_meta.set_index(0)[1].loc["updated"], dayfirst=True, utc=True
+        )
+        return int(td.total_seconds() / 60)
 
 
 def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
