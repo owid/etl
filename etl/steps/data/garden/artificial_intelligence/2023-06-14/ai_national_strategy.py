@@ -51,8 +51,7 @@ def run(dest_dir: str) -> None:
     )
     df_merged = pd.merge(countries_national_ai, tb, on=["country", "year"], how="outer")
 
-    # Make sure that we only fill NaNs with not released where there hasn't been a strategy released at any point
-    grouped = df_merged.groupby("country", group_keys=False)
+    grouped = df_merged.groupby("country", group_keys=True)
 
     # Loop through each group
     for country, group in grouped:
@@ -60,7 +59,7 @@ def run(dest_dir: str) -> None:
         if group["released_national_strategy_on_ai"].isna().all():
             # Fill NaN values with "Not Released"
             group["released_national_strategy_on_ai"].fillna("Not Released", inplace=True)
-    df_merged = grouped.apply(lambda x: x)
+        df_merged.loc[group.index] = group
 
     df_merged.drop("released", axis=1, inplace=True)
     tb = Table(df_merged, short_name=paths.short_name, underscore=True)
