@@ -19,10 +19,10 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["yougov_job_automation"]
-
-    # Rename the 'question' column to 'country' and days_since_2021 to year for visualising in the grapher
-    tb.rename(columns={"days_since_2021": "year"}, inplace=True)
-    tb.rename(columns={tb.columns[0]: "country"}, inplace=True)
+    tb.reset_index(inplace=True)
+    tb.rename(columns={"days_since_2021": "year", "group": "country"}, inplace=True)
+    print(tb)
+    tb.set_index(["year", "country"])
 
     #
     # Process data.
