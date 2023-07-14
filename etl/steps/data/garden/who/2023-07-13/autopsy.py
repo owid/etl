@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
     tb: Table = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    tb = tb.set_index(["country", "sex", "year"], verify_integrity=True)
+    tb = tb.set_index(["country", "sex", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     #
     # Save outputs.

@@ -29,6 +29,8 @@ def main(upload: bool) -> None:
     assert r.ok
     url = json.loads(r.content.decode("utf-8"))["download_url"]
     df = pd.read_csv(url, skiprows=25)
+    # assert column names are as expected
+    assert df.columns.to_list() == ["COUNTRY", "COUNTRY_GRP", "SEX", "YEAR", "VALUE"]
     # Download data from source.
     df_to_file(df, file_path=snap.path)
     # Add file to DVC and upload to S3.
