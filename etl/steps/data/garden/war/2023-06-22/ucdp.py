@@ -319,8 +319,12 @@ def add_number_conflicts_and_deaths(tb: Table) -> Table:
         tb_new,
         left_on=["year", "region", "conflict_type"],
         right_on=["year", "region", "conflict_type"],
-        suffixes=("", "_start"),
+        how="outer",  # data for (1991, intrastate) is available for 'ongoing conflicts' but not for 'new conflicts'. We don't want to loose it!
     )
+
+    # If datapoint is missing, fill with zero
+    tb = tb.fillna(0)
+
     # tb = tb.drop(columns=["year_start"])
     return tb
 
@@ -433,6 +437,9 @@ def _prepare_prio_table(tb: Table) -> Table:
     assert tb["conflict_type"].isna().sum() == 0, "Some unknown conflict type ids were found!"
     assert tb["region"].isna().sum() == 0, "Some unknown region ids were found!"
 
+    # Filter only data from the first year with ongoing conflicts
+    tb = tb[tb["year_start"] >= tb["year"].min()]
+
     return tb
 
 
@@ -504,8 +511,8 @@ def _combine_main_with_prio(tb: Table, tb_prio: Table) -> Table:
     ## Data from GEO for `number_ongoing_conflicts` goes from 1989 to 2022 (inc)
     assert tb[-tb["number_ongoing_conflicts_main"].isna()].year.min() == 1989
     assert tb[-tb["number_ongoing_conflicts_main"].isna()]["year"].max() == 2022
-    ## Data from PRIO/UCDP for `number_new_conflicts` goes from 1939 to 1989 (inc)
-    assert tb[-tb["number_new_conflicts_prio"].isna()]["year"].min() == 1939
+    ## Data from PRIO/UCDP for `number_new_conflicts` goes from 1946 to 1989 (inc)
+    assert tb[-tb["number_new_conflicts_prio"].isna()]["year"].min() == 1946
     assert tb[-tb["number_new_conflicts_prio"].isna()]["year"].max() == 1989
     ## Data from GEO for `number_new_conflicts` goes from 1990 to 2022 (inc)
     assert tb[-tb["number_new_conflicts_main"].isna()]["year"].min() == 1990
@@ -554,7 +561,7 @@ def add_conflict_all_intrastate(tb: Table) -> Table:
     tb_intra = tb[
         tb["conflict_type"].isin(["intrastate (non-internationalized)", "intrastate (internationalized)"])
     ].copy()
-    tb_intra = tb_intra.groupby(["year", "region"], as_index=False).sum(numeric_only=True)
+    tb_intra = tb_intra.groupby(["year", "region"], as_index=False).sum(numeric_only=True, min_count=1)
     tb_intra["conflict_type"] = "intrastate"
     tb = pd.concat([tb, tb_intra], ignore_index=True)
     return tb
