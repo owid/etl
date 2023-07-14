@@ -1,56 +1,41 @@
-"""Load snapshot of Multidimensional Poverty Index data and prepare a table with basic metadata.
-"""
+"""Load a snapshot and create a meadow dataset."""
+
+from typing import cast
 
 import pandas as pd
-from owid.catalog import Dataset, Table, TableMeta
-from structlog import get_logger
+from owid.catalog import Table
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
-from etl.steps.data.converters import convert_snapshot_metadata
 
-log = get_logger()
-
-# Snapshot version.
-SNAPSHOT_VERSION = "2022-12-13"
-# Current Meadow dataset version.
-MEADOW_VERSION = SNAPSHOT_VERSION
-
-# naming conventions
-N = PathFinder(__file__)
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("multidimensional_poverty_index.start")
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshot.
+    snap = cast(Snapshot, paths.load_dependency("multidimensional_poverty_index.csv"))
 
-    # retrieve snapshot
-    snap = Snapshot(f"ophi/{SNAPSHOT_VERSION}/multidimensional_poverty_index.csv")
+    # Load data from snapshot.
     df = pd.read_csv(snap.path)
 
+    # Rename columns.
     df = df.rename(columns={"cty_lab": "country"})
 
-    # create new dataset and reuse walden metadata
-    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
-    ds.metadata.version = MEADOW_VERSION
+    #
+    # Process data.
+    #
+    # Create a new table and ensure all columns are snake-case.
+    tb = Table(df, short_name=paths.short_name, underscore=True)
 
-    # # create table with metadata from dataframe
+    #
+    # Save outputs.
+    #
+    # Create a new meadow dataset with the same metadata as the snapshot.
+    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
-    table_metadata = TableMeta(
-        short_name=snap.metadata.short_name,
-        title=snap.metadata.name,
-        description=snap.metadata.description,
-    )
-    tb = Table(df, metadata=table_metadata)
-
-    # add table to a dataset
-    ds.add(tb)
-
-    # update metadata
-
-    ds.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
-    tb.update_metadata_from_yaml(N.metadata_path, "multidimensional_poverty_index")
-
-    # finally save the dataset
-    ds.save()
-
-    log.info("multidimensional_poverty_index.end")
+    # Save changes in the new garden dataset.
+    ds_meadow.save()

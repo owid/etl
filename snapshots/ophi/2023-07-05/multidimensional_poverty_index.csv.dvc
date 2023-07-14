@@ -1,15 +1,15 @@
 meta:
   name: Multidimensional Poverty Index (MPI) (OPHI, 2023)
   publication_date: '2023-07-11'
-  source_name: Alkire, Kanagaratnam and Suppa (2022), The global Multidimensional
-    Poverty Index (MPI) 2022
-  source_published_by: Alkire, Kanagaratnam and Suppa (2022), The global Multidimensional
-    Poverty Index (MPI) 2022
+  source_name: Alkire, Kanagaratnam and Suppa (2023), The global Multidimensional
+    Poverty Index (MPI) 2023
+  source_published_by: Alkire, Kanagaratnam and Suppa (2023), The global Multidimensional
+    Poverty Index (MPI) 2023. Country Results and Methodological Note
   url: https://ophi.org.uk/multidimensional-poverty-index/
   source_data_url:
-  license_url:
-  license_name:
-  date_accessed: 2023-07-05
+  license_url: https://ophi.org.uk/gmpi-2023-faq/
+  license_name: Oxford Academic License
+  date_accessed: 2023-07-11
   is_public: true
   description: |
     The global Multidimensional Poverty Index (MPI) is an international measure of acute multidimensional poverty covering over 100 developing countries. It complements traditional monetary poverty measures by capturing the acute deprivations in health, education, and living standards that a person faces simultaneously.
@@ -28,6 +28,8 @@ meta:
     If the household survey data being used is missing any of the 10 indicators, that indicator is dropped from the calculation. The weights are then adjusted so that each dimension continues to be given a weight of one-third. MPI poverty estimates are only calculated if at least one indicator in each dimension is available.
 
     The global MPI was developed by OPHI with the UN Development Programme (UNDP) for inclusion in UNDP’s flagship Human Development Report in 2010. It has been published annually by OPHI and in the HDRs ever since.
+
+    This dataset should be next updated by the source in July 2024. We will update it on Our World in Data soon after the new version is published. At the link above you can directly access the source page and see the latest available data.
 wdir: ../../../data/snapshots/ophi/2023-07-05
 outs:
 - md5: 6ff326b5974b28c9a39e1542e8895fc1

@@ -1,21 +1,39 @@
-"""
-This code generates the grapher step for the MPI dataset
-"""
+"""Load a garden dataset and create a grapher dataset."""
 
-from owid import catalog
+from typing import cast
 
-from etl.helpers import PathFinder
+from owid.catalog import Dataset
 
-N = PathFinder(__file__)
+from etl.helpers import PathFinder, create_dataset, grapher_checks
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
+    #
+    # Load inputs.
+    #
+    # Load garden dataset.
+    ds_garden = cast(Dataset, paths.load_dependency("multidimensional_poverty_index"))
 
-    table = N.garden_dataset["multidimensional_poverty_index"]
+    # Read table from garden dataset.
+    tb = ds_garden["multidimensional_poverty_index"]
 
-    # if your data is in long format, you can use `grapher_helpers.long_to_wide_tables`
-    # to get into wide format
-    dataset.add(table)
+    #
+    # Process data.
+    #
 
-    dataset.save()
+    #
+    # Save outputs.
+    #
+    # Create a new grapher dataset with the same metadata as the garden dataset.
+    ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
+
+    #
+    # Checks.
+    #
+    grapher_checks(ds_grapher)
+
+    # Save changes in the new grapher dataset.
+    ds_grapher.save()
