@@ -10,10 +10,11 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
 def process_data(tb: Table) -> Table:
-    '''
+    """
     Format years and column names.
-    '''
+    """
 
     # NOTE: On years
     # The way `year` is formatted – as a string variable often spanning two calendar years – won't work with our schema. We have to map the data to a single (integer) year.
@@ -66,9 +67,7 @@ def run(dest_dir: str) -> None:
 
     tb = process_data(tb)
 
-    tb: Table = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path
-    )
+    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Verify index and sort
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
