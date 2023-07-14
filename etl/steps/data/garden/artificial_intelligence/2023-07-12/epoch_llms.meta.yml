@@ -1,0 +1,74 @@
+dataset:
+  title: Large Language Model performance and compute, EPOCH (2023)
+  description: EPOCH dataset on how performance on a MMLU language benchmark scales with computational resources.
+  licenses:
+  - name: Creative Commons BY 4.0
+  sources:
+  - name: EPOCH (2023)
+    description: EPOCH dataset on how performance on a MMLU language benchmark scales with computational resources.
+    url: provided directly by the source
+    date_accessed: '2023-07-12'
+    publication_date: '2023-07-12'
+    publication_year: 1994
+    published_by: 'David Owen (2023), Extrapolating performance in language modeling benchmarks. Published online at epochai.org.
+      Retrieved from: ''https://epochai.org/blog/extrapolating-performance-in-language-modelling-benchmarks'' [online resource]'
+tables:
+  epoch_llms:
+    variables:
+      model_size__parameters:
+        title: Number of parameters
+        description: >
+          The number of parameters in AI models refers to the total count of learnable variables or weights that the model contains. Parameters are the internal variables that the model adjusts during the training process to optimize its performance and make predictions based on the input data.
+
+
+          In the context of deep learning models, which are a type of AI model, parameters are typically associated with the connections between the neurons or units in the neural network. Each connection has a weight associated with it, and these weights collectively represent the parameters of the model.
+
+
+          The number of parameters in a model depends on its architecture and complexity. Deep learning models often have multiple layers, each containing numerous neurons or units. The connections between these units contribute to the overall parameter count. Additionally, other components such as convolutional filters, recurrent connections, and attention mechanisms also add to the parameter count.
+
+
+          The number of parameters in AI models has a significant impact on model capacity and its ability to learn complex patterns from data. A larger number of parameters can allow the model to capture more intricate relationships and potentially achieve higher accuracy. However, it also increases the risk of overfitting, where the model becomes too specialized to the training data and performs poorly on unseen examples. Balancing the number of parameters to avoid overfitting while maintaining sufficient model capacity is a crucial consideration in model design.
+
+
+          In recent years, AI models with billions or even trillions of parameters have been developed. These models, known as "giant models," have demonstrated state-of-the-art performance in various tasks but require substantial computational resources for training and inference. Efficiently managing and training models with a large number of parameters is an active area of research in the AI community.
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      dataset_size__tokens:
+        title: Training dataset size
+        unit: 'datapoints'
+        description: >
+          Training data size refers to the amount or quantity of data that is used to train an AI model, indicating the number of examples or instances available for the model to learn from.
+
+
+          Imagine you're teaching a computer to recognize different types of fruits. The training data size would refer to the number of fruit images you show to the computer during the training process. If you show it 100 images of various fruits, then the training data size would be 100. The more training data you provide, the better the computer can learn to identify different fruits accurately.
+        display:
+          numDecimalPlaces: 0
+
+      mmlu_avg:
+        title: MMLU avg
+        unit: ''
+        description: >
+          The MMLU benchmark covers a wide range of 57 subjects, including STEM, humanities, social sciences, and more. It encompasses subjects of varying difficulty levels, spanning from elementary concepts to advanced professional topics. This comprehensive benchmark assesses not only world knowledge but also problem-solving abilities.
+        display:
+            title: Accuracy
+            numDecimalPlaces: 1
+
+      organisation:
+        title: Organisation
+        unit: ''
+      training_computation_petaflop:
+        title: Training compute (petaFLOP)
+        unit: 'petaFLOP'
+        description: >
+          Training computation, often measured in total FLOP (floating-point operations), refers to the total number of computer operations used to train an AI system. One FLOP is equivalent to one addition, subtraction, multiplication, or division of two decimal numbers, and one petaFLOP equals one quadrillion (10^15) FLOP.
+
+
+          The AI systems shown here were built using machine learning and deep learning methods. These involve complex mathematical calculations that require significant computational resources. Training these systems generally involves feeding large amounts of data through various layers and nodes and adjusting internal system parameters over numerous iterations to optimize the system’s performance.
+
+
+          The training computation used can vary depending on factors such as the size of the dataset, size and complexity of the system architecture, and the level of parallelism used during training, among other reasons.
+        display:
+            title: Training compute
+            numDecimalPlaces: 0

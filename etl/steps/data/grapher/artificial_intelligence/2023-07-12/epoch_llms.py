@@ -18,12 +18,13 @@ def run(dest_dir: str) -> None:
     ds_garden = cast(Dataset, paths.load_dependency("epoch_llms"))
     # Read table from garden dataset.
     tb = ds_garden["epoch_llms"]
-    print(tb)
 
     #
     # Process data.
     #
-
+    tb.reset_index(inplace=True)
+    tb.rename(columns={"architecture": "country"}, inplace=True)
+    tb.set_index(["country", "year"], inplace=True)
     #
     # Save outputs.
     #
