@@ -1,6 +1,6 @@
 """Generate GHE garden dataset"""
 
-from typing import Any, cast
+from typing import Any, Dict, cast
 
 import numpy as np
 import pandas as pd
@@ -11,6 +11,7 @@ from structlog import get_logger
 from etl.data_helpers import geo
 from etl.data_helpers.population import add_population
 from etl.helpers import PathFinder, create_dataset
+from etl.snapshot import Snapshot
 
 log = get_logger()
 
@@ -50,12 +51,15 @@ def run(dest_dir: str) -> None:
     # Load countries regions
     regions_dataset: Dataset = paths.load_dependency("regions")
     regions = regions_dataset["regions"]
-
+    # Load WHO Standard population
+    snap: Snapshot = paths.load_dependency("standard_age_distribution.csv")
+    who_standard = pd.read_csv(snap.path)
+    who_standard = format_who_standard(who_standard)
     # convert codes to country names
     code_to_country = cast(Dataset, paths.load_dependency("regions"))["regions"]["name"].to_dict()
     df["country"] = dataframes.map_series(df["country"], code_to_country, warn_on_missing_mappings=True)
 
-    df = clean_data(df, regions)
+    df = clean_data(df, regions, who_standard)
 
     ds_garden = create_dataset(
         dest_dir, tables=[Table(df, short_name=paths.short_name)], default_metadata=ds_meadow.metadata
@@ -65,7 +69,27 @@ def run(dest_dir: str) -> None:
     log.info("ghe.end")
 
 
-def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
+def format_who_standard(who_standard: pd.DataFrame) -> Dict[Any, Any]:
+    """
+    Convert who standard age distribution into a dict and combine the over 85 age-groups
+    """
+    under_85 = who_standard[who_standard["age_min"] < 85]
+    over_85 = who_standard[who_standard["age_min"] >= 85]
+    over_85["age_group"] = "YEARS85PLUS"
+    over_85["age_weight"] = over_85["age_weight"].sum()
+    over_85 = over_85[["age_group", "age_weight"]].drop_duplicates().reset_index(drop=True)
+
+    under_85["age_group"] = (
+        "YEARS" + under_85["age_min"].astype(str) + "-" + under_85["age_max"].astype(int).astype(str)
+    )
+    under_85 = under_85[["age_group", "age_weight"]].reset_index(drop=True)
+
+    who_standard = pd.concat([under_85, over_85])
+    who_standard_dict = who_standard.set_index("age_group")["age_weight"].to_dict()
+    return who_standard_dict
+
+
+def clean_data(df: pd.DataFrame, regions: Table, who_standard: Dict[str, float]) -> pd.DataFrame:
     log.info("ghe.basic cleaning")
     df["sex"] = df["sex"].map({"BTSX": "Both sexes", "MLE": "Male", "FMLE": "Female"})
     df = add_population(
@@ -86,7 +110,7 @@ def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
     # Add global and regional values
     df = add_regional_and_global_aggregates(df, regions)
     # Add age-standardized metric
-    df = add_age_standardized_metric(df)
+    df = add_age_standardized_metric(df, who_standard)
     # Add broader age groups
     df = add_age_groups(df)
     # Set indices
@@ -107,7 +131,7 @@ def clean_data(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
     return df.set_index(["country", "year", "age_group", "sex", "cause"], verify_integrity=True)
 
 
-def add_age_standardized_metric(df: pd.DataFrame) -> pd.DataFrame:
+def add_age_standardized_metric(df: pd.DataFrame, who_standard: Dict[str, float]) -> pd.DataFrame:
     """
     Using the WHO's standard population we can calculate the age-standardized metric
     Values from : https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/gpe_discussion_paper_series_paper31_2001_age_standardization_rates.pdf
@@ -135,32 +159,10 @@ def add_age_standardized_metric(df: pd.DataFrame) -> pd.DataFrame:
         "YEARS85PLUS": "YEARS85PLUS",
     }
 
-    who_age_distribution = {
-        "YEARS0-4": 0.0886,
-        "YEARS5-9": 0.0869,
-        "YEARS10-14": 0.0860,
-        "YEARS15-19": 0.0847,
-        "YEARS20-24": 0.0822,
-        "YEARS25-29": 0.0793,
-        "YEARS30-34": 0.0761,
-        "YEARS35-39": 0.0715,
-        "YEARS40-44": 0.0659,
-        "YEARS45-49": 0.0604,
-        "YEARS50-54": 0.0537,
-        "YEARS55-59": 0.0455,
-        "YEARS60-64": 0.0372,
-        "YEARS65-69": 0.0296,
-        "YEARS70-74": 0.0221,
-        "YEARS75-79": 0.0152,
-        "YEARS80-84": 0.0091,
-        "YEARS85PLUS": 0.00635,
-    }
-
     who_df = build_custom_age_groups(df, age_groups=age_groups_who_standard)
-    # df = df.drop(columns="index")
     df_as = who_df[["country", "year", "cause", "age_group", "sex", "death_rate100k"]]
     df_as = df_as[df_as["sex"] == "Both sexes"]
-    df_as["multiplier"] = df_as["age_group"].map(who_age_distribution, na_action="ignore")
+    df_as["multiplier"] = df_as["age_group"].map(who_standard, na_action="ignore")
     df_as["death_rate100k"] = df_as["death_rate100k"] * df_as["multiplier"]
     df_as["age_group"] = "Age-standardized"
     df_as = (
