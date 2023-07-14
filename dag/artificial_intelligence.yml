@@ -157,6 +157,7 @@ steps:
   - snapshot://artificial_intelligence/2023-06-14/ai_national_strategy.csv
   data://garden/artificial_intelligence/2023-06-14/ai_national_strategy:
   - data://meadow/artificial_intelligence/2023-06-14/ai_national_strategy
+  - data://garden/regions/2023-01-01/regions
   data://grapher/artificial_intelligence/2023-06-14/ai_national_strategy:
   - data://garden/artificial_intelligence/2023-06-14/ai_national_strategy
 
