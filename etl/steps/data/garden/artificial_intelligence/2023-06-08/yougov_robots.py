@@ -50,6 +50,15 @@ def run(dest_dir: str) -> None:
         elif column == "_2_year" or column == "_4_year":
             new_column = "education_" + column[1:]
             tb.rename(columns={column: new_column}, inplace=True)
+    # Creating a mapping dictionary
+    mapping_dict = {
+        "Don't know": "Don't know",
+        "Most robots have already developed higher levels of intelligence than humans": "Robots smarter than humans now",
+        "None of these": "None of these",
+        "Robots will be able to develop higher levels of intelligence than humans in the future": "Robots will surpass human intelligence",
+        "Robots will never be able to develop higher levels of intelligence than humans": "Robots will never surpass human intelligence",
+    }
+    tb["question"] = tb["question"].map(mapping_dict)
 
     #
     # Save outputs.
