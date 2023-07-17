@@ -40,7 +40,10 @@ def run(dest_dir: str) -> None:
     # Ensure correct dtypes
     for col in ["startdate", "enddate"]:
         tb[col] = pd.to_datetime(tb[col])
-    df["mic_qc"] = df["mic_qc"].replace(" ", pd.NA).astype("Int64")
+    tb["mic_qc"] = tb["mic_qc"].replace(" ", pd.NA).astype("Int64")
+
+    # Set index
+    tb = tb.set_index("id")
 
     #
     # Save outputs.
