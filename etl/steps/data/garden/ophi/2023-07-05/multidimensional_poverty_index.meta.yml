@@ -107,7 +107,7 @@ tables:
         description: |
           {definitions.cme}
 
-          % of the population who are multidimensionally poor according to the Multidimensional Poverty Index "Intensity of multidimensional poverty according to the Multidimensional Poverty Index (MPI).
+          % of the population who are multidimensionally poor according to the Multidimensional Poverty Index.
 
           {definitions.core}
         display:
