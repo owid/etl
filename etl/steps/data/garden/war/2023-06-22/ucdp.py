@@ -72,12 +72,17 @@ def run(dest_dir: str) -> None:
     tb = add_number_conflicts_and_deaths(tb)
 
     # Add table from UCDP/PRIO
-    log.info("ucdp: add data from ucdp/prio table (also estimate values for 'World')")
-    tb = add_prio_data(tb, tb_prio)
+    log.info("ucdp: prepare data from ucdp/prio table (also estimate values for 'World')")
+    tb_prio = prepare_prio_data(tb_prio)
 
-    # Replace missing data with zeros (where applicable)
+    # Fill NaNs
     log.info("ucdp: replace missing data with zeros (where applicable)")
+    tb_prio = replace_missing_data_with_zeros(tb_prio)
     tb = replace_missing_data_with_zeros(tb)
+
+    # Combine main dataset with PRIO/UCDP
+    log.info("ucdp: add data from ucdp/prio table")
+    tb = add_prio_data(tb, tb_prio)
 
     # Add data for "all conflicts" conflict type
     log.info("ucdp: add data for 'all conflicts'")
@@ -281,20 +286,7 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     ## Change NaNs for 0 for specific rows
     ## For columns "number_ongoing_conflicts", "number_new_conflicts"; conflict_type="extrasystemic"
     columns = ["number_ongoing_conflicts", "number_new_conflicts"]
-    mask = tb["conflict_type"] == "extrasystemic"
-    tb.loc[mask, columns] = tb.loc[mask, columns].fillna(0)
-
-    # Remove unnecessary NaNs
-    tb = tb.dropna(
-        how="all",
-        subset=[
-            "number_deaths_ongoing_conflicts",
-            "number_deaths_ongoing_conflicts_high",
-            "number_deaths_ongoing_conflicts_low",
-            "number_ongoing_conflicts",
-            "number_new_conflicts",
-        ],
-    )
+    tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
 
     return tb
 
@@ -319,8 +311,12 @@ def add_number_conflicts_and_deaths(tb: Table) -> Table:
         tb_new,
         left_on=["year", "region", "conflict_type"],
         right_on=["year", "region", "conflict_type"],
-        suffixes=("", "_start"),
+        how="outer",  # data for (1991, intrastate) is available for 'ongoing conflicts' but not for 'new conflicts'. We don't want to loose it!
     )
+
+    # If datapoint is missing, fill with zero
+    tb = tb.fillna(0)
+
     # tb = tb.drop(columns=["year_start"])
     return tb
 
@@ -390,6 +386,12 @@ def _add_number_new_conflicts(tb: Table) -> Table:
     return tb_new
 
 
+def prepare_prio_data(tb_prio: Table) -> Table:
+    tb_prio = _prepare_prio_table(tb_prio)
+    tb_prio = _prio_add_metrics(tb_prio)
+    return tb_prio
+
+
 def add_prio_data(tb: Table, tb_prio: Table) -> Table:
     """Combine main table with data from UCDP/PRIO.
 
@@ -397,12 +399,44 @@ def add_prio_data(tb: Table, tb_prio: Table) -> Table:
 
     It only includes state-based conflicts!
     """
-    # Prepare and adapt table from UCDP/PRIO
-    tb_prio = _prepare_prio_table(tb_prio)
-    tb_prio = _prio_add_metrics(tb_prio)
+    # Ensure year period for each table is as expected
+    assert tb["year"].min() == 1989, "Unexpected start year!"
+    assert tb["year"].max() == 2022, "Unexpected start year!"
+    assert tb_prio["year"].min() == 1946, "Unexpected start year!"
+    assert tb_prio["year"].max() == 1989, "Unexpected start year!"
 
-    # Combine main table with UCDP/PRIO
-    tb = _combine_main_with_prio(tb, tb_prio)
+    # Force NaN in 1989 data from Geo-referenced dataset for `number_new_conflicts`
+    # We want this data to come from PRIO/UCDP instead!
+    tb.loc[tb["year"] == 1989, "number_new_conflicts"] = np.nan
+    # Force NaN in 1989 data from PRIO/UCDP dataset for `number_ongoing_conflicts`
+    # We want this data to come from GEO instead!
+    tb_prio.loc[tb_prio["year"] == 1989, "number_ongoing_conflicts"] = np.nan
+
+    # Merge Geo with UCDP/PRIO
+    tb = tb_prio.merge(tb, on=["year", "region", "conflict_type"], suffixes=("_prio", "_main"), how="outer")
+
+    # Sanity checks
+    ## Data from PRIO/UCDP for `number_ongoing_conflicts` goes from 1946 to 1988 (inc)
+    assert tb[tb["number_ongoing_conflicts_prio"].notna()]["year"].min() == 1946
+    assert tb[tb["number_ongoing_conflicts_prio"].notna()]["year"].max() == 1988
+    ## Data from GEO for `number_ongoing_conflicts` goes from 1989 to 2022 (inc)
+    assert tb[tb["number_ongoing_conflicts_main"].notna()].year.min() == 1989
+    assert tb[tb["number_ongoing_conflicts_main"].notna()]["year"].max() == 2022
+    ## Data from PRIO/UCDP for `number_new_conflicts` goes from 1946 to 1989 (inc)
+    assert tb[tb["number_new_conflicts_prio"].notna()]["year"].min() == 1946
+    assert tb[tb["number_new_conflicts_prio"].notna()]["year"].max() == 1989
+    ## Data from GEO for `number_new_conflicts` goes from 1990 to 2022 (inc)
+    assert tb[tb["number_new_conflicts_main"].notna()]["year"].min() == 1990
+    assert tb[tb["number_new_conflicts_main"].notna()]["year"].max() == 2022
+
+    # Actually combine timeseries from UCDP/PRIO and GEO.
+    # We prioritise values from PRIO for 1989, therefore the order `PRIO.fillna(MAIN)`
+    tb["number_ongoing_conflicts"] = tb["number_ongoing_conflicts_prio"].fillna(tb["number_ongoing_conflicts_main"])
+    tb["number_new_conflicts"] = tb["number_new_conflicts_prio"].fillna(tb["number_new_conflicts_main"])
+
+    # Remove unnecessary columns
+    columns_remove = tb.filter(regex=r"(_prio|_main)").columns
+    tb = tb[[col for col in tb.columns if col not in columns_remove]]
 
     return tb
 
@@ -433,6 +467,9 @@ def _prepare_prio_table(tb: Table) -> Table:
     assert tb["conflict_type"].isna().sum() == 0, "Some unknown conflict type ids were found!"
     assert tb["region"].isna().sum() == 0, "Some unknown region ids were found!"
 
+    # Filter only data from the first year with ongoing conflicts
+    tb = tb[tb["year_start"] >= tb["year"].min()]
+
     return tb
 
 
@@ -461,25 +498,23 @@ def _prio_add_metrics(tb: Table) -> Table:
 
     # Get number of new conflicts for all regions
     ## Reduce table to only preserve first appearing event
-    tb = (
-        tb[["conflict_id", "year", "region", "conflict_type"]]
-        .sort_values("year")
-        .drop_duplicates(subset=["conflict_type", "year", "region"], keep="first")
-    )
+    tb = tb.sort_values("year").drop_duplicates(subset=["conflict_id", "year_start", "region"], keep="first")
     # Groupby operation
-    cols_idx = ["year", "region", "conflict_type"]
+    cols_idx = ["year_start", "region", "conflict_type"]
     tb_new = tb.groupby(cols_idx, as_index=False)["conflict_id"].nunique()
     tb_new.columns = cols_idx + ["number_new_conflicts"]
     # Get number of new conflicts for 'World'
-    tb = tb.sort_values("year").drop_duplicates(subset=["conflict_type", "year"], keep="first")
-    cols_idx = ["year", "conflict_type"]
+    tb = tb.sort_values("year").drop_duplicates(subset=["conflict_id", "year_start"], keep="first")
+    cols_idx = ["year_start", "conflict_type"]
     tb_new_world = tb.groupby(cols_idx, as_index=False)["conflict_id"].nunique()
     tb_new_world.columns = cols_idx + ["number_new_conflicts"]
     tb_new_world["region"] = "World"
     # Combine regions & world
     tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True)
     # Keep only until 1989 (inc)
-    tb_new = tb_new[tb_new["year"] <= 1989]
+    tb_new = tb_new[tb_new["year_start"] <= 1989]
+    # Rename column
+    tb_new = tb_new.rename(columns={"year_start": "year"})
 
     # Combine and build single table
     tb = tb_ongoing.merge(
@@ -488,38 +523,6 @@ def _prio_add_metrics(tb: Table) -> Table:
 
     # Dtypes
     tb = tb.astype({"year": "uint64", "region": "category"})
-
-    return tb
-
-
-def _combine_main_with_prio(tb: Table, tb_prio: Table) -> Table:
-    # Force NaN in 1989 data from Geo-referenced dataset for `number_new_conflicts`
-    tb.loc[tb["year"] == 1989, "number_new_conflicts"] = np.nan
-
-    # Merge Geo with UCDP/PRIO
-    tb = tb_prio.merge(tb, on=["year", "region", "conflict_type"], suffixes=("_prio", "_main"), how="outer")
-
-    # Sanity checks
-    ## Data from PRIO/UCDP for `number_ongoing_conflicts` goes from 1946 to 1988 (inc)
-    assert tb[-tb["number_ongoing_conflicts_prio"].isna()]["year"].min() == 1946
-    assert tb[-tb["number_ongoing_conflicts_prio"].isna()]["year"].max() == 1988
-    ## Data from GEO for `number_ongoing_conflicts` goes from 1989 to 2022 (inc)
-    assert tb[-tb["number_ongoing_conflicts_main"].isna()].year.min() == 1989
-    assert tb[-tb["number_ongoing_conflicts_main"].isna()]["year"].max() == 2022
-    ## Data from PRIO/UCDP for `number_new_conflicts` goes from 1939 to 1989 (inc)
-    assert tb[-tb["number_new_conflicts_prio"].isna()]["year"].min() == 1946
-    assert tb[-tb["number_new_conflicts_prio"].isna()]["year"].max() == 1989
-    ## Data from GEO for `number_new_conflicts` goes from 1990 to 2022 (inc)
-    assert tb[-tb["number_new_conflicts_main"].isna()]["year"].min() == 1990
-    assert tb[-tb["number_new_conflicts_main"].isna()]["year"].max() == 2022
-
-    # Actually combine timeseries from UCDP/PRIO and GEO
-    tb["number_ongoing_conflicts"] = tb["number_ongoing_conflicts_prio"].fillna(tb["number_ongoing_conflicts_main"])
-    tb["number_new_conflicts"] = tb["number_new_conflicts_prio"].fillna(tb["number_new_conflicts_main"])
-
-    # Remove unnecessary columns
-    columns_remove = tb.filter(regex=r"(_prio|_main)").columns
-    tb = tb[[col for col in tb.columns if col not in columns_remove]]
 
     return tb
 
@@ -556,7 +559,7 @@ def add_conflict_all_intrastate(tb: Table) -> Table:
     tb_intra = tb[
         tb["conflict_type"].isin(["intrastate (non-internationalized)", "intrastate (internationalized)"])
     ].copy()
-    tb_intra = tb_intra.groupby(["year", "region"], as_index=False).sum(numeric_only=True)
+    tb_intra = tb_intra.groupby(["year", "region"], as_index=False).sum(numeric_only=True, min_count=1)
     tb_intra["conflict_type"] = "intrastate"
     tb = pd.concat([tb, tb_intra], ignore_index=True)
     return tb
