@@ -12,3 +12,12 @@ steps:
   - data://meadow/wb/2023-07-10/education
   - data://garden/regions/2023-01-01/regions
   - data://garden/wb/2023-04-30/income_groups
+
+  # Lee and Lee datasets
+  data://meadow/wb/2023-07-17/education_lee_lee:
+  - snapshot://wb/2023-07-17/education_lee_lee.xlsx
+  data://garden/wb/2023-07-17/education_barro_lee:
+  - data://meadow/wb/2023-07-17/education_lee_lee
+
+  data://meadow/wb/2023-07-17/education_barro_lee_projections:
+  - snapshot://wb/2023-07-17/education_barro_lee_projections.csv
