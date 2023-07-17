@@ -28,6 +28,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Data management
           numDecimalPlaces: 0
 
       medical_and_healthcare:
@@ -35,6 +36,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Medical and healthcare
           numDecimalPlaces: 0
 
       fintech:
@@ -42,6 +44,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Financial technology
           numDecimalPlaces: 0
 
       av:
@@ -49,10 +52,11 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: AI ventures
           numDecimalPlaces: 0
 
       semiconductor:
-        title: Semiconductor
+        title: Semiconductors
         unit: 'US dollars'
         short_unit: '$'
         display:
@@ -63,6 +67,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Industrial automation
           numDecimalPlaces: 0
 
       retail:
@@ -77,6 +82,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Fitness and wellness
           numDecimalPlaces: 0
 
       nlp__customer_support:
@@ -84,6 +90,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Natural Language Processing, customer support
           numDecimalPlaces: 0
 
       energy__oil__and_gas:
@@ -91,6 +98,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Energy, oil and gas
           numDecimalPlaces: 0
 
       cybersecurity__data_protection:
@@ -98,6 +106,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          display: Cybersecurity
           numDecimalPlaces: 0
 
       drones:
@@ -112,6 +121,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Marketing and digital ads
           numDecimalPlaces: 0
 
       hr_tech:
@@ -119,6 +129,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Human Resources technology
           numDecimalPlaces: 0
 
       facial_recognition:
@@ -126,6 +137,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          title: Facial recognition
           numDecimalPlaces: 0
 
       insurtech:
@@ -133,6 +145,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Insurance technology
           numDecimalPlaces: 0
 
       agritech:
@@ -140,6 +153,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Agricultural technology
           numDecimalPlaces: 0
 
       sales_enablement:
@@ -147,6 +161,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Sales enablement
           numDecimalPlaces: 0
 
       ar_vr:
@@ -154,6 +169,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Augmented or virtual reality
           numDecimalPlaces: 0
 
       ed_tech:
@@ -161,6 +177,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Educational technology
           numDecimalPlaces: 0
 
       geospatial:
@@ -175,6 +192,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Legal technology
           numDecimalPlaces: 0
 
       entertainment:
@@ -189,6 +207,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Music and video content
           numDecimalPlaces: 0
 
       vc:
@@ -196,6 +215,7 @@ tables:
         unit: 'US dollars'
         short_unit: '$'
         display:
+          name: Venture capital
           numDecimalPlaces: 0
 
 

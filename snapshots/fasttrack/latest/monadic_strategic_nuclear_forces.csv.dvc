@@ -1,0 +1,28 @@
+meta:
+  name: Monadic Strategic Nuclear Forces Dataset – Suh
+  description: >-
+    This dataset provides information on the strategic nuclear forces by the nuclear
+    powers, using monadic data from Suh (2022)
+
+
+    You can download the code and complete dataset, including supplementary variables,
+    from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/nuclear_weapons
+  source:
+    name: Google Sheet
+    description:
+    url: https://kyungwon-suh.github.io/datasets/
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSocPUy6SZJ_nCqdTvQYNpxvXR-rk3B2hEAkVPOTd8_X0jaormcqD-dys3Oa7tLIIFI9X30sIVIUtVZ/pub?output=csv
+    owid_data_url:
+    date_accessed: '2023-07-12'
+    publication_date:
+    publication_year: 2023
+    published_by: Google Sheet
+  license:
+    name:
+    url:
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: aa5bff56bec25c93a3cae674e08e0226
+  size: 16458
+  path: monadic_strategic_nuclear_forces.csv

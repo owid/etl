@@ -23,10 +23,9 @@ dataset:
 tables:
   ai_employers:
     variables:
-      new_ai_phd_graduates__pct_of_total:
-        title: New AI PhD graduates (% of total)
-        unit: '% of total'
-        short_unit: '%'
+      number_of_new_ai_phd_graduates:
+        title: New AI PhD graduates
+        unit: 'students'
         display:
           numDecimalPlaces: 0
 

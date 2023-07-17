@@ -225,3 +225,13 @@ tables:
           zeroDay: '2019-01-01'
           yearIsDay: true
 
+      total_monthly_emissions:
+        title: Monthly CO₂ total emissions from aviation
+        unit: tonnes
+        short_unit: t
+        description: Includes emissions from both domestict and international passegener flights. International aviation emissions are assigned to the country of departure.
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+

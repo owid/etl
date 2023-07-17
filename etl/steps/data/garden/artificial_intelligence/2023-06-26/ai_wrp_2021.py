@@ -86,7 +86,7 @@ def run(dest_dir: str) -> None:
     # Now split categories (gender, income etc) into separate columns
     # Copy df without categories (gender, income etc)
     df_without_categories = (
-        df_merge[["country", "year", "yes_no_ratio", "help_harm_ratio"]].dropna(subset=["country"]).copy()
+        df_merge[["country", "year", "Yes, would feel safe", "Mostly help"]].dropna(subset=["country"]).copy()
     )
     # Select rows with categories (NaN country rows)
     world_df = df_merge[df_merge["country"].isna()].copy()
@@ -95,11 +95,11 @@ def run(dest_dir: str) -> None:
     # Set country as World
     world_df["country"] = world_df["country"].astype(str)
     world_df.loc[world_df["country"] == "nan", "country"] = "World"
-    # Calculates the percentage of valid responses for a help-harm ratio column in a DataFrame, split by gender, income etc.
-    conc_df_help_harm = pivot_by_category(world_df, "help_harm_ratio")
+    # Calculates the percentage of valid responses for the "Mostly help" column in a DataFrame, split by gender, income etc.
+    conc_df_help_harm = pivot_by_category(world_df, "Mostly help")
 
-    # Calculates the percentage of valid responses for a yes-no ratio column in a DataFrame, split by gender, income etc.
-    conc_df_yes_no = pivot_by_category(world_df, "yes_no_ratio")
+    # Calculates the percentage of valid responses for a "Yes, would feel safe column in a DataFrame, split by gender, income etc.
+    conc_df_yes_no = pivot_by_category(world_df, "Yes, would feel safe")
 
     # Merge  all dataframes into one
     merge_categorized = pd.merge(conc_df_yes_no, conc_df_help_harm, on=["year", "country"], how="outer")
@@ -154,14 +154,14 @@ def calculate_percentage(df, column, valid_responses_dict, column_to_split_by):
 
 def question_extract(q, df, column_to_split_by, dict_q):
     """
-    Computes the ratio of responses for a given column in a DataFrame, split by another column.
+    Computes the share of responses for a given column in a DataFrame, split by another column.
     Args:
         q (str): The question column name.
         df (DataFrame): The input DataFrame.
         column_to_split_by (str): The column name to split by.
         dict_q (dict): A dictionary mapping valid response codes to their corresponding labels.
     Returns:
-        DataFrame: A DataFrame with columns: "year", column_to_split_by, and either "help_harm_ratio" or "yes_no_ratio" depending on the question column.
+        DataFrame: A DataFrame with columns: "year", column_to_split_by, and either "Mostly help" or "Yes, would feel safe" depending on the question column.
     """
     # Calculate percentage for worries about a terrorist attack
     counts_q = calculate_percentage(df, q, dict_q, column_to_split_by)
@@ -185,14 +185,10 @@ def question_extract(q, df, column_to_split_by, dict_q):
     pivoted_df.reset_index(inplace=True)
     pivoted_df.columns.name = None
 
-    # Compute the ratio of great deal or very much to not at all or not much
     if q == "q9":
-        pivoted_df["help_harm_ratio"] = pivoted_df["Mostly help"] / pivoted_df["Mostly Harm"]
-        return pivoted_df[["year", column_to_split_by, "help_harm_ratio"]]
-
+        return pivoted_df[["year", column_to_split_by, "Mostly help"]]
     else:
-        pivoted_df["yes_no_ratio"] = pivoted_df["Yes, would feel safe"] / pivoted_df["No, would not feel safe"]
-        return pivoted_df[["year", column_to_split_by, "yes_no_ratio"]]
+        return pivoted_df[["year", column_to_split_by, "Yes, would feel safe"]]
 
 
 def map_values(df):

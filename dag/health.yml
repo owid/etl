@@ -32,6 +32,7 @@ steps:
     - data://meadow/who/2022-09-30/ghe
     - data://garden/un/2022-07-11/un_wpp
     - data://garden/regions/2023-01-01/regions
+    - snapshot://who/2023-07-14/standard_age_distribution.csv
   data://grapher/who/2022-09-30/ghe:
     - data://garden/who/2022-09-30/ghe
 
@@ -92,13 +93,6 @@ steps:
   data://grapher/ihme_gbd/2023-06-14/prevalence_dalys_world:
     - data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world
 
-  # Temporary additional to add Drug Disorders to grapher
-  data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders:
-    - snapshot-private://ihme_gbd/2023-03-29/gbd_drug_disorders.csv
-  data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders:
-    - data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders
-  data-private://grapher/ihme_gbd/2023-03-29/gbd_drug_disorders:
-    - data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders
 
   # Postnatal care coverage - World Bank (2022)
   data://meadow/postnatal_care/2022-09-19/postnatal_care:
@@ -204,3 +198,12 @@ steps:
   - data://grapher/fasttrack/2023-06-28/guinea_worm
   data://grapher/who/2023-06-30/guinea_worm:
   - data://garden/who/2023-06-29/guinea_worm
+
+# Autopsies WHO-Europe
+  data://meadow/who/2023-07-13/autopsy:
+  - snapshot://who/2022-09-01/autopsy.csv
+  data://garden/who/2023-07-13/autopsy:
+  - data://meadow/who/2023-07-13/autopsy
+  data://grapher/who/2023-07-13/autopsy:
+  - data://garden/who/2023-07-13/autopsy
+  - snapshot://fasttrack/2023-04-30/paratz.csv

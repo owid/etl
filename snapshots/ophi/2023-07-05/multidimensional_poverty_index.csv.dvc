@@ -1,0 +1,37 @@
+meta:
+  name: Multidimensional Poverty Index (MPI) (OPHI, 2023)
+  publication_date: '2023-07-11'
+  source_name: Alkire, Kanagaratnam and Suppa (2023), The global Multidimensional
+    Poverty Index (MPI) 2023
+  source_published_by: Alkire, S., Kanagaratnam, U., and Suppa, N., 'The global Multidimensional
+    Poverty Index (MPI) 2023. Country Results and Methodological Note', OPHI MPI Methodological Note 55, Oxford Poverty and Human Development Initiative, University of Oxford.
+  url: https://ophi.org.uk/multidimensional-poverty-index/
+  source_data_url:
+  license_url: https://ophi.org.uk/gmpi-2023-faq/
+  license_name: Oxford Academic License
+  date_accessed: 2023-07-11
+  is_public: true
+  description: |
+    The global Multidimensional Poverty Index (MPI) is an international measure of acute multidimensional poverty covering over 100 developing countries. It complements traditional monetary poverty measures by capturing the acute deprivations in health, education, and living standards that a person faces simultaneously.
+
+    <h4>How is multidimensional poverty defined?</h4>
+    Being ‘MPI poor’ means that a person is deprived in a third or more of ten indicators, grouped into three dimensions:
+    <ul>
+        <li><strong>Health</strong> – using two indicators: nutrition, child mortality
+        <li><strong>Education</strong> – using two indicators: years of schooling, school attendance
+        <li><strong>Living standards</strong> – using five indicators: cooking fuel, sanitation, drinking water, electricity, housing, assets.</li>
+    </ul>
+    Households are assessed as being deprived in a given indicator if they do not meet a certain threshold for that indicator. For instance, a household is deprived in the <em>Years of schooling</em> indicator if no household member has completed six years of schooling. A person is considered deprived in the <em>Cooking fuel</em> indicator if they cook using solid fuel, such as dung, agricultural crops, wood, charcoal, or coal. The thresholds for each indicator are published by OPHI in their <a href="https://www.ophi.org.uk/wp-content/uploads/OPHI_MPI_MN_54_2022.pdf">methodological notes</a>.
+
+    The individual indicators are not ‘weighted’ equally: When adding up the number of indicators in which a person is deprived, some count for more than others. Health and education indicators are given a weight of 1/6, while the indicators within the living standards dimension are given a weight of 1/18. This means that the three dimensions – health, education and living standards – have an equal weight in the total of one-third each.
+
+    If the household survey data being used is missing any of the 10 indicators, that indicator is dropped from the calculation. The weights are then adjusted so that each dimension continues to be given a weight of one-third. MPI poverty estimates are only calculated if at least one indicator in each dimension is available.
+
+    The global MPI was developed by OPHI with the UN Development Programme (UNDP) for inclusion in UNDP’s flagship Human Development Report in 2010. It has been published annually by OPHI and in the HDRs ever since.
+
+    This dataset should be next updated by the source in July 2024. We will update it on Our World in Data soon after the new version is published. At the link above you can directly access the source page and see the latest available data.
+wdir: ../../../data/snapshots/ophi/2023-07-05
+outs:
+- md5: 6ff326b5974b28c9a39e1542e8895fc1
+  size: 6772259
+  path: multidimensional_poverty_index.csv

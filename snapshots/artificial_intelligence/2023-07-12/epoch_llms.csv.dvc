@@ -1,0 +1,21 @@
+meta:
+  name: Large Language Model performance and compute, EPOCH (2023)
+  publication_year: 1994
+  publication_date: '2023-07-12'
+  source_name: EPOCH (2023)
+  source_published_by: "David Owen (2023), Extrapolating performance in language modeling
+    benchmarks. Published online at epochai.org. Retrieved from: 'https://epochai.org/blog/extrapolating-performance-in-language-modelling-benchmarks'
+    [online resource]"
+  url: provided directly by the source
+  source_data_url:
+  license_url:
+  license_name: Creative Commons BY 4.0
+  date_accessed: 2023-07-12
+  is_public: true
+  description: |
+    EPOCH dataset on how performance on a MMLU language benchmark scales with computational resources.
+wdir: ../../../data/snapshots/artificial_intelligence/2023-07-12
+outs:
+- md5: fcdc4e018fc6fc930a2227819cd45ff3
+  size: 1523
+  path: epoch_llms.csv

@@ -245,7 +245,7 @@ def run_dag(
         print("Detecting which steps need rebuilding...")
         start_time = time.time()
         steps = select_dirty_steps(steps, workers)
-        click.echo(f"{click.style('OK', fg='blue')} ({time.time() - start_time:.0f}s)")
+        click.echo(f"{click.style('OK', fg='blue')} ({time.time() - start_time:.1f}s)")
 
     if not steps:
         print("All datasets up to date!")
@@ -258,7 +258,7 @@ def run_dag(
             strict = _detect_strictness_level(step, strict)
             with strictness_level(strict):
                 time_taken = timed_run(lambda: step.run())
-                click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.0f}s)")
+                click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.1f}s)")
                 print()
 
 
@@ -324,7 +324,6 @@ def _backporting_steps(private: bool, filter_steps: Optional[Set[str]] = None) -
 
     # load all backported snapshots
     for snap in snapshot_catalog(match):
-
         # skip private backported steps
         if not private and not snap.metadata.is_public:
             continue

@@ -10,9 +10,9 @@ meta:
     AI Index Steering Committee, Institute for Human-Centered AI, Stanford University,
     Stanford, CA, April 2023
   url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
-  source_data_url: https://drive.google.com/uc?export=download&id=1wgyixa8ai8M1X2EpAMu2IWTMgRuOxcn1
+  source_data_url: https://drive.google.com/uc?export=download&id=15_Gji-pjmATWPG_QsHVmq3uKYU33PPw8
   file_extension: csv
-  license_url:
+  license_url: 
     https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   license_name: Public domain
   date_accessed: 2023-06-19
@@ -21,6 +21,6 @@ meta:
     Employment of New AI PhDs (% of Total) in North America by Sector (industry, government, academia), 2010–21.
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
 outs:
-- md5: 82ca67afe7920d61c0f984ceaee485ca
-  size: 1272
+- md5: ca7d2dbb88045f80748cd5a03d9dbd85
+  size: 708
   path: ai_employers.csv

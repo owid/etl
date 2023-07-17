@@ -1,0 +1,42 @@
+dataset:
+  sources:
+  - name: Suh (2023)
+    published_by: 'Kyungwon, Suh. 2023. Nuclear balance and the initiation of nuclear crises: Does superiority matter? Journal
+      of Peace Research 60(2): 337–351.'
+    publication_year: 2023
+    date_accessed: 2023-05-08
+    url: https://kyungwon-suh.github.io/datasets/
+tables:
+  monadic_strategic_nuclear_forces:
+    variables:
+      nuclear_warheads_stockpile:
+        title: nuclear_warheads_stockpile
+        unit: ''
+        description: The number of stockpiled nuclear warheads.
+      nuclear_warheads_firststrike:
+        title: nuclear_warheads_firststrike
+        unit: ''
+        description: >-
+          The number of strategic nuclear warheads deliverable in first strike.
+
+
+          Warheads designed for use away from the battlefield, such as against military bases, arms industries, or infrastructure
+          and that could be carried by ballistic missiles, bombers, and submarines in one strike.
+      nuclwarh_firststr_yield:
+        title: nuclwarh_firststr_yield
+        unit: ''
+        description: >-
+          The number of strategic nuclear warheads deliverable in first strike weighted by yield.
+
+
+          Strategic nuclear warheads designed for use away from the battlefield, such as against military bases, arms industries,
+          or infrastructure and that could be carried by ballistic missiles, bombers, and submarines in one strike.
+      nuclwarh_firststr_yield_accur:
+        title: nuclwarh_firststr_yield_accur
+        unit: ''
+        description: >-
+          The number of strategic nuclear warheads deliverable in first strike weighted by yield and accuracy.
+
+
+          Strategic nuclear warheads designed for use away from the battlefield, such as against military bases, arms industries,
+          or infrastructure and that could be carried by ballistic missiles, bombers, and submarines in one strike.

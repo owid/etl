@@ -167,14 +167,14 @@
   "Yemen": "Yemen",
   "Zambia": "Zambia",
   "Zimbabwe": "Zimbabwe",
-  "Asia (East)" : "East Asia",
-  "Asia (South and South-East)": "South and South-East Asia",
-  "Eastern Europe": "Eastern Europe",
-  "Latin America": "Latin America",
-  "Middle East": "Middle East",
-  "Sub-Sahara Africa": "Sub-Sahara Africa",
+  "Asia (East)" : "East Asia (MPD)",
+  "Asia (South and South-East)": "South and South-East Asia (MPD)",
+  "Eastern Europe": "Eastern Europe (MPD)",
+  "Latin America": "Latin America (MPD)",
+  "Middle East": "Middle East (MPD)",
+  "Sub-Sahara Africa": "Sub-Saharan Africa (MPD)",
   "Sudan (Former)": "Former Sudan",
   "U.R. of Tanzania: Mainland": "Tanzania",
-  "Western Europe": "Western Europe",
-  "Western Offshoots": "Western Offshoots"
+  "Western Europe": "Western Europe (MPD)",
+  "Western Offshoots": "Western Offshoots (MPD)"
 }

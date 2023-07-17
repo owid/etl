@@ -2006,6 +2006,20 @@ docs = ["mkdocs (==1.3.1)", "mkdocs-gen-files (==0.3.5)", "mkdocs-material (==8.
 tests = ["celery-types (==0.15.0)", "flaky (==3.7.0)", "mypy (==0.971)", "pylint (==2.15.0)", "pytest (==7.2.0)", "pytest-celery", "pytest-cov (==3.0.0)", "pytest-mock (==3.8.2)", "pytest-sugar (==0.9.6)", "pytest-test-utils (>=0.0.6)"]
 
 [[package]]
+name = "dynamic-yaml"
+version = "1.3.4"
+description = "Enables self referential yaml entries"
+optional = false
+python-versions = ">=3.0"
+files = [
+    {file = "dynamic-yaml-1.3.4.tar.gz", hash = "sha256:440747b7f303794f432a6eba6f78548ddc94bc183172a32c7f12504870e33a01"},
+    {file = "dynamic_yaml-1.3.4-py3-none-any.whl", hash = "sha256:6fc6dae9a4066e9c17cf588bad0e6a36d03a6a899874dc6ab05a05721a086c15"},
+]
+
+[package.dependencies]
+pyyaml = ">=5.4"
+
+[[package]]
 name = "entrypoints"
 version = "0.4"
 description = "Discover and load entry points from installed packages."
@@ -2519,6 +2533,24 @@ httplib2 = ">=0.15.0"
 six = "*"
 
 [[package]]
+name = "google-auth-oauthlib"
+version = "1.0.0"
+description = "Google Authentication Library"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "google-auth-oauthlib-1.0.0.tar.gz", hash = "sha256:e375064964820b47221a7e1b7ee1fd77051b6323c3f9e3e19785f78ab67ecfc5"},
+    {file = "google_auth_oauthlib-1.0.0-py2.py3-none-any.whl", hash = "sha256:95880ca704928c300f48194d1770cf5b1462835b6e49db61445a520f793fd5fb"},
+]
+
+[package.dependencies]
+google-auth = ">=2.15.0"
+requests-oauthlib = ">=0.7.0"
+
+[package.extras]
+tool = ["click (>=6.0.0)"]
+
+[[package]]
 name = "googleapis-common-protos"
 version = "1.59.1"
 description = "Common protobufs used in Google APIs"
@@ -2644,6 +2676,21 @@ oauth2client = ">=1.5.0"
 dev = ["flake8", "pep8-naming", "tox (>=3)", "twine", "wheel"]
 docs = ["sphinx (>=5)", "sphinx-rtd-theme"]
 test = ["mock (>=4)", "pytest (>=7)", "pytest-cov", "pytest-mock (>=3)"]
+
+[[package]]
+name = "gspread"
+version = "5.10.0"
+description = "Google Spreadsheets Python API"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "gspread-5.10.0-py3-none-any.whl", hash = "sha256:f58b15d950ef5c45c8607edb3687188d5a543f2b66242f9c26fbb0d2cf36169d"},
+    {file = "gspread-5.10.0.tar.gz", hash = "sha256:2b6bba6dc111580170346a9bcd1893e0e8c52f67a9e537caec7b7a1e27c14435"},
+]
+
+[package.dependencies]
+google-auth = ">=1.12.0"
+google-auth-oauthlib = ">=0.4.1"
 
 [[package]]
 name = "httplib2"
@@ -4241,6 +4288,22 @@ rsa = ">=3.1.4"
 six = ">=1.6.1"
 
 [[package]]
+name = "oauthlib"
+version = "3.2.2"
+description = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "oauthlib-3.2.2-py3-none-any.whl", hash = "sha256:8139f29aac13e25d502680e9e19963e83f16838d48a0d71c287fe40e7067fbca"},
+    {file = "oauthlib-3.2.2.tar.gz", hash = "sha256:9859c40929662bec5d64f34d01c99e093149682a3f38915dc0655d5a633dd918"},
+]
+
+[package.extras]
+rsa = ["cryptography (>=3.0.0)"]
+signals = ["blinker (>=1.4.0)"]
+signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
+
+[[package]]
 name = "omegaconf"
 version = "2.3.0"
 description = "A flexible configuration library"
@@ -4362,17 +4425,18 @@ name = "owid-catalog"
 version = "0.3.4"
 description = "Core data types used by OWID for managing data."
 optional = false
-python-versions = "^3.8.1"
+python-versions = ">=3.8.1"
 files = []
 develop = true
 
 [package.dependencies]
 boto3 = ">=1.21.13"
 dataclasses-json = ">=0.5.6"
+dynamic-yaml = "^1.3.4"
 ipdb = ">=0.13.9"
 jsonschema = ">=3.2.0"
 owid-repack = ">=0.1.1"
-pandas = ">=1.3.3"
+pandas = ">=1.3.3,<2.0"
 pandas-stubs = ">=1.2.0"
 pyarrow = ">=10.0.1"
 pytest-cov = ">=2.12.1"
@@ -4390,7 +4454,7 @@ name = "owid-datautils"
 version = "0.5.3"
 description = "Data utils library by the Data Team at Our World in Data"
 optional = false
-python-versions = "^3.8"
+python-versions = ">=3.8,<4.0"
 files = []
 develop = true
 
@@ -5909,6 +5973,24 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "requests-oauthlib"
+version = "1.3.1"
+description = "OAuthlib authentication support for Requests."
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+files = [
+    {file = "requests-oauthlib-1.3.1.tar.gz", hash = "sha256:75beac4a47881eeb94d5ea5d6ad31ef88856affe2332b9aafb52c6452ccf0d7a"},
+    {file = "requests_oauthlib-1.3.1-py2.py3-none-any.whl", hash = "sha256:2577c501a2fb8d05a304c09d090d6e47c306fef15809d102b327cf8364bddab5"},
+]
+
+[package.dependencies]
+oauthlib = ">=3.0.0"
+requests = ">=2.0.0"
+
+[package.extras]
+rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
+
+[[package]]
 name = "rfc3339-validator"
 version = "0.1.4"
 description = "A pure python RFC3339 validator"
@@ -7407,4 +7489,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "60dfc451b12ef1c3acad9fdcf9e18c523ec6227c453ec13b32c727dc9f3501e5"
+content-hash = "1fa9f08860d6e361e008d6f7a913609f47c37d92b6050f142d8df8d23e933216"

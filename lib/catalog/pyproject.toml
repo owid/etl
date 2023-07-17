@@ -10,8 +10,8 @@ repository = "https://github.com/owid/owid-grapher-py"
 homepage = "https://github.com/owid/owid-grapher-py"
 
 [tool.poetry.dependencies]
-python = "^3.8.1"
-pandas = ">=1.3.3"
+python = ">=3.8.1"
+pandas = ">=1.3.3,<2.0"
 jsonschema = ">=3.2.0"
 pandas-stubs = ">=1.2.0"
 dataclasses-json = ">=0.5.6"
@@ -24,6 +24,7 @@ Unidecode = ">=1.3.4"
 PyYAML = ">=5.4.1"
 structlog = ">=21.5.0"
 owid-repack = ">=0.1.1"
+dynamic-yaml = "^1.3.4"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=6.2.5"

@@ -1,10 +1,24 @@
 dataset:
   title: Parameter, Compute and Data Trends in Machine Learning (Epoch, 2023)
   description: >-
-    We update this chart with the latest available data from our source every month.
+    The affiliation of the research team building a particular notable AI system was classified according to the following:
+
+    — Academia: 100% of researchers affiliated with academia
+
+    — Collaboration, Academia-majority: 71–99% affiliated with academia
+
+    — Collaboration: 30–70% affiliated with academia
+
+    — Collaboration, Industry-majority: 71–99% affiliated with industry
+
+    — Industry: 100% of researchers affiliated with industry
+
+
+    This data corresponds to the "Organization Categorization" and "Domain" columns in the primary source data spreadsheet.
 
 
     The authors selected the AI systems for inclusion based on the following necessary criteria:
+
     — Have an explicit learning component
 
     — Showcase experimental results
@@ -13,6 +27,7 @@ dataset:
 
 
     In addition, the systems had to meet at least one of the following notability criteria:
+
     — Paper has more than 1000 citations
 
     — Historical importance
@@ -80,6 +95,11 @@ tables:
       training_dataset_size__datapoints:
         title: Training dataset size
         unit: 'datapoints'
+        description: >
+          Training data size refers to the amount or quantity of data that is used to train an AI model, indicating the number of examples or instances available for the model to learn from.
+
+
+          Imagine you're teaching a computer to recognize different types of fruits. The training data size would refer to the number of fruit images you show to the computer during the training process. If you show it 100 images of various fruits, then the training data size would be 100. The more training data you provide, the better the computer can learn to identify different fruits accurately.
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'

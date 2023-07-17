@@ -30,18 +30,18 @@ def run(dest_dir: str) -> None:
 
     # Creating a list of columns not to melt
 
-    # Applying the function for 'yes_no_ratio' and 'help_harm_ratio'
-    melted_yes_no = melt_and_clean(df, "yes_no_ratio").dropna(subset=["yes_no_ratio_value"])
+    # Applying the function for 'yes__would_feel_safe_value' and 'mostly_help'
+    melted_yes_no = melt_and_clean(df, "yes__would_feel_safe").dropna(subset=["yes__would_feel_safe_value"])
     melted_yes_no.reset_index(inplace=True, drop=True)
-    melted_help_harm = melt_and_clean(df, "help_harm_ratio").dropna(subset=["help_harm_ratio_value"])
+    melted_help_harm = melt_and_clean(df, "mostly_help").dropna(subset=["mostly_help_value"])
     melted_help_harm.reset_index(inplace=True, drop=True)
 
     # Applying the function for 'melted_help_harm' and 'melted_yes_no'
-    melted_help_harm = assign_indicator(melted_help_harm, "help_harm_ratio")
-    melted_yes_no = assign_indicator(melted_yes_no, "yes_no_ratio")
+    melted_help_harm = assign_indicator(melted_help_harm, "mostly_help")
+    melted_yes_no = assign_indicator(melted_yes_no, "yes__would_feel_safe")
 
-    df_pivot_yes_no = reshape_dataframe(melted_yes_no, "yes_no_ratio", "yes_no_ratio_value")
-    df_pivo_harm_help = reshape_dataframe(melted_help_harm, "help_harm_ratio", "help_harm_ratio_value")
+    df_pivot_yes_no = reshape_dataframe(melted_yes_no, "yes__would_feel_safe", "yes__would_feel_safe_value")
+    df_pivo_harm_help = reshape_dataframe(melted_help_harm, "mostly_help", "mostly_help_value")
 
     merged_groups = pd.merge(df_pivo_harm_help, df_pivot_yes_no, on=["year", "group"], how="outer")
     merged_groups["group"] = merged_groups["group"].replace(
@@ -83,7 +83,7 @@ def run(dest_dir: str) -> None:
 
 # Function to melt and clean dataframe based on column name
 def melt_and_clean(df, col_name):
-    excluded_columns = ["yes_no_ratio", "help_harm_ratio"]
+    excluded_columns = ["yes__would_feel_safe", "mostly_help"]
 
     melted_df = pd.melt(
         df.reset_index(),

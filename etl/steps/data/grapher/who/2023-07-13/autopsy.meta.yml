@@ -1,0 +1,54 @@
+descriptions:
+  who: &who-description >-
+
+
+    The data for the following countries is taken from the WHO European Health Information Gateway:
+
+
+    • Armenia, Austria, Azerbaijan, Belarus, Bulgaria, Croatia, Cyprus, Czechia, Denmark, Estonia, Finland, Georgia, Hungary, Iceland, Israel, Kazakhstan, Kyrgyzstan, Latvia, Lithuania, Luxembourg, Malta, Moldova, Netherlands, North Macedonia, Norway, Portugal, Romania, Russia, San Marino, Serbia, Slovakia, Sweden, Switzerland, Tajikistan, Turkey, Turkmenistan, Ukraine, United Kingdom and Uzbekistan.
+
+
+    The WHO European Health Information Gateway aggregates data from national statistics offices. Countries have data across multiple years.
+
+  paratz: &paratz-description >-
+
+
+    The data for the following countries is taken from Paratz et al., (2023):
+
+
+    • Australia, Belgium, Bhutan, Brazil, Canada, Chine, Cote d'Ivoire, Cuba, France, Jamaica, Japan, Kuwait, New Zealand, Qatar, Saudi Arabia, South Africa, South Korea, Spain and United States.
+
+
+    Paratz et al., (2023) collates data from a number of published papers and databases, including journal articles, publicly available governmental datasets, press releases, newspaper articles, and annual reports. The year shown reflects the date given in the database or the year of the publication. For Spain and Australia the data is only representative of a region of each country, Catalonia and Victoria, respectively.
+
+all_sources:
+  - who_2022: &source-who_2022
+      name: WHO (2022)
+      published_by: WHO European Health Information Gateway
+      url: https://gateway.euro.who.int/en/indicators/hfa_545-6410-autopsy-rate-for-all-deaths/
+      date_accessed: '2023-07-13'
+      publication_date: '2022-09-01'
+      description: *who-description
+  - paratz_2023: &source-paratz_2023
+      name: Paratz et al., (2023)
+      published_by: "Paratz et al., (2023) A systematic review of global autopsy rates in all-cause mortality and young sudden death. Heart Rhythm. doi: 10.1016/j.hrthm.2023.01.008."
+      url: https://www.heartrhythmjournal.com/article/S1547-5271(23)00027-9/fulltext
+      date_accessed: '2023-07-13'
+      publication_year: 2023
+      description: *paratz-description
+dataset:
+  title: "Autopsy rate (WHO, 2022; Paratz et al., 2023)"
+  description: A combination of two sources of data on autopsy rates, 1) WHO European Health Information Gateway, 2) Paratz et al., (2023).
+  sources:
+    - *source-who_2022
+    - *source-paratz_2023
+tables:
+  autopsy:
+    variables:
+      autopsy_rate:
+        title: Autopsy rate (%) for all deaths
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Autopsy rate
+          numDecimalPlaces: 1

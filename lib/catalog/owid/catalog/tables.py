@@ -8,13 +8,24 @@ import json
 from collections import defaultdict
 from os.path import dirname, join, splitext
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union, cast, overload
+from typing import (
+    IO,
+    Any,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 import pandas as pd
 import pyarrow
 import pyarrow.parquet as pq
 import structlog
-import yaml
 from owid.repack import repack_frame
 from pandas.util._decorators import rewrite_axis_style_signature
 
@@ -25,6 +36,9 @@ log = structlog.get_logger()
 
 SCHEMA = json.load(open(join(dirname(__file__), "schemas", "table.json")))
 METADATA_FIELDS = list(SCHEMA["properties"])
+
+# New type required for pandas reading functions.
+AnyStr = TypeVar("AnyStr", str, bytes)
 
 
 class Table(pd.DataFrame):
@@ -54,6 +68,7 @@ class Table(pd.DataFrame):
         metadata: Optional[TableMeta] = None,
         short_name: Optional[str] = None,
         underscore=False,
+        camel_to_snake=False,
         like: Optional["Table"] = None,
         **kwargs: Any,
     ) -> None:
@@ -62,6 +77,7 @@ class Table(pd.DataFrame):
         :param short_name: Use empty TableMeta and fill it with `short_name`. This is a shorter version
             of `Table(df, metadata=TableMeta(short_name="my_name"))`
         :param underscore: Underscore table columns and indexes. See `underscore_table` for help
+        :param camel_to_snake: Convert camelCase column names to snake_case.
         :param like: Use metadata from Table given in this argument (including columns). This is a shorter version of
             new_t = Table(df, metadata=old_t.metadata)
             for col in new_t.columns:
@@ -88,7 +104,7 @@ class Table(pd.DataFrame):
         if underscore:
             from .utils import underscore_table
 
-            underscore_table(self, inplace=True)
+            underscore_table(self, inplace=True, camel_to_snake=camel_to_snake)
 
         # reuse metadata from a different table
         if like is not None:
@@ -287,6 +303,7 @@ class Table(pd.DataFrame):
         df.metadata = TableMeta.from_dict(metadata)
         df._set_fields_from_dict(fields)
 
+        # NOTE: setting index is really slow for large datasets
         if primary_key:
             df.set_index(primary_key, inplace=True)
 
@@ -435,8 +452,10 @@ class Table(pd.DataFrame):
         :param path: Path to YAML file.
         :param table_name: Name of table, also updates this in the metadata.
         """
-        with open(path) as istream:
-            annot = yaml.safe_load(istream)
+        from .meta import DatasetMeta
+        from .utils import dynamic_yaml_load
+
+        annot = dynamic_yaml_load(path, DatasetMeta._params_yaml(self.metadata.dataset or DatasetMeta()))
 
         self.metadata.short_name = table_name
 
@@ -966,26 +985,29 @@ def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[
 
 
 def read_csv(
-    path: Union[str, Path],
+    filepath_or_buffer: Union[str, Path, IO[AnyStr]],
     metadata: Optional[TableMeta] = None,
     underscore: bool = False,
     *args,
     **kwargs,
 ) -> Table:
-    table = Table(pd.read_csv(filepath_or_buffer=path, *args, **kwargs), underscore=underscore)
+    table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
-    table = update_log(table=table, operation="load", parents=[path])
+    if isinstance(filepath_or_buffer, (str, Path)):
+        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
+    else:
+        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_csv.")
 
     return cast(Table, table)
 
 
 def read_excel(
-    path: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
+    io: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
 ) -> Table:
-    table = Table(pd.read_excel(path, *args, **kwargs), underscore=underscore)
+    table = Table(pd.read_excel(io=io, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
     # Note: Maybe we should include the sheet name in parents.
-    table = update_log(table=table, operation="load", parents=[path], inplace=False)
+    table = update_log(table=table, operation="load", parents=[io], inplace=False)
 
     return cast(Table, table)
 
