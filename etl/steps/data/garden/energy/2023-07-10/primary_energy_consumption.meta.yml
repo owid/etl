@@ -1,0 +1,65 @@
+dataset:
+  title: Primary energy consumption (EI & EIA, 2023)
+  description: |
+    Primary energy consumption data was compiled by Our World in Data based on two key data sources:
+    1. <a href="https://www.energyinst.org/statistical-review">Energy Institute (EI) Statistical Review of World Energy</a>.
+    2. <a href="https://www.eia.gov/international/data/world/total-energy/more-total-energy-data">International energy data from the U.S. Energy Information Administration (EIA)</a>.
+
+    EI provides the longest and most up-to-date time-series of primary energy. However, it does not provide data for all countries. We have therefore supplemented this dataset with energy data from the EIA. Where EI provides data for a given country, this data is adopted; for countries where this data is missing, we rely on EIA energy figures.
+
+    Per capita figures have been calculated using a population dataset that is built and maintained by Our World in Data, based on <a href="https://ourworldindata.org/population-sources">different sources</a>.
+
+    To calculate energy per unit of GDP, we use total real GDP figures from <a href="https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020">the Maddison Project Database, version 2020</a>.
+
+tables:
+  primary_energy_consumption:
+    variables:
+      annual_change_in_primary_energy_consumption__pct:
+        title: Annual change in primary energy consumption (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Annual change in primary energy consumption
+      annual_change_in_primary_energy_consumption__twh:
+        title: Annual change in primary energy consumption (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Annual change in primary energy consumption
+      gdp:
+        title: GDP
+        short_unit: $
+        unit: 2011 int-$
+        description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
+        display:
+          numDecimalPlaces: 0
+      population:
+        title: Population
+        unit: people
+      primary_energy_consumption__twh:
+        title: Primary energy consumption (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        description: Primary energy consumption, measured in terawatt-hours per year.
+        display:
+          name: Primary energy consumption
+          numDecimalPlaces: 0
+      primary_energy_consumption_per_gdp__kwh_per_dollar:
+        title: Primary energy consumption per GDP (kWh/$)
+        short_unit: kWh
+        unit: kilowatt-hours per $
+        description: Primary energy consumption per unit of gross domestic product, measured in kilowatt-hours per international-$.
+        display:
+          name: Energy consumption per dollar
+      primary_energy_consumption_per_capita__kwh:
+        title: Primary energy consumption per capita (kWh/person)
+        short_unit: kWh
+        unit: kilowatt-hours per capita
+        description: Primary energy consumption per capita, measured in kilowatt-hours per person per year.
+        display:
+          name: Per capita energy consumption
+          numDecimalPlaces: 0
+      source:
+        title: Source of data
+        short_unit: source
+        unit: source
