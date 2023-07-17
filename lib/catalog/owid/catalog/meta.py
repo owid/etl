@@ -164,8 +164,10 @@ class DatasetMeta:
                 (source,) = self.sources
                 if source.publication_date:
                     self.version = str(source.publication_date)
-                else:
+                elif source.publication_year:
                     self.version = str(source.publication_year)
+                else:
+                    self.version = None
 
     def save(self, filename: Union[str, Path]) -> None:
         filename = Path(filename).as_posix()
