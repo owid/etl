@@ -1,5 +1,5 @@
 dataset:
-  title: Energy dataset (OWID, 2023)
+  title: Energy dataset (OWID, 2023b)
   description: |
     OWID Energy dataset.
 
@@ -7,7 +7,3 @@ dataset:
 
 # Dataset sources will be created in the step by combining all component datasets' sources.
 # Also, table metadata will be built from the tables' metadata and the content of owid_energy_variable_mapping.csv.
-
-tables:
-  owid_energy:
-    variables: {}

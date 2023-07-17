@@ -42,10 +42,11 @@ def parse_coal_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
     year = int(_year[0])
 
     # Re-create the original column names, assuming the zeroth column is for countries.
-    tb.columns = ["country"] + [
+    new_columns = ["country"] + [
         "Coal reserves - " + " ".join(tb[column].iloc[0:2].fillna("").astype(str).tolist()).strip()
         for column in tb.columns[1:]
     ]
+    tb = tb.rename(columns={column: new_columns[i] for i, column in enumerate(tb.columns)})
 
     # The units should be written in the header of the first column.
     assert tb.iloc[1][0] == "Million tonnes", f"Units (or sheet format) may have changed in sheet {sheet_name}"
@@ -468,7 +469,7 @@ def run(dest_dir: str) -> None:
 
     # Combine main table and coal, gas, and oil reserves.
     for tb_reserves in [tb_coal_reserves, tb_gas_reserves, tb_oil_reserves]:
-        tb = tb.merge(tb_reserves, how="outer", on=["country", "year"]).copy_metadata(from_table=tb)
+        tb = tb.merge(tb_reserves, how="outer", on=["country", "year"])
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
@@ -496,5 +497,10 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb, tb_prices, tb_efficiency_factors], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(
+        dest_dir,
+        tables=[tb, tb_prices, tb_efficiency_factors],
+        default_metadata=snap.metadata,
+        check_variables_metadata=True,
+    )
     ds_meadow.save()

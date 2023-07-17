@@ -20,10 +20,12 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Drop unnecessary columns from table.
-    tb_garden = tb_garden.reset_index().drop(columns=["data_source"])
+    tb = tb_garden.drop(columns=["data_source"])
 
     #
     # Save outputs.
     #
-    ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata)
+    ds_grapher = create_dataset(
+        dest_dir=dest_dir, tables=[tb], default_metadata=ds_garden.metadata, check_variables_metadata=True
+    )
     ds_grapher.save()

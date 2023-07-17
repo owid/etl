@@ -597,6 +597,7 @@ class Table(pd.DataFrame):
         value_vars: Optional[Union[Tuple[str], List[str], str]] = None,
         var_name: str = "variable",
         value_name: str = "value",
+        short_name: Optional[str] = None,
         *args,
         **kwargs,
     ) -> "Table":
@@ -606,6 +607,7 @@ class Table(pd.DataFrame):
             value_vars=value_vars,
             var_name=var_name,
             value_name=value_name,
+            short_name=short_name,
             *args,
             **kwargs,
         )
@@ -617,6 +619,7 @@ class Table(pd.DataFrame):
         columns: Optional[Union[str, List[str]]] = None,
         values: Optional[Union[str, List[str]]] = None,
         join_column_levels_with: Optional[str] = None,
+        short_name: Optional[str] = None,
         **kwargs,
     ) -> "Table":
         return pivot(
@@ -625,6 +628,7 @@ class Table(pd.DataFrame):
             columns=columns,
             values=values,
             join_column_levels_with=join_column_levels_with,
+            short_name=short_name,
             **kwargs,
         )
 
@@ -698,7 +702,17 @@ class Table(pd.DataFrame):
         return cast("Table", tb)
 
 
-def merge(left, right, how="inner", on=None, left_on=None, right_on=None, suffixes=("_x", "_y"), **kwargs) -> Table:
+def merge(
+    left,
+    right,
+    how="inner",
+    on=None,
+    left_on=None,
+    right_on=None,
+    suffixes=("_x", "_y"),
+    short_name: Optional[str] = None,
+    **kwargs,
+) -> Table:
     if ("left_index" in kwargs) or ("right_index" in kwargs):
         # TODO: Arguments left_index/right_index are not implemented.
         raise NotImplementedError(
@@ -763,17 +777,19 @@ def merge(left, right, how="inner", on=None, left_on=None, right_on=None, suffix
         )
 
     # Update table metadata.
-    tb.metadata.title = combine_tables_titles(tables=[left, right])
-    tb.metadata.description = combine_tables_descriptions(tables=[left, right])
-    # tb.metadata.dataset = DatasetMeta(
-    #     sources=get_unique_sources_from_table(table=tb), licenses=get_unique_licenses_from_table(table=tb)
-    # )
+    tb.metadata = combine_tables_metadata(tables=[left, right], short_name=short_name)
 
     return tb
 
 
 def concat(
-    objs: List[Table], *, axis: Union[int, str] = 0, join: str = "outer", ignore_index: bool = False, **kwargs
+    objs: List[Table],
+    *,
+    axis: Union[int, str] = 0,
+    join: str = "outer",
+    ignore_index: bool = False,
+    short_name: Optional[str] = None,
+    **kwargs,
 ) -> Table:
     # TODO: Add more logic to this function to handle indexes and possibly other arguments.
     table = Table(pd.concat(objs=objs, axis=axis, join=join, ignore_index=ignore_index, **kwargs))  # type: ignore
@@ -793,11 +809,7 @@ def concat(
         )
 
     # Update table metadata.
-    table.metadata.title = combine_tables_titles(tables=objs)
-    table.metadata.description = combine_tables_descriptions(tables=objs)
-    # table.metadata.dataset = DatasetMeta(
-    #     sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
-    # )
+    table.metadata = combine_tables_metadata(tables=objs, short_name=short_name)
 
     return table
 
@@ -808,6 +820,7 @@ def melt(
     value_vars: Optional[Union[Tuple[str], List[str], str]] = None,
     var_name: str = "variable",
     value_name: str = "value",
+    short_name: Optional[str] = None,
     *args,
     **kwargs,
 ) -> Table:
@@ -858,12 +871,7 @@ def melt(
         )
 
     # Update table metadata.
-    table.metadata.short_name = frame.metadata.short_name
-    table.metadata.title = frame.metadata.title
-    table.metadata.description = frame.metadata.description
-    # table.metadata.dataset = DatasetMeta(
-    #     sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
-    # )
+    table.metadata = combine_tables_metadata(tables=[frame], short_name=short_name)
 
     return table
 
@@ -888,6 +896,7 @@ def pivot(
     columns: Optional[Union[str, List[str]]] = None,
     values: Optional[Union[str, List[str]]] = None,
     join_column_levels_with: Optional[str] = None,
+    short_name: Optional[str] = None,
     **kwargs,
 ) -> Table:
     # Get the new pivot table.
@@ -940,12 +949,7 @@ def pivot(
             table[column].metadata = (index_metadata + columns_metadata)[i]
 
     # Update table metadata.
-    table.metadata.short_name = data.metadata.short_name
-    table.metadata.title = data.metadata.title
-    table.metadata.description = data.metadata.description
-    # table.metadata.dataset = DatasetMeta(
-    #     sources=get_unique_sources_from_table(table=table), licenses=get_unique_licenses_from_table(table=table)
-    # )
+    table.metadata = combine_tables_metadata(tables=[data], short_name=short_name)
 
     return table
 
@@ -1206,9 +1210,9 @@ def amend_log(
         return table
 
 
-def get_unique_sources_from_table(table: Table) -> List[Source]:
-    # Make a list of all sources of all variables in table.
-    sources = sum([table._fields[column].sources for column in list(table.all_columns)], [])
+def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
+    # Make a list of all sources of all variables in all tables.
+    sources = sum([table._fields[column].sources for table in tables for column in list(table.all_columns)], [])
 
     # Get unique array of tuples of source fields (respecting the order).
     unique_sources_array = pd.unique([tuple(source.to_dict().items()) for source in sources])
@@ -1219,9 +1223,9 @@ def get_unique_sources_from_table(table: Table) -> List[Source]:
     return unique_sources
 
 
-def get_unique_licenses_from_table(table: Table) -> List[License]:
-    # Make a list of all licenses of all variables in table.
-    licenses = sum([table._fields[column].licenses for column in list(table.all_columns)], [])
+def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
+    # Make a list of all licenses of all variables in all tables.
+    licenses = sum([table._fields[column].licenses for table in tables for column in list(table.all_columns)], [])
 
     # Get unique array of tuples of license fields (respecting the order).
     unique_licenses_array = pd.unique([tuple(license.to_dict().items()) for license in licenses])
@@ -1249,3 +1253,26 @@ def combine_tables_titles(tables: List[Table]) -> Optional[str]:
 
 def combine_tables_descriptions(tables: List[Table]) -> Optional[str]:
     return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="description")
+
+
+def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = None) -> TableMeta:
+    title = combine_tables_titles(tables=tables)
+    description = combine_tables_descriptions(tables=tables)
+    if short_name is None:
+        # If a short name is not specified, take it from the first table.
+        short_name = tables[0].metadata.short_name
+    metadata = TableMeta(title=title, description=description, short_name=short_name)
+
+    return metadata
+
+
+def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List[str]] = None) -> None:
+    if fields is None:
+        fields = ["sources", "licenses"]
+
+    for table in tables:
+        table_name = table.metadata.short_name
+        for column in table.columns:
+            for field in fields:
+                if not getattr(table[column].metadata, field):
+                    log.warning(f"Table {table_name}, column {column} has no {field}.")

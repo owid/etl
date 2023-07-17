@@ -1,16 +1,8 @@
 dataset:
-  namespace: bp
-  version: 2022-12-28
-  title: Fossil fuel reserves/production ratio (BP, 2022)
+  title: Fossil fuel reserves/production ratio (Energy Institute, 2023)
   short_name: fossil_fuel_reserves_production_ratio
   description: |
     The Reserves-to-Production (R/P) Ratio measures the number of years of fuel supplies left based on current annual consumption rates. Note that this can change through time through the discovery of new fuel reserves, and increases in annual consumption.
-  sources:
-    -
-      name: Our World in Data based on BP Statistical Review of World Energy (2022)
-      published_by: BP Statistical Review of World Energy
-      date_accessed: 2022-07-08
-      url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
 
 tables:
   fossil_fuel_reserves_production_ratio:
