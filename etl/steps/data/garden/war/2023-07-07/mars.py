@@ -24,13 +24,13 @@ COLUMN_CIVIL_WAR = "civilwar"
 # Regions
 ## Region name mapping
 REGIONS_RENAME = {
-    "asia": "Asia",
-    "eeurop": "Eastern Europe",
-    "lamerica": "Latin America",
-    "nafrme": "North Africa and the Middle East",
-    "namerica": "North America",
-    "ssafrica": "Sub-Saharan Africa",
-    "weurope": "Western Europe",
+    "asia": "Asia (Project Mars)",
+    "eeurop": "Eastern Europe (Project Mars)",
+    "lamerica": "Latin America (Project Mars)",
+    "nafrme": "North Africa and the Middle East (Project Mars)",
+    "namerica": "North America (Project Mars)",
+    "ssafrica": "Sub-Saharan Africa (Project Mars)",
+    "weurope": "Western Europe (Project Mars)",
 }
 ## Columns containing FLAGs for regions
 COLUMNS_REGIONS = list(REGIONS_RENAME.keys())
