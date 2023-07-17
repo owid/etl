@@ -69,6 +69,9 @@ def run(dest_dir: str) -> None:
     log.info("war.mars: estimate metrics")
     tb = estimate_metrics(tb)
 
+    log.info("war.mars: replace NaNs with zeroes")
+    tb = replace_missing_data_with_zeros(tb)
+
     # Rename regions
     log.info("war.mars: rename regions")
     tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
@@ -260,15 +263,27 @@ def _create_ongoing_metrics(tb: Table) -> Table:
     agg_ops = {"warcode": "nunique", "kialow": "sum", "kiahigh": "sum"}
     ## Regions
     tb_ongoing_regions = tb.groupby(["year", "region", "conflict_type"], as_index=False).agg(agg_ops)
+    ### All conflicts
+    tb_ongoing_regions_all_conf = tb.groupby(["year", "region"], as_index=False).agg(agg_ops)
+    tb_ongoing_regions_all_conf["conflict_type"] = "all"
     ## World
     tb_ongoing_world = tb.groupby(["year", "conflict_type"], as_index=False).agg(agg_ops)
     tb_ongoing_world["region"] = "World"
+    ### All conflicts
+    tb_ongoing_world_all_conf = tb.groupby(["year"], as_index=False).agg(agg_ops)
+    tb_ongoing_world_all_conf["region"] = "World"
+    tb_ongoing_world_all_conf["conflict_type"] = "all"
+
     ## Combine
-    tb_ongoing = pd.concat([tb_ongoing_regions, tb_ongoing_world], ignore_index=True)
-    ## All conflicts
-    tb_ongoing_all_conf = tb_ongoing.groupby(["year", "region"], as_index=False).agg(agg_ops)
-    tb_ongoing_all_conf["conflict_type"] = "all"
-    tb_ongoing = pd.concat([tb_ongoing_all_conf, tb_ongoing], ignore_index=True)
+    tb_ongoing = pd.concat(
+        [
+            tb_ongoing_regions,
+            tb_ongoing_world,
+            tb_ongoing_regions_all_conf,
+            tb_ongoing_world_all_conf,
+        ],
+        ignore_index=True,
+    )
     return tb_ongoing
 
 
@@ -296,3 +311,28 @@ def _create_metrics_new(tb: Table) -> Table:
     tb_new = tb_new.rename(columns={"yrstart": "year"})  # type: ignore
 
     return tb_new
+
+
+def replace_missing_data_with_zeros(tb: Table) -> Table:
+    """Replace missing data with zeros.
+
+    In some instances there is missing data. Instead, we'd like this to be zero-valued.
+    """
+    # Add missing (year, region, conflict_typ) entries (filled with NaNs)
+    years = np.arange(tb["year"].min(), tb["year"].max() + 1)
+    regions = set(tb["region"])
+    conflict_types = set(tb["conflict_type"])
+    new_idx = pd.MultiIndex.from_product([years, regions, conflict_types], names=["year", "region", "conflict_type"])
+    tb = tb.set_index(["year", "region", "conflict_type"]).reindex(new_idx).reset_index()
+
+    # Change NaNs for 0 for specific rows
+    ## For columns "number_ongoing_conflicts", "number_new_conflicts"; conflict_type="extrasystemic"
+    columns = [
+        "number_ongoing_conflicts",
+        "number_new_conflicts",
+        "number_deaths_ongoing_conflicts_high",
+        "number_deaths_ongoing_conflicts_low",
+    ]
+    tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
+
+    return tb
