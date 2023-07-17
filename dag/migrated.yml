@@ -20,3 +20,7 @@ steps:
   - data://garden/covid/latest/government_response_oxbsg
   data://garden/covid/latest/government_response_oxbsg:
   - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID%20Government%20Response%20(OxBSG).csv
+  data-private://grapher/covid/latest/uk_covid_data:
+  - data-private://garden/covid/latest/uk_covid_data
+  data-private://garden/covid/latest/uk_covid_data:
+  - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/uk_covid_data.csv
