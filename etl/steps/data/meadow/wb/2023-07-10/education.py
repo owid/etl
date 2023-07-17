@@ -50,7 +50,6 @@ def run(dest_dir: str) -> None:
     for snap in snaps:
         snapshot = cast(Snapshot, paths.load_dependency(snap))
         df = load_and_select_data(snapshot)
-        print(df["Series"].unique())
         df_list.append(df)
 
     # Concatenate all processed dataframes
@@ -59,10 +58,10 @@ def run(dest_dir: str) -> None:
     # Perform further processing on the concatenated dataframe
     df.replace("..", np.nan, inplace=True)
     # Drop unnecessary columns that have the same infomariton as Series and Country but in a different format
-    df.drop(["Country Code", "Series Code"], axis=1, inplace=True)
+    df.drop(["Country Code", "Series Code"], axis="columns", inplace=True)
 
     # Clean up year columns (original columns are in the format xxxx [YRxxxx])
-    df.columns = df.columns.to_series().apply(lambda x: x.split(" ")[0] if x not in ["Country Name", "Series"] else x)
+    df.columns = df.columns.map(lambda x: x.split(" ")[0] if x not in ["Country Name", "Series"] else x)
 
     # Melt years into a single column
     df_melted = pd.melt(df, id_vars=["Country Name", "Series"], var_name="Year", value_name="Value")
