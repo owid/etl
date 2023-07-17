@@ -1,0 +1,8 @@
+steps:
+  # Temporary additional to add Drug Disorders to grapher
+  data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders:
+    - snapshot-private://ihme_gbd/2023-03-29/gbd_drug_disorders.csv
+  data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders:
+    - data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders
+  data-private://grapher/ihme_gbd/2023-03-29/gbd_drug_disorders:
+    - data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders

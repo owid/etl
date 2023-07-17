@@ -91,6 +91,7 @@ def create_dataset(
     underscore_table: bool = True,
     camel_to_snake: bool = False,
     formats: List[FileFormat] = DEFAULT_FORMATS,
+    check_variables_metadata: bool = False,
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -105,6 +106,7 @@ def create_dataset(
     :param default_metadata: The default metadata to use for the dataset, could be either SnapshotMeta or DatasetMeta.
     :param underscore_table: Whether to underscore the table name before adding it to the dataset.
     :param camel_to_snake: Whether to convert camel case to snake case for the table name.
+    :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -115,6 +117,9 @@ def create_dataset(
     # convert snapshot SnapshotMeta to DatasetMeta
     if isinstance(default_metadata, SnapshotMeta):
         default_metadata = convert_snapshot_metadata(default_metadata)
+
+    if check_variables_metadata:
+        catalog.tables.check_all_variables_have_metadata(tables=tables)
 
     # create new dataset with new metadata
     ds = catalog.Dataset.create_empty(dest_dir, metadata=default_metadata)

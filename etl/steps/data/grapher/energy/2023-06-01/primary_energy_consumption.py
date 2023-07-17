@@ -20,10 +20,13 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Remove unnecessary columns.
-    tb_garden = tb_garden.drop(columns=["gdp", "population", "source"])
+    tb = tb_garden.drop(columns=["gdp", "population", "source"])
+
+    # Set an appropriate index and sort conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
     #
-    ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata)
+    ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
     ds_grapher.save()

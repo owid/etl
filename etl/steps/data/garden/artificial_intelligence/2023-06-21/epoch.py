@@ -27,6 +27,10 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["epoch"]
     df = pd.DataFrame(tb)
+
+    # Filter notable systems by selecting rows where 'inclusion_criteria' is not nan
+    df = df[df["inclusion_criteria"].notna()].reset_index(drop=True)
+    df.drop("inclusion_criteria", axis=1, inplace=True)
     #
     # Process data.
     # Clean up researcher affiliation in column 'organization_categorization'
@@ -39,6 +43,7 @@ def run(dest_dir: str) -> None:
         "Industry - Academia Collaboration (Industry leaning)": "Collaboration, majority industry",
         "Research Collective": "Research collective",
     }
+    df["system"] = df["system"].replace({"Univeristy": "University", "Nvidia": "NVIDIA"}, regex=True)
     df["organization_categorization"] = df["organization_categorization"].replace(category_mapping)
 
     # Convert FLOP to petaFLOP
@@ -48,7 +53,7 @@ def run(dest_dir: str) -> None:
     # then, calculate 'days_since_1949'
     df["days_since_1949"] = (df["publication_date"] - pd.to_datetime("1949-01-01")).dt.days
 
-    df.dropna(subset=["days_since_1949", "system"], inplace=True)
+    df.dropna(subset=["days_since_1949"], inplace=True)
     df = df.reset_index(drop=True)
     # df.drop("publication_date", axis=1, inplace=True)
     df["days_since_1949"] = df["days_since_1949"].astype(int)
@@ -57,12 +62,8 @@ def run(dest_dir: str) -> None:
     # There is a typo in the domain name "VIsion"
     df.replace({"VIsion": "Vision"}, inplace=True)
 
-    # Filter notable systems by selecting rows where 'inclusion_criteria' is not nan
-    df_not_nan = df[df["inclusion_criteria"].notna()].reset_index(drop=True)
-    df_not_nan.drop("inclusion_criteria", axis=1, inplace=True)
-
     # Create table
-    tb = Table(df_not_nan, short_name="epoch", underscore=True)
+    tb = Table(df, short_name="epoch", underscore=True)
     #
     # Save outputs.
     #
@@ -88,7 +89,6 @@ def clean_non_unique_year_model(df):
 
     # Set the index to 'system' and 'days_since_1949'
     df.set_index(["system", "days_since_1949"], inplace=True)
-
     # Check for non-unique indexes
     non_unique_indexes = df.index[df.index.duplicated()]
 
@@ -112,7 +112,6 @@ def clean_non_unique_year_model(df):
 
     # Drop duplicate rows based on index
     df = df[~df.index.duplicated(keep="first")]
-
     # Check if duplicates still exist in the DataFrame
     duplicates = df.index.duplicated()
     if duplicates.any():

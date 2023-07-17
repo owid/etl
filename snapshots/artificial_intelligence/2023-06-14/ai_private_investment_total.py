@@ -42,7 +42,6 @@ def get_data() -> pd.DataFrame:
     for i, id in enumerate(ids):
         df_add = pd.read_csv(common_path + ids[i])
         # Add World to Label column (usually country in these datasets)
-
         if "Label" not in df_add.columns:
             df_add["Label"] = "World"
         # In the Total Investment by area spreadsheet Label is actually Year --> so change it
@@ -52,9 +51,9 @@ def get_data() -> pd.DataFrame:
                 columns={"Label": "Year", "Total Investment (in Billions of U.S. Dollars)": "Total (focus area)"},
                 inplace=True,
             )
+            df_add["Label"] = "World"
 
         all_dfs = pd.concat([all_dfs, df_add])
-
     return all_dfs
 
 

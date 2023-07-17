@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 import re
 import shutil
@@ -265,7 +266,7 @@ class SnapshotMeta:
             description=s["description"].get("additionalInfo"),
             url=s["description"].get("link"),
             published_by=s["description"].get("dataPublishedBy"),
-            date_accessed=pd.to_datetime(s["description"].get("retrievedDate")).date(),
+            date_accessed=pd.to_datetime(s["description"].get("retrievedDate") or dt.date.today()).date(),
         )
 
 

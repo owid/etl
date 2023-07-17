@@ -21,6 +21,7 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["epoch"]
     # Rename for plotting model name as country in grapher
     tb = tb.rename(columns={"system": "country", "days_since_1949": "year"})
+    tb.set_index(["country", "year"], inplace=True)
 
     #
     # Process data.

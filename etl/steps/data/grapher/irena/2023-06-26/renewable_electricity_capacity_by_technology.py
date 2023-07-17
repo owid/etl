@@ -42,5 +42,5 @@ def run(dest_dir: str) -> None:
     ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb], default_metadata=None)
     ds_grapher.metadata.title = f"Renewable electricity capacity by technology (IRENA, {paths.version})"
     # Gather all sources in variables and assign them to the dataset.
-    ds_grapher.metadata.sources = catalog.tables.get_unique_sources_from_table(tb)
+    ds_grapher.metadata.sources = catalog.tables.get_unique_sources_from_tables([tb])
     ds_grapher.save()

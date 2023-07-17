@@ -26,7 +26,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       education_2_year:
@@ -34,7 +34,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       answers_age_30_44:
@@ -42,7 +42,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       education_4_year:
@@ -50,7 +50,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       answers_age_45_64:
@@ -58,7 +58,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       answers_age_65plus:
@@ -66,7 +66,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       all_adults:
@@ -74,7 +74,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       asian:
@@ -82,7 +82,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       black:
@@ -90,7 +90,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       democrat:
@@ -98,7 +98,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       female:
@@ -106,7 +106,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       high_school_graduate:
@@ -114,7 +114,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       hispanic:
@@ -122,7 +122,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       independent:
@@ -130,7 +130,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       male:
@@ -138,7 +138,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       middle_eastern:
@@ -146,7 +146,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       native_american:
@@ -154,7 +154,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       no_hs:
@@ -162,7 +162,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       other:
@@ -170,7 +170,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       post_grad:
@@ -178,7 +178,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       republican:
@@ -186,7 +186,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       some_college:
@@ -194,7 +194,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       two_or_more_races:
@@ -202,7 +202,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       white:
@@ -210,6 +210,6 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true

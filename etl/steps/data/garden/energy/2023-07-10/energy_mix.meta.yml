@@ -1,0 +1,19 @@
+dataset:
+  title: Energy mix (Energy Institute, 2023)
+  description: |
+    Raw data on energy consumption is sourced from <a href="https://www.energyinst.org/statistical-review">the Energy Institute Statistical Review of World Energy</a>.
+
+    Primary energy in exajoules (EJ) has been converted to TWh by Our World in Data based on a conversion factor of 1,000,000 / 3,600 (~277.778).
+
+    For non-fossil based electricity sources (nuclear, hydro, wind, solar, geothermal, biomass in power, and other renewable sources), the Statistical Review's generation (in TWh) corresponds to gross generation and not accounting for cross-border electricity supply.
+    Also, for non-fossil based electricity, there are two ways to define primary energy:
+    * One is "direct primary energy", which corresponds to electricity generation (in TWh).
+    * The other is "input-equivalent primary energy" (also called "primary energy using the substitution method").
+      This is the amount of fuel that would be required by thermal power stations to generate the reported electricity, as explained in <a href="https://www.energyinst.org/__data/assets/pdf_file/0003/1055541/Methodology.pdf">the Statistical Review methodology document</a>. For example, if a country's nuclear power generated 100 TWh of electricity, and assuming that the efficiency of a standard thermal power plant is 38%, the input equivalent primary energy for this country would be 100 TWh / 0.38 = 263 TWh = 0.95 EJ. This input-equivalent primary energy takes account of the inefficiencies in fossil fuel production and provides a better approximation of each source's share of "final energy" consumption.
+
+    Additional metrics have been calculated by Our World in Data:
+    - Annual change in energy consumption by source: this is calculated as the difference from the previous year.
+    - % of total primary energy: calculated as each source's share of primary energy (direct energy and primary energy using the substitution method) from all sources.
+    - Per capita energy by source: calculated as primary energy consumption by source, divided by population.
+
+    Per capita figures have been calculated using a population dataset that is built and maintained by Our World in Data, based on <a href="https://ourworldindata.org/population-sources">different sources</a>.

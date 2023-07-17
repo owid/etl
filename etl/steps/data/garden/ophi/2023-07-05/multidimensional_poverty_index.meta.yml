@@ -1,0 +1,397 @@
+definitions:
+  core: |-
+    <h4>How is multidimensional poverty defined?</h4>
+    Being ‘MPI poor’ means that a person is deprived in a third or more of ten indicators, grouped into three dimensions:
+    <ul>
+        <li><strong>Health</strong> – using two indicators: nutrition, child mortality
+        <li><strong>Education</strong> – using two indicators: years of schooling, school attendance
+        <li><strong>Living standards</strong> – using five indicators: cooking fuel, sanitation, drinking water, electricity, housing, assets.</li></ul>
+    Households are assessed as being deprived in a given indicator if they do not meet a certain threshold for that indicator. For instance, a household is deprived in the <em>Years of schooling</em> indicator if no household member has completed six years of schooling. A person is considered deprived in the <em>Cooking fuel</em> indicator if they cook using solid fuel, such as dung, agricultural crops, wood, charcoal, or coal. The thresholds for each indicator are published by OPHI in their <a href="https://www.ophi.org.uk/wp-content/uploads/OPHI_MPI_MN55_2023.pdf">methodological notes</a>.
+
+    The individual indicators are not ‘weighted’ equally: When adding up the number of indicators in which a person is deprived, some count for more than others. Health and education indicators are given a weight of 1/6, while the indicators within the living standards dimension are given a weight of 1/18. This means that the three dimensions – health, education and living standards – have an equal weight in the total of one-third each.
+
+    If the household survey data being used is missing any of the 10 indicators, that indicator is dropped from the calculation. The weights are then adjusted so that each dimension continues to be given a weight of one-third. MPI poverty estimates are only calculated if at least one indicator in each dimension is available.
+  mpi_first: |-
+    The Multidimensional Poverty Index is obtained by multiplying two values: the share of people who are multidimensionally (MPI) poor and the intensity of multidimensional poverty among the MPI poor. A larger figure represents a higher level of poverty.
+  mpi_last: |-
+    The Multidimensional Poverty Index, being the product of the incidence and intensity of multidimensional poverty, reflects both.
+  intensity: |-
+    The intensity of multidimensional poverty is calculated as the average share of indicators in which those counted as MPI poor are deprived (using the same weights to calculate the average). This is an important complementary measure to the share of the population who are MPI poor (the 'incidence' of MPI poverty). An example given by the researchers who calculate the MPI data serves to illustrate this well:
+
+    'Imagine two countries: in both, 30 percent of people are poor (incidence). Judged by this piece of information, these two countries are equally poor. However, imagine that in one of the two countries poor people are deprived—on average—in one-third of the dimensions, whereas in the other country, the poor are deprived—on average—in two-thirds. By combining the two pieces of information - the intensity of deprivations and the proportion of poor people - we know that these two countries are not equally poor, but rather that the second is poorer than the first because the intensity of poverty is higher.'
+  cme: |-
+    <i>This variable is a current margin estimate (CME), based on the most recent survey data. Look for the harmonized over time (HOT) estimate to see trends over time.</i>
+  hot: |-
+    <i>This variable is a harmonized over time (HOT) estimate. This harmonization seeks to make two or more MPI estimations comparable by aligning the indicator definitions in each survey. Look for the current margin estimate (CME) to see the most recent survey data.</i>
+
+tables:
+  multidimensional_poverty_index:
+    variables:
+      cme_mpi_national:
+        title: MPI (national) - Current margin estimate
+        unit: ""
+        short_unit: ""
+        description: |
+          {definitions.cme}
+
+          Multidimensional Poverty Index.
+
+          {definitions.mpi_first}
+
+          {definitions.core}
+
+          {definitions.intensity}
+
+          {definitions.mpi_last}
+        display:
+           name: MPI
+      cme_mpi_urban:
+        title: MPI (urban) - Current margin estimate
+        unit: ""
+        short_unit: ""
+        description: |
+          {definitions.cme}
+
+          Multidimensional Poverty Index among the urban population.
+
+          {definitions.mpi_first}
+
+          {definitions.core}
+
+          {definitions.intensity}
+
+          {definitions.mpi_last}
+        display:
+           name: MPI (urban)
+      cme_mpi_rural:
+        title: MPI (rural) - Current margin estimate
+        unit: ""
+        short_unit: ""
+        description: |
+          {definitions.cme}
+
+          Multidimensional Poverty Index among the rural population.
+
+          {definitions.mpi_first}
+
+          {definitions.core}
+
+          {definitions.intensity}
+
+          {definitions.mpi_last}
+        display:
+           name: MPI (rural)
+      cme_mpi_camp:
+        title: MPI (camp) - Current margin estimate
+        unit: ""
+        short_unit: ""
+        description: |
+          {definitions.cme}
+
+          Multidimensional Poverty Index among populations within refugee camps (available only for Palestine).
+
+          {definitions.mpi_first}
+
+          {definitions.core}
+
+          {definitions.intensity}
+
+          {definitions.mpi_last}
+        display:
+           name: MPI (camp)
+      cme_share_national:
+        title: Share of population multidimensionally poor (national) - Current margin estimate
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.cme}
+
+          % of the population who are multidimensionally poor according to the Multidimensional Poverty Index.
+
+          {definitions.core}
+        display:
+           name: Share of population multidimensionally poor
+           numDecimalPlaces: 1
+      cme_share_urban:
+        title: Share of population multidimensionally poor (urban) - Current margin estimate
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.cme}
+
+          % of the urban population defined as poor according to the Multidimensional Poverty Index (MPI).
+
+          {definitions.core}
+        display:
+           name: Share of population multidimensionally poor (urban)
+           numDecimalPlaces: 1
+      cme_share_rural:
+        title: Share of population multidimensionally poor (rural) - Current margin estimate
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.cme}
+
+          % of the rural population who are multidimensionally poor according to the Multidimensional Poverty Index (MPI).
+
+          {definitions.core}
+        display:
+           name: Share of population multidimensionally poor (rural)
+           numDecimalPlaces: 1
+      cme_share_camp:
+        title: Share of population multidimensionally poor (camp) - Current margin estimate
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.cme}
+
+          % of the refugee camp population who are multidimensionally poor according to the Multidimensional Poverty Index (MPI) (available only for Palestine).
+
+          {definitions.core}
+        display:
+           name: Share of population multidimensionally poor (camp)
+           numDecimalPlaces: 1
+      cme_intensity_national:
+        title: Intensity of multidimensional poverty (national) - Current margin estimate
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.cme}
+
+          Intensity of multidimensional poverty according to the Multidimensional Poverty Index (MPI).
+
+          {definitions.core}
+
+          {definitions.intensity}
+        display:
+           name: Intensity of multidimensional poverty
+           numDecimalPlaces: 1
+      cme_intensity_urban:
+        title: Intensity of multidimensional poverty (urban) - Current margin estimate
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.cme}
+
+          Intensity of multidimensional poverty among the urban population, according to the Multidimensional Poverty Index (MPI).
+
+          {definitions.core}
+
+          {definitions.intensity}
+        display:
+           name: Intensity of multidimensional poverty (urban)
+           numDecimalPlaces: 1
+      cme_intensity_rural:
+        title: Intensity of multidimensional poverty (rural) - Current margin estimate
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.cme}
+
+          Intensity of multidimensional poverty among the rural population, according to the Multidimensional Poverty Index (MPI).
+
+          {definitions.core}
+
+          {definitions.intensity}
+        display:
+           name: Intensity of multidimensional poverty (rural)
+           numDecimalPlaces: 1
+      cme_intensity_camp:
+        title: Intensity of multidimensional poverty (camp) - Current margin estimate
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.cme}
+
+          Intensity of multidimensional poverty among populations within refugee camps, according to the Multidimensional Poverty Index (MPI) (available only for Palestine).
+
+          {definitions.core}
+
+          {definitions.intensity}
+        display:
+           name: Intensity of multidimensional poverty (camp)
+           numDecimalPlaces: 1
+      hot_mpi_national:
+        title: MPI (national) - Harmonized over time
+        unit: ""
+        short_unit: ""
+        description: |
+          {definitions.hot}
+
+          Multidimensional Poverty Index.
+
+          {definitions.mpi_first}
+
+          {definitions.core}
+
+          {definitions.intensity}
+
+          {definitions.mpi_last}
+        display:
+           name: MPI
+      hot_mpi_urban:
+        title: MPI (urban) - Harmonized over time
+        unit: ""
+        short_unit: ""
+        description: |
+          {definitions.hot}
+
+          Multidimensional Poverty Index among the urban population.
+
+          {definitions.mpi_first}
+
+          {definitions.core}
+
+          {definitions.intensity}
+
+          {definitions.mpi_last}
+        display:
+           name: MPI (urban)
+      hot_mpi_rural:
+        title: MPI (rural) - Harmonized over time
+        unit: ""
+        short_unit: ""
+        description: |
+          {definitions.hot}
+
+          Multidimensional Poverty Index among the rural population.
+
+          {definitions.mpi_first}
+
+          {definitions.core}
+
+          {definitions.intensity}
+
+          {definitions.mpi_last}
+        display:
+           name: MPI (rural)
+      hot_mpi_camp:
+        title: MPI (camp) - Harmonized over time
+        unit: ""
+        short_unit: ""
+        description: |
+          {definitions.hot}
+
+          Multidimensional Poverty Index among populations within refugee camps (available only for Palestine).
+
+          {definitions.mpi_first}
+
+          {definitions.core}
+
+          {definitions.intensity}
+
+          {definitions.mpi_last}
+        display:
+           name: MPI (camp)
+      hot_share_national:
+        title: Share of population multidimensionally poor (national) - Harmonized over time
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.hot}
+
+          % of the population who are multidimensionally poor according to the Multidimensional Poverty Index (MPI).
+
+          {definitions.core}
+        display:
+           name: Share of population multidimensionally poor
+           numDecimalPlaces: 1
+      hot_share_urban:
+        title: Share of population multidimensionally poor (urban) - Harmonized over time
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.hot}
+
+          % of the urban population defined as poor according to the Multidimensional Poverty Index (MPI).
+
+          {definitions.core}
+        display:
+           name: Share of population multidimensionally poor (urban)
+           numDecimalPlaces: 1
+      hot_share_rural:
+        title: Share of population multidimensionally poor (rural) - Harmonized over time
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.hot}
+
+          % of the rural population who are multidimensionally poor according to the Multidimensional Poverty Index (MPI).
+
+          {definitions.core}
+        display:
+           name: Share of population multidimensionally poor (rural)
+           numDecimalPlaces: 1
+      hot_share_camp:
+        title: Share of population multidimensionally poor (camp) - Harmonized over time
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.hot}
+
+          % of the refugee camp population who are multidimensionally poor according to the Multidimensional Poverty Index (MPI) (available only for Palestine).
+
+          {definitions.core}
+        display:
+           name: Share of population multidimensionally poor (camp)
+           numDecimalPlaces: 1
+      hot_intensity_national:
+        title: Intensity of multidimensional poverty (national) - Harmonized over time
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.hot}
+
+          Intensity of multidimensional poverty according to the Multidimensional Poverty Index (MPI).
+
+          {definitions.core}
+
+          {definitions.intensity}
+        display:
+           name: Intensity of multidimensional poverty
+           numDecimalPlaces: 1
+      hot_intensity_urban:
+        title: Intensity of multidimensional poverty (urban) - Harmonized over time
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.hot}
+
+          Intensity of multidimensional poverty among the urban population, according to the Multidimensional Poverty Index (MPI).
+
+          {definitions.core}
+
+          {definitions.intensity}
+        display:
+           name: Intensity of multidimensional poverty (urban)
+           numDecimalPlaces: 1
+      hot_intensity_rural:
+        title: Intensity of multidimensional poverty (rural) - Harmonized over time
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.hot}
+
+          Intensity of multidimensional poverty among the rural population, according to the Multidimensional Poverty Index (MPI).
+
+          {definitions.core}
+
+          {definitions.intensity}
+        display:
+           name: Intensity of multidimensional poverty (rural)
+           numDecimalPlaces: 1
+      hot_intensity_camp:
+        title: Intensity of multidimensional poverty (camp) - Harmonized over time
+        unit: "%"
+        short_unit: "%"
+        description: |
+          {definitions.hot}
+
+          Intensity of multidimensional poverty among populations within refugee camps, according to the Multidimensional Poverty Index (MPI) (available only for Palestine).
+
+          {definitions.core}
+
+          {definitions.intensity}
+        display:
+           name: Intensity of multidimensional poverty (camp)
+           numDecimalPlaces: 1

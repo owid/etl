@@ -1,7 +1,22 @@
 dataset:
   title: Robot intelligence survey (YouGov, 2023)
-  description: &description-yougov_robots |
+  description: &description-yougov_robots >
      Biannual tracker of Americans' concerns regarding robotic intelligence. Next update is in July. The provided results are weighted to ensure they are representative of the United States population across various demographic factors. The weighting is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This weighting process helps to account for the diversity within the population and ensures that the results reflect a broader representation of the United States as a whole. Each wave comprises responses from 1004 - 1085 US Adults.
+
+
+     Respondents were asked, "Which ONE, if any, of the following statements do you MOST agree with
+
+
+         - Most robots have already developed higher levels of intelligence than humans
+
+         - None of these
+
+         - Robots will be able to develop higher levels of intelligence than humans in the future
+
+         - Robots will never be able to develop higher levels of intelligence than humans
+
+         - Don't know
+
   licenses:
   - name: Public Data
   sources:
@@ -26,7 +41,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       education_2_year:
@@ -34,7 +49,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       answers_age_30_44:
@@ -42,7 +57,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       education_4_year:
@@ -50,7 +65,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       answers_age_45_64:
@@ -58,7 +73,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       answers_age_65plus:
@@ -66,7 +81,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       all_adults:
@@ -74,7 +89,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       asian:
@@ -82,7 +97,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       black:
@@ -90,7 +105,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       democrat:
@@ -98,7 +113,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       female:
@@ -106,7 +121,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       high_school_graduate:
@@ -114,7 +129,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       hispanic:
@@ -122,7 +137,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       independent:
@@ -130,7 +145,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       male:
@@ -138,7 +153,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       middle_eastern:
@@ -146,7 +161,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       native_american:
@@ -154,7 +169,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       no_hs:
@@ -162,7 +177,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       other:
@@ -170,7 +185,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       post_grad:
@@ -178,7 +193,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       republican:
@@ -186,7 +201,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       some_college:
@@ -194,7 +209,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       two_or_more_races:
@@ -202,7 +217,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
       white:
@@ -210,6 +225,6 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true

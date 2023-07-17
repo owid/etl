@@ -186,6 +186,7 @@ def _generate_step_files(namespace: str, version: str, short_name: str, backport
 
 def _generate_metadata_yaml(namespace: str, version: str, short_name: str, backport_short_name: str) -> None:
     # NOTE: loading values is wasteful, we only need metadata
+    shutil.rmtree("/tmp/migrate")
     ds = create_dataset("/tmp/migrate", backport_short_name, new_short_name=short_name)
 
     ds.metadata.namespace = namespace

@@ -1,8 +1,12 @@
+import datetime as dt
 import re
-from typing import List, Literal, Optional, overload
+from pathlib import Path
+from typing import List, Literal, Optional, Union, overload
 
+import dynamic_yaml
 import numpy as np
 import pandas as pd
+import pytz
 from unidecode import unidecode
 
 from .tables import Table
@@ -225,3 +229,15 @@ def concat_variables(variables: List[Variable]) -> Table:
         if v.name:
             t._fields[v.name] = v.metadata
     return t
+
+
+def dynamic_yaml_load(path: Union[Path, str], params: dict = {}) -> dict:
+    with open(path) as istream:
+        yd = dynamic_yaml.load(istream)
+
+    yd.update(params)
+
+    # additional parameters
+    yd["TODAY"] = dt.datetime.now().astimezone(pytz.timezone("Europe/London")).strftime("%-d %B %Y")
+
+    return yd

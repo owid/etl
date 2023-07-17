@@ -1,0 +1,21 @@
+meta:
+  name: 'Energy Transitions: Global and National Perspectives - Vaclav Smil (2017)'
+  publication_year: 2017
+  source_name: Vaclav Smil (2017)
+  source_published_by: 'Energy Transitions: Global and National Perspectives, 2nd
+    edition, Appendix A, Vaclav Smil (2017)'
+  url: 
+    https://vaclavsmil.com/2016/12/14/energy-transitions-global-and-national-perspectives-second-expanded-and-updated-edition/
+  source_data_url:
+  license_url: 
+    https://vaclavsmil.com/2016/12/14/energy-transitions-global-and-national-perspectives-second-expanded-and-updated-edition/
+  license_name: CC BY
+  date_accessed: 2023-07-10
+  is_public: true
+  description: |
+
+wdir: ../../../data/snapshots/papers/2023-07-10
+outs:
+- md5: b0b7aff72e3ec643fd7fbd02f26317f5
+  size: 2355
+  path: smil_2017.csv

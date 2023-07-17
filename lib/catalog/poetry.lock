@@ -302,6 +302,21 @@ files = [
 ]
 
 [[package]]
+name = "dynamic-yaml"
+version = "1.3.4"
+description = "Enables self referential yaml entries"
+category = "main"
+optional = false
+python-versions = ">=3.0"
+files = [
+    {file = "dynamic-yaml-1.3.4.tar.gz", hash = "sha256:440747b7f303794f432a6eba6f78548ddc94bc183172a32c7f12504870e33a01"},
+    {file = "dynamic_yaml-1.3.4-py3-none-any.whl", hash = "sha256:6fc6dae9a4066e9c17cf588bad0e6a36d03a6a899874dc6ab05a05721a086c15"},
+]
+
+[package.dependencies]
+pyyaml = ">=5.4"
+
+[[package]]
 name = "executing"
 version = "1.2.0"
 description = "Get the currently executing AST node of a frame, and other information"
@@ -1297,5 +1312,5 @@ files = [
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.8.1"
-content-hash = "32ae2806537653a4230233a14369ccd44cc229cca7146b93b27186575825ec16"
+python-versions = "^3.8.1"
+content-hash = "c4165b69508878a4ce2fd9b4afd4fac31cfa45fa928708c94ddae8047b50ee96"

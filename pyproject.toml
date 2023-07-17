@@ -11,8 +11,9 @@ publish = 'etl.publish:publish_cli'
 prune = 'etl.prune:prune_cli'
 harmonize = 'etl.harmonize:harmonize'
 backport = 'backport.backport:backport_cli'
-backport-migrate = 'backport.migrate.migrate:cli'
 bulk_backport = 'backport.bulk_backport:bulk_backport'
+backport-migrate = 'backport.migrate.migrate:cli'
+backport-fasttrack = 'backport.fasttrack_backport:cli'
 backport-datasync = 'backport.datasync.datasync:cli'
 walkthrough = 'walkthrough.cli:cli'
 fasttrack = 'fasttrack.cli:cli'
@@ -96,6 +97,7 @@ boto3-stubs = { extras = ["s3"], version = ">=1.21.16" }
 # unpinning pandas-stubs would introduce tons of type errors
 pandas-stubs = "1.2.0.62"
 notebook = {version = "^7.0.0a1", allow-prereleases = true}
+gspread = "^5.10.0"
 
 [tool.black]
 exclude = ".ipynb_checkpoints|walkthrough/.*_cookiecutter|.*playground.*.ipynb"

@@ -266,6 +266,7 @@ def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Data
             ds_regions=ds_regions,
             ds_income_groups=ds_income_groups,
             additional_members=REGIONS[region].get("additional_members"),
+            include_historical_regions_in_income_groups=True,
         )
         tb_regions = geo.add_region_aggregates(
             df=tb_regions,
@@ -404,7 +405,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Add column for thermal equivalent efficiency factors.
-    tb = tb.merge(tb_efficiency, how="left", on="year").copy_metadata(from_table=tb)
+    tb = tb.merge(tb_efficiency, how="left", on="year")
 
     # Create additional variables, like primary energy consumption in TWh (both direct and in input-equivalents).
     tb = create_additional_variables(tb=tb)
@@ -435,5 +436,10 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_prices, tb_prices_index], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir,
+        tables=[tb, tb_prices, tb_prices_index],
+        default_metadata=ds_meadow.metadata,
+        check_variables_metadata=True,
+    )
     ds_garden.save()

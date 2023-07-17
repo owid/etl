@@ -25,6 +25,7 @@ class PartialSnapshotMeta(BaseModel):
 # creates a new sheet from scratch and use those names
 SHEET_TO_GID = {
     "data": 409110122,
+    "raw_data": 901452831,
     "variables_meta": 777328216,
     "dataset_meta": 1719161864,
     "sources_meta": 1399503534,
@@ -163,7 +164,7 @@ def _move_keys_to_the_end(d: Dict[str, Any], keys: List[str]) -> None:
 
 
 def _prune_empty(d: Dict[str, Any]) -> Dict[str, Any]:
-    return {k: v for k, v in d.items() if v and not pd.isnull(v)}
+    return {k: v for k, v in d.items() if v is not None and v != "" and not pd.isnull(v)}
 
 
 def _get_data_url(dataset_meta: pd.DataFrame, url: str) -> str:

@@ -226,7 +226,6 @@ def test_dataset_hash_changes_with_data_changes():
 def test_dataset_hash_invariant_to_copying():
     # make a mock dataset
     with mock_dataset() as d1:
-
         # make a copy of it
         with temp_dataset_dir() as dirname:
             d2 = Dataset.create_empty(dirname)
@@ -328,6 +327,7 @@ def temp_dataset_dir(create: bool = False) -> Iterator[str]:
 def create_temp_dataset(dirname: Union[Path, str], n_tables: Optional[int] = None) -> Dataset:
     d = Dataset.create_empty(dirname)
     d.metadata = mock(DatasetMeta)
+    d.metadata.version = random.choice(["latest", "2023-01-01"])
     d.metadata.short_name = Path(dirname).name
     d.metadata.is_public = True
     d.save()
