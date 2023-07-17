@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = cast(Dataset, paths.load_dependency("mars"))
 
     # Read table from meadow dataset.
-    tb = ds_meadow["mars"]
+    tb = ds_meadow["mars"].reset_index()
 
     #
     # Process data.
@@ -117,7 +117,7 @@ def clean_table(tb: Table) -> Table:
     ## Check at least one and only one FLAG within each group is always activated
     assert (
         tb[COLUMNS_REGIONS].sum(axis=1) == 1
-    ).all(), "Entry found with no region (ore more than one region) assigned!"
+    ).all(), "Entry found with no region (one more than one region) assigned!"
 
     ## Keep only relevant columns
     tb = tb[COLUMNS_RELEVANT]
@@ -192,7 +192,7 @@ def expand_observations(tb: Table) -> Table:
     """
     # Add an entry of the triplet ("warcode", "campcode", "ccode") per year
     # For that we scale the number of deaths proportional to the duration of the conflict.
-    tb[["kialow", "kiahigh"]] = tb[["kialow", "kiahigh"]].div(tb["yrend"] - tb["yrstart"] + 1, "index")
+    tb[["kialow", "kiahigh"]] = tb[["kialow", "kiahigh"]].div(tb["yrend"] - tb["yrstart"] + 1, "index").round()
 
     ## Add missing years for each triplet ("warcode", "campcode", "ccode")
     YEAR_MIN = tb["yrstart"].min()
@@ -217,7 +217,7 @@ def aggregate_wars(tb: Table) -> Table:
             "conflict_type": lambda x: "others (non-civil)" if "others (non-civil)" in set(x) else "civil war",
             "kialow": "sum",
             "kiahigh": "sum",
-            "yrstart": lambda x: min(x),  # df.groupby("warcode")["yrstart"].transform(min)
+            "yrstart": lambda x: min(x),
         }
     )
     tb["yrstart"] = tb.groupby("warcode")["yrstart"].transform(min)

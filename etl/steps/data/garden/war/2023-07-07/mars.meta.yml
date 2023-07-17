@@ -19,7 +19,7 @@ tables:
         unit: deaths
         description: >-
           The number of soldiers killed in a year over the course of wars. Excluded from this total are missing soldiers as well as those who
-          died from illness and/or disease. This is the low estimate of those who were killed.
+          died from illness and/or disease. This is the high estimate of those who were killed.
         display:
           numDecimalPlaces: 0
       number_deaths_ongoing_conflicts_low:
@@ -27,7 +27,7 @@ tables:
         unit: deaths
         description: >-
           The number of soldiers killed in a year over the course of wars. Excluded from this total are missing soldiers as well as those who
-          died from illness and/or disease. This is the high estimate of those who were killed.
+          died from illness and/or disease. This is the low estimate of those who were killed.
         display:
           numDecimalPlaces: 0
 
