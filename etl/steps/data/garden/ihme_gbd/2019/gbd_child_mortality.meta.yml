@@ -28,6 +28,8 @@ tables:
       deaths__percent:
         title: Percent of total deaths
         unit: "%"
+        short_unit: "%"
       deaths__share_of_the_population:
         title: Deaths per 100 people
         unit: "%"
+        short_unit: "%"
