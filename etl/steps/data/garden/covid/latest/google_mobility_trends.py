@@ -1,7 +1,4 @@
-import datetime as dt
-
 import pandas as pd
-import pytz
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -40,14 +37,5 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset with the same metadata as the snapshot.
     ds_garden = create_dataset(dest_dir, tables=[tb])
 
-    # Add Last updated to source.
-    ds_garden.sources[0].name = f"Google COVID-19 Community Mobility Trends - Last updated {time_str_grapher()}"
-
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-
-def time_str_grapher():
-    return (
-        (dt.datetime.now() - dt.timedelta(minutes=10)).astimezone(pytz.timezone("Europe/London")).strftime("%-d %B %Y")
-    )
