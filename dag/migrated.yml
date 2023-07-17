@@ -12,3 +12,7 @@ steps:
   - data-private://garden/covid/latest/decoupling_metrics
   data-private://garden/covid/latest/decoupling_metrics:
   - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Decoupling%20of%20metrics.csv
+  data://grapher/covid/latest/hospital_and_icu:
+  - data://garden/covid/latest/hospital_and_icu
+  data://garden/covid/latest/hospital_and_icu:
+  - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-2019%20-%20Hospital%20%26%20ICU.csv
