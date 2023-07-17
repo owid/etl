@@ -46,25 +46,24 @@ def run(dest_dir: str) -> None:
     ]
 
     # Load and process data from each snapshot
-    df_list = []
-    for snap in snaps:
-        snapshot = cast(Snapshot, paths.load_dependency(snap))
-        df = load_and_select_data(snapshot)
-        df_list.append(df)
+    df_list = [load_and_select_data(cast(Snapshot, paths.load_dependency(snap))) for snap in snaps]
 
     # Concatenate all processed dataframes
-    df = pd.concat(df_list)
+    df = pd.concat(df_list, ignore_index=True)
 
     # Perform further processing on the concatenated dataframe
     df.replace("..", np.nan, inplace=True)
+    cols_to_drop = ["Country Code", "Series Code"]
     # Drop unnecessary columns that have the same infomariton as Series and Country but in a different format
-    df.drop(["Country Code", "Series Code"], axis="columns", inplace=True)
+    df.drop(cols_to_drop, axis=1, inplace=True)
 
     # Clean up year columns (original columns are in the format xxxx [YRxxxx])
-    df.columns = df.columns.map(lambda x: x.split(" ")[0] if x not in ["Country Name", "Series"] else x)
-
+    df.columns = df.columns.map(
+        lambda x: x.split(" ")[0] if x not in ["Country Name", "Series", "Country Code", "Series Code"] else x
+    )
     # Melt years into a single column
     df_melted = pd.melt(df, id_vars=["Country Name", "Series"], var_name="Year", value_name="Value")
+
     df_melted["Value"] = df_melted["Value"].astype(float)
     df_melted.rename(columns={"Country Name": "country", "Series": "indicator_name"}, inplace=True)
 

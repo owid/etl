@@ -898,84 +898,84 @@ tables:
         unit: 'ratio'
         description: 'The ratio of the number of pupils to qualified teachers in pre-primary education based on headcount.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       pupil_qualified_teacher_ratio_in_primary_education__headcount_basis:
         title: Pupil-qualified teacher ratio in primary education (headcount basis)
         unit: 'ratio'
         description: 'The ratio of the number of pupils to qualified teachers in primary education based on headcount.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       pupil_qualified_teacher_ratio_in_secondary__headcount_basis:
         title: Pupil-qualified teacher ratio in secondary (headcount basis)
         unit: 'ratio'
         description: 'The ratio of the number of pupils to qualified teachers in secondary education based on headcount.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       pupil_trained_teacher_ratio_in_pre_primary_education__headcount_basis:
         title: Pupil-trained teacher ratio in pre-primary education (headcount basis)
         unit: 'ratio'
         description: 'The ratio of the number of pupils to trained teachers in pre-primary education based on headcount.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       pupil_trained_teacher_ratio_in_primary_education__headcount_basis:
         title: Pupil-trained teacher ratio in primary education (headcount basis)
         unit: 'ratio'
         description: 'The ratio of the number of pupils to trained teachers in primary education based on headcount.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       pupil_trained_teacher_ratio_in_secondary_education__headcount_basis:
         title: Pupil-trained teacher ratio in secondary education (headcount basis)
         unit: 'ratio'
         description: 'The ratio of the number of pupils to trained teachers in secondary education based on headcount.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
      school_life_expectancy__pre_primary__both_sexes__years:
         title: School life expectancy, pre-primary, both sexes (years)
         unit: 'years'
         description: 'The expected number of years a child is expected to spend in pre-primary education.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       school_life_expectancy__pre_primary__female__years:
         title: School life expectancy, pre-primary, female (years)
         unit: 'years'
         description: 'The expected number of years a female child is expected to spend in pre-primary education.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       school_life_expectancy__pre_primary__gender_parity_index__gpi:
         title: School life expectancy, pre-primary, gender parity index (GPI)
         unit: ''
         description: 'The gender parity index (GPI) for school life expectancy in pre-primary education. It measures the ratio of the expected number of years a female child is expected to spend in pre-primary education to the expected number of years a male child is expected to spend in pre-primary education.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       school_life_expectancy__pre_primary__male__years:
         title: School life expectancy, pre-primary, male (years)
         unit: 'years'
         description: 'The expected number of years a male child is expected to spend in pre-primary education.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       school_life_expectancy__primary__both_sexes__years:
         title: School life expectancy, primary, both sexes (years)
         unit: 'years'
         description: 'The expected number of years a child is expected to spend in primary education.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       school_life_expectancy__primary__female__years:
         title: School life expectancy, primary, female (years)
         unit: 'years'
         description: 'The expected number of years a female child is expected to spend in primary education.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       school_life_expectancy__primary__gender_parity_index__gpi:
         title: School life expectancy, primary, gender parity index (GPI)
@@ -989,119 +989,119 @@ tables:
         unit: 'years'
         description: 'The expected number of years a male child is expected to spend in primary education.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       school_life_expectancy__secondary__both_sexes__years:
         title: School life expectancy, secondary, both sexes (years)
         unit: 'years'
         description: 'The expected number of years a child is expected to spend in secondary education.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       school_life_expectancy__secondary__female__years:
         title: School life expectancy, secondary, female (years)
         unit: 'years'
         description: 'The expected number of years a female child is expected to spend in secondary education.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       school_life_expectancy__secondary__gender_parity_index__gpi:
         title: School life expectancy, secondary, gender parity index (GPI)
         unit: ''
         description: 'The gender parity index (GPI) for school life expectancy in secondary education. It measures the ratio of the expected number of years a female child is expected to spend in secondary education to the expected number of years a male child is expected to spend in secondary education.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       school_life_expectancy__secondary__male__years:
         title: School life expectancy, secondary, male (years)
         unit: 'years'
         description: 'The expected number of years a male child is expected to spend in secondary education.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       timss__mean_performance_on_the_mathematics_scale_for_eighth_grade_students__female:
         title: 'TIMSS: Mean performance on the mathematics scale for eighth grade students, female'
         unit: ''
         description: 'The average performance on the mathematics scale for eighth-grade female students in the TIMSS assessment.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       timss__mean_performance_on_the_mathematics_scale_for_eighth_grade_students__male:
         title: 'TIMSS: Mean performance on the mathematics scale for eighth grade students, male'
         unit: ''
         description: 'The average performance on the mathematics scale for eighth-grade male students in the TIMSS assessment.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       timss__mean_performance_on_the_mathematics_scale_for_eighth_grade_students__total:
         title: 'TIMSS: Mean performance on the mathematics scale for eighth grade students, total'
         unit: ''
         description: 'The average performance on the mathematics scale for eighth-grade students (both sexes combined) in the TIMSS assessment.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       timss__mean_performance_on_the_mathematics_scale_for_fourth_grade_students__female:
         title: 'TIMSS: Mean performance on the mathematics scale for fourth grade students, female'
         unit: ''
         description: 'The average performance on the mathematics scale for fourth-grade female students in the TIMSS assessment.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       timss__mean_performance_on_the_mathematics_scale_for_fourth_grade_students__male:
         title: 'TIMSS: Mean performance on the mathematics scale for fourth grade students, male'
         unit: ''
         description: 'The average performance on the mathematics scale for fourth-grade male students in the TIMSS assessment.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       timss__mean_performance_on_the_mathematics_scale_for_fourth_grade_students__total:
         title: 'TIMSS: Mean performance on the mathematics scale for fourth grade students, total'
         unit: ''
         description: 'The average performance on the mathematics scale for fourth-grade students (both sexes combined) in the TIMSS assessment.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       timss__mean_performance_on_the_science_scale_for_eighth_grade_students__female:
         title: 'TIMSS: Mean performance on the science scale for eighth grade students, female'
         unit: ''
         description: 'The average performance on the science scale for eighth-grade female students in the TIMSS assessment.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       timss__mean_performance_on_the_science_scale_for_eighth_grade_students__male:
         title: 'TIMSS: Mean performance on the science scale for eighth grade students, male'
         unit: ''
         description: 'The average performance on the science scale for eighth-grade male students in the TIMSS assessment.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       timss__mean_performance_on_the_science_scale_for_eighth_grade_students__total:
         title: 'TIMSS: Mean performance on the science scale for eighth grade students, total'
         unit: ''
         description: 'The average performance on the science scale for eighth-grade students (both sexes combined) in the TIMSS assessment.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       timss__mean_performance_on_the_science_scale_for_fourth_grade_students__female:
         title: 'TIMSS: Mean performance on the science scale for fourth grade students, female'
         unit: ''
         description: 'The average performance on the science scale for fourth-grade female students in the TIMSS assessment.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       timss__mean_performance_on_the_science_scale_for_fourth_grade_students__male:
         title: 'TIMSS: Mean performance on the science scale for fourth grade students, male'
         unit: ''
         description: 'The average performance on the science scale for fourth-grade male students in the TIMSS assessment.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       timss__mean_performance_on_the_science_scale_for_fourth_grade_students__total:
         title: 'TIMSS: Mean performance on the science scale for fourth grade students, total'
         unit: ''
         description: 'The average performance on the science scale for fourth-grade students (both sexes combined) in the TIMSS assessment.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       total_net_enrolment_rate__lower_secondary__both_sexes__pct:
         title: Total net enrolment rate, lower secondary, both sexes (%)
@@ -1109,7 +1109,7 @@ tables:
         short_unit: '%'
         description: 'The percentage of children of official lower secondary school age who are enrolled in lower secondary education, regardless of age, expressed as a percentage of the population of the corresponding official school age group.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       total_net_enrolment_rate__lower_secondary__female__pct:
         title: Total net enrolment rate, lower secondary, female (%)
@@ -1117,7 +1117,7 @@ tables:
         short_unit: '%'
         description: 'The percentage of female children of official lower secondary school age who are enrolled in lower secondary education, regardless of age, expressed as a percentage of the population of the corresponding official school age group.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       total_net_enrolment_rate__lower_secondary__gender_parity_index__gpi:
         title: Total net enrolment rate, lower secondary, gender parity index (GPI)
@@ -1132,7 +1132,7 @@ tables:
         short_unit: '%'
         description: 'The percentage of male children of official lower secondary school age who are enrolled in lower secondary education, regardless of age, expressed as a percentage of the population of the corresponding official school age group.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       total_net_enrolment_rate__primary__both_sexes__pct:
         title: Total net enrolment rate, primary, both sexes (%)
@@ -1140,7 +1140,7 @@ tables:
         short_unit: '%'
         description: 'The percentage of children of official primary school age who are enrolled in primary education, regardless of age, expressed as a percentage of the population of the corresponding official school age group.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       total_net_enrolment_rate__primary__female__pct:
         title: Total net enrolment rate, primary, female (%)
@@ -1148,7 +1148,7 @@ tables:
         short_unit: '%'
         description: 'The percentage of female children of official primary school age who are enrolled in primary education, regardless of age, expressed as a percentage of the population of the corresponding official school age group.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       total_net_enrolment_rate__primary__gender_parity_index__gpi:
         title: Total net enrolment rate, primary, gender parity index (GPI)
@@ -1163,7 +1163,7 @@ tables:
         short_unit: '%'
         description: 'The percentage of male children of official primary school age who are enrolled in primary education, regardless of age, expressed as a percentage of the population of the corresponding official school age group.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       total_net_enrolment_rate__upper_secondary__both_sexes__pct:
         title: Total net enrolment rate, upper secondary, both sexes (%)
@@ -1171,7 +1171,7 @@ tables:
         short_unit: '%'
         description: 'The percentage of children of official upper secondary school age who are enrolled in upper secondary education, regardless of age, expressed as a percentage of the population of the corresponding official school age group.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       total_net_enrolment_rate__upper_secondary__female__pct:
         title: Total net enrolment rate, upper secondary, female (%)
@@ -1179,7 +1179,7 @@ tables:
         short_unit: '%'
         description: 'The percentage of female children of official upper secondary school age who are enrolled in upper secondary education, regardless of age, expressed as a percentage of the population of the corresponding official school age group.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       total_net_enrolment_rate__upper_secondary__gender_parity_index__gpi:
         title: Total net enrolment rate, upper secondary, gender parity index (GPI)
@@ -1194,14 +1194,14 @@ tables:
         short_unit: '%'
         description: 'The percentage of male children of official upper secondary school age who are enrolled in upper secondary education, regardless of age, expressed as a percentage of the population of the corresponding official school age group.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       volume_of_official_development_assistance_flows_for_scholarships_by_sector_and_type_of_study__constant_usd:
         title: Volume of official development assistance flows for scholarships by sector and type of study, constant US$
         unit: 'constant USD'
         description: 'The volume of official development assistance (ODA) flows in constant US dollars that are specifically allocated for scholarships by sector and type of study.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       youth_literacy_rate__population_15_24_years__adjusted_gender_parity_index__gpia:
         title: Youth literacy rate, population 15-24 years, adjusted gender parity index (GPIA)
@@ -1216,7 +1216,7 @@ tables:
         short_unit: '%'
         description: 'The percentage of the population aged 15-24 years who can read and write with understanding a short, simple statement about their everyday life.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       youth_literacy_rate__population_15_24_years__female__pct:
         title: Youth literacy rate, population 15-24 years, female (%)
@@ -1224,7 +1224,7 @@ tables:
         short_unit: '%'
         description: 'The percentage of females in the population aged 15-24 years who can read and write with understanding a short, simple statement about their everyday life.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 
       youth_literacy_rate__population_15_24_years__male__pct:
         title: Youth literacy rate, population 15-24 years, male (%)
@@ -1232,4 +1232,4 @@ tables:
         short_unit: '%'
         description: 'The percentage of males in the population aged 15-24 years who can read and write with understanding a short, simple statement about their everyday life.'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
