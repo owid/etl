@@ -78,13 +78,5 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
 
-    # For now the variable descriptions are stored as a list of strings, this transforms them into a single string
-    tb_garden = ds_garden["multidimensional_poverty_index"]
-    for col in tb_garden.columns:
-        if isinstance(tb_garden[col].metadata.description, list):
-            tb_garden[col].metadata.description = "\n".join(tb_garden[col].metadata.description)
-
-    ds_garden.add(tb_garden)
-
     # Save changes in the new garden dataset.
     ds_garden.save()
