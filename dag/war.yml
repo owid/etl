@@ -34,7 +34,7 @@ steps:
     - snapshot://war/2023-06-22/ucdp.battle_related_dyadic.zip
     - snapshot://war/2023-06-22/ucdp.geo.zip
     - snapshot://war/2023-06-22/ucdp.prio_armed_conflict.zip
-  data://meadow/war/2023-06-09/war_mars:
+  data://meadow/war/2023-06-09/mars:
     - snapshot://war/2023-06-09/war_mars.xls
   data://meadow/war/2023-06-09/cow_mid:
     - snapshot://war/2023-06-09/cow_mid.zip
@@ -62,3 +62,5 @@ steps:
   # Grapher
   data://grapher/war/2023-06-26/ucdp:
     - data://garden/war/2023-06-22/ucdp
+  data://grapher/war/2023-07-14/mars:
+    - data://garden/war/2023-07-07/mars
