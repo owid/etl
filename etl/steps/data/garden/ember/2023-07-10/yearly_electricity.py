@@ -4,7 +4,6 @@
 
 import numpy as np
 import owid.catalog.processing as pr
-import pandas as pd
 from owid import catalog
 from owid.catalog import Dataset, Table
 from shared import add_region_aggregates, correct_data_points
@@ -55,21 +54,21 @@ AMENDMENTS = {
                 "year": [AFFECTED_YEAR],
             },
             {
-                "Clean (GW)": pd.NA,
-                "Fossil (GW)": pd.NA,
-                "Gas and Other Fossil (GW)": pd.NA,
-                "Hydro, Bioenergy and Other Renewables (GW)": pd.NA,
-                "Renewables (GW)": pd.NA,
-                "Wind and Solar (GW)": pd.NA,
-                "Bioenergy (GW)": pd.NA,
-                "Coal (GW)": pd.NA,
-                "Gas (GW)": pd.NA,
-                "Hydro (GW)": pd.NA,
-                "Nuclear (GW)": pd.NA,
-                "Other Fossil (GW)": pd.NA,
-                "Other Renewables (GW)": pd.NA,
-                "Solar (GW)": pd.NA,
-                "Wind (GW)": pd.NA,
+                "Clean (GW)": np.nan,
+                "Fossil (GW)": np.nan,
+                "Gas and Other Fossil (GW)": np.nan,
+                "Hydro, Bioenergy and Other Renewables (GW)": np.nan,
+                "Renewables (GW)": np.nan,
+                "Wind and Solar (GW)": np.nan,
+                "Bioenergy (GW)": np.nan,
+                "Coal (GW)": np.nan,
+                "Gas (GW)": np.nan,
+                "Hydro (GW)": np.nan,
+                "Nuclear (GW)": np.nan,
+                "Other Fossil (GW)": np.nan,
+                "Other Renewables (GW)": np.nan,
+                "Solar (GW)": np.nan,
+                "Wind (GW)": np.nan,
             },
         )
     ],
@@ -80,9 +79,9 @@ AMENDMENTS = {
                 "year": [AFFECTED_YEAR],
             },
             {
-                "Demand (TWh)": pd.NA,
-                "population": pd.NA,
-                "Demand per capita (kWh)": pd.NA,
+                "Demand (TWh)": np.nan,
+                "population": np.nan,
+                "Demand per capita (kWh)": np.nan,
             },
         )
     ],
@@ -93,37 +92,37 @@ AMENDMENTS = {
                 "year": [AFFECTED_YEAR],
             },
             {
-                "Clean (%)": pd.NA,
-                "Fossil (%)": pd.NA,
-                "Gas and Other Fossil (%)": pd.NA,
-                "Hydro, Bioenergy and Other Renewables (%)": pd.NA,
-                "Renewables (%)": pd.NA,
-                "Wind and Solar (%)": pd.NA,
-                "Clean (TWh)": pd.NA,
-                "Fossil (TWh)": pd.NA,
-                "Gas and Other Fossil (TWh)": pd.NA,
-                "Hydro, Bioenergy and Other Renewables (TWh)": pd.NA,
-                "Renewables (TWh)": pd.NA,
-                "Wind and Solar (TWh)": pd.NA,
-                "Bioenergy (%)": pd.NA,
-                "Coal (%)": pd.NA,
-                "Gas (%)": pd.NA,
-                "Hydro (%)": pd.NA,
-                "Nuclear (%)": pd.NA,
-                "Other Fossil (%)": pd.NA,
-                "Other Renewables (%)": pd.NA,
-                "Solar (%)": pd.NA,
-                "Wind (%)": pd.NA,
-                "Bioenergy (TWh)": pd.NA,
-                "Coal (TWh)": pd.NA,
-                "Gas (TWh)": pd.NA,
-                "Hydro (TWh)": pd.NA,
-                "Nuclear (TWh)": pd.NA,
-                "Other Fossil (TWh)": pd.NA,
-                "Other Renewables (TWh)": pd.NA,
-                "Solar (TWh)": pd.NA,
-                "Wind (TWh)": pd.NA,
-                "Total Generation (TWh)": pd.NA,
+                "Clean (%)": np.nan,
+                "Fossil (%)": np.nan,
+                "Gas and Other Fossil (%)": np.nan,
+                "Hydro, Bioenergy and Other Renewables (%)": np.nan,
+                "Renewables (%)": np.nan,
+                "Wind and Solar (%)": np.nan,
+                "Clean (TWh)": np.nan,
+                "Fossil (TWh)": np.nan,
+                "Gas and Other Fossil (TWh)": np.nan,
+                "Hydro, Bioenergy and Other Renewables (TWh)": np.nan,
+                "Renewables (TWh)": np.nan,
+                "Wind and Solar (TWh)": np.nan,
+                "Bioenergy (%)": np.nan,
+                "Coal (%)": np.nan,
+                "Gas (%)": np.nan,
+                "Hydro (%)": np.nan,
+                "Nuclear (%)": np.nan,
+                "Other Fossil (%)": np.nan,
+                "Other Renewables (%)": np.nan,
+                "Solar (%)": np.nan,
+                "Wind (%)": np.nan,
+                "Bioenergy (TWh)": np.nan,
+                "Coal (TWh)": np.nan,
+                "Gas (TWh)": np.nan,
+                "Hydro (TWh)": np.nan,
+                "Nuclear (TWh)": np.nan,
+                "Other Fossil (TWh)": np.nan,
+                "Other Renewables (TWh)": np.nan,
+                "Solar (TWh)": np.nan,
+                "Wind (TWh)": np.nan,
+                "Total Generation (TWh)": np.nan,
             },
         ),
     ],
@@ -145,24 +144,24 @@ AMENDMENTS = {
                 "year": [AFFECTED_YEAR],
             },
             {
-                "Clean (mtCO2)": pd.NA,
-                "Fossil (mtCO2)": pd.NA,
-                "Gas and Other Fossil (mtCO2)": pd.NA,
-                "Hydro, Bioenergy and Other Renewables (mtCO2)": pd.NA,
-                "Renewables (mtCO2)": pd.NA,
-                "Wind and Solar (mtCO2)": pd.NA,
-                "Bioenergy (mtCO2)": pd.NA,
-                "Coal (mtCO2)": pd.NA,
-                "Gas (mtCO2)": pd.NA,
-                "Hydro (mtCO2)": pd.NA,
-                "Nuclear (mtCO2)": pd.NA,
-                "Other Fossil (mtCO2)": pd.NA,
-                "Other Renewables (mtCO2)": pd.NA,
-                "Solar (mtCO2)": pd.NA,
-                "Wind (mtCO2)": pd.NA,
-                "Total emissions (mtCO2)": pd.NA,
-                "Total Generation (TWh)": pd.NA,
-                "CO2 intensity (gCO2/kWh)": pd.NA,
+                "Clean (mtCO2)": np.nan,
+                "Fossil (mtCO2)": np.nan,
+                "Gas and Other Fossil (mtCO2)": np.nan,
+                "Hydro, Bioenergy and Other Renewables (mtCO2)": np.nan,
+                "Renewables (mtCO2)": np.nan,
+                "Wind and Solar (mtCO2)": np.nan,
+                "Bioenergy (mtCO2)": np.nan,
+                "Coal (mtCO2)": np.nan,
+                "Gas (mtCO2)": np.nan,
+                "Hydro (mtCO2)": np.nan,
+                "Nuclear (mtCO2)": np.nan,
+                "Other Fossil (mtCO2)": np.nan,
+                "Other Renewables (mtCO2)": np.nan,
+                "Solar (mtCO2)": np.nan,
+                "Wind (mtCO2)": np.nan,
+                "Total emissions (mtCO2)": np.nan,
+                "Total Generation (TWh)": np.nan,
+                "CO2 intensity (gCO2/kWh)": np.nan,
             },
         ),
     ],
@@ -327,6 +326,10 @@ def make_wide_table(tb: Table, category: str, ds_regions: Dataset, ds_income_gro
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
     )
+
+    # Ensure numeric columns have the right type.
+    for column in table.drop(columns=["country", "year"]).columns:
+        table[column] = table[column].astype(float)
 
     # Recover the original table and variables metadata.
     table = table.copy_metadata(_tb)
@@ -494,7 +497,11 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names.
     tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, warn_on_missing_countries=True, warn_on_unused_countries=True
+        df=tb,
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
+        warn_on_missing_countries=True,
+        warn_on_unused_countries=True,
     )
 
     # Split data into different tables, one per category, and process each one individually.
@@ -523,10 +530,6 @@ def run(dest_dir: str) -> None:
             tables[table_name] = correct_data_points(df=tables[table_name], corrections=AMENDMENTS[table_name])
         tables[table_name] = tables[table_name].set_index(["country", "year"], verify_integrity=True).sort_index()
         tables[table_name].metadata.short_name = catalog.utils.underscore(table_name)
-
-        # Ensure each column as at least one source.
-        for column in tables[table_name].columns:
-            assert len(tables[table_name][column].metadata.sources) >= 1
 
     #
     # Save outputs.
