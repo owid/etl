@@ -11,30 +11,24 @@ all_sources:
       published_by: Alkire, S., Kanagaratnam, U., and Suppa, N. (2023), 'The global Multidimensional Poverty Index (MPI) 2023. Country Results and Methodological Note', OPHI MPI Methodological Note 55, Oxford Poverty and Human Development Initiative, University of Oxford.
       url: |
         {source_common.url}
-      date_accessed: |
-        {source_common.date_accessed}
-      publication_date: |
-        {source_common.publication_date}
+      date_accessed: "{source_common.date_accessed}"
+      publication_date: "{source_common.publication_date}"
   - hot: &source-hot
       name: |
         {source_common.name}
       published_by: Alkire, S., Kanagaratnam, U., and Suppa, N. (2023), 'A methodological note on the global Multidimensional Poverty Index (MPI) 2023 changes over time results for 84 countries', OPHI MPI Methodological Note 57, Oxford Poverty and Human Development Initiative, University of Oxford.
       url: |
         {source_common.url}
-      date_accessed: |
-        {source_common.date_accessed}
-      publication_date: |
-        {source_common.publication_date}
+      date_accessed: "{source_common.date_accessed}"
+      publication_date: "{source_common.publication_date}"
   - dissagregated: &source-dissagregated
       name: |
         {source_common.name}
       published_by: Alkire, S., Kanagaratnam, U., and Suppa, N. (2023), 'The global Multidimensional Poverty Index (MPI) 2023. Dissagregation Results and Methodological Note', OPHI MPI Methodological Note 56, Oxford Poverty and Human Development Initiative, University of Oxford.
       url: |
         {source_common.url}
-      date_accessed: |
-        {source_common.date_accessed}
-      publication_date: |
-        {source_common.publication_date}
+      date_accessed: "{source_common.date_accessed}"
+      publication_date: "{source_common.publication_date}"
 
 definitions:
   core: |-

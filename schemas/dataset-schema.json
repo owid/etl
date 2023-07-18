@@ -60,8 +60,16 @@
                     "type": "string"
                   },
                   "date_accessed": {
-                    "type": "string",
-                    "format": "date"
+                    "anyOf": [
+                      {
+                          "type": "string",
+                          "format": "date"
+                      },
+                      {
+                          "type": "string",
+                          "pattern": "^\\{.*\\}$"
+                      }
+                    ]
                   },
                   "description": {
                     "type": "string"
@@ -70,8 +78,16 @@
                     "type": "integer"
                   },
                   "publication_date": {
-                    "type": "string",
-                    "format": "date"
+                    "anyOf": [
+                      {
+                          "type": "string",
+                          "format": "date"
+                      },
+                      {
+                          "type": "string",
+                          "pattern": "^\\{.*\\}$"
+                      }
+                    ]
                   },
                   "published_by": {
                     "type": "string"
@@ -141,8 +157,16 @@
                             "type": "string"
                           },
                           "date_accessed": {
-                            "type": "string",
-                            "format": "date"
+                            "anyOf": [
+                              {
+                                  "type": "string",
+                                  "format": "date"
+                              },
+                              {
+                                  "type": "string",
+                                  "pattern": "^\\{.*\\}$"
+                              }
+                            ]
                           },
                           "description": {
                             "type": "string"
@@ -151,8 +175,16 @@
                             "type": "integer"
                           },
                           "publication_date": {
-                            "type": "string",
-                            "format": "date"
+                            "anyOf": [
+                              {
+                                  "type": "string",
+                                  "format": "date"
+                              },
+                              {
+                                  "type": "string",
+                                  "pattern": "^\\{.*\\}$"
+                              }
+                            ]
                           },
                           "published_by": {
                             "type": "string"
