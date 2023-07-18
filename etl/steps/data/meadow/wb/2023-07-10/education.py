@@ -70,7 +70,9 @@ def run(dest_dir: str) -> None:
     tb = Table(df_melted, short_name=paths.short_name, underscore=True)
     tb.set_index(["country", "year", "indicator_name"], inplace=True)
 
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=None)
+    # Use metadata from the first snapshot, then edit the descriptions in the garden step
+    metadata_snap = cast(Snapshot, paths.load_dependency(snaps[0]))
+    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=metadata_snap.metadata)
 
     # Save the dataset
     ds_meadow.save()
