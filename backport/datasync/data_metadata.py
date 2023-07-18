@@ -183,12 +183,14 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
     grapherConfigETLJson = row.pop("grapherConfigETL", None)
     grapherConfigAdminJson = row.pop("grapherConfigAdmin", None)
     presentationLicenseJson = row.pop("presentationLicense", None)
+    keyInfoTextJson = row.pop("keyInfoText", None)
 
     presentation = json.loads(presentationJson) if presentationJson else None
     display = json.loads(displayJson)
     grapherConfigETL = json.loads(grapherConfigETLJson) if grapherConfigETLJson else None
     grapherConfigAdmin = json.loads(grapherConfigAdminJson) if grapherConfigAdminJson else None
     presentationLicense = json.loads(presentationLicenseJson) if presentationLicenseJson else None
+    keyInfoText = json.loads(keyInfoTextJson) if keyInfoTextJson else None
 
     variableMetadata = dict(
         **_omit_nullable_values(variable),
@@ -201,6 +203,7 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         grapherConfigETL=grapherConfigETL,
         grapherConfigAdmin=grapherConfigAdmin,
         presentationLicense=presentationLicense,
+        keyInfoText=keyInfoText,
     )
 
     # add source
@@ -303,4 +306,4 @@ def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
 
 
 def _omit_nullable_values(d: dict) -> dict:
-    return {k: v for k, v in d.items() if v is not None and not pd.isna(v)}
+    return {k: v for k, v in d.items() if v is not None and (isinstance(v, list) and len(v) or not pd.isna(v))}

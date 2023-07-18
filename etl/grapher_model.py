@@ -842,7 +842,7 @@ class Variable(SQLModel, table=True):
     citationInline: Optional[str] = Field(default=None, sa_column=Column("citationInline", LONGTEXT))
     descriptionShort: Optional[str] = Field(default=None, sa_column=Column("descriptionShort", LONGTEXT))
     descriptionFromProducer: Optional[str] = Field(default=None, sa_column=Column("descriptionFromProducer", LONGTEXT))
-    keyInfoText: Optional[List[dict]] = Field(default=None, sa_column=Column("keyInfoText", JSON))
+    keyInfoText: Optional[List[str]] = Field(default=None, sa_column=Column("keyInfoText", JSON))
     processingInfo: Optional[str] = Field(default=None, sa_column=Column("processingInfo", LONGTEXT))
     licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
     presentationLicense: Optional[dict] = Field(default=None, sa_column=Column("presentationLicense", JSON))
