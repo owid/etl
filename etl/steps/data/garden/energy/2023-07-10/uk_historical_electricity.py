@@ -5,6 +5,10 @@ electricity mix in the UK.
 
 import numpy as np
 from owid.catalog import Dataset, Table
+from owid.catalog.tables import (
+    get_unique_licenses_from_tables,
+    get_unique_sources_from_tables,
+)
 from owid.datautils import dataframes
 
 from etl.helpers import PathFinder, create_dataset
@@ -148,6 +152,13 @@ def combine_beis_and_electricity_mix_data(tb_beis: Table, tb_elec: Table) -> Tab
     tb_combined = dataframes.combine_two_overlapping_dataframes(
         df1=tb_elec, df2=tb_beis, index_columns=["country", "year"]
     )
+    # NOTE: Currently, function combine_two_overlapping_dataframes does not properly propagate metadata.
+    #  For now, sources and licenses have to be combined manually.
+    sources = get_unique_sources_from_tables([tb_elec, tb_beis])
+    licenses = get_unique_licenses_from_tables([tb_elec, tb_beis])
+    for column in tb_combined.drop(columns=["country", "year"]).columns:
+        tb_combined[column].metadata.sources = sources
+        tb_combined[column].metadata.licenses = licenses
 
     # Add an index and sort conveniently.
     tb_combined = tb_combined.set_index(["country", "year"]).sort_index().sort_index(axis=1)
