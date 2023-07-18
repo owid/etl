@@ -406,7 +406,7 @@ class Dataset(SQLModel, table=True):
             createdByUserId=user_id,
             description=metadata.description or "",
             isPrivate=not metadata.is_public,
-            updatePeriodDays=metadata.update_period,
+            updatePeriodDays=metadata.update_period_days,
         )
 
     @classmethod
@@ -785,7 +785,7 @@ class Variable(SQLModel, table=True):
         'display': '{}',
         'columnOrder': 0,
         'originalMetadata': '{}',
-        'grapherConfig': None
+        'grapherConfigAdmin': None
     }
     """
 
@@ -823,7 +823,7 @@ class Variable(SQLModel, table=True):
     code: Optional[str] = Field(default=None, sa_column=Column("code", String(255, "utf8mb4_0900_as_cs")))
     shortUnit: Optional[str] = Field(default=None, sa_column=Column("shortUnit", String(255, "utf8mb4_0900_as_cs")))
     originalMetadata: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("originalMetadata", JSON))
-    grapherConfig: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfig", JSON))
+    grapherConfigAdmin: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfigAdmin", JSON))
     grapherConfigETL: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfigETL", JSON))
     catalogPath: Optional[str] = Field(default=None, sa_column=Column("catalogPath", LONGTEXT))
     dataPath: Optional[str] = Field(default=None, sa_column=Column("dataPath", LONGTEXT))
@@ -919,7 +919,7 @@ class Variable(SQLModel, table=True):
                 ds.originalMetadata = self.originalMetadata
             if self.grapherConfigETL is not None:
                 ds.grapherConfigETL = self.grapherConfigETL
-            assert self.grapherConfig is None, "grapherConfigETL should be used instead of grapherConfig"
+            assert self.grapherConfigAdmin is None, "grapherConfigETL should be used instead of grapherConfigAdmin"
 
         session.add(ds)
 

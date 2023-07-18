@@ -181,13 +181,13 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
     processingLevel = row.pop("processingLevel", None)
     presentationJson = row.pop("presentation", None)
     grapherConfigETLJson = row.pop("grapherConfigETL", None)
-    grapherConfigJson = row.pop("grapherConfig", None)
+    grapherConfigAdminJson = row.pop("grapherConfigAdmin", None)
     presentationLicenseJson = row.pop("presentationLicense", None)
 
     presentation = json.loads(presentationJson) if presentationJson else None
     display = json.loads(displayJson)
     grapherConfigETL = json.loads(grapherConfigETLJson) if grapherConfigETLJson else None
-    grapherConfig = json.loads(grapherConfigJson) if grapherConfigJson else None
+    grapherConfigAdmin = json.loads(grapherConfigAdminJson) if grapherConfigAdminJson else None
     presentationLicense = json.loads(presentationLicenseJson) if presentationLicenseJson else None
 
     variableMetadata = dict(
@@ -199,7 +199,7 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         processingLevel=processingLevel,
         presentation=presentation,
         grapherConfigETL=grapherConfigETL,
-        grapherConfig=grapherConfig,
+        grapherConfigAdmin=grapherConfigAdmin,
         presentationLicense=presentationLicense,
     )
 

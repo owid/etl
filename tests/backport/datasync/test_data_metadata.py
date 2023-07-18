@@ -40,7 +40,7 @@ def test_variable_metadata():
         "display": '{"name": "Population density", "unit": "people per km²", "shortUnit": null, "includeInTable": true, "numDecimalPlaces": 1}',
         "columnOrder": 0,
         "originalMetadata": None,
-        "grapherConfig": None,
+        "grapherConfigAdmin": None,
         "shortName": "population_density",
         "catalogPath": "grapher/owid/latest/key_indicators/population_density",
         "dimensions": None,
