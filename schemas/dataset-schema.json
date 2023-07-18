@@ -12,7 +12,7 @@
           "description": {
             "type": "string"
           },
-          "update_period": {
+          "update_period_days": {
             "type": "integer"
           },
           "licenses": {

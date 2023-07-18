@@ -137,7 +137,7 @@ def _load_variable(engine: Engine, variable_id: int) -> Dict[str, Any]:
         variables.*,
         datasets.name AS datasetName,
         datasets.nonRedistributable AS nonRedistributable,
-        datasets.updatePeriod,
+        datasets.updatePeriodDays,
         datasets.version as datasetVersion,
         sources.name AS sourceName,
         sources.description AS sourceDescription

@@ -298,7 +298,7 @@ class DatasetMeta:
     additional_info: Optional[Dict[str, Any]] = None
     version: Optional[str] = None
     # update period in days
-    update_period: Optional[str] = None
+    update_period_days: Optional[str] = None
 
     # an md5 checksum of the ingredients used to make this dataset
     source_checksum: Optional[str] = None
