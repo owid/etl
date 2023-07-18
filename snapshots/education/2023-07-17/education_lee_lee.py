@@ -21,7 +21,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/education_lee_lee.xlsx")
+    snap = Snapshot(f"education/{SNAPSHOT_VERSION}/education_lee_lee.xlsx")
     all_dfs = get_data()
     df_to_file(all_dfs, file_path=snap.path)
     # Add file to DVC and upload to S3.
@@ -54,7 +54,7 @@ def get_data() -> pd.DataFrame:
         # Fill NaN values in 'Country' column with previous non-NaN value
         df_add["Country"].fillna(method="ffill", inplace=True)
         df_add["Sex"] = sex_column[i]
-
+        df_add["age_group"] = "not specified"
         # Concatenate the data to the main dataframe
         all_dfs_enrol = pd.concat([all_dfs_enrol, df_add])
 
@@ -97,6 +97,8 @@ def get_data() -> pd.DataFrame:
 
         # Rename columns
         df_add.rename(columns={"Age Group": "starting_age", "Unnamed: 3": "finishing_age"}, inplace=True)
+        df_add["age_group"] = df_add["starting_age"].astype(str) + "-" + df_add["finishing_age"].astype(str)
+        df_add.drop(["starting_age", "finishing_age"], axis=1, inplace=True)
 
         # Remove columns with NaN in column name
         df_add.columns = [col for col in df_add.columns if str(col) != "nan"]
@@ -110,7 +112,12 @@ def get_data() -> pd.DataFrame:
         all_dfs_attainment = pd.concat([all_dfs_attainment, df_add])
 
     # Merge Enrollment and Attainment Data based on common columns
-    df_merged = pd.merge(all_dfs_attainment, all_dfs_enrol, on=["Year", "Country", "Region", "Sex"], how="outer")
+    df_merged = pd.merge(
+        all_dfs_attainment,
+        all_dfs_enrol,
+        on=["Year", "Country", "Region", "Sex", "age_group"],
+        how="outer",
+    )
 
     return df_merged
 
