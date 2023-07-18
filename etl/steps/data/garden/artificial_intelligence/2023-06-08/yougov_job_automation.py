@@ -43,12 +43,12 @@ def run(dest_dir: str) -> None:
     ).reset_index()
     pivot_df = pivot_df.rename_axis(None, axis=1)
     rename_entries = {
-        "18-29": "18-29 year olds",
+        "18-29": "18-29 years",
         "2-year": "2-year post-secondary education",
-        "30-44": "30-44 year olds",
-        "4-year": "4-Year Post-secondary Education",
-        "45-64": "45-64 year olds",
-        "65+": "65+ year olds",
+        "30-44": "30-44 years",
+        "4-year": "4-Year post-secondary education",
+        "45-64": "45-64 years",
+        "65+": "65+ years",
         "High school graduate": "High school graduates",
         "No HS": "No high school education",
         "Post-grad": "Post-graduate education",
