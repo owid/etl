@@ -57,7 +57,7 @@ def run(dest_dir: str) -> None:
     columns_to_split_by = ["country", "gender", "education", "income_5", "emp_2010", "agegroups4", "globalregion"]
 
     # Dictionary to map response codes to labels for question 9
-    dict_q9 = {1: "Mostly help", 2: "Mostly Harm", 3: "Don't have an opinion", 4: "Neither", 98: "DK", 99: "Refused"}
+    dict_q9 = {1: "Mostly help", 2: "Mostly harm", 3: "Don't have an opinion", 4: "Neither", 98: "DK", 99: "Refused"}
 
     # Dictionary to map response codes to labels for question 8
     dict_q8 = {1: "Yes, would feel safe", 2: "No, would not feel safe", 98: "DK", 99: "Refused"}
@@ -86,7 +86,9 @@ def run(dest_dir: str) -> None:
     # Now split categories (gender, income etc) into separate columns
     # Copy df without categories (gender, income etc)
     df_without_categories = (
-        df_merge[["country", "year", "Yes, would feel safe", "Mostly help"]].dropna(subset=["country"]).copy()
+        df_merge[["country", "year", "Yes, would feel safe", "Mostly help", "No, would not feel safe", "Mostly harm"]]
+        .dropna(subset=["country"])
+        .copy()
     )
     # Select rows with categories (NaN country rows)
     world_df = df_merge[df_merge["country"].isna()].copy()
@@ -96,13 +98,17 @@ def run(dest_dir: str) -> None:
     world_df["country"] = world_df["country"].astype(str)
     world_df.loc[world_df["country"] == "nan", "country"] = "World"
     # Calculates the percentage of valid responses for the "Mostly help" column in a DataFrame, split by gender, income etc.
-    conc_df_help_harm = pivot_by_category(world_df, "Mostly help")
+    conc_df_help = pivot_by_category(world_df, "Mostly help")
+    conc_df_harm = pivot_by_category(world_df, "Mostly harm")
+    merge_help_harm = pd.merge(conc_df_help, conc_df_harm, on=["year", "country"], how="outer")
 
     # Calculates the percentage of valid responses for a "Yes, would feel safe column in a DataFrame, split by gender, income etc.
-    conc_df_yes_no = pivot_by_category(world_df, "Yes, would feel safe")
+    conc_df_yes = pivot_by_category(world_df, "Yes, would feel safe")
+    conc_df_no = pivot_by_category(world_df, "No, would not feel safe")
+    merge_yes_no = pd.merge(conc_df_yes, conc_df_no, on=["year", "country"], how="outer")
 
     # Merge  all dataframes into one
-    merge_categorized = pd.merge(conc_df_yes_no, conc_df_help_harm, on=["year", "country"], how="outer")
+    merge_categorized = pd.merge(merge_help_harm, merge_yes_no, on=["year", "country"], how="outer")
     merge_rest = pd.merge(df_without_categories, merge_categorized, on=["year", "country"], how="outer")
     merge_rest.set_index(["year", "country"], inplace=True)
 
@@ -186,9 +192,9 @@ def question_extract(q, df, column_to_split_by, dict_q):
     pivoted_df.columns.name = None
 
     if q == "q9":
-        return pivoted_df[["year", column_to_split_by, "Mostly help"]]
+        return pivoted_df[["year", column_to_split_by, "Mostly help", "Mostly harm"]]
     else:
-        return pivoted_df[["year", column_to_split_by, "Yes, would feel safe"]]
+        return pivoted_df[["year", column_to_split_by, "Yes, would feel safe", "No, would not feel safe"]]
 
 
 def map_values(df):

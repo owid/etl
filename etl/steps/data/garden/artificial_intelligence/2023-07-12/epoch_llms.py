@@ -22,6 +22,7 @@ def run(dest_dir: str) -> None:
     df["Architecture"] = df.apply(add_asterisks, axis=1)
     df["training_computation_petaflop"] = df["Approx Compute (FLOP)"] / 1e15
     df.drop("Approx Compute (FLOP)", axis=1, inplace=True)
+    df["MMLU avg"] *= 100
     tb = Table(df, short_name=paths.short_name, underscore=True)
     tb.set_index(["architecture", "year"], inplace=True)
 

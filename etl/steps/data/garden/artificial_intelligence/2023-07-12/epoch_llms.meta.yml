@@ -48,11 +48,12 @@ tables:
 
       mmlu_avg:
         title: MMLU avg
-        unit: ''
+        unit: '%'
+        short_unit: '%'
         description: >
           The MMLU benchmark covers a wide range of 57 subjects, including STEM, humanities, social sciences, and more. It encompasses subjects of varying difficulty levels, spanning from elementary concepts to advanced professional topics. This comprehensive benchmark assesses not only world knowledge but also problem-solving abilities.
         display:
-            title: Accuracy
+            name: Performance on knowledge tests (MMLU)
             numDecimalPlaces: 1
 
       organisation:

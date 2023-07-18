@@ -31,19 +31,30 @@ def run(dest_dir: str) -> None:
     # Creating a list of columns not to melt
 
     # Applying the function for 'yes__would_feel_safe_value' and 'mostly_help'
-    melted_yes_no = melt_and_clean(df, "yes__would_feel_safe").dropna(subset=["yes__would_feel_safe_value"])
-    melted_yes_no.reset_index(inplace=True, drop=True)
-    melted_help_harm = melt_and_clean(df, "mostly_help").dropna(subset=["mostly_help_value"])
-    melted_help_harm.reset_index(inplace=True, drop=True)
+    melted_yes = melt_and_clean(df, "yes__would_feel_safe").dropna(subset=["yes__would_feel_safe_value"])
+    melted_yes.reset_index(inplace=True, drop=True)
+    melted_yes = assign_indicator(melted_yes, "yes__would_feel_safe")
+    df_pivot_yes = reshape_dataframe(melted_yes, "yes__would_feel_safe", "yes__would_feel_safe_value")
 
-    # Applying the function for 'melted_help_harm' and 'melted_yes_no'
-    melted_help_harm = assign_indicator(melted_help_harm, "mostly_help")
-    melted_yes_no = assign_indicator(melted_yes_no, "yes__would_feel_safe")
+    melted_no = melt_and_clean(df, "no__would_not_feel_safe").dropna(subset=["no__would_not_feel_safe_value"])
+    melted_no.reset_index(inplace=True, drop=True)
+    melted_no = assign_indicator(melted_no, "no__would_not_feel_safe")
+    df_pivot_no = reshape_dataframe(melted_no, "no__would_not_feel_safe", "no__would_not_feel_safe_value")
 
-    df_pivot_yes_no = reshape_dataframe(melted_yes_no, "yes__would_feel_safe", "yes__would_feel_safe_value")
-    df_pivo_harm_help = reshape_dataframe(melted_help_harm, "mostly_help", "mostly_help_value")
+    melted_help = melt_and_clean(df, "mostly_help").dropna(subset=["mostly_help_value"])
+    melted_help.reset_index(inplace=True, drop=True)
+    melted_help = assign_indicator(melted_help, "mostly_help")
+    df_pivo_help = reshape_dataframe(melted_help, "mostly_help", "mostly_help_value")
 
-    merged_groups = pd.merge(df_pivo_harm_help, df_pivot_yes_no, on=["year", "group"], how="outer")
+    melted_harm = melt_and_clean(df, "mostly_harm").dropna(subset=["mostly_harm_value"])
+    melted_harm.reset_index(inplace=True, drop=True)
+    melted_harm = assign_indicator(melted_harm, "mostly_harm")
+    df_pivot_harm = reshape_dataframe(melted_harm, "mostly_harm", "mostly_harm_value")
+
+    merged_help_harm = pd.merge(df_pivo_help, df_pivot_harm, on=["year", "group"], how="outer")
+    merged_yes_no = pd.merge(df_pivot_yes, df_pivot_no, on=["year", "group"], how="outer")
+    merged_groups = pd.merge(merged_help_harm, merged_yes_no, on=["year", "group"], how="outer")
+
     merged_groups["group"] = merged_groups["group"].replace(
         {
             " 15 29": "15-29 years",
@@ -83,7 +94,7 @@ def run(dest_dir: str) -> None:
 
 # Function to melt and clean dataframe based on column name
 def melt_and_clean(df, col_name):
-    excluded_columns = ["yes__would_feel_safe", "mostly_help"]
+    excluded_columns = ["yes__would_feel_safe", "mostly_help", "no__would_not_feel_safe", "mostly_harm"]
 
     melted_df = pd.melt(
         df.reset_index(),
