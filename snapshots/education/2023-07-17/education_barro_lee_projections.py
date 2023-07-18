@@ -21,7 +21,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/education_barro_lee_projections.csv")
+    snap = Snapshot(f"education/{SNAPSHOT_VERSION}/education_barro_lee_projections.csv")
     all_dfs = get_data()
     df_to_file(all_dfs, file_path=snap.path)
     # Add file to DVC and upload to S3.

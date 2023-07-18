@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
     COLUMNS_RENAME = {
         "BLcode": "Barro-Lee Country Code",
         "WBcode": "World Bank Country Code",
-        "region_code": "Region Code",
+        "region_code": "region",
         "country": "Country",
         "year": "Year",
         "sex": "Sex",
@@ -50,15 +50,17 @@ def run(dest_dir: str) -> None:
         "pop": "Population (thousands)",
     }
     # Rename columns in the DataFrame.
-
     df = df.rename(columns=COLUMNS_RENAME)
+
+    df["age_group"] = df["Starting Age"].astype(str) + "-" + df["Finishing Age"].astype(str)
+    df.drop(["Starting Age", "Finishing Age"], axis=1, inplace=True)
 
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb.set_index(["country", "year", "sex", "starting_age", "finishing_age"], inplace=True)
+    tb.set_index(["country", "year", "sex", "age_group"], inplace=True)
 
     # Drop unnecessary columns
-    tb.drop(["barro_lee_country_code", "world_bank_country_code", "region_code"], axis=1, inplace=True)
+    tb.drop(["barro_lee_country_code", "world_bank_country_code"], axis=1, inplace=True)
 
     #
     # Save outputs.

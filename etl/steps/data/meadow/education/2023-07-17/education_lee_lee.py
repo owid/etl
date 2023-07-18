@@ -46,7 +46,8 @@ def run(dest_dir: str) -> None:
 
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb.set_index(["country", "year", "sex", "starting_age", "finishing_age"], inplace=True)
+
+    tb.set_index(["country", "year", "sex", "age_group"], inplace=True)
 
     #
     # Save outputs.

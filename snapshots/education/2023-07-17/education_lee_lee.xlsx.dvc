@@ -15,8 +15,8 @@ meta:
 
     Datasets were last updated in 2021 September.
 
-wdir: ../../../data/snapshots/wb/2023-07-17
+wdir: ../../../data/snapshots/education/2023-07-17
 outs:
-- md5: 3461a225527e68b678c327370ea3823d
-  size: 2827545
+- md5: f0fb3bce41349fe2f2cf5e809524a653
+  size: 3343127
   path: education_lee_lee.xlsx
