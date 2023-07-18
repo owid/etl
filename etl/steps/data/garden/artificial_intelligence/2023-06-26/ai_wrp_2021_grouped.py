@@ -15,83 +15,6 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
-    log.info("ai_wrp_2021_grouped.start")
-
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("ai_wrp_2021"))
-
-    # Read table from meadow dataset.
-    tb = ds_garden["ai_wrp_2021"]
-    df = pd.DataFrame(tb)
-
-    # Creating a list of columns not to melt
-
-    # Applying the function for 'yes__would_feel_safe_value' and 'mostly_help'
-    melted_yes = melt_and_clean(df, "yes__would_feel_safe").dropna(subset=["yes__would_feel_safe_value"])
-    melted_yes.reset_index(inplace=True, drop=True)
-    melted_yes = assign_indicator(melted_yes, "yes__would_feel_safe")
-    df_pivot_yes = reshape_dataframe(melted_yes, "yes__would_feel_safe", "yes__would_feel_safe_value")
-
-    melted_no = melt_and_clean(df, "no__would_not_feel_safe").dropna(subset=["no__would_not_feel_safe_value"])
-    melted_no.reset_index(inplace=True, drop=True)
-    melted_no = assign_indicator(melted_no, "no__would_not_feel_safe")
-    df_pivot_no = reshape_dataframe(melted_no, "no__would_not_feel_safe", "no__would_not_feel_safe_value")
-
-    melted_help = melt_and_clean(df, "mostly_help").dropna(subset=["mostly_help_value"])
-    melted_help.reset_index(inplace=True, drop=True)
-    melted_help = assign_indicator(melted_help, "mostly_help")
-    df_pivo_help = reshape_dataframe(melted_help, "mostly_help", "mostly_help_value")
-
-    melted_harm = melt_and_clean(df, "mostly_harm").dropna(subset=["mostly_harm_value"])
-    melted_harm.reset_index(inplace=True, drop=True)
-    melted_harm = assign_indicator(melted_harm, "mostly_harm")
-    df_pivot_harm = reshape_dataframe(melted_harm, "mostly_harm", "mostly_harm_value")
-
-    merged_help_harm = pd.merge(df_pivo_help, df_pivot_harm, on=["year", "group"], how="outer")
-    merged_yes_no = pd.merge(df_pivot_yes, df_pivot_no, on=["year", "group"], how="outer")
-    merged_groups = pd.merge(merged_help_harm, merged_yes_no, on=["year", "group"], how="outer")
-
-    merged_groups["group"] = merged_groups["group"].replace(
-        {
-            " 15 29": "15-29 years",
-            " 30 49": "30-49 years",
-            " 50 64": "50-64 years",
-            " 65Plus": "65+ years",
-            "Australia And New Zealand": "Australia and New Zealand",
-            "Fourth 20Pct": "Fourth 20%",
-            "Middle 20Pct": "Middle 20%",
-            "Poorest 20Pct": "Poorest 20%",
-            "Richest 20Pct": "Richest 20%",
-            "Second 20Pct": "Second 20%",
-            "Primary  0 8 Years ": "Primary",
-            "Secondary  9 15 Years ": "Secondary",
-            "Tertiary  16 Years Or More ": "Tertiary",
-            "Latin America And Caribbean": "Latin America and Caribbean",
-            "Employed Full Time For An Employer": "Employed Full-Time (Employer)",
-            "Employed Full Time For Self": "Employed Full-Time (Self)",
-            "Employed Part Time Do Not Want Full Time": "Employed Part-Time (Not seeking Full-Time)",
-            "Employed Part Time Want Full Time": "Employed Part-Time (Seeking Full-Time)",
-        }
-    )
-
-    tb = Table(merged_groups, short_name=paths.short_name, underscore=True)
-    tb.set_index(["year", "group"], inplace=True)
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
-
-    # Save changes in the new garden dataset.
-    ds_garden.save()
-
-    log.info("ai_wrp_2021_grouped.end")
-
-
 # Function to melt and clean dataframe based on column name
 def melt_and_clean(df, col_name):
     excluded_columns = ["yes__would_feel_safe", "mostly_help", "no__would_not_feel_safe", "mostly_harm"]
@@ -175,3 +98,72 @@ def reshape_dataframe(df, col_categories, col_values):
     reshaped_df.rename(columns=rename_dict, inplace=True)
 
     return reshaped_df
+
+
+def run(dest_dir: str) -> None:
+    log.info("ai_wrp_2021_grouped.start")
+
+    # Load meadow dataset.
+    ds_garden = cast(Dataset, paths.load_dependency("ai_wrp_2021"))
+
+    # Read table from meadow dataset.
+    df = pd.DataFrame(ds_garden["ai_wrp_2021"])
+
+    # Melt and clean dataframes
+    melted_yes = melt_and_clean(df, "yes__would_feel_safe").dropna(subset=["yes__would_feel_safe_value"])
+    melted_no = melt_and_clean(df, "no__would_not_feel_safe").dropna(subset=["no__would_not_feel_safe_value"])
+    melted_help = melt_and_clean(df, "mostly_help").dropna(subset=["mostly_help_value"])
+    melted_harm = melt_and_clean(df, "mostly_harm").dropna(subset=["mostly_harm_value"])
+
+    # Assign indicators
+    melted_yes = assign_indicator(melted_yes, "yes__would_feel_safe")
+    melted_no = assign_indicator(melted_no, "no__would_not_feel_safe")
+    melted_help = assign_indicator(melted_help, "mostly_help")
+    melted_harm = assign_indicator(melted_harm, "mostly_harm")
+
+    # Reshape dataframes
+    df_pivot_yes = reshape_dataframe(melted_yes, "yes__would_feel_safe", "yes__would_feel_safe_value")
+    df_pivot_no = reshape_dataframe(melted_no, "no__would_not_feel_safe", "no__would_not_feel_safe_value")
+    df_pivo_help = reshape_dataframe(melted_help, "mostly_help", "mostly_help_value")
+    df_pivot_harm = reshape_dataframe(melted_harm, "mostly_harm", "mostly_harm_value")
+
+    # Merge dataframes
+    merged_help_harm = pd.merge(df_pivo_help, df_pivot_harm, on=["year", "group"], how="outer")
+    merged_yes_no = pd.merge(df_pivot_yes, df_pivot_no, on=["year", "group"], how="outer")
+    merged_groups = pd.merge(merged_help_harm, merged_yes_no, on=["year", "group"], how="outer")
+
+    # Rename group values
+    group_replacements = {
+        " 15 29": "15-29 years",
+        " 30 49": "30-49 years",
+        " 50 64": "50-64 years",
+        " 65Plus": "65+ years",
+        "Australia And New Zealand": "Australia and New Zealand",
+        "Fourth 20Pct": "Fourth 20%",
+        "Middle 20Pct": "Middle 20%",
+        "Poorest 20Pct": "Poorest 20%",
+        "Richest 20Pct": "Richest 20%",
+        "Second 20Pct": "Second 20%",
+        "Primary  0 8 Years ": "Primary",
+        "Secondary  9 15 Years ": "Secondary",
+        "Tertiary  16 Years Or More ": "Tertiary",
+        "Latin America And Caribbean": "Latin America and Caribbean",
+        "Employed Full Time For An Employer": "Employed Full-Time (Employer)",
+        "Employed Full Time For Self": "Employed Full-Time (Self)",
+        "Employed Part Time Do Not Want Full Time": "Employed Part-Time (Not seeking Full-Time)",
+        "Employed Part Time Want Full Time": "Employed Part-Time (Seeking Full-Time)",
+    }
+    merged_groups["group"].replace(group_replacements, inplace=True)
+    merged_groups.set_index(["year", "group"], inplace=True)
+
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(
+        dest_dir,
+        tables=[Table(merged_groups, short_name=paths.short_name, underscore=True)],
+        default_metadata=ds_garden.metadata,
+    )
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+    log.info("ai_wrp_2021_grouped.end")
