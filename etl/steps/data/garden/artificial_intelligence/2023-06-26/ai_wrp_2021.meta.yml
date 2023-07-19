@@ -41,6 +41,7 @@ tables:
         display:
           numDecimalPlaces: 0
       no__would_not_feel_safe:
+        title: Not safe
         description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
