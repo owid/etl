@@ -12,12 +12,17 @@ def run(dest_dir: str, paths: PathFinder) -> None:
     #
     url = paths.load_etag_url()
 
-    df = (
-        pd.read_csv(url)
-        .rename(columns={"Year": "year", "Country": "country"})
-        .set_index(["year", "country"])
-        .dropna(axis=0, how="all")
+    df = pd.read_csv(url).rename(columns={"Year": "year", "Country": "country"})
+
+    # Harmonize country names.
+    df.country = df.country.replace(
+        {
+            "Faeroe Islands": "Faroe Islands",
+            "Timor": "East Timor",
+        }
     )
+
+    df = df.set_index(["year", "country"]).dropna(axis=0, how="all")
 
     #
     # Process data.
