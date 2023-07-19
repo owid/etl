@@ -27,54 +27,59 @@ tables:
   ai_wrp_2021:
     variables:
       yes__would_feel_safe:
-        title: Feel safe
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver"
+        title: Yes, would feel safe
+        description: Share of respondents who responded "Yes, would feel safe" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 0
-      mostly_help:
-        title: Help
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
+
       no__would_not_feel_safe:
-        title: Not safe
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?".
+        title: No, would not feel safe
+        description: Share of respondents who responded "No, would not feel safe" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 0
+
+      mostly_help:
+        title: "Mostly help"
+        description: Share of respondents who responded "Mostly help" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
       mostly_harm:
-        title: Harm
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
+        title: "Mostly harm"
+        description: Share of respondents who responded "Mostly harm" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 0
+
       neither:
-        title: Neither
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
+        title: "Neither"
+        description: Share of respondents who responded "Neither" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 0
-      other_yes_no:
-        title: Don't know (self-driving cars)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver".
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Don't know
-          numDecimalPlaces: 0
+
       other_help_harm:
-        title: Other
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?".
-          Includes "Don't have an opinion", "Neither" and "Don't know responses"
+        title: "Don't have an opinion, Don't know, or Refused - help/harm question"
+        description: Share of respondents who refused to answer the question or said "Don't have an opinion" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
         display:
-          name: Other
+          name: "Other"
+          numDecimalPlaces: 0
+
+      other_yes_no:
+        title: "Don't know or Refused - self-driving cars question"
+        description: Share of respondents who refused to answer the question or said "Don't know" to the question "Would you feel safe in a car driven by a computer without a human driver?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: "Other"
           numDecimalPlaces: 0
