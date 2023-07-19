@@ -69,10 +69,14 @@ def run(dest_dir: str) -> None:
     df.rename(columns={"Year": "year"}, inplace=True)
     df.loc[:, df.columns.isin(cols_to_adjust_for_infaltion)] *= 1e9
 
+    # Import US CPI data from the API
     df_wdi_cpi_us = us_cpi.import_US_cpi_API()
+    if df_wdi_cpi_us is None:
+        log.info("Failed to import US CPI data from the API.")
+        return
 
     # Adjust CPI values so that 2021 is the reference year (2021 = 100)
-    cpi_2021 = df_wdi_cpi_us[df_wdi_cpi_us["year"] == 2021]["fp_cpi_totl"].values[0]
+    cpi_2021 = df_wdi_cpi_us.loc[df_wdi_cpi_us["year"] == 2021, "fp_cpi_totl"].values[0]
     # Adjust 'fp_cpi_totl' column by the 2021 CPI
     df_wdi_cpi_us["cpi_adj_2021"] = 100 * df_wdi_cpi_us["fp_cpi_totl"] / cpi_2021
 
