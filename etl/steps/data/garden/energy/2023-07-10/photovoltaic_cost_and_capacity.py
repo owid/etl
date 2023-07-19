@@ -161,5 +161,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new dataset with the same metadata as meadow
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_combined])
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_combined], check_variables_metadata=True)
+    # NOTE: Currently, ETL fails if the dataset has no sources. Therefore, manually gather sources from all variables.
+    ds_garden.metadata.sources = get_unique_sources_from_tables([tb_combined])
     ds_garden.save()
