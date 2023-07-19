@@ -1,0 +1,144 @@
+dataset:
+  title: YouGov-Imperial COVID-19 Behavior Tracker, composite variables
+  description: >-
+    Data constructed from:
+
+
+    (1) Survey data collected by YouGov in partnership with the Institute of Global
+    Health Innovation (IGHI) at Imperial
+    College London. YouGov has partnered with the Institute of Global Health Innovation
+    (IGHI) at Imperial College London
+    to gather global insights on people’s behaviors in response to COVID-19. The
+    research will cover 29 countries, interviewing
+    around 21,000 people each week.
+
+
+    It is designed to provide behavioral analysis on how different populations are
+    responding to the pandemic, helping public
+    health bodies in their efforts to limit the impact of the disease. Anonymized
+    respondent level data will be available
+    for all public health and academic institutions globally.
+
+
+    The questions in the survey, led by IGHI, cover data on testing, symptoms, self-isolating
+    in response to symptoms and
+    the ability and willingness to self-isolate if needed. It also looks at behaviors,
+    including going outdoors, working
+    outside the home, contact with others, handwashing and the extent of compliance
+    with 20 common preventative measures.
+
+
+    (2) COVID-19 vaccination figures collated by Our World in Data from public official
+    sources. You can download the full
+    dataset here: https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations.
+  sources:
+  - name: Imperial College London YouGov Covid 19 Behaviour Tracker Data Hub – Last updated {TODAY}
+    published_by: Imperial College London YouGov Covid 19 Behaviour Tracker Data Hub – Last updated 15 March 2022, 09:00 (London time)
+tables:
+  yougov_imperial_behavior_tracker_composite:
+    variables:
+      people_vaccinated_per_hundred:
+        title: people_vaccinated_per_hundred
+        description: Monthly share of the population who have received at least one dose of a COVID-19 vaccine.
+        unit: '%'
+        display:
+          includeInTable: true
+          name: Share of people who have received at least one dose of a COVID-19 vaccine
+          numDecimalPlaces: 2
+          yearIsDay: true
+        short_unit: '%'
+      uncertain_covid_vaccinate_this_week_pct_pop:
+        title: uncertain_covid_vaccinate_this_week_pct_pop
+        description: >-
+          Monthly share of the population who have not received a COVID-19 vaccine and who neither agree or disagree with
+          the statement: "If a COVID-19 vaccine were made available to me this week, I would definitely get it." Respondents
+          were presented with a 1 to 5 scale, ranging from "Strongly agree" (1) to "Strongly disagree" (5). We consider responses
+          of 3 to neither be in agreement or disagreement with the statement.
+
+
+          This statement was only presented to survey respondents who said they have not received a COVID-19 vaccination.
+          To aggregate these responses into a share of a country's population, we multiply the share of respondents who neither
+          agree or disagree with the statement by the share of the country's population that is unvaccinated. Data on the
+          share of a country's population that is unvaccinated comes from public official sources, collated by Our World in
+          Data at https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations.
+
+
+          Individuals under 18 years of age were not surveyed. As a result, the share of survey respondents who neither agree
+          or disagree with the statement is a representative estimate of the share of a country's unvaccinated population
+          aged 18 and above who would neither agree or disagree with the statement, but is not necessarily a representative
+          estimate of the share of a country's unvaccinated population of all ages who would neither agree or disagree with
+          the statement. Nevertheless, we expect any differences to be minor.
+
+
+          Months containing fewer than 500 survey respondents are excluded.
+        unit: '%'
+        display:
+          includeInTable: true
+          name: Share of people who have not received a COVID-19 vaccine and are uncertain if they would get a COVID-19 vaccine
+            if it was available to them this week
+          numDecimalPlaces: 2
+          yearIsDay: true
+        short_unit: '%'
+      unwillingness_covid_vaccinate_this_week_pct_pop:
+        title: unwillingness_covid_vaccinate_this_week_pct_pop
+        description: >-
+          Monthly share of the population who have not received a COVID-19 vaccine and who do NOT agree with the statement:
+          "If a COVID-19 vaccine were made available to me this week, I would definitely get it." Respondents were presented
+          with a 1 to 5 scale, ranging from "Strongly agree" (1) to "Strongly disagree" (5). We consider responses of 4 or
+          5 to NOT be in agreement with the statement.
+
+
+          This statement was only presented to survey respondents who said they have not received a COVID-19 vaccination.
+          To aggregate these responses into a share of a country's population, we multiply the share of respondents who do
+          not agree with the statement by the share of the country's population that is unvaccinated. Data on the share of
+          a country's population that is unvaccinated comes from public official sources, collated by Our World in Data at
+          https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations.
+
+
+          Individuals under 18 years of age were not surveyed. As a result, the share of survey respondents who do not agree
+          with the statement is a representative estimate of the share of a country's unvaccinated population aged 18 and
+          above that would not agree with the statement, but is not necessarily a representative estimate of the share of
+          a country's unvaccinated population of all ages that would not agree with the statement. Nevertheless, we expect
+          any differences to be minor.
+
+
+          Months containing fewer than 500 survey respondents are excluded.
+        unit: '%'
+        display:
+          includeInTable: true
+          name: Share of people who have not received a COVID-19 vaccine and would not get a COVID-19 vaccine if it was available
+            to them this week
+          numDecimalPlaces: 2
+          yearIsDay: true
+        short_unit: '%'
+      willingness_covid_vaccinate_this_week_pct_pop:
+        title: willingness_covid_vaccinate_this_week_pct_pop
+        description: >-
+          Monthly share of the population who have not received a COVID-19 vaccine and who agree with the statement: "If a
+          COVID-19 vaccine were made available to me this week, I would definitely get it." Respondents were presented with
+          a 1 to 5 scale, ranging from "Strongly agree" (1) to "Strongly disagree" (5). We consider responses of 1 or 2 to
+          be in agreement with the statement.
+
+
+          This statement was only presented to survey respondents who said they have not received a COVID-19 vaccination.
+          To aggregate these responses into a share of a country's population, we multiply the share of respondents who agree
+          with the statement by the share of the country's population that is unvaccinated. Data on the share of a country's
+          population that is unvaccinated comes from public official sources, collated by Our World in Data at https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations.
+
+
+          Individuals under 18 years of age were not surveyed. As a result, the share of survey respondents who agree with
+          the statement is a representative estimate of the share of a country's unvaccinated population aged 18 and above
+          that would agree with the statement, but is not necessarily a representative estimate of the share of a country's
+          unvaccinated population of all ages that would agree with the statement. Nevertheless, we expect any differences
+          to be minor.
+
+
+          Months containing fewer than 500 survey respondents are excluded.
+        unit: '%'
+        display:
+          includeInTable: true
+          name: Share of people who have not received a COVID-19 vaccine and would get a COVID-19 vaccine if it was available
+            to them this week
+          numDecimalPlaces: 2
+          yearIsDay: true
+        short_unit: '%'

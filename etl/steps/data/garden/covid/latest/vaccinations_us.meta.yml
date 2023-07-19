@@ -1,0 +1,113 @@
+dataset:
+  title: COVID-19 - United States vaccinations
+  description: >-
+    Data on vaccinations against COVID-19, collected from the data updated daily
+    by the United States Centers for Disease
+    Control and Prevention.
+
+
+    You can download the full dataset here: https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations
+  sources:
+  - name: Centers for Disease Control and Prevention – Last updated {TODAY}
+    url: https://covid.cdc.gov/covid-data-tracker/#vaccinations
+    published_by: Centers for Disease Control and Prevention – Last updated 2 November
+      2022 (Eastern Time)
+tables:
+  vaccinations_us:
+    variables:
+      daily_vaccinations:
+        title: daily_vaccinations
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      daily_vaccinations_per_million:
+        title: daily_vaccinations_per_million
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      daily_vaccinations_raw:
+        title: daily_vaccinations_raw
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      distributed_per_hundred:
+        title: distributed_per_hundred
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      people_fully_vaccinated:
+        title: people_fully_vaccinated
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      people_fully_vaccinated_per_hundred:
+        title: people_fully_vaccinated_per_hundred
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      people_vaccinated:
+        title: people_vaccinated
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      people_vaccinated_per_hundred:
+        title: people_vaccinated_per_hundred
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      share_doses_used:
+        title: share_doses_used
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      total_boosters:
+        title: total_boosters
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      total_boosters_per_hundred:
+        title: total_boosters_per_hundred
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      total_distributed:
+        title: total_distributed
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      total_vaccinations:
+        title: total_vaccinations
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      total_vaccinations_per_hundred:
+        title: total_vaccinations_per_hundred
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
