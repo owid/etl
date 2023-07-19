@@ -313,7 +313,6 @@ tables:
            numDecimalPlaces: 3
         sources:
           - *source-hot
-          - *source-dissagregated
       hot_mpi_rural:
         title: MPI (rural) - Harmonized over time
         unit: ""
@@ -335,7 +334,6 @@ tables:
            numDecimalPlaces: 3
         sources:
           - *source-hot
-          - *source-dissagregated
       hot_mpi_camp:
         title: MPI (camp) - Harmonized over time
         unit: ""
@@ -357,7 +355,6 @@ tables:
            numDecimalPlaces: 3
         sources:
           - *source-hot
-          - *source-dissagregated
       hot_share_national:
         title: Share of population multidimensionally poor (national) - Harmonized over time
         unit: "%"
@@ -388,7 +385,6 @@ tables:
            numDecimalPlaces: 1
         sources:
           - *source-hot
-          - *source-dissagregated
       hot_share_rural:
         title: Share of population multidimensionally poor (rural) - Harmonized over time
         unit: "%"
@@ -404,7 +400,6 @@ tables:
            numDecimalPlaces: 1
         sources:
           - *source-hot
-          - *source-dissagregated
       hot_share_camp:
         title: Share of population multidimensionally poor (camp) - Harmonized over time
         unit: "%"
@@ -420,7 +415,6 @@ tables:
            numDecimalPlaces: 1
         sources:
           - *source-hot
-          - *source-dissagregated
       hot_intensity_national:
         title: Intensity of multidimensional poverty (national) - Harmonized over time
         unit: "%"
@@ -455,7 +449,6 @@ tables:
            numDecimalPlaces: 1
         sources:
           - *source-hot
-          - *source-dissagregated
       hot_intensity_rural:
         title: Intensity of multidimensional poverty (rural) - Harmonized over time
         unit: "%"
@@ -473,7 +466,6 @@ tables:
            numDecimalPlaces: 1
         sources:
           - *source-hot
-          - *source-dissagregated
       hot_intensity_camp:
         title: Intensity of multidimensional poverty (camp) - Harmonized over time
         unit: "%"
@@ -491,4 +483,3 @@ tables:
            numDecimalPlaces: 1
         sources:
           - *source-hot
-          - *source-dissagregated
