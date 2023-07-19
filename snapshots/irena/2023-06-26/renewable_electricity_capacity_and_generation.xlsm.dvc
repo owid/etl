@@ -4,11 +4,11 @@ meta:
 
   publication_date: '2023-03-01'
   source_name: International Renewable Energy Agency (IRENA)
-  source_published_by: International Renewable Energy Agency (IRENA)
+  source_published_by: International Renewable Energy Agency © IRENA 2022
   url: https://www.irena.org/Statistics/Download-query-tools
-  source_data_url: 
+  source_data_url:
     https://www.irena.org/IRENADocuments/IRENA_RE_electricity_statistics_-_Query_tool.xlsm
-  license_url: 
+  license_url:
     https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2023/Mar/IRENA_RE_Capacity_Statistics_2023.pdf
   license_name: Copyright © IRENA 2023
   date_accessed: 2023-06-28
