@@ -99,35 +99,5 @@ steps:
     - data://garden/emissions/2023-05-02/national_contributions
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
-  #
-  # GCP - Global Carbon Budget (2023-04-28).
-  #
-  data://meadow/gcp/2023-04-28/global_carbon_budget:
-    - snapshot://gcp/2023-04-28/global_carbon_budget_fossil_co2_emissions.csv
-    - snapshot://gcp/2023-04-28/global_carbon_budget_global_emissions.xlsx
-    - snapshot://gcp/2023-04-28/global_carbon_budget_national_emissions.xlsx
-    - snapshot://gcp/2023-04-28/global_carbon_budget_land_use_change_emissions.xlsx
-  data://garden/gcp/2023-04-28/global_carbon_budget:
-    - data://meadow/gcp/2023-04-28/global_carbon_budget
-    # Loaded to calculate emissions per unit energy.
-    - data://garden/energy/2023-06-01/primary_energy_consumption
-    # Loaded to calculate emissions per GDP.
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    # Loaded to create per-capita variables.
-    - data://garden/demography/2022-12-08/population
-    # Loaded to create region aggregates (including income groups).
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2021-07-01/wb_income
-  data://grapher/gcp/2023-04-28/global_carbon_budget:
-    - data://garden/gcp/2023-04-28/global_carbon_budget
-  #
-  # Emissions - CO2 dataset (2022).
-  #
-  data://garden/emissions/2023-05-03/owid_co2:
-    - data://garden/emissions/2023-05-02/national_contributions
-    - data://garden/gcp/2023-04-28/global_carbon_budget
-    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-    - data://garden/energy/2023-06-01/primary_energy_consumption
-    - data://garden/demography/2022-12-08/population
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/regions/2023-01-01/regions
+  
+  ######################################################################################################################
