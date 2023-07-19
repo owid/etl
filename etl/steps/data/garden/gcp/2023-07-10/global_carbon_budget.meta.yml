@@ -1,5 +1,5 @@
 dataset:
-  title: Global Carbon Budget (Global Carbon Project, 2023)
+  title: Global Carbon Budget (Global Carbon Project, 2023b)
   description: |
     The Global Carbon Budget dataset is available <a href="https://globalcarbonbudget.org/archive/">here</a>.
 
@@ -18,15 +18,6 @@ dataset:
 
     Our World in Data have renamed bunker fuels as "International transport" for improved clarity, which includes emissions from international aviation and shipping.
     Emissions from the Kuwaiti oil fires in 1991 have been included as part of Kuwait's emissions for that year.
-
-  licenses:
-  - name: Creative Commons Attribution 4.0 International
-    url: https://zenodo.org/record/7215364
-  sources:
-  - name: Our World in Data based on the Global Carbon Project (2023)
-    published_by: "Friedlingstein, P., O'Sullivan, M., Jones, M. W., Andrew, R. M., Gregor, L., Hauck, J., Le Quéré, C., Luijkx, I. T., Olsen, A., Peters, G. P., Peters, W., Pongratz, J., Schwingshackl, C., Sitch, S., Canadell, J. G., Ciais, P., Jackson, R. B., Alin, S. R., Alkama, R., Arneth, A., Arora, V. K., Bates, N. R., Becker, M., Bellouin, N., Bittig, H. C., Bopp, L., Chevallier, F., Chini, L. P., Cronin, M., Evans, W., Falk, S., Feely, R. A., Gasser, T., Gehlen, M., Gkritzalis, T., Gloege, L., Grassi, G., Gruber, N., Gürses, Ö., Harris, I., Hefner, M., Houghton, R. A., Hurtt, G. C., Iida, Y., Ilyina, T., Jain, A. K., Jersild, A., Kadono, K., Kato, E., Kennedy, D., Klein Goldewijk, K., Knauer, J., Korsbakken, J. I., Landschützer, P., Lefèvre, N., Lindsay, K., Liu, J., Liu, Z., Marland, G., Mayot, N., McGrath, M. J., Metzl, N., Monacci, N. M., Munro, D. R., Nakaoka, S.-I., Niwa, Y., O'Brien, K., Ono, T., Palmer, P. I., Pan, N., Pierrot, D., Pocock, K., Poulter, B., Resplandy, L., Robertson, E., Rödenbeck, C., Rodriguez, C., Rosan, T. M., Schwinger, J., Séférian, R., Shutler, J. D., Skjelvan, I., Steinhoff, T., Sun, Q., Sutton, A. J., Sweeney, C., Takao, S., Tanhua, T., Tans, P. P., Tian, X., Tian, H., Tilbrook, B., Tsujino, H., Tubiello, F., van der Werf, G. R., Walker, A. P., Wanninkhof, R., Whitehead, C., Willstrand Wranne, A., Wright, R., Yuan, W., Yue, C., Yue, X., Zaehle, S., Zeng, J., and Zheng, B.: Global Carbon Budget 2022, Earth Syst. Sci. Data, 14, 4811-4900, https://doi.org/10.5194/essd-14-4811-2022, 2022."
-    url: https://www.globalcarbonproject.org/
-    date_accessed: 2023-04-28
 
 tables:
   global_carbon_budget:
