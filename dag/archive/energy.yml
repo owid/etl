@@ -266,6 +266,15 @@ steps:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/regions/2023-01-01/regions
   #
+  # IRENA - Renewable power generation costs (2022).
+  #
+  data://meadow/irena/2023-01-04/renewable_power_generation_costs:
+    - walden://irena/2022-10-07/renewable_power_generation_costs
+  data://garden/irena/2023-01-04/renewable_power_generation_costs:
+    - data://meadow/irena/2023-01-04/renewable_power_generation_costs
+  data://grapher/irena/2023-01-04/renewable_power_generation_costs:
+    - data://garden/irena/2023-01-04/renewable_power_generation_costs
+  #
   # IRENA - Renewable electricity capacity (and generation, although the generation part is ignored for now, 2022).
   #
   data://meadow/irena/2023-01-04/renewable_electricity_capacity_and_generation:

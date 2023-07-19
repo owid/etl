@@ -16,8 +16,12 @@ For cost data, we use Nemet (2009) between 1975 and 2003, Farmer & Lafond (2016)
 
 """
 
-import pandas as pd
-from owid import catalog
+import owid.catalog.processing as pr
+from owid.catalog import Dataset, Table
+from owid.catalog.tables import (
+    get_unique_licenses_from_tables,
+    get_unique_sources_from_tables,
+)
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
 from etl.helpers import PathFinder, create_dataset
@@ -32,7 +36,7 @@ USD2004_TO_USD2021 = 1.42
 USD2013_TO_USD2021 = 1.19
 
 
-def prepare_capacity_data(tb_nemet: catalog.Table, tb_irena_capacity: catalog.Table) -> catalog.Table:
+def prepare_capacity_data(tb_nemet: Table, tb_irena_capacity: Table) -> Table:
     # Column "previous_capacity" is equivalent to tb_nemet["yearly_capacity"].shift(1).cumsum()
     # As they explain in the paper, "Following Epple et al. (1991), cumulative capacity is lagged one year to account
     # for the time it takes to incorporate new techniques obtained as a result of learning from experience."
@@ -58,13 +62,19 @@ def prepare_capacity_data(tb_nemet: catalog.Table, tb_irena_capacity: catalog.Ta
         .sort_values("year")
         .reset_index(drop=True)
     )
+    # NOTE: The previous operation does not propagate metadata. Manually combine sources.
+    for column in ["cumulative_capacity", "cumulative_capacity_source"]:
+        cumulative_capacity[column].metadata.sources = get_unique_sources_from_tables(
+            [tb_nemet_capacity, tb_irena_capacity]
+        )
+        cumulative_capacity[column].metadata.licenses = get_unique_licenses_from_tables(
+            [tb_nemet_capacity, tb_irena_capacity]
+        )
 
     return cumulative_capacity
 
 
-def prepare_cost_data(
-    tb_nemet: catalog.Table, tb_irena_cost: catalog.Table, tb_farmer_lafond: catalog.Table
-) -> catalog.Table:
+def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: Table) -> Table:
     # Prepare solar photovoltaic cost data from Nemet (2009).
     tb_nemet_cost = tb_nemet[["year", "cost"]].copy()
     tb_nemet_cost["cost_source"] = "Nemet (2009)"
@@ -94,6 +104,15 @@ def prepare_cost_data(
     # Combine the previous with IRENA, prioritizing the latter.
     combined = combine_two_overlapping_dataframes(df1=tb_irena_cost, df2=combined, index_columns="year")
 
+    # NOTE: The previous operation does not propagate metadata. Manually combine sources.
+    for column in ["cost", "cost_source"]:
+        combined[column].metadata.sources = get_unique_sources_from_tables(
+            [tb_nemet_cost, tb_farmer_lafond, tb_irena_cost]
+        )
+        combined[column].metadata.licenses = get_unique_licenses_from_tables(
+            [tb_nemet_cost, tb_farmer_lafond, tb_irena_cost]
+        )
+
     return combined
 
 
@@ -101,21 +120,21 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Load Nemet (2009) dataset from Garden.
-    ds_nemet: catalog.Dataset = paths.load_dependency("nemet_2009")
+    # Load Nemet (2009) dataset from garden and read its main table.
+    ds_nemet: Dataset = paths.load_dependency("nemet_2009")
     tb_nemet = ds_nemet["nemet_2009"].reset_index()
 
-    # Load Farmer & Lafond (2016) dataset from Garden.
-    ds_farmer_lafond: catalog.Dataset = paths.load_dependency("farmer_lafond_2016")
+    # Load Farmer & Lafond (2016) dataset from garden and read its main table.
+    ds_farmer_lafond: Dataset = paths.load_dependency("farmer_lafond_2016")
     tb_farmer_lafond = ds_farmer_lafond["farmer_lafond_2016"].reset_index()
 
-    # Load IRENA dataset on capacity from Garden.
-    ds_irena_capacity: catalog.Dataset = paths.load_dependency("renewable_electricity_capacity")
+    # Load IRENA dataset on capacity from garden and read its main table.
+    ds_irena_capacity: Dataset = paths.load_dependency("renewable_electricity_capacity")
     tb_irena_capacity = ds_irena_capacity["renewable_electricity_capacity"].reset_index()
 
-    # Load IRENA dataset on cost from Garden.
-    ds_irena_cost: catalog.Dataset = paths.load_dependency("renewable_power_generation_costs")
-    tb_irena_cost = ds_irena_cost["solar_photovoltaic_module_prices"]
+    # Load IRENA dataset on cost from garden and read its main table.
+    ds_irena_cost: Dataset = paths.load_dependency("renewable_power_generation_costs")
+    tb_irena_cost = ds_irena_cost["solar_photovoltaic_module_prices"].reset_index()
 
     #
     # Process data.
@@ -127,7 +146,7 @@ def run(dest_dir: str) -> None:
     cost = prepare_cost_data(tb_nemet=tb_nemet, tb_irena_cost=tb_irena_cost, tb_farmer_lafond=tb_farmer_lafond)
 
     # Combine capacity and cost data.
-    tb_combined = pd.merge(cost, cumulative_capacity, on="year", how="outer")
+    tb_combined = pr.merge(cost, cumulative_capacity, on="year", how="outer")
 
     # Add column for region.
     tb_combined = tb_combined.assign(**{"country": "World"})
@@ -135,10 +154,12 @@ def run(dest_dir: str) -> None:
     # Set an appropriate index and sort conveniently.
     tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index()
 
+    # Rename table.
+    tb_combined.metadata.short_name = paths.short_name
+
     #
     # Save outputs.
     #
     # Create a new dataset with the same metadata as meadow
-    tb_combined.metadata.short_name = paths.short_name
     ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_combined])
     ds_garden.save()
