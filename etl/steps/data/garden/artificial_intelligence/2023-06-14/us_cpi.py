@@ -14,6 +14,7 @@ YEARS = 23
 def import_US_cpi_API(years_back=YEARS):
     """
     Imports the US Consumer Price Index (CPI) data from the World Bank API.
+    https://datahelpdesk.worldbank.org/knowledgebase/articles/898581 - visit here for details
 
     Returns:
         DataFrame: A DataFrame containing the extracted CPI data with columns 'year' and 'fp_cpi_totl'.
