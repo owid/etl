@@ -141,6 +141,8 @@ tables:
         display:
            name: MPI (camp)
            numDecimalPlaces: 3
+        sources:
+          - *source-dissagregated
       cme_share_national:
         title: Share of population multidimensionally poor (national) - Current margin estimate
         unit: "%"
@@ -154,6 +156,8 @@ tables:
         display:
            name: Share of population multidimensionally poor
            numDecimalPlaces: 1
+        sources:
+          - *source-cme
       cme_share_urban:
         title: Share of population multidimensionally poor (urban) - Current margin estimate
         unit: "%"
@@ -167,6 +171,8 @@ tables:
         display:
            name: Share of population multidimensionally poor (urban)
            numDecimalPlaces: 1
+        sources:
+          - *source-dissagregated
       cme_share_rural:
         title: Share of population multidimensionally poor (rural) - Current margin estimate
         unit: "%"
@@ -180,6 +186,8 @@ tables:
         display:
            name: Share of population multidimensionally poor (rural)
            numDecimalPlaces: 1
+        sources:
+          - *source-dissagregated
       cme_share_camp:
         title: Share of population multidimensionally poor (camp) - Current margin estimate
         unit: "%"
@@ -193,6 +201,8 @@ tables:
         display:
            name: Share of population multidimensionally poor (camp)
            numDecimalPlaces: 1
+        sources:
+          - *source-dissagregated
       cme_intensity_national:
         title: Intensity of multidimensional poverty (national) - Current margin estimate
         unit: "%"
@@ -208,6 +218,8 @@ tables:
         display:
            name: Intensity of multidimensional poverty
            numDecimalPlaces: 1
+        sources:
+          - *source-cme
       cme_intensity_urban:
         title: Intensity of multidimensional poverty (urban) - Current margin estimate
         unit: "%"
@@ -223,6 +235,8 @@ tables:
         display:
            name: Intensity of multidimensional poverty (urban)
            numDecimalPlaces: 1
+        sources:
+          - *source-dissagregated
       cme_intensity_rural:
         title: Intensity of multidimensional poverty (rural) - Current margin estimate
         unit: "%"
@@ -238,6 +252,8 @@ tables:
         display:
            name: Intensity of multidimensional poverty (rural)
            numDecimalPlaces: 1
+        sources:
+          - *source-dissagregated
       cme_intensity_camp:
         title: Intensity of multidimensional poverty (camp) - Current margin estimate
         unit: "%"
@@ -253,6 +269,8 @@ tables:
         display:
            name: Intensity of multidimensional poverty (camp)
            numDecimalPlaces: 1
+        sources:
+          - *source-dissagregated
       hot_mpi_national:
         title: MPI (national) - Harmonized over time
         unit: ""
@@ -272,6 +290,8 @@ tables:
         display:
            name: MPI
            numDecimalPlaces: 3
+        sources:
+          - *source-hot
       hot_mpi_urban:
         title: MPI (urban) - Harmonized over time
         unit: ""
@@ -291,6 +311,9 @@ tables:
         display:
            name: MPI (urban)
            numDecimalPlaces: 3
+        sources:
+          - *source-hot
+          - *source-dissagregated
       hot_mpi_rural:
         title: MPI (rural) - Harmonized over time
         unit: ""
@@ -310,6 +333,9 @@ tables:
         display:
            name: MPI (rural)
            numDecimalPlaces: 3
+        sources:
+          - *source-hot
+          - *source-dissagregated
       hot_mpi_camp:
         title: MPI (camp) - Harmonized over time
         unit: ""
@@ -329,6 +355,9 @@ tables:
         display:
            name: MPI (camp)
            numDecimalPlaces: 3
+        sources:
+          - *source-hot
+          - *source-dissagregated
       hot_share_national:
         title: Share of population multidimensionally poor (national) - Harmonized over time
         unit: "%"
@@ -342,6 +371,8 @@ tables:
         display:
            name: Share of population multidimensionally poor
            numDecimalPlaces: 1
+        sources:
+          - *source-hot
       hot_share_urban:
         title: Share of population multidimensionally poor (urban) - Harmonized over time
         unit: "%"
@@ -355,6 +386,9 @@ tables:
         display:
            name: Share of population multidimensionally poor (urban)
            numDecimalPlaces: 1
+        sources:
+          - *source-hot
+          - *source-dissagregated
       hot_share_rural:
         title: Share of population multidimensionally poor (rural) - Harmonized over time
         unit: "%"
@@ -368,6 +402,9 @@ tables:
         display:
            name: Share of population multidimensionally poor (rural)
            numDecimalPlaces: 1
+        sources:
+          - *source-hot
+          - *source-dissagregated
       hot_share_camp:
         title: Share of population multidimensionally poor (camp) - Harmonized over time
         unit: "%"
@@ -381,6 +418,9 @@ tables:
         display:
            name: Share of population multidimensionally poor (camp)
            numDecimalPlaces: 1
+        sources:
+          - *source-hot
+          - *source-dissagregated
       hot_intensity_national:
         title: Intensity of multidimensional poverty (national) - Harmonized over time
         unit: "%"
@@ -396,6 +436,8 @@ tables:
         display:
            name: Intensity of multidimensional poverty
            numDecimalPlaces: 1
+        sources:
+          - *source-hot
       hot_intensity_urban:
         title: Intensity of multidimensional poverty (urban) - Harmonized over time
         unit: "%"
@@ -411,6 +453,9 @@ tables:
         display:
            name: Intensity of multidimensional poverty (urban)
            numDecimalPlaces: 1
+        sources:
+          - *source-hot
+          - *source-dissagregated
       hot_intensity_rural:
         title: Intensity of multidimensional poverty (rural) - Harmonized over time
         unit: "%"
@@ -426,6 +471,9 @@ tables:
         display:
            name: Intensity of multidimensional poverty (rural)
            numDecimalPlaces: 1
+        sources:
+          - *source-hot
+          - *source-dissagregated
       hot_intensity_camp:
         title: Intensity of multidimensional poverty (camp) - Harmonized over time
         unit: "%"
@@ -441,3 +489,6 @@ tables:
         display:
            name: Intensity of multidimensional poverty (camp)
            numDecimalPlaces: 1
+        sources:
+          - *source-hot
+          - *source-dissagregated
