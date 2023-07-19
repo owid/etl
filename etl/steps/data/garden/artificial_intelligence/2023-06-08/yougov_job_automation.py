@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
         "18-29": "18-29 years",
         "2-year": "2-year post-secondary education",
         "30-44": "30-44 years",
-        "4-year": "4-Year post-secondary education",
+        "4-year": "4-year post-secondary education",
         "45-64": "45-64 years",
         "65+": "65+ years",
         "High school graduate": "High school graduates",

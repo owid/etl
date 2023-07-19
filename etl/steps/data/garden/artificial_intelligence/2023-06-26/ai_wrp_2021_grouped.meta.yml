@@ -26,231 +26,60 @@ dataset:
 tables:
   ai_wrp_2021_grouped:
     variables:
-      age_mostly_help:
-        title: Age - Help
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-          Answers by respondents grouped by age.
+      yes__would_feel_safe_value:
+        title: Yes, would feel safe
+        description: Share of respondents who responded "Yes, would feel safe" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
         display:
-          name: Age
-          numDecimalPlaces: 0
-      education_mostly_help:
-        title: Education - Help
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-          Answers by respondents grouped by education level.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Education
-          numDecimalPlaces: 0
-      employment_mostly_help:
-        title: Employment - Help
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-          Answers by respondents grouped by employment status.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Employment
-          numDecimalPlaces: 0
-      gender_mostly_help:
-        title: Gender - Help
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-          Answers by respondents grouped by gender.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Gender
-          numDecimalPlaces: 0
-      income_mostly_help:
-        title: Income - Help
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-          Answers by respondents grouped by income level.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Income
-          numDecimalPlaces: 0
-      region_mostly_help:
-        title: Region - Help
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-          Answers by respondents grouped by region.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Region
           numDecimalPlaces: 0
 
-      age_mostly_harm:
-        title: Age - Harm
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-          Answers by respondents grouped by age group.
+      no__would_not_feel_safe_value:
+        title: No, would not feel safe
+        description: Share of respondents who responded "No, would not feel safe" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
         display:
-          name: Age
           numDecimalPlaces: 0
 
-      education_mostly_harm:
-        title: Education - Harm
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-          Answers by respondents grouped by education level.
+      mostly_help_value:
+        title: "Mostly help"
+        description: Share of respondents who responded "Mostly help" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
         display:
-          name: Education
           numDecimalPlaces: 0
 
-      employment_mostly_harm:
-        title: Employment - Harm
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-          Answers by respondents grouped by employment status.
+      mostly_harm_value:
+        title: "Mostly harm"
+        description: Share of respondents who responded "Mostly harm" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
         display:
-          name: Employment
           numDecimalPlaces: 0
 
-      gender_mostly_harm:
-        title: Gender - Harm
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-          Answers by respondents grouped by gender.
+      neither_value:
+        title: "Neither"
+        description: Share of respondents who responded "Neither" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
         display:
-          name: Gender
           numDecimalPlaces: 0
 
-      income_mostly_harm:
-        title: Income - Harm
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-          Answers by respondents grouped by income level.
+      other_help_harm:
+        title: "Don't have an opinion, Don't know, or Refused - help/harm question"
+        description: Share of respondents who refused to answer the question or said "Don't have an opinion" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
         display:
-          name: Income
+          name: "Other"
           numDecimalPlaces: 0
 
-      region_mostly_harm:
-        title: Region - Harm
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-          Answers by respondents grouped by region.
+      other_yes_no:
+        title: "Don't know or Refused - self-driving cars question"
+        description: Share of respondents who refused to answer the question or said "Don't know" to the question "Would you feel safe in a car driven by a computer without a human driver?".
         unit: '%'
         short_unit: '%'
         display:
-          name: Region
-          numDecimalPlaces: 0
-
-      age_yes__would_feel_safe:
-        title: Age - Yes
-        description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?"
-          Answers by respondents grouped by age.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Age
-          numDecimalPlaces: 0
-      education_yes__would_feel_safe:
-        title: Education - Yes
-        description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?"
-          Answers by respondents grouped by education level.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Education
-          numDecimalPlaces: 0
-      employment_yes__would_feel_safe:
-        title: Employment - Yes
-        description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?"
-          Answers by respondents grouped by employment status.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Employment
-          numDecimalPlaces: 0
-      gender_yes__would_feel_safe:
-        title: Gender - Yes
-        description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?"
-          Answers by respondents grouped by gender.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Gender
-          numDecimalPlaces: 0
-      income_yes__would_feel_safe:
-        title: Income - Yes
-        description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?"
-          Answers by respondents grouped by income level.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Income
-          numDecimalPlaces: 0
-      region_yes__would_feel_safe:
-        title: Region - Yes
-        description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?"
-          Answers by respondents grouped by region.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Region
-          numDecimalPlaces: 0
-      age_no__would_not_feel_safe:
-        title: Age - No
-        description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?"
-          Answers by respondents grouped by age group.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Age
-          numDecimalPlaces: 0
-
-      education_no__would_not_feel_safe:
-        title: Education - No
-        description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?"
-          Answers by respondents grouped by education level.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Education
-          numDecimalPlaces: 0
-
-      employment_no__would_not_feel_safe:
-        title: Employment - No
-        description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?"
-          Answers by respondents grouped by employment status.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Employment
-          numDecimalPlaces: 0
-
-      gender_no__would_not_feel_safe:
-        title: Gender - No
-        description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?"
-          Answers by respondents grouped by gender.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Gender
-          numDecimalPlaces: 0
-
-      income_no__would_not_feel_safe:
-        title: Income - No
-        description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?"
-          Answers by respondents grouped by income level.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Income
-          numDecimalPlaces: 0
-
-      region_no__would_not_feel_safe:
-        title: Reion - No
-        description: World Risk Survey question - "Would you feel safe in a car driven by a computer without a human driver?"
-          Answers by respondents grouped by region.
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Reion
+          name: "Other"
           numDecimalPlaces: 0
