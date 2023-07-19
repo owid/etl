@@ -1,9 +1,8 @@
 dataset:
   title: uk_covid_data
   sources:
-  - name: UK Government COVID-19 Dashboard – Last updated 17 July 2023
+  - name: UK Government COVID-19 Dashboard – Last updated {TODAY}
     url: https://coronavirus.data.gov.uk/details/download
-    date_accessed: 2023-07-17
     published_by: Government of the United Kingdom
 tables:
   uk_covid_data:

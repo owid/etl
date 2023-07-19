@@ -43,7 +43,6 @@ dataset:
     of Health & Human Services</a>
   sources:
   - name: Official data collated by Our World in Data
-    date_accessed: 2023-07-17
     published_by: Official data collated by Our World in Data
 
 tables:

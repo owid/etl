@@ -25,7 +25,6 @@ dataset:
   sources:
   - name: World Health Organization
     url: https://covid19.who.int/data
-    date_accessed: '2023-07-17'
     published_by: 'WHO COVID-19 Dashboard. Geneva: World Health Organization, 2020.'
 tables:
   cases_and_deaths_who:

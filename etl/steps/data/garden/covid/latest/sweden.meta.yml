@@ -12,8 +12,7 @@ dataset:
   sources:
   - name: Swedish Public Health Agency – Last updated 24 March 2023
     url: https://www.folkhalsomyndigheten.se/smittskydd-beredskap/utbrott/aktuella-utbrott/covid-19/statistik-och-analyser/bekraftade-fall-i-sverige/
-    date_accessed: 2023-07-17
-    published_by: Swedish Public Health Agency – Last updated 28 October 2022
+    published_by: Swedish Public Health Agency – Last updated {TODAY}
 tables:
   sweden:
     variables:

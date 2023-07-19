@@ -208,9 +208,8 @@ dataset:
     5 - Universal availability
   sources:
   - name: Oxford COVID-19 Government Response Tracker, Blavatnik School of Government,
-      University of Oxford – Last updated 14 June 2023
+      University of Oxford – Last updated {TODAY}
     url: https://www.bsg.ox.ac.uk/research/research-projects/oxford-covid-19-government-response-tracker
-    date_accessed: 2023-07-17
     published_by: Thomas Hale, Noam Angrist, Rafael Goldszmidt, Beatriz Kira, Anna
       Petherick, Toby Phillips, Samuel Webster, Emily Cameron-Blake, Laura Hallas,
       Saptarshi Majumdar, and Helen Tatlow. (2021). “A global panel database of pandemic
