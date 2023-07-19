@@ -77,7 +77,7 @@ include:
   - dag/archive/energy.yml
   # - dag/archive/walkthrough.yml
   # - dag/archive/examples.yml
-  # - dag/archive/emissions.yml
+  - dag/archive/emissions.yml
   - dag/archive/papers.yml
   - dag/archive/demography.yml
   # - dag/archive/war.yml
