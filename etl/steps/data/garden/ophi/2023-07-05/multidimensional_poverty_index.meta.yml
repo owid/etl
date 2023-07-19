@@ -10,7 +10,7 @@ definitions:
 
     The individual indicators are not ‘weighted’ equally: When adding up the number of indicators in which a person is deprived, some count for more than others. Health and education indicators are given a weight of 1/6, while the indicators within the living standards dimension are given a weight of 1/18. This means that the three dimensions – health, education and living standards – have an equal weight in the total of one-third each.
 
-    If the household survey data being used is missing any of the 10 indicators, that indicator is dropped from the calculation. The weights are then adjusted so that each dimension continues to be given a weight of one-third. MPI poverty estimates are only calculated if at least one indicator in each dimension is available.
+    If the household survey data being used is missing any of the 10 indicators, that indicator is dropped from the calculation. The weights are then adjusted so that each dimension continues to be given a weight of one-third. MPI poverty estimates are only calculated if at least one indicator in health and education dimensions is available, and if up to four indicators in the living standards dimension are available.
   mpi_first: |-
     The Multidimensional Poverty Index is obtained by multiplying two values: the share of people who are multidimensionally (MPI) poor and the intensity of multidimensional poverty among the MPI poor. A larger figure represents a higher level of poverty.
   mpi_last: |-
@@ -45,6 +45,7 @@ tables:
           {definitions.mpi_last}
         display:
            name: MPI
+           numDecimalPlaces: 3
       cme_mpi_urban:
         title: MPI (urban) - Current margin estimate
         unit: ""
@@ -63,6 +64,7 @@ tables:
           {definitions.mpi_last}
         display:
            name: MPI (urban)
+           numDecimalPlaces: 3
       cme_mpi_rural:
         title: MPI (rural) - Current margin estimate
         unit: ""
@@ -81,6 +83,7 @@ tables:
           {definitions.mpi_last}
         display:
            name: MPI (rural)
+           numDecimalPlaces: 3
       cme_mpi_camp:
         title: MPI (camp) - Current margin estimate
         unit: ""
@@ -99,6 +102,7 @@ tables:
           {definitions.mpi_last}
         display:
            name: MPI (camp)
+           numDecimalPlaces: 3
       cme_share_national:
         title: Share of population multidimensionally poor (national) - Current margin estimate
         unit: "%"
@@ -229,6 +233,7 @@ tables:
           {definitions.mpi_last}
         display:
            name: MPI
+           numDecimalPlaces: 3
       hot_mpi_urban:
         title: MPI (urban) - Harmonized over time
         unit: ""
@@ -247,6 +252,7 @@ tables:
           {definitions.mpi_last}
         display:
            name: MPI (urban)
+           numDecimalPlaces: 3
       hot_mpi_rural:
         title: MPI (rural) - Harmonized over time
         unit: ""
@@ -265,6 +271,7 @@ tables:
           {definitions.mpi_last}
         display:
            name: MPI (rural)
+           numDecimalPlaces: 3
       hot_mpi_camp:
         title: MPI (camp) - Harmonized over time
         unit: ""
@@ -283,6 +290,7 @@ tables:
           {definitions.mpi_last}
         display:
            name: MPI (camp)
+           numDecimalPlaces: 3
       hot_share_national:
         title: Share of population multidimensionally poor (national) - Harmonized over time
         unit: "%"

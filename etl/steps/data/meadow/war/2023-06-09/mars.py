@@ -17,7 +17,7 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("war_mars.start")
+    log.info("mars.start")
 
     #
     # Load inputs.
@@ -40,7 +40,10 @@ def run(dest_dir: str) -> None:
     # Ensure correct dtypes
     for col in ["startdate", "enddate"]:
         tb[col] = pd.to_datetime(tb[col])
-    df["mic_qc"] = df["mic_qc"].replace(" ", pd.NA).astype("Int64")
+    tb["mic_qc"] = tb["mic_qc"].replace(" ", pd.NA).astype("Int64")
+
+    # Set index
+    tb = tb.set_index("id")
 
     #
     # Save outputs.
@@ -51,4 +54,4 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_meadow.save()
 
-    log.info("war_mars.end")
+    log.info("mars.end")
