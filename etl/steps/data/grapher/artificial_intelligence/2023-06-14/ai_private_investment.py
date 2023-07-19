@@ -2,7 +2,6 @@
 
 from typing import cast
 
-import numpy as np
 from owid.catalog import Dataset
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
@@ -22,9 +21,7 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["ai_private_investment"]
     tb.reset_index(inplace=True)
 
-    # For plotting in grapher add focus area to country and then drop focus_area column
-    tb["country"] = np.where(tb["focus_area"].notna(), tb["focus_area"], tb["country"])
-    tb.drop("focus_area", axis=1, inplace=True)
+    tb.rename(columns={"focus_area": "country"}, inplace=True)
     tb.set_index(["country", "year"], inplace=True)
 
     # Save outputs.
