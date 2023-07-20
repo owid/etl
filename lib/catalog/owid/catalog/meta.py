@@ -147,7 +147,8 @@ class Origin:
             if value is not None:
                 setattr(self, key, value)
 
-
+# Minor is for cases where we only harmonized the countries or similar
+# Major is for cases where we do more, like create new aggregations, combine multiple indicators, etc.
 OWID_PROCESSING_LEVELS = Literal["minor", "major"]
 
 
@@ -170,9 +171,9 @@ class VariablePresentationMeta:
     grapher_config: Optional[GrapherConfig] = None
     # The text for the header of the data page
     title_public: Optional[str] = None
-    # Shown next to title to differentiate e.g. future projections from historical values
+    # Shown next to title to differentiate similar indicators e.g. "future projections" or "historical values"
     title_variant: Optional[str] = None
-    # Shown next to title to differentiate e.g. WHO from IHME
+    # Shown next to title to differentiate similar indicators e.g. "WHO" or "IHME"
     producer_short: Optional[str] = None
     # A short text to use to credit the source e.g. at the bottom of charts. Autofilled from the list of origins (see below). Semicolon separated if there are multiple.
     citation_inline: Optional[str] = None
@@ -180,10 +181,13 @@ class VariablePresentationMeta:
     topic_tags_links: List[str] = field(default_factory=list)
 
     # Fields that are more work to add but of high value
-    faqs: List[FaqLink] = field(default_factory=list)  # List of google doc ids + fragment id
+
+    # List of google doc ids + fragment id
+    faqs: List[FaqLink] = field(default_factory=list)
+    # List of bullet points for the key info text (can use markdown formatting)
     key_info_text: List[str] = field(
         default_factory=list
-    )  # List of bullet points for the key info text (can use markdown formatting)
+    )
 
     # A short summary of what was done to process this indicator
     processing_info: Optional[str] = None

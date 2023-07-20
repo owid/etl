@@ -304,7 +304,7 @@
                       }
                     ]
                   },
-                  "processing_level": { "type": "string", "enum": ["minor", "medium", "major"] },
+                  "processing_level": { "type": "string", "enum": ["minor", "major"] },
                   "presentation_license": {
                     "type": "object",
                     "additionalProperties": false,
@@ -324,6 +324,7 @@
                       "title_public": { "type": "string" },
                       "title_variant": { "type": "string" },
                       "citation_inline": { "type": "string" },
+                      "producer_short": { "type": "string" },
                       "topic_tags_links": {
                         "type": "array",
                         "items": { "type": "string" }
