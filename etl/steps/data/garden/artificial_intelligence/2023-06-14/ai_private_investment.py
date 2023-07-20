@@ -44,7 +44,6 @@ def run(dest_dir: str) -> None:
         "Music, Video Content",
         "VC",
         "Total",
-        "Total (focus area)",
     ]
 
     log.info("ai_private_investment.start")
@@ -53,8 +52,8 @@ def run(dest_dir: str) -> None:
     #
     # Load AI corporate investment snapshot
     snap = cast(Snapshot, paths.load_dependency("ai_private_investment.csv"))
-    df = pd.read_csv(snap.path)
-    df["Geographic Area"] = df["Geographic Area"].replace(
+    df_focus = pd.read_csv(snap.path)
+    df_focus["Geographic Area"] = df_focus["Geographic Area"].replace(
         {"CN": "China", "US": "United States", "EU/UK": "European Union and United Kingdom", "World": "World"}
     )
 
@@ -64,7 +63,7 @@ def run(dest_dir: str) -> None:
     df_total.rename(
         columns={"Total Investment (in Billions of U.S. Dollars)": "Total", "Label": "Geographic Area"}, inplace=True
     )
-    df = pd.merge(df, df_total, on=["Year", "Geographic Area"], how="outer")
+    df = pd.merge(df_focus, df_total, on=["Year", "Geographic Area"], how="outer")
 
     df.rename(columns={"Year": "year"}, inplace=True)
     df.loc[:, df.columns.isin(cols_to_adjust_for_infaltion)] *= 1e9
@@ -147,37 +146,8 @@ def reshape_for_plotting(df):
         "VC": "Venture capital",
     }
 
-    # Select relevant columns for the world data
-    cols_world = ["year", "country", "Total (focus area)", "Focus Area"]
-    world_df = df[cols_world]
-
-    # Drop rows with missing values in 'Total (focus area)' or 'Focus Area'
-    world_df = world_df.dropna(subset=["Total (focus area)", "Focus Area"], how="all")
-
-    # Remove the 'country' column
-    world_df.drop("country", axis=1, inplace=True)
-
-    # Reset the index of the DataFrame
-    world_df.reset_index(drop=True, inplace=True)
-
-    # Rename the 'Total (focus area)' column to 'World'
-    world_df.rename(columns={"Total (focus area)": "World"}, inplace=True)
-
-    # Replace focus area names using the mapping dictionary
-    world_df["Focus Area"] = world_df["Focus Area"].replace(name_map_dict)
-
-    # Select columns that are not 'Total (focus area)' or 'Focus Area'
-    mask_focus_area = ~df.columns.isin(["Total (focus area)", "Focus Area"])
-    focus_area_df = df.loc[:, mask_focus_area]
-
-    # Select columns to check for missing values
-    cols_to_check = focus_area_df.columns.difference(["year", "country"])
-
-    # Drop rows with missing values in the selected columns
-    df_focus_clean = focus_area_df.dropna(subset=cols_to_check, how="all")
-
     # Reshape the DataFrame by melting it
-    df_melted_focus = df_focus_clean.melt(id_vars=["year", "country"], var_name="Focus Area", value_name="value")
+    df_melted_focus = df.melt(id_vars=["year", "country"], var_name="Focus Area", value_name="value")
 
     # Pivot the melted DataFrame to create country-specific columns
     df_pivoted_focus = df_melted_focus.pivot(index=["year", "Focus Area"], columns="country", values="value")
@@ -190,16 +160,5 @@ def reshape_for_plotting(df):
 
     # Replace focus area names using the mapping dictionary
     df_pivoted_focus["Focus Area"] = df_pivoted_focus["Focus Area"].replace(name_map_dict)
-
-    # Merge the pivoted DataFrame with the world DataFrame
-    df_pivoted_focus = df_pivoted_focus.merge(
-        world_df[["year", "Focus Area", "World"]], on=["year", "Focus Area"], how="left", suffixes=("", "_world")
-    )
-
-    # Fill missing values in the 'World' column with corresponding values from 'World_world' column
-    df_pivoted_focus["World"] = df_pivoted_focus["World"].fillna(df_pivoted_focus["World_world"])
-
-    # Drop the redundant 'World_world' column
-    df_pivoted_focus = df_pivoted_focus.drop("World_world", axis=1)
 
     return df_pivoted_focus

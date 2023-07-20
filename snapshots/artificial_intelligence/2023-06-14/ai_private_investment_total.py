@@ -30,30 +30,19 @@ def get_data() -> pd.DataFrame:
     """
     For each google drive ID, fetch all the data from the google drive folder.
     """
-    all_dfs = pd.DataFrame()
     common_path = "https://drive.google.com/uc?export=download&id="
-    # IDs of the download files (in google drive)
-    ids = [
-        "1jxlta9M0gYI-uaAFTQfg7edJG_7cXjaa",
-        "1tZY99BLUYr6PwpZYjzgDVLw-nObTnTZ-",
-        "1q0T8IfqlkUTC4XGkBAXWK64YDPpj6FMz",
-    ]
-
+    # IDs of the download files (in google drive) (Total Private investment by 1 - World and 2 -by country)
+    ids = ["1jxlta9M0gYI-uaAFTQfg7edJG_7cXjaa", "1tZY99BLUYr6PwpZYjzgDVLw-nObTnTZ-"]
+    df_list = []
     for i, id in enumerate(ids):
         df_add = pd.read_csv(common_path + ids[i])
         # Add World to Label column (usually country in these datasets)
         if "Label" not in df_add.columns:
             df_add["Label"] = "World"
-        # In the Total Investment by area spreadsheet Label is actually Year --> so change it
-        elif df_add["Label"].isin([2021, 2020]).any():
-            # Also rename Total Investment (in Billions of U.S. Dollars) so it's a separate column to the by country indicator
-            df_add.rename(
-                columns={"Label": "Year", "Total Investment (in Billions of U.S. Dollars)": "Total (focus area)"},
-                inplace=True,
-            )
-            df_add["Label"] = "World"
-
-        all_dfs = pd.concat([all_dfs, df_add])
+        df_list.append(df_add)
+    all_dfs = pd.merge(
+        df_list[0], df_list[1], on=["Label", "Year", "Total Investment (in Billions of U.S. Dollars)"], how="outer"
+    )
     return all_dfs
 
 
