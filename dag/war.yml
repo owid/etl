@@ -54,10 +54,12 @@ steps:
     - data://meadow/war/2023-01-10/sorokin_1937
   data://garden/war/2023-01-18/sutton_1971:
     - data://meadow/war/2023-01-10/sutton_1971
-  data://garden/war/2023-07-07/mars:
-    - data://meadow/war/2023-06-09/mars
   data://garden/war/2023-06-22/ucdp:
     - data://meadow/war/2023-06-22/ucdp
+  data://garden/war/2023-07-07/mars:
+    - data://meadow/war/2023-06-09/mars
+  # data://garden/war/2023-07-18/cow:
+  #   - data://meadow/war/2023-06-07/cow
 
   # Grapher
   data://grapher/war/2023-06-26/ucdp:
