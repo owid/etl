@@ -17,6 +17,7 @@ dataset:
     Data on global emissions has been converted by Our World in Data from tonnes of carbon to tonnes of carbon dioxide (CO₂) using a conversion factor of 3.664.
 
     Our World in Data have renamed bunker fuels as "International transport" for improved clarity, which includes emissions from international aviation and shipping.
+
     Emissions from the Kuwaiti oil fires in 1991 have been included as part of Kuwait's emissions for that year.
 
 tables:

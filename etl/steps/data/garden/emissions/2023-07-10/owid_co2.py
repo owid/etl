@@ -23,10 +23,6 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Details for dataset to export.
-DATASET_SHORT_NAME = "owid_co2"
-DATASET_TITLE = "CO2 dataset (OWID, 2022)"
-
 # Conversion factor from tonnes to million tonnes.
 TONNES_TO_MILLION_TONNES = 1e-6
 
