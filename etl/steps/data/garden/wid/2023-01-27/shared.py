@@ -5,6 +5,20 @@ If new variables are included in the dataset (from `wid` command in Stata) the d
 
 from owid.catalog import Table, VariableMeta
 
+# This is text common for all variables
+
+new_line = "<br><br>"
+
+additional_description = new_line.join(
+    [
+        "The data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.",
+        "These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries.",
+    ]
+)
+
+# NOTE: Change the year when needed
+ppp_description = "The data is measured in international-$ at 2022 prices – this adjusts for inflation and for differences in the cost of living between countries."
+
 # These are parameters specifically defined for each type of variable
 var_dict = {
     "avg": {
@@ -97,19 +111,19 @@ var_dict = {
 inc_cons_dict = {
     "pretax": {
         "name": "Pretax",
-        "description": "This measure is related to <b>pretax national income</b>, which is income before the payment and receipt of taxes and benefits, but after payment of public and private pensions.",
+        "description": "Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.",
     },
     "posttax_dis": {
         "name": "Post-tax disposable",
-        "description": "This measure is related to <b>post-tax disposable income</b>, which includes all cash redistribution through the tax and transfer system, but does not include in-kind benefits and therefore does not add up to national income.",
+        "description": "Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received, but does not include in-kind benefits and therefore does not add up to national income.",
     },
     "posttax_nat": {
         "name": "Post-tax national",
-        "description": "This measure is related to <b>post-tax national income</b>. which includes all cash redistribution through the tax and transfer system and also all in-kind transfers (i.e., government consumption expenditures) to individuals.",
+        "description": "Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received.",
     },
     "wealth": {
         "name": "Net national wealth",
-        "description": "This measure is related to <b>net national wealth</b>, which is the total value of non-financial and financial assets (housing, land, deposits, bonds, equities, etc.) held by households, minus their debts.",
+        "description": "This measure is related to net national wealth, which is the total value of non-financial and financial assets (housing, land, deposits, bonds, equities, etc.) held by households, minus their debts.",
     },
 }
 
@@ -203,41 +217,34 @@ extrapolation_dict = {"": "Estimated", "_extrapolated": "Extrapolated"}
 
 
 def add_metadata_vars(tb_garden: Table) -> Table:
-
     # Get a list of all the variables available
     cols = list(tb_garden.columns)
 
     for var in var_dict:
         for wel in inc_cons_dict:
             for ext in extrapolation_dict:
-
                 # For variables that use income variable
                 col_name = f"{var}_{wel}{ext}"
 
                 if col_name in cols:
-
                     # Create metadata for these variables
                     tb_garden[col_name].metadata = var_metadata_income(var, wel, ext)
 
                 for pct in pct_dict:
-
                     # For variables that use income variable and percentiles (deciles)
                     col_name = f"{pct}_{var}_{wel}{ext}"
 
                     if col_name in cols:
-
                         # Create metadata for these variables
                         tb_garden[col_name].metadata = var_metadata_income_percentiles(var, wel, pct, ext)
 
                         # Replace values in description according to `pct`, depending on `var`
                         if var == "thr":
-
                             tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
                                 "{str(pct_dict[pct]['thr_number'])}", str(pct_dict[pct]["thr_number"])
                             )
 
                         else:
-
                             tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
                                 "{pct_dict[pct]['decile10_extra'].lower()}",
                                 pct_dict[pct]["decile10_extra"].lower(),
@@ -248,25 +255,18 @@ def add_metadata_vars(tb_garden: Table) -> Table:
 
 # Metadata functions to show a clearer main code
 def var_metadata_income(var, wel, ext) -> VariableMeta:
-    meta = VariableMeta(
-        title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-        description=f"{var_dict[var]['description']}\n\n{inc_cons_dict[wel]['description']}",
-        unit=var_dict[var]["unit"],
-        short_unit=var_dict[var]["short_unit"],
-    )
-    meta.display = {
-        "name": meta.title,
-        "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
-    }
-    return meta
-
-
-def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
-    if var == "thr":
-
+    # For monetary variables I include the PPP description
+    if var == "p0p100_avg" or var == "median":
         meta = VariableMeta(
-            title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"{var_dict[var]['description']}\n\n{inc_cons_dict[wel]['description']}",
+            title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
+            description=new_line.join(
+                [
+                    var_dict[var]["description"],
+                    inc_cons_dict[wel]["description"],
+                    ppp_description,
+                    additional_description,
+                ]
+            ),
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -277,8 +277,71 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
 
     else:
         meta = VariableMeta(
+            title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
+            description=new_line.join(
+                [var_dict[var]["description"], inc_cons_dict[wel]["description"], additional_description]
+            ),
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+        )
+        meta.display = {
+            "name": meta.title,
+            "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
+        }
+
+    return meta
+
+
+def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
+    if var == "thr":
+        meta = VariableMeta(
+            title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
+            description=new_line.join(
+                [
+                    var_dict[var]["description"],
+                    inc_cons_dict[wel]["description"],
+                    ppp_description,
+                    additional_description,
+                ]
+            ),
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+        )
+        meta.display = {
+            "name": meta.title,
+            "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
+        }
+
+    elif var == "avg":
+        meta = VariableMeta(
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"{var_dict[var]['description']}\n\n{inc_cons_dict[wel]['description']}",
+            description=new_line.join(
+                [
+                    var_dict[var]["description"],
+                    inc_cons_dict[wel]["description"],
+                    ppp_description,
+                    additional_description,
+                ]
+            ),
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+        )
+        meta.display = {
+            "name": meta.title,
+            "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
+        }
+
+    # Shares do not have PPP description
+    else:
+        meta = VariableMeta(
+            title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
+            description=new_line.join(
+                [
+                    var_dict[var]["description"],
+                    inc_cons_dict[wel]["description"],
+                    additional_description,
+                ]
+            ),
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
