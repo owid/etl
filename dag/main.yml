@@ -528,6 +528,14 @@ steps:
   data://garden/oecd/2023-06-20/ppp_exchange_rates:
   - data://meadow/oecd/2023-06-20/ppp_exchange_rates
 
+# Terrorism
+  data://meadow/terrorism/2023-07-20/global_terrorism_database:
+  - snapshot://terrorism/2023-07-20/global_terrorism_database.xlsx
+  - snapshot://terrorism/2023-07-20/global_terrorism_database_2021.xlsx
+  data://garden/terrorism/2023-07-20/global_terrorism_database:
+  - data://meadow/terrorism/2023-07-20/global_terrorism_database
+  data://grapher/terrorism/2023-07-20/global_terrorism_database:
+  - data://garden/terrorism/2023-07-20/global_terrorism_database
 
 
 
