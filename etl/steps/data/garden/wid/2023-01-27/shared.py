@@ -5,7 +5,7 @@ If new variables are included in the dataset (from `wid` command in Stata) the d
 
 from owid.catalog import Table, VariableMeta
 
-# This is text common for all variables
+# This is text common to all variables
 
 new_line = "<br><br>"
 
