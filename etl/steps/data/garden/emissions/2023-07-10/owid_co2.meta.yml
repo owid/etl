@@ -1,5 +1,5 @@
 dataset:
-  title: OWID CO2 dataset (2023)
+  title: OWID CO2 dataset (2023b)
   description: |
     OWID CO2 dataset.
 
@@ -7,6 +7,3 @@ dataset:
 
 # Dataset sources will be created in the step by combining all component datasets' sources.
 # Also, table metadata will be built from the tables' original metadata.
-
-tables:
-  {}
