@@ -1,0 +1,73 @@
+dataset:
+  title: History of war (Brecke, 2020)
+  description: >-
+    This dataset contains information on armed conflicts, both internal and external, in the period of 1400 and 1999.
+
+
+    It has been constructed using the Conflict Catalog Data by Dr. Peter Brecke.
+
+
+    This dataset has its own region definitions (taken from https://bpb-us-w2.wpmucdn.com/sites.gatech.edu/dist/1/19/files/2018/09/Brecke-PSS-1999-paper-Violent-Conflicts-1400-AD-to-the-Present.pdf):
+
+      - North America, Central America, and the Caribbean
+
+      - South America
+
+      - Europe west of 15 degrees east longitude plus Sweden and Italy
+
+      - Europe east of 15 degrees east longitude (includes Caucusus region)
+
+      - Middle East (Iran west to Syria and Arabian peninsula)
+
+      - North Africa (Egypt to Morocco and Mauritania east to Sudan)
+
+      - West & Central Africa (Senegal to Congo)
+
+      - East & South Africa (Ethiopia to Zambia to Angola and south)
+
+      - Central Asia (Afghanistan, former Soviet republics, and Siberia)
+
+      - South Asia
+
+      - Southeast Asia (Burma to Australia and Pacific islands)
+
+      - East Asia (China, Korea, Japan)
+
+
+    More details about original dataset by Brecke:
+
+
+tables:
+  brecke:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      number_deaths_ongoing_conflicts_military:
+        title: Number of soldier deaths in ongoing conflicts
+        unit: deaths
+        description: >-
+          The number of soldiers killed in a year over the course of wars.. The military fatalities estimates are reasonably close to being just soldiers, but some civilians might be in the counts.
+        display:
+          numDecimalPlaces: 0
+      number_deaths_ongoing_conflicts:
+        title: Number deaths in ongoing conflicts
+        unit: deaths
+        description: >-
+          The total fatalities estimates in a year over the course of wars. The total fatalities estimates vary significantly in terms of the degree to which they include disease, starvation, etc.
+        display:
+          numDecimalPlaces: 0
+
+      number_ongoing_conflicts:
+        title: Number of ongoing conflicts
+        unit: conflicts
+        description: >-
+          Number of ongoing conflicts in a given year.
+        display:
+          numDecimalPlaces: 0
+      number_new_conflicts:
+        title: Number of new conflicts
+        unit: conflicts
+        description: >-
+          Number of new conflicts in a given year.
+
+        display:
+          numDecimalPlaces: 0
