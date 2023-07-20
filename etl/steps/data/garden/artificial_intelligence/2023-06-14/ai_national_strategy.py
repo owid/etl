@@ -51,17 +51,18 @@ def run(dest_dir: str) -> None:
         {0: "In development", 1: "Released"}
     )
     df_merged = pd.merge(countries_national_ai, tb, on=["country", "year"], how="outer")
+    df_merged.sort_values(by=["year"], inplace=True)
 
-    grouped = df_merged.groupby("country", group_keys=False)
+    # Fill with the most recent value (e.g., if a strategy was released in 2015, then it's still released in 2016 onwards; for countries that have NaNs everywhere fill with Not Release)
+    for country, group in df_merged.groupby("country"):
+        # Check if any year for the current country is not NaN
+        if not group["released_national_strategy_on_ai"].isna().all():
+            # Forward fill NaN values after "Released"
+            group["released_national_strategy_on_ai"].fillna(method="ffill", inplace=True)
 
-    # Loop through each group
-    for country, group in grouped:
-        # Check if all years for the current country are NaN
-        if group["released_national_strategy_on_ai"].isna().all():
-            # Fill NaN values with "Not Released"
-            group["released_national_strategy_on_ai"].fillna("Not Released", inplace=True)
+        # Fill remaining NaN values with "Not Released"
+        group["released_national_strategy_on_ai"].fillna("Not Released", inplace=True)
         df_merged.loc[group.index] = group
-
     df_merged.drop("released", axis=1, inplace=True)
     tb = Table(df_merged, short_name=paths.short_name, underscore=True)
 

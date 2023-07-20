@@ -1,7 +1,7 @@
 dataset:
   title: AI Job Postings (AI Index, 2023)
   description: >
-    Data from Lightcast which mined millions of job postings collected from over 51,000 websites since 2010 and flagged listings calling for AI skills (via AI Index (2023)). Includes percentage of all job
+    Data from Lightcast which mined millions of job postings collected from over 51,000 websites since 2010 and flagged listings calling for AI skills (via AI Index, 2023). Includes percentage of all job
     postings that require some kind of AI skil across select countries.
 
     The AI Index is an independent initiative at the Stanford University Institute for Human-Centered Artificial Intelligence.
