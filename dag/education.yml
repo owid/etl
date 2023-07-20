@@ -22,12 +22,13 @@ steps:
   data://garden/education/2023-07-17/education_lee_lee:
   - data://meadow/education/2023-07-17/education_lee_lee
 
+  # Barro and Lee projections dataset
   data://meadow/education/2023-07-17/education_barro_lee_projections:
   - snapshot://education/2023-07-17/education_barro_lee_projections.csv
+  # Garden step includes combined data where available with Lee and Lee historical data
   data://garden/education/2023-07-17/education_barro_lee_projections:
   - data://meadow/education/2023-07-17/education_barro_lee_projections
   - data://garden/education/2023-07-17/education_lee_lee
-
   data://grapher/education/2023-07-17/education_barro_lee_projections:
   - data://garden/education/2023-07-17/education_barro_lee_projections
 
