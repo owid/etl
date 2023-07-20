@@ -26,24 +26,39 @@ def main(upload: bool) -> None:
     snap.dvc_add(upload=upload)
 
 
-def get_data() -> pd.DataFrame:
+def get_data():
     """
-    For each google drive ID, fetch all the data from the google drive folder.
+    Fetches data from a Google Drive folder for each provided Google Drive ID and merges the data into a single DataFrame.
+
+    Returns:
+        pd.DataFrame: Merged DataFrame containing the fetched data.
+
+    Raises:
+        IOError: If there is an error in fetching or merging the data.
+
     """
     common_path = "https://drive.google.com/uc?export=download&id="
-    # IDs of the download files (in google drive) (Total Private investment by 1 - World and 2 -by country)
+    # IDs of the download files (in Google Drive) (Total Private investment by 1 - World and 2 - by country)
     ids = ["1jxlta9M0gYI-uaAFTQfg7edJG_7cXjaa", "1tZY99BLUYr6PwpZYjzgDVLw-nObTnTZ-"]
     df_list = []
-    for i, id in enumerate(ids):
-        df_add = pd.read_csv(common_path + ids[i])
-        # Add World to Label column (usually country in these datasets)
-        if "Label" not in df_add.columns:
-            df_add["Label"] = "World"
-        df_list.append(df_add)
-    all_dfs = pd.merge(
-        df_list[0], df_list[1], on=["Label", "Year", "Total Investment (in Billions of U.S. Dollars)"], how="outer"
-    )
-    return all_dfs
+
+    try:
+        # Fetch data from Google Drive and store in a list of DataFrames
+        for i, drive_id in enumerate(ids):
+            df_add = pd.read_csv(common_path + drive_id)
+            # Add "World" to Label column (usually country in these datasets) if it doesn't exist
+            if "Label" not in df_add.columns:
+                df_add["Label"] = "World"
+            df_list.append(df_add)
+
+        # Merge the DataFrames from the list based on common columns
+        all_dfs = pd.merge(
+            df_list[0], df_list[1], on=["Label", "Year", "Total Investment (in Billions of U.S. Dollars)"], how="outer"
+        )
+
+        return all_dfs
+    except Exception as e:
+        raise IOError("Error in fetching or merging the data: " + str(e))
 
 
 if __name__ == "__main__":

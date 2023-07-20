@@ -28,23 +28,38 @@ def main(upload: bool) -> None:
     snap.dvc_add(upload=upload)
 
 
-def get_data() -> pd.DataFrame:
+def get_data():
     """
-    For each google drive ID, fetch all the data from the google drive folder.
+    Fetches data from a Google Drive folder for each provided Google Drive ID and concatenates the data into a single DataFrame.
+
+    Returns:
+        pd.DataFrame: Concatenated DataFrame containing the fetched data.
+
+    Raises:
+        IOError: If there is an error in fetching or concatenating the data.
+
     """
     common_path = "https://drive.google.com/uc?export=download&id="
-    # IDs of the download files (in google drive) (Investment by focus area 1 - by country and 2 - World)
+    # IDs of the download files (in Google Drive) (Investment by focus area 1 - by country and 2 - World)
     ids = ["1dRiv5KHWnfp-N3xpC2MfcYkqDPKhF7sQ", "13U0x05ltyt-0tr5OrmOedUR8KBjUbplq"]
 
     df_list = []
-    for i, id in enumerate(ids):
-        df_add = pd.read_csv(common_path + ids[i])
-        # Add World to Label column (usually country in these datasets)
-        if "Geographic Area" not in df_add.columns:
-            df_add["Geographic Area"] = "World"
-        df_list.append(df_add)
-    all_dfs = pd.concat(df_list)
-    return all_dfs
+
+    try:
+        # Fetch data from Google Drive and store in a list of DataFrames
+        for i, drive_id in enumerate(ids):
+            df_add = pd.read_csv(common_path + drive_id)
+            # Add "World" to Geographic Area column (usually country in these datasets) if it doesn't exist
+            if "Geographic Area" not in df_add.columns:
+                df_add["Geographic Area"] = "World"
+            df_list.append(df_add)
+
+        # Concatenate the DataFrames from the list
+        all_dfs = pd.concat(df_list)
+
+        return all_dfs
+    except Exception as e:
+        raise IOError("Error in fetching or concatenating the data: " + str(e))
 
 
 if __name__ == "__main__":
