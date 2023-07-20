@@ -10,6 +10,7 @@ from owid.catalog.variables import (
     Variable,
     combine_variables_metadata,
     get_unique_licenses_from_variables,
+    get_unique_origins_from_variables,
     get_unique_sources_from_variables,
 )
 
@@ -186,6 +187,12 @@ def test_get_unique_sources_from_variables(variable_1, variable_2, sources):
     assert get_unique_sources_from_variables([variable_1, variable_2]) == [sources[2], sources[1], sources[3]]
     # Ensure that the function respects the order in which sources appear.
     assert get_unique_sources_from_variables([variable_2, variable_1]) == [sources[2], sources[3], sources[1]]
+
+
+def test_get_unique_origins_from_variables(variable_1, variable_2, origins):
+    assert get_unique_origins_from_variables([variable_1, variable_2]) == [origins[2], origins[1], origins[3]]
+    # Ensure that the function respects the order in which origins appear.
+    assert get_unique_origins_from_variables([variable_2, variable_1]) == [origins[2], origins[3], origins[1]]
 
 
 def test_get_unique_licenses_from_variables(variable_1, variable_2, licenses):

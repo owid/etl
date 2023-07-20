@@ -3,7 +3,14 @@ from collections import defaultdict
 import pandas as pd
 import pytest
 
-from owid.catalog.meta import DatasetMeta, License, Source, TableMeta, VariableMeta
+from owid.catalog.meta import (
+    DatasetMeta,
+    License,
+    Origin,
+    Source,
+    TableMeta,
+    VariableMeta,
+)
 from owid.catalog.tables import Table
 from owid.catalog.variables import Variable
 
@@ -17,6 +24,17 @@ def sources():
         4: Source(name="Name of Source 4", description="Description of Source 4"),
     }
     return sources
+
+
+@pytest.fixture
+def origins():
+    origins = {
+        1: Origin(dataset_title_owid="Name of Origin 1", dataset_description_owid="Description of Origin 1"),
+        2: Origin(dataset_title_owid="Name of Origin 2", dataset_description_owid="Description of Origin 2"),
+        3: Origin(dataset_title_owid="Name of Origin 3", dataset_description_owid="Description of Origin 3"),
+        4: Origin(dataset_title_owid="Name of Origin 4", dataset_description_owid="Description of Origin 4"),
+    }
+    return origins
 
 
 @pytest.fixture

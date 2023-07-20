@@ -1,7 +1,6 @@
 from datetime import datetime
 
-import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Origin, Table, tables
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -18,13 +17,14 @@ def run(dest_dir: str) -> None:
 
     # retrieve snapshot
     snap = Snapshot("biodiversity/2023-01-11/cherry_blossom.csv")
-    df = pd.read_csv(snap.path)
+    tb = tables.read_csv(snap.path)
+    tb.metadata.short_name = paths.short_name
 
     # clean and transform data
-    df = clean_data(df)
-    df = convert_date(df)
+    tb = clean_data(tb)
+    tb = convert_date(tb)
 
-    tb = Table(df.reset_index(drop=True), short_name=paths.short_name)
+    tb["Full-flowering date"].metadata.origins = [Origin(dataset_title_owid="My origin")]
 
     #
     # Save outputs.
@@ -38,7 +38,7 @@ def run(dest_dir: str) -> None:
     log.info("cherry_blossom.end")
 
 
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
+def clean_data(df: Table) -> Table:
     df = df.dropna(subset=["Entity", "Full-flowering date"])
 
     return df.rename(columns={"Entity": "country", "Year": "year"}).drop(
@@ -46,7 +46,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def convert_date(df: pd.DataFrame) -> pd.DataFrame:
+def convert_date(df: Table) -> Table:
     """
     The full flowering date is formated like MDD, we should change this to day of the year for better biological meaning. For example the 4th April is shown as 404.
     In this function we:

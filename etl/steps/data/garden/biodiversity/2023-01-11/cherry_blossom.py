@@ -1,4 +1,3 @@
-import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
@@ -16,14 +15,10 @@ def run(dest_dir: str) -> None:
 
     # read dataset from meadow
     ds_meadow = Dataset(DATA_DIR / "meadow/biodiversity/2023-01-11/cherry_blossom")
-    tb_meadow = ds_meadow["cherry_blossom"].reset_index()
-
-    df = pd.DataFrame(tb_meadow)
+    tb = ds_meadow["cherry_blossom"].reset_index()
 
     # Calculate a 20,40 and 50 year average
-    df = calculate_multiple_year_average(df)
-
-    tb = Table(df.reset_index(drop=True), short_name=paths.short_name)
+    tb = calculate_multiple_year_average(tb)
 
     #
     # Save outputs.
@@ -37,17 +32,13 @@ def run(dest_dir: str) -> None:
     log.info("cherry_blossom.end")
 
 
-def calculate_multiple_year_average(df: pd.DataFrame) -> pd.DataFrame:
-    min_year = df["year"].min()
-    max_year = df["year"].max()
+def calculate_multiple_year_average(tb: Table) -> Table:
+    min_year = tb["year"].min()
+    max_year = tb["year"].max()
 
-    df_year = pd.DataFrame()
-    df_year["year"] = pd.Series(range(min_year, max_year))
-    df_year["country"] = "Japan"
-    df_comb = pd.merge(df, df_year, how="outer", on=["country", "year"])
+    tb = tb.set_index("year").reindex(range(min_year, max_year)).reset_index().sort_values("year")
+    tb["country"] = "Japan"
 
-    df_comb = df_comb.sort_values("year")
+    tb["average_20_years"] = tb["full_flowering_date"].rolling(20, min_periods=5).mean()
 
-    df_comb["average_20_years"] = df_comb["full_flowering_date"].rolling(20, min_periods=5).mean()
-
-    return df_comb
+    return tb
