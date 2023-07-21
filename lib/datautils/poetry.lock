@@ -1026,6 +1026,20 @@ files = [
 ]
 
 [[package]]
+name = "dynamic-yaml"
+version = "1.3.4"
+description = "Enables self referential yaml entries"
+optional = false
+python-versions = ">=3.0"
+files = [
+    {file = "dynamic-yaml-1.3.4.tar.gz", hash = "sha256:440747b7f303794f432a6eba6f78548ddc94bc183172a32c7f12504870e33a01"},
+    {file = "dynamic_yaml-1.3.4-py3-none-any.whl", hash = "sha256:6fc6dae9a4066e9c17cf588bad0e6a36d03a6a899874dc6ab05a05721a086c15"},
+]
+
+[package.dependencies]
+pyyaml = ">=5.4"
+
+[[package]]
 name = "et-xmlfile"
 version = "1.1.0"
 description = "An implementation of lxml.xmlfile for the standard library"
@@ -2037,28 +2051,45 @@ et-xmlfile = "*"
 
 [[package]]
 name = "owid-catalog"
-version = "0.3.4"
+version = "0.3.5"
 description = "Core data types used by OWID for managing data."
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = ">=3.8.1"
 files = [
-    {file = "owid_catalog-0.3.4-py3-none-any.whl", hash = "sha256:fcfaddd7d9e8d3f4a4374781e6b19f48497f3ec1645e6dc8bd99883bdb7251d3"},
-    {file = "owid_catalog-0.3.4.tar.gz", hash = "sha256:a6ccc0a72bf2372a4af67b498dc384b0cc9a0ce3598857436052752a25fb0d2b"},
+    {file = "owid_catalog-0.3.5-py3-none-any.whl", hash = "sha256:32c1ee213d053d8d417b465344a3f84af0cd374ce00b78bfcf1d3466b70ced0c"},
+    {file = "owid_catalog-0.3.5.tar.gz", hash = "sha256:065fab5eb6f4348794cd5eb363d3e6b9cd95fc1436a8f679869f5a5bd2f1a922"},
 ]
 
 [package.dependencies]
-boto3 = ">=1.21.13,<2.0.0"
-dataclasses-json = ">=0.5.6,<0.6.0"
-ipdb = ">=0.13.9,<0.14.0"
-jsonschema = ">=3.2.0,<4.0.0"
-pandas = ">=1.3.3,<2.0.0"
-pandas-stubs = ">=1.2.0,<2.0.0"
-pyarrow = ">=10.0.1,<11.0.0"
-pytest-cov = ">=2.12.1,<3.0.0"
-PyYAML = ">=5.4.1,<6.0.0"
-requests = ">=2.26.0,<3.0.0"
-structlog = ">=21.5.0,<22.0.0"
-Unidecode = ">=1.3.4,<2.0.0"
+boto3 = ">=1.21.13"
+dataclasses-json = ">=0.5.6"
+dynamic-yaml = ">=1.3.4,<2.0.0"
+ipdb = ">=0.13.9"
+jsonschema = ">=3.2.0"
+owid-repack = ">=0.1.1"
+pandas = ">=1.3.3,<2.0"
+pandas-stubs = ">=1.2.0"
+pyarrow = ">=10.0.1"
+pytest-cov = ">=2.12.1"
+PyYAML = ">=5.4.1"
+requests = ">=2.26.0"
+structlog = ">=21.5.0"
+Unidecode = ">=1.3.4"
+
+[[package]]
+name = "owid-repack"
+version = "0.1.2"
+description = "Pack Pandas data frames into smaller, more memory-efficient data types."
+optional = false
+python-versions = ">=3.8.1"
+files = [
+    {file = "owid_repack-0.1.2-py3-none-any.whl", hash = "sha256:6c1a098aeb32b8fedee225990abf48141892a15ff1d492291483e4cca40d2860"},
+    {file = "owid_repack-0.1.2.tar.gz", hash = "sha256:e583e022b548e9e9e40d5dab6c3d8026c80a293bbd677df487908a00f1f01a7e"},
+]
+
+[package.dependencies]
+numpy = ">=1.24.0,<2.0.0"
+pandas = ">=1.5.2,<2.0.0"
 
 [[package]]
 name = "packaging"
@@ -3338,5 +3369,5 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.8,<4.0"
-content-hash = "0a4c95e0bfd4e446b5ea39f88cc8d1fbed86ab05c2652a4af0fae637d1648926"
+python-versions = ">=3.8.1,<4.0"
+content-hash = "bb4d5ee7847339ec19669816ce54195dee58d5677f9d1556f2b744ffb7a48b67"
