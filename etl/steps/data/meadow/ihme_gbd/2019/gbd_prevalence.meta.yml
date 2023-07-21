@@ -7,7 +7,7 @@ dataset:
     This dataset contains metrics on the prevalence and incidence of diseases and injuries.
   sources:
     -
-      name: Global Burden of Disease Study (2019) - Prevalence and Incidence
+      name: IHME, Global Burden of Disease Study (2019)
       published_by: Institute of Health Metrics and Evaluation
 
 tables:

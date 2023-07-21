@@ -1,9 +1,3 @@
-dataset:
-  sources:
-    -
-      name: Global Burden of Disease Study (2019) - Child mortality
-      published_by: Institute of Health Metrics and Evaluation
-
 tables:
   gbd_mental_health:
      variables:
