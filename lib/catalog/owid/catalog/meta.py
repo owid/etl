@@ -147,6 +147,7 @@ class Origin:
             if value is not None:
                 setattr(self, key, value)
 
+
 # Minor is for cases where we only harmonized the countries or similar
 # Major is for cases where we do more, like create new aggregations, combine multiple indicators, etc.
 OWID_PROCESSING_LEVELS = Literal["minor", "major"]
@@ -185,9 +186,7 @@ class VariablePresentationMeta:
     # List of google doc ids + fragment id
     faqs: List[FaqLink] = field(default_factory=list)
     # List of bullet points for the key info text (can use markdown formatting)
-    key_info_text: List[str] = field(
-        default_factory=list
-    )
+    key_info_text: List[str] = field(default_factory=list)
 
     # A short summary of what was done to process this indicator
     processing_info: Optional[str] = None
