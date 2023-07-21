@@ -2,7 +2,6 @@
 
 from typing import List, cast
 
-import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 
@@ -13,7 +12,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # Regions for which aggregates will be created.
-REGIONS = ["North America", "South America", "Europe", "European Union (27)", "Africa", "Asia", "Oceania"]
+REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
 
 def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset) -> Table:
@@ -75,11 +74,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb: Table = geo.harmonize_countries(
-        df=tb_terrorism,
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-    )
+    tb: Table = geo.harmonize_countries(df=tb_terrorism, countries_file=paths.country_mapping_path)
 
     total_df = pd.DataFrame()
     total_df["total_killed"] = tb.groupby(["country", "year"])["nkill"].sum()
@@ -87,16 +82,82 @@ def run(dest_dir: str) -> None:
     total_df["total_incident_counts"] = tb.groupby(["country", "year"]).size()
     total_df["total_casualties"] = total_df["total_wounded"] + total_df["total_incident_counts"]
 
-    df_pop_deaths = add_deaths_and_population(total_df)
+    pivot_weapon_type, pivot_target_type, pivot_df_attack_type = terrorism_targets_attacks_weapons(tb)
+    merge_weapon_target = pd.merge(pivot_target_type, pivot_weapon_type, on=["country", "year"])
+    merge_attack = pd.merge(pivot_df_attack_type, merge_weapon_target, on=["country", "year"])
+    merge_all = pd.merge(total_df, merge_attack, on=["country", "year"])
+
+    df_pop_deaths = add_deaths_and_population(merge_all)
     # Add region aggregates.
     # Load regions dataset.
     ds_regions: Dataset = paths.load_dependency("regions")
     df_pop_deaths = add_data_for_regions(tb=df_pop_deaths, regions=REGIONS, ds_regions=ds_regions)
+    # df_pop_deaths["terrorism_share_of_deaths"] = (df_pop_deaths["total_killed"] / df_pop_deaths["deaths"]) * 100
 
     df_pop_deaths["terrorism_wounded_per_capita"] = df_pop_deaths["total_wounded"] / df_pop_deaths["population"]
+
     df_pop_deaths["terrorism_deaths_per_capita"] = df_pop_deaths["total_killed"] / df_pop_deaths["population"]
     df_pop_deaths["terrorism_casualties_per_capita"] = df_pop_deaths["total_casualties"] / df_pop_deaths["population"]
-    df_pop_deaths["terrorism_share_of_deaths"] = (df_pop_deaths["total_killed"] / df_pop_deaths["deaths"]) * 100
+
+    cols_for_decadal_av = [
+        "terrorism_wounded_per_capita",
+        "terrorism_deaths_per_capita",
+        "terrorism_casualties_per_capita",
+        "Armed Assault_attack",
+        "Assassination_attack",
+        "Bombing/Explosion_attack",
+        "Facility/Infrastructure Attack_attack",
+        "Hijacking_attack",
+        "Hostage Taking (Barricade Incident)_attack",
+        "Hostage Taking (Kidnapping)_attack",
+        "Unarmed Assault_attack",
+        "Unknown_attack",
+        "Abortion Related_target",
+        "Airports & Aircraft_target",
+        "Business_target",
+        "Educational Institution_target",
+        "Food or Water Supply_target",
+        "Government (Diplomatic)_target",
+        "Government (General)_target",
+        "Journalists & Media_target",
+        "Maritime_target",
+        "Military_target",
+        "NGO_target",
+        "Other_target",
+        "Police_target",
+        "Private Citizens & Property_target",
+        "Religious Figures/Institutions_target",
+        "Telecommunication_target",
+        "Terrorists/Non-State Militia_target",
+        "Tourists_target",
+        "Transportation_target",
+        "Unknown_target",
+        "Utilities_target",
+        "Violent Political Party_target",
+        "Biological_weapon",
+        "Chemical_weapon",
+        "Explosives_weapon",
+        "Fake Weapons_weapon",
+        "Firearms_weapon",
+        "Incendiary_weapon",
+        "Melee_weapon",
+        "Other_weapon",
+        "Radiological_weapon",
+        "Sabotage Equipment_weapon",
+        "Unknown_weapon",
+        "Vehicle (not to include vehicle-borne explosives, i.e., car or truck bombs)_weapon",
+    ]
+
+    df_pop_deaths = perform_decadal_averaging(
+        df_pop_deaths,
+        cols_for_decadal_av=cols_for_decadal_av,
+    )
+
+    df_pop_deaths["terrorism_casualties_per_capita"] = df_pop_deaths["terrorism_casualties_per_capita"].astype(
+        "float64"
+    )
+    df_pop_deaths["terrorism_deaths_per_capita"] = df_pop_deaths["terrorism_deaths_per_capita"].astype("float64")
+    df_pop_deaths["terrorism_wounded_per_capita"] = df_pop_deaths["terrorism_wounded_per_capita"].astype("float64")
 
     tb_garden = Table(df_pop_deaths, short_name=paths.short_name)
     tb_garden.set_index(["country", "year"], inplace=True)
@@ -109,3 +170,50 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+# Define a function to perform decadal averaging
+def perform_decadal_averaging(df, cols_for_decadal_av):
+    # Group the data by decade for each column in the DataFrame
+    for column in df[cols_for_decadal_av]:
+        decadal_column = f"decadal_{column}"
+        df[decadal_column] = df.groupby(df["year"] // 10 * 10)[column].transform("mean")
+        df[decadal_column] = df[decadal_column].mask(df["year"] % 10 != 0, pd.NA)
+
+    # Return the modified DataFrame
+    return df
+
+
+def terrorism_targets_attacks_weapons(df):
+    total_df_attack_type = (
+        df.groupby(["country", "year", "attacktype1_txt"]).size().reset_index(name="attack_type_year")
+    )
+    # Group the data by 'country', 'year', and 'weaptype1_txt', and calculate the size
+    total_df_weapon_type = df.groupby(["country", "year", "weaptype1_txt"]).size().reset_index(name="weapon_type_year")
+    # Group the data by 'country', 'year', and 'targtype1_txt', and calculate the size
+    total_df_target_type = df.groupby(["country", "year", "targtype1_txt"]).size().reset_index(name="target_type_year")
+
+    # Perform decadal averaging for pivot_weapon_type and pivot_target_type
+    pivot_weapon_type = pd.pivot(
+        total_df_weapon_type, index=["country", "year"], columns="weaptype1_txt", values="weapon_type_year"
+    )
+    pivot_weapon_type = add_suffix(pivot_weapon_type, "_weapon")
+    pivot_target_type = pd.pivot(
+        total_df_target_type, index=["country", "year"], columns="targtype1_txt", values="target_type_year"
+    )
+    pivot_target_type = add_suffix(pivot_target_type, "_target")
+
+    pivot_df_attack_type = pd.pivot(
+        total_df_attack_type, index=["country", "year"], columns="attacktype1_txt", values="attack_type_year"
+    )
+    pivot_df_attack_type = add_suffix(pivot_df_attack_type, "_attack")
+
+    return pivot_weapon_type, pivot_target_type, pivot_df_attack_type
+
+
+def add_suffix(df, suffix):
+    # loop over each column and add suffix if the column name is not 'year' or 'country'
+    for column in df.columns:
+        if column not in ["year", "country"]:
+            df.rename(columns={column: column + suffix}, inplace=True)
+    return df

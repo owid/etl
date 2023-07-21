@@ -1,35 +1,351 @@
-# (Inherited from meadow, remove if not different.)
-all_sources:
-  - source_testing: &source-testing
-      name: # Example: Testing Short Citation
-      published_by: # (if different to short citation). Example: Testing Full Citation
-      url: # Example: https://url_of_testing_source.com/
-      date_accessed: # Example: 2023-01-01
-      publication_date: # Example: 2023-01-01
-      publication_year: # (if publication_date is not given). Example: 2023
-      # description: Source description.
-
-# (Inherited from meadow, remove if not different.)
 dataset:
-  title: # Example: Testing Dataset Name (Institution, 2023)
-  # description: Dataset description.
+  title: Terrorism dataset, Global Terrorism Database (2022)
+  description: The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
+    around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to Terrorism
+    (START) at the University of Maryland
   licenses:
-    - name: # Example: Testing License Name
-      url: # Example: https://url_of_testing_source.com/license
+  - name: Copyright University of Maryland 2022
+    url: https://www.start.umd.edu/gtd/terms-of-use/
   sources:
-    - *source-testing
+  - name: Global Terrorism Database (2022)
+    description: The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
+      around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to
+      Terrorism (START) at the University of Maryland
 
+
+    url: https://www.start.umd.edu/gtd/
+    date_accessed: '2023-07-20'
+    publication_year: 2022
+    published_by: START (National Consortium for the Study of Terrorism and Responses to Terrorism). (2022). Global Terrorism
+      Database, 1970 - 2020 [data file]. https://www.start.umd.edu/gtd
 tables:
   global_terrorism_database:
-    # (Inherited from meadow, remove if not different.)
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description: Full description of testing variable.
-      #   sources:
-      #     - *source-testing
-      #   display:
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
+      total_killed:
+        title: total_killed
+        unit: ''
+      total_wounded:
+        title: total_wounded
+        unit: ''
+      total_incident_counts:
+        title: total_incident_counts
+        unit: ''
+        description: >
+        The GTD defines a terrorist attack as the threatened or actual use of illegal force and violence by a non- state actor to attain a political, economic, religious, or social goal through fear, coercion, or intimidation. In practice this means in order to consider an incident for inclusion in the GTD, all three of the following attributes must be present:
+
+
+           The incident must be intentional – the result of a conscious calculation on the part of a perpetrator.
+
+
+           The incident must entail some level of violence or immediate threat of violence -including property violence, as well as violence against people.
+
+
+           The perpetrators of the incidents must be sub-national actors. The database does not include acts of state terrorism.
+
+
+        In addition, at least two of the following three criteria must be present for an incident to be included in the GTD:
+
+           Criterion 1: The act must be aimed at attaining a political, economic, religious, or social goal. In terms of economic goals, the exclusive pursuit of profit does not satisfy this criterion. It must involve the pursuit of more profound, systemic economic change.
+
+
+           Criterion 2: There must be evidence of an intention to coerce, intimidate, or convey some other message to a larger audience (or audiences) than the immediate victims. It is the act taken as a totality that is considered, irrespective if every individual involved in carrying out the act was aware of this intention. As long as any of the planners or decision-makers behind the attack intended to coerce, intimidate or publicize, the intentionality criterion is met.
+
+
+           Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants.
+      total_casualties:
+        title: total_casualties
+        unit: ''
+      armed_assault_attack:
+        title: Armed Assault_attack
+        unit: ''
+      assassination_attack:
+        title: Assassination_attack
+        unit: ''
+      bombing_explosion_attack:
+        title: Bombing/Explosion_attack
+        unit: ''
+      facility_infrastructure_attack_attack:
+        title: Facility/Infrastructure Attack_attack
+        unit: ''
+      hijacking_attack:
+        title: Hijacking_attack
+        unit: ''
+      hostage_taking__barricade_incident__attack:
+        title: Hostage Taking (Barricade Incident)_attack
+        unit: ''
+      hostage_taking__kidnapping__attack:
+        title: Hostage Taking (Kidnapping)_attack
+        unit: ''
+      unarmed_assault_attack:
+        title: Unarmed Assault_attack
+        unit: ''
+      unknown_attack:
+        title: Unknown_attack
+        unit: ''
+      abortion_related_target:
+        title: Abortion Related_target
+        unit: ''
+      airports__and__aircraft_target:
+        title: Airports & Aircraft_target
+        unit: ''
+      business_target:
+        title: Business_target
+        unit: ''
+      educational_institution_target:
+        title: Educational Institution_target
+        unit: ''
+      food_or_water_supply_target:
+        title: Food or Water Supply_target
+        unit: ''
+      government__diplomatic__target:
+        title: Government (Diplomatic)_target
+        unit: ''
+      government__general__target:
+        title: Government (General)_target
+        unit: ''
+      journalists__and__media_target:
+        title: Journalists & Media_target
+        unit: ''
+      maritime_target:
+        title: Maritime_target
+        unit: ''
+      military_target:
+        title: Military_target
+        unit: ''
+      ngo_target:
+        title: NGO_target
+        unit: ''
+      other_target:
+        title: Other_target
+        unit: ''
+      police_target:
+        title: Police_target
+        unit: ''
+      private_citizens__and__property_target:
+        title: Private Citizens & Property_target
+        unit: ''
+      religious_figures_institutions_target:
+        title: Religious Figures/Institutions_target
+        unit: ''
+      telecommunication_target:
+        title: Telecommunication_target
+        unit: ''
+      terrorists_non_state_militia_target:
+        title: Terrorists/Non-State Militia_target
+        unit: ''
+      tourists_target:
+        title: Tourists_target
+        unit: ''
+      transportation_target:
+        title: Transportation_target
+        unit: ''
+      unknown_target:
+        title: Unknown_target
+        unit: ''
+      utilities_target:
+        title: Utilities_target
+        unit: ''
+      violent_political_party_target:
+        title: Violent Political Party_target
+        unit: ''
+      biological_weapon:
+        title: Biological_weapon
+        unit: ''
+      chemical_weapon:
+        title: Chemical_weapon
+        unit: ''
+      explosives_weapon:
+        title: Explosives_weapon
+        unit: ''
+      fake_weapons_weapon:
+        title: Fake Weapons_weapon
+        unit: ''
+      firearms_weapon:
+        title: Firearms_weapon
+        unit: ''
+      incendiary_weapon:
+        title: Incendiary_weapon
+        unit: ''
+      melee_weapon:
+        title: Melee_weapon
+        unit: ''
+      other_weapon:
+        title: Other_weapon
+        unit: ''
+      radiological_weapon:
+        title: Radiological_weapon
+        unit: ''
+      sabotage_equipment_weapon:
+        title: Sabotage Equipment_weapon
+        unit: ''
+      unknown_weapon:
+        title: Unknown_weapon
+        unit: ''
+      vehicle__not_to_include_vehicle_borne_explosives__i_e__car_or_truck_bombs__weapon:
+        title: Vehicle (not to include vehicle-borne explosives, i.e., car or truck bombs)_weapon
+        unit: ''
+      population:
+        title: population
+        unit: ''
+      deaths:
+        title: deaths
+        unit: ''
+      terrorism_wounded_per_capita:
+        title: terrorism_wounded_per_capita
+        unit: ''
+        display:
+          numDecimalPlaces: 7
+      terrorism_deaths_per_capita:
+        title: terrorism_deaths_per_capita
+        unit: ''
+        display:
+          numDecimalPlaces: 7
+      terrorism_casualties_per_capita:
+        title: terrorism_casualties_per_capita
+        unit: ''
+        display:
+          numDecimalPlaces: 7
+      decadal_terrorism_wounded_per_capita:
+        title: decadal_terrorism_wounded_per_capita
+        unit: ''
+        display:
+          numDecimalPlaces: 7
+      decadal_terrorism_deaths_per_capita:
+        title: decadal_terrorism_deaths_per_capita
+        unit: ''
+        display:
+          numDecimalPlaces: 7
+      decadal_terrorism_casualties_per_capita:
+        title: decadal_terrorism_casualties_per_capita
+        unit: ''
+        display:
+          numDecimalPlaces: 7
+      decadal_armed_assault_attack:
+        title: decadal_Armed Assault_attack
+        unit: ''
+      decadal_assassination_attack:
+        title: decadal_Assassination_attack
+        unit: ''
+      decadal_bombing_explosion_attack:
+        title: decadal_Bombing/Explosion_attack
+        unit: ''
+      decadal_facility_infrastructure_attack_attack:
+        title: decadal_Facility/Infrastructure Attack_attack
+        unit: ''
+      decadal_hijacking_attack:
+        title: decadal_Hijacking_attack
+        unit: ''
+      decadal_hostage_taking__barricade_incident__attack:
+        title: decadal_Hostage Taking (Barricade Incident)_attack
+        unit: ''
+      decadal_hostage_taking__kidnapping__attack:
+        title: decadal_Hostage Taking (Kidnapping)_attack
+        unit: ''
+      decadal_unarmed_assault_attack:
+        title: decadal_Unarmed Assault_attack
+        unit: ''
+      decadal_unknown_attack:
+        title: decadal_Unknown_attack
+        unit: ''
+      decadal_abortion_related_target:
+        title: decadal_Abortion Related_target
+        unit: ''
+      decadal_airports__and__aircraft_target:
+        title: decadal_Airports & Aircraft_target
+        unit: ''
+      decadal_business_target:
+        title: decadal_Business_target
+        unit: ''
+      decadal_educational_institution_target:
+        title: decadal_Educational Institution_target
+        unit: ''
+      decadal_food_or_water_supply_target:
+        title: decadal_Food or Water Supply_target
+        unit: ''
+      decadal_government__diplomatic__target:
+        title: decadal_Government (Diplomatic)_target
+        unit: ''
+      decadal_government__general__target:
+        title: decadal_Government (General)_target
+        unit: ''
+      decadal_journalists__and__media_target:
+        title: decadal_Journalists & Media_target
+        unit: ''
+      decadal_maritime_target:
+        title: decadal_Maritime_target
+        unit: ''
+      decadal_military_target:
+        title: decadal_Military_target
+        unit: ''
+      decadal_ngo_target:
+        title: decadal_NGO_target
+        unit: ''
+      decadal_other_target:
+        title: decadal_Other_target
+        unit: ''
+      decadal_police_target:
+        title: decadal_Police_target
+        unit: ''
+      decadal_private_citizens__and__property_target:
+        title: decadal_Private Citizens & Property_target
+        unit: ''
+      decadal_religious_figures_institutions_target:
+        title: decadal_Religious Figures/Institutions_target
+        unit: ''
+      decadal_telecommunication_target:
+        title: decadal_Telecommunication_target
+        unit: ''
+      decadal_terrorists_non_state_militia_target:
+        title: decadal_Terrorists/Non-State Militia_target
+        unit: ''
+      decadal_tourists_target:
+        title: decadal_Tourists_target
+        unit: ''
+      decadal_transportation_target:
+        title: decadal_Transportation_target
+        unit: ''
+      decadal_unknown_target:
+        title: decadal_Unknown_target
+        unit: ''
+      decadal_utilities_target:
+        title: decadal_Utilities_target
+        unit: ''
+      decadal_violent_political_party_target:
+        title: decadal_Violent Political Party_target
+        unit: ''
+      decadal_biological_weapon:
+        title: decadal_Biological_weapon
+        unit: ''
+      decadal_chemical_weapon:
+        title: decadal_Chemical_weapon
+        unit: ''
+      decadal_explosives_weapon:
+        title: decadal_Explosives_weapon
+        unit: ''
+      decadal_fake_weapons_weapon:
+        title: decadal_Fake Weapons_weapon
+        unit: ''
+      decadal_firearms_weapon:
+        title: decadal_Firearms_weapon
+        unit: ''
+      decadal_incendiary_weapon:
+        title: decadal_Incendiary_weapon
+        unit: ''
+      decadal_melee_weapon:
+        title: decadal_Melee_weapon
+        unit: ''
+      decadal_other_weapon:
+        title: decadal_Other_weapon
+        unit: ''
+      decadal_radiological_weapon:
+        title: decadal_Radiological_weapon
+        unit: ''
+      decadal_sabotage_equipment_weapon:
+        title: decadal_Sabotage Equipment_weapon
+        unit: ''
+      decadal_unknown_weapon:
+        title: decadal_Unknown_weapon
+        unit: ''
+      decadal_vehicle__not_to_include_vehicle_borne_explosives__i_e__car_or_truck_bombs__weapon:
+        title: decadal_Vehicle (not to include vehicle-borne explosives, i.e., car or truck bombs)_weapon
+        unit: ''
