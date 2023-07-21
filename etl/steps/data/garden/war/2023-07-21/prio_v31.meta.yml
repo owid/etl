@@ -1,0 +1,64 @@
+dataset:
+  title: History of war (PRIO v3.1, 2017)
+  description: >-
+    This dataset contains information on conflicts, in the period of 1946 and 2008.
+
+
+    It has been constructed using the Battledeaths PRIO v3.1 dataset.
+
+
+    More details about PRIO v3.1:
+
+
+tables:
+  prio_v31:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      number_deaths_ongoing_conflicts_high:
+        title: Number of soldier deaths in ongoing conflicts (high estimate)
+        unit: deaths
+        description: >-
+          The number of battle fatalities in a year over the course of wars. This is the high estimate of those who were killed.
+        display:
+          numDecimalPlaces: 0
+      number_deaths_ongoing_conflicts_low:
+        title: Number of soldier deaths in ongoing conflicts (low estimate)
+        unit: deaths
+        description: >-
+          The number of battle fatalities in a year over the course of wars. This is the low estimate of those who were killed.
+        display:
+          numDecimalPlaces: 0
+      number_deaths_ongoing_conflicts:
+        title: Number deaths in ongoing conflicts (best estimate)
+        unit: deaths
+        description: >-
+          The number of battle fatalities in a year over the course of wars.
+        display:
+          numDecimalPlaces: 0
+
+      number_ongoing_conflicts:
+        title: Number of ongoing conflicts
+        unit: conflicts
+        description: >-
+          Number of ongoing conflicts in a given year.
+
+          We count a war as ongoing in a region even if the conflict is also ongoing in other regions.
+          The sum across all regions can therefore be higher than the total number of ongoing wars.
+
+        display:
+          numDecimalPlaces: 0
+      number_new_conflicts:
+        title: Number of new conflicts
+        unit: conflicts
+        description: >-
+          Number of new conflicts in a given year.
+
+
+          • New conflicts for the 'World': We only count a war as new when the war overall started that year, not if it restarted
+          or a new campaign within it begins.
+
+          • New conflicts by type: We only consider the type of a conflict when it first started. Therefore, if a conflict transitions
+          into a different type, we do not add one to the counter of new conflicts of this particular new type.
+
+        display:
+          numDecimalPlaces: 0

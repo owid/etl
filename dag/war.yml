@@ -58,9 +58,13 @@ steps:
     - data://meadow/war/2023-06-09/mars
   data://garden/war/2023-06-22/ucdp:
     - data://meadow/war/2023-06-22/ucdp
+  data://garden/war/2023-07-21/prio_v31:
+    - data://meadow/war/2023-02-03/prio_v31
 
   # Grapher
   data://grapher/war/2023-06-26/ucdp:
     - data://garden/war/2023-06-22/ucdp
   data://grapher/war/2023-07-14/mars:
     - data://garden/war/2023-07-07/mars
+  data://grapher/war/2023-07-21/prio_v31:
+    - data://garden/war/2023-07-21/prio_v31

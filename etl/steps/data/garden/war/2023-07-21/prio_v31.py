@@ -1,0 +1,177 @@
+"""Load a meadow dataset and create a garden dataset."""
+from typing import cast
+
+import numpy as np
+import pandas as pd
+from owid.catalog import Dataset, Table
+from structlog import get_logger
+
+from etl.helpers import PathFinder, create_dataset
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+# Logger
+log = get_logger()
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset.
+    ds_meadow = cast(Dataset, paths.load_dependency("prio_v31"))
+
+    # Read table from meadow dataset.
+    tb = ds_meadow["prio_v31"]
+
+    #
+    # Process data.
+    #
+    # Relevant rows
+    log.info("war.prio31: keep relevant columns")
+    COLUMNS_RELEVANT = ["id", "year", "region", "type", "startdate", "ependdate", "bdeadlow", "bdeadhig", "bdeadbes"]
+    tb = tb[COLUMNS_RELEVANT]
+
+    log.info("war.prio31: sanity checks")
+    _sanity_checks(tb)
+
+    log.info("war.prio31: estimate metrics")
+    tb = estimate_metrics(tb)
+
+    log.info("war.prio31: rename columns")
+    tb = tb.rename(columns={
+        "type": "conflict_type",
+    })
+
+    log.info("war.prio31: replace NaNs with zeroes")
+    tb = replace_missing_data_with_zeros(tb)
+
+    log.info("war.prio31: set index")
+    tb = tb.set_index(["year", "region", "type"], verify_integrity=True)
+
+    log.info("war.prio31: add shortname to table")
+    tb = Table(tb, short_name=paths.short_name)
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+
+def _sanity_checks(tb: Table) -> None:
+    # Low and High estimates
+    columns = ["bdeadlow", "bdeadhig"]
+    for column in columns:
+        assert tb[column].isna().sum() == 0, f"Missing values found in {column}"
+        assert not set(tb.loc[tb[column] < 0, column]), f"Negative values found in {column}"
+
+    # Best estimate
+    column = "bdeadbes"
+    assert tb[column].isna().sum() == 0, f"Missing values found in {column}"
+    assert not set(tb.loc[tb[column] < 0, column]) - {-999}, f"Negative values other than '-999' found in {column}"
+    # Replace -999 with NaN
+    tb[column] = tb[column].replace(-999, np.nan)
+
+    # Check regions
+    assert (tb.groupby("id").region.nunique() == 1).all(), "Some conflicts occurs in multiple regions! That was not expected."
+    assert (tb.groupby(["id", "year"]).type.nunique() == 1).all(), "Some conflicts has different values for `type` in the same year! That was not expected."
+
+
+def estimate_metrics(tb: Table) -> Table:
+    tb_ongoing = _add_ongoing_metrics(tb)
+    tb_new = _add_new_metrics(tb)
+
+    # Combine
+    tb = tb_ongoing.merge(tb_new, on=["year", "region", "type"], how="outer")
+
+    return tb
+
+def _add_ongoing_metrics(tb: Table) -> Table:
+    # Get ongoing metrics
+    sum_nan = (lambda x: x.sum() if not x.isna().any() else np.nan)
+    ops = {"id": "nunique", "bdeadlow": sum_nan, "bdeadbes": sum_nan, "bdeadhig": sum_nan}
+    ## By region and type
+    tb_ongoing = tb.groupby(["year", "type", "region"], as_index=False).agg(ops)
+    ## Type
+    tb_ongoing_alltype = tb.groupby(["year", "region"], as_index=False).agg(ops)
+    tb_ongoing_alltype["type"] = "all"
+    ## World
+    tb_ongoing_world = tb.groupby(["year", "type"], as_index=False).agg(ops)
+    tb_ongoing_world["region"] = "World"
+    tb_ongoing_world_alltype = tb.groupby(["year"], as_index=False).agg(ops)
+    tb_ongoing_world_alltype["region"] = "World"
+    tb_ongoing_world_alltype["type"] = "all"
+
+    ## Combine
+    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_alltype, tb_ongoing_world, tb_ongoing_world_alltype], ignore_index=True)
+    tb_ongoing = tb_ongoing.sort_values(["year", "region", "type"])
+
+    ## Rename
+    tb_ongoing = tb_ongoing.rename(columns={
+        "id": "number_ongoing_conflicts",
+        "bdeadlow": "number_deaths_ongoing_conflicts_low",
+        "bdeadhig": "number_deaths_ongoing_conflicts_high",
+        "bdeadbes": "number_deaths_ongoing_conflicts",
+    })
+
+    return tb_ongoing
+
+
+def _add_new_metrics(tb: Table) -> Table:
+    # Reduce table
+    tb_new = tb.sort_values("year").drop_duplicates(subset=["id", "region"], keep="first")[["year", "region", "type", "id"]]
+    assert tb_new["id"].value_counts().max() == 1, "There are multiple instances of a conflict with the same ID. Maybe same conflict in different regions or with different types? This is assumed not to happen"
+
+    # Estimate metric for regions and types
+    tb_new_regions = tb_new.groupby(["year", "region", "type"], as_index=False)["id"].nunique()
+
+    # Estimate metric for new type='all'
+    tb_new_alltype = tb_new_regions.groupby(["year", "region"], as_index=False)["id"].sum()
+    tb_new_alltype["type"] = "all"
+
+    tb_new = pd.concat([tb_new, tb_new_alltype], ignore_index=True)
+
+    # Estimate metric for new region='World'
+    tb_new_world = tb_new.groupby(["year", "type"], as_index=False)["id"].sum()
+    tb_new_world["region"] = "World"
+
+    # Combine
+    tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True)
+
+    # Rename
+    tb_new = tb_new.rename(
+        columns={
+            "id": "number_new_conflicts"
+        }
+    )
+
+    return tb_new
+
+
+def replace_missing_data_with_zeros(tb: Table) -> Table:
+    """Replace missing data with zeros.
+
+    In some instances there is missing data. Instead, we'd like this to be zero-valued.
+    """
+    # Add missing (year, region, conflict_typ) entries (filled with NaNs)
+    years = np.arange(tb["year"].min(), tb["year"].max() + 1)
+    regions = set(tb["region"])
+    conflict_types = set(tb["conflict_type"])
+    new_idx = pd.MultiIndex.from_product([years, regions, conflict_types], names=["year", "region", "conflict_type"])
+    tb = tb.set_index(["year", "region", "conflict_type"]).reindex(new_idx).reset_index()
+
+    # Change NaNs for 0 for specific rows
+    ## For columns "number_ongoing_conflicts", "number_new_conflicts"
+    columns = [
+        "number_ongoing_conflicts",
+        "number_new_conflicts",
+        # "number_deaths_ongoing_conflicts_high",
+        # "number_deaths_ongoing_conflicts_low",
+    ]
+    tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
+
+    return tb
