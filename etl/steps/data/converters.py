@@ -2,9 +2,7 @@
 #  converters.py
 #
 
-import warnings
-
-from owid.catalog import DatasetMeta, License, Origin, Source, VariableMeta
+from owid.catalog import DatasetMeta, License, Source, VariableMeta
 from owid.walden import Dataset as WaldenDataset
 
 from etl import grapher_model as gm
