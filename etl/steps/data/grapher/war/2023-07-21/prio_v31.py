@@ -15,10 +15,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("mars"))
+    ds_garden = cast(Dataset, paths.load_dependency("prio_v31"))
 
     # Read table from garden dataset.
-    tb = ds_garden["mars"]
+    tb = ds_garden["prio_v31"]
 
     #
     # Process data.
