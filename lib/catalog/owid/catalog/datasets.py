@@ -126,6 +126,7 @@ class Dataset:
             )
 
         # check Float64 and Int64 columns for np.nan
+        # see: https://github.com/owid/etl/issues/1334
         for col, dtype in table.dtypes.items():
             if dtype in NULLABLE_DTYPES:
                 # pandas nullable types like Float64 have their own pd.NA instead of np.nan
