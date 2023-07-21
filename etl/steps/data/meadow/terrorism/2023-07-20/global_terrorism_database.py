@@ -20,8 +20,8 @@ def run(dest_dir: str) -> None:
         dest_dir (str): The directory where the new Meadow dataset will be created.
 
     targtype1_txt: the target/victim type field captures the general type of target/victim.
-    weaptype1_txt: Represents the type of weapon used in the incident.
-    attacktype1_txt:  Represents the hierarchy of attack types, including:
+    weaptype1_txt:  the type of weapon used in the incident.
+    attacktype1_txt:  the hierarchy of attack types, including:
           - Assassination
           - Hijacking
           - Kidnapping
@@ -34,21 +34,19 @@ def run(dest_dir: str) -> None:
 
 
     Casualty Fields:
-        - nkill: Stores the number of total confirmed fatalities for the incident.
-        - nwound: Records the number of confirmed non-fatal injuries to both perpetrators and victims.
+        - nkill: total confirmed fatalities for the incident
+        - nwound: confirmed non-fatal injuries to both perpetrators and victims
     """
     #
     # Load inputs.
 
     #
-    # Retrieve snapshot.
+    # Retrieve snapshots for terrorism data up intil 2020 and terrorism data between 2020-2021.
     snap_2020 = cast(Snapshot, paths.load_dependency("global_terrorism_database.xlsx"))
     snap_2021 = cast(Snapshot, paths.load_dependency("global_terrorism_database_2021.xlsx"))
-
+    # Select columns of interest
     COLUMNS_OF_INTEREST = [
         "iyear",
-        "imonth",
-        "iday",
         "country_txt",
         "region_txt",
         "attacktype1_txt",
@@ -58,12 +56,13 @@ def run(dest_dir: str) -> None:
         "nwound",
     ]
 
-    # Load data from snapshot.
-    df_2020 = pd.read_excel(snap_2020.path)[COLUMNS_OF_INTEREST]
-    df_2021 = pd.read_excel(snap_2021.path)[COLUMNS_OF_INTEREST]
-    df = pd.concat([df_2020, df_2021])
-    df.rename(columns={"country_txt": "country", "iyear": "year", "imonth": "month", "iday": "day"}, inplace=True)
-    df.set_index(["country", "year", "day", "month"], inplace=True)
+    # Load data from snapshots.
+    df_2020 = pd.read_excel(snap_2020.path)
+    df_2021 = pd.read_excel(snap_2021.path)
+    # Combine terrorism data up until 2020 and 2020-2021.
+    df = pd.concat([df_2020[COLUMNS_OF_INTEREST], df_2021[COLUMNS_OF_INTEREST]])
+    df = df.rename(columns={"country_txt": "country", "iyear": "year"})
+    df.set_index(["country", "year"], inplace=True)
 
     #
     # Process data.
