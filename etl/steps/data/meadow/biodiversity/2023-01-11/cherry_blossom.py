@@ -24,7 +24,6 @@ def run(dest_dir: str) -> None:
     tb = clean_data(tb)
     tb = convert_date(tb)
 
-    tb["Full-flowering date"].metadata.origins = [Origin(dataset_title_owid="My origin")]
 
     #
     # Save outputs.

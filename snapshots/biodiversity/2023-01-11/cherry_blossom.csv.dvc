@@ -3,6 +3,8 @@ meta:
     producer: Yasuyuki Aono
     dataset_title_owid: Peak Cherry Tree Blossom at Kyoto City
     dataset_url_main: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
+    attribution: Multiple sources compiled by Aono
+    attribution_short: Aono
     dataset_description_owid: |-
       Multiple sources compiled by Aono (2021):
 
