@@ -11,8 +11,6 @@ dataset:
     description: The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
       around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to
       Terrorism (START) at the University of Maryland
-
-
     url: https://www.start.umd.edu/gtd/
     date_accessed: '2023-07-20'
     publication_year: 2022
@@ -30,28 +28,6 @@ tables:
       total_incident_counts:
         title: total_incident_counts
         unit: ''
-        description: >
-        The GTD defines a terrorist attack as the threatened or actual use of illegal force and violence by a non- state actor to attain a political, economic, religious, or social goal through fear, coercion, or intimidation. In practice this means in order to consider an incident for inclusion in the GTD, all three of the following attributes must be present:
-
-
-           The incident must be intentional – the result of a conscious calculation on the part of a perpetrator.
-
-
-           The incident must entail some level of violence or immediate threat of violence -including property violence, as well as violence against people.
-
-
-           The perpetrators of the incidents must be sub-national actors. The database does not include acts of state terrorism.
-
-
-        In addition, at least two of the following three criteria must be present for an incident to be included in the GTD:
-
-           Criterion 1: The act must be aimed at attaining a political, economic, religious, or social goal. In terms of economic goals, the exclusive pursuit of profit does not satisfy this criterion. It must involve the pursuit of more profound, systemic economic change.
-
-
-           Criterion 2: There must be evidence of an intention to coerce, intimidate, or convey some other message to a larger audience (or audiences) than the immediate victims. It is the act taken as a totality that is considered, irrespective if every individual involved in carrying out the act was aware of this intention. As long as any of the planners or decision-makers behind the attack intended to coerce, intimidate or publicize, the intentionality criterion is met.
-
-
-           Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants.
       total_casualties:
         title: total_casualties
         unit: ''
@@ -205,6 +181,18 @@ tables:
         unit: ''
         display:
           numDecimalPlaces: 7
+      decadal_total_killed:
+        title: decadal_total_killed
+        unit: ''
+      decadal_total_wounded:
+        title: decadal_total_wounded
+        unit: ''
+      decadal_total_incident_counts:
+        title: decadal_total_incident_counts
+        unit: ''
+      decadal_total_casualties:
+        title: decadal_total_casualties
+        unit: ''
       decadal_terrorism_wounded_per_capita:
         title: decadal_terrorism_wounded_per_capita
         unit: ''

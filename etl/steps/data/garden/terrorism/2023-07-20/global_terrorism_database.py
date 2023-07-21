@@ -124,6 +124,10 @@ def run(dest_dir: str) -> None:
 
     # Perform decadal averaging for selected columns
     cols_for_decadal_av = [
+        "total_killed",
+        "total_wounded",
+        "total_incident_counts",
+        "total_casualties",
         "terrorism_wounded_per_capita",
         "terrorism_deaths_per_capita",
         "terrorism_casualties_per_capita",
