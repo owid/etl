@@ -13,7 +13,6 @@ from owid.catalog.utils import underscore
 
 from etl.db import get_connection, get_engine
 from etl.db_utils import DBUtils
-from etl.steps.data.converters import convert_origin_to_source, convert_source_to_origin
 
 log = structlog.get_logger()
 
@@ -474,24 +473,6 @@ def _adapt_table_for_grapher(
     table = _ensure_source_per_variable(table)
 
     return cast(catalog.Table, table)
-
-
-def _add_sources_to_origins(origins: List[catalog.Origin], sources: List[catalog.Source]) -> List[catalog.Origin]:
-    """Add sources to origins. Don't add sources with `name` that already exists as `producer` in origins."""
-    origins = list(origins)
-    for source in sources:
-        if source.name not in [origin.producer for origin in origins]:
-            origins.append(convert_source_to_origin(source))
-    return origins
-
-
-def _add_origins_to_sources(sources: List[catalog.Source], origins: List[catalog.Origin]) -> List[catalog.Source]:
-    """Add origins to sources. Don't add origins with `producer` that already exists as `name` in sources."""
-    sources = list(sources)
-    for origin in origins:
-        if origin.producer not in [source.name for source in sources]:
-            sources.append(convert_origin_to_source(origin))
-    return sources
 
 
 def _add_dataset_origins_to_variables(table: catalog.Table) -> catalog.Table:

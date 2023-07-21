@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from owid.catalog import Origin, Table, tables
+from owid.catalog import Table, tables
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -23,7 +23,6 @@ def run(dest_dir: str) -> None:
     # clean and transform data
     tb = clean_data(tb)
     tb = convert_date(tb)
-
 
     #
     # Save outputs.
