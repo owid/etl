@@ -61,9 +61,10 @@ def run(dest_dir: str) -> None:
     df_2021 = pd.read_excel(snap_2021.path)
     # Combine terrorism data up until 2020 and 2020-2021.
     df = pd.concat([df_2020[COLUMNS_OF_INTEREST], df_2021[COLUMNS_OF_INTEREST]])
-    df = df.rename(columns={"country_txt": "country", "iyear": "year"})
-    df.set_index(["country", "year"], inplace=True)
+    # Rename country and year columns
+    df.columns = ["country" if col == "country_txt" else "year" if col == "iyear" else col for col in df.columns]
 
+    df.set_index(["country", "year"], inplace=True)
     #
     # Process data.
     #

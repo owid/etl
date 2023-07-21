@@ -131,49 +131,6 @@ def run(dest_dir: str) -> None:
         "terrorism_wounded_per_capita",
         "terrorism_deaths_per_capita",
         "terrorism_casualties_per_capita",
-        "Armed Assault_attack",
-        "Assassination_attack",
-        "Bombing/Explosion_attack",
-        "Facility/Infrastructure Attack_attack",
-        "Hijacking_attack",
-        "Hostage Taking (Barricade Incident)_attack",
-        "Hostage Taking (Kidnapping)_attack",
-        "Unarmed Assault_attack",
-        "Unknown_attack",
-        "Abortion Related_target",
-        "Airports & Aircraft_target",
-        "Business_target",
-        "Educational Institution_target",
-        "Food or Water Supply_target",
-        "Government (Diplomatic)_target",
-        "Government (General)_target",
-        "Journalists & Media_target",
-        "Maritime_target",
-        "Military_target",
-        "NGO_target",
-        "Other_target",
-        "Police_target",
-        "Private Citizens & Property_target",
-        "Religious Figures/Institutions_target",
-        "Telecommunication_target",
-        "Terrorists/Non-State Militia_target",
-        "Tourists_target",
-        "Transportation_target",
-        "Unknown_target",
-        "Utilities_target",
-        "Violent Political Party_target",
-        "Biological_weapon",
-        "Chemical_weapon",
-        "Explosives_weapon",
-        "Fake Weapons_weapon",
-        "Firearms_weapon",
-        "Incendiary_weapon",
-        "Melee_weapon",
-        "Other_weapon",
-        "Radiological_weapon",
-        "Sabotage Equipment_weapon",
-        "Unknown_weapon",
-        "Vehicle (not to include vehicle-borne explosives, i.e., car or truck bombs)_weapon",
     ]
 
     df_pop_deaths = perform_decadal_averaging(df_pop_deaths, cols_for_decadal_av=cols_for_decadal_av)
@@ -185,6 +142,8 @@ def run(dest_dir: str) -> None:
     df_pop_deaths["terrorism_deaths_per_capita"] = df_pop_deaths["terrorism_deaths_per_capita"].astype("float64")
     df_pop_deaths["terrorism_wounded_per_capita"] = df_pop_deaths["terrorism_wounded_per_capita"].astype("float64")
 
+    # Drop total deaths and population columns
+    df_pop_deaths.drop(["deaths", "population"], axis=1, inplace=True)
     # Convert DataFrame to a new garden dataset table.
     tb_garden = Table(df_pop_deaths, short_name=paths.short_name)
     tb_garden.set_index(["country", "year"], inplace=True)
