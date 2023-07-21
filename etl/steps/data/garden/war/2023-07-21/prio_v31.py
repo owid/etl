@@ -12,6 +12,20 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 # Logger
 log = get_logger()
+# Rename columns
+REGIONS_RENAME = {
+    1: "Europe (PRIO)",
+    2: "Middle East (PRIO)",
+    3: "Asia (PRIO)",
+    4: "Africa (PRIO)",
+    5: "Americas (PRIO)",
+}
+CONFTYPES_RENAME = {
+    1: "extrasystemic",
+    2: "interstate",
+    3: "intrastate (non-internationalized)",
+    4: "intrastate (internationalized)",
+}
 
 
 def run(dest_dir: str) -> None:
@@ -28,28 +42,40 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Relevant rows
-    log.info("war.prio31: keep relevant columns")
+    log.info("war.prio_v31: keep relevant columns")
     COLUMNS_RELEVANT = ["id", "year", "region", "type", "startdate", "ependdate", "bdeadlow", "bdeadhig", "bdeadbes"]
     tb = tb[COLUMNS_RELEVANT]
 
-    log.info("war.prio31: sanity checks")
+    log.info("war.prio_v31: sanity checks")
     _sanity_checks(tb)
 
-    log.info("war.prio31: estimate metrics")
+    log.info("war.prio_v31: estimate metrics")
     tb = estimate_metrics(tb)
 
-    log.info("war.prio31: rename columns")
-    tb = tb.rename(columns={
-        "type": "conflict_type",
-    })
+    log.info("war.prio_v31: rename columns")
+    tb = tb.rename(
+        columns={
+            "type": "conflict_type",
+        }
+    )
 
-    log.info("war.prio31: replace NaNs with zeroes")
+    log.info("war.prio_v31: replace NaNs with zeroes")
     tb = replace_missing_data_with_zeros(tb)
 
-    log.info("war.prio31: set index")
-    tb = tb.set_index(["year", "region", "type"], verify_integrity=True)
+    # Rename regions
+    log.info("war.prio_v31: rename regions")
+    tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
+    assert tb["region"].isna().sum() == 0, "Unmapped regions!"
 
-    log.info("war.prio31: add shortname to table")
+    # Rename conflict_type
+    log.info("war.prio_v31: rename regions")
+    tb["conflict_type"] = tb["conflict_type"].map(CONFTYPES_RENAME | {"all": "all", "intrastate": "intrastate"})
+    assert tb["conflict_type"].isna().sum() == 0, "Unmapped conflict_type!"
+
+    log.info("war.prio_v31: set index")
+    tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True)
+
+    log.info("war.prio_v31: add shortname to table")
     tb = Table(tb, short_name=paths.short_name)
 
     #
@@ -77,8 +103,12 @@ def _sanity_checks(tb: Table) -> None:
     tb[column] = tb[column].replace(-999, np.nan)
 
     # Check regions
-    assert (tb.groupby("id").region.nunique() == 1).all(), "Some conflicts occurs in multiple regions! That was not expected."
-    assert (tb.groupby(["id", "year"]).type.nunique() == 1).all(), "Some conflicts has different values for `type` in the same year! That was not expected."
+    assert (
+        tb.groupby("id").region.nunique() == 1
+    ).all(), "Some conflicts occurs in multiple regions! That was not expected."
+    assert (
+        tb.groupby(["id", "year"]).type.nunique() == 1
+    ).all(), "Some conflicts has different values for `type` in the same year! That was not expected."
 
 
 def estimate_metrics(tb: Table) -> Table:
@@ -90,41 +120,67 @@ def estimate_metrics(tb: Table) -> Table:
 
     return tb
 
+
 def _add_ongoing_metrics(tb: Table) -> Table:
     # Get ongoing metrics
-    sum_nan = (lambda x: x.sum() if not x.isna().any() else np.nan)
+    sum_nan = lambda x: x.sum() if not x.isna().any() else np.nan
     ops = {"id": "nunique", "bdeadlow": sum_nan, "bdeadbes": sum_nan, "bdeadhig": sum_nan}
     ## By region and type
     tb_ongoing = tb.groupby(["year", "type", "region"], as_index=False).agg(ops)
-    ## Type
+    ## Type='all'
     tb_ongoing_alltype = tb.groupby(["year", "region"], as_index=False).agg(ops)
     tb_ongoing_alltype["type"] = "all"
-    ## World
+    ## Type='intrastate'
+    tb_intra_ = tb[tb["type"].isin([3, 4])].copy()
+    tb_ongoing_intratype = tb_intra_.groupby(["year", "region"], as_index=False).agg(ops)
+    tb_ongoing_intratype["type"] = "intrastate"
+    ## World (by type)
     tb_ongoing_world = tb.groupby(["year", "type"], as_index=False).agg(ops)
     tb_ongoing_world["region"] = "World"
+    ## World (type 'all')
     tb_ongoing_world_alltype = tb.groupby(["year"], as_index=False).agg(ops)
     tb_ongoing_world_alltype["region"] = "World"
     tb_ongoing_world_alltype["type"] = "all"
+    ## World (type 'intrastate')
+    tb_ongoing_world_intratype = tb_intra_.groupby(["year"], as_index=False).agg(ops)
+    tb_ongoing_world_intratype["region"] = "World"
+    tb_ongoing_world_intratype["type"] = "intrastate"
 
     ## Combine
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_alltype, tb_ongoing_world, tb_ongoing_world_alltype], ignore_index=True)
+    tb_ongoing = pd.concat(
+        [
+            tb_ongoing,
+            tb_ongoing_alltype,
+            tb_ongoing_intratype,
+            tb_ongoing_world,
+            tb_ongoing_world_alltype,
+            tb_ongoing_world_intratype,
+        ],
+        ignore_index=True,
+    )
     tb_ongoing = tb_ongoing.sort_values(["year", "region", "type"])
 
     ## Rename
-    tb_ongoing = tb_ongoing.rename(columns={
-        "id": "number_ongoing_conflicts",
-        "bdeadlow": "number_deaths_ongoing_conflicts_low",
-        "bdeadhig": "number_deaths_ongoing_conflicts_high",
-        "bdeadbes": "number_deaths_ongoing_conflicts",
-    })
+    tb_ongoing = tb_ongoing.rename(
+        columns={
+            "id": "number_ongoing_conflicts",
+            "bdeadlow": "number_deaths_ongoing_conflicts_low",
+            "bdeadhig": "number_deaths_ongoing_conflicts_high",
+            "bdeadbes": "number_deaths_ongoing_conflicts",
+        }
+    )
 
     return tb_ongoing
 
 
 def _add_new_metrics(tb: Table) -> Table:
     # Reduce table
-    tb_new = tb.sort_values("year").drop_duplicates(subset=["id", "region"], keep="first")[["year", "region", "type", "id"]]
-    assert tb_new["id"].value_counts().max() == 1, "There are multiple instances of a conflict with the same ID. Maybe same conflict in different regions or with different types? This is assumed not to happen"
+    tb_new = tb.sort_values("year").drop_duplicates(subset=["id", "region"], keep="first")[
+        ["year", "region", "type", "id"]
+    ]
+    assert (
+        tb_new["id"].value_counts().max() == 1
+    ), "There are multiple instances of a conflict with the same ID. Maybe same conflict in different regions or with different types? This is assumed not to happen"
 
     # Estimate metric for regions and types
     tb_new_regions = tb_new.groupby(["year", "region", "type"], as_index=False)["id"].nunique()
@@ -133,7 +189,12 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new_alltype = tb_new_regions.groupby(["year", "region"], as_index=False)["id"].sum()
     tb_new_alltype["type"] = "all"
 
-    tb_new = pd.concat([tb_new, tb_new_alltype], ignore_index=True)
+    # Estimate metric for new type='intrastate'
+    tb_new_regions_intra_ = tb_new_regions[tb_new_regions["type"].isin([3, 4])]
+    tb_new_intratype = tb_new_regions_intra_.groupby(["year", "region"], as_index=False)["id"].sum()
+    tb_new_intratype["type"] = "intrastate"
+
+    tb_new = pd.concat([tb_new_regions, tb_new_alltype, tb_new_intratype], ignore_index=True)
 
     # Estimate metric for new region='World'
     tb_new_world = tb_new.groupby(["year", "type"], as_index=False)["id"].sum()
@@ -143,11 +204,7 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True)
 
     # Rename
-    tb_new = tb_new.rename(
-        columns={
-            "id": "number_new_conflicts"
-        }
-    )
+    tb_new = tb_new.rename(columns={"id": "number_new_conflicts"})
 
     return tb_new
 
