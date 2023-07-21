@@ -152,35 +152,3 @@ def convert_grapher_variable(g: gm.Variable, s: gm.Source) -> VariableMeta:
         # TODO: can we get unit from `display` or not?
         # licenses: List[Source] = field(default_factory=list)
     )
-
-
-def convert_origin_to_source(o: Origin) -> Source:
-    # `dataset_title` isn't used, but it is assigned to DatasetMeta.title
-    # when propagating Snapshot to meadow dataset. Same for `dataset_description`,
-    # though that one is used here as `Source.description`.
-    return Source(
-        name=o.producer,
-        description=o.dataset_description_owid,
-        url=o.dataset_url_main,
-        source_data_url=o.dataset_url_download,
-        date_accessed=str(o.date_accessed) if o.date_accessed else None,
-        publication_date=o.date_published,
-        published_by=o.citation_producer,
-        # excluded fields
-        # owid_data_url
-        # publication_year
-    )
-
-
-def convert_source_to_origin(s: Source) -> Origin:
-    """Inverse of `convert_origin_to_source`."""
-    warnings.warn("Converting sourcs to origins is highly discouraged.")
-    return Origin(
-        producer=s.name,
-        dataset_description_owid=s.description,
-        dataset_url_main=s.url,
-        dataset_url_download=s.source_data_url,
-        date_accessed=s.date_accessed if s.date_accessed else None,  # type: ignore
-        date_published=s.publication_date if s.publication_date else None,  # type: ignore
-        citation_producer=s.published_by,
-    )
