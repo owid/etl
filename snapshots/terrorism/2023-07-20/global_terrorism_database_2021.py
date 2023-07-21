@@ -19,6 +19,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
+    "To download the files you need to fill out a form here: https://www.start.umd.edu/gtd/contact/download"
     # Create a new snapshot.
     snap = Snapshot(f"terrorism/{SNAPSHOT_VERSION}/global_terrorism_database_2021.xlsx")
 
