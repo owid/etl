@@ -66,13 +66,24 @@ def read_and_clean_data(local_file: str) -> pd.DataFrame:
         return clean_data(arrow_table.to_pandas())
 
 
+def fix_percent(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    IHME doesn't seem to be consistent with how it stores percentages.
+    If the percent value for all causes == 1 for a particular dataset we need to multiply it by 100
+    """
+
+    if all(df[(df["cause"] == "All causes") & (df["metric"] == "Percent")] == 1):
+        df["value"][(df["metric"] == "Percent")] = df["value"][(df["metric"] == "Percent")] * 100
+    return df
+
+
 def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, dest_dir: str) -> None:
     # retrieve raw data from walden
     walden_ds = WaldenCatalog().find_one(namespace=namespace, short_name=dataset, version=version)
     local_file = walden_ds.ensure_downloaded()
-
     tb = read_and_clean_data(local_file)
     tb = tb.drop_duplicates()
+    tb = fix_percent(tb)
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
