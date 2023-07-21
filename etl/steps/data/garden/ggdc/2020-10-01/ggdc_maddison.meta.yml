@@ -23,3 +23,42 @@ tables:
         display:
           entityAnnotationsMap: "Western Offshoots (MPD): United States, Canada, Australia and New Zealand"
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            title: GDP per capita
+            subtitle: This data is adjusted for inflation and for differences in the cost of living between countries.
+            note: 'This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices.'
+            hideRelativeToggle: false
+            hasMapTab: true
+            variantName: 'Maddison Project Database, constant international-$'
+            originUrl: 'https://ourworldindata.org/economic-growth'
+            isPublished: true
+            yAxis:
+                min: 0
+                canChangeScaleType: true
+            map:
+                time: latest
+                colorScale:
+                    baseColorScheme: GnBu
+                    binningStrategy: manual
+                    binningStrategyBinCount: 9
+                    customNumericValues:
+                        - 1000
+                        - 2000
+                        - 5000
+                        - 10000
+                        - 20000
+                        - 50000
+                        - 100000
+                variableId: 417485
+            selectedEntityNames:
+                - World
+                - South and South-East Asia (MPD)
+                - Sub-Saharan Africa (MPD)
+                - Western Offshoots (MPD)
+                - Western Europe (MPD)
+                - Eastern Europe (MPD)
+                - Latin America (MPD)
+                - Middle East (MPD)
+                - East Asia (MPD)
+            $schema: 'https://files.ourworldindata.org/schemas/grapher-schema.003.json'
