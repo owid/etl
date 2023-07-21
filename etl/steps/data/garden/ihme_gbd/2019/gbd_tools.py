@@ -90,8 +90,9 @@ def pivot(df: pd.DataFrame, dims: List[str]) -> Table:
     df_percent = _pivot_percent(df, dims)
     df_rate = _pivot_rate(df, dims)
     df_share = _pivot_share(df, dims)
-
-    tb_garden = Table(pd.concat([df_number, df_percent, df_rate, df_share], axis=1))
+    df_garden = pd.concat([df_number, df_percent, df_rate, df_share], axis=1)
+    # add metadata step
+    tb_garden = Table(df_garden)
     tb_garden = underscore_table(tb_garden)
 
     return tb_garden
@@ -150,6 +151,14 @@ def add_share_of_population(df: pd.DataFrame) -> pd.DataFrame:
 
     df = cast(pd.DataFrame, pd.concat([df, df_percent], axis=0))
     return df
+
+
+def add_metadata(df: pd.DataFrame, dims: List[str]) -> pd.DataFrame:
+    """
+    Adding metadata at the variable level
+    """
+    dim_group = dims + ["measure"] + ["metric"]
+    df.groupby(dim_group)
 
 
 def run_wrapper(
