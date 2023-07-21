@@ -123,7 +123,11 @@ def estimate_metrics(tb: Table) -> Table:
 
 def _add_ongoing_metrics(tb: Table) -> Table:
     # Get ongoing metrics
-    sum_nan = lambda x: x.sum() if not x.isna().any() else np.nan
+    def sum_nan(x: pd.Series):
+        if not x.isna().any():
+            return x.sum()
+        return np.nan
+
     ops = {"id": "nunique", "bdeadlow": sum_nan, "bdeadbes": sum_nan, "bdeadhig": sum_nan}
     ## By region and type
     tb_ongoing = tb.groupby(["year", "type", "region"], as_index=False).agg(ops)
@@ -158,10 +162,10 @@ def _add_ongoing_metrics(tb: Table) -> Table:
         ],
         ignore_index=True,
     )
-    tb_ongoing = tb_ongoing.sort_values(["year", "region", "type"])
+    tb_ongoing = tb_ongoing.sort_values(["year", "region", "type"])  # type: ignore
 
     ## Rename
-    tb_ongoing = tb_ongoing.rename(
+    tb_ongoing = tb_ongoing.rename(  # type: ignore
         columns={
             "id": "number_ongoing_conflicts",
             "bdeadlow": "number_deaths_ongoing_conflicts_low",
@@ -204,7 +208,7 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True)
 
     # Rename
-    tb_new = tb_new.rename(columns={"id": "number_new_conflicts"})
+    tb_new = tb_new.rename(columns={"id": "number_new_conflicts"})  # type: ignore
 
     return tb_new
 
