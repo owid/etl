@@ -32,7 +32,7 @@ meta:
     source_data_url: 
       https://raw.githubusercontent.com/dkobak/excess-mortality/main/baselines-per-year.csv
     owid_data_url:
-    date_accessed: 2023-07-22
+    date_accessed: 2023-07-23
     publication_date: '2021-06-30'
     publication_year: 2021
     published_by: Karlinsky & Kobak, 2021, Tracking excess mortality across countries
