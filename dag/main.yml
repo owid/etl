@@ -530,8 +530,8 @@ steps:
 
 # Terrorism
   data://meadow/terrorism/2023-07-20/global_terrorism_database:
-  - snapshot://terrorism/2023-07-20/global_terrorism_database.xlsx
-  - snapshot://terrorism/2023-07-20/global_terrorism_database_2021.xlsx
+  - snapshot://terrorism/2023-07-20/global_terrorism_database.csv
+  - snapshot://terrorism/2023-07-20/global_terrorism_database_2021.csv
   data://garden/terrorism/2023-07-20/global_terrorism_database:
   - data://meadow/terrorism/2023-07-20/global_terrorism_database
   - data://garden/un/2022-07-11/un_wpp

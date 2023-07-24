@@ -2,6 +2,7 @@
 
 from typing import List, cast
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 
@@ -96,6 +97,12 @@ def run(dest_dir: str) -> None:
     # Load inputs from the meadow dataset.
     ds_meadow_terrorism = cast(Dataset, paths.load_dependency("global_terrorism_database"))
     tb_terrorism = ds_meadow_terrorism["global_terrorism_database"]
+    tb_terrorism = tb_terrorism.astype(
+        {
+            "nkill": float,
+            "nwound": float,
+        }
+    )
     tb_terrorism.reset_index(inplace=True)
 
     # Process data to calculate statistics related to terrorism incidents.
@@ -179,7 +186,7 @@ def perform_decadal_averaging(df: pd.DataFrame, cols_for_decadal_av: list) -> pd
         df[decadal_column] = df.groupby(df["year"] // 10 * 10)[column].transform("mean")
 
         # Replace non-decadal years with NaN
-        df[decadal_column] = df[decadal_column].mask(df["year"] % 10 != 0, pd.NA)
+        df[decadal_column] = df[decadal_column].mask(df["year"] % 10 != 0, np.nan)
 
     # Return the modified DataFrame
     return df

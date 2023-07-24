@@ -1,5 +1,5 @@
 meta:
-  name: Terrorism dataset, Global Terrorism Database (2022)
+  name: Terrorism dataset, Global Terrorism Database (2020-2021)
   publication_year: 2022
   source_name: Global Terrorism Database (2022)
   source_published_by: START (National Consortium for the Study of Terrorism and Responses
@@ -10,10 +10,11 @@ meta:
   license_name: Copyright University of Maryland 2022
   date_accessed: 2023-07-20
   is_public: true
-  description: |
-    The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to Terrorism (START) at the University of Maryland
+  description: |-
+    The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to Terrorism (START) at the University of Maryland.
+    Seperate file for terrorism data between 2020 and 2021.
 wdir: ../../../data/snapshots/terrorism/2023-07-20
 outs:
-- md5: a072d3032e473579a0f7d681f5853ed6
-  size: 104455519
-  path: global_terrorism_database.xlsx
+- md5: dfaeaea5b32c7c2ad88cb9afcc93e056
+  size: 5468150
+  path: global_terrorism_database_2021.csv
