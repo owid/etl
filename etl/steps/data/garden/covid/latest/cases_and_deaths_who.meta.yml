@@ -1,5 +1,5 @@
 dataset:
-  title: COVID-19 Cases and deaths - WHO
+  title: "COVID-19: Confirmed cases and deaths (WHO)"
   description: >-
       Raw data on confirmed cases and deaths for all countries is sourced from the
       <a href="https://covid19.who.int/data">WHO
