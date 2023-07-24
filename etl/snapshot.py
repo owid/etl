@@ -236,7 +236,7 @@ class SnapshotMeta:
                     publication_date=str(publication_date) if publication_date else None,
                     publication_year=meta.pop("publication_year", None),
                 )
-            assert meta.get("origin") or meta.get("source")
+            assert meta.get("origin") or meta.get("source"), 'Either "origin" or "source" must be set'
 
             if "license" not in meta:
                 if "license_name" in meta or "license_url" in meta:

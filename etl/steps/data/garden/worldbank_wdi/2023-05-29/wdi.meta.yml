@@ -1945,9 +1945,6 @@ tables:
           https://www.itu.int/en/ITU-D/Statistics/Pages/stat/default.aspx
 
           [Text from [World Bank World Development Indicators metadata](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/IT.NET.USER.ZS)]
-        licenses:
-        - name: Creative Commons Attribution 4.0
-          url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
         short_unit: '%'
         unit: '% of population'
         display:
@@ -1969,6 +1966,9 @@ tables:
           dataset_url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
           date_accessed: 2023-05-29
           date_published: '2023-05-11'
+          license:
+            name: Creative Commons Attribution 4.0
+            url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
         processing_level: minor
         presentation:
           title_public: Share of the population using the Internet

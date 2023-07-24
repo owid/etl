@@ -40,7 +40,7 @@ def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
     Copy metadata for a dataset directly from what we have in Snapshot.
     """
     if snap.origin:
-        assert not snap.source
+        assert not snap.source, "Snapshot cannot have both origin and source"
         return DatasetMeta(
             short_name=snap.short_name,
             namespace=snap.namespace,
@@ -52,7 +52,7 @@ def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
             licenses=[snap.license] if snap.license else [],
         )
     elif snap.source:
-        assert not snap.origin
+        assert not snap.origin, "Snapshot cannot have both origin and source"
         return DatasetMeta(
             short_name=snap.short_name,
             namespace=snap.namespace,
