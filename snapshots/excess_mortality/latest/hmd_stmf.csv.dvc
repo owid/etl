@@ -63,7 +63,7 @@ meta:
     url: https://www.mortality.org/Data/STMF
     source_data_url: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
     owid_data_url:
-    date_accessed: 2023-07-23
+    date_accessed: 2023-07-24
     publication_date: 2023-07-17
     publication_year: 2023
     published_by: HMD. Human Mortality Database. Max Planck Institute for Demographic
