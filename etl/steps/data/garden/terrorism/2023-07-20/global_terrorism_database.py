@@ -128,7 +128,7 @@ def run(dest_dir: str) -> None:
     df_pop_deaths["terrorism_wounded_per_capita"] = df_pop_deaths["total_wounded"] / df_pop_deaths["population"]
     df_pop_deaths["terrorism_deaths_per_capita"] = df_pop_deaths["total_killed"] / df_pop_deaths["population"]
     df_pop_deaths["terrorism_casualties_per_capita"] = df_pop_deaths["total_casualties"] / df_pop_deaths["population"]
-
+    df_pop_deaths["share_of_deaths"] = (df_pop_deaths["total_killed"] / df_pop_deaths["deaths"]) * 100
     # Perform decadal averaging for selected columns
     cols_for_decadal_av = [
         "total_killed",

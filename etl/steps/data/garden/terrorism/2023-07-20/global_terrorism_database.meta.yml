@@ -685,3 +685,11 @@ tables:
           Where several independent sources report different numbers of non-fatal injuries and fatalties, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
         display:
           numDecimalPlaces: 7
+      share_of_deaths:
+        title: Share of deaths from terrorism
+        unit: 'deaths'
+        description: >
+          This field records the number of confirmed fatalties from terrorism as a share of total deaths.
+
+        display:
+          numDecimalPlaces: 2
