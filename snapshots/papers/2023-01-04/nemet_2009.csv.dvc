@@ -3,6 +3,8 @@ meta:
   short_name: nemet_2009
   name: Interim monitoring of cost dynamics for publicly supported energy technologies
   source_name: G. F. Nemet (2009) via Performance Curve Database
+  source_published_by: |
+    Interim monitoring of cost dynamics for publicly supported energy technologies, Energy Policy 37(3): 825-835, by Nemet, G. F. (2009), obtained via the Performance Curve Database by http://pcdb.santafe.edu
   publication_year: 2009
   publication_date: 2009-03-01
   url: https://pcdb.santafe.edu/graph.php?curve=158
@@ -13,7 +15,6 @@ meta:
   date_accessed: 2023-01-04
   is_public: true
   description: |
-    Energy Policy 37(3): 825-835. by Nemet, G. F (2009). Obtained via the Performance Curve Database by http://pcdb.santafe.edu.
 wdir: ../../../data/snapshots/papers/2023-01-04
 outs:
 - md5: 3ad0ba878a3f06addac0d6bc75c92b74
