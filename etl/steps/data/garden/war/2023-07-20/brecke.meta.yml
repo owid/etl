@@ -34,9 +34,6 @@ dataset:
       - East Asia (China, Korea, Japan)
 
 
-    More details about original dataset by Brecke:
-
-
 tables:
   brecke:
     # (Inherited from meadow, remove if not different.)
@@ -45,11 +42,11 @@ tables:
         title: Number of soldier deaths in ongoing conflicts
         unit: deaths
         description: >-
-          The number of soldiers killed in a year over the course of wars.. The military fatalities estimates are reasonably close to being just soldiers, but some civilians might be in the counts.
+          The number of soldiers killed in a year over the course of wars. The military fatalities estimates are reasonably close to being just soldiers, but some civilians might be in the counts.
         display:
           numDecimalPlaces: 0
       number_deaths_ongoing_conflicts:
-        title: Number deaths in ongoing conflicts
+        title: Number of deaths in ongoing conflicts
         unit: deaths
         description: >-
           The total fatalities estimates in a year over the course of wars. The total fatalities estimates vary significantly in terms of the degree to which they include disease, starvation, etc.

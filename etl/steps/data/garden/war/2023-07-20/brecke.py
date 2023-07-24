@@ -3,6 +3,8 @@
 This dataset provides data since 1400, where each row in it denotes a certain conflict and its fatalities.
 
 Drawback of this dataset is that the field `name` encodes the conflict name and conflict type together as a flat string.
+
+Conflicts in this dataset always occur in the same region, and have the same conflict type. Conflict type can either be "inter-state" or "intra-state".
 """
 
 from typing import cast
@@ -227,25 +229,35 @@ def estimate_metrics(tb: Table) -> Table:
 def _add_ongoing_metrics(tb: Table) -> Table:
     # Get ongoing #conflicts and deaths, by region and conflict type.
 
+    def sum_nan(x: pd.Series):
+        # Perform summation if all numbers are notna; otherwise return NaN.
+        if not x.isna().any():
+            return x.sum()
+        return np.nan
+
+    ops = {
+        "conflict_code": "nunique",
+        "milfatalities": sum_nan,
+        "totalfatalities": sum_nan,
+    }
     ## By region and conflict_type
-    tb_ongoing = tb.groupby(["year", "region", "conflict_type"], as_index=False).agg(
-        {
-            "conflict_code": "nunique",
-            "milfatalities": lambda x: x.sum(min_count=1),
-            "totalfatalities": lambda x: x.sum(min_count=1),
-        }
-    )
+    tb_ongoing = tb.groupby(["year", "region", "conflict_type"], as_index=False).agg(ops)
 
     ## All conflicts
-    tb_ongoing_all_conf = tb_ongoing.groupby(["year", "region"], as_index=False).sum(min_count=1)
+    tb_ongoing_all_conf = tb.groupby(["year", "region"], as_index=False).agg(ops)
     tb_ongoing_all_conf["conflict_type"] = "all"
 
     ## World
-    tb_ongoing_world = tb_ongoing.groupby(["year", "conflict_type"], as_index=False).sum(min_count=1)
+    tb_ongoing_world = tb.groupby(["year", "conflict_type"], as_index=False).agg(ops)
     tb_ongoing_world["region"] = "World"
 
-    ## Combine
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_all_conf, tb_ongoing_world], ignore_index=True).sort_values(  # type: ignore
+    ## World & all conflicts
+    tb_ongoing_world_all_conf = tb.groupby(["year"], as_index=False).agg(ops)
+    tb_ongoing_world_all_conf["region"] = "World"
+    tb_ongoing_world_all_conf["conflict_type"] = "all"
+
+    ## Add region=World
+    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_all_conf, tb_ongoing_world, tb_ongoing_world_all_conf], ignore_index=True).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
 
@@ -263,26 +275,32 @@ def _add_ongoing_metrics(tb: Table) -> Table:
 
 def _add_new_metrics(tb: Table) -> Table:
     # Get new #conflicts, by region and conflict type.
+    ops = {"conflict_code": "nunique"}
     ## By region and conflict_type
-    tb_new = tb.groupby(["startyear", "region", "conflict_type"], as_index=False).agg({"conflict_code": "nunique"})
-    tb_new = tb_new.rename(columns={"startyear": "year"})
+    tb_new = tb.groupby(["startyear", "region", "conflict_type"], as_index=False).agg(ops)
 
     ## All conflicts
-    tb_new_all_conf = tb_new.groupby(["year", "region"], as_index=False).sum(min_count=1)
+    tb_new_all_conf = tb.groupby(["startyear", "region"], as_index=False).agg(ops)
     tb_new_all_conf["conflict_type"] = "all"
 
     ## World
-    tb_new_world = tb_new.groupby(["year", "conflict_type"], as_index=False).sum(min_count=1)
+    tb_new_world = tb.groupby(["startyear", "conflict_type"], as_index=False).agg(ops)
     tb_new_world["region"] = "World"
 
+    ## World + all conflicts
+    tb_new_world_all_conf = tb.groupby(["startyear"], as_index=False).agg(ops)
+    tb_new_world_all_conf["region"] = "World"
+    tb_new_world_all_conf["conflict_type"] = "all"
+
     ## Combine
-    tb_new = pd.concat([tb_new, tb_new_all_conf, tb_new_world], ignore_index=True).sort_values(  # type: ignore
-        by=["year", "region", "conflict_type"]
+    tb_new = pd.concat([tb_new, tb_new_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True).sort_values(  # type: ignore
+        by=["startyear", "region", "conflict_type"]
     )
 
     ## Rename columns
     tb_new = tb_new.rename(  # type: ignore
         columns={
+            "startyear": "year",
             "conflict_code": "number_new_conflicts",
         }
     )
@@ -300,7 +318,7 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     regions = set(tb["region"])
     conflict_types = set(tb["conflict_type"])
     new_idx = pd.MultiIndex.from_product([years, regions, conflict_types], names=["year", "region", "conflict_type"])
-    tb = tb.set_index(["year", "region", "conflict_type"]).reindex(new_idx).reset_index()
+    tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True).reindex(new_idx).reset_index()
 
     # Change NaNs for 0 for specific rows
     ## For columns "number_ongoing_conflicts", "number_new_conflicts"
