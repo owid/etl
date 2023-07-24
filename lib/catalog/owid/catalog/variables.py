@@ -457,7 +457,6 @@ def update_log(
     comment: Optional[str] = None,
     inplace: bool = False,
 ) -> Optional[Variable]:
-
     if not inplace:
         variable = copy.deepcopy(variable)
 

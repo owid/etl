@@ -248,7 +248,7 @@ tables:
         unit: 'thousand tonnes'
         short_unit: 'kt'
       lithium_reserves_kt:
-        title: 'Lithium Reserves'
+        title: 'Lithium reserves - kt'
         unit: 'thousand tonnes'
         short_unit: 'kt'
       nuclear_consumption_equivalent_ej:
