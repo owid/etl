@@ -537,6 +537,12 @@ class PathFinder:
         assert isinstance(dataset, catalog.Dataset)
         return dataset
 
+    def load_etag_url(self) -> str:
+        """Load etag url dependency and return its URL."""
+        deps = [dep for dep in self.dependencies if dep.startswith("etag://")]
+        assert len(deps) == 1
+        return deps[0].replace("etag://", "https://")
+
 
 def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
     """List all steps in a dag.

@@ -95,8 +95,11 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
     variable_dict = {v.name: v for v in config.variables}
     variable_source_dict = {s.id: s for s in config.sources}
 
-    for col in t.columns:
-        variable = variable_dict[col]
+    for col, variable in variable_dict.items():
+        if col not in t.columns:
+            log.warning("create_wide_table.no_values", variable_id=variable.id, variable_name=variable.name)
+            t[col] = np.nan
+
         t[col].metadata = convert_grapher_variable(variable, variable_source_dict[variable.sourceId])
 
     # NOTE: collision happens for dataset 5629 with column names

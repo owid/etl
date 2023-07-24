@@ -1,0 +1,107 @@
+dataset:
+  title: COVID-19 - Vaccinations by manufacturer
+  description: |-
+    Data on COVID-19 vaccinations. We only rely on figures that are verifiable based on public official sources.
+
+    You can download the full dataset here: https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations
+  sources:
+  - name: Official data collated by Our World in Data
+    published_by: For source details see
+      https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations/locations-manufacturer.csv
+tables:
+  vaccinations_by_manufacturer:
+    variables:
+      cansino:
+        title: CanSino
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      covaxin:
+        title: Covaxin
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      johnson_and_johnson:
+        title: Johnson&Johnson
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      medicago:
+        title: Medicago
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      moderna:
+        title: Moderna
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      novavax:
+        title: Novavax
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      oxford_astrazeneca:
+        title: Oxford/AstraZeneca
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      pfizer_biontech:
+        title: Pfizer/BioNTech
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      skycovione:
+        title: SKYCovione
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      sanofi_gsk:
+        title: Sanofi/GSK
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      sinopharm_beijing:
+        title: Sinopharm/Beijing
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      sinovac:
+        title: Sinovac
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      sputnik_light:
+        title: Sputnik Light
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      sputnik_v:
+        title: Sputnik V
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      valneva:
+        title: Valneva
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
