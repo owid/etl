@@ -151,6 +151,28 @@ def _load_variable(engine: Engine, variable_id: int) -> Dict[str, Any]:
     return df.iloc[0].to_dict()
 
 
+def _load_topic_tags(engine: Engine, variable_id: int) -> list[str]:
+    sql = """
+    SELECT
+        tags.name
+    FROM tags_variables_topic_tags
+    JOIN tags ON tags_variables_topic_tags.tagId = tags.id
+    WHERE variableId = %(variable_id)s
+    """
+    return pd.read_sql(sql, engine, params={"variable_id": variable_id})["name"].tolist()
+
+
+def _load_faqs(engine: Engine, variable_id: int) -> list[dict]:
+    sql = """
+    SELECT
+        gdocId,
+        fragmentId
+    FROM posts_gdocs_variables_faqs
+    WHERE variableId = %(variable_id)s
+    """
+    return pd.read_sql(sql, engine, params={"variable_id": variable_id}).to_dict(orient="records")
+
+
 def _load_origins_df(engine: Engine, variable_id: int) -> pd.DataFrame:
     sql = """
     SELECT
@@ -165,8 +187,9 @@ def _load_origins_df(engine: Engine, variable_id: int) -> pd.DataFrame:
 
 
 def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
-    """Fetch metadata for a single variable from database.
-    This function is similar to Variables.getVariableData in owid-grapher repository
+    """Fetch metadata for a single variable from database. This function was initially based on the
+    one from owid-grapher repository and uses raw SQL commands. It'd be interesting to rewrite it
+    using SQLAlchemy ORM in grapher_model.py.
     """
     row = _load_variable(engine, variable_id)
 
@@ -177,20 +200,32 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
     nonRedistributable = row.pop("nonRedistributable")
     displayJson = row.pop("display")
 
-    schemaVersion = row.pop("schemaVersion", None)
-    processingLevel = row.pop("processingLevel", None)
-    presentationJson = row.pop("presentation", None)
-    grapherConfigETLJson = row.pop("grapherConfigETL", None)
-    grapherConfigAdminJson = row.pop("grapherConfigAdmin", None)
-    presentationLicenseJson = row.pop("presentationLicense", None)
-    keyInfoTextJson = row.pop("keyInfoText", None)
+    schemaVersion = row.pop("schemaVersion")
+    processingLevel = row.pop("processingLevel")
+    grapherConfigETLJson = row.pop("grapherConfigETL")
+    grapherConfigAdminJson = row.pop("grapherConfigAdmin")
+    presentationLicenseJson = row.pop("presentationLicense")
+    keyInfoTextJson = row.pop("keyInfoText")
 
-    presentation = json.loads(presentationJson) if presentationJson else None
     display = json.loads(displayJson)
     grapherConfigETL = json.loads(grapherConfigETLJson) if grapherConfigETLJson else None
     grapherConfigAdmin = json.loads(grapherConfigAdminJson) if grapherConfigAdminJson else None
     presentationLicense = json.loads(presentationLicenseJson) if presentationLicenseJson else None
     keyInfoText = json.loads(keyInfoTextJson) if keyInfoTextJson else None
+
+    # group fields from flat structure into presentation field
+    presentation = dict(
+        grapherConfigETL=grapherConfigETL,
+        grapherConfigAdmin=grapherConfigAdmin,
+        titlePublic=row.pop("titlePublic"),
+        titleVariant=row.pop("titleVariant"),
+        producerShort=row.pop("producerShort"),
+        citationInline=row.pop("citationInline"),
+        topicTagsLinks=_load_topic_tags(engine, variable_id),
+        faqs=_load_faqs(engine, variable_id),
+        keyInfoText=keyInfoText,
+        processingInfo=row.pop("processingInfo"),
+    )
 
     variableMetadata = dict(
         **_omit_nullable_values(variable),
@@ -199,9 +234,7 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         display=display,
         schemaVersion=schemaVersion,
         processingLevel=processingLevel,
-        presentation=presentation,
-        grapherConfigETL=grapherConfigETL,
-        grapherConfigAdmin=grapherConfigAdmin,
+        presentation=_omit_nullable_values(presentation),
         presentationLicense=presentationLicense,
         keyInfoText=keyInfoText,
     )
