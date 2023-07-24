@@ -60,7 +60,7 @@ tables:
           numDecimalPlaces: 2
       gini_reduction:
         title: Percentage reduction in Gini coefficient (before vs. after tax)
-        description:
+        description: |
           This is the percentage difference between the Gini coefficient before taxes and benefits and the Gini coefficient after taxes and benefits.
 
           {descriptions.equivalization}
@@ -93,7 +93,7 @@ tables:
       palma:
         title: Palma ratio
         description: |
-          The share of income of the richest 10% divided by the share of the poorest 40%.
+          The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality.
 
           {descriptions.disposable_income}
 
