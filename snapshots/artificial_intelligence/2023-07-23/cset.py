@@ -26,7 +26,7 @@ def main(upload: bool) -> None:
 
     files = {
         "companies": ["companies_yearly_disclosed.csv", "companies_yearly_estimated.csv"],
-        # "patents": ["patents_yearly_applications.csv", "patents_yearly_granted.csv"],
+        "patents": ["patents_yearly_applications.csv", "patents_yearly_granted.csv"],
         "articles": ["publications_yearly_articles.csv", "publications_yearly_citations.csv"],
     }
 
