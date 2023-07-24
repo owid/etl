@@ -101,7 +101,7 @@ def run(dest_dir: str) -> None:
 
     # Merge pivot table for professional service robots, application area and sector with aggregates
     merge_all = pd.merge(merge_service, df_agg_clean, on=["year", "country"], how="outer")
-    merge_all["unspecified_others"] = merge_all["Unspecified Sector"] + merge_all["All others"]
+    merge_all["unspecified_others"] = merge_all["Unspecified Sector"] + merge_all["All Others"]
 
     # Set the index as 'country' and 'year'
     merge_all.set_index(["country", "year"], inplace=True)
