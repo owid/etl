@@ -26,6 +26,9 @@ REGIONS = [
 
 def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     tb_with_regions = tb.copy()
+
+    aggregations = {column: "median" for column in tb_with_regions.columns if column not in ["country", "year"]}
+
     for region in REGIONS:
         # Find members of current region.
         members = geo.list_members_of_region(
@@ -40,6 +43,7 @@ def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset, ds_
             countries_that_must_have_data=[],
             num_allowed_nans_per_year=None,
             frac_allowed_nans_per_year=0.99999,
+            aggregations=aggregations,
         )
     tb_with_regions = tb_with_regions.copy_metadata(from_table=tb)
 
