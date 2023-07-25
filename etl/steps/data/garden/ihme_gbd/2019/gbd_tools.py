@@ -243,7 +243,7 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str)
     new_variable = variable.copy()
     new_variable.name = underscore(var_name_dict[variable.name]["title"])
     new_variable.metadata.title = var_name_dict[variable.name]["title"]
-    new_variable.metadata.display["name"] = var_name_dict[variable.name]["title"]
+    # new_variable.metadata.display["name"] = var_name_dict[variable.name]["title"]
     new_variable.metadata.description = var_name_dict[variable.name]["description"]
     new_variable.metadata.unit = var_name_dict[variable.name]["unit"]
     new_variable.metadata.short_unit = var_name_dict[variable.name]["short_unit"]
@@ -283,7 +283,7 @@ def tidy_sex_dimension(df: pd.DataFrame) -> pd.DataFrame:
     Improve the labelling of the sex column
     """
     sex_dict = {"Both": "Both sexes"}
-    df["sex"] = df["sex"].map(sex_dict)
+    df["sex"] = df["sex"].replace(sex_dict, regex=False)
     return df
 
 
@@ -323,15 +323,4 @@ def run_wrapper(
     df_garden = add_share_of_population(df_garden)
     df_garden = pivot(df_garden, dims)
 
-    # free up memory
-    # del df_garden
-
     add_metadata_and_save(dest_dir=dest_dir, ds_meadow=ds_meadow, df=df_garden, dims=dims)
-    # ds_garden = Dataset.create_empty(dest_dir)
-    # ds_garden.metadata = ds_meadow.metadata
-
-    # tb_garden.metadata = tb_meadow.metadata
-    # ds_garden.metadata.update_from_yaml(metadata_path)
-    # tb_garden.update_metadata_from_yaml(metadata_path, f"{dataset}")
-    # ds_garden.add(tb_garden)
-    # ds_garden.save()

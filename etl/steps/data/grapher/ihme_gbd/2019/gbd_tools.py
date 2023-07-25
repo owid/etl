@@ -12,4 +12,4 @@ def run_wrapper(garden_dataset: Dataset, dataset: Dataset, dims: List[str]) -> D
     for table in tables:
         tab = garden_dataset[table]
         dataset.add(tab)
-    return dataset
+    dataset.save()
