@@ -31,6 +31,10 @@ def run(dest_dir: str) -> None:
         "no__would_not_feel_safe",
         "mostly_help",
         "yes__would_feel_safe",
+        "dk_no_op",
+        "refused__help_harm",
+        "dk__cars",
+        "refused__cars",
     ]
 
     tb = tb[column_list_to_plot]
