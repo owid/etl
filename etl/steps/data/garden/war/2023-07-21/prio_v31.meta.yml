@@ -7,9 +7,6 @@ dataset:
     It has been constructed using the Battledeaths PRIO v3.1 dataset.
 
 
-    More details about PRIO v3.1:
-
-
 tables:
   prio_v31:
     # (Inherited from meadow, remove if not different.)
