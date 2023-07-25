@@ -11,22 +11,22 @@ tables:
   prio_v31:
     # (Inherited from meadow, remove if not different.)
     variables:
-      number_deaths_ongoing_conflicts_high:
-        title: Number of soldier deaths in ongoing conflicts (high estimate)
+      number_deaths_ongoing_conflicts_battle_high:
+        title: Number of battle deaths in ongoing conflicts (high estimate)
         unit: deaths
         description: >-
           The number of battle fatalities in a year over the course of wars. This is the high estimate of those who were killed.
         display:
           numDecimalPlaces: 0
-      number_deaths_ongoing_conflicts_low:
-        title: Number of soldier deaths in ongoing conflicts (low estimate)
+      number_deaths_ongoing_conflicts_battle_low:
+        title: Number of battle deaths in ongoing conflicts (low estimate)
         unit: deaths
         description: >-
           The number of battle fatalities in a year over the course of wars. This is the low estimate of those who were killed.
         display:
           numDecimalPlaces: 0
-      number_deaths_ongoing_conflicts:
-        title: Number deaths in ongoing conflicts (best estimate)
+      number_deaths_ongoing_conflicts_battle:
+        title: Number of battle deaths in ongoing conflicts (best estimate)
         unit: deaths
         description: >-
           The number of battle fatalities in a year over the course of wars.

@@ -109,8 +109,8 @@ def _sanity_checks(tb: Table) -> None:
     # Low and High estimates
     columns = ["bdeadlow", "bdeadhig"]
     for column in columns:
-        assert tb[column].isna().sum() == 0, f"Missing values found in {column}"
-        assert not set(tb.loc[tb[column] < 0, column]), f"Negative values found in {column}"
+        assert tb[column].isna().sum() == 0, f"Missing values found in {column}. Consequently, we can't set to zero this field in `replace_missing_data_with_zeros`!"
+        assert not set(tb.loc[tb[column] < 0, column]), f"Negative values found in {column}. Consequently, we can't set to zero this field in `replace_missing_data_with_zeros`!"
 
     # Best estimate
     column = "bdeadbes"
@@ -185,9 +185,9 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing = tb_ongoing.rename(  # type: ignore
         columns={
             "id": "number_ongoing_conflicts",
-            "bdeadlow": "number_deaths_ongoing_conflicts_low",
-            "bdeadhig": "number_deaths_ongoing_conflicts_high",
-            "bdeadbes": "number_deaths_ongoing_conflicts",
+            "bdeadlow": "number_deaths_ongoing_conflicts_battle_low",
+            "bdeadhig": "number_deaths_ongoing_conflicts_battle_high",
+            "bdeadbes": "number_deaths_ongoing_conflicts_battle",
         }
     )
 
@@ -247,15 +247,18 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     columns = [
         "number_ongoing_conflicts",
         "number_new_conflicts",
-        # "number_deaths_ongoing_conflicts_high",
-        # "number_deaths_ongoing_conflicts_low",
+        "number_deaths_ongoing_conflicts_battle_high",
+        "number_deaths_ongoing_conflicts_battle_low",
     ]
     tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
 
+    # Set number of deaths to zero whenever high and low estimates are zero
+    tb.loc[(tb["number_deaths_ongoing_conflicts_battle_high"] == 0) & (tb["number_deaths_ongoing_conflicts_battle_low"] == 0), "number_deaths_ongoing_conflicts_battle"] = 0
     return tb
 
 
 def _sanity_check_final(tb: Table) -> Table:
+    # 1) Check that number of conflicts by type makes sense with aggregate. That is `ALL = INTRA + INTER + ...`
     ## Preserve all conflict types (without overlap)
     conflict_types_exclude = ["all", "intrastate"]
     mask = ~tb["conflict_type"].isin(conflict_types_exclude)
@@ -277,3 +280,7 @@ def _sanity_check_final(tb: Table) -> Table:
     assert (
         tb_["number_new_conflicts_all"] - tb_["number_new_conflicts_check"] == 0
     ).all(), "Number of new conflicts for conflict_type='all' is not equivalent to the sum of individual conflict types"
+
+    # 2)
+    msk = (tb["number_deaths_ongoing_conflicts_battle_low"] > tb["number_deaths_ongoing_conflicts_battle_high"])
+    assert not msk.any(), f"Low estimates higher than high estimates. This can't be correct! {tb[msk]}"
