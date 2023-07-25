@@ -1,4 +1,17 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""History of War dataset built using PRIO v3.1 dataset.
+
+In PRIO 3.1 dataset, each row is a year-observation of a certain conflict. That is, for a certain year, we have the number of fatalities that occured in a certain
+conflict. There are a total of approx 1900 observations.
+
+Death estimates are given in low, best and high estimates. While values for high and low estimates are always present, best estimates are sometimes missing (~800 observaionts).
+
+Also, a conflict (i.e. one specific `id`) can have multiple campaigns. Take `id=1`, where we have three entries separated in time (i.e. three campaigns):
+
+    - First campaign: 1946 (Bolivia and Popular Revolutionary Movement)
+    - Second campaign: 1952 (Bolivia and MNR)
+    - Third campaign: 1967 (Bolivia and ELN)
+
+"""
 from typing import cast
 
 import numpy as np
@@ -71,6 +84,10 @@ def run(dest_dir: str) -> None:
     log.info("war.prio_v31: rename regions")
     tb["conflict_type"] = tb["conflict_type"].map(CONFTYPES_RENAME | {"all": "all", "intrastate": "intrastate"})
     assert tb["conflict_type"].isna().sum() == 0, "Unmapped conflict_type!"
+
+    # sanity check: summing number of ongoing and new conflicts of all types is equivalent to conflict_type="all"
+    log.info("war.prio_v31: sanity checking number of conflicts")
+    _sanity_check_final(tb)
 
     log.info("war.prio_v31: set index")
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True)
@@ -236,3 +253,27 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
 
     return tb
+
+
+def _sanity_check_final(tb: Table) -> Table:
+    ## Preserve all conflict types (without overlap)
+    conflict_types_exclude = ["all", "intrastate"]
+    mask = ~tb["conflict_type"].isin(conflict_types_exclude)
+    ## Sum metrics
+    tb_check = (
+        tb.loc[mask]
+        .groupby(["year", "region"], as_index=False)[["number_ongoing_conflicts", "number_new_conflicts"]]
+        .sum()
+    )
+    ## Compare with conflict_type="all"
+    tb_all = tb[tb["conflict_type"] == "all"]
+    tb_ = tb_all.merge(tb_check, on=["year", "region"], suffixes=("_all", "_check"), validate="one_to_one")
+    ## Assertions
+    assert (
+        tb_["number_ongoing_conflicts_all"] - tb_["number_ongoing_conflicts_check"] == 0
+    ).all(), (
+        "Number of ongoing conflicts for conflict_type='all' is not equivalent to the sum of individual conflict types"
+    )
+    assert (
+        tb_["number_new_conflicts_all"] - tb_["number_new_conflicts_check"] == 0
+    ).all(), "Number of new conflicts for conflict_type='all' is not equivalent to the sum of individual conflict types"
