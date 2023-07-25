@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, List, Optional, Union
 
 import pandas as pd
+
 from owid.datautils.decorators import enable_file_download
 
 COMPRESSION_SUPPORTED = ["gz", "bz2", "zip", "xz", "zst", "tar"]

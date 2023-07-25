@@ -39,6 +39,8 @@ unittest-default: .venv
 format-default: .venv
 	@echo '==> Reformatting files'
 	@poetry run black $(SRC)
+	@echo '==> Sorting imports'
+	@poetry run isort $(SRC)
 
 watch-default: .venv
 	@echo '==> Watching for changes and re-running tests'

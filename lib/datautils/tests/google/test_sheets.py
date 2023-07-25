@@ -1,7 +1,9 @@
 from unittest import mock
-from owid.datautils.google.sheets import GSheetsApi
+
 import pandas as pd
 from gsheets import Sheets
+
+from owid.datautils.google.sheets import GSheetsApi
 
 
 class MockSheets:

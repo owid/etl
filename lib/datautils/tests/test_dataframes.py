@@ -8,8 +8,9 @@ from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
-from owid.datautils import dataframes
 from pytest import raises, warns
+
+from owid.datautils import dataframes
 
 
 class TestCompareDataFrames:

@@ -5,9 +5,10 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import union_categoricals
+
 from owid.datautils.common import ExceptionFromDocstring, warn_on_list_of_entities
 from owid.datautils.io.df import to_file as to_file_
-from pandas.api.types import union_categoricals
 
 
 # Backwards compatibility

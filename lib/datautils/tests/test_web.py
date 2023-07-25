@@ -3,13 +3,14 @@
 """
 
 
-from pytest import warns
 from unittest import mock
+
+from pytest import warns
 
 from owid.datautils.io.json import load_json
 from owid.datautils.web import download_file_from_url, get_base_url
-from .mocks import MockResponse
 
+from .mocks import MockResponse
 
 # Mock URLs and responses.
 MOCK_URL_1 = "http://owid_example.com/test.json"

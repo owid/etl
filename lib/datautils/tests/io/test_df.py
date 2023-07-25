@@ -8,8 +8,9 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
-from owid.datautils.io.df import from_file, to_file
 from pytest import raises
+
+from owid.datautils.io.df import from_file, to_file
 
 
 class TestLoadDf:
