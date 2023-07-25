@@ -25,6 +25,8 @@ lint-default: .venv
 check-formatting-default: .venv
 	@echo '==> Checking formatting'
 	@poetry run black --check $(SRC)
+	@echo '==> Checking imports sorting'
+	@poetry run isort --check-only $(SRC)
 
 check-typing-default: .venv
 	@echo '==> Checking types'
