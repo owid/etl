@@ -182,8 +182,7 @@ def run(dest_dir: str) -> None:
         if key != "regions":
             merged_df = pd.merge(merged_df, pivot_tables[key], on=["year", "country"], how="outer")
 
-    merge_all = pd.merge(total_df, merged_df, on=["country", "year"])
-
+    merge_all = pd.merge(total_df, merged_df, on=["country", "year"], how="outer")
     # Add deaths and population data, and region aggregates.
     df_pop_deaths = add_deaths_and_population(merge_all)
     ds_regions: Dataset = paths.load_dependency("regions")
@@ -295,7 +294,7 @@ def generate_summary_dataframe(df, group_columns, target_columns):
     for column in target_columns:
         summary_df[f"total_{column}"] = grouped_df[column].sum()
 
-    summary_df["total_incident_counts"] = grouped_df.size().reset_index(name="counts")["counts"]
+    summary_df["total_incident_counts"] = grouped_df.size()
 
     return summary_df.reset_index()
 

@@ -43,6 +43,7 @@ tables:
           in the "Additional Notes" field.
         unit: deaths
         display:
+          name: Global Terrorism Database
           numDecimalPlaces: 0
       total_wounded:
         title: Terrorism non-fatal injuries
@@ -1564,7 +1565,7 @@ tables:
 
 
           This value includes cultural centers that have diplomatic functions, and attacks against diplomatic staff and their families (when the relationship is relevant to the motive of the attack) and property. The United Nations is a diplomatic target.
-        deaths: 'deaths'
+        unit: 'deaths'
         display:
           name: Diplomatic
           numDecimalPlaces: 0
@@ -1675,7 +1676,7 @@ tables:
         title: Terrorism deaths Telecommunication Target
         description: >
           This includes attacks on facilities and infrastructure for the transmission of information. More specifically this value includes things like cell phone towers, telephone booths, television transmitters, radio, and microwave towers.
-        name: "deaths"
+        unit: "deaths"
         display:
           name: Telecommunication
           numDecimalPlaces: 0
@@ -1687,7 +1688,7 @@ tables:
 
 
           This value also includes cases involving the targeting of militias and guerillas
-        name: "deaths"
+        unit: "deaths"
         display:
           name: Terrorist or non-state militia
           numDecimalPlaces: 0
@@ -1813,7 +1814,7 @@ tables:
 
 
           This value includes cultural centers that have diplomatic functions, and attacks against diplomatic staff and their families (when the relationship is relevant to the motive of the attack) and property. The United Nations is a diplomatic target.
-        deaths: 'injuries'
+        unit: 'injuries'
         display:
           name: Diplomatic
           numDecimalPlaces: 0
@@ -1920,7 +1921,7 @@ tables:
         title: Terrorism non-fatal injuries Telecommunication Target
         description: >
           This includes attacks on facilities and infrastructure for the transmission of information. More specifically this value includes things like cell phone towers, telephone booths, television transmitters, radio, and microwave towers.
-        name: "injuries"
+        unit: "injuries"
         display:
           name: Telecommunication
           numDecimalPlaces: 0
@@ -1932,7 +1933,7 @@ tables:
 
 
           This value also includes cases involving the targeting of militias and guerillas
-        name: "injuries"
+        unit: "injuries"
         display:
           name: Terrorist or non-state militia
           numDecimalPlaces: 0
@@ -2053,7 +2054,7 @@ tables:
 
 
           This value includes cultural centers that have diplomatic functions, and attacks against diplomatic staff and their families (when the relationship is relevant to the motive of the attack) and property. The United Nations is a diplomatic target.
-        deaths: 'attacks'
+        unit: 'attacks'
         display:
           name: Diplomatic
           numDecimalPlaces: 0
@@ -2157,7 +2158,7 @@ tables:
           numDecimalPlaces: 0
       total_incident_counts_ngo_target:
         title: Terrorist attacks NGO Target
-         description: >
+        description: >
           Includes attacks on offices and employees of non-governmental organizations (NGOs). NGOs here include large multinational non-governmental organizations such as the Red Cross and
 
           Doctors without Borders, as well as domestic organizations. Does not include labor unions, social clubs, student groups, and other non-NGO (such cases are coded as “Private Citizens and Property”).
@@ -2214,7 +2215,7 @@ tables:
         title: Terrorist attacks Telecommunication Target
         description: >
           This includes attacks on facilities and infrastructure for the transmission of information. More specifically this value includes things like cell phone towers, telephone booths, television transmitters, radio, and microwave towers.
-        name: "attacks"
+        unit: "attacks"
         display:
           name: Telecommunication
           numDecimalPlaces: 0
@@ -2226,7 +2227,7 @@ tables:
 
 
           This value also includes cases involving the targeting of militias and guerillas
-        name: "attacks"
+        unit: "attacks"
         display:
           name: Terrorist or non-state militia
           numDecimalPlaces: 0
@@ -2308,6 +2309,7 @@ tables:
           name: Injuries from non-suicide terrorist attacks
           numDecimalPlaces: 0
       total_nwound_suicide:
+        title:  Terrorism non-fatal injuries Suicide
         description: >
             The incident was a suicide attack.
         unit: 'injuries'
@@ -2317,7 +2319,7 @@ tables:
 
       total_incident_counts_no_suicide:
         title: Terrorist attacks No Suicide
-       description: >
+        description: >
            There is no indication that the incident was a suicide attack.
         unit: 'attacks'
         display:
