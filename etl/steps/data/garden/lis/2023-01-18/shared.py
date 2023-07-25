@@ -33,21 +33,21 @@ ppp_description = "The data is measured in international-$ at 2017 prices – th
 var_dict = {
     "avg": {
         "title": "Average",
-        "description": "This is the mean income or consumption per year within the {pct_dict[pct]['decile10']} (tenth of the population).",
+        "description": "The mean {inc_cons_dict[wel]['type']} per year within the {pct_dict[pct]['decile10']} (tenth of the population).",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
         "numDecimalPlaces": 0,
     },
     "share": {
         "title": "Share",
-        "description": "This is the income or consumption of the {pct_dict[pct]['decile10']} (tenth of the population) as a share of total income or consumption.",
+        "description": "The share of {inc_cons_dict[wel]['type']} {inc_cons_dict[wel]['verb']} by the {pct_dict[pct]['decile10']} (tenth of the population).",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
     },
     "thr": {
         "title": "Threshold",
-        "description": "This is the level of income or consumption per year below which {str(pct)}% of the population falls.",
+        "description": "The level of {inc_cons_dict[wel]['type']} per year below which {str(pct)}% of the population falls.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
         "numDecimalPlaces": 0,
@@ -96,28 +96,28 @@ var_dict = {
     },
     "gini": {
         "title": "Gini coefficient",
-        "description": "The Gini coefficient is a measure of the inequality of the income distribution in a population. Higher values indicate a higher level of inequality.",
+        "description": "The Gini coefficient measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
     },
     "mean": {
         "title": "Mean",
-        "description": "Mean income or consumption.",
+        "description": "Mean {inc_cons_dict[wel]['type']}.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
         "numDecimalPlaces": 0,
     },
     "median": {
         "title": "Median",
-        "description": "Median income or consumption.",
+        "description": "Median {inc_cons_dict[wel]['type']}.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
         "numDecimalPlaces": 0,
     },
     "palma_ratio": {
         "title": "Palma ratio",
-        "description": "The Palma ratio is the share of total income or consumption of the top 10% divided by the share of the bottom 40%.",
+        "description": "The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
@@ -152,14 +152,14 @@ var_dict = {
     },
     "share_bottom50": {
         "title": "Share of the bottom 50%",
-        "description": "This is the income or consumption of the poorest 50% as a share of total income or consumption.",
+        "description": "The share of {inc_cons_dict[wel]['type']} {inc_cons_dict[wel]['verb']} by the poorest 50%.",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
     },
     "share_middle40": {
         "title": "Share of the middle 40%",
-        "description": "This is the income or consumption of the middle 40% as a share of total income or consumption. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.",
+        "description": "The share of {inc_cons_dict[wel]['type']} {inc_cons_dict[wel]['verb']} by the middle 40%. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
@@ -170,18 +170,26 @@ var_dict = {
 inc_cons_dict = {
     "dhi": {
         "name": "Disposable household income",
+        "type": "income",
+        "verb": "received",
         "description": "Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received.",
     },
     "dhci": {
         "name": "Disposable household cash income",
+        "type": "income",
+        "verb": "received",
         "description": "Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received and excluding fringe benefits, home production, in-kind benefits and transfers",
     },
     "mi": {
         "name": "Market income",
+        "type": "income",
+        "verb": "received",
         "description": "Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received.",
     },
     "hcexp": {
         "name": "Total consumption",
+        "type": "consumption",
+        "verb": "spent",
         "description": "This measure is related to total consumption, including that stemming from goods and services that have been purchased by the household, and goods ans services that have not been purchased, but either given to the household from somebody else, or self-produced.",
     },
 }
@@ -246,6 +254,14 @@ def add_metadata_vars(tb_garden: Table):
                     # Create metadata for these variables
                     tb_garden[col_name].metadata = var_metadata_income_and_equivalence_scale(var, wel, e)
 
+                    # Replace income/wealth words according to `wel`
+                    tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                        "{inc_cons_dict[wel]['verb']}", str(inc_cons_dict[wel]["verb"])
+                    )
+                    tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                        "{inc_cons_dict[wel]['type']}", str(inc_cons_dict[wel]["type"])
+                    )
+
                 for rel in rel_dict:
                     # For variables that use income variable, equivalence scale and relative poverty lines
                     col_name = f"{var}_{rel}_median_{wel}_{e}"
@@ -292,6 +308,14 @@ def add_metadata_vars(tb_garden: Table):
                             tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
                                 "{pct_dict[pct]['decile10']}", pct_dict[pct]["decile10"].lower()
                             )
+
+                        # Replace income/wealth words according to `wel`
+                        tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                            "{inc_cons_dict[wel]['verb']}", str(inc_cons_dict[wel]["verb"])
+                        )
+                        tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                            "{inc_cons_dict[wel]['type']}", str(inc_cons_dict[wel]["type"])
+                        )
 
     return tb_garden
 

@@ -1,0 +1,696 @@
+dataset:
+  title: Terrorism dataset, Global Terrorism Database (2022)
+  description: The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
+    around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to Terrorism
+    (START) at the University of Maryland.
+  licenses:
+  - name: Copyright University of Maryland 2022
+    url: https://www.start.umd.edu/gtd/terms-of-use/
+  sources:
+  - name: Global Terrorism Database (2022)
+    description: The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
+      around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to
+      Terrorism (START) at the University of Maryland.
+    url: https://www.start.umd.edu/gtd/
+    date_accessed: '2023-07-20'
+    publication_year: 2022
+    published_by: START (National Consortium for the Study of Terrorism and Responses to Terrorism). (2022). Global Terrorism
+      Database, 1970 - 2020 [data file]. https://www.start.umd.edu/gtd
+tables:
+  global_terrorism_database:
+    variables:
+      total_killed:
+        title: Terrorism deaths
+        unit: 'deaths'
+        description: >
+          This field stores the number of total confirmed fatalities for the incident. The number includes all victims and attackers who died as a direct result of the incident.
+
+
+          Where there is evidence of fatalities, but a figure is not reported or it is too vague to be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of fatalities, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its death numbers on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered fatality figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
+        display:
+          numDecimalPlaces: 0
+
+      total_wounded:
+        title: Terrorism non-fatal injuries
+        unit: 'injuries'
+        description: >
+          This field records the number of confirmed non-fatal injuries to both perpetrators and victims.
+
+
+          Where there is evidence of non-fatal injuries, but a figure is not reported or it is too vague to be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of non-fatal injuries, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
+
+        display:
+          numDecimalPlaces: 0
+
+
+      total_incident_counts:
+        title: Terrorist attacks
+        unit: 'attacks'
+        description: >
+          The GTD defines a terrorist attack as the threatened or actual use of illegal force and violence by a non- state actor to attain a political, economic, religious, or social goal through fear, coercion, or intimidation. In practice this means in order to consider an incident for inclusion in the GTD, all three of the following attributes must be present:
+
+
+          - The incident must be intentional – the result of a conscious calculation on the part of a perpetrator.
+
+
+          - The incident must entail some level of violence or immediate threat of violence -including property violence, as well as violence against people.
+
+
+          - The perpetrators of the incidents must be sub-national actors. The database does not include acts of state terrorism.
+
+
+          In addition, at least two of the following three criteria must be present for an incident to be included in the GTD:
+
+
+          - Criterion 1: The act must be aimed at attaining a political, economic, religious, or social goal. In terms of economic goals, the exclusive pursuit of profit does not satisfy this criterion. It must involve the pursuit of more profound, systemic economic change.
+
+
+          - Criterion 2: There must be evidence of an intention to coerce, intimidate, or convey some other message to a larger audience (or audiences) than the immediate victims. It is the act taken as a totality that is considered, irrespective if every individual involved in carrying out the act was aware of this intention. As long as any of the planners or decision-makers behind the attack intended to coerce, intimidate or publicize, the intentionality criterion is met.
+
+
+          - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants
+        display:
+          numDecimalPlaces: 0
+
+      total_casualties:
+        title: Terrorism casualties
+        unit: 'casualties'
+        description: >
+          This field records the number of confirmed non-fatal injuries and fatalties to both perpetrators and victims.
+
+
+          Where there is evidence of non-fatal injuries and fatalties, but a figure is not reported or it is too vague to be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of non-fatal injuries and fatalties, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
+        display:
+          numDecimalPlaces: 0
+
+      armed_assault_attack:
+        title: Armed assault attacks
+        unit: 'attacks'
+        description: >
+          An armed assault is determined to be successful if the assault takes place and if a target is hit (including people and/or property). Unsuccessful armed assaults are those in which the perpetrators attack and do not hit the target. An armed assault is also unsuccessful if the perpetrators are apprehended on their way to commit the assault. To make this determination, however, there must be information to indicate that an actual assault was imminent.
+        display:
+          name: Armed assault
+          numDecimalPlaces: 0
+
+      assassination_attack:
+        title: Assassination attacks
+        unit: 'attacks'
+        description: >
+          An attack whose primary objective is to cause physical harm or death directly to human beings by use of a firearm, incendiary, or sharp instrument (knife, etc.). Not to include attacks involving the use of fists, rocks, sticks, or other handheld (less-than-lethal) weapons. Also includes attacks involving certain classes of explosive devices in addition to firearms, incendiaries, or sharp instruments. The explosive device subcategories that are included in this classification are grenades, projectiles, and unknown or other explosive devices that are thrown.
+        display:
+          name: Assassination
+          numDecimalPlaces: 0
+
+      bombing_explosion_attack:
+        title: Bombing/Explosion attacks
+        unit: 'attacks'
+        description: >
+          An attack where the primary effects are caused by an energetically unstable material undergoing rapid decomposition and releasing a pressure wave that causes physical damage to the surrounding environment. Can include either high or low explosives (including a dirty bomb) but does not include a nuclear explosive device that releases energy from fission and/or fusion, or an incendiary device where decomposition takes place at a much slower rate.
+
+
+          If an attack involves certain classes of explosive devices along with firearms, incendiaries, or sharp objects, then the attack is coded as an armed assault only. The explosive device subcategories that are included in this classification are grenades, projectiles, and unknown or other explosive devices that are thrown in which the bombers are also using firearms or incendiary devices.
+        display:
+          name: Bombing
+          numDecimalPlaces: 0
+
+      facility_infrastructure_attack_attack:
+        title: Facility/Infrastructure attacks
+        unit: 'attacks'
+        description: >
+          An act, excluding the use of an explosive, whose primary objective is to cause damage to a non-human target, such as a building, monument, train, pipeline, etc. Such attacks include arson and various forms of sabotage (e.g., sabotaging a train track is a facility/infrastructure attack, even if passengers are killed). Facility/infrastructure attacks can include acts which aim to harm an installation, yet also cause harm to people incidentally (e.g. an arson attack primarily aimed at damaging a building, but causes injuries or fatalities).
+        display:
+          name: Infrastructure
+          numDecimalPlaces: 0
+
+      hijacking_attack:
+        title: Hijacking attacks
+        unit: 'attacks'
+        description: >
+          An act whose primary objective is to take control of a vehicle such as an aircraft, boat, bus, etc. for the purpose of diverting it to an unprogrammed destination, force the release of prisoners, or some other political objective. Obtaining payment of a ransom should not the sole purpose of a Hijacking, but can be one element of the incident so long as additional objectives have also been stated. Hijackings are distinct from Hostage Taking because the target is a vehicle, regardless of whether there are people/passengers in the vehicle.
+        display:
+          name: Hijacking
+          numDecimalPlaces: 0
+
+      hostage_taking__barricade_incident__attack:
+        title: Hostage taking (barricade) attacks
+        unit: 'attacks'
+        description: >
+          An act whose primary objective is to take control of hostages for the purpose of achieving a political objective through concessions or through disruption of normal operations. Such attacks are distinguished from kidnapping since the incident occurs and usually plays out at the target location with little or no intention to hold the hostages for an extended period in a separate clandestine location.
+        display:
+          name: Hostage taking, barricading
+          numDecimalPlaces: 0
+
+      hostage_taking__kidnapping__attack:
+        title: Hostage taking (kidnapping) attacks
+        unit: 'attacks'
+        description: >
+          An act whose primary objective is to take control of hostages for the purpose of achieving a political objective through concessions or through disruption of normal operations. Kidnappings are distinguished from barricading in that they involve moving and holding the hostages in another location.
+        display:
+          name: Hostage taking, kidnapping
+          numDecimalPlaces: 0
+
+      unarmed_assault_attack:
+        title: Unarmed assault attacks
+        unit: 'attacks'
+        description: >
+          An attack whose primary objective is to cause physical harm or death directly to human beings by any means other than explosive, firearm, incendiary, or sharp instrument (knife, etc.). Attacks involving chemical, biological or radiological weapons are considered unarmed assaults.
+        display:
+          name: Unarmed assault
+          numDecimalPlaces: 0
+
+      unknown_attack:
+        title: Unknown attacks
+        unit: 'attacks'
+        description: >
+          The attack type cannot be determined from the available information.
+        display:
+          name: Unknown
+          numDecimalPlaces: 0
+
+      abortion_related_target:
+        title: Abortion related targets
+        unit: 'attacks'
+        description: >
+          Attacks on abortion clinics, employees, patrons, or security personnel stationed at clinics.
+        display:
+          name: Abortion related
+          numDecimalPlaces: 0
+      airports__and__aircraft_target:
+        title: Airports & aircraft targets
+        unit: 'attacks'
+        description: >
+          An attack that was carried out either against an aircraft or against an airport. Attacks against airline employees while on board are also included in this value.
+
+
+          Includes attacks conducted against airport business offices and executives. Military aircrafts are not included.
+        display:
+          name: Airports and planes
+          numDecimalPlaces: 0
+
+      business_target:
+        title: Business targets
+        unit: ''
+        description: >
+          Businesses are defined as individuals or organizations engaged in commercial or mercantile activity as a means of livelihood. Any attack on a business or private citizens patronizing a business such as a restaurant, gas station, music store, bar, café, etc.
+
+
+          This includes attacks carried out against corporate offices or employees of firms like mining companies, or oil corporations. Furthermore, includes attacks conducted on business people or corporate officers. Included in this value as well are hospitals and chambers of commerce and cooperatives.
+
+
+          Does not include attacks carried out in public or quasi-public areas such as “business district or commercial area”, or generic business-related individuals such as “businessmen” (these attack are captured under “Private Citizens and Property”).
+
+
+          Also does not include attacks against generic business-related individuals such as “businessmen.” Unless the victims were targeted because of their specific business affiliation, these attacks belong in “Private Citizens and Property.”
+        display:
+          name: Business
+          numDecimalPlaces: 0
+
+      educational_institution_target:
+        title: Educational institution targets
+        unit: 'attacks'
+        description: >
+          Attacks against schools, teachers, or guards protecting school sites. Includes attacks against university professors, teaching staff and school buses. Moreover, includes attacks against religious schools in this value.
+
+
+          As noted below in the “Private Citizens and Property” value, the GTD has several attacks against students. If attacks involving students are not expressly against a school, university or other educational institution or are carried out in an educational setting, they are coded as private citizens and property.
+
+
+          Excludes attacks against military schools (attacks on military schools are coded as “Military".
+        display:
+          numDecimalPlaces: 0
+
+      food_or_water_supply_target:
+        title: Food or water supply targets
+        unit: 'attacks'
+        description: >
+          Attacks on food or water supplies and reserves are included in this value. This generally includes attacks aimed at the infrastructure related to food and water for human consumption
+        display:
+          name: Food or water supply
+          numDecimalPlaces: 0
+
+      government__diplomatic__target:
+        title: Government (Diplomatic) targets
+        unit: 'attacks'
+        description: >
+          Attacks carried out against foreign missions, including embassies, consulates, etc.
+
+
+          This value includes cultural centers that have diplomatic functions, and attacks against diplomatic staff and their families (when the relationship is relevant to the motive of the attack) and property. The United Nations is a diplomatic target.
+        display:
+          name: Diplomatic
+          numDecimalPlaces: 0
+
+      government__general__target:
+        title: Government (General) targets
+        unit: 'attacks'
+        description: >
+          Any attack on a government building; government member, former members, including members of political parties in official capacities, their convoys, or events sponsored by political parties; political movements; or a government sponsored institution where the attack is expressly carried out to harm the government.
+
+
+          This value includes attacks on judges, public attorneys (e.g., prosecutors), courts and court systems, politicians, royalty, head of state, government employees (unless police or military), election-related attacks, or intelligence agencies and spies.
+
+
+          This value does not include attacks on political candidates for office or members of political parties that do not hold an elected office (these attacks are captured in “Private Citizens and Property”).
+        display:
+          name: Government
+          numDecimalPlaces: 0
+
+      journalists__and__media_target:
+        title: Journalists & Media targets
+        description: >
+            Includes, attacks on reporters, news assistants, photographers, publishers, as well as attacks on media headquarters and offices.
+
+
+            Attacks on transmission facilities such as antennae or transmission towers, or broadcast infrastructure are coded as “Telecommunications,”.
+        unit: 'attacks'
+        display:
+          name: Journalists & media
+          numDecimalPlaces: 0
+
+      maritime_target:
+        title: Maritime targets
+        unit: 'attacks'
+        description: >
+            Includes civilian maritime: attacks against fishing ships, oil tankers, ferries, yachts, etc. (Attacks on fishermen are coded as “Private Citizens and Property,”).
+        display:
+          name: Maritime
+          numDecimalPlaces: 0
+
+      military_target:
+        title: Military targets
+        unit: 'attacks'
+        descrtiption: >
+          Includes attacks against military units, patrols, barracks, convoys, jeeps, and aircraft. Also includes attacks on recruiting sites, and soldiers engaged in internal policing functions such as at checkpoints and in anti-narcotics activities. This category also includes peacekeeping units that conduct military operations (e.g., AMISOM)
+        display:
+          name: Military
+          numDecimalPlaces: 0
+
+      ngo_target:
+        title: NGO targets
+        unit: 'attacks'
+        description: >
+          Includes attacks on offices and employees of non-governmental organizations (NGOs). NGOs here include large multinational non-governmental organizations such as the Red Cross and
+
+          Doctors without Borders, as well as domestic organizations. Does not include labor unions, social clubs, student groups, and other non-NGO (such cases are coded as “Private Citizens and Property”).
+        display:
+          name: NGO
+          numDecimalPlaces: 0
+
+      other_target:
+        title: Other targets
+        unit: 'attacks'
+        description: >
+          This value includes acts of terrorism committed against targets which do not fit into other categories. Some examples include ambulances, firefighters, and international demilitarized zones.
+        display:
+          name: Other
+          numDecimalPlaces: 0
+
+      police_target:
+        title: Police targets
+        unit: 'attacks'
+        description: >
+          This value includes attacks on members of the police force or police installations; this includes police boxes, patrols headquarters, academies, cars, checkpoints, etc. Includes attacks against jails or prison facilities, or jail or prison staff or guards.
+        display:
+          name: Police
+          numDecimalPlaces: 0
+
+      private_citizens__and__property_target:
+        title: Private citizens & property targets
+        unit: 'attacks'
+        description: >
+          This value includes attacks on individuals, the public in general or attacks in public areas including markets, commercial streets, busy intersections and pedestrian malls.
+
+
+          Also includes ambiguous cases where the target/victim was a named individual, or where the target/victim of an attack could be identified by name, age, occupation, gender or nationality.
+
+
+          This value also includes ceremonial events, such as weddings and funerals. The GTD contains a number of attacks against students. If these attacks are not expressly against a school, university or other educational institution or are not carried out in an educational setting, these attacks are coded using this value. Also, includes incidents involving political supporters as private citizens and property, provided that these supporters are not part of a government-sponsored event.
+
+
+          Finally, this value includes police informers. Does not include attacks causing civilian casualties in businesses such as restaurants, cafes or movie theaters (these categories are coded as “Business”)
+        display:
+          name: Private citizens & property
+          numDecimalPlaces: 0
+
+      religious_figures_institutions_target:
+        title: Religious figures/institutions targets
+        unit: 'attacks'
+        description: >
+          This value includes attacks on religious leaders, (Imams, priests, bishops, etc.), religious institutions (mosques, churches), religious places or objects (shrines, relics, etc.). This value alsoincludes attacks on organizations that are affiliated with religious entities that are not NGOs, businesses or schools.
+
+
+          Attacks on religious pilgrims are considered “Private Citizens and Property;” attacks on missionaries are considered religious figures.
+        display:
+          name: Religious figures or institutions
+          numDecimalPlaces: 0
+
+      telecommunication_target:
+        title: Telecommunication targets
+        unit: 'attacks'
+        description: >
+          This includes attacks on facilities and infrastructure for the transmission of information. More specifically this value includes things like cell phone towers, telephone booths, television transmitters, radio, and microwave towers.
+        display:
+          name: Telecommunication
+          numDecimalPlaces: 0
+
+      terrorists_non_state_militia_target:
+        title: Terrorists/Non-State Militia targets
+        unit: 'attacks'
+        descrtiption: >
+          Terrorists or members of identified terrorist groups within the GTD are included in this value. Membership is broadly defined and includes informants for terrorist groups, but excludes former or surrendered terrorists.
+
+
+          This value also includes cases involving the targeting of militias and guerillas
+        display:
+          name: Terrorist or non-state militia
+          numDecimalPlaces: 0
+
+      tourists_target:
+        title: Tourists targets
+        unit: 'attacks'
+        description: >
+          This value includes the targeting of tour buses, tourists, or “tours.” Tourists are persons who travel primarily for the purposes of leisure or amusement. Government tourist offices are included in this value.
+
+
+          The attack must clearly target tourists, not just an assault on a business or transportation system used by tourists. Travel agencies are coded as business targets.
+        display:
+          name: Tourists
+          numDecimalPlaces: 0
+
+      transportation_target:
+        title: Transportation targets
+        unit: 'attacks'
+        description: >
+          Attacks on public transportation systems are included in this value. This can include efforts to assault public buses, minibuses, trains, metro/subways, highways (if the highway itself is the target of the attack), bridges, roads, etc.
+
+
+          The GTD contains a number of attacks on generic terms such as “cars” or “vehicles.” These attacks are assumed to be against “Private Citizens and Property” unless shown to be against public transportation systems. In this regard, buses are assumed to be public transportation unless otherwise noted.
+        display:
+          name: Transportation
+          numDecimalPlaces: 0
+
+      unknown_target:
+        title: Unknown targets
+        unit: 'attacks'
+        description: >
+          The target type cannot be determined from the available information.
+        display:
+          name: Unknown
+          numDecimalPlaces: 0
+
+      utilities_target:
+        title: Utilities targets
+        unit: 'attacks'
+        descrtiption: >
+          This value pertains to facilities for the transmission or generation of energy. For example, power lines, oil pipelines, electrical transformers, high tension lines, gas and electric substations, are all included in this value. This value also includes lampposts or street lights.
+
+
+          Attacks on officers, employees or facilities of utility companies excluding the type of facilities above are coded as business.
+        display:
+          name: Utilities
+          numDecimalPlaces: 0
+
+      violent_political_party_target:
+        title: Violent political party targets
+        unit: 'attacks'
+        descrtiption: >
+          This value pertains to entities that are both political parties (and thus, coded as “government” in this coding scheme) and terrorists. It is operationally defined as groups that engage in electoral politics and appear as “Perpetrators” in the GTD.
+        display:
+          name: Violent political parties
+          numDecimalPlaces: 0
+
+      biological_weapon:
+        title: Biological weapons
+        unit: 'attacks'
+        description: >
+          A weapon whose components are produced from pathogenic microorganisms or toxic  substances of biological origins.
+        display:
+          name: Biological
+          numDecimalPlaces: 0
+
+      chemical_weapon:
+        title: Chemical weapons
+        unit: 'attacks'
+        description: >
+          A weapon produced from toxic chemicals that is contained in a delivery system and dispersed as a liquid, vapor, or aerosol. This category includes chemical weapons delivered via explosive device.
+        display:
+          name: Chemical
+          numDecimalPlaces: 0
+
+      explosives_weapon:
+        title: Explosive weapons
+        unit: 'attacks'
+        descrtipive: >
+          A weapon composed of energetically unstable material undergoing rapid decomposition and releasing a pressure wave that causes physical damage to the surrounding environment. Note that chemical weapons delivered via explosive are classified as “Chemical” with weapon subtype “Explosives.”
+        display:
+          name: Explosives
+          numDecimalPlaces: 0
+
+      fake_weapons_weapon:
+        title: Fake weapons
+        unit: 'attacks'
+        descrtiption: >
+          A weapon that was claimed by the perpetrator at the time of the incident to be real but was discovered after-the-fact to be non-existent or incapable of producing the desired effects.
+        display:
+          name: Fake
+          numDecimalPlaces: 0
+
+      firearms_weapon:
+        title: Firearms
+        unit: 'attacks'
+        descrtiption: A weapon which is capable of firing a projectile using an explosive charge as a propellant.
+        display:
+          numDecimalPlaces: 0
+
+      incendiary_weapon:
+        title: Incendiary weapons
+        unit: 'attacks'
+        description: A weapon that is capable of catching fire, causing fire, or burning readily and produces intensely hot fire when exploded.
+        display:
+          name: Incendiary
+          numDecimalPlaces: 0
+
+      melee_weapon:
+        title: Melee weapons
+        unit: 'attacks'
+        description: A weapon—targeting people rather than property—that does not involve a projectile in which the user and target are in contact with it simultaneously.
+        display:
+          name: Melee
+          numDecimalPlaces: 0
+
+      other_weapon:
+        title: Other weapons
+        unit: 'attacks'
+        description: A weapon that has been identified but does not fit into one of the above categories.
+        display:
+          name: Other
+          numDecimalPlaces: 0
+
+      radiological_weapon:
+        title: Radiological weapons
+        unit: 'attacks'
+        description:  A weapon whose components are produced from radioactive materials that emit ionizing radiation and can take many forms.
+        display:
+          numDecimalPlaces: 0
+
+      sabotage_equipment_weapon:
+        title: Sabotage equipment weapons
+        unit: 'attacks'
+        description: A weapon that is used in the demolition or destruction of property (e.g., removing bolts from a train tracks)
+        display:
+          name: Sabotage equipment
+          numDecimalPlaces: 0
+
+      unknown_weapon:
+        title: Unknown weapons
+        unit: 'attacks'
+        description: The weapon type cannot be determined from the available information.
+        display:
+          name: Unknown
+          numDecimalPlaces: 0
+
+      vehicle__not_to_include_vehicle_borne_explosives__i_e__car_or_truck_bombs__weapon:
+        title: Vehicle weapons
+        unit: 'attacks'
+        description: An automobile that is used in an incident that does not incorporate the use of explosives such as a car bomb or truck bomb.
+        display:
+          name: Vehicle
+          numDecimalPlaces: 0
+
+      terrorism_wounded_per_capita:
+        title: Terrorism non-fatal injuries per capita
+        unit: 'injuries per capita'
+        description: >
+          This field records the number of confirmed non-fatal injuries to both perpetrators and victims.
+
+
+          Where there is evidence of non-fatal injuries, but a figure is not reported or it is too vague to be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of non-fatal injuries, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
+
+        display:
+          name: Non-fatal injuries per capita
+          numDecimalPlaces: 7
+
+      terrorism_deaths_per_capita:
+        title: Terrorism deaths per capita
+        unit: 'deaths'
+        description: >
+          This field stores the number of total confirmed fatalities for the incident. The number includes all victims and attackers who died as a direct result of the incident.
+
+
+          Where there is evidence of fatalities, but a figure is not reported or it is too vague to be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of fatalities, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its death numbers on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered fatality figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
+        display:
+          numDecimalPlaces: 7
+
+      terrorism_casualties_per_capita:
+        title: Terrorism casualties per capita
+        unit: 'casualties'
+        description: >
+          This field records the number of confirmed non-fatal injuries and fatalties to both perpetrators and victims.
+
+
+          Where there is evidence of non-fatal injuries and fatalties, but a figure is not reported or it is too vague to be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of non-fatal injuries and fatalties, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
+        display:
+          numDecimalPlaces: 7
+
+      decadal_total_killed:
+        title: Terrorism deaths, decadal
+        unit: 'deaths'
+        description: >
+          This field stores the number of total confirmed fatalities for the incident. The number includes all victims and attackers who died as a direct result of the incident.
+
+
+          Where there is evidence of fatalities, but a figure is not reported or it is too vague to be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of fatalities, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its death numbers on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered fatality figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
+
+        display:
+          numDecimalPlaces: 0
+
+      decadal_total_wounded:
+        title: Terrorism non-fatal injuries, decadal
+        unit: 'injuries per capita'
+        description: >
+          This field records the number of confirmed non-fatal injuries to both perpetrators and victims.
+
+
+          Where there is evidence of non-fatal injuries, but a figure is not reported or it is too vague to be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of non-fatal injuries, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
+
+        display:
+          numDecimalPlaces: 0
+
+      decadal_total_incident_counts:
+        title:  Terrorist attacks, decadal
+        unit: 'attacks'
+        description: >
+          The GTD defines a terrorist attack as the threatened or actual use of illegal force and violence by a non- state actor to attain a political, economic, religious, or social goal through fear, coercion, or intimidation. In practice this means in order to consider an incident for inclusion in the GTD, all three of the following attributes must be present:
+
+
+          - The incident must be intentional – the result of a conscious calculation on the part of a perpetrator.
+
+
+          - The incident must entail some level of violence or immediate threat of violence -including property violence, as well as violence against people.
+
+
+          - The perpetrators of the incidents must be sub-national actors. The database does not include acts of state terrorism.
+
+
+          In addition, at least two of the following three criteria must be present for an incident to be included in the GTD:
+
+
+          - Criterion 1: The act must be aimed at attaining a political, economic, religious, or social goal. In terms of economic goals, the exclusive pursuit of profit does not satisfy this criterion. It must involve the pursuit of more profound, systemic economic change.
+
+
+          - Criterion 2: There must be evidence of an intention to coerce, intimidate, or convey some other message to a larger audience (or audiences) than the immediate victims. It is the act taken as a totality that is considered, irrespective if every individual involved in carrying out the act was aware of this intention. As long as any of the planners or decision-makers behind the attack intended to coerce, intimidate or publicize, the intentionality criterion is met.
+
+
+          - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants
+        display:
+          numDecimalPlaces: 0
+
+      decadal_total_casualties:
+        title: Terrorism casualties, decadal
+        unit: 'casualties'
+        description: >
+          This field records the number of confirmed non-fatal injuries and fatalties to both perpetrators and victims.
+
+
+          Where there is evidence of non-fatal injuries and fatalties, but a figure is not reported or it is too vague to be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of non-fatal injuries and fatalties, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
+        display:
+          numDecimalPlaces: 0
+
+      decadal_terrorism_wounded_per_capita:
+        title: Terrorism non-fatal injuries per capita, decadal
+        unit: 'injuries per capita'
+        description: >
+          This field records the number of confirmed non-fatal injuries to both perpetrators and victims.
+
+
+          Where there is evidence of non-fatal injuries, but a figure is not reported or it is too vague to be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of non-fatal injuries, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
+
+        display:
+          numDecimalPlaces: 7
+
+      decadal_terrorism_deaths_per_capita:
+        title: Terrorism deaths per capita, decadal
+        unit: 'deaths per capita'
+        description: >
+          This field stores the number of total confirmed fatalities for the incident. The number includes all victims and attackers who died as a direct result of the incident.
+
+
+          Where there is evidence of fatalities, but a figure is not reported or it is too vague to be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of fatalities, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its death numbers on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered fatality figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
+
+        display:
+          numDecimalPlaces: 7
+      decadal_terrorism_casualties_per_capita:
+        title: Terrorism casualties per capita, decadal
+        unit: 'casualties per capita'
+        description: >
+          This field records the number of confirmed non-fatal injuries and fatalties to both perpetrators and victims.
+
+
+          Where there is evidence of non-fatal injuries and fatalties, but a figure is not reported or it is too vague to be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of non-fatal injuries and fatalties, the database will usually reflect the number given by the most recent source. However, the most recent source will not be used if the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group. When there are several “most recent” sources published around the same time, or there are concerns about the validity of a recent source, the majority figure will be used. Where there is no majority figure among independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted in the “Additional Notes” field.
+        display:
+          numDecimalPlaces: 7
+      share_of_deaths:
+        title: Share of deaths from terrorism
+        unit: '%'
+        short_unit: '%'
+        description: >
+          This field records the number of confirmed fatalties from terrorism as a share of total deaths.
+
+        display:
+          numDecimalPlaces: 2

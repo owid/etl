@@ -1,18 +1,19 @@
 meta:
-  namespace: backport
-  short_name: dataset_5442_covid_19__decoupling_of_metrics_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:53:50.522581
   name: COVID-19 - Decoupling of metrics
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5442
-  source_published_by: Our World in Data catalog backport
+  source:
+    name: Our World in Data catalog backport
+    description:
+    url: https://owid.cloud/admin/datasets/5442
+    source_data_url:
+    owid_data_url:
+    date_accessed: 2023-07-17 14:12:27.832361
+    publication_date: latest
+    publication_year:
+    published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f0d0300b195b252a4a0f0e987481f66f
-  size: 43498
+- md5: 69c1df95664e6c090765f3589ae254f8
+  size: 29586
   path: dataset_5442_covid_19__decoupling_of_metrics_values.feather
