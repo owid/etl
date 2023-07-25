@@ -71,5 +71,5 @@ tables:
 
           The training computation used can vary depending on factors such as the size of the dataset, size and complexity of the system architecture, and the level of parallelism used during training, among other reasons.
         display:
-            title: Training computation (petaFLOP)
+            name: Training computation (petaFLOP)
             numDecimalPlaces: 0
