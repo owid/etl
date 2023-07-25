@@ -76,7 +76,7 @@ tables:
           numDecimalPlaces: 0
 
       other_help_harm:
-        title: "Don't have an opinion, Don't know help/harm question or refused"
+        title: "Don't have an opinion, Don't know, or Refused - help/harm question"
         description: Share of respondents said "Don't have an opinion", "Don't know" or refused the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
