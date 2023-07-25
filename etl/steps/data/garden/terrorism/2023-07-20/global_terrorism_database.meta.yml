@@ -687,7 +687,8 @@ tables:
           numDecimalPlaces: 7
       share_of_deaths:
         title: Share of deaths from terrorism
-        unit: 'deaths'
+        unit: '%'
+        short_unit: '%'
         description: >
           This field records the number of confirmed fatalties from terrorism as a share of total deaths.
 

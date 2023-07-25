@@ -119,3 +119,20 @@ tables:
         display:
           name: "No response"
           numDecimalPlaces: 0
+      dk__help_harm_value:
+        title: "DK -  help/harm question"
+        description: Share of respondents who responded "Don't know" to answer the question "Will Artificial Intelligence help or harm people in the next 20 years?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: "Don't know"
+          numDecimalPlaces: 0
+
+      dont_have_an_opinion_value:
+        title: "Don't have an opinion -  help/harm question"
+        description: Share of respondents who responded "Don't have an opinion" to answer the question "Will Artificial Intelligence help or harm people in the next 20 years?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: "Don't have an opinion"
+          numDecimalPlaces: 0

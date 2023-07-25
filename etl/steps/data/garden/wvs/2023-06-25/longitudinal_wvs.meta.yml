@@ -75,6 +75,7 @@ tables:
         unit: "%"
         short_unit: "%"
         display:
+          name: Share of people worried about terrorism
           numDecimalPlaces: 0
 
       not_at_all_or_not_much:
