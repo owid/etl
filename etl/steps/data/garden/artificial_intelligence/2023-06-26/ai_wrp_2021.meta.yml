@@ -67,7 +67,7 @@ tables:
           numDecimalPlaces: 0
 
       dk_no_op:
-        title: "Don't have an opinion, Don't know help/harm question"
+        title: "Don't have an opinion, Don't know - help/harm question"
         description: Share of respondents said "Don't have an opinion" or "Don't know" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
         unit: '%'
         short_unit: '%'
