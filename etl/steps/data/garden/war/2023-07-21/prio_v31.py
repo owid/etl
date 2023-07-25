@@ -109,8 +109,12 @@ def _sanity_checks(tb: Table) -> None:
     # Low and High estimates
     columns = ["bdeadlow", "bdeadhig"]
     for column in columns:
-        assert tb[column].isna().sum() == 0, f"Missing values found in {column}. Consequently, we can't set to zero this field in `replace_missing_data_with_zeros`!"
-        assert not set(tb.loc[tb[column] < 0, column]), f"Negative values found in {column}. Consequently, we can't set to zero this field in `replace_missing_data_with_zeros`!"
+        assert (
+            tb[column].isna().sum() == 0
+        ), f"Missing values found in {column}. Consequently, we can't set to zero this field in `replace_missing_data_with_zeros`!"
+        assert not set(
+            tb.loc[tb[column] < 0, column]
+        ), f"Negative values found in {column}. Consequently, we can't set to zero this field in `replace_missing_data_with_zeros`!"
 
     # Best estimate
     column = "bdeadbes"
@@ -253,7 +257,11 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
 
     # Set number of deaths to zero whenever high and low estimates are zero
-    tb.loc[(tb["number_deaths_ongoing_conflicts_battle_high"] == 0) & (tb["number_deaths_ongoing_conflicts_battle_low"] == 0), "number_deaths_ongoing_conflicts_battle"] = 0
+    tb.loc[
+        (tb["number_deaths_ongoing_conflicts_battle_high"] == 0)
+        & (tb["number_deaths_ongoing_conflicts_battle_low"] == 0),
+        "number_deaths_ongoing_conflicts_battle",
+    ] = 0
     return tb
 
 
@@ -282,5 +290,5 @@ def _sanity_check_final(tb: Table) -> Table:
     ).all(), "Number of new conflicts for conflict_type='all' is not equivalent to the sum of individual conflict types"
 
     # 2)
-    msk = (tb["number_deaths_ongoing_conflicts_battle_low"] > tb["number_deaths_ongoing_conflicts_battle_high"])
+    msk = tb["number_deaths_ongoing_conflicts_battle_low"] > tb["number_deaths_ongoing_conflicts_battle_high"]
     assert not msk.any(), f"Low estimates higher than high estimates. This can't be correct! {tb[msk]}"
