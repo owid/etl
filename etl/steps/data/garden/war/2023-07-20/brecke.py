@@ -160,8 +160,8 @@ def add_conflict_type(tb: Table) -> Table:
     mask = name_wo_year.str.contains("-")
 
     # Set conflict type
-    tb["conflict_type"] = "intrastate"
-    tb.loc[mask, "conflict_type"] = "interstate"
+    tb["conflict_type"] = "internal"
+    tb.loc[mask, "conflict_type"] = "internal"
 
     return tb
 
