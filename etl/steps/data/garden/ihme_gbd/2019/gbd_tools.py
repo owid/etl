@@ -203,10 +203,47 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str)
             "unit": "DALYs",
             "short_unit": "",
         },
+        "Incidence - Number": {
+            "title": f"Number of new cases of {cause.lower()}, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "cases",
+            "short_unit": "",
+        },
+        "Prevalence - Number": {
+            "title": f"Current number of cases of {cause.lower()}, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "cases",
+            "short_unit": "",
+        },
+        "Incidence - Rate": {
+            "title": f"Number of new cases of {cause.lower()} per 100,000 people, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "cases",
+            "short_unit": "",
+        },
+        "Prevalence - Rate": {
+            "title": f"Current number of cases of {cause.lower()} per 100,000 people, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "cases",
+            "short_unit": "",
+        },
+        "Incidence - Share of the population": {
+            "title": f"Number of new cases of {cause.lower()} per 100 people, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "%",
+            "short_unit": "%",
+        },
+        "Prevalence - Share of the population": {
+            "title": f"Current number of cases of {cause.lower()} per 100 people, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "%",
+            "short_unit": "%",
+        },
     }
     new_variable = variable.copy()
     new_variable.name = underscore(var_name_dict[variable.name]["title"])
     new_variable.metadata.title = var_name_dict[variable.name]["title"]
+    new_variable.metadata.display["name"] = var_name_dict[variable.name]["title"]
     new_variable.metadata.description = var_name_dict[variable.name]["description"]
     new_variable.metadata.unit = var_name_dict[variable.name]["unit"]
     new_variable.metadata.short_unit = var_name_dict[variable.name]["short_unit"]
@@ -236,7 +273,6 @@ def add_metadata_and_save(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, d
             cleaned_variable = create_variable_metadata(variable=tb_group[variable_name], cause=cause, sex=sex, age=age)
             tb_group[cleaned_variable.name] = cleaned_variable
             tb_group = tb_group.drop(columns=variable_name)
-        # tb_group = underscore_table(tb_group)
         tb_group = tb_group.set_index(["country", "year"] + dims, verify_integrity=True)
         ds_garden.add(tb_group)
     ds_garden.save()

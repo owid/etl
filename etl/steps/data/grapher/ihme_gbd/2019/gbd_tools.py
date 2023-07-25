@@ -11,6 +11,5 @@ def run_wrapper(garden_dataset: Dataset, dataset: Dataset, dims: List[str]) -> D
     tables = garden_dataset.table_names
     for table in tables:
         tab = garden_dataset[table]
-
         dataset.add(tab)
     return dataset

@@ -7,18 +7,3 @@ dataset:
     -
       name: IHME, Global Burden of Disease Study (2019)
       published_by: Institute of Health Metrics and Evaluation
-
-tables:
-  gbd_cause:
-    variables:
-      measure:
-        title: Measure name
-        description: Deaths or DALYs - ways of measuring the impact of causes of death.
-      cause:
-        title: Causes of death
-        description: Disease or injuries that result in or contribute to an individuals death.
-      value:
-        title: Deaths or DALYs
-        description: The number of deaths or disability adjusted life years (DALYs) caused by a given disease or injury.
-
-
