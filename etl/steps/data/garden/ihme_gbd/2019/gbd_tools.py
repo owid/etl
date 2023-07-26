@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, List, cast
 
 import pandas as pd
-from owid.catalog import Dataset, Table, Variable
+from owid.catalog import Dataset, Table, Variable, VariableMeta
 from owid.catalog.utils import underscore, underscore_table
 from structlog import get_logger
 
@@ -160,93 +160,112 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str)
             "description": "",
             "unit": "%",
             "short_unit": "%",
+            "num_decimal_places": 1,
         },
         "DALYs (Disability-Adjusted Life Years) - Share of the population": {
             "title": f"Share of DALYs that are from {cause.lower()}, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
+            "num_decimal_places": 1,
         },
         "Deaths - Rate": {
             "title": f"Deaths from {cause.lower()} per 100,000 population, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "deaths per 100,000 people",
             "short_unit": "",
+            "num_decimal_places": 1,
         },
         "DALYs (Disability-Adjusted Life Years) - Rate": {
             "title": f"DALYs from {cause.lower()} per 100,000 population, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "DALYs per 100,000 people",
             "short_unit": "",
+            "num_decimal_places": 1,
         },
         "Deaths - Percent": {
             "title": f"Share of total deaths from {cause.lower()}, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
+            "num_decimal_places": 1,
         },
         "DALYs (Disability-Adjusted Life Years) - Percent": {
             "title": f"Share of DALYs from {cause.lower()}, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
+            "num_decimal_places": 1,
         },
         "Deaths - Number": {
             "title": f"Deaths from {cause.lower()}, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "deaths",
             "short_unit": "",
+            "num_decimal_places": 0,
         },
         "DALYs (Disability-Adjusted Life Years) - Number": {
             "title": f"DALYs from {cause.lower()}, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "DALYs",
             "short_unit": "",
+            "num_decimal_places": 1,
         },
         "Incidence - Number": {
             "title": f"Number of new cases of {cause.lower()}, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "cases",
             "short_unit": "",
+            "num_decimal_places": 0,
         },
         "Prevalence - Number": {
             "title": f"Current number of cases of {cause.lower()}, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "cases",
             "short_unit": "",
+            "num_decimal_places": 0,
         },
         "Incidence - Rate": {
             "title": f"Number of new cases of {cause.lower()} per 100,000 people, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "cases",
             "short_unit": "",
+            "num_decimal_places": 1,
         },
         "Prevalence - Rate": {
             "title": f"Current number of cases of {cause.lower()} per 100,000 people, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "cases",
             "short_unit": "",
+            "num_decimal_places": 1,
         },
         "Incidence - Share of the population": {
             "title": f"Number of new cases of {cause.lower()} per 100 people, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
+            "num_decimal_places": 1,
         },
         "Prevalence - Share of the population": {
             "title": f"Current number of cases of {cause.lower()} per 100 people, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
+            "num_decimal_places": 1,
         },
     }
     new_variable = variable.copy()
     new_variable.name = underscore(var_name_dict[variable.name]["title"])
-    new_variable.metadata.title = var_name_dict[variable.name]["title"]
-    # new_variable.metadata.display["name"] = var_name_dict[variable.name]["title"]
-    new_variable.metadata.description = var_name_dict[variable.name]["description"]
-    new_variable.metadata.unit = var_name_dict[variable.name]["unit"]
-    new_variable.metadata.short_unit = var_name_dict[variable.name]["short_unit"]
+    new_variable.metadata = VariableMeta(
+        title=var_name_dict[variable.name]["title"],
+        description=var_name_dict[variable.name]["description"],
+        unit=var_name_dict[variable.name]["unit"],
+        short_unit=var_name_dict[variable.name]["short_unit"],
+    )
+    new_variable.metadata.display = {
+        "name": var_name_dict[variable.name]["title"],
+        "numDecimalPlaces": var_name_dict["num_decimal_places"],
+    }
 
     return new_variable
 
