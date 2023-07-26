@@ -70,6 +70,16 @@ def run(dest_dir: str) -> None:
     assert tb.groupby(["name"]).region.nunique().max() == 1, "Wars with same name but different region!"
     assert tb.groupby(["name"]).conflict_type.nunique().max() == 1, "Wars with same name but different conflict_type!"
 
+    # Add enyear 2000 where unknown
+    ## This will help us expand the observations and distribute the number of deaths over the conflict years.
+    log.info("war.brecke: set end year to 2000 where unknown")
+    YEAR_LAST = 2000
+    tb.loc[tb["endyear"].isna(), "endyear"] = YEAR_LAST
+
+    # Add deaths where they are missing (instead of NaNs use a lower bound, specified by the source)
+    log.info("war.brecke: add lower bound value of deaths")
+    tb = add_lower_bound_deaths(tb)
+
     # Expand observations
     log.info("war.brecke: expand observations")
     tb = expand_observations(tb)
@@ -83,8 +93,12 @@ def run(dest_dir: str) -> None:
     log.info("war.brecke: replace missing data with zeroes")
     tb = replace_missing_data_with_zeros(tb)
 
+    # Distribute numbers for region -9
+    log.info("war.brecke: distributing metrics for region -9")
+    tb = distribute_metrics_m9(tb)
+
     # Rename regions
-    log.info("war.mars: rename regions")
+    log.info("war.brecke: rename regions")
     tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
     assert tb["region"].isna().sum() == 0, "Unmapped regions!"
 
@@ -93,7 +107,7 @@ def run(dest_dir: str) -> None:
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True)
 
     # Add short_name to table
-    log.info("war.mars: add shortname to table")
+    log.info("war.brecke: add shortname to table")
     tb = Table(tb, short_name=paths.short_name)
 
     #
@@ -163,6 +177,18 @@ def add_conflict_type(tb: Table) -> Table:
     tb["conflict_type"] = "internal"
     tb.loc[mask, "conflict_type"] = "internal"
 
+    return tb
+
+
+def add_lower_bound_deaths(tb: Table) -> Table:
+    """Replace missing data on deaths for a lower bound.
+
+    Brecke writes that he only includes major violent conflicts. Among other characteristics, this means for him that there were at least 32 deaths per year.
+    So what we are doing for conflicts with missing death estimates is to create a (possibly very) lower-bound estimate of 32 deaths for conflicts that lasted one year, 64 for those lasting two years, and so on.
+    This would take the source seriously, allow us to calculate aggregates while still including these conflicts, and we could use line charts to visualize the data.
+    """
+    mask = tb["totalfatalities"].isna()
+    tb.loc[mask, "totalfatalities"] = 32 * (tb.loc[mask, "endyear"] - tb.loc[mask, "startyear"] + 1)
     return tb
 
 
@@ -325,7 +351,64 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     columns = [
         "number_ongoing_conflicts",
         "number_new_conflicts",
+        "number_deaths_ongoing_conflicts",
+        "number_deaths_ongoing_conflicts_military",
     ]
     tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
+
+    return tb
+
+
+def distribute_metrics_m9(tb: Table) -> Table:
+    """Integrate rows entries with region=-9 with the rest of the data.
+
+    Region -9 is likely to be 'World'. Therefore, we add these numbers to the other regions and remove these entries. We add the numbers as follows:
+
+    - `number_deaths_ongoing_conflicts` and `number_deaths_ongoing_conflicts_military`
+        - For 'World', we simply add the numbers.
+        - For other regions, we divide the number by the number of regions in the dataset and add the numbers.
+    - `number_ongoing_conflicts` and `number_new_conflicts`
+        - We add the numbers for all regions (including 'World')
+    """
+    # Distribute data for region=-9
+    ## Get rows with region -9
+    mask = tb["region"] == -9
+    tb_m9 = tb.loc[mask].drop(columns=["region"]).copy()
+
+    # Get regions
+    regions = set(tb.region) - {-9, "World"}
+    print(len(regions), regions)
+    # original columns
+    columns_og = tb.columns
+
+    # Merge
+    tb = tb.merge(tb_m9, on=["year", "conflict_type"], how="left", suffixes=("", "_m9"))
+
+    # Integrate numbers with main table
+    # Add number of conflicts, add uniformly the number of deaths
+    columns = [
+        "number_ongoing_conflicts",
+        "number_deaths_ongoing_conflicts_military",
+        "number_deaths_ongoing_conflicts",
+        "number_new_conflicts",
+    ]
+    # World
+    for column in columns:
+        print(columns, tb.loc[mask, f"{column}_m9"], len(regions))
+        # World
+        mask = tb["region"] == "World"
+        tb.loc[mask, column] += tb.loc[mask, f"{column}_m9"]
+        # Regions
+        mask = tb["region"] != "World"
+        if "deaths" in column:
+            tb.loc[mask, column] += tb.loc[mask, f"{column}_m9"] / len(regions)
+        else:
+            tb.loc[mask, column] += tb.loc[mask, f"{column}_m9"]
+
+    # Remove region -9
+    tb = tb[-tb["region"].isin([-9])]
+
+    # Keep original columns
+    tb = tb[columns_og]
 
     return tb
