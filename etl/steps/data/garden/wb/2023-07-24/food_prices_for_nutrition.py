@@ -24,7 +24,7 @@ def adapt_units(tb: Table) -> Table:
         tb = tb.rename(columns={column: column.replace("millions_of_people", "people")})
 
     # Convert units expressed as fractions to percentages.
-    for column in [column for column in tb.columns if "cost_share" in column]:
+    for column in [column for column in tb.columns if column.startswith(("cost_share_", "affordability_"))]:
         tb[column] *= 100
 
     return tb
