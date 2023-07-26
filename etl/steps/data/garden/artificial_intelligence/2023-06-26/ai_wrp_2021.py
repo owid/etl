@@ -2,6 +2,7 @@
 
 from typing import cast
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -57,10 +58,17 @@ def run(dest_dir: str) -> None:
     columns_to_split_by = ["country", "gender", "education", "income_5", "emp_2010", "agegroups4", "globalregion"]
 
     # Dictionary to map response codes to labels for question 9
-    dict_q9 = {1: "Mostly help", 2: "Mostly Harm", 3: "Don't have an opinion", 4: "Neither", 98: "DK", 99: "Refused"}
+    dict_q9 = {
+        1: "Mostly help",
+        2: "Mostly harm",
+        3: "Don't have an opinion",
+        4: "Neither",
+        98: "DK(help/harm)",
+        99: "Refused(help/harm)",
+    }
 
     # Dictionary to map response codes to labels for question 8
-    dict_q8 = {1: "Yes, would feel safe", 2: "No, would not feel safe", 98: "DK", 99: "Refused"}
+    dict_q8 = {1: "Yes, would feel safe", 2: "No, would not feel safe", 98: "DK(cars)", 99: "Refused(cars)"}
 
     # Create a list of DataFrames for each column_to_split_by for question 8
     df_q8_list = []
@@ -86,27 +94,36 @@ def run(dest_dir: str) -> None:
     # Now split categories (gender, income etc) into separate columns
     # Copy df without categories (gender, income etc)
     df_without_categories = (
-        df_merge[["country", "year", "Yes, would feel safe", "Mostly help"]].dropna(subset=["country"]).copy()
+        df_merge[
+            [
+                "country",
+                "year",
+                "Yes, would feel safe",
+                "Mostly help",
+                "No, would not feel safe",
+                "Mostly harm",
+                "Neither",
+                "DK(help/harm)",
+                "Refused(help/harm)",
+                "DK(cars)",
+                "Refused(cars)",
+                "Don't have an opinion",
+            ]
+        ]
+        .dropna(subset=["country"])
+        .copy()
     )
-    # Select rows with categories (NaN country rows)
-    world_df = df_merge[df_merge["country"].isna()].copy()
-    world_df.reset_index(drop=True, inplace=True)
 
-    # Set country as World
-    world_df["country"] = world_df["country"].astype(str)
-    world_df.loc[world_df["country"] == "nan", "country"] = "World"
-    # Calculates the percentage of valid responses for the "Mostly help" column in a DataFrame, split by gender, income etc.
-    conc_df_help_harm = pivot_by_category(world_df, "Mostly help")
-
-    # Calculates the percentage of valid responses for a "Yes, would feel safe column in a DataFrame, split by gender, income etc.
-    conc_df_yes_no = pivot_by_category(world_df, "Yes, would feel safe")
-
-    # Merge  all dataframes into one
-    merge_categorized = pd.merge(conc_df_yes_no, conc_df_help_harm, on=["year", "country"], how="outer")
-    merge_rest = pd.merge(df_without_categories, merge_categorized, on=["year", "country"], how="outer")
-    merge_rest.set_index(["year", "country"], inplace=True)
+    merge_rest = calculate_world_data(df_merge, df_without_categories)
 
     tb = Table(merge_rest, short_name=paths.short_name, underscore=True)
+
+    tb["dk_no_op"] = tb[["dk__help_harm", "dont_have_an_opinion"]].sum(axis=1).values
+    tb["other_help_harm"] = tb[["dk__help_harm", "dont_have_an_opinion", "refused__help_harm"]].sum(axis=1).values
+    tb["other_yes_no"] = tb[["dk__cars", "refused__cars"]].sum(axis=1).values
+    tb[["dk_no_op", "other_help_harm", "other_yes_no"]] = tb[["dk_no_op", "other_help_harm", "other_yes_no"]].replace(
+        0.0, np.NaN
+    )
 
     #
     # Save outputs.
@@ -126,7 +143,8 @@ def calculate_percentage(df, column, valid_responses_dict, column_to_split_by):
     Args:
         df (DataFrame): The input DataFrame.
         column (str): The column name to calculate the percentage.
-        valid_responses_dict (dict): A dictionary mapping valid response codes to their corresponding labels.
+        valid_responses_dict (dict): A dictionary mapping vali
+        d response codes to their corresponding labels.
         column_to_split_by (str): The column name to split by.
     Returns:
         DataFrame: A DataFrame with columns: the column_to_split_by, "year", "column", "count", and "percentage".
@@ -186,9 +204,67 @@ def question_extract(q, df, column_to_split_by, dict_q):
     pivoted_df.columns.name = None
 
     if q == "q9":
-        return pivoted_df[["year", column_to_split_by, "Mostly help"]]
+        return pivoted_df[
+            [
+                "year",
+                column_to_split_by,
+                "Mostly help",
+                "Mostly harm",
+                "Neither",
+                "Don't have an opinion",
+                "DK(help/harm)",
+                "Refused(help/harm)",
+            ]
+        ]
     else:
-        return pivoted_df[["year", column_to_split_by, "Yes, would feel safe"]]
+        return pivoted_df[
+            ["year", column_to_split_by, "Yes, would feel safe", "No, would not feel safe", "DK(cars)", "Refused(cars)"]
+        ]
+
+
+def calculate_world_data(df_merge, df_without_categories):
+    # Select rows with categories (NaN country rows)
+    world_df = df_merge[df_merge["country"].isna()].copy()
+    world_df.reset_index(drop=True, inplace=True)
+
+    # Set country as World
+    world_df["country"] = world_df["country"].astype(str)
+    world_df.loc[world_df["country"] == "nan", "country"] = "World"
+
+    # Calculate the percentage of valid responses for "Mostly help", "Mostly harm", "Neither" in a DataFrame,
+    # split by gender, income etc.
+    columns_to_calculate = [
+        "Mostly help",
+        "Mostly harm",
+        "Neither",
+        "DK(help/harm)",
+        "Don't have an opinion",
+        "Refused(help/harm)",
+    ]
+    merge_help_harm_all = None
+    for column in columns_to_calculate:
+        conc_df = pivot_by_category(world_df, column)
+        if merge_help_harm_all is None:
+            merge_help_harm_all = conc_df
+        else:
+            merge_help_harm_all = pd.merge(merge_help_harm_all, conc_df, on=["year", "country"], how="outer")
+
+    # Calculate the percentage of valid responses for "Yes, would feel safe" in a DataFrame, split by gender, income etc.
+    columns_to_calculate = ["Yes, would feel safe", "No, would not feel safe", "DK(cars)", "Refused(cars)"]
+    merge_yes_no = None
+    for column in columns_to_calculate:
+        conc_df = pivot_by_category(world_df, column)
+        if merge_yes_no is None:
+            merge_yes_no = conc_df
+        else:
+            merge_yes_no = pd.merge(merge_yes_no, conc_df, on=["year", "country"], how="outer")
+
+    # Merge all dataframes into one
+    merge_categorized = pd.merge(merge_help_harm_all, merge_yes_no, on=["year", "country"], how="outer")
+    merge_rest = pd.merge(df_without_categories, merge_categorized, on=["year", "country"], how="outer")
+
+    merge_rest.set_index(["year", "country"], inplace=True)
+    return merge_rest
 
 
 def map_values(df):
@@ -205,7 +281,6 @@ def map_values(df):
         1: "Primary (0-8 years)",
         2: "Secondary (9-15 years)",
         3: "Tertiary (16 years or more)",
-        9: "DK/Refused",
     }
 
     wealth_quintile = {1: "Poorest 20%", 2: "Second 20%", 3: "Middle 20%", 4: "Fourth 20%", 5: "Richest 20%"}

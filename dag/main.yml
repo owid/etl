@@ -213,9 +213,9 @@ steps:
     - data://garden/demography/2023-02-03/life_expectancy
     - data://garden/owid/latest/key_indicators
     - data://garden/regions/2023-01-01/regions
-    - data://garden/gcp/2023-04-28/global_carbon_budget
+    - data://garden/gcp/2023-07-10/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
-    - data://garden/bp/2023-02-20/energy_mix
+    - data://garden/energy/2023-07-10/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Global GDP in the long run
@@ -528,7 +528,17 @@ steps:
   data://garden/oecd/2023-06-20/ppp_exchange_rates:
   - data://meadow/oecd/2023-06-20/ppp_exchange_rates
 
-
+# Terrorism
+  data://meadow/terrorism/2023-07-20/global_terrorism_database:
+  - snapshot://terrorism/2023-07-20/global_terrorism_database.csv
+  - snapshot://terrorism/2023-07-20/global_terrorism_database_2021.csv
+  data://garden/terrorism/2023-07-20/global_terrorism_database:
+  - data://meadow/terrorism/2023-07-20/global_terrorism_database
+  - data://garden/un/2022-07-11/un_wpp
+  - data://garden/demography/2023-03-31/population
+  - data://garden/regions/2023-01-01/regions
+  data://grapher/terrorism/2023-07-20/global_terrorism_database:
+  - data://garden/terrorism/2023-07-20/global_terrorism_database
 
 
 # Sub-dags to import
@@ -551,4 +561,4 @@ include:
   - dag/agriculture.yml
   - dag/space.yml
   - dag/artificial_intelligence.yml
-
+  - dag/covid.yml

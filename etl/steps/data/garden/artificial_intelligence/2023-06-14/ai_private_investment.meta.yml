@@ -1,14 +1,14 @@
 dataset:
-  title: Private Investment in AI by Focus Area and Geographic Area, 2017–2022 (AI Index, 2023)
-  description: >
-    Data on AI private investment by focus area over time within select
-    geographic regions, highlighting how private investment priorities in AI differ
-    across geographies.
+  title: Private Investment in AI by Focus Area (AI Index, 2023)
+  description: >-
+    Data on AI private investment by focus area over time within select geographic regions, highlighting how private investment
+    priorities in AI differ across geographies.
 
 
     The AI Index is an independent initiative at the Stanford University Institute for Human-Centered Artificial Intelligence.
-    The mission of the AI Index is “to provide unbiased, rigorously vetted, and globally sourced data for policymakers, researchers, executives, journalists, and the general public to develop intuitions about the complex field of AI.”
-    Their flagship output is the annual AI Index Report, which has been published since 2017.
+    The mission of the AI Index is "to provide unbiased, rigorously vetted, and globally sourced data for policymakers, researchers,
+    executives, journalists, and the general public to develop intuitions about the complex field of AI." Their flagship output
+    is the annual AI Index Report, which has been published since 2017.
   licenses:
   - name: Public domain
     url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
@@ -19,232 +19,16 @@ dataset:
     date_accessed: '2023-06-28'
     publication_date: '2023-03-20'
     publication_year: 2023
-    published_by: NetBase Quid (2022) via AI Index 2023 Annual Report, AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2023
+    published_by: NetBase Quid (2022) via AI Index 2023 Annual Report, AI Index Steering Committee, Institute for Human-Centered
+      AI, Stanford University, Stanford, CA, April 2023
 tables:
   ai_private_investment:
     variables:
-      data_management__processing__cloud:
-        title: Data Management, Processing, Cloud
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Data management
-          numDecimalPlaces: 0
-
-      medical_and_healthcare:
-        title: Medical and Healthcare
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Medical and healthcare
-          numDecimalPlaces: 0
-
-      fintech:
-        title: Fintech
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Financial technology
-          numDecimalPlaces: 0
-
-      av:
-        title: AV
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: AI ventures
-          numDecimalPlaces: 0
-
-      semiconductor:
-        title: Semiconductors
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          numDecimalPlaces: 0
-
-      industrial_automation__network:
-        title: Industrial Automation, Network
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Industrial automation
-          numDecimalPlaces: 0
-
-      retail:
-        title: Retail
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          numDecimalPlaces: 0
-
-      fitness_and_wellness:
-        title: Fitness and Wellness
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Fitness and wellness
-          numDecimalPlaces: 0
-
-      nlp__customer_support:
-        title: NLP, Customer Support
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Natural Language Processing, customer support
-          numDecimalPlaces: 0
-
-      energy__oil__and_gas:
-        title: Energy, Oil, and Gas
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Energy, oil and gas
-          numDecimalPlaces: 0
-
-      cybersecurity__data_protection:
-        title: Cybersecurity, Data Protection
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          display: Cybersecurity
-          numDecimalPlaces: 0
-
-      drones:
-        title: Drones
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          numDecimalPlaces: 0
-
-      marketing__digital_ads:
-        title: Marketing, Digital Ads
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Marketing and digital ads
-          numDecimalPlaces: 0
-
-      hr_tech:
-        title: HR Tech
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Human Resources technology
-          numDecimalPlaces: 0
-
-      facial_recognition:
-        title: Facial Recognition
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          title: Facial recognition
-          numDecimalPlaces: 0
-
-      insurtech:
-        title: Insurtech
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Insurance technology
-          numDecimalPlaces: 0
-
-      agritech:
-        title: Agritech
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Agricultural technology
-          numDecimalPlaces: 0
-
-      sales_enablement:
-        title: Sales Enablement
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Sales enablement
-          numDecimalPlaces: 0
-
-      ar_vr:
-        title: AR/VR
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Augmented or virtual reality
-          numDecimalPlaces: 0
-
-      ed_tech:
-        title: Ed Tech
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Educational technology
-          numDecimalPlaces: 0
-
-      geospatial:
-        title: Geospatial
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          numDecimalPlaces: 0
-
-      legal_tech:
-        title: Legal Tech
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Legal technology
-          numDecimalPlaces: 0
-
-      entertainment:
-        title: Entertainment
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          numDecimalPlaces: 0
-
-      music__video_content:
-        title: Music, Video Content
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Music and video content
-          numDecimalPlaces: 0
-
-      vc:
-        title: VC
-        unit: 'US dollars'
-        short_unit: '$'
-        display:
-          name: Venture capital
-          numDecimalPlaces: 0
-
-
-      total:
-        title: Total
+      china:
+        title: China
         unit: 'US dollars'
         short_unit: '$'
         description: >-
-          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
-
-
-          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
-
-
-          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
-
-
-          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
-
-
-          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
-        display:
-          numDecimalPlaces: 0
-
-      total__focus_area:
-          title: "Total investment by focus area"
-          unit: 'US dollars'
-          short_unit: '$'
-          description: >-
             Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
 
 
@@ -258,6 +42,65 @@ tables:
 
 
             The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
-          display:
-            numDecimalPlaces: 0
+        display:
+          numDecimalPlaces: 0
+      european_union_and_united_kingdom:
+        title: European Union and United Kingdom
+        unit: 'US dollars'
+        short_unit: '$'
+        description: >-
+            Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
 
+
+            It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+
+            It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+
+
+            In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+
+            The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+        display:
+          numDecimalPlaces: 0
+      united_states:
+        title: United States
+        unit: 'US dollars'
+        short_unit: '$'
+        description: >-
+            Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+
+            It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+
+            It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+
+
+            In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+
+            The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+        display:
+          numDecimalPlaces: 0
+      world:
+        title: World
+        unit: 'US dollars'
+        short_unit: '$'
+        description: >-
+            Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+
+            It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+
+            It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+
+
+            In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+
+            The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+        display:
+          numDecimalPlaces: 0

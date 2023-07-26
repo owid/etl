@@ -215,6 +215,7 @@ t = Table.read_csv('/tmp/my_table.csv')
 ## Changelog
 
 - `dev`
+- `v0.3.5`
   - Remove `catalog.frames`; use `owid-repack` package instead
   - Relax dependency constraints
   - Add optional `channel` argument to `DatasetMeta`

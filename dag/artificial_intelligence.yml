@@ -96,7 +96,6 @@ steps:
   # AI corporate investment
   data://garden/artificial_intelligence/2023-06-14/ai_corporate_investment:
     - snapshot://artificial_intelligence/2023-06-14/ai_corporate_investment.csv
-    - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/artificial_intelligence/2023-06-14/ai_corporate_investment:
     - data://garden/artificial_intelligence/2023-06-14/ai_corporate_investment
 
@@ -104,7 +103,6 @@ steps:
   data://garden/artificial_intelligence/2023-06-14/ai_private_investment:
     - snapshot://artificial_intelligence/2023-06-14/ai_private_investment.csv
     - snapshot://artificial_intelligence/2023-06-14/ai_private_investment_total.csv
-    - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/artificial_intelligence/2023-06-14/ai_private_investment:
     - data://garden/artificial_intelligence/2023-06-14/ai_private_investment
 
@@ -207,3 +205,4 @@ steps:
   - data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset
   data://grapher/artificial_intelligence/2023-07-07/semiconductors_cset:
   - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset
+

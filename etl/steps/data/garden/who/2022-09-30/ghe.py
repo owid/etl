@@ -150,7 +150,7 @@ def add_age_standardized_metric(df: pd.DataFrame, who_standard: Dict[str, float]
         "YEARS40-44": "YEARS40-44",
         "YEARS45-49": "YEARS45-49",
         "YEARS50-54": "YEARS50-54",
-        "YEARS55-59": "YEARS54-59",
+        "YEARS55-59": "YEARS55-59",
         "YEARS60-64": "YEARS60-64",
         "YEARS65-69": "YEARS65-69",
         "YEARS70-74": "YEARS70-74",
@@ -163,10 +163,12 @@ def add_age_standardized_metric(df: pd.DataFrame, who_standard: Dict[str, float]
     df_as = who_df[["country", "year", "cause", "age_group", "sex", "death_rate100k"]]
     df_as = df_as[df_as["sex"] == "Both sexes"]
     df_as["multiplier"] = df_as["age_group"].map(who_standard, na_action="ignore")
+    assert all(df_as["multiplier"].notna())
     df_as["death_rate100k"] = df_as["death_rate100k"] * df_as["multiplier"]
+
     df_as["age_group"] = "Age-standardized"
     df_as = (
-        df_as.groupby(["country", "year", "cause", "age_group", "sex"]).sum().drop(columns="multiplier").reset_index()
+        df_as.groupby(["country", "year", "cause", "age_group", "sex"]).sum().drop(columns=["multiplier"]).reset_index()
     )
     df = pd.concat([df, df_as])
     return df
