@@ -54,11 +54,12 @@ def run(dest_dir: str) -> None:
         "targtype1_txt",
         "nkill",
         "nwound",
+        "suicide",
     ]
 
     # Load data from snapshots.
-    df_2020 = pd.read_csv(snap_2020.path)
-    df_2021 = pd.read_csv(snap_2021.path)
+    df_2020 = pd.read_csv(snap_2020.path, low_memory=False)
+    df_2021 = pd.read_csv(snap_2021.path, low_memory=False)
     # Combine terrorism data up until 2020 and 2020-2021.
     df = pd.concat([df_2020[COLUMNS_OF_INTEREST], df_2021[COLUMNS_OF_INTEREST]])
     # Rename country and year columns
