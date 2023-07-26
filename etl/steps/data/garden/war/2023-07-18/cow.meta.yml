@@ -10,18 +10,11 @@ dataset:
 tables:
   cow:
     variables:
-      number_deaths_ongoing_conflicts_battle:
-        title: Number of soldier deaths in ongoing conflicts (high estimate)
+      number_deaths_ongoing_conflicts:
+        title: Number of soldier deaths in ongoing conflicts
         unit: deaths
         description: >-
           Number of battle deaths in a year over the course of wars.
-        display:
-          numDecimalPlaces: 0
-      number_deaths_ongoing_conflicts_nonstate:
-        title: Number of soldier deaths in ongoing conflicts (low estimate)
-        unit: deaths
-        description: >-
-          Number of battle deaths in a year over the course of wars (only from non-state side)
         display:
           numDecimalPlaces: 0
 
