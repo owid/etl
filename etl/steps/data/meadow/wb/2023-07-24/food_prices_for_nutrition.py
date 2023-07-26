@@ -33,8 +33,6 @@ def prepare_data(tb: Table) -> Table:
     # Add titles to each variable metadata.
     for variable_id, variable_title in variable_id_to_title.items():
         tb[variable_id].metadata.title = variable_title
-        # tb[variable_id].metadata.description = f"{variable_title}.\n"\
-        #     "This indicator corresponds to the World Bank's '{variable_id}'."
         tb = tb.rename(columns={variable_id: variable_title})
 
     # Ensure all column names are snake-case.
