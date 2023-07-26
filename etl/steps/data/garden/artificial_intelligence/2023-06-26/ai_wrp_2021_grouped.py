@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
+from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -14,32 +14,20 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-# Function to melt and clean dataframe based on column name
-def melt_and_clean(df, col_name):
-    excluded_columns = [
-        "yes__would_feel_safe",
-        "mostly_help",
-        "no__would_not_feel_safe",
-        "mostly_harm",
-        "other_help_harm",
-        "other_yes_no",
-        "neither",
-    ]
-
+def melt_and_clean(df: pd.DataFrame, col_name: str, excluded_columns: List[str]) -> pd.DataFrame:
+    """
+    Melt and clean dataframe based on column name.
+    """
     melted_df = pd.melt(
         df.reset_index(),
         id_vars=["year", "country"],
         value_vars=[col for col in df.columns if col_name in col and col not in excluded_columns],
     )
-    melted_df[col_name] = (
+    melted_df["group"] = (
         melted_df["variable"].str.split("_" + col_name, expand=True)[0].str.replace("_", " ").str.title()
     )
     melted_df.rename(columns={"value": f"{col_name}_value"}, inplace=True)
-    melted_df.rename(columns={col_name: "group"}, inplace=True)
-
     melted_df = melted_df[melted_df[f"{col_name}_value"].notnull()]
-    melted_df.reset_index(drop=True, inplace=True)
-
     return melted_df[["year", f"{col_name}_value", "group"]]
 
 
@@ -48,28 +36,58 @@ def run(dest_dir: str) -> None:
 
     # Load meadow dataset.
     ds_garden = cast(Dataset, paths.load_dependency("ai_wrp_2021"))
-
-    # Read table from meadow dataset.
     df = pd.DataFrame(ds_garden["ai_wrp_2021"])
 
-    # Melt and clean dataframes
-    melted_yes = melt_and_clean(df, "yes__would_feel_safe").dropna(subset=["yes__would_feel_safe_value"])
-    melted_no = melt_and_clean(df, "no__would_not_feel_safe").dropna(subset=["no__would_not_feel_safe_value"])
-    merge_yes_no = pd.merge(melted_yes, melted_no, on=["year", "group"], how="outer")
-    melted_help = melt_and_clean(df, "mostly_help").dropna(subset=["mostly_help_value"])
-    melted_harm = melt_and_clean(df, "mostly_harm").dropna(subset=["mostly_harm_value"])
-    melted_neither = melt_and_clean(df, "neither").dropna(subset=["neither_value"])
-    merge_help_harm = pd.merge(melted_help, melted_harm, on=["year", "group"], how="outer")
-    merge_help_harm_neither = pd.merge(merge_help_harm, melted_neither, on=["year", "group"], how="outer")
-    merge_all = pd.merge(merge_yes_no, merge_help_harm_neither, on=["year", "group"], how="outer")
+    columns_to_melt = [
+        "yes__would_feel_safe",
+        "no__would_not_feel_safe",
+        "dk__cars",
+        "refused__cars",
+        "mostly_help",
+        "mostly_harm",
+        "neither",
+        "dk__help_harm",
+        "dont_have_an_opinion",
+        "refused__help_harm",
+    ]
 
-    merge_all["other_help_harm"] = 100 - (
-        merge_all["mostly_help_value"] + merge_all["mostly_harm_value"] + merge_all["neither_value"]
-    )
+    # Define a common list of excluded columns.
+    excluded_columns = [
+        "yes__would_feel_safe",
+        "mostly_help",
+        "no__would_not_feel_safe",
+        "mostly_harm",
+        "other_yes_no",
+        "other_help_harm",
+        "neither",
+        "refused__cars",
+        "dk__cars",
+        "refused__help_harm",
+        "dk_no_op",
+        "dk__help_harm",
+        "dont_have_an_opinion",
+    ]
 
-    merge_all["other_yes_no"] = 100 - (
-        merge_all["yes__would_feel_safe_value"] + merge_all["no__would_not_feel_safe_value"]
+    # Using a dictionary to store the melted dataframes.
+    melted_dfs = {}
+
+    for column in columns_to_melt:
+        melted_dfs[column] = melt_and_clean(df, column, excluded_columns)
+
+    merge_all = melted_dfs[columns_to_melt[0]]
+
+    # Merge all melted dataframes together.
+    for column in columns_to_melt[1:]:
+        merge_all = pd.merge(merge_all, melted_dfs[column], on=["year", "group"], how="outer")
+
+    # Derive additional columns (mainly to avoid grapher errors)
+    merge_all["other_yes_no_value"] = merge_all["dk__cars_value"] + merge_all["refused__cars_value"]
+    merge_all["other_help_harm_value"] = (
+        merge_all["dk__help_harm_value"]
+        + merge_all["dont_have_an_opinion_value"]
+        + merge_all["refused__help_harm_value"]
     )
+    merge_all["dk_no_op_value"] = merge_all["dk__help_harm_value"] + merge_all["dont_have_an_opinion_value"]
 
     # Rename group values
     group_replacements = {
@@ -92,8 +110,8 @@ def run(dest_dir: str) -> None:
         "Employed Part Time Do Not Want Full Time": "Employed Part-Time (Not seeking Full-Time)",
         "Employed Part Time Want Full Time": "Employed Part-Time (Seeking Full-Time)",
     }
-    merge_all["group"].replace(group_replacements, inplace=True)
 
+    merge_all["group"].replace(group_replacements, inplace=True)
     merge_all.set_index(["year", "group"], inplace=True)
 
     # Create a new garden dataset with the same metadata as the meadow dataset.

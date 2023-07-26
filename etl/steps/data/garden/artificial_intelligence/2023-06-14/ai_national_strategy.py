@@ -61,7 +61,7 @@ def run(dest_dir: str) -> None:
             group["released_national_strategy_on_ai"].fillna(method="ffill", inplace=True)
 
         # Fill remaining NaN values with "Not Released"
-        group["released_national_strategy_on_ai"].fillna("Not Released", inplace=True)
+        group["released_national_strategy_on_ai"].fillna("Not released", inplace=True)
         df_merged.loc[group.index] = group
     df_merged.drop("released", axis=1, inplace=True)
     tb = Table(df_merged, short_name=paths.short_name, underscore=True)
