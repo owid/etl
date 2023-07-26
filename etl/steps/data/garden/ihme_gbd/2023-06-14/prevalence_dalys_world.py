@@ -48,25 +48,24 @@ def run(dest_dir: str) -> None:
 def make_table_dalys(ds: Dataset) -> Table:
     """Build table with DALYs for mental health causes."""
     # Reset index
-    tb = ds["gbd_cause"].reset_index()
     # We are only interested in mental health causes
     causes_mental_health = [
-        "Anxiety disorders",
-        "Bipolar disorder",
-        "Depressive disorders",
-        "Eating disorders",
-        "Schizophrenia",
+        "anxiety_disorders__both_sexes__age_standardized",
+        "bipolar_disorder__both_sexes__age_standardized",
+        "depressive_disorders__both_sexes__age_standardized",
+        "eating_disorders__both_sexes__age_standardized",
+        "schizophrenia__both_sexes__age_standardized",
     ]
+    tb = Table()
+    for cause in causes_mental_health:
+        tb_cause = ds[cause].reset_index()
+        tb = pd.concat([tb, tb_cause])
+
     # Filter dimensions
-    tb = tb[
-        (tb["country"] == "World")
-        & (tb["sex"] == "Both")
-        & (tb["age"] == "Age-standardized")
-        & (tb["cause"].isin(causes_mental_health))
-    ]
+    tb = tb[(tb["country"] == "World") & (tb["sex"] == "Both sexes")]
     # Filter columns and sort rows
-    tb = tb[["cause", "year", "dalys__disability_adjusted_life_years__rate"]].set_index(["cause", "year"]).sort_index()
-    tb = tb.rename(columns={"dalys__disability_adjusted_life_years__rate": "dalys_rate"})
+    tb = tb.set_index(["cause", "year"], verify_integrity=True).sort_index()
+    # tb = tb.rename(columns={"dalys__disability_adjusted_life_years__rate": "dalys_rate"})
     return tb
 
 
