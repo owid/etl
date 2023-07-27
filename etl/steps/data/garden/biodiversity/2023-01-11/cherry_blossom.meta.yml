@@ -25,7 +25,7 @@ tables:
               min: 70
             selectedEntityNames:
             - Japan
-        presentation_license:
+        license:
           url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
 
       average_20_years:

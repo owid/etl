@@ -1973,7 +1973,7 @@ tables:
         presentation:
           title_public: Share of the population using the Internet
           title_variant: WDI
-          # citation_inline: # defaults to origin[*].producer so does not have to be set here
+          # attribution: # defaults to origin[*].producer so does not have to be set here
           topic_tags_links:
           - Technological Progress
           - Internet

@@ -177,7 +177,7 @@ class VariablePresentationMeta:
     # Shown next to title to differentiate similar indicators e.g. "WHO" or "IHME"
     producer_short: Optional[str] = None
     # A short text to use to credit the source e.g. at the bottom of charts. Autofilled from the list of origins (see below). Semicolon separated if there are multiple.
-    citation_inline: Optional[str] = None
+    attribution: Optional[str] = None
     # List of topic tags
     topic_tags_links: List[str] = field(default_factory=list)
 
@@ -239,7 +239,7 @@ class VariableMeta:
     # This one is the license that we give the data. Normally it will be empty and then it will
     # be our usual license (CC-BY) but in cases where special restriction apply this is where
     # we would capture this.
-    presentation_license: Optional[License] = None
+    license: Optional[License] = None
 
     # This is the old sources that we keep for compatibility. Use is strongly discouraged going forward
     sources: List[Source] = field(default_factory=list)

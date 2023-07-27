@@ -204,13 +204,13 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
     processingLevel = row.pop("processingLevel")
     grapherConfigETLJson = row.pop("grapherConfigETL")
     grapherConfigAdminJson = row.pop("grapherConfigAdmin")
-    presentationLicenseJson = row.pop("presentationLicense")
+    licenseJson = row.pop("license")
     keyInfoTextJson = row.pop("keyInfoText")
 
     display = json.loads(displayJson)
     grapherConfigETL = json.loads(grapherConfigETLJson) if grapherConfigETLJson else None
     grapherConfigAdmin = json.loads(grapherConfigAdminJson) if grapherConfigAdminJson else None
-    presentationLicense = json.loads(presentationLicenseJson) if presentationLicenseJson else None
+    license = json.loads(licenseJson) if licenseJson else None
     keyInfoText = json.loads(keyInfoTextJson) if keyInfoTextJson else None
 
     # group fields from flat structure into presentation field
@@ -220,7 +220,7 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         titlePublic=row.pop("titlePublic"),
         titleVariant=row.pop("titleVariant"),
         producerShort=row.pop("producerShort"),
-        citationInline=row.pop("citationInline"),
+        attribution=row.pop("attribution"),
         topicTagsLinks=_load_topic_tags(engine, variable_id),
         faqs=_load_faqs(engine, variable_id),
         keyInfoText=keyInfoText,
@@ -235,7 +235,7 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         schemaVersion=schemaVersion,
         processingLevel=processingLevel,
         presentation=_omit_nullable_values(presentation),
-        presentationLicense=presentationLicense,
+        license=license,
         keyInfoText=keyInfoText,
     )
 

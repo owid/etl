@@ -323,7 +323,7 @@
                     "properties": {
                       "title_public": { "type": "string" },
                       "title_variant": { "type": "string" },
-                      "citation_inline": { "type": "string" },
+                      "attribution": { "type": "string" },
                       "producer_short": { "type": "string" },
                       "topic_tags_links": {
                         "type": "array",

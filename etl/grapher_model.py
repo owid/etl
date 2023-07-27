@@ -839,13 +839,13 @@ class Variable(SQLModel, table=True):
     titlePublic: Optional[str] = Field(default=None, sa_column=Column("titlePublic", LONGTEXT))
     titleVariant: Optional[str] = Field(default=None, sa_column=Column("titleVariant", LONGTEXT))
     producerShort: Optional[str] = Field(default=None, sa_column=Column("producerShort", LONGTEXT))
-    citationInline: Optional[str] = Field(default=None, sa_column=Column("citationInline", LONGTEXT))
+    attribution: Optional[str] = Field(default=None, sa_column=Column("attribution", LONGTEXT))
     descriptionShort: Optional[str] = Field(default=None, sa_column=Column("descriptionShort", LONGTEXT))
     descriptionFromProducer: Optional[str] = Field(default=None, sa_column=Column("descriptionFromProducer", LONGTEXT))
     keyInfoText: Optional[List[str]] = Field(default=None, sa_column=Column("keyInfoText", JSON))
     processingInfo: Optional[str] = Field(default=None, sa_column=Column("processingInfo", LONGTEXT))
     licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
-    presentationLicense: Optional[dict] = Field(default=None, sa_column=Column("presentationLicense", JSON))
+    license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
@@ -902,13 +902,13 @@ class Variable(SQLModel, table=True):
             ds.titlePublic = self.titlePublic
             ds.titleVariant = self.titleVariant
             ds.producerShort = self.producerShort
-            ds.citationInline = self.citationInline
+            ds.attribution = self.attribution
             ds.descriptionShort = self.descriptionShort
             ds.descriptionFromProducer = self.descriptionFromProducer
             ds.keyInfoText = self.keyInfoText
             ds.processingInfo = self.processingInfo
             ds.licenses = self.licenses
-            ds.presentationLicense = self.presentationLicense
+            ds.license = self.license
             ds.updatedAt = datetime.utcnow()
             # do not update these fields unless they're specified
             if self.columnOrder is not None:
@@ -979,7 +979,7 @@ class Variable(SQLModel, table=True):
             descriptionShort=metadata.description_short,
             descriptionFromProducer=metadata.description_from_producer,
             licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
-            presentationLicense=metadata.presentation_license.to_dict() if metadata.presentation_license else None,
+            license=metadata.license.to_dict() if metadata.license else None,
             **presentation_dict,
         )
 
