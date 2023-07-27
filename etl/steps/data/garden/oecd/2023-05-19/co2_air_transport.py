@@ -76,7 +76,6 @@ def run(dest_dir: str) -> None:
     # Process monthly data
     pivot_table_mn = process_monthly_data(df, month_names)
     merge_df = pd.merge(pivot_outb, pivot_table_mn, on=["year", "country"], how="outer")
-    print(merge_df.columns)
     regions_ = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
     for region in regions_:
