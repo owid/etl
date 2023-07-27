@@ -3,7 +3,7 @@ meta:
   publication_year: 2023
 
   publication_date: '2023-07-01'
-  source_name: World Bank based on different sources
+  source_name: World Bank, adapted from Herforth et al. (2022)
   source_published_by: |
     World Bank, adapted from Herforth, A., Venkat, A., Bai, Y., Costlow, L., Holleman, C. & Masters, W.A. 2022. Methods and options to monitor globally the cost and affordability of a healthy diet. Background paper for The State of Food Security and Nutrition in the World 2022. Rome, FAO.
   url: https://databank.worldbank.org/source/food-prices-for-nutrition

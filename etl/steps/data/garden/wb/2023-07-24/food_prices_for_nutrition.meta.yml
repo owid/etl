@@ -15,7 +15,7 @@ tables:
         unit: international-$ in 2017 prices
         short_unit: $
         description: |
-          Cost of the least expensive starchy staple for energy balance for a representative person at 2330 kcal/day. Data available for 2017.
+          Cost of the least expensive starchy staple for energy balance for a representative person at 2330 kcal/day.
       affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of an energy sufficient diet: ratio of cost to food expenditures"
         unit: "%"
@@ -41,10 +41,12 @@ tables:
         unit: people
         short_unit: ""
         description: |
-          The indicator expresses the total number of people who cannot afford an energy-sufficient diet. The indicator is computed by multiplying the percentage of the population in a country unable to afford a healthy diet by population data taken from the World Development Indicators (WDI) of the World Bank. A value of zero indicates a null or a small number rounded down at the current precision level.
+          The indicator expresses the total number of people who cannot afford an energy-sufficient diet. A diet is deemed unaffordable if it costs more than 52% of a household's income.
+
+          The indicator is computed by multiplying the percentage of the population in a country unable to afford a healthy diet by population data taken from the World Development Indicators (WDI) of the World Bank. A value of zero indicates a null or a small number rounded down at the current precision level.
       cost_of_a_healthy_diet:
         title: Cost of a healthy diet
-        unit: current international-$/person/day
+        unit: current international-$ per person per day
         short_unit: $
         description: |
           The cost of a healthy diet indicator is the cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines (FBDGs) for a representative person within energy balance at 2330 kcal/day.
@@ -79,7 +81,7 @@ tables:
         unit: international-$ in 2017 prices
         short_unit: $
         description: |
-          The cost of purchasing the least expensive locally available fruits to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Fruits are one of the six food groups within the Healthy Diet Basket. Data available for 2017.
+          The cost of purchasing the least expensive locally available fruits to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Fruits are one of the six food groups within the Healthy Diet Basket.
       cost_share_for_fruits_in_a_least_cost_healthy_diet:
         title: Cost share for fruits in a least-cost healthy diet
         unit: "%"
@@ -165,7 +167,9 @@ tables:
         unit: people
         short_unit: ""
         description: |
-          The indicator expresses the total number of people who cannot afford a healthy diet in a given country and year. The indicator is computed by multiplying the percentage of the population in a country unable to afford a healthy diet by population data taken from the World Development Indicators (WDI) of the World Bank. A value of zero indicates a null or a small number rounded down at the current precision level. Data are currently available for 2017, 2018, 2019, 2020 and 2021.
+          The indicator expresses the total number of people who cannot afford a healthy diet in a given country and year. A diet is deemed unaffordable if it costs more than 52% of a household's income.
+
+          The indicator is computed by multiplying the percentage of the population in a country unable to afford a healthy diet by population data taken from the World Development Indicators (WDI) of the World Bank. A value of zero indicates a null or a small number rounded down at the current precision level.
       cost_of_vegetables:
         title: Cost of vegetables
         unit: international-$ in 2017 prices
@@ -177,7 +181,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description: |
-          Share of costs for the least expensive vegetables to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet. Data available for 2017.
+          Share of costs for the least expensive vegetables to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
       cost_of_vegetables_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of vegetables relative to the starchy staples in a least-cost healthy diet
         unit: ""
@@ -189,7 +193,7 @@ tables:
         unit: international-$ in 2017 prices
         short_unit: $
         description: |
-          Cost of the least expensive locally-available foods for nutrient adequacy for a representative person within upper and lower bounds for 23 essential macro- and micronutrients plus energy balance at 2330 kcal/day. Data available for 2017.
+          Cost of the least expensive locally-available foods for nutrient adequacy for a representative person within upper and lower bounds for 23 essential macro- and micronutrients plus energy balance at 2330 kcal/day.
       affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of a nutrient adequate diet: ratio of cost to food expenditures"
         unit: "%"
@@ -215,7 +219,9 @@ tables:
         unit: people
         short_unit: ""
         description: |
-          The indicator expresses the total number of people who cannot afford a nutrient adequate diet in a given country and year. The indicator is computed by multiplying the percentage of the population in a country unable to afford a healthy diet by population data taken from the World Development Indicators (WDI) of the World Bank. A value of zero indicates a null or a small number rounded down at the current precision level.
+          The indicator expresses the total number of people who cannot afford a nutrient adequate diet. A diet is deemed unaffordable if it costs more than 52% of a household's income.
+
+          The indicator is computed by multiplying the percentage of the population in a country unable to afford a healthy diet by population data taken from the World Development Indicators (WDI) of the World Bank. A value of zero indicates a null or a small number rounded down at the current precision level.
       population:
         title: Population according to the World Bank
         unit: people
