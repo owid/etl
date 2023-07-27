@@ -294,7 +294,9 @@ def add_metadata(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, dims: List
             cleaned_variable = create_variable_metadata(variable=tb_group[variable_name], **dims_id)
             tb_group[cleaned_variable.name] = cleaned_variable
             tb_group = tb_group.drop(columns=variable_name)
-        tb_group = tb_group.set_index(["country", "year"] + dims, verify_integrity=True)
+        # Dropping dims as table name contains them
+        tb_group = tb_group.drop(columns=dims)
+        tb_group = tb_group.set_index(["country", "year"], verify_integrity=True)
         ds_garden.add(tb_group)
     return ds_garden
 
