@@ -1,20 +1,13 @@
 steps:
   # World Bank EdStats
   data://meadow/wb/2023-07-10/education:
-  - snapshot://wb/2023-07-10/education_learning_outcomes.csv
-  - snapshot://wb/2023-07-10/education_pre_primary.csv
-  - snapshot://wb/2023-07-10/education_primary.csv
-  - snapshot://wb/2023-07-10/education_secondary.csv
-  - snapshot://wb/2023-07-10/education_tertiary.csv
-  - snapshot://wb/2023-07-10/education_literacy.csv
-  - snapshot://wb/2023-07-10/education_expenditure_and_teachers.csv
-  data://garden/wb/2023-07-10/education:
+  - snapshot://wb/2023-07-10/education.zip
+
+  data://garden/wb/2023-07-10/education_pre_primary:
   - data://meadow/wb/2023-07-10/education
   - data://garden/regions/2023-01-01/regions
   - data://garden/wb/2023-04-30/income_groups
   - data://garden/education/2023-07-17/education_lee_lee
-  data://grapher/wb/2023-07-10/education:
-  - data://garden/wb/2023-07-10/education
 
   # Lee and Lee datasets
   data://meadow/education/2023-07-17/education_lee_lee:

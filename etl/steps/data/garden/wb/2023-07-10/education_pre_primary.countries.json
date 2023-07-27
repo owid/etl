@@ -62,7 +62,6 @@
   "Equatorial Guinea": "Equatorial Guinea",
   "Eritrea": "Eritrea",
   "Estonia": "Estonia",
-  "Eswatini": "Eswatini",
   "Ethiopia": "Ethiopia",
   "Faroe Islands": "Faroe Islands",
   "Fiji": "Fiji",
@@ -116,6 +115,7 @@
   "Lithuania": "Lithuania",
   "Luxembourg": "Luxembourg",
   "Macao SAR, China": "Macao",
+  "Macedonia, FYR": "North Macedonia",
   "Madagascar": "Madagascar",
   "Malawi": "Malawi",
   "Malaysia": "Malaysia",
@@ -143,7 +143,7 @@
   "Nicaragua": "Nicaragua",
   "Niger": "Niger",
   "Nigeria": "Nigeria",
-  "North Macedonia": "North Macedonia",
+  "North America": "North America",
   "Northern Mariana Islands": "Northern Mariana Islands",
   "Norway": "Norway",
   "Oman": "Oman",
@@ -185,6 +185,7 @@
   "St. Vincent and the Grenadines": "Saint Vincent and the Grenadines",
   "Sudan": "Sudan",
   "Suriname": "Suriname",
+  "Swaziland": "Eswatini",
   "Sweden": "Sweden",
   "Switzerland": "Switzerland",
   "Syrian Arab Republic": "Syria",
@@ -212,8 +213,9 @@
   "Vietnam": "Vietnam",
   "Virgin Islands (U.S.)": "United States Virgin Islands",
   "West Bank and Gaza": "Palestine",
+  "World": "World",
   "Yemen, Rep.": "Yemen",
   "Zambia": "Zambia",
   "Zimbabwe": "Zimbabwe",
-  "Korea, Dem. People\u0092s Rep.": "North Korea"
+  "East Asia & Pacific": "East Asia & Pacific"
 }

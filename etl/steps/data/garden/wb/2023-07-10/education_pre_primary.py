@@ -7,6 +7,21 @@ from owid.catalog import Dataset, Table
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
+PRE_PRIMARY_EDUCATION_VARIABLES = [
+    "Gross enrolment ratio, pre-primary, both sexes (%)",
+    "Official entrance age to pre-primary education (years)",
+    "School life expectancy, pre-primary, gender parity index (GPI)",
+    "School life expectancy, pre-primary, both sexes (years)",
+    "School life expectancy, pre-primary, female (years)",
+    "School life expectancy, pre-primary, male (years)",
+    "Pupil/qualified teacher ratio in pre-primary education (headcount basis)",
+    "Pupil/trained teacher ratio in pre-primary education (headcount basis)",
+    "Percentage of teachers in pre-primary education who are qualified, both sexes (%)",
+    "Percentage of teachers in pre-primary education who are trained, both sexes (%)",
+    "Annual statutory teacher salaries in public institutions in USD. Pre-Primary. Starting salary",
+    "Government expenditure on pre-primary education as % of GDP (%)",
+]
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 REGIONS = [
@@ -70,6 +85,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = tb[tb["indicator_name"].isin(PRE_PRIMARY_EDUCATION_VARIABLES)]
+    tb.reset_index(inplace=True)
 
     # Pivot the dataframe so that each indicator is a separate column
     tb = tb.pivot(index=["country", "year"], columns="indicator_name", values="value")
@@ -79,7 +96,6 @@ def run(dest_dir: str) -> None:
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-
     tb = Table(tb, short_name=paths.short_name, underscore=True)
 
     #

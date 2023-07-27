@@ -1,4 +1,5 @@
-from typing import cast
+import os
+import zipfile
 
 import numpy as np
 import pandas as pd
@@ -11,68 +12,43 @@ from etl.snapshot import Snapshot
 paths = PathFinder(__file__)
 
 
-def load_and_select_data(snap: Snapshot) -> pd.DataFrame:
-    """
-    Loads a CSV file from a snapshot and selects data up to the first row containing all NaN values (including country and year).
-
-    Parameters:
-    snap: Snapshot - The snapshot from which the CSV file is to be loaded
-
-    Returns:
-    df: DataFrame - The loaded and selected data
-    """
-
-    df = pd.read_csv(snap.path, low_memory=False, encoding="latin1")
-    first_nan_row_index = df.isnull().all(axis=1).idxmax()
-    df = df.iloc[:first_nan_row_index]
-    return df
-
-
 def run(dest_dir: str) -> None:
     """
     Main function to load, process and save all World Bank Education datasets.
 
     """
+    snap: Snapshot = paths.load_dependency("education.zip")
+    # Replace 'data.zip' with the name of your zip file
 
-    # Define a list of snapshots to be loaded
-    snaps = [
-        "education_learning_outcomes.csv",
-        "education_pre_primary.csv",
-        "education_primary.csv",
-        "education_secondary.csv",
-        "education_tertiary.csv",
-        "education_literacy.csv",
-        "education_expenditure_and_teachers.csv",
-    ]
+    # Step 1: Unzip the file
+    with zipfile.ZipFile(snap.path, "r") as zip_ref:
+        # Replace 'data.csv' with the name of your CSV file in the zip archive
+        csv_file_name = "EdStatsData.csv"
+        destination_directory = os.path.dirname(snap.path)
+        zip_ref.extract(csv_file_name, destination_directory)
 
-    # Load and process data from each snapshot
-    df_list = [load_and_select_data(cast(Snapshot, paths.load_dependency(snap))) for snap in snaps]
+    # Now, use pandas to read the CSV file into a DataFrame
+    df = pd.read_csv(os.path.join(destination_directory, csv_file_name))
 
-    # Concatenate all processed dataframes
-    df = pd.concat(df_list, ignore_index=True)
+    df.dropna(axis=1, how="all", inplace=True)
 
     # Perform further processing on the concatenated dataframe
     df.replace("..", np.nan, inplace=True)
-    cols_to_drop = ["Country Code", "Series Code"]
+    cols_to_drop = ["Country Code", "Indicator Code"]
     # Drop unnecessary columns that have the same infomariton as Series and Country but in a different format
     df.drop(cols_to_drop, axis=1, inplace=True)
 
-    # Clean up year columns (original columns are in the format xxxx [YRxxxx])
-    df.columns = df.columns.map(
-        lambda x: x.split(" ")[0] if x not in ["Country Name", "Series", "Country Code", "Series Code"] else x
-    )
     # Melt years into a single column
-    df_melted = pd.melt(df, id_vars=["Country Name", "Series"], var_name="Year", value_name="Value")
+    df_melted = pd.melt(df, id_vars=["Country Name", "Indicator Name"], var_name="Year", value_name="Value")
 
     df_melted["Value"] = df_melted["Value"].astype(float)
-    df_melted.rename(columns={"Country Name": "country", "Series": "indicator_name"}, inplace=True)
+    df_melted.rename(columns={"Country Name": "country", "Indicator Name": "indicator_name"}, inplace=True)
 
     tb = Table(df_melted, short_name=paths.short_name, underscore=True)
     tb.set_index(["country", "year", "indicator_name"], inplace=True)
 
     # Use metadata from the first snapshot, then edit the descriptions in the garden step
-    metadata_snap = cast(Snapshot, paths.load_dependency(snaps[0]))
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=metadata_snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
     # Save the dataset
     ds_meadow.save()
