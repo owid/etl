@@ -1,0 +1,15 @@
+tables:
+  food_expenditure:
+    variables:
+      food_as_share_of_all_expenditure:
+        display:
+          numDecimalPlaces: 1
+      alcohol_and_tobacco_as_share_of_all_expenditure:
+        display:
+          numDecimalPlaces: 1
+      consumer_expenditure:
+        display:
+          numDecimalPlaces: 0
+      food_expenditure:
+        display:
+          numDecimalPlaces: 0

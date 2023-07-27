@@ -4,8 +4,7 @@ meta:
   name: Real Commodity Price Index since 1850 - Jacks (2016)
   version: '2023-06-07'
   publication_year: 2020
-  source_name: 'Jacks, D.S. (2019), "From Boom to Bust: A Typology of Real Commodity
-    Prices in the Long Run." Cliometrica 13(2), 202-220.'
+  source_name: Jacks (2019)
   source_published_by: 'Jacks, D.S. (2019), "From Boom to Bust: A Typology of Real
     Commodity Prices in the Long Run." Cliometrica 13(2), 202-220.'
   url: http://www.sfu.ca/~djacks/data/boombust/index.html

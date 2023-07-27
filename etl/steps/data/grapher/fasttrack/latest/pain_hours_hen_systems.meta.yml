@@ -1,0 +1,69 @@
+dataset:
+  sources:
+  - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+    published_by: Welfare Footprint
+    publication_year: 2021
+    url: https://welfarefootprint.org/research-projects/laying-hens/
+tables:
+  pain_hours_hen_systems:
+    variables:
+      total_hours_of_pain:
+        title: Total hours of pain
+        short_unit: hours
+        unit: hours
+        description: The total number of hours an average hen will spend in pain, regardless of the intensity.
+        display:
+          numDecimalPlaces: 0
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      excrutiating_pain:
+        title: Excrutiating pain
+        short_unit: hours
+        unit: hours
+        description: The number of hours an average hen will spend in excrutiating pain.
+        display:
+          numDecimalPlaces: 2
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      disabling_pain:
+        title: Disabling pain
+        short_unit: hours
+        unit: hours
+        description: The number of hours an average hen will spend in disabling pain.
+        display:
+          numDecimalPlaces: 0
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      hurtful_pain:
+        title: Hurtful pain
+        short_unit: hours
+        unit: hours
+        description: The number of hours an average hen will spend in hurtful pain.
+        display:
+          numDecimalPlaces: 0
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      annoying_pain:
+        title: Annoying pain
+        short_unit: hours
+        unit: hours
+        description: The number of hours an average hen will spend in annoying pain.
+        display:
+          numDecimalPlaces: 0
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
