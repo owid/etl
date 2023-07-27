@@ -54,7 +54,7 @@ def run(dest_dir: str) -> None:
     #
     # Keep relevant columns
     log.info("war.brecke: keep relevant columns")
-    COLUMNS_RELEVANT = ["name", "startyear", "endyear", "region", "milfatalities", "totalfatalities"]
+    COLUMNS_RELEVANT = ["name", "startyear", "endyear", "region", "totalfatalities"]
     tb = tb[COLUMNS_RELEVANT]
 
     # Create conflict code
@@ -206,9 +206,7 @@ def expand_observations(tb: Table) -> Table:
         Here, each conflict has as many rows as years of activity. Its deaths have been uniformly distributed among the years of activity.
     """
     # For that we scale the number of deaths proportional to the duration of the conflict.
-    tb[["milfatalities", "totalfatalities"]] = (
-        tb[["milfatalities", "totalfatalities"]].div(tb["endyear"] - tb["startyear"] + 1, "index").round()
-    )
+    tb[["totalfatalities"]] = tb[["totalfatalities"]].div(tb["endyear"] - tb["startyear"] + 1, "index").round()
 
     # Add missing years for each triplet ("warcode", "campcode", "ccode")
     YEAR_MIN = tb["startyear"].min()
@@ -263,7 +261,6 @@ def _add_ongoing_metrics(tb: Table) -> Table:
 
     ops = {
         "conflict_code": "nunique",
-        "milfatalities": sum_nan,
         "totalfatalities": sum_nan,
     }
     ## By region and conflict_type
@@ -291,7 +288,6 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing = tb_ongoing.rename(  # type: ignore
         columns={
             "conflict_code": "number_ongoing_conflicts",
-            "milfatalities": "number_deaths_ongoing_conflicts_military",
             "totalfatalities": "number_deaths_ongoing_conflicts",
         }
     )
@@ -364,11 +360,15 @@ def distribute_metrics_m9(tb: Table) -> Table:
 
     Region -9 is likely to be 'World'. Therefore, we add these numbers to the other regions and remove these entries. We add the numbers as follows:
 
-    - `number_deaths_ongoing_conflicts` and `number_deaths_ongoing_conflicts_military`
+    - `number_deaths_ongoing_conflicts`
         - For 'World', we simply add the numbers.
         - For other regions, we divide the number by the number of regions in the dataset and add the numbers.
     - `number_ongoing_conflicts` and `number_new_conflicts`
         - We add the numbers for all regions (including 'World')
+
+    NOTE:
+        - Metrics in region -9 were already accounted for when estimating the values for 'World' in function `estimate_metrics`. Hence, we
+        don't need to add anything to entries with region='World'.
     """
     # Distribute data for region=-9
     ## Get rows with region -9
@@ -377,7 +377,7 @@ def distribute_metrics_m9(tb: Table) -> Table:
 
     # Get regions
     regions = set(tb.region) - {-9, "World"}
-    print(len(regions), regions)
+
     # original columns
     columns_og = tb.columns
 
@@ -388,16 +388,11 @@ def distribute_metrics_m9(tb: Table) -> Table:
     # Add number of conflicts, add uniformly the number of deaths
     columns = [
         "number_ongoing_conflicts",
-        "number_deaths_ongoing_conflicts_military",
         "number_deaths_ongoing_conflicts",
         "number_new_conflicts",
     ]
     # World
     for column in columns:
-        print(columns, tb.loc[mask, f"{column}_m9"], len(regions))
-        # World
-        mask = tb["region"] == "World"
-        tb.loc[mask, column] += tb.loc[mask, f"{column}_m9"]
         # Regions
         mask = tb["region"] != "World"
         if "deaths" in column:

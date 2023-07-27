@@ -38,18 +38,15 @@ tables:
   brecke:
     # (Inherited from meadow, remove if not different.)
     variables:
-      number_deaths_ongoing_conflicts_military:
-        title: Number of soldier deaths in ongoing conflicts
-        unit: deaths
-        description: >-
-          The number of soldiers killed in a year over the course of wars. The military fatalities estimates are reasonably close to being just soldiers, but some civilians might be in the counts.
-        display:
-          numDecimalPlaces: 0
       number_deaths_ongoing_conflicts:
         title: Number of deaths in ongoing conflicts
         unit: deaths
         description: >-
           The total fatalities estimates in a year over the course of wars. The total fatalities estimates vary significantly in terms of the degree to which they include disease, starvation, etc.
+
+
+          For some conflicts, data on the number of fatalities was missing. In such cases, we have set the value to 32, which is the lower bound of yearly
+          deaths defined by the source for a violent conflict to be recorded in the dataset.
         display:
           numDecimalPlaces: 0
 
@@ -58,6 +55,9 @@ tables:
         unit: conflicts
         description: >-
           Number of ongoing conflicts in a given year.
+
+
+          We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
         display:
           numDecimalPlaces: 0
       number_new_conflicts:
@@ -66,5 +66,9 @@ tables:
         description: >-
           Number of new conflicts in a given year.
 
+          • New conflicts for the 'World': We only count a conflict as new when the conflict overall started that year, not if it became active again.
+
+          • New conflicts for all regions: We count a conflict as new in a region even if the conflict overall started earlier in another region.
+          The sum across all regions can therefore be higher than the total number of new conflicts.
         display:
           numDecimalPlaces: 0
