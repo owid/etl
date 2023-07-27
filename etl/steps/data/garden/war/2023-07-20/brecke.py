@@ -227,7 +227,6 @@ def estimate_metrics(tb: Table) -> Table:
         - number_ongoing_conflicts
         - number_new_conflicts
         - number_deaths_ongoing_conflicts
-        - number_deaths_ongoing_conflicts_military
 
     Parameters
     ----------
@@ -348,7 +347,6 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
         "number_ongoing_conflicts",
         "number_new_conflicts",
         "number_deaths_ongoing_conflicts",
-        "number_deaths_ongoing_conflicts_military",
     ]
     tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
 
