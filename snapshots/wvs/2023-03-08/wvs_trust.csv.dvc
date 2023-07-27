@@ -13,8 +13,9 @@ meta:
   url: https://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
   source_data_url:
   file_extension: csv
-  license_url:
-  license_name:
+  license_url: https://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
+  license_name: The data can be used freely for non-commercial purposes such as research,
+    publication, teaching etc. Data redistribution is prohibited.
   date_accessed: 2023-03-08
   is_public: true
   description: |
@@ -32,6 +33,6 @@ meta:
     The WVS runs a new survey wave every five years; the last update was done in 2022.  We will aim to update our data on Our World in Data soon after the WVS updates the source data with a new wave. You can access the source page at the link above and see the latest available data from the WVS.
 wdir: ../../../data/snapshots/wvs/2023-03-08
 outs:
-- md5: 8e04671f4f697d5eb4e3b3fcbc023d16
-  size: 20007
+- md5: 4f9171475c60a7f39d8054605e9edae9
+  size: 88943
   path: wvs_trust.csv
