@@ -270,9 +270,11 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str)
     return new_variable
 
 
-def add_metadata_and_save(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, dims: List[str]) -> None:
+def add_metadata(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, dims: List[str]) -> Dataset:
     """
     Adding metadata at the variable level
+    First step is to group by the dims, which are normally: age, sex and cause.
+    Then for each variable (the different metrics) we add in the metadata.
     """
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
@@ -280,28 +282,28 @@ def add_metadata_and_save(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, d
     df = df.reset_index()
     df_group = df.groupby(dims)
     for group_id, group in df_group:
+        # Grab out the IDs of each of the grouping factors, e.g. the age-group, sex and cause
         dims_id = dict(zip(dims, group_id))
-        cause = dims_id["cause"]
-        sex = dims_id["sex"]
-        age = dims_id["age"]
         tb_group = Table(group)
+        # Create the unique table short name
         tb_group.metadata.short_name = underscore(f"{dims_id['cause']} - {dims_id['sex']} - {dims_id['age']}")
         variables = tb_group.columns.drop(dims + ["country", "year"])
         for variable_name in variables:
             tb_group[variable_name] = Variable(tb_group[variable_name])
-            cleaned_variable = create_variable_metadata(variable=tb_group[variable_name], cause=cause, sex=sex, age=age)
+            # Create all the necessary metadata
+            cleaned_variable = create_variable_metadata(variable=tb_group[variable_name], **dims_id)
             tb_group[cleaned_variable.name] = cleaned_variable
             tb_group = tb_group.drop(columns=variable_name)
         tb_group = tb_group.set_index(["country", "year"] + dims, verify_integrity=True)
         ds_garden.add(tb_group)
-    ds_garden.save()
+    return ds_garden
 
 
 def tidy_sex_dimension(df: pd.DataFrame) -> pd.DataFrame:
     """
     Improve the labelling of the sex column
     """
-    sex_dict = {"Both": "Both sexes"}
+    sex_dict = {"Both": "Both sexes", "Female": "Females", "Male": "Males"}
     df["sex"] = df["sex"].replace(sex_dict, regex=False)
     return df
 
@@ -342,4 +344,6 @@ def run_wrapper(
     df_garden = add_share_of_population(df_garden)
     df_garden = pivot(df_garden, dims)
 
-    add_metadata_and_save(dest_dir=dest_dir, ds_meadow=ds_meadow, df=df_garden, dims=dims)
+    ds_garden = add_metadata(dest_dir=dest_dir, ds_meadow=ds_meadow, df=df_garden, dims=dims)
+
+    ds_garden.save()

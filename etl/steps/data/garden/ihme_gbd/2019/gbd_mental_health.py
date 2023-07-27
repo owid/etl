@@ -4,17 +4,17 @@ from structlog import get_logger
 from etl.helpers import PathFinder
 
 # naming conventions
-N = PathFinder(__file__)
+paths = PathFinder(__file__)
 log = get_logger()
 
 
 def run(dest_dir: str) -> None:
     dims = ["sex", "age", "cause"]
     # Get dataset level variables
-    dataset = N.short_name
+    dataset = paths.short_name
     log.info(f"{dataset}.start")
-    country_mapping_path = N.directory / "gbd.countries.json"
-    excluded_countries_path = N.directory / "gbd.excluded_countries.json"
+    country_mapping_path = paths.directory / "gbd.countries.json"
+    excluded_countries_path = paths.directory / "gbd.excluded_countries.json"
     # Run the function to produce garden dataset
     run_wrapper(dataset, country_mapping_path, excluded_countries_path, dest_dir, dims)
     log.info(f"{dataset}.end")
