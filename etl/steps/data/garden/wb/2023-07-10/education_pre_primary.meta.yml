@@ -1,0 +1,70 @@
+dataset:
+  title: World Bank Education Statistics
+  description: >-
+    PISA dataset includes data on the educational attainment of 15-year-olds and their ability to use their reading, mathematics
+    and science knowledge and skills to meet real-life challenges.
+
+
+    The Harmonized Learning Outcomes (HLO) database addresses the need for globally comparable learning metrics to track human
+    capital formation. While international achievement tests are mainly administered in high-income countries, limiting insights
+    into low- and middle-income nations, the HLO database fills this gap. It provides a comprehensive and regularly updated
+    dataset covering 164 countries from 2000 to 2017. The dataset encompasses 98% of the global population, with a focus on
+    developing economies, which make up two-thirds of the included countries.
+  licenses:
+  - name: Creative Commons Attribution 4.0
+    url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+  sources:
+  - name: OECD and World Bank EdStats (2023)
+    description: >-
+      PISA dataset includes data on the educational attainment of 15-year-olds and their ability to use their reading, mathematics
+      and science knowledge and skills to meet real-life challenges.
+
+
+      The Harmonized Learning Outcomes (HLO) database addresses the need for globally comparable learning metrics to track
+      human capital formation. While international achievement tests are mainly administered in high-income countries, limiting
+      insights into low- and middle-income nations, the HLO database fills this gap. It provides a comprehensive and regularly
+      updated dataset covering 164 countries from 2000 to 2017. The dataset encompasses 98% of the global population, with
+      a focus on developing economies, which make up two-thirds of the included countries.
+    url: https://databank.worldbank.org/reports.aspx?source=Education%20Statistics#
+    date_accessed: '2023-07-10'
+    publication_year: 2018
+    published_by: World Bank Education Statistics (2023)
+tables:
+  education_pre_primary:
+    variables:
+      annual_statutory_teacher_salaries_in_public_institutions_in_usd__pre_primary__starting_salary:
+        title: Annual statutory teacher salaries in public institutions in USD. Pre-Primary. Starting salary
+        unit: ''
+      government_expenditure_on_pre_primary_education_as_pct_of_gdp__pct:
+        title: Government expenditure on pre-primary education as % of GDP (%)
+        unit: ''
+      gross_enrolment_ratio__pre_primary__both_sexes__pct:
+        title: Gross enrolment ratio, pre-primary, both sexes (%)
+        unit: ''
+      official_entrance_age_to_pre_primary_education__years:
+        title: Official entrance age to pre-primary education (years)
+        unit: ''
+      percentage_of_teachers_in_pre_primary_education_who_are_qualified__both_sexes__pct:
+        title: Percentage of teachers in pre-primary education who are qualified, both sexes (%)
+        unit: ''
+      percentage_of_teachers_in_pre_primary_education_who_are_trained__both_sexes__pct:
+        title: Percentage of teachers in pre-primary education who are trained, both sexes (%)
+        unit: ''
+      pupil_qualified_teacher_ratio_in_pre_primary_education__headcount_basis:
+        title: Pupil/qualified teacher ratio in pre-primary education (headcount basis)
+        unit: ''
+      pupil_trained_teacher_ratio_in_pre_primary_education__headcount_basis:
+        title: Pupil/trained teacher ratio in pre-primary education (headcount basis)
+        unit: ''
+      school_life_expectancy__pre_primary__both_sexes__years:
+        title: School life expectancy, pre-primary, both sexes (years)
+        unit: ''
+      school_life_expectancy__pre_primary__female__years:
+        title: School life expectancy, pre-primary, female (years)
+        unit: ''
+      school_life_expectancy__pre_primary__gender_parity_index__gpi:
+        title: School life expectancy, pre-primary, gender parity index (GPI)
+        unit: ''
+      school_life_expectancy__pre_primary__male__years:
+        title: School life expectancy, pre-primary, male (years)
+        unit: ''
