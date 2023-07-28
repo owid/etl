@@ -1,10 +1,9 @@
 dataset:
-  title: Combined dataset of historical estimatates and projections of educational attainment 1820-2040 (Lee and Lee, 2015; Barro and Lee, 2015)
+  title: Projections of educational attainment 2015-2040 (Barro and Lee, 2015)
   description: &desc >-
       Barro and Lee (2015): Using the estimates on school enrollment and population structure, Lee and Lee (2016) have constructed projections of
       educational attainment for the population, disaggregated by gender and age group (15-24, 25-64, and 15-64) for 146 countries
       from 2015 to 2040 at five-year intervals.
-
 
       They first use the 2010 data on educational attainment by age group as benchmark figures to project the educational
       attainment of the population by age group for the next three decades. They then estimate the distribution of educational
@@ -12,10 +11,6 @@ dataset:
       the estimates to construct the distribution of educational attainment for the older population groups. For the population
       structure, they use existing U.N. projections. For the detailed explanation of the estimation method, see Barro and
       Lee (2015, chapter 3). Data can be accessed here: https://barrolee.github.io/BarroLeeDataSet/OUPProj.html
-
-
-      Lee and Lee (2016): Datasets on estimated school enrollment ratios from 1820 to 2010 and estimated educational attainment for the total,
-      female and male populations from 1870 to 2010. The estimates are available in five-year intervals for 111 countries. Data can be accessed here: https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html
 
 
       Datasets were last updated in 2021 September.
