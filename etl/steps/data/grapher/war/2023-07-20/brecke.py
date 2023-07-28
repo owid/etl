@@ -14,9 +14,18 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load garden dataset and read its main table.
-    ds_garden = cast(Dataset, paths.load_dependency("food_expenditure"))
-    tb = ds_garden["food_expenditure"]
+    # Load garden dataset.
+    ds_garden = cast(Dataset, paths.load_dependency("brecke"))
+
+    # Read table from garden dataset.
+    tb = ds_garden["brecke"]
+
+    #
+    # Process data.
+    #
+    # Rename index column `region` to `country`.
+    tb = tb.reset_index().rename(columns={"region": "country"})
+    tb = tb.set_index(["year", "country", "conflict_type"])
 
     #
     # Save outputs.
