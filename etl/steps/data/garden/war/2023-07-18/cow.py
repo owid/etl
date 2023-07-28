@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import json
 from typing import List, Set, cast
 
 import numpy as np
@@ -30,6 +31,10 @@ CONFLICT_TYPES_RENAME = {
     8: "non-state (in non-state territory)",
     9: "non-state (accross borders)",
 }
+# Mapping conflicts to regions for some intra-state conflicts
+## We map intrastate conflicts to only one region. We have region composites (ME & NA, Asia & Oceania) and we need to find the actual region.
+## We have done this manually, and is summarised in the dictionary below.
+path = "cow.intrastate.region_mapping_custom.json"
 
 
 def run(dest_dir: str) -> None:
@@ -76,10 +81,6 @@ def run(dest_dir: str) -> None:
         values_exp_wartype={1},
         check_unique_for_location=False,
     )
-    # Rename death-related metric columns
-    tb_inter = tb_inter.rename(columns={"batdeath": "number_deaths_ongoing_conflicts"})
-    # Assign conflict_type
-    tb_inter["conflict_type"] = "inter-state"
 
     # Intra-state
     log.info("war.cow.intra: read data")
@@ -92,10 +93,6 @@ def run(dest_dir: str) -> None:
         columns_deaths=["totalbdeaths"],
         values_exp_wartype={4, 5, 6, 7},
     )
-    # Rename death-related metric columns
-    tb_intra = tb_intra.rename(columns={"totalbdeaths": "number_deaths_ongoing_conflicts"})
-    # Assign conflict_type
-    tb_intra["conflict_type"] = "intra-state"
 
     # Check that there are no overlapping warnums between tables
     log.info("war.cow: check overlapping warnum in tables")
@@ -107,10 +104,10 @@ def run(dest_dir: str) -> None:
     tb_extra = make_table_extra(tb_extra)
     tb_non = make_table_nonstate(tb_non)
     tb_inter = make_table_inter(tb_inter)
-    # tb_intra = make_table_intra(tb_intra)
+    tb_intra = make_table_intra(tb_intra)
 
     # Combine data
-    tb = combine_types(
+    tb = combine_tables(
         tb_extra=tb_extra,
         tb_nonstate=tb_non,
         tb_inter=tb_inter,
@@ -127,11 +124,26 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def combine_types(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intra: Table) -> Table:
+def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intra: Table) -> Table:
     """Combine the tables from all four different conflict types.
 
     The original data comes in separate tables: extra-, non-, inter- and intra-state.
     """
+    # Get relevant columns
+    log.info("war.cow.extra: keep relevant columns")
+    COLUMNS_RELEVANT = [
+        "warnum",
+        "year_start",
+        "year_end",
+        "conflict_type",
+        "region",
+        "number_deaths_ongoing_conflicts",
+    ]
+    for tb in [tb_extra, tb_nonstate, tb_inter, tb_intra]:
+        tb = tb[COLUMNS_RELEVANT]
+
+    # Concatenate
+    log.info("war.cow: concatenate tables")
     tb = pd.concat(
         [
             tb_extra,
@@ -141,6 +153,19 @@ def combine_types(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intra
         ],
         ignore_index=True,
     )
+
+    # Add yearly observations (scale values)
+    log.info("war.cow: expand observations")
+    tb = expand_observations(tb, column_metrics=["number_deaths_ongoing_conflicts"])  # type: ignore
+
+    # Estimate metrics (do the aggregations)
+    log.info("war.cow: estimate metrics")
+    tb = estimate_metrics(tb)
+
+    # Rename regions
+    log.info("war.cow: rename regions")
+    tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
+    assert tb["region"].isna().sum() == 0, "Unmapped regions!"
 
     # TODO: Add values for conflict_type='all'
 
@@ -171,33 +196,11 @@ def make_table_extra(tb: Table) -> Table:
     log.info("war.cow.extra: Sanity checks")
     _sanity_checks_extra(tb)
 
-    log.info("war.cow.extra: Replace negative values where applicable")
+    log.info("war.cow.extra: replace negative values where applicable")
     tb = replace_negative_values_extra(tb)
 
     log.info("war.cow.extra: obtain total number of deaths")
     tb["number_deaths_ongoing_conflicts"] = tb["battle_deaths"] + tb["nonstate_deaths"]
-
-    log.info("war.cow.extra: keep relevant columns")
-    COLUMNS_RELEVANT = [
-        "warnum",
-        "year_start",
-        "year_end",
-        "conflict_type",
-        "region",
-        "number_deaths_ongoing_conflicts",
-    ]
-    tb = tb[COLUMNS_RELEVANT]
-
-    log.info("war.cow.extra: expand observations")
-    tb = expand_observations(tb, column_metrics=["number_deaths_ongoing_conflicts"])  # type: ignore
-
-    log.info("war.cow.extra: estimate metrics")
-    tb = estimate_metrics(tb)
-
-    # Rename regions
-    log.info("war.cow.extra: rename regions")
-    tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
-    assert tb["region"].isna().sum() == 0, "Unmapped regions!"
 
     return tb
 
@@ -250,30 +253,8 @@ def make_table_nonstate(tb: Table) -> Table:
     log.info("war.cow.non_state: sanity checks")
     _sanity_check_nonstate(tb)
 
-    log.info("war.cow.non_state: replace -9 for NaN")
+    log.info("war.cow.non_state: replace negative values where applicable")
     tb[["number_deaths_ongoing_conflicts"]] = tb[["number_deaths_ongoing_conflicts"]].replace(-9, np.nan)
-
-    log.info("war.cow.non_state: keep relevant columns")
-    COLUMNS_RELEVANT = [
-        "warnum",
-        "year_start",
-        "year_end",
-        "conflict_type",
-        "region",
-        "number_deaths_ongoing_conflicts",
-    ]
-    tb = tb[COLUMNS_RELEVANT]
-
-    log.info("war.cow.non_state: expand observations")
-    tb = expand_observations(tb, column_metrics=["number_deaths_ongoing_conflicts"])  # type: ignore
-
-    log.info("war.cow.non_state: estimate metrics")
-    tb = estimate_metrics(tb)
-
-    # Rename regions
-    log.info("war.cow.non_state: rename regions")
-    tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
-    assert tb["region"].isna().sum() == 0, "Unmapped regions!"
 
     return tb
 
@@ -299,6 +280,7 @@ def _sanity_check_nonstate(tb: Table) -> None:
 
 
 def make_table_inter(tb: Table) -> Table:
+    """Generate inter-state table."""
     # Rename death-related metric columns
     tb = tb.rename(columns={"batdeath": "number_deaths_ongoing_conflicts"})
     # Assign conflict type
@@ -307,33 +289,11 @@ def make_table_inter(tb: Table) -> Table:
     log.info("war.cow.inter: sanity checks")
     _sanity_checks_inter(tb)
 
-    log.info("war.cow.inter: -9 -> NaN")
+    log.info("war.cow.inter: replace negative values where applicable")
     tb[["number_deaths_ongoing_conflicts"]] = tb[["number_deaths_ongoing_conflicts"]].replace(-9, np.nan)
-
-    log.info("war.cow.inter: keep relevant columns")
-    COLUMNS_RELEVANT = [
-        "warnum",
-        "year_start",
-        "year_end",
-        "conflict_type",
-        "region",
-        "number_deaths_ongoing_conflicts",
-    ]
-    tb = tb[COLUMNS_RELEVANT]
-
-    log.info("war.cow.inter: expand observations")
-    tb = expand_observations(tb, column_metrics=["number_deaths_ongoing_conflicts"])  # type: ignore
 
     log.info("war.cow.inter: split region composites")
     tb = split_regions_composites(tb)
-
-    log.info("war.cow.inter: estimate metrics")
-    tb = estimate_metrics(tb)
-
-    # Rename regions
-    log.info("war.cow.non_state: rename regions")
-    tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
-    assert tb["region"].isna().sum() == 0, "Unmapped regions!"
 
     return tb
 
@@ -401,7 +361,74 @@ def split_regions_composites(tb: Table) -> Table:
 
 
 def make_table_intra(tb: Table) -> Table:
-    pass
+    """Generate intra-state table."""
+    # Rename death-related metric columns
+    tb = tb.rename(columns={"totalbdeaths": "number_deaths_ongoing_conflicts"})
+    # Assign conflict_type
+    tb["conflict_type"] = "intra-state"
+
+    log.info("war.cow.intra: sanity checks")
+    _sanity_checks_intra(tb)
+
+    log.info("war.cow.intra: replace negative values where applicable")
+    tb = replace_negative_values_intra(tb)
+
+    log.info("war.cow.intra: standardise region numbering")
+    tb = standardise_region_ids(tb)
+    return tb
+
+
+def _sanity_checks_intra(tb: Table) -> None:
+    assert tb.groupby(["warnum"]).size().max() == 1, "There should only be one instance for each (warnum, ccode, side)."
+    # A conflict only is of one type
+    assert tb.groupby("warnum")["conflict_type"].nunique().max() == 1, "More than one conflict type for some conflicts!"
+    # Check negative values in metric deaths
+    col = "number_deaths_ongoing_conflicts"
+    assert set(tb.loc[tb[col] < 0, col]) == {-9}, f"Negative values other than -9 found for {col}"
+    # Check year end
+    col = "year_end"
+    assert not (tb[col].isna().any()), "Unexpected NaN value for `year_end`!"
+    assert set(tb.loc[tb[col] < 0, col]) == {-7}, f"Negative values other than -7 found for {col}"
+
+
+def replace_negative_values_intra(tb: Table) -> Table:
+    """Replace negative values for missing value where applicable.
+
+    Some fields use negative values to encode missing values.
+    """
+    # Replace endyear1=-7 for 2007
+    tb.loc[tb["year_end"] == -7, "year_end"] = 2014
+    # Replace missing values for deaths
+    tb[["number_deaths_ongoing_conflicts"]] = tb[["number_deaths_ongoing_conflicts"]].replace(-9, np.nan)
+
+    return tb
+
+
+def standardise_region_ids(tb: Table) -> Table:
+    """Fix regions IDs.
+
+    By default, regions in intra state conflicts table use a different numbering. This function standardises this.
+
+    Also, this dataset uses composite regions, such as "Middle East and Northern Africa" or "Asia and Oceania". This function
+    replaces rows with these composites with individual valid regions. That is, assigns "Africa" to a conflict labeled with region
+    "Middle East and Northern Afrrica", if that's the actual region. This has been done manually, bu carefully assigning regions to
+    each conflict.
+    """
+    # Map to standard numbering
+    regions_mapping = {
+        1: 1,  # Americas
+        3: 2,  # Europe
+        4: 4,  # Africa
+    }
+    # Load custom mapping
+    path = "cow.intrastate.region_mapping_custom.json"
+    with open(path, "r") as f:
+        regions_mapping_default = json.load(f)
+    regions_mapping_default = {float(k): v for k, v in regions_mapping_default.items()}
+    # Apply custom & default mapping
+    tb["region"] = tb["warnum"].map(regions_mapping_default).fillna(tb["region"].map(regions_mapping))
+
+    return tb
 
 
 ########################################################################
@@ -493,6 +520,7 @@ def load_cow_table(
     # Dtypes
     for col in columns_deaths:
         tb[col] = tb[col].astype(str).str.replace(",", "").astype("Int64")
+    tb["warnum"] = tb["warnum"].astype(float).round(1)
 
     return tb
 
