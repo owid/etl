@@ -34,37 +34,619 @@ tables:
     variables:
       annual_statutory_teacher_salaries_in_public_institutions_in_usd__pre_primary__starting_salary:
         title: Annual statutory teacher salaries in public institutions in USD. Pre-Primary. Starting salary
+        description: |-
+          'Starting salaries refer to the average scheduled gross salary per year for a full-time teacher with the minimum
+          training necessary to be fully qualified at the beginning of the teaching career. Salaries are in equivalent USD
+          converted using PPPs for private consumption. Statutory salaries refer to scheduled salaries according to official
+          pay scales, while actual salaries refer to the average annual salary earned by a full-time teacher. The salaries
+          reported are gross (total sum paid by the employer) less the employer's contribution to social security and pension,
+          according to existing salary scales. Salaries are "before tax", i.e. before deductions for income tax. Teachers'
+          salaries are one component of teachers' total compensation. Other benefits, such as regional allowances for teaching
+          in remote areas, family allowances, reduced rates on public transport and tax allowances on the purchase of cultural
+          materials, may also form part of teachers' total remuneration. There are also large differences in taxation and
+          social-benefits systems in OECD countries. All this should be borne in mind when comparing statutory salaries across
+          countries. Data after 2009 is not comparable to data for 2009 and before due to changes in methodology. For more
+          information, consult the OECD''s Education at a Glance website: http://www.oecd.org/edu/eag.htm'
         unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      annual_statutory_teacher_salaries_in_public_institutions_in_usd__primary__starting_salary:
+        title: Annual statutory teacher salaries in public institutions in USD. Primary. Starting salary
+        description:
+        - 'Starting salaries refer to the average scheduled gross salary per year for a full-time teacher with the minimum
+          training necessary to be fully qualified at the beginning of the teaching career. Salaries are in equivalent USD
+          converted using PPPs for private consumption. Statutory salaries refer to scheduled salaries according to official
+          pay scales, while actual salaries refer to the average annual salary earned by a full-time teacher. The salaries
+          reported are gross (total sum paid by the employer) less the employer's contribution to social security and pension,
+          according to existing salary scales. Salaries are "before tax", i.e. before deductions for income tax. Teachers'
+          salaries are one component of teachers' total compensation. Other benefits, such as regional allowances for teaching
+          in remote areas, family allowances, reduced rates on public transport and tax allowances on the purchase of cultural
+          materials, may also form part of teachers' total remuneration. There are also large differences in taxation and
+          social-benefits systems in OECD countries. All this should be borne in mind when comparing statutory salaries across
+          countries. Data after 2009 is not comparable to data for 2009 and before due to changes in methodology. For more
+          information, consult the OECD''s Education at a Glance website: http://www.oecd.org/edu/eag.htm'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+        unit: ''
+      dhs__proportion_of_out_of_school__primary:
+        title: 'DHS: Proportion of out-of-school. Primary'
+        description:
+        - Proportion of out-of-school. Primary is the number of children in the official primary school age range who are
+          not attending primary or secondary education, expressed as a percentage of children of the official primary school
+          age range. By definition, children in the official primary-age range, who are attending pre-primary education, are
+          considered out-of-school. The sum of the net primary attendance rate and the proportion out of school do not add
+          to 100 percent because the net primary attendance rate does not count students who are in secondary.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      dhs__proportion_of_out_of_school__primary__female:
+        title: 'DHS: Proportion of out-of-school. Primary. Female'
+        description:
+        - Proportion of out-of-school. Primary. Female is the number of female children in the official primary school age
+          range who are not attending primary or secondary education, expressed as a percentage of female children of the
+          official primary school age range. By definition, children in the official primary-age range, who are attending
+          pre-primary education, are considered out-of-school. The sum of the net primary attendance rate and the proportion
+          out of school do not add to 100 percent because the net primary attendance rate does not count students who are
+          in secondary.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      dhs__proportion_of_out_of_school__primary__male:
+        title: 'DHS: Proportion of out-of-school. Primary. Male'
+        description:
+        - Proportion of out-of-school. Primary. Male is the number of male children in the official primary school age range
+          who are not attending primary or secondary education, expressed as a percentage of male children of the official
+          primary school age range. By definition, children in the official primary-age range, who are attending pre-primary
+          education, are considered out-of-school. The sum of the net primary attendance rate and the proportion out of school
+          do not add to 100 percent because the net primary attendance rate does not count students who are in secondary.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
       government_expenditure_on_pre_primary_education_as_pct_of_gdp__pct:
         title: Government expenditure on pre-primary education as % of GDP (%)
+        description: '''Total general (local, regional and central) government expenditure on pre-primary education (current,
+          capital, and transfers), expressed as a percentage of GDP. It includes expenditure funded by transfers from international
+          sources to government. Divide total government expenditure for a given level of education (ex. primary, secondary,
+          or all levels combined) by the GDP, and multiply by 100. For more information, consult the UNESCO Institute of Statistics
+          website: http://www.uis.unesco.org/Education/'''
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      government_expenditure_on_primary_education_as_pct_of_gdp__pct:
+        title: Government expenditure on primary education as % of GDP (%)
+        description:
+        - 'Total general (local, regional and central) government expenditure on primary education (current, capital, and
+          transfers), expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources
+          to government. Divide total government expenditure for a given level of education (ex. primary, secondary, or all
+          levels combined) by the GDP, and multiply by 100. For more information, consult the UNESCO Institute of Statistics
+          website: http://www.uis.unesco.org/Education/'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
         unit: ''
       gross_enrolment_ratio__pre_primary__both_sexes__pct:
         title: Gross enrolment ratio, pre-primary, both sexes (%)
+        description: Total enrollment in pre-primary education, regardless of age, expressed as a percentage of the total
+          population of official pre-primary education age. GER can exceed 100% due to the inclusion of over-aged and under-aged
+          students because of early or late school entrance and grade repetition.
         unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      gross_enrolment_ratio__primary__both_sexes__pct:
+        title: Gross enrolment ratio, primary, both sexes (%)
+        description:
+        - Total enrollment in primary education, regardless of age, expressed as a percentage of the population of official
+          primary education age. GER can exceed 100% due to the inclusion of over-aged and under-aged students because of
+          early or late school entrance and grade repetition.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
       official_entrance_age_to_pre_primary_education__years:
         title: Official entrance age to pre-primary education (years)
+        description: Age at which students would enter pre-primary education.
         unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      pasec__average_performance_gap_between_2nd_grade_students_in_private_and_public_education__language:
+        title: 'PASEC: Average performance gap between 2nd grade students in private and public education. Language'
+        description:
+        - 'Average difference between pupil scores in private and public educational institutions controlling for the territorial
+          planning index, which is calculated based on the availability of the following infrastructure and services: a paved
+          road; electricity; a lower secondary school; an upper secondary school; a hospital; a medical or healthcare center;
+          a police station; a bank; a savings bank; a post office; and a cultural center or library. When public and private
+          schools are located in areas with similar infrastructure and service levels as measured by the territorial planning
+          index, the gaps between pupils' scores tend to be smaller. See footnotes for the statistical significance of each
+          data point. Data were published for this indicator beginning with PASEC 2014. Consult the PASEC website for more
+          detailed information: http://www.pasec.confemen.org/'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+        unit: ''
+      pasec__average_performance_gap_between_2nd_grade_students_in_private_and_public_education__mathematics:
+        title: 'PASEC: Average performance gap between 2nd grade students in private and public education. Mathematics'
+        description:
+        - 'Average difference between pupil scores in private and public educational institutions controlling for the territorial
+          planning index, which is calculated based on the availability of the following infrastructure and services: a paved
+          road; electricity; a lower secondary school; an upper secondary school; a hospital; a medical or healthcare center;
+          a police station; a bank; a savings bank; a post office; and a cultural center or library. When public and private
+          schools are located in areas with similar infrastructure and service levels as measured by the territorial planning
+          index, the gaps between pupils' scores tend to be smaller. See footnotes for the statistical significance of each
+          data point. Data were published for this indicator beginning with PASEC 2014. Consult the PASEC website for more
+          detailed information: http://www.pasec.confemen.org/'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+        unit: ''
+      percentage_of_enrolment_in_early_childhood_education_programmes_in_private_institutions__pct:
+        title: Percentage of enrolment in early childhood education programmes in private institutions (%)
+        description:
+        - Total number of students in early childhood education programmes enrolled in institutions that are not operated
+          by a public authority but controlled and managed, whether for profit or not, by a private body (e.g., non-governmental
+          organisation, religious body, special interest group, foundation or business enterprise), expressed as a percentage
+          of total number of students enrolled in early childhood education programmes. Within ISCED 0, early childhood educational
+          development programmes are targeted at children aged 0 to 2 years; and pre-primary education programmes are targeted
+          at children aged 3 years until the age to start ISCED 1.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      percentage_of_enrolment_in_early_childhood_educational_development_programmes_in_private_institutions__pct:
+        title: Percentage of enrolment in early childhood educational development programmes in private institutions (%)
+        description:
+        - Total number of students in early childhood educational development programmes enrolled in institutions that are
+          not operated by a public authority but controlled and managed, whether for profit or not, by a private body (e.g.,
+          non-governmental organisation, religious body, special interest group, foundation or business enterprise), expressed
+          as a percentage of total number of students enrolled in early childhood educational development programmes. Within
+          ISCED 0, early childhood educational development programmes are targeted at children aged 0 to 2 years; and pre-primary
+          education programmes are targeted at children aged 3 years until the age to start ISCED 1.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      percentage_of_enrolment_in_primary_education_in_private_institutions__pct:
+        title: Percentage of enrolment in primary education in private institutions (%)
+        description:
+        - Total number of students in primary education enrolled in institutions that are not operated by a public authority
+          but controlled and managed, whether for profit or not, by a private body (e.g., non-governmental organisation, religious
+          body, special interest group, foundation or business enterprise), expressed as a percentage of total number of students
+          enrolled in primary education.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
       percentage_of_teachers_in_pre_primary_education_who_are_qualified__both_sexes__pct:
         title: Percentage of teachers in pre-primary education who are qualified, both sexes (%)
+        description: Number of teachers in a given level of education who are qualified is expressed as a percentage of all
+          teachers in that level of education.  A qualified teacher is one who has the minimum academic qualifications necessary
+          to teach at a specific level of education in a given country. This is usually related to the subject(s) they teach.
+          The percentage of qualified teachers should not exceed 100%. When feasible, the number of part-time teachers should
+          be converted to 'full-time equivalent' numbers of teachers; a double-shift teacher should be counted twice, etc.
+          Ideally, all staff involved in direct classroom-teaching roles should be included in the calculations. High values
+          indicate that students are being taught by teachers who are academically well qualified in the subjects they teach.
         unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
       percentage_of_teachers_in_pre_primary_education_who_are_trained__both_sexes__pct:
         title: Percentage of teachers in pre-primary education who are trained, both sexes (%)
+        description: Number of teachers who have received the minimum organized teacher training (pre-service or in-service)
+          required for teaching at the pre-primary level in the given country, expressed as a percentage of the total number
+          of teachers at the pre-primary level.
         unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      percentage_of_teachers_in_primary_education_who_are_qualified__both_sexes__pct:
+        title: Percentage of teachers in primary education who are qualified, both sexes (%)
+        description:
+        - Number of teachers in a given level of education who are qualified is expressed as a percentage of all teachers
+          in that level of education.  A qualified teacher is one who has the minimum academic qualifications necessary to
+          teach at a specific level of education in a given country. This is usually related to the subject(s) they teach.
+          The percentage of qualified teachers should not exceed 100%. When feasible, the number of part-time teachers should
+          be converted to 'full-time equivalent' numbers of teachers; a double-shift teacher should be counted twice, etc.
+          Ideally, all staff involved in direct classroom-teaching roles should be included in the calculations. High values
+          indicate that students are being taught by teachers who are academically well qualified in the subjects they teach.
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+        unit: ''
+      percentage_of_teachers_in_primary_education_who_are_trained__both_sexes__pct:
+        title: Percentage of teachers in primary education who are trained, both sexes (%)
+        description:
+        - Number of teachers who have received the minimum organized teacher training (pre-service or in-service) required
+          for teaching at the primary level in the given country, expressed as a percentage of the total number of teachers
+          at the primary level.
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+        unit: ''
+      primary_completion_rate__both_sexes__pct:
+        title: Primary completion rate, both sexes (%)
+        description:
+        - Total number of new entrants in the last grade of primary education, regardless of age, expressed as percentage
+          of the total population of the theoretical entrance age to the last grade of primary. This indicator is also known
+          as "gross intake rate to the last grade of primary education." The ratio can exceed 100% due to over-aged and under-aged
+          children who enter primary school late/early and/or repeat grades.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      primary_completion_rate__female__pct:
+        title: Primary completion rate, female (%)
+        description:
+        - Total number of new female entrants in the last grade of primary education, regardless of age, expressed as percentage
+          of the total female population of the theoretical entrance age to the last grade of primary. This indicator is also
+          known as "gross intake rate to the last grade of primary education." The ratio can exceed 100% due to over-aged
+          and under-aged children who enter primary school late/early and/or repeat grades.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      primary_completion_rate__gender_parity_index__gpi:
+        title: Primary completion rate, gender parity index (GPI)
+        description:
+        - Ratio of the female primary completion rate to the male primary completion rate. It is calculated by dividing the
+          female value for the indicator by the male value for the indicator. A GPI equal to 1 indicates parity between females
+          and males. In general, a value less than 1 indicates disparity in favor of males and a value greater than 1 indicates
+          disparity in favor of females. Primary completion rate is also referred to as "gross intake ratio to the last grade
+          of primary education."
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      primary_completion_rate__male__pct:
+        title: Primary completion rate, male (%)
+        description:
+        - Total number of new male entrants in the last grade of primary education, regardless of age, expressed as percentage
+          of the total male population of the theoretical entrance age to the last grade of primary. This indicator is also
+          known as "gross intake rate to the last grade of primary education." The ratio can exceed 100% due to over-aged
+          and under-aged children who enter primary school late/early and/or repeat grades.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
       pupil_qualified_teacher_ratio_in_pre_primary_education__headcount_basis:
         title: Pupil/qualified teacher ratio in pre-primary education (headcount basis)
+        description: Average number of pupils per qualified teacher at a given level of education, based on headcounts of
+          both pupils and teachers. Divide the total number of pupils enrolled at the specified level of education by the
+          number of qualified teachers at the same level. A qualified teacher is one who has the minimum academic qualifications
+          necessary to teach at a specific level of education in a given country. This is usually related to the subject(s)
+          they teach. In computing and interpreting this indicator, one should take into account the existence of part-time
+          teaching, school-shifts, multi-grade classes and other practices that may affect the precision and meaningfulness
+          of pupil-teacher ratios. When feasible, the number of part-time teachers is converted to 'full-time equivalent'
+          teachers; a double-shift teacher is counted twice, etc. Teachers are defined as persons whose professional activity
+          involves the transmitting of knowledge, attitudes and skills that are stipulated in a formal curriculum programme
+          to students enrolled in a formal educational institution.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      pupil_qualified_teacher_ratio_in_primary_education__headcount_basis:
+        title: Pupil/qualified teacher ratio in primary education (headcount basis)
+        description:
+        - Average number of pupils per qualified teacher at a given level of education, based on headcounts of both pupils
+          and teachers. Divide the total number of pupils enrolled at the specified level of education by the number of qualified
+          teachers at the same level. A qualified teacher is one who has the minimum academic qualifications necessary to
+          teach at a specific level of education in a given country. This is usually related to the subject(s) they teach.
+          In computing and interpreting this indicator, one should take into account the existence of part-time teaching,
+          school-shifts, multi-grade classes and other practices that may affect the precision and meaningfulness of pupil-teacher
+          ratios. When feasible, the number of part-time teachers is converted to 'full-time equivalent' teachers; a double-shift
+          teacher is counted twice, etc. Teachers are defined as persons whose professional activity involves the transmitting
+          of knowledge, attitudes and skills that are stipulated in a formal curriculum programme to students enrolled in
+          a formal educational institution.
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
         unit: ''
       pupil_trained_teacher_ratio_in_pre_primary_education__headcount_basis:
         title: Pupil/trained teacher ratio in pre-primary education (headcount basis)
+        description: Average number of pupils per trained teacher at a given level of education, based on headcounts of both
+          pupils and teachers. Divide the total number of pupils enrolled at the specified level of education by the number
+          of trained teachers at the same level. A trained teacher is defined as a teacher who has fulfilled at least the
+          minimum organized teacher-training requirements (pre-service or in-service) to teach a specific level of education
+          according to the relevant national policy or law. These requirements usually include pedagogical knowledge (broad
+          principles and strategies of classroom management and organization that transcend the subject matter being taught
+          - typically approaches, methods and techniques of teaching), and professional knowledge (knowledge of statutory
+          instruments and other legal frameworks that govern the teaching profession). Some programmes may also cover content
+          knowledge (knowledge of the curriculum and the subject matter to be taught and the use of relevant materials). In
+          computing and interpreting this indicator, one should take into account the existence of part-time teaching, school-shifts,
+          multi-grade classes and other practices that may affect the precision and meaningfulness of pupil-teacher ratios.
+          When feasible, the number of part-time teachers is converted to 'full-time equivalent' teachers; a double-shift
+          teacher is counted twice, etc. Teachers are defined as persons whose professional activity involves the transmitting
+          of knowledge, attitudes and skills that are stipulated in a formal curriculum programme to students enrolled in
+          a formal educational institution.
         unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      pupil_trained_teacher_ratio_in_primary_education__headcount_basis:
+        title: Pupil/trained teacher ratio in primary education (headcount basis)
+        description:
+        - Average number of pupils per trained teacher at a given level of education, based on headcounts of both pupils and
+          teachers. Divide the total number of pupils enrolled at the specified level of education by the number of trained
+          teachers at the same level. A trained teacher is defined as a teacher who has fulfilled at least the minimum organized
+          teacher-training requirements (pre-service or in-service) to teach a specific level of education according to the
+          relevant national policy or law. These requirements usually include pedagogical knowledge (broad principles and
+          strategies of classroom management and organization that transcend the subject matter being taught - typically approaches,
+          methods and techniques of teaching), and professional knowledge (knowledge of statutory instruments and other legal
+          frameworks that govern the teaching profession). Some programmes may also cover content knowledge (knowledge of
+          the curriculum and the subject matter to be taught and the use of relevant materials). In computing and interpreting
+          this indicator, one should take into account the existence of part-time teaching, school-shifts, multi-grade classes
+          and other practices that may affect the precision and meaningfulness of pupil-teacher ratios. When feasible, the
+          number of part-time teachers is converted to 'full-time equivalent' teachers; a double-shift teacher is counted
+          twice, etc. Teachers are defined as persons whose professional activity involves the transmitting of knowledge,
+          attitudes and skills that are stipulated in a formal curriculum programme to students enrolled in a formal educational
+          institution.
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+        unit: ''
+      rate_of_out_of_school_children_of_primary_school_age__both_sexes__pct:
+        title: Rate of out-of-school children of primary school age, both sexes (%)
+        description:
+        - Number of children of official primary school age who are not enrolled in primary or secondary school, expressed
+          as a percentage of the population of official primary school age. Children enrolled in pre-primary education are
+          excluded and considered out of school.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      rate_of_out_of_school_children_of_primary_school_age__female__pct:
+        title: Rate of out-of-school children of primary school age, female (%)
+        description:
+        - Number of females of official primary school age who are not enrolled in primary or secondary school, expressed
+          as a percentage of the female population of official primary school age. Children enrolled in pre-primary education
+          are excluded and considered out of school.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      rate_of_out_of_school_children_of_primary_school_age__male__pct:
+        title: Rate of out-of-school children of primary school age, male (%)
+        description:
+        - Number of males of official primary school age who are not enrolled in primary or secondary school, expressed as
+          a percentage of the male population of official primary school age. Children enrolled in pre-primary education are
+          excluded and considered out of school.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
       school_life_expectancy__pre_primary__both_sexes__years:
         title: School life expectancy, pre-primary, both sexes (years)
+        description: Number of years a person of school entrance age can expect to spend within the specified level of education.
+          For a child of a certain age a, the school life expectancy is calculated as the sum of the age specific enrolment
+          rates for the levels of education specified. The part of the enrolment that is not distributed by age is divided
+          by the school-age population for the level of education they are enrolled in, and multiplied by the duration of
+          that level of education. The result is then added to the sum of the age-specific enrolment rates. A relatively high
+          SLE indicates greater probability for children to spend more years in education and higher overall retention within
+          the education system. It must be noted that the expected number of years does not necessarily coincide with the
+          expected number of grades of education completed, because of repetition. Since school life expectancy is an average
+          based on participation in different levels of education, the expected number of years of schooling may be pulled
+          down by the magnitude of children who never go to school. Those children who are in school may benefit from many
+          more years of education than the average.
         unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
       school_life_expectancy__pre_primary__female__years:
         title: School life expectancy, pre-primary, female (years)
+        description: Number of years a person of school entrance age can expect to spend within the specified level of education.
+          For a child of a certain age a, the school life expectancy is calculated as the sum of the age specific enrolment
+          rates for the levels of education specified. The part of the enrolment that is not distributed by age is divided
+          by the school-age population for the level of education they are enrolled in, and multiplied by the duration of
+          that level of education. The result is then added to the sum of the age-specific enrolment rates. A relatively high
+          SLE indicates greater probability for children to spend more years in education and higher overall retention within
+          the education system. It must be noted that the expected number of years does not necessarily coincide with the
+          expected number of grades of education completed, because of repetition. Since school life expectancy is an average
+          based on participation in different levels of education, the expected number of years of schooling may be pulled
+          down by the magnitude of children who never go to school. Those children who are in school may benefit from many
+          more years of education than the average.
         unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
       school_life_expectancy__pre_primary__gender_parity_index__gpi:
         title: School life expectancy, pre-primary, gender parity index (GPI)
+        description: Ratio of female school life expectancy to the male school life expectancy. It is calculated by dividing
+          the female value for the indicator by the male value for the indicator. A GPI equal to 1 indicates parity between
+          females and males. In general, a value less than 1 indicates disparity in favor of males and a value greater than
+          1 indicates disparity in favor of females.
         unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
       school_life_expectancy__pre_primary__male__years:
         title: School life expectancy, pre-primary, male (years)
+        description: Number of years a person of school entrance age can expect to spend within the specified level of education.
+          For a child of a certain age a, the school life expectancy is calculated as the sum of the age specific enrolment
+          rates for the levels of education specified. The part of the enrolment that is not distributed by age is divided
+          by the school-age population for the level of education they are enrolled in, and multiplied by the duration of
+          that level of education. The result is then added to the sum of the age-specific enrolment rates. A relatively high
+          SLE indicates greater probability for children to spend more years in education and higher overall retention within
+          the education system. It must be noted that the expected number of years does not necessarily coincide with the
+          expected number of grades of education completed, because of repetition. Since school life expectancy is an average
+          based on participation in different levels of education, the expected number of years of schooling may be pulled
+          down by the magnitude of children who never go to school. Those children who are in school may benefit from many
+          more years of education than the average.
         unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      school_life_expectancy__primary__both_sexes__years:
+        title: School life expectancy, primary, both sexes (years)
+        description:
+        - Number of years a person of school entrance age can expect to spend within the specified level of education. For
+          a child of a certain age a, the school life expectancy is calculated as the sum of the age specific enrolment rates
+          for the levels of education specified. The part of the enrolment that is not distributed by age is divided by the
+          school-age population for the level of education they are enrolled in, and multiplied by the duration of that level
+          of education. The result is then added to the sum of the age-specific enrolment rates. A relatively high SLE indicates
+          greater probability for children to spend more years in education and higher overall retention within the education
+          system. It must be noted that the expected number of years does not necessarily coincide with the expected number
+          of grades of education completed, because of repetition. Since school life expectancy is an average based on participation
+          in different levels of education, the expected number of years of schooling may be pulled down by the magnitude
+          of children who never go to school. Those children who are in school may benefit from many more years of education
+          than the average.
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+        unit: ''
+      school_life_expectancy__primary__female__years:
+        title: School life expectancy, primary, female (years)
+        description:
+        - Number of years a person of school entrance age can expect to spend within the specified level of education. For
+          a child of a certain age a, the school life expectancy is calculated as the sum of the age specific enrolment rates
+          for the levels of education specified. The part of the enrolment that is not distributed by age is divided by the
+          school-age population for the level of education they are enrolled in, and multiplied by the duration of that level
+          of education. The result is then added to the sum of the age-specific enrolment rates. A relatively high SLE indicates
+          greater probability for children to spend more years in education and higher overall retention within the education
+          system. It must be noted that the expected number of years does not necessarily coincide with the expected number
+          of grades of education completed, because of repetition. Since school life expectancy is an average based on participation
+          in different levels of education, the expected number of years of schooling may be pulled down by the magnitude
+          of children who never go to school. Those children who are in school may benefit from many more years of education
+          than the average.
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+        unit: ''
+      school_life_expectancy__primary__gender_parity_index__gpi:
+        title: School life expectancy, primary, gender parity index (GPI)
+        description:
+        - Ratio of female school life expectancy to the male school life expectancy. It is calculated by dividing the female
+          value for the indicator by the male value for the indicator. A GPI equal to 1 indicates parity between females and
+          males. In general, a value less than 1 indicates disparity in favor of males and a value greater than 1 indicates
+          disparity in favor of females.
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+        unit: ''
+      school_life_expectancy__primary__male__years:
+        title: School life expectancy, primary, male (years)
+        description:
+        - Number of years a person of school entrance age can expect to spend within the specified level of education. For
+          a child of a certain age a, the school life expectancy is calculated as the sum of the age specific enrolment rates
+          for the levels of education specified. The part of the enrolment that is not distributed by age is divided by the
+          school-age population for the level of education they are enrolled in, and multiplied by the duration of that level
+          of education. The result is then added to the sum of the age-specific enrolment rates. A relatively high SLE indicates
+          greater probability for children to spend more years in education and higher overall retention within the education
+          system. It must be noted that the expected number of years does not necessarily coincide with the expected number
+          of grades of education completed, because of repetition. Since school life expectancy is an average based on participation
+          in different levels of education, the expected number of years of schooling may be pulled down by the magnitude
+          of children who never go to school. Those children who are in school may benefit from many more years of education
+          than the average.
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+        unit: ''
+      total_net_enrolment_rate__primary__both_sexes__pct:
+        title: Total net enrolment rate, primary, both sexes (%)
+        description:
+        - Total number of students of the official age group for primary education who are enrolled in any level of education,
+          expressed as a percentage of the corresponding population. Divide the total number of students in the official school
+          age range for primary education who are enrolled in any level of education by the population of the same age group
+          and multiply the result by 100. The difference between the total NER and the adjusted NER provides a measure of
+          the proportion of children in the official relevant school age group who are enrolled in levels of education below
+          the one intended for their age. The difference between the total NER and the adjusted NER for primary education
+          is due to enrolment in pre-primary education. The total NER should be based on total enrolment of the official relevant
+          school age group in any level of education for all types of schools and education institutions, including public,
+          private and all other institutions that provide organized educational programmes.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      total_net_enrolment_rate__primary__female__pct:
+        title: Total net enrolment rate, primary, female (%)
+        description:
+        - Total number of female students of the official age group for primary education who are enrolled in any level of
+          education, expressed as a percentage of the corresponding female population. Divide the total number of female students
+          in the official school age range for primary education who are enrolled in any level of education by the female
+          population of the same age group and multiply the result by 100. The difference between the total NER and the adjusted
+          NER provides a measure of the proportion of children in the official relevant school age group who are enrolled
+          in levels of education below the one intended for their age. The difference between the total NER and the adjusted
+          NER for primary education is due to enrolment in pre-primary education. The total NER should be based on total enrolment
+          of the official relevant school age group in any level of education for all types of schools and education institutions,
+          including public, private and all other institutions that provide organized educational programmes.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      total_net_enrolment_rate__primary__gender_parity_index__gpi:
+        title: Total net enrolment rate, primary, gender parity index (GPI)
+        description:
+        - Ratio of female total net enrolment rate for primary to the male total net enrolment rate for primary. It is calculated
+          by dividing the female value for the indicator by the male value for the indicator. A GPI equal to 1 indicates parity
+          between females and males. In general, a value less than 1 indicates disparity in favor of males and a value greater
+          than 1 indicates disparity in favor of females.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      total_net_enrolment_rate__primary__male__pct:
+        title: Total net enrolment rate, primary, male (%)
+        description:
+        - Total number of male students of the official age group for primary education who are enrolled in any level of education,
+          expressed as a percentage of the corresponding male population. Divide the total number of male students in the
+          official school age range for primary education who are enrolled in any level of education by the male population
+          of the same age group and multiply the result by 100. The difference between the total NER and the adjusted NER
+          provides a measure of the proportion of children in the official relevant school age group who are enrolled in levels
+          of education below the one intended for their age. The difference between the total NER and the adjusted NER for
+          primary education is due to enrolment in pre-primary education. The total NER should be based on total enrolment
+          of the official relevant school age group in any level of education for all types of schools and education institutions,
+          including public, private and all other institutions that provide organized educational programmes.
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      uis__rate_of_out_of_school_children_of_primary_school_age__both_sexes__household_survey_data__pct:
+        title: 'UIS: Rate of out-of-school children of primary school age, both sexes (household survey data) (%)'
+        description:
+        - 'Number of children of official primary school age who did not attend primary or secondary school at any time during
+          the reference academic year, expressed as a percentage of the number of official primary school age children in
+          the household survey sample. Children attending pre-primary or non-formal education are considered out of school.
+          The UNESCO Institute for Statistics (UIS) releases estimates of out-of-school children calculated from both administrative
+          and household survey sources (Demographic and Health Surveys and Multiple Indicator Cluster Surveys). Administrative
+          records and household surveys are two data sources which differ in fundamental ways: who collects the data, as well
+          as how, when and for what purpose. As a result, the out-of school children estimates calculated from one data source
+          may not match those based on other data sources. For more information, consult the UIS website: http://www.uis.unesco.org/Education/'
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      uis__rate_of_out_of_school_children_of_primary_school_age__female__household_survey_data__pct:
+        title: 'UIS: Rate of out-of-school children of primary school age, female (household survey data) (%)'
+        description:
+        - 'Number of children of official primary school age who did not attend primary or secondary school at any time during
+          the reference academic year, expressed as a percentage of the number of official primary school age children in
+          the household survey sample. Children attending pre-primary or non-formal education are considered out of school.
+          The UNESCO Institute for Statistics (UIS) releases estimates of out-of-school children calculated from both administrative
+          and household survey sources (Demographic and Health Surveys and Multiple Indicator Cluster Surveys). Administrative
+          records and household surveys are two data sources which differ in fundamental ways: who collects the data, as well
+          as how, when and for what purpose. As a result, the out-of school children estimates calculated from one data source
+          may not match those based on other data sources. For more information, consult the UIS website: http://www.uis.unesco.org/Education/'
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      uis__rate_of_out_of_school_children_of_primary_school_age__male__household_survey_data__pct:
+        title: 'UIS: Rate of out-of-school children of primary school age, male (household survey data) (%)'
+        description:
+        - 'Number of children of official primary school age who did not attend primary or secondary school at any time during
+          the reference academic year, expressed as a percentage of the number of official primary school age children in
+          the household survey sample. Children attending pre-primary or non-formal education are considered out of school.
+          The UNESCO Institute for Statistics (UIS) releases estimates of out-of-school children calculated from both administrative
+          and household survey sources (Demographic and Health Surveys and Multiple Indicator Cluster Surveys). Administrative
+          records and household surveys are two data sources which differ in fundamental ways: who collects the data, as well
+          as how, when and for what purpose. As a result, the out-of school children estimates calculated from one data source
+          may not match those based on other data sources. For more information, consult the UIS website: http://www.uis.unesco.org/Education/'
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0

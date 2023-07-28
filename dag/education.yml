@@ -5,6 +5,7 @@ steps:
 
   data://garden/wb/2023-07-10/education_pre_primary:
   - data://meadow/wb/2023-07-10/education
+  - snapshot://wb/2023-07-10/education.zip
   - data://garden/regions/2023-01-01/regions
   - data://garden/wb/2023-04-30/income_groups
   - data://garden/education/2023-07-17/education_lee_lee
