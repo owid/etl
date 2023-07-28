@@ -157,8 +157,8 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
     var_name_dict = {
         "Deaths - Share of the population": {
             "title": f"Share of total deaths that are from {cause.lower()}"
-            + (f", attributed to {rei.lower()}" if rei is not None else "")
-            + f" in {sex.lower()} aged {age.lower()}",
+            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + f", in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
@@ -166,8 +166,8 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "DALYs (Disability-Adjusted Life Years) - Share of the population": {
             "title": f"Share of total DALYs that are from {cause.lower()}"
-            + (f", attributed to {rei.lower()}" if rei is not None else "")
-            + f" in {sex.lower()} aged {age.lower()}",
+            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + f", in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
@@ -175,8 +175,8 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "Deaths - Rate": {
             "title": f"Deaths that are from {cause.lower()}"
-            + (f", attributed to {rei.lower()}" if rei is not None else "")
-            + f" per 100,000 people in {sex.lower()} aged {age.lower()}",
+            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + f" per 100,000 people, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "deaths per 100,000 people",
             "short_unit": "",
@@ -184,8 +184,8 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "DALYs (Disability-Adjusted Life Years) - Rate": {
             "title": f"DALYs from {cause.lower()}"
-            + (f", attributed to {rei.lower()}" if rei is not None else "")
-            + f" per 100,000 people in {sex.lower()} aged {age.lower()}",
+            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + f" per 100,000 people in, {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "DALYs per 100,000 people",
             "short_unit": "",
@@ -193,8 +193,8 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "Deaths - Percent": {
             "title": f"Share of total deaths that are from {cause.lower()}"
-            + (f", attributed to {rei.lower()}" if rei is not None else "")
-            + f" in {sex.lower()} aged {age.lower()}",
+            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + f", in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
@@ -202,8 +202,8 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "DALYs (Disability-Adjusted Life Years) - Percent": {
             "title": f"Share of total DALYs that are from {cause.lower()}"
-            + (f", attributed to {rei.lower()}" if rei is not None else "")
-            + f" in {sex.lower()} aged {age.lower()}",
+            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + f", in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
@@ -211,8 +211,8 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "Deaths - Number": {
             "title": f"Deaths that are from {cause.lower()}"
-            + (f", attributed to {rei.lower()}" if rei is not None else "")
-            + f" in {sex.lower()} aged {age.lower()}",
+            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + f", in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "deaths",
             "short_unit": "",
@@ -220,8 +220,8 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "DALYs (Disability-Adjusted Life Years) - Number": {
             "title": f"DALYs that are from {cause.lower()}"
-            + (f", attributed to {rei.lower()}" if rei is not None else "")
-            + f" in {sex.lower()} aged {age.lower()}",
+            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + f", in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "DALYs",
             "short_unit": "",
