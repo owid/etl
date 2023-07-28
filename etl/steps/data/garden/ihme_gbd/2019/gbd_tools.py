@@ -153,7 +153,7 @@ def add_share_of_population(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str, rei: str = None):
+def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str, rei: Any = None):
     var_name_dict = {
         "Deaths - Share of the population": {
             "title": f"Share of total deaths that are from {cause.lower()}"
