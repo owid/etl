@@ -24,10 +24,17 @@ def run(dest_dir: str) -> None:
     # Load snapshots
     snap = cast(Snapshot, paths.load_dependency("ai_adoption.csv"))
     df = pd.read_csv(snap.path)
+    df["% of Respondents"] *= 100
 
     df.rename(columns={"Geographic Area": "country"}, inplace=True)
+    df["country"] = df["country"].replace(
+        {
+            "Developing Markets (incl. India, Latin America, MENA)": "Developing markets",
+            "Greater China (incl. Hong Kong, Taiwan) China": "Greater China",
+        }
+    )
 
-    tb = Table(df, short_name="ai_adoption", underscore=True)
+    tb = Table(df, short_name=paths.short_name, underscore=True)
     #
     # Save outputs.
     #

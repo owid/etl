@@ -11,8 +11,9 @@ publish = 'etl.publish:publish_cli'
 prune = 'etl.prune:prune_cli'
 harmonize = 'etl.harmonize:harmonize'
 backport = 'backport.backport:backport_cli'
-backport-migrate = 'backport.migrate.migrate:cli'
 bulk_backport = 'backport.bulk_backport:bulk_backport'
+backport-migrate = 'backport.migrate.migrate:cli'
+backport-fasttrack = 'backport.fasttrack_backport:cli'
 backport-datasync = 'backport.datasync.datasync:cli'
 walkthrough = 'walkthrough.cli:cli'
 fasttrack = 'fasttrack.cli:cli'
@@ -71,6 +72,7 @@ streamlit = "^1.22.0"
 fsspec = "2022.11.0"
 openai = "^0.27.7"
 pdfplumber = "^0.9.0"
+wbgapi = "^1.0.12"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"
@@ -85,17 +87,20 @@ jupytext = "^1.14.6"
 jupyter_nbextensions_configurator = ">=0.4.1"
 plotly = ">=5.7.0"
 cookiecutter = ">=2.1.1"
-isort = ">=5.10.1"
-pyright = "1.1.288"
+isort = ">=5.12.0"
 types-PyYAML = ">=6.0.12"
 hydra-core = ">=1.3.0"
 mkdocs-material = "<9.0.0"
 pywebio = ">=1.8.2"
 black = {version = "22.3.0", extras = ["jupyter"]}
 boto3-stubs = { extras = ["s3"], version = ">=1.21.16" }
-# unpinning pandas-stubs would introduce tons of type errors
-pandas-stubs = "1.2.0.62"
 notebook = {version = "^7.0.0a1", allow-prereleases = true}
+gspread = "^5.10.0"
+# unpinning those would introduce tons of type errors
+pyright = "1.1.288"
+pandas-stubs = "1.2.0.62"
+dataclasses-json = "0.5.7"
+
 
 [tool.black]
 exclude = ".ipynb_checkpoints|walkthrough/.*_cookiecutter|.*playground.*.ipynb"

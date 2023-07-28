@@ -36,20 +36,28 @@ def run(dest_dir: str) -> None:
     df = df.drop("date", axis=1)
 
     # Create a pivot table for each demographic group
-    pivot_df = df.pivot(index=[df.columns[0], "days_since_2021"], columns="group", values="value").reset_index()
+    pivot_df = df.pivot(
+        index=["group", "days_since_2021"],
+        columns="which_one__if_any__of_the_following_statements_do_you_most_agree_with",
+        values="value",
+    ).reset_index()
     pivot_df = pivot_df.rename_axis(None, axis=1)
-
-    pivot_df.rename(columns={pivot_df.columns[0]: "question"}, inplace=True)
+    rename_entries = {
+        "18-29": "18-29 years",
+        "2-year": "2-year post-secondary education",
+        "30-44": "30-44 years",
+        "4-year": "4-year post-secondary education",
+        "45-64": "45-64 years",
+        "65+": "65+ years",
+        "High school graduate": "High school graduates",
+        "No HS": "No high school education",
+        "Post-grad": "Post-graduate education",
+    }
+    pivot_df["group"] = pivot_df["group"].replace(rename_entries)
 
     tb = Table(pivot_df, short_name="yougov_robots", underscore=True)
 
-    for column in tb.columns:
-        if column.startswith("_") and column not in ["_2_year", "_4_year"]:
-            new_column = "answers_age_" + column[1:]
-            tb.rename(columns={column: new_column}, inplace=True)
-        elif column == "_2_year" or column == "_4_year":
-            new_column = "education_" + column[1:]
-            tb.rename(columns={column: new_column}, inplace=True)
+    tb.set_index(["group", "days_since_2021"], inplace=True)
 
     #
     # Save outputs.

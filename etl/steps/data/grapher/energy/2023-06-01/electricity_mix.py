@@ -34,6 +34,9 @@ def run(dest_dir: str) -> None:
         tb_garden[new_column].metadata = deepcopy(tb_garden[column].metadata)
         tb_garden[new_column].metadata.title += " (zero filled)"
 
+    # Set an appropriate index and sort conveniently.
+    tb_garden = tb_garden.set_index(["country", "year"], verify_integrity=True).sort_index()
+
     #
     # Save outputs.
     #

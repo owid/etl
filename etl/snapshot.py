@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
 import yaml
@@ -79,9 +79,9 @@ class Snapshot:
 
     def download_from_source(self) -> None:
         """Download file from source_data_url."""
-        assert self.metadata.source_data_url, "source_data_url is not set"
+        assert self.metadata.source.source_data_url, "source_data_url is not set"
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        files.download(self.metadata.source_data_url, str(self.path))
+        files.download(self.metadata.source.source_data_url, str(self.path))
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
@@ -115,22 +115,8 @@ class Snapshot:
                         "short_name": self.metadata.short_name,
                         "title": self.metadata.name,
                         "version": self.metadata.version,
-                        "sources": [
-                            Source(
-                                name=self.metadata.source_name,
-                                published_by=self.metadata.source_published_by,
-                                source_data_url=self.metadata.source_data_url,
-                                url=self.metadata.url,
-                                date_accessed=self.metadata.date_accessed,
-                                publication_date=str(self.metadata.publication_date)
-                                if self.metadata.publication_date
-                                else None,
-                                publication_year=self.metadata.publication_year,
-                            )
-                        ],
-                        "licenses": [License(name=self.metadata.license_name, url=self.metadata.license_url)]
-                        if self.metadata.license_name or self.metadata.license_url
-                        else [],
+                        "sources": [self.metadata.source],
+                        "licenses": [self.metadata.license],
                     }
                 ),
             }
@@ -150,30 +136,16 @@ class SnapshotMeta:
     # how to get the data file
     file_extension: str
 
-    # usually today
-    date_accessed: dt.date
-
     # fields that are meant to be shown to humans
     name: str
     description: str
-    source_name: str  # Short source citation.
-    url: str
-    source_published_by: Optional[str] = None  # Full source citation.
 
-    # URL with file, use `download_and_create(metadata)` for uploading to walden
-    source_data_url: Optional[str] = None
+    source: Source
+    license: Optional[License] = None
 
-    # license
-    # NOTE: license_url should be ideally required, but we don't have it for backported datasets
-    # so we have to relax this condition
-    license_url: Optional[str] = None
-    license_name: Optional[str] = None
     access_notes: Optional[str] = None
 
     is_public: Optional[bool] = True
-
-    publication_year: Optional[int] = None
-    publication_date: Union[Optional[dt.date], Literal["latest"]] = None
 
     outs: Any = None
 
@@ -182,31 +154,35 @@ class SnapshotMeta:
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
+    def to_yaml(self) -> str:
+        """Convert to YAML string."""
+        d = self.to_dict()
+
+        # exclude `outs` with md5, we reset it when saving new metadata
+        d.pop("outs", None)
+
+        # remove is_public if it's True
+        if d["is_public"]:
+            del d["is_public"]
+
+        # remove namespace/version/short_name/file_extension if they match path
+        if _parse_snapshot_path(self.path) == (
+            d["namespace"],
+            str(d["version"]),
+            d["short_name"],
+            d["file_extension"],
+        ):
+            del d["namespace"]
+            del d["version"]
+            del d["short_name"]
+            del d["file_extension"]
+
+        return yaml_dump({"meta": d})  # type: ignore
+
     def save(self) -> None:
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        with open(self.path, "w") as ostream:
-            d = self.to_dict()
-
-            # exclude `outs` with md5, we reset it when saving new metadata
-            d.pop("outs", None)
-
-            # remove is_public if it's True
-            if d["is_public"]:
-                del d["is_public"]
-
-            # remove namespace/version/short_name/file_extension if they match path
-            if _parse_snapshot_path(self.path) == (
-                d["namespace"],
-                str(d["version"]),
-                d["short_name"],
-                d["file_extension"],
-            ):
-                del d["namespace"]
-                del d["version"]
-                del d["short_name"]
-                del d["file_extension"]
-
-            yaml_dump({"meta": d}, ostream)
+        with open(self.path, "w") as f:
+            f.write(self.to_yaml())
 
     @property
     def uri(self):
@@ -230,6 +206,27 @@ class SnapshotMeta:
                 meta["short_name"] = _parse_snapshot_path(Path(filename))[2]
             if "file_extension" not in meta:
                 meta["file_extension"] = _parse_snapshot_path(Path(filename))[3]
+
+            # convert legacy fields to source
+            if "source" not in meta:
+                publication_date = meta.pop("publication_date", None)
+                meta["source"] = Source(
+                    name=meta.pop("source_name", None),
+                    description=meta.get("description", None),
+                    published_by=meta.pop("source_published_by", None),
+                    source_data_url=meta.pop("source_data_url", None),
+                    url=meta.pop("url", None),
+                    date_accessed=meta.pop("date_accessed", None),
+                    publication_date=str(publication_date) if publication_date else None,
+                    publication_year=meta.pop("publication_year", None),
+                )
+
+            if "license" not in meta:
+                if "license_name" in meta or "license_url" in meta:
+                    meta["license"] = License(
+                        name=meta.pop("license_name", None),
+                        url=meta.pop("license_url", None),
+                    )
 
             return cls.from_dict(dict(**meta, outs=yml.get("outs", [])))
 
@@ -264,11 +261,13 @@ class SnapshotMeta:
         assert len(js["sources"]) == 1
         s = js["sources"][0]
         self.name = js["dataset"]["name"]
-        self.source_name = s["name"]
-        self.description = s["description"].get("additionalInfo")
-        self.url = s["description"].get("link")
-        self.date_accessed = pd.to_datetime(s["description"].get("retrievedDate")).date()
-        self.source_published_by = s["description"].get("dataPublishedBy")
+        self.source = Source(
+            name=s["name"],
+            description=s["description"].get("additionalInfo"),
+            url=s["description"].get("link"),
+            published_by=s["description"].get("dataPublishedBy"),
+            date_accessed=pd.to_datetime(s["description"].get("retrievedDate") or dt.date.today()).date(),
+        )
 
 
 def add_snapshot(

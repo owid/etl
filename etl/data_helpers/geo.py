@@ -45,6 +45,9 @@ TNAME_WB_INCOME = "wb_income_group"
 
 @functools.lru_cache
 def _load_population() -> pd.DataFrame:
+    ####################################################################################################################
+    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    ####################################################################################################################
     population = Dataset(DATASET_POPULATION)[TNAME_KEY_INDICATORS]
     population = population.reset_index()
     return cast(pd.DataFrame, population)
@@ -52,12 +55,18 @@ def _load_population() -> pd.DataFrame:
 
 @functools.lru_cache
 def _load_countries_regions() -> pd.DataFrame:
+    ####################################################################################################################
+    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    ####################################################################################################################
     countries_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"]
     return cast(pd.DataFrame, countries_regions)
 
 
 @functools.lru_cache
 def _load_income_groups() -> pd.DataFrame:
+    ####################################################################################################################
+    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    ####################################################################################################################
     income_groups = Dataset(DATASET_WB_INCOME)[TNAME_WB_INCOME]
     return cast(pd.DataFrame, income_groups)
 
@@ -72,6 +81,10 @@ def list_countries_in_region(
     income_groups: Optional[pd.DataFrame] = None,
 ) -> List[str]:
     """List countries that are members of a region.
+
+    ####################################################################################################################
+    WARNING: This function is deprecated, use list_members_of_region instead.
+    ####################################################################################################################
 
     Parameters
     ----------
@@ -522,6 +535,127 @@ def add_population_to_dataframe(
     return df_with_population
 
 
+def add_population_to_table(
+    tb: Table,
+    ds_population: Dataset,
+    country_col: str = "country",
+    year_col: str = "year",
+    population_col: str = "population",
+    warn_on_missing_countries: bool = True,
+    show_full_warning: bool = True,
+    interpolate_missing_population: bool = False,
+    expected_countries_without_population: Optional[List[str]] = None,
+) -> Table:
+    """Add column of population to a table with metadata.
+
+    Parameters
+    ----------
+    tb : Table
+        Original table that contains a column of country names and years.
+    ds_population : Dataset
+        Population dataset.
+    country_col : str
+        Name of column in original table with country names.
+    year_col : str
+        Name of column in original table with years.
+    population_col : str
+        Name of new column to be created with population values.
+    warn_on_missing_countries : bool
+        True to warn about countries that appear in original table but not in the population dataset.
+    show_full_warning : bool
+        True to display list of countries in warning messages.
+    interpolate_missing_population : bool
+        True to linearly interpolate population on years that are presented in tb, but for which we do not have
+        population data; otherwise False to keep missing population data as nans.
+        For example, if interpolate_missing_population is True and tb has data for all years between 1900 and 1910,
+        but population is only given for 1900 and 1910, population will be linearly interpolated between those years.
+    expected_countries_without_population : list
+        Countries that are expected to not have population (that should be ignored if warnings are activated).
+
+    Returns
+    -------
+    tb_with_population : Table
+        Original table after adding a column with population values.
+
+    """
+    # Create a dataframe with an additional population column.
+    df_with_population = add_population_to_dataframe(
+        df=tb,
+        ds_population=ds_population,
+        country_col=country_col,
+        year_col=year_col,
+        population_col=population_col,
+        warn_on_missing_countries=warn_on_missing_countries,
+        show_full_warning=show_full_warning,
+        interpolate_missing_population=interpolate_missing_population,
+        expected_countries_without_population=expected_countries_without_population,
+    )
+
+    # Convert the dataframe into a table, with the metadata of the original table.
+    tb_with_population = Table(df_with_population).copy_metadata(tb)
+
+    # Add metadata to the new population column.
+    tb_with_population[population_col] = tb_with_population[population_col].copy_metadata(
+        ds_population["population"]["population"]
+    )
+
+    ####################################################################################################################
+    # NOTE: Currently, column "population" in table "population" does not have licenses. Manually add them.
+    tb_with_population[population_col].metadata.licenses = ds_population.metadata.licenses
+    ####################################################################################################################
+
+    return tb_with_population
+
+
+def add_gdp_to_table(
+    tb: Table, ds_gdp: Dataset, country_col: str = "country", year_col: str = "year", gdp_col: str = "gdp"
+) -> Table:
+    """Add column of GDP to a table with metadata.
+
+    Parameters
+    ----------
+    tb : Table
+        Original table that contains a column of country names and years.
+    ds_gdp : Dataset
+        Population dataset.
+    country_col : str
+        Name of column in original table with country names.
+    year_col : str
+        Name of column in original table with years.
+    gdp_col : str
+        Name of new column to be created with GDP values.
+
+    Returns
+    -------
+    tb_with_gdo : Table
+        Original table after adding a column with GDP values.
+
+    """
+    tb_with_gdp = tb.copy()
+
+    # Read main table from GDP dataset.
+    tb_gdp = ds_gdp["maddison_gdp"].reset_index()
+
+    # Add metadata sources and licenses to the main GDP variable.
+    tb_gdp["gdp"].metadata.sources = ds_gdp.metadata.sources
+    tb_gdp["gdp"].metadata.licenses = ds_gdp.metadata.licenses
+
+    gdp_columns = {
+        "country": country_col,
+        "year": year_col,
+        "gdp": gdp_col,
+    }
+    tb_gdp = tb_gdp[list(gdp_columns)].rename(columns=gdp_columns)
+
+    # Drop rows with missing values.
+    tb_gdp = tb_gdp.dropna(how="any").reset_index(drop=True)
+
+    # Add GDP column to original table.
+    tb_with_gdp = tb_with_gdp.merge(tb_gdp, on=[country_col, year_col], how="left")
+
+    return tb_with_gdp
+
+
 def list_members_of_region(
     region: str,
     ds_regions: Dataset,
@@ -530,6 +664,7 @@ def list_members_of_region(
     excluded_regions: Optional[List[str]] = None,
     additional_members: Optional[List[str]] = None,
     excluded_members: Optional[List[str]] = None,
+    include_historical_regions_in_income_groups: bool = False,
 ) -> List[str]:
     """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
 
@@ -552,6 +687,8 @@ def list_members_of_region(
         Additional individual members to include in the list.
     excluded_members : list
         Individual members to exclude from the list.
+    include_historical_regions_in_income_groups : bool
+        True to include historical regions in income groups.
 
     Returns
     -------
@@ -592,12 +729,44 @@ def list_members_of_region(
     )
 
     if ds_income_groups is not None:
-        # Get the main table from the income groups dataset.
-        df_income = pd.DataFrame(ds_income_groups["wb_income_group"]).reset_index()
+        if "wb_income_group" in ds_income_groups.table_names:
+            # TODO: Remove this block once the old income groups dataset has been archived.
+            # Get the main table from the income groups dataset.
+            df_income = (
+                pd.DataFrame(ds_income_groups["wb_income_group"])
+                .reset_index()
+                .rename(columns={"income_group": "classification"})
+            )
+        elif "income_groups_latest" in ds_income_groups.table_names:
+            # Get the table with the current definitions of income groups.
+            df_income = ds_income_groups["income_groups_latest"].reset_index()
+        else:
+            raise KeyError(
+                "Table 'income_groups_latest' not found. "
+                "You may not be using the right version of the income groups dataset ds_income_groups."
+            )
+
+        if include_historical_regions_in_income_groups:
+            # Since "income_groups_latest" does not include historical regions, optionally we take their latest
+            # classification from "income_groups" and add them to df_income.
+            historical_regions = ds_income_groups["income_groups"].reset_index()
+            # Keep only countries that are not in "income_groups_latest".
+            # NOTE: This not only includes historical regions, but also countries that don't appear in
+            # "income_groups_latest", like Venezuela.
+            historical_regions = historical_regions[~historical_regions["country"].isin(df_income["country"])]
+            # Keep only the latest income group classification of each historical region.
+            historical_regions = (
+                historical_regions.sort_values(["country", "year"], ascending=True)
+                .drop_duplicates(subset="country", keep="last")
+                .drop(columns="year")
+                .reset_index(drop=True)
+            )
+            # Append historical regions to latest income group classifications.
+            df_income = pd.concat([df_income, historical_regions], ignore_index=True)
 
         # Create a dataframe of countries in each income group.
         df_countries_in_income_group = (
-            df_income.rename(columns={"income_group": "region", "country": "members"})
+            df_income.rename(columns={"classification": "region", "country": "members"})
             .groupby("region", as_index=True, observed=True)
             .agg({"members": list})
         )

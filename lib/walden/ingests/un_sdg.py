@@ -226,7 +226,6 @@ def dimensions_description() -> dict:
 
 
 def get_goal_codes() -> List[int]:
-
     # retrieves all goal codes
     url = f"{BASE_URL}/v1/sdg/Goal/List"
     res = requests.get(url)

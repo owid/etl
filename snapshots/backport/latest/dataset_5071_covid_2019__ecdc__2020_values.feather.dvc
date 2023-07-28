@@ -1,18 +1,18 @@
 meta:
-  namespace: backport
-  short_name: dataset_5071_covid_2019__ecdc__2020_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:59:11.792847
   name: COVID-2019 - ECDC (2020)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5071
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+  source:
+    name: Our World in Data catalog backport
+    description:
+    url: https://owid.cloud/admin/datasets/5071
+    source_data_url:
+    owid_data_url:
+    date_accessed: 2023-07-19 08:45:55.116798
+    publication_date: latest
+    publication_year:
+    published_by: Our World in Data catalog backport
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b9c53f5e95c1502094ef981fcc9c7fe3
+- md5: ca0fafb3459efe8306f1f972765ceb21
   size: 7220474
   path: dataset_5071_covid_2019__ecdc__2020_values.feather

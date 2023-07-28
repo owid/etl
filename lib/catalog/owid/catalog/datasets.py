@@ -111,11 +111,11 @@ class Dataset:
         if not table.primary_key:
             if "OWID_STRICT" in environ:
                 raise PrimaryKeyMissing(
-                    f"Table `{table.metadata.short_name}` does not have a primary_key set -- please use set_index() to indicate dimensions"
+                    f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
                 )
             else:
                 warnings.warn(
-                    f"Table `{table.metadata.short_name}` does not have a primary_key set -- please use set_index() to indicate dimensions"
+                    f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
                 )
 
         if not table.index.is_unique and "OWID_STRICT" in environ:
@@ -126,6 +126,7 @@ class Dataset:
             )
 
         # check Float64 and Int64 columns for np.nan
+        # see: https://github.com/owid/etl/issues/1334
         for col, dtype in table.dtypes.items():
             if dtype in NULLABLE_DTYPES:
                 # pandas nullable types like Float64 have their own pd.NA instead of np.nan

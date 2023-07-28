@@ -148,30 +148,30 @@ GDP_COLUMNS = {
 UNITS = {"tonnes": {"conversion": TONNES_TO_MILLION_TONNES, "new_unit": "million tonnes"}}
 
 
-def gather_sources_from_tables(
-    tables: List[catalog.Table],
+def unique_sources_from_datasets(
+    datasets: List[catalog.Dataset],
 ) -> List[catalog.meta.Source]:
-    """Gather unique sources from the metadata.dataset of each table in a list of tables.
+    """Gather unique sources from datasets.
 
     Note: To check if a source is already listed, only the name of the source is considered (not the description or any
     other field in the source).
 
     Parameters
     ----------
-    tables : list
-        List of tables with metadata.
+    datasets : list
+        List of datasets with metadata.
 
     Returns
     -------
     known_sources : list
-        List of unique sources from all tables.
+        List of unique sources from all datasets.
 
     """
     # Initialise list that will gather all unique metadata sources from the tables.
     known_sources: List[catalog.meta.Source] = []
-    for table in tables:
+    for ds in datasets:
         # Get list of sources of the dataset of current table.
-        table_sources = table.metadata.dataset.sources
+        table_sources = ds.metadata.sources
         # Go source by source of current table, and check if its name is not already in the list of known_sources.
         for source in table_sources:
             # Check if this source's name is different to all known_sources.
@@ -276,16 +276,6 @@ def combine_tables(
 
     # Countries-regions dataset does not have a year column, so it has to be merged on country.
     combined = pd.merge(combined, tb_regions, on="country", how="left")
-
-    # OWID population dataset does not have sources metadata.
-    # Add those sources manually.
-    tb_population.metadata.dataset = catalog.meta.DatasetMeta(
-        sources=[
-            catalog.meta.Source(
-                name="Our World in Data based on different sources (https://ourworldindata.org/population-sources)."
-            )
-        ]
-    )
 
     # Assign variables metadata back to combined dataframe.
     for variable in variables_metadata:
@@ -411,8 +401,24 @@ def run(dest_dir: str) -> None:
     ds_garden = create_dataset(dest_dir, tables=[combined])
 
     # Gather metadata sources from all tables' original dataset sources.
-    tables = [tb_gcp, tb_jones, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population]
-    ds_garden.metadata.sources = gather_sources_from_tables(tables=tables)
+    datasets = [
+        ds_gcp,
+        ds_jones,
+        ds_cait,
+        ds_gdp,
+        ds_energy,
+        ds_regions,
+    ]
+    sources = unique_sources_from_datasets(datasets=datasets)
+
+    # OWID population dataset does not have sources metadata.
+    sources.append(
+        catalog.meta.Source(
+            name="Our World in Data based on different sources (https://ourworldindata.org/population-sources)."
+        )
+    )
+
+    ds_garden.metadata.sources = sources
 
     # Create dataset.
     ds_garden.save()

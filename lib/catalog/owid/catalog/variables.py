@@ -40,6 +40,7 @@ OPERATION = Literal[
     "pivot",
     "concat",
     "sort",
+    "pct_change",
 ]
 
 # Environment variable such that, if True, the processing log will be updated, if False, the log will always be empty.
@@ -258,6 +259,14 @@ class Variable(pd.Series):
     def div(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":
         return self.truediv(other=other, *args, **kwargs)
 
+    def pct_change(self, *args, **kwargs) -> "Variable":
+        variable_name = self.name or UNNAMED_VARIABLE
+        variable = Variable(super().pct_change(*args, **kwargs), name=variable_name)
+        variable._fields[variable_name] = combine_variables_metadata(
+            variables=[self], operation="pct_change", name=variable_name
+        )
+        return variable
+
     def update_log(
         self,
         parents: List[Any],
@@ -294,6 +303,9 @@ class Variable(pd.Series):
             inplace=inplace,
         )
 
+    def copy_metadata(self, from_variable: "Variable", inplace: bool = False) -> Optional["Variable"]:
+        return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)
+
 
 # dynamically add all metadata properties to the class
 for k in VariableMeta.__dataclass_fields__:
@@ -305,17 +317,23 @@ for k in VariableMeta.__dataclass_fields__:
 
 def _combine_variable_units_or_short_units(variables: List[Variable], operation, unit_or_short_unit) -> Optional[str]:
     # Gather units (or short units) of all variables.
-    units_or_short_units = pd.unique([getattr(variable.metadata, unit_or_short_unit) for variable in variables])
+    units_or_short_units = pd.unique(
+        [
+            getattr(variable.metadata, unit_or_short_unit)
+            for variable in variables
+            if getattr(variable.metadata, unit_or_short_unit) is not None
+        ]
+    )
     # Initialise the unit (or short unit) of the output variable.
     unit_or_short_unit_combined = None
-    if operation in ["+", "-", "melt", "pivot", "concat"]:
-        # If units (or short units) do not coincide among all variables, raise a warning and assign None.
-        if len(units_or_short_units) != 1:
-            log.warning(f"Different values of '{unit_or_short_unit}' detected among variables: {units_or_short_units}")
-            unit_or_short_unit_combined = None
-        else:
-            # Otherwise, assign the common unit.
+    if operation in ["+", "-", "melt", "pivot", "concat", "fillna"]:
+        if len(units_or_short_units) == 1:
+            # If (short) units coincide among all variables, assign the common unit.
             unit_or_short_unit_combined = units_or_short_units[0]
+        elif len(units_or_short_units) > 1:
+            # If there are multiple (short) units among variables, raise a warning (and keep combined unit as None).
+            log.warning(f"Different values of '{unit_or_short_unit}' detected among variables: {units_or_short_units}")
+        # In any other case, none of the variables have units, therefore keep combined unit as None.
 
     return unit_or_short_unit_combined
 
@@ -336,7 +354,7 @@ def _combine_variables_titles_and_descriptions(
     # Keep the title only if all variables have exactly the same title.
     # Otherwise we assume that the variable has a different meaning, and its title should be manually handled.
     title_or_description_combined = None
-    if operation in ["+", "-", "fillna", "dropna", "merge", "melt", "pivot", "concat"]:
+    if operation in ["+", "-", "fillna", "dropna", "merge", "melt", "pivot", "concat", "pct_change"]:
         titles_or_descriptions = pd.unique([getattr(variable.metadata, title_or_description) for variable in variables])
         if len(titles_or_descriptions) == 1:
             title_or_description_combined = titles_or_descriptions[0]
@@ -439,7 +457,6 @@ def update_log(
     comment: Optional[str] = None,
     inplace: bool = False,
 ) -> Optional[Variable]:
-
     if not inplace:
         variable = copy.deepcopy(variable)
 
@@ -609,3 +626,22 @@ def update_variable_name(variable: Variable, name: str) -> None:
             json.dumps(variable.metadata.processing_log).replace("**TEMPORARY UNNAMED VARIABLE**", name)
         )
     variable.name = name
+
+
+@overload
+def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool = False) -> Variable:
+    ...
+
+
+@overload
+def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool = True) -> None:
+    ...
+
+
+def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool = False) -> Optional[Variable]:
+    if inplace:
+        to_variable.metadata = copy.deepcopy(from_variable.metadata)
+    else:
+        new_variable = copy.deepcopy(to_variable)
+        new_variable.metadata = copy.deepcopy(from_variable.metadata)
+        return new_variable

@@ -4,6 +4,7 @@ from typing import List, Optional
 import click
 import pandas as pd
 import structlog
+from owid.catalog import Source
 from sqlalchemy.engine import Engine
 from sqlmodel import Session
 
@@ -174,12 +175,14 @@ def _snapshot_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> 
         short_name=f"{short_name}_values",
         version="latest",
         name=ds.name,
-        date_accessed=dt.datetime.utcnow(),
         description=ds.description,
-        source_name="Our World in Data catalog backport",
-        source_published_by="Our World in Data catalog backport",
-        url=f"https://owid.cloud/admin/datasets/{ds.id}",
-        publication_date="latest",
+        source=Source(
+            name="Our World in Data catalog backport",
+            published_by="Our World in Data catalog backport",
+            url=f"https://owid.cloud/admin/datasets/{ds.id}",
+            publication_date="latest",
+            date_accessed=dt.datetime.utcnow(),
+        ),
         file_extension="feather",
         is_public=public,
     )

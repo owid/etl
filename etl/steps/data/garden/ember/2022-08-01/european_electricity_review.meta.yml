@@ -5,7 +5,7 @@ dataset:
   short_name: european_electricity_review
   sources:
     -
-      name: Our World in Data based on Ember's European Electricity Review (2022).
+      name: Ember's European Electricity Review (2022).
       published_by: Ember
       publication_year: 2022
       date_accessed: 2022-08-01

@@ -91,6 +91,7 @@ def create_dataset(
     underscore_table: bool = True,
     camel_to_snake: bool = False,
     formats: List[FileFormat] = DEFAULT_FORMATS,
+    check_variables_metadata: bool = False,
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -105,6 +106,7 @@ def create_dataset(
     :param default_metadata: The default metadata to use for the dataset, could be either SnapshotMeta or DatasetMeta.
     :param underscore_table: Whether to underscore the table name before adding it to the dataset.
     :param camel_to_snake: Whether to convert camel case to snake case for the table name.
+    :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -115,6 +117,9 @@ def create_dataset(
     # convert snapshot SnapshotMeta to DatasetMeta
     if isinstance(default_metadata, SnapshotMeta):
         default_metadata = convert_snapshot_metadata(default_metadata)
+
+    if check_variables_metadata:
+        catalog.tables.check_all_variables_have_metadata(tables=tables)
 
     # create new dataset with new metadata
     ds = catalog.Dataset.create_empty(dest_dir, metadata=default_metadata)
@@ -532,6 +537,12 @@ class PathFinder:
         assert isinstance(dataset, catalog.Dataset)
         return dataset
 
+    def load_etag_url(self) -> str:
+        """Load etag url dependency and return its URL."""
+        deps = [dep for dep in self.dependencies if dep.startswith("etag://")]
+        assert len(deps) == 1
+        return deps[0].replace("etag://", "https://")
+
 
 def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
     """List all steps in a dag.
@@ -822,6 +833,8 @@ class VersionTracker:
     def check_that_latest_version_of_steps_are_active(self) -> None:
         # Check that the latest version of each main data step is in the dag.
         # If not, it could be because it has been deleted by accident.
+        # We may decide to remove this test, because it will raise an error if an old step is archived, and it has no
+        # newer version. This can happen for example if the name of the step was changed during the update.
         latest_data_steps = set(
             self.step_attributes_df[
                 (self.step_attributes_df["n_newer_versions"] == 0)
@@ -868,7 +881,7 @@ class VersionTracker:
 
     def apply_sanity_checks(self) -> None:
         self.check_that_archive_steps_are_not_dependencies_of_active_steps()
-        self.check_that_latest_version_of_steps_are_active()
+        # self.check_that_latest_version_of_steps_are_active()
         self.check_that_all_active_steps_are_necessary()
 
 

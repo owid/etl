@@ -15,7 +15,7 @@ UPDATE = 2
 
 
 def normalize_entity_name(entity_name: str) -> str:
-    return unidecode(entity_name.lower().strip())
+    return unidecode(entity_name.strip())
 
 
 class NotOne(ValueError):
@@ -117,11 +117,11 @@ class DBUtils:
         rows = self.fetch_many(
             """
             SELECT
-                LOWER(entities.name),
+                name,
                 id
             FROM entities
             WHERE
-                LOWER(entities.name) IN %(country_names)s
+                entities.name IN %(country_names)s
             ORDER BY entities.id ASC
         """,
             {"country_names": [normalize_entity_name(x) for x in names]},

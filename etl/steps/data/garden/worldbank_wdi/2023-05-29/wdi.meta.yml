@@ -1465,31 +1465,31 @@ tables:
         title: Primary government expenditures as a proportion of original approved budget (%)
       hd_hci_ovrl:
         title: Human capital index (HCI) (scale 0-1)
-        unit: scale 0-1
+        unit: ""
       hd_hci_ovrl_fe:
         title: Human capital index (HCI), female (scale 0-1)
-        unit: scale 0-1
+        unit: ""
       hd_hci_ovrl_lb:
         title: Human capital index (HCI), lower bound (scale 0-1)
-        unit: scale 0-1
+        unit: ""
       hd_hci_ovrl_lb_fe:
         title: Human capital index (HCI), female, lower bound (scale 0-1)
-        unit: scale 0-1
+        unit: ""
       hd_hci_ovrl_lb_ma:
         title: Human capital index (HCI), male, lower bound (scale 0-1)
-        unit: scale 0-1
+        unit: ""
       hd_hci_ovrl_ma:
         title: Human capital index (HCI), male (scale 0-1)
-        unit: scale 0-1
+        unit: ""
       hd_hci_ovrl_ub:
         title: Human capital index (HCI), upper bound (scale 0-1)
-        unit: scale 0-1
+        unit: ""
       hd_hci_ovrl_ub_fe:
         title: Human capital index (HCI), female, upper bound (scale 0-1)
-        unit: scale 0-1
+        unit: ""
       hd_hci_ovrl_ub_ma:
         title: Human capital index (HCI), male, upper bound (scale 0-1)
-        unit: scale 0-1
+        unit: ""
       ic_bus_dfrn_xq:
         title: Ease of doing business score (0 = lowest performance to 100 = best performance)
         unit: 0=lowest performance to 100=frontier
@@ -2491,7 +2491,7 @@ tables:
       ny_gdp_mktp_pp_kd:
         title: GDP, PPP (constant 2017 international $)
         short_unit: $
-        unit: constant 2017 international $
+        unit: international-$ in 2017 prices
       ny_gdp_ngas_rt_zs:
         title: Natural gas rents (% of GDP)
         short_unit: '%'
@@ -2524,7 +2524,7 @@ tables:
       ny_gdp_pcap_pp_kd:
         title: GDP per capita, PPP (constant 2017 international $)
         short_unit: $
-        unit: constant 2017 international $
+        unit: international-$ in 2017 prices
         display:
           name: GDP per capita
           tolerance: 5
@@ -2583,7 +2583,7 @@ tables:
       ny_gnp_mktp_pp_kd:
         title: GNI, PPP (constant 2017 international $)
         short_unit: $
-        unit: constant 2017 international $
+        unit: international-$ in 2017 prices
       ny_gnp_pcap_cd:
         title: GNI per capita, Atlas method (current US$)
         short_unit: $
@@ -2609,7 +2609,10 @@ tables:
       ny_gnp_pcap_pp_kd:
         title: GNI per capita, PPP (constant 2017 international $)
         short_unit: $
-        unit: constant 2017 international $
+        unit: international-$ in 2017 prices
+        display:
+          name: GNI per capita
+          numDecimalPlaces: 0
       ny_gns_ictr_cd:
         title: Gross savings (current US$)
         short_unit: $

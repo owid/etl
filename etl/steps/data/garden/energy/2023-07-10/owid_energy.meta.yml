@@ -1,0 +1,9 @@
+dataset:
+  title: Energy dataset (OWID, 2023b)
+  description: |
+    OWID Energy dataset.
+
+    This dataset will be loaded by <a href="https://github.com/owid/energy-data">the energy-data repository</a>, to create a csv file of the dataset that can be downloaded in one click.
+
+# Dataset sources will be created in the step by combining all component datasets' sources.
+# Also, table metadata will be built from the tables' metadata and the content of owid_energy_variable_mapping.csv.

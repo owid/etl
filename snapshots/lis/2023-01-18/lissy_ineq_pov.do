@@ -60,6 +60,9 @@ global dataset = "all"
 *Select the variables to extract
 global inc_cons_vars dhi dhci mi hcexp
 
+*Select components of market income
+global market_income hifactor hiprivate hi33
+
 *Select if relative poverty lines should be obtained from the DHI median (1) or from each welfare variable (0)
 global relative_poverty_dhi = 0
 
@@ -82,7 +85,19 @@ program define make_variables
 	quietly drop if miss_comp==1
 
 	*Create market income variable
-	gen mi = hifactor + hiprivate + hi33
+	*Obtain maximum value of component variables
+	foreach var in $market_income {
+		quietly sum `var'
+		local max_`var' = r(max)
+	}
+	
+	if `max_hifactor' > 0 & `max_hiprivate' > 0 & `max_hi33' > 0 {
+		gen mi = hifactor + hiprivate + hi33
+	}
+	
+	else {
+		gen mi = .
+	}
 
 	*Get the grossnet variable from the dataset
 	quietly levelsof grossnet, local(uniq_gross) clean

@@ -138,6 +138,17 @@ def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
     """
     dag_yml = _load_dag_yaml(str(filename))
     curr_dag = _parse_dag_yaml(dag_yml)
+
+    # make sure there are no fast-track steps in the DAG
+    if "fasttrack.yml" not in str(filename):
+        fast_track_steps = {step for step in curr_dag if "/fasttrack/" in step}
+        if fast_track_steps:
+            raise ValueError(f"Fast-track steps detected in DAG {filename}: {fast_track_steps}")
+
+    duplicate_steps = prev_dag.keys() & curr_dag.keys()
+    if duplicate_steps:
+        raise ValueError(f"Duplicate steps detected in DAG {filename}: {duplicate_steps}")
+
     curr_dag.update(prev_dag)
 
     for sub_dag_filename in dag_yml.get("include", []):
@@ -306,8 +317,9 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
 class Step(Protocol):
     path: str
     is_public: bool = True
+    version: str
 
-    def run(self) -> None:
+    def run(self, strict: bool = False) -> None:
         ...
 
     def is_dirty(self) -> bool:
@@ -334,6 +346,23 @@ class DataStep(Step):
 
     def __str__(self) -> str:
         return f"data://{self.path}"
+
+    @property
+    def channel(self) -> str:
+        return self.path.split("/")[0]
+
+    @property
+    def namespace(self) -> str:
+        return self.path.split("/")[1]
+
+    @property
+    def version(self) -> str:
+        # channel / namspace / version / dataset
+        return self.path.split("/")[2]
+
+    @property
+    def dataset(self) -> str:
+        return self.path.split("/")[3]
 
     def _dataset_index_mtime(self) -> Optional[float]:
         try:
@@ -472,7 +501,7 @@ class DataStep(Step):
         )
 
         try:
-            subprocess.check_call(args)
+            subprocess.check_call(args, env=os.environ.copy())
         except subprocess.CalledProcessError:
             # swallow this exception and just exit -- the important stack trace
             # will already have been printed to stderr
@@ -558,6 +587,11 @@ class WaldenStep(Step):
 
         return dataset
 
+    @property
+    def version(self) -> str:
+        # namspace / version / dataset
+        return self.path.split("/")[1]
+
 
 @dataclass
 class SnapshotStep(Step):
@@ -605,6 +639,11 @@ class SnapshotStep(Step):
     def _path(self) -> str:
         return f"{paths.DATA_DIR}/snapshots/{self.path}"
 
+    @property
+    def version(self) -> str:
+        # namspace / version / filename
+        return self.path.split("/")[1]
+
 
 class SnapshotStepPrivate(SnapshotStep):
     def __str__(self) -> str:
@@ -640,6 +679,11 @@ class GrapherStep(Step):
         return f"grapher://{self.path}"
 
     @property
+    def version(self) -> str:
+        # channel / namspace / version / dataset
+        return self.path.split("/")[2]
+
+    @property
     def dataset(self) -> catalog.Dataset:
         """Grapher dataset we are upserting."""
         return self.data_step._output_dataset
@@ -672,7 +716,8 @@ class GrapherStep(Step):
             dataset.metadata.sources,
         )
 
-        variable_upsert_results = []
+        thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS)
+        futures = []
 
         # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
         # is fetching the whole dataset from data-api as they would receive all tables merged in a single
@@ -683,7 +728,6 @@ class GrapherStep(Step):
             table = gh._adapt_table_for_grapher(table)
 
             # generate table with entity_id, year and value for every column
-            tables = gh._yield_wide_table(table, na_action="drop")
             upsert = lambda t: gi.upsert_table(  # noqa: E731
                 engine,
                 t,
@@ -692,15 +736,10 @@ class GrapherStep(Step):
                 dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
             )
 
-            # insert data in parallel, this speeds it up considerably and is even faster than loading
-            # data with LOAD DATA INFILE
-            if config.GRAPHER_INSERT_WORKERS > 1:
-                with concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as executor:
-                    results = executor.map(upsert, tables)
-            else:
-                results = map(upsert, tables)
+            for t in gh._yield_wide_table(table, na_action="drop"):
+                futures.append(thread_pool.submit(upsert, t))
 
-            variable_upsert_results += list(results)
+        variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
 
         self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
@@ -745,8 +784,8 @@ class GithubStep(Step):
     """
 
     path: str
-
     gh_repo: git.GithubRepo = field(repr=False)
+    version: str = "latest"
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -784,6 +823,7 @@ class ETagStep(Step):
     """
 
     path: str
+    version: str = "latest"
 
     def __init__(self, path: str) -> None:
         self.path = path

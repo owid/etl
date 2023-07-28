@@ -3,7 +3,8 @@
 from typing import cast
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+import us_cpi
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -32,24 +33,25 @@ def run(dest_dir: str) -> None:
         columns={"Label": "type", "Year": "year", "Total Investment (in Billions of U.S. Dollars)": "Total Investment"},
         inplace=True,
     )
+    # Add Total Investment
+    total_investment = df.groupby("year")["Total Investment"].sum()
+    # Create a DataFrame from the total investment series
+    total_df = pd.DataFrame(
+        {"year": total_investment.index, "Total Investment": total_investment.values, "type": "Total"}
+    )
 
-    # Load WDI
-    ds_wdi = cast(Dataset, paths.load_dependency("wdi"))
-    tb_wdi = ds_wdi["wdi"]
+    # Merge the total investment DataFrame with the original DataFrame
+    df = pd.merge(df, total_df, on=["year", "type", "Total Investment"], how="outer")
 
-    # Assume country and year are multi-index
-    df_wdi_cpi = tb_wdi[["fp_cpi_totl"]]
-
-    # Select only the data for the "United States"
-    df_wdi_cpi = df_wdi_cpi.sort_index()
-    df_wdi_cpi_us = df_wdi_cpi.loc[("United States",)]
+    # Import US CPI data from the API
+    df_wdi_cpi_us = us_cpi.import_US_cpi_API()
+    if df_wdi_cpi_us is None:
+        log.info("Failed to import US CPI data from the API.")
+        return
 
     # Adjust CPI values so that 2021 is the reference year (2021 = 100)
-    cpi_2021 = df_wdi_cpi_us.loc[(2021,), "fp_cpi_totl"]
-
-    # Adjust 'fp_cpi_totl' column by the 2021 CPI
+    cpi_2021 = df_wdi_cpi_us.loc[df_wdi_cpi_us["year"] == 2021, "fp_cpi_totl"].values[0]
     df_wdi_cpi_us["cpi_adj_2021"] = 100 * df_wdi_cpi_us["fp_cpi_totl"] / cpi_2021
-    df_wdi_cpi_us.reset_index(inplace=True)
 
     # Assuming df5 exists and it has a column named 'Year'
     # Merge df5 with CPI data
@@ -58,6 +60,7 @@ def run(dest_dir: str) -> None:
     df_cpi_inv["total_corporate_investment_by_activity_inflation_adjusted"] = round(
         100 * df_cpi_inv["Total Investment"] / df_cpi_inv["cpi_adj_2021"]
     )
+    df_cpi_inv.drop(["cpi_adj_2021", "fp_cpi_totl"], axis=1, inplace=True)
 
     tb = Table(df_cpi_inv, short_name="ai_corporate_investment", underscore=True)
     #

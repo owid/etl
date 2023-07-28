@@ -26,6 +26,7 @@ tables:
           This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
         display:
            name: GDP
+           numDecimalPlaces: 0
       rgdpo:
         title: GDP (output, multiple price benchmarks)
         unit: international-$ in 2017 prices
@@ -35,6 +36,7 @@ tables:
           This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
         display:
             name: GDP
+            numDecimalPlaces: 0
       cgdpe:
         title: GDP (expenditure, single price benchmark)
         unit: international-$ in 2017 prices
@@ -44,6 +46,7 @@ tables:
           This variable only uses the most recent ICP PPP benchmark.
         display:
            name: GDP
+           numDecimalPlaces: 0
       cgdpo:
         title: GDP (output, single price benchmark)
         unit: international-$ in 2017 prices
@@ -53,6 +56,7 @@ tables:
           This variable only uses the most recent ICP PPP benchmark.
         display:
            name: GDP
+           numDecimalPlaces: 0
       rgdpna:
         title: GDP (using national accounts growth rates)
         unit: international-$ in 2017 prices
@@ -60,6 +64,7 @@ tables:
         description: The difference with the other GDP variables is this is computed based on the growth rate of real GDP from national accounts data for each country. For this reason, this variable is useful for comparing growth of GDP over time in each country.
         display:
            name: GDP
+           numDecimalPlaces: 0
       rgdpe_pc:
         title: GDP per capita (expenditure, multiple price benchmarks)
         unit: international-$ in 2017 prices
@@ -69,6 +74,7 @@ tables:
           This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
         display:
            name: GDP per capita
+           numDecimalPlaces: 0
       rgdpo_pc:
         title: GDP per capita (output, multiple price benchmarks)
         unit: international-$ in 2017 prices
@@ -78,6 +84,7 @@ tables:
           This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
         display:
            name: GDP per capita
+           numDecimalPlaces: 0
       cgdpe_pc:
         title: GDP per capita (expenditure, single price benchmark)
         unit: international-$ in 2017 prices
@@ -87,6 +94,7 @@ tables:
           The GDP estimate in this variable only uses the most recent ICP PPP benchmark.
         display:
            name: GDP per capita
+           numDecimalPlaces: 0
       cgdpo_pc:
         title: GDP per capita (output, single price benchmark)
         unit: international-$ in 2017 prices
@@ -96,6 +104,7 @@ tables:
           The GDP estimate in this variable only uses the most recent ICP PPP benchmark.
         display:
            name: GDP per capita
+           numDecimalPlaces: 0
       rgdpna_pc:
         title: GDP per capita (using national accounts growth rates)
         unit: international-$ in 2017 prices
@@ -105,6 +114,7 @@ tables:
           The GDP is computed based on the growth rate of real GDP from national accounts data for each country. For this reason, this variable is useful for comparing growth of GDP over time in each country.
         display:
            name: GDP per capita
+           numDecimalPlaces: 0
       pop:
         title: Population
         unit: people
@@ -115,7 +125,7 @@ tables:
         description: This is the number of people working in the country (employees and self-employed).
       avh:
         title: Annual working hours per worker
-        unit: Hours per worker
+        unit: hours per worker
         description: It is the average sum of hours worked by employees and self-employed people during each year in a country.
       hc:
         title: Human capital index, based on years of schooling and returns to education
@@ -297,6 +307,9 @@ tables:
         unit: international-$ in 2017 prices per hour
         short_unit: $/h
         description: It is the GDP (output, multiple price benchmarks) divided by the Annual working hours per worker and the Number of people in work.
+        display:
+           name: Productivity
+           numDecimalPlaces: 1
       trade_openness:
         title: Trade openness (share of exports and imports in GDP)
         unit: "%"

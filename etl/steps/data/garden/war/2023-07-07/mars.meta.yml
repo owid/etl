@@ -1,0 +1,66 @@
+dataset:
+  title: History of war (Project Mars, 2020)
+  description: >-
+    This dataset contains information on armed conflicts, both internal and external, in the period of 1800 and 2011.
+
+
+    It has been constructed using the Project Mars dataset by Lyall, Jason.
+
+
+    More details about Project Mars:
+
+
+tables:
+  mars:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      number_deaths_ongoing_conflicts_high:
+        title: Number of soldier deaths in ongoing conflicts (high estimate)
+        unit: deaths
+        description: >-
+          The number of soldiers killed in a year over the course of wars. Excluded from this total are missing soldiers as well as those who
+          died from illness and/or disease. This is the high estimate of those who were killed.
+        display:
+          numDecimalPlaces: 0
+      number_deaths_ongoing_conflicts_low:
+        title: Number of soldier deaths in ongoing conflicts (low estimate)
+        unit: deaths
+        description: >-
+          The number of soldiers killed in a year over the course of wars. Excluded from this total are missing soldiers as well as those who
+          died from illness and/or disease. This is the low estimate of those who were killed.
+        display:
+          numDecimalPlaces: 0
+
+      number_ongoing_conflicts:
+        title: Number of ongoing conflicts
+        unit: conflicts
+        description: >-
+          Number of ongoing conflicts in a given year.
+
+          We count a war as ongoing in a region even if the conflict is also ongoing in other regions.
+          The sum across all regions can therefore be higher than the total number of ongoing wars.
+
+
+          For the wars that had campaigns within it that were a civil war and a non-civil war, we coded them as non-civil wars.
+
+        display:
+          numDecimalPlaces: 0
+      number_new_conflicts:
+        title: Number of new conflicts
+        unit: conflicts
+        description: >-
+          Number of new conflicts in a given year.
+
+
+          • New conflicts for the 'World': We only count a war as new when the war overall started that year, not if it restarted
+          or a new campaign within it begins.
+
+          • New conflicts for all regions (except 'World'): We count a war as new in a region even if the war overall started
+          earlier in another region. The sum across all regions can therefore be higher than the total number of new wars.
+
+          • New conflicts by type: We only count a civil war as new when the war overall started that year, not if it became a civil war.
+          We only count a non-civil war as new when the war overall started that year, not if a civil war became internationalized.
+
+
+        display:
+          numDecimalPlaces: 0
