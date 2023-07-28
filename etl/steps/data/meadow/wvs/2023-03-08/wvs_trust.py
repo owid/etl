@@ -21,7 +21,7 @@ def rename_vars(df: pd.DataFrame) -> pd.DataFrame:
 
     # This is a dictionary with the meaning of the codes
     vars_dict = {
-        "D001_B": "Family",
+        "D001_B": "Famil",
         "E069_01": "Churches",
         "E069_02": "Armed Forces",
         "E069_03": "Education System",
