@@ -31,8 +31,24 @@ def add_metadata(tb, df_metadata):
     for column in tb.columns:
         title_to_find = tb[column].metadata.title
         tb[column].metadata.description = df_metadata["Long definition"][df_metadata["Indicator Name"] == title_to_find]
+
         tb[column].metadata.display = {}
-        tb[column].metadata.display["numDecimalPlaces"] = 0
+        if "%" in title_to_find:
+            tb[column].metadata.display["numDecimalPlaces"] = 0
+            tb[column].metadata.unit = "%"
+            tb[column].metadata.short_unit = "%"
+        elif "ratio":
+            tb[column].metadata.display["numDecimalPlaces"] = 1
+            tb[column].metadata.unit = "ratio"
+            tb[column].metadata.short_unit = " "
+        elif "(years)":
+            tb[column].metadata.display["numDecimalPlaces"] = 1
+            tb[column].metadata.unit = "years"
+            tb[column].metadata.short_unit = " "
+        elif "number of pupils" or "number":
+            tb[column].metadata.display["numDecimalPlaces"] = 0
+            tb[column].metadata.unit = "pupils"
+            tb[column].metadata.short_unit = " "
 
     return tb
 
@@ -57,7 +73,11 @@ REGIONS = [
 def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     tb_with_regions = tb.copy()
 
-    aggregations = {column: "median" for column in tb_with_regions.columns if column not in ["country", "year"]}
+    aggregations = {
+        column: "median"
+        for column in tb_with_regions.columns
+        if column not in ["country", "year"] and "number" not in column
+    }
 
     for region in REGIONS:
         # Find members of current region.
@@ -100,7 +120,11 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    print(paths.excluded_countries_path)
+    tb = geo.harmonize_countries(
+        df=tb, excluded_countries_file=paths.excluded_countries_path, countries_file=paths.country_mapping_path
+    )
+
     df_metadata = read_metadata()
     # First, filter the DataFrame to get only the rows with the specified topics
     filtered_df = df_metadata[df_metadata["Topic"].isin(["Early Childhood Education", "Pre-Primary", "Primary"])]
