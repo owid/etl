@@ -23,8 +23,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = tb.reset_index().drop(columns=["sex", "age", "cause"]).set_index(["country", "year"])
-
+    tb = tb.reset_index().rename(columns={"cause": "country"}).set_index(["country", "year"])
     #
     # Save outputs.
     #
