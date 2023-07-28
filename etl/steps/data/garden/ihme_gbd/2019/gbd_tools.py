@@ -153,59 +153,75 @@ def add_share_of_population(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str):
+def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str, rei: str = None):
     var_name_dict = {
         "Deaths - Share of the population": {
-            "title": f"Share of total deaths that are from {cause.lower()}, in {sex.lower()} aged {age.lower()}",
+            "title": f"Share of total deaths that are from {cause.lower()}"
+            + (f", attributed to {rei.lower()}" if rei is not None else "")
+            + f" in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
             "num_decimal_places": 1,
         },
         "DALYs (Disability-Adjusted Life Years) - Share of the population": {
-            "title": f"Share of DALYs that are from {cause.lower()}, in {sex.lower()} aged {age.lower()}",
+            "title": f"Share of total DALYs that are from {cause.lower()}"
+            + (f", attributed to {rei.lower()}" if rei is not None else "")
+            + f" in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
             "num_decimal_places": 1,
         },
         "Deaths - Rate": {
-            "title": f"Deaths from {cause.lower()} per 100,000 population, in {sex.lower()} aged {age.lower()}",
+            "title": f"Deaths that are from {cause.lower()}"
+            + (f", attributed to {rei.lower()}" if rei is not None else "")
+            + f" per 100,000 people in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "deaths per 100,000 people",
             "short_unit": "",
             "num_decimal_places": 1,
         },
         "DALYs (Disability-Adjusted Life Years) - Rate": {
-            "title": f"DALYs from {cause.lower()} per 100,000 population, in {sex.lower()} aged {age.lower()}",
+            "title": f"DALYs from {cause.lower()}"
+            + (f", attributed to {rei.lower()}" if rei is not None else "")
+            + f" per 100,000 people in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "DALYs per 100,000 people",
             "short_unit": "",
             "num_decimal_places": 1,
         },
         "Deaths - Percent": {
-            "title": f"Share of total deaths from {cause.lower()}, in {sex.lower()} aged {age.lower()}",
+            "title": f"Share of total deaths that are from {cause.lower()}"
+            + (f", attributed to {rei.lower()}" if rei is not None else "")
+            + f" in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
             "num_decimal_places": 1,
         },
         "DALYs (Disability-Adjusted Life Years) - Percent": {
-            "title": f"Share of DALYs from {cause.lower()}, in {sex.lower()} aged {age.lower()}",
+            "title": f"Share of total DALYs that are from {cause.lower()}"
+            + (f", attributed to {rei.lower()}" if rei is not None else "")
+            + f" in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
             "short_unit": "%",
             "num_decimal_places": 1,
         },
         "Deaths - Number": {
-            "title": f"Deaths from {cause.lower()}, in {sex.lower()} aged {age.lower()}",
+            "title": f"Deaths that are from {cause.lower()}"
+            + (f", attributed to {rei.lower()}" if rei is not None else "")
+            + f" in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "deaths",
             "short_unit": "",
             "num_decimal_places": 0,
         },
         "DALYs (Disability-Adjusted Life Years) - Number": {
-            "title": f"DALYs from {cause.lower()}, in {sex.lower()} aged {age.lower()}",
+            "title": f"DALYs that are from {cause.lower()}"
+            + (f", attributed to {rei.lower()}" if rei is not None else "")
+            + f" in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "DALYs",
             "short_unit": "",
@@ -286,6 +302,7 @@ def add_metadata(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, dims: List
         dims_id = dict(zip(dims, group_id))
         tb_group = Table(group)
         # Create the unique table short name
+
         tb_group.metadata.short_name = underscore(f"{dims_id['cause']} - {dims_id['sex']} - {dims_id['age']}")
         variables = tb_group.columns.drop(dims + ["country", "year"])
         for variable_name in variables:
