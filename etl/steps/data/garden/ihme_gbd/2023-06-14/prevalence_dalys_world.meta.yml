@@ -25,7 +25,6 @@ dataset:
       url: https://www.healthdata.org/data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
   sources:
     - *source-ihme
-
 tables:
   prevalence_dalys_world:
     # (Inherited from meadow, remove if not different.)
