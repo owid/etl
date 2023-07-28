@@ -106,7 +106,7 @@ tables:
         title: Monthly CO₂ total emissions from aviation
         unit: tonnes
         short_unit: t
-        description:  Includes emissions from both domestic aviation. International aviation emissions are assigned to the country of departure. CO₂ emissions from commercial passenger flights only.
+        description:  Includes emissions from both domestic and international aviation. International aviation emissions are assigned to the country of departure. CO₂ emissions from commercial passenger flights only.
         display:
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
