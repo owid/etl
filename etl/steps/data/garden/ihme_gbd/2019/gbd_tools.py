@@ -298,6 +298,7 @@ def add_metadata(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, dims: List
     df = df.reset_index()
     df_group = df.groupby(dims)
     for group_id, group in df_group:
+        print(group_id)
         # Grab out the IDs of each of the grouping factors, e.g. the age-group, sex and cause
         dims_id = dict(zip(dims, group_id))
         tb_group = Table(group)
@@ -312,7 +313,7 @@ def add_metadata(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, dims: List
             tb_group[cleaned_variable.name] = cleaned_variable
             tb_group = tb_group.drop(columns=variable_name)
             # dropping columns that are totally empty - not all combinations of variables exist or have been downloaded
-            tb_group = tb_group.dropna(axis=1, how="all")
+        tb_group = tb_group.dropna(axis=1, how="all")
         # Dropping dims as table name contains them
         tb_group = tb_group.drop(columns=dims)
         tb_group = tb_group.set_index(["country", "year"], verify_integrity=True)
