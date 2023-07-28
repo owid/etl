@@ -113,12 +113,76 @@ def run(dest_dir: str) -> None:
     total_df["total_incident_counts"] = tb.groupby(["country", "year"]).size()
     total_df["total_casualties"] = total_df["total_wounded"] + total_df["total_incident_counts"]
 
-    # Process terrorism targets, attacks, and weapons data.
-    pivot_weapon_type, pivot_target_type, pivot_df_attack_type = terrorism_targets_attacks_weapons(tb)
-    merge_weapon_target = pd.merge(pivot_target_type, pivot_weapon_type, on=["country", "year"])
-    merge_attack = pd.merge(pivot_df_attack_type, merge_weapon_target, on=["country", "year"])
-    merge_all = pd.merge(total_df, merge_attack, on=["country", "year"])
+    tb.loc[tb["nkill"] == 0, "severity"] = "0 deaths"
+    tb.loc[(tb["nkill"] >= 1) & (tb["nkill"] <= 5), "severity"] = "1-5 deaths"
+    tb.loc[(tb["nkill"] >= 6) & (tb["nkill"] <= 10), "severity"] = "6-10 deaths"
+    tb.loc[(tb["nkill"] >= 11) & (tb["nkill"] <= 20), "severity"] = "11-20 deaths"
+    tb.loc[(tb["nkill"] >= 21) & (tb["nkill"] <= 50), "severity"] = "21-50 deaths"
+    tb.loc[(tb["nkill"] >= 51) & (tb["nkill"] <= 100), "severity"] = "51-99 deaths"
+    tb.loc[(tb["nkill"] > 100), "severity"] = "100+"
 
+    # For the total_regions_df
+    total_regions_df = generate_summary_dataframe(tb, ["year", "region_txt"], ["nkill", "nwound"])
+
+    # For the total_attack_type
+    total_attack_type = generate_summary_dataframe(tb, ["country", "year", "attacktype1_txt"], ["nkill", "nwound"])
+
+    # For the total_suicide
+    total_suicide = generate_summary_dataframe(tb, ["country", "year", "suicide"], ["nkill", "nwound"])
+    suicide_mapping = {0: "No Suicide", 1: "Suicide"}
+    total_suicide["suicide"] = total_suicide["suicide"].map(suicide_mapping)
+
+    # For the total_target
+    total_target = generate_summary_dataframe(tb, ["country", "year", "targtype1_txt"], ["nkill", "nwound"])
+
+    # For the total_severity
+    total_severity = pd.DataFrame()
+    total_severity["total_incident_severity"] = tb.groupby(["country", "year", "severity"]).size()
+    total_severity.reset_index(inplace=True)
+
+    # Create a dictionary to store all pivot tables
+    pivot_tables = {
+        "regions": pivot_dataframe(
+            total_regions_df,
+            index_columns=["year"],
+            pivot_column="region_txt",
+            value_columns=["total_nkill", "total_nwound", "total_incident_counts"],
+        ),
+        "attack_type": pivot_dataframe(
+            total_attack_type,
+            index_columns=["year", "country"],
+            pivot_column="attacktype1_txt",
+            value_columns=["total_nkill", "total_nwound", "total_incident_counts"],
+        ),
+        "target": pivot_dataframe(
+            total_target,
+            index_columns=["year", "country"],
+            pivot_column="targtype1_txt",
+            value_columns=["total_nkill", "total_nwound", "total_incident_counts"],
+        ),
+        "suicide": pivot_dataframe(
+            total_suicide,
+            index_columns=["year", "country"],
+            pivot_column="suicide",
+            value_columns=["total_nkill", "total_nwound", "total_incident_counts"],
+        ),
+        "total_severity": pivot_dataframe(
+            total_severity,
+            index_columns=["year", "country"],
+            pivot_column="severity",
+            value_columns="total_incident_severity",
+        ),
+    }
+
+    # Merge all pivot tables
+    merged_df = pivot_tables["regions"]
+    for key in pivot_tables:
+        if key == "target":
+            pivot_tables[key] = add_suffix(pivot_tables[key], "_target")
+        if key != "regions":
+            merged_df = pd.merge(merged_df, pivot_tables[key], on=["year", "country"], how="outer")
+
+    merge_all = pd.merge(total_df, merged_df, on=["country", "year"], how="outer")
     # Add deaths and population data, and region aggregates.
     df_pop_deaths = add_deaths_and_population(merge_all)
     ds_regions: Dataset = paths.load_dependency("regions")
@@ -192,54 +256,6 @@ def perform_decadal_averaging(df: pd.DataFrame, cols_for_decadal_av: list) -> pd
     return df
 
 
-def terrorism_targets_attacks_weapons(df: pd.DataFrame) -> tuple:
-    """
-    Perform data processing on the given DataFrame to extract information related to terrorism targets, attacks,
-    and weapons.
-
-    This function groups the DataFrame by 'country', 'year', and different attributes like 'attacktype1_txt',
-    'weaptype1_txt', and 'targtype1_txt'. It then calculates the total occurrences for each group. The data is
-    further transformed into pivot tables, with suffixes added to column names.
-
-    Parameters:
-        df (pd.DataFrame): The DataFrame containing terrorism data.
-
-    Returns:
-        tuple: A tuple containing three pivot tables representing the occurrences of weapons, targets, and attacks
-               across different countries and years.
-    """
-
-    # Group the data by 'country', 'year', and 'attacktype1_txt', and calculate the size
-    total_df_attack_type = (
-        df.groupby(["country", "year", "attacktype1_txt"]).size().reset_index(name="attack_type_year")
-    )
-
-    # Group the data by 'country', 'year', and 'weaptype1_txt', and calculate the size
-    total_df_weapon_type = df.groupby(["country", "year", "weaptype1_txt"]).size().reset_index(name="weapon_type_year")
-
-    # Group the data by 'country', 'year', and 'targtype1_txt', and calculate the size
-    total_df_target_type = df.groupby(["country", "year", "targtype1_txt"]).size().reset_index(name="target_type_year")
-
-    # Pivot the dataframes so that each target, attack, weapon is a column
-    pivot_weapon_type = pd.pivot(
-        total_df_weapon_type, index=["country", "year"], columns="weaptype1_txt", values="weapon_type_year"
-    )
-
-    pivot_target_type = pd.pivot(
-        total_df_target_type, index=["country", "year"], columns="targtype1_txt", values="target_type_year"
-    )
-
-    pivot_df_attack_type = pd.pivot(
-        total_df_attack_type, index=["country", "year"], columns="attacktype1_txt", values="attack_type_year"
-    )
-    # Add suffix for easier identification of what these columns mean later
-    pivot_weapon_type = add_suffix(pivot_weapon_type, "_weapon")
-    pivot_target_type = add_suffix(pivot_target_type, "_target")
-    pivot_df_attack_type = add_suffix(pivot_df_attack_type, "_attack")
-
-    return pivot_weapon_type, pivot_target_type, pivot_df_attack_type
-
-
 def add_suffix(df: pd.DataFrame, suffix: str) -> pd.DataFrame:
     """
     Add a suffix to the column names of the given DataFrame, excluding 'year' and 'country' columns.
@@ -258,3 +274,55 @@ def add_suffix(df: pd.DataFrame, suffix: str) -> pd.DataFrame:
             df.rename(columns={column: column + suffix}, inplace=True)
 
     return df
+
+
+def generate_summary_dataframe(df, group_columns, target_columns):
+    """
+    Generate a summary DataFrame based on the specified group and target columns.
+
+    Parameters:
+        df (pandas.DataFrame): The original DataFrame.
+        group_columns (list): List of column names for grouping the data.
+        target_columns (list): List of column names for calculating the summary statistics.
+
+    Returns:
+        pandas.DataFrame: A summary DataFrame with grouped data and corresponding summary statistics.
+    """
+    grouped_df = df.groupby(group_columns)
+    summary_df = pd.DataFrame()
+
+    for column in target_columns:
+        summary_df[f"total_{column}"] = grouped_df[column].sum()
+
+    summary_df["total_incident_counts"] = grouped_df.size()
+
+    return summary_df.reset_index()
+
+
+def pivot_dataframe(dataframe, index_columns, pivot_column, value_columns):
+    """
+    Pivot the dataframe based on the given parameters.
+
+    Parameters:
+        dataframe (pd.DataFrame): The input DataFrame to be pivoted.
+        index_columns (list): List of column names to be used as index in the pivot.
+        pivot_column (str): Column name to be used for creating columns in the pivot.
+        value_columns (list): List of column names to be aggregated in the pivot.
+
+    Returns:
+        pd.DataFrame: The pivoted DataFrame.
+    """
+    pivot_df = pd.pivot(dataframe, index=index_columns, columns=pivot_column, values=value_columns)
+    pivot_df.reset_index(inplace=True)
+
+    # If 'country' is not a column, add a column with default value 'GTD'
+    if "country" not in pivot_df.columns:
+        pivot_df["country"] = "GTD"
+
+    # If pivot_column is not 'severity' (not hierarchical) modify column names
+    if pivot_column != "severity":
+        pivot_df.columns = [
+            f"{col[0]}_{col[1]}" if col[0] not in ["year", "country"] else col[0] for col in pivot_df.columns
+        ]
+
+    return pivot_df

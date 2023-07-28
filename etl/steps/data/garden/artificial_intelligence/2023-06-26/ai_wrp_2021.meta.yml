@@ -104,7 +104,7 @@ tables:
 
       dk__cars:
         title: "Don't know - self-driving cars question"
-        description: Share of respondents who refused to answer the question or said "Don't know" to the question "Would you feel safe in a car driven by a computer without a human driver?".
+        description: Share of respondents who said  "Don't know" to the question "Would you feel safe in a car driven by a computer without a human driver?".
         unit: '%'
         short_unit: '%'
         display:

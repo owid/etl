@@ -15,29 +15,18 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("ai_wrp_2021"))
+    ds_garden = cast(Dataset, paths.load_dependency("brecke"))
 
     # Read table from garden dataset.
-    tb = ds_garden["ai_wrp_2021"]
+    tb = ds_garden["brecke"]
 
     #
     # Process data.
     #
-    column_list_to_plot = [
-        "other_yes_no",
-        "other_help_harm",
-        "neither",
-        "mostly_harm",
-        "no__would_not_feel_safe",
-        "mostly_help",
-        "yes__would_feel_safe",
-        "dk_no_op",
-        "refused__help_harm",
-        "dk__cars",
-        "refused__cars",
-    ]
+    # Rename index column `region` to `country`.
+    tb = tb.reset_index().rename(columns={"region": "country"})
+    tb = tb.set_index(["year", "country", "conflict_type"])
 
-    tb = tb[column_list_to_plot]
     #
     # Save outputs.
     #

@@ -14,30 +14,10 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("ai_wrp_2021"))
+    # Load garden dataset and read its main table.
+    ds_garden = cast(Dataset, paths.load_dependency("food_prices_for_nutrition"))
+    tb = ds_garden["food_prices_for_nutrition"]
 
-    # Read table from garden dataset.
-    tb = ds_garden["ai_wrp_2021"]
-
-    #
-    # Process data.
-    #
-    column_list_to_plot = [
-        "other_yes_no",
-        "other_help_harm",
-        "neither",
-        "mostly_harm",
-        "no__would_not_feel_safe",
-        "mostly_help",
-        "yes__would_feel_safe",
-        "dk_no_op",
-        "refused__help_harm",
-        "dk__cars",
-        "refused__cars",
-    ]
-
-    tb = tb[column_list_to_plot]
     #
     # Save outputs.
     #
