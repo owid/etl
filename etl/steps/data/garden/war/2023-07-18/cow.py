@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import json
-from typing import List, Set, cast
+from typing import List, Set, Tuple, cast
 
 import numpy as np
 import pandas as pd
@@ -34,7 +34,7 @@ CONFLICT_TYPES_RENAME = {
 # Mapping conflicts to regions for some intra-state conflicts
 ## We map intrastate conflicts to only one region. We have region composites (ME & NA, Asia & Oceania) and we need to find the actual region.
 ## We have done this manually, and is summarised in the dictionary below.
-path = "cow.intrastate.region_mapping_custom.json"
+PATH_CUSTOM_REGIONS_INTRASTATE = paths.directory / "cow.intrastate.region_mapping_custom.json"
 
 
 def run(dest_dir: str) -> None:
@@ -45,10 +45,48 @@ def run(dest_dir: str) -> None:
     ds_meadow = cast(Dataset, paths.load_dependency("cow"))
 
     # Read data (there are four different tables)
+    log.info("war.cow: load data")
+    tb_extra, tb_nonstate, tb_inter, tb_intra = load_tables(ds_meadow)
+
+    # Check that there are no overlapping warnums between tables
+    log.info("war.cow: check overlapping warnum in tables")
+    _check_overlapping_warnum(tb_extra, tb_nonstate, tb_inter, tb_intra)
+
+    #
+    # Process data.
+    #
+    tb_extra = make_table_extra(tb_extra)
+    tb_nonstate = make_table_nonstate(tb_nonstate)
+    tb_inter = make_table_inter(tb_inter)
+    tb_intra = make_table_intra(tb_intra)
+
+    # Combine data
+    tb = combine_tables(
+        tb_extra=tb_extra,
+        tb_nonstate=tb_nonstate,
+        tb_inter=tb_inter,
+        tb_intra=tb_intra,
+    )
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+
+def load_tables(ds: Dataset) -> Tuple[Table, Table, Table, Table]:
+    """Load all CoW tables.
+
+    This includes tables for extra-, non-, inter- and intra-state conflicts.
+    """
     # Extra-state
     log.info("war.cow.extra: read data")
     tb_extra = load_cow_table(
-        ds=ds_meadow,
+        ds=ds,
         table_name="extra_state",
         column_start_year="startyear1",
         column_end_year="endyear1",
@@ -59,8 +97,8 @@ def run(dest_dir: str) -> None:
 
     # Non-state
     log.info("war.cow.non: read data")
-    tb_non = load_cow_table(
-        ds=ds_meadow,
+    tb_nonstate = load_cow_table(
+        ds=ds,
         table_name="non_state",
         column_start_year="startyear",
         column_end_year="endyear",
@@ -72,7 +110,7 @@ def run(dest_dir: str) -> None:
     # Inter-state
     log.info("war.cow.inter: read data")
     tb_inter = load_cow_table(
-        ds=ds_meadow,
+        ds=ds,
         table_name="inter_state",
         column_start_year="startyear1",
         column_end_year="endyear1",
@@ -85,7 +123,7 @@ def run(dest_dir: str) -> None:
     # Intra-state
     log.info("war.cow.intra: read data")
     tb_intra = load_cow_table(
-        ds=ds_meadow,
+        ds=ds,
         table_name="intra_state",
         column_start_year="startyr1",
         column_end_year="endyr1",
@@ -94,34 +132,7 @@ def run(dest_dir: str) -> None:
         values_exp_wartype={4, 5, 6, 7},
     )
 
-    # Check that there are no overlapping warnums between tables
-    log.info("war.cow: check overlapping warnum in tables")
-    _check_overlapping_warnum(tb_extra, tb_non, tb_inter, tb_intra)
-
-    #
-    # Process data.
-    #
-    tb_extra = make_table_extra(tb_extra)
-    tb_non = make_table_nonstate(tb_non)
-    tb_inter = make_table_inter(tb_inter)
-    tb_intra = make_table_intra(tb_intra)
-
-    # Combine data
-    tb = combine_tables(
-        tb_extra=tb_extra,
-        tb_nonstate=tb_non,
-        tb_inter=tb_inter,
-        tb_intra=None,
-    )
-
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
-
-    # Save changes in the new garden dataset.
-    ds_garden.save()
+    return tb_extra, tb_nonstate, tb_inter, tb_intra
 
 
 def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intra: Table) -> Table:
@@ -139,8 +150,30 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
         "region",
         "number_deaths_ongoing_conflicts",
     ]
-    for tb in [tb_extra, tb_nonstate, tb_inter, tb_intra]:
-        tb = tb[COLUMNS_RELEVANT]
+    tb_extra = tb_extra[COLUMNS_RELEVANT]
+    tb_nonstate = tb_nonstate[COLUMNS_RELEVANT]
+    tb_inter = tb_inter[COLUMNS_RELEVANT]
+    tb_intra = tb_intra[COLUMNS_RELEVANT]
+
+    # Fill nulls with zeroes (TODO: this might be wrong, lower-bound is prefered)
+    log.info("war.cow: filling NaNs")
+    tb_nonstate["number_deaths_ongoing_conflicts"] = tb_nonstate["number_deaths_ongoing_conflicts"].fillna(0)
+    tb_inter["number_deaths_ongoing_conflicts"] = tb_inter["number_deaths_ongoing_conflicts"].fillna(0)
+    tb_intra["number_deaths_ongoing_conflicts"] = tb_intra["number_deaths_ongoing_conflicts"].fillna(0)
+
+    # Check NaNs and negative values in tables
+    log.info("war.cow: checking NaNs and negative values")
+
+    def _checks(tb: Table, tb_name: str) -> None:
+        assert not tb.isna().any(axis=None), f"There are some NaN values in `{tb_name}`!"
+        assert not (
+            tb["number_deaths_ongoing_conflicts"] < 0
+        ).any(), f"There are negative values NaN values in `{tb_name}`!"
+
+    _checks(tb_extra, "tb_extra")
+    _checks(tb_nonstate, "tb_nonstate")
+    _checks(tb_inter, "tb_inter")
+    _checks(tb_intra, "tb_intra")
 
     # Concatenate
     log.info("war.cow: concatenate tables")
@@ -149,7 +182,7 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
             tb_extra,
             tb_nonstate,
             tb_inter,
-            # tb_intra,
+            tb_intra,
         ],
         ignore_index=True,
     )
@@ -166,8 +199,6 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
     log.info("war.cow: rename regions")
     tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
     assert tb["region"].isna().sum() == 0, "Unmapped regions!"
-
-    # TODO: Add values for conflict_type='all'
 
     # Replace missing values with zeroes
     log.info("war.cow: replace missing values with zeroes")
@@ -200,7 +231,9 @@ def make_table_extra(tb: Table) -> Table:
     tb = replace_negative_values_extra(tb)
 
     log.info("war.cow.extra: obtain total number of deaths")
-    tb["number_deaths_ongoing_conflicts"] = tb["battle_deaths"] + tb["nonstate_deaths"]
+    tb["number_deaths_ongoing_conflicts"] = tb["battle_deaths"].fillna(0) + tb["nonstate_deaths"].fillna(
+        0
+    )  # TODO: Fill NaNs with zeroes?
 
     return tb
 
@@ -416,17 +449,17 @@ def standardise_region_ids(tb: Table) -> Table:
     """
     # Map to standard numbering
     regions_mapping = {
-        1: 1,  # Americas
+        1: 1,  # Americas (NA)
+        2: 1,  # Americas (SA)
         3: 2,  # Europe
-        4: 4,  # Africa
+        4: 4,  # Africa (SSA)
     }
     # Load custom mapping
-    path = "cow.intrastate.region_mapping_custom.json"
-    with open(path, "r") as f:
+    with open(PATH_CUSTOM_REGIONS_INTRASTATE, "r") as f:
         regions_mapping_default = json.load(f)
     regions_mapping_default = {float(k): v for k, v in regions_mapping_default.items()}
     # Apply custom & default mapping
-    tb["region"] = tb["warnum"].map(regions_mapping_default).fillna(tb["region"].map(regions_mapping))
+    tb["region"] = tb["warnum"].map(regions_mapping_default).fillna(tb["region"].map(regions_mapping)).astype(int)
 
     return tb
 
@@ -561,7 +594,9 @@ def estimate_metrics(tb: Table) -> Table:
         Table with a row per year, and the corresponding metrics of interest.
     """
     # Get metrics (ongoing and new)
+    log.info("war.cow: estimate ongoing metrics (# ongoing conflicts, deaths in # ongoing conflicts)")
     tb_ongoing = _get_ongoing_metrics(tb)
+    log.info("war.cow: estimate 'new' metrics (# new conflicts)")
     tb_new = _get_new_metrics(tb)
 
     # Combine
@@ -587,12 +622,21 @@ def _get_ongoing_metrics(tb: Table) -> Table:
     ## By region and conflict_type
     tb_ongoing = tb.groupby(["year", "region", "conflict_type"], as_index=False).agg(ops)
 
+    ## conflict_type='all'
+    tb_ongoing_alltypes = tb.groupby(["year", "region"], as_index=False).agg(ops)
+    tb_ongoing_alltypes["conflict_type"] = "all"
+
     ## World
     tb_ongoing_world = tb.groupby(["year", "conflict_type"], as_index=False).agg(ops)
     tb_ongoing_world["region"] = "World"
 
+    ## conflict_type='all' and region='World'
+    tb_ongoing_world_alltypes = tb.groupby(["year"], as_index=False).agg(ops)
+    tb_ongoing_world_alltypes["region"] = "World"
+    tb_ongoing_world_alltypes["conflict_type"] = "all"
+
     ## Add region=World
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_world], ignore_index=True).sort_values(  # type: ignore
+    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_alltypes, tb_ongoing_world, tb_ongoing_world_alltypes], ignore_index=True).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
 
@@ -618,6 +662,10 @@ def _get_new_metrics(tb: Table) -> Table:
     ## Estimate metrics
     tb_new = tb_.groupby(["year_start", "region", "conflict_type"], as_index=False).agg(ops)
 
+    # By region and conflict_type='all'
+    tb_new_alltypes = tb_.groupby(["year_start", "region"], as_index=False).agg(ops)
+    tb_new_alltypes["conflict_type"] = "all"
+
     # World
     ## Keep one row per (warnum).
     tb_ = tb.sort_values("year_start").drop_duplicates(subset=["warnum"], keep="first")
@@ -625,8 +673,13 @@ def _get_new_metrics(tb: Table) -> Table:
     tb_new_world = tb.groupby(["year_start", "conflict_type"], as_index=False).agg(ops)
     tb_new_world["region"] = "World"
 
+    # World and conflict_type='all'
+    tb_new_world_alltypes = tb.groupby(["year_start"], as_index=False).agg(ops)
+    tb_new_world_alltypes["region"] = "World"
+    tb_new_world_alltypes["conflict_type"] = "all"
+
     ## Combine
-    tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pd.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True).sort_values(  # type: ignore
         by=["year_start", "region", "conflict_type"]
     )
 
@@ -657,6 +710,7 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     columns = [
         "number_ongoing_conflicts",
         "number_new_conflicts",
+        "number_deaths_ongoing_conflicts",
     ]
     tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
 
