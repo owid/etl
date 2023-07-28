@@ -303,7 +303,7 @@ def add_metadata(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, dims: List
         tb_group = Table(group)
         # Create the unique table short name
 
-        tb_group.metadata.short_name = underscore(f"{dims_id['cause']} - {dims_id['sex']} - {dims_id['age']}")
+        tb_group.metadata.short_name = underscore(f"{dims_id['cause']} - {dims_id['sex']} - {dims_id['age']}")[0:240]
         variables = tb_group.columns.drop(dims + ["country", "year"])
         for variable_name in variables:
             tb_group[variable_name] = Variable(tb_group[variable_name])
