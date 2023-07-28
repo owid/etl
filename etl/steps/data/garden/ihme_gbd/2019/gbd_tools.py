@@ -298,7 +298,6 @@ def add_metadata(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, dims: List
     df = df.reset_index()
     df_group = df.groupby(dims)
     for group_id, group in df_group:
-        print(group_id)
         # Grab out the IDs of each of the grouping factors, e.g. the age-group, sex and cause
         dims_id = dict(zip(dims, group_id))
         tb_group = Table(group)
