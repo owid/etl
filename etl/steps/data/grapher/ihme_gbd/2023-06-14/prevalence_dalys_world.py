@@ -24,7 +24,6 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = tb.reset_index().rename(columns={"cause": "country"}).set_index(["country", "year"])
-
     #
     # Save outputs.
     #
