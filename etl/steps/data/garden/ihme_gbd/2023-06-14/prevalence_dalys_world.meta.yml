@@ -1,6 +1,6 @@
 all_sources:
   - source_testing: &source-ihme
-      name: IHME, Global Burden of Disease (2019)
+      name: IHME, Global Burden of Disease (2020)
       published_by: 'Global Burden of Disease Collaborative Network. Global Burden
         of Disease Study 2019 (GBD 2019) Results. Seattle, United States: Institute for
         Health Metrics and Evaluation (IHME), 2020. Available from https://vizhub.healthdata.org/gbd-results/'
