@@ -2,7 +2,6 @@
 
 from typing import List, cast
 
-import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 
@@ -193,18 +192,6 @@ def run(dest_dir: str) -> None:
     df_pop_deaths["terrorism_deaths_per_capita"] = df_pop_deaths["total_killed"] / df_pop_deaths["population"]
     df_pop_deaths["terrorism_casualties_per_capita"] = df_pop_deaths["total_casualties"] / df_pop_deaths["population"]
     df_pop_deaths["share_of_deaths"] = (df_pop_deaths["total_killed"] / df_pop_deaths["deaths"]) * 100
-    # Perform decadal averaging for selected columns
-    cols_for_decadal_av = [
-        "total_killed",
-        "total_wounded",
-        "total_incident_counts",
-        "total_casualties",
-        "terrorism_wounded_per_capita",
-        "terrorism_deaths_per_capita",
-        "terrorism_casualties_per_capita",
-    ]
-
-    df_pop_deaths = perform_decadal_averaging(df_pop_deaths, cols_for_decadal_av=cols_for_decadal_av)
 
     # Convert relevant columns to float64 data type (to avoid errors related to this issue -  https://github.com/owid/etl/issues/1334)
     df_pop_deaths["terrorism_casualties_per_capita"] = df_pop_deaths["terrorism_casualties_per_capita"].astype(
@@ -242,36 +229,6 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-
-def perform_decadal_averaging(df: pd.DataFrame, cols_for_decadal_av: list) -> pd.DataFrame:
-    """
-    Perform decadal averaging on the specified columns in the DataFrame.
-
-    This function calculates the mean value for each specified column over the decades. It groups the data by decade
-    based on the 'year' column and computes the mean for each decadal group. Non-decadal years are replaced with NaN.
-
-    Parameters:
-        df (pd.DataFrame): The DataFrame containing the data.
-        cols_for_decadal_av (list): A list of column names for which decadal averaging should be performed.
-
-    Returns:
-        pd.DataFrame: A modified DataFrame with additional columns representing decadal averages for the specified
-                      columns.
-    """
-
-    for column in df[cols_for_decadal_av]:
-        # Create a new column name for decadal average
-        decadal_column = f"decadal_{column}"
-
-        # Group the data by decade and compute the mean for each decadal group
-        df[decadal_column] = df.groupby(df["year"] // 10 * 10)[column].transform("mean")
-
-        # Replace non-decadal years with NaN
-        df[decadal_column] = df[decadal_column].mask(df["year"] % 10 != 0, np.nan)
-
-    # Return the modified DataFrame
-    return df
 
 
 def add_suffix(df: pd.DataFrame, suffix: str) -> pd.DataFrame:
