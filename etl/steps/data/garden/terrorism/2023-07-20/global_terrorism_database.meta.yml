@@ -1846,10 +1846,7 @@ tables:
       total_nwound_maritime_target:
         title: Terrorism non-fatal injuries Maritime Target
         description: >
-            Includes, attacks on reporters, news assistants, photographers, publishers, as well as attacks on media headquarters and offices.
-
-
-            Attacks on transmission facilities such as antennae or transmission towers, or broadcast infrastructure are coded as “Telecommunications,”.
+            Includes civilian maritime: attacks against fishing ships, oil tankers, ferries, yachts, etc. (Attacks on fishermen are coded as “Private Citizens and Property,”).
         unit: 'injuries'
         display:
           name: Maritime
