@@ -1,0 +1,1333 @@
+dataset:
+  title: "World Bank Education Statistics: Systems Approach for Better Education Results (SABER) (2023)"
+  description: The World Bank EdStats All Indicator Query holds over 4,000 internationally comparable indicators that describe
+    education access, progression, completion, literacy, teachers, population, and expenditures. The indicators cover the
+    education cycle from pre-primary to vocational and tertiary education.The query also holds learning outcome data from
+    international and regional learning assessments (e.g. PISA, TIMSS, PIRLS), equity data from household surveys, and projection/attainment
+    data to 2050. For further information, please visit the EdStats website.
+  licenses:
+  - name: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+    url: Creative Commons Attribution 4.0
+  sources:
+  - name: World Bank (2023)
+    description: The World Bank EdStats All Indicator Query holds over 4,000 internationally comparable indicators that describe
+      education access, progression, completion, literacy, teachers, population, and expenditures. The indicators cover the
+      education cycle from pre-primary to vocational and tertiary education.The query also holds learning outcome data from
+      international and regional learning assessments (e.g. PISA, TIMSS, PIRLS), equity data from household surveys, and projection/attainment
+      data to 2050. For further information, please visit the EdStats website.
+    url: https://datacatalog.worldbank.org/search/dataset/0038480/Education-Statistics
+    source_data_url: https://databank.worldbank.org/data/download/EdStats_CSV.zip
+    date_accessed: '2023-07-26'
+    publication_year: 2023
+    published_by: World Bank Education Statistics (2023)
+tables:
+  education_saber:
+    variables:
+      saber__early_childhood_development__policy_goal_1_lever_1__legal_framework:
+        title: 'SABER: (Early Childhood Development) Policy Goal 1 Lever 1: Legal Framework'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__early_childhood_development__policy_goal_1_lever_2__inter_sectoral_coordination:
+        title: 'SABER: (Early Childhood Development) Policy Goal 1 Lever 2: Inter-sectoral Coordination'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__early_childhood_development__policy_goal_1__establishing_an_enabling_environment:
+        title: 'SABER: (Early Childhood Development) Policy Goal 1: Establishing an Enabling Environment'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__early_childhood_development__policy_goal_2_lever_1__scope_of_programs:
+        title: 'SABER: (Early Childhood Development) Policy Goal 2 Lever 1: Scope of Programs'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__early_childhood_development__policy_goal_2_lever_2__coverage:
+        title: 'SABER: (Early Childhood Development) Policy Goal 2 Lever 2: Coverage'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__early_childhood_development__policy_goal_2_lever_3__equity:
+        title: 'SABER: (Early Childhood Development) Policy Goal 2 Lever 3: Equity'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__early_childhood_development__policy_goal_2__scope_of_programs:
+        title: 'SABER: (Early Childhood Development) Policy Goal 2: Scope of Programs'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__early_childhood_development__policy_goal_3_lever_1__data_availability:
+        title: 'SABER: (Early Childhood Development) Policy Goal 3 Lever 1: Data Availability'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__early_childhood_development__policy_goal_3_lever_2__quality_standards:
+        title: 'SABER: (Early Childhood Development) Policy Goal 3 Lever 2: Quality Standards'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__early_childhood_development__policy_goal_3_lever_3__compliance_with_standards:
+        title: 'SABER: (Early Childhood Development) Policy Goal 3 Lever 3: Compliance with Standards'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__early_childhood_development__policy_goal_3__monitoring_and_assuring_quality:
+        title: 'SABER: (Early Childhood Development) Policy Goal 3: Monitoring and Assuring Quality'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_1_lever_1__legal_framework:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 1 Lever 1: Legal Framework'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_1_lever_2__organizational_structure:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 1 Lever 2: Organizational Structure'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_1_lever_3__human_resources:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 1 Lever 3: Human Resources'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_1_lever_4__infrastructural_capacity:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 1 Lever 4: Infrastructural capacity'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_1_lever_5__budget:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 1 Lever 5: Budget'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_1_lever_6__data_driven_culture:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 1 Lever 6: Data-driven Culture'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_1__enabling_environment:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 1: Enabling Environment'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_2_lever_1__data_architecture:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 2 Lever 1: Data Architecture'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_2_lever_2__data_coverage:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 2 Lever 2: Data Coverage'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_2_lever_3__data_analytics:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 2 Lever 3: Data Analytics'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_2_lever_4__dynamic_system:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 2 Lever 4: Dynamic System'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_2_lever_5__serviceability:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 2 Lever 5: Serviceability'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_2__system_soundness:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 2: System Soundness'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_3_lever_1__methodological_soundness:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 3 Lever 1: Methodological Soundness'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_3_lever_2__accuracy_and_reliability:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 3 Lever 2: Accuracy and Reliability'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_3_lever_3__integrity:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 3 Lever 3: Integrity'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_3_lever_4__periodicity_and_timeliness:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 3 Lever 4: Periodicity and Timeliness'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_3__quality_data:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 3: Quality data'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_4_lever_1__openness:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 4 Lever 1: Openness'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_4_lever_2__operational_use:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 4 Lever 2: Operational Use'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ratio
+        short_unit: ''
+        display:
+          numDecimalPlaces: 1
+      saber__education_management_information_systems__policy_goal_4_lever_3__accessibility:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 4 Lever 3: Accessibility'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_4_lever_4__effectiveness_in_disseminating_findings:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 4 Lever 4: Effectiveness in Disseminating Findings'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__education_management_information_systems__policy_goal_4__utilization_in_decision_making:
+        title: 'SABER: (Education Management Information Systems) Policy Goal 4: Utilization in decision making'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_1_lever_1__teacher_standards:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 1 Lever 1: Teacher standards'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_1_lever_2__teacher_appointment_and_deployment:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 1 Lever 2: Teacher appointment and deployment'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_1_lever_3__teacher_salaries:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 1 Lever 3: Teacher salaries'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_1_lever_4__teacher_dismissal:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 1 Lever 4: Teacher dismissal'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_1_lever_5__curriculum_delivery:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 1 Lever 5: Curriculum Delivery'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_1_lever_6__classroom_resourcing:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 1 Lever 6: Classroom resourcing'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_1__encouraging_innovation_by_providers:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 1: Encouraging innovation by providers'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_2_lever_1__student_standards:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 2 Lever 1: Student standards'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_2_lever_2__student_assessment:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 2 Lever 2: Student assessment'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_2_lever_3__inspection:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 2 Lever 3: Inspection'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_2_lever_4__improvement_planning:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 2 Lever 4: Improvement planning'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_2_lever_5__sanctions:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 2 Lever 5: Sanctions'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_2__holding_schools_accountable:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 2: Holding schools accountable'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_3_lever_1__information:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 3 Lever 1: Information'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_3_lever_2__voice:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 3 Lever 2: Voice'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_3_lever_3__financial_support:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 3 Lever 3: Financial Support'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_3__empowering_all_parents__students__and_communities:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 3: Empowering all parents, students, and communities'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_4_lever_1__tuition_fees:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 4 Lever 1: Tuition fees'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_4_lever_2__ownership:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 4 Lever 2: Ownership'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_4_lever_3__certification_standards:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 4 Lever 3: Certification standards'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_4_lever_4__market_entry:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 4 Lever 4: Market entry'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_4_lever_5__regulatory_fees:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 4 Lever 5: Regulatory fees'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__policy_goal_4__promoting_diversity_of_supply:
+        title: 'SABER: (Engaging the Private Sector) Policy Goal 4: Promoting diversity of supply'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_5_lever_1__teacher_standards:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 5 Lever 1: Teacher standards'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_5_lever_2__appointment_and_deployment_of_teachers:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 5 Lever 2: Appointment and deployment
+          of teachers'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_5_lever_3__teacher_salaries:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 5 Lever 3: Teacher salaries'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_5_lever_4__teacher_dismissal:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 5 Lever 4: Teacher dismissal'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_5_lever_5__curriculum_delivery:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 5 Lever 5: Curriculum delivery'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_5_lever_6__classroom_resourcing:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 5 Lever 6: Classroom resourcing'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_5_lever_7__budget_autonomy:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 5 Lever 7: Budget autonomy'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_5__encouraging_innovation_by_providers:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 5: Encouraging innovation by providers'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_6_lever_1__student_standards:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 6 Lever 1: Student standards'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_6_lever_2__student_assessment:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 6 Lever 2: Student assessment'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_6_lever_3__financial_reporting:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 6 Lever 3: Financial reporting'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_6_lever_4__inspection:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 6 Lever 4: Inspection'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_6_lever_5__improvement_planning:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 6 Lever 5: Improvement planning'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_6_lever_6__sanctions_and_rewards:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 6 Lever 6: Sanctions and rewards'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_6__holding_schools_accountable:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 6: Holding schools accountable'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_7_lever_1__information:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 7 Lever 1: Information'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_7_lever_2__voice:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 7 Lever 2: Voice'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_7_lever_3__selection:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 7 Lever 3: Selection'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_7_lever_4__contributions:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 7 Lever 4: Contributions'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_7__empowering_all_parents__students__and_communities:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 7: Empowering all parents, students, and
+          communities'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_8_lever_1__ownership:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 8 Lever 1: Ownership'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_8_lever_2__certification_standards:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 8 Lever 2: Certification standards'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_8_lever_3__market_entry_information:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 8 Lever 3: Market entry information'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_8_lever_4__regulatory_fees:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 8 Lever 4: Regulatory fees'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_8_lever_5__funding:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 8 Lever 5: Funding'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_8_lever_6__incentives:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 8 Lever 6: Incentives'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_8_lever_7__planning:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 8 Lever 7: Planning'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__engaging_the_private_sector__government_funded__policy_goal_8__promoting_diversity_of_supply:
+        title: 'SABER: (Engaging the Private Sector, Government funded) Policy Goal 8: Promoting diversity of supply'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_1_lever_1__are_there_policies_and_systems_set_up_to_provide_basic_educational_inputs_to_all:
+        title: 'SABER: (School Finance) Policy Goal 1 Lever 1: Are there policies and systems set up to provide basic educational
+          inputs to all?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_1_lever_2__are_there_basic_educational_inputs_for_all_primary_school_students:
+        title: 'SABER: (School Finance) Policy Goal 1 Lever 2: Are there basic educational inputs for all primary school students?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_1__ensuring_basic_conditions_for_learning:
+        title: 'SABER: (School Finance) Policy Goal 1: Ensuring basic conditions for learning'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_2_lever_1__does_the_government_provide_more_resources_to_students_from_disadvantaged_backgrounds:
+        title: 'SABER: (School Finance) Policy Goal 2 Lever 1: Does the government provide more resources to students from
+          disadvantaged backgrounds?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_2_lever_2__do_payments_for_schooling_represent_a_high_share_of_income_for_low_income_households:
+        title: 'SABER: (School Finance) Policy Goal 2 Lever 2: Do payments for schooling represent a high share of income
+          for low income households?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      saber__school_finance__policy_goal_2__monitoring_learning_conditions_and_outcomes:
+        title: 'SABER: (School Finance) Policy Goal 2: Monitoring learning conditions and outcomes'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_3_lever_1__are_resources_allocated_and_disbursed_in_a_manner_that_is_transparent_and_effective:
+        title: 'SABER: (School Finance) Policy Goal 3 Lever 1: Are resources allocated and disbursed in a manner that is transparent
+          and effective?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_3_lever_2__do_monitoring_and_auditing_processes_encourage_accountability_in_the_use_of_funding:
+        title: 'SABER: (School Finance) Policy Goal 3 Lever 2: Do monitoring and auditing processes encourage accountability
+          in the use of funding?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_3__overseeing_service_delivery:
+        title: 'SABER: (School Finance) Policy Goal 3: Overseeing service delivery'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_4_lever_1__is_there_an_informed_budget_process:
+        title: 'SABER: (School Finance) Policy Goal 4 Lever 1: Is there an informed budget process?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_4_lever_2__is_the_budget_comprehensive_and_transparent:
+        title: 'SABER: (School Finance) Policy Goal 4 Lever 2: Is the budget comprehensive and transparent?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_4__budgeting_with_adequate_and_transparent_information:
+        title: 'SABER: (School Finance) Policy Goal 4: Budgeting with adequate and transparent information'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_5_lever_1__are_more_public_resources_available_to_students_from_disadvantaged_backgrounds:
+        title: 'SABER: (School Finance) Policy Goal 5 Lever 1: Are more public resources available to students from disadvantaged
+          backgrounds?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_5_lever_2__do_payments_for_schooling_represent_a_small_share_of_income_for_low_income_families:
+        title: 'SABER: (School Finance) Policy Goal 5 Lever 2: Do payments for schooling represent a small share of income
+          for low income families?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      saber__school_finance__policy_goal_5__providing_more_resources_to_students_who_need_them:
+        title: 'SABER: (School Finance) Policy Goal 5: Providing more resources to students who need them'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_6_lever_1__are_there_systems_in_place_to_verify_the_use_of_educational_resources:
+        title: 'SABER: (School Finance) Policy Goal 6 Lever 1: Are there systems in place to verify the use of educational
+          resources?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_6_lever_2__are_education_expenditures_audited:
+        title: 'SABER: (School Finance) Policy Goal 6 Lever 2: Are education expenditures audited?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_finance__policy_goal_6__managing_resources_efficiently:
+        title: 'SABER: (School Finance) Policy Goal 6: Managing resources efficiently'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_health_and_school_feeding__policy_goal_1__policy_frameworks:
+        title: 'SABER: (School Health and School Feeding) Policy Goal 1: Policy Frameworks'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_health_and_school_feeding__policy_goal_2__financial_capacity:
+        title: 'SABER: (School Health and School Feeding) Policy Goal 2: Financial Capacity'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_health_and_school_feeding__policy_goal_3__institutional_capacity_and_coordination:
+        title: 'SABER: (School Health and School Feeding) Policy Goal 3: Institutional Capacity and Coordination'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_health_and_school_feeding__policy_goal_4__design_and_implementation:
+        title: 'SABER: (School Health and School Feeding) Policy Goal 4: Design and Implementation'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_health_and_school_feeding__policy_goal_5__community_roles_reaching_beyond_schools:
+        title: 'SABER: (School Health and School Feeding) Policy Goal 5: Community Roles-Reaching Beyond Schools'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_health_and_school_feeding__policy_goal_6__health_related_school_policies:
+        title: 'SABER: (School Health and School Feeding) Policy Goal 6: Health-related school policies'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_health_and_school_feeding__policy_goal_7__safe__supportive_school_environments:
+        title: 'SABER: (School Health and School Feeding) Policy Goal 7: Safe, Supportive School Environments'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_health_and_school_feeding__policy_goal_8__school_based_health_and_nutrition_services:
+        title: 'SABER: (School Health and School Feeding) Policy Goal 8: School-Based Health and Nutrition Services'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__school_health_and_school_feeding__policy_goal_9__skills_based_health_education:
+        title: 'SABER: (School Health and School Feeding) Policy Goal 9: Skills-Based Health Education'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_1_lever_1__enabling_context_and_system_alignment:
+        title: 'SABER: (Student Assessment) Policy Goal 1 Lever 1: Enabling Context and System Alignment'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_1_lever_2__assessment_quality:
+        title: 'SABER: (Student Assessment) Policy Goal 1 Lever 2: Assessment Quality'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_1__classroom_assessment:
+        title: 'SABER: (Student Assessment) Policy Goal 1: Classroom Assessment'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_2_lever_1__enabling_context:
+        title: 'SABER: (Student Assessment) Policy Goal 2 Lever 1: Enabling Context'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_2_lever_2__system_alignment:
+        title: 'SABER: (Student Assessment) Policy Goal 2 Lever 2: System Alignment'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_2_lever_3__assessment_quality:
+        title: 'SABER: (Student Assessment) Policy Goal 2 Lever 3: Assessment Quality'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_2__examinations:
+        title: 'SABER: (Student Assessment) Policy Goal 2: Examinations'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_3_lever_1__enabling_context:
+        title: 'SABER: (Student Assessment) Policy Goal 3 Lever 1: Enabling Context'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_3_lever_2__system_alignment:
+        title: 'SABER: (Student Assessment) Policy Goal 3 Lever 2: System Alignment'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_3_lever_3__assessment_quality:
+        title: 'SABER: (Student Assessment) Policy Goal 3 Lever 3: Assessment Quality'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_3__national_large_scale_assessment__nlsa:
+        title: 'SABER: (Student Assessment) Policy Goal 3: National Large-Scale Assessment (NLSA)'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_4_lever_1__enabling_context:
+        title: 'SABER: (Student Assessment) Policy Goal 4 Lever 1: Enabling Context'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_4_lever_2__system_alignment:
+        title: 'SABER: (Student Assessment) Policy Goal 4 Lever 2: System Alignment'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_4_lever_3__assessment_quality:
+        title: 'SABER: (Student Assessment) Policy Goal 4 Lever 3: Assessment Quality'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__student_assessment__policy_goal_4__international_large_scale_assessment__ilsa:
+        title: 'SABER: (Student Assessment) Policy Goal 4: International Large-Scale Assessment (ILSA)'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_1_lever_1__are_there_clear_expectations_for_teachers:
+        title: 'SABER: (Teachers) Policy Goal 1 Lever 1: Are there clear expectations for teachers?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_1_lever_2__is_there_useful_guidance_on_the_use_of_teachers_working_time:
+        title: 'SABER: (Teachers) Policy Goal 1 Lever 2: Is there useful guidance on the use of teachers'' working time?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_1__setting_clear_expectations_for_teachers:
+        title: 'SABER: (Teachers) Policy Goal 1: Setting clear expectations for teachers'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_2_lever_1__are_entry_requirements_set_up_to_attract_talented_candidates:
+        title: 'SABER: (Teachers) Policy Goal 2 Lever 1: Are entry requirements set up to attract talented candidates?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_2_lever_2__is_teacher_pay_appealing_for_talented_candidates:
+        title: 'SABER: (Teachers) Policy Goal 2 Lever 2: Is teacher pay appealing for talented candidates?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_2_lever_3__are_working_conditions_appealing_for_talented_applicants:
+        title: 'SABER: (Teachers) Policy Goal 2 Lever 3: Are working conditions appealing for talented applicants?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_2_lever_4__are_there_attractive_career_opportunities:
+        title: 'SABER: (Teachers) Policy Goal 2 Lever 4: Are there attractive career opportunities?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_2__attracting_the_best_into_teaching:
+        title: 'SABER: (Teachers) Policy Goal 2: Attracting the best into teaching'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_3_lever_1__are_there_minimum_standards_for_pre_service_teaching_education_programs:
+        title: 'SABER: (Teachers) Policy Goal 3 Lever 1: Are there minimum standards for pre-service teaching education programs?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_3_lever_2__to_what_extent_are_teacher_entrants_required_to_be_familiar_with_classroom_practice:
+        title: 'SABER: (Teachers) Policy Goal 3 Lever 2: To what extent are teacher-entrants required to be familiar with
+          classroom practice?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_4_lever_1__are_there_incentives_for_teachers_to_work_at_hard_to_staff_schools:
+        title: 'SABER: (Teachers) Policy Goal 4 Lever 1: Are there incentives for teachers to work at hard-to-staff schools?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_4_lever_2__are_there_incentives_for_teachers_to_teach_critical_shortage_subjects:
+        title: 'SABER: (Teachers) Policy Goal 4 Lever 2: Are there incentives for teachers to teach critical shortage subjects?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_4__matching_teachers_skills_with_students_needs:
+        title: 'SABER: (Teachers) Policy Goal 4: Matching teachers'' skills with students'' needs'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_5_lever_1__does_the_education_system_invest_in_developing_qualified_school_leaders:
+        title: 'SABER: (Teachers) Policy Goal 5 Lever 1: Does the education system invest in developing qualified school leaders?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_5_lever_2__are_principals_expected_to_support_and_improve_instructional_practice:
+        title: 'SABER: (Teachers) Policy Goal 5 Lever 2: Are principals expected to support and improve instructional practice?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_5__leading_teachers_with_strong_principals:
+        title: 'SABER: (Teachers) Policy Goal 5: Leading teachers with strong principals'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_6_lever_1__are_there_systems_in_place_to_assess_student_learning_in_order_to_inform_teaching_and_policy:
+        title: 'SABER: (Teachers) Policy Goal 6 Lever 1: Are there systems in place to assess student learning in order to
+          inform teaching and policy?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_6_lever_2__are_there_systems_in_place_to_monitor_teacher_performance:
+        title: 'SABER: (Teachers) Policy Goal 6 Lever 2: Are there systems in place to monitor teacher performance?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_6_lever_3__are_there_multiple_mechanisms_to_evaluate_teacher_performance:
+        title: 'SABER: (Teachers) Policy Goal 6 Lever 3: Are there multiple mechanisms to evaluate teacher performance?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_6__monitoring_teaching_and_learning:
+        title: 'SABER: (Teachers) Policy Goal 6: Monitoring teaching and learning'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_7_lever_1__are_there_opportunities_for_professional_development:
+        title: 'SABER: (Teachers) Policy Goal 7 Lever 1: Are there opportunities for professional development?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+            saber__teachers__policy_goal_7_lever_2__is_teacher_professional_development_collaborative_and_focused_on_instructional_improvement
+      : title: 'SABER: (Teachers) Policy Goal 7 Lever 2: Is teacher professional development collaborative and focused on
+          instructional improvement?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_7_lever_3__is_teacher_professional_development_assigned_based_on_perceived_needs:
+        title: 'SABER: (Teachers) Policy Goal 7 Lever 3: Is teacher professional development assigned based on perceived needs?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_7__supporting_teachers_to_improve_instruction:
+        title: 'SABER: (Teachers) Policy Goal 7: Supporting teachers to improve instruction'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_8_lever_1__are_career_opportunities_linked_to_performance:
+        title: 'SABER: (Teachers) Policy Goal 8 Lever 1: Are career opportunities linked to performance?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_8_lever_2__are_there_mechanisms_to_hold_teachers_accountable:
+        title: 'SABER: (Teachers) Policy Goal 8 Lever 2: Are there mechanisms to hold teachers accountable?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_8_lever_3__is_teacher_compensation_linked_to_performance:
+        title: 'SABER: (Teachers) Policy Goal 8 Lever 3: Is teacher compensation linked to performance?'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__teachers__policy_goal_8__motivating_teachers_to_perform:
+        title: 'SABER: (Teachers) Policy Goal 8: Motivating teachers to perform'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_1_lever_1__clear_vision:
+        title: 'SABER: (Tertiary Education) Policy Goal 1 Lever 1: Clear vision'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_1__vision_for_tertiary_education:
+        title: 'SABER: (Tertiary Education) Policy Goal 1: Vision for Tertiary Education'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_2_lever_1__steering_the_system:
+        title: 'SABER: (Tertiary Education) Policy Goal 2 Lever 1: Steering the system'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_2__regulatory_framework_for_tertiary_education:
+        title: 'SABER: (Tertiary Education) Policy Goal 2: Regulatory Framework for Tertiary Education'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_3_lever_1__articulation:
+        title: 'SABER: (Tertiary Education) Policy Goal 3 Lever 1: Articulation'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_3_lever_2__institutional_autonomy:
+        title: 'SABER: (Tertiary Education) Policy Goal 3 Lever 2: Institutional autonomy'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_3__governance:
+        title: 'SABER: (Tertiary Education) Policy Goal 3: Governance'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_4_lever_1__coverage_of_resource_allocation:
+        title: 'SABER: (Tertiary Education) Policy Goal 4 Lever 1: Coverage of resource allocation'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_4_lever_2__resource_allocation:
+        title: 'SABER: (Tertiary Education) Policy Goal 4 Lever 2: Resource allocation'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_4_lever_3__resource_utilization__equity:
+        title: 'SABER: (Tertiary Education) Policy Goal 4 Lever 3: Resource utilization (Equity)'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_4__finance:
+        title: 'SABER: (Tertiary Education) Policy Goal 4: Finance'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_5_lever_1__accreditation_and_institutional_quality_standards:
+        title: 'SABER: (Tertiary Education) Policy Goal 5 Lever 1: Accreditation and Institutional Quality Standards'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_5__quality_assurance:
+        title: 'SABER: (Tertiary Education) Policy Goal 5: Quality Assurance'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_6_lever_1__economic_development:
+        title: 'SABER: (Tertiary Education) Policy Goal 6 Lever 1: Economic Development'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_6_lever_2__fostering_rdi_and_innovation:
+        title: 'SABER: (Tertiary Education) Policy Goal 6 Lever 2: Fostering RDI and Innovation'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_6_lever_3__fostering_social_and_cultural_development_and_environmental_protection_and_sustainability:
+        title: 'SABER: (Tertiary Education) Policy Goal 6 Lever 3: Fostering Social and Cultural Development and Environmental
+          Protection and Sustainability'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__tertiary_education__policy_goal_6__the_relevance_of_tertiary_education_for_economic_and_social_needs:
+        title: 'SABER: (Tertiary Education) Policy Goal 6: The Relevance of Tertiary Education for Economic and Social Needs'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__workforce_development__policy_goal_1_lever_1__setting_a_strategic_direction:
+        title: 'SABER: (Workforce Development) Policy Goal 1 Lever 1: Setting a Strategic Direction'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__workforce_development__policy_goal_1_lever_2__fostering_a_demand_driven_approach:
+        title: 'SABER: (Workforce Development) Policy Goal 1 Lever 2: Fostering a Demand-Driven Approach'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__workforce_development__policy_goal_1_lever_3__strengthening_critical_coordination:
+        title: 'SABER: (Workforce Development) Policy Goal 1 Lever 3: Strengthening Critical Coordination'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__workforce_development__policy_goal_1__strategic_framework:
+        title: 'SABER: (Workforce Development) Policy Goal 1: Strategic Framework'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__workforce_development__policy_goal_2_lever_1__ensuring_efficiency_and_equity_in_funding:
+        title: 'SABER: (Workforce Development) Policy Goal 2 Lever 1: Ensuring Efficiency and Equity in Funding'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__workforce_development__policy_goal_2_lever_2__assuring_relevant_and_reliable_standards:
+        title: 'SABER: (Workforce Development) Policy Goal 2 Lever 2: Assuring Relevant and Reliable Standards'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__workforce_development__policy_goal_2_lever_3__diversifying_pathways_for_skills_acquisition:
+        title: 'SABER: (Workforce Development) Policy Goal 2 Lever 3: Diversifying Pathways for Skills Acquisition'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__workforce_development__policy_goal_2__system_oversight:
+        title: 'SABER: (Workforce Development) Policy Goal 2: System Oversight'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__workforce_development__policy_goal_3_lever_1__enabling_diversity_and_excellence_in_training_provision:
+        title: 'SABER: (Workforce Development) Policy Goal 3 Lever 1: Enabling Diversity and Excellence in Training Provision'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__workforce_development__policy_goal_3_lever_2__fostering_relevance_in_public_training_programs:
+        title: 'SABER: (Workforce Development) Policy Goal 3 Lever 2: Fostering Relevance in Public Training Programs'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__workforce_development__policy_goal_3_lever_3__enhancing_evidence_based_accountability_for_results:
+        title: 'SABER: (Workforce Development) Policy Goal 3 Lever 3: Enhancing Evidence-based Accountability for Results'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
+      saber__workforce_development__policy_goal_3__service_delivery:
+        title: 'SABER: (Workforce Development) Policy Goal 3: Service Delivery'
+        description: >
+          'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
+          (website: http://saber.worldbank.org/index.cfm'
+        unit: ''
+        short_unit: ''
