@@ -43,6 +43,33 @@ tables:
           in the "Additional Notes" field.
         unit: deaths
         display:
+          name: Deaths
+          numDecimalPlaces: 0
+
+      total_killed_gtd:
+        title: Terrorism deaths (GTD)
+        description: >-
+          This field stores the number of total confirmed fatalities for the incident. The number includes all victims and
+          attackers who died as a direct result of the incident.
+
+
+          Where there is evidence of fatalities, but a figure is not reported or it is too vague to be of use, this field
+          remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities
+          are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise,
+          if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this
+          field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of fatalities, the database will usually reflect the
+          number given by the most recent source. However, the most recent source will not be used if the source itself is
+          of questionable validity or if the source bases its death numbers on claims made by a perpetrator group. When there
+          are several "most recent" sources published around the same time, or there are concerns about the validity of a
+          recent source, the majority figure will be used. Where there is no majority figure among independent sources, the
+          database will record the lowest proffered fatality figure, unless that figure comes from a source of questionable
+          validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted
+          in the "Additional Notes" field.
+        unit: deaths
+        display:
           name: Global Terrorism Database
           numDecimalPlaces: 0
       total_wounded:
@@ -2471,7 +2498,8 @@ tables:
           numDecimalPlaces: 7
       share_of_deaths:
         title: Share of deaths from terrorism
-        description: This field records the number of confirmed fatalties from terrorism as a share of total deaths.
+        description: >
+            The percentage of deaths due to terrorism is derived by comparing the confirmed fatalities data from the Global Terrorism Database to the overall mortality figures obtained from the 2022 UN World Population Prospects data.
         unit: '%'
         short_unit: '%'
         display:

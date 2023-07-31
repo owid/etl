@@ -215,9 +215,12 @@ def run(dest_dir: str) -> None:
 
     # Drop total deaths and population columns
     df_pop_deaths.drop(["deaths", "population"], axis=1, inplace=True)
+
     # Convert DataFrame to a new garden dataset table.
     tb_garden = Table(df_pop_deaths, short_name=paths.short_name, underscore=True)
     tb_garden.set_index(["country", "year"], inplace=True)
+    # Creat a copy of deaths for plotting across sources
+    tb_garden["total_killed_gtd"] = tb_garden["total_killed"].copy()
 
     # Add deaths and attacks per suicide/ non-suicide terrorist attack
     tb_garden["killed_per_suicide_attack"] = (
