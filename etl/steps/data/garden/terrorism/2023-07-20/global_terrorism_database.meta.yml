@@ -1690,7 +1690,7 @@ tables:
           This value also includes cases involving the targeting of militias and guerillas
         unit: "deaths"
         display:
-          name: Terrorist/non-state militia
+          name: Militia
           numDecimalPlaces: 0
 
       total_nkill_tourists_target:
@@ -1931,7 +1931,7 @@ tables:
           This value also includes cases involving the targeting of militias and guerillas
         unit: "injuries"
         display:
-          name: Terrorist/non-state militia
+          name: Militia
           numDecimalPlaces: 0
 
       total_nwound_tourists_target:
@@ -2232,7 +2232,7 @@ tables:
           This value also includes cases involving the targeting of militias and guerillas
         unit: "attacks"
         display:
-          name: Terrorist/non-state militia
+          name: Militia
           numDecimalPlaces: 0
 
       total_incident_counts_tourists_target:
