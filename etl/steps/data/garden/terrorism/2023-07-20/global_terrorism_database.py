@@ -290,7 +290,7 @@ def pivot_dataframe(dataframe, index_columns, pivot_column, value_columns):
     pivot_df = pd.pivot(dataframe, index=index_columns, columns=pivot_column, values=value_columns)
     pivot_df.reset_index(inplace=True)
 
-    # If 'country' is not a column, add a column with default value 'GTD'
+    # If 'country' is not a column, add a column with default value 'GTD' id Global Tourism Dataset (when pivoting using GTD defined regions)
     if "country" not in pivot_df.columns:
         pivot_df["country"] = "GTD"
 
