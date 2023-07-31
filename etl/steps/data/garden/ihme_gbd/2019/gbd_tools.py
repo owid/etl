@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import Any, List, cast
 
 import pandas as pd
-from owid.catalog import Dataset, Table
-from owid.catalog.utils import underscore_table
+from owid.catalog import Dataset, Table, Variable, VariableMeta
+from owid.catalog.utils import underscore, underscore_table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -83,18 +83,19 @@ def _pivot_share(df: pd.DataFrame, dims: List[str]) -> Any:
     return df_share
 
 
-def pivot(df: pd.DataFrame, dims: List[str]) -> Table:
+def pivot(df: pd.DataFrame, dims: List[str]) -> pd.DataFrame:
     # NOTE: processing them separately simplifies the code and is faster (and less memory heavy) than
     # doing it all in one pivot operation
     df_number = _pivot_number(df, dims)
     df_percent = _pivot_percent(df, dims)
     df_rate = _pivot_rate(df, dims)
     df_share = _pivot_share(df, dims)
+    df_garden = pd.concat([df_number, df_percent, df_rate, df_share], axis=1)
+    # add metadata step
+    # tb_garden = Table(df_garden)
+    # tb_garden = underscore_table(tb_garden)
 
-    tb_garden = Table(pd.concat([df_number, df_percent, df_rate, df_share], axis=1))
-    tb_garden = underscore_table(tb_garden)
-
-    return tb_garden
+    return df_garden
 
 
 def omm_metrics(df: pd.DataFrame) -> Any:
@@ -152,12 +153,200 @@ def add_share_of_population(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str, rei: str = "None"):
+    var_name_dict = {
+        "Deaths - Share of the population": {
+            "title": f"Share of total deaths that are from {cause.lower()}"
+            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + f", in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "%",
+            "short_unit": "%",
+            "num_decimal_places": 1,
+        },
+        "DALYs (Disability-Adjusted Life Years) - Share of the population": {
+            "title": f"Share of total DALYs that are from {cause.lower()}"
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
+            + f", in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "%",
+            "short_unit": "%",
+            "num_decimal_places": 1,
+        },
+        "Deaths - Rate": {
+            "title": f"Deaths that are from {cause.lower()}"
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
+            + f" per 100,000 people, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "deaths per 100,000 people",
+            "short_unit": "",
+            "num_decimal_places": 1,
+        },
+        "DALYs (Disability-Adjusted Life Years) - Rate": {
+            "title": f"DALYs from {cause.lower()}"
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
+            + f" per 100,000 people in, {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "DALYs per 100,000 people",
+            "short_unit": "",
+            "num_decimal_places": 1,
+        },
+        "Deaths - Percent": {
+            "title": f"Share of total deaths that are from {cause.lower()}"
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
+            + f", in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "%",
+            "short_unit": "%",
+            "num_decimal_places": 1,
+        },
+        "DALYs (Disability-Adjusted Life Years) - Percent": {
+            "title": f"Share of total DALYs that are from {cause.lower()}"
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
+            + f", in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "%",
+            "short_unit": "%",
+            "num_decimal_places": 1,
+        },
+        "Deaths - Number": {
+            "title": f"Deaths that are from {cause.lower()}"
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
+            + f", in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "deaths",
+            "short_unit": "",
+            "num_decimal_places": 0,
+        },
+        "DALYs (Disability-Adjusted Life Years) - Number": {
+            "title": f"DALYs that are from {cause.lower()}"
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
+            + f", in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "DALYs",
+            "short_unit": "",
+            "num_decimal_places": 1,
+        },
+        "Incidence - Number": {
+            "title": f"Number of new cases of {cause.lower()}, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "cases",
+            "short_unit": "",
+            "num_decimal_places": 0,
+        },
+        "Prevalence - Number": {
+            "title": f"Current number of cases of {cause.lower()}, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "cases",
+            "short_unit": "",
+            "num_decimal_places": 0,
+        },
+        "Incidence - Rate": {
+            "title": f"Number of new cases of {cause.lower()} per 100,000 people, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "cases",
+            "short_unit": "",
+            "num_decimal_places": 1,
+        },
+        "Prevalence - Rate": {
+            "title": f"Current number of cases of {cause.lower()} per 100,000 people, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "cases",
+            "short_unit": "",
+            "num_decimal_places": 1,
+        },
+        "Incidence - Share of the population": {
+            "title": f"Number of new cases of {cause.lower()} per 100 people, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "%",
+            "short_unit": "%",
+            "num_decimal_places": 1,
+        },
+        "Prevalence - Share of the population": {
+            "title": f"Current number of cases of {cause.lower()} per 100 people, in {sex.lower()} aged {age.lower()}",
+            "description": "",
+            "unit": "%",
+            "short_unit": "%",
+            "num_decimal_places": 1,
+        },
+    }
+    new_variable = variable.copy()
+    new_variable.name = underscore(var_name_dict[variable.name]["title"])
+    new_variable.metadata = VariableMeta(
+        title=var_name_dict[variable.name]["title"],
+        description=var_name_dict[variable.name]["description"],
+        unit=var_name_dict[variable.name]["unit"],
+        short_unit=var_name_dict[variable.name]["short_unit"],
+    )
+    new_variable.metadata.display = {
+        "name": var_name_dict[variable.name]["title"],
+        "numDecimalPlaces": var_name_dict[variable.name]["num_decimal_places"],
+    }
+
+    return new_variable
+
+
+def add_metadata(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, dims: List[str]) -> Dataset:
+    """
+    Adding metadata at the variable level
+    First step is to group by the dims, which are normally: age, sex and cause.
+    Then for each variable (the different metrics) we add in the metadata.
+    """
+    ds_garden = Dataset.create_empty(dest_dir)
+    ds_garden.metadata = ds_meadow.metadata
+
+    df = df.reset_index()
+    df_group = df.groupby(dims)
+    for group_id, group in df_group:
+        # Grab out the IDs of each of the grouping factors, e.g. the age-group, sex and cause
+        dims_id = dict(zip(dims, group_id))
+        tb_group = Table(group)
+        # Create the unique table short name
+        dims_values = list(dims_id.values())
+        tb_group.metadata.short_name = underscore(" - ".join(dims_values))[0:240]
+        variables = tb_group.columns.drop(dims + ["country", "year"])
+        for variable_name in variables:
+            tb_group[variable_name] = Variable(tb_group[variable_name])
+            # Create all the necessary metadata
+            cleaned_variable = create_variable_metadata(variable=tb_group[variable_name], **dims_id)
+            tb_group[cleaned_variable.name] = cleaned_variable
+            tb_group = tb_group.drop(columns=variable_name)
+            # dropping columns that are totally empty - not all combinations of variables exist or have been downloaded
+        tb_group = tb_group.dropna(axis=1, how="all")
+        # Dropping dims as table name contains them
+        tb_group = tb_group.drop(columns=dims)
+        tb_group = tb_group.set_index(["country", "year"], verify_integrity=True)
+        ds_garden.add(tb_group)
+    return ds_garden
+
+
+def tidy_sex_dimension(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Improve the labelling of the sex column
+    """
+    sex_dict = {"Both": "Both sexes", "Female": "Females", "Male": "Males"}
+    df["sex"] = df["sex"].replace(sex_dict, regex=False)
+    return df
+
+
+def tidy_age_dimension(df: pd.DataFrame) -> pd.DataFrame:
+    age_dict = {
+        "Early Neonatal": "0-6 days",
+        "Late Neonatal": "7-27 days",
+        "Post Neonatal": "28-364 days",
+        "1 to 4": "1-4 years",
+    }
+
+    df["age"] = df["age"].replace(age_dict, regex=False)
+
+    return df
+
+
 def run_wrapper(
     dataset: str,
     country_mapping_path: Path,
     excluded_countries_path: Path,
     dest_dir: str,
-    metadata_path: Path,
     dims: List[str],
 ) -> None:
     # read dataset from meadow
@@ -167,21 +356,15 @@ def run_wrapper(
     tb_meadow = tb_meadow.drop(["index"], axis=1, errors="ignore")
     df_garden = pd.DataFrame(tb_meadow)
     df_garden = tidy_countries(country_mapping_path, excluded_countries_path, df_garden)
+    df_garden = tidy_sex_dimension(df_garden)
+    df_garden = tidy_age_dimension(df_garden)
     df_garden = prepare_garden(df_garden)
 
     omm = omm_metrics(df_garden)
     df_garden = cast(pd.DataFrame, pd.concat([df_garden, omm], axis=0))
     df_garden = add_share_of_population(df_garden)
-    tb_garden = pivot(df_garden, dims)
+    df_garden = pivot(df_garden, dims)
 
-    # free up memory
-    del df_garden
+    ds_garden = add_metadata(dest_dir=dest_dir, ds_meadow=ds_meadow, df=df_garden, dims=dims)
 
-    ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata
-
-    tb_garden.metadata = tb_meadow.metadata
-    ds_garden.metadata.update_from_yaml(metadata_path)
-    tb_garden.update_metadata_from_yaml(metadata_path, f"{dataset}")
-    ds_garden.add(tb_garden)
     ds_garden.save()

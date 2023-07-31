@@ -146,6 +146,8 @@ class CountryRegionMapper:
             if code in aliases_s.index:
                 for alias in aliases_s.loc[[code]]:
                     aliases[alias.lower()] = name
+            # Include the region code itself as another alias.
+            aliases[code.lower()] = name
 
         self.aliases = aliases
         self.valid_names = valid_names

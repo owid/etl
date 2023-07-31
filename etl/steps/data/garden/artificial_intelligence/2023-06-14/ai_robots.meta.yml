@@ -184,6 +184,7 @@ tables:
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
+            name: Total industrial robots in operation
             numDecimalPlaces: 0
 
       number_of_industrial_robots_installed_2021:
@@ -191,7 +192,7 @@ tables:
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
-          name: Number of industrial robots installed
+          name: Total of industrial robots installed
           numDecimalPlaces: 0
 
       annual_count__number_of_industrial_robots_installed:
@@ -199,7 +200,7 @@ tables:
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
-          name: Number of industrial robots installed
+          name: Annual industrial robots installed
           numDecimalPlaces: 0
 
       new_robots_installed__number_of_industrial_robots_installed:
@@ -208,4 +209,11 @@ tables:
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
           name: Number of industrial robots installed
+          numDecimalPlaces: 0
+      unspecified_others:
+        title: Unspecified or Other Sector
+        unit: 'robots'
+        description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
+        display:
+          name: Unspecified or other
           numDecimalPlaces: 0

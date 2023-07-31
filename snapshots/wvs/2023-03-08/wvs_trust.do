@@ -18,8 +18,18 @@ INSTRUCTIONS
 
 use WVS_TimeSeries_4_0, clear
 
+*List of confidence questions
+ds E069*
+global confidence_questions `r(varlist)'
+
+* List of other trust questions (family, neighborhood, other religion, other nationality, churches)
+global other_trust_questions D001_B G007_18_B G007_35_B G007_36_B
+
+* Join confidence and other trust questions
+global additional_questions $confidence_questions $other_trust_questions
+
 * List of questions to work with
-global questions A165 A168 E069_11 G007_33 G007_34
+global questions A165 A168 G007_33_B G007_34_B $additional_questions
 
  * Keep wave ID, country, weight and the list of questions
 keep S002VS S003 S017 $questions
@@ -40,7 +50,7 @@ rename S003 country
 preserve
 
 * List the labels of the selected questions
-label list $questions
+// label list $questions
 
 /*
 A165 is the question "most people can be trusted"
@@ -122,17 +132,24 @@ restore
 preserve
 
 /*
-E069_11 is the question about confidence in the government
+Processing of multiple additional trust and confidence questions
 */
 
-keep if E069_11 >= -1
+foreach var in $additional_questions {
+	keep if `var' >= -1
 
-gen confidence_government = 0
-replace confidence_government = 1 if E069_11 == 1 | E069_11 == 2
+	gen confidence_`var' = 0
+	replace confidence_`var' = 1 if `var' == 1 | `var' == 2
 
-collapse (mean) confidence_government, by (year country)
-tempfile confidence_government_file
-save "`confidence_government_file'"
+	collapse (mean) confidence_`var', by (year country)
+	tempfile confidence_`var'_file
+	save "`confidence_`var'_file'"
+	
+	restore
+	preserve
+}
+
+
 
 * Combine all the saved datasets
 use "`trust_file'", clear
@@ -140,7 +157,10 @@ use "`trust_file'", clear
 merge 1:1 year country using "`trust_first_file'", nogenerate // keep(master match)
 merge 1:1 year country using "`trust_personally_file'", nogenerate // keep(master match)
 merge 1:1 year country using "`take_advantage_file'", nogenerate // keep(master match)
-merge 1:1 year country using "`confidence_government_file'", nogenerate // keep(master match)
+
+foreach var in $additional_questions {
+	merge 1:1 year country using "`confidence_`var'_file'", nogenerate // keep(master match)
+}
 
 * Get a list of variables excluding country and year
 ds country year, not
