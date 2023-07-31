@@ -3,7 +3,6 @@ from structlog import get_logger
 
 from etl.helpers import PathFinder
 
-# naming conventions
 paths = PathFinder(__file__)
 log = get_logger()
 
