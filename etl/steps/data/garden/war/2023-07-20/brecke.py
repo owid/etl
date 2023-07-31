@@ -168,14 +168,14 @@ def add_conflict_type(tb: Table) -> Table:
         tb["name"] = tb["name"].str.replace(text, text.replace("-", ""))
 
     # Remove year part
-    name_wo_year = tb.name.apply(lambda x: ",".join(x.split(",")[:-1]))
+    name_to_year = tb.name.apply(lambda x: ",".join(x.split(",")[:-1]))
 
     # Get mask
-    mask = name_wo_year.str.contains("-")
+    mask = name_to_year.str.contains("-")
 
     # Set conflict type
     tb["conflict_type"] = "internal"
-    tb.loc[mask, "conflict_type"] = "internal"
+    tb.loc[mask, "conflict_type"] = "interstate"
 
     return tb
 
