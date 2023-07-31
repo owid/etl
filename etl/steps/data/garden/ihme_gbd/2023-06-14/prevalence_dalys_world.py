@@ -71,14 +71,16 @@ def make_table_dalys(ds: Dataset) -> Table:
     tb = tb[(tb["country"] == "World")].drop(columns=["country"])
 
     cause_rename = {
-        "dalys_from_anxiety_disorders_per_100_000_population__in_both_sexes_aged_age_standardized": "Anxiety disorders",
-        "dalys_from_bipolar_disorder_per_100_000_population__in_both_sexes_aged_age_standardized": "Bipolar disorder",
-        "dalys_from_depressive_disorders_per_100_000_population__in_both_sexes_aged_age_standardized": "Depressive disorders",
-        "dalys_from_eating_disorders_per_100_000_population__in_both_sexes_aged_age_standardized": "Eating disorders",
-        "dalys_from_schizophrenia_per_100_000_population__in_both_sexes_aged_age_standardized": "Schizophrenia",
+        "dalys_from_anxiety_disorders_per_100_000_people_in__both_sexes_aged_age_standardized": "Anxiety disorders",
+        "dalys_from_bipolar_disorder_per_100_000_people_in__both_sexes_aged_age_standardized": "Bipolar disorder",
+        "dalys_from_depressive_disorders_per_100_000_people_in__both_sexes_aged_age_standardized": "Depressive disorders",
+        "dalys_from_eating_disorders_per_100_000_people_in__both_sexes_aged_age_standardized": "Eating disorders",
+        "dalys_from_schizophrenia_per_100_000_people_in__both_sexes_aged_age_standardized": "Schizophrenia",
     }
     tb = tb.melt(id_vars=["year"])
-    tb = tb[tb["variable"].isin(cause_rename.keys())]
+    list_keys = list(cause_rename.keys())
+    tb = tb[tb["variable"].isin(list_keys)]
+    assert len(tb["variable"].drop_duplicates()) == len(cause_rename)
     tb["variable"] = tb["variable"].replace(cause_rename)
 
     tb = tb.rename(columns={"variable": "cause", "value": "dalys_rate"})
