@@ -1077,8 +1077,8 @@ tables:
           (website: http://saber.worldbank.org/index.cfm'
         unit: ''
         short_unit: ''
-            saber__teachers__policy_goal_7_lever_2__is_teacher_professional_development_collaborative_and_focused_on_instructional_improvement
-      : title: 'SABER: (Teachers) Policy Goal 7 Lever 2: Is teacher professional development collaborative and focused on
+      saber__teachers__policy_goal_7_lever_2__is_teacher_professional_development_collaborative_and_focused_on_instructional_improvement:
+        title: 'SABER: (Teachers) Policy Goal 7 Lever 2: Is teacher professional development collaborative and focused on
           instructional improvement?'
         description: >
           'Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER:
