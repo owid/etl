@@ -2662,3 +2662,34 @@ tables:
         unit: casualties per capita
         display:
           numDecimalPlaces: 7
+      killed_per_suicide_attack:
+        title: Terrorism deaths per suicide attack
+        description: The incident was a suicide attack.
+        unit: 'deaths per attack'
+        display:
+          name: Deaths per suicide attack
+          numDecimalPlaces: 0
+
+      killed_per_non_suicide_attack:
+        title: Terrorism deaths per no suicide attack
+        description: >
+           There is no indication that the incident was a suicide attack.
+        unit: 'deaths per attack'
+        display:
+          name: Deaths per non-suicide attack
+          numDecimalPlaces: 0
+      injured_per_suicide_attack:
+        title: Terrorism injuries per suicide attack
+        description: The incident was a suicide attack.
+        unit: 'injuries per attack'
+        display:
+          name: Injuries per suicide attack
+          numDecimalPlaces: 0
+      injured_per_non_suicide_attack:
+        title: Terrorism injuries per non-suicide attack
+        description: >
+           There is no indication that the incident was a suicide attack.
+        unit: 'injuries per attack'
+        display:
+          name: Injuries per non-suicide attack
+          numDecimalPlaces: 0

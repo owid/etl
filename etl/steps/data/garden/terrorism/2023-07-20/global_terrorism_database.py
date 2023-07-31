@@ -216,8 +216,23 @@ def run(dest_dir: str) -> None:
     # Drop total deaths and population columns
     df_pop_deaths.drop(["deaths", "population"], axis=1, inplace=True)
     # Convert DataFrame to a new garden dataset table.
-    tb_garden = Table(df_pop_deaths, short_name=paths.short_name)
+    tb_garden = Table(df_pop_deaths, short_name=paths.short_name, underscore=True)
     tb_garden.set_index(["country", "year"], inplace=True)
+
+    # Add deaths and attacks per suicide/ non-suicide terrorist attack
+    tb_garden["killed_per_suicide_attack"] = (
+        tb_garden["total_nkill_suicide"] / tb_garden["total_incident_counts_suicide"]
+    )
+    tb_garden["killed_per_non_suicide_attack"] = (
+        tb_garden["total_nkill_no_suicide"] / tb_garden["total_incident_counts_no_suicide"]
+    )
+
+    tb_garden["injured_per_suicide_attack"] = (
+        tb_garden["total_nwound_suicide"] / tb_garden["total_incident_counts_suicide"]
+    )
+    tb_garden["injured_per_non_suicide_attack"] = (
+        tb_garden["total_nwound_no_suicide"] / tb_garden["total_incident_counts_no_suicide"]
+    )
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow_terrorism.metadata)
