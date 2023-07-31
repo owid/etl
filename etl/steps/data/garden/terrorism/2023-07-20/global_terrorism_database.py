@@ -219,6 +219,7 @@ def run(dest_dir: str) -> None:
     tb_garden = Table(df_pop_deaths, short_name=paths.short_name, underscore=True)
     tb_garden.set_index(["country", "year"], inplace=True)
 
+    # Add deaths and attacks per suicide/ non-suicide terrorist attack
     tb_garden["killed_per_suicide_attack"] = (
         tb_garden["total_nkill_suicide"] / tb_garden["total_incident_counts_suicide"]
     )
