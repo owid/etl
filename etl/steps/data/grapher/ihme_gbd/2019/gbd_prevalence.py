@@ -2,7 +2,7 @@ from owid import catalog
 
 from etl.helpers import PathFinder
 
-from .gbd_tools import run_wrapper
+from .shared import run_wrapper
 
 paths = PathFinder(__file__)
 

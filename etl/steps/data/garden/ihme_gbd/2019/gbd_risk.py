@@ -1,7 +1,8 @@
-from gbd_tools import run_wrapper
 from structlog import get_logger
 
 from etl.helpers import PathFinder
+
+from .shared import run_wrapper
 
 paths = PathFinder(__file__)
 log = get_logger()
