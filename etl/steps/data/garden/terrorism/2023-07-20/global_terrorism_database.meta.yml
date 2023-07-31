@@ -1669,7 +1669,7 @@ tables:
           Attacks on religious pilgrims are considered “Private Citizens and Property;” attacks on missionaries are considered religious figures.
         unit: "deaths"
         display:
-          name: Religious figures or institutions
+          name: Religious targets
           numDecimalPlaces: 0
 
       total_nkill_telecommunication_target:
@@ -1690,7 +1690,7 @@ tables:
           This value also includes cases involving the targeting of militias and guerillas
         unit: "deaths"
         display:
-          name: Terrorist or non-state militia
+          name: Terrorist/non-state militia
           numDecimalPlaces: 0
 
       total_nkill_tourists_target:
@@ -1852,9 +1852,7 @@ tables:
             Attacks on transmission facilities such as antennae or transmission towers, or broadcast infrastructure are coded as “Telecommunications,”.
         unit: 'injuries'
         display:
-          name: Journalists & media
           numDecimalPlaces: 0
-
       total_nwound_military_target:
         title: Terrorism non-fatal injuries Military Target
         descrtiption: >
@@ -1915,7 +1913,7 @@ tables:
           Attacks on religious pilgrims are considered “Private Citizens and Property;” attacks on missionaries are considered religious figures.
         unit: "injuries"
         display:
-          name: Religious figures or institutions
+          name: Religious targets
           numDecimalPlaces: 0
       total_nwound_telecommunication_target:
         title: Terrorism non-fatal injuries Telecommunication Target
@@ -1935,7 +1933,7 @@ tables:
           This value also includes cases involving the targeting of militias and guerillas
         unit: "injuries"
         display:
-          name: Terrorist or non-state militia
+          name: Terrorist/non-state militia
           numDecimalPlaces: 0
 
       total_nwound_tourists_target:
@@ -2110,6 +2108,10 @@ tables:
           - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be
           outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants
         unit: attacks
+        display:
+          name: Journalists & media
+          numDecimalPlaces: 0
+
       total_incident_counts_maritime_target:
         title: Terrorist attacks Maritime Target
         description: >-
@@ -2148,6 +2150,9 @@ tables:
           - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be
           outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants
         unit: attacks
+        display:
+          name: Maritime
+          numDecimalPlaces: 0
       total_incident_counts_military_target:
         title: Terrorist attacks Military Target
         descrtiption: >
@@ -2208,7 +2213,7 @@ tables:
           Attacks on religious pilgrims are considered “Private Citizens and Property;” attacks on missionaries are considered religious figures.
         unit: "attacks"
         display:
-          name: Religious figures or institutions
+          name: Religious targets
           numDecimalPlaces: 0
 
       total_incident_counts_telecommunication_target:
@@ -2229,7 +2234,7 @@ tables:
           This value also includes cases involving the targeting of militias and guerillas
         unit: "attacks"
         display:
-          name: Terrorist or non-state militia
+          name: Terrorist/non-state militia
           numDecimalPlaces: 0
 
       total_incident_counts_tourists_target:
