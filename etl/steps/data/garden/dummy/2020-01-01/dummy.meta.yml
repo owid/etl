@@ -1,23 +1,50 @@
 # (Inherited from meadow, remove if not different.)
 all_sources:
-- source_testing: &source-testing
-    name: Dummy source
-    published_by:
-    url:
-    date_accessed:
-    publication_date:
-    publication_year:
 dataset:
   title: Dummy dataset
-  licenses:
-  - name:
-    url:
-  sources:
-  - *source-testing
-
 tables:
   dummy:
     # (Inherited from meadow, remove if not different.)
     variables:
       dummy_variable:
-        unit: dummy unit
+        title: Dummy
+        description: This is a dummy indicator with full metadata. # Description can be a long text if need be.
+        licenses: [] # Licenses is an obsolete field - use origin.license in the snapshot to record upstream licenses and license to specify the redistribution license
+        unit: Dummy unit
+        short_unit: Du
+        display:
+          isProjection: true
+          conversionFactor: 1000
+          numDecimalPlaces: 1
+          tolerance: 5
+          yearIsDay: false
+          zeroDay: 1900-01-01
+          entityAnnotationsMap: "Germany: dummy annotation"
+          includeInTable: true
+        description_short: Short description of the dummy indicator.
+        description_from_producer: The description of the dummy indicator by the producer, shown separately on a data page.
+        processing_level: major
+        license:
+          name: CC-BY 4.0
+          url: ""
+        presentation:
+          grapher_config: # Note that the fields in here use camelCase, not snake_case. All fields of the schema can be used: https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema
+            title: The dummy indicator - chart title
+            subtitle: You'll never guess where the line will go
+            hasMapTab: true
+            selectedEntityNames:
+              - Germany
+              - Italy
+              - France
+          title_public: The dummy indicator - data page title
+          title_variant: historical data # This is useful to discern between similar indicators, e.g. if some are projections and some are historical data
+          producer_short: ACME
+          attribution: ACME project # This is what we show in places like the lower left side of Grapher charts to say who produced the data. Often this can be empty, in this case we construct this text from the attribution fields on the Origins.
+          topic_tags_links: # These should exist in the tags table in the grapher db and use the same spelling and case as they do there
+            - "Internet"
+          key_info_text:
+            - "First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)"
+            - "Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)"
+          faqs:
+          - fragment_id: about-dummy
+            gdoc_id: XXXXXXX
