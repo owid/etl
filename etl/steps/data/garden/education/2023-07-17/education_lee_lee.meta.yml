@@ -25,10 +25,6 @@ dataset:
 tables:
   education_lee_lee:
     variables:
-      region:
-        title: "Barro, Lee and Lee regional classification"
-        unit: ""
-
       mf_primary_enrollment_rates:
         title: "Total net enrolment rate, primary, both sexes"
         unit: "%"
@@ -753,56 +749,3 @@ tables:
         display:
           numDecimalPlaces: 1
 
-      mf_youth_and_adults__15_64_years__population__thousands:
-        title: "Population of male and female youth and adults aged 15-64 years (in thousands)"
-        unit: "thousands"
-        display:
-          numDecimalPlaces: 0
-
-      f_youth_and_adults__15_64_years__population__thousands:
-        title: "Population of female youth and adults aged 15-64 years (in thousands)"
-        unit: "thousands"
-        display:
-          numDecimalPlaces: 0
-
-      m_youth_and_adults__15_64_years__population__thousands:
-        title: "Population of male youth and adults aged 15-64 years (in thousands)"
-        unit: "thousands"
-        display:
-          numDecimalPlaces: 0
-
-      mf_youth__15_24_years__population__thousands:
-        title: "Population of male and female youth aged 15-24 years (in thousands)"
-        unit: "thousands"
-        display:
-          numDecimalPlaces: 0
-
-      f_youth__15_24_years__population__thousands:
-        title: "Population of female youth aged 15-24 years (in thousands)"
-        unit: "thousands"
-        display:
-          numDecimalPlaces: 0
-
-      m_youth__15_24_years__population__thousands:
-        title: "Population of male youth aged 15-24 years (in thousands)"
-        unit: "thousands"
-        display:
-          numDecimalPlaces: 0
-
-      mf_adults__25_64_years__population__thousands:
-        title: "Population of male and female adults aged 25-64 years (in thousands)"
-        unit: "thousands"
-        display:
-          numDecimalPlaces: 0
-
-      f_adults__25_64_years__population__thousands:
-        title: "Population of female adults aged 25-64 years (in thousands)"
-        unit: "thousands"
-        display:
-          numDecimalPlaces: 0
-
-      m_adults__25_64_years__population__thousands:
-        title: "Population of male adults aged 25-64 years (in thousands)"
-        unit: "thousands"
-        display:
-          numDecimalPlaces: 0

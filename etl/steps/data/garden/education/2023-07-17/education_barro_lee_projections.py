@@ -22,18 +22,14 @@ REGIONS = [
     "Upper-middle-income countries",
     "Lower-middle-income countries",
     "High-income countries",
+    "World",
 ]
 
 
 def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     tb_with_regions = tb.copy()
 
-    aggregations = {
-        column: "median"
-        for column in tb_with_regions.columns
-        if column not in ["country", "year"] and "number" not in column
-    }
-
+    aggregations = {column: "median" for column in tb_with_regions.columns if column not in ["country", "year"]}
     for region in REGIONS:
         # Find members of current region.
         members = geo.list_members_of_region(
@@ -78,10 +74,17 @@ def run(dest_dir: str) -> None:
     tb["age_group"] = tb["age_group"].replace(
         {"15-64": "Youth and Adults (15-64 years)", "15-24": "Youth (15-24 years)", "25-64": "Adults (25-64 years)"}
     )
-    tb = add_data_for_regions(tb=tb, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     df_projections = education_lee_lee.prepare_attainment_data(tb)
+    columns_to_drop = [column for column in df_projections.columns if "__thousands" in column]
+    df_projections = df_projections.drop(columns=columns_to_drop)
+
     tb_projections = Table(df_projections, short_name=paths.short_name, underscore=True)
+
+    tb_projections = add_data_for_regions(
+        tb=tb_projections, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups
+    )
+
     tb_projections.set_index(["country", "year"], inplace=True)
 
     #

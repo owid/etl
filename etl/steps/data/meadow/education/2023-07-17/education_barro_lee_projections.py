@@ -60,7 +60,7 @@ def run(dest_dir: str) -> None:
     tb.set_index(["country", "year", "sex", "age_group"], inplace=True)
 
     # Drop unnecessary columns
-    tb.drop(["barro_lee_country_code", "world_bank_country_code"], axis=1, inplace=True)
+    tb.drop(["barro_lee_country_code", "world_bank_country_code", "region"], axis=1, inplace=True)
 
     #
     # Save outputs.

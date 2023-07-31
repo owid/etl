@@ -48,6 +48,8 @@ def run(dest_dir: str) -> None:
     tb = Table(df, short_name=paths.short_name, underscore=True)
 
     tb.set_index(["country", "year", "sex", "age_group"], inplace=True)
+    # Drop unnecessary columns
+    tb.drop("region", axis=1, inplace=True)
 
     #
     # Save outputs.
