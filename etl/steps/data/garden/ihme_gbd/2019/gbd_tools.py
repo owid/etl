@@ -153,7 +153,7 @@ def add_share_of_population(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str, rei: Any = None):
+def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str, rei: str = "None"):
     var_name_dict = {
         "Deaths - Share of the population": {
             "title": f"Share of total deaths that are from {cause.lower()}"
@@ -166,7 +166,7 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "DALYs (Disability-Adjusted Life Years) - Share of the population": {
             "title": f"Share of total DALYs that are from {cause.lower()}"
-            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
             + f", in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
@@ -175,7 +175,7 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "Deaths - Rate": {
             "title": f"Deaths that are from {cause.lower()}"
-            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
             + f" per 100,000 people, in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "deaths per 100,000 people",
@@ -184,7 +184,7 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "DALYs (Disability-Adjusted Life Years) - Rate": {
             "title": f"DALYs from {cause.lower()}"
-            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
             + f" per 100,000 people in, {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "DALYs per 100,000 people",
@@ -193,7 +193,7 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "Deaths - Percent": {
             "title": f"Share of total deaths that are from {cause.lower()}"
-            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
             + f", in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
@@ -202,7 +202,7 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "DALYs (Disability-Adjusted Life Years) - Percent": {
             "title": f"Share of total DALYs that are from {cause.lower()}"
-            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
             + f", in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "%",
@@ -211,7 +211,7 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "Deaths - Number": {
             "title": f"Deaths that are from {cause.lower()}"
-            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
             + f", in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "deaths",
@@ -220,7 +220,7 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         },
         "DALYs (Disability-Adjusted Life Years) - Number": {
             "title": f"DALYs that are from {cause.lower()}"
-            + (f" attributed to {rei.lower()}" if rei is not None else "")
+            + (f" attributed to {rei.lower()}" if rei != "None" else "")
             + f", in {sex.lower()} aged {age.lower()}",
             "description": "",
             "unit": "DALYs",
@@ -302,8 +302,8 @@ def add_metadata(dest_dir: str, ds_meadow: Dataset, df: pd.DataFrame, dims: List
         dims_id = dict(zip(dims, group_id))
         tb_group = Table(group)
         # Create the unique table short name
-
-        tb_group.metadata.short_name = underscore(f"{dims_id['cause']} - {dims_id['sex']} - {dims_id['age']}")[0:240]
+        dims_values = list(dims_id.values())
+        tb_group.metadata.short_name = underscore(" - ".join(dims_values))[0:240]
         variables = tb_group.columns.drop(dims + ["country", "year"])
         for variable_name in variables:
             tb_group[variable_name] = Variable(tb_group[variable_name])
