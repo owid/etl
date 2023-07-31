@@ -1852,6 +1852,7 @@ tables:
             Attacks on transmission facilities such as antennae or transmission towers, or broadcast infrastructure are coded as “Telecommunications,”.
         unit: 'injuries'
         display:
+          name: Maritime
           numDecimalPlaces: 0
       total_nwound_military_target:
         title: Terrorism non-fatal injuries Military Target
