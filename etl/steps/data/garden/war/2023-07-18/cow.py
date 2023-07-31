@@ -24,13 +24,6 @@ REGIONS_RENAME = {
     7: "Asia",
     9: "Oceania",
 }
-# Conflict types rename (this is very granular, and currently not in use)
-CONFLICT_TYPES_RENAME = {
-    2: "colonial war",
-    3: "imperial war",
-    8: "non-state (in non-state territory)",
-    9: "non-state (accross borders)",
-}
 # Mapping conflicts to regions for some intra-state conflicts
 ## We map intrastate conflicts to only one region. We have region composites (ME & NA, Asia & Oceania) and we need to find the actual region.
 ## We have done this manually, and is summarised in the dictionary below.
@@ -157,9 +150,18 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
 
     # Fill nulls with zeroes (TODO: this might be wrong, lower-bound is prefered)
     log.info("war.cow: filling NaNs")
-    tb_nonstate["number_deaths_ongoing_conflicts"] = tb_nonstate["number_deaths_ongoing_conflicts"].fillna(0)
-    tb_inter["number_deaths_ongoing_conflicts"] = tb_inter["number_deaths_ongoing_conflicts"].fillna(0)
-    tb_intra["number_deaths_ongoing_conflicts"] = tb_intra["number_deaths_ongoing_conflicts"].fillna(0)
+    assert (
+        not tb_nonstate["number_deaths_ongoing_conflicts"].isna().any()
+    ), "Unexpected NaNs found in `number_deaths_ongoing_conflicts`."
+    assert (
+        not tb_intra["number_deaths_ongoing_conflicts"].isna().any()
+    ), "Unexpected NaNs found in `number_deaths_ongoing_conflicts`."
+    assert (
+        not tb_inter["number_deaths_ongoing_conflicts"].isna().any()
+    ), "Unexpected NaNs found in `number_deaths_ongoing_conflicts`."
+    assert (
+        not tb_intra["number_deaths_ongoing_conflicts"].isna().any()
+    ), "Unexpected NaNs found in `number_deaths_ongoing_conflicts`."
 
     # Check NaNs and negative values in tables
     log.info("war.cow: checking NaNs and negative values")
@@ -200,6 +202,12 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
     tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
     assert tb["region"].isna().sum() == 0, "Unmapped regions!"
 
+    # Sanity check on NaNs
+    log.info("war.cow: check NaNs in `number_deaths_ongoing_conflicts`")
+    assert (
+        not tb["number_deaths_ongoing_conflicts"].isna().any()
+    ), "Some NaNs found in `number_deaths_ongoing_conflicts`!"
+
     # Replace missing values with zeroes
     log.info("war.cow: replace missing values with zeroes")
     tb = replace_missing_data_with_zeros(tb)
@@ -230,10 +238,8 @@ def make_table_extra(tb: Table) -> Table:
     log.info("war.cow.extra: replace negative values where applicable")
     tb = replace_negative_values_extra(tb)
 
-    log.info("war.cow.extra: obtain total number of deaths")
-    tb["number_deaths_ongoing_conflicts"] = tb["battle_deaths"].fillna(0) + tb["nonstate_deaths"].fillna(
-        0
-    )  # TODO: Fill NaNs with zeroes?
+    log.info("war.cow.extra: obtain total number of deaths (assign lower bound value to missing values)")
+    tb = aggregate_rows_by_periods_extra(tb)
 
     return tb
 
@@ -271,6 +277,35 @@ def replace_negative_values_extra(tb: Table) -> Table:
     return tb
 
 
+def aggregate_rows_by_periods_extra(tb: Table) -> Table:
+    """Aggregate rows by war, region, conflict type and period.
+
+    Also, it makes sure that there is no missing value for the number of deaths. To this end:
+
+        1. It summs all the deaths for each war conflict over the defined period of years (`battle_deaths` + `nonstate_deaths`).
+        2. If an observation has a missing value, it assigns zero to it.
+        3. If the summation is greater than the lower bound defined by the source (1,000 deaths per year) it is left as it is, otherwise
+            it is replaced by the lower bound (e.g. 2,000 for 2 years, etc.)
+    """
+    # Get summation (assuming NaN=0) and flag stating if a NaN is found
+    tb = tb.groupby(["warnum", "conflict_type", "region", "year_start", "year_end"], as_index=False).agg(
+        {"battle_deaths": [has_nan, sum], "nonstate_deaths": [has_nan, sum]}
+    )
+    tb.columns = [f"{col1}_{col2}" if col2 != "" else col1 for col1, col2 in tb.columns]
+
+    # Obtain deaths threshold according to dataset description
+    tb["deaths_threshold"] = 1000 * (tb["year_end"] - tb["year_start"] + 1)
+
+    # Re-build `number_deaths_ongoing_conflicts`
+    tb["number_deaths_ongoing_conflicts"] = tb["battle_deaths_sum"] + tb["nonstate_deaths_sum"]
+    mask = tb["battle_deaths_has_nan"] + tb["nonstate_deaths_has_nan"] > 0
+    tb.loc[mask, "number_deaths_ongoing_conflicts"] = tb.loc[
+        mask, ["deaths_threshold", "number_deaths_ongoing_conflicts"]
+    ].max(axis=1)
+
+    return tb
+
+
 ########################################################################
 ## NON-STATE ###########################################################
 ########################################################################
@@ -288,6 +323,10 @@ def make_table_nonstate(tb: Table) -> Table:
 
     log.info("war.cow.non_state: replace negative values where applicable")
     tb[["number_deaths_ongoing_conflicts"]] = tb[["number_deaths_ongoing_conflicts"]].replace(-9, np.nan)
+
+    log.info("war.cow.non_state: replace NaNs in number of deaths with lower bound (1,000)")
+    tb["deaths_threshold"] = 1000 * (tb["year_end"] - tb["year_start"] + 1)
+    tb["number_deaths_ongoing_conflicts"] = tb["number_deaths_ongoing_conflicts"].fillna(tb["deaths_threshold"])
 
     return tb
 
@@ -325,6 +364,9 @@ def make_table_inter(tb: Table) -> Table:
     log.info("war.cow.inter: replace negative values where applicable")
     tb[["number_deaths_ongoing_conflicts"]] = tb[["number_deaths_ongoing_conflicts"]].replace(-9, np.nan)
 
+    log.info("war.cow.inter: assign lower bound of deaths where value is missing")
+    tb = aggregate_rows_by_periods_inter(tb)
+
     log.info("war.cow.inter: split region composites")
     tb = split_regions_composites(tb)
 
@@ -344,6 +386,34 @@ def _sanity_checks_inter(tb: Table) -> Table:
     assert set(tb.loc[tb[col] < 0, col]) == {-9}, f"Negative values other than -9 found for {col}"
     # Check year end
     assert not (tb["year_end"].isna().any()), "Unexpected NaN value for `year_end`!"
+
+
+def aggregate_rows_by_periods_inter(tb: Table) -> Table:
+    """Aggregate rows by war, region, conflict type and period.
+
+    Also, it makes sure that there is no missing value for the number of deaths. To this end:
+
+        1. It summs all the deaths for each war conflict over the defined period of years.
+        2. If an observation has a missing value, it assigns zero to it.
+        3. If the summation is greater than the lower bound defined by the source (1,000 deaths per year) it is left as it is, otherwise
+            it is replaced by the lower bound (e.g. 2,000 for 2 years, etc.)
+    """
+    # Get summation (NaN if any NaN, and assuming NaN=0)
+    tb = tb.groupby(["warnum", "conflict_type", "region", "year_start", "year_end"], as_index=False).agg(
+        {"number_deaths_ongoing_conflicts": [has_nan, sum]}
+    )
+    tb.columns = [f"{col1}_{col2}" if col2 != "" else col1 for col1, col2 in tb.columns]
+    # Obtain deaths threshold according to dataset description
+    tb["deaths_threshold"] = 1000 * (tb["year_end"] - tb["year_start"] + 1)
+
+    # Re-build `number_deaths_ongoing_conflicts`
+    tb["number_deaths_ongoing_conflicts"] = tb["number_deaths_ongoing_conflicts_sum"]
+    mask = tb["number_deaths_ongoing_conflicts_has_nan"]
+    tb.loc[mask, "number_deaths_ongoing_conflicts"] = tb.loc[
+        mask, ["number_deaths_ongoing_conflicts_sum", "deaths_threshold"]
+    ].max(axis=1)
+
+    return tb
 
 
 def split_regions_composites(tb: Table) -> Table:
@@ -397,8 +467,6 @@ def make_table_intra(tb: Table) -> Table:
     """Generate intra-state table."""
     # Rename death-related metric columns
     tb = tb.rename(columns={"totalbdeaths": "number_deaths_ongoing_conflicts"})
-    # Assign conflict_type
-    tb["conflict_type"] = "intra-state"
 
     log.info("war.cow.intra: sanity checks")
     _sanity_checks_intra(tb)
@@ -406,15 +474,26 @@ def make_table_intra(tb: Table) -> Table:
     log.info("war.cow.intra: replace negative values where applicable")
     tb = replace_negative_values_intra(tb)
 
+    log.info("war.cow.non_state: replace NaNs in number of deaths with lower bound (1,000)")
+    tb["deaths_threshold"] = 1000 * (tb["year_end"] - tb["year_start"] + 1)
+    tb["number_deaths_ongoing_conflicts"] = tb["number_deaths_ongoing_conflicts"].fillna(tb["deaths_threshold"])
+
     log.info("war.cow.intra: standardise region numbering")
     tb = standardise_region_ids(tb)
+
+    log.info("war.cow.intra: deaggregate international / non-international intrastate conflicts")
+    assert (
+        tb.groupby("warnum")["intnl"].nunique().max() == 1
+    ), "An intra-state conflict is not expected to change between international / non-international!"
+    mask = tb["intnl"] == 1
+    tb.loc[mask, "conflict_type"] = "intra-state (internationalized)"
+    tb.loc[-mask, "conflict_type"] = "intra-state (non-internationalized)"
+
     return tb
 
 
 def _sanity_checks_intra(tb: Table) -> None:
     assert tb.groupby(["warnum"]).size().max() == 1, "There should only be one instance for each (warnum, ccode, side)."
-    # A conflict only is of one type
-    assert tb.groupby("warnum")["conflict_type"].nunique().max() == 1, "More than one conflict type for some conflicts!"
     # Check negative values in metric deaths
     col = "number_deaths_ongoing_conflicts"
     assert set(tb.loc[tb[col] < 0, col]) == {-9}, f"Negative values other than -9 found for {col}"
@@ -467,6 +546,11 @@ def standardise_region_ids(tb: Table) -> Table:
 ########################################################################
 ## GENERIC #############################################################
 ########################################################################
+
+
+def has_nan(x: pd.Series) -> bool:
+    """Check if there is a NaN in a group."""
+    return x.isna().any()
 
 
 def _check_overlapping_warnum(tb_extra: Table, tb_non: Table, tb_inter: Table, tb_intra: Table) -> None:
@@ -635,8 +719,18 @@ def _get_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world_alltypes["region"] = "World"
     tb_ongoing_world_alltypes["conflict_type"] = "all"
 
-    ## Add region=World
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_alltypes, tb_ongoing_world, tb_ongoing_world_alltypes], ignore_index=True).sort_values(  # type: ignore
+    ## conflict_type='intra-state'
+    tb_intra = tb[tb["conflict_type"].str.contains("intra-state")].copy()
+    tb_ongoing_intra = tb_intra.groupby(["year", "region"], as_index=False).agg(ops)
+    tb_ongoing_intra["conflict_type"] = "intra-state"
+
+    ## conflict_type='intrastate' and region='World'
+    tb_ongoing_world_intra = tb_intra.groupby(["year"], as_index=False).agg(ops)
+    tb_ongoing_world_intra["region"] = "World"
+    tb_ongoing_world_intra["conflict_type"] = "intra-state"
+
+    ## Combine all
+    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_alltypes, tb_ongoing_world, tb_ongoing_world_alltypes, tb_ongoing_intra, tb_ongoing_world_intra], ignore_index=True).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
 
@@ -666,6 +760,11 @@ def _get_new_metrics(tb: Table) -> Table:
     tb_new_alltypes = tb_.groupby(["year_start", "region"], as_index=False).agg(ops)
     tb_new_alltypes["conflict_type"] = "all"
 
+    # By region and conflict_type='intra-state'
+    tb_intra = tb[tb["conflict_type"].str.contains("intra-state")].copy()
+    tb_new_intra = tb_intra.groupby(["year_start", "region"], as_index=False).agg(ops)
+    tb_new_intra["conflict_type"] = "intra-state"
+
     # World
     ## Keep one row per (warnum).
     tb_ = tb.sort_values("year_start").drop_duplicates(subset=["warnum"], keep="first")
@@ -678,8 +777,13 @@ def _get_new_metrics(tb: Table) -> Table:
     tb_new_world_alltypes["region"] = "World"
     tb_new_world_alltypes["conflict_type"] = "all"
 
+    # World and conflict_type='all'
+    tb_new_world_intra = tb_intra.groupby(["year_start"], as_index=False).agg(ops)
+    tb_new_world_intra["region"] = "World"
+    tb_new_world_intra["conflict_type"] = "intra-state"
+
     ## Combine
-    tb_new = pd.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pd.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes, tb_new_intra, tb_new_world_intra], ignore_index=True).sort_values(  # type: ignore
         by=["year_start", "region", "conflict_type"]
     )
 
