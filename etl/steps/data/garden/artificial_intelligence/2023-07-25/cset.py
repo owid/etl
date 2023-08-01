@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
     # List of columns to include for conversion to millions (investment values)
     _investment_cols = [col for col in merged_total.columns if "investment" in col]
     # Convert all other columns to million
-    merged_total[_investment_cols] *= 1e6
+    merged_total.loc[:, _investment_cols] *= 1e6
 
     # Import US CPI data from the API
     df_wdi_cpi_us = us_cpi.import_US_cpi_API()
