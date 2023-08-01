@@ -22,6 +22,6 @@ meta:
 
 wdir: ../../../data/snapshots/artificial_intelligence/2023-07-25
 outs:
-- md5: dff9295c9724772a413828bc0e9ec89f
-  size: 2302924
+- md5: 1b43efe51b04a89416bec5de66e97bb9
+  size: 2626345
   path: cset.csv

@@ -1,0 +1,161 @@
+dataset:
+  title: 'Country Activity Tracker: Artificial Intelligence (Center for Security and     Emerging Technology, 2023)'
+  description: >-
+    CAT, or Country Attributes and Topics, is a research tool curated by CSET that offers a wealth of data about artificial
+    intelligence (AI) globally. This data comes from a vast repository known as the Merged Academic Corpus (MAC), which contains
+    details about more than 270 million academic articles worldwide. In CAT, only those articles that are related to AI are
+    utilized.
+
+
+    CSET determines the country of origin for each article by looking at the affiliations of the authors. If an author is
+    associated with an organization in a specific country, that article is attributed to that country. These articles are
+    then grouped into various AI sub-categories. This categorization is based on a scoring system that assigns scores to each
+    article according to its subject. However, this scoring system only applies to English-language articles. For non-English
+    articles, scores are estimated based on the average scores of articles they either cite or are cited by.
+
+
+    CAT also provides patent data sourced from 1790 Analytics and Dimensions, encompassing AI-related patents. However, instead
+    of indicating patent ownership, CAT highlights where the patents are filed. For instance, a patent filed in the U.S. patent
+    office is not necessarily owned by an American. CSET is striving to include data regarding the nationality of patent owners
+    in future updates of CAT.
+
+
+    Additionally, CAT uses data from Crunchbase to identify AI-related companies and includes metrics about investments in
+    these companies. The definition of an 'AI company' is not straightforward, but CSET identifies such companies based on
+    specific criteria. These include whether the company description contains AI-related keywords, whether Crunchbase tags
+    it as an AI company, or if it is linked with an AI Publication, AI Patent, or a Top AI Conference Publication as per CSET's
+    Private-sector AI-Related Activity Tracker. CSET aims to encompass a broad range of AI-related companies across the globe.
+    Therefore, some companies may be categorized as AI-related that others may not consider as such. Conversely, some companies
+    perceived as AI-related by others may not meet the criteria set by CSET.
+
+
+    CSET ensures the data in CAT is updated at least quarterly, with plans to provide more frequent updates in the future.
+  licenses:
+  - name: Creative Commons BY 4.0
+    url: https://eto.tech/tou/
+  sources:
+  - name: Center for Security and Emerging Technology (2023)
+    url: https://cat.eto.tech/
+    date_accessed: '2023-07-25'
+    publication_year: 2023
+    published_by: Emerging Technology Observatory Country Activity Tracker, Artificial Intelligence (Center for Security and
+      Emerging Technology, 2023)
+tables:
+  cset:
+    variables:
+      disclosed_investment:
+        title: Disclosed investment
+        description:  Investments in AI-related companies across various industries where the investment value has been publicly disclosed.
+        unit: US dollars
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+          name: Disclosed
+
+      investment_estimated:
+        title: Estimated investment
+        description:  Estimated value of investments in AI-related companies across various industries when exact investment amounts aren't publicly disclosed. The estimate is based on the median value of similar investments from Crunchbase.
+        unit: US dollars
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+          name: Estimated
+
+      disclosed_investment_summary:
+        title: Total disclosed investment
+        description: Investments in AI-related companies across various industries where the investment value has been publicly disclosed.
+        unit: US dollars
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+          name: Disclosed
+
+      estimated_investment_summary:
+        title: Total estimated investment
+        description: >
+          Estimated value of investments in AI-related companies across various industries when exact investment amounts aren't publicly disclosed. The estimate is based on the median value of similar investments from Crunchbase.
+        unit: US dollars
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+          name: Estimated
+
+      num_patent_applications:
+        title: Patent applications
+        description: Yearly total number of patent applications.
+        unit: applications
+        display:
+          numDecimalPlaces: 0
+          name: Applications
+
+      num_patent_granted:
+        title: Patent applications granted
+        description: Yearly total number of patents granted.
+        unit: granted applications
+        display:
+          numDecimalPlaces: 0
+          name: Granted
+
+      num_patent_applications_summary:
+        title: Total patent applications
+        description: Total number of patent applications between 2010-2020.
+        unit: applications
+        display:
+          numDecimalPlaces: 0
+          name: Applications
+
+      num_patent_granted_summary:
+        title: Total patent applications granted
+        description: Total number of patents granted between 2010-2020.
+        unit: granted applications
+        display:
+          numDecimalPlaces: 0
+          name: Granted
+
+      num_articles:
+        title: Number of articles
+        description: Yearly number of articles published in AI fields.
+        unit: articles
+        display:
+          numDecimalPlaces: 0
+          name: Articles
+
+      num_citations:
+        title: Number of citations
+        description: Yearly number of citations in the AI field.
+        unit: citations
+        display:
+          numDecimalPlaces: 0
+          name: Citations
+
+      num_articles_summary:
+        title: Total number of articles
+        description: Yearly total number of articles in the AI field between 2010-2022
+        unit: articles
+        display:
+          numDecimalPlaces: 0
+          name: Articles
+
+      num_citations_summary:
+        title: Total number of citations
+        description: The total number of citations in the AI field between 2010-2022
+        unit: citations
+        display:
+          numDecimalPlaces: 0
+          name: Citations
+
+      proportion_patents_granted:
+        title: Share of patents granted
+        description: Yearly share of patent applications that have been granted.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
+      citations_per_article:
+        title: Citations per article, 2010-2022
+        description: The total number of citations per article in the AI field between 2010-2022. Citations take time to accumulate so recent years  may have fewer citations, and the measure for these years may not completely reflective of their eventual total
+        unit: 'citations per article'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
