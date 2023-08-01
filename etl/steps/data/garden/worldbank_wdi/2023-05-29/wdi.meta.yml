@@ -1977,9 +1977,9 @@ tables:
           topic_tags_links:
           - Technological Progress
           - Internet
-          faqs:
-          - gdoc_id: 1E1sLXZmwU1SSVDFvMsJNbOAreHaKnRXqmJDqCAUfdDE
-            fragment_id: test
+          faqs: []
+          # - gdoc_id: 1E1sLXZmwU1SSVDFvMsJNbOAreHaKnRXqmJDqCAUfdDE
+          #   fragment_id: test
           key_info_text:
           - An Internet user is defined by the International Telecommunication Union as anyone
             who has accessed the Internet from any location in the last three months.

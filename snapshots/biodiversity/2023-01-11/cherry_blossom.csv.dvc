@@ -23,6 +23,7 @@ meta:
     date_published: 2021-03-26
     date_accessed: 2023-01-11
     license:
+      name: Custom license
       url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
 wdir: ../../../data/snapshots/biodiversity/2023-01-11
 outs:
