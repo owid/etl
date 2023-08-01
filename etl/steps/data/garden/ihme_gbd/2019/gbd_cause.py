@@ -11,7 +11,7 @@ log = get_logger()
 
 def run(dest_dir: str) -> None:
     # Name the dimensions we are keeping and pivoting by - this varies for gbd_risk
-    dims = ["sex", "age", "cause"]
+    dims = ["cause", "sex", "age"]
 
     # Get dataset level variables
 

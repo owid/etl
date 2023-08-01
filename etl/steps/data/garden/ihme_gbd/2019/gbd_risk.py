@@ -9,7 +9,7 @@ log = get_logger()
 
 
 def run(dest_dir: str) -> None:
-    dims = ["sex", "age", "cause", "rei"]
+    dims = ["cause", "rei", "sex", "age"]
     # Get dataset level variables
     dataset = paths.short_name
     log.info(f"{dataset}.start")
