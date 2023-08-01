@@ -43,7 +43,7 @@ tables:
           in the "Additional Notes" field.
         unit: deaths
         display:
-          name: Deaths
+          name: Fatalties
           numDecimalPlaces: 0
 
       total_killed_gtd:
@@ -95,7 +95,9 @@ tables:
           will be noted in the "Additional Notes" field.
         unit: injuries
         display:
+          name: Non-fatal injuries
           numDecimalPlaces: 0
+
       total_incident_counts:
         title: Terrorist attacks
         description: >-
@@ -135,6 +137,7 @@ tables:
           outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants
         unit: attacks
         display:
+          name: Attacks
           numDecimalPlaces: 0
       total_casualties:
         title: Terrorism casualties
