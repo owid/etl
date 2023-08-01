@@ -42,9 +42,7 @@ def run(dest_dir: str) -> None:
 
     # Drop selected variables
     vars_to_drop = [
-        "trust_first",
         "trust_first_not_very_much",
-        "trust_personally",
         "trust_personally_not_very_much",
         "confidence_confidence_in_cer_with_australia",  # Only New Zealand
         "confidence_american_forces",  # Only Iraq

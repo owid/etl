@@ -9,6 +9,22 @@ tables:
         display:
           name: Agree "Most people can be trusted"
           numDecimalPlaces: 1
+      trust_first:
+        title: Agree "Trust those I meet for the first time"
+        description: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "People you meet for the first time".'
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Agree "Trust those I meet for the first time"
+          numDecimalPlaces: 1
+      trust_personally:
+        title: Agree "Trust those I know personally"
+        description: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "People you know personally".'
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Agree "Trust those I know personally"
+          numDecimalPlaces: 1
       trust_first_not_at_all:
         title: Agree "Do not trust those I meet for the first time"
         description: '% of respondents replying that they "do not trust at all" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "People you meet for the first time".'

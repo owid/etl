@@ -15,15 +15,18 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("prevalence_dalys_world"))
+    ds_garden = cast(Dataset, paths.load_dependency("prio_v31"))
 
     # Read table from garden dataset.
-    tb = ds_garden["prevalence_dalys_world"]
+    tb = ds_garden["prio_v31"]
 
     #
     # Process data.
     #
-    tb = tb.reset_index().rename(columns={"cause": "country"}).set_index(["country", "year"])
+    # Rename index column `region` to `country`.
+    tb = tb.reset_index().rename(columns={"region": "country"})
+    tb = tb.set_index(["year", "country", "conflict_type"])
+
     #
     # Save outputs.
     #

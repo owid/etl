@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    log.info("ucdp: sanity checks")
+    log.info("war.ucdp: sanity checks")
     _sanity_checks(ds_meadow)
 
     # Load relevant tables
@@ -57,35 +57,42 @@ def run(dest_dir: str) -> None:
     tb_conflict = ds_meadow["battle_related_conflict"]
     tb_prio = ds_meadow["prio_armed_conflict"]
 
-    # Create `conflict_type` column
-    log.info("ucdp: add field `conflict_type`")
+    # Keep only active conflicts
+    log.info("war.ucdp: keep active conflicts")
     tb_geo = tb_geo[tb_geo["active_year"] == 1]
+
+    # Create `conflict_type` column
+    log.info("war.ucdp: add field `conflict_type`")
     tb = add_conflict_type(tb_geo, tb_conflict)
 
     # Sanity check conflict_type transitions
-    ## Only consider transitions between intrastate and intl intrastate
+    ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
     _sanity_check_conflict_types(tb)
     _sanity_check_prio_conflict_types(tb_prio)
 
     # Add number of new conflicts and ongoing conflicts (also adds data for the World)
-    log.info("ucdp: get metrics for main dataset (also estimate values for 'World')")
-    tb = add_number_conflicts_and_deaths(tb)
+    log.info("war.ucdp: get metrics for main dataset (also estimate values for 'World')")
+    tb = estimate_metrics(tb)
 
     # Add table from UCDP/PRIO
-    log.info("ucdp: prepare data from ucdp/prio table (also estimate values for 'World')")
+    log.info("war.ucdp: prepare data from ucdp/prio table (also estimate values for 'World')")
     tb_prio = prepare_prio_data(tb_prio)
 
     # Fill NaNs
-    log.info("ucdp: replace missing data with zeros (where applicable)")
+    log.info("war.ucdp: replace missing data with zeros (where applicable)")
     tb_prio = replace_missing_data_with_zeros(tb_prio)
     tb = replace_missing_data_with_zeros(tb)
 
     # Combine main dataset with PRIO/UCDP
-    log.info("ucdp: add data from ucdp/prio table")
-    tb = add_prio_data(tb, tb_prio)
+    log.info("war.ucdp: add data from ucdp/prio table")
+    tb = combine_tables(tb, tb_prio)
+
+    # Add extra-systemic after 1989
+    log.info("war.ucdp: fix extra-systemic nulls")
+    tb = fix_extrasystemic_entries(tb)
 
     # Add data for "all conflicts" conflict type
-    log.info("ucdp: add data for 'all conflicts'")
+    log.info("war.ucdp: add data for 'all conflicts'")
     tb = add_conflict_all(tb)
 
     # Add data for "all intrastate" conflict types
@@ -101,7 +108,7 @@ def run(dest_dir: str) -> None:
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True).sort_index()
 
     # Add short_name to table
-    log.info("ucdp: add shortname to table")
+    log.info("war.ucdp: add shortname to table")
     tb.metadata.short_name = paths.short_name
 
     #
@@ -204,6 +211,17 @@ def add_conflict_type(tb_geo: Table, tb_conflict: Table) -> Table:
        - interstate
        - intrastate
        - internationalized intrastate
+
+    The thing is that the original table `tb_geo` only contains a very high level categorisation. In particular,
+    it labels all state-based conflicts as 'state-based'. Instead, we want to use a more fine grained definition:
+    extrasystemic, intrastate, interstate.
+
+    Parameters
+    ----------
+        tb_geo: Table
+            This is the main table with the relevant data
+        tb_conflict: Table
+            This is a secondary table, that we use to obtain the conflict types of the conflicts.
     """
     tb_conflict = tb_conflict[["conflict_id", "year", "type_of_conflict"]].drop_duplicates()
     assert tb_conflict.groupby(["conflict_id", "year"]).size().max() == 1, "Some conflict_id-year pairs are duplicated!"
@@ -214,11 +232,13 @@ def add_conflict_type(tb_geo: Table, tb_conflict: Table) -> Table:
         tb_conflict, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
     )
     # Fill unknown types of violence
-    msk = tb_geo["type_of_violence"] == 1
-    tb_geo.loc[msk, "type_of_conflict"] = tb_geo.loc[msk, "type_of_conflict"].fillna("state-based (unknown)")
+    mask = tb_geo["type_of_violence"] == 1  # these are state-based conflicts
+    tb_geo.loc[mask, "type_of_conflict"] = tb_geo.loc[mask, "type_of_conflict"].fillna("state-based (unknown)")
 
     # Assert that `type_of_conflict` was only added for state-based events
-    assert tb_geo[tb_geo["type_of_violence"] != 1]["type_of_conflict"].isna().all()
+    assert (
+        tb_geo[tb_geo["type_of_violence"] != 1]["type_of_conflict"].isna().all()
+    ), "There are some actual values for non-state based conflicts! These should only be NaN, since `tb_conflict` should only contain data for state-based conflicts."
     # Check that `type_of_conflict` is not NaN for state-based events
     assert (
         not tb_geo[tb_geo["type_of_violence"] == 1]["type_of_conflict"].isna().any()
@@ -237,23 +257,32 @@ def add_conflict_type(tb_geo: Table, tb_conflict: Table) -> Table:
 
 
 def _sanity_check_conflict_types(tb: Table) -> Table:
+    """Check conflict type.
+
+    - Only transitions accepted are between intrastate conflicts.
+    - The same conflict is only expceted to have one type in a year.
+    """
     # Define expected combinations of conflicT_types for a conflict. Typically, only in the intrastate domain
     TRANSITION_EXPECTED = {"intrastate (internationalized)", "intrastate (non-internationalized)"}
     # Get conflicts with more than one conflict type assigned to them over their lifetime
     conflict_type_transitions = tb.groupby("conflict_new_id")["conflict_type"].apply(set)
     transitions = conflict_type_transitions[conflict_type_transitions.apply(len) > 1].drop_duplicates()
     # Extract unique combinations of conflict_types for a conflict
-    print(transitions)
     assert (len(transitions) == 1) & (transitions.iloc[0] == TRANSITION_EXPECTED), "Error"
 
     # Check if different regions categorise the conflict differently in the same year
     assert not (
         tb.groupby(["conflict_id", "year"])["type_of_conflict"].nunique() > 1
-    ).any(), "Seems like the conflict hast multiple types for a single year! Is it categorised differently depending on the region?"
+    ).any(), "Seems like the conflict has multiple types for a single year! Is it categorised differently depending on the region? This case has not been taken into account -- please review the code!"
 
 
 def _sanity_check_prio_conflict_types(tb: Table) -> Table:
-    # Define expected combinations of conflicT_types for a conflict. Typically, only in the intrastate domain
+    """Check conflict type in UCDP/PRIO data.
+
+    - Only transitions accepted between intrastate conflicts.
+    - The same conflict is only expceted to have one type in a year.
+    """
+    # Define expected combinations of conflict_types for a conflict. Typically, only in the intrastate domain
     TRANSITIONS_EXPECTED = {"{3, 4}"}
     # Get conflicts with more than one conflict type assigned to them over their lifetime
     conflict_type_transitions = tb.groupby("conflict_id")["type_of_conflict"].apply(set)
@@ -284,29 +313,37 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
 
     # ADD HERE IF YOU WANT TO REPLACE MISSING DATA WITH ZEROS
     ## Change NaNs for 0 for specific rows
-    ## For columns "number_ongoing_conflicts", "number_new_conflicts"; conflict_type="extrasystemic"
-    columns = ["number_ongoing_conflicts", "number_new_conflicts"]
-    tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
+    ## For columns "number_ongoing_conflicts", "number_new_conflicts", and "number_deaths_ongoing_conflict*"
+    columns = [
+        "number_ongoing_conflicts",
+        "number_new_conflicts",
+        "number_deaths_ongoing_conflicts",
+        "number_deaths_ongoing_conflicts_low",
+        "number_deaths_ongoing_conflicts_high",
+    ]
+    for col in columns:
+        if col in tb.columns:
+            tb.loc[:, col] = tb.loc[:, col].fillna(0)
 
     return tb
 
 
-def add_number_conflicts_and_deaths(tb: Table) -> Table:
-    """Add number of ongoing and new conflicts.
+def estimate_metrics(tb: Table) -> Table:
+    """Add number of ongoing and new conflicts, and number of deaths.
 
     It also estimates the values for 'World', otherwise this can't be estimated later on.
     This is because some conflicts occur in multiple regions, and hence would be double counted. To overcome this,
     we need to access the actual conflict_id field to find the number of unique values. This can only be done here.
     """
     # Get number of ongoing conflicts, and deaths in ongoing conflicts
-    log.info("ucdp: get number of ongoing conflicts and deaths in ongoing conflicts")
-    tb_ongoing = _add_number_ongoing_conflicts_and_deaths(tb)
+    log.info("war.ucdp: get number of ongoing conflicts and deaths in ongoing conflicts")
+    tb_ongoing = _get_ongoing_metrics(tb)
 
     # Get number of new conflicts every year
-    log.info("ucdp: get number of new conflicts every year")
-    tb_new = _add_number_new_conflicts(tb)
+    log.info("war.ucdp: get number of new conflicts every year")
+    tb_new = _get_new_metrics(tb)
     # Combine and build single table
-    log.info("ucdp: combine and build single table")
+    log.info("war.ucdp: combine and build single table")
     tb = tb_ongoing.merge(
         tb_new,
         left_on=["year", "region", "conflict_type"],
@@ -321,7 +358,7 @@ def add_number_conflicts_and_deaths(tb: Table) -> Table:
     return tb
 
 
-def _add_number_ongoing_conflicts_and_deaths(tb: Table) -> Table:
+def _get_ongoing_metrics(tb: Table) -> Table:
     # For each region
     columns_idx = ["year", "region", "conflict_type"]
     tb_ongoing = (
@@ -357,7 +394,7 @@ def _add_number_ongoing_conflicts_and_deaths(tb: Table) -> Table:
     return tb_ongoing
 
 
-def _add_number_new_conflicts(tb: Table) -> Table:
+def _get_new_metrics(tb: Table) -> Table:
     # Reduce table to only preserve first appearing event
     tb = (
         tb[["conflict_new_id", "year", "region", "conflict_type"]]
@@ -387,12 +424,16 @@ def _add_number_new_conflicts(tb: Table) -> Table:
 
 
 def prepare_prio_data(tb_prio: Table) -> Table:
+    """Prepare PRIO table.
+
+    This includes estimating all necessary metrics (ongoing and new).
+    """
     tb_prio = _prepare_prio_table(tb_prio)
     tb_prio = _prio_add_metrics(tb_prio)
     return tb_prio
 
 
-def add_prio_data(tb: Table, tb_prio: Table) -> Table:
+def combine_tables(tb: Table, tb_prio: Table) -> Table:
     """Combine main table with data from UCDP/PRIO.
 
     UCDP/PRIO table provides estimates for dates earlier then 1989.
@@ -438,6 +479,37 @@ def add_prio_data(tb: Table, tb_prio: Table) -> Table:
     columns_remove = tb.filter(regex=r"(_prio|_main)").columns
     tb = tb[[col for col in tb.columns if col not in columns_remove]]
 
+    return tb
+
+
+def fix_extrasystemic_entries(tb: Table) -> Table:
+    """Fix entries with conflict_type='extrasystemic.
+
+    Basically means setting to zero null entries after 1989.
+    """
+    # Sanity check
+    assert (
+        tb.loc[tb["conflict_type"] == "extrasystemic", "year"].max() == 1989
+    ), "There are years beyond 1989 for extrasystemic conflicts by default!"
+
+    # Get only extra-systemic stuff
+    mask = tb.conflict_type == "extrasystemic"
+    tb_extra = tb.loc[mask].copy()
+
+    # add all combinations
+    years = np.arange(tb["year"].min(), tb["year"].max() + 1)
+    regions = set(tb["region"])
+    new_idx = pd.MultiIndex.from_product([years, regions], names=["year", "region"])
+    tb_extra = tb_extra.set_index(["year", "region"]).reindex(new_idx).reset_index()
+    tb_extra["conflict_type"] = "extrasystemic"
+
+    # Replace nulls with zeroes
+    tb_extra[["number_ongoing_conflicts", "number_new_conflicts"]] = tb_extra[
+        ["number_ongoing_conflicts", "number_new_conflicts"]
+    ].fillna(0)
+
+    # Add to main table
+    tb = pd.concat([tb[-mask], tb_extra])
     return tb
 
 
