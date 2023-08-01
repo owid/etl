@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = cast(Dataset, paths.load_dependency("prio_v31"))
 
     # Read table from meadow dataset.
-    tb = ds_meadow["prio_v31"]
+    tb = ds_meadow["prio_v31"].reset_index()
 
     #
     # Process data.
