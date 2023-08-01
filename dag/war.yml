@@ -54,10 +54,12 @@ steps:
     - data://meadow/war/2023-01-10/sorokin_1937
   data://garden/war/2023-01-18/sutton_1971:
     - data://meadow/war/2023-01-10/sutton_1971
-  data://garden/war/2023-07-07/mars:
-    - data://meadow/war/2023-06-09/mars
   data://garden/war/2023-06-22/ucdp:
     - data://meadow/war/2023-06-22/ucdp
+  data://garden/war/2023-07-07/mars:
+    - data://meadow/war/2023-06-09/mars
+  data://garden/war/2023-07-18/cow:
+    - data://meadow/war/2023-06-07/cow
   data://garden/war/2023-07-21/prio_v31:
     - data://meadow/war/2023-02-03/prio_v31
   data://garden/war/2023-07-20/brecke:
@@ -68,6 +70,8 @@ steps:
     - data://garden/war/2023-06-22/ucdp
   data://grapher/war/2023-07-14/mars:
     - data://garden/war/2023-07-07/mars
+  data://grapher/war/2023-07-26/cow:
+    - data://garden/war/2023-07-18/cow
   data://grapher/war/2023-07-21/prio_v31:
     - data://garden/war/2023-07-21/prio_v31
   data://grapher/war/2023-07-20/brecke:
