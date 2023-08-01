@@ -408,7 +408,7 @@ def aggregate_rows_by_periods_inter(tb: Table) -> Table:
 
     # Re-build `number_deaths_ongoing_conflicts`
     tb["number_deaths_ongoing_conflicts"] = tb["number_deaths_ongoing_conflicts_sum"]
-    mask = tb["number_deaths_ongoing_conflicts_has_nan"]
+    mask = tb["number_deaths_ongoing_conflicts_has_nan"] == 1
     tb.loc[mask, "number_deaths_ongoing_conflicts"] = tb.loc[
         mask, ["number_deaths_ongoing_conflicts_sum", "deaths_threshold"]
     ].max(axis=1)
