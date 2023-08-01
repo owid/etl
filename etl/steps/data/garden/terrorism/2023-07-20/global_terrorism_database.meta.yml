@@ -43,6 +43,33 @@ tables:
           in the "Additional Notes" field.
         unit: deaths
         display:
+          name: Deaths
+          numDecimalPlaces: 0
+
+      total_killed_gtd:
+        title: Terrorism deaths (GTD)
+        description: >-
+          This field stores the number of total confirmed fatalities for the incident. The number includes all victims and
+          attackers who died as a direct result of the incident.
+
+
+          Where there is evidence of fatalities, but a figure is not reported or it is too vague to be of use, this field
+          remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities
+          are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise,
+          if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this
+          field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of fatalities, the database will usually reflect the
+          number given by the most recent source. However, the most recent source will not be used if the source itself is
+          of questionable validity or if the source bases its death numbers on claims made by a perpetrator group. When there
+          are several "most recent" sources published around the same time, or there are concerns about the validity of a
+          recent source, the majority figure will be used. Where there is no majority figure among independent sources, the
+          database will record the lowest proffered fatality figure, unless that figure comes from a source of questionable
+          validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted
+          in the "Additional Notes" field.
+        unit: deaths
+        display:
           name: Global Terrorism Database
           numDecimalPlaces: 0
       total_wounded:
@@ -1669,7 +1696,7 @@ tables:
           Attacks on religious pilgrims are considered “Private Citizens and Property;” attacks on missionaries are considered religious figures.
         unit: "deaths"
         display:
-          name: Religious figures or institutions
+          name: Religious targets
           numDecimalPlaces: 0
 
       total_nkill_telecommunication_target:
@@ -1690,7 +1717,7 @@ tables:
           This value also includes cases involving the targeting of militias and guerillas
         unit: "deaths"
         display:
-          name: Terrorist or non-state militia
+          name: Militia
           numDecimalPlaces: 0
 
       total_nkill_tourists_target:
@@ -1846,15 +1873,11 @@ tables:
       total_nwound_maritime_target:
         title: Terrorism non-fatal injuries Maritime Target
         description: >
-            Includes, attacks on reporters, news assistants, photographers, publishers, as well as attacks on media headquarters and offices.
-
-
-            Attacks on transmission facilities such as antennae or transmission towers, or broadcast infrastructure are coded as “Telecommunications,”.
+            Includes civilian maritime: attacks against fishing ships, oil tankers, ferries, yachts, etc. (Attacks on fishermen are coded as “Private Citizens and Property,”).
         unit: 'injuries'
         display:
-          name: Journalists & media
+          name: Maritime
           numDecimalPlaces: 0
-
       total_nwound_military_target:
         title: Terrorism non-fatal injuries Military Target
         descrtiption: >
@@ -1915,7 +1938,7 @@ tables:
           Attacks on religious pilgrims are considered “Private Citizens and Property;” attacks on missionaries are considered religious figures.
         unit: "injuries"
         display:
-          name: Religious figures or institutions
+          name: Religious targets
           numDecimalPlaces: 0
       total_nwound_telecommunication_target:
         title: Terrorism non-fatal injuries Telecommunication Target
@@ -1935,7 +1958,7 @@ tables:
           This value also includes cases involving the targeting of militias and guerillas
         unit: "injuries"
         display:
-          name: Terrorist or non-state militia
+          name: Militia
           numDecimalPlaces: 0
 
       total_nwound_tourists_target:
@@ -2110,6 +2133,10 @@ tables:
           - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be
           outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants
         unit: attacks
+        display:
+          name: Journalists & media
+          numDecimalPlaces: 0
+
       total_incident_counts_maritime_target:
         title: Terrorist attacks Maritime Target
         description: >-
@@ -2148,6 +2175,9 @@ tables:
           - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be
           outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants
         unit: attacks
+        display:
+          name: Maritime
+          numDecimalPlaces: 0
       total_incident_counts_military_target:
         title: Terrorist attacks Military Target
         descrtiption: >
@@ -2208,7 +2238,7 @@ tables:
           Attacks on religious pilgrims are considered “Private Citizens and Property;” attacks on missionaries are considered religious figures.
         unit: "attacks"
         display:
-          name: Religious figures or institutions
+          name: Religious targets
           numDecimalPlaces: 0
 
       total_incident_counts_telecommunication_target:
@@ -2229,7 +2259,7 @@ tables:
           This value also includes cases involving the targeting of militias and guerillas
         unit: "attacks"
         display:
-          name: Terrorist or non-state militia
+          name: Militia
           numDecimalPlaces: 0
 
       total_incident_counts_tourists_target:
@@ -2468,194 +2498,41 @@ tables:
           numDecimalPlaces: 7
       share_of_deaths:
         title: Share of deaths from terrorism
-        description: This field records the number of confirmed fatalties from terrorism as a share of total deaths.
+        description: >
+            The percentage of deaths due to terrorism is derived by comparing the confirmed fatalities data from the Global Terrorism Database to the overall mortality figures obtained from the 2022 UN World Population Prospects data.
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 2
-      decadal_total_killed:
-        title: Terrorism deaths, decadal
-        description: >-
-          This field stores the number of total confirmed fatalities for the incident. The number includes all victims and
-          attackers who died as a direct result of the incident.
 
-
-          Where there is evidence of fatalities, but a figure is not reported or it is too vague to be of use, this field
-          remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities
-          are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise,
-          if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this
-          field will only report the number of victims killed in the incident.
-
-
-          Where several independent sources report different numbers of fatalities, the database will usually reflect the
-          number given by the most recent source. However, the most recent source will not be used if the source itself is
-          of questionable validity or if the source bases its death numbers on claims made by a perpetrator group. When there
-          are several "most recent" sources published around the same time, or there are concerns about the validity of a
-          recent source, the majority figure will be used. Where there is no majority figure among independent sources, the
-          database will record the lowest proffered fatality figure, unless that figure comes from a source of questionable
-          validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted
-          in the "Additional Notes" field.
-        unit: deaths
+      killed_per_suicide_attack:
+        title: Terrorism deaths per suicide attack
+        description: The incident was a suicide attack.
+        unit: 'deaths per attack'
         display:
+          name: Deaths per suicide attack
           numDecimalPlaces: 0
-      decadal_total_wounded:
-        title: Terrorism non-fatal injuries, decadal
-        description: >-
-          This field records the number of confirmed non-fatal injuries to both perpetrators and victims.
 
-
-          Where there is evidence of non-fatal injuries, but a figure is not reported or it is too vague to be of use, this
-          field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator
-          fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident.
-          Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are
-          known, this field will only report the number of victims killed in the incident.
-
-
-          Where several independent sources report different numbers of non-fatal injuries, the database will usually reflect
-          the number given by the most recent source. However, the most recent source will not be used if the source itself
-          is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group.
-          When there are several "most recent" sources published around the same time, or there are concerns about the validity
-          of a recent source, the majority figure will be used. Where there is no majority figure among independent sources,
-          the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source
-          of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities
-          will be noted in the "Additional Notes" field.
-        unit: injuries per capita
+      killed_per_non_suicide_attack:
+        title: Terrorism deaths per no suicide attack
+        description: >
+           There is no indication that the incident was a suicide attack.
+        unit: 'deaths per attack'
         display:
+          name: Deaths per non-suicide attack
           numDecimalPlaces: 0
-      decadal_total_incident_counts:
-        title: Terrorist attacks, decadal
-        description: >-
-          The GTD defines a terrorist attack as the threatened or actual use of illegal force and violence by a non- state
-          actor to attain a political, economic, religious, or social goal through fear, coercion, or intimidation. In practice
-          this means in order to consider an incident for inclusion in the GTD, all three of the following attributes must
-          be present:
-
-
-          - The incident must be intentional - the result of a conscious calculation on the part of a perpetrator.
-
-
-          - The incident must entail some level of violence or immediate threat of violence -including property violence,
-          as well as violence against people.
-
-
-          - The perpetrators of the incidents must be sub-national actors. The database does not include acts of state terrorism.
-
-
-          In addition, at least two of the following three criteria must be present for an incident to be included in the
-          GTD:
-
-
-          - Criterion 1: The act must be aimed at attaining a political, economic, religious, or social goal. In terms of
-          economic goals, the exclusive pursuit of profit does not satisfy this criterion. It must involve the pursuit of
-          more profound, systemic economic change.
-
-
-          - Criterion 2: There must be evidence of an intention to coerce, intimidate, or convey some other message to a larger
-          audience (or audiences) than the immediate victims. It is the act taken as a totality that is considered, irrespective
-          if every individual involved in carrying out the act was aware of this intention. As long as any of the planners
-          or decision-makers behind the attack intended to coerce, intimidate or publicize, the intentionality criterion is
-          met.
-
-
-          - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be
-          outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants
-        unit: attacks
+      injured_per_suicide_attack:
+        title: Terrorism injuries per suicide attack
+        description: The incident was a suicide attack.
+        unit: 'injuries per attack'
         display:
+          name: Injuries per suicide attack
           numDecimalPlaces: 0
-      decadal_total_casualties:
-        title: Terrorism casualties, decadal
-        description: >-
-          This field records the number of confirmed non-fatal injuries and fatalties to both perpetrators and victims.
-
-
-          Where there is evidence of non-fatal injuries and fatalties, but a figure is not reported or it is too vague to
-          be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack,
-          but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result
-          of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim
-          fatalities are known, this field will only report the number of victims killed in the incident.
-
-
-          Where several independent sources report different numbers of non-fatal injuries and fatalties, the database will
-          usually reflect the number given by the most recent source. However, the most recent source will not be used if
-          the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a
-          perpetrator group. When there are several "most recent" sources published around the same time, or there are concerns
-          about the validity of a recent source, the majority figure will be used. Where there is no majority figure among
-          independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure
-          comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting
-          reports of fatalities will be noted in the "Additional Notes" field.
-        unit: casualties
+      injured_per_non_suicide_attack:
+        title: Terrorism injuries per non-suicide attack
+        description: >
+           There is no indication that the incident was a suicide attack.
+        unit: 'injuries per attack'
         display:
+          name: Injuries per non-suicide attack
           numDecimalPlaces: 0
-      decadal_terrorism_wounded_per_capita:
-        title: Terrorism non-fatal injuries per capita, decadal
-        description: >-
-          This field records the number of confirmed non-fatal injuries to both perpetrators and victims.
-
-
-          Where there is evidence of non-fatal injuries, but a figure is not reported or it is too vague to be of use, this
-          field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator
-          fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident.
-          Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are
-          known, this field will only report the number of victims killed in the incident.
-
-
-          Where several independent sources report different numbers of non-fatal injuries, the database will usually reflect
-          the number given by the most recent source. However, the most recent source will not be used if the source itself
-          is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group.
-          When there are several "most recent" sources published around the same time, or there are concerns about the validity
-          of a recent source, the majority figure will be used. Where there is no majority figure among independent sources,
-          the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source
-          of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities
-          will be noted in the "Additional Notes" field.
-        unit: injuries per capita
-        display:
-          numDecimalPlaces: 7
-      decadal_terrorism_deaths_per_capita:
-        title: Terrorism deaths per capita, decadal
-        description: >-
-          This field stores the number of total confirmed fatalities for the incident. The number includes all victims and
-          attackers who died as a direct result of the incident.
-
-
-          Where there is evidence of fatalities, but a figure is not reported or it is too vague to be of use, this field
-          remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities
-          are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise,
-          if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this
-          field will only report the number of victims killed in the incident.
-
-
-          Where several independent sources report different numbers of fatalities, the database will usually reflect the
-          number given by the most recent source. However, the most recent source will not be used if the source itself is
-          of questionable validity or if the source bases its death numbers on claims made by a perpetrator group. When there
-          are several "most recent" sources published around the same time, or there are concerns about the validity of a
-          recent source, the majority figure will be used. Where there is no majority figure among independent sources, the
-          database will record the lowest proffered fatality figure, unless that figure comes from a source of questionable
-          validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted
-          in the "Additional Notes" field.
-        unit: deaths per capita
-        display:
-          numDecimalPlaces: 7
-      decadal_terrorism_casualties_per_capita:
-        title: Terrorism casualties per capita, decadal
-        description: >-
-          This field records the number of confirmed non-fatal injuries and fatalties to both perpetrators and victims.
-
-
-          Where there is evidence of non-fatal injuries and fatalties, but a figure is not reported or it is too vague to
-          be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack,
-          but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result
-          of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim
-          fatalities are known, this field will only report the number of victims killed in the incident.
-
-
-          Where several independent sources report different numbers of non-fatal injuries and fatalties, the database will
-          usually reflect the number given by the most recent source. However, the most recent source will not be used if
-          the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a
-          perpetrator group. When there are several "most recent" sources published around the same time, or there are concerns
-          about the validity of a recent source, the majority figure will be used. Where there is no majority figure among
-          independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure
-          comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting
-          reports of fatalities will be noted in the "Additional Notes" field.
-        unit: casualties per capita
-        display:
-          numDecimalPlaces: 7

@@ -1,0 +1,24 @@
+meta:
+  name: Antibiotic usage in livestock
+  description: ''
+  source:
+    name: Google Sheet
+    description:
+    url: 
+      https://journals.plos.org/globalpublichealth/article?id=10.1371/journal.pgph.0001305
+    source_data_url: 
+      gAAAAABkx3upTZWMXztjekxii8ErfSTERmQwg76o8XHXX99JDWZui1nd-YrHePmQ6x4_xO_kwKDwO0g3yEvrLcZzGPVwxL7MKUw9emPLsHHpziNdqMCIHQ-UIZE6s3tzpIz3I-A6oSH51v7e594YPvoMjs76jDLvMHs_UGMOFWCIAbbdIvrUUS6pRsTb-mluYrbUKxAZWbdclY0SR7gz9KzUKTHNrkkOyhaWKtukC-NOIRu1wDEWu9kz9mRhWADk8Lt4ah_P2LEW
+    owid_data_url:
+    date_accessed: '2023-07-31'
+    publication_date:
+    publication_year: 2023
+    published_by: Google Sheet
+  license:
+    name:
+    url:
+  is_public: false
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 46eb3fe37b902a64c1d12395c0c8e55a
+  size: 9261
+  path: antibiotic_usage_livestock.csv

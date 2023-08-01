@@ -63,8 +63,8 @@ meta:
     url: https://www.mortality.org/Data/STMF
     source_data_url: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
     owid_data_url:
-    date_accessed: 2023-07-28
-    publication_date: 2023-07-17
+    date_accessed: 2023-08-01
+    publication_date: 2023-07-31
     publication_year: 2023
     published_by: HMD. Human Mortality Database. Max Planck Institute for Demographic
       Research (Germany), University of California, Berkeley (USA), and French Institute
@@ -74,6 +74,6 @@ meta:
     url: https://www.mortality.org/Data/UserAgreement
 wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: e2a3006eaf77e5ba9b753d958090abe3
-  size: 19979066
+- md5: 684f629cb1214961d9e2ffdb5661e2fb
+  size: 20017001
   path: hmd_stmf.csv

@@ -140,7 +140,8 @@ def _update_variables_display(table: catalog.Table) -> None:
     for col in table.columns:
         meta = table[col].metadata
         meta.display = meta.display or {}
-        meta.display.setdefault("shortUnit", meta.short_unit)
+        if meta.short_unit:
+            meta.display.setdefault("shortUnit", meta.short_unit)
         if meta.unit:
             meta.display.setdefault("unit", meta.unit)
 

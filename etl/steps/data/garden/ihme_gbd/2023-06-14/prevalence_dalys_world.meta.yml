@@ -25,22 +25,20 @@ dataset:
       url: https://www.healthdata.org/data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
   sources:
     - *source-ihme
-
 tables:
   prevalence_dalys_world:
     # (Inherited from meadow, remove if not different.)
     variables:
-      dalys_rate:
-        title: DALYs (rate)
-        description: >-
-          One DALY represents the loss of the equivalent of one year of full health. DALYs for a disease or health condition are the sum of the years of life lost to due
-          to premature mortality (YLLs) and the years lived with a disability (YLDs) due to prevalent cases of the disease or health condition in a population.
-
-          This is estimated as the total number of DALYs per 100,000 population.
-        unit: DALYs per 100,000 people
       share_rate:
         title: Prevalence (share of population)
         description: >-
           Share of population of a particular disease or health condition. This is estimated as the total share of cases with anxiety disorders relative to the population of a country.
         unit: "%"
         short_unit: "%"
+      dalys_rate:
+        title: DALYs (rate)
+        description: >-
+          One DALY represents the loss of the equivalent of one year of full health. DALYs for a disease or health condition are the sum of the years of life lost to due
+          to premature mortality (YLLs) and the years lived with a disability (YLDs) due to prevalent cases of the disease or health condition in a population.
+          This is estimated as the total number of DALYs per 100,000 population.
+        unit: DALYs per 100,000 people

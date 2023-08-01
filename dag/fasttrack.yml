@@ -86,3 +86,7 @@ steps:
   - snapshot://fasttrack/2023-04-30/paratz.csv
   data-private://grapher/fasttrack/latest/pain_hours_hen_systems:
   - snapshot-private://fasttrack/latest/pain_hours_hen_systems.csv
+  data-private://grapher/fasttrack/latest/antibiotic_usage_livestock:
+  - snapshot-private://fasttrack/latest/antibiotic_usage_livestock.csv
+  data-private://grapher/fasttrack/latest/antimicrobial_usage_livestock:
+  - snapshot-private://fasttrack/latest/antimicrobial_usage_livestock.csv
