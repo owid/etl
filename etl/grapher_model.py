@@ -844,7 +844,6 @@ class Variable(SQLModel, table=True):
     ) -> "Variable":
         # `unit` can be an empty string, but cannot be null
         assert metadata.unit is not None
-        assert metadata.display
         return cls(
             shortName=short_name,
             name=metadata.title,
@@ -855,7 +854,7 @@ class Variable(SQLModel, table=True):
             shortUnit=metadata.short_unit,
             timespan=timespan,
             coverage="",
-            display=metadata.display,
+            display=metadata.display or {},
             catalogPath=catalog_path,
             dimensions=dimensions,
         )
