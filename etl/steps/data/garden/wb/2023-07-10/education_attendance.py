@@ -44,6 +44,8 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["education"]
     tb.reset_index(inplace=True)
 
+    tb = tb[tb["indicator_name"].str.contains("attendance", case=False)]
+    tb.reset_index(inplace=True)
     #
     # Process data.
     #
@@ -56,31 +58,6 @@ def run(dest_dir: str) -> None:
         countries_file=os.path.join(base_directory, "education.countries.json"),
     )
     snap: Snapshot = paths.load_dependency("education.zip")
-    df_metadata = shared.read_metadata(snap)
-    # First, filter the DataFrame to get only the rows with the specified topics
-    filtered_df = df_metadata[
-        df_metadata["Topic"].isin(
-            [
-                "Education Management Information Systems (SABER)",
-                "Early Child Development (SABER)",
-                "Engaging the Private Sector (SABER)",
-                "School Health and School Feeding (SABER)",
-                "School Autonomy and Accountability (SABER)",
-                "School Finance (SABER)",
-                "Student Assessment (SABER)",
-                "Teachers (SABER)",
-                "Tertiary Education (SABER)",
-                "Workforce Development (SABER)",
-            ]
-        )
-    ]
-
-    # Now, you can access the rows in the indicator column
-    indicator_values = filtered_df["Indicator Name"].tolist()
-
-    tb = tb[tb["indicator_name"].isin(indicator_values)]
-
-    tb.reset_index(inplace=True)
 
     # Pivot the dataframe so that each indicator is a separate column
     tb = tb.pivot(index=["country", "year"], columns="indicator_name", values="value")
@@ -92,6 +69,7 @@ def run(dest_dir: str) -> None:
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     tb = Table(tb, short_name=paths.short_name, underscore=True)
+    df_metadata = shared.read_metadata(snap)
     tb = shared.add_metadata(tb, df_metadata)
 
     #

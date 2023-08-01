@@ -3,79 +3,13 @@ steps:
   data://meadow/wb/2023-07-10/education:
   - snapshot://wb/2023-07-10/education.zip
 
-  data://garden/wb/2023-07-10/education_by_level:
+  data://garden/wb/2023-07-10/education_attendance:
   - data://meadow/wb/2023-07-10/education
   - snapshot://wb/2023-07-10/education.zip
   - data://garden/regions/2023-01-01/regions
   - data://garden/wb/2023-04-30/income_groups
-  data://grapher/wb/2023-07-10/education_by_level:
-  - data://garden/wb/2023-07-10/education_by_level
-
-  data://garden/wb/2023-07-10/education_attainment:
-  - data://meadow/wb/2023-07-10/education
-  - snapshot://wb/2023-07-10/education.zip
-  - data://garden/regions/2023-01-01/regions
-  - data://garden/wb/2023-04-30/income_groups
-  data://grapher/wb/2023-07-10/education_attainment:
-  - data://garden/wb/2023-07-10/education_attainment
-
-  data://garden/wb/2023-07-10/education_learning_outcomes:
-  - data://meadow/wb/2023-07-10/education
-  - snapshot://wb/2023-07-10/education.zip
-  - data://garden/regions/2023-01-01/regions
-  - data://garden/wb/2023-04-30/income_groups
-  data://grapher/wb/2023-07-10/education_learning_outcomes:
-  - data://garden/wb/2023-07-10/education_learning_outcomes
-
-  data://garden/wb/2023-07-10/education_literacy:
-  - data://meadow/wb/2023-07-10/education
-  - snapshot://wb/2023-07-10/education.zip
-  - data://garden/regions/2023-01-01/regions
-  - data://garden/wb/2023-04-30/income_groups
-  data://grapher/wb/2023-07-10/education_literacy:
-  - data://garden/wb/2023-07-10/education_literacy
-
-  data://garden/wb/2023-07-10/education_saber:
-  - data://meadow/wb/2023-07-10/education
-  - snapshot://wb/2023-07-10/education.zip
-  - data://garden/regions/2023-01-01/regions
-  - data://garden/wb/2023-04-30/income_groups
-  data://grapher/wb/2023-07-10/education_saber:
-  - data://garden/wb/2023-07-10/education_saber
-
-  data://garden/wb/2023-07-10/education_teachers:
-  - data://meadow/wb/2023-07-10/education
-  - snapshot://wb/2023-07-10/education.zip
-  - data://garden/regions/2023-01-01/regions
-  - data://garden/wb/2023-04-30/income_groups
-  data://grapher/wb/2023-07-10/education_teachers:
-  - data://garden/wb/2023-07-10/education_teachers
-
-  data://garden/wb/2023-07-10/education_expenditure_policy:
-  - data://meadow/wb/2023-07-10/education
-  - snapshot://wb/2023-07-10/education.zip
-  - data://garden/regions/2023-01-01/regions
-  - data://garden/wb/2023-04-30/income_groups
-  data://grapher/wb/2023-07-10/education_expenditure_policy:
-  - data://garden/wb/2023-07-10/education_expenditure_policy
-
-  data://garden/wb/2023-07-10/education_equality:
-  - data://meadow/wb/2023-07-10/education
-  - snapshot://wb/2023-07-10/education.zip
-  - data://garden/regions/2023-01-01/regions
-  - data://garden/wb/2023-04-30/income_groups
-  data://grapher/wb/2023-07-10/education_equality:
-  - data://garden/wb/2023-07-10/education_equality
-
-  # Lee and Lee datasets
-  data://meadow/education/2023-07-17/education_lee_lee:
-  - snapshot://education/2023-07-17/education_lee_lee.xlsx
-  data://garden/education/2023-07-17/education_lee_lee:
-  - data://meadow/education/2023-07-17/education_lee_lee
-  - data://garden/regions/2023-01-01/regions
-  - data://garden/wb/2023-04-30/income_groups
-  data://grapher/education/2023-07-17/education_lee_lee:
-  - data://garden/education/2023-07-17/education_lee_lee
+  data://grapher/wb/2023-07-10/education_attendance:
+  - data://garden/wb/2023-07-10/education_attendance
 
 
   # Barro and Lee projections dataset
