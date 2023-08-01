@@ -1,0 +1,20 @@
+meta:
+  name: WHO Mortality Database (2022)
+  publication_year: 2022
+
+  publication_date: '2022-09-01'
+  source_name: WHO Mortality Database (2022)
+  source_published_by: WHO Mortality Database (2022)
+  url: https://platform.who.int/mortality/themes/theme-details/MDB/all-causes
+  source_data_url:
+  license_url: https://www.who.int/about/policies/publishing/copyright
+  license_name: CC BY-NC-SA 3.0 IGO
+  date_accessed: 2023-08-01
+  is_public: true
+  description: |
+
+wdir: ../../../data/snapshots/who/2023-08-01
+outs:
+- md5: 5355c819bb7f387d4cc9b6e110f29fb3
+  size: 809685059
+  path: mortality_database.csv
