@@ -26,9 +26,9 @@ help:
 	@echo '  make lab       	Start a Jupyter Lab server'
 	@echo '  make publish   	Publish the generated catalog to S3'
 	@echo '  make test      	Run all linting and unit tests'
-	@echo '  make test-all      Run all linting and unit tests (including for modules in lib/)'
+	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make watch     	Run all tests, watching for changes'
-	@echo '  make watch-all     Run all tests, watching for changes (including for modules in lib/)'
+	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
 
 docs: .venv
