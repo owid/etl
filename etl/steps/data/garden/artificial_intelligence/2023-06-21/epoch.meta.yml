@@ -111,13 +111,6 @@ tables:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
           yearIsDay: true
-      equivalent_training_time__hours:
-        title: Equivalent training time
-        unit: 'hours'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '1949-01-01'
-          yearIsDay: true
       training_computation_petaflop:
         title: Training compute (petaFLOP)
         unit: 'petaFLOP'

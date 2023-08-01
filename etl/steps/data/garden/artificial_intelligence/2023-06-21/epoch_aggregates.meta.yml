@@ -54,9 +54,6 @@ tables:
       _3d_reconstruction:
         title: 3D reconstruction
         unit: ''
-      audio:
-        title: Audio
-        unit: ''
       drawing:
         title: Drawing
         unit: ''
@@ -74,9 +71,6 @@ tables:
         unit: ''
       other:
         title: Other
-        unit: ''
-      reading:
-        title: Reading
         unit: ''
       recommendation:
         title: Recommendation
@@ -113,9 +107,6 @@ tables:
         unit: ''
       collaboration__majority_industry:
         title: Collaboration, majority industry
-        unit: ''
-      non_profit:
-        title: Non-profit
         unit: ''
       research_collective:
         title: Research collective
