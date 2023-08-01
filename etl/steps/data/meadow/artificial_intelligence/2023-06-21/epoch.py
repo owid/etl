@@ -41,7 +41,6 @@ def run(dest_dir: str) -> None:
         "Training compute (FLOP)",
         "Training dataset size (datapoints)",
         "Training time (hours)",
-        "Equivalent training time (hours)",
         "Inclusion criteria",
     ]
 
