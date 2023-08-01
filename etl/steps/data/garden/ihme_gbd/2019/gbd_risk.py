@@ -1,15 +1,15 @@
-from gbd_tools import run_wrapper
 from structlog import get_logger
 
 from etl.helpers import PathFinder
 
-# naming conventions
+from .shared import run_wrapper
+
 paths = PathFinder(__file__)
 log = get_logger()
 
 
 def run(dest_dir: str) -> None:
-    dims = ["sex", "age", "cause", "rei"]
+    dims = ["cause", "rei", "sex", "age"]
     # Get dataset level variables
     dataset = paths.short_name
     log.info(f"{dataset}.start")

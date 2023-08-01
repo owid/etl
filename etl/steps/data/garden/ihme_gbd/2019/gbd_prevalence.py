@@ -1,7 +1,8 @@
-from gbd_tools import run_wrapper
 from structlog import get_logger
 
 from etl.helpers import PathFinder
+
+from .shared import run_wrapper
 
 # naming conventions
 paths = PathFinder(__file__)
@@ -10,7 +11,7 @@ log = get_logger()
 
 def run(dest_dir: str) -> None:
     # Name the dimensions we are keeping and pivoting by - this varies for gbd_risk
-    dims = ["sex", "age", "cause"]
+    dims = ["cause", "sex", "age"]
 
     # Get dataset level variables
 
