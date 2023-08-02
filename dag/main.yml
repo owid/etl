@@ -540,6 +540,15 @@ steps:
   data://grapher/terrorism/2023-07-20/global_terrorism_database:
   - data://garden/terrorism/2023-07-20/global_terrorism_database
 
+# European Social Survey - Trust questions
+  data://meadow/ess/2023-08-02/ess_trust:
+  - snapshot://ess/2023-08-02/ess_trust.csv
+  - data://garden/regions/2023-01-01/regions
+  data://garden/ess/2023-08-02/ess_trust:
+  - data://meadow/ess/2023-08-02/ess_trust
+  data://grapher/ess/2023-08-02/ess_trust:
+  - data://garden/ess/2023-08-02/ess_trust
+
 
 # Sub-dags to import
 include:
