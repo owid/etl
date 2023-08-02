@@ -129,14 +129,14 @@ def create_variable_metadata(
     var_name_dict = {
         "number": {
             "title": f"Total deaths that are from {cause.lower()}" + f", in {sex.lower()} aged {age_group.lower()}",
-            "description": "",
+            "description": f"{cause} has the following ICD 10 codes: {icd10_codes}.",
             "unit": "deaths",
             "short_unit": "",
-            "num_decimal_places": 1,
+            "num_decimal_places": 0,
         },
         "percentage_of_cause_specific_deaths_out_of_total_deaths": {
             "title": f"Share of total deaths in {sex.lower()} aged {age_group.lower()} years that are from {cause.lower()}",
-            "description": f"{cause} is from the {broad_cause_group.lower()} cause of death group and has the following ICD 10 codes: {icd10_codes}",
+            "description": f"{cause} has the following ICD 10 codes: {icd10_codes}.",
             "unit": "%",
             "short_unit": "%",
             "num_decimal_places": 1,
@@ -144,14 +144,14 @@ def create_variable_metadata(
         "age_standardized_death_rate_per_100_000_standard_population": {
             "title": f"Age-stadarized deaths that are from {cause.lower()}"
             + f" per 100,000 people, in {sex.lower()} aged {age_group.lower()}",
-            "description": f"{cause} is from the {broad_cause_group.lower()} cause of death group and has the following ICD 10 codes: {icd10_codes}. The data is standardized using the WHO standard population.",
+            "description": f"{cause} has the following ICD 10 codes: {icd10_codes}. The data is standardized using the WHO standard population.",
             "unit": "deaths per 100,000 people",
             "short_unit": "",
             "num_decimal_places": 1,
         },
         "death_rate_per_100_000_population": {
             "title": f"Deaths from {cause.lower()}" + f" per 100,000 people in, {sex.lower()} aged {age_group.lower()}",
-            "description": f"{cause} is from the {broad_cause_group.lower()} cause of death group and has the following ICD 10 codes: {icd10_codes}",
+            "description": f"{cause} has the following ICD 10 codes: {icd10_codes}.",
             "unit": "deaths per 100,000 people",
             "short_unit": "",
             "num_decimal_places": 1,
