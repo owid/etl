@@ -142,7 +142,7 @@ def create_variable_metadata(
             "num_decimal_places": 1,
         },
         "age_standardized_death_rate_per_100_000_standard_population": {
-            "title": f"Age-stadarized deaths that are from {cause.lower()}"
+            "title": f"Age-standardized deaths that are from {cause.lower()}"
             + f" per 100,000 people, in {sex.lower()} aged {age_group.lower()}",
             "description": f"{cause} has the following ICD 10 codes: {icd10_codes}. The data is standardized using the WHO standard population.",
             "unit": "deaths per 100,000 people",
