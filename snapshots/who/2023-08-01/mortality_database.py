@@ -108,11 +108,15 @@ def combine_datasets() -> pd.DataFrame:
         file_path = base_file_path + file_name
         assert file_path.endswith("csv")
         df = pd.read_csv(file_path, skiprows=6)
+        cols = df.columns
+        df = df.reset_index()
+        df = df.dropna(how="all", axis=1)
+        df.columns = cols
         df["cause"] = cause
         df["icd10_codes"] = list_of_causes[cause]["icd_codes"]
         df["broad_cause_group"] = list_of_causes[cause]["broad_cause_group"]
         df_all = pd.concat([df_all, df])
-    return df_all
+    return df_all.reset_index(drop=True)
 
 
 if __name__ == "__main__":

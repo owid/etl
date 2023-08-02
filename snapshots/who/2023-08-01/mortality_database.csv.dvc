@@ -15,6 +15,6 @@ meta:
 
 wdir: ../../../data/snapshots/who/2023-08-01
 outs:
-- md5: 8224e32cdbed63b78a2ebe140b9d3f47
-  size: 1003383281
+- md5: 511ed132860849c8e7bb626c6462a40a
+  size: 1018271798
   path: mortality_database.csv
