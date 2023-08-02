@@ -130,8 +130,8 @@ def create_variable_metadata(
         "number": {
             "title": f"Total deaths that are from {cause.lower()}" + f", in {sex.lower()} aged {age_group.lower()}",
             "description": "",
-            "unit": "%",
-            "short_unit": "%",
+            "unit": "deaths",
+            "short_unit": "",
             "num_decimal_places": 1,
         },
         "percentage_of_cause_specific_deaths_out_of_total_deaths": {

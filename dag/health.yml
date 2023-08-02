@@ -223,3 +223,12 @@ steps:
   data://grapher/who/2023-07-13/autopsy:
   - data://garden/who/2023-07-13/autopsy
   - snapshot://fasttrack/2023-04-30/paratz.csv
+
+# WHO Mortality Database - 1st level causes
+
+  data://meadow/who/2023-08-01/mortality_database:
+  - snapshot://who/2023-08-01/mortality_database.csv
+  data://garden/who/2023-08-01/mortality_database:
+  - data://meadow/who/2023-08-01/mortality_database
+  data://grapher/who/2023-08-01/mortality_database:
+  - data://garden/who/2023-08-01/mortality_database
