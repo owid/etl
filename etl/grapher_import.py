@@ -215,13 +215,10 @@ def upsert_table(
 
         source = table[column_name].metadata.sources[0]
 
-        # Does it already exist in the database?
-        source_id = dataset_upsert_result.source_ids.get(source.name)
-        if not source_id:
-            # Not exists, upsert it
-            # NOTE: this could be quite inefficient as we upsert source for every variable
-            #   optimize this if this turns out to be a bottleneck
-            source_id = _upsert_source_to_db(session, source, dataset_upsert_result.dataset_id)
+        # Upsert source to database
+        # NOTE: this could be quite inefficient as we upsert source for every variable
+        #   optimize this if this turns out to be a bottleneck
+        source_id = _upsert_source_to_db(session, source, dataset_upsert_result.dataset_id)
 
         variable = gm.Variable.from_variable_metadata(
             table[column_name].metadata,
