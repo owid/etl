@@ -27,6 +27,9 @@ def run(dest_dir: str) -> None:
     #
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = tb.drop(columns=["region_code", "country_code", "age_group_code"])
+    tb = tb.rename(columns={"country_name": "country"})
+    tb = tb.set_index(["country", "year", "sex", "age_group", "cause"], verify_integrity=True)
 
     #
     # Save outputs.
