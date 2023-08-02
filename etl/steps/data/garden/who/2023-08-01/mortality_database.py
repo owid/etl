@@ -123,6 +123,9 @@ def add_metadata(dest_dir: str, ds_meadow: Dataset, tb: Table) -> Dataset:
 def create_variable_metadata(
     variable: Variable, cause: str, age_group: str, sex: str, icd10_codes: str, broad_cause_group: str
 ):
+    """
+    Create variabe metadata for each group
+    """
     var_name_dict = {
         "number": {
             "title": f"Total deaths that are from {cause.lower()}" + f", in {sex.lower()} aged {age_group.lower()}",
