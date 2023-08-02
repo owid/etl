@@ -1,4 +1,5 @@
-"""Grapher step for the Electricity Mix (BP & Ember) dataset.
+"""Grapher step for the Electricity Mix (Energy Institute & Ember) dataset.
+
 """
 
 from owid.catalog import Dataset
@@ -22,6 +23,10 @@ def run(dest_dir: str) -> None:
     #
     # Drop unnecessary columns.
     tb = tb_garden.drop(columns=["population"])
+
+    # NOTE: Chart [Electricity production by source](https://ourworldindata.org/grapher/electricity-prod-source-stacked)
+    # has a timeline starting in 1990 (instead of 1985) because the data is incomplete for many countries between 1985
+    # and 1990. If EI data changes in the future and is more complete in that range, remove the timeline restriction.
 
     #
     # Save outputs.
