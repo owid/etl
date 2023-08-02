@@ -590,5 +590,6 @@ include:
   - dag/space.yml
   - dag/artificial_intelligence.yml
   - dag/education.yml
+  - dag/covid.yml
   - dag/animal_welfare.yml
 
