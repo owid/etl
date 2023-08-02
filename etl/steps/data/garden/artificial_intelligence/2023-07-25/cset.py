@@ -2,6 +2,7 @@
 
 from typing import cast
 
+import numpy as np
 import pandas as pd
 import us_cpi
 from owid.catalog import Dataset, Table
@@ -31,14 +32,17 @@ def run(dest_dir: str) -> None:
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Grouping the DataFrame by 'year' to get the sum for each year
-    df_total = tb.groupby(["year", "field"]).sum(numeric_only=True)
+    # Select the valid numeric columns for aggregation
+    numeric_cols = tb.select_dtypes(include=[np.number]).columns
+
+    # Group by "year" and "field", select valid columns, and apply the custom aggregation function
+    df_total = tb.groupby(["year", "field"])[numeric_cols].agg(sum_with_nan)
 
     # Resetting the index to convert 'year' from the index to a column
     df_total.reset_index(inplace=True)
 
     # Adding a 'Total' row in the 'country' column
     df_total["country"] = "Total"
-    df_total.set_index(["year", "country", "field"], inplace=True)
     merged_total = pd.concat([df_total, tb])
     # List of columns to include for conversion to millions (investment values)
     _investment_cols = [col for col in merged_total.columns if "investment" in col]
@@ -81,3 +85,11 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+# Define a custom aggregation function that returns NaN if all values are NaN, else returns the sum
+def sum_with_nan(values):
+    if values.isnull().all():
+        return np.nan
+    else:
+        return values.sum()

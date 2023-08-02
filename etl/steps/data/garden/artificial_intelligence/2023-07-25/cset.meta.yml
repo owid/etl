@@ -45,40 +45,102 @@ tables:
     variables:
       disclosed_investment:
         title: Disclosed investment
-        description:  Investments in AI-related companies across various industries where the investment value has been publicly disclosed.
+        description:  >
+          Investments in AI-related companies across various industries where the investment value has been publicly disclosed.
+
+
+          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+
+          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+
+          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+
+
+          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+
+          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
         unit: US dollars
         short_unit: $
         display:
           numDecimalPlaces: 0
-          name: Disclosed
 
       investment_estimated:
         title: Estimated investment
-        description:  Estimated value of investments in AI-related companies across various industries when exact investment amounts aren't publicly disclosed. The estimate is based on the median value of similar investments from Crunchbase.
+        description:  >
+          Estimated value of investments in AI-related companies across various industries when exact investment amounts aren't publicly disclosed. The estimate is based on the median value of similar investments from Crunchbase.
+
+
+          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+
+          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+
+          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+
+
+          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+
+          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
         unit: US dollars
         short_unit: $
         display:
           numDecimalPlaces: 0
-          name: Estimated
 
       disclosed_investment_summary:
         title: Total disclosed investment
-        description: Investments in AI-related companies across various industries where the investment value has been publicly disclosed.
+        description: >
+          Investments in AI-related companies across various industries where the investment value has been publicly disclosed.
+
+
+          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+
+          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+
+          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+
+
+          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+
+          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
         unit: US dollars
         short_unit: $
         display:
           numDecimalPlaces: 0
-          name: Disclosed
 
       estimated_investment_summary:
         title: Total estimated investment
         description: >
           Estimated value of investments in AI-related companies across various industries when exact investment amounts aren't publicly disclosed. The estimate is based on the median value of similar investments from Crunchbase.
+
+
+          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+
+          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+
+          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+
+
+          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+
+          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
         unit: US dollars
         short_unit: $
         display:
           numDecimalPlaces: 0
-          name: Estimated
 
       num_patent_applications:
         title: Patent applications
@@ -86,7 +148,6 @@ tables:
         unit: applications
         display:
           numDecimalPlaces: 0
-          name: Applications
 
       num_patent_granted:
         title: Patent applications granted
@@ -94,7 +155,6 @@ tables:
         unit: granted applications
         display:
           numDecimalPlaces: 0
-          name: Granted
 
       num_patent_applications_summary:
         title: Total patent applications
@@ -102,7 +162,6 @@ tables:
         unit: applications
         display:
           numDecimalPlaces: 0
-          name: Applications
 
       num_patent_granted_summary:
         title: Total patent applications granted
@@ -110,7 +169,6 @@ tables:
         unit: granted applications
         display:
           numDecimalPlaces: 0
-          name: Granted
 
       num_articles:
         title: Number of articles
@@ -118,7 +176,6 @@ tables:
         unit: articles
         display:
           numDecimalPlaces: 0
-          name: Articles
 
       num_citations:
         title: Number of citations
@@ -126,7 +183,6 @@ tables:
         unit: citations
         display:
           numDecimalPlaces: 0
-          name: Citations
 
       num_articles_summary:
         title: Total number of articles
@@ -134,7 +190,6 @@ tables:
         unit: articles
         display:
           numDecimalPlaces: 0
-          name: Articles
 
       num_citations_summary:
         title: Total number of citations
@@ -142,7 +197,6 @@ tables:
         unit: citations
         display:
           numDecimalPlaces: 0
-          name: Citations
 
       proportion_patents_granted:
         title: Share of patents granted
