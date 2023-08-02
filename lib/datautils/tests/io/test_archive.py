@@ -1,9 +1,11 @@
-import zipfile
 import tarfile
+import zipfile
 from pathlib import Path
 from typing import Union
-from owid.datautils.io.archive import decompress_file
+
 from pytest import raises
+
+from owid.datautils.io.archive import decompress_file
 
 
 class TestDecompressZipFile:

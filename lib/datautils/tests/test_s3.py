@@ -1,5 +1,6 @@
 # type: ignore
 from unittest import mock
+
 import boto3
 
 from owid.datautils import s3

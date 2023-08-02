@@ -170,7 +170,7 @@ class Table(pd.DataFrame):
         If the table is stored at "mytable.csv", the metadata will be at
         "mytable.meta.json".
         """
-        if not isinstance(path, str) or not path.endswith(".csv"):
+        if not str(path).endswith(".csv"):
             raise ValueError(f'filename must end in ".csv": {path}')
 
         df = pd.DataFrame(self)
@@ -193,7 +193,7 @@ class Table(pd.DataFrame):
         If the table is stored at "mytable.feather", the metadata will be at
         "mytable.meta.json".
         """
-        if not isinstance(path, str) or not path.endswith(".feather"):
+        if not str(path).endswith(".feather"):
             raise ValueError(f'filename must end in ".feather": {path}')
 
         # feather can't store the index
@@ -223,7 +223,7 @@ class Table(pd.DataFrame):
         NOTE: we save the metadata for fields in the table scheme, but it might be
               possible with Parquet to store it in the fields themselves somehow
         """
-        if not isinstance(path, str) or not path.endswith(".parquet"):
+        if not str(path).endswith(".parquet"):
             raise ValueError(f'filename must end in ".parquet": {path}')
 
         # parquet can store the index, but repacking is wasted on index columns so
