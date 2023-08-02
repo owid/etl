@@ -1,5 +1,5 @@
 dataset:
-  title: Global hen inventory (Welfare Footprint Project, 2023)
+  title: Global hen inventory (Welfare Footprint Project, 2022)
 
 tables:
   global_hen_inventory:
@@ -30,7 +30,7 @@ tables:
         unit: 'farms'
         short_unit: ''
       share_of_hens_free_range_not_organic:
-        title: Share of not-organic, free-range hens
+        title: Share of non-organic, free-range hens
         unit: '%'
         short_unit: '%'
       share_of_hens_free_range_organic:

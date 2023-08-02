@@ -34,7 +34,7 @@ COLUMNS = {
 def add_individual_sources_to_metadata(tb: Table) -> Table:
     tb = tb.copy()
     # Check that each country has only one source.
-    assert (tb.groupby("country").agg({"source": "nunique"})["source"] == 1).all()
+    assert (tb.groupby("country").agg({"source": "nunique"})["source"] == 1).all(), "Expected one source per country."
     # Gather the data source for each country.
     original_sources = (
         "- "
@@ -63,9 +63,8 @@ def clean_values(tb: Table) -> Table:
     tb = tb.copy()
     # Remove the spurious "%" symbols from some of the values in some columns.
     for column in tb.columns:
-        if any(["%" in str(value) for value in tb[column]]):
-            tb[column] = [float(str(value).replace("%", "")) for value in tb[column].values]
-            tb[column] = tb[column].astype(float)
+        if tb[column].astype(str).str.contains("%").any():
+            tb[column] = tb[column].str.replace("%", "").astype(float)
 
     return tb
 

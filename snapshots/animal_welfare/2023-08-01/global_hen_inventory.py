@@ -1,4 +1,18 @@
-"""Script to create a snapshot of dataset 'Global hen inventory'."""
+"""Script to create a snapshot of dataset 'Global hen inventory'.
+
+The data is manually downloaded from the first Tableau dashboard shown in:
+https://welfarefootprint.org/research-projects/laying-hens/
+
+To download the data:
+* Go to: https://public.tableau.com/views/GlobalHenInventory-Reduced/Dashboard1
+* Click on the download button on the bottom-right corner of the dashboard.
+* Select "Data" in the pop-up message, which will open another window showing a data table.
+* In that new window, there is a button "Show fields" on the upper-right corner of the window. Select all fields.
+* Next to that button, click on "Download", which will download a csv file.
+
+Then execute this script with the argument --path-to-file followed by the path to the downloaded file.
+
+"""
 
 from pathlib import Path
 
