@@ -100,8 +100,10 @@ def add_metadata(dest_dir: str, ds_meadow: Dataset, tb: Table) -> Dataset:
         group = Table(group)
         dims_id = dict(zip(dims, group_id))
         # Create the unique table short name
-        dims_values = list(dims_id.values())
-        group.metadata.short_name = underscore(" - ".join(dims_values))[0:240]
+        keys_to_extract = ["cause", "sex", "age_group"]
+        # Extract values for the specified keys
+        name_list = [dims_id[key] for key in keys_to_extract]
+        group.metadata.short_name = underscore(" - ".join(name_list))[0:240]
         variables = group.columns.drop(dims + ["country", "year"])
         for variable_name in variables:
             group[variable_name] = Variable(group[variable_name])
