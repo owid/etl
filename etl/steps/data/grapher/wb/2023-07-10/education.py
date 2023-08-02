@@ -15,10 +15,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("education_by_level"))
+    ds_garden = cast(Dataset, paths.load_dependency("education"))
 
     # Read table from garden dataset.
-    tb = ds_garden["education_by_level"]
+    tb = ds_garden["education"]
 
     #
     # Process data.
