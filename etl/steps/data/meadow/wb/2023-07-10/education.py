@@ -34,12 +34,13 @@ def run(dest_dir: str) -> None:
 
     # Perform further processing on the concatenated dataframe
     df.replace("..", np.nan, inplace=True)
-    cols_to_drop = ["Country Code", "Indicator Code"]
-    # Drop unnecessary columns that have the same infomariton as Series and Country but in a different format
-    df.drop(cols_to_drop, axis=1, inplace=True)
+    # Drop unnecessary country code column
+    df.drop("Country Code", axis=1, inplace=True)
 
     # Melt years into a single column
-    df_melted = pd.melt(df, id_vars=["Country Name", "Indicator Name"], var_name="Year", value_name="Value")
+    df_melted = pd.melt(
+        df, id_vars=["Country Name", "Indicator Name", "Indicator Code"], var_name="Year", value_name="Value"
+    )
 
     df_melted["Value"] = df_melted["Value"].astype(float)
     df_melted.rename(columns={"Country Name": "country", "Indicator Name": "indicator_name"}, inplace=True)
