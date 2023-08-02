@@ -49,25 +49,27 @@ def licenses():
 
 
 @pytest.fixture
-def variable_1(sources, licenses):
+def variable_1(sources, origins, licenses):
     v1 = Variable(pd.Series([1, 2, 3]), name="Variable 1")
     v1.metadata.title = "Title of Variable 1"
     v1.metadata.description = "Description of Variable 1"
     v1.metadata.unit = "Unit of Variable 1"
     v1.metadata.unit = "Short unit of Variable 1"
     v1.metadata.sources = [sources[2], sources[1]]
+    v1.metadata.origins = [origins[2], origins[1]]
     v1.metadata.licenses = [licenses[1]]
     return v1
 
 
 @pytest.fixture
-def variable_2(sources, licenses):
+def variable_2(sources, origins, licenses):
     v2 = Variable(pd.Series([4, 5, 6]), name="Variable 2")
     v2.metadata.title = "Title of Variable 2"
     v2.metadata.description = "Description of Variable 2"
     v2.metadata.unit = "Unit of Variable 2"
     v2.metadata.unit = "Short unit of Variable 2"
     v2.metadata.sources = [sources[2], sources[3]]
+    v2.metadata.origins = [origins[2], origins[3]]
     v2.metadata.licenses = [licenses[2], licenses[3]]
     return v2
 
