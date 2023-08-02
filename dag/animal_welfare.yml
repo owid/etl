@@ -1,0 +1,10 @@
+steps:
+  #
+  # Global hen inventory (Welfare Footprint Project, 2023).
+  #
+  data://meadow/animal_welfare/2023-08-01/global_hen_inventory:
+    - snapshot://animal_welfare/2023-08-01/global_hen_inventory.csv
+  data://garden/animal_welfare/2023-08-01/global_hen_inventory:
+    - data://meadow/animal_welfare/2023-08-01/global_hen_inventory
+  data://grapher/animal_welfare/2023-08-01/global_hen_inventory:
+    - data://garden/animal_welfare/2023-08-01/global_hen_inventory
