@@ -36,7 +36,7 @@ def add_individual_sources_to_metadata(tb: Table) -> Table:
     # Check that each country has only one source.
     assert (tb.groupby("country").agg({"source": "nunique"})["source"] == 1).all()
     # Gather the data source for each country.
-    descriptions = (
+    original_sources = (
         "- "
         + tb["country"].astype(str)
         + ": "
@@ -50,11 +50,10 @@ def add_individual_sources_to_metadata(tb: Table) -> Table:
     ), "Expected only one source. Something has changed."
     # Take the source from any of those variables.
     source = tb[tb.columns[-1]].metadata.sources[0]
-    # Add a description to the variable source.
-    source.published_by = source.published_by + "\n" + "\n".join(descriptions)
-    # Replace the source of each variable with the new one that has a description.
+    # Add the full list of original sources to the variable source.
+    source.published_by = source.published_by + "\n" + "\n".join(original_sources)
+    # Replace the source of each variable with the new one that has the full list of original sources.
     for column in tb.columns:
-        # Update source.
         tb[column].metadata.sources = [source]
 
     return tb

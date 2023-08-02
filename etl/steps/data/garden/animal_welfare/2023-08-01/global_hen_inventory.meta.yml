@@ -4,7 +4,6 @@ dataset:
 tables:
   global_hen_inventory:
     title: Global hen inventory
-    description: ''
     variables:
       share_of_hens_in_barns:
         title: Share of hens housed in a barn or aviary
@@ -19,14 +18,17 @@ tables:
         unit: '%'
         short_unit: '%'
       number_of_hens_cage_free:
-        title: Number of cage-Free hens
-        unit: ''
+        title: Number of cage-free hens
+        unit: 'hens'
+        short_unit: ''
       number_of_hens_in_cages:
         title: Number of hens in cages
-        unit: ''
+        unit: 'hens'
+        short_unit: ''
       number_of_commercial_egg_farms:
         title: Number of commercial egg farms
-        unit: ''
+        unit: 'farms'
+        short_unit: ''
       share_of_hens_free_range_not_organic:
         title: Share of not-organic, free-range hens
         unit: '%'
