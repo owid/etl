@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     # Convert all other columns to million
     merged_total.loc[:, _investment_cols] *= 1e6
 
-    # Import US CPI data from the API
+    # Import US CPI data from the API (to adjust investment indicators for inflation)
     df_wdi_cpi_us = us_cpi.import_US_cpi_API()
     if df_wdi_cpi_us is None:
         log.info("Failed to import US CPI data from the API.")
