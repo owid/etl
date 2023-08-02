@@ -1,0 +1,22 @@
+dataset:
+  title: "UK egg statistics (Defra, 2023)"
+
+tables:
+  uk_egg_statistics:
+    variables:
+      number_of_eggs_from_barns:
+        title: Number of eggs from hens in barns
+        unit: eggs
+        short_unit: ''
+      number_of_eggs_from_enriched_cages:
+        title: Number of eggs from hens in (enriched) cages
+        unit: eggs
+        short_unit: ''
+      number_of_eggs_from_non_organic_free_range_farms:
+        title: Number of eggs from hens in non-organic, free-range farms
+        unit: eggs
+        short_unit: ''
+      number_of_eggs_from_organic_free_range_farms:
+        title: Number of eggs from hens in organic, free-range farms
+        unit: eggs
+        short_unit: ''
