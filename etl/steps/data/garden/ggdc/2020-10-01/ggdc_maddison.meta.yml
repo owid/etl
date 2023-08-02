@@ -1,3 +1,5 @@
+dataset:
+  title: Maddison Database (GGDC, 2020)
 tables:
   maddison_gdp:
     variables:
