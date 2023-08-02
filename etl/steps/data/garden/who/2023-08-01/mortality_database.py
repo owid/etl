@@ -28,9 +28,7 @@ def run(dest_dir: str) -> None:
     tb = tidy_sex_dimension(tb)
     tb = tidy_age_dimension(tb)
     tb = tidy_causes_dimension(tb)
-    tb: Table = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     ds_garden = add_metadata(dest_dir=dest_dir, ds_meadow=ds_meadow, tb=tb)
 
@@ -88,9 +86,23 @@ def tidy_age_dimension(tb: Table) -> Table:
 
 def add_metadata(dest_dir: str, ds_meadow: Dataset, tb: Table) -> Dataset:
     """
-    Adding metadata at the variable level
-    First step is to group by the dims, which are normally: age, sex and cause.
+    Adding metadata at the variable level. The first step is to group by the dims, which are : age, sex and cause, icd10_codes and broad_cause_group.
+    Age, sex and cause are used to name the tables, icd10_codes and broad_cause_group are somewhat extraneous but could be useful in the variable description.
     Then for each variable (the different metrics) we add in the metadata.
+
+    Parameters
+    ----------
+    dest_dir : str
+        Compulsory etl destination directory.
+    ds_meadow : Dataset
+        The meadow Dataset, the metadata of this dataset is used in the garden Dataset.
+    tb: Table
+        The Table with the full dataset.
+
+    Returns
+    -------
+    ds_garden: Dataset:
+        Dataset containing tables with causes of mortality for each group ("cause", "sex", "age_group"), with variable level metadata.
     """
     ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
     dims = ["cause", "sex", "age_group", "icd10_codes", "broad_cause_group"]
@@ -99,7 +111,7 @@ def add_metadata(dest_dir: str, ds_meadow: Dataset, tb: Table) -> Dataset:
         # Grab out the IDs of each of the grouping factors, e.g. the age-group, sex and cause
         group = Table(group)
         dims_id = dict(zip(dims, group_id))
-        # Create the unique table short name
+        # Create the unique table short name as a combination of cause, sex and age
         keys_to_extract = ["cause", "sex", "age_group"]
         # Extract values for the specified keys
         name_list = [dims_id[key] for key in keys_to_extract]
@@ -110,8 +122,9 @@ def add_metadata(dest_dir: str, ds_meadow: Dataset, tb: Table) -> Dataset:
             # Create all the necessary metadata
             cleaned_variable = create_variable_metadata(variable=group[variable_name], **dims_id)
             group[cleaned_variable.name] = cleaned_variable
+            # Drop the original variable name as the same data with new variable name now it exists
             group = group.drop(columns=variable_name)
-            # dropping columns that are totally empty - not all combinations of variables exist or have been downloaded
+            # dropping columns that are totally empty - not all combinations of variables exist
         group = group.dropna(axis=1, how="all")
         # Dropping dims as table name contains them
         group = group.drop(columns=dims)
@@ -122,9 +135,28 @@ def add_metadata(dest_dir: str, ds_meadow: Dataset, tb: Table) -> Dataset:
 
 def create_variable_metadata(
     variable: Variable, cause: str, age_group: str, sex: str, icd10_codes: str, broad_cause_group: str
-):
+) -> Variable:
     """
-    Create variabe metadata for each group
+    Creates the metadata for the four metrics in each table. Each table is a group for every cause-sex-age combination and there is additional information included on the ICD10 codes and the broad cause group (e.g. Injuries). The broad cause group is not currently used.
+    To add additional information the desired column should be added to the `dims` argument set in add_metadata().
+
+    Parameters
+    ----------
+    variable : Variable
+        Original variable with no assigned metadata.
+    cause : str
+        The cause of death dimension.
+    age_group: str
+        The age-group dimension.
+    sex: str
+        The sex dimension.
+    broad_cause_group: str
+        The broad cause of death group e.g. Injuries. Not currently used.
+
+    Returns
+    -------
+    new_variable: Variable
+        Variable with tailored metadata according to the required metric and cause, age and sex dimensions.
     """
     var_name_dict = {
         "number": {
