@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     ds_garden = cast(Dataset, paths.load_dependency("mortality_database"))
 
     # Read table names from garden dataset.
-    table_names = ds_garden.table_names
+    table_names = sorted(ds_garden.table_names)
 
     ds_grapher = catalog.Dataset.create_empty(dest_dir, ds_garden.metadata)
     # terate through each table and add them to grapher
