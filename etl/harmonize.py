@@ -133,9 +133,12 @@ class CountryRegionMapper:
     valid_names: Set[str]
 
     def __init__(self) -> None:
-        ds_regions = Dataset(LATEST_REGIONS_DATASET_PATH)
-        rc_df = ds_regions["definitions"]
-        aliases_s = ds_regions["aliases"]["alias"]
+        tb_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"]
+        rc_df = tb_regions[["name", "short_name", "region_type", "is_historical", "defined_by"]]
+        # Convert strings of lists of aliases into lists of aliases.
+        tb_regions["aliases"] = [json.loads(alias) if pd.notnull(alias) else [] for alias in tb_regions["aliases"]]
+        # Explode list of aliases to have one row per alias.
+        aliases_s = tb_regions["aliases"].explode().dropna()
         aliases = {}
         valid_names = set()
         for row in rc_df.itertuples():

@@ -1,6 +1,7 @@
 import datetime as dt
 import difflib
 import functools
+import json
 import os
 import urllib.error
 from enum import Enum
@@ -597,8 +598,17 @@ def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
     """Check if all countries are harmonized."""
     po.put_markdown("""## Harmonizing countries...""")
 
-    ds_regions = Dataset(LATEST_REGIONS_DATASET_PATH)
-    alias_to_country = ds_regions["definitions"].join(ds_regions["aliases"], how="left").set_index("alias")["name"]
+    # Read the main table of the regions dataset.
+    tb_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"][["name", "aliases"]]
+
+    # Convert strings of lists of aliases into lists of aliases.
+    tb_regions["aliases"] = [json.loads(alias) if pd.notnull(alias) else [] for alias in tb_regions["aliases"]]
+
+    # Explode list of aliases to have one row per alias.
+    tb_regions = tb_regions.explode("aliases").reset_index(drop=True)
+
+    # Create a series that maps aliases to country names.
+    alias_to_country = tb_regions.rename(columns={"aliases": "alias"}).set_index("alias")["name"]
 
     df = df.reset_index()
 
