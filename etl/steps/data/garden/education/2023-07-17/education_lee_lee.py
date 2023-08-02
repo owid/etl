@@ -4,6 +4,7 @@ from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog.utils import underscore
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -58,6 +59,28 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = cast(Dataset, paths.load_dependency("education_lee_lee"))
 
+    # Extract World Bank Education Dataset
+    ds_garden_wb = cast(Dataset, paths.load_dependency("education"))
+    tb_wb = ds_garden_wb["education"]
+
+    # Extract indicators with enrolment rates from World Bank that match the ones in the current dataset (net enrolment up to secondary and gross enrolment for tertiary)
+    dictionary_to_rename_and_combine = {
+        "net_enrolment_rate__primary__both_sexes__pct": "mf_primary_enrollment_rates",
+        "net_enrolment_rate__primary__female__pct": "f_primary_enrollment_rates",
+        "net_enrolment_rate__primary__male__pct": "m_primary_enrollment_rates",
+        "net_enrolment_rate__secondary__both_sexes__pct": "mf_secondary_enrollment_rates",
+        "net_enrolment_rate__secondary__female__pct": "f_secondary_enrollment_rates",
+        "net_enrolment_rate__secondary__male__pct": "m_secondary_enrollment_rates",
+        "gross_enrolment_ratio__tertiary__both_sexes__pct": "mf_tertiary_enrollment_rates",
+        "gross_enrolment_ratio__tertiary__female__pct": "f_tertiary_enrollment_rates",
+        "gross_enrolment_ratio__tertiary__male__pct": "m_tertiary_enrollment_rates",
+    }
+
+    enrolment_wb = tb_wb[dictionary_to_rename_and_combine.keys()]
+    enrolment_wb.rename(columns=dictionary_to_rename_and_combine, inplace=True)
+    df_above_2010 = enrolment_wb[(enrolment_wb.index.get_level_values("year") > 2010)]
+    df_above_2010.reset_index(inplace=True)
+
     # Load regions dataset.
     ds_regions: Dataset = paths.load_dependency("regions")
 
@@ -89,15 +112,35 @@ def run(dest_dir: str) -> None:
     columns_to_check = df_attainment.columns.drop(["country", "year"])
     df_attainment = df_attainment.dropna(subset=columns_to_check, how="all")
     df_attainment.reset_index(drop=True, inplace=True)
+
     df_attainment = add_data_for_regions(
         tb=df_attainment, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups
     )
     merged_df = pd.merge(df_enrollment, df_attainment, on=["year", "country"], how="outer")
+
+    # Drop historic population values
     columns_to_drop = [column for column in merged_df.columns if "__thousands" in column]
     merged_df = merged_df.drop(columns=columns_to_drop)
+    merged_df.columns = [underscore(col) for col in merged_df.columns]
 
-    tb = Table(merged_df, short_name=paths.short_name, underscore=True)
-    tb.set_index(["country", "year"], inplace=True)
+    df_above_2010 = add_data_for_regions(
+        tb=df_above_2010, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups
+    )
+    df_merged_enrollment = pd.concat(
+        [merged_df[["country", "year"] + list(dictionary_to_rename_and_combine.values())], df_above_2010]
+    )
+    suffix = "_combined_wb"
+    df_merged_enrollment.set_index(["country", "year"], inplace=True)
+
+    wb_combined_columns = df_merged_enrollment.columns + suffix
+    df_merged_enrollment.columns = wb_combined_columns
+
+    merged_df.set_index(["country", "year"], inplace=True)
+
+    df_merged_wb = pd.merge(df_merged_enrollment, merged_df, on=["country", "year"], how="outer")
+    df_merged_wb = df_merged_wb.dropna(how="all")
+
+    tb = Table(df_merged_wb, short_name=paths.short_name, underscore=True)
 
     #
     # Save outputs.

@@ -3,6 +3,7 @@
 from typing import List, cast
 
 import education_lee_lee
+import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
@@ -87,11 +88,34 @@ def run(dest_dir: str) -> None:
 
     tb_projections.set_index(["country", "year"], inplace=True)
 
+    tb_projections_copy = tb_projections.copy(deep=True)
+    suffix = "_projections"
+    tb_projections_copy_columns = tb_projections_copy.columns + suffix
+    tb_projections_copy.columns = tb_projections_copy_columns
+
+    ds_past = cast(Dataset, paths.load_dependency("education_lee_lee"))
+    tb_past = ds_past["education_lee_lee"]
+    cols_to_drop = [col for col in tb_past.columns if "enrollment_rates" in col]
+    tb_past = tb_past.drop(columns=cols_to_drop)
+    df_below_2015 = tb_past[(tb_past.index.get_level_values("year") < 2015)]
+    stiched = pd.concat([tb_projections, df_below_2015])
+
+    stiched_projections = pd.merge(
+        tb_projections_copy,
+        stiched,
+        on=[
+            "country",
+            "year",
+        ],
+        how="outer",
+    )
+
+    tb_stiched = Table(stiched_projections, short_name=paths.short_name)
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_projections], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb_stiched], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
