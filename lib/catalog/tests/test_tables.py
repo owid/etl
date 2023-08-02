@@ -592,6 +592,10 @@ def test_concat_with_axis_0(table_1, table_2, sources, licenses) -> None:
 def test_concat_with_axis_1(table_1, table_2, sources, licenses) -> None:
     # TODO: Assert that concat raises an error if the resulting table has multiple columns with the same name.
     # tb = tables.concat([table_1, table_2], axis=1)
+
+    # Concat along axis 1 should preserve all metadata, even display.
+    table_1.a.metadata.display = {"unit": "foo"}
+
     # Rename columns in table_2 so that they don't coincide with names in table_1.
     tb = tables.concat(
         [table_1, table_2.rename(columns={"country": "country_right", "year": "year_right", "a": "a_right"})], axis=1

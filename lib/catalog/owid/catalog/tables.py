@@ -819,13 +819,23 @@ def concat(
         repeated_columns = table.columns[table.columns.duplicated()].tolist()
         if len(repeated_columns) > 0:
             raise KeyError(f"Concatenated table contains repeated columns: {repeated_columns}")
-    # Add to each column either the metadata of the original variable (if the variable appeared only in one of the input
-    # tables) or the combination of the metadata from different tables (if the variable appeared in various tables).
-    for column in table.all_columns:
-        variables_to_combine = [table_i[column] for table_i in objs if column in table_i.all_columns]
-        table._fields[column] = variables.combine_variables_metadata(
-            variables=variables_to_combine, operation="concat", name=column
-        )
+
+        # Assign variable metadata from input tables.
+        for table_i in objs:
+            for column in table_i.columns:
+                table[column].metadata = table_i[column].metadata
+
+    else:
+        if list(filter(None, table.index.names)):
+            raise NotImplementedError("Concatenation of tables with index is not implemented.")
+
+        # Add to each column either the metadata of the original variable (if the variable appeared only in one of the input
+        # tables) or the combination of the metadata from different tables (if the variable appeared in various tables).
+        for column in table.all_columns:
+            variables_to_combine = [table_i[column] for table_i in objs if column in table_i.all_columns]
+            table._fields[column] = variables.combine_variables_metadata(
+                variables=variables_to_combine, operation="concat", name=column
+            )
 
     # Update table metadata.
     table.metadata = combine_tables_metadata(tables=objs, short_name=short_name)
