@@ -36,10 +36,36 @@ def as_table(df: pd.DataFrame, table: catalog.Table) -> catalog.Table:
     return t
 
 
+def expand_dimensions(tb: catalog.Table) -> catalog.Table:
+    """Expands dataframe with extra dimensions beyond country and year into multiple tables.
+    For instance DataFrame with index names [country, year, sex, a] would expand into a table
+    with columns [country, year, a__sex_male, a__sex_female].
+
+    This function is not very memory efficient as it returns a table that will be very sparse.
+    """
+    # rename country to entity_id for the sake of `_yield_wide_table`
+    tb = tb.reset_index("country").rename(columns={"country": "entity_id"}).set_index("entity_id", append=True)
+    tables = list(_yield_wide_table(tb, na_action="drop", warn_null_variables=False))
+
+    # join all tables
+    # NOTE: we could also return individual tables to reduce memory usage
+    expanded_table = catalog.tables.concat(tables, axis=1)
+
+    # rename entity_id back to country
+    expanded_table = (
+        expanded_table.reset_index("entity_id")
+        .rename(columns={"entity_id": "country"})
+        .set_index("country", append=True)
+    )
+
+    return expanded_table
+
+
 def _yield_wide_table(
     table: catalog.Table,
     na_action: Literal["drop", "raise"] = "raise",
     dim_titles: Optional[List[str]] = None,
+    warn_null_variables: bool = True,
 ) -> Iterable[catalog.Table]:
     """We have 5 dimensions but graphers data model can only handle 2 (year and entityId). This means
     we have to iterate all combinations of the remaining 3 dimensions and create a new variable for
@@ -76,7 +102,7 @@ def _yield_wide_table(
         dim_titles = dim_names
 
     if dim_names:
-        grouped = table.groupby(dim_names, as_index=False, observed=True)
+        grouped = table.groupby(dim_names if len(dim_names) > 1 else dim_names[0], as_index=False, observed=True)
     else:
         # a situation when there's only year and entity_id in index with no additional dimensions
         grouped = [([], table)]
@@ -89,7 +115,8 @@ def _yield_wide_table(
         for column in table_to_yield.columns:
             # If all values are null, skip variable
             if table_to_yield[column].isnull().all():
-                log.warning("yield_wide_table.null_variable", column=column, dims=dims)
+                if warn_null_variables:
+                    log.warning("yield_wide_table.null_variable", column=column, dims=dims)
                 continue
 
             # Safety check to see if the metadata is still intact
