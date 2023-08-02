@@ -73,6 +73,7 @@ fsspec = "2022.11.0"
 openai = "^0.27.7"
 pdfplumber = "^0.9.0"
 wbgapi = "^1.0.12"
+odfpy = "^1.4.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"
