@@ -11,14 +11,6 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
-def load_countries_regions() -> Table:
-    """Load countries-regions table from reference dataset (e.g. to map from iso codes to country names)."""
-    ds_reference = cast(Dataset, paths.load_dependency("regions"))
-    tb_countries_regions = ds_reference["regions"]
-
-    return tb_countries_regions
-
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -27,14 +19,15 @@ def run(dest_dir: str) -> None:
     ds_meadow = cast(Dataset, paths.load_dependency("ess_trust"))
 
     # Read table from meadow dataset.
-    tb = ds_meadow["ess_trust"]
+    tb = ds_meadow["ess_trust"].reset_index()
 
     #
     # Process data.
     #
-    tb: Table = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Create index, verify that it is unique, and sort.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
