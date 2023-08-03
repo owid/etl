@@ -117,7 +117,7 @@ def main(
     similarity_name: str = SIMILARITY_NAME,
     max_suggestions: int = N_MAX_SUGGESTIONS,
 ) -> None:
-    if Path(output_file).suffix != '.json':
+    if Path(output_file).suffix != ".json":
         raise ValueError(f"`output_file` ({output_file}) should point to a JSON file ('*.json')!")
 
     with db.get_connection() as db_conn:
