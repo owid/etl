@@ -47,7 +47,7 @@ CURRENT_DIR = os.path.dirname(__file__)
 @dataclass
 class DatasetUpsertResult:
     dataset_id: int
-    source_ids: Dict[str, int]
+    source_ids: Dict[int, int]
 
 
 @dataclass
@@ -109,10 +109,10 @@ def upsert_dataset(
             id=ds.id,
         )
 
-        source_ids: Dict[str, int] = dict()
+        source_ids: Dict[int, int] = dict()
         for source in sources:
             assert source.name
-            source_ids[source.name] = _upsert_source_to_db(session, source, ds.id)
+            source_ids[hash(source)] = _upsert_source_to_db(session, source, ds.id)
 
         session.commit()
 
@@ -152,7 +152,7 @@ def _add_or_update_source(
 
     # Does it already exist in the database?
     assert source.name
-    source_id = dataset_upsert_result.source_ids.get(source.name)
+    source_id = dataset_upsert_result.source_ids.get(hash(source))
     if not source_id:
         # Not exists, upsert it
         # NOTE: this could be quite inefficient as we upsert source for every variable

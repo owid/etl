@@ -80,6 +80,22 @@ class Source:
     # we're keeping both for the time being. We might consolidate them in the future
     published_by: Optional[str] = None
 
+    def __hash__(self):
+        """Hash that uniquely identifies a source."""
+        return hash(
+            (
+                self.name,
+                self.description,
+                self.url,
+                self.source_data_url,
+                self.owid_data_url,
+                self.date_accessed,
+                self.publication_date,
+                self.publication_year,
+                self.published_by,
+            )
+        )
+
     def to_dict(self) -> Dict[str, Any]:
         ...
 
