@@ -1,5 +1,5 @@
 meta:
-  name: Peak Cherry Tree Blossom at Kyoto City (2022)
+  name: Peak Cherry Tree Blossom at Kyoto City (Aono, 2022)
   origin:
     producer: Yasuyuki Aono
     dataset_title_owid: Peak Cherry Tree Blossom at Kyoto City
@@ -8,6 +8,7 @@ meta:
     attribution: Multiple sources compiled by Aono
     attribution_short: Yasuyuki Aono
     citation_producer: |-
+      Yasuyuki Aono compiled this data based on multiple sources:
       - Taguchi,T. (1939) Climatic change in historical time in Japan J. Mar. Meteorol. Soc. 19 217–27
 
       - Sekiguchi,T. (1969) The historical dates of Japanese cherry festival since the 8th century and her climatic changes Tokyo Geog. Pap. 13 175–90
@@ -20,7 +21,7 @@ meta:
 
       Data for 812-2021 is available here - http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
 
-      Date for 2022 peak blossom gathered from the Met Office (2022) - https://www.metoffice.gov.uk/about-us/press-office/news/weather-and-climate/2022/kyoto-cherry-blossom-dates-shifted-by-human-influence#:~:text=Last%20year%20was%20the%20earliest,declared%20on%201%20April%202022.
+      Data for 2022 peak blossom is gathered from the Met Office (2022) - https://www.metoffice.gov.uk/about-us/press-office/news/weather-and-climate/2022/kyoto-cherry-blossom-dates-shifted-by-human-influence
     date_published: 2021-03-26
     date_accessed: 2023-01-11
     license:
