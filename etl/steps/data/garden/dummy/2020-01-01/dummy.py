@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = cast(Dataset, paths.load_dependency("dummy"))
 
     # Read table from meadow dataset.
-    tb = ds_meadow["dummy"]
+    tb = ds_meadow["dummy"].reset_index()
 
     #
     # Process data.
@@ -32,7 +32,9 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb.set_index(["country", "year"])], default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()

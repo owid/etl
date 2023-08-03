@@ -10,6 +10,8 @@ from pywebio import input as pi
 from pywebio import output as po
 from pywebio.session import go_app
 
+from etl.paths import SNAPSHOTS_DIR
+
 from . import utils
 
 CURRENT_DIR = Path(__file__).parent
@@ -52,8 +54,9 @@ class SnapshotForm(BaseModel):
 def app(run_checks: bool) -> None:
     state = utils.APP_STATE
 
+    po.put_markdown("# Walkthrough - Snapshot")
     with open(CURRENT_DIR / "snapshot.md", "r") as f:
-        po.put_markdown(f.read())
+        po.put_collapse("Instructions", [po.put_markdown(f.read())])
 
     # run checks
     if run_checks:
@@ -179,16 +182,15 @@ def app(run_checks: bool) -> None:
     # save form data to global state for next steps
     state.update(form.dict())
 
-    # use multi-line description
-    form.description = form.description.replace("\n", "\n  ")
-
     # cookiecutter on python files
-    SNAPSHOT_DIR = utils.generate_step(
-        CURRENT_DIR / "snapshot_cookiecutter/", dict(**form.dict(), version=form.snapshot_version, channel="snapshots")
+    utils.generate_step(
+        CURRENT_DIR / "snapshot_cookiecutter/",
+        dict(**form.dict(), channel="snapshots"),
+        SNAPSHOTS_DIR,
     )
 
-    ingest_path = SNAPSHOT_DIR / (form.short_name + ".py")
-    meta_path = SNAPSHOT_DIR / f"{form.short_name}.{form.file_extension}.dvc"
+    ingest_path = SNAPSHOTS_DIR / form.namespace / form.snapshot_version / (form.short_name + ".py")
+    meta_path = SNAPSHOTS_DIR / form.namespace / form.snapshot_version / f"{form.short_name}.{form.file_extension}.dvc"
 
     po.put_markdown(
         f"""
@@ -198,7 +200,7 @@ def app(run_checks: bool) -> None:
 
 2. Run the snapshot step to upload files to S3
 ```bash
-python snapshots/{form.namespace}/{form.version}/{form.short_name}.py
+python snapshots/{form.namespace}/{form.snapshot_version}/{form.short_name}.py
 ```
 
 3. Continue to the meadow step

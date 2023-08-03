@@ -56,8 +56,9 @@ class GardenForm(BaseModel):
 def app(run_checks: bool) -> None:
     state = utils.APP_STATE
 
+    po.put_markdown("# Walkthrough - Garden")
     with open(CURRENT_DIR / "garden.md", "r") as f:
-        po.put_markdown(f.read())
+        po.put_collapse("Instructions", [po.put_markdown(f.read())])
 
     data = pi.input_group(
         "Options",
@@ -136,7 +137,9 @@ def app(run_checks: bool) -> None:
     else:
         dag_content = ""
 
-    DATASET_DIR = utils.generate_step(CURRENT_DIR / "garden_cookiecutter/", dict(**form.dict(), channel="garden"))
+    DATASET_DIR = utils.generate_step_to_channel(
+        CURRENT_DIR / "garden_cookiecutter/", dict(**form.dict(), channel="garden")
+    )
 
     step_path = DATASET_DIR / (form.short_name + ".py")
     notebook_path = DATASET_DIR / "playground.ipynb"
@@ -245,9 +248,7 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     with open(metadata_path, "r") as f:
         doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
 
-    doc["dataset"]["title"] = "Dummy dataset"
     doc["tables"]["dummy"]["variables"] = {"dummy_variable": {"unit": "dummy unit"}}
-    doc["all_sources"][0]["source_testing"]["name"] = "Dummy source"
 
     with open(metadata_path, "w") as f:
         ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
