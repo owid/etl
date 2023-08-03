@@ -538,12 +538,9 @@ class Source(SQLModel, table=True):
         conds = [
             cls.name == self.name,
             cls.datasetId == self.datasetId,
+            cls.description["additionalInfo"] == self.description.get("additionalInfo", ""),  # type: ignore
+            cls.description["dataPublishedBy"] == self.description.get("dataPublishedBy", ""),  # type: ignore
         ]
-        if self.description.get("additionalInfo"):
-            conds.append(cls.description["additionalInfo"] == self.description["additionalInfo"])  # type: ignore
-
-        if self.description.get("dataPublishedBy"):
-            conds.append(cls.description["dataPublishedBy"] == self.description["dataPublishedBy"])  # type: ignore
 
         return select(cls).where(*conds)  # type: ignore
 
