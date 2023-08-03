@@ -86,10 +86,16 @@ class Snapshot:
 
     def download_from_source(self) -> None:
         """Download file from source_data_url."""
-        assert self.metadata.source
-        assert self.metadata.source.source_data_url, "source_data_url is not set"
+        if self.metadata.origin:
+            assert self.metadata.origin.dataset_url_download, "dataset_url_download is not set"
+            download_url = self.metadata.origin.dataset_url_download
+        elif self.metadata.source:
+            assert self.metadata.source.source_data_url, "source_data_url is not set"
+            download_url = self.metadata.source.source_data_url
+        else:
+            raise ValueError("Neither origin nor source is set")
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        files.download(self.metadata.source.source_data_url, str(self.path))
+        files.download(download_url, str(self.path))
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
