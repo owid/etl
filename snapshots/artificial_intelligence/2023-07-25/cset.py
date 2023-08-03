@@ -86,6 +86,8 @@ def read_and_clean_data(file_ids: List[str], common_path: str, field_name: str) 
     for id in file_ids:
         # Read each CSV file into a pandas dataframe
         df_add = pd.read_csv(common_path + id)
+        df_add["field"] = df_add["field"].apply(lambda s: s[0] + s[1:].lower() if isinstance(s, str) else s)
+
         # If the file contains estimated investment, rename the corresponding column
         if "estimated" in id:
             df_add.rename(columns={"disclosed_investment": "investment_estimated"}, inplace=True)

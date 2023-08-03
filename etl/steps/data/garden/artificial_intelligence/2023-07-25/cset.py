@@ -69,7 +69,6 @@ def run(dest_dir: str) -> None:
         df_cpi_inv[col] = round(100 * df_cpi_inv[col] / df_cpi_inv["cpi_adj_2021"])
 
     df_cpi_inv.drop("cpi_adj_2021", axis=1, inplace=True)
-    df_cpi_inv["field"] = df_cpi_inv["field"].apply(lambda s: s[0] + s[1:].lower() if isinstance(s, str) else s)
 
     tb = Table(df_cpi_inv, short_name=paths.short_name, underscore=True)
     tb.set_index(["country", "year", "field"], inplace=True)
