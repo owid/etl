@@ -131,26 +131,67 @@ def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
     return data  # type: ignore
 
 
-def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
-    """Fetch metadata for a single variable from database.
-    This function is similar to Variables.getVariableData in owid-grapher repository
-    """
+def _load_variable(engine: Engine, variable_id: int) -> Dict[str, Any]:
     sql = """
     SELECT
         variables.*,
         datasets.name AS datasetName,
         datasets.nonRedistributable AS nonRedistributable,
+        datasets.updatePeriodDays,
+        datasets.version as datasetVersion,
         sources.name AS sourceName,
         sources.description AS sourceDescription
     FROM variables
     JOIN datasets ON variables.datasetId = datasets.id
-    JOIN sources ON variables.sourceId = sources.id
+    LEFT JOIN sources ON variables.sourceId = sources.id
     WHERE variables.id = %(variable_id)s
     """
     df = pd.read_sql(sql, engine, params={"variable_id": variable_id})
     assert not df.empty, f"variableId `{variable_id}` not found"
+    return df.iloc[0].to_dict()
 
-    row = df.iloc[0].to_dict()
+
+def _load_topic_tags(engine: Engine, variable_id: int) -> list[str]:
+    sql = """
+    SELECT
+        tags.name
+    FROM tags_variables_topic_tags
+    JOIN tags ON tags_variables_topic_tags.tagId = tags.id
+    WHERE variableId = %(variable_id)s
+    """
+    return pd.read_sql(sql, engine, params={"variable_id": variable_id})["name"].tolist()
+
+
+def _load_faqs(engine: Engine, variable_id: int) -> list[dict]:
+    sql = """
+    SELECT
+        gdocId,
+        fragmentId
+    FROM posts_gdocs_variables_faqs
+    WHERE variableId = %(variable_id)s
+    """
+    return pd.read_sql(sql, engine, params={"variable_id": variable_id}).to_dict(orient="records")
+
+
+def _load_origins_df(engine: Engine, variable_id: int) -> pd.DataFrame:
+    sql = """
+    SELECT
+        origins.*
+    FROM origins
+    JOIN origins_variables ON origins.id = origins_variables.originId
+    WHERE origins_variables.variableId = %(variable_id)s
+    """
+    df = pd.read_sql(sql, engine, params={"variable_id": variable_id})
+    df["license"] = df["license"].map(lambda x: json.loads(x) if x else None)
+    return df
+
+
+def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
+    """Fetch metadata for a single variable from database. This function was initially based on the
+    one from owid-grapher repository and uses raw SQL commands. It'd be interesting to rewrite it
+    using SQLAlchemy ORM in grapher_model.py.
+    """
+    row = _load_variable(engine, variable_id)
 
     variable = row
     sourceId = row.pop("sourceId")
@@ -159,14 +200,49 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
     nonRedistributable = row.pop("nonRedistributable")
     displayJson = row.pop("display")
 
+    schemaVersion = row.pop("schemaVersion")
+    processingLevel = row.pop("processingLevel")
+    grapherConfigETLJson = row.pop("grapherConfigETL")
+    grapherConfigAdminJson = row.pop("grapherConfigAdmin")
+    licenseJson = row.pop("license")
+    keyInfoTextJson = row.pop("keyInfoText")
+
     display = json.loads(displayJson)
-    partialSource = json.loads(sourceDescription)
+    grapherConfigETL = json.loads(grapherConfigETLJson) if grapherConfigETLJson else None
+    grapherConfigAdmin = json.loads(grapherConfigAdminJson) if grapherConfigAdminJson else None
+    license = json.loads(licenseJson) if licenseJson else None
+    keyInfoText = json.loads(keyInfoTextJson) if keyInfoTextJson else None
+
+    # group fields from flat structure into presentation field
+    presentation = dict(
+        grapherConfigETL=grapherConfigETL,
+        grapherConfigAdmin=grapherConfigAdmin,
+        titlePublic=row.pop("titlePublic"),
+        titleVariant=row.pop("titleVariant"),
+        producerShort=row.pop("producerShort"),
+        attribution=row.pop("attribution"),
+        topicTagsLinks=_load_topic_tags(engine, variable_id),
+        faqs=_load_faqs(engine, variable_id),
+        keyInfoText=keyInfoText,
+        processingInfo=row.pop("processingInfo"),
+    )
+
     variableMetadata = dict(
         **_omit_nullable_values(variable),
         type="mixed",  # precise type will be updated further down
         nonRedistributable=bool(nonRedistributable),
         display=display,
-        source=dict(
+        schemaVersion=schemaVersion,
+        processingLevel=processingLevel,
+        presentation=_omit_nullable_values(presentation),
+        license=license,
+        keyInfoText=keyInfoText,
+    )
+
+    # add source
+    if sourceId:
+        partialSource = json.loads(sourceDescription)
+        variableMetadata["source"] = dict(
             id=sourceId,
             name=sourceName,
             dataPublishedBy=partialSource.get("dataPublishedBy") or "",
@@ -174,8 +250,9 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
             link=partialSource.get("link") or "",
             retrievedDate=partialSource.get("retrievedDate") or "",
             additionalInfo=partialSource.get("additionalInfo") or "",
-        ),
-    )
+        )
+
+    variableMetadata = _omit_nullable_values(variableMetadata)
 
     entityArray = (
         variable_data[["entityId", "entityName", "entityCode"]]
@@ -208,6 +285,10 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
     time_format = "%Y-%m-%dT%H:%M:%S.000Z"
     for col in ("createdAt", "updatedAt"):
         variableMetadata[col] = variableMetadata[col].strftime(time_format)  # type: ignore
+
+    # add origins
+    origins_df = _load_origins_df(engine, variable_id)
+    variableMetadata["origins"] = [_omit_nullable_values(d) for d in origins_df.to_dict(orient="records")]  # type: ignore
 
     return variableMetadata
 
@@ -258,4 +339,4 @@ def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
 
 
 def _omit_nullable_values(d: dict) -> dict:
-    return {k: v for k, v in d.items() if v is not None and not pd.isna(v)}
+    return {k: v for k, v in d.items() if v is not None and (isinstance(v, list) and len(v) or not pd.isna(v))}

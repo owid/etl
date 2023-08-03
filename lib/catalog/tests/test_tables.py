@@ -186,7 +186,11 @@ def test_tables_always_list_fields_in_metadata():
         m = json.load(open(join(temp_dir, "example.meta.json")))
 
     assert m["primary_key"] == ["country"]
-    assert m["fields"] == {"country": {}, "gdp": {}, "french_fries": {}}
+    assert m["fields"] == {
+        "country": {},
+        "french_fries": {},
+        "gdp": {},
+    }
 
 
 def test_field_access_can_be_typecast():

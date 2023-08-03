@@ -4,10 +4,12 @@
 #  Metadata helpers.
 #
 
+import datetime as dt
 import json
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, TypeVar, Union
 
 import pandas as pd
 from dataclasses_json import dataclass_json
@@ -19,8 +21,11 @@ def pruned_json(cls: T) -> T:
     orig = cls.to_dict  # type: ignore
 
     # only keep non-null public variables
+    # make sure to call `to_dict` of nested objects as well
     cls.to_dict = lambda self, **kwargs: {  # type: ignore
-        k: v for k, v in orig(self, **kwargs).items() if not k.startswith("_") and v not in [None, [], {}]
+        k: getattr(self, k).to_dict(**kwargs) if hasattr(getattr(self, k), "to_dict") else v
+        for k, v in orig(self, **kwargs).items()
+        if not k.startswith("_") and v not in [None, [], {}]
     }
 
     return cls
@@ -29,6 +34,28 @@ def pruned_json(cls: T) -> T:
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 
 
+YearDateLatest = NewType("YearDateLatest", str)
+
+
+@pruned_json
+@dataclass_json
+@dataclass
+class License:
+    name: Optional[str] = None
+    url: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        ...
+
+    @staticmethod
+    def from_dict(d: Dict[str, Any]) -> "License":
+        ...
+
+    def __bool__(self):
+        return bool(self.name or self.url)
+
+
+# DEPRECATED: use Origin instead
 @pruned_json
 @dataclass_json
 @dataclass
@@ -56,6 +83,10 @@ class Source:
     def to_dict(self) -> Dict[str, Any]:
         ...
 
+    @staticmethod
+    def from_dict(d: Dict[str, Any]) -> "Source":
+        ...
+
     def update(self, **kwargs: Dict[str, Any]) -> None:
         for key, value in kwargs.items():
             if value is not None:
@@ -65,19 +96,104 @@ class Source:
 @pruned_json
 @dataclass_json
 @dataclass
-class License:
-    name: Optional[str] = None
-    url: Optional[str] = None
+class Origin:
+    # Dataset title written by OWID (without a year)
+    dataset_title_owid: Optional[str] = None
+    # Dataset title written producer (without a year)
+    dataset_title_producer: Optional[str] = None
+    # Our description of the dataset
+    dataset_description_owid: Optional[str] = None
+    # The description for this dataset used by the producer
+    dataset_description_producer: Optional[str] = None
+    # The name of the institution (without a year) or the main authors of the paper
+    producer: Optional[str] = None
+    # The full citation that the producer asks for
+    citation_producer: Optional[str] = None
+    # These will be often empty and then producer is used instead, but for the (relatively common) cases
+    # where the data product is more famous than the authors we would use this (e.g. VDEM instead of the first authors)
+    attribution: Optional[str] = None
+    attribution_short: Optional[str] = None
+    # This is also often empty but if not then it will be part of the short citation (e.g. for VDEM)
+    version: Optional[str] = None
+    # The authorative URL of the dataset
+    dataset_url_main: Optional[str] = None
+    # Direct URL to download the dataset
+    dataset_url_download: Optional[str] = None
+    # Date when the dataset was accessed
+    date_accessed: Optional[str] = None
+    # Publication date or, if the exact date is not known, publication year
+    date_published: Optional[YearDateLatest] = None
+    # License of the dataset
+    license: Optional[License] = None
+
+    def __post_init__(self):
+        if self.date_published:
+            # convert date to string
+            if isinstance(self.date_published, dt.date):
+                self.date_published = YearDateLatest(str(self.date_published))
+
+            if self.date_published != "latest" and not is_year_or_date(self.date_published):
+                raise ValueError("date_published should be either a year or a date or latest")
 
     def to_dict(self) -> Dict[str, Any]:
         ...
 
     @staticmethod
-    def from_dict(d: Dict[str, Any]) -> "License":
+    def from_dict(d: Dict[str, Any]) -> "Origin":
         ...
 
-    def __bool__(self):
-        return bool(self.name or self.url)
+    def update(self, **kwargs: Dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if value is not None:
+                setattr(self, key, value)
+
+
+# Minor is for cases where we only harmonized the countries or similar
+# Major is for cases where we do more, like create new aggregations, combine multiple indicators, etc.
+OWID_PROCESSING_LEVELS = Literal["minor", "major"]
+
+
+@pruned_json
+@dataclass_json
+@dataclass
+class FaqLink:
+    gdoc_id: str
+    fragment_id: str
+
+
+GrapherConfig = Dict[str, Any]
+
+
+@pruned_json
+@dataclass_json
+@dataclass
+class VariablePresentationMeta:
+    # Any fields of grapher config can be set here - title and subtitle *should* be set whenever possible
+    grapher_config: Optional[GrapherConfig] = None
+    # The text for the header of the data page
+    title_public: Optional[str] = None
+    # Shown next to title to differentiate similar indicators e.g. "future projections" or "historical values"
+    title_variant: Optional[str] = None
+    # Shown next to title to differentiate similar indicators e.g. "WHO" or "IHME"
+    producer_short: Optional[str] = None
+    # A short text to use to credit the source e.g. at the bottom of charts. Autofilled from the list of origins (see below). Semicolon separated if there are multiple.
+    attribution: Optional[str] = None
+    # List of topic tags
+    topic_tags_links: List[str] = field(default_factory=list)
+
+    # Fields that are more work to add but of high value
+
+    # List of google doc ids + fragment id
+    faqs: List[FaqLink] = field(default_factory=list)
+    # List of bullet points for the key info text (can use markdown formatting)
+    key_info_text: List[str] = field(default_factory=list)
+
+    # A short summary of what was done to process this indicator
+    processing_info: Optional[str] = None
+
+    @staticmethod
+    def from_dict(d: Dict[str, Any]) -> "VariablePresentationMeta":
+        ...
 
 
 @pruned_json
@@ -101,13 +217,32 @@ class VariableMeta:
 
     title: Optional[str] = None
     description: Optional[str] = None
-    sources: List[Source] = field(default_factory=list)
+    # A 1-2 sentence description - used internally or as fallback for key_info_text
+    description_short: Optional[str] = None
+    # How did the origin describe this variable?
+    description_from_producer: Optional[str] = None
+    origins: List[Origin] = field(default_factory=list)  # Origins is the new replacement for sources
     licenses: List[License] = field(default_factory=list)
     unit: Optional[str] = None
     short_unit: Optional[str] = None
+    # We keep display for the time being as the "less powerful sibling" of grapherConfig below
     display: Optional[Dict[str, Any]] = None
-    additional_info: Optional[Dict[str, Any]] = None
+    additional_info: Optional[Dict[str, Any]] = None  # Only used for internal bookkeeping
+
+    # How much processing did we do to this data?
+    processing_level: Optional[OWID_PROCESSING_LEVELS] = None
+    # List of processing steps, in the future autogenerated
     processing_log: List[Dict[str, Any]] = field(default_factory=list)
+
+    presentation: Optional[VariablePresentationMeta] = None
+
+    # This one is the license that we give the data. Normally it will be empty and then it will
+    # be our usual license (CC-BY) but in cases where special restriction apply this is where
+    # we would capture this.
+    license: Optional[License] = None
+
+    # This is the old sources that we keep for compatibility. Use is strongly discouraged going forward
+    sources: List[Source] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         ...
@@ -115,6 +250,17 @@ class VariableMeta:
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> "VariableMeta":
         ...
+
+    @property
+    def schema_version(self) -> int:
+        """Schema version is used to easily understand everywhere what metadata standard was used
+        for authoring this variable metadata. Defaults to 1 for our legacy variables. "Modern" variables
+        that fill in the presentation key and use origins should record 2 here.
+        """
+        if self.origins or self.presentation:
+            return 2
+        else:
+            return 1
 
     def _repr_html_(self):
         # Render a nice display of the table metadata
@@ -147,11 +293,15 @@ class DatasetMeta:
     short_name: Optional[str] = None
     title: Optional[str] = None
     description: Optional[str] = None
+    origins: List[Origin] = field(default_factory=list)
+    # sources is deprecated, use origins instead
     sources: List[Source] = field(default_factory=list)
     licenses: List[License] = field(default_factory=list)
     is_public: bool = True
     additional_info: Optional[Dict[str, Any]] = None
     version: Optional[str] = None
+    # update period in days
+    update_period_days: Optional[str] = None
 
     # an md5 checksum of the ingredients used to make this dataset
     source_checksum: Optional[str] = None
@@ -301,3 +451,14 @@ def to_html(record: Any) -> Optional[str]:
 
     else:
         return str(record)
+
+
+def is_year_or_date(s: str) -> bool:
+    """Matches dates in "yyyy-mm-dd" format or years in "yyyy" format."""
+    date_pattern = r"^\d{4}-\d{2}-\d{2}$"
+    year_pattern = r"^\d{4}$"
+
+    if re.match(date_pattern, s) or re.match(year_pattern, s):
+        return True
+    else:
+        return False

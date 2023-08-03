@@ -12,7 +12,7 @@ import structlog
 from pandas._typing import Scalar
 from pandas.core.series import Series
 
-from .meta import License, Source, VariableMeta
+from .meta import License, Origin, Source, VariableMeta
 from .properties import metadata_property
 
 log = structlog.get_logger()
@@ -387,6 +387,19 @@ def get_unique_sources_from_variables(variables: List[Variable]) -> List[Source]
     return unique_sources
 
 
+def get_unique_origins_from_variables(variables: List[Variable]) -> List[Origin]:
+    # Make a list of all origins of all variables.
+    origins = sum([variable.metadata.origins for variable in variables], [])
+
+    # Get unique array of tuples of origin fields (respecting the order).
+    unique_origins_array = pd.unique([tuple(origin.to_dict().items()) for origin in origins])
+
+    # Make a list of origins.
+    unique_origins = [Origin.from_dict(dict(origin)) for origin in unique_origins_array]  # type: ignore
+
+    return unique_origins
+
+
 def get_unique_licenses_from_variables(variables: List[Variable]) -> List[License]:
     # Make a list of all licenses of all variables.
     licenses = sum([variable.metadata.licenses for variable in variables], [])
@@ -580,6 +593,7 @@ def combine_variables_metadata(
     metadata.unit = combine_variables_units(variables=variables_only, operation=operation)
     metadata.short_unit = combine_variables_short_units(variables=variables_only, operation=operation)
     metadata.sources = get_unique_sources_from_variables(variables=variables_only)
+    metadata.origins = get_unique_origins_from_variables(variables=variables_only)
     metadata.licenses = get_unique_licenses_from_variables(variables=variables_only)
     metadata.processing_log = combine_variables_processing_logs(variables=variables_only)
 

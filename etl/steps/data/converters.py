@@ -37,17 +37,33 @@ def convert_walden_metadata(wd: WaldenDataset) -> DatasetMeta:
 
 def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
     """
-    Copy metadata for a dataset directly from what we have in Walden.
+    Copy metadata for a dataset directly from what we have in Snapshot.
     """
-    return DatasetMeta(
-        short_name=snap.short_name,
-        namespace=snap.namespace,
-        title=snap.name,
-        version=snap.version,
-        description=snap.description,
-        sources=[snap.source],
-        licenses=[snap.license] if snap.license else [],
-    )
+    if snap.origin:
+        assert not snap.source, "Snapshot cannot have both origin and source"
+        return DatasetMeta(
+            short_name=snap.short_name,
+            namespace=snap.namespace,
+            version=snap.version,
+            # dataset title and description are filled from origin
+            title=snap.origin.dataset_title_owid,
+            description=snap.origin.dataset_description_owid,
+            origins=[snap.origin],
+            licenses=[snap.license] if snap.license else [],
+        )
+    elif snap.source:
+        assert not snap.origin, "Snapshot cannot have both origin and source"
+        return DatasetMeta(
+            short_name=snap.short_name,
+            namespace=snap.namespace,
+            title=snap.name,
+            version=snap.version,
+            description=snap.description,
+            sources=[snap.source],
+            licenses=[snap.license] if snap.license else [],
+        )
+    else:
+        raise ValueError("Snapshot must have either origin or source")
 
 
 def convert_grapher_source(s: gm.Source) -> Source:

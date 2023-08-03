@@ -774,6 +774,7 @@ class GrapherStep(Step):
             workers=config.GRAPHER_INSERT_WORKERS,
         )
         gi.cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
+        # TODO: cleanup origins that are not used by any variable
 
 
 @dataclass
