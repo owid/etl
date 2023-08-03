@@ -74,8 +74,6 @@ def cli(
     Sync data_values and metadata from MySQL to s3://owid-catalog/baked-variables/[db_name]/data/[variable_id].json files
     with structure that can be consumed by the grapher.
 
-    Once variable is replicated, we point its dataPath column in MySQL to the file.
-
     This is intended to run as continuous service at the moment, but in the long run we should be creating those JSON files
     when running etl --grapher.
 
@@ -163,28 +161,21 @@ def _sync_variable_data_metadata(engine: Engine, variable_id: int, dry_run: bool
         # NOTE: if metadata changes, we still reupload even data to S3, this is quite inefficient, but
         #   this entire script is a temporary solution until everything is uploaded directly from ETL
         if variable_df.empty:
-            assert variable.dataPath
-            variable_df = variable_data_df_from_s3(engine, [variable.dataPath])
+            assert variable.id
+            variable_df = variable_data_df_from_s3(engine, variable_ids=[variable.id])
 
         var_data = variable_data(variable_df)
         var_metadata = variable_metadata(engine, variable_id, variable_df)
 
         if not dry_run:
             # upload data and metadata to S3
-            data_path = upload_gzip_dict(var_data, variable.s3_data_path(), private, r2=True)
-            metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path(), private, r2=True)
-
-            # update dataPath and metadataPath of a variable if different
-            if variable.dataPath != data_path or variable.metadataPath != metadata_path:
-                variable.dataPath = data_path
-                variable.metadataPath = metadata_path
-                session.add(variable)
-                session.commit()
+            upload_gzip_dict(var_data, variable.s3_data_path(), private, r2=True)
+            upload_gzip_dict(var_metadata, variable.s3_metadata_path(), private, r2=True)
 
     log.info("datasync.upload", t=f"{time.time() - t:.2f}s", variable_id=variable_id)
 
 
-def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False, r2: bool = False) -> str:
+def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False, r2: bool = False) -> None:
     """Upload compressed dictionary to S3 and return its URL."""
     body_gzip = gzip.compress(json.dumps(d, default=str).encode())  # type: ignore
 
@@ -212,18 +203,6 @@ def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False, r2:
                 ContentType="application/json",
                 **extra_args,
             )
-
-    # bucket owid-catalog is behind Cloudflare
-    if bucket == "owid-catalog":
-        return f"https://catalog.ourworldindata.org/{key}"
-    elif bucket == "owid-api":
-        return f"https://api.ourworldindata.org/{key}"
-    elif bucket == "owid-api-staging":
-        return f"https://api-staging.owid.io/{key}"
-    elif not r2:
-        return f"https://{bucket}.nyc3.digitaloceanspaces.com/{key}"
-    else:
-        raise NotImplementedError()
 
 
 @dataclass_json

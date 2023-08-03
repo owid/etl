@@ -12,6 +12,8 @@ from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
+from etl import config
+
 
 def variable_data_df_from_mysql(engine: Engine, variable_id: int) -> pd.DataFrame:
     q = """
@@ -30,20 +32,8 @@ def variable_data_df_from_mysql(engine: Engine, variable_id: int) -> pd.DataFram
     return pd.read_sql(q, engine, params={"variable_id": variable_id})
 
 
-def _extract_variable_id_from_data_path(data_path: str) -> int:
-    match = re.search(r"/indicators/(\d+)", data_path)
-    if match:
-        return int(match.group(1))
-    else:
-        match = re.search(r"/data/(\d+)", data_path)
-        assert match, f"Could not find variableId in dataPath `{data_path}`"
-        return int(match.group(1))
-
-
-def _fetch_data_df_from_s3(data_path: str):
+def _fetch_data_df_from_s3(variable_id: int) -> pd.DataFrame:  # type: ignore
     try:
-        variable_id = _extract_variable_id_from_data_path(data_path)
-
         # Cloudflare limits us to 600 requests per minute, retry in case we hit the limit
         # NOTE: increase wait time or attempts if we hit the limit too often
         for attempt in Retrying(
@@ -53,7 +43,7 @@ def _fetch_data_df_from_s3(data_path: str):
         ):
             with attempt:
                 return (
-                    pd.read_json(data_path)
+                    pd.read_json(config.variable_data_url(variable_id))
                     .rename(
                         columns={
                             "entities": "entityId",
@@ -63,30 +53,15 @@ def _fetch_data_df_from_s3(data_path: str):
                     )
                     .assign(variableId=variable_id)
                 )
-    # no data on S3 in dataPath
+    # no data on S3
     except HTTPError:
         return pd.DataFrame(columns=["variableId", "entityId", "year", "value"])
 
 
-def variable_data_df_from_s3(
-    engine: Engine, data_paths: List[str] = [], variable_ids: List[int] = [], workers: int = 1
-) -> pd.DataFrame:
-    """Fetch data from S3 and add entity code and name from DB. You can use either data_paths or variable_ids."""
-    if not data_paths:
-        q = """
-        SELECT
-            dataPath
-        FROM variables as v
-        WHERE id in %(variable_ids)s
-        """
-        data_paths = pd.read_sql(
-            q,
-            engine,
-            params={"variable_ids": variable_ids},
-        )["dataPath"].tolist()
-
+def variable_data_df_from_s3(engine: Engine, variable_ids: List[int] = [], workers: int = 1) -> pd.DataFrame:
+    """Fetch data from S3 and add entity code and name from DB."""
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-        results = list(executor.map(lambda data_path: _fetch_data_df_from_s3(data_path), data_paths))
+        results = list(executor.map(_fetch_data_df_from_s3, variable_ids))
 
     if isinstance(results, list) and all(isinstance(df, pd.DataFrame) for df in results):
         df = pd.concat(cast(List[pd.DataFrame], results))
