@@ -23,21 +23,19 @@ definitions:
   - egip:
       description: &description_egip |
         An ethnic group in power (EGIP) is a politically relevant ethnic group which has access to power, in one of these options:
-          <ol>
-            <li>The group rules alone:</li><ul><li>Monopoly: Elite members hold power in the executive to the exclusion of members of all other ethnic groups.</li>
-                <li>Dominance: Elite members hold dominant power in the executive, but there is some limited inclusion of "token" members of other groups who however do not have real influence on decision making.</li>
-              </ul><li>The group shares power:</li><ul><li>Senior Partner: Representatives of the group participate as senior partners in a formal or informal power-sharing arrangement. By power sharing means any arrangement that divides executive power among leaders who claim to represent particular ethnic groups and who have real influence on political decision making.</li>
-                <li>Junior Partner: Representatives participate as junior partners in government, reflected in the number and importance of the positions controlled by group members.</li>
-              </ul>
-          </ol>
+          1. The group rules alone:
+            * Monopoly: Elite members hold power in the executive to the exclusion of members of all other ethnic groups.
+            * Dominance: Elite members hold dominant power in the executive, but there is some limited inclusion of "token" members of other groups who however do not have real influence on decision making.
+
+          2. The group shares power:
+            * Senior Partner: Representatives of the group participate as senior partners in a formal or informal power-sharing arrangement. By power sharing means any arrangement that divides executive power among leaders who claim to represent particular ethnic groups and who have real influence on political decision making.
+            * Junior Partner: Representatives participate as junior partners in government, reflected in the number and importance of the positions controlled by group members.
   - meg:
       description: &description_meg |
         An ethnic group is marginalized (MEG) if it is politically relevant but does not have access to power. Marginalization can take one of the following forms:
-          <ul>
-            <li>Powerless: Elite representatives hold no political power (or do not have influence on decision making) at the national level of executive power - although without being explicitly discriminated against.</li>
-            <li>Discrimination: Group members are subjected to active, intentional, and targeted discrimination by the state, with the intent of excluding them from political power. Such active discrimination can be either formal or informal, but always refers to the domain of public politics (excluding discrimination in the socio-economic sphere).</li>
-            <li>Self-exclusion: Applies to groups that have excluded themselves from central state power, in the sense that they control a particular territory of the state which they have declared independent from the central government.</li>
-          </ul>
+          * Powerless: Elite representatives hold no political power (or do not have influence on decision making) at the national level of executive power - although without being explicitly discriminated against.
+          * Discrimination: Group members are subjected to active, intentional, and targeted discrimination by the state, with the intent of excluding them from political power. Such active discrimination can be either formal or informal, but always refers to the domain of public politics (excluding discrimination in the socio-economic sphere).
+          * Self-exclusion: Applies to groups that have excluded themselves from central state power, in the sense that they control a particular territory of the state which they have declared independent from the central government.
   - autonomy:
       description: &description_autonomy |
         For a group to be coded as regionally autonomous, two conditions must be jointly satisfied:
@@ -48,10 +46,10 @@ definitions:
   - acd_conflict:
       description: &description_acd_conflict |
         An ACD (Armed Conflict Database) conflict for this dataset includes:
-            <ul>
-              <li>Intrastate conflict: A conflict between a government and a non-governmental party, with no interference from other countries.</li>
-              <li>Intrastate conflict internationalized: An armed conflict between a government and a non-government party where the government side, the opposing side, or both sides, receive troop support from other governments that actively participate in the conflict.</li>
-            </ul>Each conflict is assigned a unique UCDP (Uppsala Conflict Data Program) ID. ACD conflicts are merged with the Ethnic Power Relations country-level data by assigning each country-year observation one or several UCDP IDs if the ACD dataset reports an ongoing conflict in the respective country and year.
+          * Intrastate conflict: A conflict between a government and a non-governmental party, with no interference from other countries.
+          * Intrastate conflict internationalized: An armed conflict between a government and a non-government party where the government side, the opposing side, or both sides, receive troop support from other governments that actively participate in the conflict.
+
+        Each conflict is assigned a unique UCDP (Uppsala Conflict Data Program) ID. ACD conflicts are merged with the Ethnic Power Relations country-level data by assigning each country-year observation one or several UCDP IDs if the ACD dataset reports an ongoing conflict in the respective country and year.
   - conflict_onset:
       description: &description_conflict_onset |
         A conflict onset occurs if a country experiences an intrastate conflict in a given year, and the respective conflict (as identified via its UCDP ID) has been inactive in the given country in the previous two calendar years.
