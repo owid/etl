@@ -2,6 +2,7 @@
 
 from typing import cast
 
+import pandas as pd
 from owid.catalog import Dataset
 
 from etl.helpers import PathFinder, create_dataset
@@ -30,7 +31,7 @@ def run(dest_dir: str) -> None:
     # Process data.
 
     # Concatenate the two tables.
-    tb = tb_latino.concat(tb_ess[["country", "year", "trust"]], ignore_index=True)
+    tb = pd.concat([tb_latino, tb_ess[["country", "year", "trust"]]], ignore_index=True)
 
     # Create index, verify columns, and sort.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
