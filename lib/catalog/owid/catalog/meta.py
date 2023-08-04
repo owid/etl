@@ -7,7 +7,7 @@
 import datetime as dt
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Literal, NewType, Optional, TypeVar, Union
 
@@ -43,6 +43,10 @@ YearDateLatest = NewType("YearDateLatest", str)
 class License:
     name: Optional[str] = None
     url: Optional[str] = None
+
+    def __hash__(self):
+        """Hash that uniquely identifies a License."""
+        return _hash_dataclass(self)
 
     def to_dict(self) -> Dict[str, Any]:
         ...
@@ -82,19 +86,7 @@ class Source:
 
     def __hash__(self):
         """Hash that uniquely identifies a source."""
-        return hash(
-            (
-                self.name,
-                self.description,
-                self.url,
-                self.source_data_url,
-                self.owid_data_url,
-                self.date_accessed,
-                self.publication_date,
-                self.publication_year,
-                self.published_by,
-            )
-        )
+        return _hash_dataclass(self)
 
     def to_dict(self) -> Dict[str, Any]:
         ...
@@ -141,6 +133,10 @@ class Origin:
     date_published: Optional[YearDateLatest] = None
     # License of the dataset
     license: Optional[License] = None
+
+    def __hash__(self):
+        """Hash that uniquely identifies an origin."""
+        return _hash_dataclass(self)
 
     def __post_init__(self):
         if self.date_published:
@@ -207,6 +203,10 @@ class VariablePresentationMeta:
     # A short summary of what was done to process this indicator
     processing_info: Optional[str] = None
 
+    def __hash__(self):
+        """Hash that uniquely identifies VariablePresentationMeta."""
+        return _hash_dataclass(self)
+
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> "VariablePresentationMeta":
         ...
@@ -259,6 +259,10 @@ class VariableMeta:
 
     # This is the old sources that we keep for compatibility. Use is strongly discouraged going forward
     sources: List[Source] = field(default_factory=list)
+
+    def __hash__(self):
+        """Hash that uniquely identifies VariableMeta."""
+        return _hash_dataclass(self)
 
     def to_dict(self) -> Dict[str, Any]:
         ...
@@ -321,6 +325,10 @@ class DatasetMeta:
 
     # an md5 checksum of the ingredients used to make this dataset
     source_checksum: Optional[str] = None
+
+    def __hash__(self):
+        """Hash that uniquely identifies DatasetMeta."""
+        return _hash_dataclass(self)
 
     def __post_init__(self) -> None:
         """Imply version from publication_date or publication_year if not given
@@ -414,6 +422,10 @@ class TableMeta:
     dataset: Optional[DatasetMeta] = field(compare=False, default=None)
     primary_key: List[str] = field(default_factory=list)
 
+    def __hash__(self):
+        """Hash that uniquely identifies TableMeta."""
+        return _hash_dataclass(self)
+
     @property
     def checked_name(self) -> str:
         if not self.short_name:
@@ -478,3 +490,21 @@ def is_year_or_date(s: str) -> bool:
         return True
     else:
         return False
+
+
+def _hash_dataclass(dataclass: Any) -> int:
+    """Return unique hash for a dataclass. This is useful if you can't make your dataclasses
+    frozen but still want to use operations such as `set` or `unique`."""
+    fields = []
+    for k, v in dataclass.__dict__.items():
+        if is_dataclass(v):
+            fields.append((k, hash(v)))
+        elif isinstance(v, list):
+            hashes = [_hash_dataclass(x) if is_dataclass(x) else hash(x) for x in v]
+            fields.append((k, hash(tuple(hashes))))
+        elif isinstance(v, dict):
+            hashes = [(x, _hash_dataclass(y) if is_dataclass(y) else hash(y)) for x, y in v.items()]
+            fields.append((k, hash(tuple(hashes))))
+        else:
+            fields.append((k, v))
+    return hash(tuple(fields))
