@@ -1247,25 +1247,15 @@ def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
     sources = sum([table._fields[column].sources for table in tables for column in list(table.all_columns)], [])
 
     # Get unique array of tuples of source fields (respecting the order).
-    unique_sources_array = pd.unique([tuple(source.to_dict().items()) for source in sources])
-
-    # Make a list of unique sources.
-    unique_sources = [Source.from_dict(dict(source)) for source in unique_sources_array]  # type: ignore
-
-    return unique_sources
+    return pd.unique(sources).tolist()
 
 
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     # Make a list of all licenses of all variables in all tables.
     licenses = sum([table._fields[column].licenses for table in tables for column in list(table.all_columns)], [])
 
-    # Get unique array of tuples of license fields (respecting the order).
-    unique_licenses_array = pd.unique([tuple(license.to_dict().items()) for license in licenses])
-
-    # Make a list of unique licenses.
-    unique_licenses = [License.from_dict(dict(license)) for license in unique_licenses_array]  # type: ignore
-
-    return unique_licenses
+    # Get unique array of tuples of source fields (respecting the order).
+    return pd.unique(licenses).tolist()
 
 
 def _combine_tables_titles_and_descriptions(tables: List[Table], title_or_description: str) -> Optional[str]:
