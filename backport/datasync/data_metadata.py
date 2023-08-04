@@ -1,6 +1,5 @@
 import concurrent.futures
 import json
-import re
 from http.client import RemoteDisconnected
 from typing import Any, Dict, List, Union, cast
 from urllib.error import HTTPError, URLError
