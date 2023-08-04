@@ -2,7 +2,7 @@
 
 from typing import cast
 
-import pandas as pd
+import owid.catalog.processing as pr
 from owid.catalog import Dataset
 
 from etl.helpers import PathFinder, create_dataset
@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
     # Process data.
 
     # Concatenate the two tables.
-    tb = pd.concat([tb_latino, tb_ess[["country", "year", "trust"]]], ignore_index=True)
+    tb = pr.concat([tb_latino, tb_ess[["country", "year", "trust"]]], ignore_index=True, short_name="trust_surveys")
 
     # Create index, verify columns, and sort.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
@@ -40,7 +40,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow_latino.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb])
 
     # Save changes in the new garden dataset.
     ds_garden.save()
