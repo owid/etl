@@ -45,7 +45,6 @@ tables:
           key_info_text:
             - "First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)"
             - "Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)"
-          faqs: []
-          # This could be something like:
-          # - fragment_id: dummy-term
-          #   gdoc_id: 1OLoTWloy4VecOjKTjB1wLV6tEphHJIMXfexrf1ZYJzU
+          faqs:
+          - fragment_id: cherries
+            gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE

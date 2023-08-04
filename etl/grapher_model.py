@@ -538,15 +538,12 @@ class Source(SQLModel, table=True):
         conds = [
             cls.name == self.name,
             cls.datasetId == self.datasetId,
-            cls.description["additionalInfo"] == self.description.get("additionalInfo", ""),  # type: ignore
-            cls.description["dataPublishedBy"] == self.description.get("dataPublishedBy", ""),  # type: ignore
+            _json_is(cls.description, "additionalInfo", self.description.get("additionalInfo")),
+            _json_is(cls.description, "dataPublishedBy", self.description.get("dataPublishedBy")),
         ]
-
         return select(cls).where(*conds)  # type: ignore
 
     def upsert(self, session: Session) -> "Source":
-        # NOTE: we match on both name and additionalInfo (source's description) so that we can
-        # have sources with the same name, but different descriptions
         ds = session.exec(self._upsert_select).one_or_none()
 
         if not ds:
@@ -1011,10 +1008,19 @@ class Variable(SQLModel, table=True):
             )
         # establish relationships between variables and posts
         if faqs:
+            required_gdoc_ids = {faq.gdoc_id for faq in faqs}
+            statement = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))  # type: ignore
+            gdoc_posts = session.exec(statement).all()
+            existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
+            missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
+            if missing_gdoc_ids:
+                log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
+
             session.add_all(
                 [
                     PostsGdocsVariablesFaqsLink(gdocId=faq.gdoc_id, variableId=self.id, fragmentId=faq.fragment_id)
                     for faq in faqs
+                    if faq.gdoc_id in existing_gdoc_ids
                 ]
             )
         # establish relationships between variables and tags
@@ -1185,3 +1191,11 @@ class Origin(SQLModel, table=True):
 
         # select added object to get its id
         return session.exec(self._upsert_select).one()
+
+
+def _json_is(json_field: Any, key: str, val: Any) -> Any:
+    """SQLAlchemy condition for checking if a JSON field has a key with a given value. Works for null."""
+    if val is None:
+        return text(f"JSON_VALUE({json_field.key}, '$.{key}') IS NULL")
+    else:
+        return json_field[key] == val
