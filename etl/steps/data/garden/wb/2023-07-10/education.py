@@ -163,6 +163,7 @@ def add_metadata(tb, df_metadata):
         # We were using indicator id for matching metadata as this is less prone to problems.
         # Now we should use make the variable names more informative - so use the value from the Indicator Name as a new column name
         new_column_name = underscore(variable_name)
+
         # Rename the column in 'tb' to 'new_column_name'.
         tb.rename(columns={column: new_column_name}, inplace=True)
 
@@ -181,7 +182,7 @@ def add_metadata(tb, df_metadata):
         ):
             tb[new_column_name].metadata.unit = "%"
             tb[new_column_name].metadata.short_unit = "%"
-            tb[new_column_name].metadata.display["numDecimalPlaces"] = 0
+            tb[new_column_name].metadata.display["numDecimalPlaces"] = 1
         elif "ratio" in variable_name:
             tb[new_column_name].metadata.display["numDecimalPlaces"] = 1
             tb[new_column_name].metadata.unit = "ratio"
