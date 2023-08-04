@@ -2,9 +2,8 @@
 
 from typing import cast
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
