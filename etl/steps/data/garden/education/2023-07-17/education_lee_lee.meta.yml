@@ -37,7 +37,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       f_primary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, primary, female
@@ -51,7 +51,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       m_primary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, primary, male
@@ -65,7 +65,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       mf_secondary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, secondary, both sexes
@@ -79,7 +79,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       f_secondary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, secondary, female
@@ -93,7 +93,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       m_secondary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, secondary, male
@@ -107,7 +107,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       mf_tertiary_enrollment_rates_combined_wb:
         title: Combined gross enrolment ratio for tertiary education, both sexes
@@ -120,7 +120,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       f_tertiary_enrollment_rates_combined_wb:
         title: Combined gross enrolment ratio for tertiary education, female
@@ -133,7 +133,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       m_tertiary_enrollment_rates_combined_wb:
         title: Combined gross enrolment ratio for tertiary education, male
@@ -146,7 +146,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       mf_primary_enrollment_rates:
         title: Total net enrolment rate, primary, both sexes
@@ -156,7 +156,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_primary_enrollment_rates:
         title: Total net enrolment rate, primary, female
         description: Adjusted net enrollment rate in primary education is calculated by dividing the number of children in
@@ -165,7 +165,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_primary_enrollment_rates:
         title: Total net enrolment rate, primary, male
         description: Adjusted net enrollment rate in primary education is calculated by dividing the number of children in
@@ -174,7 +174,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_secondary_enrollment_rates:
         title: Total net enrolment rate, secondary, both sexes
         description: Net enrollment rate for secondary school is calculated by dividing the number of students of official
@@ -183,7 +183,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_secondary_enrollment_rates:
         title: Total net enrolment rate, secondary, female
         description: Net enrollment rate for secondary school is calculated by dividing the number of students of official
@@ -192,7 +192,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_secondary_enrollment_rates:
         title: Total net enrolment rate, secondary, male
         description: Net enrollment rate for secondary school is calculated by dividing the number of students of official
@@ -201,7 +201,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_tertiary_enrollment_rates:
         title: Gross enrolment ratio for tertiary education, both sexes
         description: Total enrolment in tertiary education regardless of age expressed as a percentage of the population in
@@ -209,7 +209,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_tertiary_enrollment_rates:
         title: Gross enrolment ratio for tertiary education, female
         description: Total enrolment in tertiary education regardless of age expressed as a percentage of the population in
@@ -217,7 +217,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_tertiary_enrollment_rates:
         title: Gross enrolment ratio for tertiary education, male
         description: Total enrolment in tertiary education regardless of age expressed as a percentage of the population in
@@ -225,382 +225,382 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth_and_adults__15_64_years__percentage_of_no_education:
         title: Percentage of youth and adults aged between 15 and 64 years with no education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth_and_adults__15_64_years__percentage_of_no_education:
         title: Percentage of female youth and adults aged between 15 and 64 years with no education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth_and_adults__15_64_years__percentage_of_no_education:
         title: Percentage of male youth and adults aged between 15 and 64 years with no education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth__15_24_years__percentage_of_no_education:
         title: Percentage of male and female youth aged between 15 and 24 years with no education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth__15_24_years__percentage_of_no_education:
         title: Percentage of female youth aged between 15 and 24 years with no education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth__15_24_years__percentage_of_no_education:
         title: Percentage of male youth aged between 15 and 24 years with no education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_adults__25_64_years__percentage_of_no_education:
         title: Percentage of male and female adults aged between 25 and 64 years with no education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_adults__25_64_years__percentage_of_no_education:
         title: Percentage of female adults aged between 25 and 64 years with no education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_adults__25_64_years__percentage_of_no_education:
         title: Percentage of male adults aged between 25 and 64 years with no education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth_and_adults__15_64_years__percentage_of_primary_education:
         title: Percentage of male and female youth and adults aged between 15 and 64 years with incomplete primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth_and_adults__15_64_years__percentage_of_primary_education:
         title: Percentage of female youth and adults aged between 15 and 64 years with incomplete primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth_and_adults__15_64_years__percentage_of_primary_education:
         title: Percentage of male youth and adults aged between 15 and 64 years with incomplete primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth__15_24_years__percentage_of_primary_education:
         title: Percentage of male and female youth aged between 15 and 24 years with incomplete primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth__15_24_years__percentage_of_primary_education:
         title: Percentage of female youth aged between 15 and 24 years with incomplete primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth__15_24_years__percentage_of_primary_education:
         title: Percentage of male youth aged between 15 and 24 years with incomplete primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_adults__25_64_years__percentage_of_primary_education:
         title: Percentage of male and female adults aged between 25 and 64 years with incomplete primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_adults__25_64_years__percentage_of_primary_education:
         title: Percentage of female adults aged between 25 and 64 years with incomplete primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_adults__25_64_years__percentage_of_primary_education:
         title: Percentage of male adults aged between 25 and 64 years with incomplete primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth_and_adults__15_64_years__percentage_of_complete_primary_education_attained:
         title: Percentage of 15-64 years youth and adults who completed primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth_and_adults__15_64_years__percentage_of_complete_primary_education_attained:
         title: Percentage of 15-64 years female youth and adults who completed primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth_and_adults__15_64_years__percentage_of_complete_primary_education_attained:
         title: Percentage of 15-64 years male youth and adults who completed primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth__15_24_years__percentage_of_complete_primary_education_attained:
         title: Percentage of 15-24 years youth who completed primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth__15_24_years__percentage_of_complete_primary_education_attained:
         title: Percentage of 15-24 years female youth who completed primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth__15_24_years__percentage_of_complete_primary_education_attained:
         title: Percentage of 15-24 years male youth who completed primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_adults__25_64_years__percentage_of_complete_primary_education_attained:
         title: Percentage of 25-64 years adults who completed primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_adults__25_64_years__percentage_of_complete_primary_education_attained:
         title: Percentage of 25-64 years female adults who completed primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_adults__25_64_years__percentage_of_complete_primary_education_attained:
         title: Percentage of 25-64 years male adults who completed primary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth_and_adults__15_64_years__percentage_of_secondary_education:
         title: Percentage of 15-64 years youth and adults with incomplete secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth_and_adults__15_64_years__percentage_of_secondary_education:
         title: Percentage of 15-64 years female youth and adults with incomplete secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth_and_adults__15_64_years__percentage_of_secondary_education:
         title: Percentage of 15-64 years male youth and adults with incomplete secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth__15_24_years__percentage_of_secondary_education:
         title: Percentage of 15-24 years youth with incomplete secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth__15_24_years__percentage_of_secondary_education:
         title: Percentage of 15-24 years female youth with incomplete secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth__15_24_years__percentage_of_secondary_education:
         title: Percentage of 15-24 years male youth with incomplete secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_adults__25_64_years__percentage_of_secondary_education:
         title: Percentage of 25-64 years adults with incomplete secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_adults__25_64_years__percentage_of_secondary_education:
         title: Percentage of 25-64 years female adults with incomplete secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_adults__25_64_years__percentage_of_secondary_education:
         title: Percentage of 25-64 years male adults with incomplete secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth_and_adults__15_64_years__percentage_of_complete_secondary_education_attained:
         title: Percentage of 15-64 years youth and adults who completed secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth_and_adults__15_64_years__percentage_of_complete_secondary_education_attained:
         title: Percentage of 15-64 years female youth and adults who completed secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth_and_adults__15_64_years__percentage_of_complete_secondary_education_attained:
         title: Percentage of 15-64 years male youth and adults who completed secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth__15_24_years__percentage_of_complete_secondary_education_attained:
         title: Percentage of 15-24 years youth who completed secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth__15_24_years__percentage_of_complete_secondary_education_attained:
         title: Percentage of 15-24 years female youth who completed secondary education
         unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth__15_24_years__percentage_of_complete_secondary_education_attained:
         title: Percentage of 15-24 years male youth who completed secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_adults__25_64_years__percentage_of_complete_secondary_education_attained:
         title: Percentage of 25-64 years adults who completed secondary education
         unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_adults__25_64_years__percentage_of_complete_secondary_education_attained:
         title: Percentage of 25-64 years female adults who completed secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_adults__25_64_years__percentage_of_complete_secondary_education_attained:
         title: Percentage of 25-64 years male adults who completed secondary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth_and_adults__15_64_years__percentage_of_tertiary_education:
         title: Percentage of 15-64 years youth and adults with incomplete tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth_and_adults__15_64_years__percentage_of_tertiary_education:
         title: Percentage of 15-64 years female youth and adults with incomplete tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth_and_adults__15_64_years__percentage_of_tertiary_education:
         title: Percentage of 15-64 years male youth and adults with incomplete tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth__15_24_years__percentage_of_tertiary_education:
         title: Percentage of 15-24 years youth with incomplete tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth__15_24_years__percentage_of_tertiary_education:
         title: Percentage of 15-24 years female youth with incomplete tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth__15_24_years__percentage_of_tertiary_education:
         title: Percentage of 15-24 years male youth with incomplete tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_adults__25_64_years__percentage_of_tertiary_education:
         title: Percentage of 25-64 years adults with incomplete tertiary education
         unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_adults__25_64_years__percentage_of_tertiary_education:
         title: Percentage of 25-64 years female adults with incomplete tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_adults__25_64_years__percentage_of_tertiary_education:
         title: Percentage of 25-64 years male adults with incomplete tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth_and_adults__15_64_years__percentage_of_complete_tertiary_education_attained:
         title: Percentage of 15-64 years youth and adults who completed tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth_and_adults__15_64_years__percentage_of_complete_tertiary_education_attained:
         title: Percentage of 15-64 years female youth and adults who completed tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth_and_adults__15_64_years__percentage_of_complete_tertiary_education_attained:
         title: Percentage of 15-64 years male youth and adults who completed tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth__15_24_years__percentage_of_complete_tertiary_education_attained:
         title: Percentage of 15-24 years youth who completed tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_youth__15_24_years__percentage_of_complete_tertiary_education_attained:
         title: Percentage of 15-24 years female youth who completed tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_youth__15_24_years__percentage_of_complete_tertiary_education_attained:
         title: Percentage of 15-24 years male youth who completed tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_adults__25_64_years__percentage_of_complete_tertiary_education_attained:
         title: Percentage of 25-64 years male and female adults who completed tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       f_adults__25_64_years__percentage_of_complete_tertiary_education_attained:
         title: Percentage of 25-64 years female adults who completed tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       m_adults__25_64_years__percentage_of_complete_tertiary_education_attained:
         title: Percentage of 25-64 years male adults who completed tertiary education
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
       mf_youth_and_adults__15_64_years__average_years_of_education:
         title: Average years of education for 15-64 years male and female youth and adults
         unit: years
