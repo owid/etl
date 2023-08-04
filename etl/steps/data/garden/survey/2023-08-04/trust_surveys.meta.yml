@@ -18,7 +18,7 @@ dataset:
       url: https://www.latinobarometro.org/
       date_accessed: 2023-08-04
       publication_year: 2021
-      published_by: Corporación Latinobarómetro
+      published_by: 'Latinobarómetro (2021). Data Bank: Stata files 1996-2020. Retrieved 03-08-2023 from https://www.latinobarometro.org/'
 tables:
   trust_surveys:
     variables:
