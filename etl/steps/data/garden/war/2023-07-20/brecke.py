@@ -22,19 +22,24 @@ paths = PathFinder(__file__)
 log = get_logger()
 # Region mapping
 REGIONS_RENAME = {
-    1: "North America, Central America, and the Caribbean (Brecke)",
-    2: "South America (Brecke)",
-    3: "Western Europe (Brecke)",
-    4: "Eastern Europe (Brecke)",
+    1: "America",  # "North America, Central America, and the Caribbean (Brecke)",
+    2: "America",  # "South America (Brecke)",
+
+    3: "Europe",  # "Western Europe (Brecke)",
+    4: "Europe",  # "Eastern Europe (Brecke)",
+
     5: "Middle East (Brecke)",
-    6: "North Africa (Brecke)",
-    7: "West & Central Africa (Brecke)",
-    8: "East & South Africa (Brecke)",
-    9: "Central Asia (Brecke)",
-    10: "South Asia (Brecke)",
-    11: "Southeast Asia (Brecke)",
-    12: "East Asia (Brecke)",
-    -9: "Unknown",
+
+    6: "Africa",  # "North Africa (Brecke)",
+    7: "Africa",  # "West & Central Africa (Brecke)",
+    8: "Africa",  # "East & South Africa (Brecke)",
+
+    9: "Asia",  # "Central Asia (Brecke)",
+    10: "Asia",  # "South Asia (Brecke)",
+    11: "Asia",  # "Southeast Asia (Brecke)",
+    12: "Asia",  # "East Asia (Brecke)",
+
+    -9: -9,  # Unknown
 }
 
 
@@ -80,6 +85,11 @@ def run(dest_dir: str) -> None:
     log.info("war.brecke: add lower bound value of deaths")
     tb = add_lower_bound_deaths(tb)
 
+    # Rename regions
+    log.info("war.brecke: rename regions")
+    tb["region"] = tb["region"].map(REGIONS_RENAME)
+    assert tb["region"].isna().sum() == 0, "Unmapped regions!"
+
     # Expand observations
     log.info("war.brecke: expand observations")
     tb = expand_observations(tb)
@@ -96,11 +106,7 @@ def run(dest_dir: str) -> None:
     # Distribute numbers for region -9
     log.info("war.brecke: distributing metrics for region -9")
     tb = distribute_metrics_m9(tb)
-
-    # Rename regions
-    log.info("war.brecke: rename regions")
-    tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
-    assert tb["region"].isna().sum() == 0, "Unmapped regions!"
+    assert (tb["region"] != -9).all(), "-9 region still detected!"
 
     # Set index
     log.info("war.brecke: set index")
