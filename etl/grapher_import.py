@@ -233,13 +233,17 @@ def upsert_table(
         column_name = table.columns[0]
         variable_meta: catalog.VariableMeta = table[column_name].metadata
 
-        years = table.index.unique(level="year").values
-        if len(years) == 0:
+        # Timespan does not work for yearIsDay variables
+        if (variable_meta.display or {}).get("yearIsDay"):
             timespan = ""
         else:
-            min_year = min(years)
-            max_year = max(years)
-            timespan = f"{min_year}-{max_year}"
+            years = table.index.unique(level="year").values
+            if len(years) == 0:
+                timespan = ""
+            else:
+                min_year = min(years)
+                max_year = max(years)
+                timespan = f"{min_year}-{max_year}"
 
         table.reset_index(inplace=True)
 
