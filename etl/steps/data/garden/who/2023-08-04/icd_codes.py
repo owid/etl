@@ -23,8 +23,12 @@ def run(dest_dir: str) -> None:
 
     tb = tb.groupby(["year", "icd"]).count().reset_index()
     tb = tb.rename(columns={"icd": "country", "country": "countries_using_icd_code"})
+    icd_codes_map = {"Icd10": "ICD-10", "Icd9": "ICD-9", "Icd8": "ICD-8", "Icd7": "ICD-7"}
+    tb["country"] = tb["country"].replace(icd_codes_map)
+
     tb = tb.set_index(["year", "country"], verify_integrity=True)
     tb.metadata.short_name = "icd_codes"
+
     #
     # Save outputs.
     #
