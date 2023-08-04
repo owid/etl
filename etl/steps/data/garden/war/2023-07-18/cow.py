@@ -201,6 +201,9 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
     log.info("war.cow: rename regions")
     tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
     assert tb["region"].isna().sum() == 0, "Unmapped regions!"
+    # Add suffix with source name
+    msk = tb["region"] != "World"
+    tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (COW)"
 
     # Sanity check on NaNs
     log.info("war.cow: check NaNs in `number_deaths_ongoing_conflicts`")
