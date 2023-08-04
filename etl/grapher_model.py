@@ -538,15 +538,12 @@ class Source(SQLModel, table=True):
         conds = [
             cls.name == self.name,
             cls.datasetId == self.datasetId,
-            cls.description["additionalInfo"] == self.description.get("additionalInfo", ""),  # type: ignore
-            cls.description["dataPublishedBy"] == self.description.get("dataPublishedBy", ""),  # type: ignore
+            _json_is(cls.description, "additionalInfo", self.description.get("additionalInfo")),
+            _json_is(cls.description, "dataPublishedBy", self.description.get("dataPublishedBy")),
         ]
-
         return select(cls).where(*conds)  # type: ignore
 
     def upsert(self, session: Session) -> "Source":
-        # NOTE: we match on both name and additionalInfo (source's description) so that we can
-        # have sources with the same name, but different descriptions
         ds = session.exec(self._upsert_select).one_or_none()
 
         if not ds:
@@ -1185,3 +1182,11 @@ class Origin(SQLModel, table=True):
 
         # select added object to get its id
         return session.exec(self._upsert_select).one()
+
+
+def _json_is(json_field: Any, key: str, val: Any) -> Any:
+    """SQLAlchemy condition for checking if a JSON field has a key with a given value. Works for null."""
+    if val is None:
+        return text(f"JSON_VALUE({json_field.key}, '$.{key}') IS NULL")
+    else:
+        return json_field[key] == val
