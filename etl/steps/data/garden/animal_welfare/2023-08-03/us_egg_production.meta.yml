@@ -1,0 +1,65 @@
+tables:
+  us_egg_production:
+    variables:
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description: Full description of testing variable.
+      #   description_short: Short description of testing variable.
+      #   description_from_producer: Description of testing variable from producer.
+      #   processing_level: minor
+      #   display:
+      #     name: Testing variable
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0
+      #     conversionFactor: 1
+      #   presentation:
+      #     grapher_config
+      #     title_public
+      #     title_variant
+      #     producer_short
+      #     attribution
+      #     topic_tags_links
+      #     faqs
+      #     key_info_text
+      number_of_eggs_all:
+        title: Total number of eggs
+        unit: 'eggs'
+        short_unit: ''
+        description: Total number of hatching and table eggs produced in all housing systems (both from hens in cages and cage-free).
+      number_of_eggs_cage_free_non_organic:
+        title: Number of cage-free, non-organic eggs
+        unit: 'eggs'
+        short_unit: ''
+        description: Number of hatching and table eggs produced from cage-free, non-organic farms.
+      number_of_eggs_cage_free_organic:
+        title: Number of cage-free, organic eggs
+        unit: 'eggs'
+        short_unit: ''
+        description: Number of hatching and table eggs produced from cage-free, organic farms.
+      number_of_hens_all:
+        title: Total number of hens
+        unit: 'hens'
+        short_unit: ''
+        description: Total number of laying hens used to produce eggs in all housing systems (both in cages and cage-free).
+      number_of_hens_cage_free_non_organic:
+        title: Number of cage-free, non-organic hens
+        unit: 'hens'
+        short_unit: ''
+        description: Number of laying hens used to produce eggs in cage-free, non-organic farms.
+      number_of_hens_cage_free_organic:
+        title: Number of cage-free, organic hens
+        unit: 'hens'
+        short_unit: ''
+        description: Number of laying hens used to produce eggs in cage-free, organic farms.
+  us_egg_production_share_cage_free:
+    variables:
+      share_of_hens_cage_free:
+        title: 'Share of laying hens that are cage-free'
+        unit: '%'
+        short_unit: '%'
+      share_of_eggs_cage_free:
+        title: 'Share of cage-free eggs'
+        unit: '%'
+        short_unit: '%'
