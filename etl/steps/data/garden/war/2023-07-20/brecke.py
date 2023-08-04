@@ -169,10 +169,21 @@ def add_conflict_type(tb: Table) -> Table:
         tb["name"] = tb["name"].str.replace(text, text.replace("-", ""))
 
     # Remove year part
-    name_to_year = tb.name.apply(lambda x: ",".join(x.split(",")[:-1]))
+    name_wo_year = tb["name"].apply(lambda x: ",".join(x.split(",")[:-1]))
 
     # Get mask
-    mask = name_to_year.str.contains("-")
+    ## Wars that are inter-state but don't have a hyphen, hence would be classified as internal
+    wars_interstate = [
+        "First World War, 1914-18",
+        "Thirty Years' War, 1618-48",
+        "Napoleonic Wars, 1803-15",
+        "Wars of the French Revolution, 1791-1802",
+        "Vietnam, 1964-75",
+    ]
+    mask_custom = tb["name"].isin(wars_interstate)
+    assert mask_custom.sum() == len(wars_interstate), "Some corrections can't be made, because some war names specified in `wars_interstate` are not found in the data!"
+    ## Build final mask
+    mask = name_wo_year.str.contains("-") | mask_custom
 
     # Set conflict type
     tb["conflict_type"] = "internal"
