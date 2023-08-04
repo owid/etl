@@ -1257,7 +1257,7 @@ def get_unique_origins_from_tables(tables: List[Table]) -> List[Origin]:
     # First, ensure only "origins" (and not "sources") are used in the variables.
     if any(
         [
-            ("sources" in table[column].metadata) and (len(table[column].metadata.sources) > 0)
+            ("sources" in table[column].metadata.to_dict()) and (len(table[column].metadata.sources) > 0)
             for table in tables
             for column in table.columns
         ]

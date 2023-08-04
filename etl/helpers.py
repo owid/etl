@@ -122,7 +122,7 @@ def create_dataset(
     if default_metadata is None:
         # If not defined, gather origins and licenses from the metadata of the tables.
         licenses = get_unique_licenses_from_tables(tables=tables)
-        if any(["origins" in table[column].metadata for table in tables for column in table.columns]):
+        if any(["origins" in table[column].metadata.to_dict() for table in tables for column in table.columns]):
             # If any of the variables contains "origins" this means that it is a recently created dataset.
             # Gather origins from all variables in all tables.
             origins = get_unique_origins_from_tables(tables=tables)
