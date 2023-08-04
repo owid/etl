@@ -1,0 +1,11 @@
+tables:
+  trust_surveys:
+    variables:
+      trust:
+        title: Agree "Most people can be trusted"
+        description: '% of respondents replying "One can trust most people" when asked "Generally speaking, would you say that you can trust most people, or that you can never be too careful in dealing with others?" Possible answers include "One can trust most people" and "One can never be too careful in dealing with others".'
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Agree "Most people can be trusted"
+          numDecimalPlaces: 1

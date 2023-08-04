@@ -1,0 +1,19 @@
+meta:
+  name: Trust questions in the Latinobarómetro Dataset (Latinobarómetro, 2021)
+  publication_year: 2021
+  source_name: Latinobarómetro (2021)
+  source_published_by: 'Latinobarómetro (2021). Data Bank: Stata files 1996-2020.
+    Retrieved 03-08-2023 from https://www.latinobarometro.org/'
+  url: https://www.latinobarometro.org/
+  source_data_url:
+  license_url:
+  license_name: ''
+  date_accessed: 2023-08-04
+  is_public: true
+  description: |
+    Latinobarómetro is an annual public opinion survey that involves some 20,000 interviews in 18 Latin American countries, representing more than 600 million inhabitants.
+wdir: ../../../data/snapshots/survey/2023-08-04
+outs:
+- md5: 76a3b517106066b58876f4ce26b394c8
+  size: 8702
+  path: latinobarometro_trust.csv

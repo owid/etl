@@ -1,7 +1,7 @@
 tables:
   ess_trust:
     variables:
-      trust_people:
+      trust:
         title: Agree "Most people can be trusted"
         description: '% of respondents replying a score from 6 to 10 when asked "Would you say that most people can be trusted or that you cannot be too careful?" The scale ranges from 0 ("You cannot be too careful") to 10 ("Most people can be trusted").'
         unit: "%"

@@ -21,7 +21,7 @@ def rename_columns(df: pd.DataFrame) -> pd.DataFrame:
 
     # Define dictionary of columns to rename ppltrst trstep trstlgl trstplc trstplt trstprl trstprt trstun gvimpc19 trstsci
     rename_dict = {
-        "ppltrst": "trust_people",
+        "ppltrst": "trust",
         "trstep": "trust_european_parliament",
         "trstlgl": "trust_legal_system",
         "trstplc": "trust_police",
