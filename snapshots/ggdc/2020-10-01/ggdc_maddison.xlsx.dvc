@@ -1,5 +1,6 @@
 meta:
   origin:
+    dataset_title_owid: Maddison Project Database
     dataset_title_producer: Maddison Project Database
     dataset_description_owid: |
       The Maddison Project Database is based on the work of many researchers that have produced estimates of

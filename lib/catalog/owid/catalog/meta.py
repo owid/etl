@@ -114,7 +114,7 @@ class Source:
 @dataclass
 class Origin:
     # Dataset title written by OWID (without a year)
-    dataset_title_owid: Optional[str] = None
+    dataset_title_owid: str
     # Dataset title written by producer (without a year)
     dataset_title_producer: Optional[str] = None
     # Our description of the dataset
