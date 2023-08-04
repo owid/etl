@@ -1008,10 +1008,19 @@ class Variable(SQLModel, table=True):
             )
         # establish relationships between variables and posts
         if faqs:
+            required_gdoc_ids = {faq.gdoc_id for faq in faqs}
+            statement = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))  # type: ignore
+            gdoc_posts = session.exec(statement).all()
+            existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
+            missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
+            if missing_gdoc_ids:
+                log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
+
             session.add_all(
                 [
                     PostsGdocsVariablesFaqsLink(gdocId=faq.gdoc_id, variableId=self.id, fragmentId=faq.fragment_id)
                     for faq in faqs
+                    if faq.gdoc_id in existing_gdoc_ids
                 ]
             )
         # establish relationships between variables and tags
