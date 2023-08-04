@@ -13,7 +13,7 @@ import pytest
 
 from owid.catalog import tables
 from owid.catalog.datasets import FileFormat
-from owid.catalog.meta import Source, TableMeta, VariableMeta
+from owid.catalog.meta import TableMeta, VariableMeta
 from owid.catalog.tables import SCHEMA, Table, get_unique_sources_from_tables
 from owid.catalog.variables import PROCESSING_LOG, Variable
 
