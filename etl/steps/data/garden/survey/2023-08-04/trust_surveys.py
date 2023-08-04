@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
     # Process data.
 
     # Concatenate the two tables.
-    tb = tb_latino.append(tb_ess[["country", "year", "trust"]], ignore_index=True)
+    tb = tb_latino.concat(tb_ess[["country", "year", "trust"]], ignore_index=True)
 
     # Create index, verify columns, and sort.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow_latino.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb])
 
     # Save changes in the new garden dataset.
     ds_garden.save()
