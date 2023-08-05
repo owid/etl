@@ -28,14 +28,11 @@ def run(dest_dir: str) -> None:
     # Calculate sum of number of countries using each ICD code type each year
     tb_sum = tb.groupby(["year", "icd"]).count().reset_index()
     tb_sum = tb_sum.rename(columns={"icd": "country", "country": "countries_using_icd_code"})
-    # tb_sum = tb_sum.set_index(["country", "year"], verify_integrity=True)
-    # tb_sum.metadata.short_name = "icd_codes"
 
     # More of a traditional grapher dataset. For each country-year, which ICD code is being used.
-
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    # tb = tb.sort_values(["country", "year"]).set_index(["country", "year"], verify_integrity=True)
 
+    # Combine the datasets
     tb_combined = pr.concat([tb_sum, tb])
     tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True)
     tb_combined.metadata.short_name = "icd_codes"
