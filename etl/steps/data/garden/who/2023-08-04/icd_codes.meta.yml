@@ -23,3 +23,7 @@ tables:
         unit: 'countries'
         display:
           numDecimalPlaces: 0
+      icd:
+        title: The version of ICD codes that a country is using each year
+        description: A country is only included here if their data is a reported to the WHO Mortality Database and to do this they must record cause of death for at least 65% of deaths.
+        unit: ICD version
