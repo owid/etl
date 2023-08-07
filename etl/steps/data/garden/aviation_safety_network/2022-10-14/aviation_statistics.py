@@ -38,8 +38,10 @@ def run(dest_dir: str) -> None:
     tb_web_meadow = ds_web_meadow[ds_web_meadow.table_names[0]]
     tb_sheet_meadow = ds_sheet_meadow[ds_sheet_meadow.table_names[0]]
     # Create dataframes out of the tables.
-    df_web = pd.DataFrame(tb_web_meadow).reset_index()
-    df_sheet = pd.DataFrame(tb_sheet_meadow).reset_index()
+    # Use standard floats to avoid pd.NA
+    df_web = pd.DataFrame(tb_web_meadow).astype(float).reset_index()
+    df_sheet = pd.DataFrame(tb_sheet_meadow).astype(float).reset_index()
+
     # Load WDI dataset, and the only table it contains.
     wdi_ds = Dataset(WDI_DATASET_PATH)
     # Load the only table it contains.

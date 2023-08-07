@@ -29,6 +29,13 @@ REGIONS_RENAME = {
 ## We have done this manually, and is summarised in the dictionary below.
 PATH_CUSTOM_REGIONS_INTRASTATE = paths.directory / "cow.intrastate.region_mapping_custom.json"
 
+# Last reported end years for each of the building datasets
+END_YEAR_MAX_EXTRA = 2007
+END_YEAR_MAX_INTRA = 2014
+END_YEAR_MAX_INTER = 2003
+END_YEAR_MAX_NONSTATE = 2005
+END_YEAR_MAX = min([END_YEAR_MAX_EXTRA, END_YEAR_MAX_INTRA, END_YEAR_MAX_INTER, END_YEAR_MAX_NONSTATE])
+
 
 def run(dest_dir: str) -> None:
     #
@@ -201,6 +208,9 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
     log.info("war.cow: rename regions")
     tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
     assert tb["region"].isna().sum() == 0, "Unmapped regions!"
+    # Add suffix with source name
+    msk = tb["region"] != "World"
+    tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (COW)"
 
     # Sanity check on NaNs
     log.info("war.cow: check NaNs in `number_deaths_ongoing_conflicts`")
@@ -261,6 +271,10 @@ def _sanity_checks_extra(tb: Table) -> None:
     assert set(tb.loc[tb[col] < 0, col]) == {-9, -8}, f"Negative values other than -9 or -8 found for {col}"
     col = "year_end"
     assert set(tb.loc[tb[col] < 0, col]) == {-7}, f"Negative values other than -7 found for {col}"
+    # Check max end year is as expected
+    assert (
+        tb["year_end"].max() == END_YEAR_MAX_EXTRA - 1
+    ), f"Extra-state data is expected to have its latest end year by {END_YEAR_MAX_EXTRA - 1}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
 
 
 def replace_negative_values_extra(tb: Table) -> Table:
@@ -344,6 +358,14 @@ def _sanity_check_nonstate(tb: Table) -> None:
     assert set(tb.loc[tb[col] < 0, col]) == {-9}, f"Negative values other than -9 found for {col}"
     # Check year end
     assert (tb["year_end"] > 1819).all(), "Unexpected value for `year_end`!"
+    # Check latest end year
+    assert (
+        tb["year_end"].max() == END_YEAR_MAX_NONSTATE
+    ), f"Non-state data is expected to have its latest end year by {END_YEAR_MAX_NONSTATE}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
+    # Check outcome
+    assert (
+        tb["outcome"] != 5
+    ).all(), "Some conflicts are coded as if they were still on going in 2007! That shouldn't be the case! Check if maximum value for `year_end` has changed."
 
 
 ########################################################################
@@ -385,7 +407,15 @@ def _sanity_checks_inter(tb: Table) -> Table:
     col = "number_deaths_ongoing_conflicts"
     assert set(tb.loc[tb[col] < 0, col]) == {-9}, f"Negative values other than -9 found for {col}"
     # Check year end
-    assert not (tb["year_end"].isna().any()), "Unexpected NaN value for `year_end`!"
+    assert not (tb["year_end"].isna().any()), "Unexpected NaN values for `year_end`!"
+    assert not ((tb["year_end"] < 0).any()), "Unexpected negative values for `year_end`!"
+    assert (
+        tb["year_end"].max() == END_YEAR_MAX_INTER
+    ), f"Inter-state data is expected to have its latest end year by {END_YEAR_MAX_INTER}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
+    # Check outcome
+    assert (
+        tb["outcome"] != 5
+    ).all(), "Some conflicts are coded as if they were still on going in 2007! That shouldn't be the case! Check if maximum value for `year_end` has changed."
 
 
 def aggregate_rows_by_periods_inter(tb: Table) -> Table:
@@ -501,6 +531,9 @@ def _sanity_checks_intra(tb: Table) -> None:
     col = "year_end"
     assert not (tb[col].isna().any()), "Unexpected NaN value for `year_end`!"
     assert set(tb.loc[tb[col] < 0, col]) == {-7}, f"Negative values other than -7 found for {col}"
+    assert (
+        tb["year_end"].max() == END_YEAR_MAX_INTRA
+    ), f"Intra-state data is expected to have its latest end year by {END_YEAR_MAX_INTRA}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
 
 
 def replace_negative_values_intra(tb: Table) -> Table:
@@ -818,4 +851,21 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     ]
     tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
 
+    # Set NaNs
+    tb.loc[(tb["year"] > END_YEAR_MAX) & (tb["conflict_type"] == "all"), columns] = np.nan
+    tb.loc[(tb["year"] > END_YEAR_MAX_EXTRA) & (tb["conflict_type"] == "extra-state"), columns] = np.nan
+    tb.loc[(tb["year"] > END_YEAR_MAX_INTER) & (tb["conflict_type"] == "inter-state"), columns] = np.nan
+    tb.loc[
+        (tb["year"] > END_YEAR_MAX_INTRA)
+        & (
+            tb["conflict_type"].isin(
+                ["intra-state", "intra-state (internationalized)", "intra-state (non-internationalized)"]
+            )
+        ),
+        columns,
+    ] = np.nan
+    tb.loc[(tb["year"] > END_YEAR_MAX_NONSTATE) & (tb["conflict_type"] == "non-state"), columns] = np.nan
+
+    # Drop all-NaN rows
+    tb = tb.dropna(subset=columns, how="all")
     return tb
