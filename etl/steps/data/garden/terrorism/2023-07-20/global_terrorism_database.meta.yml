@@ -12,9 +12,13 @@ dataset:
     url: https://www.start.umd.edu/gtd/terms-of-use/
   sources:
   - name: Global Terrorism Database (2022)
-    description: The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
+    description: >
+      The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
       around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to
       Terrorism (START) at the University of Maryland.
+
+
+      For target and attack type OWID GTD typically records only one attack/target type for each incident, recorded in columns targtype1 and attacktype1. OWID uses these two indicators, even though there are some events with several targets/methods.
     url: https://www.start.umd.edu/gtd/
     date_accessed: '2023-07-20'
     publication_year: 2022
@@ -2070,6 +2074,7 @@ tables:
           name: Educational institutions
           numDecimalPlaces: 0
       total_incident_counts_food_or_water_supply_target:
+        title: Terrorist attacks Foor or Water Supply Target
         description: >
           Attacks on food or water supplies and reserves are included in this value. This generally includes attacks aimed at the infrastructure related to food and water for human consumption
         unit: "attacks"
