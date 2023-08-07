@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
+from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -10,6 +10,28 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+REGIONS = ["Europe", "Africa", "Asia", "Oceania", "World"]
+
+
+def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset) -> Table:
+    tb_with_regions = tb.copy()
+    for region in REGIONS:
+        # Find members of current region.
+        members = geo.list_members_of_region(
+            region=region,
+            ds_regions=ds_regions,
+        )
+        tb_with_regions = geo.add_region_aggregates(
+            df=tb_with_regions,
+            region=region,
+            countries_in_region=members,
+            countries_that_must_have_data=[],
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.99999,
+        )
+
+    return tb_with_regions
 
 
 def add_deaths_and_population(tb_terrorism: pd.DataFrame) -> pd.DataFrame:
@@ -158,7 +180,8 @@ def run(dest_dir: str) -> None:
     merge_all = pd.merge(total_df, merged_df, on=["country", "year"], how="outer")
     # Add deaths and population data, and region aggregates.
     df_pop_deaths = add_deaths_and_population(merge_all)
-
+    ds_regions: Dataset = paths.load_dependency("regions")
+    df_pop_deaths = add_data_for_regions(tb=df_pop_deaths, regions=REGIONS, ds_regions=ds_regions)
     # Calculate statistics per capita
     df_pop_deaths["terrorism_wounded_per_100k"] = df_pop_deaths["total_wounded"] / (
         df_pop_deaths["population"] / 100000
