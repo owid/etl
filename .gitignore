@@ -37,6 +37,7 @@ docs/.vscode
 *.xlsx
 *.zip
 *.dta
+*.sav
 
 # mkdocs
 site/

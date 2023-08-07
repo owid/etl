@@ -22,6 +22,12 @@ def run(dest_dir: str) -> None:
     tb_latino = ds_meadow_latino["latinobarometro_trust"].reset_index()
 
     # Load meadow dataset.
+    ds_meadow_afro = cast(Dataset, paths.load_dependency("afrobarometer_trust"))
+
+    # Read table from meadow dataset.
+    tb_afro = ds_meadow_afro["afrobarometer_trust"].reset_index()
+
+    # Load meadow dataset.
     ds_meadow_ess = cast(Dataset, paths.load_dependency("ess_trust"))
 
     # Read table from meadow dataset.
@@ -31,7 +37,9 @@ def run(dest_dir: str) -> None:
     # Process data.
 
     # Concatenate the two tables.
-    tb = pr.concat([tb_latino, tb_ess[["country", "year", "trust"]]], ignore_index=True, short_name="trust_surveys")
+    tb = pr.concat(
+        [tb_latino, tb_afro, tb_ess[["country", "year", "trust"]]], ignore_index=True, short_name="trust_surveys"
+    )
 
     # Create index, verify columns, and sort.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()

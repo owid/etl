@@ -1,0 +1,11 @@
+tables:
+  afrobarometer_trust:
+    variables:
+      trust:
+        title: Agree "Most people can be trusted"
+        description: '% of respondents replying "Most people can be trusted" when asked "Generally speaking, would you say that most people can be trusted or that you must be very careful in dealing with people?" Possible answers include "Most people can be trusted" and "Must be very careful".'
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Agree "Most people can be trusted"
+          numDecimalPlaces: 1
