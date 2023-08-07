@@ -370,7 +370,7 @@ def app(run_checks: bool) -> None:
 
     # cookiecutter on python files
     if utils.WALKTHROUGH_ORIGINS:
-        cookiecutter_path = CURRENT_DIR / "snapshot_cookiecutter_origins/"
+        cookiecutter_path = CURRENT_DIR / "snapshot_origins_cookiecutter/"
     else:
         cookiecutter_path = CURRENT_DIR / "snapshot_cookiecutter/"
 
