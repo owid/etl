@@ -1,0 +1,14 @@
+tables:
+  icd_totals:
+    variables:
+      countries_using_icd_code:
+        title: The number of countries using each type of ICD code
+        unit: 'countries'
+        display:
+          numDecimalPlaces: 0
+  icd_country_year:
+    variables:
+      icd:
+        title: The version of ICD codes that a country is using each year
+        description: A country is only included here if their data is a reported to the WHO Mortality Database and to do this they must record cause of death for at least 65% of deaths.
+        unit: ICD version
