@@ -115,26 +115,48 @@ class Snapshot:
                         dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
 
     def to_table_metadata(self):
-        table_meta = TableMeta.from_dict(
-            {
-                "short_name": self.metadata.short_name,
-                "title": self.metadata.name,
-                "description": self.metadata.description,
-                "dataset": DatasetMeta.from_dict(
-                    {
-                        "channel": "snapshots",
-                        "description": self.metadata.description,
-                        "is_public": self.metadata.is_public,
-                        "namespace": self.metadata.namespace,
-                        "short_name": self.metadata.short_name,
-                        "title": self.metadata.name,
-                        "version": self.metadata.version,
-                        "sources": [self.metadata.source],
-                        "licenses": [self.metadata.license],
-                    }
-                ),
-            }
-        )
+        if "origin" in self.metadata.to_dict():
+            table_meta = TableMeta.from_dict(
+                {
+                    "short_name": self.metadata.short_name,
+                    "title": self.metadata.origin.dataset_title_owid,  # type: ignore
+                    "description": self.metadata.origin.dataset_description_owid,  # type: ignore
+                    "dataset": DatasetMeta.from_dict(
+                        {
+                            "channel": "snapshots",
+                            "namespace": self.metadata.namespace,
+                            "short_name": self.metadata.short_name,
+                            "title": self.metadata.origin.dataset_title_owid,  # type: ignore
+                            "description": self.metadata.origin.dataset_description_owid,  # type: ignore
+                            "origins": [self.metadata.origin],
+                            "licenses": [self.metadata.license],
+                            "is_public": self.metadata.is_public,
+                            "version": self.metadata.version,
+                        }
+                    ),
+                }
+            )
+        else:
+            table_meta = TableMeta.from_dict(
+                {
+                    "short_name": self.metadata.short_name,
+                    "title": self.metadata.name,
+                    "description": self.metadata.description,
+                    "dataset": DatasetMeta.from_dict(
+                        {
+                            "channel": "snapshots",
+                            "description": self.metadata.description,
+                            "is_public": self.metadata.is_public,
+                            "namespace": self.metadata.namespace,
+                            "short_name": self.metadata.short_name,
+                            "title": self.metadata.name,
+                            "version": self.metadata.version,
+                            "sources": [self.metadata.source],
+                            "licenses": [self.metadata.license],
+                        }
+                    ),
+                }
+            )
         return table_meta
 
 
