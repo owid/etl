@@ -14,7 +14,7 @@ import pytest
 from owid.catalog import tables
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
-from owid.catalog.tables import SCHEMA, Table
+from owid.catalog.tables import SCHEMA, Table, get_unique_sources_from_tables
 from owid.catalog.variables import PROCESSING_LOG, Variable
 
 from .mocking import mock
@@ -186,7 +186,11 @@ def test_tables_always_list_fields_in_metadata():
         m = json.load(open(join(temp_dir, "example.meta.json")))
 
     assert m["primary_key"] == ["country"]
-    assert m["fields"] == {"country": {}, "gdp": {}, "french_fries": {}}
+    assert m["fields"] == {
+        "country": {},
+        "french_fries": {},
+        "gdp": {},
+    }
 
 
 def test_field_access_can_be_typecast():
@@ -766,3 +770,12 @@ def test_pivot(table_1, sources) -> None:
     assert tb["country"].metadata == table_1["country"].metadata
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
+
+
+def test_get_unique_sources_from_tables(table_1, sources):
+    unique_sources = get_unique_sources_from_tables([table_1, table_1])
+    assert unique_sources == [
+        sources[2],
+        sources[1],
+        sources[3],
+    ]

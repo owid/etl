@@ -188,17 +188,14 @@ def run(dest_dir: str) -> None:
     df_pop_deaths = add_data_for_regions(tb=df_pop_deaths, regions=REGIONS, ds_regions=ds_regions)
 
     # Calculate statistics per capita
-    df_pop_deaths["terrorism_wounded_per_capita"] = df_pop_deaths["total_wounded"] / df_pop_deaths["population"]
-    df_pop_deaths["terrorism_deaths_per_capita"] = df_pop_deaths["total_killed"] / df_pop_deaths["population"]
-    df_pop_deaths["terrorism_casualties_per_capita"] = df_pop_deaths["total_casualties"] / df_pop_deaths["population"]
-    df_pop_deaths["share_of_deaths"] = (df_pop_deaths["total_killed"] / df_pop_deaths["deaths"]) * 100
-
-    # Convert relevant columns to float64 data type (to avoid errors related to this issue -  https://github.com/owid/etl/issues/1334)
-    df_pop_deaths["terrorism_casualties_per_capita"] = df_pop_deaths["terrorism_casualties_per_capita"].astype(
-        "float64"
+    df_pop_deaths["terrorism_wounded_per_100k"] = df_pop_deaths["total_wounded"] / (
+        df_pop_deaths["population"] / 100000
     )
-    df_pop_deaths["terrorism_deaths_per_capita"] = df_pop_deaths["terrorism_deaths_per_capita"].astype("float64")
-    df_pop_deaths["terrorism_wounded_per_capita"] = df_pop_deaths["terrorism_wounded_per_capita"].astype("float64")
+    df_pop_deaths["terrorism_deaths_per_100k"] = df_pop_deaths["total_killed"] / (df_pop_deaths["population"] / 100000)
+    df_pop_deaths["terrorism_casualties_per_100k"] = df_pop_deaths["total_casualties"] / (
+        df_pop_deaths["population"] / 100000
+    )
+    df_pop_deaths["share_of_deaths"] = (df_pop_deaths["total_killed"] / df_pop_deaths["deaths"]) * 100
 
     # Drop total deaths and population columns
     df_pop_deaths.drop(["deaths", "population"], axis=1, inplace=True)

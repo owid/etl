@@ -705,25 +705,24 @@ def list_members_of_region(
     if excluded_members is None:
         excluded_members = []
 
-    # Get main tables from the regions dataset.
-    df_region_definitions = pd.DataFrame(ds_regions["definitions"]).reset_index()
-    df_region_members = pd.DataFrame(ds_regions["members"]).reset_index()
+    # Get the main table from the regions dataset.
+    tb_regions = ds_regions["regions"][["name", "members"]]
 
-    # Get a mapping from region code to name.
-    region_names = df_region_definitions.set_index("code").to_dict()["name"]
+    # Get a mapping from code to region name.
+    mapping = tb_regions["name"].to_dict()
 
-    # Map each region code to its name, and each member code to its name.
-    df_countries_in_region = df_region_members.copy()
-    df_countries_in_region["region"] = map_series(
-        df_countries_in_region["code"], mapping=region_names, warn_on_missing_mappings=True
-    )
-    df_countries_in_region["member"] = map_series(
-        df_countries_in_region["member"], mapping=region_names, warn_on_missing_mappings=True
-    )
+    # Convert strings of lists of members into lists of aliases.
+    tb_regions["members"] = [json.loads(member) if pd.notnull(member) else [] for member in tb_regions["members"]]
+
+    # Explode list of members to have one row per member.
+    tb_regions = tb_regions.explode("members").dropna()
+
+    # Map member codes to names.
+    tb_regions["members"] = map_series(series=tb_regions["members"], mapping=mapping, warn_on_missing_mappings=True)
 
     # Create a column with the list of members in each region
-    df_countries_in_region = (
-        df_countries_in_region.rename(columns={"member": "members"})
+    tb_countries_in_region = (
+        tb_regions.rename(columns={"name": "region"})
         .groupby("region", as_index=True, observed=True)
         .agg({"members": list})
     )
@@ -732,14 +731,12 @@ def list_members_of_region(
         if "wb_income_group" in ds_income_groups.table_names:
             # TODO: Remove this block once the old income groups dataset has been archived.
             # Get the main table from the income groups dataset.
-            df_income = (
-                pd.DataFrame(ds_income_groups["wb_income_group"])
-                .reset_index()
-                .rename(columns={"income_group": "classification"})
+            tb_income = (
+                ds_income_groups["wb_income_group"].reset_index().rename(columns={"income_group": "classification"})
             )
         elif "income_groups_latest" in ds_income_groups.table_names:
             # Get the table with the current definitions of income groups.
-            df_income = ds_income_groups["income_groups_latest"].reset_index()
+            tb_income = ds_income_groups["income_groups_latest"].reset_index()
         else:
             raise KeyError(
                 "Table 'income_groups_latest' not found. "
@@ -753,7 +750,7 @@ def list_members_of_region(
             # Keep only countries that are not in "income_groups_latest".
             # NOTE: This not only includes historical regions, but also countries that don't appear in
             # "income_groups_latest", like Venezuela.
-            historical_regions = historical_regions[~historical_regions["country"].isin(df_income["country"])]
+            historical_regions = historical_regions[~historical_regions["country"].isin(tb_income["country"])]
             # Keep only the latest income group classification of each historical region.
             historical_regions = (
                 historical_regions.sort_values(["country", "year"], ascending=True)
@@ -762,33 +759,33 @@ def list_members_of_region(
                 .reset_index(drop=True)
             )
             # Append historical regions to latest income group classifications.
-            df_income = pd.concat([df_income, historical_regions], ignore_index=True)
+            tb_income = pd.concat([tb_income, historical_regions], ignore_index=True)
 
         # Create a dataframe of countries in each income group.
-        df_countries_in_income_group = (
-            df_income.rename(columns={"classification": "region", "country": "members"})
+        tb_countries_in_income_group = (
+            tb_income.rename(columns={"classification": "region", "country": "members"})  # type: ignore
             .groupby("region", as_index=True, observed=True)
             .agg({"members": list})
         )
 
         # Create a dataframe of members in regions, including income groups.
-        df_countries_in_region = pd.concat([df_countries_in_region, df_countries_in_income_group], ignore_index=False)
+        tb_countries_in_region = pd.concat([tb_countries_in_region, tb_countries_in_income_group], ignore_index=False)
 
     # Get list of default members for the given region, if it's known.
-    if region in df_countries_in_region.index.tolist():
-        countries_set = set(df_countries_in_region.loc[region]["members"])
+    if region in tb_countries_in_region.index.tolist():
+        countries_set = set(tb_countries_in_region.loc[region]["members"])
     else:
         # Initialise an empty set of members.
         countries_set = set()
 
     # List countries from the list of regions included.
     countries_set |= set(
-        sum([df_countries_in_region.loc[region_included]["members"] for region_included in additional_regions], [])
+        sum([tb_countries_in_region.loc[region_included]["members"] for region_included in additional_regions], [])
     )
 
     # Remove all countries from the list of regions excluded.
     countries_set -= set(
-        sum([df_countries_in_region.loc[region_excluded]["members"] for region_excluded in excluded_regions], [])
+        sum([tb_countries_in_region.loc[region_excluded]["members"] for region_excluded in excluded_regions], [])
     )
 
     # Add the list of individual countries to be included.

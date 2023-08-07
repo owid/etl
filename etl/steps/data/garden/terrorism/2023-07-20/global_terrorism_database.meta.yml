@@ -2425,8 +2425,8 @@ tables:
         display:
           name: 6-10 deaths
           numDecimalPlaces: 0
-      terrorism_wounded_per_capita:
-        title: Terrorism non-fatal injuries per capita
+      terrorism_wounded_per_100k:
+        title: Terrorism non-fatal injuries per 100,000 people
         description: >-
           This field records the number of confirmed non-fatal injuries to both perpetrators and victims.
 
@@ -2446,12 +2446,12 @@ tables:
           the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source
           of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities
           will be noted in the "Additional Notes" field.
-        unit: injuries per capita
+        unit: injuries per 100,000 people
         display:
-          name: Non-fatal injuries per capita
-          numDecimalPlaces: 7
-      terrorism_deaths_per_capita:
-        title: Terrorism deaths per capita
+          name: Non-fatal injuries per 100,000 people
+          numDecimalPlaces: 1
+      terrorism_deaths_per_100k:
+        title: Terrorism deaths per 100,000 people
         description: >-
           This field stores the number of total confirmed fatalities for the incident. The number includes all victims and
           attackers who died as a direct result of the incident.
@@ -2474,9 +2474,9 @@ tables:
           in the "Additional Notes" field.
         unit: deaths
         display:
-          numDecimalPlaces: 7
-      terrorism_casualties_per_capita:
-        title: Terrorism casualties per capita
+          numDecimalPlaces: 1
+      terrorism_casualties_per_100k:
+        title: Terrorism casualties per 100,000 people
         description: >-
           This field records the number of confirmed non-fatal injuries and fatalties to both perpetrators and victims.
 
@@ -2498,7 +2498,7 @@ tables:
           reports of fatalities will be noted in the "Additional Notes" field.
         unit: casualties
         display:
-          numDecimalPlaces: 7
+          numDecimalPlaces: 1
       share_of_deaths:
         title: Share of deaths from terrorism
         description: >

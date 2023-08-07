@@ -4,8 +4,10 @@ be easily loaded in Grapher codebase.
 This dataset is not meant to be imported to MySQL and is excluded from automatic deployment.
 """
 
+import ast
 import re
 
+import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -255,17 +257,29 @@ def run(dest_dir: str) -> None:
     ds_garden: Dataset = paths.load_dependency("regions")
 
     # Read tables from regions dataset.
-    regions = ds_garden["definitions"]
-    legacy_codes = ds_garden["legacy_codes"]
-    members_expanded = ds_garden["members"]
+    regions = ds_garden["regions"][["name", "short_name", "region_type", "is_historical", "defined_by"]]
+    members = ds_garden["regions"][["members"]]
+    legacy_codes = ds_garden["regions"][
+        [
+            "cow_code",
+            "cow_letter",
+            "imf_code",
+            "iso_alpha2",
+            "iso_alpha3",
+            "kansas_code",
+            "legacy_country_id",
+            "legacy_entity_id",
+            "marc_code",
+            "ncd_code",
+            "penn_code",
+            "unctad_code",
+            "wikidata_code",
+        ]
+    ]
 
     #
     # Process data.
     #
-
-    # Rename definitions to regions.
-    regions.metadata.short_name = "regions"
-
     # Drop unneeded columns
     regions: Table = regions.drop(columns=["defined_by"])  # type: ignore
 
@@ -282,7 +296,9 @@ def run(dest_dir: str) -> None:
     regions["short_code"] = legacy_codes["iso_alpha2"]
 
     # Add members
-    regions["members"] = members_expanded.groupby("code").agg(";".join)
+    regions["members"] = (
+        members["members"].astype(object).apply(lambda x: ";".join(ast.literal_eval(x)) if pd.notna(x) else "")
+    )
 
     #
     # Save outputs.

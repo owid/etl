@@ -12,7 +12,7 @@ import structlog
 from pandas._typing import Scalar
 from pandas.core.series import Series
 
-from .meta import License, Source, VariableMeta
+from .meta import License, Origin, Source, VariableMeta
 from .properties import metadata_property
 
 log = structlog.get_logger()
@@ -378,26 +378,22 @@ def get_unique_sources_from_variables(variables: List[Variable]) -> List[Source]
     # Make a list of all sources of all variables.
     sources = sum([variable.metadata.sources for variable in variables], [])
 
-    # Get unique array of tuples of source fields (respecting the order).
-    unique_sources_array = pd.unique([tuple(source.to_dict().items()) for source in sources])
+    return pd.unique(sources).tolist()
 
-    # Make a list of sources.
-    unique_sources = [Source.from_dict(dict(source)) for source in unique_sources_array]  # type: ignore
 
-    return unique_sources
+def get_unique_origins_from_variables(variables: List[Variable]) -> List[Origin]:
+    # Make a list of all origins of all variables.
+    origins = sum([variable.metadata.origins for variable in variables], [])
+
+    # Get unique array of tuples of origin fields (respecting the order).
+    return pd.unique(origins).tolist()
 
 
 def get_unique_licenses_from_variables(variables: List[Variable]) -> List[License]:
     # Make a list of all licenses of all variables.
     licenses = sum([variable.metadata.licenses for variable in variables], [])
 
-    # Get unique array of tuples of license fields (respecting the order).
-    unique_licenses_array = pd.unique([tuple(license.to_dict().items()) for license in licenses])
-
-    # Make a list of licenses.
-    unique_licenses = [License.from_dict(dict(license)) for license in unique_licenses_array]
-
-    return unique_licenses
+    return pd.unique(licenses).tolist()
 
 
 def add_entry_to_processing_log(
@@ -580,6 +576,7 @@ def combine_variables_metadata(
     metadata.unit = combine_variables_units(variables=variables_only, operation=operation)
     metadata.short_unit = combine_variables_short_units(variables=variables_only, operation=operation)
     metadata.sources = get_unique_sources_from_variables(variables=variables_only)
+    metadata.origins = get_unique_origins_from_variables(variables=variables_only)
     metadata.licenses = get_unique_licenses_from_variables(variables=variables_only)
     metadata.processing_log = combine_variables_processing_logs(variables=variables_only)
 

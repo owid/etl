@@ -120,6 +120,13 @@ tb = {_snippet_dataset(ds_b, table_name)}
                     table_a = table_a.set_index(new_index)
                     table_b = table_b.set_index(new_index)
 
+            # indexes differ, reset them to make them somehow comparable
+            if table_a.index.names != table_b.index.names:
+                if table_a.index.names != [None]:
+                    table_a = table_a.reset_index()
+                if table_b.index.names != [None]:
+                    table_b = table_b.reset_index()
+
             # only sort index if different to avoid unnecessary sorting for huge datasets such as ghe
             if len(table_a) != len(table_b) or not _index_equals(table_a, table_b):
                 index_diff = True
@@ -325,7 +332,7 @@ def cli(
             continue
         except Exception as e:
             # soft fail and continue with another dataset
-            log.exception(e)
+            log.error(e)
             any_error = True
             continue
 

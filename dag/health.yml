@@ -229,3 +229,11 @@ steps:
   - snapshot-private://un/2023-08-02/comtrade_pandemics.1987_1998.csv
   - snapshot-private://un/2023-08-02/comtrade_pandemics.1999_2010.csv
   - snapshot-private://un/2023-08-02/comtrade_pandemics.2011_2022.csv
+
+# WHO Mortality Database - 1st level causes
+  data://meadow/who/2023-08-01/mortality_database:
+  - snapshot://who/2023-08-01/mortality_database.csv
+  data://garden/who/2023-08-01/mortality_database:
+  - data://meadow/who/2023-08-01/mortality_database
+  data://grapher/who/2023-08-01/mortality_database:
+  - data://garden/who/2023-08-01/mortality_database

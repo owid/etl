@@ -1,9 +1,11 @@
-from owid.datautils.decorators import enable_file_download
+from typing import Any
+from unittest import mock
+
+import boto3
 from pytest import raises
 
-from unittest import mock
-from typing import Any
-import boto3
+from owid.datautils.decorators import enable_file_download
+
 from .mocks import MockResponse
 
 

@@ -1,13 +1,16 @@
 """Test functions in owid.datautils.io.local module.
 
 """
-from owid.datautils.io.df import from_file, to_file
-from pathlib import Path
 import tempfile
+from pathlib import Path
 from typing import Any
-import pandas as pd
-from pytest import raises
+
 import numpy as np
+import pandas as pd
+from owid.catalog import Table
+from pytest import raises
+
+from owid.datautils.io.df import from_file, to_file
 
 
 class TestLoadDf:
@@ -252,3 +255,10 @@ class TestToFile:
             temp_file = Path(temp_dir) / "test.made_up_extension"
             with raises(ValueError):
                 to_file(df, file_path=temp_file)
+
+    def test_Table_save_csv_file(self):
+        df = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(
+            df=df, file_path=Path("temp.csv")
+        )
+        assert recovered_df.equals(df)

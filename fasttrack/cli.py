@@ -1,6 +1,7 @@
 import datetime as dt
 import difflib
 import functools
+import json
 import os
 import urllib.error
 from enum import Enum
@@ -521,11 +522,12 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
     metas.sort(key=lambda meta: str(meta.source.date_accessed), reverse=True)  # type: ignore
 
     # exclude local CSVs
-    metas = [m for m in metas if m.source.name != "Local CSV"]
+    metas = [m for m in metas if m.source.name != "Local CSV"]  # type: ignore
 
     # decrypt URLs if private
     for meta in metas:
         if not meta.is_public:
+            assert meta.source
             assert meta.source.source_data_url
             meta.source.source_data_url = _decrypt(meta.source.source_data_url)
 
@@ -597,8 +599,17 @@ def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
     """Check if all countries are harmonized."""
     po.put_markdown("""## Harmonizing countries...""")
 
-    ds_regions = Dataset(LATEST_REGIONS_DATASET_PATH)
-    alias_to_country = ds_regions["definitions"].join(ds_regions["aliases"], how="left").set_index("alias")["name"]
+    # Read the main table of the regions dataset.
+    tb_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"][["name", "aliases"]]
+
+    # Convert strings of lists of aliases into lists of aliases.
+    tb_regions["aliases"] = [json.loads(alias) if pd.notnull(alias) else [] for alias in tb_regions["aliases"]]
+
+    # Explode list of aliases to have one row per alias.
+    tb_regions = tb_regions.explode("aliases").reset_index(drop=True)
+
+    # Create a series that maps aliases to country names.
+    alias_to_country = tb_regions.rename(columns={"aliases": "alias"}).set_index("alias")["name"]
 
     df = df.reset_index()
 

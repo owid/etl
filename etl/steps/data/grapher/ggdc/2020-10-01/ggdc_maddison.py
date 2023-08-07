@@ -1,14 +1,19 @@
-from owid import catalog
+from typing import cast
 
-from etl.helpers import PathFinder
+from owid.catalog import Dataset
 
-N = PathFinder(__file__)
+from etl.helpers import PathFinder, create_dataset, grapher_checks
+
+paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
-    dataset.save()
+    ds_garden = cast(Dataset, paths.load_dependency("ggdc_maddison"))
+    tb = ds_garden["maddison_gdp"]
 
-    table = N.garden_dataset["maddison_gdp"].reset_index()
+    ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
 
-    dataset.add(table.loc[:, ["country", "year", "gdp", "gdp_per_capita", "population"]])
+    grapher_checks(ds_grapher)
+
+    # Save changes in the new grapher dataset.
+    ds_grapher.save()

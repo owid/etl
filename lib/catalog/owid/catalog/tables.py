@@ -170,7 +170,7 @@ class Table(pd.DataFrame):
         If the table is stored at "mytable.csv", the metadata will be at
         "mytable.meta.json".
         """
-        if not isinstance(path, str) or not path.endswith(".csv"):
+        if not str(path).endswith(".csv"):
             raise ValueError(f'filename must end in ".csv": {path}')
 
         df = pd.DataFrame(self)
@@ -193,7 +193,7 @@ class Table(pd.DataFrame):
         If the table is stored at "mytable.feather", the metadata will be at
         "mytable.meta.json".
         """
-        if not isinstance(path, str) or not path.endswith(".feather"):
+        if not str(path).endswith(".feather"):
             raise ValueError(f'filename must end in ".feather": {path}')
 
         # feather can't store the index
@@ -223,7 +223,7 @@ class Table(pd.DataFrame):
         NOTE: we save the metadata for fields in the table scheme, but it might be
               possible with Parquet to store it in the fields themselves somehow
         """
-        if not isinstance(path, str) or not path.endswith(".parquet"):
+        if not str(path).endswith(".parquet"):
             raise ValueError(f'filename must end in ".parquet": {path}')
 
         # parquet can store the index, but repacking is wasted on index columns so
@@ -819,13 +819,23 @@ def concat(
         repeated_columns = table.columns[table.columns.duplicated()].tolist()
         if len(repeated_columns) > 0:
             raise KeyError(f"Concatenated table contains repeated columns: {repeated_columns}")
-    # Add to each column either the metadata of the original variable (if the variable appeared only in one of the input
-    # tables) or the combination of the metadata from different tables (if the variable appeared in various tables).
-    for column in table.all_columns:
-        variables_to_combine = [table_i[column] for table_i in objs if column in table_i.all_columns]
-        table._fields[column] = variables.combine_variables_metadata(
-            variables=variables_to_combine, operation="concat", name=column
-        )
+
+        # Assign variable metadata from input tables.
+        for table_i in objs:
+            for column in table_i.columns:
+                table[column].metadata = table_i[column].metadata
+
+    else:
+        if list(filter(None, table.index.names)):
+            raise NotImplementedError("Concatenation of tables with index is not implemented.")
+
+        # Add to each column either the metadata of the original variable (if the variable appeared only in one of the input
+        # tables) or the combination of the metadata from different tables (if the variable appeared in various tables).
+        for column in table.all_columns:
+            variables_to_combine = [table_i[column] for table_i in objs if column in table_i.all_columns]
+            table._fields[column] = variables.combine_variables_metadata(
+                variables=variables_to_combine, operation="concat", name=column
+            )
 
     # Update table metadata.
     table.metadata = combine_tables_metadata(tables=objs, short_name=short_name)
@@ -1237,25 +1247,15 @@ def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
     sources = sum([table._fields[column].sources for table in tables for column in list(table.all_columns)], [])
 
     # Get unique array of tuples of source fields (respecting the order).
-    unique_sources_array = pd.unique([tuple(source.to_dict().items()) for source in sources])
-
-    # Make a list of unique sources.
-    unique_sources = [Source.from_dict(dict(source)) for source in unique_sources_array]  # type: ignore
-
-    return unique_sources
+    return pd.unique(sources).tolist()
 
 
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     # Make a list of all licenses of all variables in all tables.
     licenses = sum([table._fields[column].licenses for table in tables for column in list(table.all_columns)], [])
 
-    # Get unique array of tuples of license fields (respecting the order).
-    unique_licenses_array = pd.unique([tuple(license.to_dict().items()) for license in licenses])
-
-    # Make a list of unique licenses.
-    unique_licenses = [License.from_dict(dict(license)) for license in unique_licenses_array]  # type: ignore
-
-    return unique_licenses
+    # Get unique array of tuples of source fields (respecting the order).
+    return pd.unique(licenses).tolist()
 
 
 def _combine_tables_titles_and_descriptions(tables: List[Table], title_or_description: str) -> Optional[str]:

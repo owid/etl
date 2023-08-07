@@ -36,10 +36,36 @@ def as_table(df: pd.DataFrame, table: catalog.Table) -> catalog.Table:
     return t
 
 
+def expand_dimensions(tb: catalog.Table) -> catalog.Table:
+    """Expands dataframe with extra dimensions beyond country and year into multiple tables.
+    For instance DataFrame with index names [country, year, sex, a] would expand into a table
+    with columns [country, year, a__sex_male, a__sex_female].
+
+    This function is not very memory efficient as it returns a table that will be very sparse.
+    """
+    # rename country to entity_id for the sake of `_yield_wide_table`
+    tb = tb.reset_index("country").rename(columns={"country": "entity_id"}).set_index("entity_id", append=True)
+    tables = list(_yield_wide_table(tb, na_action="drop", warn_null_variables=False))
+
+    # join all tables
+    # NOTE: we could also return individual tables to reduce memory usage
+    expanded_table = catalog.tables.concat(tables, axis=1)
+
+    # rename entity_id back to country
+    expanded_table = (
+        expanded_table.reset_index("entity_id")
+        .rename(columns={"entity_id": "country"})
+        .set_index("country", append=True)
+    )
+
+    return expanded_table
+
+
 def _yield_wide_table(
     table: catalog.Table,
     na_action: Literal["drop", "raise"] = "raise",
     dim_titles: Optional[List[str]] = None,
+    warn_null_variables: bool = True,
 ) -> Iterable[catalog.Table]:
     """We have 5 dimensions but graphers data model can only handle 2 (year and entityId). This means
     we have to iterate all combinations of the remaining 3 dimensions and create a new variable for
@@ -76,7 +102,7 @@ def _yield_wide_table(
         dim_titles = dim_names
 
     if dim_names:
-        grouped = table.groupby(dim_names, as_index=False, observed=True)
+        grouped = table.groupby(dim_names if len(dim_names) > 1 else dim_names[0], as_index=False, observed=True)
     else:
         # a situation when there's only year and entity_id in index with no additional dimensions
         grouped = [([], table)]
@@ -89,7 +115,8 @@ def _yield_wide_table(
         for column in table_to_yield.columns:
             # If all values are null, skip variable
             if table_to_yield[column].isnull().all():
-                log.warning("yield_wide_table.null_variable", column=column, dims=dims)
+                if warn_null_variables:
+                    log.warning("yield_wide_table.null_variable", column=column, dims=dims)
                 continue
 
             # Safety check to see if the metadata is still intact
@@ -344,20 +371,32 @@ def _adapt_dataset_metadata_for_grapher(
         Adapted dataset metadata, ready to be inserted into grapher.
 
     """
-    # Combine metadata sources into one.
-    metadata.sources = [combine_metadata_sources(metadata.sources)]
+    # Add origins to sources to stay backward compatible.
+    if metadata.origins:
+        # NOTE: we disabled source <-> origin conversion
+        # metadata.sources = _add_origins_to_sources(metadata.sources, metadata.origins)
+        pass
+    else:
+        warnings.warn(
+            "Dataset has sources instead of origins. This is deprecated and will be removed in the future. "
+            "Please use origins instead."
+        )
 
-    # Add the dataset description as if it was a source's description.
-    if metadata.description is not None:
-        if metadata.sources[0].description:
-            # If descriptions are not subsets of each other (or equal), add them together
-            if (
-                metadata.sources[0].description not in metadata.description
-                and metadata.description not in metadata.sources[0].description
-            ):
-                metadata.sources[0].description = metadata.description + "\n" + metadata.sources[0].description
-        else:
-            metadata.sources[0].description = metadata.description
+    # Combine metadata sources into one.
+    if metadata.sources:
+        metadata.sources = [combine_metadata_sources(metadata.sources)]
+
+        # Add the dataset description as if it was a source's description.
+        if metadata.description is not None:
+            if metadata.sources[0].description:
+                # If descriptions are not subsets of each other (or equal), add them together
+                if (
+                    metadata.sources[0].description not in metadata.description
+                    and metadata.description not in metadata.sources[0].description
+                ):
+                    metadata.sources[0].description = metadata.description + "\n" + metadata.sources[0].description
+            else:
+                metadata.sources[0].description = metadata.description
 
     # Empty dataset description (otherwise it will appear in `Internal notes` in the admin UI).
     metadata.description = ""
@@ -410,6 +449,10 @@ def _adapt_table_for_grapher(
 
     table = table.set_index(["entity_id", "year"] + dim_names)
 
+    # Add dataset origins to variables if they don't have an origin.
+    # TODO: In the future, all variables should have their origins and dataset origins will be union of their origins.
+    table = _add_dataset_origins_to_variables(table)
+
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).
     table = _ensure_source_per_variable(table)
@@ -417,11 +460,26 @@ def _adapt_table_for_grapher(
     return cast(catalog.Table, table)
 
 
+def _add_dataset_origins_to_variables(table: catalog.Table) -> catalog.Table:
+    assert table.metadata.dataset
+    for col in table.columns:
+        variable_meta = table[col].metadata
+        if not variable_meta.origins:
+            variable_meta.origins = table.metadata.dataset.origins
+    return table
+
+
 def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
     assert table.metadata.dataset
     dataset_meta = table.metadata.dataset
     for column in table.columns:
         variable_meta: catalog.VariableMeta = table[column].metadata
+
+        # If neither variable and dataset has no sources, we're using origins instead.
+        if len(variable_meta.sources) == 0 and len(dataset_meta.sources) == 0:
+            assert len(variable_meta.origins) > 0, f"Variable `{column}` has no sources or origins."
+            continue
+
         if len(variable_meta.sources) == 0:
             # Take the metadata sources from the dataset's metadata (after combining them into one).
             assert (

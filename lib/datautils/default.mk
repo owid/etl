@@ -25,6 +25,8 @@ lint-default: .venv
 check-formatting-default: .venv
 	@echo '==> Checking formatting'
 	@poetry run black --check $(SRC)
+	@echo '==> Checking imports sorting'
+	@poetry run isort --check-only $(SRC)
 
 check-typing-default: .venv
 	@echo '==> Checking types'
@@ -37,6 +39,8 @@ unittest-default: .venv
 format-default: .venv
 	@echo '==> Reformatting files'
 	@poetry run black $(SRC)
+	@echo '==> Sorting imports'
+	@poetry run isort $(SRC)
 
 watch-default: .venv
 	@echo '==> Watching for changes and re-running tests'
