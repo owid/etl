@@ -31,8 +31,6 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Combine the datasets
-    # tb_combined = pr.concat([tb_sum, tb], short_name="icd_codes")
-    # tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
     tb.metadata.short_name = "icd_country_year"
     tb_sum = tb_sum.set_index(["country", "year"], verify_integrity=True)
