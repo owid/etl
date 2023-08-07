@@ -51,6 +51,9 @@
           "origin": {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "dataset_title_owid"
+            ],
             "properties": {
               "dataset_title_owid": {
                 "type": "string"

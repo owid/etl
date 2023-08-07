@@ -239,7 +239,7 @@ def app(dummy_data: bool, commit: bool) -> None:
     dag_content = _add_to_dag(meta.dataset, form.is_private)
 
     # create step and metadata file
-    walkthrough_utils.generate_step(
+    walkthrough_utils.generate_step_to_channel(
         CURRENT_DIR / "grapher_cookiecutter/", dict(**meta.dataset.dict(), channel="grapher")
     )
     fast_import.save_metadata()

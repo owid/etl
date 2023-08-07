@@ -378,13 +378,7 @@ def get_unique_sources_from_variables(variables: List[Variable]) -> List[Source]
     # Make a list of all sources of all variables.
     sources = sum([variable.metadata.sources for variable in variables], [])
 
-    # Get unique array of tuples of source fields (respecting the order).
-    unique_sources_array = pd.unique([tuple(source.to_dict().items()) for source in sources])
-
-    # Make a list of sources.
-    unique_sources = [Source.from_dict(dict(source)) for source in unique_sources_array]  # type: ignore
-
-    return unique_sources
+    return pd.unique(sources).tolist()
 
 
 def get_unique_origins_from_variables(variables: List[Variable]) -> List[Origin]:
@@ -392,25 +386,14 @@ def get_unique_origins_from_variables(variables: List[Variable]) -> List[Origin]
     origins = sum([variable.metadata.origins for variable in variables], [])
 
     # Get unique array of tuples of origin fields (respecting the order).
-    unique_origins_array = pd.unique([tuple(origin.to_dict().items()) for origin in origins])
-
-    # Make a list of origins.
-    unique_origins = [Origin.from_dict(dict(origin)) for origin in unique_origins_array]  # type: ignore
-
-    return unique_origins
+    return pd.unique(origins).tolist()
 
 
 def get_unique_licenses_from_variables(variables: List[Variable]) -> List[License]:
     # Make a list of all licenses of all variables.
     licenses = sum([variable.metadata.licenses for variable in variables], [])
 
-    # Get unique array of tuples of license fields (respecting the order).
-    unique_licenses_array = pd.unique([tuple(license.to_dict().items()) for license in licenses])
-
-    # Make a list of licenses.
-    unique_licenses = [License.from_dict(dict(license)) for license in unique_licenses_array]
-
-    return unique_licenses
+    return pd.unique(licenses).tolist()
 
 
 def add_entry_to_processing_log(

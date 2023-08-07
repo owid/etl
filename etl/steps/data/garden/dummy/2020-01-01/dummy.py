@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = cast(Dataset, paths.load_dependency("dummy"))
 
     # Read table from meadow dataset.
-    tb = ds_meadow["dummy"]
+    tb = ds_meadow["dummy"].reset_index()
 
     #
     # Process data.
@@ -27,6 +27,7 @@ def run(dest_dir: str) -> None:
     tb: Table = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
     # Save outputs.

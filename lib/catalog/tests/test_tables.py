@@ -14,7 +14,7 @@ import pytest
 from owid.catalog import tables
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
-from owid.catalog.tables import SCHEMA, Table
+from owid.catalog.tables import SCHEMA, Table, get_unique_sources_from_tables
 from owid.catalog.variables import PROCESSING_LOG, Variable
 
 from .mocking import mock
@@ -596,6 +596,10 @@ def test_concat_with_axis_0(table_1, table_2, sources, licenses) -> None:
 def test_concat_with_axis_1(table_1, table_2, sources, licenses) -> None:
     # TODO: Assert that concat raises an error if the resulting table has multiple columns with the same name.
     # tb = tables.concat([table_1, table_2], axis=1)
+
+    # Concat along axis 1 should preserve all metadata, even display.
+    table_1.a.metadata.display = {"unit": "foo"}
+
     # Rename columns in table_2 so that they don't coincide with names in table_1.
     tb = tables.concat(
         [table_1, table_2.rename(columns={"country": "country_right", "year": "year_right", "a": "a_right"})], axis=1
@@ -770,3 +774,12 @@ def test_pivot(table_1, sources) -> None:
     assert tb["country"].metadata == table_1["country"].metadata
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
+
+
+def test_get_unique_sources_from_tables(table_1, sources):
+    unique_sources = get_unique_sources_from_tables([table_1, table_1])
+    assert unique_sources == [
+        sources[2],
+        sources[1],
+        sources[3],
+    ]
