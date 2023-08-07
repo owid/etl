@@ -2,7 +2,6 @@
 
 from typing import cast
 
-import owid.catalog.processing as pr
 from owid.catalog import Dataset
 
 from etl.data_helpers import geo
@@ -29,17 +28,19 @@ def run(dest_dir: str) -> None:
     tb_sum = tb.groupby(["year", "icd"]).count().reset_index()
     tb_sum = tb_sum.rename(columns={"icd": "country", "country": "countries_using_icd_code"})
 
-    # More of a traditional grapher dataset. For each country-year, which ICD code is being used.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Combine the datasets
-    tb_combined = pr.concat([tb_sum, tb])
-    tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True)
-    tb_combined.metadata.short_name = "icd_codes"
+    # tb_combined = pr.concat([tb_sum, tb], short_name="icd_codes")
+    # tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb.metadata.short_name = "icd_country_year"
+    tb_sum = tb_sum.set_index(["country", "year"], verify_integrity=True)
+    tb_sum.metadata.short_name = "icd_totals"
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb, tb_sum], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
