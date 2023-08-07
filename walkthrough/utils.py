@@ -1,3 +1,4 @@
+import json
 import shutil
 import tempfile
 from pathlib import Path
@@ -16,7 +17,6 @@ from etl.paths import (
     DAG_DIR,
     LATEST_POPULATION_VERSION,
     LATEST_REGIONS_VERSION,
-    SNAPSHOTS_DIR,
     STEP_DIR,
 )
 from etl.steps import DAG
@@ -121,38 +121,40 @@ def remove_from_dag(step: str, dag_path: Path = DAG_WALKTHROUGH_PATH) -> None:
         ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
 
 
-def generate_step(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
-    assert {"channel", "namespace", "version"} <= data.keys()
-
+def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Path) -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
-        OUTPUT_DIR = temp_dir
+        # create config file with data for cookiecutter
+        config_path = cookiecutter_path / "cookiecutter.json"
+        with open(config_path, "w") as f:
+            json.dump(data, f)
 
-        # generate ingest scripts
-        cookiecutter(
-            cookiecutter_path.as_posix(),
-            no_input=True,
-            output_dir=temp_dir,
-            overwrite_if_exists=True,
-            extra_context=dict(directory_name=data["channel"], **data),
-        )
+        try:
+            cookiecutter(
+                cookiecutter_path.as_posix(),
+                no_input=True,
+                output_dir=temp_dir,
+                overwrite_if_exists=True,
+                extra_context=data,
+            )
+        finally:
+            config_path.unlink()
 
-        if data["channel"] == "walden":
-            DATASET_DIR = WALDEN_INGEST_DIR / data["namespace"] / data["version"]
-        elif data["channel"] == "snapshots":
-            DATASET_DIR = SNAPSHOTS_DIR / data["namespace"] / data["version"]
-        else:
-            DATASET_DIR = STEP_DIR / "data" / data["channel"] / data["namespace"] / data["version"]
+        # Apply black formatter to generated files.
+        apply_black_formatter_to_files(file_paths=list(Path(temp_dir).glob("**/*.py")))
 
         shutil.copytree(
-            Path(OUTPUT_DIR) / data["channel"],
-            DATASET_DIR,
+            Path(temp_dir),
+            target_dir,
             dirs_exist_ok=True,
         )
 
-    # Apply black formatter to generated step files.
-    apply_black_formatter_to_files(file_paths=DATASET_DIR.glob("*.py"))
 
-    return DATASET_DIR
+def generate_step_to_channel(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
+    assert {"channel", "namespace", "version"} <= data.keys()
+
+    target_dir = STEP_DIR / "data" / data["channel"]
+    generate_step(cookiecutter_path, data, target_dir)
+    return target_dir / data["namespace"] / data["version"]
 
 
 def _check_env() -> bool:

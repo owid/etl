@@ -40,8 +40,9 @@ class GrapherForm(BaseModel):
 def app(run_checks: bool) -> None:
     state = utils.APP_STATE
 
+    po.put_markdown("# Walkthrough - Grapher")
     with open(CURRENT_DIR / "grapher.md", "r") as f:
-        po.put_markdown(f.read())
+        po.put_collapse("Instructions", [po.put_markdown(f.read())])
 
     if run_checks:
         po.put_markdown("""## Checking `.env` file...""")
@@ -117,7 +118,9 @@ def app(run_checks: bool) -> None:
     else:
         dag_content = ""
 
-    DATASET_DIR = utils.generate_step(CURRENT_DIR / "grapher_cookiecutter/", dict(**form.dict(), channel="grapher"))
+    DATASET_DIR = utils.generate_step_to_channel(
+        CURRENT_DIR / "grapher_cookiecutter/", dict(**form.dict(), channel="grapher")
+    )
 
     step_path = DATASET_DIR / (form.short_name + ".py")
 

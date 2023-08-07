@@ -38,8 +38,9 @@ class ExplorersForm(BaseModel):
 def app(run_checks: bool) -> None:
     state = utils.APP_STATE
 
+    po.put_markdown("# Walkthrough - Explorers")
     with open(CURRENT_DIR / "explorers.md", "r") as f:
-        po.put_markdown(f.read())
+        po.put_collapse("Instructions", [po.put_markdown(f.read())])
 
     data = pi.input_group(
         "Options",
@@ -100,7 +101,9 @@ def app(run_checks: bool) -> None:
     else:
         dag_content = ""
 
-    DATASET_DIR = utils.generate_step(CURRENT_DIR / "explorers_cookiecutter/", dict(**form.dict(), channel="explorers"))
+    DATASET_DIR = utils.generate_step_to_channel(
+        CURRENT_DIR / "explorers_cookiecutter/", dict(**form.dict(), channel="explorers")
+    )
 
     step_path = DATASET_DIR / (form.short_name + ".py")
 

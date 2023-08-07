@@ -1,5 +1,3 @@
-# Walkthrough - Meadow
-
 Here's a summary of this walkthrough, you don't have to manually execute anything, all of it will be done automatically after submitting a form below
 
 

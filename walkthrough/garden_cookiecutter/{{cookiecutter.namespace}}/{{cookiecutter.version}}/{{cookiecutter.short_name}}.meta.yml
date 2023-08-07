@@ -1,0 +1,13 @@
+tables:
+  {{cookiecutter.short_name}}:
+    variables:
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description: Full description of testing variable.
+      #   sources:
+      #     - *source-testing
+      #   display:
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0
