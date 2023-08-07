@@ -8,6 +8,7 @@ import re
 import sys
 from collections.abc import Iterable
 from functools import lru_cache
+from http.client import IncompleteRead
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, cast
 from urllib.error import HTTPError
@@ -251,6 +252,9 @@ def get_published_checksums(bucket: str, channel: CHANNEL) -> Dict[str, str]:
         existing = existing[["path", "checksum"]].drop_duplicates().set_index("path").checksum.to_dict()
     except HTTPError:
         existing = {}  # type: ignore
+    except IncompleteRead as e:
+        print(f"ERROR: error when reading {uri}: {e}", file=sys.stderr)
+        raise e
 
     return cast(Dict[str, str], existing)
 
