@@ -149,7 +149,7 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Pat
         # create config file with data for cookiecutter
         config_path = cookiecutter_path / "cookiecutter.json"
         with open(config_path, "w") as f:
-            json.dump(data, f)
+            json.dump(data, f, default=str)
 
         try:
             cookiecutter(
@@ -157,7 +157,6 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Pat
                 no_input=True,
                 output_dir=temp_dir,
                 overwrite_if_exists=True,
-                extra_context=data,
             )
         finally:
             config_path.unlink()
