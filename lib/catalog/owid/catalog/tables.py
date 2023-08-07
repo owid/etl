@@ -534,21 +534,22 @@ class Table(pd.DataFrame):
         keys: Union[str, List[str]],
         *,
         inplace: Literal[True],
+        **kwargs: Any,
     ) -> None:
         ...
 
     @overload
-    def set_index(self, keys: Union[str, List[str]], *, inplace: Literal[False]) -> "Table":
+    def set_index(self, keys: Union[str, List[str]], *, inplace: Literal[False], **kwargs: Any) -> "Table":
         ...
 
     @overload
-    def set_index(self, keys: Union[str, List[str]]) -> "Table":
+    def set_index(self, keys: Union[str, List[str]], **kwargs: Any) -> "Table":
         ...
 
     def set_index(
         self,
         keys: Union[str, List[str]],
-        **kwargs,
+        **kwargs: Any,
     ) -> Optional["Table"]:
         if isinstance(keys, str):
             keys = [keys]
