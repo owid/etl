@@ -15,4 +15,4 @@ meta:
   date_accessed: {% now 'local', '%Y-%m-%d' %}
   is_public: {% if cookiecutter.is_private == "True" %}false{% else %}true{% endif %}
   description: |
-    {{cookiecutter.description.replace("\n", "\n  ")}}
+    {{cookiecutter.description.replace("\n", "\n    ")}}

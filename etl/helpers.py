@@ -12,8 +12,13 @@ from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, ca
 import pandas as pd
 import structlog
 from owid import catalog
-from owid.catalog import CHANNEL
+from owid.catalog import CHANNEL, DatasetMeta
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
+from owid.catalog.tables import (
+    get_unique_licenses_from_tables,
+    get_unique_origins_from_tables,
+    get_unique_sources_from_tables,
+)
 from owid.datautils.common import ExceptionFromDocstring
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
@@ -114,8 +119,20 @@ def create_dataset(
     """
     from etl.steps.data.converters import convert_snapshot_metadata
 
-    # convert snapshot SnapshotMeta to DatasetMeta
-    if isinstance(default_metadata, SnapshotMeta):
+    if default_metadata is None:
+        # If not defined, gather origins and licenses from the metadata of the tables.
+        licenses = get_unique_licenses_from_tables(tables=tables)
+        if any(["origins" in table[column].metadata.to_dict() for table in tables for column in table.columns]):
+            # If any of the variables contains "origins" this means that it is a recently created dataset.
+            # Gather origins from all variables in all tables.
+            origins = get_unique_origins_from_tables(tables=tables)
+            default_metadata = DatasetMeta(licenses=licenses, origins=origins)
+        else:
+            # None of the variables includes "origins", which means it is an old dataset, with "sources".
+            sources = get_unique_sources_from_tables(tables=tables)
+            default_metadata = DatasetMeta(licenses=licenses, sources=sources)
+    elif isinstance(default_metadata, SnapshotMeta):
+        # convert snapshot SnapshotMeta to DatasetMeta
         default_metadata = convert_snapshot_metadata(default_metadata)
 
     if check_variables_metadata:

@@ -11,8 +11,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Regions for which aggregates will be created.
-REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
+REGIONS = ["Europe", "Africa", "Asia", "Oceania", "World"]
 
 
 def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset) -> Table:
@@ -121,24 +120,21 @@ def run(dest_dir: str) -> None:
     tb.loc[(tb["nkill"] > 100), "severity"] = "100+"
 
     # For the total_regions_df
-    total_regions_df = generate_summary_dataframe(tb, ["year", "region_txt"], ["nkill", "nwound"])
+    total_regions_df = generate_summary_dataframe(tb, "region_txt", ["nkill", "nwound"])
 
     # For the total_attack_type
-    total_attack_type = generate_summary_dataframe(tb, ["country", "year", "attacktype1_txt"], ["nkill", "nwound"])
+    total_attack_type = generate_summary_dataframe(tb, "attacktype1_txt", ["nkill", "nwound"])
 
     # For the total_suicide
-    total_suicide = generate_summary_dataframe(tb, ["country", "year", "suicide"], ["nkill", "nwound"])
+    total_suicide = generate_summary_dataframe(tb, "suicide", ["nkill", "nwound"])
     suicide_mapping = {0: "No Suicide", 1: "Suicide"}
     total_suicide["suicide"] = total_suicide["suicide"].map(suicide_mapping)
 
     # For the total_target
-    total_target = generate_summary_dataframe(tb, ["country", "year", "targtype1_txt"], ["nkill", "nwound"])
+    total_target = generate_summary_dataframe(tb, "targtype1_txt", ["nkill", "nwound"])
 
     # For the total_severity
-    total_severity = pd.DataFrame()
-    total_severity["total_incident_severity"] = tb.groupby(["country", "year", "severity"]).size()
-    total_severity.reset_index(inplace=True)
-
+    total_severity = severity(tb)
     # Create a dictionary to store all pivot tables
     pivot_tables = {
         "regions": pivot_dataframe(
@@ -186,7 +182,6 @@ def run(dest_dir: str) -> None:
     df_pop_deaths = add_deaths_and_population(merge_all)
     ds_regions: Dataset = paths.load_dependency("regions")
     df_pop_deaths = add_data_for_regions(tb=df_pop_deaths, regions=REGIONS, ds_regions=ds_regions)
-
     # Calculate statistics per capita
     df_pop_deaths["terrorism_wounded_per_100k"] = df_pop_deaths["total_wounded"] / (
         df_pop_deaths["population"] / 100000
@@ -248,27 +243,50 @@ def add_suffix(df: pd.DataFrame, suffix: str) -> pd.DataFrame:
     return df
 
 
-def generate_summary_dataframe(df, group_columns, target_columns):
+def generate_summary_dataframe(df, group_column, target_columns):
     """
-    Generate a summary DataFrame based on the specified group and target columns.
+    Generate a summary DataFrame based on specified group and target columns. The function groups
+    data by year and the specified group column, which may include "country" or "region_txt."
+    If the group column is not "region_txt," it will also include regional summaries.
 
     Parameters:
-        df (pandas.DataFrame): The original DataFrame.
-        group_columns (list): List of column names for grouping the data.
-        target_columns (list): List of column names for calculating the summary statistics.
+        df (pandas.DataFrame): The original DataFrame containing the data.
+        group_column (str): The column name by which to group the data. If "region_txt," data
+                            will be grouped by "year" and "region_txt"; otherwise, data will be
+                            grouped by "country," "year," and the specified group column.
+        target_columns (list of str): List of column names for calculating summary statistics
+                                      (e.g., sum of "nkill" and "nwound").
 
     Returns:
         pandas.DataFrame: A summary DataFrame with grouped data and corresponding summary statistics.
+                          If group_column is not "region_txt," the DataFrame also includes regional
+                          summaries, and the index name "region_txt" is renamed to "country."
     """
-    grouped_df = df.groupby(group_columns)
+    if group_column != "region_txt":
+        grouped_df = df.groupby(["country", "year", group_column])
+    else:
+        grouped_df = df.groupby(["year", group_column])
+
     summary_df = pd.DataFrame()
 
     for column in target_columns:
         summary_df[f"total_{column}"] = grouped_df[column].sum()
 
     summary_df["total_incident_counts"] = grouped_df.size()
+    if group_column != "region_txt":
+        grouped_regions_df = df.groupby(["region_txt", "year", group_column])
+        summary_regions_df = pd.DataFrame()
 
-    return summary_df.reset_index()
+        for column in target_columns:
+            summary_regions_df[f"total_{column}"] = grouped_regions_df[column].sum()
+
+        summary_regions_df["total_incident_counts"] = grouped_regions_df.size()
+        summary_regions_df = summary_regions_df.rename_axis(index={"region_txt": "country"})
+        merge_GTD_regions = pd.concat([summary_regions_df, summary_df])
+
+        return merge_GTD_regions.reset_index()
+    else:
+        return summary_df.reset_index()
 
 
 def pivot_dataframe(dataframe, index_columns, pivot_column, value_columns):
@@ -298,3 +316,31 @@ def pivot_dataframe(dataframe, index_columns, pivot_column, value_columns):
         ]
 
     return pivot_df
+
+
+def severity(tb):
+    """
+    Calculate the total incident severity for each country and region by year and severity level.
+    The function groups the input DataFrame by country, year, and severity, and then by region (region_txt),
+    year, and severity. The results are concatenated into a single DataFrame, where the region_txt index
+    level is renamed to "country."
+
+    Parameters:
+        tb (pandas.DataFrame): The original DataFrame containing columns "country," "region_txt,"
+                              "year," and "severity."
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing the total incident severity for each country and region,
+                          grouped by year and severity level. The DataFrame has columns "country," "year,"
+                          "severity," and "total_incident_severity."
+    """
+    total_severity_country = pd.DataFrame()
+    total_severity_country["total_incident_severity"] = tb.groupby(["country", "year", "severity"]).size()
+
+    total_severity_regions = pd.DataFrame()
+    total_severity_regions["total_incident_severity"] = tb.groupby(["region_txt", "year", "severity"]).size()
+
+    total_severity_regions = total_severity_regions.rename_axis(index={"region_txt": "country"})
+    merge_GTD_regions = pd.concat([total_severity_country, total_severity_regions])
+
+    return merge_GTD_regions.reset_index()

@@ -30,7 +30,7 @@ from owid.repack import repack_frame
 from pandas.util._decorators import rewrite_axis_style_signature
 
 from . import variables
-from .meta import License, Source, TableMeta, VariableMeta
+from .meta import License, Origin, Source, TableMeta, VariableMeta
 
 log = structlog.get_logger()
 
@@ -534,21 +534,22 @@ class Table(pd.DataFrame):
         keys: Union[str, List[str]],
         *,
         inplace: Literal[True],
+        **kwargs: Any,
     ) -> None:
         ...
 
     @overload
-    def set_index(self, keys: Union[str, List[str]], *, inplace: Literal[False]) -> "Table":
+    def set_index(self, keys: Union[str, List[str]], *, inplace: Literal[False], **kwargs: Any) -> "Table":
         ...
 
     @overload
-    def set_index(self, keys: Union[str, List[str]]) -> "Table":
+    def set_index(self, keys: Union[str, List[str]], **kwargs: Any) -> "Table":
         ...
 
     def set_index(
         self,
         keys: Union[str, List[str]],
-        **kwargs,
+        **kwargs: Any,
     ) -> Optional["Table"]:
         if isinstance(keys, str):
             keys = [keys]
@@ -987,7 +988,10 @@ def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[
     if metadata is not None:
         table.metadata = metadata
         for column in list(table.all_columns):
-            table._fields[column].sources = metadata.dataset.sources  # type: ignore
+            if "origins" in metadata.dataset.to_dict():  # type: ignore
+                table._fields[column].origins = metadata.dataset.origins  # type: ignore
+            else:
+                table._fields[column].sources = metadata.dataset.sources  # type: ignore
             table._fields[column].licenses = metadata.dataset.licenses  # type: ignore
     table = update_processing_logs_when_loading_or_creating_table(table=table)
 
@@ -1250,6 +1254,29 @@ def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
     return pd.unique(sources).tolist()
 
 
+def get_unique_origins_from_tables(tables: List[Table]) -> List[Origin]:
+    # First, ensure only "origins" (and not "sources") are used in the variables.
+    if any(
+        [
+            ("sources" in table[column].metadata.to_dict()) and (len(table[column].metadata.sources) > 0)
+            for table in tables
+            for column in table.columns
+        ]
+    ):
+        log.warning("Origins and sources mixed in tables. The resulting dataset may not include all origins.")
+
+    # Make a list of all origins of all variables in all tables.
+    origins = sum([table._fields[column].origins for table in tables for column in list(table.all_columns)], [])
+
+    # Get unique array of tuples of origin fields (respecting the order).
+    unique_origins_array = pd.unique([tuple(origin.to_dict().items()) for origin in origins])
+
+    # Make a list of unique origins.
+    unique_origins = [Origin.from_dict(dict(origin)) for origin in unique_origins_array]  # type: ignore
+
+    return unique_origins
+
+
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     # Make a list of all licenses of all variables in all tables.
     licenses = sum([table._fields[column].licenses for table in tables for column in list(table.all_columns)], [])
@@ -1290,7 +1317,7 @@ def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = Non
 
 def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List[str]] = None) -> None:
     if fields is None:
-        fields = ["sources", "licenses"]
+        fields = ["origins", "licenses"]
 
     for table in tables:
         table_name = table.metadata.short_name
