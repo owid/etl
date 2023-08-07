@@ -61,7 +61,7 @@ simplejson = ">=3.17.6"
 bugsnag = ">=4.2.1"
 xlrd = ">=2.0.1"
 PyPDF2 = ">=2.11.1"
-dvc = {extras = ["s3"], version = ">=2.56.0"}
+dvc = {version = "<3.0.0", extras = ["s3"]}
 "ruamel.yaml" = ">=0.17.21"
 owid-repack = {path = "lib/repack", develop = true}
 mkdocs-jupyter = "^0.22.0"
@@ -69,7 +69,7 @@ gitpython = "^3.1.30"
 rapidfuzz = "^2.13.7"
 streamlit = "^1.22.0"
 # pinned because of frictionless, remove this pin when frictionless is updated
-fsspec = "2022.11.0"
+fsspec = "^2023.6.0"
 openai = "^0.27.7"
 pdfplumber = "^0.9.0"
 pyhumps = "^3.8.0"

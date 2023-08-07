@@ -15,8 +15,8 @@ meta:
     date_accessed: 2023-08-07
   license:
     name: MIT dummy license
-wdir: ../../../data/snapshots/dummy/2020-01-01
 outs:
 - md5: becb9bc64792f7372580683b384e5411
   size: 96
   path: dummy.csv
+wdir: ../../../data/snapshots/dummy/2020-01-01

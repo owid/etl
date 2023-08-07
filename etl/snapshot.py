@@ -74,8 +74,9 @@ class Snapshot:
 
     def pull(self, force=True) -> None:
         """Pull file from S3."""
-        with _unignore_backports(self.path):
-            get_dvc().pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
+        with dvc_lock, _unignore_backports(self.path):
+            dvc = get_dvc()
+            dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -369,16 +370,17 @@ def _unignore_backports(path: Path):
     Changing .dvcignore in-place is not great, but no other way was working (tried monkey-patching
     DVC and subrepos).
     """
+    dvc_ignore_path = paths.BASE_DIR / ".dvcignore"
     if "backport/" in str(path):
         with unignore_backports_lock:
-            with open(".dvcignore") as f:
+            with open(dvc_ignore_path) as f:
                 s = f.read()
             try:
-                with open(".dvcignore", "w") as f:
+                with open(dvc_ignore_path, "w") as f:
                     f.write(s.replace("snapshots/backport/", "# snapshots/backport/"))
                 yield
             finally:
-                with open(".dvcignore", "w") as f:
+                with open(dvc_ignore_path, "w") as f:
                     f.write(s)
     else:
         yield
