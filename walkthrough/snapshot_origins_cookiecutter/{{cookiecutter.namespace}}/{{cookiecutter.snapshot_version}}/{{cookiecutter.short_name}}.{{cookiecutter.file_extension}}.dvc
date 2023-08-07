@@ -1,8 +1,6 @@
 meta:
   origin:
-    {%- if cookiecutter.dataset_title_owid %}
     dataset_title_owid: {{cookiecutter.dataset_title_owid}}
-    {%- endif %}
     {%- if cookiecutter.dataset_title_producer %}
     dataset_title_producer: {{cookiecutter.dataset_title_producer}}
     {%- endif %}

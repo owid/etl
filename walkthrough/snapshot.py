@@ -131,6 +131,7 @@ def app(run_checks: bool) -> None:
                     "Origin: Dataset title by OWID",
                     name="dataset_title_owid",
                     placeholder="Testing Title OWID",
+                    required=True,
                     value=state.get("dataset_title_owid"),
                     help_text="Dataset title written by OWID (without a year). Example: Natural disasters",
                 ),
