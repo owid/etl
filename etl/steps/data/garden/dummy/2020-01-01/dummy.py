@@ -27,14 +27,13 @@ def run(dest_dir: str) -> None:
     tb: Table = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb.set_index(["country", "year"])], default_metadata=ds_meadow.metadata
-    )
+    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

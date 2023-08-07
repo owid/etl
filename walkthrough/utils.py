@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 import tempfile
 from pathlib import Path
@@ -28,21 +29,43 @@ WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
 DATASET_POPULATION_URI = f"data://garden/demography/{LATEST_POPULATION_VERSION}/population"
 DATASET_REGIONS_URI = f"data://garden/regions/{LATEST_REGIONS_VERSION}/regions"
 
-DUMMY_DATA = {
-    "namespace": "dummy",
-    "short_name": "dummy",
-    "version": "2020-01-01",
-    "walden_version": "2020-01-01",
-    "snapshot_version": "2020-01-01",
-    "name": "Dummy dataset",
-    "description": "This\nis\na\ndummy\ndataset",
-    "file_extension": "csv",
-    "source_data_url": "https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv",
-    "publication_date": "2020-01-01",
-    "source_name": "Dummy short source citation",
-    "source_published_by": "Dummy full source citation",
-    "url": "https://www.url-dummy.com/",
-}
+# use origins in walkthrough
+WALKTHROUGH_ORIGINS = os.environ.get("WALKTHROUGH_ORIGINS") == "1"
+
+
+if WALKTHROUGH_ORIGINS:
+    DUMMY_DATA = {
+        "namespace": "dummy",
+        "short_name": "dummy",
+        "version": "2020-01-01",
+        "walden_version": "2020-01-01",
+        "snapshot_version": "2020-01-01",
+        "dataset_title_owid": "Dummy OWID dataset title",
+        "dataset_description_owid": "This\nis\na\ndummy\ndataset",
+        "file_extension": "csv",
+        "date_published": "2020-01-01",
+        "producer": "Dummy producer",
+        "citation_producer": "Dummy producer citation",
+        "dataset_url_download": "https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv",
+        "dataset_url_main": "https://www.url-dummy.com/",
+        "license_name": "MIT dummy license",
+    }
+else:
+    DUMMY_DATA = {
+        "namespace": "dummy",
+        "short_name": "dummy",
+        "version": "2020-01-01",
+        "walden_version": "2020-01-01",
+        "snapshot_version": "2020-01-01",
+        "name": "Dummy dataset",
+        "description": "This\nis\na\ndummy\ndataset",
+        "file_extension": "csv",
+        "source_data_url": "https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv",
+        "publication_date": "2020-01-01",
+        "source_name": "Dummy short source citation",
+        "source_published_by": "Dummy full source citation",
+        "url": "https://www.url-dummy.com/",
+    }
 
 # state shared between steps
 APP_STATE = {}
