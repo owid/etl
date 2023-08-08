@@ -13,7 +13,6 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-new_line = "<br><br>"
 
 
 def run(dest_dir: str) -> None:
@@ -90,14 +89,14 @@ def add_metadata(tb):
             # Update the metadata for the current column.
             tb[column].metadata.title = name
             new_column_name = underscore(name)
+            name = name.replace(",", "")
+
             tb.rename(columns={column: new_column_name}, inplace=True)
-            tb[new_column_name].metadata.description = new_line.join(
-                [
-                    sourceNote,
-                    sourceOrganization,
-                    "World Bank variable id: " + variable_id,
-                ]
+
+            tb[new_column_name].metadata.description = " ".join(
+                [sourceNote, sourceOrganization, ".World Bank variable id: " + variable_id]
             )
+
             tb[new_column_name].metadata.display = {}
             # Now update metadata units, short_units and number of decimal places to display depending on what keywords the variable name contains.
             #
