@@ -1,5 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
+import zipfile
 from typing import cast
 
 import pandas as pd
@@ -17,16 +18,19 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("{{cookiecutter.short_name}}.{{cookiecutter.file_extension}}"))
+    snap = cast(Snapshot, paths.load_dependency("icd_codes.zip"))
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
-
+    zf = zipfile.ZipFile(snap.path)
+    df = pd.read_excel(zf.open("list_ctry_yrs_27feb2023.xlsx"), skiprows=7)
+    df = df[["name", "Year", "Icd"]]
+    df = df.drop_duplicates()
     #
     # Process data.
     #
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = tb.rename(columns={"name": "country"}).set_index(["country", "year"], verify_integrity=True)
 
     #
     # Save outputs.

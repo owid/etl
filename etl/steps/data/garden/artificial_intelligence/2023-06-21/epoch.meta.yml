@@ -38,6 +38,8 @@ dataset:
 
 
     The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models.'"
+
+    In cases where the model name was unavailable, OWID uses the institution name that published the model for identification.
   licenses:
   - name: Public domain
   sources:

@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
     df_total.reset_index(inplace=True)
 
     # Adding a 'Total' row in the 'country' column
-    df_total["country"] = "Total"
+    df_total["country"] = "World"
     merged_total = pd.concat([df_total, tb])
     # List of columns to include for conversion to millions (investment values)
     _investment_cols = [col for col in merged_total.columns if "investment" in col]

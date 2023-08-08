@@ -1,0 +1,21 @@
+meta:
+  name: WHO Mortality Database (WHO, 2023)
+  publication_year: 2023
+  publication_date: 2023-02
+  source_name: WHO (2023)
+  source_published_by: WHO Mortality Database (WHO, 2023)
+  url: 
+    https://www.who.int/data/data-collection-tools/who-mortality-database#:~:text=The%20WHO%20Mortality%20Database%20is,death%20as%20reported%20by%20countries
+  source_data_url: 
+    https://cdn.who.int/media/docs/default-source/world-health-data-platform/mortality-raw-data/mort_availability.zip
+  license_url: https://www.who.int/about/policies/publishing/copyright
+  license_name: CC BY-NC-SA 3.0 IGO
+  date_accessed: 2023-08-04
+  is_public: true
+  description: |
+    The availability of countries-years on mortality data as of 27 February 2023, disaggregated by the type of ICD code used.
+wdir: ../../../data/snapshots/who/2023-08-04
+outs:
+- md5: 3a7f85961040fbb39fd14a811634b883
+  size: 245253
+  path: icd_codes.zip

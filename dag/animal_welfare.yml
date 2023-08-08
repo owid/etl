@@ -17,3 +17,19 @@ steps:
     - data://meadow/animal_welfare/2023-08-01/uk_egg_statistics
   data://grapher/animal_welfare/2023-08-01/uk_egg_statistics:
     - data://garden/animal_welfare/2023-08-01/uk_egg_statistics
+  #
+  # US egg production (The Humane League, 2023).
+  #
+  data://meadow/animal_welfare/2023-08-03/us_egg_production:
+    - snapshot://animal_welfare/2023-08-03/us_egg_production.csv
+    - snapshot://animal_welfare/2023-08-03/us_egg_production_share_cage_free.csv
+  data://garden/animal_welfare/2023-08-03/us_egg_production:
+    - data://meadow/animal_welfare/2023-08-03/us_egg_production
+  #
+  # Share of cage-free eggs (Various sources, 2023).
+  #
+  data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs:
+    - data://garden/animal_welfare/2023-08-03/us_egg_production
+    - data://garden/animal_welfare/2023-08-01/uk_egg_statistics
+  data://grapher/animal_welfare/2023-08-03/share_of_cage_free_eggs:
+    - data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs

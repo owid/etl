@@ -1,16 +1,24 @@
 dataset:
   title: Terrorism dataset, Global Terrorism Database (2022)
-  description: The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
+  description: >
+    The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
     around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to Terrorism
     (START) at the University of Maryland.
+
+
+    For target and attack type OWID GTD typically records only one attack/target type for each incident, recorded in columns targtype1 and attacktype1. OWID uses these two indicators, even though there are some events with several targets/methods.
   licenses:
   - name: Copyright University of Maryland 2022
     url: https://www.start.umd.edu/gtd/terms-of-use/
   sources:
   - name: Global Terrorism Database (2022)
-    description: The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
+    description: >
+      The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
       around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to
       Terrorism (START) at the University of Maryland.
+
+
+      For target and attack type OWID GTD typically records only one attack/target type for each incident, recorded in columns targtype1 and attacktype1. OWID uses these two indicators, even though there are some events with several targets/methods.
     url: https://www.start.umd.edu/gtd/
     date_accessed: '2023-07-20'
     publication_year: 2022
@@ -2066,6 +2074,7 @@ tables:
           name: Educational institutions
           numDecimalPlaces: 0
       total_incident_counts_food_or_water_supply_target:
+        title: Terrorist attacks Foor or Water Supply Target
         description: >
           Attacks on food or water supplies and reserves are included in this value. This generally includes attacks aimed at the infrastructure related to food and water for human consumption
         unit: "attacks"
@@ -2425,8 +2434,8 @@ tables:
         display:
           name: 6-10 deaths
           numDecimalPlaces: 0
-      terrorism_wounded_per_capita:
-        title: Terrorism non-fatal injuries per capita
+      terrorism_wounded_per_100k:
+        title: Terrorism non-fatal injuries per 100,000 people
         description: >-
           This field records the number of confirmed non-fatal injuries to both perpetrators and victims.
 
@@ -2446,12 +2455,12 @@ tables:
           the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source
           of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities
           will be noted in the "Additional Notes" field.
-        unit: injuries per capita
+        unit: injuries per 100,000 people
         display:
-          name: Non-fatal injuries per capita
-          numDecimalPlaces: 7
-      terrorism_deaths_per_capita:
-        title: Terrorism deaths per capita
+          name: Non-fatal injuries per 100,000 people
+          numDecimalPlaces: 1
+      terrorism_deaths_per_100k:
+        title: Terrorism deaths per 100,000 people
         description: >-
           This field stores the number of total confirmed fatalities for the incident. The number includes all victims and
           attackers who died as a direct result of the incident.
@@ -2474,9 +2483,9 @@ tables:
           in the "Additional Notes" field.
         unit: deaths
         display:
-          numDecimalPlaces: 7
-      terrorism_casualties_per_capita:
-        title: Terrorism casualties per capita
+          numDecimalPlaces: 1
+      terrorism_casualties_per_100k:
+        title: Terrorism casualties per 100,000 people
         description: >-
           This field records the number of confirmed non-fatal injuries and fatalties to both perpetrators and victims.
 
@@ -2498,7 +2507,7 @@ tables:
           reports of fatalities will be noted in the "Additional Notes" field.
         unit: casualties
         display:
-          numDecimalPlaces: 7
+          numDecimalPlaces: 1
       share_of_deaths:
         title: Share of deaths from terrorism
         description: >

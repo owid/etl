@@ -20,6 +20,6 @@ meta:
     Data are included only for countries reporting data properly coded according to the International Classification of Diseases (ICD). Today the database is maintained by the WHO Division of Data, Analytics and Delivery for Impact (DDI) and contains data from over 120 countries and areas. Data reported by member states and selected areas are displayed in this portal’s interactive visualizations if the data are reported to the WHO mortality database in the requested format and at least 65% of deaths were recorded in each country and year.
 wdir: ../../../data/snapshots/who/2023-08-01
 outs:
-- md5: 511ed132860849c8e7bb626c6462a40a
-  size: 1018271798
+- md5: fdb8e559a522dbe07d46f4dab5e247a5
+  size: 1063009173
   path: mortality_database.csv
