@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["icd_codes"]
     tb = tb.reset_index()
-    icd_codes_sum = {"Icd10": "ICD-10", "Icd9": "ICD-9", "Icd8": "ICD-8", "Icd7": "01. ICD-7"}
+    icd_codes_sum = {"Icd10": "ICD-10", "Icd9": "ICD-9", "Icd8": "ICD-8", "Icd7": "ICD-7"}
     icd_codes_map = {"Icd10": "04. ICD-10", "Icd9": "03. ICD-9", "Icd8": "02. ICD-8", "Icd7": "01. ICD-7"}
 
     # Calculate sum of number of countries using each ICD code type each year
