@@ -64,10 +64,9 @@ def add_metadata(tb):
     """
 
     for column in tqdm(tb.columns, desc="Processing metadata for indicators"):
+        # Extract the title from the metadata to find the corresponding World Bank indicator.
+        indicator_to_find = tb[column].metadata.title
         try:
-            # Extract the title from the metadata to find the corresponding World Bank indicator.
-            indicator_to_find = tb[column].metadata.title
-
             # Construct the URL to fetch metadata from the World Bank API.
             url = f"https://api.worldbank.org/v2/indicator/{indicator_to_find}?format=json"
 
