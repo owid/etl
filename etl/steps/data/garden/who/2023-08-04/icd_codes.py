@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
     # Calculate sum of number of countries using each ICD code type each year
     tb_sum = tb.groupby(["year", "icd"]).count().reset_index()
     tb_sum = tb_sum.rename(columns={"icd": "country", "country": "countries_using_icd_code"})
-    tb_sum["country"] = tb["country"].replace(icd_codes_sum)
+    tb_sum["country"] = tb_sum["country"].replace(icd_codes_sum)
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb["icd"] = tb["icd"].replace(icd_codes_map)
