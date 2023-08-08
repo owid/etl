@@ -100,6 +100,7 @@ def combine_datasets() -> pd.DataFrame:
             "icd_codes": "V01-X59, Y40-Y86, Y88, Y89 (minus X41-X42, X44-X45), U12.9",
             "broad_cause_group": "Injuries",
         },
+        "Ill-defined diseases": {"icd_codes": "R00-R94, R96-R99", "broad_cause_group": "Ill-defined diseases"},
     }
     df_all = pd.DataFrame()
     for cause in list_of_causes.keys():
