@@ -33,3 +33,12 @@ steps:
     - data://garden/animal_welfare/2023-08-01/uk_egg_statistics
   data://grapher/animal_welfare/2023-08-03/share_of_cage_free_eggs:
     - data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs
+  #
+  # Farmed finfishes used for food (Mood et al. 2023).
+  #
+  data://meadow/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
+    - snapshot://animal_welfare/2023-08-08/farmed_finfishes_used_for_food.zip
+  data://garden/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
+    - data://meadow/animal_welfare/2023-08-08/farmed_finfishes_used_for_food
+  data://grapher/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
+    - data://garden/animal_welfare/2023-08-08/farmed_finfishes_used_for_food

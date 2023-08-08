@@ -1,0 +1,33 @@
+tables:
+  farmed_finfishes_used_for_food:
+    variables:
+      n_fish_low:
+        title: Estimated number of farmed finfishes killed for food (lower bound)
+        unit: 'fishes'
+        short_unit: ''
+        # description: ''
+      n_fish:
+        title: Estimated number of farmed finfishes killed for food
+        unit: 'fishes'
+        short_unit: ''
+        # description: ''
+      n_fish_high:
+        title: Estimated number of farmed finfishes killed for food (upper bound)
+        unit: 'fishes'
+        short_unit: ''
+        # description: ''
+      production:
+        title: Production of farmed finfishes
+        unit: 'tonnes'
+        short_unit: 't'
+        # description: ''
+      production_relative_to_1990:
+        title: Production of farmed finfishes relative to 1990
+        unit: '%'
+        short_unit: '%'
+        # description: ''
+      n_fish_relative_to_1990:
+        title: Estimated number of farmed finfishes relative to 1990
+        unit: '%'
+        short_unit: '%'
+        # description: ''
