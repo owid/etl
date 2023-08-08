@@ -219,7 +219,7 @@ def _upload_data_metadata(lg: Any, backport_short_name: str, dry_run: bool) -> N
     dataset = config["dataset"]
 
     for db_variable_row in variables:
-        assert db_variable_row["schemaVersion"] == 1, "Only schema version 1 is supported"
+        assert db_variable_row["schemaVersion"] == 1, "Only metadata schema version 1 is supported"
 
         # find source and fill missing data
         source = [s for s in sources if s["id"] == db_variable_row["sourceId"]][0]

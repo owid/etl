@@ -74,7 +74,7 @@ class Snapshot:
 
     def pull(self, force=True) -> None:
         """Pull file from S3."""
-        with dvc_lock, _unignore_backports(self.path):
+        with _unignore_backports(self.path):
             dvc = get_dvc()
             dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
 

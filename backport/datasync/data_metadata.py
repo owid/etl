@@ -1,9 +1,10 @@
 import concurrent.futures
 import json
 from http.client import RemoteDisconnected
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Union, cast
 from urllib.error import HTTPError, URLError
 
+import numpy as np
 import pandas as pd
 from sqlalchemy.engine import Engine
 from tenacity import Retrying
@@ -14,24 +15,7 @@ from tenacity.wait import wait_fixed
 from etl import config
 
 
-def variable_data_df_from_mysql(engine: Engine, variable_id: int) -> pd.DataFrame:
-    q = """
-    SELECT
-        value,
-        year,
-        entities.id AS entityId,
-        entities.name AS entityName,
-        entities.code AS entityCode
-    FROM data_values
-    LEFT JOIN entities ON data_values.entityId = entities.id
-    WHERE data_values.variableId = %(variable_id)s
-    ORDER BY
-        year ASC
-    """
-    return pd.read_sql(q, engine, params={"variable_id": variable_id})
-
-
-def _fetch_data_df_from_s3(variable_id: int) -> pd.DataFrame:  # type: ignore
+def _fetch_data_df_from_s3(variable_id: int):
     try:
         # Cloudflare limits us to 600 requests per minute, retry in case we hit the limit
         # NOTE: increase wait time or attempts if we hit the limit too often
@@ -235,6 +219,9 @@ def _variable_metadata(
         .drop_duplicates(["entityId"])
         .rename(columns={"entityId": "id", "entityName": "name", "entityCode": "code"})
         .set_index("id", drop=False)
+        .astype(object)
+        # avoid NaN in JSON
+        .replace(to_replace=np.nan, value=None)
         .to_dict(orient="records")
     )
 

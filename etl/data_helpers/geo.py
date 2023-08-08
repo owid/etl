@@ -341,7 +341,7 @@ def add_region_aggregates(
         # Include this variable to the dataframe of added regions.
         df_region = pd.merge(df_region, df_added, on=[country_col, year_col], how="outer")
 
-    if type(keep_original_region_with_suffix) == str:
+    if isinstance(keep_original_region_with_suffix, str):
         # Keep rows in the original dataframe containing rows for region (adding a suffix to the region name), and then
         # append new rows for region.
         rows_original_region = df[country_col] == region

@@ -56,6 +56,7 @@ def underscore(name: Optional[str], validate: bool = True, camel_to_snake: bool 
         .replace("-", "_")
         .replace("—", "_")
         .replace("–", "_")
+        .replace("‑", "_")
         .replace(",", "_")
         .replace(".", "_")
         .replace("\t", "_")
