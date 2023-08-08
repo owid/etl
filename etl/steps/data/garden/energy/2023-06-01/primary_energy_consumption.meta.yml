@@ -30,7 +30,8 @@ tables:
         title: GDP
         short_unit: $
         unit: 2011 int-$
-        description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over
+        description: >-
+          Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over
           time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
         display:
           numDecimalPlaces: 0
