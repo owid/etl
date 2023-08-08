@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-
+from time import sleep
 from typing import cast
 
 import requests
@@ -56,75 +56,87 @@ def run(dest_dir: str) -> None:
 
 def add_metadata(tb):
     """
-    Add metadata to the DataFrame 'tb' by fetching information from the World Bank API.
+    Adds metadata to the columns of a DataFrame by fetching details from the World Bank API.
 
-    :param tb: DataFrame containing the indicators.
-    :return: Updated DataFrame with the added metadata.
+    Args:
+        tb (DataFrame): The DataFrame containing columns to which metadata needs to be added.
+
+    Returns:
+        DataFrame: The DataFrame with updated metadata.
+
+    Note:
+        Each column's metadata must contain a title attribute that corresponds to a World Bank indicator.
     """
-
+    # Loop through the DataFrame columns
     for column in tqdm(tb.columns, desc="Processing metadata for indicators"):
-        # Extract the title from the metadata to find the corresponding World Bank indicator.
-        indicator_to_find = tb[column].metadata.title
-        try:
-            # Construct the URL to fetch metadata from the World Bank API.
-            url = f"https://api.worldbank.org/v2/indicator/{indicator_to_find}?format=json"
+        retries = 3
+        delay = 1  # Initial delay in seconds
 
-            # Send GET request to the World Bank API.
-            response = requests.get(url)
-            response.raise_for_status()  # Will raise an HTTPError if the HTTP request returned an unsuccessful status code
+        # Attempt to process each column up to `retries` times
+        for attempt in range(retries):
+            try:
+                # Extract the title from the metadata to find the corresponding World Bank indicator
+                indicator_to_find = tb[column].metadata.title
 
-            data = response.json()
+                # Construct the URL to fetch metadata from the World Bank API
+                url = f"https://api.worldbank.org/v2/indicator/{indicator_to_find}?format=json"
 
-            # Check if the expected data format is received
-            if len(data) < 2 or not isinstance(data[1], list) or len(data[1]) < 1:
-                raise ValueError("Unexpected data format received from the World Bank API")
+                # Send GET request to the World Bank API with a timeout (in seconds)
+                response = requests.get(url, timeout=10)
+                response.raise_for_status()  # Check for unsuccessful status codes
 
-            # Extract relevant data from the API response.
-            nested_data = data[1][0]
-            sourceNote = nested_data["sourceNote"]
-            sourceOrganization = nested_data["sourceOrganization"]
-            name = nested_data["name"]
-            variable_id = nested_data["id"]
+                data = response.json()
 
-            # Update the metadata for the current column.
-            tb[column].metadata.title = name
-            new_column_name = underscore(name)
-            name = name.replace(",", "")
+                # Validate the expected data format received from the World Bank API
+                if len(data) < 2 or not isinstance(data[1], list) or len(data[1]) < 1:
+                    raise ValueError("Unexpected data format received from the World Bank API")
 
-            tb.rename(columns={column: new_column_name}, inplace=True)
+                # Extract relevant metadata from the API response
+                nested_data = data[1][0]
+                name = nested_data["name"].replace("‚", "")
+                new_column_name = underscore(name)  # Convert name to underscore format
 
-            tb[new_column_name].metadata.description = " ".join(
-                [sourceNote, sourceOrganization, ".World Bank variable id: " + variable_id]
-            )
+                # Update the DataFrame column name and metadata
+                tb.rename(columns={column: new_column_name}, inplace=True)
+                tb[new_column_name].metadata.description = " ".join(
+                    [
+                        nested_data["sourceNote"],
+                        "World Bank variable id: " + nested_data["id"],
+                        nested_data["sourceOrganization"],
+                    ]
+                )
 
-            tb[new_column_name].metadata.display = {}
-            # Now update metadata units, short_units and number of decimal places to display depending on what keywords the variable name contains.
-            #
-            if "%" in name or "Percentage" in name or "percentage" in name or "share of" in name or "rate" in name:
-                tb[new_column_name].metadata.unit = "%"
-                tb[new_column_name].metadata.short_unit = "%"
-                tb[new_column_name].metadata.display["numDecimalPlaces"] = 1
-            elif "ratio" in name:
-                tb[new_column_name].metadata.display["numDecimalPlaces"] = 1
-                tb[new_column_name].metadata.unit = "ratio"
-                tb[new_column_name].metadata.short_unit = " "
-            elif "(years)" in name or "years" in name:
-                tb[new_column_name].metadata.display["numDecimalPlaces"] = 1
-                tb[new_column_name].metadata.unit = "years"
-                tb[new_column_name].metadata.short_unit = " "
-            elif "number of pupils" in name:
-                tb[new_column_name].metadata.display["numDecimalPlaces"] = 0
-                tb[new_column_name].metadata.unit = "pupils"
-                tb[new_column_name].metadata.short_unit = " "
-            else:
-                tb[new_column_name].metadata.unit = " "
-                tb[new_column_name].metadata.short_unit = " "
+                tb[new_column_name].metadata.display = {}
+                # Now update metadata units, short_units and number of decimal places to display depending on what keywords the variable name contains.
+                #
+                if "%" in name or "Percentage" in name or "percentage" in name or "share of" in name or "rate" in name:
+                    tb[new_column_name].metadata.unit = "%"
+                    tb[new_column_name].metadata.short_unit = "%"
+                    tb[new_column_name].metadata.display["numDecimalPlaces"] = 1
+                elif "ratio" in name:
+                    tb[new_column_name].metadata.display["numDecimalPlaces"] = 1
+                    tb[new_column_name].metadata.unit = "ratio"
+                    tb[new_column_name].metadata.short_unit = " "
+                elif "(years)" in name or "years" in name:
+                    tb[new_column_name].metadata.display["numDecimalPlaces"] = 1
+                    tb[new_column_name].metadata.unit = "years"
+                    tb[new_column_name].metadata.short_unit = " "
+                elif "number of pupils" in name:
+                    tb[new_column_name].metadata.display["numDecimalPlaces"] = 0
+                    tb[new_column_name].metadata.unit = "pupils"
+                    tb[new_column_name].metadata.short_unit = " "
+                else:
+                    tb[new_column_name].metadata.unit = " "
+                    tb[new_column_name].metadata.short_unit = " "
 
-        except requests.RequestException as e:
-            print(f"An error occurred while fetching data for {indicator_to_find}: {e}")
-        except ValueError as e:
-            print(f"An error occurred while processing data for {indicator_to_find}: {e}")
-        except Exception as e:
-            print(f"An unexpected error occurred for {indicator_to_find}: {e}")
+                break  # Success, exit the retry loop
+
+            except requests.exceptions.ReadTimeout:
+                print(f"Timeout while processing column {column}. Retrying in {delay} seconds...")
+                sleep(delay)
+                delay *= 2  # Double the delay for the next attempt
+
+        if attempt == retries - 1:
+            print(f"Failed to process column {column} after {retries} attempts.")
 
     return tb
