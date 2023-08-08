@@ -14,19 +14,6 @@ from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-REGIONS = [
-    "North America",
-    "South America",
-    "Europe",
-    "European Union (27)",
-    "Africa",
-    "Asia",
-    "Oceania",
-    "Low-income countries",
-    "Upper-middle-income countries",
-    "Lower-middle-income countries",
-    "High-income countries",
-]
 
 
 def run(dest_dir: str) -> None:
@@ -39,9 +26,6 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["education"]
     tb.reset_index(inplace=True)
-    # Add region aggregates.
-    # tb = add_data_for_regions(tb=tb, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-
     #
     # Process data.
     #
@@ -191,7 +175,7 @@ def add_metadata(tb, df_metadata):
             tb[new_column_name].metadata.display["numDecimalPlaces"] = 1
             tb[new_column_name].metadata.unit = "years"
             tb[new_column_name].metadata.short_unit = " "
-        elif "number of pupils" in variable_name or "number" in variable_name:
+        elif "number of pupils" in variable_name:
             tb[new_column_name].metadata.display["numDecimalPlaces"] = 0
             tb[new_column_name].metadata.unit = "pupils"
             tb[new_column_name].metadata.short_unit = " "
