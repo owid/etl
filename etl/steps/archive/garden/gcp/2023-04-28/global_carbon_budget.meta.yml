@@ -310,7 +310,9 @@ tables:
         title: "GDP"
         unit: "2011 international-$"
         short_unit: "$"
-        description: "Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries."
+        description:  >-
+          Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time
+          (inflation) and price differences between countries.
       global_cumulative_emissions_from_cement:
         title: "Global cumulative CO₂ emissions from cement"
         unit: "tonnes"

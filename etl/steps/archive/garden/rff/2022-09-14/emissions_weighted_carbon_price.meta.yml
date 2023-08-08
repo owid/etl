@@ -17,8 +17,9 @@ dataset:
     A full technical note on this methodology is provided by the authors [here](https://www.rff.org/publications/working-papers/emissions-weighted-carbon-price-sources-and-methods/).
   sources:
   - name: Dolphin, Pollitt and Newbery (2020). Emissions-weighted Carbon Price.
-    published_by: 'Dolphin, G., Pollitt, M. and Newbery, D. 2020. The political economy of carbon pricing: a panel analysis.
-      Oxford Economic Papers 72(2): 472-500.'
+    published_by: >-
+      Dolphin, G., Pollitt, M. and Newbery, D. 2020. The political economy of carbon pricing: a panel analysis.
+      Oxford Economic Papers 72(2): 472-500.
     publication_year: 2022
     publication_date: 2022-01-18
     url: https://github.com/g-dolphin/ECP
