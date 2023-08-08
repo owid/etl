@@ -43,6 +43,7 @@ def main(path_to_file: str, upload: bool) -> None:
     snap.path.parent.mkdir(exist_ok=True, parents=True)
 
     wb_education_df = get_data(path_to_file)
+
     df_to_file(wb_education_df, file_path=snap.path)
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)
@@ -66,6 +67,8 @@ def fetch_education_data(education_code: str) -> pd.DataFrame:
     df["wb_seriescode"] = df.columns[-1]
     # Rename the column with values related to the indicator from series code to "value"
     df.rename(columns={df.columns[-2]: "value"}, inplace=True)
+    df.dropna(subset=["value"], inplace=True)
+
     return df
 
 
