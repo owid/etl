@@ -4,6 +4,16 @@ dataset:
 
 tables:
   cow_mid:
+    description: >-
+      Data on the number of disputes and deaths from militarized disputes.
+
+
+      A militarized dispute (MID) is based on a sequence of related militarized incidents, each of which (except the first)
+      is an outgrowth of or a response to one or more previous incidents. To ensure that each MID is a unified and recognized
+      episode of militarized incidents, particular attention should be given to continuity of location and issue, as well as
+      the interpretations of observers.
+
+      For more details please refer to the source's codebook.
     variables:
       number_ongoing_disputes:
         title: Number of ongoing disputes
@@ -64,6 +74,24 @@ tables:
           For some conflicts, data on the number of fatalities was missing (source field "FatalPre"). In such cases, we have used the lower bound from the range
           specified by the source field "Fatality". If this was also missing, we have set the value to zero. Consequently, the number of fatalities in ongoing
           disputes is likely to be underestimated.
+        description_from_producer: >-
+          The Participant Fatalities section of the dispute coding spreadsheet is used to record the fatalities of each and every
+          participant in the dispute. These values should be derived from the incidents related to the dispute and may require a good
+          deal of work in complex disputes.
+
+          Assessment of each participant's fatalities should be based on the following categories:
+
+          • -9 — No overall assessment of military fatalities for this participant was possible.
+          • 0 — No military fatalities were suffered by this participant.
+          • 1 — Participant fatalities were between 1 and 25.
+          • 2 — Participant fatalities were between 26 and 100.
+          • 3 — Participant fatalities were between 101 and 250.
+          • 4 — Participant fatalities were between 251 and 500.
+          • 5 — Participant fatalities were between 501 and 999.
+          • 6 — Participant fatalities were 1,000 or more.
+
+          If an exact value for total military fatalities can be determined from the related incidents, then that number should
+          be entered in the precise fatality cell of the coding spreadsheet
         processing_level: major
         display:
           numDecimalPlaces: 0
