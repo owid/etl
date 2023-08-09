@@ -102,8 +102,7 @@ def add_metadata(tb):
                     [
                         nested_data["sourceNote"],
                         "World Bank variable id: " + nested_data["id"],
-                        ".Source:"
-                        + nested_data["sourceOrganization"],  # change this when the new metadata format is ready
+                        nested_data["sourceOrganization"],  # change this when the new metadata format is ready
                     ]
                 )
                 tb[new_column_name].metadata.title = nested_data["name"]
