@@ -798,6 +798,28 @@ def test_sum_columns(table_1, sources, licenses):
     assert variable_c.metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
 
+def test_operations_of_table_and_scalar(table_1, sources, licenses):
+    table_1[["a", "b"]] = table_1[["a", "b"]] + 1
+    table_1[["a", "b"]] += 1
+    table_1[["a", "b"]] = table_1[["a", "b"]] - 1
+    table_1[["a", "b"]] -= 1
+    table_1[["a", "b"]] = table_1[["a", "b"]] * 1
+    table_1[["a", "b"]] *= 1
+    table_1[["a", "b"]] = table_1[["a", "b"]] / 1
+    table_1[["a", "b"]] /= 1
+    table_1[["a", "b"]] = table_1[["a", "b"]] // 1
+    table_1[["a", "b"]] //= 1
+    table_1[["a", "b"]] = table_1[["a", "b"]] % 1
+    table_1[["a", "b"]] %= 1
+    table_1[["a", "b"]] = table_1[["a", "b"]] ** 1
+    table_1[["a", "b"]] **= 1
+
+    assert table_1["a"].metadata.sources == [sources[2], sources[1]]
+    assert table_1["a"].metadata.licenses == [licenses[1]]
+    assert table_1["b"].metadata.sources == [sources[2], sources[3]]
+    assert table_1["b"].metadata.licenses == [licenses[2], licenses[3]]
+
+
 def test_multiply_columns(table_1, sources, licenses):
     # Create a new column that is the element-wise product of the other two existing columns.
     table_1["c"] = table_1[["a", "b"]].prod(axis=1)
