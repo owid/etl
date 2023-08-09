@@ -9,7 +9,6 @@ only important for OWID staff.
 
 import os
 import pwd
-import warnings
 from os import environ as env
 
 import bugsnag
@@ -53,7 +52,6 @@ def get_username():
 if "DATA_API_ENV" in env:
     DATA_API_ENV = env["DATA_API_ENV"]
 else:
-    warnings.warn("DATA_API_ENV not set, using username")
     DATA_API_ENV = env.get("DATA_API_ENV", get_username())
 
 # Production checks
