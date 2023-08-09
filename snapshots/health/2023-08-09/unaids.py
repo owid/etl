@@ -11,18 +11,22 @@ In particular, we follow these steps:
     - For that, we can use the function `get_all_data_from_api` from this module.
 """
 
+import tempfile
 from pathlib import Path
 
 import click
 import pandas as pd
 import requests
 from requests.adapters import HTTPAdapter
+from structlog import get_logger
 from urllib3.util.retry import Retry
 
 from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
+# Logger
+log = get_logger()
 
 
 @click.command()
@@ -32,7 +36,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
     type=bool,
     help="Upload dataset to Snapshot",
 )
-@click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
+@click.option("--path-to-file", prompt=True, type=str, help="Path to local file with the API links.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"health/{SNAPSHOT_VERSION}/unaids.csv")
@@ -40,21 +44,27 @@ def main(path_to_file: str, upload: bool) -> None:
     # Ensure destination folder exists.
     snap.path.parent.mkdir(exist_ok=True, parents=True)
 
-    # Copy local data file to snapshots data folder.
-    snap.path.write_bytes(Path(path_to_file).read_bytes())
+    # Get data
+    df = get_all_data_from_api(path_to_file)
+
+    with tempfile.NamedTemporaryFile(mode='w') as csvfile:
+        df.to_csv(csvfile, index=False)
+        with open(csvfile.name) as csvfile:
+            # Copy local data file to snapshots data folder.
+            snap.path.write_bytes(Path(csvfile.name).read_bytes())
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)
 
 
-def get_all_data_from_api() -> pd.DataFrame:
+def get_all_data_from_api(path: str) -> pd.DataFrame:
     """Download relevant data from UNAIDS API."""
     # Relevant indicators in UNAIDS data
     FIELDS_RELEVANT = {
         "EPI": [
             "HIV Prevalence",
             "Deaths averted due to ART",
-            "AID-related deaths",
+            "AIDS-related deaths",
         ],
         "GAM": [
             "Country-reported HIV expenditure by funding source",
@@ -62,7 +72,6 @@ def get_all_data_from_api() -> pd.DataFrame:
     }
 
     # Load all api links
-    path = "UNAIDS_API_links.xlsx"
     df_links = pd.read_excel(path, sheet_name=None)
 
     # Load relevant fields, and concatenate
@@ -77,13 +86,13 @@ def get_all_data_from_api() -> pd.DataFrame:
     session = requests.Session()
     retry = Retry(connect=3, backoff_factor=0.5)
     adapter = HTTPAdapter(max_retries=retry)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
 
     def _get_data_from_api_links(df: pd.DataFrame) -> pd.DataFrame:
         dfs = []
         for url in df["API"].values:
-            print(url)
+            log.info(f"health.unaids: downloading from {url}")
             data = session.get(url).json()
             df_ = pd.DataFrame.from_records(data["Data"][0]["Observation"])
             dfs.append(df_)

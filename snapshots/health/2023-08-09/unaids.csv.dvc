@@ -10,11 +10,16 @@ meta:
   license_name: UNAIDS terms
   date_accessed: 2023-08-09
   is_public: true
-  description: |
-    This report makes clear that there is a path to end AIDS. Taking that path will help ensure preparedness to address other pandemic challenges, and advance progress across the Sustainable Development Goals. The data and real-world examples in the report make it very clear what that path is. It is not a mystery. It is a choice. Some leaders are already following the path—and succeeding. It is inspiring to note that Botswana, Eswatini, Rwanda, the United Republic of Tanzania and Zimbabwe have already achieved the 95–95–95 targets, and at least 16 other countries (including eight in sub-Saharan Africa) are close to doing so.
+  description: >-
+    This report makes clear that there is a path to end AIDS. Taking that path will help ensure preparedness to address
+    other pandemic challenges, and advance progress across the Sustainable Development Goals. The data and real-world
+    examples in the report make it very clear what that path is. It is not a mystery. It is a choice. Some leaders are
+    already following the path—and succeeding. It is inspiring to note that Botswana, Eswatini, Rwanda, the United Republic
+    of Tanzania and Zimbabwe have already achieved the 95–95–95 targets, and at least 16 other countries (including eight
+    in sub-Saharan Africa) are close to doing so.
 
 wdir: ../../../data/snapshots/health/2023-08-09
 outs:
-- md5: e04735d964a8e600d7f4b158c8e11c26
-  size: 56393060
+- md5: 27ab0a9cd70f7f9c00665947d7a37319
+  size: 160264610
   path: unaids.csv
