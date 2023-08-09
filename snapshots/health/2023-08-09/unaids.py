@@ -48,7 +48,7 @@ def main(path_to_file: str, upload: bool) -> None:
     df = get_all_data_from_api(path_to_file)
 
     with tempfile.NamedTemporaryFile(mode="w") as csvfile:
-        df.to_csv(csvfile, index=False)
+        df.to_csv(csvfile, index=False)  # type: ignore
         with open(csvfile.name) as csvfile:
             # Copy local data file to snapshots data folder.
             snap.path.write_bytes(Path(csvfile.name).read_bytes())
@@ -89,19 +89,19 @@ def get_all_data_from_api(path: str) -> pd.DataFrame:
     session.mount("http://", adapter)
     session.mount("https://", adapter)
 
-    def _get_data_from_api_links(df: pd.DataFrame) -> pd.DataFrame:
+    def _get_data_from_api_links(df_links: pd.DataFrame) -> pd.DataFrame:
         dfs = []
-        for url in df["API"].values:
+        for url in df_links["API"].values:
             log.info(f"health.unaids: downloading from {url}")
             data = session.get(url).json()
             df_ = pd.DataFrame.from_records(data["Data"][0]["Observation"])
             dfs.append(df_)
             # time.sleep(2)
-        df = pd.concat(dfs, ignore_index=True)
+        df: pd.DataFrame = pd.concat(dfs, ignore_index=True)  # type: ignore
         return df
 
     # Get data
-    df = _get_data_from_api_links(df)
+    df = _get_data_from_api_links(df)  # type: ignore
 
     return df
 
