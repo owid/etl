@@ -155,10 +155,6 @@ class Table(pd.DataFrame):
         else:
             raise ValueError(f"could not detect a suitable format to read from: {path}")
 
-        # If each variable does not have sources, load them from the dataset.
-        # TODO: I think this is not a good idea, consider removing.
-        # table = assign_dataset_sources_and_licenses_to_each_variable(table=table)
-
         # Add processing log to the metadata of each variable in the table.
         # TODO: For some reason, the snapshot loading entry gets repeated.
         table = update_processing_logs_when_loading_or_creating_table(table=table)
@@ -1129,10 +1125,38 @@ def read_excel(
 def read_from_records(data: Any, *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs):
     table = Table(pd.DataFrame.from_records(data=data, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
-    # Note: Parents could be passed as arguments, or extracted from metadata.
+    # NOTE: Parents could be passed as arguments, or extracted from metadata.
     table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
 
     return table
+
+
+def read_from_dict(
+    data: Dict[Any, Any], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
+):
+    table = Table(pd.DataFrame.from_dict(data=data, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    # NOTE: Parents could be passed as arguments, or extracted from metadata.
+    table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
+
+    return table
+
+
+def read_json(
+    path_or_buf: Union[str, Path, IO[AnyStr]],
+    metadata: Optional[TableMeta] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_json(path_or_buf=path_or_buf, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    if isinstance(path_or_buf, (str, Path)):
+        table = update_log(table=table, operation="load", parents=[path_or_buf])
+    else:
+        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_json.")
+
+    return cast(Table, table)
 
 
 class ExcelFile(pd.ExcelFile):
