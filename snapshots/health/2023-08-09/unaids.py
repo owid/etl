@@ -47,7 +47,7 @@ def main(path_to_file: str, upload: bool) -> None:
     # Get data
     df = get_all_data_from_api(path_to_file)
 
-    with tempfile.NamedTemporaryFile(mode='w') as csvfile:
+    with tempfile.NamedTemporaryFile(mode="w") as csvfile:
         df.to_csv(csvfile, index=False)
         with open(csvfile.name) as csvfile:
             # Copy local data file to snapshots data folder.

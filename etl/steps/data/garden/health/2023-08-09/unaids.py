@@ -33,16 +33,16 @@ def run(dest_dir: str) -> None:
 
     # Pivot table
     log.info("health.unaids: pivot table")
-    tb = tb.pivot(index=["country", "year", "subgroup_description"], columns="indicator", values="obs_value").reset_index()
+    tb = tb.pivot(
+        index=["country", "year", "subgroup_description"], columns="indicator", values="obs_value"
+    ).reset_index()
 
     # Underscore column names
     log.info("health.unaids: underscore column names")
     tb = tb.underscore()
 
     log.info("health.unaids: harmonize countries")
-    tb: Table = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path
-    )
+    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Rename columns
     log.info("health.unaids: rename columns")
