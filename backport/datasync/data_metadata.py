@@ -1,10 +1,10 @@
 import concurrent.futures
 import json
-import re
 from http.client import RemoteDisconnected
 from typing import Any, Dict, List, Union, cast
 from urllib.error import HTTPError, URLError
 
+import numpy as np
 import pandas as pd
 from sqlalchemy.engine import Engine
 from tenacity import Retrying
@@ -12,38 +12,11 @@ from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
-
-def variable_data_df_from_mysql(engine: Engine, variable_id: int) -> pd.DataFrame:
-    q = """
-    SELECT
-        value,
-        year,
-        entities.id AS entityId,
-        entities.name AS entityName,
-        entities.code AS entityCode
-    FROM data_values
-    LEFT JOIN entities ON data_values.entityId = entities.id
-    WHERE data_values.variableId = %(variable_id)s
-    ORDER BY
-        year ASC
-    """
-    return pd.read_sql(q, engine, params={"variable_id": variable_id})
+from etl import config
 
 
-def _extract_variable_id_from_data_path(data_path: str) -> int:
-    match = re.search(r"/indicators/(\d+)", data_path)
-    if match:
-        return int(match.group(1))
-    else:
-        match = re.search(r"/data/(\d+)", data_path)
-        assert match, f"Could not find variableId in dataPath `{data_path}`"
-        return int(match.group(1))
-
-
-def _fetch_data_df_from_s3(data_path: str):
+def _fetch_data_df_from_s3(variable_id: int):
     try:
-        variable_id = _extract_variable_id_from_data_path(data_path)
-
         # Cloudflare limits us to 600 requests per minute, retry in case we hit the limit
         # NOTE: increase wait time or attempts if we hit the limit too often
         for attempt in Retrying(
@@ -53,7 +26,7 @@ def _fetch_data_df_from_s3(data_path: str):
         ):
             with attempt:
                 return (
-                    pd.read_json(data_path)
+                    pd.read_json(config.variable_data_url(variable_id))
                     .rename(
                         columns={
                             "entities": "entityId",
@@ -63,30 +36,15 @@ def _fetch_data_df_from_s3(data_path: str):
                     )
                     .assign(variableId=variable_id)
                 )
-    # no data on S3 in dataPath
+    # no data on S3
     except HTTPError:
         return pd.DataFrame(columns=["variableId", "entityId", "year", "value"])
 
 
-def variable_data_df_from_s3(
-    engine: Engine, data_paths: List[str] = [], variable_ids: List[int] = [], workers: int = 1
-) -> pd.DataFrame:
-    """Fetch data from S3 and add entity code and name from DB. You can use either data_paths or variable_ids."""
-    if not data_paths:
-        q = """
-        SELECT
-            dataPath
-        FROM variables as v
-        WHERE id in %(variable_ids)s
-        """
-        data_paths = pd.read_sql(
-            q,
-            engine,
-            params={"variable_ids": variable_ids},
-        )["dataPath"].tolist()
-
+def variable_data_df_from_s3(engine: Engine, variable_ids: List[int] = [], workers: int = 1) -> pd.DataFrame:
+    """Fetch data from S3 and add entity code and name from DB."""
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-        results = list(executor.map(lambda data_path: _fetch_data_df_from_s3(data_path), data_paths))
+        results = list(executor.map(_fetch_data_df_from_s3, variable_ids))
 
     if isinstance(results, list) and all(isinstance(df, pd.DataFrame) for df in results):
         df = pd.concat(cast(List[pd.DataFrame], results))
@@ -186,12 +144,14 @@ def _load_origins_df(engine: Engine, variable_id: int) -> pd.DataFrame:
     return df
 
 
-def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
-    """Fetch metadata for a single variable from database. This function was initially based on the
-    one from owid-grapher repository and uses raw SQL commands. It'd be interesting to rewrite it
-    using SQLAlchemy ORM in grapher_model.py.
-    """
-    row = _load_variable(engine, variable_id)
+def _variable_metadata(
+    db_variable_row: Dict[str, Any],
+    variable_data: pd.DataFrame,
+    db_origins_df: pd.DataFrame,
+    db_topic_tags: list[str],
+    db_faqs: list[dict],
+) -> Dict[str, Any]:
+    row = db_variable_row
 
     variable = row
     sourceId = row.pop("sourceId")
@@ -221,8 +181,8 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         titleVariant=row.pop("titleVariant"),
         producerShort=row.pop("producerShort"),
         attribution=row.pop("attribution"),
-        topicTagsLinks=_load_topic_tags(engine, variable_id),
-        faqs=_load_faqs(engine, variable_id),
+        topicTagsLinks=db_topic_tags,
+        faqs=db_faqs,
         keyInfoText=keyInfoText,
         processingInfo=row.pop("processingInfo"),
     )
@@ -259,6 +219,9 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         .drop_duplicates(["entityId"])
         .rename(columns={"entityId": "id", "entityName": "name", "entityCode": "code"})
         .set_index("id", drop=False)
+        .astype(object)
+        # avoid NaN in JSON
+        .replace(to_replace=np.nan, value=None)
         .to_dict(orient="records")
     )
 
@@ -287,10 +250,23 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         variableMetadata[col] = variableMetadata[col].strftime(time_format)  # type: ignore
 
     # add origins
-    origins_df = _load_origins_df(engine, variable_id)
-    variableMetadata["origins"] = [_omit_nullable_values(d) for d in origins_df.to_dict(orient="records")]  # type: ignore
+    variableMetadata["origins"] = [_omit_nullable_values(d) for d in db_origins_df.to_dict(orient="records")]  # type: ignore
 
     return variableMetadata
+
+
+def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
+    """Fetch metadata for a single variable from database. This function was initially based on the
+    one from owid-grapher repository and uses raw SQL commands. It'd be interesting to rewrite it
+    using SQLAlchemy ORM in grapher_model.py.
+    """
+    return _variable_metadata(
+        db_variable_row=_load_variable(engine, variable_id),
+        variable_data=variable_data,
+        db_origins_df=_load_origins_df(engine, variable_id),
+        db_topic_tags=_load_topic_tags(engine, variable_id),
+        db_faqs=_load_faqs(engine, variable_id),
+    )
 
 
 def _infer_variable_type(values: pd.Series) -> str:

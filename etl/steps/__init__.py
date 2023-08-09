@@ -701,6 +701,9 @@ class GrapherStep(Step):
     def run(self) -> None:
         import etl.grapher_import as gi
 
+        if "DATA_API_ENV" not in os.environ:
+            warnings.warn(f"DATA_API_ENV not set, using '{config.DATA_API_ENV}'")
+
         # save dataset to grapher DB
         dataset = self.dataset
 

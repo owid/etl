@@ -103,6 +103,34 @@ def test_replace_a_variables_own_value(table_1) -> None:
     assert tb1._fields["a"] == table_1._fields["a"]
     assert tb1._fields["b"] == table_1._fields["b"]
 
+    # Idem using +=.
+    tb1 = table_1.copy()
+    tb1["a"] += 1
+    assert (tb1["a"] == pd.Series([2, 3, 4])).all()
+    # Metadata for "a" and "b" should be identical.
+    assert tb1._fields["a"] == table_1._fields["a"]
+    assert tb1._fields["b"] == table_1._fields["b"]
+
+
+def test_operations_of_variable_and_scalar(table_1, sources, licenses):
+    table_1["a"] = table_1["a"] + 1
+    table_1["a"] += 1
+    table_1["a"] = table_1["a"] - 1
+    table_1["a"] -= 1
+    table_1["a"] = table_1["a"] * 1
+    table_1["a"] *= 1
+    table_1["a"] = table_1["a"] / 1
+    table_1["a"] /= 1
+    table_1["a"] = table_1["a"] // 1
+    table_1["a"] //= 1
+    table_1["a"] = table_1["a"] % 1
+    table_1["a"] %= 1
+    table_1["a"] = table_1["a"] ** 1
+    table_1["a"] **= 1
+
+    assert table_1["a"].metadata.sources == [sources[2], sources[1]]
+    assert table_1["a"].metadata.licenses == [licenses[1]]
+
 
 def test_create_new_variable_as_product_of_other_two(table_1, sources, licenses) -> None:
     tb1 = table_1.copy()

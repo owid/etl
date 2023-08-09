@@ -14,7 +14,6 @@ backport = 'backport.backport:backport_cli'
 bulk_backport = 'backport.bulk_backport:bulk_backport'
 backport-migrate = 'backport.migrate.migrate:cli'
 backport-fasttrack = 'backport.fasttrack_backport:cli'
-backport-datasync = 'backport.datasync.datasync:cli'
 walkthrough = 'walkthrough.cli:cli'
 fasttrack = 'fasttrack.cli:cli'
 run_python_step = 'etl.run_python_step:main'
@@ -61,7 +60,9 @@ simplejson = ">=3.17.6"
 bugsnag = ">=4.2.1"
 xlrd = ">=2.0.1"
 PyPDF2 = ">=2.11.1"
-dvc = {extras = ["s3"], version = ">=2.56.0"}
+# DVC 3.0.0 does not allow storing metadata in a different place (we store data in `data/snapshots` and dvc files in `snapshots/*`)
+# It doesn't even improve performance and complicates our use case
+dvc = {version = "<3.0.0", extras = ["s3"]}
 "ruamel.yaml" = ">=0.17.21"
 owid-repack = {path = "lib/repack", develop = true}
 mkdocs-jupyter = "^0.22.0"

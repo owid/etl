@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_964_livestock_counts__hyde__and__fao__2017_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:53:49.999926
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/964
+    date_accessed: 2023-08-08 07:37:03.923041
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_964_livestock_counts__hyde__and__fao__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/964
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 22aa4351be1ea3a1bb431aa901e63984
-  size: 9167
+- md5: 65b786029bd3bfc0a4a8f0c8eb146cc1
+  size: 12350
   path: dataset_964_livestock_counts__hyde__and__fao__2017_config.json

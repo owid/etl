@@ -109,7 +109,8 @@ def run(dest_dir: str) -> None:
     total_df["total_killed"] = tb.groupby(["country", "year"])["nkill"].sum()
     total_df["total_wounded"] = tb.groupby(["country", "year"])["nwound"].sum()
     total_df["total_incident_counts"] = tb.groupby(["country", "year"]).size()
-    total_df["total_casualties"] = total_df["total_wounded"] + total_df["total_incident_counts"]
+    # Add GTD regions to number of deaths, attacks and wounded
+    total_df = add_regions(tb, total_df)
 
     tb.loc[tb["nkill"] == 0, "severity"] = "0 deaths"
     tb.loc[(tb["nkill"] >= 1) & (tb["nkill"] <= 5), "severity"] = "1-5 deaths"
@@ -187,9 +188,6 @@ def run(dest_dir: str) -> None:
         df_pop_deaths["population"] / 100000
     )
     df_pop_deaths["terrorism_deaths_per_100k"] = df_pop_deaths["total_killed"] / (df_pop_deaths["population"] / 100000)
-    df_pop_deaths["terrorism_casualties_per_100k"] = df_pop_deaths["total_casualties"] / (
-        df_pop_deaths["population"] / 100000
-    )
     df_pop_deaths["share_of_deaths"] = (df_pop_deaths["total_killed"] / df_pop_deaths["deaths"]) * 100
 
     # Drop total deaths and population columns
@@ -241,6 +239,36 @@ def add_suffix(df: pd.DataFrame, suffix: str) -> pd.DataFrame:
             df.rename(columns={column: column + suffix}, inplace=True)
 
     return df
+
+
+def add_regions(df, total_df):
+    """
+    Aggregates incident data by regions and years, summarizing the total killed, wounded, and incident counts.
+
+    Args:
+        df (pd.DataFrame): A DataFrame containing the columns 'region_txt', 'year', 'nkill', 'nwound',
+                           and 'total_incident_counts'. 'region_txt' refers to the region text, 'nkill'
+                           to the number of people killed, 'nwound' to the number of people wounded,
+                           and 'total_incident_counts' to the total number of incidents.
+
+    Returns:
+        pd.DataFrame: A concatanated DataFrame with original data concatenated with aggregated data grouped by region and year, containing the total number
+                      of killed, wounded, and incidents.
+
+    """
+    grouped_regions_df = df.groupby(["region_txt", "year"])
+    summary_regions_df = pd.DataFrame()
+
+    for column in ["nkill", "nwound"]:
+        summary_regions_df[f"total_{column}"] = grouped_regions_df[column].sum()
+
+    summary_regions_df["total_incident_counts"] = grouped_regions_df.size()
+    summary_regions_df = summary_regions_df.rename_axis(index={"region_txt": "country"})
+
+    summary_regions_df.rename(columns={"total_nkill": "total_killed", "total_nwound": "total_wounded"}, inplace=True)
+    merged_df = pd.concat([summary_regions_df, total_df])
+
+    return merged_df
 
 
 def generate_summary_dataframe(df, group_column, target_columns):

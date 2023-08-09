@@ -783,3 +783,51 @@ def test_get_unique_sources_from_tables(table_1, sources):
         sources[1],
         sources[3],
     ]
+
+
+def test_sum_columns(table_1, sources, licenses):
+    # Create a new column that is the element-wise sum of the other two existing columns.
+    table_1["c"] = table_1[["a", "b"]].sum(axis=1)
+    assert table_1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert table_1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+
+    # Create a new variable (it cannot be added as a new column since it has different dimensions) that is the sum of
+    # each of the other two existing columns.
+    variable_c = table_1[["a", "b"]].sum(axis=0)
+    assert variable_c.metadata.sources == [sources[2], sources[1], sources[3]]
+    assert variable_c.metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+
+
+def test_operations_of_table_and_scalar(table_1, sources, licenses):
+    table_1[["a", "b"]] = table_1[["a", "b"]] + 1
+    table_1[["a", "b"]] += 1
+    table_1[["a", "b"]] = table_1[["a", "b"]] - 1
+    table_1[["a", "b"]] -= 1
+    table_1[["a", "b"]] = table_1[["a", "b"]] * 1
+    table_1[["a", "b"]] *= 1
+    table_1[["a", "b"]] = table_1[["a", "b"]] / 1
+    table_1[["a", "b"]] /= 1
+    table_1[["a", "b"]] = table_1[["a", "b"]] // 1
+    table_1[["a", "b"]] //= 1
+    table_1[["a", "b"]] = table_1[["a", "b"]] % 1
+    table_1[["a", "b"]] %= 1
+    table_1[["a", "b"]] = table_1[["a", "b"]] ** 1
+    table_1[["a", "b"]] **= 1
+
+    assert table_1["a"].metadata.sources == [sources[2], sources[1]]
+    assert table_1["a"].metadata.licenses == [licenses[1]]
+    assert table_1["b"].metadata.sources == [sources[2], sources[3]]
+    assert table_1["b"].metadata.licenses == [licenses[2], licenses[3]]
+
+
+def test_multiply_columns(table_1, sources, licenses):
+    # Create a new column that is the element-wise product of the other two existing columns.
+    table_1["c"] = table_1[["a", "b"]].prod(axis=1)
+    assert table_1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert table_1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+
+    # Create a new variable (it cannot be added as a new column since it has different dimensions) that is the product
+    # of each of the other two existing columns.
+    variable_c = table_1[["a", "b"]].prod(axis=0)
+    assert variable_c.metadata.sources == [sources[2], sources[1], sources[3]]
+    assert variable_c.metadata.licenses == [licenses[1], licenses[2], licenses[3]]

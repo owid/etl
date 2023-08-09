@@ -820,8 +820,6 @@ class Variable(SQLModel, table=True):
     grapherConfigAdmin: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfigAdmin", JSON))
     grapherConfigETL: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfigETL", JSON))
     catalogPath: Optional[str] = Field(default=None, sa_column=Column("catalogPath", LONGTEXT))
-    dataPath: Optional[str] = Field(default=None, sa_column=Column("dataPath", LONGTEXT))
-    metadataPath: Optional[str] = Field(default=None, sa_column=Column("metadataPath", LONGTEXT))
     dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=True))
 
     schemaVersion: Optional[int] = Field(default=None, sa_column=Column("schemaVersion", Integer))
@@ -887,8 +885,6 @@ class Variable(SQLModel, table=True):
             ds.coverage = self.coverage
             ds.display = self.display
             ds.catalogPath = self.catalogPath
-            ds.dataPath = self.dataPath
-            ds.metadataPath = self.metadataPath
             ds.dimensions = self.dimensions
             ds.schemaVersion = self.schemaVersion
             ds.processingLevel = self.processingLevel
