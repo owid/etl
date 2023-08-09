@@ -27,6 +27,8 @@ import pyarrow
 import pyarrow.parquet as pq
 import structlog
 from owid.repack import repack_frame
+from pandas._typing import Scalar
+from pandas.core.series import Series
 from pandas.util._decorators import rewrite_axis_style_signature
 
 from . import variables
@@ -738,6 +740,86 @@ class Table(pd.DataFrame):
         )
 
         return variable
+
+    def __add__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
+        # The following would have a parents only the scalar, not the scalar and the corresponding variable.
+        # tb = update_log(table=tb, operation="+", parents=[other], variable_names=tb.columns)
+        # Instead, update the processing log of each variable in the table.
+        for column in tb.columns:
+            tb[column] = variables.update_log(
+                variable=tb[column], parents=[column, other], operation="+", variable_name=column
+            )
+        return tb
+
+    def __iadd__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        return self.__add__(other)
+
+    def __sub__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        tb = cast(Table, Table(super().__sub__(other=other)).copy_metadata(self))
+        for column in tb.columns:
+            tb[column] = variables.update_log(
+                variable=tb[column], parents=[column, other], operation="-", variable_name=column
+            )
+        return tb
+
+    def __isub__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        return self.__sub__(other)
+
+    def __mul__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        tb = cast(Table, Table(super().__mul__(other=other)).copy_metadata(self))
+        for column in tb.columns:
+            tb[column] = variables.update_log(
+                variable=tb[column], parents=[column, other], operation="*", variable_name=column
+            )
+        return tb
+
+    def __imul__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        return self.__mul__(other)
+
+    def __truediv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        tb = cast(Table, Table(super().__truediv__(other=other)).copy_metadata(self))
+        for column in tb.columns:
+            tb[column] = variables.update_log(
+                variable=tb[column], parents=[column, other], operation="/", variable_name=column
+            )
+        return tb
+
+    def __itruediv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        return self.__truediv__(other)
+
+    def __floordiv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        tb = cast(Table, Table(super().__floordiv__(other=other)).copy_metadata(self))
+        for column in tb.columns:
+            tb[column] = variables.update_log(
+                variable=tb[column], parents=[column, other], operation="//", variable_name=column
+            )
+        return tb
+
+    def __ifloordiv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        return self.__floordiv__(other)
+
+    def __mod__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        tb = cast(Table, Table(super().__mod__(other=other)).copy_metadata(self))
+        for column in tb.columns:
+            tb[column] = variables.update_log(
+                variable=tb[column], parents=[column, other], operation="%", variable_name=column
+            )
+        return tb
+
+    def __imod__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        return self.__mod__(other)
+
+    def __pow__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        tb = cast(Table, Table(super().__pow__(other=other)).copy_metadata(self))
+        for column in tb.columns:
+            tb[column] = variables.update_log(
+                variable=tb[column], parents=[column, other], operation="**", variable_name=column
+            )
+        return tb
+
+    def __ipow__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+        return self.__pow__(other)
 
 
 def merge(
