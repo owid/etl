@@ -16,10 +16,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("years_of_education"))
+    ds_meadow = cast(Dataset, paths.load_dependency("clio_infra_education"))
 
     # Read table from meadow dataset.
-    tb = ds_meadow["years_of_education"].reset_index()
+    tb = ds_meadow["clio_infra_education"].reset_index()
 
     #
     # Process data.
