@@ -124,7 +124,6 @@ class PotentialBackport:
 
     def upload(self, upload: bool, dry_run: bool, engine: Engine) -> None:
         config_metadata = _snapshot_config_metadata(self.ds, self.short_name, self.public)
-        config_metadata.save()
         _upload_config_to_snapshot(
             self.config,
             config_metadata,
@@ -135,13 +134,16 @@ class PotentialBackport:
         # upload values to snapshot
         df = _load_values(engine, self.variable_ids)
         values_metadata = _snapshot_values_metadata(self.ds, self.short_name, self.public)
-        values_metadata.save()
         _upload_values_to_snapshot(
             df,
             values_metadata,
             dry_run,
             upload,
         )
+
+        # save snapshots YAML, do it only after successfull upload
+        config_metadata.save()
+        values_metadata.save()
 
 
 def backport(
