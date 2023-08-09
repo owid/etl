@@ -116,49 +116,7 @@ class Snapshot:
                         dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
 
     def to_table_metadata(self):
-        if "origin" in self.metadata.to_dict():
-            table_meta = TableMeta.from_dict(
-                {
-                    "short_name": self.metadata.short_name,
-                    "title": self.metadata.origin.dataset_title_owid,  # type: ignore
-                    "description": self.metadata.origin.dataset_description_owid,  # type: ignore
-                    "dataset": DatasetMeta.from_dict(
-                        {
-                            "channel": "snapshots",
-                            "namespace": self.metadata.namespace,
-                            "short_name": self.metadata.short_name,
-                            "title": self.metadata.origin.dataset_title_owid,  # type: ignore
-                            "description": self.metadata.origin.dataset_description_owid,  # type: ignore
-                            "origins": [self.metadata.origin],
-                            "licenses": [self.metadata.license],
-                            "is_public": self.metadata.is_public,
-                            "version": self.metadata.version,
-                        }
-                    ),
-                }
-            )
-        else:
-            table_meta = TableMeta.from_dict(
-                {
-                    "short_name": self.metadata.short_name,
-                    "title": self.metadata.name,
-                    "description": self.metadata.description,
-                    "dataset": DatasetMeta.from_dict(
-                        {
-                            "channel": "snapshots",
-                            "description": self.metadata.description,
-                            "is_public": self.metadata.is_public,
-                            "namespace": self.metadata.namespace,
-                            "short_name": self.metadata.short_name,
-                            "title": self.metadata.name,
-                            "version": self.metadata.version,
-                            "sources": [self.metadata.source],
-                            "licenses": [self.metadata.license],
-                        }
-                    ),
-                }
-            )
-        return table_meta
+        return self.metadata.to_table_metadata()
 
 
 @pruned_json
@@ -316,6 +274,51 @@ class SnapshotMeta:
             published_by=s["description"].get("dataPublishedBy"),
             date_accessed=pd.to_datetime(s["description"].get("retrievedDate") or dt.date.today()).date(),
         )
+
+    def to_table_metadata(self):
+        if "origin" in self.to_dict():
+            table_meta = TableMeta.from_dict(
+                {
+                    "short_name": self.short_name,
+                    "title": self.origin.dataset_title_owid,  # type: ignore
+                    "description": self.origin.dataset_description_owid,  # type: ignore
+                    "dataset": DatasetMeta.from_dict(
+                        {
+                            "channel": "snapshots",
+                            "namespace": self.namespace,
+                            "short_name": self.short_name,
+                            "title": self.origin.dataset_title_owid,  # type: ignore
+                            "description": self.origin.dataset_description_owid,  # type: ignore
+                            "origins": [self.origin],
+                            "licenses": [self.license],
+                            "is_public": self.is_public,
+                            "version": self.version,
+                        }
+                    ),
+                }
+            )
+        else:
+            table_meta = TableMeta.from_dict(
+                {
+                    "short_name": self.short_name,
+                    "title": self.name,
+                    "description": self.description,
+                    "dataset": DatasetMeta.from_dict(
+                        {
+                            "channel": "snapshots",
+                            "description": self.description,
+                            "is_public": self.is_public,
+                            "namespace": self.namespace,
+                            "short_name": self.short_name,
+                            "title": self.name,
+                            "version": self.version,
+                            "sources": [self.source],
+                            "licenses": [self.license],
+                        }
+                    ),
+                }
+            )
+        return table_meta
 
 
 def add_snapshot(
