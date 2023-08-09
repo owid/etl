@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/5623
-    date_accessed: 2023-08-09 13:40:19.508170
+    date_accessed: 2023-08-09 15:10:05.387980
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5623_excess_mortality_estimates__who__2022
