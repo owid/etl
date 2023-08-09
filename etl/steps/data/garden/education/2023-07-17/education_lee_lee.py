@@ -64,20 +64,58 @@ def run(dest_dir: str) -> None:
     tb_wb = ds_garden_wb["education"]
 
     # Extract indicators with enrolment rates from World Bank that match the ones in the current dataset (net enrolment up to secondary and gross enrolment for tertiary)
+    select_enrolment_cols = [
+        "total_net_enrolment_rate__primary__both_sexes__pct",
+        "total_net_enrolment_rate__primary__female__pct",
+        "total_net_enrolment_rate__primary__male__pct",
+        "school_enrollment__tertiary__pct_gross",
+        "school_enrollment__tertiary__female__pct_gross",
+        "school_enrollment__tertiary__male__pct_gross",
+        "total_net_enrolment_rate__lower_secondary__both_sexes__pct",
+        "total_net_enrolment_rate__upper_secondary__both_sexes__pct",
+        "total_net_enrolment_rate__lower_secondary__male__pct",
+        "total_net_enrolment_rate__upper_secondary__male__pct",
+        "total_net_enrolment_rate__lower_secondary__female__pct",
+        "total_net_enrolment_rate__upper_secondary__female__pct",
+    ]
+
     dictionary_to_rename_and_combine = {
-        "net_enrolment_rate__primary__both_sexes__pct": "mf_primary_enrollment_rates",
-        "net_enrolment_rate__primary__female__pct": "f_primary_enrollment_rates",
-        "net_enrolment_rate__primary__male__pct": "m_primary_enrollment_rates",
-        "net_enrolment_rate__secondary__both_sexes__pct": "mf_secondary_enrollment_rates",
-        "net_enrolment_rate__secondary__female__pct": "f_secondary_enrollment_rates",
-        "net_enrolment_rate__secondary__male__pct": "m_secondary_enrollment_rates",
-        "gross_enrolment_ratio__tertiary__both_sexes__pct": "mf_tertiary_enrollment_rates",
-        "gross_enrolment_ratio__tertiary__female__pct": "f_tertiary_enrollment_rates",
-        "gross_enrolment_ratio__tertiary__male__pct": "m_tertiary_enrollment_rates",
+        "total_net_enrolment_rate__primary__both_sexes__pct": "mf_primary_enrollment_rates",
+        "total_net_enrolment_rate__primary__female__pct": "f_primary_enrollment_rates",
+        "total_net_enrolment_rate__primary__male__pct": "m_primary_enrollment_rates",
+        "school_enrollment__tertiary__pct_gross": "mf_tertiary_enrollment_rates",
+        "school_enrollment__tertiary__female__pct_gross": "f_tertiary_enrollment_rates",
+        "school_enrollment__tertiary__male__pct_gross": "m_tertiary_enrollment_rates",
     }
 
-    enrolment_wb = tb_wb[dictionary_to_rename_and_combine.keys()]
+    enrolment_wb = tb_wb[select_enrolment_cols]
     enrolment_wb.rename(columns=dictionary_to_rename_and_combine, inplace=True)
+    enrolment_wb["mf_secondary_enrollment_rates"] = (
+        enrolment_wb["total_net_enrolment_rate__lower_secondary__both_sexes__pct"]
+        + enrolment_wb["total_net_enrolment_rate__upper_secondary__both_sexes__pct"]
+    ) / 2
+
+    enrolment_wb["m_secondary_enrollment_rates"] = (
+        enrolment_wb["total_net_enrolment_rate__lower_secondary__male__pct"]
+        + enrolment_wb["total_net_enrolment_rate__upper_secondary__male__pct"]
+    ) / 2
+
+    enrolment_wb["f_secondary_enrollment_rates"] = (
+        enrolment_wb["total_net_enrolment_rate__lower_secondary__female__pct"]
+        + enrolment_wb["total_net_enrolment_rate__upper_secondary__female__pct"]
+    ) / 2
+    enrolment_wb.drop(
+        [
+            "total_net_enrolment_rate__lower_secondary__both_sexes__pct",
+            "total_net_enrolment_rate__upper_secondary__both_sexes__pct",
+            "total_net_enrolment_rate__lower_secondary__female__pct",
+            "total_net_enrolment_rate__upper_secondary__female__pct",
+            "total_net_enrolment_rate__lower_secondary__male__pct",
+            "total_net_enrolment_rate__upper_secondary__male__pct",
+        ],
+        axis=1,
+        inplace=True,
+    )
     df_above_2010 = enrolment_wb[(enrolment_wb.index.get_level_values("year") > 2010)]
     df_above_2010.reset_index(inplace=True)
 
