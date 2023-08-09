@@ -94,17 +94,24 @@ def test_underscore():
 
 
 def test_underscore_table():
-    df = pd.DataFrame({"A": [1, 2, 3]})
+    df = pd.DataFrame({"A": [1, 2, 3], "b": [1, 2, 3]})
     df.index.names = ["I"]
 
     t = Table(df)
     t["A"].metadata.description = "column A"
+    t["b"].metadata.description = "column B"
 
     tt = underscore_table(t)
-    assert tt.columns == ["a"]
+    assert list(tt.columns) == ["a", "b"]
     assert tt.index.names == ["i"]
+
+    # original column name is moved to title if we underscored it
     assert tt["a"].metadata.description == "column A"
     assert tt["a"].metadata.title == "A"
+
+    # title is None if underscoring didn't change the name
+    assert tt["b"].metadata.description == "column B"
+    assert tt["b"].metadata.title is None
 
 
 def test_underscore_table_collision():
