@@ -3697,8 +3697,8 @@ tables:
         unit: '%'
       sh_prv_smok:
         title: Prevalence of current tobacco use (% of adults)
-        short_unit: ages 15+
-        unit: ages 15+
+        short_unit: '%'
+        unit: '% of adults'
         display:
           name: Adults who smoke
       sh_prv_smok_fe:
