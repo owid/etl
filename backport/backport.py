@@ -5,7 +5,7 @@ from typing import Any, List, Optional
 import click
 import pandas as pd
 import structlog
-from git import Repo
+from git.repo import Repo
 from owid.catalog import Source
 from sqlalchemy.engine import Engine
 from sqlmodel import Session
