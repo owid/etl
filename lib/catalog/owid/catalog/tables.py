@@ -1126,6 +1126,15 @@ def read_excel(
     return cast(Table, table)
 
 
+def read_from_records(data: Any, *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs):
+    table = Table(pd.DataFrame.from_records(data=data, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    # Note: Parents could be passed as arguments, or extracted from metadata.
+    table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
+
+    return table
+
+
 class ExcelFile(pd.ExcelFile):
     def parse(
         self,

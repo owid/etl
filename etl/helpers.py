@@ -11,8 +11,9 @@ from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, ca
 
 import pandas as pd
 import structlog
+import yaml
 from owid import catalog
-from owid.catalog import CHANNEL, DatasetMeta
+from owid.catalog import CHANNEL, DatasetMeta, Table
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
 from owid.catalog.tables import (
     get_unique_licenses_from_tables,
@@ -904,3 +905,38 @@ class VersionTracker:
 
 def run_version_tracker_checks():
     VersionTracker().apply_sanity_checks()
+
+
+def print_tables_metadata_template(tables: List[Table]):
+    # This function is meant to be used when creating code in an interactive window (or a notebook).
+    # It prints a template for the metadata of the tables in the list.
+    # The template can be copied and pasted into the corresponding yaml file.
+    # In the future, we should have an interactive tool to add or edit the content of the metadata yaml files, using
+    # AI-generated texts when possible.
+
+    # Initialize output dictionary.
+    dict_tables = {}
+    for tb in tables:
+        dict_variables = {}
+        for column in tb.columns:
+            dict_values = {}
+            for field in ["title", "unit", "short_unit", "description"]:
+                value = getattr(tb[column].metadata, field) or ""
+
+                # Add some simple rules to simplify some common cases.
+
+                # If title is empty, or if title is underscore (probably because it is taken from the column name),
+                # create a custom title.
+                if (field == "title") and ((value == "") or ("_" in value)):
+                    value = column.capitalize().replace("_", " ")
+
+                # If unit or short_unit is empty, and the column name contains 'pct', set it to '%'.
+                if (value == "") and (field in ["unit", "short_unit"]) and "pct" in column:
+                    value = "%"
+
+                dict_values[field] = value
+            dict_variables[column] = dict_values
+        dict_tables[tb.metadata.short_name] = {"variables": dict_variables}
+    dict_output = {"tables": dict_tables}
+
+    print(yaml.dump(dict_output, default_flow_style=False, sort_keys=False))
