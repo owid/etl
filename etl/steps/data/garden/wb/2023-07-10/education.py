@@ -102,10 +102,11 @@ def add_metadata(tb):
                     [
                         nested_data["sourceNote"],
                         "World Bank variable id: " + nested_data["id"],
-                        nested_data["sourceOrganization"],
+                        ".Source:"
+                        + nested_data["sourceOrganization"],  # change this when the new metadata format is ready
                     ]
                 )
-
+                tb[new_column_name].metadata.title = nested_data["name"]
                 tb[new_column_name].metadata.display = {}
                 # Now update metadata units, short_units and number of decimal places to display depending on what keywords the variable name contains.
                 #
@@ -135,8 +136,4 @@ def add_metadata(tb):
                 print(f"Timeout while processing column {column}. Retrying in {delay} seconds...")
                 sleep(delay)
                 delay *= 2  # Double the delay for the next attempt
-
-        if attempt == retries - 1:
-            print(f"Failed to process column {column} after {retries} attempts.")
-
     return tb
