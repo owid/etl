@@ -1,0 +1,101 @@
+"""The data for this for this snapshot is obtained from multiple links on the UNAIDS website.
+
+In particular, we follow these steps:
+
+- Get the file with all API links: "UNAIDS_API_links.csv"
+    - This file was obtained by directly reaching the UNAIDS via mail.
+    - This file contains the list of all UNAIDS indicators, along with their respective API links to access their values.
+- Select those indicators of interest
+    - Together with a researcher, we selected the indicators of interest.
+- Access the data, combine them into a CSV and store it.
+    - For that, we can use the function `get_all_data_from_api` from this module.
+"""
+
+from pathlib import Path
+
+import click
+import pandas as pd
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+from etl.snapshot import Snapshot
+
+# Version for current snapshot dataset.
+SNAPSHOT_VERSION = Path(__file__).parent.name
+
+
+@click.command()
+@click.option(
+    "--upload/--skip-upload",
+    default=True,
+    type=bool,
+    help="Upload dataset to Snapshot",
+)
+@click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
+def main(path_to_file: str, upload: bool) -> None:
+    # Create a new snapshot.
+    snap = Snapshot(f"health/{SNAPSHOT_VERSION}/unaids.csv")
+
+    # Ensure destination folder exists.
+    snap.path.parent.mkdir(exist_ok=True, parents=True)
+
+    # Copy local data file to snapshots data folder.
+    snap.path.write_bytes(Path(path_to_file).read_bytes())
+
+    # Add file to DVC and upload to S3.
+    snap.dvc_add(upload=upload)
+
+
+def get_all_data_from_api() -> pd.DataFrame:
+    """Download relevant data from UNAIDS API."""
+    # Relevant indicators in UNAIDS data
+    FIELDS_RELEVANT = {
+        "EPI": [
+            "HIV Prevalence",
+            "Deaths averted due to ART",
+            "AID-related deaths",
+        ],
+        "GAM": [
+            "Country-reported HIV expenditure by funding source",
+        ],
+    }
+
+    # Load all api links
+    path = "UNAIDS_API_links.xlsx"
+    df_links = pd.read_excel(path, sheet_name=None)
+
+    # Load relevant fields, and concatenate
+    dfs = []
+    for category, fields in FIELDS_RELEVANT.items():
+        df_ = df_links[category]
+        df_ = df_[df_["Indicator_Name"].isin(fields)]
+        dfs.append(df_)
+    df = pd.concat(dfs, ignore_index=True)
+
+    # Define requests session
+    session = requests.Session()
+    retry = Retry(connect=3, backoff_factor=0.5)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+
+    def _get_data_from_api_links(df: pd.DataFrame) -> pd.DataFrame:
+        dfs = []
+        for url in df["API"].values:
+            print(url)
+            data = session.get(url).json()
+            df_ = pd.DataFrame.from_records(data["Data"][0]["Observation"])
+            dfs.append(df_)
+            # time.sleep(2)
+        df = pd.concat(dfs, ignore_index=True)
+        return df
+
+    # Get data
+    df = _get_data_from_api_links(df)
+
+    return df
+
+
+if __name__ == "__main__":
+    main()
