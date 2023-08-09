@@ -721,6 +721,24 @@ class Table(pd.DataFrame):
 
         return cast("Table", tb)
 
+    def sum(self, *args, **kwargs) -> variables.Variable:
+        variable_name = variables.UNNAMED_VARIABLE
+        variable = variables.Variable(super().sum(*args, **kwargs), name=variable_name)
+        variable.metadata = variables.combine_variables_metadata(
+            variables=[self[column] for column in self.columns], operation="+", name=variable_name
+        )
+
+        return variable
+
+    def prod(self, *args, **kwargs) -> variables.Variable:
+        variable_name = variables.UNNAMED_VARIABLE
+        variable = variables.Variable(super().prod(*args, **kwargs), name=variable_name)
+        variable.metadata = variables.combine_variables_metadata(
+            variables=[self[column] for column in self.columns], operation="*", name=variable_name
+        )
+
+        return variable
+
 
 def merge(
     left,
