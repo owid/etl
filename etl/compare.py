@@ -326,7 +326,7 @@ def read_variables_from_db(env_path: str, namespace: str, version: str, dataset:
     )
 
     # drop uninteresting columns
-    df = df.drop(["updatedAt", "createdAt", "dataPath", "metadataPath", "catalogPath"], axis=1)
+    df = df.drop(["updatedAt", "createdAt", "catalogPath"], axis=1)
 
     return cast(pd.DataFrame, df)
 
@@ -363,7 +363,6 @@ def read_values_from_s3(env_path: str, namespace: str, version: str, dataset: st
     q = """
     SELECT
         v.id as variableId,
-        v.dataPath,
         v.name as variable
     FROM variables as v
     JOIN datasets as d ON v.datasetId = d.id
@@ -376,7 +375,7 @@ def read_values_from_s3(env_path: str, namespace: str, version: str, dataset: st
     )
 
     # read them from S3
-    df = variable_data_df_from_s3(engine, vf.dataPath.tolist(), workers=10)
+    df = variable_data_df_from_s3(engine, variable_ids=vf.variableId.tolist(), workers=10)
 
     # add variable name
     df = df.merge(vf[["variableId", "variable"]], on="variableId")
