@@ -7,12 +7,12 @@ meta:
     Well-being since 1820, OECD Publishing, Paris, https://doi.org/10.1787/9789264214262-en.'
   url: https://clio-infra.eu/Indicators/AverageYearsofEducation.html#
   source_data_url: https://clio-infra.eu/data/AverageYearsofEducation_Compact.xlsx
-  license_url: https://clio-infra.eu/index.html#about
+  license_url: https://www.oecd.org/termsandconditions/
   license_name: ''
   date_accessed: 2023-08-09
   is_public: true
   description: |
-    The Average years of education in the total population aged 15 years and older is given for the period 1870-2010
+    The average years of education in the total population aged 15 years and older is given for the period 1870-2010.
 wdir: ../../../data/snapshots/oecd/2023-08-09
 outs:
 - md5: 435ef211f3dcd437702b8036407cc9cf
