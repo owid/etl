@@ -1,0 +1,70 @@
+tables:
+  unaids:
+    variables:
+      aids_deaths:
+        title: AIDS-related deaths
+        unit: deaths
+        description_from_producer: >-
+          The number of people dying from AIDS-related causes can be obtained using a variety of measures,
+          including through a vital registration system adjusted for misreporting, as part of a facility- or
+          population-based survey that may include verbal autopsy and through mathematical modelling using such tools as Spectrum.
+          Modelling tools typically use demographic data, HIV prevalence from survey and surveillance, the number of people
+          receiving antiretroviral therapy, HIV incidence and assumptions around survival patterns to estimate the number of people dying.
+          In some instances, data from vital reporting systems and estimates of underreporting and misclassification also may be
+          incorporated into these models to derive estimates of the number of AIDS-related deaths.
+
+          The source of the estimate is requested. Countries providing the number of people dying from AIDS-related causes derived from
+          a source other than Spectrum should provide any accompanying estimates of uncertainty around this number and upload an
+          electronic copy of the report describing how the number was calculated.
+
+          Countries should preferably report a modelled estimate rather than one derived from their vital registration
+          system unless this system has been recently evaluated as one of high quality. Users can now opt to use their
+          Spectrum estimate or enter nationally representative population-level data. If Spectrum estimates are chosen,
+          the values will be pulled directly from the software once the national file is finalized.
+
+        description: >-
+          Number of people dying from AIDS-related causes. This is measured annually and is disaggregated by sex, and age group.
+
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+
+      deaths_averted_art:
+        title: Deaths averted due to antiretroviral therapy
+        unit: deaths
+        description: >-
+          Deaths that were prevented thanks to the usage of antiretroviral therapy (ART).
+
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+
+      domestic_spending_fund_source:
+        title: Country-reported HIV expenditure by funding source
+        unit: US$
+        short_unit: $
+        description: >-
+          HIV expenditure by funding source.
+
+        description_from_producer: >-
+          The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources.
+          There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
+
+          The calculation of each service/programme or sub-indicator may have individual characteristics to ensure proper accounting
+          of all components (e.g., direct and shared costs of service provision) and to avoid double-counting; these calculations may
+          be different by each financing source and service delivery modality (or even by service provider). Further guidance is
+          available in the respective guidelines and manuals listed at the end of this section.
+
+
+        processing_level: minor
+
+      hiv_prevalence:
+        title: HIV Prevalence
+        unit: "%"
+        short_unit: "%"
+        description: >-
+          Percentage of people in a specific key population who test positive for HIV.
+
+
+          Additionally, upper and lower estimates are provided.
+        processing_level: minor
