@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5282_threatened_and_evaluated_species__iucn_red_list_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:19:05.577082
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5282
+    date_accessed: 2023-08-10 08:28:23.808575
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5282_threatened_and_evaluated_species__iucn_red_list
   description: Manually update spreadsheet
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5282
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a91e7901dcfd5b281771eac3b3de4675
-  size: 6408
+- md5: 819c1209685d7e6b0a8b7523fee0e212
+  size: 7059
   path: dataset_5282_threatened_and_evaluated_species__iucn_red_list_config.json

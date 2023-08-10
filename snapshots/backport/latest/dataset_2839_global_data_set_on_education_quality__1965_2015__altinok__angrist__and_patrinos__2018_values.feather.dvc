@@ -1,21 +1,18 @@
 meta:
-  namespace: backport
-  short_name: dataset_2839_global_data_set_on_education_quality__1965_2015__altinok__angrist__and_patrinos__2018_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:51:57.442752
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2839
+    date_accessed: 2023-08-10 09:15:59.670803
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Global Data Set on Education Quality (1965-2015) - Altinok, Angrist, and Patrinos
     (2018)
   description: 'Learning outcomes scores (using the 2018 data vintage) have been discontinued
     by the authors Angrist et al in favour of the 2021 edition of the HLO Database
     maintained by the World Bank at: https://datacatalog.worldbank.org/dataset/harmonized-learning-outcomes-hlo-database'
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2839
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ea28e909ba72998c62951f3c084b6814
+- md5: e28c63ffe2c1855f63d3660bb8703ca2
   size: 23690
-  path: dataset_2839_global_data_set_on_education_quality__1965_2015__altinok__angrist__and_patrinos__2018_values.feather
+  path: 
+    dataset_2839_global_data_set_on_education_quality__1965_2015__altinok__angrist__and_patrinos__2018_values.feather

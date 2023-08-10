@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2709_life_expectancy__oecd_values
-  file_extension: feather
-  date_accessed: 2023-02-23 15:17:00.460320
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2709
+    date_accessed: 2023-08-10 09:13:38.954059
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Life expectancy - OECD
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2709
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 36909837ee5d17395052deeb664308c9
+- md5: 519da9465d8cabac6bc9ec48d5137805
   size: 15714
   path: dataset_2709_life_expectancy__oecd_values.feather

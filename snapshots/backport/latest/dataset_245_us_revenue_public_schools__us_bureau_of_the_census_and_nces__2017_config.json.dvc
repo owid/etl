@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_245_us_revenue_public_schools__us_bureau_of_the_census_and_nces__2017_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:41:24.747663
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/245
+    date_accessed: 2023-08-10 08:03:05.977840
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_245_us_revenue_public_schools__us_bureau_of_the_census_and_nces__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/245
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d1f88145a85c9a1e17be01d9180e4a81
-  size: 4279
-  path: dataset_245_us_revenue_public_schools__us_bureau_of_the_census_and_nces__2017_config.json
+- md5: d09d04d1a45ce6e316bfefb03cbb554c
+  size: 4821
+  path: 
+    dataset_245_us_revenue_public_schools__us_bureau_of_the_census_and_nces__2017_config.json

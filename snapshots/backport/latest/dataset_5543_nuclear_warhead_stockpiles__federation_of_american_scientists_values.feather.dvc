@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5543_nuclear_warhead_stockpiles__federation_of_american_scientists_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:13:16.910877
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5543
+    date_accessed: 2023-08-10 09:25:17.186088
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Nuclear warhead stockpiles – Federation of American Scientists
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5543
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 93121e010e5650a52abdf94ca38b170a
+- md5: 5a647ec8abc99afbdca8e856761a9315
   size: 8458
-  path: dataset_5543_nuclear_warhead_stockpiles__federation_of_american_scientists_values.feather
+  path: 
+    dataset_5543_nuclear_warhead_stockpiles__federation_of_american_scientists_values.feather

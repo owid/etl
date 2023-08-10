@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2936_world_conflict_deaths__various_sources_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:52:30.332353
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2936
+    date_accessed: 2023-08-10 09:20:53.710007
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: World conflict deaths (various sources)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2936
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b2fa1a663ee022ce5fdab94532c2cb39
+- md5: 34caefe7f1366b9e4a3d52214de3c206
   size: 26210
   path: dataset_2936_world_conflict_deaths__various_sources_values.feather

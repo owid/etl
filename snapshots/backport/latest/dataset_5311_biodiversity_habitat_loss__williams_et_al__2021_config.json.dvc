@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5311_biodiversity_habitat_loss__williams_et_al__2021_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:42:28.822431
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5311
+    date_accessed: 2023-08-10 09:06:09.076137
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5311_biodiversity_habitat_loss__williams_et_al__2021
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5311
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bb6ddc4e7d07871583dcb259a12563e8
-  size: 34891
+- md5: 0e8fe2bb32f349de687db0c579d525e5
+  size: 41542
   path: dataset_5311_biodiversity_habitat_loss__williams_et_al__2021_config.json

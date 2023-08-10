@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2877_length_of_the_workday_in_1880__atack_and_bateman__1992_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:53:54.932235
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2877
+    date_accessed: 2023-08-10 08:01:52.137674
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2877_length_of_the_workday_in_1880__atack_and_bateman__1992
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2877
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3ce03983d2782036a7009f8fed249418
-  size: 7134
+- md5: 406862ce89451d2314ae3cd810d30dc7
+  size: 8049
   path: dataset_2877_length_of_the_workday_in_1880__atack_and_bateman__1992_config.json

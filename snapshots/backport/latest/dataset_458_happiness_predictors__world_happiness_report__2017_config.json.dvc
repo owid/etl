@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_458_happiness_predictors__world_happiness_report__2017_config
-  file_extension: json
-  date_accessed: 2023-02-23 15:18:10.857023
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/458
+    date_accessed: 2023-08-10 09:20:40.870249
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_458_happiness_predictors__world_happiness_report__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/458
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e92e78680e794813a404f4bcd8a3572b
-  size: 7603
+- md5: f8533168d86be09608b4ec5a2f3b8be4
+  size: 8532
   path: dataset_458_happiness_predictors__world_happiness_report__2017_config.json

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_1847_clark__fleche__and__senik__happiness_inequality_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:51:44.971481
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1847
+    date_accessed: 2023-08-10 08:07:08.028650
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Clark, Flèche & Senik – Happiness Inequality
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1847
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 16d8da4c5bbe18617bcbe18a44560988
+- md5: 0e4deb773c29c10922d944b2d38325e3
   size: 7282
   path: dataset_1847_clark__fleche__and__senik__happiness_inequality_values.feather

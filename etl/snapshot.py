@@ -377,7 +377,13 @@ def _unignore_backports(path: Path):
                 s = f.read()
             try:
                 with open(dvc_ignore_path, "w") as f:
-                    f.write(s.replace("snapshots/backport/", "# snapshots/backport/"))
+                    dataset_id = path.name.split("_")[1]
+                    f.write(
+                        s.replace(
+                            "snapshots/backport/latest/*",
+                            f"snapshots/backport/latest/*\n!snapshots/backport/latest/dataset_{dataset_id}*",
+                        )
+                    )
                 yield
             finally:
                 with open(dvc_ignore_path, "w") as f:

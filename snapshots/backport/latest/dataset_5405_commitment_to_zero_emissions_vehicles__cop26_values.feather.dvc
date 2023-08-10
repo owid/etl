@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5405_commitment_to_zero_emissions_vehicles__cop26_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:53:35.687141
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5405
+    date_accessed: 2023-08-10 09:11:08.000385
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Commitment to zero emissions vehicles (COP26)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5405
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 68c0c4be99fac990276d0aa53b022b47
+- md5: 95d53b1838b98abe4f1bc4f40d8aa49f
   size: 7306
   path: dataset_5405_commitment_to_zero_emissions_vehicles__cop26_values.feather

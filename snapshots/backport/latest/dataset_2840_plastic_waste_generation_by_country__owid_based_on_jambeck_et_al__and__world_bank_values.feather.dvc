@@ -1,21 +1,16 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_2840_plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:40:22.684617
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2840
+    date_accessed: 2023-08-10 09:45:36.088063
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Plastic waste generation by country - OWID based on Jambeck et al. & World
     Bank
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2840
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: aa81216b40be4fdf1108e9c2a90c948f
+- md5: b9d072cab675c360cf0c08bac830b513
   size: 12098
   path: 
     dataset_2840_plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank_values.feather

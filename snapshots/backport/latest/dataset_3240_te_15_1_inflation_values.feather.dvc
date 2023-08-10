@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3240_te_15_1_inflation_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:11:31.761062
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3240
+    date_accessed: 2023-08-10 07:47:12.962968
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: TE-15.1_inflation
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3240
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 02c2d4c4fe92aa904d9e03117335fd6d
+- md5: 9a38deaa0a20c57a8d54db14f9fd6e64
   size: 6522
   path: dataset_3240_te_15_1_inflation_values.feather

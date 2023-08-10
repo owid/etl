@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2792_smallpox_cases_reported_and_revised__fenner_et_al__1988_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:31:21.924056
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2792
+    date_accessed: 2023-08-10 08:30:06.730518
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Smallpox cases reported and revised - Fenner et al. (1988)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2792
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6ab26ce2d2ca1042e2115046c9f9fa2c
+- md5: 1dff76e31465bb1f7b1e2fbc68427a96
   size: 6402
-  path: dataset_2792_smallpox_cases_reported_and_revised__fenner_et_al__1988_values.feather
+  path: 
+    dataset_2792_smallpox_cases_reported_and_revised__fenner_et_al__1988_values.feather

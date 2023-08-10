@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2872_unemployment_rate__ages_25_54__by_education__ilostat__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:49:43.192596
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2872
+    date_accessed: 2023-08-10 08:56:34.712308
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Unemployment rate, ages 25-54, by education - ILOSTAT (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2872
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f5e8e5af377f2d2006a8fedc59a0648c
-  size: 39778
-  path: dataset_2872_unemployment_rate__ages_25_54__by_education__ilostat__2017_values.feather
+- md5: 928f28d01f467116539c07d99549c318
+  size: 39762
+  path: 
+    dataset_2872_unemployment_rate__ages_25_54__by_education__ilostat__2017_values.feather

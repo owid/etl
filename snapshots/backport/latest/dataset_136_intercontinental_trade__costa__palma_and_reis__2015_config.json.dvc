@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_136_intercontinental_trade__costa__palma_and_reis__2015_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:52:43.762975
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/136
+    date_accessed: 2023-08-10 09:14:03.290251
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_136_intercontinental_trade__costa__palma_and_reis__2015
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/136
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8f62ba06c92e20c9a2e02911446f51f7
-  size: 1844
+- md5: 37e50e059c92367c4c349d8e0247dc7e
+  size: 2001
   path: dataset_136_intercontinental_trade__costa__palma_and_reis__2015_config.json

@@ -410,6 +410,9 @@ def add_entry_to_processing_log(
     # Consider using a deepcopy if any of the operations in this function alter mutable objects in processing_log.
     processing_log_updated = copy.deepcopy(processing_log)
 
+    # TODO: Parents currently can be anything. Here we should ensure that they are strings. For example, we could
+    # extract the name of the parent if it is a variable.
+
     # Define new log entry.
     log_new_entry = {"variable": variable_name, "parents": parents, "operation": operation}
     if comment is not None:

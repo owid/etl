@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3251_figure_21_4_gdp_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:29:16.358583
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3251
+    date_accessed: 2023-08-10 08:06:57.186929
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Figure 21.4_GDP
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3251
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e136844549c908d15e69d2095bd0c6a4
+- md5: 4efce3f7b1ade7c61a3917a8c1700473
   size: 10362
   path: dataset_3251_figure_21_4_gdp_values.feather

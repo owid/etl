@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_3025_total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:46:41.609061
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3025
+    date_accessed: 2023-08-10 08:41:08.527103
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Total merchandise trade as share of GDP (COW v 4.0 National (2016)) (split)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3025
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e7ddba05d1718e94d3cdf587cb31d980
+- md5: f933d66abda12526d9ea999d9823493b
   size: 99010
-  path: dataset_3025_total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split_values.feather
+  path: 
+    dataset_3025_total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split_values.feather

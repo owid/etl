@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2791_smallpox_cases_by_country_1920_1977_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:03:05.261645
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2791
+    date_accessed: 2023-08-10 08:42:44.314313
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2791_smallpox_cases_by_country_1920_1977
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2791
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 64677bd34dd99799a68ac005b2d39771
-  size: 5141
+- md5: 5798de1a6338448b5c9623aa685077a4
+  size: 5294
   path: dataset_2791_smallpox_cases_by_country_1920_1977_config.json

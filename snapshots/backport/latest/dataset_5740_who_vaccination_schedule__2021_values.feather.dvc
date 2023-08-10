@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5740_who_vaccination_schedule__2021_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:34:36.424227
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5740
+    date_accessed: 2023-08-10 09:17:29.101612
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: WHO Vaccination Schedule (2021)
-  description: https://github.com/owid/notebooks/tree/main/FionaSpooner/who_vaccination_schedule
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5740
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+  description: 
+    https://github.com/owid/notebooks/tree/main/FionaSpooner/who_vaccination_schedule
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 744cb46843a41ec481cbbd9b15b04751
-  size: 246906
+- md5: 11a256b63c6e37db27456cfffe5589fb
+  size: 246898
   path: dataset_5740_who_vaccination_schedule__2021_values.feather

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_677_projections_of_peak_agricultural_land__fao__2006__oecd__2012__mea__2005_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:33:53.091373
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/677
+    date_accessed: 2023-08-10 09:02:59.661947
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Projections of peak agricultural land - FAO (2006), OECD (2012), MEA (2005)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/677
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fe4c99b01babd57b5821d48a984a6051
+- md5: 8f69b54301d9d2347f60cd7bad9b4317
   size: 7690
-  path: dataset_677_projections_of_peak_agricultural_land__fao__2006__oecd__2012__mea__2005_values.feather
+  path: 
+    dataset_677_projections_of_peak_agricultural_land__fao__2006__oecd__2012__mea__2005_values.feather

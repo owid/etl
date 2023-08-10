@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_1836_us_measles_cases_and_deaths__owid__2017_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:00:08.486400
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1836
+    date_accessed: 2023-08-10 08:52:29.694337
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_1836_us_measles_cases_and_deaths__owid__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1836
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 233f6c798e516caf44456a958dc21100
-  size: 11119
+- md5: 0f8c21f3b9a66494e889ddf6a5021a29
+  size: 11653
   path: dataset_1836_us_measles_cases_and_deaths__owid__2017_config.json

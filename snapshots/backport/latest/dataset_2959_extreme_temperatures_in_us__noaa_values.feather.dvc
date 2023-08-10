@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2959_extreme_temperatures_in_us__noaa_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:30:07.708808
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2959
+    date_accessed: 2023-08-10 09:10:16.126020
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Extreme Temperatures in US (NOAA)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2959
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: efbd51843e38c088d3531ed6ea4f4c84
+- md5: ae5f948f64a1118d74ec8297036c74f7
   size: 11730
   path: dataset_2959_extreme_temperatures_in_us__noaa_values.feather

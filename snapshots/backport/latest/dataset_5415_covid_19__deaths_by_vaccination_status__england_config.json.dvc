@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5415_covid_19__deaths_by_vaccination_status__england_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:26:53.876060
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5415
+    date_accessed: 2023-08-10 08:39:01.119152
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5415_covid_19__deaths_by_vaccination_status__england
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5415
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 473e9afa6a7dae14f124660063768399
-  size: 3872
+- md5: 5e185ee0bc35151455482771a938cff4
+  size: 4148
   path: dataset_5415_covid_19__deaths_by_vaccination_status__england_config.json

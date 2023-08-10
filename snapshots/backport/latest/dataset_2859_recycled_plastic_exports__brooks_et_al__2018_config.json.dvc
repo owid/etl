@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2859_recycled_plastic_exports__brooks_et_al__2018_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:55:01.055349
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2859
+    date_accessed: 2023-08-10 09:26:56.072516
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2859_recycled_plastic_exports__brooks_et_al__2018
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2859
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a355b3e84f3b8d43499582e7069850fe
-  size: 3090
+- md5: cfc64f235a9641d14fea6654636e1ac7
+  size: 3497
   path: dataset_2859_recycled_plastic_exports__brooks_et_al__2018_config.json
