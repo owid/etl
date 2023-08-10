@@ -5,6 +5,7 @@ from typing import Any, List, Optional
 import click
 import pandas as pd
 import structlog
+from git.repo import Repo
 from owid.catalog import Source
 from sqlalchemy.engine import Engine
 from sqlmodel import Session
@@ -17,6 +18,7 @@ from backport.datasync.data_metadata import (
 from backport.datasync.datasync import upload_gzip_dict
 from etl import config
 from etl import grapher_model as gm
+from etl import paths
 from etl.backport_helpers import GrapherConfig
 from etl.db import get_engine
 from etl.files import checksum_str
@@ -123,25 +125,37 @@ class PotentialBackport:
             return True
 
     def upload(self, upload: bool, dry_run: bool, engine: Engine) -> None:
+        repo = Repo(paths.BASE_DIR)
+
         config_metadata = _snapshot_config_metadata(self.ds, self.short_name, self.public)
         config_metadata.save()
-        _upload_config_to_snapshot(
-            self.config,
-            config_metadata,
-            dry_run,
-            upload,
-        )
+        try:
+            _upload_config_to_snapshot(
+                self.config,
+                config_metadata,
+                dry_run,
+                upload,
+            )
+        except (KeyboardInterrupt, Exception) as e:
+            # rollback metadata file
+            repo.git.checkout("HEAD", config_metadata.path)
+            raise e
 
         # upload values to snapshot
         df = _load_values(engine, self.variable_ids)
         values_metadata = _snapshot_values_metadata(self.ds, self.short_name, self.public)
         values_metadata.save()
-        _upload_values_to_snapshot(
-            df,
-            values_metadata,
-            dry_run,
-            upload,
-        )
+        try:
+            _upload_values_to_snapshot(
+                df,
+                values_metadata,
+                dry_run,
+                upload,
+            )
+        except (KeyboardInterrupt, Exception) as e:
+            # rollback metadata file
+            repo.git.checkout("HEAD", values_metadata.path)
+            raise e
 
 
 def backport(

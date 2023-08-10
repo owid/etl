@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/2707
-    date_accessed: 2023-08-08 07:39:09.941693
+    date_accessed: 2023-08-09 14:42:38.039480
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for 
@@ -10,7 +10,7 @@ meta:
   description: This dataset uses CEPII dyadic trade data.
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 23c2f657dfae0088a14e42b865370213
-  size: 17343
+- md5: e88a32450521e8ee361e8ae17f39bd12
+  size: 15263
   path: 
     dataset_2707_split_of_exports_to_different_country_groups__owid_calculations_based_on_fouquin_and_hugot__cepii_2016__dyadic_data_config.json

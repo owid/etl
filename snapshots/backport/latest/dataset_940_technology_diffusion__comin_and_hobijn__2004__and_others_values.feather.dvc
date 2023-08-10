@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_940_technology_diffusion__comin_and_hobijn__2004__and_others_values
-  file_extension: feather
-  date_accessed: 2023-03-13 13:43:07.256543
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/940
+    date_accessed: 2023-08-09 13:36:36.770205
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Technology Diffusion - Comin and Hobijn (2004) and others
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/940
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e9c25a79eb944fa65e6c6c6b8573600a
+- md5: 07a3509370a80d425b747ec603b136b8
   size: 12402
-  path: dataset_940_technology_diffusion__comin_and_hobijn__2004__and_others_values.feather
+  path: 
+    dataset_940_technology_diffusion__comin_and_hobijn__2004__and_others_values.feather
