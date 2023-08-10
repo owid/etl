@@ -131,7 +131,6 @@ def run(dest_dir: str) -> None:
 
     # Add region='World'
     log.info("un.comtrade: add region='World'")
-    print(tb.columns)
     columns = list(CMD_CODE_TO_METRIC_NAME.values())
     tb_world = tb.groupby("year", as_index=False)[columns].sum()
     tb_world["country"] = "World"
@@ -169,7 +168,6 @@ def _sanity_checks(tb: Table):
     assert set(tb["flowcode"]) == {"M"}, "Flow code other than 'M' detected!"
     assert set(tb["refmonth"]) == {52}, "Reference month other than '52' detected!"
 
-    print(tb.columns)
     assert (tb["period"] == tb["refyear"]).all(), "period != refyear!"
     assert (
         tb.groupby(["refyear", "reporterdesc", "cmdcode"]).size().max() == 1
