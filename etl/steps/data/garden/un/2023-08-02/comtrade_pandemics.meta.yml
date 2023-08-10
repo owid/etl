@@ -10,6 +10,9 @@ tables:
       value of services performed to deliver goods to the border of the exporting country, and the value of the services
       performed to deliver the goods from the border of the exporting country to the border of the importing country.
 
+
+      "Other Asia, not elsewhere specified" refers to territories belonging to Asia, but not specified by country. More details at
+      https://unstats.un.org/wiki/display/comtrade/Taiwan%2C+Province+of+China+Trade+data
     variables:
       import_cif_breathing_appliances:
         title: Imports of breathing appliances and gas masks
@@ -42,7 +45,7 @@ tables:
         description: >-
           Imports of articles of apparel and clothing accessories (including gloves, mittens and mitts).
       import_cif_spectacles_goggles:
-        title: Imports of Spectacles, goggles and the like
+        title: Imports of spectacles, goggles and the like
         short_unit: "$"
         unit: "USD"
         description: >-
