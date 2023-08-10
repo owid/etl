@@ -102,27 +102,7 @@ def run(dest_dir: str) -> None:
 
     # Add regions
     log.info("un.comtrade: add regions")
-    regions = [
-        "Africa",
-        "Asia",
-        "Europe",
-        "North America",
-        "South America",
-        "Oceania",
-    ]
-    for region in regions:
-        countries_in_region = geo.list_members_of_region(
-            region=region,
-            ds_regions=ds_regions,
-        )
-        tb_region = geo.add_region_aggregates(tb, region, countries_in_region=countries_in_region)
-        tb = pd.concat(
-            [
-                tb[tb["country"] != region],
-                tb_region[tb_region["country"] == region],
-            ],
-            ignore_index=True,
-        ).reset_index(drop=True)
+    tb = add_regions(tb, ds_regions)
 
     # Correct former country names
     log.info("un.comtrade: finish handling former countries West Germany and Sudan (former)")
@@ -131,19 +111,7 @@ def run(dest_dir: str) -> None:
 
     # Add region='World'
     log.info("un.comtrade: add region='World'")
-    columns = list(CMD_CODE_TO_METRIC_NAME.values())
-    tb_world = tb.groupby("year", as_index=False)[columns].sum()
-    tb_world["country"] = "World"
-
-    # Combine
-    log.info("un.comtrade: combine all tables")
-    tb = pd.concat(
-        [
-            tb,
-            tb_world,
-        ],
-        ignore_index=True,
-    )
+    tb = add_world(tb)
 
     # Set index
     log.info("un.comtrade: set index")
@@ -172,3 +140,49 @@ def _sanity_checks(tb: Table):
     assert (
         tb.groupby(["refyear", "reporterdesc", "cmdcode"]).size().max() == 1
     ), "There should, at most, one entry per (refyear, reporterdesc, cmdcode) triplet"
+
+
+def add_regions(tb: Table, ds_regions: Dataset) -> Table:
+    """Add region aggregates to the table."""
+    regions = [
+        "Africa",
+        "Asia",
+        "Europe",
+        "North America",
+        "South America",
+        "Oceania",
+    ]
+    for region in regions:
+        countries_in_region = geo.list_members_of_region(
+            region=region,
+            ds_regions=ds_regions,
+        )
+        tb_region = geo.add_region_aggregates(tb, region, countries_in_region=countries_in_region)
+        tb = pd.concat(
+            [
+                tb[tb["country"] != region],
+                tb_region[tb_region["country"] == region],
+            ],
+            ignore_index=True,
+        ).reset_index(drop=True)
+
+    return tb
+
+
+def add_world(tb: Table) -> Table:
+    """Add world aggregate to the table."""
+    columns = list(CMD_CODE_TO_METRIC_NAME.values())
+    tb_world = tb.groupby("year", as_index=False)[columns].sum()
+    tb_world["country"] = "World"
+
+    # Combine
+    log.info("un.comtrade: combine all tables")
+    tb = pd.concat(
+        [
+            tb,
+            tb_world,
+        ],
+        ignore_index=True,
+    )
+
+    return tb
