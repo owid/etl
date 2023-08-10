@@ -1,19 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_396_uk_nominal_wage_data__price_data__and_real_wage__bank_of_england__three_centuries_of_macroeconomic_data__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:25:21.403445
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/396
+    date_accessed: 2023-08-10 09:08:49.903910
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: UK Nominal wage data, price data, and real wage – Bank of England ("Three
     centuries of macroeconomic data") (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/396
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bec241e905d0c87d20a223f65dbf84e4
+- md5: db820e8ec1ff60af9b59a31627cbc2cf
   size: 13154
-  path: dataset_396_uk_nominal_wage_data__price_data__and_real_wage__bank_of_england__three_centuries_of_macroeconomic_data__2017_values.feather
+  path: 
+    dataset_396_uk_nominal_wage_data__price_data__and_real_wage__bank_of_england__three_centuries_of_macroeconomic_data__2017_values.feather

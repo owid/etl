@@ -1,20 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_448_social_expenditure_in_the_long_run__lindert_2004__oecd_1985__oecd__socx_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:41:33.481615
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/448
+    date_accessed: 2023-08-10 07:45:12.635437
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Social Expenditure in the long run - Lindert 2004; OECD 1985; OECD (SOCX).
   description: Data-set put together by Marco Molteni under the guidance of Esteban.
     OECD (SOCX) on social spending are used as reference series and data are extrapolated
     backwards using OECD 1985.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/448
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 61386fb4ece6278266609d681e8eeb4a
+- md5: 7ec5f7ec99a9579296514bc084a72fc6
   size: 13098
-  path: dataset_448_social_expenditure_in_the_long_run__lindert_2004__oecd_1985__oecd__socx_values.feather
+  path: 
+    dataset_448_social_expenditure_in_the_long_run__lindert_2004__oecd_1985__oecd__socx_values.feather

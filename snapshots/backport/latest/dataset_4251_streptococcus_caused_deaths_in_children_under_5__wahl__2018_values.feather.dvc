@@ -1,19 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_4251_streptococcus_caused_deaths_in_children_under_5__wahl__2018_values
-  file_extension: feather
-  date_accessed: 2023-06-01 13:17:48.369111
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4251
+    date_accessed: 2023-08-10 08:32:18.503822
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Streptococcus-caused deaths in children under-5, Wahl (2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4251
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fd97e9f1a3017f610a7f15790d4da192
+- md5: d780e4f0e254d7b328333d4ad7dd5b89
   size: 55858
   path: 
     dataset_4251_streptococcus_caused_deaths_in_children_under_5__wahl__2018_values.feather

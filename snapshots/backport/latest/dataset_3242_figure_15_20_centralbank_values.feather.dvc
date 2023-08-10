@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3242_figure_15_20_centralbank_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:46:17.409064
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3242
+    date_accessed: 2023-08-10 07:45:16.757663
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Figure 15.20_CentralBank
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3242
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8406c14bc5b1b91587b2a2a1784316e2
+- md5: eb2433e8f3710b262d58e69cc7ddb977
   size: 6650
   path: dataset_3242_figure_15_20_centralbank_values.feather

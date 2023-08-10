@@ -1,19 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_4099_corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:31:20.719936
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4099
+    date_accessed: 2023-08-10 07:46:20.830139
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Corporate income tax (CIT) - Corporate Tax Statistics Database (CTSD) - OECD
     (2019)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4099
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 968bbd5d4169e8fa857605d9b91893a1
+- md5: 0d5d9b5224ecd6eb4e0fa2f142fc8fbb
   size: 13578
-  path: dataset_4099_corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019_values.feather
+  path: 
+    dataset_4099_corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019_values.feather

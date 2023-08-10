@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_985_executions_by_country__amnesty_international_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:04:46.056778
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/985
+    date_accessed: 2023-08-10 08:03:12.180135
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_985_executions_by_country__amnesty_international
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/985
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d31ce8a27491ca2ca662e556e604e2ab
-  size: 3486
+- md5: e1875c6ec875bdb0d2f68b434485cf38
+  size: 3639
   path: dataset_985_executions_by_country__amnesty_international_config.json

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5634_democracy__bertelsmann_transformation_index__2022_values
-  file_extension: feather
-  date_accessed: 2023-06-01 15:06:40.622475
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5634
+    date_accessed: 2023-08-10 07:48:39.029930
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Democracy - Bertelsmann Transformation Index (2022)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5634
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 05ec5dd7357157c75f6c3939f2c38e06
+- md5: 2f96c38115c3f5b17dd14d822166d6de
   size: 112546
   path: dataset_5634_democracy__bertelsmann_transformation_index__2022_values.feather

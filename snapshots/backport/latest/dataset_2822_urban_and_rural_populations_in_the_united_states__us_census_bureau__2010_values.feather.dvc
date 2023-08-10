@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2822_urban_and_rural_populations_in_the_united_states__us_census_bureau__2010_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:31:53.581972
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2822
+    date_accessed: 2023-08-10 08:29:03.277158
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Urban and rural populations in the United States - US Census Bureau (2010)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2822
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b16b0414978eccd74c27847cfea59541
+- md5: 8ea6e367b7fa1d33bae305542ce3ab8e
   size: 7330
-  path: dataset_2822_urban_and_rural_populations_in_the_united_states__us_census_bureau__2010_values.feather
+  path: 
+    dataset_2822_urban_and_rural_populations_in_the_united_states__us_census_bureau__2010_values.feather

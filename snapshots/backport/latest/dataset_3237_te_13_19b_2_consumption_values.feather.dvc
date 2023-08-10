@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3237_te_13_19b_2_consumption_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:28:22.881433
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3237
+    date_accessed: 2023-08-10 08:48:04.641734
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: TE-13.19b_2_consumption
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3237
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2037a6f1aa90be991c4c80b4068b742a
+- md5: 79d1529132c95aecc7801028e889b92d
   size: 6962
   path: dataset_3237_te_13_19b_2_consumption_values.feather

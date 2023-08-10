@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2703_estimated_historical_literacy_rates__buringh_and_van_zanden__2009_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:48:29.355090
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2703
+    date_accessed: 2023-08-10 08:51:31.393944
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2703_estimated_historical_literacy_rates__buringh_and_van_zanden__2009
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2703
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 21c5cfed0b2eb7f04b18a98721095f57
-  size: 1961
-  path: dataset_2703_estimated_historical_literacy_rates__buringh_and_van_zanden__2009_config.json
+- md5: 89ce3d98c33ce24d7c429d906f3ed40d
+  size: 2114
+  path: 
+    dataset_2703_estimated_historical_literacy_rates__buringh_and_van_zanden__2009_config.json

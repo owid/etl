@@ -1,23 +1,25 @@
 meta:
-  namespace: backport
-  short_name: dataset_355_people_experiencing_homelessness_in_the_usa__pit__by_sheltering_status__hud__2016_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:15:23.366927
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/355
+    date_accessed: 2023-08-10 08:56:25.404352
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: People experiencing homelessness in the USA (PIT) by sheltering status - HUD
     (2016)
-  description: |-
+  description: >-
     Marco:
 
-    I was not sure which sub category was appropriate for this dataset. Eventually I opted for the sub category "Poverty in Individual Countries".
-    Following Esteban's request I uploaded only aggregates data, but the raw data has also data by US state
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/355
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+
+    I was not sure which sub category was appropriate for this dataset. Eventually
+    I opted for the sub category "Poverty in
+    Individual Countries".
+
+    Following Esteban's request I uploaded only aggregates data, but the raw data
+    has also data by US state
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6aa5c6032634997cce64348c660e1644
+- md5: a007f80f60d97eefe7e757630da2498b
   size: 6418
-  path: dataset_355_people_experiencing_homelessness_in_the_usa__pit__by_sheltering_status__hud__2016_values.feather
+  path: 
+    dataset_355_people_experiencing_homelessness_in_the_usa__pit__by_sheltering_status__hud__2016_values.feather

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_152_press_freedom__freedom_house__2017_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:51:49.447113
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/152
+    date_accessed: 2023-08-10 08:41:39.257484
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_152_press_freedom__freedom_house__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/152
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8daa41cb6578524e38a453326ebd82bd
-  size: 2350
+- md5: e129b95da5a024d41809246e65bff3d1
+  size: 2507
   path: dataset_152_press_freedom__freedom_house__2017_config.json

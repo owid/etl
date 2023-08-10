@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_963_educational_outcomes__hanushek_and_woessmann__2012_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:05:34.498656
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/963
+    date_accessed: 2023-08-10 08:51:36.787633
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Educational Outcomes – Hanushek and Woessmann (2012)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/963
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 82355db73737a7501016a1f78f789547
+- md5: 1b893d176df71387ee1c26c46248459e
   size: 9946
   path: dataset_963_educational_outcomes__hanushek_and_woessmann__2012_values.feather

@@ -1,19 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_267_life_expectancy__james_riley_for_data_1990_and_earlier__who_and_world_bank_for_later_data__by_max_roser_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:35:46.375283
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/267
+    date_accessed: 2023-08-10 09:03:46.715284
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Life expectancy – James Riley for data 1990 and earlier; WHO and World Bank
     for later data (by Max Roser)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/267
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fcc77b7b5008f94991347ded003788c6
+- md5: d25a8a544db2ca2ebe5e41e6d3fb2ce8
   size: 7434
-  path: dataset_267_life_expectancy__james_riley_for_data_1990_and_earlier__who_and_world_bank_for_later_data__by_max_roser_values.feather
+  path: 
+    dataset_267_life_expectancy__james_riley_for_data_1990_and_earlier__who_and_world_bank_for_later_data__by_max_roser_values.feather

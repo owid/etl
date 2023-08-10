@@ -1,18 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_5419_clinical_trial_results_reporting_by_country__eu_ctr__dal_re_et_al__2021_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:03:12.687501
-  name: Grapher metadata for dataset_5419_clinical_trial_results_reporting_by_country__eu_ctr__dal_re_et_al__2021
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5419
+    date_accessed: 2023-08-10 08:26:06.913158
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_5419_clinical_trial_results_reporting_by_country__eu_ctr__dal_re_et_al__2021
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5419
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f62b873af706a1984c203ef3bf435135
-  size: 2892
-  path: dataset_5419_clinical_trial_results_reporting_by_country__eu_ctr__dal_re_et_al__2021_config.json
+- md5: d10ee27953091d66f966c3a5721a4770
+  size: 3061
+  path: 
+    dataset_5419_clinical_trial_results_reporting_by_country__eu_ctr__dal_re_et_al__2021_config.json

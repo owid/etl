@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_4130_corporate_tax_revenue__ictd_unu_wider_grd__2019_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:21:17.002531
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4130
+    date_accessed: 2023-08-10 08:50:11.491611
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Corporate tax revenue - ICTD UNU-WIDER GRD (2019)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4130
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8cb1030343830fd6b95f2f1d1f2a8d6c
+- md5: 33e7daeb804fbc13a64dd1fb5761d0cb
   size: 77018
   path: dataset_4130_corporate_tax_revenue__ictd_unu_wider_grd__2019_values.feather

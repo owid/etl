@@ -1,21 +1,22 @@
 meta:
-  namespace: backport
-  short_name: dataset_353_extreme_income_poverty_in_europe__bradshaw_and_mayhew__2011_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:43:22.854300
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/353
+    date_accessed: 2023-08-10 09:17:06.222922
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Extreme income poverty in Europe - Bradshaw and Mayhew (2011)
-  description: |-
-    The authors use EU-SILC 2008 data to estimate "World Bank type extreme poverty rates".
+  description: >-
+    The authors use EU-SILC 2008 data to estimate "World Bank type extreme poverty
+    rates".
 
-    They seem to estimate extreme poverty by translating the $1 and $2.15 per person per day poverty lines to European countries using PPP conversions. They do not explain
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/353
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+
+    They seem to estimate extreme poverty by translating the $1 and $2.15 per person
+    per day poverty lines to European countries
+    using PPP conversions. They do not explain
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ff85c89add22e8242483ebf2332ee785
+- md5: b8957f4f2f6bc63cdd191b92e007ebf5
   size: 7026
-  path: dataset_353_extreme_income_poverty_in_europe__bradshaw_and_mayhew__2011_values.feather
+  path: 
+    dataset_353_extreme_income_poverty_in_europe__bradshaw_and_mayhew__2011_values.feather

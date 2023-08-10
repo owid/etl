@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_167_child_labor_italy__historic__toniolo__g__and__vecchi__g__2007_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:27:50.408573
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/167
+    date_accessed: 2023-08-10 09:40:51.062561
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Child Labor Italy (historic) - Toniolo, G., & Vecchi, G. (2007)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/167
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4dccb9db7c1083277131582f24ad7574
+- md5: 71d30c5ababafb1c624133519b4708b9
   size: 6474
-  path: dataset_167_child_labor_italy__historic__toniolo__g__and__vecchi__g__2007_values.feather
+  path: 
+    dataset_167_child_labor_italy__historic__toniolo__g__and__vecchi__g__2007_values.feather

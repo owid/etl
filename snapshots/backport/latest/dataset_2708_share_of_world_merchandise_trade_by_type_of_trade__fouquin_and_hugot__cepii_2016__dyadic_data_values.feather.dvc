@@ -1,19 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_2708_share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:07:07.292370
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2708
+    date_accessed: 2023-08-10 09:44:09.422243
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Share of world merchandise trade by type of trade - Fouquin and Hugot (CEPII
     2016, Dyadic data)
   description: This dataset uses Fouquin and Hugot (CEPII 2016) dyadic trade data.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2708
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8b8fe431821259b89201c677662bbd8f
+- md5: 6eac79cbd7b2ae71161094150583e580
   size: 17658
-  path: dataset_2708_share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data_values.feather
+  path: 
+    dataset_2708_share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data_values.feather

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5291_plastic_ocean_pollution__meijer_et_al__2021_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:55:42.137436
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5291
+    date_accessed: 2023-08-10 08:59:33.807704
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Plastic ocean pollution (Meijer et al. 2021)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5291
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 288cc2deadff14cc0bb1f9edea1fcfa2
+- md5: 2a736d4502b7985a2a96a624816bfb52
   size: 19642
   path: dataset_5291_plastic_ocean_pollution__meijer_et_al__2021_values.feather

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_300_tax_composition__arroyo_abad__and_p__lindert__2016_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:01:21.866939
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/300
+    date_accessed: 2023-08-10 08:49:22.918907
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Tax composition –   Arroyo Abad  and P. Lindert (2016)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/300
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9864b5d59025df739a8f97aa8888ecbf
+- md5: 2e07a1f6688648e6ce6e072ded08b97f
   size: 9130
   path: dataset_300_tax_composition__arroyo_abad__and_p__lindert__2016_values.feather
