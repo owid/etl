@@ -320,6 +320,5 @@ def prepare_attainment_data(df: pd.DataFrame) -> pd.DataFrame:
 
     cols_to_drop = [col for col in df_pivot.columns if "Age not specified" in col]
     df_pivot = df_pivot.drop(columns=cols_to_drop)
-    print(df_pivot)
 
     return df_pivot
