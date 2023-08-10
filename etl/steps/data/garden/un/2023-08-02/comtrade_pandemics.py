@@ -62,25 +62,19 @@ def run(dest_dir: str) -> None:
 
     # Keep relevant columns
     log.info("un.comtrade: keep relevant columns")
-    COLUMNS_RELEVANT = [
-        "refyear",
-        "reporterdesc",
-        "cmdcode",
-        "cifvalue"
-    ]
+    COLUMNS_RELEVANT = ["refyear", "reporterdesc", "cmdcode", "cifvalue"]
     tb = tb[COLUMNS_RELEVANT]
 
     # Rename cmd codes for their metric names
     log.info("un.comtrade: map cmd codes to indicator names")
     tb["cmdcode"] = tb["cmdcode"].map(CMD_CODE_TO_METRIC_NAME)
-    assert not tb["cmdcode"].isna().any(), "Unassigned metric name to some cmd code. Please review consistency between `CMD_CODE_TO_METRIC_NAME` and `cmdcode`."
+    assert (
+        not tb["cmdcode"].isna().any()
+    ), "Unassigned metric name to some cmd code. Please review consistency between `CMD_CODE_TO_METRIC_NAME` and `cmdcode`."
 
     # Rename year and country column fields
     log.info("un.comtrade: rename columns")
-    tb = tb.rename(columns={
-        "refyear": "year",
-        "reporterdesc": "country"
-    })
+    tb = tb.rename(columns={"refyear": "year", "reporterdesc": "country"})
 
     # Pivot to get wide format (one column for each cmd item)
     log.info("un.comtrade: pivot table")
@@ -88,8 +82,12 @@ def run(dest_dir: str) -> None:
 
     # Check that there is no intersection between former and current countries
     log.info("un.comtrade: handle former countries West Germany and Sudan (former)")
-    assert tb[tb["country"].str.contains("Germany")].groupby("year").size().max() == 1, "There are some years with data for both Germany and West Germany"
-    assert tb[tb["country"].str.contains("Sudan")].groupby("year").size().max() == 1, "There are some years with data for both Sudan and Sudan (former)"
+    assert (
+        tb[tb["country"].str.contains("Germany")].groupby("year").size().max() == 1
+    ), "There are some years with data for both Germany and West Germany"
+    assert (
+        tb[tb["country"].str.contains("Sudan")].groupby("year").size().max() == 1
+    ), "There are some years with data for both Sudan and Sudan (former)"
     # West Germany and Sudan (former) are both mapped to current countries (Germany and Sudan).
     # This is to ease the region aggregate estimations.
     # However, later, we undo this for the specific regions. That's why we need the year range.
@@ -114,7 +112,8 @@ def run(dest_dir: str) -> None:
     ]
     for region in regions:
         countries_in_region = geo.list_members_of_region(
-            region=region, ds_regions=ds_regions,
+            region=region,
+            ds_regions=ds_regions,
         )
         tb_region = geo.add_region_aggregates(tb, region, countries_in_region=countries_in_region)
         tb = pd.concat(
@@ -144,7 +143,7 @@ def run(dest_dir: str) -> None:
             tb,
             tb_world,
         ],
-        ignore_index=True
+        ignore_index=True,
     )
 
     # Set index
@@ -167,9 +166,11 @@ def run(dest_dir: str) -> None:
 def _sanity_checks(tb: Table):
     assert set(tb["typecode"]) == {"C"}, "Type code other than 'C' detected!"
     assert set(tb["freqcode"]) == {"A"}, "Frequency code other than 'A' detected!"
-    assert set(tb["flowcode"]) == {'M'}, "Flow code other than 'M' detected!"
+    assert set(tb["flowcode"]) == {"M"}, "Flow code other than 'M' detected!"
     assert set(tb["refmonth"]) == {52}, "Reference month other than '52' detected!"
 
     print(tb.columns)
     assert (tb["period"] == tb["refyear"]).all(), "period != refyear!"
-    assert (tb.groupby(["refyear", "reporterdesc", "cmdcode"]).size().max() == 1), "There should, at most, one entry per (refyear, reporterdesc, cmdcode) triplet"
+    assert (
+        tb.groupby(["refyear", "reporterdesc", "cmdcode"]).size().max() == 1
+    ), "There should, at most, one entry per (refyear, reporterdesc, cmdcode) triplet"
