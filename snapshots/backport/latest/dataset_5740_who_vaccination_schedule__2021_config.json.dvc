@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5740_who_vaccination_schedule__2021_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:34:07.191492
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5740
+    date_accessed: 2023-08-10 09:16:47.986976
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5740_who_vaccination_schedule__2021
-  description: https://github.com/owid/notebooks/tree/main/FionaSpooner/who_vaccination_schedule
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5740
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+  description: 
+    https://github.com/owid/notebooks/tree/main/FionaSpooner/who_vaccination_schedule
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4dd8530b9ac531ad78e7e22368397eb3
-  size: 9188
+- md5: c7cdfcf8dc8b64cb7f291586a72cdb50
+  size: 10464
   path: dataset_5740_who_vaccination_schedule__2021_config.json

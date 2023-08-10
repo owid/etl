@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3220_alcohol_consumption_since_1890__alexander__and__holmes__2017_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:28:17.386255
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3220
+    date_accessed: 2023-08-10 08:48:42.901860
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3220_alcohol_consumption_since_1890__alexander__and__holmes__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3220
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a10f0c30989a87d0812ab8d0fcbafdc5
-  size: 2974
-  path: dataset_3220_alcohol_consumption_since_1890__alexander__and__holmes__2017_config.json
+- md5: 6585d4b6915d106c8f2ad1b222d6df3c
+  size: 3127
+  path: 
+    dataset_3220_alcohol_consumption_since_1890__alexander__and__holmes__2017_config.json

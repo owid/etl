@@ -1,19 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_39_population_dynamics_and_global_human_capital__iiasa__2015_values
-  file_extension: feather
-  date_accessed: 2023-06-01 15:27:05.554973
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/39
+    date_accessed: 2023-08-10 09:49:22.000510
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Population Dynamics and Global Human Capital - IIASA (2015)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/39
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e42da95e7c887a1150d73bff28fe1df6
+- md5: 8e896b9d98dafdd59c3821e562917e7a
   size: 126698
   path: 
     dataset_39_population_dynamics_and_global_human_capital__iiasa__2015_values.feather

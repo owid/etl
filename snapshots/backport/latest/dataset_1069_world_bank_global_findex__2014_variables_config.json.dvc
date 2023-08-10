@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_1069_world_bank_global_findex__2014_variables_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:26:14.872051
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1069
+    date_accessed: 2023-08-10 08:07:51.329078
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_1069_world_bank_global_findex__2014_variables
   description: This is a dataset imported by the automated fetcher
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1069
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: eda9673067a7355adbabbddd4144bbc1
-  size: 742930
+- md5: d18929a9b84671272c1351ecfbcd682b
+  size: 803154
   path: dataset_1069_world_bank_global_findex__2014_variables_config.json

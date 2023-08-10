@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_3266_sex_ratio_at_birth_by_birth_order_in_s_korea__and__china__jiang_et_al__2017__and__nso_korea_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:34:05.550187
-  name: Grapher metadata for dataset_3266_sex_ratio_at_birth_by_birth_order_in_s_korea__and__china__jiang_et_al__2017__and__nso_korea
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3266
+    date_accessed: 2023-08-10 08:41:24.623819
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_3266_sex_ratio_at_birth_by_birth_order_in_s_korea__and__china__jiang_et_al__2017__and__nso_korea
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3266
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 254b6373065666f8a1aec2988c8ae2ab
-  size: 6659
-  path: dataset_3266_sex_ratio_at_birth_by_birth_order_in_s_korea__and__china__jiang_et_al__2017__and__nso_korea_config.json
+- md5: 6fcf4a09865edb0deb718ecdc35e7fae
+  size: 7320
+  path: 
+    dataset_3266_sex_ratio_at_birth_by_birth_order_in_s_korea__and__china__jiang_et_al__2017__and__nso_korea_config.json

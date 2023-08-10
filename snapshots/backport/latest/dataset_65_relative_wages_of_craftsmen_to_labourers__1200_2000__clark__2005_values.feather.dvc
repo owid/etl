@@ -1,21 +1,21 @@
 meta:
-  namespace: backport
-  short_name: dataset_65_relative_wages_of_craftsmen_to_labourers__1200_2000__clark__2005_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:42:50.746117
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/65
+    date_accessed: 2023-08-10 08:35:59.334043
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Relative wages of craftsmen to labourers, 1200-2000 - Clark (2005)
-  description: |-
+  description: >-
     Unmatched data taken from Table A2.
 
-    The Condition of the Working Class in England, 1209–2004. Gregory Clark. Journal of Political Economy, Vol. 113, No. 6 (December 2005), pp. 1307-1340.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/65
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+
+    The Condition of the Working Class in England, 1209–2004. Gregory Clark. Journal
+    of Political Economy, Vol. 113, No. 6
+    (December 2005), pp. 1307-1340.
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 73cc68b1e13794c525f4fa492b31bd7c
+- md5: 5ed2d8cc75772bc91b048930e3f06561
   size: 6818
-  path: dataset_65_relative_wages_of_craftsmen_to_labourers__1200_2000__clark__2005_values.feather
+  path: 
+    dataset_65_relative_wages_of_craftsmen_to_labourers__1200_2000__clark__2005_values.feather

@@ -1,21 +1,18 @@
 meta:
-  namespace: backport
-  short_name: dataset_577_newsworthiness_of_disasters_by_disaster_type_and_region__eisensee_and_stromberg__2007_values
-  file_extension: feather
-  date_accessed: 2023-02-23 15:17:52.333610
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/577
+    date_accessed: 2023-08-10 09:43:32.238050
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Newsworthiness of disasters by disaster type and region - Eisensee and Strömberg
     (2007)
   description: This data is derived by considering ~5,000 natural disasters occurring
     between 1968 and 2002 and corresponding news coverage in major US networks. Here,
     it is controlled for the number killed and affected, country, year, and month.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/577
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bb157793ecdb0f7a1eb6eafd445d0555
+- md5: 738a1474c285eca9a5e342b632d752e7
   size: 6706
-  path: dataset_577_newsworthiness_of_disasters_by_disaster_type_and_region__eisensee_and_stromberg__2007_values.feather
+  path: 
+    dataset_577_newsworthiness_of_disasters_by_disaster_type_and_region__eisensee_and_stromberg__2007_values.feather

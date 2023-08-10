@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_4865_percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:55:53.665790
-  name: Grapher metadata for dataset_4865_percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4865
+    date_accessed: 2023-08-10 08:36:52.862666
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4865_percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4865
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0896927475cc06a6c801c5f2b280d8ab
-  size: 1919
-  path: dataset_4865_percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada_config.json
+- md5: 276b5728b146c8a989046909f01e6a46
+  size: 2070
+  path: 
+    dataset_4865_percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada_config.json

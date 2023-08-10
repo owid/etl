@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_5437_near_earth_asteroids_discovered_over_time_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:37:31.032445
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5437
+    date_accessed: 2023-08-10 08:38:22.289505
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Near-Earth asteroids discovered over time
-  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/2021_12_near_earth_asteroids
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5437
-  source_published_by: Our World in Data catalog backport
+  description: 
+    https://github.com/owid/notebooks/tree/main/EdouardMathieu/2021_12_near_earth_asteroids
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cd1843b659d61280cba31a334cc3be46
+- md5: 737b5f78d2f5b408e8f9dcc33cb7d8ea
   size: 6810
   path: dataset_5437_near_earth_asteroids_discovered_over_time_values.feather

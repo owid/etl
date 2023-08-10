@@ -329,8 +329,12 @@ def _backporting_steps(private: bool, filter_steps: Optional[Set[str]] = None) -
             continue
 
         # two files are generated for each dataset, skip one
-        if snap.metadata.short_name.endswith("_values"):
-            short_name = snap.metadata.short_name.removesuffix("_values")
+        if snap.metadata.short_name.endswith("_config"):
+            # skip archived backported datasets
+            if "(archived)" in snap.metadata.name:  # type: ignore
+                continue
+
+            short_name = snap.metadata.short_name.removesuffix("_config")
 
             private_suffix = "" if snap.metadata.is_public else "-private"
 

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:42:19.860002
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/581
+    date_accessed: 2023-08-10 07:45:09.369121
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Daily supply of calories per person (OWID based on UN FAO & historical sources)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/581
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 13fccd88b25e9b4f9e7de99639290ed3
+- md5: f71080a5a59085dfb6d3fc1ac32c3b1c
   size: 51922
-  path: dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources_values.feather
+  path: 
+    dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources_values.feather

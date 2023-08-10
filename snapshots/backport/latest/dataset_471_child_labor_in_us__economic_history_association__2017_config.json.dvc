@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_471_child_labor_in_us__economic_history_association__2017_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:42:53.129006
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/471
+    date_accessed: 2023-08-10 08:47:20.804989
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_471_child_labor_in_us__economic_history_association__2017
   description: Incidence of child labor in US - Economic History Association
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/471
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e3ce60b604790c711da2cd8dba50139d
-  size: 4057
+- md5: b6998e06fc6969f244f4f37ae1b99749
+  size: 4470
   path: dataset_471_child_labor_in_us__economic_history_association__2017_config.json

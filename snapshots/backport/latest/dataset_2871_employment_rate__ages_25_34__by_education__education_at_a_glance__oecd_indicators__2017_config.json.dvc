@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_2871_employment_rate__ages_25_34__by_education__education_at_a_glance__oecd_indicators__2017_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:58:20.776417
-  name: Grapher metadata for dataset_2871_employment_rate__ages_25_34__by_education__education_at_a_glance__oecd_indicators__2017
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2871
+    date_accessed: 2023-08-10 09:21:07.629881
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2871_employment_rate__ages_25_34__by_education__education_at_a_glance__oecd_indicators__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2871
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4903a52312cb4905685e191cf25d8dff
-  size: 5212
-  path: dataset_2871_employment_rate__ages_25_34__by_education__education_at_a_glance__oecd_indicators__2017_config.json
+- md5: bb387f5ba6ed148a406d3e6319adc8cb
+  size: 5746
+  path: 
+    dataset_2871_employment_rate__ages_25_34__by_education__education_at_a_glance__oecd_indicators__2017_config.json

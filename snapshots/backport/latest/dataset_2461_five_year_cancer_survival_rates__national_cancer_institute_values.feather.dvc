@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2461_five_year_cancer_survival_rates__national_cancer_institute_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:33:35.326531
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2461
+    date_accessed: 2023-08-10 07:47:24.472521
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Five-year cancer survival rates - National Cancer Institute
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2461
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 76feef306da8236091b3da0960a6f93a
+- md5: 3236eec494bff2289a030e23c52d6f2f
   size: 13418
-  path: dataset_2461_five_year_cancer_survival_rates__national_cancer_institute_values.feather
+  path: 
+    dataset_2461_five_year_cancer_survival_rates__national_cancer_institute_values.feather

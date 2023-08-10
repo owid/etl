@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_4205_missing_plastic_budget__lebreton_et_al__2019_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:27:10.848307
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4205
+    date_accessed: 2023-08-10 08:57:33.434899
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4205_missing_plastic_budget__lebreton_et_al__2019
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4205
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1624146134c8f135549a198f9aa2d2f5
-  size: 3217
+- md5: b9435758dd52496bc006753eb8734539
+  size: 3493
   path: dataset_4205_missing_plastic_budget__lebreton_et_al__2019_config.json

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2848_surface_ocean_plastic_by_particle_count__eriksen_et_al__2014_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:47:24.303623
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2848
+    date_accessed: 2023-08-10 08:55:49.164575
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Surface ocean plastic by particle count - Eriksen et al. (2014)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2848
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 129d8729ca02c3eb39a1d99bc4448d40
+- md5: bbb7495df724e1ad81b0f8d01b58f767
   size: 6634
-  path: dataset_2848_surface_ocean_plastic_by_particle_count__eriksen_et_al__2014_values.feather
+  path: 
+    dataset_2848_surface_ocean_plastic_by_particle_count__eriksen_et_al__2014_values.feather

@@ -1,21 +1,17 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_4203_percentage_of_children_under_5_with_symptoms_of_pneumonia_taken_for_care_to_a_health_provider_values
-  file_extension: feather
-  date_accessed: 2023-06-01 13:05:59.748493
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4203
+    date_accessed: 2023-08-10 09:24:08.109311
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Percentage of children under 5 with symptoms of pneumonia taken for care to
     a health provider
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4203
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8e74c91a97f1a9ca839994d7fd1934ec
+- md5: 3f5b19fa93e6805fd96aaf14f383f5a5
   size: 12858
   path: 
     dataset_4203_percentage_of_children_under_5_with_symptoms_of_pneumonia_taken_for_care_to_a_health_provider_values.feather

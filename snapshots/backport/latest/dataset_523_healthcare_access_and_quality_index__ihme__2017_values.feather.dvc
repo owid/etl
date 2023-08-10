@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_523_healthcare_access_and_quality_index__ihme__2017_values
-  file_extension: feather
-  date_accessed: 2023-06-01 14:56:17.324875
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/523
+    date_accessed: 2023-08-10 09:47:02.268097
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Healthcare Access and Quality Index – IHME (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/523
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 019f0e9d6af962dea1d612a225ff6a36
+- md5: afcd4856a3d8a957ed6f2f617562e859
   size: 18826
   path: dataset_523_healthcare_access_and_quality_index__ihme__2017_values.feather

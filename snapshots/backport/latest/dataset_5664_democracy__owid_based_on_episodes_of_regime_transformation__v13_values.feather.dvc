@@ -1,20 +1,15 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_5664_democracy__owid_based_on_episodes_of_regime_transformation__v13_values
-  file_extension: feather
-  date_accessed: 2023-06-01 15:16:54.426137
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5664
+    date_accessed: 2023-08-10 09:48:44.411822
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Democracy - OWID based on Episodes of Regime Transformation (v13)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5664
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 45357fa0c027ea9a8ae11a5970ba17b3
+- md5: 710d2b867848568c98552b3f837abd92
   size: 475490
   path: 
     dataset_5664_democracy__owid_based_on_episodes_of_regime_transformation__v13_values.feather

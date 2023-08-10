@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Iterator, Optional, Union
 
 import pandas as pd
 import yaml
@@ -350,17 +350,15 @@ def add_snapshot(
     snap.dvc_add(upload=upload)
 
 
-def snapshot_catalog(match: str = r".*") -> List[Snapshot]:
+def snapshot_catalog(match: str = r".*") -> Iterator[Snapshot]:
     """Return a catalog of all snapshots. It can take more than 10s to load the entire catalog,
     so it's recommended to use `match` to filter the snapshots.
     :param match: pattern to match uri
     """
-    catalog = []
     for path in paths.SNAPSHOTS_DIR.glob("**/*.dvc"):
         uri = str(path.relative_to(paths.SNAPSHOTS_DIR)).replace(".dvc", "")
         if re.search(match, uri):
-            catalog.append(Snapshot(uri))
-    return catalog
+            yield Snapshot(uri)
 
 
 @contextmanager
@@ -380,7 +378,13 @@ def _unignore_backports(path: Path):
                 s = f.read()
             try:
                 with open(dvc_ignore_path, "w") as f:
-                    f.write(s.replace("snapshots/backport/", "# snapshots/backport/"))
+                    dataset_id = path.name.split("_")[1]
+                    f.write(
+                        s.replace(
+                            "snapshots/backport/latest/*",
+                            f"snapshots/backport/latest/*\n!snapshots/backport/latest/dataset_{dataset_id}*",
+                        )
+                    )
                 yield
             finally:
                 with open(dvc_ignore_path, "w") as f:

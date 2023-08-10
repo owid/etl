@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_303_top_marginal_income_tax_rate__reynolds__2008_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:01:14.950221
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/303
+    date_accessed: 2023-08-10 07:42:02.240059
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_303_top_marginal_income_tax_rate__reynolds__2008
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/303
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 05dab7a060817f8a32ef34cbd2f4faac
-  size: 2079
+- md5: 2e8c0a903c756016239aa4b0e7d35783
+  size: 2234
   path: dataset_303_top_marginal_income_tax_rate__reynolds__2008_config.json
