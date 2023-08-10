@@ -55,8 +55,22 @@ tables:
           be different by each financing source and service delivery modality (or even by service provider). Further guidance is
           available in the respective guidelines and manuals listed at the end of this section.
 
-
         processing_level: minor
+
+      domestic_spending_fund_source_per_capita:
+        title: Country-reported HIV expenditure by funding source (per capita)
+        unit: US$ per capita
+        description: >-
+          HIV expenditure by funding source per capita.
+
+        description_from_producer: >-
+          The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources.
+          There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
+
+          The calculation of each service/programme or sub-indicator may have individual characteristics to ensure proper accounting
+          of all components (e.g., direct and shared costs of service provision) and to avoid double-counting; these calculations may
+          be different by each financing source and service delivery modality (or even by service provider). Further guidance is
+          available in the respective guidelines and manuals listed at the end of this section.
 
       hiv_prevalence:
         title: HIV Prevalence
