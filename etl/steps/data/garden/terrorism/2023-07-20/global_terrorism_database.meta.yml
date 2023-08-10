@@ -1,16 +1,24 @@
 dataset:
   title: Terrorism dataset, Global Terrorism Database (2022)
-  description: The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
+  description: >
+    The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
     around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to Terrorism
     (START) at the University of Maryland.
+
+
+    For target and attack type OWID GTD typically records only one attack/target type for each incident, recorded in columns targtype1 and attacktype1. OWID uses these two indicators, even though there are some events with several targets/methods.
   licenses:
   - name: Copyright University of Maryland 2022
     url: https://www.start.umd.edu/gtd/terms-of-use/
   sources:
   - name: Global Terrorism Database (2022)
-    description: The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
+    description: >
+      The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
       around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to
       Terrorism (START) at the University of Maryland.
+
+
+      For target and attack type OWID GTD typically records only one attack/target type for each incident, recorded in columns targtype1 and attacktype1. OWID uses these two indicators, even though there are some events with several targets/methods.
     url: https://www.start.umd.edu/gtd/
     date_accessed: '2023-07-20'
     publication_year: 2022
@@ -139,30 +147,7 @@ tables:
         display:
           name: Attacks
           numDecimalPlaces: 0
-      total_casualties:
-        title: Terrorism casualties
-        description: >-
-          This field records the number of confirmed non-fatal injuries and fatalties to both perpetrators and victims.
 
-
-          Where there is evidence of non-fatal injuries and fatalties, but a figure is not reported or it is too vague to
-          be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack,
-          but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result
-          of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim
-          fatalities are known, this field will only report the number of victims killed in the incident.
-
-
-          Where several independent sources report different numbers of non-fatal injuries and fatalties, the database will
-          usually reflect the number given by the most recent source. However, the most recent source will not be used if
-          the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a
-          perpetrator group. When there are several "most recent" sources published around the same time, or there are concerns
-          about the validity of a recent source, the majority figure will be used. Where there is no majority figure among
-          independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure
-          comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting
-          reports of fatalities will be noted in the "Additional Notes" field.
-        unit: casualties
-        display:
-          numDecimalPlaces: 0
       total_nkill_australasia__and__oceania:
         title: Terrorism deaths Australasia & Oceania
         description: >-
@@ -2066,6 +2051,7 @@ tables:
           name: Educational institutions
           numDecimalPlaces: 0
       total_incident_counts_food_or_water_supply_target:
+        title: Terrorist attacks Food or Water Supply Target
         description: >
           Attacks on food or water supplies and reserves are included in this value. This generally includes attacks aimed at the infrastructure related to food and water for human consumption
         unit: "attacks"
@@ -2473,30 +2459,6 @@ tables:
           validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted
           in the "Additional Notes" field.
         unit: deaths
-        display:
-          numDecimalPlaces: 1
-      terrorism_casualties_per_100k:
-        title: Terrorism casualties per 100,000 people
-        description: >-
-          This field records the number of confirmed non-fatal injuries and fatalties to both perpetrators and victims.
-
-
-          Where there is evidence of non-fatal injuries and fatalties, but a figure is not reported or it is too vague to
-          be of use, this field remains blank. If information is missing regarding the number of victims killed in an attack,
-          but perpetrator fatalities are known, this value will reflect only the number of perpetrators who died as a result
-          of the incident. Likewise, if information on the number of perpetrators killed in an attack is missing, but victim
-          fatalities are known, this field will only report the number of victims killed in the incident.
-
-
-          Where several independent sources report different numbers of non-fatal injuries and fatalties, the database will
-          usually reflect the number given by the most recent source. However, the most recent source will not be used if
-          the source itself is of questionable validity or if the source bases its non-fatal injuries on claims made by a
-          perpetrator group. When there are several "most recent" sources published around the same time, or there are concerns
-          about the validity of a recent source, the majority figure will be used. Where there is no majority figure among
-          independent sources, the database will record the lowest proffered non-fatal injuries figure, unless that figure
-          comes from a source of questionable validity or there is another compelling reason to do otherwise. Conflicting
-          reports of fatalities will be noted in the "Additional Notes" field.
-        unit: casualties
         display:
           numDecimalPlaces: 1
       share_of_deaths:

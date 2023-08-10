@@ -535,8 +535,8 @@ steps:
   data://garden/terrorism/2023-07-20/global_terrorism_database:
   - data://meadow/terrorism/2023-07-20/global_terrorism_database
   - data://garden/un/2022-07-11/un_wpp
-  - data://garden/demography/2023-03-31/population
   - data://garden/regions/2023-01-01/regions
+  - data://garden/demography/2023-03-31/population
   data://grapher/terrorism/2023-07-20/global_terrorism_database:
   - data://garden/terrorism/2023-07-20/global_terrorism_database
 

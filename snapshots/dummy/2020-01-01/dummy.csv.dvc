@@ -1,28 +1,22 @@
 meta:
-  name: Dummy dataset
   origin:
-    dataset_title_producer: The best dummy dataset  # the dataset title as used by the producer. This should be the default to be filled
-    dataset_title_owid: Dummy # What we call the dataset if the producer's title does not fit our needs.
-    dataset_description_producer: This is a description of the best dummy dataset # How the producer describes this dataset
-    dataset_description_owid: | # How we describe this dataset - also a place to collect important information about the entire dataset.
-      This is a description of this dummy dataset as we would word it.
-
-      It can be a few paragraphs long if need be. Citation information should not go in here. For
-      specific information about indicators, prefer to add indciator level descriptions in meadow or garden.
-    attribution: ACME project # The text we want to appear when we want to credit the "origin" of the data. Should be reasonably short. Can be a project, an institution, actual people. Can include versions or years if that is important.
-    attribution_short: ACME # The shortest version of the attribution that we think is acceptable. Used in places like "This database is used on data by ..."
-    producer: Max Mustermann # Name of the institution or people who are the authors of this data. Should never be the name of a project.
-    citation_producer: Max Mustermann et al based on John Doe. # The citation that the producer asks for, verbatim.
-    dataset_url_main: http://dummy-project.org # The URL where this dataset is described
-    dataset_url_download: http://dummy-project.org/download # The URL from where we downloaded the data
-    date_accessed: 2023-06-29
+    dataset_title_owid: Dummy OWID dataset title
+    dataset_description_owid: |-
+      This
+      is
+      a
+      dummy
+      dataset
+    producer: Dummy producer
+    citation_producer: Dummy producer citation
+    dataset_url_main: https://www.url-dummy.com/
+    dataset_url_download: https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv
     date_published: 2020-01-01
-    version: "1" # Some datasets release versions over time - if so then here we capture the version identifier the producer used for this release
-    license:
-      name: CC-BY 4.0 # The license that governs this dataset
-      url: http://dummy-project.org/license # The URL where the licensing terms are given
-wdir: ../../../data/snapshots/dummy/2020-01-01
+    date_accessed: 2023-08-07
+  license:
+    name: MIT dummy license
 outs:
 - md5: becb9bc64792f7372580683b384e5411
   size: 96
   path: dummy.csv
+wdir: ../../../data/snapshots/dummy/2020-01-01

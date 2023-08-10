@@ -21,7 +21,6 @@ DEFAULT_EXTENSION = "csv"
 
 class Options(Enum):
     ADD_TO_DAG = "Add steps into dag/walkthrough.yaml file"
-    INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
     GENERATE_NOTEBOOK = "Generate playground notebook"
     IS_PRIVATE = "Make dataset private"
 
@@ -34,7 +33,6 @@ class MeadowForm(BaseModel):
     file_extension: str
     add_to_dag: bool
     generate_notebook: bool
-    include_metadata_yaml: bool
     is_private: bool
 
     def __init__(self, **data: Any) -> None:
@@ -42,7 +40,6 @@ class MeadowForm(BaseModel):
         if data["file_extension"] == "":
             data["file_extension"] = DEFAULT_EXTENSION
         data["add_to_dag"] = Options.ADD_TO_DAG.value in options
-        data["include_metadata_yaml"] = Options.INCLUDE_METADATA_YAML.value in options
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
         data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
@@ -51,8 +48,9 @@ class MeadowForm(BaseModel):
 def app(run_checks: bool) -> None:
     state = utils.APP_STATE
 
+    po.put_markdown("# Walkthrough - Meadow")
     with open(CURRENT_DIR / "meadow.md", "r") as f:
-        po.put_markdown(f.read())
+        po.put_collapse("Instructions", [po.put_markdown(f.read())])
 
     data = pi.input_group(
         "Options",
@@ -101,14 +99,12 @@ def app(run_checks: bool) -> None:
                 "Additional Options",
                 options=[
                     Options.ADD_TO_DAG.value,
-                    Options.INCLUDE_METADATA_YAML.value,
                     Options.GENERATE_NOTEBOOK.value,
                     Options.IS_PRIVATE.value,
                 ],
                 name="options",
                 value=[
                     Options.ADD_TO_DAG.value,
-                    # Options.INCLUDE_METADATA_YAML.value,
                     Options.GENERATE_NOTEBOOK.value,
                 ],
             ),
@@ -132,17 +128,15 @@ def app(run_checks: bool) -> None:
     else:
         dag_content = ""
 
-    DATASET_DIR = utils.generate_step(CURRENT_DIR / "meadow_cookiecutter/", dict(**form.dict(), channel="meadow"))
+    DATASET_DIR = utils.generate_step_to_channel(
+        CURRENT_DIR / "meadow_cookiecutter/", dict(**form.dict(), channel="meadow")
+    )
 
     step_path = DATASET_DIR / (form.short_name + ".py")
     notebook_path = DATASET_DIR / "playground.ipynb"
-    metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
 
     if not form.generate_notebook:
         os.remove(notebook_path)
-
-    if not form.include_metadata_yaml:
-        os.remove(metadata_path)
 
     po.put_markdown(
         f"""
@@ -156,21 +150,7 @@ def app(run_checks: bool) -> None:
 
 2. (Optional) Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
 
-3. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
-
-    ```
-    poetry run etl-metadata-export data/meadow/{form.namespace}/{form.version}/{form.short_name} -o etl/steps/data/meadow/{form.namespace}/{form.version}/{form.short_name}.meta.yml
-    ```
-
-    then manual edit it and rerun the step again with
-
-    ```
-    poetry run etl data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
-    ```
-
-    Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
-
-4. Continue to the garden step
+3. Continue to the garden step
 """
     )
     po.put_buttons(["Go to garden"], [lambda: go_app("garden", new_window=False)])
@@ -181,8 +161,6 @@ def app(run_checks: bool) -> None:
 """
     )
 
-    if form.include_metadata_yaml:
-        utils.preview_file(metadata_path, "yaml")
     utils.preview_file(step_path, "python")
 
     if dag_content:

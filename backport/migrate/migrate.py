@@ -1,21 +1,19 @@
 import shutil
-import tempfile
 from pathlib import Path
-from typing import Any, Dict, Optional, cast
+from typing import Optional, cast
 
 import click
 import structlog
-from cookiecutter.main import cookiecutter
 from owid.catalog.utils import underscore
 from sqlalchemy.engine import Engine
 
 from etl import config
 from etl.backport_helpers import create_dataset
 from etl.db import get_engine
-from etl.files import apply_black_formatter_to_files, yaml_dump
+from etl.files import yaml_dump
 from etl.metadata_export import metadata_export
 from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
-from walkthrough.utils import add_to_dag
+from walkthrough.utils import add_to_dag, generate_step
 
 from ..backport import PotentialBackport
 
@@ -87,31 +85,6 @@ def cli(
         dry_run=dry_run,
         upload=upload,
     )
-
-
-def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Path) -> None:
-    with tempfile.TemporaryDirectory() as temp_dir:
-        OUTPUT_DIR = temp_dir
-
-        # generate ingest scripts
-        cookiecutter(
-            cookiecutter_path.as_posix(),
-            no_input=True,
-            output_dir=temp_dir,
-            overwrite_if_exists=True,
-            extra_context=data,
-        )
-
-        shutil.copytree(
-            Path(OUTPUT_DIR),
-            target_dir,
-            dirs_exist_ok=True,
-        )
-
-    DATASET_DIR = target_dir / data["namespace"] / data["version"]
-
-    # Apply black formatter to generated files.
-    apply_black_formatter_to_files(file_paths=DATASET_DIR.glob("*.py"))
 
 
 def migrate(

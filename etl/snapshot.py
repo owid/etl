@@ -75,7 +75,8 @@ class Snapshot:
     def pull(self, force=True) -> None:
         """Pull file from S3."""
         with _unignore_backports(self.path):
-            get_dvc().pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
+            dvc = get_dvc()
+            dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -86,10 +87,16 @@ class Snapshot:
 
     def download_from_source(self) -> None:
         """Download file from source_data_url."""
-        assert self.metadata.source
-        assert self.metadata.source.source_data_url, "source_data_url is not set"
+        if self.metadata.origin:
+            assert self.metadata.origin.dataset_url_download, "dataset_url_download is not set"
+            download_url = self.metadata.origin.dataset_url_download
+        elif self.metadata.source:
+            assert self.metadata.source.source_data_url, "source_data_url is not set"
+            download_url = self.metadata.source.source_data_url
+        else:
+            raise ValueError("Neither origin nor source is set")
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        files.download(self.metadata.source.source_data_url, str(self.path))
+        files.download(download_url, str(self.path))
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
@@ -109,26 +116,48 @@ class Snapshot:
                         dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
 
     def to_table_metadata(self):
-        table_meta = TableMeta.from_dict(
-            {
-                "short_name": self.metadata.short_name,
-                "title": self.metadata.name,
-                "description": self.metadata.description,
-                "dataset": DatasetMeta.from_dict(
-                    {
-                        "channel": "snapshots",
-                        "description": self.metadata.description,
-                        "is_public": self.metadata.is_public,
-                        "namespace": self.metadata.namespace,
-                        "short_name": self.metadata.short_name,
-                        "title": self.metadata.name,
-                        "version": self.metadata.version,
-                        "sources": [self.metadata.source],
-                        "licenses": [self.metadata.license],
-                    }
-                ),
-            }
-        )
+        if "origin" in self.metadata.to_dict():
+            table_meta = TableMeta.from_dict(
+                {
+                    "short_name": self.metadata.short_name,
+                    "title": self.metadata.origin.dataset_title_owid,  # type: ignore
+                    "description": self.metadata.origin.dataset_description_owid,  # type: ignore
+                    "dataset": DatasetMeta.from_dict(
+                        {
+                            "channel": "snapshots",
+                            "namespace": self.metadata.namespace,
+                            "short_name": self.metadata.short_name,
+                            "title": self.metadata.origin.dataset_title_owid,  # type: ignore
+                            "description": self.metadata.origin.dataset_description_owid,  # type: ignore
+                            "origins": [self.metadata.origin],
+                            "licenses": [self.metadata.license],
+                            "is_public": self.metadata.is_public,
+                            "version": self.metadata.version,
+                        }
+                    ),
+                }
+            )
+        else:
+            table_meta = TableMeta.from_dict(
+                {
+                    "short_name": self.metadata.short_name,
+                    "title": self.metadata.name,
+                    "description": self.metadata.description,
+                    "dataset": DatasetMeta.from_dict(
+                        {
+                            "channel": "snapshots",
+                            "description": self.metadata.description,
+                            "is_public": self.metadata.is_public,
+                            "namespace": self.metadata.namespace,
+                            "short_name": self.metadata.short_name,
+                            "title": self.metadata.name,
+                            "version": self.metadata.version,
+                            "sources": [self.metadata.source],
+                            "licenses": [self.metadata.license],
+                        }
+                    ),
+                }
+            )
         return table_meta
 
 
@@ -341,16 +370,17 @@ def _unignore_backports(path: Path):
     Changing .dvcignore in-place is not great, but no other way was working (tried monkey-patching
     DVC and subrepos).
     """
+    dvc_ignore_path = paths.BASE_DIR / ".dvcignore"
     if "backport/" in str(path):
         with unignore_backports_lock:
-            with open(".dvcignore") as f:
+            with open(dvc_ignore_path) as f:
                 s = f.read()
             try:
-                with open(".dvcignore", "w") as f:
+                with open(dvc_ignore_path, "w") as f:
                     f.write(s.replace("snapshots/backport/", "# snapshots/backport/"))
                 yield
             finally:
-                with open(".dvcignore", "w") as f:
+                with open(dvc_ignore_path, "w") as f:
                     f.write(s)
     else:
         yield

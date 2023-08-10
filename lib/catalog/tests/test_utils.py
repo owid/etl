@@ -8,11 +8,16 @@ from owid.catalog.utils import underscore, underscore_table
 def test_underscore():
     assert (
         underscore(
+            "Proportion of young women and men aged 18‑29 years who experienced sexual violence by age 18",
+        )
+        == "proportion_of_young_women_and_men_aged_18_29_years_who_experienced_sexual_violence_by_age_18"
+    )
+    assert (
+        underscore(
             "`17.11.1 - Developing countries’ and least developed countries’ share of global merchandise exports (%) - TX_EXP_GBMRCH`"
         )
         == "_17_11_1__developing_countries_and_least_developed_countries_share_of_global_merchandise_exports__pct__tx_exp_gbmrch"
     )
-
     assert underscore("Urban population") == "urban_population"
     assert underscore("Urban population (% of total population)") == "urban_population__pct_of_total_population"
     assert (

@@ -295,14 +295,12 @@ def upsert_table(
 
         # process and upload data to S3
         var_data = variable_data(df)
-        data_path = upload_gzip_dict(var_data, db_variable.s3_data_path(), r2=True)
+        upload_gzip_dict(var_data, db_variable.s3_data_path(), r2=True)
 
         # process and upload metadata to S3
         var_metadata = variable_metadata(engine, db_variable.id, df)
-        metadata_path = upload_gzip_dict(var_metadata, db_variable.s3_metadata_path(), r2=True)
+        upload_gzip_dict(var_metadata, db_variable.s3_metadata_path(), r2=True)
 
-        db_variable.dataPath = data_path
-        db_variable.metadataPath = metadata_path
         session.add(db_variable)
         session.commit()
 

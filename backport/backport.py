@@ -1,5 +1,6 @@
 import datetime as dt
-from typing import List, Optional
+import json
+from typing import Any, List, Optional
 
 import click
 import pandas as pd
@@ -8,7 +9,12 @@ from owid.catalog import Source
 from sqlalchemy.engine import Engine
 from sqlmodel import Session
 
-from backport.datasync.data_metadata import variable_data_df_from_s3
+from backport.datasync.data_metadata import (
+    _variable_metadata,
+    variable_data,
+    variable_data_df_from_s3,
+)
+from backport.datasync.datasync import upload_gzip_dict
 from etl import config
 from etl import grapher_model as gm
 from etl.backport_helpers import GrapherConfig
@@ -43,17 +49,25 @@ log = structlog.get_logger()
     type=bool,
     help="Upload dataset to S3 as snapshot",
 )
+@click.option(
+    "--data-metadata/--skip-data-metadata",
+    default=False,
+    type=bool,
+    help="Upload data & metadata JSON of variable to R2",
+)
 def backport_cli(
     dataset_id: int,
     force: bool = False,
     dry_run: bool = False,
     upload: bool = True,
+    data_metadata: bool = False,
 ) -> None:
     return backport(
         dataset_id=dataset_id,
         force=force,
         dry_run=dry_run,
         upload=upload,
+        data_metadata=data_metadata,
     )
 
 
@@ -131,7 +145,12 @@ class PotentialBackport:
 
 
 def backport(
-    dataset_id: int, force: bool = False, dry_run: bool = False, upload: bool = True, engine: Optional[Engine] = None
+    dataset_id: int,
+    force: bool = False,
+    dry_run: bool = False,
+    upload: bool = True,
+    data_metadata: bool = False,
+    engine: Optional[Engine] = None,
 ) -> None:
     lg = log.bind(dataset_id=dataset_id)
 
@@ -161,7 +180,94 @@ def backport(
         public=dataset.public,
     )
 
+    if data_metadata:
+        _upload_data_metadata(lg, dataset.short_name, dry_run)
+        lg.info(
+            "backport.data_metadata.finished",
+            dry_run=dry_run,
+        )
+
     lg.info("backport.finished")
+
+
+def _upload_data_metadata(lg: Any, backport_short_name: str, dry_run: bool) -> None:
+    lg.info("backport.data_metadata.pull_snapshots.start")
+    snap_values = Snapshot(f"backport/latest/{backport_short_name}_values.feather")
+    snap_values.pull()
+    snap_config = Snapshot(f"backport/latest/{backport_short_name}_config.json")
+    snap_config.pull()
+    lg.info("backport.data_metadata.pull_snapshots.end")
+
+    values = (
+        pd.read_feather(snap_values.path)
+        .rename(
+            columns={
+                "entity_id": "entityId",
+                "entity_name": "entityName",
+                "entity_code": "entityCode",
+                "variable_name": "variableName",
+            }
+        )
+        .astype({"value": str})
+    )
+
+    with open(snap_config.path, "r") as f:
+        config = json.load(f)
+
+    variables = config["variables"]
+    sources = config["sources"]
+    dataset = config["dataset"]
+
+    for db_variable_row in variables:
+        assert db_variable_row["schemaVersion"] == 1, "Only metadata schema version 1 is supported"
+
+        # find source and fill missing data
+        source = [s for s in sources if s["id"] == db_variable_row["sourceId"]][0]
+        db_variable_row["sourceName"] = source["name"]
+        db_variable_row["sourceDescription"] = source["description"]
+
+        # get dataset and fill missing data
+        db_variable_row["datasetName"] = dataset["name"]
+        db_variable_row["datasetVersion"] = dataset["version"]
+        db_variable_row["updatePeriodDays"] = dataset["updatePeriodDays"]
+        db_variable_row["nonRedistributable"] = dataset["nonRedistributable"]
+
+        # encode dicts as JSON
+        db_variable_row["display"] = json.dumps(db_variable_row["display"])
+        db_variable_row["sourceDescription"] = json.dumps(db_variable_row["sourceDescription"])
+
+        # use date types
+        db_variable_row["createdAt"] = pd.to_datetime(db_variable_row["createdAt"])
+        db_variable_row["updatedAt"] = pd.to_datetime(db_variable_row["updatedAt"])
+
+        # add values
+        var_data = values[values.variable_id == db_variable_row["id"]]
+
+        # artificial variable with id just to get s3 paths
+        db_var = gm.Variable(
+            id=db_variable_row["id"],
+            datasetId=1,
+            unit="",
+            coverage="",
+            timespan="",
+            sourceId=0,
+            display={},
+            dimensions=None,
+        )
+
+        upload_variable_data = variable_data(var_data)
+        if not dry_run:
+            upload_gzip_dict(upload_variable_data, db_var.s3_data_path(), r2=True)
+
+        upload_variable_metadata = _variable_metadata(
+            db_variable_row=db_variable_row,
+            variable_data=var_data,
+            db_origins_df=pd.DataFrame(),
+            db_topic_tags=[],
+            db_faqs=[],
+        )
+        if not dry_run:
+            upload_gzip_dict(upload_variable_metadata, db_var.s3_metadata_path(), r2=True)
 
 
 def _snapshot_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> SnapshotMeta:
