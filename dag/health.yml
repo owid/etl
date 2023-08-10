@@ -232,6 +232,8 @@ steps:
   data-private://garden/un/2023-08-02/comtrade_pandemics:
     - data-private://meadow/un/2023-08-02/comtrade_pandemics
     - data://garden/regions/2023-01-01/regions
+  data-private://grapher/un/2023-08-10/comtrade_pandemics:
+    - data-private://garden/un/2023-08-02/comtrade_pandemics
 
 # WHO Mortality Database - 1st level causes
   data://meadow/who/2023-08-01/mortality_database:
