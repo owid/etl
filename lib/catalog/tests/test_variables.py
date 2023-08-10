@@ -194,8 +194,8 @@ def test_create_new_variable_as_another_variable_to_the_power_of_a_scalar(table_
     tb1["j"] = tb1["a"] ** 2
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
     assert (tb1["j"] == pd.Series([1, 4, 9])).all()
-    assert tb1["j"].metadata.title is None
-    assert tb1["j"].metadata.description is None
+    assert tb1["j"].metadata.title == "Title of Table 1 Variable a"
+    assert tb1["j"].metadata.description == "Description of Table 1 Variable a"
     assert tb1["j"].metadata.sources == [sources[2], sources[1]]
     assert tb1["j"].metadata.licenses == [licenses[1]]
 

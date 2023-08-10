@@ -400,10 +400,10 @@ def test_merge_without_any_on_arguments(table_1, table_2, sources, licenses) -> 
     # Check that non-overlapping columns preserve metadata.
     assert tb["c"].metadata == table_2["c"].metadata
     # Check that "on" columns combine the metadata of left and right tables.
-    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
-    # with table_2, title should be preserved, but description will be lost.
+    # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
+    # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description is None
+    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
     # Column "year" has no metadata in either table.
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -430,10 +430,10 @@ def test_merge_with_on_argument(table_1, table_2, sources, licenses) -> None:
     tb = tables.merge(table_1, table_2, on=["country", "year"])
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.merge(table_2, on=["country", "year"]))
-    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
-    # with table_2, title should be preserved, but description will be lost.
+    # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
+    # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description is None
+    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
     # Idem for "year".
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -465,10 +465,10 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     tb = tables.merge(table_1, table_2, left_on=["country", "year"], right_on=["country", "year"])
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.merge(table_2, left_on=["country", "year"], right_on=["country", "year"]))
-    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
-    # with table_2, title should be preserved, but description will be lost.
+    # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
+    # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description is None
+    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
     # Idem for "year".
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -511,10 +511,10 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     tb = tables.merge(table_1, table_2, left_on=["country", "year", "b"], right_on=["country", "year", "c"])
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.merge(table_2, left_on=["country", "year", "b"], right_on=["country", "year", "c"]))
-    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
-    # with table_2, title should be preserved, but description will be lost.
+    # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
+    # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description is None
+    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
     # Idem for "year".
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -539,10 +539,10 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     tb = tables.merge(table_1, table_2, left_on=["country", "year", "a"], right_on=["country", "year", "a"])
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.merge(table_2, left_on=["country", "year", "a"], right_on=["country", "year", "a"]))
-    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
-    # with table_2, title should be preserved, but description will be lost.
+    # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
+    # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description is None
+    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
     # Idem for "year".
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -568,10 +568,10 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
 
 def test_concat_with_axis_0(table_1, table_2, sources, licenses) -> None:
     tb = tables.concat([table_1, table_2])
-    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
-    # with table_2, title should be preserved, but description will be lost.
+    # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
+    # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description is None
+    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
     # Column "year" has no title and no description in any of the tables.
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
