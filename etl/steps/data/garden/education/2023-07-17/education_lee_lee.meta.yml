@@ -9,7 +9,7 @@ dataset:
   licenses:
   - name: 2021 by Robert J. Barro and Jong-Wha Lee.
     url: https://github.com/barrolee/BarroLeeDataSet
-  sources:
+  origin:
   - name: Lee and Lee (2016)
     description: >-
       Datasets on estimated school enrollment ratios from 1820 to 2010 and estimated educational attainment for the total,
