@@ -122,13 +122,6 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
     """
     tb = tb.copy()
 
-    # Add population to data.
-    tb = geo.add_population_to_table(
-        tb=tb,
-        ds_population=ds_population,
-        warn_on_missing_countries=False,
-    )
-
     # Estimate per-capita variables.
     ## Only consider variable "domestic_spending_fund_source"
     mask = tb["domestic_spending_fund_source"].isna()
@@ -136,7 +129,9 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
     ## Add population variable
     tb_fund = geo.add_population_to_table(tb[~mask], ds_population, expected_countries_without_population=[])
     ## Estimate ratio
-    tb_fund["domestic_spending_fund_source_per_capita"] = tb_fund["domestic_spending_fund_source"] / tb_fund["population"]
+    tb_fund["domestic_spending_fund_source_per_capita"] = (
+        tb_fund["domestic_spending_fund_source"] / tb_fund["population"]
+    )
 
     ## Combine tables again
     tb = pr.concat([tb_fund, tb[mask]], ignore_index=True)
