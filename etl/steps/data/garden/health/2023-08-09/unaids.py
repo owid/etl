@@ -42,7 +42,11 @@ def run(dest_dir: str) -> None:
     tb = tb.underscore()
 
     log.info("health.unaids: harmonize countries")
-    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb: Table = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path
+    )
 
     # Rename columns
     log.info("health.unaids: rename columns")
