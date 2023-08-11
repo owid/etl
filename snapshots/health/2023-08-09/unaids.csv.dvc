@@ -2,8 +2,9 @@ meta:
   name: Global AIDS Update (UNAIDS, 2023)
   publication_year: 2023
   source_name: UNAIDS
-  source_published_by: 'The path that ends AIDS: UNAIDS Global AIDS Update 2023. Geneva:
-    Joint United Nations Programme on HIV/AIDS; 2023. Licence: CC BY-NC-SA 3.0 IGO.'
+  source_published_by: >-
+    The path that ends AIDS: UNAIDS Global AIDS Update 2023. Geneva: Joint United Nations Programme on HIV/AIDS; 2023.
+    Licence: CC BY-NC-SA 3.0 IGO.
   url: https://aidsinfo.unaids.org/
   source_data_url:
   license_url: https://www.unaids.org/en/terms-of-use
