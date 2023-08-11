@@ -4,22 +4,22 @@ dataset:
     The majority of series data is sourced from the OECD Statistics.
 
 
-    For particular countries, longer series have been sourced from specific national records as referenced below.
+    For particular countries, historical data have been sourced from specific national records as referenced below.
 
 
     Germany: Statistisches Bundesamt (https://www.destatis.de/EN/FactsFigures/EconomicSectors/TransportTraffic/TrafficAccidents/Tables_/RoadTrafficAccidents.html)
 
 
-    New Zealand: http://www.transport.govt.nz/research/roadtoll/annualroadtollhistoricalinformation/
+    New Zealand: https://web.archive.org/web/20200116174845/https://www.transport.govt.nz/mot-resources/road-safety-resources/road-deaths/annual-number-of-road-deaths-historical-information/
 
 
-    Australia: https://bitre.gov.au/publications/ongoing/road_deaths_australia_annual_summaries.aspx and https://infrastructure.gov.au/roads/safety/publications/2008/pdf/Ann_Stats_2007.pdf
+    Australia: https://web.archive.org/web/20220525052753/https://www.bitre.gov.au/publications/ongoing/road_deaths_australia_annual_summaries and https://web.archive.org/web/20210501075840/https://www.infrastructure.gov.au/roads/safety/publications/2008/pdf/Ann_Stats_2007.pdf
 
 
     Scotland: https://www.transport.gov.scot/media/39307/sct05174402361.pdf
 
 
-    Northern Ireland: https://www.psni.police.uk/inside-psni/Statistics/road-traffic-collision-statistics/
+    Northern Ireland: https://web.archive.org/web/20190801195213/https://www.psni.police.uk/inside-psni/Statistics/road-traffic-collision-statistics/
 
 
     United States: https://www.bts.gov/content/transportation-fatalities-mode
@@ -40,22 +40,22 @@ dataset:
       The majority of series data is sourced from the OECD Statistics.
 
 
-      For particular countries, longer series have been sourced from specific national records as referenced below.
+      For particular countries, historical data have been sourced from specific national records as referenced below.
 
 
       Germany: Statistisches Bundesamt (https://www.destatis.de/EN/FactsFigures/EconomicSectors/TransportTraffic/TrafficAccidents/Tables_/RoadTrafficAccidents.html)
 
 
-      New Zealand: http://www.transport.govt.nz/research/roadtoll/annualroadtollhistoricalinformation/
+      New Zealand: https://web.archive.org/web/20200116174845/https://www.transport.govt.nz/mot-resources/road-safety-resources/road-deaths/annual-number-of-road-deaths-historical-information/
 
 
-      Australia: https://bitre.gov.au/publications/ongoing/road_deaths_australia_annual_summaries.aspx and https://infrastructure.gov.au/roads/safety/publications/2008/pdf/Ann_Stats_2007.pdf
+      Australia: https://web.archive.org/web/20220525052753/https://www.bitre.gov.au/publications/ongoing/road_deaths_australia_annual_summaries and https://web.archive.org/web/20210501075840/https://www.infrastructure.gov.au/roads/safety/publications/2008/pdf/Ann_Stats_2007.pdf
 
 
       Scotland: https://www.transport.gov.scot/media/39307/sct05174402361.pdf
 
 
-      Northern Ireland: https://www.psni.police.uk/inside-psni/Statistics/road-traffic-collision-statistics/
+      Northern Ireland: https://web.archive.org/web/20190801195213/https://www.psni.police.uk/inside-psni/Statistics/road-traffic-collision-statistics/
 
 
       United States: https://www.bts.gov/content/transportation-fatalities-mode
