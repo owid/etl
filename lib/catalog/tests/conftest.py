@@ -60,9 +60,8 @@ def variable_1(sources, origins, licenses):
     v1.metadata.origins = [origins[2], origins[1]]
     v1.metadata.licenses = [licenses[1]]
     v1.metadata.processing_level = "minor"
-    v1.metadata.presentation = VariablePresentationMeta(
-        title_public="Title of Variable 1", title_variant="Common title variant"
-    )
+    v1.metadata.presentation = VariablePresentationMeta(title_public="Title of Variable 1")
+    v1.metadata.display = {"isProjection": True, "numDecimalPlaces": 1}
     return v1
 
 
@@ -77,9 +76,8 @@ def variable_2(sources, origins, licenses):
     v2.metadata.origins = [origins[2], origins[3]]
     v2.metadata.licenses = [licenses[2], licenses[3]]
     v2.metadata.processing_level = "major"
-    v2.metadata.presentation = VariablePresentationMeta(
-        title_public="Title of Variable 2", title_variant="Common title variant"
-    )
+    v2.metadata.presentation = VariablePresentationMeta(title_public="Title of Variable 2")
+    v2.metadata.display = {"isProjection": True, "numDecimalPlaces": 1}
     return v2
 
 
@@ -108,6 +106,8 @@ def table_1(sources, licenses, origins):
                 origins=[origins[2], origins[1]],
                 licenses=[licenses[1]],
                 processing_level="minor",
+                presentation=VariablePresentationMeta(title_public="Title of Variable 1"),
+                display={"isProjection": True, "numDecimalPlaces": 1},
             ),
             "b": VariableMeta(
                 title="Title of Table 1 Variable b",
@@ -118,6 +118,8 @@ def table_1(sources, licenses, origins):
                 origins=[origins[2], origins[3]],
                 licenses=[licenses[2], licenses[3]],
                 processing_level="major",
+                presentation=VariablePresentationMeta(title_public="Title of Variable 2"),
+                display={"isProjection": True, "numDecimalPlaces": 1},
             ),
         },
     )
