@@ -38,6 +38,12 @@ def run(dest_dir: str) -> None:
     log.info("health.unaids: handle NaNs")
     tb = handle_nans(tb)
 
+    # Harmonize country names (main table)
+    log.info("health.unaids: harmonize countries (main table)")
+    tb: Table = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
+
     # Pivot table
     log.info("health.unaids: pivot table")
     tb = tb.pivot(
@@ -48,15 +54,15 @@ def run(dest_dir: str) -> None:
     log.info("health.unaids: underscore column names")
     tb = tb.underscore()
 
+    # Harmonize country names (auxiliary table)
+    log.info("health.unaids: harmonize countries (aux table)")
+    tb_aux: Table = geo.harmonize_countries(
+        df=tb_aux, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
+
     # Combine tables
     log.info("health.unaids: combine tables")
     tb = pr.concat([tb, tb_aux], ignore_index=True)
-
-    # Harmonize countries
-    log.info("health.unaids: harmonize countries")
-    tb: Table = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
 
     # Rename columns
     log.info("health.unaids: rename columns")
