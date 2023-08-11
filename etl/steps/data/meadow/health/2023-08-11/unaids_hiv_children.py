@@ -14,9 +14,9 @@ from etl.snapshot import Snapshot
 paths = PathFinder(__file__)
 # Mapping long dimension names to short names.
 DIMENSION_MAPPING = {
-    "N- Children prevalence (0-14) (Percent) Male+Female": "Central estimate",
-    "N- Children prevalence (0-14) (Percent) Male+Female; Lower bound": "Lower bound",
-    "N- Children prevalence (0-14) (Percent) Male+Female; Upper bound": "Upper bound",
+    "N- Children prevalence (0-14) (Percent) Male+Female": "0-14 estimate",
+    "N- Children prevalence (0-14) (Percent) Male+Female; Lower bound": "0-14 lower estimate",
+    "N- Children prevalence (0-14) (Percent) Male+Female; Upper bound": "0-14 upper estimate",
 }
 # Logger
 log = get_logger()
@@ -43,16 +43,16 @@ def run(dest_dir: str) -> None:
     df = df.rename(
         columns={
             "Unnamed: 0": "country",
-            "Unnamed: 1": "estimate",
+            "Unnamed: 1": "subgroup_description",
         }
     )
     # Map long dimension names to short names.
     log.info("unaids_hiv_children: set short dimension names")
-    df["estimate"] = df["estimate"].map(DIMENSION_MAPPING)
+    df["subgroup_description"] = df["subgroup_description"].map(DIMENSION_MAPPING)
 
     # Pivot years
     log.info("unaids_hiv_children: melt dataframe (wide -> long format)")
-    df = df.melt(id_vars=["country", "estimate"], var_name="year", value_name="hiv_prevalence")
+    df = df.melt(id_vars=["country", "subgroup_description"], var_name="year", value_name="hiv_prevalence")
 
     # Replace dots
     log.info("unaids_hiv_children: replace '...' with NaNs")
@@ -65,7 +65,7 @@ def run(dest_dir: str) -> None:
     # Create a new table and ensure all columns are snake-case.
     log.info("unaids_hiv_children: create table")
     tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb = tb.set_index(["country", "year", "estimate"], verify_integrity=True)
+    tb = tb.set_index(["country", "year", "subgroup_description"], verify_integrity=True)
 
     #
     # Save outputs.
