@@ -129,4 +129,18 @@ tables:
         unit: "current US$ per capita"
         description: >-
           Imports of textiles. This includes made up articles (including dress patterns).
+      import_cif_total_pandemics_per_capita:
+        title: Imports of pandemic-related customs
+        short_unit: "$"
+        unit: "current US$"
+        description: >-
+          Total imports from any of the following products:
 
+            - Breathing appliances and gas masks
+            - Gloves, mittens and mitts (knitted or crocheted)
+            - Gloves, mittens and mitts (not knitted or crocheted)
+            - Vulcanized (other than hard rubber), gloves other than surgical gloves.
+            - Plastics in clothing
+            - Spectacles, goggles and the like
+            - Surgical gloves
+            - Textiles and made up articles
