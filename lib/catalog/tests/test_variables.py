@@ -7,6 +7,7 @@ import pytest
 
 from owid.catalog.meta import VariableMeta
 from owid.catalog.variables import (
+    License,
     Variable,
     combine_variables_metadata,
     get_unique_licenses_from_variables,
@@ -270,3 +271,19 @@ def test_dropna(table_1) -> None:
     assert tb1.metadata == table_1.metadata
     # Check that the original variable's metadata is not affected.
     assert tb1["b"].metadata == table_1["b"].metadata
+
+
+def test_copy() -> None:
+    v1 = Variable([1, 2, 3], name="dog")
+    v1.metadata.title = "dog"
+    v1.metadata.license = License(name="dog license")
+
+    v2 = v1.copy()
+
+    # change metadata of a new variable
+    v2.metadata.title = "cat"
+    v2.metadata.license.name = "cat license"  # type: ignore
+
+    # make sure it doesn't affect original variable
+    assert v1.metadata.title == "dog"
+    assert v1.metadata.license.name == "dog license"

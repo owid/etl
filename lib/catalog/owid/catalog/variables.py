@@ -303,8 +303,11 @@ class Variable(pd.Series):
             inplace=inplace,
         )
 
-    def copy_metadata(self, from_variable: "Variable", inplace: bool = False) -> Optional["Variable"]:
-        return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)
+    def copy(self, deep: bool = True) -> "Variable":
+        new_var = super().copy(deep=deep)
+        if deep:
+            new_var._fields = {k: var_meta.copy(deep=deep) for k, var_meta in self._fields.items()}
+        return new_var
 
 
 # dynamically add all metadata properties to the class
