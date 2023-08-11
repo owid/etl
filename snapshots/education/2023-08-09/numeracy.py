@@ -19,7 +19,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"oecd/{SNAPSHOT_VERSION}/numeracy_gender.xlsx")
+    snap = Snapshot(f"education/{SNAPSHOT_VERSION}/numeracy.xlsx")
 
     # Download data from source.
     snap.download_from_source()

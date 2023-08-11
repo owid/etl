@@ -541,16 +541,16 @@ steps:
   - data://garden/terrorism/2023-07-20/global_terrorism_database
 
 # OECD historical education data
-  data://meadow/oecd/2023-08-09/clio_infra_education:
-  - snapshot://oecd/2023-08-09/years_of_education.xlsx
-  - snapshot://oecd/2023-08-09/years_of_education_gini.xlsx
-  - snapshot://oecd/2023-08-09/years_of_education_gender.xlsx
-  - snapshot://oecd/2023-08-09/numeracy.xlsx
-  - snapshot://oecd/2023-08-09/numeracy_gender.xlsx
-  data://garden/oecd/2023-08-09/clio_infra_education:
-  - data://meadow/oecd/2023-08-09/clio_infra_education
-  data://grapher/oecd/2023-08-09/clio_infra_education:
-  - data://garden/oecd/2023-08-09/clio_infra_education
+  data://meadow/education/2023-08-09/clio_infra_education:
+  - snapshot://education/2023-08-09/years_of_education.xlsx
+  - snapshot://education/2023-08-09/years_of_education_gini.xlsx
+  - snapshot://education/2023-08-09/years_of_education_gender.xlsx
+  - snapshot://education/2023-08-09/numeracy.xlsx
+  - snapshot://education/2023-08-09/numeracy_gender.xlsx
+  data://garden/education/2023-08-09/clio_infra_education:
+  - data://meadow/education/2023-08-09/clio_infra_education
+  data://grapher/education/2023-08-09/clio_infra_education:
+  - data://garden/education/2023-08-09/clio_infra_education
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
