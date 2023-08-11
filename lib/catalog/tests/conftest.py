@@ -106,7 +106,7 @@ def table_1(sources, licenses, origins):
                 origins=[origins[2], origins[1]],
                 licenses=[licenses[1]],
                 processing_level="minor",
-                presentation=VariablePresentationMeta(title_public="Title of Variable 1"),
+                presentation=VariablePresentationMeta(title_public="Title of Variable a"),
                 display={"isProjection": True, "numDecimalPlaces": 1},
             ),
             "b": VariableMeta(
@@ -143,6 +143,9 @@ def table_2(sources, licenses):
                 description="Description of Table 2 Variable a",
                 sources=[sources[2]],
                 licenses=[licenses[2]],
+                processing_level="major",
+                presentation=VariablePresentationMeta(title_public="Title of Variable a"),
+                display={"isProjection": True, "numDecimalPlaces": 1, "tolerance": 2},
             ),
             "c": VariableMeta(
                 title="Title of Table 2 Variable c",

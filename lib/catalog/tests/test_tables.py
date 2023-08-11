@@ -437,6 +437,12 @@ def test_merge_without_any_on_arguments(table_1, table_2, sources, origins, lice
     assert tb["a"].metadata.sources == [sources[2], sources[1]]
     assert tb["a"].metadata.origins == [origins[2], origins[1]]
     assert tb["a"].metadata.licenses == [licenses[1], licenses[2]]
+    # Since table_1["a"] has processing level "minor" and table_2["a"] has "major", the combination should be "major".
+    assert tb["a"].metadata.processing_level == "major"
+    # Since table_1["a"] and table_2["a"] have identical presentation, the combination should have the same.
+    assert tb["a"].metadata.presentation == table_1["a"].metadata.presentation
+    # Since table_1["a"] and table_2["a"] have different display, the combination should have no display.
+    assert tb["a"].metadata.display is None
     # Column "b" appears only in table_1, so it should keep its original metadata.
     assert tb["b"].metadata == table_1["b"].metadata
     # Column "c" appears only in table_2, so it should keep its original metadata.
@@ -445,6 +451,19 @@ def test_merge_without_any_on_arguments(table_1, table_2, sources, origins, lice
     # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
     assert tb.metadata.title is None
     assert tb.metadata.description is None
+
+
+def test_merge_tables_where_only_one_has_title_or_description(table_1, table_2) -> None:
+    tb1 = table_1.copy()
+    tb2 = table_2.copy()
+    # Delete title from tb1, and make description of tb2 identical to the description of tb1.
+    tb1.metadata.title = None
+    tb2.metadata.description = "Description of Table 1"
+    tb = tables.merge(tb1, tb2)
+    # The resulting table should have the title of tb2 (since tb1 has no title), and the description of tb1
+    # (which is identical to the description of tb2).
+    assert tb.metadata.title == "Title of Table 2"
+    assert tb.metadata.description == "Description of Table 1"
 
 
 def test_merge_with_on_argument(table_1, table_2) -> None:
@@ -637,6 +656,12 @@ def test_melt(table_1, sources, origins, licenses) -> None:
         assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
         assert tb[column].metadata.origins == [origins[2], origins[1], origins[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+        # The combination should have the largest processing level of both variables combined.
+        assert tb[column].metadata.processing_level == "major"
+        # Since "a" and "b" have different presentation, the combination should have no presentation.
+        assert tb[column].metadata.presentation is None
+        # Since "a" and "b" have identical display, the combination should have the same display.
+        assert tb[column].metadata.display == table_1["a"].metadata.display
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
@@ -652,6 +677,12 @@ def test_melt(table_1, sources, origins, licenses) -> None:
         assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
         assert tb[column].metadata.origins == [origins[2], origins[1], origins[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+        # The combination should have the largest processing level of both variables combined.
+        assert tb[column].metadata.processing_level == "major"
+        # Since "a" and "b" have different presentation, the combination should have no presentation.
+        assert tb[column].metadata.presentation is None
+        # Since "a" and "b" have identical display, the combination should have the same display.
+        assert tb[column].metadata.display == table_1["a"].metadata.display
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
@@ -668,6 +699,12 @@ def test_melt(table_1, sources, origins, licenses) -> None:
         assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
         assert tb[column].metadata.origins == [origins[2], origins[1], origins[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+        # The combination should have the largest processing level of both variables combined.
+        assert tb[column].metadata.processing_level == "major"
+        # Since "a" and "b" have different presentation, the combination should have no presentation.
+        assert tb[column].metadata.presentation is None
+        # Since "a" and "b" have identical display, the combination should have the same display.
+        assert tb[column].metadata.display == table_1["a"].metadata.display
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
@@ -685,6 +722,12 @@ def test_melt(table_1, sources, origins, licenses) -> None:
         assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
         assert tb[column].metadata.origins == [origins[2], origins[1], origins[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+        # The combination should have the largest processing level of both variables combined.
+        assert tb[column].metadata.processing_level == "major"
+        # Since "a" and "b" have different presentation, the combination should have no presentation.
+        assert tb[column].metadata.presentation is None
+        # Since "a" and "b" have identical display, the combination should have the same display.
+        assert tb[column].metadata.display == table_1["a"].metadata.display
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
@@ -704,6 +747,9 @@ def test_melt(table_1, sources, origins, licenses) -> None:
         assert tb[column].metadata.sources == table_1["b"].metadata.sources
         assert tb[column].metadata.origins == table_1["b"].metadata.origins
         assert tb[column].metadata.licenses == table_1["b"].metadata.licenses
+        assert tb[column].metadata.processing_level == table_1["b"].metadata.processing_level
+        assert tb[column].metadata.presentation == table_1["b"].metadata.presentation
+        assert tb[column].metadata.display == table_1["b"].metadata.display
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
@@ -817,6 +863,11 @@ def test_sum_columns(table_1, sources, origins, licenses):
     assert table_1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert table_1["c"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert table_1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    assert table_1["c"].metadata.title is None
+    assert table_1["c"].metadata.description is None
+    assert table_1["c"].metadata.processing_level == "major"
+    assert table_1["c"].metadata.presentation is None
+    assert table_1["c"].metadata.display == table_1["a"].metadata.display
 
     # Create a new variable (it cannot be added as a new column since it has different dimensions) that is the sum of
     # each of the other two existing columns.
@@ -824,9 +875,15 @@ def test_sum_columns(table_1, sources, origins, licenses):
     assert variable_c.metadata.sources == [sources[2], sources[1], sources[3]]
     assert variable_c.metadata.origins == [origins[2], origins[1], origins[3]]
     assert variable_c.metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    assert variable_c.metadata.title is None
+    assert variable_c.metadata.description is None
+    assert variable_c.metadata.processing_level == "major"
+    assert variable_c.metadata.presentation is None
+    assert variable_c.metadata.display == table_1["a"].metadata.display
 
 
 def test_operations_of_table_and_scalar(table_1, sources, origins, licenses):
+    table_1_original = table_1.copy()
     table_1[["a", "b"]] = table_1[["a", "b"]] + 1
     table_1[["a", "b"]] += 1
     table_1[["a", "b"]] = table_1[["a", "b"]] - 1
@@ -842,12 +899,9 @@ def test_operations_of_table_and_scalar(table_1, sources, origins, licenses):
     table_1[["a", "b"]] = table_1[["a", "b"]] ** 1
     table_1[["a", "b"]] **= 1
 
-    assert table_1["a"].metadata.sources == [sources[2], sources[1]]
-    assert table_1["a"].metadata.origins == [origins[2], origins[1]]
-    assert table_1["a"].metadata.licenses == [licenses[1]]
-    assert table_1["b"].metadata.sources == [sources[2], sources[3]]
-    assert table_1["b"].metadata.origins == [origins[2], origins[3]]
-    assert table_1["b"].metadata.licenses == [licenses[2], licenses[3]]
+    # Check that the metadata of both variables is preserved (only the processing log should have changed).
+    assert table_1["a"].metadata == table_1_original["a"].metadata
+    assert table_1["b"].metadata == table_1_original["b"].metadata
 
 
 def test_multiply_columns(table_1, sources, origins, licenses):
@@ -856,6 +910,11 @@ def test_multiply_columns(table_1, sources, origins, licenses):
     assert table_1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert table_1["c"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert table_1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    assert table_1["c"].metadata.title is None
+    assert table_1["c"].metadata.description is None
+    assert table_1["c"].metadata.processing_level == "major"
+    assert table_1["c"].metadata.presentation is None
+    assert table_1["c"].metadata.display == table_1["a"].metadata.display
 
     # Create a new variable (it cannot be added as a new column since it has different dimensions) that is the product
     # of each of the other two existing columns.
@@ -863,3 +922,8 @@ def test_multiply_columns(table_1, sources, origins, licenses):
     assert variable_c.metadata.sources == [sources[2], sources[1], sources[3]]
     assert variable_c.metadata.origins == [origins[2], origins[1], origins[3]]
     assert variable_c.metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    assert variable_c.metadata.title is None
+    assert variable_c.metadata.description is None
+    assert variable_c.metadata.processing_level == "major"
+    assert variable_c.metadata.presentation is None
+    assert variable_c.metadata.display == table_1["a"].metadata.display
