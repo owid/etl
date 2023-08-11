@@ -1,0 +1,28 @@
+tables:
+  road_accidents:
+    variables:
+      accidents_involving_casualties:
+        title: Road accidents involving casualties
+        unit: accidents
+        display:
+          numDecimalPlaces: 0
+      deaths_per_million_inhabitants:
+        title: Road accident fatalities per million inhabitants
+        unit: deaths
+        display:
+          numDecimalPlaces: 1
+      deaths__per_million_vehicles:
+        title: Road accident fatalities per million vehicles
+        unit: deaths
+        display:
+          numDecimalPlaces: 1
+      deaths:
+        title: Road accident deaths
+        unit: deaths
+        display:
+          numDecimalPlaces: 0
+      injuries:
+        title: Road accident injuries
+        unit: injuries
+        display:
+          numDecimalPlaces: 0
