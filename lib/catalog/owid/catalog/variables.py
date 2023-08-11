@@ -333,9 +333,9 @@ def _get_metadata_value_from_variables_if_all_identical(
     if len(unique_values) == 1:
         combined_value = unique_values.pop()
     else:
-        if warn_if_different:
-            log.warning(f"Different values of '{field}' detected among variables: {unique_values}")
         combined_value = None
+        if (len(unique_values) > 1) and warn_if_different:
+            log.warning(f"Different values of '{field}' detected among variables: {unique_values}")
 
     return combined_value
 
