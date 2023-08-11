@@ -1,18 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_3019_total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:02:12.493957
-  name: Grapher metadata for dataset_3019_total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3019
+    date_accessed: 2023-08-10 09:22:38.057330
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_3019_total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3019
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ade523861f47efb9439e8e5806980cb5
-  size: 3285
-  path: dataset_3019_total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split_config.json
+- md5: 886ee9600ca09dd7fa76b0527f53795e
+  size: 3438
+  path: 
+    dataset_3019_total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split_config.json

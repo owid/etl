@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3272_missing_women_estimates__bongaarts__and__guilmoto__2015_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:57:07.896008
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3272
+    date_accessed: 2023-08-10 08:57:45.060539
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Missing women estimates (Bongaarts & Guilmoto, 2015)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3272
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: eeca7ffee9ad096554550936653f5e9f
+- md5: c43569adc2c2f5bec2473862067675d0
   size: 7570
-  path: dataset_3272_missing_women_estimates__bongaarts__and__guilmoto__2015_values.feather
+  path: 
+    dataset_3272_missing_women_estimates__bongaarts__and__guilmoto__2015_values.feather

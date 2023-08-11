@@ -1,19 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_5781_seasonal_influenza_mortality__glamor__2019_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:44:48.727196
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5781
+    date_accessed: 2023-08-10 08:45:58.029269
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Seasonal influenza mortality – GLaMOR (2019)
   description: This dataset has higher estimates for seasonal influenza mortality
     for Eastern European countries than the CDC dataset.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5781
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a022ac3f12a4f850db24a0de0c53ec19
+- md5: 9491654127261f48ae5b78c12b8a8285
   size: 19738
   path: dataset_5781_seasonal_influenza_mortality__glamor__2019_values.feather

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_852_drug_overdose_deaths_in_the_us__cdc_wonder_values
-  file_extension: feather
-  date_accessed: 2023-03-23 10:46:46.598733
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/852
+    date_accessed: 2023-08-10 09:48:13.256446
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Drug overdose deaths in the US (CDC WONDER)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/852
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5b55493c12571dd020227b6d1318543b
+- md5: daefcf2c15b45a635a5d2890d026c553
   size: 7338
   path: dataset_852_drug_overdose_deaths_in_the_us__cdc_wonder_values.feather

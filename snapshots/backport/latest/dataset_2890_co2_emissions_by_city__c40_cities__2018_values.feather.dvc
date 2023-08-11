@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2890_co2_emissions_by_city__c40_cities__2018_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:27:32.180474
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2890
+    date_accessed: 2023-08-10 09:03:50.231998
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: CO2 emissions by city - C40 Cities (2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2890
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 79dd56540f24df3a54aeff3b0d1581bf
+- md5: cae4ab4435215b6e52973245f74e8ae3
   size: 8322
   path: dataset_2890_co2_emissions_by_city__c40_cities__2018_values.feather

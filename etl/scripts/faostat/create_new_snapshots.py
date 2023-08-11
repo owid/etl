@@ -273,7 +273,7 @@ class FAOAdditionalMetadata:
 
 def main(read_only: bool = False) -> None:
     # Load list of existing snapshots related to current NAMESPACE.
-    existing_snapshots = snapshot_catalog(match=NAMESPACE)
+    existing_snapshots = list(snapshot_catalog(match=NAMESPACE))
 
     # Initialise a flag that will become true if any dataset needs to be updated.
     any_dataset_was_updated = False

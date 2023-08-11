@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2731_parties_to_montreal_protocol__unep__2023_values
-  file_extension: feather
-  date_accessed: 2023-06-01 13:04:44.149180
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2731
+    date_accessed: 2023-08-10 08:26:51.372491
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Parties to Montreal Protocol (UNEP, 2023)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2731
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0a901d9873bfa7ebd63d6ee0bd061ea2
+- md5: 31bfa101e2912abde8f2ffbcc8b5078a
   size: 19202
   path: dataset_2731_parties_to_montreal_protocol__unep__2023_values.feather

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2780_historical_index_of_human_development__prados_de_la_escosura_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:12:30.747061
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2780
+    date_accessed: 2023-08-10 09:17:51.465833
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2780_historical_index_of_human_development__prados_de_la_escosura
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2780
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 80d8ddd9ad9716dc5ecdc82ba2e9caee
-  size: 2060
-  path: dataset_2780_historical_index_of_human_development__prados_de_la_escosura_config.json
+- md5: 4dcd47c4dee331323b3c146bf4b37f6b
+  size: 2188
+  path: 
+    dataset_2780_historical_index_of_human_development__prados_de_la_escosura_config.json

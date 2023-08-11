@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2731_parties_to_montreal_protocol__unep__2023_config
-  file_extension: json
-  date_accessed: 2023-06-01 13:03:57.796541
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2731
+    date_accessed: 2023-08-10 08:26:20.976740
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2731_parties_to_montreal_protocol__unep__2023
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2731
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 154cf14fea2d04f1dbf415aef8839eb5
-  size: 2883
+- md5: f0eb734b2910f2e27e75cca1b4eb66f8
+  size: 3163
   path: dataset_2731_parties_to_montreal_protocol__unep__2023_config.json

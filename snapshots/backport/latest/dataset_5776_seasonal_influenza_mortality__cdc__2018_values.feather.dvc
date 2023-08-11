@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5776_seasonal_influenza_mortality__cdc__2018_values
-  file_extension: feather
-  date_accessed: 2023-06-01 15:01:49.828326
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5776
+    date_accessed: 2023-08-10 08:52:52.846652
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Seasonal influenza mortality – CDC (2018)
   description: https://github.com/owid/notebooks/tree/cdc_flu/FionaSpooner/cdc_influenza
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5776
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9a3d8b57a40907e5a636f11164a89a0e
+- md5: 50abb3e2daec2d6ceba1ba36fdeba027
   size: 16018
   path: dataset_5776_seasonal_influenza_mortality__cdc__2018_values.feather

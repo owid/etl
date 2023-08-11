@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2862_shark_attacks_and_fatalities__global_shark_attack_file__gsaf__2018_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:33:07.634503
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2862
+    date_accessed: 2023-08-10 09:19:38.614602
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Shark attacks and fatalities - Global Shark Attack File (GSAF) (2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2862
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 27779021a359cf29c4a5c7685111b021
+- md5: fba8c187973b16acde81ca10ab943deb
   size: 24650
-  path: dataset_2862_shark_attacks_and_fatalities__global_shark_attack_file__gsaf__2018_values.feather
+  path: 
+    dataset_2862_shark_attacks_and_fatalities__global_shark_attack_file__gsaf__2018_values.feather

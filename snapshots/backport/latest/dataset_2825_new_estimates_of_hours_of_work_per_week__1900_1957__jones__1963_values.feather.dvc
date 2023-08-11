@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_2825_new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:26:39.647834
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2825
+    date_accessed: 2023-08-10 08:46:00.991563
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: New estimates of hours of work per week, 1900-1957 - Jones (1963)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2825
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c842c30e2de6e6ed0e2a826f587a477d
+- md5: e327cf61ae20f720416b8f44f7c7590f
   size: 8074
-  path: dataset_2825_new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963_values.feather
+  path: 
+    dataset_2825_new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963_values.feather

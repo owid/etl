@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_61_iq_data__pietschnig_and_voracek__2015_values
-  file_extension: feather
-  date_accessed: 2023-02-23 15:19:22.697213
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/61
+    date_accessed: 2023-08-10 07:51:00.035077
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: IQ Data - Pietschnig and Voracek (2015)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/61
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 26b939171c318002886ca08fcdf50ad9
+- md5: a73295499168cdf0b7871a62eaf0fde8
   size: 8106
   path: dataset_61_iq_data__pietschnig_and_voracek__2015_values.feather

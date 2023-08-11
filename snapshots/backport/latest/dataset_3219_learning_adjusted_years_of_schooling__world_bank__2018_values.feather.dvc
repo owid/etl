@@ -1,19 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3219_learning_adjusted_years_of_schooling__world_bank__2018_values
-  file_extension: feather
-  date_accessed: 2023-06-01 13:09:49.199067
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3219
+    date_accessed: 2023-08-10 08:48:09.760825
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Learning-Adjusted Years of Schooling - World Bank (2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3219
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 38c3c74bbac5a98ddcbe388fc267c7e9
+- md5: b4011f36776fe51cc690b3a20acd0a9c
   size: 11274
   path: 
     dataset_3219_learning_adjusted_years_of_schooling__world_bank__2018_values.feather

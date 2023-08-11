@@ -64,6 +64,8 @@ steps:
     - data://meadow/war/2023-02-03/prio_v31
   data://garden/war/2023-07-20/brecke:
     - data://meadow/war/2023-02-03/brecke
+  data://garden/war/2023-08-05/cow_mid:
+    - data://meadow/war/2023-06-09/cow_mid
 
   # Grapher
   data://grapher/war/2023-06-26/ucdp:
@@ -76,3 +78,5 @@ steps:
     - data://garden/war/2023-07-21/prio_v31
   data://grapher/war/2023-07-20/brecke:
     - data://garden/war/2023-07-20/brecke
+  data://grapher/war/2023-08-08/cow_mid:
+  - data://garden/war/2023-08-05/cow_mid

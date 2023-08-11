@@ -127,6 +127,7 @@ def migrate(
 
     print(f"Execute snapshot with `python snapshots/{namespace}/{version}/{short_name}.py`")
     print(f"Import dataset with `etl {namespace}/{version}/{short_name} --grapher`")
+    print("Run chart revisions with `ENV=.env.prod.write walkthrough charts`")
 
 
 def _add_to_migrated_dag(namespace: str, version: str, short_name: str):

@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/706
-    date_accessed: 2023-08-07 14:39:46.887999
+    date_accessed: 2023-08-10 08:48:59.334133
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_706_output_of_key_industrial_sectors_in_england__bank_of_england__2017
@@ -10,7 +10,7 @@ meta:
     in England (1270-1870).
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6384a203cd1c655715206ddeb1b7e692
-  size: 6133
+- md5: b57193010aee49bffdedb4cf3db1d147
+  size: 5501
   path: 
     dataset_706_output_of_key_industrial_sectors_in_england__bank_of_england__2017_config.json

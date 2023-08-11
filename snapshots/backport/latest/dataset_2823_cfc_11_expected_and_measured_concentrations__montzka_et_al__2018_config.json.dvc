@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2823_cfc_11_expected_and_measured_concentrations__montzka_et_al__2018_config
-  file_extension: json
-  date_accessed: 2023-03-23 17:23:53.010673
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2823
+    date_accessed: 2023-08-10 09:03:20.758073
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2823_cfc_11_expected_and_measured_concentrations__montzka_et_al__2018
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2823
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: db970ca220829162cf28f317b7c91d7f
-  size: 3619
-  path: dataset_2823_cfc_11_expected_and_measured_concentrations__montzka_et_al__2018_config.json
+- md5: ea2838316e66499042c42c51493e53a9
+  size: 4026
+  path: 
+    dataset_2823_cfc_11_expected_and_measured_concentrations__montzka_et_al__2018_config.json

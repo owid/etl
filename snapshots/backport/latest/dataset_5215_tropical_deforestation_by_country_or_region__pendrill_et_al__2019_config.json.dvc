@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5215_tropical_deforestation_by_country_or_region__pendrill_et_al__2019_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:58:40.771474
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5215
+    date_accessed: 2023-08-10 08:31:58.928324
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5215_tropical_deforestation_by_country_or_region__pendrill_et_al__2019
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5215
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4aef23be0ae8b87faa15c8944a5047cb
-  size: 7838
-  path: dataset_5215_tropical_deforestation_by_country_or_region__pendrill_et_al__2019_config.json
+- md5: f076c07c9c07e90e3393fefa9e203f10
+  size: 8864
+  path: 
+    dataset_5215_tropical_deforestation_by_country_or_region__pendrill_et_al__2019_config.json

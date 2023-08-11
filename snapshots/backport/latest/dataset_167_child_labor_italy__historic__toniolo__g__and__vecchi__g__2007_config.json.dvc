@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_167_child_labor_italy__historic__toniolo__g__and__vecchi__g__2007_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:27:23.151201
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/167
+    date_accessed: 2023-08-10 09:40:15.847410
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_167_child_labor_italy__historic__toniolo__g__and__vecchi__g__2007
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/167
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 73d61aa2892df1dacde2bd4c8debd0d4
-  size: 3344
-  path: dataset_167_child_labor_italy__historic__toniolo__g__and__vecchi__g__2007_config.json
+- md5: 278259aaa8f2f1d3d55be60487e57d67
+  size: 3763
+  path: 
+    dataset_167_child_labor_italy__historic__toniolo__g__and__vecchi__g__2007_config.json

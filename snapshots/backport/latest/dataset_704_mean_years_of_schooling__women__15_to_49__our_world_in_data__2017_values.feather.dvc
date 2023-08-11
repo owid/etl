@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_704_mean_years_of_schooling__women__15_to_49__our_world_in_data__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 15:16:39.032749
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/704
+    date_accessed: 2023-08-10 09:13:34.617053
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Mean years of schooling, women (15 to 49) – Our World In Data (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/704
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2739474a4a3ca8d899e3b7516059cc0c
+- md5: 80bec9ef3185233dfcf339a1f4d65f40
   size: 27010
-  path: dataset_704_mean_years_of_schooling__women__15_to_49__our_world_in_data__2017_values.feather
+  path: 
+    dataset_704_mean_years_of_schooling__women__15_to_49__our_world_in_data__2017_values.feather

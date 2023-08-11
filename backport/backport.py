@@ -5,6 +5,7 @@ from typing import Any, List, Optional
 import click
 import pandas as pd
 import structlog
+from git.exc import GitCommandError
 from git.repo import Repo
 from owid.catalog import Source
 from sqlalchemy.engine import Engine
@@ -138,7 +139,10 @@ class PotentialBackport:
             )
         except (KeyboardInterrupt, Exception) as e:
             # rollback metadata file
-            repo.git.checkout("HEAD", config_metadata.path)
+            try:
+                repo.git.checkout("HEAD", config_metadata.path)
+            except GitCommandError:
+                pass
             raise e
 
         # upload values to snapshot
@@ -154,7 +158,10 @@ class PotentialBackport:
             )
         except (KeyboardInterrupt, Exception) as e:
             # rollback metadata file
-            repo.git.checkout("HEAD", values_metadata.path)
+            try:
+                repo.git.checkout("HEAD", values_metadata.path)
+            except GitCommandError:
+                pass
             raise e
 
 
@@ -314,6 +321,10 @@ def _snapshot_config_metadata(ds: gm.Dataset, short_name: str, public: bool) -> 
     config.short_name = short_name + "_config"
     config.name = f"Grapher metadata for {short_name}"
     config.file_extension = "json"
+
+    if ds.isArchived == 1:
+        config.name += " (archived)"
+
     return config
 
 

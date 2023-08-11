@@ -1,21 +1,16 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_3179_number_of_people_with_and_without_energy_access__owid_based_on_world_bank__2021_config
-  file_extension: json
-  date_accessed: 2023-06-01 15:05:39.409294
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3179
+    date_accessed: 2023-08-10 08:40:22.848163
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for 
     dataset_3179_number_of_people_with_and_without_energy_access__owid_based_on_world_bank__2021
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3179
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 571f2bf479407863f009664582a0fd81
-  size: 5329
+- md5: b1210bc95ab527cb46f4d0103995a755
+  size: 5859
   path: 
     dataset_3179_number_of_people_with_and_without_energy_access__owid_based_on_world_bank__2021_config.json

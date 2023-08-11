@@ -1,20 +1,16 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_3085_gini_index_around_2000_and_2015__povcal_2018_and_chartbook_2017_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:50:33.036951
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3085
+    date_accessed: 2023-08-10 07:50:30.121113
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Gini Index around 2000 and 2015 (Povcal 2018 and Chartbook 2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3085
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1bd6f44878a357b8aaa7ff14675dc03a
+- md5: a54634fc64b5dbbabb7fbbad07915fdf
   size: 11290
   path: 
     dataset_3085_gini_index_around_2000_and_2015__povcal_2018_and_chartbook_2017_values.feather

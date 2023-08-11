@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5491_agricultural_total_factor_productivity__usda_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:45:22.083214
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5491
+    date_accessed: 2023-08-10 08:02:24.320092
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Agricultural total factor productivity (USDA)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5491
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 15d1042c6d14790fb3495ac579f6f731
+- md5: 0fa5fffdfb37d18496c91e4c9d8aca15
   size: 1687450
   path: dataset_5491_agricultural_total_factor_productivity__usda_values.feather

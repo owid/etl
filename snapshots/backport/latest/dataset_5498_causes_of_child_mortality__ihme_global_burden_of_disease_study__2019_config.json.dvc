@@ -1,29 +1,38 @@
 meta:
-  namespace: backport
-  short_name: dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:19:07.547718
-  name: Grapher metadata for dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019
-  description: |-
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5498
+    date_accessed: 2023-08-10 08:47:27.771873
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019
+  description: >-
     The permalink to download data: http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/7a483ad2f2e1b646bc258b7fd4cf3492
 
+
     The following selection was made and downloaded:
+
     Location: Global
+
     Years: 1990 & most recent year
+
     Context: Cause
+
     Age: Under 5
+
     Metric: Number
+
     Measure: Deaths
+
     Sex: Both
-    Cause: 'Select only most detailed causes' but remove causes where the estimates are 0.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5498
-  source_published_by: Our World in Data catalog backport
+
+    Cause: 'Select only most detailed causes' but remove causes where the estimates
+    are 0.
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 543ee1f0433dfe98fe17540cfe0059ec
-  size: 2077
-  path: dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019_config.json
+- md5: f2bff462a79f5689b1f77aa5d40b1d47
+  size: 2228
+  path: 
+    dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019_config.json

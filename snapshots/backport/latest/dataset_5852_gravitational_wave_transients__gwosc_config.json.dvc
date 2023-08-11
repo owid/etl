@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5852_gravitational_wave_transients__gwosc_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:28:56.275909
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5852
+    date_accessed: 2023-08-10 07:42:01.813237
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5852_gravitational_wave_transients__gwosc
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/gravitational_waves
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5852
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: da7fc8708b875be30619a1c5ff69fd21
-  size: 2248
+- md5: 44f7db045feb8ba873f2e37a267a9050
+  size: 2399
   path: dataset_5852_gravitational_wave_transients__gwosc_config.json

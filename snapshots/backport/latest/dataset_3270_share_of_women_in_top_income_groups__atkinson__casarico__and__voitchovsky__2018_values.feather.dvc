@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_3270_share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:02:01.478472
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3270
+    date_accessed: 2023-08-10 09:09:59.340455
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Share of women in top income groups – Atkinson, Casarico & Voitchovsky (2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3270
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c87f64538d74f679674714631ccccdca
+- md5: 2f87016380c89e7ade51c15e2c273eeb
   size: 9642
-  path: dataset_3270_share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018_values.feather
+  path: 
+    dataset_3270_share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018_values.feather

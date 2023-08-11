@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_4897_estimated_average_age_at_marriage__by_gender__un_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:37:00.194036
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4897
+    date_accessed: 2023-08-10 08:54:00.919766
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Estimated average age at marriage, by gender (UN)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4897
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a54583989bbca399958432327677b571
+- md5: 25ee5217dd574e3499854828f8f9b944
   size: 32962
   path: dataset_4897_estimated_average_age_at_marriage__by_gender__un_values.feather
