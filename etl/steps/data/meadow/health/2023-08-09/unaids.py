@@ -58,9 +58,11 @@ def run(dest_dir: str) -> None:
     # Replace '...' with NaN
     tb["obs_value"] = tb["obs_value"].replace("...", np.nan)
     # Type
-    tb = tb.astype({
-        "obs_value": float,
-    })
+    tb = tb.astype(
+        {
+            "obs_value": float,
+        }
+    )
     #
     # Save outputs.
     #
