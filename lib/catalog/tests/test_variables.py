@@ -73,14 +73,16 @@ def _assert_untouched_data_and_metadata_did_not_change(tb1, tb1_expected):
         assert tb1._fields[column] == tb1_expected._fields[column]
 
 
-def test_create_new_variable_as_sum_of_other_two(table_1, sources, licenses) -> None:
+def test_create_new_variable_as_sum_of_other_two(table_1, sources, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["c"] = tb1["a"] + tb1["b"]
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
     assert (tb1["c"] == pd.Series([5, 7, 9])).all()
+    # Since "a" and "b" have different title and description, "c" should have no title or description.
     assert tb1["c"].metadata.title is None
     assert tb1["c"].metadata.description is None
     assert tb1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert tb1["c"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
 
@@ -92,6 +94,7 @@ def test_create_new_variable_as_sum_of_another_variable_plus_a_scalar(table_1) -
     assert tb1["d"].metadata.title == table_1["a"].metadata.title
     assert tb1["d"].metadata.description == table_1["a"].metadata.description
     assert tb1["d"].metadata.sources == table_1["a"].metadata.sources
+    assert tb1["d"].metadata.origins == table_1["a"].metadata.origins
     assert tb1["d"].metadata.licenses == table_1["a"].metadata.licenses
 
 
@@ -112,7 +115,8 @@ def test_replace_a_variables_own_value(table_1) -> None:
     assert tb1._fields["b"] == table_1._fields["b"]
 
 
-def test_operations_of_variable_and_scalar(table_1, sources, licenses):
+def test_operations_of_variable_and_scalar(table_1):
+    table_1_original = table_1.copy()
     table_1["a"] = table_1["a"] + 1
     table_1["a"] += 1
     table_1["a"] = table_1["a"] - 1
@@ -128,11 +132,11 @@ def test_operations_of_variable_and_scalar(table_1, sources, licenses):
     table_1["a"] = table_1["a"] ** 1
     table_1["a"] **= 1
 
-    assert table_1["a"].metadata.sources == [sources[2], sources[1]]
-    assert table_1["a"].metadata.licenses == [licenses[1]]
+    # None of the operations above should have affected the metadata.
+    assert table_1["a"].metadata == table_1_original["a"].metadata
 
 
-def test_create_new_variable_as_product_of_other_two(table_1, sources, licenses) -> None:
+def test_create_new_variable_as_product_of_other_two(table_1, sources, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["e"] = tb1["a"] * tb1["b"]
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -140,10 +144,11 @@ def test_create_new_variable_as_product_of_other_two(table_1, sources, licenses)
     assert tb1["e"].metadata.title is None
     assert tb1["e"].metadata.description is None
     assert tb1["e"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert tb1["e"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["e"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
 
-def test_create_new_variable_as_product_of_other_three(table_1, sources, licenses) -> None:
+def test_create_new_variable_as_product_of_other_three(table_1, sources, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["c"] = tb1["a"] + tb1["b"]
     tb1["f"] = tb1["a"] * tb1["b"] * tb1["c"]
@@ -153,10 +158,11 @@ def test_create_new_variable_as_product_of_other_three(table_1, sources, license
     assert tb1["f"].metadata.title is None
     assert tb1["f"].metadata.description is None
     assert tb1["f"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert tb1["f"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["f"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
 
-def test_create_new_variable_as_division_of_other_two(table_1, sources, licenses) -> None:
+def test_create_new_variable_as_division_of_other_two(table_1, sources, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["g"] = tb1["a"] / tb1["b"]
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -164,10 +170,11 @@ def test_create_new_variable_as_division_of_other_two(table_1, sources, licenses
     assert tb1["g"].metadata.title is None
     assert tb1["g"].metadata.description is None
     assert tb1["g"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert tb1["g"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["g"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
 
-def test_create_new_variable_as_floor_division_of_other_two(table_1, sources, licenses) -> None:
+def test_create_new_variable_as_floor_division_of_other_two(table_1, sources, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["h"] = tb1["b"] // tb1["a"]
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -175,10 +182,11 @@ def test_create_new_variable_as_floor_division_of_other_two(table_1, sources, li
     assert tb1["h"].metadata.title is None
     assert tb1["h"].metadata.description is None
     assert tb1["h"].metadata.sources == [sources[2], sources[3], sources[1]]
+    assert tb1["h"].metadata.origins == [origins[2], origins[3], origins[1]]
     assert tb1["h"].metadata.licenses == [licenses[2], licenses[3], licenses[1]]
 
 
-def test_create_new_variable_as_module_division_of_other_two(table_1, sources, licenses) -> None:
+def test_create_new_variable_as_module_division_of_other_two(table_1, sources, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["i"] = tb1["a"] % tb1["b"]
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -186,10 +194,11 @@ def test_create_new_variable_as_module_division_of_other_two(table_1, sources, l
     assert tb1["i"].metadata.title is None
     assert tb1["i"].metadata.description is None
     assert tb1["i"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert tb1["i"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["i"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
 
-def test_create_new_variable_as_another_variable_to_the_power_of_a_scalar(table_1, sources, licenses) -> None:
+def test_create_new_variable_as_another_variable_to_the_power_of_a_scalar(table_1, sources, origins, licenses) -> None:
     tb1 = table_1.copy()
     tb1["j"] = tb1["a"] ** 2
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -197,10 +206,13 @@ def test_create_new_variable_as_another_variable_to_the_power_of_a_scalar(table_
     assert tb1["j"].metadata.title == "Title of Table 1 Variable a"
     assert tb1["j"].metadata.description == "Description of Table 1 Variable a"
     assert tb1["j"].metadata.sources == [sources[2], sources[1]]
+    assert tb1["j"].metadata.origins == [origins[2], origins[1]]
     assert tb1["j"].metadata.licenses == [licenses[1]]
 
 
-def test_create_new_variables_as_another_variable_to_the_power_of_another_variable(table_1, sources, licenses) -> None:
+def test_create_new_variables_as_another_variable_to_the_power_of_another_variable(
+    table_1, sources, origins, licenses
+) -> None:
     tb1 = table_1.copy()
     tb1["k"] = tb1["a"] ** tb1["b"]
     _assert_untouched_data_and_metadata_did_not_change(tb1=tb1, tb1_expected=table_1)
@@ -208,6 +220,7 @@ def test_create_new_variables_as_another_variable_to_the_power_of_another_variab
     assert tb1["k"].metadata.title is None
     assert tb1["k"].metadata.description is None
     assert tb1["k"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert tb1["k"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["k"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
 
 
@@ -229,7 +242,7 @@ def test_get_unique_licenses_from_variables(variable_1, variable_2, licenses):
     assert get_unique_licenses_from_variables([variable_2, variable_1]) == [licenses[2], licenses[3], licenses[1]]
 
 
-def test_combine_variables_metadata_with_different_fields(variable_1, variable_2, sources, licenses) -> None:
+def test_combine_variables_metadata_with_different_fields(variable_1, variable_2, sources, origins, licenses) -> None:
     variable_1 = variable_1.copy()
     variable_2 = variable_2.copy()
     for operation in ["+", "-", "melt", "pivot", "concat"]:
@@ -241,7 +254,10 @@ def test_combine_variables_metadata_with_different_fields(variable_1, variable_2
         assert metadata.unit is None
         assert metadata.short_unit is None
         assert metadata.sources == [sources[2], sources[1], sources[3]]
+        assert metadata.origins == [origins[2], origins[1], origins[3]]
         assert metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+        # variable_2 has a major processing level, so the combined variable should have a major processing level.
+        assert metadata.processing_level == "major"
 
 
 def test_combine_variables_metadata_with_equal_fields(variable_1, variable_2) -> None:
@@ -256,7 +272,10 @@ def test_combine_variables_metadata_with_equal_fields(variable_1, variable_2) ->
         assert metadata.unit == variable_1.metadata.unit
         assert metadata.short_unit == variable_1.metadata.short_unit
         assert metadata.sources == variable_1.metadata.sources
+        assert metadata.origins == variable_1.metadata.origins
         assert metadata.licenses == variable_2.metadata.licenses
+        # Now both variables have the same processing level, which is minor.
+        assert metadata.processing_level == "minor"
 
 
 def test_dropna(table_1) -> None:

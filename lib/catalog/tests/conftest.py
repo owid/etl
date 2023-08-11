@@ -10,6 +10,7 @@ from owid.catalog.meta import (
     Source,
     TableMeta,
     VariableMeta,
+    VariablePresentationMeta,
 )
 from owid.catalog.tables import Table
 from owid.catalog.variables import Variable
@@ -58,6 +59,10 @@ def variable_1(sources, origins, licenses):
     v1.metadata.sources = [sources[2], sources[1]]
     v1.metadata.origins = [origins[2], origins[1]]
     v1.metadata.licenses = [licenses[1]]
+    v1.metadata.processing_level = "minor"
+    v1.metadata.presentation = VariablePresentationMeta(
+        title_public="Title of Variable 1", title_variant="Common title variant"
+    )
     return v1
 
 
@@ -71,17 +76,23 @@ def variable_2(sources, origins, licenses):
     v2.metadata.sources = [sources[2], sources[3]]
     v2.metadata.origins = [origins[2], origins[3]]
     v2.metadata.licenses = [licenses[2], licenses[3]]
+    v2.metadata.processing_level = "major"
+    v2.metadata.presentation = VariablePresentationMeta(
+        title_public="Title of Variable 2", title_variant="Common title variant"
+    )
     return v2
 
 
 @pytest.fixture
-def table_1(sources, licenses):
+def table_1(sources, licenses, origins):
     tb1 = Table({"country": ["Spain", "Spain", "France"], "year": [2020, 2021, 2021], "a": [1, 2, 3], "b": [4, 5, 6]})
     tb1.metadata = TableMeta(
         title="Title of Table 1",
         description="Description of Table 1",
         dataset=DatasetMeta(
-            sources=[sources[1], sources[2], sources[3]], licenses=[licenses[1], licenses[2], licenses[3]]
+            sources=[sources[1], sources[2], sources[3]],
+            origins=[origins[1], origins[2], origins[3]],
+            licenses=[licenses[1], licenses[2], licenses[3]],
         ),
     )
     tb1._fields = defaultdict(
@@ -91,14 +102,22 @@ def table_1(sources, licenses):
             "a": VariableMeta(
                 title="Title of Table 1 Variable a",
                 description="Description of Table 1 Variable a",
+                description_short="Short description of Table 1 Variable a",
+                description_from_producer="Common description from producer",
                 sources=[sources[2], sources[1]],
+                origins=[origins[2], origins[1]],
                 licenses=[licenses[1]],
+                processing_level="minor",
             ),
             "b": VariableMeta(
                 title="Title of Table 1 Variable b",
                 description="Description of Table 1 Variable b",
+                description_short="Short description of Table 1 Variable b",
+                description_from_producer="Common description from producer",
                 sources=[sources[2], sources[3]],
+                origins=[origins[2], origins[3]],
                 licenses=[licenses[2], licenses[3]],
+                processing_level="major",
             ),
         },
     )
