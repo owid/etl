@@ -65,9 +65,21 @@ def get_all_data_from_api(path: str) -> pd.DataFrame:
             "HIV Prevalence",
             "Deaths averted due to ART",
             "AIDS-related deaths",
+            "HIV Incidence per 1000 population",
+            "New HIV Infections averted due to PMTCT",
+            "New HIV Infections",
+            "AIDS Orphans",
+            "Gap to reaching the target percent of people receiving ART",
         ],
         "GAM": [
             "Country-reported HIV expenditure by funding source",
+            "Condom use at last high-risk sex",
+            "Condom use among men who have sex with men",
+            "Discriminatory attitudes towards people living with HIV",
+            "Knowledge about HIV prevention in young people",
+            "Estimated TB-related deaths among people living with HIV",
+            "TB patients living with HIV receiving ART",
+            "TB patients tested positive for HIV",
         ],
     }
 
