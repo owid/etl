@@ -107,27 +107,32 @@ def add_metadata(tb):
                 )
                 tb[new_column_name].metadata.title = nested_data["name"]
                 tb[new_column_name].metadata.display = {}
+
                 # Now update metadata units, short_units and number of decimal places to display depending on what keywords the variable name contains.
                 #
-                if "%" in name or "Percentage" in name or "percentage" in name or "share of" in name or "rate" in name:
-                    tb[new_column_name].metadata.unit = "%"
-                    tb[new_column_name].metadata.short_unit = "%"
-                    tb[new_column_name].metadata.display["numDecimalPlaces"] = 1
-                elif "ratio" in name:
-                    tb[new_column_name].metadata.display["numDecimalPlaces"] = 1
-                    tb[new_column_name].metadata.unit = "ratio"
-                    tb[new_column_name].metadata.short_unit = " "
-                elif "(years)" in name or "years" in name:
-                    tb[new_column_name].metadata.display["numDecimalPlaces"] = 1
-                    tb[new_column_name].metadata.unit = "years"
-                    tb[new_column_name].metadata.short_unit = " "
-                elif "number of pupils" in name:
-                    tb[new_column_name].metadata.display["numDecimalPlaces"] = 0
-                    tb[new_column_name].metadata.unit = "pupils"
-                    tb[new_column_name].metadata.short_unit = " "
+                def update_metadata(table, column, display_decimals, unit, short_unit=" "):
+                    table[column].metadata.display["numDecimalPlaces"] = display_decimals
+                    table[column].metadata.unit = unit
+                    table[column].metadata.short_unit = short_unit
+
+                name_lower = name.lower()
+
+                percentage_unit = ["%", "percentage", "share of", "rate"]
+                # Checking the most specific conditions first to avoid redundancy
+                if any(keyword in name_lower for keyword in percentage_unit) and not ("number" in name_lower):
+                    update_metadata(tb, new_column_name, 1, "%", "%")
+                elif "ratio" in name_lower:
+                    update_metadata(tb, new_column_name, 1, "ratio", " ")
+                elif "number of pupils" in name_lower:
+                    update_metadata(tb, new_column_name, 0, "pupils", " ")
+                elif "number" in name_lower and not ("rate" in name_lower) and not ("pasec" in name_lower):
+                    update_metadata(tb, new_column_name, 0, "people", " ")
+                elif "(years)" in name_lower or "years" in name_lower:
+                    update_metadata(tb, new_column_name, 1, "years", " ")
+                elif "index" in name_lower:
+                    update_metadata(tb, new_column_name, 1, "index", " ")
                 else:
-                    tb[new_column_name].metadata.unit = " "
-                    tb[new_column_name].metadata.short_unit = " "
+                    update_metadata(tb, new_column_name, 0, " ", " ")
 
                 break  # Success, exit the retry loop
 
