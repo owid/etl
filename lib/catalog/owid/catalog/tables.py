@@ -1423,28 +1423,30 @@ def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     return pd.unique(licenses).tolist()
 
 
-def _combine_tables_titles_and_descriptions(tables: List[Table], title_or_description: str) -> Optional[str]:
-    # Keep the title only if all tables have exactly the same title.
-    # Otherwise we assume that the table has a different meaning, and its title should be manually handled.
-    title_or_description_combined = None
-    titles_or_descriptions = pd.unique([getattr(table.metadata, title_or_description) for table in tables])
-    if len(titles_or_descriptions) == 1:
-        title_or_description_combined = titles_or_descriptions[0]
+def _get_metadata_value_from_tables_if_all_identical(tables: List[Table], field: str) -> Optional[Any]:
+    # Get unique values from list, ignoring Nones.
+    unique_values = set(
+        [getattr(table.metadata, field) for table in tables if getattr(table.metadata, field) is not None]
+    )
+    if len(unique_values) == 1:
+        combined_value = unique_values.pop()
+    else:
+        combined_value = None
 
-    return title_or_description_combined
-
-
-def combine_tables_titles(tables: List[Table]) -> Optional[str]:
-    return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="title")
+    return combined_value
 
 
-def combine_tables_descriptions(tables: List[Table]) -> Optional[str]:
-    return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="description")
+def combine_tables_title(tables: List[Table]) -> Optional[str]:
+    return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="title")
+
+
+def combine_tables_description(tables: List[Table]) -> Optional[str]:
+    return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="description")
 
 
 def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = None) -> TableMeta:
-    title = combine_tables_titles(tables=tables)
-    description = combine_tables_descriptions(tables=tables)
+    title = combine_tables_title(tables=tables)
+    description = combine_tables_description(tables=tables)
     if short_name is None:
         # If a short name is not specified, take it from the first table.
         short_name = tables[0].metadata.short_name

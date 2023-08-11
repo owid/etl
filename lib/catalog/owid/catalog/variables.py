@@ -340,13 +340,13 @@ def _get_metadata_value_from_variables_if_all_identical(
     return combined_value
 
 
-def combine_variables_units(variables: List[Variable]) -> Optional[str]:
+def combine_variables_unit(variables: List[Variable]) -> Optional[str]:
     return _get_metadata_value_from_variables_if_all_identical(
         variables=variables, field="unit", warn_if_different=True
     )
 
 
-def combine_variables_short_units(variables: List[Variable]) -> Optional[str]:
+def combine_variables_short_unit(variables: List[Variable]) -> Optional[str]:
     return _get_metadata_value_from_variables_if_all_identical(
         variables=variables, field="short_unit", warn_if_different=True
     )
@@ -470,8 +470,8 @@ def combine_variables_metadata(
     metadata.description = combine_variables_description(variables=variables_only)
     metadata.description_short = combine_variables_description_short(variables=variables_only)
     metadata.description_from_producer = combine_variables_description_from_producer(variables=variables_only)
-    metadata.unit = combine_variables_units(variables=variables_only)
-    metadata.short_unit = combine_variables_short_units(variables=variables_only)
+    metadata.unit = combine_variables_unit(variables=variables_only)
+    metadata.short_unit = combine_variables_short_unit(variables=variables_only)
     metadata.sources = get_unique_sources_from_variables(variables=variables_only)
     metadata.origins = get_unique_origins_from_variables(variables=variables_only)
     metadata.licenses = get_unique_licenses_from_variables(variables=variables_only)
