@@ -53,6 +53,11 @@ def run(dest_dir: str) -> None:
 
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
+
+    # Remove duplicates
+    tb = tb.drop_duplicates(subset=["country", "year", "indicator", "subgroup"], keep="first")
+
+    # Set index
     tb = tb.set_index(["country", "year", "indicator", "subgroup"], verify_integrity=True)
 
     # Replace '...' with NaN
