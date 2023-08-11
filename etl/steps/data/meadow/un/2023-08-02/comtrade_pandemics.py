@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
     assert (tb["Period"] == tb["RefYear"]).all(), "`period` != `refyear`!"
     assert (
         tb.groupby(["RefYear", "ReporterDesc", "CmdCode"]).size().max() == 1
-    ), "There should, at most, one entry per (refyear, reporterdesc, cmdcode) triplet"
+    ), "There should be, at most, one entry per (refyear, reporterdesc, cmdcode) triplet"
 
     #
     # Process data.

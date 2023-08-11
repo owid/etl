@@ -1,6 +1,6 @@
 """Script to create a snapshot of dataset 'UN Comtrade: Pandemics (UN, 2023)'.
 
-Data is avaialble from UN Comtrade dashboard: https://comtradeplus.un.org/
+Data is available from UN Comtrade dashboard: https://comtradeplus.un.org/
 
 Steps to download:
 
@@ -19,7 +19,7 @@ Steps to download:
         - 2nd Partner: World
         - Mode of Transports: TOTAL modes of transport
         - Customs Code: TOTAL customs procedure codes
-        - Breadkown Mode: Plus
+        - Breakdown Mode: Plus
         - Aggregate By: None
     - Click on "Download"
 

@@ -139,7 +139,7 @@ def _sanity_checks(tb: Table):
     assert (tb["period"] == tb["refyear"]).all(), "period != refyear!"
     assert (
         tb.groupby(["refyear", "reporterdesc", "cmdcode"]).size().max() == 1
-    ), "There should, at most, one entry per (refyear, reporterdesc, cmdcode) triplet"
+    ), "There should be, at most, one entry per (refyear, reporterdesc, cmdcode) triplet"
 
 
 def add_regions(tb: Table, ds_regions: Dataset) -> Table:

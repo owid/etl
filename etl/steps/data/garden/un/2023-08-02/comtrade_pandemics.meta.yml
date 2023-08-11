@@ -6,61 +6,67 @@ tables:
       From [UN Stats](https://unstats.un.org/wiki/display/comtrade/Trade+valuation):
 
 
-      Import values are recorded as a CIF-type value. CIF-type values include the transaction value of the goods, the
+      Import values are recorded as a (Cost, Insurance and Freight)-type (CIF-type) value. CIF-type values include the transaction value of the goods, the
       value of services performed to deliver goods to the border of the exporting country, and the value of the services
       performed to deliver the goods from the border of the exporting country to the border of the importing country.
 
 
       "Other Asia, not elsewhere specified" refers to territories belonging to Asia, but not specified by country. More details at
       https://unstats.un.org/wiki/display/comtrade/Taiwan%2C+Province+of+China+Trade+data
+
+
+      For more information about the calculation of dollar value in this trade statistics, please refer to
+      https://unstats.un.org/wiki/display/comtrade/Calculation+of+dollar+value+in+trade+statistics+-+Current+value+or+constant+dollar+value
     variables:
       import_cif_breathing_appliances:
         title: Imports of breathing appliances and gas masks
         short_unit: "$"
-        unit: "USD"
+        unit: "current US$"
         description: >-
           Imports of breathing appliances and gas masks; excluding protective masks having neither mechanical parts nor
-          eplaceable filters and excluding apparatus of item no. 9019.20.
+          replaceable filters and excluding apparatus of item no. "901920" ("901920 - Therapeutic respiration apparatus;
+          ozone, oxygen, aerosol therapy apparatus; artificial respiration or other therapeutic respiration apparatus" in
+          COMTRADE database).
       import_cif_gloves_mittens_mitts_knitted_croacheted:
         title: Imports of gloves, mittens and mitts (knitted or crocheted)
         short_unit: "$"
-        unit: "USD"
+        unit: "current US$"
         description: >-
           Imports of gloves, mittens and mitts knitted or crocheted, impregnated, coated or covered with plastics or rubber.
       import_cif_gloves_mittens_mitts_not_knitted_croacheted:
         title: Imports of gloves, mittens and mitts (not knitted or crocheted)
         short_unit: "$"
-        unit: "USD"
+        unit: "current US$"
         description: >-
           Imports of gloves, mittens and mitts (not knitted or crocheted).
       import_cif_non_surgical_gloves:
-        title: Imports of vulcanised (other than hard rubber), gloves other than surgical gloves.
+        title: Imports of vulcanized (other than hard rubber), gloves other than surgical gloves.
         short_unit: "$"
-        unit: "USD"
-        description:
+        unit: "current US$"
+        description: >-
+          Imports of non-surgical gloves.
       import_cif_plastics_clothing:
         title: Imports of plastics in clothing
         short_unit: "$"
-        unit: "USD"
+        unit: "current US$"
         description: >-
           Imports of articles of apparel and clothing accessories (including gloves, mittens and mitts).
       import_cif_spectacles_goggles:
         title: Imports of spectacles, goggles and the like
         short_unit: "$"
-        unit: "USD"
+        unit: "current US$"
         description: >-
           Imports of spectacles, goggles and the like; (other than sunglasses) corrective, protective or other.
       import_cif_surgical_gloves:
         title: Imports of surgical gloves
         short_unit: "$"
-        unit: "USD"
+        unit: "current US$"
         description: >-
-          Imports of vulcanised (other than hard rubber), surgical gloves.
+          Imports of vulcanized (other than hard rubber), surgical gloves.
       import_cif_textiles_made_up_articles:
         title: Imports of textiles and made up articles
         short_unit: "$"
-        unit: "USD"
+        unit: "current US$"
         description: >-
-          Imports of textiles. This includes made up articles (including dress patterns), n.e.s. in chapter 63, n.e.s.
-          in heading no. 6307.
+          Imports of textiles. This includes made up articles (including dress patterns).
 
