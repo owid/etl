@@ -46,6 +46,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = cast(Dataset, paths.load_dependency("comtrade_pandemics"))
+    # Load population dataset
+    ds_population = cast(Dataset, paths.load_dependency("population"))
 
     # Load regions dataset.
     ds_regions: Dataset = paths.load_dependency("regions")
@@ -100,6 +102,10 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
+    # Add total
+    log.info("un.comtrade: add total")
+    tb = add_total(tb)
+
     # Add regions
     log.info("un.comtrade: add regions")
     tb = add_regions(tb, ds_regions)
@@ -112,6 +118,10 @@ def run(dest_dir: str) -> None:
     # Add region='World'
     log.info("un.comtrade: add region='World'")
     tb = add_world(tb)
+
+    # Add per capita metrics
+    log.info("un.comtrade: add per capita")
+    tb = add_per_capita_variables(tb, ds_population)
 
     # Set index
     log.info("un.comtrade: set index")
@@ -140,6 +150,12 @@ def _sanity_checks(tb: Table):
     assert (
         tb.groupby(["refyear", "reporterdesc", "cmdcode"]).size().max() == 1
     ), "There should be, at most, one entry per (refyear, reporterdesc, cmdcode) triplet"
+
+
+def add_total(tb: Table) -> Table:
+    """Add total aggregate to the table."""
+    tb["import_cif_total_pandemics"] = tb[CMD_CODE_TO_METRIC_NAME.values()].sum(axis=1)
+    return tb
 
 
 def add_regions(tb: Table, ds_regions: Dataset) -> Table:
@@ -184,5 +200,35 @@ def add_world(tb: Table) -> Table:
         ],
         ignore_index=True,
     )
+
+    return tb
+
+
+def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
+    """Add per-capita variables.
+
+    Parameters
+    ----------
+    tb : Table
+        Primary data.
+    ds_population : Dataset
+        Population dataset.
+    Returns
+    -------
+    tb : Table
+        Data after adding per-capita variables.
+    """
+    tb = tb.copy()
+
+    # Estimate per-capita variables.
+    ## Add population variable
+    tb = geo.add_population_to_dataframe(tb, ds_population, expected_countries_without_population=[])
+    ## Estimate ratio
+    for col in tb.columns:
+        if col not in ["population", "year", "country"]:
+            tb[f"{col}_per_capita"] = tb[col] / tb["population"]
+
+    # Drop unnecessary column.
+    tb = tb.drop(columns=["population"])
 
     return tb
