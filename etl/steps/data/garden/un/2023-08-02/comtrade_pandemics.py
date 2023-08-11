@@ -102,6 +102,10 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
+    # Add total
+    log.info("un.comtrade: add total")
+    # tb = add_total(tb)
+
     # Add regions
     log.info("un.comtrade: add regions")
     tb = add_regions(tb, ds_regions)
@@ -146,6 +150,12 @@ def _sanity_checks(tb: Table):
     assert (
         tb.groupby(["refyear", "reporterdesc", "cmdcode"]).size().max() == 1
     ), "There should be, at most, one entry per (refyear, reporterdesc, cmdcode) triplet"
+
+
+def add_total(tb: Table) -> Table:
+    """Add total aggregate to the table."""
+    tb["import_cif_total_pandemics"] = tb[CMD_CODE_TO_METRIC_NAME.values()].sum(axis=1)
+    return tb
 
 
 def add_regions(tb: Table, ds_regions: Dataset) -> Table:
