@@ -117,14 +117,14 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
 
     Parameters
     ----------
-    primary_energy : Table
-        Primary energy data.
+    tb : Table
+        Primary data.
     ds_population : Dataset
         Population dataset.
 
     Returns
     -------
-    primary_energy : Table
+    tb : Table
         Data after adding per-capita variables.
 
     """
