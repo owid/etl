@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/2509
-    date_accessed: 2023-08-10 09:03:23.726489
+    date_accessed: 2023-08-11 10:04:54.182249
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2509_road_deaths_and_injuries__oecd
