@@ -46,6 +46,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = cast(Dataset, paths.load_dependency("comtrade_pandemics"))
+    # Load population dataset
+    ds_population = cast(Dataset, paths.load_dependency("population"))
 
     # Load regions dataset.
     ds_regions: Dataset = paths.load_dependency("regions")
@@ -112,6 +114,10 @@ def run(dest_dir: str) -> None:
     # Add region='World'
     log.info("un.comtrade: add region='World'")
     tb = add_world(tb)
+
+    # Add per capita metrics
+    log.info("un.comtrade: add per capita")
+    tb = add_per_capita_variables(tb, ds_population)
 
     # Set index
     log.info("un.comtrade: set index")
@@ -184,5 +190,35 @@ def add_world(tb: Table) -> Table:
         ],
         ignore_index=True,
     )
+
+    return tb
+
+
+def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
+    """Add per-capita variables.
+
+    Parameters
+    ----------
+    tb : Table
+        Primary data.
+    ds_population : Dataset
+        Population dataset.
+    Returns
+    -------
+    tb : Table
+        Data after adding per-capita variables.
+    """
+    tb = tb.copy()
+
+    # Estimate per-capita variables.
+    ## Add population variable
+    tb = geo.add_population_to_table(tb, ds_population, expected_countries_without_population=[])
+    ## Estimate ratio
+    for col in tb.columns:
+        if col not in ["population", "year", "country"]:
+            tb[f"{col}_per_capita"] = tb[col] / tb["population"]
+
+    # Drop unnecessary column.
+    tb = tb.drop(columns=["population"])
 
     return tb
