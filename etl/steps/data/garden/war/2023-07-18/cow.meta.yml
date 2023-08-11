@@ -7,6 +7,23 @@ dataset:
     It has been constructed using the Correlates of War - War data dataset.
 
 
+    The regions defined by the source are:
+
+      • W. Hemisphere (we have renamed this to "Americas")
+
+      • Europe
+
+      • Africa
+
+      • Middle East
+
+      • Asia
+
+      • Oceania
+
+
+      The source does not specify the countries within each region.
+
 tables:
   cow:
     variables:
