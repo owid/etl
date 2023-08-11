@@ -3,6 +3,7 @@
 import ast
 from typing import cast
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
@@ -54,6 +55,12 @@ def run(dest_dir: str) -> None:
     tb = Table(df, short_name=paths.short_name, underscore=True)
     tb = tb.set_index(["country", "year", "indicator", "subgroup"], verify_integrity=True)
 
+    # Replace '...' with NaN
+    tb["obs_value"] = tb["obs_value"].replace("...", np.nan)
+    # Type
+    tb = tb.astype({
+        "obs_value": float,
+    })
     #
     # Save outputs.
     #
