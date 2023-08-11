@@ -303,6 +303,9 @@ class Variable(pd.Series):
             inplace=inplace,
         )
 
+    def copy_metadata(self, from_variable: "Variable", inplace: bool = False) -> Optional["Variable"]:
+        return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)
+
     def copy(self, deep: bool = True) -> "Variable":
         new_var = super().copy(deep=deep)
         if deep:
