@@ -115,7 +115,7 @@ foreach option in $options {
 		*Union with average and threshold income
 		append using "`avgthr'"
 		
-		if $option == 1 {
+		if `option' == 1 {
 		
 			*Variable adjustments to create a wide dataset
 
@@ -201,7 +201,7 @@ foreach option in $options {
 		
 		}
 		
-		else if $option == 2 {
+		else if `option' == 2 {
 			
 			* Extract from variable the indicator (a,t,s) and welfare (ptinc, diinc, cainc, hweal)
 			gen indicator = substr(variable, 1, 1)
