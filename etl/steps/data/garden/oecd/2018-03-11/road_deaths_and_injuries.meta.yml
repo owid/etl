@@ -1,0 +1,20 @@
+dataset:
+  title: Road deaths and injuries - OECD
+tables:
+  road_deaths_and_injuries:
+    variables:
+      accidents_involving_casualties:
+        title: Accidents involving casualties
+        unit: accidents
+      deaths:
+        title: Deaths
+        unit: deaths
+      deaths__per_million_vehicles:
+        title: Deaths (per million vehicles)
+        unit: deaths (per million vehicles)
+      injuries:
+        title: Injuries
+        unit: injuries
+      road_deaths_per_100_million_vehicle_kilometres:
+        title: Road deaths per 100 million vehicle kilometres
+        unit: deaths per 100 million vehicle kilometres
