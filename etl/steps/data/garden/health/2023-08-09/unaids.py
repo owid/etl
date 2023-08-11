@@ -22,12 +22,15 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = cast(Dataset, paths.load_dependency("unaids"))
+    # Auxiliary dataset, contains HIV prevalence data for children (0-14)
+    ds_meadow_aux = cast(Dataset, paths.load_dependency("unaids_hiv_children"))
 
     # Load population dataset.
     ds_population: Dataset = paths.load_dependency("population")
 
-    # Read table from meadow dataset.
+    # Read tables from meadow datasets.
     tb = ds_meadow["unaids"].reset_index()
+    tb_aux = ds_meadow_aux["unaids_hiv_children"].reset_index()
 
     #
     # Process data.
@@ -45,6 +48,11 @@ def run(dest_dir: str) -> None:
     log.info("health.unaids: underscore column names")
     tb = tb.underscore()
 
+    # Combine tables
+    log.info("health.unaids: combine tables")
+    tb = pr.concat([tb, tb_aux], ignore_index=True)
+
+    # Harmonize countries
     log.info("health.unaids: harmonize countries")
     tb: Table = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
