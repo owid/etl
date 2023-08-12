@@ -297,6 +297,10 @@ def test_copy_metadata_from() -> None:
     assert t2.country.metadata.title == "Country"
     assert t2.metadata.title == "GDP table"
 
+    # make sure it doesn't affect the original table
+    t2.gdp.metadata.title = "new GDP"
+    assert t.gdp.metadata.title == "GDP"
+
 
 def test_addition_without_metadata() -> None:
     t: Table = Table({"a": [1, 2], "b": [3, 4]})

@@ -4,6 +4,7 @@
 #  Metadata helpers.
 #
 
+import dataclasses
 import datetime as dt
 import json
 import re
@@ -293,6 +294,13 @@ class VariableMeta:
             getattr(self, "_name", None), to_html(record)
         )
 
+    def copy(self, deep=True) -> "VariableMeta":
+        """Return a copy of the VariableMeta object."""
+        if not deep:
+            return dataclasses.replace(self)
+        else:
+            return _deepcopy_dataclass(self)
+
 
 @pruned_json
 @dataclass_json
@@ -508,3 +516,18 @@ def _hash_dataclass(dataclass: Any) -> int:
         else:
             fields.append((k, v))
     return hash(tuple(fields))
+
+
+def _deepcopy_dataclass(dc) -> Any:
+    """Create a deep copy of a dataclass. This is much faster than running copy.deepcopy."""
+    dc = dataclasses.replace(dc)
+    for k, v in dc.__dict__.items():
+        if is_dataclass(v):
+            setattr(dc, k, _deepcopy_dataclass(v))
+        elif isinstance(v, list):
+            setattr(dc, k, [_deepcopy_dataclass(x) if is_dataclass(x) else x for x in v])
+        elif isinstance(v, dict):
+            setattr(dc, k, {x: _deepcopy_dataclass(y) if is_dataclass(y) else y for x, y in v.items()})
+        else:
+            pass
+    return dc

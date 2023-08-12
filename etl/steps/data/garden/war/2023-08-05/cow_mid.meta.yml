@@ -1,5 +1,23 @@
 dataset:
   title: History of war (COW MID, 2020)
+  description: >-
+      This dataset contains information on armed conflicts, both internal and external, in the period of 1816 and 2014.
+
+
+      It has been constructed using the Correlates of War - Militarised Interstate Disputes v5.0 dataset.
+
+      Regions: The regions are defined based on Gleditsch and Ward codes (GWno). Find complete mapping at
+      https://dornsife.usc.edu/assets/sites/298/docs/country_to_gwno_PUBLIC_6-5-2015.txt
+
+      • Americas: 2-199
+
+      • Europe: 200-399
+
+      • Africa: 400-626
+
+      • Middle East: 630-699
+
+      • Asia: 700-999
 
 
 tables:

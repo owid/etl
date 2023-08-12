@@ -25,6 +25,9 @@ def run(dest_dir: str) -> None:
     #
     # Rename index column `region` to `country`.
     tb = tb.reset_index().rename(columns={"region": "country"})
+    # Remove suffixes in region names
+    tb["country"] = tb["country"].str.replace(r" \(.+\)", "", regex=True)
+    # Set index
     tb = tb.set_index(["year", "country", "conflict_type"])
 
     #

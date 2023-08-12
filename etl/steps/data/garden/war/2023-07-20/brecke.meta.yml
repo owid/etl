@@ -9,13 +9,13 @@ dataset:
 
     This dataset has its own region definitions (taken from https://bpb-us-w2.wpmucdn.com/sites.gatech.edu/dist/1/19/files/2018/09/Brecke-PSS-1999-paper-Violent-Conflicts-1400-AD-to-the-Present.pdf):
 
-      - North America, Central America, and the Caribbean
-
-      - South America
-
       - Europe west of 15 degrees east longitude plus Sweden and Italy
 
       - Europe east of 15 degrees east longitude (includes Caucusus region)
+
+      - North America, Central America, and the Caribbean
+
+      - South America
 
       - Middle East (Iran west to Syria and Arabian peninsula)
 
@@ -32,6 +32,43 @@ dataset:
       - Southeast Asia (Burma to Australia and Pacific islands)
 
       - East Asia (China, Korea, Japan)
+
+
+    We have combined these to create the following regions:
+
+      - Europe:
+
+        - Europe west of 15 degrees east longitude plus Sweden and Italy
+
+        - Europe east of 15 degrees east longitude (includes Caucusus region)
+
+      - Middle East:
+
+        - Middle East (Iran west to Syria and Arabian peninsula)
+
+      - Asia:
+
+        - Central Asia (Afghanistan, former Soviet republics, and Siberia)
+
+        - South Asia
+
+        - Southeast Asia (Burma to Australia and Pacific islands)
+
+        - East Asia (China, Korea, Japan)
+
+      - Africa:
+
+        - North Africa (Egypt to Morocco and Mauritania east to Sudan)
+
+        - West & Central Africa (Senegal to Congo)
+
+        - East & South Africa (Ethiopia to Zambia to Angola and south)
+
+      - Americas:
+
+        - North America, Central America, and the Caribbean
+
+        - South America
 
 
 tables:

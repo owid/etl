@@ -517,14 +517,11 @@ class Table(pd.DataFrame):
             if missing_columns:
                 log.warning(f"Missing columns in table: {missing_columns}")
 
-        # NOTE: copying with `dataclasses.replace` is much faster than `copy.deepcopy`
         new_fields = defaultdict(VariableMeta)
         for k in common_columns:
             # copy if we have metadata in the other table
             if k in table._fields:
-                v = table._fields[k]
-                new_fields[k] = dataclasses.replace(v)
-                new_fields[k].sources = [dataclasses.replace(s) for s in v.sources]
+                new_fields[k] = table._fields[k].copy()
             # otherwise keep current metadata (if it exists)
             elif k in self._fields:
                 new_fields[k] = self._fields[k]
@@ -596,8 +593,7 @@ class Table(pd.DataFrame):
         # copy variables metadata from other table
         if isinstance(other, Table):
             for k, v in other._fields.items():
-                t._fields[k] = dataclasses.replace(v)
-                t._fields[k].sources = [dataclasses.replace(s) for s in v.sources]
+                t._fields[k] = v.copy()
         return t  # type: ignore
 
     def _repr_html_(self):
