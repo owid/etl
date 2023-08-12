@@ -124,7 +124,7 @@ tables:
       hiv_incidence:
         title: HIV Incidence per 1000 population
         short_unit: ""
-        unit: "HIV infections per 1000 uninfected population"
+        unit: "infections per 1000 uninfected population"
         description_from_producer: >-
           Number of new HIV infections per 1000 uninfected population. The incidence rate is the number of new cases per population
           at risk in a given time period. Numerator: Number of new HIV infections. Denominator: Uninfected population (which is
@@ -250,4 +250,12 @@ tables:
         unit: "deaths"
         description: >-
           Number of deaths from people living with HIV that are related to tuberculosis.
+        processing_level: minor
+
+      new_infections:
+        title: New HIV Infections
+        short_unit: ""
+        unit: "infections"
+        description: >-
+          Number of newly HIV infected people in a year.
         processing_level: minor
