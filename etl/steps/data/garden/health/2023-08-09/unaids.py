@@ -90,6 +90,9 @@ def run(dest_dir: str) -> None:
     # Drop all NaN rows
     tb = tb.dropna(how="all")
 
+    # Set table's short_name
+    tb.metadata.short_name = paths.short_name
+
     #
     # Save outputs.
     #
@@ -141,7 +144,9 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
     mask = tb["domestic_spending_fund_source"].isna()
 
     ## Add population variable
-    tb_fund = geo.add_population_to_table(tb[~mask], ds_population, expected_countries_without_population=[])
+    # print("----------------")
+    # tb_fund = geo.add_population_to_table(tb[~mask], ds_population, expected_countries_without_population=[])
+    tb_fund = geo.add_population_to_dataframe(tb[~mask], ds_population, expected_countries_without_population=[])
     ## Estimate ratio
     tb_fund["domestic_spending_fund_source_per_capita"] = (
         tb_fund["domestic_spending_fund_source"] / tb_fund["population"]
