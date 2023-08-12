@@ -130,7 +130,7 @@ tables:
         description: >-
           Imports of textiles. This includes made up articles (including dress patterns).
       import_cif_total_pandemics_per_capita:
-        title: Imports of pandemic-related customs
+        title: Imports of pandemic-related customs (per-capita)
         short_unit: "$"
         unit: "current US$"
         description: >-
