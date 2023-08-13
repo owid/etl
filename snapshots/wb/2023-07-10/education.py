@@ -2,9 +2,11 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from time import sleep
 
 import click
 import pandas as pd
+import requests
 import world_bank_data as wb
 from owid.datautils.io import df_to_file
 from tqdm import tqdm
@@ -43,6 +45,7 @@ def main(path_to_file: str, upload: bool) -> None:
     snap.path.parent.mkdir(exist_ok=True, parents=True)
 
     wb_education_df = get_data(path_to_file)
+    wb_education_df = add_metadata(wb_education_df)
 
     df_to_file(wb_education_df, file_path=snap.path)
     # Add file to DVC and upload to S3.
@@ -103,6 +106,55 @@ def get_data(path_to_file: str) -> pd.DataFrame:
     for df in tqdm(wb_education, desc="Concatenating dataframes"):
         wb_education_df = pd.concat([wb_education_df, df], ignore_index=True)
     return wb_education_df
+
+
+def add_metadata(df):
+    """
+    Adds metadata (description and sources) by fetching details from the World Bank API using the world bank code.
+
+    Args:
+        df (DataFrame): The DataFrame containing wb_seriescode which is used for fetching metadata.
+
+    Returns:
+        DataFrame: The DataFrame with two new metadata columns - 'description' and 'source.
+
+    Note:
+        Each code needs to correspond to a World Bank indicator.
+    """
+    # Loop through the DataFrame columns
+    for wb_code in tqdm(df["wb_seriescode"].unique(), desc="Processing metadata for indicators"):
+        retries = 3
+        delay = 1  # Initial delay in seconds
+
+        # Attempt to process each column up to `retries` times
+        for attempt in range(retries):
+            try:
+                # Construct the URL to fetch metadata from the World Bank API
+                url = f"https://api.worldbank.org/v2/indicator/{wb_code}?format=json"
+
+                # Send GET request to the World Bank API with a timeout (in seconds)
+                response = requests.get(url, timeout=10)
+                response.raise_for_status()  # Check for unsuccessful status codes
+
+                data = response.json()
+
+                # Validate the expected data format received from the World Bank API
+                if len(data) < 2 or not isinstance(data[1], list) or len(data[1]) < 1:
+                    raise ValueError("Unexpected data format received from the World Bank API")
+
+                # Extract relevant metadata from the API response
+                nested_data = data[1][0]
+
+                # Update only the rows where 'wb_seriescode' matches the current 'wb_code'
+                df.loc[df["wb_seriescode"] == wb_code, "description"] = nested_data["sourceNote"]
+                df.loc[df["wb_seriescode"] == wb_code, "source"] = nested_data["sourceOrganization"]
+
+            except requests.exceptions.ReadTimeout:
+                print(f"Timeout while processing column {wb_code}. Retrying in {delay} seconds...")
+                sleep(delay)
+            delay *= 2  # Double the delay for the next attempt
+
+    return df
 
 
 if __name__ == "__main__":
