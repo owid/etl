@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # To date
-    tb["date"] = pd.to_datetime(tb["month"]).astype('datetime64[ns]')
+    tb["date"] = pd.to_datetime(tb["month"]).astype("datetime64[ns]")
 
     # Drop columns
     tb = tb.drop(columns=["range", "month"])
