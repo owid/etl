@@ -1,7 +1,8 @@
 from owid import catalog
-from shared import run_wrapper
 
 from etl.helpers import PathFinder
+
+from .shared import run_wrapper
 
 paths = PathFinder(__file__)
 
