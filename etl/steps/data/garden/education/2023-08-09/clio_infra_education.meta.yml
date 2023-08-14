@@ -5,21 +5,26 @@ dataset:
     It also includes historical estimates of Gini coefficient of inequality in educational attainment (years of education) and Gini and gender coefficient of inequality for both educational attainment and numeracy.
 
   licenses:
-  - url: https://clio-infra.eu/index.html#about
+  - url: https://creativecommons.org/publicdomain/zero/1.0/
   sources:
-  - name: van Zanden, J., et al. (2014) via OECD and Clio Infra; Baten, J. (2013; 2015) via Clio Infra; van Leeuwen B., et al. (2013) via Clio Infra
+  - name:
     description:  *desc
-    usrl: https://clio-infra.eu/Indicators/NumeracyTotal.html#datasets
-    source_data_url:
+    url: https://clio-infra.eu/Indicators/NumeracyTotal.html#datasets
+    source_data_url: van Zanden, J et al (2014);  van Leeuwen, B. & van Leeuwen-Li, J. (2015); Carmichael, S., Dilli, S., Rijpma, A. (2015)
     date_accessed: '2023-08-09'
     publication_date: '2013-12-26'
     publication_year: 2013
     published_by: >-
-      'van Zanden, J., et al. (eds.) (2014), How Was Life?: Global Well-being since 1820, OECD Publishing, Paris, https://doi.org/10.1787/9789264214262-en.';
-       Baten, J. Gender Equality of Numeracy (2013) via Clio Infra;
-       van Leeuwen B., van Leeuwen-Li J., and Foldvari P. (2013) Educational Inequality Gini Coefficient via Clio Infra;
-       Baten, J. et al. Numeracy (Total) (2015) via Clio Infra;
-       Baten, J. Gender Equality of Numeracy (2013) via Clio Infra
+      van Zanden, J., et al. (eds.) (2014), How Was Life?: Global Well-being since 1820, OECD Publishing, Paris, https://doi.org/10.1787/9789264214262-en.;
+
+
+      van Leeuwen, Bas; van Leeuwen-Li, Jieli, 2015, "Average Years of Education", https://hdl.handle.net/10622/KCBMKI, IISH Data Collection, V1
+
+
+      Carmichael, Sarah; Dilli, Selin; Rijpma, Auke, 2015, "Gender Equality Years of Education", https://hdl.handle.net/10622/OTHFUK, IISH Data Collection, V1
+
+
+      van Leeuwen, Bas; van Leeuwen-Li, Jieli, 2015, "Educational Inequality Gini Coefficient", https://hdl.handle.net/10622/KORKQW, IISH Data Collection, V1
 tables:
   clio_infra_education:
     variables:
@@ -28,15 +33,33 @@ tables:
         description: The average years of education in the total population aged 15 years and older is given for the period 1870-2010.
         unit: years
         short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
       years_of_education_gini:
         title: Historical estimates of average years of education, Gini inequality index
         descrtiption: The Gini of the spread of education in the total population aged 15 years and older is given annually for the period 1850-2010 (the time period varies by country)
-        unit: years
+        unit: index
         short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+
       years_of_education_gender:
         title: Historical estimates of average years of education, gender differences
-        unit: years
+        description: >-
+          Ratio of girls to boys in average years of schooling by country and decade.
+
+
+          Based on Barro and Lee (2010) who provide data on educational attainment disaggregated by age groups over 15 and by sex. The information on average years of education has been used to evaluate the progress that has been made in the second half of the 20th century in closing the gender gap regarding education. Their data and detailed information regarding their dataset can be accessed at: http://www.barrolee.com/
+
+
+          Data on school attainment comes from census/survey figures, which report the distribution of education in the population over age 15 by sex.
+        unit: ratio
         short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
       numeracy:
         title:  Historical numeracy estimates
         description: >-
@@ -47,6 +70,9 @@ tables:
           The authors of this dataset use this “age heaping” to measure gender inequality in cognitive ability in quantitative reasoning, or “numeracy” and construct a database of age heaping-based estimates of basic numeracy with broad geographic and temporal coverage.
         unit: '%'
         short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
       numeracy_gender:
         title: Historical numeracy estimates, gender differences
         description: >
@@ -59,4 +85,5 @@ tables:
           The higher the measure of gender equality, the lower the share of women rounding up or down their age in comparison to men rounding up or down in a certain country. A positive (negative) gender equality index implies a female (male) numeracy advantage.
         unit: '%'
         short_unit: '%'
-
+        display:
+          numDecimalPlaces: 0

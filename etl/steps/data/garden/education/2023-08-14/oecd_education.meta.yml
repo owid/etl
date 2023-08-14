@@ -1,0 +1,56 @@
+dataset:
+  title: How Was Life? Global Well-being since 1820 - Education (2014)
+  description: 'This dataset contains two indicators to describe educational inequalities around the globe since 1820: literacy
+    rates and years of schooling. These indicators are based on merging two major datasets that rely mainly on population
+    census data.'
+  licenses:
+  - name: Creative Commons BY 4.0
+    url: https://www.oecd.org/termsandconditions/
+  sources:
+  - name: van Zanden, J. et al. via OECD (2014)
+    description: 'This dataset contains two indicators to describe educational inequalities around the globe since 1820: literacy
+      rates and years of schooling. These indicators are based on merging two major datasets that rely mainly on population
+      census data.'
+    url: https://www.oecd-ilibrary.org/economics/how-was-life/education-since-1820_9789264214262-9-en
+    date_accessed: '2023-08-14'
+    publication_date: '2014-10-06'
+    publication_year: 2014
+    published_by: 'van Zanden, J., et al. (eds.) (2014), How Was Life?: Global Well-being since 1820, OECD Publishing, Paris,
+      https://doi.org/10.1787/9789264214262-en.'
+tables:
+  oecd_education:
+    variables:
+      population_with_basic_education:
+        title: Population having attained at least basic education, 1870-2010
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
+      average_years_of_education:
+        title:  Average years of education by region, 1850-2010
+        unit: 'years'
+        display:
+          numDecimalPlaces: 0
+
+      literacy:
+        title: World development of literacy, 1820-2010
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
+      best_guess:
+        title: Best guess for world development of at least basic education, 1820
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
+      educational_attainment:
+        title: World development of at least basic education, 1870-2010
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
