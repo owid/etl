@@ -826,7 +826,7 @@ class Variable(SQLModel, table=True):
     # processingLevel: Optional[str] = Field(
     #     default=None, sa_column=Column("processingLevel", ENUM("minor", "medium", "major"))
     # )
-    processingLevel: Optional[Optional[Annotated[str, catalog.meta.OWID_PROCESSING_LEVELS]]] = Field(default=None)
+    processingLevel: Optional[Optional[Annotated[str, catalog.meta.PROCESSING_LEVELS]]] = Field(default=None)
     processingLog: Optional[dict] = Field(default=None, sa_column=Column("processingLog", JSON))
     titlePublic: Optional[str] = Field(default=None, sa_column=Column("titlePublic", LONGTEXT))
     titleVariant: Optional[str] = Field(default=None, sa_column=Column("titleVariant", LONGTEXT))

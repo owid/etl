@@ -14,7 +14,13 @@ import pytest
 from owid.catalog import tables
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
-from owid.catalog.tables import SCHEMA, Table, get_unique_sources_from_tables
+from owid.catalog.tables import (
+    SCHEMA,
+    Table,
+    get_unique_licenses_from_tables,
+    get_unique_origins_from_tables,
+    get_unique_sources_from_tables,
+)
 from owid.catalog.variables import PROCESSING_LOG, Variable
 
 from .mocking import mock
@@ -344,6 +350,15 @@ def test_addition_same_variable() -> None:
     assert t.a.metadata.title is None
     assert t.b.metadata.title == "B"
 
+    # However, if "b" did not have a title, when adding both, the title of "a" should be preserved.
+    t: Table = Table({"a": [1, 2], "b": [3, 4]})
+    t.a.metadata.title = "A"
+    t.b.metadata.title = None
+
+    t["a"] = t["a"] + t["b"]
+    assert t.a.metadata.title == "A"
+    assert t.b.metadata.title is None
+
 
 def test_addition_of_scalar() -> None:
     t: Table = Table({"a": [1, 2], "b": [3, 4]})
@@ -383,19 +398,27 @@ def test_set_index_keeps_metadata_inplace() -> None:
     assert tb_new["b"].metadata.title == "B"
 
 
-def test_assign_dataset_sources_and_licenses_to_each_variable(table_1, sources) -> None:
+def test_assign_dataset_sources_origins_and_licenses_to_each_variable(table_1, sources, origins, licenses) -> None:
     tb = table_1.copy()
     # Create a new variable without metadata.
     tb["c"] = 1
-    tb = tables.assign_dataset_sources_and_licenses_to_each_variable(tb)
+    tb = tables.assign_dataset_sources_origins_and_licenses_to_each_variable(tb)
     # Check that variables that did not have sources now have the dataset of the dataset.
     assert tb["c"].metadata.sources == [sources[1], sources[2], sources[3]]
     # Check that variables that did have sources were not affected.
     assert tb["a"].metadata.sources == [sources[2], sources[1]]
+    # Check that variables that did not have origins now have the dataset of the dataset.
+    assert tb["c"].metadata.origins == [origins[1], origins[2], origins[3]]
+    # Check that variables that did have origins were not affected.
+    assert tb["a"].metadata.origins == [origins[2], origins[1]]
+    # Check that variables that did not have licenses now have the dataset of the dataset.
+    assert tb["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    # Check that variables that did have licenses were not affected.
+    assert tb["a"].metadata.licenses == [licenses[1]]
     # Note: This function will also add all sources to columns "country" and "year", which may not be a desired effect.
 
 
-def test_merge_without_any_on_arguments(table_1, table_2, sources, licenses) -> None:
+def test_merge_without_any_on_arguments(table_1, table_2, sources, origins, licenses) -> None:
     # If "on", "left_on" and "right_on" are not specified, the join is performed on common columns.
     # In this case, "country", "year", "a".
     tb = tables.merge(table_1, table_2)
@@ -404,10 +427,10 @@ def test_merge_without_any_on_arguments(table_1, table_2, sources, licenses) -> 
     # Check that non-overlapping columns preserve metadata.
     assert tb["c"].metadata == table_2["c"].metadata
     # Check that "on" columns combine the metadata of left and right tables.
-    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
-    # with table_2, title should be preserved, but description will be lost.
+    # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
+    # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description is None
+    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
     # Column "year" has no metadata in either table.
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -416,7 +439,14 @@ def test_merge_without_any_on_arguments(table_1, table_2, sources, licenses) -> 
     assert tb["a"].metadata.title is None
     assert tb["a"].metadata.description is None
     assert tb["a"].metadata.sources == [sources[2], sources[1]]
+    assert tb["a"].metadata.origins == [origins[2], origins[1]]
     assert tb["a"].metadata.licenses == [licenses[1], licenses[2]]
+    # Since table_1["a"] has processing level "minor" and table_2["a"] has "major", the combination should be "major".
+    assert tb["a"].metadata.processing_level == "major"
+    # Since table_1["a"] and table_2["a"] have identical presentation, the combination should have the same.
+    assert tb["a"].metadata.presentation == table_1["a"].metadata.presentation
+    # Since table_1["a"] and table_2["a"] have different display, the combination should have no display.
+    assert tb["a"].metadata.display is None
     # Column "b" appears only in table_1, so it should keep its original metadata.
     assert tb["b"].metadata == table_1["b"].metadata
     # Column "c" appears only in table_2, so it should keep its original metadata.
@@ -425,19 +455,29 @@ def test_merge_without_any_on_arguments(table_1, table_2, sources, licenses) -> 
     # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
     assert tb.metadata.title is None
     assert tb.metadata.description is None
-    # Sources and licenses should be all sources and licenses of the resulting variables.
-    # assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]  # type: ignore
-    # assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]  # type: ignore
 
 
-def test_merge_with_on_argument(table_1, table_2, sources, licenses) -> None:
+def test_merge_tables_where_only_one_has_title_or_description(table_1, table_2) -> None:
+    tb1 = table_1.copy()
+    tb2 = table_2.copy()
+    # Delete title from tb1, and make description of tb2 identical to the description of tb1.
+    tb1.metadata.title = None
+    tb2.metadata.description = "Description of Table 1"
+    tb = tables.merge(tb1, tb2)
+    # The resulting table should have the title of tb2 (since tb1 has no title), and the description of tb1
+    # (which is identical to the description of tb2).
+    assert tb.metadata.title == "Title of Table 2"
+    assert tb.metadata.description == "Description of Table 1"
+
+
+def test_merge_with_on_argument(table_1, table_2) -> None:
     tb = tables.merge(table_1, table_2, on=["country", "year"])
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.merge(table_2, on=["country", "year"]))
-    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
-    # with table_2, title should be preserved, but description will be lost.
+    # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
+    # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description is None
+    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
     # Idem for "year".
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -458,21 +498,18 @@ def test_merge_with_on_argument(table_1, table_2, sources, licenses) -> None:
     # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
     assert tb.metadata.title is None
     assert tb.metadata.description is None
-    # Sources and licenses should be all sources and licenses of the resulting variables.
-    # assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]  # type: ignore
-    # assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]  # type: ignore
 
 
-def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, licenses) -> None:
+def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, origins, licenses) -> None:
     # Join on columns "country" and "year" (in this case, the result should be identical to simply defining
     # on=["country", "year"]).
     tb = tables.merge(table_1, table_2, left_on=["country", "year"], right_on=["country", "year"])
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.merge(table_2, left_on=["country", "year"], right_on=["country", "year"]))
-    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
-    # with table_2, title should be preserved, but description will be lost.
+    # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
+    # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description is None
+    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
     # Idem for "year".
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -489,9 +526,6 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
     assert tb.metadata.title is None
     assert tb.metadata.description is None
-    # Sources and licenses should be all sources and licenses of the resulting variables.
-    # assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]  # type: ignore
-    # assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]  # type: ignore
 
     # Repeat the same merge, but specifying suffixes.
     tb = tables.merge(
@@ -507,18 +541,15 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
     assert tb.metadata.title is None
     assert tb.metadata.description is None
-    # Sources and licenses should be all sources and licenses of the resulting variables.
-    # assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]  # type: ignore
-    # assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]  # type: ignore
 
     # Now do a merge where left_on and right_on have one column different.
     tb = tables.merge(table_1, table_2, left_on=["country", "year", "b"], right_on=["country", "year", "c"])
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.merge(table_2, left_on=["country", "year", "b"], right_on=["country", "year", "c"]))
-    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
-    # with table_2, title should be preserved, but description will be lost.
+    # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
+    # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description is None
+    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
     # Idem for "year".
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -535,27 +566,25 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
     assert tb.metadata.title is None
     assert tb.metadata.description is None
-    # Sources and licenses should be all sources and licenses of the resulting variables.
-    # assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]  # type: ignore
-    # assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]  # type: ignore
 
     # Now do a merge where column "a" is included both on left_on and right_on.
     tb = tables.merge(table_1, table_2, left_on=["country", "year", "a"], right_on=["country", "year", "a"])
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.merge(table_2, left_on=["country", "year", "a"], right_on=["country", "year", "a"]))
-    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
-    # with table_2, title should be preserved, but description will be lost.
+    # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
+    # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description is None
+    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
     # Idem for "year".
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
     # Column "a" should now combine metadata from left and right tables.
-    # Given that they have differring titles and description, the combined title and description should disappear.
+    # Given that they have differing titles and description, the combined title and description should disappear.
     assert tb["a"].metadata.title is None
     assert tb["a"].metadata.description is None
-    # Sources and licenses should be the combination from the two tables.
+    # Sources, origins and licenses should be the combination from the two tables.
     assert tb["a"].metadata.sources == [sources[2], sources[1]]
+    assert tb["a"].metadata.origins == [origins[2], origins[1]]
     assert tb["a"].metadata.licenses == [licenses[1], licenses[2]]
     # Column "b" appears only in table_1, so it should keep its original metadata.
     assert tb["b"].metadata == table_1["b"].metadata
@@ -565,17 +594,14 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, lic
     # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
     assert tb.metadata.title is None
     assert tb.metadata.description is None
-    # Sources and licenses should be all sources and licenses of the resulting variables.
-    # assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]  # type: ignore
-    # assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]  # type: ignore
 
 
-def test_concat_with_axis_0(table_1, table_2, sources, licenses) -> None:
+def test_concat_with_axis_0(table_1, table_2, sources, origins, licenses) -> None:
     tb = tables.concat([table_1, table_2])
-    # Column "country" has the same title on both tables, but has description only on table_1, therefore when combining
-    # with table_2, title should be preserved, but description will be lost.
+    # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
+    # with table_2, the unique title should be preserved, and the only existing description should persist.
     assert tb["country"].metadata.title == "Country Title"
-    assert tb["country"].metadata.description is None
+    assert tb["country"].metadata.description == "Description of Table 1 Variable country"
     # Column "year" has no title and no description in any of the tables.
     assert tb["year"].metadata.title is None
     assert tb["year"].metadata.description is None
@@ -583,6 +609,7 @@ def test_concat_with_axis_0(table_1, table_2, sources, licenses) -> None:
     assert tb["a"].metadata.title is None
     assert tb["a"].metadata.description is None
     assert tb["a"].metadata.sources == [sources[2], sources[1]]
+    assert tb["a"].metadata.origins == [origins[2], origins[1]]
     assert tb["a"].metadata.licenses == [licenses[1], licenses[2]]
     # Column "b" appears only in table_1, so it should keep its original metadata.
     assert tb["b"].metadata == table_1["b"].metadata
@@ -592,12 +619,9 @@ def test_concat_with_axis_0(table_1, table_2, sources, licenses) -> None:
     # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
     assert tb.metadata.title is None
     assert tb.metadata.description is None
-    # Sources and licenses should be all sources and licenses of the resulting variables.
-    # assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]  # type: ignore
-    # assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]  # type: ignore
 
 
-def test_concat_with_axis_1(table_1, table_2, sources, licenses) -> None:
+def test_concat_with_axis_1(table_1, table_2) -> None:
     # TODO: Assert that concat raises an error if the resulting table has multiple columns with the same name.
     # tb = tables.concat([table_1, table_2], axis=1)
 
@@ -621,12 +645,9 @@ def test_concat_with_axis_1(table_1, table_2, sources, licenses) -> None:
     # Since titles and descriptions of the tables concatenated are different, title and description should be empty.
     assert tb.metadata.title is None
     assert tb.metadata.description is None
-    # Sources and licenses should be all sources and licenses of the resulting variables.
-    # assert tb.metadata.dataset.sources == [sources[2], sources[1], sources[3], sources[4]]  # type: ignore
-    # assert tb.metadata.dataset.licenses == [licenses[1], licenses[2], licenses[3], licenses[4]]  # type: ignore
 
 
-def test_melt(table_1, sources, licenses) -> None:
+def test_melt(table_1, sources, origins, licenses) -> None:
     # If nothing specified, all columns are melted.
     tb = tables.melt(table_1)
     # Check that the result is identical to using the table method.
@@ -637,7 +658,14 @@ def test_melt(table_1, sources, licenses) -> None:
         assert tb[column].metadata.description is None
         # Sources and licenses should be the combination of sources and licenses of all columns in table_1.
         assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
+        assert tb[column].metadata.origins == [origins[2], origins[1], origins[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+        # The combination should have the largest processing level of both variables combined.
+        assert tb[column].metadata.processing_level == "major"
+        # Since "a" and "b" have different presentation, the combination should have no presentation.
+        assert tb[column].metadata.presentation is None
+        # Since "a" and "b" have identical display, the combination should have the same display.
+        assert tb[column].metadata.display == table_1["a"].metadata.display
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
@@ -651,7 +679,14 @@ def test_melt(table_1, sources, licenses) -> None:
         assert tb[column].metadata.description is None
         # Sources and licenses should be the combination of sources and licenses of all columns in table_1.
         assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
+        assert tb[column].metadata.origins == [origins[2], origins[1], origins[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+        # The combination should have the largest processing level of both variables combined.
+        assert tb[column].metadata.processing_level == "major"
+        # Since "a" and "b" have different presentation, the combination should have no presentation.
+        assert tb[column].metadata.presentation is None
+        # Since "a" and "b" have identical display, the combination should have the same display.
+        assert tb[column].metadata.display == table_1["a"].metadata.display
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
@@ -666,7 +701,14 @@ def test_melt(table_1, sources, licenses) -> None:
     # The new "variable" and "value" columns should combine the sources and licenses of "a" and "b".
     for column in ["variable", "value"]:
         assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
+        assert tb[column].metadata.origins == [origins[2], origins[1], origins[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+        # The combination should have the largest processing level of both variables combined.
+        assert tb[column].metadata.processing_level == "major"
+        # Since "a" and "b" have different presentation, the combination should have no presentation.
+        assert tb[column].metadata.presentation is None
+        # Since "a" and "b" have identical display, the combination should have the same display.
+        assert tb[column].metadata.display == table_1["a"].metadata.display
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
@@ -682,7 +724,14 @@ def test_melt(table_1, sources, licenses) -> None:
     # The new "variable" and "value" columns should combine the sources and licenses of "a" and "b".
     for column in ["var", "val"]:
         assert tb[column].metadata.sources == [sources[2], sources[1], sources[3]]
+        assert tb[column].metadata.origins == [origins[2], origins[1], origins[3]]
         assert tb[column].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+        # The combination should have the largest processing level of both variables combined.
+        assert tb[column].metadata.processing_level == "major"
+        # Since "a" and "b" have different presentation, the combination should have no presentation.
+        assert tb[column].metadata.presentation is None
+        # Since "a" and "b" have identical display, the combination should have the same display.
+        assert tb[column].metadata.display == table_1["a"].metadata.display
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
@@ -700,14 +749,19 @@ def test_melt(table_1, sources, licenses) -> None:
         assert tb[column].metadata.title == table_1["b"].metadata.title
         assert tb[column].metadata.description == table_1["b"].metadata.description
         assert tb[column].metadata.sources == table_1["b"].metadata.sources
+        assert tb[column].metadata.origins == table_1["b"].metadata.origins
         assert tb[column].metadata.licenses == table_1["b"].metadata.licenses
+        assert tb[column].metadata.processing_level == table_1["b"].metadata.processing_level
+        assert tb[column].metadata.presentation == table_1["b"].metadata.presentation
+        assert tb[column].metadata.display == table_1["b"].metadata.display
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
 
-def test_pivot(table_1, sources) -> None:
-    # To better test the expected behaviour, I will add a source to the "country" column.
+def test_pivot(table_1, sources, origins) -> None:
+    # To better test the expected behavior, I will add a source (and origin) to the "country" column.
     table_1["country"].metadata.sources = [sources[4]]
+    table_1["country"].metadata.origins = [origins[4]]
     tb = tables.pivot(table_1, columns="country")
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.pivot(columns="country"))
@@ -789,20 +843,51 @@ def test_get_unique_sources_from_tables(table_1, sources):
     ]
 
 
-def test_sum_columns(table_1, sources, licenses):
+def test_get_unique_origins_from_tables(table_1, origins):
+    unique_origins = get_unique_origins_from_tables([table_1, table_1])
+    assert unique_origins == [
+        origins[2],
+        origins[1],
+        origins[3],
+    ]
+
+
+def test_get_unique_license_from_tables(table_1, licenses):
+    unique_licenses = get_unique_licenses_from_tables([table_1, table_1])
+    assert unique_licenses == [
+        licenses[1],
+        licenses[2],
+        licenses[3],
+    ]
+
+
+def test_sum_columns(table_1, sources, origins, licenses):
     # Create a new column that is the element-wise sum of the other two existing columns.
     table_1["c"] = table_1[["a", "b"]].sum(axis=1)
     assert table_1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert table_1["c"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert table_1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    assert table_1["c"].metadata.title is None
+    assert table_1["c"].metadata.description is None
+    assert table_1["c"].metadata.processing_level == "major"
+    assert table_1["c"].metadata.presentation is None
+    assert table_1["c"].metadata.display == table_1["a"].metadata.display
 
     # Create a new variable (it cannot be added as a new column since it has different dimensions) that is the sum of
     # each of the other two existing columns.
     variable_c = table_1[["a", "b"]].sum(axis=0)
     assert variable_c.metadata.sources == [sources[2], sources[1], sources[3]]
+    assert variable_c.metadata.origins == [origins[2], origins[1], origins[3]]
     assert variable_c.metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    assert variable_c.metadata.title is None
+    assert variable_c.metadata.description is None
+    assert variable_c.metadata.processing_level == "major"
+    assert variable_c.metadata.presentation is None
+    assert variable_c.metadata.display == table_1["a"].metadata.display
 
 
-def test_operations_of_table_and_scalar(table_1, sources, licenses):
+def test_operations_of_table_and_scalar(table_1, sources, origins, licenses):
+    table_1_original = table_1.copy()
     table_1[["a", "b"]] = table_1[["a", "b"]] + 1
     table_1[["a", "b"]] += 1
     table_1[["a", "b"]] = table_1[["a", "b"]] - 1
@@ -818,20 +903,31 @@ def test_operations_of_table_and_scalar(table_1, sources, licenses):
     table_1[["a", "b"]] = table_1[["a", "b"]] ** 1
     table_1[["a", "b"]] **= 1
 
-    assert table_1["a"].metadata.sources == [sources[2], sources[1]]
-    assert table_1["a"].metadata.licenses == [licenses[1]]
-    assert table_1["b"].metadata.sources == [sources[2], sources[3]]
-    assert table_1["b"].metadata.licenses == [licenses[2], licenses[3]]
+    # Check that the metadata of both variables is preserved (only the processing log should have changed).
+    assert table_1["a"].metadata == table_1_original["a"].metadata
+    assert table_1["b"].metadata == table_1_original["b"].metadata
 
 
-def test_multiply_columns(table_1, sources, licenses):
+def test_multiply_columns(table_1, sources, origins, licenses):
     # Create a new column that is the element-wise product of the other two existing columns.
     table_1["c"] = table_1[["a", "b"]].prod(axis=1)
     assert table_1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
+    assert table_1["c"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert table_1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    assert table_1["c"].metadata.title is None
+    assert table_1["c"].metadata.description is None
+    assert table_1["c"].metadata.processing_level == "major"
+    assert table_1["c"].metadata.presentation is None
+    assert table_1["c"].metadata.display == table_1["a"].metadata.display
 
     # Create a new variable (it cannot be added as a new column since it has different dimensions) that is the product
     # of each of the other two existing columns.
     variable_c = table_1[["a", "b"]].prod(axis=0)
     assert variable_c.metadata.sources == [sources[2], sources[1], sources[3]]
+    assert variable_c.metadata.origins == [origins[2], origins[1], origins[3]]
     assert variable_c.metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    assert variable_c.metadata.title is None
+    assert variable_c.metadata.description is None
+    assert variable_c.metadata.processing_level == "major"
+    assert variable_c.metadata.presentation is None
+    assert variable_c.metadata.display == table_1["a"].metadata.display

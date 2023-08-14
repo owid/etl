@@ -155,10 +155,6 @@ class Table(pd.DataFrame):
         else:
             raise ValueError(f"could not detect a suitable format to read from: {path}")
 
-        # If each variable does not have sources, load them from the dataset.
-        # TODO: I think this is not a good idea, consider removing.
-        # table = assign_dataset_sources_and_licenses_to_each_variable(table=table)
-
         # Add processing log to the metadata of each variable in the table.
         # TODO: For some reason, the snapshot loading entry gets repeated.
         table = update_processing_logs_when_loading_or_creating_table(table=table)
@@ -1125,10 +1121,38 @@ def read_excel(
 def read_from_records(data: Any, *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs):
     table = Table(pd.DataFrame.from_records(data=data, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
-    # Note: Parents could be passed as arguments, or extracted from metadata.
+    # NOTE: Parents could be passed as arguments, or extracted from metadata.
     table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
 
     return table
+
+
+def read_from_dict(
+    data: Dict[Any, Any], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
+):
+    table = Table(pd.DataFrame.from_dict(data=data, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    # NOTE: Parents could be passed as arguments, or extracted from metadata.
+    table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
+
+    return table
+
+
+def read_json(
+    path_or_buf: Union[str, Path, IO[AnyStr]],
+    metadata: Optional[TableMeta] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_json(path_or_buf=path_or_buf, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    if isinstance(path_or_buf, (str, Path)):
+        table = update_log(table=table, operation="load", parents=[path_or_buf])
+    else:
+        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_json.")
+
+    return cast(Table, table)
 
 
 class ExcelFile(pd.ExcelFile):
@@ -1201,24 +1225,29 @@ def _add_processing_log_entry_to_each_variable(
     return table
 
 
-def assign_dataset_sources_and_licenses_to_each_variable(table: Table) -> Table:
-    # Get sources and licenses from the table dataset.
+def assign_dataset_sources_origins_and_licenses_to_each_variable(table: Table) -> Table:
+    # Get sources, origins and licenses from the table dataset.
     sources = []
+    origins = []
     licenses = []
     if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
         sources = table.metadata.dataset.sources  # type: ignore
+    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "origins"):
+        origins = table.metadata.dataset.origins  # type: ignore
     if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
         licenses = table.metadata.dataset.licenses  # type: ignore
 
-    if len(sources) == len(licenses) == 0:
-        # There are no default sources/licenses to assign to each variable.
+    if len(sources) == len(licenses) == len(origins) == 0:
+        # There are no default sources/origins/licenses to assign to each variable.
         return table
 
-    # If a variable does not have sources/licenses defined, assign the ones from the dataset.
+    # If a variable does not have sources/origins/licenses defined, assign the ones from the dataset.
     # Do this for all columns, including index columns.
     for column in list(table.all_columns):
         if len(table._fields[column].sources) == 0:
             table._fields[column].sources = sources
+        if len(table._fields[column].origins) == 0:
+            table._fields[column].origins = origins
         if len(table._fields[column].licenses) == 0:
             table._fields[column].licenses = licenses
 
@@ -1390,28 +1419,30 @@ def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     return pd.unique(licenses).tolist()
 
 
-def _combine_tables_titles_and_descriptions(tables: List[Table], title_or_description: str) -> Optional[str]:
-    # Keep the title only if all tables have exactly the same title.
-    # Otherwise we assume that the table has a different meaning, and its title should be manually handled.
-    title_or_description_combined = None
-    titles_or_descriptions = pd.unique([getattr(table.metadata, title_or_description) for table in tables])
-    if len(titles_or_descriptions) == 1:
-        title_or_description_combined = titles_or_descriptions[0]
+def _get_metadata_value_from_tables_if_all_identical(tables: List[Table], field: str) -> Optional[Any]:
+    # Get unique values from list, ignoring Nones.
+    unique_values = set(
+        [getattr(table.metadata, field) for table in tables if getattr(table.metadata, field) is not None]
+    )
+    if len(unique_values) == 1:
+        combined_value = unique_values.pop()
+    else:
+        combined_value = None
 
-    return title_or_description_combined
-
-
-def combine_tables_titles(tables: List[Table]) -> Optional[str]:
-    return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="title")
+    return combined_value
 
 
-def combine_tables_descriptions(tables: List[Table]) -> Optional[str]:
-    return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="description")
+def combine_tables_title(tables: List[Table]) -> Optional[str]:
+    return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="title")
+
+
+def combine_tables_description(tables: List[Table]) -> Optional[str]:
+    return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="description")
 
 
 def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = None) -> TableMeta:
-    title = combine_tables_titles(tables=tables)
-    description = combine_tables_descriptions(tables=tables)
+    title = combine_tables_title(tables=tables)
+    description = combine_tables_description(tables=tables)
     if short_name is None:
         # If a short name is not specified, take it from the first table.
         short_name = tables[0].metadata.short_name

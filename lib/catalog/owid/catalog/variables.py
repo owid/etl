@@ -13,7 +13,15 @@ import structlog
 from pandas._typing import Scalar
 from pandas.core.series import Series
 
-from .meta import License, Origin, Source, VariableMeta
+from .meta import (
+    PROCESSING_LEVELS,
+    PROCESSING_LEVELS_ORDER,
+    License,
+    Origin,
+    Source,
+    VariableMeta,
+    VariablePresentationMeta,
+)
 from .properties import metadata_property
 
 log = structlog.get_logger()
@@ -324,63 +332,49 @@ for k in VariableMeta.__dataclass_fields__:
     setattr(Variable, k, metadata_property(k))
 
 
-def _combine_variable_units_or_short_units(variables: List[Variable], operation, unit_or_short_unit) -> Optional[str]:
-    # Gather units (or short units) of all variables.
-    units_or_short_units = pd.unique(
-        [
-            getattr(variable.metadata, unit_or_short_unit)
-            for variable in variables
-            if getattr(variable.metadata, unit_or_short_unit) is not None
-        ]
+def _get_metadata_value_from_variables_if_all_identical(
+    variables: List[Variable], field: str, warn_if_different: bool = False
+) -> Optional[Any]:
+    # Get unique values from list, ignoring Nones.
+    unique_values = set(
+        [getattr(variable.metadata, field) for variable in variables if getattr(variable.metadata, field) is not None]
     )
-    # Initialise the unit (or short unit) of the output variable.
-    unit_or_short_unit_combined = None
-    if operation in ["+", "-", "melt", "pivot", "concat", "fillna"]:
-        if len(units_or_short_units) == 1:
-            # If (short) units coincide among all variables, assign the common unit.
-            unit_or_short_unit_combined = units_or_short_units[0]
-        elif len(units_or_short_units) > 1:
-            # If there are multiple (short) units among variables, raise a warning (and keep combined unit as None).
-            log.warning(f"Different values of '{unit_or_short_unit}' detected among variables: {units_or_short_units}")
-        # In any other case, none of the variables have units, therefore keep combined unit as None.
+    if len(unique_values) == 1:
+        combined_value = unique_values.pop()
+    else:
+        combined_value = None
+        if (len(unique_values) > 1) and warn_if_different:
+            log.warning(f"Different values of '{field}' detected among variables: {unique_values}")
 
-    return unit_or_short_unit_combined
+    return combined_value
 
 
-def combine_variables_units(variables: List[Variable], operation: OPERATION) -> Optional[str]:
-    return _combine_variable_units_or_short_units(variables=variables, operation=operation, unit_or_short_unit="unit")
-
-
-def combine_variables_short_units(variables: List[Variable], operation: OPERATION) -> Optional[str]:
-    return _combine_variable_units_or_short_units(
-        variables=variables, operation=operation, unit_or_short_unit="short_unit"
+def combine_variables_unit(variables: List[Variable]) -> Optional[str]:
+    return _get_metadata_value_from_variables_if_all_identical(
+        variables=variables, field="unit", warn_if_different=True
     )
 
 
-def _combine_variables_titles_and_descriptions(
-    variables: List[Variable], operation: OPERATION, title_or_description: str
-) -> Optional[str]:
-    # Keep the title only if all variables have exactly the same title.
-    # Otherwise we assume that the variable has a different meaning, and its title should be manually handled.
-    title_or_description_combined = None
-    if operation in ["+", "-", "fillna", "dropna", "merge", "melt", "pivot", "concat", "pct_change"]:
-        titles_or_descriptions = pd.unique([getattr(variable.metadata, title_or_description) for variable in variables])
-        if len(titles_or_descriptions) == 1:
-            title_or_description_combined = titles_or_descriptions[0]
-
-    return title_or_description_combined
-
-
-def combine_variables_titles(variables: List[Variable], operation: OPERATION) -> Optional[str]:
-    return _combine_variables_titles_and_descriptions(
-        variables=variables, operation=operation, title_or_description="title"
+def combine_variables_short_unit(variables: List[Variable]) -> Optional[str]:
+    return _get_metadata_value_from_variables_if_all_identical(
+        variables=variables, field="short_unit", warn_if_different=True
     )
 
 
-def combine_variables_descriptions(variables: List[Variable], operation: OPERATION) -> Optional[str]:
-    return _combine_variables_titles_and_descriptions(
-        variables=variables, operation=operation, title_or_description="description"
-    )
+def combine_variables_title(variables: List[Variable]) -> Optional[str]:
+    return _get_metadata_value_from_variables_if_all_identical(variables=variables, field="title")
+
+
+def combine_variables_description(variables: List[Variable]) -> Optional[str]:
+    return _get_metadata_value_from_variables_if_all_identical(variables=variables, field="description")
+
+
+def combine_variables_description_short(variables: List[Variable]) -> Optional[str]:
+    return _get_metadata_value_from_variables_if_all_identical(variables=variables, field="description_short")
+
+
+def combine_variables_description_from_producer(variables: List[Variable]) -> Optional[str]:
+    return _get_metadata_value_from_variables_if_all_identical(variables=variables, field="description_from_producer")
 
 
 def get_unique_sources_from_variables(variables: List[Variable]) -> List[Source]:
@@ -403,6 +397,110 @@ def get_unique_licenses_from_variables(variables: List[Variable]) -> List[Licens
     licenses = sum([variable.metadata.licenses for variable in variables], [])
 
     return pd.unique(licenses).tolist()
+
+
+def combine_variables_processing_logs(variables: List[Variable]) -> List[Dict[str, Any]]:
+    # Make a list with all entries in the processing log of all variables.
+    processing_log = sum(
+        [
+            variable.metadata.processing_log if variable.metadata.processing_log is not None else []
+            for variable in variables
+        ],
+        [],
+    )
+
+    return processing_log
+
+
+def _get_dict_from_list_if_all_identical(list_of_objects: List[Optional[Dict[str, Any]]]) -> Optional[Dict[str, Any]]:
+    # The argument list_of_objects can contain dictionaries or None, or be empty.
+    # If a list contains one dictionary (possibly repeated multiple times with identical content), return that
+    # dictionary. Otherwise, if not all dictionaries are identical, return None.
+
+    # List all dictionaries, ignoring Nones.
+    defined_dicts = [d for d in list_of_objects if d is not None]
+
+    if not defined_dicts:
+        # If there are no dictionaries, return None.
+        return None
+
+    # Take the first dictionary as a reference.
+    reference_dict = defined_dicts[0]
+
+    # Return the first dictionary if all dictionaries are identical, otherwise return None.
+    return reference_dict if all(d == reference_dict for d in defined_dicts) else None
+
+
+def combine_variables_display(variables: List[Variable]) -> Optional[Dict[str, Any]]:
+    return _get_dict_from_list_if_all_identical(list_of_objects=[variable.metadata.display for variable in variables])
+
+
+def combine_variables_presentation(variables: List[Variable]) -> Optional[VariablePresentationMeta]:
+    return _get_dict_from_list_if_all_identical(
+        list_of_objects=[variable.metadata.presentation for variable in variables]  # type: ignore
+    )
+
+
+def combine_variables_processing_level(variables: List[Variable]) -> Optional[PROCESSING_LEVELS]:
+    # Gather processing levels from all variables that are defined.
+    processing_levels = [
+        variable.metadata.processing_level for variable in variables if variable.metadata.processing_level is not None
+    ]
+
+    if len(processing_levels) == 0:
+        # If there are no processing levels, return None.
+        return None
+
+    # Ensure that all processing levels are known.
+    unknown_processing_levels = set([level for level in processing_levels]) - set(PROCESSING_LEVELS_ORDER)
+    assert len(unknown_processing_levels) == 0, f"Unknown processing levels: {unknown_processing_levels}"
+
+    # If any of the variables has a processing level, take the highest level.
+    maximum_level = max([PROCESSING_LEVELS_ORDER[level] for level in processing_levels])
+
+    # Return the maximum level as a string.
+    combined_processing_level = {value: key for key, value in PROCESSING_LEVELS_ORDER.items()}[maximum_level]
+
+    return cast(PROCESSING_LEVELS, combined_processing_level)
+
+
+def combine_variables_metadata(
+    variables: List[Any], operation: OPERATION, name: str = UNNAMED_VARIABLE
+) -> VariableMeta:
+    # Initialise an empty metadata.
+    metadata = VariableMeta()
+
+    # Skip other objects passed in variables that may not contain metadata (e.g. a scalar),
+    # and skip unnamed variables that cannot have metadata
+    variables_only = [v for v in variables if hasattr(v, "name") and v.name and hasattr(v, "metadata")]
+
+    # Combine each metadata field using the logic of the specified operation.
+    metadata.title = combine_variables_title(variables=variables_only)
+    metadata.description = combine_variables_description(variables=variables_only)
+    metadata.description_short = combine_variables_description_short(variables=variables_only)
+    metadata.description_from_producer = combine_variables_description_from_producer(variables=variables_only)
+    metadata.unit = combine_variables_unit(variables=variables_only)
+    metadata.short_unit = combine_variables_short_unit(variables=variables_only)
+    metadata.sources = get_unique_sources_from_variables(variables=variables_only)
+    metadata.origins = get_unique_origins_from_variables(variables=variables_only)
+    metadata.licenses = get_unique_licenses_from_variables(variables=variables_only)
+    metadata.processing_log = combine_variables_processing_logs(variables=variables_only)
+    metadata.display = combine_variables_display(variables=variables_only)
+    metadata.presentation = combine_variables_presentation(variables=variables_only)
+    metadata.processing_level = combine_variables_processing_level(variables=variables_only)
+
+    # List names of variables and scalars (or other objects passed in variables).
+    variables_and_scalars_names = [
+        variable.name if hasattr(variable, "name") else str(variable) for variable in variables
+    ]
+    metadata.processing_log = add_entry_to_processing_log(
+        processing_log=metadata.processing_log,
+        variable_name=name,
+        parents=variables_and_scalars_names,
+        operation=operation,
+    )
+
+    return metadata
 
 
 def add_entry_to_processing_log(
@@ -557,53 +655,6 @@ def amend_log(
 
     if not inplace:
         return variable
-
-
-def combine_variables_processing_logs(variables: List[Variable]) -> List[Dict[str, Any]]:
-    # Make a list with all entries in the processing log of all variables.
-    processing_log = sum(
-        [
-            variable.metadata.processing_log if variable.metadata.processing_log is not None else []
-            for variable in variables
-        ],
-        [],
-    )
-
-    return processing_log
-
-
-def combine_variables_metadata(
-    variables: List[Any], operation: OPERATION, name: str = UNNAMED_VARIABLE
-) -> VariableMeta:
-    # Initialise an empty metadata.
-    metadata = VariableMeta()
-
-    # Skip other objects passed in variables that may not contain metadata (e.g. a scalar),
-    # and skip unnamed variables that cannot have metadata
-    variables_only = [v for v in variables if hasattr(v, "name") and v.name and hasattr(v, "metadata")]
-
-    # Combine each metadata field using the logic of the specified operation.
-    metadata.title = combine_variables_titles(variables=variables_only, operation=operation)
-    metadata.description = combine_variables_descriptions(variables=variables_only, operation=operation)
-    metadata.unit = combine_variables_units(variables=variables_only, operation=operation)
-    metadata.short_unit = combine_variables_short_units(variables=variables_only, operation=operation)
-    metadata.sources = get_unique_sources_from_variables(variables=variables_only)
-    metadata.origins = get_unique_origins_from_variables(variables=variables_only)
-    metadata.licenses = get_unique_licenses_from_variables(variables=variables_only)
-    metadata.processing_log = combine_variables_processing_logs(variables=variables_only)
-
-    # List names of variables and scalars (or other objects passed in variables).
-    variables_and_scalars_names = [
-        variable.name if hasattr(variable, "name") else str(variable) for variable in variables
-    ]
-    metadata.processing_log = add_entry_to_processing_log(
-        processing_log=metadata.processing_log,
-        variable_name=name,
-        parents=variables_and_scalars_names,
-        operation=operation,
-    )
-
-    return metadata
 
 
 def update_variable_name(variable: Variable, name: str) -> None:
