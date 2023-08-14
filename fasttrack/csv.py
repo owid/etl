@@ -1,10 +1,10 @@
-from typing import List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import pandas as pd
+from owid.catalog import DatasetMeta, VariableMeta
 from owid.catalog.utils import underscore
 
-from .sheets import PartialSnapshotMeta, parse_data_from_sheets
-from .yaml_meta import YAMLMeta
+from .sheets import parse_data_from_sheets
 
 
 def parse_data_from_csv(csv_df: pd.DataFrame) -> pd.DataFrame:
@@ -17,10 +17,10 @@ def parse_data_from_csv(csv_df: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def parse_metadata_from_csv(filename: str, columns: List[str]) -> Tuple[YAMLMeta, PartialSnapshotMeta]:
+def parse_metadata_from_csv(filename: str, columns: List[str]) -> Tuple[DatasetMeta, Dict[str, VariableMeta]]:
     filename = filename.replace(".csv", "")
     title = f"DRAFT {filename}"
-    dataset_dict = {
+    dataset_dict: dict[str, Any] = {
         "title": title,
         "short_name": underscore(filename),
         "version": "latest",
@@ -37,12 +37,18 @@ def parse_metadata_from_csv(filename: str, columns: List[str]) -> Tuple[YAMLMeta
         if col.lower() not in ("country", "year", "entity")
     }
 
-    return (
-        YAMLMeta(**{"dataset": dataset_dict, "tables": {dataset_dict["short_name"]: {"variables": variables_dict}}}),
-        PartialSnapshotMeta(
+    dataset_dict["sources"] = [
+        dict(
+            name="Unknown",
             url="",
             publication_year=None,
-            license_url=None,
-            license_name=None,
-        ),
-    )
+        )
+    ]
+    dataset_dict["licenses"] = [
+        {
+            "url": None,
+            "name": None,
+        }
+    ]
+
+    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}
