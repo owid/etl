@@ -1,0 +1,19 @@
+tables:
+  number_of_farmed_fish:
+    variables:
+      n_farmed_fish_lower:
+        title: Estimated number of farmed fish (lower bound)
+        unit: 'fish'
+        short_unit: ''
+        description: ''
+      n_farmed_fish_midpoint:
+        title: Estimated number of farmed fish
+        unit: 'fish'
+        short_unit: ''
+        description: |
+          Midpoint estimate of the number of farmed fish in the world, calculated as the average between the lower and upper limit estimates.
+      n_farmed_fish_upper:
+        title: Estimated number of farmed fish (upper bound)
+        unit: 'fish'
+        short_unit: ''
+        description: ''
