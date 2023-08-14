@@ -5,12 +5,15 @@ from typing import cast
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
+from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+# Logger
+log = get_logger()
 # Regions
 REGIONS = [
     "Asia",
@@ -27,27 +30,36 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("avian_influenza_ah5n1"))
+    ds_meadow = cast(Dataset, paths.load_dependency("avian_influenza_h5n1_kucharski"))
 
     # Load regions dataset.
     ds_regions: Dataset = paths.load_dependency("regions")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["avian_influenza_ah5n1"].reset_index()
+    tb = ds_meadow["avian_influenza_h5n1_kucharski"].reset_index()
 
     #
     # Process data.
     #
-    # To date
-    tb["date"] = pd.to_datetime(tb["month"]).astype("datetime64[ns]")
+    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # Drop columns
-    tb = tb.drop(columns=["range", "month"])
+    # Classify outcome into deaths and cases
+    log.info("avian: classify outcome into deaths and cases")
+    mask = tb["outcome"].isin(["Died", "Fatal"])
+    tb.loc[mask, "indicator"] = "avian_deaths"
+    tb.loc[~mask, "indicator"] = "avian_cases"
 
-    # Harmonize country names
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    # Add month of report
+    log.info("avian: add month of report")
+    tb["date"] = tb["date_reported"].dt.strftime("%Y-%m") + "-01"
+    tb["date"] = pd.to_datetime(tb["date"]).astype("datetime64[ns]")
 
-    # Add aggregates
+    # Format dataframe
+    log.info("avian: format dataframe")
+    tb = tb.groupby(["date", "country", "indicator"], as_index=False).size()
+    tb = tb.pivot(index=["date", "country"], columns="indicator", values="size").reset_index()
+
+    # Add regions
     tb = add_regions(tb, ds_regions)
     tb = add_world(tb)
 
@@ -68,14 +80,14 @@ def run(dest_dir: str) -> None:
 
 
 def add_regions(tb: Table, ds_regions: Dataset) -> Table:
-    "Add regions to the table."
+    """Add regions to the table."""
     for region in REGIONS:
         # List of countries in region.
         countries_in_region = geo.list_members_of_region(region=region, ds_regions=ds_regions)
 
         # Add region
-        tb_region = tb[tb["country"].isin(countries_in_region)]
-        tb_region = tb_region.assign(country=region)
+        tb_region = tb[tb["country"].isin(countries_in_region)].copy()
+        tb_region["country"] = region
         tb_region = tb_region.groupby(["date", "country"], as_index=False)["avian_cases"].sum()
 
         # Combine
@@ -91,7 +103,7 @@ def add_world(tb: Table) -> Table:
 
     # Aggregate
     tb_world = tb.groupby("date", as_index=False)["avian_cases"].sum()
-    tb_world = tb_world.assign(country="World")
+    tb_world["country"] = "World"
 
     # Combine
     tb = pd.concat(

@@ -23,9 +23,8 @@ meta:
     A/H5N1 cases reported globally
     between 2006-2014. These case reports were collated from Fiebig et al. (2011)
     and WHO.
-
 wdir: ../../../data/snapshots/health/2023-08-14
 outs:
 - md5: 48d7612c5a91467daa917ac849e3f2aa
   size: 96625
-  path: avian_influenza_kucharski.xlsx
+  path: avian_influenza_h5n1_kucharski.xlsx

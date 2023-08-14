@@ -280,7 +280,16 @@ steps:
   - snapshot://who/2023-08-14/avian_influenza_ah5n1.csv
   data://garden/who/2023-08-14/avian_influenza_ah5n1:
   - data://meadow/who/2023-08-14/avian_influenza_ah5n1
+  - data://garden/regions/2023-01-01/regions
   data://grapher/who/2023-08-14/avian_influenza_ah5n1:
   - data://garden/who/2023-08-14/avian_influenza_ah5n1
-  data://grapher/who/2023-08-14/avian_influenza_ah5n1_year:
-  - data://garden/who/2023-08-14/avian_influenza_ah5n1
+
+
+# Kucharski
+  data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski:
+  - snapshot://health/2023-08-14/avian_influenza_h5n1_kucharski.xlsx
+  data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski:
+  - data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski
+  - data://garden/regions/2023-01-01/regions
+  data://grapher/health/2023-08-14/avian_influenza_h5n1_kucharski:
+  - data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski
