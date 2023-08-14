@@ -489,7 +489,7 @@ class Table(pd.DataFrame):
     def prune_metadata(self) -> "Table":
         """Prune metadata for columns that are not in the table. This can happen after slicing
         the table by columns."""
-        self._fields = {col: self._fields[col] for col in self.all_columns}
+        self._fields = defaultdict(VariableMeta, {col: self._fields[col] for col in self.all_columns})
         return self
 
     def copy(self, deep: bool = True) -> "Table":

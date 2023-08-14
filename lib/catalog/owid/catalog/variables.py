@@ -5,6 +5,7 @@
 import copy
 import json
 import os
+from collections import defaultdict
 from typing import Any, Dict, List, Literal, Optional, Union, cast, overload
 
 import pandas as pd
@@ -71,7 +72,7 @@ class Variable(pd.Series):
         _fields: Optional[Dict[str, VariableMeta]] = None,
         **kwargs: Any,
     ) -> None:
-        self._fields = _fields or {}
+        self._fields = _fields or defaultdict(VariableMeta)
 
         # silence warning
         if data is None and not kwargs.get("dtype"):
@@ -309,7 +310,9 @@ class Variable(pd.Series):
     def copy(self, deep: bool = True) -> "Variable":
         new_var = super().copy(deep=deep)
         if deep:
-            new_var._fields = {k: var_meta.copy(deep=deep) for k, var_meta in self._fields.items()}
+            new_var._fields = defaultdict(
+                VariableMeta, {k: var_meta.copy(deep=deep) for k, var_meta in self._fields.items()}
+            )
         return new_var
 
 
@@ -646,8 +649,8 @@ def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool 
 
 def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool = False) -> Optional[Variable]:
     if inplace:
-        to_variable.metadata = copy.deepcopy(from_variable.metadata)
+        to_variable.metadata = from_variable.metadata.copy()
     else:
-        new_variable = copy.deepcopy(to_variable)
-        new_variable.metadata = copy.deepcopy(from_variable.metadata)
+        new_variable = to_variable.copy()
+        new_variable.metadata = from_variable.metadata.copy()
         return new_variable
