@@ -1,0 +1,13 @@
+dataset:
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-08-14
+tables:
+  gbif_animal_presence:
+    variables:
+      animal_presence_human_observations:
+        title: animal_presence_human_observations
+        unit: observations
+        description: Recorded human observations of animal presence in the Global Biodiversity Information Facility database.
