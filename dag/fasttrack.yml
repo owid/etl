@@ -92,3 +92,5 @@ steps:
   - snapshot-private://fasttrack/latest/antimicrobial_usage_livestock.csv
   data://grapher/fasttrack/2023-08-07/pain_hours_days_hen_systems:
   - snapshot://fasttrack/2023-08-07/pain_hours_days_hen_systems.csv
+  data-private://grapher/fasttrack/latest/historical_france_mortality_cause:
+  - snapshot-private://fasttrack/latest/historical_france_mortality_cause.csv
