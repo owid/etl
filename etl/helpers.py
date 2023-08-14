@@ -16,6 +16,8 @@ from owid import catalog
 from owid.catalog import CHANNEL, DatasetMeta, Table
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
 from owid.catalog.tables import (
+    combine_tables_description,
+    combine_tables_title,
     get_unique_licenses_from_tables,
     get_unique_origins_from_tables,
     get_unique_sources_from_tables,
@@ -121,17 +123,21 @@ def create_dataset(
     from etl.steps.data.converters import convert_snapshot_metadata
 
     if default_metadata is None:
+        # Get titles and descriptions from the tables.
+        # Note: If there are different titles or description, the result will be None.
+        title = combine_tables_title(tables=tables)
+        description = combine_tables_description(tables=tables)
         # If not defined, gather origins and licenses from the metadata of the tables.
         licenses = get_unique_licenses_from_tables(tables=tables)
         if any(["origins" in table[column].metadata.to_dict() for table in tables for column in table.columns]):
             # If any of the variables contains "origins" this means that it is a recently created dataset.
             # Gather origins from all variables in all tables.
             origins = get_unique_origins_from_tables(tables=tables)
-            default_metadata = DatasetMeta(licenses=licenses, origins=origins)
+            default_metadata = DatasetMeta(licenses=licenses, origins=origins, title=title, description=description)
         else:
             # None of the variables includes "origins", which means it is an old dataset, with "sources".
             sources = get_unique_sources_from_tables(tables=tables)
-            default_metadata = DatasetMeta(licenses=licenses, sources=sources)
+            default_metadata = DatasetMeta(licenses=licenses, sources=sources, title=title, description=description)
     elif isinstance(default_metadata, SnapshotMeta):
         # convert snapshot SnapshotMeta to DatasetMeta
         default_metadata = convert_snapshot_metadata(default_metadata)
@@ -907,12 +913,15 @@ def run_version_tracker_checks():
     VersionTracker().apply_sanity_checks()
 
 
-def print_tables_metadata_template(tables: List[Table]):
+def print_tables_metadata_template(tables: Union[Table, List[Table]]):
     # This function is meant to be used when creating code in an interactive window (or a notebook).
     # It prints a template for the metadata of the tables in the list.
     # The template can be copied and pasted into the corresponding yaml file.
     # In the future, we should have an interactive tool to add or edit the content of the metadata yaml files, using
     # AI-generated texts when possible.
+
+    if isinstance(tables, Table):
+        tables = [tables]
 
     # Initialize output dictionary.
     dict_tables = {}
