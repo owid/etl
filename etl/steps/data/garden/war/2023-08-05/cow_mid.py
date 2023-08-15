@@ -228,11 +228,12 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     ## By region and hostility_level
     tb_ongoing = tb.groupby(["year", "region", "hostility_level"], as_index=False).agg(ops)
     ## region='World' and by hostility_level
-    tb_ongoing_world = tb.groupby(["year", "hostility_level"], as_index=False).agg(ops)
+    tb_ = tb.groupby(["dispnum", "year"], as_index=False).agg({"hostility_level": max})
+    tb_ongoing_world = tb_.groupby(["year", "hostility_level"], as_index=False).agg(ops)
     tb_ongoing_world["region"] = "World"
 
     ops = {"dispnum": "nunique", "fatalpre": sum}
-    ## By region and hostility_level='all
+    ## By region and hostility_level='all'
     tb_ongoing_alltypes = tb.groupby(["year", "region"], as_index=False).agg(ops)
     tb_ongoing_alltypes["hostility_level"] = "all"
     ## region='World' and hostility_level='all'
@@ -271,12 +272,13 @@ def _add_new_metrics(tb: Table) -> Table:
 
     # World
     ## Keep one row per (dispnum). Otherwise, we might count the same dispute in multiple years!
-    tb_ = tb.sort_values("styear").drop_duplicates(subset=["dispnum"], keep="first")
+    tb_ = tb.groupby(["dispnum", "styear"], as_index=False).agg({"hostility_level": max})
+    # tb_ = tb.sort_values("styear").drop_duplicates(subset=["dispnum"], keep="first")
     ## region='World' and by hostility_level
-    tb_new_world = tb.groupby(["styear", "hostility_level"], as_index=False).agg(ops)
+    tb_new_world = tb_.groupby(["styear", "hostility_level"], as_index=False).agg(ops)
     tb_new_world["region"] = "World"
     ## World and hostility_level='all'
-    tb_new_world_alltypes = tb.groupby(["styear"], as_index=False).agg(ops)
+    tb_new_world_alltypes = tb_.groupby(["styear"], as_index=False).agg(ops)
     tb_new_world_alltypes["region"] = "World"
     tb_new_world_alltypes["hostility_level"] = "all"
 
