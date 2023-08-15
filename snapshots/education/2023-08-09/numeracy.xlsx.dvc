@@ -1,0 +1,27 @@
+meta:
+  name: Historical numeracy estimates (Clio Infra, 1500-1970)
+  publication_year: 2013
+  publication_date: '2013-12-26'
+  source_name: Clio Infra
+  source_published_by: Baten, Joerg, University of Tuebingen.; with the help of several
+    coauthors, without implying any responsibility to them for potential mistakes
+    (Valeria Prayon, Dorothee Crayen, Dácil Juif, Ralph Hippe, Christina Mumme and
+    many others)
+  url: https://clio-infra.eu/Indicators/NumeracyTotal.html
+  source_data_url: https://clio-infra.eu/data/Numeracy(Total)_Compact.xlsx
+  license_url: https://clio-infra.eu/index.html#about
+  license_name: ''
+  date_accessed: 2023-08-09
+  is_public: true
+  description: |
+    Age heaping refers to the tendency for age data collected in surveys or censuses to be disproportionately reported at certain "attractive" or "round" numbers. This phenomenon often manifests itself in ages being reported at numbers that end in 0 or 5.
+
+    For example, when people are asked their age, they might be more likely to report it as 30, 35, 40, etc., rather than the exact age of 31, 36, or 39.
+
+    The authors of this dataset use this “age heaping” to measure cognitive ability in quantitative reasoning, or “numeracy” and construct a database of age heaping-based estimates of basic numeracy with broad geographic and temporal coverage.
+
+wdir: ../../../data/snapshots/education/2023-08-09
+outs:
+- md5: 7b01bc2416fc72ec6103e58201fa737d
+  size: 217881
+  path: numeracy.xlsx
