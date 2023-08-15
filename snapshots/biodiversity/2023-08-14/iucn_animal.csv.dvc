@@ -1,6 +1,7 @@
 meta:
   name: Number of animal species listed in each IUCN Red List Category by country
-  publication_date: '2022'
+  publication_date: 2022
+  publication_year: 2022
   source_name: IUCN (2022)
   source_published_by: IUCN. 2022. The IUCN Red List of Threatened Species. Version
     2022-2. https://www.iucnredlist.org. Accessed on [14 August 2023]
