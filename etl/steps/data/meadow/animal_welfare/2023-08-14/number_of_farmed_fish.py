@@ -12,7 +12,7 @@ from etl.snapshot import Snapshot
 paths = PathFinder(__file__)
 
 # Title for the resulting dataset and its main table.
-TITLE = "Number of farmed fish killed for food"
+TITLE = "Number of farmed fish killed for food (Fishcount, 2018)"
 
 
 def find_number_of_lines_to_skip(file_name: Path) -> int:
