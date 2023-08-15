@@ -1,4 +1,17 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""COW Militarised Inter-state Dispute dataset.
+
+
+- This dataset only contains inter-state conflicts. We use the hostility level to differentiate different "types" of conflicts.
+
+- The same conflict might be happening in different regions, with different hostility levels. This is important to consider when
+estimating the global number of ongoing (or new) conflicts by broken down by hostility level
+
+    - Such a conflict (occuring in mutliple regions at the same time with different hostility levels) has been coded using the
+    most hostile category at global level.
+
+- Each entry in this dataset describes a conflict (its participants and period). Therefore we need to "explode" it to add observations
+for each year of the conflict.
+"""
 
 from typing import cast
 
