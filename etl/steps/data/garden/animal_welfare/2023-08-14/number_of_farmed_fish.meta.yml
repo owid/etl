@@ -18,6 +18,8 @@ tables:
           Lower bound estimate of the number of farmed fish.
 
           {definitions.common}
+        display:
+          numDecimalPlaces: 0
       n_farmed_fish:
         title: Estimated number of farmed fish
         unit: 'fish'
@@ -26,6 +28,8 @@ tables:
           Midpoint estimate of the number of farmed fish in the world, calculated as the average between the lower and upper limit estimates.
 
           {definitions.common}
+        display:
+          numDecimalPlaces: 0
       n_farmed_fish_high:
         title: Estimated number of farmed fish (upper bound)
         unit: 'fish'
@@ -34,3 +38,5 @@ tables:
           Upper bound estimate of the number of farmed fish.
 
           {definitions.common}
+        display:
+          numDecimalPlaces: 0
