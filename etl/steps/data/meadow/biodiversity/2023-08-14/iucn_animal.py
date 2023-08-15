@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb["year"] = snap.metadata.source.publication_year
+    tb["year"] = 2022
     tb = tb.rename(columns={"name": "country"})
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
