@@ -93,8 +93,23 @@
                 "format": "date"
               },
               "date_published": {
-                "type": "string",
-                "format": "date"
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9]{4}$"
+                  },
+                  {
+                    "type": "string",
+                    "enum": ["latest"]
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ]
               },
               "license": {
                 "type": "object",

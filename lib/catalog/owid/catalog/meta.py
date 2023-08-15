@@ -141,8 +141,8 @@ class Origin:
 
     def __post_init__(self):
         if self.date_published:
-            # convert date to string
-            if isinstance(self.date_published, dt.date):
+            # convert date or int to string
+            if isinstance(self.date_published, (dt.date, int)):
                 self.date_published = YearDateLatest(str(self.date_published))
 
             if self.date_published != "latest" and not is_year_or_date(self.date_published):
