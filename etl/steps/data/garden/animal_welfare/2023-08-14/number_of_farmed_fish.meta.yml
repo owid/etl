@@ -1,3 +1,6 @@
+dataset:
+  title: Number of farmed fish killed for food
+
 definitions:
   common: |-
     This study estimates the annual number of farmed fish slaughtered for food using data on aquaculture production tonnages (from the Food and Agriculture Organization of the United Nations) and mean weights estimated from available fish size data (from a range of internet sources).
