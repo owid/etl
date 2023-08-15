@@ -913,15 +913,12 @@ def run_version_tracker_checks():
     VersionTracker().apply_sanity_checks()
 
 
-def print_tables_metadata_template(tables: Union[Table, List[Table]]):
+def print_tables_metadata_template(tables: List[Table]):
     # This function is meant to be used when creating code in an interactive window (or a notebook).
     # It prints a template for the metadata of the tables in the list.
     # The template can be copied and pasted into the corresponding yaml file.
     # In the future, we should have an interactive tool to add or edit the content of the metadata yaml files, using
     # AI-generated texts when possible.
-
-    if isinstance(tables, Table):
-        tables = [tables]
 
     # Initialize output dictionary.
     dict_tables = {}
