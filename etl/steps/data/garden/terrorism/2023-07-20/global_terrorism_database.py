@@ -120,9 +120,6 @@ def run(dest_dir: str) -> None:
     tb.loc[(tb["nkill"] >= 51) & (tb["nkill"] <= 100), "severity"] = "51-99 deaths"
     tb.loc[(tb["nkill"] > 100), "severity"] = "100+"
 
-    # For the total_regions_df
-    total_regions_df = generate_summary_dataframe(tb, "region_txt", ["nkill", "nwound"])
-
     # For the total_attack_type
     total_attack_type = generate_summary_dataframe(tb, "attacktype1_txt", ["nkill", "nwound"])
 
@@ -138,12 +135,6 @@ def run(dest_dir: str) -> None:
     total_severity = severity(tb)
     # Create a dictionary to store all pivot tables
     pivot_tables = {
-        "regions": pivot_dataframe(
-            total_regions_df,
-            index_columns=["year"],
-            pivot_column="region_txt",
-            value_columns=["total_nkill", "total_nwound", "total_incident_counts"],
-        ),
         "attack_type": pivot_dataframe(
             total_attack_type,
             index_columns=["year", "country"],
@@ -171,11 +162,11 @@ def run(dest_dir: str) -> None:
     }
 
     # Merge all pivot tables
-    merged_df = pivot_tables["regions"]
+    merged_df = pivot_tables["attack_type"]
     for key in pivot_tables:
         if key == "target":
             pivot_tables[key] = add_suffix(pivot_tables[key], "_target")
-        if key != "regions":
+        if key != "attack_type":
             merged_df = pd.merge(merged_df, pivot_tables[key], on=["year", "country"], how="outer")
 
     merge_all = pd.merge(total_df, merged_df, on=["country", "year"], how="outer")
