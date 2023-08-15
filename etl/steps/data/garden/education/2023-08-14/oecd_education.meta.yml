@@ -25,32 +25,32 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       average_years_of_education:
         title:  Average years of education by region, 1850-2010
         unit: 'years'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       literacy:
         title: World development of literacy, 1820-2010
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       best_guess:
         title: Best guess for world development of at least basic education, 1820
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       educational_attainment:
         title: World development of at least basic education, 1870-2010
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
