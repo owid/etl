@@ -11,6 +11,9 @@ from etl.snapshot import Snapshot
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Title for the resulting dataset and its main table.
+TITLE = "Number of farmed decapod crustaceans killed for food"
+
 
 def find_number_of_lines_to_skip(file_name: Path) -> int:
     """Find number of lines to skip in file."""
@@ -75,6 +78,9 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
+    # Update the title of the main table (the same title will be used for the dataset).
+    tb.metadata.title = TITLE
+
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_meadow.save()

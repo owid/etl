@@ -1,6 +1,3 @@
-dataset:
-  title: Number of farmed decapod crustaceans killed for food
-
 definitions:
   common: |
     This study estimates the annual number of farmed decapod crustaceans slaughtered for food using data on aquaculture production tonnages (from the Food and Agriculture Organization of the United Nations) and mean weights estimated from available decapod crustaceans size data (from a range of internet sources). For species categories where no estimated mean weight was obtained, a generic mean weight was used to estimate numbers.
