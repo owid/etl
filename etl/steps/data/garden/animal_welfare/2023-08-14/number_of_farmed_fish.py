@@ -106,9 +106,6 @@ def run(dest_dir: str) -> None:
     # Run sanity checks on outputs.
     run_sanity_checks_on_outputs(tb=tb)
 
-    # TODO: Decide what to do about global data, which does not include fish without EMW.
-    #  All country curves seem to follow a similar pattern, which is suspicious.
-
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 

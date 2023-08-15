@@ -14,15 +14,9 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load garden dataset.
+    # Load garden dataset and read its main table.
     ds_garden = cast(Dataset, paths.load_dependency("number_of_farmed_fish"))
-
-    # Read table from garden dataset.
     tb = ds_garden["number_of_farmed_fish"]
-
-    #
-    # Process data.
-    #
 
     #
     # Save outputs.

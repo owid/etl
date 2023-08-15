@@ -1,5 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
+from pathlib import Path
+
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -10,7 +12,7 @@ from etl.snapshot import Snapshot
 paths = PathFinder(__file__)
 
 
-def find_number_of_lines_to_skip(file_name: str) -> int:
+def find_number_of_lines_to_skip(file_name: Path) -> int:
     """Find number of lines to skip in file."""
     temp = pr.read_excel(file_name, header=None)
     line_number = [i for i, line in enumerate(temp[temp.columns[0]]) if str(line).strip().lower() == "country"]
@@ -18,7 +20,7 @@ def find_number_of_lines_to_skip(file_name: str) -> int:
     return line_number[0]
 
 
-def process_yearly_data(tb_i: Table, year: str) -> Table:
+def process_yearly_data(tb_i: Table, year: int) -> Table:
     # Remove empty rows and use last row for a global total.
     tb_i = tb_i.dropna(how="all")
     assert len(tb_i[tb_i["Country"].isnull()]) < 2, "At most one row was expected to be empty."
