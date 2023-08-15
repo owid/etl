@@ -33,4 +33,4 @@ wdir: ../../../data/snapshots/war/2023-03-14
 outs:
 - md5: ebdf452ee71231abba84080db47d2fa0
   size: 346286
-  path: cow.inter_state_dyadic.csv
+  path: cow.inter_state_dyadic.zip

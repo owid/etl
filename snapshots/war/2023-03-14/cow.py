@@ -30,7 +30,7 @@ def main(upload: bool) -> None:
         f"war/{SNAPSHOT_VERSION}/cow.non_state.csv",
         f"war/{SNAPSHOT_VERSION}/cow.intra_state.zip",
         f"war/{SNAPSHOT_VERSION}/cow.inter_state.csv",
-        f"war/{SNAPSHOT_VERSION}/cow.inter_state_dyadic.csv",
+        f"war/{SNAPSHOT_VERSION}/cow.inter_state_dyadic.zip",
         f"war/{SNAPSHOT_VERSION}/cow.extra_state.csv",
     ]
     for path in snapshot_paths:

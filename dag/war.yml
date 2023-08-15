@@ -25,6 +25,7 @@ steps:
   data://meadow/war/2023-06-07/cow:
     - snapshot://war/2023-03-14/cow.extra_state.csv
     - snapshot://war/2023-03-14/cow.inter_state.csv
+    - snapshot://war/2023-03-14/cow.inter_state_dyadic.zip
     - snapshot://war/2023-03-14/cow.intra_state.zip
     - snapshot://war/2023-03-14/cow.non_state.csv
   data://meadow/war/2023-06-22/ucdp:
