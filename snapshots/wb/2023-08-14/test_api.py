@@ -18,10 +18,13 @@ def api_health() -> str:
     return health
 
 
-def api_aux_tables(health):
+def pip_aux_tables():
     """
     Download aux tables if the API is running.
     """
+
+    health = api_health()
+
     aux_tables_list = [
         "aux_versions",
         "countries",
@@ -62,30 +65,93 @@ def api_aux_tables(health):
         log.error(f"Health check: {health}")
 
 
-def api_versions(health) -> dict:
+def pip_versions() -> dict:
     """
     Download aux tables if the API is running.
     """
+
+    health = api_health()
+
     if health == "PIP API is running":
         log.info(f"Health check: {health}")
 
         df = pd.read_csv("https://api.worldbank.org/pip/v1/versions?format=csv")
+        df = df[["ppp_version", "release_version", "version"]]
 
         # Obtain the max release_version
         max_release_version = df["release_version"].max()
 
         # Get the version for ppp_versions 2011 and 2017
-        ppp_versions = (
-            df[df["release_version"] == max_release_version][["ppp_version", "release_version", "version"]]
-            .set_index()
-            .to_dict()
-        )
+        versions = df[df["release_version"] == max_release_version]
+
+        # Set index and convert to dict
+        versions = versions.set_index("ppp_version", verify_integrity=True).sort_index().to_dict(orient="index")
 
     else:
         log.error(f"Health check: {health}")
 
-    return ppp_versions
+    log.info("PIP dataset versions extracted")
+
+    return versions
 
 
-ppp_versions = api_versions(health=api_health())
-print(f"{ppp_versions[0]}")
+def pip_query(
+    popshare_or_povline,
+    value,
+    country_code="all",
+    year="all",
+    fill_gaps="true",
+    welfare_type="all",
+    reporting_level="all",
+    ppp_version="2017",
+) -> pd.DataFrame:
+    """
+    Query the PIP API.
+    """
+
+    health = api_health()
+    versions = pip_versions()
+
+    if health == "PIP API is running":
+        log.info(f"Health check: {health}")
+
+        if ppp_version in ["2011", "2017"]:
+            # convert ppp_version to integer
+            ppp_version = int(ppp_version)
+            version = versions[ppp_version]["version"]
+            release_version = versions[ppp_version]["release_version"]
+
+            df = pd.read_csv(
+                f"https://api.worldbank.org/pip/v1/pip?{popshare_or_povline}={value}&country={country_code}&year={year}&fill_gaps={fill_gaps}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
+            )
+
+        elif ppp_version == "all":
+            df = pd.DataFrame()
+            for ppp_version in versions.keys():
+                version = versions[ppp_version]["version"]
+                release_version = versions[ppp_version]["release_version"]
+
+                df_ppp = pd.read_csv(
+                    f"https://api.worldbank.org/pip/v1/pip?{popshare_or_povline}={value}&country={country_code}&year={year}&fill_gaps={fill_gaps}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
+                )
+                df_ppp["ppp_version"] = ppp_version
+                df = pd.concat([df, df_ppp], ignore_index=True)
+
+    else:
+        log.error(f"Health check: {health}")
+
+    log.info(f"PIP query executed for {popshare_or_povline}={value} (ppp_version={ppp_version})")
+
+    return df
+
+
+df = pip_query(
+    popshare_or_povline="povline",
+    value=2.15,
+    country_code="all",
+    year="all",
+    fill_gaps="true",
+    welfare_type="all",
+    reporting_level="all",
+    ppp_version="all",
+)
