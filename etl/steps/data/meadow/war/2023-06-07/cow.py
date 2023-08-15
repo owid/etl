@@ -36,7 +36,7 @@ def run(dest_dir: str) -> None:
     #
 
     tables = []
-    # CSV to tables
+    # CSVs to tables
     uri_shortname = {
         "cow.extra_state.csv": "extra_state",
         "cow.inter_state.csv": "inter_state",
@@ -50,6 +50,7 @@ def run(dest_dir: str) -> None:
         tb = Table(df, short_name=short_name, underscore=True)
         tables.append(tb)
     # ZIP to table
+    ## Intra-state
     snap = cast(Snapshot, paths.load_dependency("cow.intra_state.zip"))
     with tempfile.TemporaryDirectory() as tmpdir:
         decompress_file(snap.path, tmpdir)
@@ -61,7 +62,18 @@ def run(dest_dir: str) -> None:
         df = pd.read_csv(path, encoding=encoding)
         tb = Table(df, short_name="intra_state", underscore=True)
         tables.append(tb)
-
+    ## Inter-state (dydadic)
+    snap = cast(Snapshot, paths.load_dependency("cow.inter_state_dyadic.zip"))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        decompress_file(snap.path, tmpdir)
+        path = os.path.join(
+            tmpdir, "directed_dyadic_war.csv"
+        )  # other file: "INTRA-STATE_State_participants v5.1 CSV.csv"
+        encoding = infer_encoding(path)
+        log.info(f"cow: creating table from {snap.path}")
+        df = pd.read_csv(path, encoding=encoding)
+        tb = Table(df, short_name="inter_state_dyadic", underscore=True)
+        tables.append(tb)
     #
     # Save outputs.
     #
