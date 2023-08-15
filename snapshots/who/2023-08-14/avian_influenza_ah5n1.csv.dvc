@@ -1,0 +1,46 @@
+meta:
+  name: Human Cases with Highly Pathogenic Avian Influenza A/H5N1 (WHO, 2023)
+  publication_year: 2023
+  source_name: WHO, Global Influenza Programme (2023)
+  source_published_by: >-
+    Human Cases with Highly Pathogenic Avian Influenza A/H5N1.
+    World Health Organization, Global Influenza Programme; 2023. Licence: CC BY-NC-SA
+    3.0 IGO.
+  url: https://www.cdc.gov/flu/avianflu/chart-epi-curve-ah5n1.html
+  source_data_url:
+  license_url: https://www.who.int/about/policies/publishing/copyright
+  license_name: CC BY-NC-SA 3.0 IGO
+  date_accessed: 2023-08-14
+  is_public: true
+  description: >-
+    This dataset contains all human infections with HPAI H5N1 bird flu virus reported
+    to the World Health Organization (WHO), since the first human cases in 1997.
+
+
+    H5N1 bird flu viruses first emerged in southern China in 1996. Those viruses caused
+    large poultry outbreaks in Hong Kong in 1997, which resulted in 18 human infections.
+    The 1997 bird outbreak was controlled, but the H5N1 bird flu viruses were not
+    eradicated in birds and re-surfaced in 2003 to spread widely in birds throughout
+    Asia,
+    and later in Africa, Europe, and the Middle East, causing poultry outbreaks and
+    sporadic human infections. Since 2003, more than 20 countries have reported more
+    than 860 human infections with H5N1 bird flu viruses to WHO.
+
+
+    H5N1 bird flu viruses that are currently circulating in wild birds and poultry
+    in much of the world are genetically different from earlier versions of the virus
+    and
+    emerged to become the predominant subtype of HPAI H5 in the fall of 2021. These
+    viruses have caused sporadic poultry infections and poultry outbreaks in many
+    countries,
+    most recently the United States. In contrast to previous H5N1 viruses, which still
+    circulate to a lesser extent in several countries, at this time, fewer than 10
+    cases
+    with current H5N1 bird flu viruses have been reported globally. However, illness
+    in humans from all bird flu virus infections has ranged in severity from no symptoms
+    or mild illness to severe disease that resulted in death.
+wdir: ../../../data/snapshots/who/2023-08-14
+outs:
+- md5: 16498ed922a90d22c50a4b465e9c5255
+  size: 21641
+  path: avian_influenza_ah5n1.csv
