@@ -11,6 +11,8 @@ estimating the global number of ongoing (or new) conflicts by broken down by hos
 
 - Each entry in this dataset describes a conflict (its participants and period). Therefore we need to "explode" it to add observations
 for each year of the conflict.
+
+- The number of deaths is not estimated for each hostile level, but rather only the aggregate is obtained.
 """
 
 from typing import cast
