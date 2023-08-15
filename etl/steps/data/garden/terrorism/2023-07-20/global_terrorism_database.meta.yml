@@ -1356,7 +1356,7 @@ tables:
           in the "Additional Notes" field.
         unit: deaths
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
       share_of_deaths:
         title: Share of deaths from terrorism
         description: >
@@ -1382,6 +1382,7 @@ tables:
         display:
           name: Deaths per non-suicide attack
           numDecimalPlaces: 0
+
       injured_per_suicide_attack:
         title: Terrorism injuries per suicide attack
         description: The incident was a suicide attack.
