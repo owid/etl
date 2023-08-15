@@ -1,0 +1,21 @@
+meta:
+  origin:
+    dataset_title_owid: Number of farmed decapod crustaceans in 2015
+    dataset_title_producer: |-
+      Estimated numbers of individuals in annual global aquaculture production (FAO) of decapod species (2015)
+    dataset_description_owid: |-
+      Estimated number of individual decapod crustaceans in annual aquaculture production in 2015.
+    producer: Fishcount
+    citation_producer: |-
+      Fishcount.org.uk based on data from the Food and Agriculture Organization of the United Nations.
+    dataset_url_main: http://fishcount.org.uk/
+    dataset_url_download: http://fishcount.org.uk/studydatascreens2/2015/Farmed-decapods-2015.xlsx
+    date_published: '2016'
+    date_accessed: 2023-08-15
+  license:
+    name: CC BY
+wdir: ../../../data/snapshots/animal_welfare/2023-08-15
+outs:
+- md5: 1be2a6587aa2316eda7d312106ed19d5
+  size: 215682
+  path: number_of_farmed_decapod_crustaceans_2015.xlsx

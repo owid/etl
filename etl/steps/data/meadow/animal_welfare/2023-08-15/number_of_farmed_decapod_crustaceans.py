@@ -12,7 +12,7 @@ from etl.snapshot import Snapshot
 paths = PathFinder(__file__)
 
 # Title for the resulting dataset and its main table.
-TITLE = "Number of farmed fish killed for food (Fishcount, 2018)"
+TITLE = "Number of farmed decapod crustaceans killed for food (Fishcount, 2018)"
 
 
 def find_number_of_lines_to_skip(file_name: Path) -> int:
@@ -38,10 +38,12 @@ def process_yearly_data(tb_i: Table, year: int) -> Table:
     tb_i = tb_i.rename(
         columns={
             "Numbers (lower) millions": "Estimated numbers (millions) lower",
-            "Numbers (upper) millions": "Estimated numbers (millions) upper",
+            # There is a typo in a column of the 2015 file.
+            "Numberws (upper) millions": "Estimated numbers (millions) upper",
             # It is unclear whether the following mapping is correct, but we will not use these columns anyway.
             "mean weight (lower)": "Weighted estimated mean weight (lower) (same as L except for some Rainbow trout)",
-            "mean weight (upper)": "Weighted estimated mean weight (upper) (same as L except for some Rainbow trout)",
+            # There is a typo in a column of the 2015 file.
+            "mean weight (upprr)": "Weighted estimated mean weight (upper) (same as L except for some Rainbow trout)",
         },
         errors="ignore",
     )
@@ -59,7 +61,7 @@ def run(dest_dir: str) -> None:
     # Retrieve and process snapshots.
     tb = Table(short_name=paths.short_name)
     for year in [2015, 2016, 2017]:
-        snap_i: Snapshot = paths.load_dependency(f"number_of_farmed_fish_{year}.xlsx")
+        snap_i: Snapshot = paths.load_dependency(f"number_of_farmed_decapod_crustaceans_{year}.xlsx")
         tb_i = pr.read_excel(
             snap_i.path, skiprows=find_number_of_lines_to_skip(snap_i.path), metadata=snap_i.to_table_metadata()
         )
