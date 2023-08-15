@@ -1,7 +1,7 @@
 dataset:
   title: History of war (Gibler and Miller, 2020)
   description: >-
-      This dataset contains information on armed conflicts, both internal and external, in the period of 1816 and 2014.
+      This dataset contains information on interstate conflicts in the period of 1816 and 2014.
 
 
       It has been constructed using the Militarized Interstate Events (MIE) Dataset (version 1) by D. M. Gibler and S. V. Miller.
