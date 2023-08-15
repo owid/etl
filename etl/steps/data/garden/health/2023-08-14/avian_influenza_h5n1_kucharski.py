@@ -102,7 +102,7 @@ def add_world(tb: Table) -> Table:
     tb_world = tb[~tb["country"].isin(REGIONS)].copy()
 
     # Aggregate
-    tb_world = tb.groupby("date", as_index=False)["avian_cases"].sum()
+    tb_world = tb_world.groupby("date", as_index=False)["avian_cases"].sum()
     tb_world["country"] = "World"
 
     # Combine
