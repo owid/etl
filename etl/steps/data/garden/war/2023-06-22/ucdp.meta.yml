@@ -1,10 +1,25 @@
 dataset:
   title: History of war (UCDP, 2023)
   description: >-
-    This dataset contains information on armed conflicts, both internal and external, in the period of 1989 and 2022.
+    This dataset contains information on armed conflicts - state, non-state and one-sided conflicts, in the period of 1989 and 2022.
 
 
     It has been constructed using the Georeferenced Event Dataset version 23.1 by the UCDP.
+
+
+    Regions: The regions are defined based on Gleditsch and Ward codes (GWno). Find complete mapping at
+    https://dornsife.usc.edu/assets/sites/298/docs/country_to_gwno_PUBLIC_6-5-2015.txt
+
+      • Americas: 2-199
+
+      • Europe: 200-399
+
+      • Africa: 400-626
+
+      • Middle East: 630-699
+
+      • Asia: 700-999
+
 
 
     More details about Georeferenced Event Dataset version 23.1 by the UCDP:
