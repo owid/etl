@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1588
+    date_accessed: 2023-08-16 08:23:04.516760
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1588_other_neurological_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b5d777f07fc5af36cc22adca19e19dba
+  size: 31895
+  path: dataset_1588_other_neurological_disorders_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1535
+    date_accessed: 2023-08-14 05:48:10.933739
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1535_other_pharynx_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2e1c5466aa9a34301d958773152f023e
+  size: 26968
+  path: dataset_1535_other_pharynx_cancer_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1061
+    date_accessed: 2023-08-14 14:45:24.689132
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank Global Findex - Financial Sector: Exchange rates & prices'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3c2d753138757ed2bf4b4a078a8e3710
+  size: 12210
+  path: 
+    dataset_1061_world_bank_global_findex__financial_sector__exchange_rates__and__prices_values.feather

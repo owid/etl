@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4512
+    date_accessed: 2023-08-14 05:36:57.303559
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Annual mean levels of fine particulate matter in cities, urban population
+    (micrograms per cubic meter)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2f18b0116242dcd782d2207672ae5680
+  size: 15602
+  path: 
+    dataset_4512_annual_mean_levels_of_fine_particulate_matter_in_cities__urban_population__micrograms_per_cubic_meter_values.feather

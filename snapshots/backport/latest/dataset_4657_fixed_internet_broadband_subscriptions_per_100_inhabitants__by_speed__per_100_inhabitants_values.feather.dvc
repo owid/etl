@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4657
+    date_accessed: 2023-08-16 08:51:29.182756
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Fixed Internet broadband subscriptions per 100 inhabitants, by speed (per
+    100 inhabitants)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a1eb4579965c333470010ef1b21f3c74
+  size: 45706
+  path: 
+    dataset_4657_fixed_internet_broadband_subscriptions_per_100_inhabitants__by_speed__per_100_inhabitants_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2262
+    date_accessed: 2023-08-14 15:42:51.341236
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2262_other_musculoskeletal_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0a6391740e0d301e9abf436b6caa77d4
+  size: 33166
+  path: dataset_2262_other_musculoskeletal_disorders_config.json

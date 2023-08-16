@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_4189_inequality_pre__and_post__taxes__oecd__2019_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:23:00.881136
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4189
+    date_accessed: 2023-08-10 14:58:59.914139
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Inequality pre- and post- taxes - OECD (2019)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4189
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1cee374f5b1dd57ad5f22203d8f4698d
+- md5: 5047bbee15ff3f1cba1af8956ca40096
   size: 9898
   path: dataset_4189_inequality_pre__and_post__taxes__oecd__2019_values.feather

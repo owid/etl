@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4570
+    date_accessed: 2023-08-14 15:18:49.988047
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Mountain green cover area (square kilometres)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4b5ca1ef9681549af7e1be0bff2b329c
+  size: 13066
+  path: dataset_4570_mountain_green_cover_area__square_kilometres_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2197
+    date_accessed: 2023-08-11 07:35:18.734541
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2197_tension_type_headache (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: db8a36e879739738ce34d5056ddfaf7e
+  size: 32746
+  path: dataset_2197_tension_type_headache_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5680
+    date_accessed: 2023-08-16 08:34:41.520008
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5680_air_pollution_emissions_by_fuel_per_capita__ceds__2022
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 07bb1820d278e738160ff116c98b3e9e
+  size: 46735
+  path: dataset_5680_air_pollution_emissions_by_fuel_per_capita__ceds__2022_config.json

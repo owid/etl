@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_223_historical_world_population_comparison__various_sources_values
-  file_extension: feather
-  date_accessed: 2023-04-14 17:10:23.517563
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/223
+    date_accessed: 2023-08-16 09:54:04.569523
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Historical world population comparison (various sources)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/223
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9d7fc7e762f851c17b9ba4264e7e792e
+- md5: b664c75402fd1c79c1bc2ac3bd44c846
   size: 11082
-  path: dataset_223_historical_world_population_comparison__various_sources_values.feather
+  path: 
+    dataset_223_historical_world_population_comparison__various_sources_values.feather

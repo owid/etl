@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5243
+    date_accessed: 2023-08-16 10:02:32.358748
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: OECD Collective Bargaining Coverage
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bd6d79bf2452536dd7e65d0a79432ebe
+  size: 11466
+  path: dataset_5243_oecd_collective_bargaining_coverage_values.feather

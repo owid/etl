@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1606
+    date_accessed: 2023-08-16 09:58:47.976242
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Neglected tropical diseases and malaria
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b217d501cfe52e77cd8cee03461ea247
+  size: 2012058
+  path: dataset_1606_neglected_tropical_diseases_and_malaria_values.feather

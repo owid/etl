@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2059
+    date_accessed: 2023-08-14 15:23:53.437840
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Manufacturing employment as a proportion of total employment
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 522ba5b16d332559dc5fcf758d2ee3fb
+  size: 20274
+  path: 
+    dataset_2059_manufacturing_employment_as_a_proportion_of_total_employment_values.feather

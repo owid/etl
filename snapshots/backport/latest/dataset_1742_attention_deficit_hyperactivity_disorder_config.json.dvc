@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1742
+    date_accessed: 2023-08-14 05:41:54.994521
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1742_attention_deficit_hyperactivity_disorder
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 667af8f7cffdbdf0251b5f4eb43605a6
+  size: 17048
+  path: dataset_1742_attention_deficit_hyperactivity_disorder_config.json

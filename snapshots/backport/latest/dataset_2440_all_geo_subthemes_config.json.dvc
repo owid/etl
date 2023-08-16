@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2440
+    date_accessed: 2023-08-16 10:14:35.373297
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2440_all_geo_subthemes (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: edc1575f5600641847a9f1f74706f67a
+  size: 2573
+  path: dataset_2440_all_geo_subthemes_config.json

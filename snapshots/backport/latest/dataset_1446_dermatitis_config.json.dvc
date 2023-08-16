@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1446
+    date_accessed: 2023-08-16 08:42:10.505674
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1446_dermatitis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9a93e21b0854967157d279415d2ebfa9
+  size: 16418
+  path: dataset_1446_dermatitis_config.json

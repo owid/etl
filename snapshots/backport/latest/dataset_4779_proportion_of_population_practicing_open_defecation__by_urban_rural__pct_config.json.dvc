@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4779
+    date_accessed: 2023-08-16 09:44:44.206904
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4779_proportion_of_population_practicing_open_defecation__by_urban_rural__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ecc96eb502ae0f400d973fcb61a5b938
+  size: 18148
+  path: 
+    dataset_4779_proportion_of_population_practicing_open_defecation__by_urban_rural__pct_config.json

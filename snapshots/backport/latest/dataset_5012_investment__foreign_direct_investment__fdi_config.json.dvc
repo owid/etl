@@ -1,0 +1,35 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5012
+    date_accessed: 2023-08-16 10:17:17.752378
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5012_investment__foreign_direct_investment__fdi
+    (archived)
+  description: "All data originates from the United Nations Conference on Trade and
+    Development (UNCTAD), the International Trade Centre (INTRACEN) and the Organisation
+    for Economic Co-operation and Development (OECD). Foreign Direct Investment (FDI)
+    data is collected following the International Monetary Fund's Balance of Payments
+    Manual, Fifth Edition, BPM5, IMF 1993, the OECD's Detailed Benchmark Definition
+    of Foreign Direct Investment,Third Edition, BMD3, OECD 1996 and the updated OECD's
+    benchmark definition (BMD4, OECD, 2008). .All datasets contain FDI data for the
+    whole economy, for agriculture, forestry and fishery (AFF) and for food, beverages
+    and tobacco (FBT) sectors. The FDI sectoral disaggregation follows the International
+    Standard Industrial Classification of All Economic Activities, Rev.4 (ISIC, Rev.
+    4).UNCTAD database presents time-series data from 1980 onwards to 2017 of FDI
+    for most UN Members States and other territories. Data availability extends to
+    approximately 80 countries for AFF and FBT.See link to UNCTAD data:- For the whole
+    economy: http://unctadstat.unctad.org/wds/ReportFolders/reportFolders.aspx - For
+    AFF and FBT: provided by UNCTAD (not available to the public).INTRACEN dataset
+    extends from 2007 to 2016 for approximately 80 countries. See link to INTRACEN
+    data: http://www.investmentmap.org/SelectionMenu.aspx (a username and a password
+    need to be created to login).OECD dataset extends from 2005 to 2016 for approximately
+    34 OECD countries. See link to OECD data:http://www.oecd.org/investment/statistics.htmBased
+    on the FDI sources, the FAO FDI dataset extends from 1991 to 2017. The availability
+    of data was the highest between years 1997 to 2011."
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 69d7996f1f49ab44bd1e325219a37292
+  size: 45356
+  path: dataset_5012_investment__foreign_direct_investment__fdi_config.json

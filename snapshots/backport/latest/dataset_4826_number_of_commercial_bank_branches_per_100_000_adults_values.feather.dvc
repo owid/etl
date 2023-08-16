@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4826
+    date_accessed: 2023-08-16 10:09:48.718134
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of commercial bank branches per 100,000 adults
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2ecdca339c4792707d44aeb260887d9b
+  size: 24730
+  path: 
+    dataset_4826_number_of_commercial_bank_branches_per_100_000_adults_values.feather

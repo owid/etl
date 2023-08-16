@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2484
+    date_accessed: 2023-08-16 10:16:14.968469
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2484_lis_key_figures__luxumbourg_income_study
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f98b81c469243ae414d9ab10359b0e8f
+  size: 2403
+  path: dataset_2484_lis_key_figures__luxumbourg_income_study_config.json

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2743
+    date_accessed: 2023-08-14 05:42:21.723036
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2743_un_wpp__annual_female_population_by_five_year_age_group__region__subregion_and_country__1950_2100__thousands
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9185cff6acbdfba21bf30789d1a5d38d
+  size: 36341
+  path: 
+    dataset_2743_un_wpp__annual_female_population_by_five_year_age_group__region__subregion_and_country__1950_2100__thousands_config.json

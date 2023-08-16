@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4853
+    date_accessed: 2023-08-14 05:46:51.221472
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of small-scale industries in total industry value added (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1f4c64c7163e2387aaa565e03817bb7e
+  size: 11450
+  path: 
+    dataset_4853_proportion_of_small_scale_industries_in_total_industry_value_added__pct_values.feather

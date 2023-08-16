@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2040
+    date_accessed: 2023-08-16 07:20:37.024999
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of businesses that had at least one contact with a public official
+    and that paid a bribe to a public official, or were asked for a bribe by those
+    public officials during the previous 12 months
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1506f16738f54f944084dad180b60b7a
+  size: 12306
+  path: 
+    dataset_2040_proportion_of_businesses_that_had_at_least_one_contact_with_a_public_official_and_that_paid_a_bribe_to_a_public_official__or_were_asked_for_a_bribe_by_those_public_officials_during_the_previous_12_months_values.feather

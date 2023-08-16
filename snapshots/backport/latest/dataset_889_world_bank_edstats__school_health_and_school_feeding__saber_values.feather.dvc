@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/889
+    date_accessed: 2023-08-14 05:49:29.068542
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - School Health and School Feeding (SABER)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2d35afaad4167fc661ed98b1f3895bc7
+  size: 6954
+  path: 
+    dataset_889_world_bank_edstats__school_health_and_school_feeding__saber_values.feather

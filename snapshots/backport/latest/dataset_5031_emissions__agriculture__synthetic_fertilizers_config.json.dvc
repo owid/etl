@@ -1,0 +1,25 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5031
+    date_accessed: 2023-08-10 13:05:57.226570
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5031_emissions__agriculture__synthetic_fertilizers
+    (archived)
+  description: Greenhouse gas (GHG) emissions from synthetic fertilizers consist of
+    nitrous oxide gas from synthetic nitrogen additions to managed soils. Specifically,
+    N2O is produced by microbial processes of nitrification and de-nitrification taking
+    place on the addition site (direct emissions), and after volatilization/re-deposition
+    and leaching processes (indirect emissions).  The FAOSTAT emissions database is
+    computed following Tier 1 IPCC 2006 Guidelines for National GHG Inventories vol.
+    4, ch. 11 (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol4.html). GHG emissions
+    are provided as direct, indirect and total by country, regions and special groups,
+    with global coverage, relative to the period 1961-present (with annual updates)
+    and with projections for 2030 and 2050, expressed as Gg N2O and Gg CO2eq. Implied
+    emission factor for N2O and activity data (consumption) are also provided.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eca75839d54d4033c472f9a62de8a20a
+  size: 28749
+  path: dataset_5031_emissions__agriculture__synthetic_fertilizers_config.json

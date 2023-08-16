@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/823
+    date_accessed: 2023-08-11 07:40:09.227844
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Agri-Environmental Indicators: Emissions by sector - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5c396db93e02522254ae66e98c73b598
+  size: 3301762
+  path: 
+    dataset_823_agri_environmental_indicators__emissions_by_sector__fao__2017_values.feather

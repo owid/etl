@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/3619
-    date_accessed: 2023-08-08 07:30:09.738831
+    date_accessed: 2023-08-16 10:40:49.558225
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Maternal and neonatal disorders
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ce3bd1af874593fdb902eab36505baaa
+- md5: 3a198e2c2c7da1ce68a29e5962551296
   size: 1962210
   path: dataset_3619_maternal_and_neonatal_disorders_values.feather

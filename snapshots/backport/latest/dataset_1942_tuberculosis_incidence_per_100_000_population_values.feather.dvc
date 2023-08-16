@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1942
+    date_accessed: 2023-08-10 15:02:21.066511
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Tuberculosis incidence per 100,000 population
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f123e88ee3675b26e89f26398d15de08
+  size: 48914
+  path: dataset_1942_tuberculosis_incidence_per_100_000_population_values.feather

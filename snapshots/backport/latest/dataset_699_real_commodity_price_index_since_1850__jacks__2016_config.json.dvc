@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_699_real_commodity_price_index_since_1850__jacks__2016_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:50:45.663064
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/699
+    date_accessed: 2023-08-16 10:02:18.940414
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_699_real_commodity_price_index_since_1850__jacks__2016
+    (archived)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/699
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 06193b628eaf016b3eac20782ced30a2
-  size: 24884
+- md5: 24588f7366286e361572d06b54b832dc
+  size: 30070
   path: dataset_699_real_commodity_price_index_since_1850__jacks__2016_config.json

@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4448
+    date_accessed: 2023-08-14 15:09:41.651171
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4448_number_of_people_whose_destroyed_dwellings_were_attributed_to_disasters__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 86766397e9f50f03eacd60739338bce4
+  size: 10255
+  path: 
+    dataset_4448_number_of_people_whose_destroyed_dwellings_were_attributed_to_disasters__number_config.json

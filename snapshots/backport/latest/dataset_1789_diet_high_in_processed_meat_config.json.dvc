@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/1789
-    date_accessed: 2023-08-08 07:37:32.156553
+    date_accessed: 2023-08-14 15:40:20.560460
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for dataset_1789_diet_high_in_processed_meat
+  name: Grapher metadata for dataset_1789_diet_high_in_processed_meat (archived)
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1b5fd9c4b6553b8366f160c4000e82e0
-  size: 26268
+- md5: 1fbb0989e99a85e80550090993c83e09
+  size: 22108
   path: dataset_1789_diet_high_in_processed_meat_config.json

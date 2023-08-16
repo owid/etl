@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2576
+    date_accessed: 2023-08-16 08:48:09.561199
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environment - Greenhouse gas emissions
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d64ca26495812d7138ad7c21005bb5ce
+  size: 173514
+  path: dataset_2576_environment__greenhouse_gas_emissions_values.feather

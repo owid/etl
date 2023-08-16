@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2552
+    date_accessed: 2023-08-16 08:43:19.933003
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Public Sector, Taxation and Market Regulation - Table III.2. Employer social
+    security contribution rates
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cbad9bd7de56bf53e2e4966bea29bdeb
+  size: 17410
+  path: 
+    dataset_2552_public_sector__taxation_and_market_regulation__table_iii_2__employer_social_security_contribution_rates_values.feather

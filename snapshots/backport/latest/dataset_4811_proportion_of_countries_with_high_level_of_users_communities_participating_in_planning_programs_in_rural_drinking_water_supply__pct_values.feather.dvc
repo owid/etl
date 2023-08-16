@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4811
+    date_accessed: 2023-08-16 08:53:00.110462
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of countries with high level of users/communities participating
+    in planning programs in rural drinking-water supply (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 591468c8035ae60effbd867f943de425
+  size: 7162
+  path: 
+    dataset_4811_proportion_of_countries_with_high_level_of_users_communities_participating_in_planning_programs_in_rural_drinking_water_supply__pct_values.feather

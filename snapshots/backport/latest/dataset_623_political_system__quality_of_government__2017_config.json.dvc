@@ -2,13 +2,14 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/623
-    date_accessed: 2023-08-08 07:38:34.142635
+    date_accessed: 2023-08-14 15:59:09.835072
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_623_political_system__quality_of_government__2017
+    (archived)
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c5f89711e76413b9f2656865a1e80d0b
-  size: 309415
+- md5: 2520ed5e2006ebb3841c296724e72c95
+  size: 283503
   path: dataset_623_political_system__quality_of_government__2017_config.json

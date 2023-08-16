@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3296
+    date_accessed: 2023-08-16 08:26:26.196802
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Suboptimal breastfeeding
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 56ccdeebd571faf118bda021ae51f5e0
+  size: 546802
+  path: dataset_3296_suboptimal_breastfeeding_values.feather

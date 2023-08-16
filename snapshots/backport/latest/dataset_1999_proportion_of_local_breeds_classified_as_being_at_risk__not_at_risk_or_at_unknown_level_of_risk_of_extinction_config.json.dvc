@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1999
+    date_accessed: 2023-08-14 14:58:47.361438
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1999_proportion_of_local_breeds_classified_as_being_at_risk__not_at_risk_or_at_unknown_level_of_risk_of_extinction
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ba8a106d07ce9c7a7002a6fa5e76f2bc
+  size: 6956
+  path: 
+    dataset_1999_proportion_of_local_breeds_classified_as_being_at_risk__not_at_risk_or_at_unknown_level_of_risk_of_extinction_config.json

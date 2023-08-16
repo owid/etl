@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4248
+    date_accessed: 2023-08-16 07:28:55.663977
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Arable land per crop output (PIN) (FAO, 2019)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2cee066fbd14369cac791e22cb8eaf21
+  size: 103906
+  path: dataset_4248_arable_land_per_crop_output__pin__fao__2019_values.feather

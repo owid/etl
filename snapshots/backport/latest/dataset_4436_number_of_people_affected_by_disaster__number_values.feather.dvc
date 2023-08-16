@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4436
+    date_accessed: 2023-08-16 07:17:16.497762
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of people affected by disaster (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 86b81ebe4708f3ad14803a07225ec5f4
+  size: 17922
+  path: dataset_4436_number_of_people_affected_by_disaster__number_values.feather

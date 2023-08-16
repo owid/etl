@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2523
+    date_accessed: 2023-08-14 05:51:33.879743
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Hygiene
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 121a9d63091210ea266ae745bc2b1373
+  size: 18250
+  path: dataset_2523_hygiene_values.feather

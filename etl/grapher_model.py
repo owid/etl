@@ -422,7 +422,7 @@ class Dataset(SQLModel, table=True):
     @classmethod
     def load_variables_for_dataset(cls, session: Session, dataset_id: int) -> list["Variable"]:
         vars = session.exec(select(Variable).where(Variable.datasetId == dataset_id)).all()
-        assert vars
+        assert vars, f'Dataset {dataset_id} has no variables'
         return vars
 
 

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/888
+    date_accessed: 2023-08-16 10:23:10.607756
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_888_world_bank_edstats__early_child_development__saber
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 65038e7c9e0b6fbcdb1e6a4be5ca81e2
+  size: 18692
+  path: dataset_888_world_bank_edstats__early_child_development__saber_config.json

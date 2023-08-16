@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4809
+    date_accessed: 2023-08-16 09:56:09.541676
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Water body extent (permanent) (% of total land area)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 82245bac188e51775c9b2ca7b18cd110
+  size: 37650
+  path: dataset_4809_water_body_extent__permanent__pct_of_total_land_area_values.feather

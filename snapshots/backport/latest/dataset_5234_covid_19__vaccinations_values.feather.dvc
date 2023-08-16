@@ -1,19 +1,15 @@
 meta:
-  name: COVID-19 - Vaccinations
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5234
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-19 08:30:13.967819
+    date_accessed: 2023-08-16 10:12:16.346544
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: COVID-19 - Vaccinations
+  description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ae594b83523f917d7d0d415ff0121917
-  size: 5869826
+- md5: a2fe4a72051ef2baadae786c23e872b1
+  size: 5905770
   path: dataset_5234_covid_19__vaccinations_values.feather

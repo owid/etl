@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4652
+    date_accessed: 2023-08-16 08:48:39.973845
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Net official development assistance (ODA) from OECD-DAC countries, by donor
+    countries (millions of constant 2017 United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6a825183e5b4a2d4977d02dad9158144
+  size: 12002
+  path: 
+    dataset_4652_net_official_development_assistance__oda__from_oecd_dac_countries__by_donor_countries__millions_of_constant_2017_united_states_dollars_values.feather

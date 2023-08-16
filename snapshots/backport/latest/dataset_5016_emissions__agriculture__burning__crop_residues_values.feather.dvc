@@ -1,0 +1,26 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5016
+    date_accessed: 2023-08-14 15:52:44.642861
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Agriculture: Burning - Crop Residues'
+  description: Greenhouse Gas (GHG) emissions from burning crop residues consist of
+    methane (CH4) and nitrous oxide (N2O) gases produced by the combustion of a percentage
+    of crop residues burnt on-site. The mass of fuel available for burning should
+    be estimated taking into account the fractions removed before burning due to animal
+    consumption, decay in the field, and use in other sectors (e.g., biofuel, domestic
+    livestock feed, building materials, etc.). FAOSTAT emission estimates are computed
+    at Tier 1 following the IPCC 2006 Guidelines for National GHG Inventories (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol4.html).
+    GHG emissions are provided by country, reguions and special groups, with global
+    coverage, relative to the period 1961-present (with annual updates) and with projections
+    for 2030 and 2050, expressed both as Gg CH4, Gg N2O, Gg CO2eq and CO2eq from CH4
+    and N2O, by crop (maize, rice, sugarcane and wheat) and by aggregates. Implied
+    emission factors for N2O and CH4  as well activity data (biomass burned) are also
+    provided.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9c5302cd71ab85d2dacbbedbe36feaa8
+  size: 1507346
+  path: dataset_5016_emissions__agriculture__burning__crop_residues_values.feather

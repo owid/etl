@@ -1,18 +1,14 @@
 meta:
-  name: COVID-2019 - Hospital & ICU
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5205
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-17 14:50:36.175435
+    date_accessed: 2023-08-16 07:55:10.006395
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: COVID-2019 - Hospital & ICU
+  description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 62f0e61aba8e3dee2f05b449373fe758
-  size: 921978
+- md5: ac0a3a868c3099ed97bd7baecbf77d66
+  size: 922514
   path: dataset_5205_covid_2019__hospital__and__icu_values.feather

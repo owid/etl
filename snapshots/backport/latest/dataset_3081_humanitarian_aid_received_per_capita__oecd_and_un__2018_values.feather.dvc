@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3081
+    date_accessed: 2023-08-14 05:51:08.704466
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Humanitarian aid received per capita (OECD and UN, 2018)
+  description: For OECD Report - do not delete.
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4fd379fe7b9d28ebf2a86b3ea837911d
+  size: 47050
+  path: 
+    dataset_3081_humanitarian_aid_received_per_capita__oecd_and_un__2018_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/352
+    date_accessed: 2023-08-14 15:56:24.235602
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_352_china_share_of_world_poverty__world_bank__wdi__2017
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 229813e4cf56c2b13f81cc185a3096a2
+  size: 3580
+  path: dataset_352_china_share_of_world_poverty__world_bank__wdi__2017_config.json

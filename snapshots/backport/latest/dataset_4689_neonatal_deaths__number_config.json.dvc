@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4689
+    date_accessed: 2023-08-14 14:35:39.267017
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4689_neonatal_deaths__number (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 575dea635512171ee574b909417fa924
+  size: 15614
+  path: dataset_4689_neonatal_deaths__number_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/792
+    date_accessed: 2023-08-14 16:10:04.605495
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_792_investment__credit_to_agriculture__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f57688b750c62d17088c1a3a2379e788
+  size: 6322
+  path: dataset_792_investment__credit_to_agriculture__fao__2017_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1507
+    date_accessed: 2023-08-16 09:34:38.444059
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other exposure to mechanical forces
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2812b9f93920dab28a2c58e0361f27c4
+  size: 2012058
+  path: dataset_1507_other_exposure_to_mechanical_forces_values.feather

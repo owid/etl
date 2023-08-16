@@ -1,19 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_229_incomes_across_the_distribution_database__nolan__thewissen__roser__in_levels__2016_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:17:45.055077
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/229
+    date_accessed: 2023-08-16 07:22:17.434963
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Incomes across the Distribution Database (Nolan, Thewissen, Roser) in levels
     (2016)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/229
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+  is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6b0b88f029daf31cabeee023048789ac
+- md5: db2000b7b3fe15f39dfa8e889fef1118
   size: 17978
-  path: dataset_229_incomes_across_the_distribution_database__nolan__thewissen__roser__in_levels__2016_values.feather
+  path: 
+    dataset_229_incomes_across_the_distribution_database__nolan__thewissen__roser__in_levels__2016_values.feather
