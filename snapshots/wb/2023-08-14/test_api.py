@@ -1,6 +1,9 @@
+import asyncio
+import concurrent.futures
 import io
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import requests
 from structlog import get_logger
@@ -11,6 +14,7 @@ log = get_logger()
 PARENT_DIR = Path(__file__).parent.absolute()
 MAX_REPEATS = 10
 TIMEOUT = 500
+FILL_GAPS = "false"
 
 
 def api_health():
@@ -68,11 +72,11 @@ def pip_aux_tables(table="all") -> pd.DataFrame:
         df_dict = {}
 
         # Download each table and append it to the list
-        for table in aux_tables_list:
-            df = pd.read_csv(f"https://api.worldbank.org/pip/v1/aux?table={table}&long_format=false&format=csv")
+        for tab in aux_tables_list:
+            df = pd.read_csv(f"https://api.worldbank.org/pip/v1/aux?table={tab}&long_format=false&format=csv")
 
             # Add table to df_dict
-            df_dict[table] = df
+            df_dict[tab] = df
 
     else:
         df = pd.read_csv(f"https://api.worldbank.org/pip/v1/aux?table={table}&long_format=false&format=csv")
@@ -122,12 +126,15 @@ def pip_query_country(
     welfare_type="all",
     reporting_level="all",
     ppp_version=2017,
+    download="false",
 ) -> pd.DataFrame:
     """
     Query the PIP API.
     """
 
     api_health()
+
+    value = round(value, 2)
 
     version = versions[ppp_version]["version"]
     release_version = versions[ppp_version]["release_version"]
@@ -154,13 +161,26 @@ def pip_query_country(
 
     # Replace names of columns and drop redundancies
     df = df.rename(columns={"country_name": "country", "reporting_year": "year"})
-    df = df.drop(columns=["region_name", "region_code", "country_code"])
+    df = df.drop(columns=["region_name", "region_code"])
 
     # Reorder columns: ppp_version, country, year, povline and the rest
     first_columns = ["ppp_version", "country", "year", "poverty_line"]
     df = df[first_columns + [column for column in df.columns if column not in first_columns]]
 
-    log.info(f"Country data extracted for {popshare_or_povline} = {value} ({ppp_version} PPPs)")
+    if download == "true":
+        # make sure the directory exists. If not, create it
+        Path(f"{PARENT_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
+        df.to_csv(
+            f"{PARENT_DIR}/pip_country_data/pip_{country_code}_{year}_{popshare_or_povline}_{value}_{welfare_type}_{reporting_level}.csv",
+            index=False,
+        )
+
+    if country_code == "all":
+        log.info(f"Country data extracted for {popshare_or_povline} = {value} ({ppp_version} PPPs)")
+    else:
+        log.info(
+            f"Country data extracted for {popshare_or_povline} = {value} ({ppp_version} PPPs) in {country_code} {year}"
+        )
 
     return df
 
@@ -180,6 +200,8 @@ def pip_query_region(
     """
 
     api_health()
+
+    value = round(value, 2)
 
     version = versions[ppp_version]["version"]
     release_version = versions[ppp_version]["release_version"]
@@ -205,8 +227,7 @@ def pip_query_region(
     df["ppp_version"] = ppp_version
 
     # Replace names of columns and drop redundancies
-    df = df.rename(columns={"region_name": "country", "reporting_year": "year"})
-    df = df.drop(columns=["region_code"])
+    df = df.rename(columns={"region_name": "country", "reporting_year": "year", "region_code": "country_code"})
 
     # Reorder columns: ppp_version, country, year, povline and the rest
     first_columns = ["ppp_version", "country", "year", "poverty_line"]
@@ -223,61 +244,175 @@ def pip_query_region(
 #                                           #
 #############################################
 
-povlines_dict = {
-    2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
-    2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
-}
+# # GENERATE MAIN INDICATORS FILE
+
+# povlines_dict = {
+#     2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
+#     2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
+# }
+
+# versions = pip_versions()
+
+# df_country = pd.DataFrame()
+# df_region = pd.DataFrame()
+# for ppp_version, povlines in povlines_dict.items():
+#     for povline in povlines:
+#         df_query = pip_query_country(
+#             popshare_or_povline="povline",
+#             value=povline / 100,
+#             versions=versions,
+#             country_code="all",
+#             year="all",
+#             fill_gaps=FILL_GAPS,
+#             welfare_type="all",
+#             reporting_level="all",
+#             ppp_version=ppp_version,
+#         )
+#         df_country = pd.concat([df_country, df_query], ignore_index=True)
+
+# # I check if the set of countries is the same in the df and in the aux table (list of countries)
+# aux_dict = pip_aux_tables(table="countries")
+# assert set(df_country["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
+#     "List of countries is not the same!"
+# )
+
+# for ppp_version, povlines in povlines_dict.items():
+#     for povline in povlines:
+#         df_query = pip_query_region(
+#             popshare_or_povline="povline",
+#             value=povline / 100,
+#             versions=versions,
+#             country_code="all",
+#             year="all",
+#             welfare_type="all",
+#             reporting_level="all",
+#             ppp_version=ppp_version,
+#         )
+#         df_region = pd.concat([df_region, df_query], ignore_index=True)
+
+# # I check if the set of regions is the same in the df and in the aux table (list of regions)
+# aux_dict = pip_aux_tables(table="regions")
+# assert set(df_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
+#     "List of regions is not the same!"
+# )
+
+# # Concatenate df_country and df_region
+# df = pd.concat([df_country, df_region], ignore_index=True)
+
+# # Sort ppp_version, country, year and poverty_line
+# df = df.sort_values(by=["ppp_version", "country", "year", "poverty_line"])
+
+# # Save to csv
+# df.to_csv(f"{PARENT_DIR}/pip.csv", index=False)
+
+# # GENERATE RELATIVE POVERTY INDICATORS FILE
+# # This is data not given directly by the query, but we can get it by calculating 40, 50, 60% of the median and query
+# # NOTE: Medians need to be patched first in order to get data for all country-years (there are several missing values)
+
+# versions = pip_versions()
+# # Get data from the most common query
+# df = pip_query_country(
+#     popshare_or_povline="povline",
+#     value=2.15,
+#     versions=versions,
+#     country_code="all",
+#     year="all",
+#     fill_gaps=FILL_GAPS,
+#     welfare_type="all",
+#     reporting_level="all",
+#     ppp_version=2017,
+# )
+
+# for pct in [40, 50, 60]:
+#     # Initialize lists
+#     headcount_ratio_list = []
+#     pgi_list = []
+#     pov_severity_list = []
+#     watts_list = []
+#     for i in range(len(df)):
+#         if ~np.isnan(df["median"].iloc[i]):
+#             df_relative = pip_query_country(
+#                 popshare_or_povline="povline",
+#                 value=df["median"].iloc[i] * pct / 100,
+#                 versions=versions,
+#                 country_code=df["country_code"].iloc[i],
+#                 year=df["year"].iloc[i],
+#                 fill_gaps=FILL_GAPS,
+#                 welfare_type=df["welfare_type"].iloc[i],
+#                 reporting_level=df["reporting_level"].iloc[i],
+#                 ppp_version=2017,
+#             )
+
+#             headcount_ratio_value = df_relative["headcount"][0]
+#             headcount_ratio_list.append(headcount_ratio_value)
+#             pgi_value = df_relative["poverty_gap"][0]
+#             pgi_list.append(pgi_value)
+#             pov_severity_value = df_relative["poverty_severity"][0]
+#             pov_severity_list.append(pov_severity_value)
+#             watts_value = df_relative["watts"][0]
+#             watts_list.append(watts_value)
+#         else:
+#             headcount_ratio_list.append(np.nan)
+#             pgi_list.append(np.nan)
+#             pov_severity_list.append(np.nan)
+#             watts_list.append(np.nan)
+
+#     # Add the lists as columns to the df
+#     df[f"headcount_ratio_{pct}_median"] = headcount_ratio_list
+#     df[f"poverty_gap_index_{pct}_median"] = pgi_list
+#     df[f"poverty_severity_{pct}_median"] = pov_severity_list
+#     df[f"watts_{pct}_median"] = watts_list
+
+# # Save to csv
+# df.to_csv(f"{PARENT_DIR}/pip_relative.csv", index=False)
+
+
+# asyncio version
+
+# GENERATE RELATIVE POVERTY INDICATORS FILE
+# This is data not given directly by the query, but we can get it by calculating 40, 50, 60% of the median and query
+# NOTE: Medians need to be patched first in order to get data for all country-years (there are several missing values)
 
 versions = pip_versions()
-
-df_country = pd.DataFrame()
-df_region = pd.DataFrame()
-for ppp_version, povlines in povlines_dict.items():
-    for povline in povlines:
-        df_query = pip_query_country(
-            popshare_or_povline="povline",
-            value=povline / 100,
-            versions=versions,
-            country_code="all",
-            year="all",
-            fill_gaps="false",
-            welfare_type="all",
-            reporting_level="all",
-            ppp_version=ppp_version,
-        )
-        df_country = pd.concat([df_country, df_query], ignore_index=True)
-
-# I check if the set of countries is the same in the df and in the aux table (list of countries)
-aux_dict = pip_aux_tables(table="countries")
-assert set(df_country["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
-    "List of countries is not the same!"
+# Get data from the most common query
+df = pip_query_country(
+    popshare_or_povline="povline",
+    value=2.15,
+    versions=versions,
+    country_code="all",
+    year="all",
+    fill_gaps=FILL_GAPS,
+    welfare_type="all",
+    reporting_level="all",
+    ppp_version=2017,
 )
 
-for ppp_version, povlines in povlines_dict.items():
-    for povline in povlines:
-        df_query = pip_query_region(
+
+def get_relative_data(df_row, pct, versions):
+    if ~np.isnan(df_row["median"]):
+        return pip_query_country(
             popshare_or_povline="povline",
-            value=povline / 100,
+            value=df_row["median"] * pct / 100,
             versions=versions,
-            country_code="all",
-            year="all",
-            welfare_type="all",
-            reporting_level="all",
-            ppp_version=ppp_version,
+            country_code=df_row["country_code"],
+            year=df_row["year"],
+            fill_gaps=FILL_GAPS,
+            welfare_type=df_row["welfare_type"],
+            reporting_level=df_row["reporting_level"],
+            ppp_version=2017,
+            download="true",
         )
-        df_region = pd.concat([df_region, df_query], ignore_index=True)
 
-# I check if the set of regions is the same in the df and in the aux table (list of regions)
-aux_dict = pip_aux_tables(table="regions")
-assert set(df_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
-    "List of regions is not the same!"
-)
 
-# Concatenate df_country and df_region
-df = pd.concat([df_country, df_region], ignore_index=True)
+def main():
+    with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+        tasks = []
+        for pct in [40, 50, 60]:
+            for i in range(len(df)):
+                task = executor.submit(get_relative_data, df.iloc[i], pct, versions)
+                tasks.append(task)
+        results = [task.result() for task in concurrent.futures.as_completed(tasks)]
 
-# Sort ppp_version, country, year and poverty_line
-df = df.sort_values(by=["ppp_version", "country", "year", "poverty_line"])
 
-# Save to csv
-df.to_csv(f"{PARENT_DIR}/pip.csv", index=False)
+# Run the main function
+main()
