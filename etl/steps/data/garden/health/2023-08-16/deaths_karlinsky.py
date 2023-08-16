@@ -30,7 +30,8 @@ def run(dest_dir: str) -> None:
 
     # harmonize country names
     tb: Table = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path,
+        df=tb,
+        countries_file=paths.country_mapping_path,
     )
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
