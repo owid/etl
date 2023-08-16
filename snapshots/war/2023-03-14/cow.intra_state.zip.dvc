@@ -11,8 +11,8 @@ meta:
   url: https://correlatesofwar.org/data-sets/cow-war/
   source_data_url: https://correlatesofwar.org/wp-content/uploads/Intra-State-Wars-v5.1.zip
   file_extension: zip
-  license_url:
-  license_name:
+  license_url: https://correlatesofwar.org/data-sets/
+  license_name: Correlates of War terms
   date_accessed: 2023-03-14
   is_public: true
   description: |

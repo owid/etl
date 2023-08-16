@@ -11,8 +11,8 @@ meta:
   url: https://correlatesofwar.org/data-sets/cow-war/
   source_data_url: https://correlatesofwar.org/wp-content/uploads/Inter-StateWarData_v4.0.csv
   file_extension: csv
-  license_url:
-  license_name:
+  license_url: https://correlatesofwar.org/data-sets/
+  license_name: Correlates of War terms
   date_accessed: 2023-03-14
   is_public: true
   description: |

@@ -11,8 +11,8 @@ meta:
   url: https://www.prio.org/data/1
   source_data_url: https://www.prio.org/download/datasetfile/8/PRIO%20Battle%20Deaths%20Dataset%203.1.xls
   file_extension: xls
-  license_url: PRIO.org
-  license_name: © 2023 PRIO.org
+  license_url: https://cdn.cloud.prio.org/files/91648bba-8885-40ce-8a78-fae75c850c55/PRIO%20Battle%20Deaths%20Dataset%2030%20Documentation.pdf?inline=true
+  license_name: PRIO terms
   date_accessed: 2023-02-02
   is_public: true
   description: >-
