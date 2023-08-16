@@ -109,7 +109,9 @@ class Table(pd.DataFrame):
 
         # reuse metadata from a different table
         if like is not None:
-            self.copy_metadata_from(like)
+            copy = self.copy_metadata(like)
+            self._fields = copy._fields
+            self.metadata = copy.metadata
 
     @property
     def primary_key(self) -> List[str]:
@@ -557,7 +559,7 @@ class Table(pd.DataFrame):
         """Fix type signature of join."""
         t = super().join(other, *args, **kwargs)
 
-        t.copy_metadata_from(self, errors="ignore")
+        t = t.copy_metadata(self)
 
         # copy variables metadata from other table
         if isinstance(other, Table):
