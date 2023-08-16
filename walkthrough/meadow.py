@@ -109,7 +109,7 @@ def app(run_checks: bool) -> None:
                     Options.GENERATE_NOTEBOOK.value,
                 ],
             ),
-            pi.select('Add to DAG', ['ignore'] + dag_files, name="dag_file"),
+            pi.select("Add to DAG", ["ignore"] + dag_files, name="dag_file"),
         ],
     )
     form = MeadowForm(**data)
