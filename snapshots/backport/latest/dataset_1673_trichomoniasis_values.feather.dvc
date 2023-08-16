@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1673
+    date_accessed: 2023-08-16 10:00:36.828471
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Trichomoniasis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1797feb841aed65f25fc05f067b05df2
+  size: 857194
+  path: dataset_1673_trichomoniasis_values.feather

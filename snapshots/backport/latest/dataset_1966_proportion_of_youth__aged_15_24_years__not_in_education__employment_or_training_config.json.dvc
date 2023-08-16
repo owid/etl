@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1966
+    date_accessed: 2023-08-16 09:44:54.597891
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1966_proportion_of_youth__aged_15_24_years__not_in_education__employment_or_training
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8c06a7e87d9800ae20e440151f504b7c
+  size: 21796
+  path: 
+    dataset_1966_proportion_of_youth__aged_15_24_years__not_in_education__employment_or_training_config.json

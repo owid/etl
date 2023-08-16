@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2540
+    date_accessed: 2023-08-16 09:44:41.045372
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2540_regions_and_cities__metropolitan_areas (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fd62a55624bee53265c0bb19a8baa5e8
+  size: 6242
+  path: dataset_2540_regions_and_cities__metropolitan_areas_config.json

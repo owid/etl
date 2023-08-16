@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2544
+    date_accessed: 2023-08-14 15:05:23.831723
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Public Sector, Taxation and Market Regulation - Table III.3 Self-employed
+    social security contribution rates
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0830841eb4044e21c5b4d41d89f4bd7d
+  size: 21002
+  path: 
+    dataset_2544_public_sector__taxation_and_market_regulation__table_iii_3_self_employed_social_security_contribution_rates_values.feather

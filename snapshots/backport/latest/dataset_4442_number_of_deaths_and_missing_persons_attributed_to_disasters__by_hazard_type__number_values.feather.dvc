@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4442
+    date_accessed: 2023-08-14 08:15:23.159031
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of deaths and missing persons attributed to disasters, by hazard type
+    (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d12b90512bca3cd4c379562a75820f4a
+  size: 77786
+  path: 
+    dataset_4442_number_of_deaths_and_missing_persons_attributed_to_disasters__by_hazard_type__number_values.feather

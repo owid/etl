@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/137
+    date_accessed: 2023-08-10 14:43:36.042426
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_137_integrated_network_for_societal_conflict_research__political_instability_task_force__pitf
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f9b4b650a9b19e823bf53b6a73821025
+  size: 2319
+  path: 
+    dataset_137_integrated_network_for_societal_conflict_research__political_instability_task_force__pitf_config.json

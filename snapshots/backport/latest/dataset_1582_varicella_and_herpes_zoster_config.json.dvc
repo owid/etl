@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1582
+    date_accessed: 2023-08-10 14:58:44.330628
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1582_varicella_and_herpes_zoster (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bcef565f63fd43e4d93582cdda6c9cff
+  size: 31855
+  path: dataset_1582_varicella_and_herpes_zoster_config.json

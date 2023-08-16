@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4804
+    date_accessed: 2023-08-16 08:21:17.595225
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4804_nationally_derived_extend_of_rivers__square_kilometres
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dc6378521d330c6812db39df8e6aa54a
+  size: 1816
+  path: dataset_4804_nationally_derived_extend_of_rivers__square_kilometres_config.json

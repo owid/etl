@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5473
+    date_accessed: 2023-08-14 10:59:30.995130
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: IHME - Global Burden of Disease - Mental Health - Institute for Health Metrics
+    and Evaluation  (2021-09)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 30718e5853fdbe5a4d12015c5dd88174
+  size: 10089234
+  path: 
+    dataset_5473_ihme__global_burden_of_disease__mental_health__institute_for_health_metrics_and_evaluation__2021_09_values.feather

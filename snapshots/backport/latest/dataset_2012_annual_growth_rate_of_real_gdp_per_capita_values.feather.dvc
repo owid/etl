@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2012
+    date_accessed: 2023-08-14 11:01:40.219667
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Annual growth rate of real GDP per capita
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8c02710e320f30dea5c07ae77a8d84d4
+  size: 30154
+  path: dataset_2012_annual_growth_rate_of_real_gdp_per_capita_values.feather

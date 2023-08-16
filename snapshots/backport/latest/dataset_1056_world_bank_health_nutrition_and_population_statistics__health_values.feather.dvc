@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1056
+    date_accessed: 2023-08-16 10:27:17.049463
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank Health Nutrition and Population Statistics - Health
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 045d2a20d6f98b837975c66105cd6f8c
+  size: 14402058
+  path: 
+    dataset_1056_world_bank_health_nutrition_and_population_statistics__health_values.feather

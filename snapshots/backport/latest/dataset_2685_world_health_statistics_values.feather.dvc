@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2685
+    date_accessed: 2023-08-11 07:39:52.041491
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Health Statistics
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0208ec789d708714207ac6fa8c0eaa26
+  size: 94858
+  path: dataset_2685_world_health_statistics_values.feather

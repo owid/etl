@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2271
+    date_accessed: 2023-08-11 07:44:09.252776
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Congenital musculoskeletal and limb anomalies
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a814f2eb0cf87d45ac4040b1a470698d
+  size: 1489586
+  path: dataset_2271_congenital_musculoskeletal_and_limb_anomalies_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1737
+    date_accessed: 2023-08-14 14:57:32.509486
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1737_bipolar_disorder (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b1bf60113bc47cdf23f2e32f1dd9b4c6
+  size: 16544
+  path: dataset_1737_bipolar_disorder_config.json

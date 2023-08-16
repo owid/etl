@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1954
+    date_accessed: 2023-08-16 10:15:44.748368
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1954_mortality_rate_attributed_to_unsafe_water__unsafe_sanitation_and_lack_of_hygiene__exposure_to_unsafe_water__sanitation_and_hygiene_for_all__wash__services
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bdbef1d06d0310d46b55bf45928cafa6
+  size: 4640
+  path: 
+    dataset_1954_mortality_rate_attributed_to_unsafe_water__unsafe_sanitation_and_lack_of_hygiene__exposure_to_unsafe_water__sanitation_and_hygiene_for_all__wash__services_config.json

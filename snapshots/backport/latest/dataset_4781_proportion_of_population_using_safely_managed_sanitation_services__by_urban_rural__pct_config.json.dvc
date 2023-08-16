@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4781
+    date_accessed: 2023-08-14 05:46:59.039295
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4781_proportion_of_population_using_safely_managed_sanitation_services__by_urban_rural__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 783edb4aeb3bfd2f43dcc55db00a55b1
+  size: 18212
+  path: 
+    dataset_4781_proportion_of_population_using_safely_managed_sanitation_services__by_urban_rural__pct_config.json

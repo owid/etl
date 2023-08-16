@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/794
+    date_accessed: 2023-08-14 15:08:50.858253
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_794_inputs__employment_indicators__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1e747ad8b8675158aae4fa864c80b953
+  size: 280661
+  path: dataset_794_inputs__employment_indicators__fao__2017_config.json

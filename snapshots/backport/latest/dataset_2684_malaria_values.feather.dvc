@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2684
+    date_accessed: 2023-08-16 10:43:29.229280
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Malaria
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8b108954d95107b02f83411acbc32b60
+  size: 62338
+  path: dataset_2684_malaria_values.feather

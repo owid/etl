@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2704
+    date_accessed: 2023-08-16 08:51:18.719237
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: WHO Cancer Mortality
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f127839b653be83017c055e3e30b4b2d
+  size: 1910562
+  path: dataset_2704_who_cancer_mortality_values.feather

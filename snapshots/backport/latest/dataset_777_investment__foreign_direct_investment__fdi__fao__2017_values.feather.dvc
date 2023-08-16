@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/777
+    date_accessed: 2023-08-14 15:55:44.022297
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Investment: Foreign Direct Investment (FDI) - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 31580fe98a33e1c35765f8fa57ffcced
+  size: 165698
+  path: dataset_777_investment__foreign_direct_investment__fdi__fao__2017_values.feather

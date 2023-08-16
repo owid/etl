@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4819
+    date_accessed: 2023-08-16 07:21:54.345721
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of population with access to electricity, by urban/rural (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 75ab0d78afd4443c454f4980c85ec5f6
+  size: 76722
+  path: 
+    dataset_4819_proportion_of_population_with_access_to_electricity__by_urban_rural__pct_values.feather

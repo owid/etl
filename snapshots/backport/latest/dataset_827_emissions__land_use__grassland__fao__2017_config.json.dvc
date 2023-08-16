@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/827
+    date_accessed: 2023-08-14 15:53:21.462893
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_827_emissions__land_use__grassland__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 764dad656467d0cb0d850eb4080a81cc
+  size: 7942
+  path: dataset_827_emissions__land_use__grassland__fao__2017_config.json

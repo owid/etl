@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1085
+    date_accessed: 2023-08-14 15:30:36.895796
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank SE4ALL database - Access to energy
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f468fb5536e3893f29e4d9281d63f13a
+  size: 36338
+  path: dataset_1085_world_bank_se4all_database__access_to_energy_values.feather

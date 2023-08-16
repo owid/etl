@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1469
+    date_accessed: 2023-08-16 09:59:09.774685
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diarrhea, lower respiratory, and other common infectious diseases
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3189a93fd11d806d1808d0b50bc96771
+  size: 1916002
+  path: 
+    dataset_1469_diarrhea__lower_respiratory__and_other_common_infectious_diseases_values.feather

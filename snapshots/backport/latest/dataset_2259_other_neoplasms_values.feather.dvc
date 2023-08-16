@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2259
+    date_accessed: 2023-08-16 08:13:30.630306
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other neoplasms
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5f3c1d4092b703bf0f07ec7ed167dd69
+  size: 2112562
+  path: dataset_2259_other_neoplasms_values.feather

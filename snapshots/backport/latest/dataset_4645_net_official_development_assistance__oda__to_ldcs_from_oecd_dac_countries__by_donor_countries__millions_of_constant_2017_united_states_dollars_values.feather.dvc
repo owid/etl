@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4645
+    date_accessed: 2023-08-14 05:57:50.571841
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Net official development assistance (ODA) to LDCs from OECD-DAC countries,
+    by donor countries (millions of constant 2017 United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: af77ca012ed43c6871fd4c057dc9ba43
+  size: 11458
+  path: 
+    dataset_4645_net_official_development_assistance__oda__to_ldcs_from_oecd_dac_countries__by_donor_countries__millions_of_constant_2017_united_states_dollars_values.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4447
+    date_accessed: 2023-08-14 05:44:20.621230
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of people whose livelihoods were disrupted or destroyed, attributed
+    to disasters (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 27df4852823f04c659fe8555eeed3497
+  size: 8338
+  path: 
+    dataset_4447_number_of_people_whose_livelihoods_were_disrupted_or_destroyed__attributed_to_disasters__number_values.feather

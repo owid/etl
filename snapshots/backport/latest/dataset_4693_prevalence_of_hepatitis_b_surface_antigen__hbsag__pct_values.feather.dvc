@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4693
+    date_accessed: 2023-08-16 08:16:29.736098
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Prevalence of hepatitis B surface antigen (HBsAg) (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a546a5d702cb4e552fdd1dbb8682a069
+  size: 13914
+  path: 
+    dataset_4693_prevalence_of_hepatitis_b_surface_antigen__hbsag__pct_values.feather

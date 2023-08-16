@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1525
+    date_accessed: 2023-08-16 09:24:56.327663
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1525_nutritional_deficiencies (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4457da0a0d44f772e62eeafba30128e4
+  size: 32005
+  path: dataset_1525_nutritional_deficiencies_config.json

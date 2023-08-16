@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1655
+    date_accessed: 2023-08-16 10:20:32.856501
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1655_executions_and_police_conflict (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 38850617937c909a8d716b1771324c97
+  size: 31975
+  path: dataset_1655_executions_and_police_conflict_config.json

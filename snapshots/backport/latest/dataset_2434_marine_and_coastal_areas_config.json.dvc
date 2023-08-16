@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2434
+    date_accessed: 2023-08-16 10:31:11.260718
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2434_marine_and_coastal_areas (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 954845bd6d57eddf4b445ea79e809c5a
+  size: 39112
+  path: dataset_2434_marine_and_coastal_areas_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1975
+    date_accessed: 2023-08-14 05:58:31.527980
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1975_coverage_of_protected_areas_in_relation_to_marine_areas
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d5d5ca6d94895469e9f16a916b10703f
+  size: 8409
+  path: dataset_1975_coverage_of_protected_areas_in_relation_to_marine_areas_config.json

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5233
+    date_accessed: 2023-08-11 07:39:09.937289
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: "'Quantitative conjectures' of average annual GDP growth rates for African
+    countries, 1870-1950 – de la Ecosura (2013)"
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a2ffec7eb5fae35638f89465889d7ee1
+  size: 9842
+  path: 
+    dataset_5233_quantitative_conjectures_of_average_annual_gdp_growth_rates_for_african_countries__1870_1950__de_la_ecosura__2013_values.feather

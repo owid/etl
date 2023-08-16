@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1943
+    date_accessed: 2023-08-14 15:12:00.399113
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1943_worldwide_weighted_tariff_average (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7c151d9e52869e5efe7602690696b91c
+  size: 13686
+  path: dataset_1943_worldwide_weighted_tariff_average_config.json

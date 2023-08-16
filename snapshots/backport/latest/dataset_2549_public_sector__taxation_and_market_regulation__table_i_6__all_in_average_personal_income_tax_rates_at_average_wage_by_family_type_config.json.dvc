@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2549
+    date_accessed: 2023-08-16 10:37:02.140615
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2549_public_sector__taxation_and_market_regulation__table_i_6__all_in_average_personal_income_tax_rates_at_average_wage_by_family_type
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 697e890194b0e026a5053e50e0570285
+  size: 5533
+  path: 
+    dataset_2549_public_sector__taxation_and_market_regulation__table_i_6__all_in_average_personal_income_tax_rates_at_average_wage_by_family_type_config.json

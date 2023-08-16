@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4519
+    date_accessed: 2023-08-16 10:25:02.979790
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4519_countries_with_macro_policy_for_sustainable_consumption_and_production__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eb7e0f2edb2c297a80b65c0309d27ab2
+  size: 21084
+  path: 
+    dataset_4519_countries_with_macro_policy_for_sustainable_consumption_and_production__1__yes__0__no_config.json

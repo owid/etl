@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2093
+    date_accessed: 2023-08-16 09:44:57.057322
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2093_cardiomyopathy_and_myocarditis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 50f0762c2852e696d6b119cdaa2097fa
+  size: 33124
+  path: dataset_2093_cardiomyopathy_and_myocarditis_config.json

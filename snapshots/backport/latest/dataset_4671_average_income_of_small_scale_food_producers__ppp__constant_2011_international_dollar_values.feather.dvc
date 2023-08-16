@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4671
+    date_accessed: 2023-08-14 14:35:17.743227
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Average income of small-scale food producers, PPP (constant 2011 international
+    $)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e5e37648f1b7a662531bb9364b27b52f
+  size: 7778
+  path: 
+    dataset_4671_average_income_of_small_scale_food_producers__ppp__constant_2011_international_dollar_values.feather

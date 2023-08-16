@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2658
+    date_accessed: 2023-08-14 15:21:46.757307
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2658_social_protection_and_well_being__children_well_being
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 906597dc8d89dd4f92b037e38d88ebff
+  size: 48200
+  path: dataset_2658_social_protection_and_well_being__children_well_being_config.json

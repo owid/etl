@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4827
+    date_accessed: 2023-08-10 14:35:23.883857
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of adults (15 years and older) with an account at a financial institution
+    or mobile-money-service provider, by sex (% of adults aged 15 years and older)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 27f24f9a59cedd1fdddbfb11986939cf
+  size: 19242
+  path: 
+    dataset_4827_proportion_of_adults__15_years_and_older__with_an_account_at_a_financial_institution_or_mobile_money_service_provider__by_sex__pct_of_adults_aged_15_years_and_older_values.feather

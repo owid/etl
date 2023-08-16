@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4704
+    date_accessed: 2023-08-16 08:27:34.499064
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4704_proportion_of_population_with_large_household_expenditures_on_health__greater_than_10pct__as_a_share_of_total_household_expenditure_or_income__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5e23ad8fc308f4a04a31fd5cf2fe0163
+  size: 38907
+  path: 
+    dataset_4704_proportion_of_population_with_large_household_expenditures_on_health__greater_than_10pct__as_a_share_of_total_household_expenditure_or_income__pct_config.json

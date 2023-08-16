@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2723
+    date_accessed: 2023-08-16 09:57:35.078474
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Ozone hole area and concentration - NASA
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bd9cf9113d9ca7daa916a43b28976627
+  size: 7210
+  path: dataset_2723_ozone_hole_area_and_concentration__nasa_values.feather

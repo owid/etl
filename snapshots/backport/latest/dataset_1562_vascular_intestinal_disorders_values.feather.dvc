@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1562
+    date_accessed: 2023-08-11 07:40:06.035755
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Vascular intestinal disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5bedfea1f2d99509851f2642ca370e1a
+  size: 2012050
+  path: dataset_1562_vascular_intestinal_disorders_values.feather

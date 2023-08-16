@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4793
+    date_accessed: 2023-08-14 15:47:53.591752
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of transboundary river and lake basins with an operational arrangement
+    for water cooperation (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7b8d0ade9481b923fcc5307c9cc48766
+  size: 9034
+  path: 
+    dataset_4793_proportion_of_transboundary_river_and_lake_basins_with_an_operational_arrangement_for_water_cooperation__pct_values.feather

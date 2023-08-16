@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1071
+    date_accessed: 2023-08-16 09:40:06.627410
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank Poverty and Equity database - Poverty: Income distribution'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 932f88b5c14a4f0dcfb44114365302f3
+  size: 50002
+  path: 
+    dataset_1071_world_bank_poverty_and_equity_database__poverty__income_distribution_values.feather

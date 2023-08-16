@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1676
+    date_accessed: 2023-08-14 15:37:40.004486
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1676_physical_violence_by_firearm (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4823a17b6c9cc994c9e6ab449b36401b
+  size: 31895
+  path: dataset_1676_physical_violence_by_firearm_config.json

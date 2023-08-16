@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/802
+    date_accessed: 2023-08-10 14:43:03.229934
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_802_production__livestock_processed__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 68aa710fb0ba8c3702b471240801a3b1
+  size: 41875
+  path: dataset_802_production__livestock_processed__fao__2017_config.json

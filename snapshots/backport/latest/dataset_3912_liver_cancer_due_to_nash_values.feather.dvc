@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3912
+    date_accessed: 2023-08-16 07:15:59.668893
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Liver cancer due to NASH
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8dd76e7dd258d2b38b2dc5b6bc53117c
+  size: 1389882
+  path: dataset_3912_liver_cancer_due_to_nash_values.feather

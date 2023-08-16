@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/2699
-    date_accessed: 2023-08-08 07:36:49.114648
+    date_accessed: 2023-08-10 15:04:25.358768
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Penn World Table
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: acd850c7804933b6ad9850eb68250118
+- md5: 6d174b266f701a19f551e969c2eabbf5
   size: 555146
   path: dataset_2699_penn_world_table_values.feather

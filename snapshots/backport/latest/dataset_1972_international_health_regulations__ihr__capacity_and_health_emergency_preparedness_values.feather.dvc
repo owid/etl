@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1972
+    date_accessed: 2023-08-10 14:31:39.287906
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: International Health Regulations (IHR) capacity and health emergency preparedness
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 252c20de0a4d9c4e981e855799b8f54f
+  size: 14402
+  path: 
+    dataset_1972_international_health_regulations__ihr__capacity_and_health_emergency_preparedness_values.feather

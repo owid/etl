@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1828
+    date_accessed: 2023-08-14 14:43:53.865483
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Impaired kidney function
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 902166d19ff88f981183d411246e96c2
+  size: 1381098
+  path: dataset_1828_impaired_kidney_function_values.feather

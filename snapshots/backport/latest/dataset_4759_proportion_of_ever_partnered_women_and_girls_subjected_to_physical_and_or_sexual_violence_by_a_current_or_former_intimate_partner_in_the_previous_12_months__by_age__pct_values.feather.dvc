@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4759
+    date_accessed: 2023-08-11 07:52:59.454911
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of ever-partnered women and girls subjected to physical and/or
+    sexual violence by a current or former intimate partner in the previous 12 months,
+    by age (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6ac434bcd0075404dae8c8b8719dc90b
+  size: 13378
+  path: 
+    dataset_4759_proportion_of_ever_partnered_women_and_girls_subjected_to_physical_and_or_sexual_violence_by_a_current_or_former_intimate_partner_in_the_previous_12_months__by_age__pct_values.feather

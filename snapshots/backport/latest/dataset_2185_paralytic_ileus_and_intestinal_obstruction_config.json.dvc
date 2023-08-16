@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2185
+    date_accessed: 2023-08-16 07:18:53.096783
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2185_paralytic_ileus_and_intestinal_obstruction
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fa5853e71fa39e98271a56ae0c264b56
+  size: 33628
+  path: dataset_2185_paralytic_ileus_and_intestinal_obstruction_config.json

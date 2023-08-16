@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1819
+    date_accessed: 2023-08-16 10:35:15.063411
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1819_ambient_ozone_pollution (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d384c5f13865c164b825a111a21ddf2c
+  size: 21970
+  path: dataset_1819_ambient_ozone_pollution_config.json
