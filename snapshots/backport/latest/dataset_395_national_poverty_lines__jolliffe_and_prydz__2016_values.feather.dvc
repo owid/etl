@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/395
+    date_accessed: 2023-08-14 05:46:09.992859
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: National Poverty Lines - Jolliffe and Prydz (2016)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d926650d463b81bf97b60acba4cbdeb9
+  size: 10346
+  path: dataset_395_national_poverty_lines__jolliffe_and_prydz__2016_values.feather

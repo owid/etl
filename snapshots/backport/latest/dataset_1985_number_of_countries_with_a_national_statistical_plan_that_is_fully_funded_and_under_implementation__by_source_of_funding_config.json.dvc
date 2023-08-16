@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1985
+    date_accessed: 2023-08-16 10:15:05.556834
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1985_number_of_countries_with_a_national_statistical_plan_that_is_fully_funded_and_under_implementation__by_source_of_funding
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6b3efe494a6a57ab2a2e7aa1b92c7e25
+  size: 5907
+  path: 
+    dataset_1985_number_of_countries_with_a_national_statistical_plan_that_is_fully_funded_and_under_implementation__by_source_of_funding_config.json

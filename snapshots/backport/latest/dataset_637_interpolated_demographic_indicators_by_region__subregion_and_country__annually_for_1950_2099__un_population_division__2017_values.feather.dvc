@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/637
+    date_accessed: 2023-08-16 08:52:44.274675
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Interpolated demographic indicators by region, subregion and country, annually
+    for 1950-2099 - UN Population Division (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 73aa979baab183e0d7cfd94db11b93e5
+  size: 3018026
+  path: 
+    dataset_637_interpolated_demographic_indicators_by_region__subregion_and_country__annually_for_1950_2099__un_population_division__2017_values.feather

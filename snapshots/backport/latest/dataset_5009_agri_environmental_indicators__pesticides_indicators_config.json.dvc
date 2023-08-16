@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5009
+    date_accessed: 2023-08-16 10:25:07.622157
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5009_agri_environmental_indicators__pesticides_indicators
+    (archived)
+  description: Agri-environmental indicator on the Use of pesticides per area of cropland
+    (which is the sum of arable land and land under permanent crops) at national level
+    for the period 1990 to 2016.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 34f233f540b42d2b55494faf6b57d6f6
+  size: 3412
+  path: dataset_5009_agri_environmental_indicators__pesticides_indicators_config.json

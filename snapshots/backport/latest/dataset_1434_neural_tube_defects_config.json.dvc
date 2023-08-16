@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1434
+    date_accessed: 2023-08-16 10:24:40.229396
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1434_neural_tube_defects (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8e36fd283f630c90b0eb2920bfb88146
+  size: 29179
+  path: dataset_1434_neural_tube_defects_config.json

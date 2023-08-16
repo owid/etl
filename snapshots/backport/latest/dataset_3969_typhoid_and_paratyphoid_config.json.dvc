@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3969
+    date_accessed: 2023-08-14 08:49:59.760892
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3969_typhoid_and_paratyphoid (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9d6954f7597fcc97bed7de7b9a0df31c
+  size: 31797
+  path: dataset_3969_typhoid_and_paratyphoid_config.json

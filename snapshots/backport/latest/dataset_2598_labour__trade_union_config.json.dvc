@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2598
+    date_accessed: 2023-08-14 14:32:17.827310
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2598_labour__trade_union (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b19192f75a77abe83543abc3377b9d39
+  size: 6424
+  path: dataset_2598_labour__trade_union_config.json

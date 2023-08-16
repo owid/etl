@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1500
+    date_accessed: 2023-08-14 14:31:21.723162
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1500_hypertensive_heart_disease (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4493410e3225e5dd26bcac8639acaf49
+  size: 31815
+  path: dataset_1500_hypertensive_heart_disease_config.json

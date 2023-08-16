@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/912
+    date_accessed: 2023-08-16 10:11:31.215528
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - EMIS
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b8396e78ee8b8217551facd9e46bc2ce
+  size: 9242
+  path: dataset_912_world_bank_edstats__emis_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1822
+    date_accessed: 2023-08-16 10:33:40.083997
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1822_child_underweight (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8bfe4bb9c587d61e18670add3b3c3319
+  size: 21802
+  path: dataset_1822_child_underweight_config.json

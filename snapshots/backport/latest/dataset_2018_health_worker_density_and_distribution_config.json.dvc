@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2018
+    date_accessed: 2023-08-14 10:59:38.777341
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2018_health_worker_density_and_distribution (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5f132b31b4539ecbaacd3ada171e1e4d
+  size: 5792
+  path: dataset_2018_health_worker_density_and_distribution_config.json

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1082
+    date_accessed: 2023-08-16 09:43:23.065773
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1082_world_bank_health_nutrition_and_population_statistics_by_wealth_quintile__quintile__health
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d640605dd3fda5beb4d0b5f34fc4b0e2
+  size: 637549
+  path: 
+    dataset_1082_world_bank_health_nutrition_and_population_statistics_by_wealth_quintile__quintile__health_config.json

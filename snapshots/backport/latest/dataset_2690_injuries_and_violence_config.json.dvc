@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2690
+    date_accessed: 2023-08-14 14:29:19.159989
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2690_injuries_and_violence (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 075e96f22edd589297dc0ca7bbe65fad
+  size: 34936
+  path: dataset_2690_injuries_and_violence_config.json

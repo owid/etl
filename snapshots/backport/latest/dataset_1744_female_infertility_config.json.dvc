@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1744
+    date_accessed: 2023-08-16 07:57:30.115797
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1744_female_infertility (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a6fd5cc5290d43825ec0f1fafe02a356
+  size: 16586
+  path: dataset_1744_female_infertility_config.json

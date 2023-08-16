@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2100
+    date_accessed: 2023-08-16 10:45:17.881093
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Cannabis use disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ee139daa11b1ee53710845a99d656e63
+  size: 1653618
+  path: dataset_2100_cannabis_use_disorders_values.feather

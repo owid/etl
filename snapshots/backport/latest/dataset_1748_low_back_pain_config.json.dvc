@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1748
+    date_accessed: 2023-08-10 14:47:29.344934
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1748_low_back_pain (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 96010c33a0206b106084a3e26d6ce390
+  size: 16481
+  path: dataset_1748_low_back_pain_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1560
+    date_accessed: 2023-08-14 14:28:38.039734
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1560_inguinal__femoral__and_abdominal_hernia
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a4aabf9b5d11296bf42bf8b5a9ce7e7a
+  size: 32335
+  path: dataset_1560_inguinal__femoral__and_abdominal_hernia_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5148
+    date_accessed: 2023-08-16 08:42:43.725556
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Excess Mortality Data – OWID (2022)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a7cb2794c53a04de798c79250460dda5
+  size: 1868170
+  path: dataset_5148_excess_mortality_data__owid__2022_values.feather

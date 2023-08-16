@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4591
+    date_accessed: 2023-08-16 09:41:33.992057
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4591_proportion_of_children_aged_1_14_years_who_experienced_physical_punishment_and_or_psychological_aggression_by_caregivers_in_last_month__pct_of_children_aged_1_14_years
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5cef4e646472b0ef7f17ccbe0a62d82c
+  size: 14150
+  path: 
+    dataset_4591_proportion_of_children_aged_1_14_years_who_experienced_physical_punishment_and_or_psychological_aggression_by_caregivers_in_last_month__pct_of_children_aged_1_14_years_config.json

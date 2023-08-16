@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4424
+    date_accessed: 2023-08-10 14:31:03.371501
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: '[ILO] Proportion of mothers with newborns receiving maternity cash benefit
+    (%)'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cf79d3df3cfcbdd5eb25578ff5be71ca
+  size: 9314
+  path: 
+    dataset_4424_ilo__proportion_of_mothers_with_newborns_receiving_maternity_cash_benefit__pct_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2288
+    date_accessed: 2023-08-16 08:16:59.246878
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2288_lymphatic_filariasis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 631ac749d6a41f02fdfe8799559d6eba
+  size: 32704
+  path: dataset_2288_lymphatic_filariasis_config.json

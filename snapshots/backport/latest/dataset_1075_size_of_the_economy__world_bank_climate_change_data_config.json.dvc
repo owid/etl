@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1075
+    date_accessed: 2023-08-16 09:20:32.038360
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1075_size_of_the_economy__world_bank_climate_change_data
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 104842e7477c1a6b6ed35f0628e2d013
+  size: 9004
+  path: dataset_1075_size_of_the_economy__world_bank_climate_change_data_config.json

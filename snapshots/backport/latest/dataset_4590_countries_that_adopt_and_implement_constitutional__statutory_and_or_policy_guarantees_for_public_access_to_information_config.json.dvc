@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4590
+    date_accessed: 2023-08-16 08:42:14.784477
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4590_countries_that_adopt_and_implement_constitutional__statutory_and_or_policy_guarantees_for_public_access_to_information
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4bb8c04e345a2e57e8852fa69207da5d
+  size: 18674
+  path: 
+    dataset_4590_countries_that_adopt_and_implement_constitutional__statutory_and_or_policy_guarantees_for_public_access_to_information_config.json

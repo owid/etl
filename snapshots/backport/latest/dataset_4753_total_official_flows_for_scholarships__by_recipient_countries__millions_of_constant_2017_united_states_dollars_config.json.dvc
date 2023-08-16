@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4753
+    date_accessed: 2023-08-16 09:49:17.625676
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4753_total_official_flows_for_scholarships__by_recipient_countries__millions_of_constant_2017_united_states_dollars
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 06412aef1b94ce33f1b526b30f1b7a22
+  size: 1982
+  path: 
+    dataset_4753_total_official_flows_for_scholarships__by_recipient_countries__millions_of_constant_2017_united_states_dollars_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3267
+    date_accessed: 2023-08-16 10:12:42.450920
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Causes of infant death in boys and girls (IHME, 2018)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 870151c5a5306766527450ba382e0431
+  size: 6818
+  path: dataset_3267_causes_of_infant_death_in_boys_and_girls__ihme__2018_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4849
+    date_accessed: 2023-08-16 10:37:24.933139
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Passenger volume (passenger kilometres), by mode of transport
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 461f1bd7b81b155a6b3a69ba3be45ccd
+  size: 18850
+  path: 
+    dataset_4849_passenger_volume__passenger_kilometres__by_mode_of_transport_values.feather

@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_4903_marriage_equality__global_comparisons__council_on_foreign_relations_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:38:12.344012
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4903
+    date_accessed: 2023-08-16 10:05:16.417933
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: 'Marriage equality: global comparisons - Council on Foreign Relations'
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4903
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 80e4dd8499ae26db0e0bb48710063cee
+- md5: 324921bbbf0f4f2e3614e4a27e55844f
   size: 10098
-  path: dataset_4903_marriage_equality__global_comparisons__council_on_foreign_relations_values.feather
+  path: 
+    dataset_4903_marriage_equality__global_comparisons__council_on_foreign_relations_values.feather

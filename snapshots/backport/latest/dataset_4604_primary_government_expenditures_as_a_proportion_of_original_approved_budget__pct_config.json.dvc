@@ -2,16 +2,17 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/4604
-    date_accessed: 2023-08-08 07:31:10.270155
+    date_accessed: 2023-08-16 10:23:37.073335
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for 
     dataset_4604_primary_government_expenditures_as_a_proportion_of_original_approved_budget__pct
+    (archived)
   description: This is a dataset imported by the automated fetcher
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2bff3267b5dfff2d8025ff12e0d1a25a
-  size: 12174
+- md5: 35039f8ecd94f712dc916ff4cd36ab63
+  size: 12012
   path: 
     dataset_4604_primary_government_expenditures_as_a_proportion_of_original_approved_budget__pct_config.json

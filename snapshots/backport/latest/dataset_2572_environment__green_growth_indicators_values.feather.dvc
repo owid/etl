@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2572
+    date_accessed: 2023-08-14 15:21:13.551505
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environment - Green Growth Indicators
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cd80e600ea67ea96b6c0565b6828c64b
+  size: 690306
+  path: dataset_2572_environment__green_growth_indicators_values.feather

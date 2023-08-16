@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2742
+    date_accessed: 2023-08-16 09:32:09.528842
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: UN WPP - Population density by region, subregion and country, 1950-2100 (persons
+    per square km)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f069cd227c2e55d0370d58c376c967ed
+  size: 1834890
+  path: 
+    dataset_2742_un_wpp__population_density_by_region__subregion_and_country__1950_2100__persons_per_square_km_values.feather

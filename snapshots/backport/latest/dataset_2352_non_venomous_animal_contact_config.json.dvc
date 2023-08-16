@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2352
+    date_accessed: 2023-08-16 08:11:42.068155
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2352_non_venomous_animal_contact (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5ab4a64afd4fc3618bd09e774eadc262
+  size: 32998
+  path: dataset_2352_non_venomous_animal_contact_config.json

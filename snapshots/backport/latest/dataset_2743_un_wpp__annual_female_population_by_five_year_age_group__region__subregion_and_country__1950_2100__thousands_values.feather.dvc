@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2743
+    date_accessed: 2023-08-14 05:42:58.576666
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: UN WPP - Annual female population by five-year age group, region, subregion
+    and country, 1950-2100 (thousands)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5b8abd63ad04bbafcb00cb9aa70840de
+  size: 3980738
+  path: 
+    dataset_2743_un_wpp__annual_female_population_by_five_year_age_group__region__subregion_and_country__1950_2100__thousands_values.feather

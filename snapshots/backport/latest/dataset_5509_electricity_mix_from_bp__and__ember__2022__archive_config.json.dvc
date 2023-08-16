@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5509
+    date_accessed: 2023-08-11 07:41:57.705950
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5509_electricity_mix_from_bp__and__ember__2022__archive
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 36903d13f4875d95f9256623a6a17b73
+  size: 41186
+  path: dataset_5509_electricity_mix_from_bp__and__ember__2022__archive_config.json

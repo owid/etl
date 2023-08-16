@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/131
+    date_accessed: 2023-08-10 14:39:46.872905
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_131_wages_in_the_manufacturing_sector_vs__several_food_prices_in_the_us__u_s__bureau_of_labor_statistics__2013
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e8d22e9fc11e5cf1b25333df848d30f8
+  size: 1966
+  path: 
+    dataset_131_wages_in_the_manufacturing_sector_vs__several_food_prices_in_the_us__u_s__bureau_of_labor_statistics__2013_config.json

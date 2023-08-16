@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4718
+    date_accessed: 2023-08-10 14:46:08.104600
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total official development assistance to medical research and basic heath
+    sectors, gross disbursement, by recipient countries (millions of constant 2017
+    United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e43fa6c892c6d81a91d24c8f53d32dcf
+  size: 37914
+  path: 
+    dataset_4718_total_official_development_assistance_to_medical_research_and_basic_heath_sectors__gross_disbursement__by_recipient_countries__millions_of_constant_2017_united_states_dollars_values.feather

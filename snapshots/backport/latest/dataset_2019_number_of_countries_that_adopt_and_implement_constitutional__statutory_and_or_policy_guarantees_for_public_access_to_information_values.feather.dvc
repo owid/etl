@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2019
+    date_accessed: 2023-08-14 05:44:54.265553
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of countries that adopt and implement constitutional, statutory and/or
+    policy guarantees for public access to information
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1ea1ba2f3c53871816b7d8610e9bcf46
+  size: 9314
+  path: 
+    dataset_2019_number_of_countries_that_adopt_and_implement_constitutional__statutory_and_or_policy_guarantees_for_public_access_to_information_values.feather

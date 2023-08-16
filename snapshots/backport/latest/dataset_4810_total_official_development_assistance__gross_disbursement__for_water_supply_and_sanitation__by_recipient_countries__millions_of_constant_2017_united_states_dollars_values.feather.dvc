@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4810
+    date_accessed: 2023-08-11 07:18:16.319359
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total official development assistance (gross disbursement) for water supply
+    and sanitation, by recipient countries (millions of constant 2017 United States
+    dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5befdd64afab9ae1f87a928790ca83b1
+  size: 35786
+  path: 
+    dataset_4810_total_official_development_assistance__gross_disbursement__for_water_supply_and_sanitation__by_recipient_countries__millions_of_constant_2017_united_states_dollars_values.feather

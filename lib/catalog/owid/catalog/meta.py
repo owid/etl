@@ -466,6 +466,13 @@ class TableMeta:
             short_name, to_html(record)
         )
 
+    def copy(self, deep=True) -> "TableMeta":
+        """Return a copy of the TableMeta object."""
+        if not deep:
+            return dataclasses.replace(self)
+        else:
+            return _deepcopy_dataclass(self)
+
 
 def to_html(record: Any) -> Optional[str]:
     if isinstance(record, dict):

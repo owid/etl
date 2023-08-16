@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4553
+    date_accessed: 2023-08-14 15:48:00.831412
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4553_protected_marine_area__exclusive_economic_zones__square_kilometres
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c9208af50644b274cfe1d7efeef066d5
+  size: 42744
+  path: 
+    dataset_4553_protected_marine_area__exclusive_economic_zones__square_kilometres_config.json

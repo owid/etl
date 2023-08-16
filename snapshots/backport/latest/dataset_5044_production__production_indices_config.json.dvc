@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5044
+    date_accessed: 2023-08-16 10:14:16.826601
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5044_production__production_indices (archived)
+  description: The dataset includes data on gross and net production indices for various
+    food and agriculture aggregates expressed in both totals and per capita.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f9bb1dee125ccab93776248f7aba6bc3
+  size: 68439
+  path: dataset_5044_production__production_indices_config.json

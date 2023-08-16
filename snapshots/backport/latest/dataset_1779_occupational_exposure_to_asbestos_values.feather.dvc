@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1779
+    date_accessed: 2023-08-14 11:00:29.820299
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational exposure to asbestos
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7c73036287fafaca9239895e22aeeb77
+  size: 1070578
+  path: dataset_1779_occupational_exposure_to_asbestos_values.feather

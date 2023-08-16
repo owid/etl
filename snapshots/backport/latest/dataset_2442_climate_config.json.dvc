@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2442
+    date_accessed: 2023-08-16 09:39:02.989615
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2442_climate (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f080fb6b2b5feca7e63fb4d42b18861a
+  size: 19059
+  path: dataset_2442_climate_config.json

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2016
+    date_accessed: 2023-08-14 15:53:55.042727
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2016_prevalence_of_malnutrition__weight_for_height__gt_plus2_or__lt__2_standard_deviation_from_the_median_of_the_who_child_growth_standards__among_children_under_5_years_of_age__by_type__wasting_and_overweight
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 207af6ba0c9991ba320dd34e7dab8aef
+  size: 14707
+  path: 
+    dataset_2016_prevalence_of_malnutrition__weight_for_height__gt_plus2_or__lt__2_standard_deviation_from_the_median_of_the_who_child_growth_standards__among_children_under_5_years_of_age__by_type__wasting_and_overweight_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/670
+    date_accessed: 2023-08-14 16:08:06.154837
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_670_long_term_yields_in_the_united_kingdom__2022
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e02e5a871f440ceb65bd0006fa5d913f
+  size: 7951
+  path: dataset_670_long_term_yields_in_the_united_kingdom__2022_config.json

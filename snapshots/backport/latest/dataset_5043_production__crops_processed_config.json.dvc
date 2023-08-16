@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5043
+    date_accessed: 2023-08-16 10:18:11.383583
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5043_production__crops_processed (archived)
+  description: 'The dataset covers the following commodities: Beer of barley; Cotton
+    lint; Cottonseed; Margarine, short; Molasses; Oil, coconut (copra); Oil, cottonseed;
+    Oil, groundnut; Oil, linseed; Oil, maize; Oil, olive, virgin; Oil, palm; Oil,
+    palm kernel; Oil, rapeseed; Oil, safflower; Oil, sesame; Oil, soybean; Oil, sunflower;
+    Palm kernels; Sugar Raw Centrifugal; Wine.'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7fcf0c7a0b48c053ff406d541feedbda
+  size: 26738
+  path: dataset_5043_production__crops_processed_config.json

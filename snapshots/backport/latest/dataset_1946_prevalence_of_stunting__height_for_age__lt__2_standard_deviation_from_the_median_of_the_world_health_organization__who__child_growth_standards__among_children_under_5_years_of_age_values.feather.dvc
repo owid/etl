@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1946
+    date_accessed: 2023-08-10 14:47:59.452693
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Prevalence of stunting (height for age <-2 standard deviation from the median
+    of the World Health Organization (WHO) Child Growth Standards) among children
+    under 5 years of age
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d8568aad32ed10f013190fb0325934f7
+  size: 22418
+  path: 
+    dataset_1946_prevalence_of_stunting__height_for_age__lt__2_standard_deviation_from_the_median_of_the_world_health_organization__who__child_growth_standards__among_children_under_5_years_of_age_values.feather

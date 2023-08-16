@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2094
+    date_accessed: 2023-08-14 15:58:36.570047
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Atrial fibrillation and flutter
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: aa2988b252637c591e058277f4fb5c3b
+  size: 1499306
+  path: dataset_2094_atrial_fibrillation_and_flutter_values.feather

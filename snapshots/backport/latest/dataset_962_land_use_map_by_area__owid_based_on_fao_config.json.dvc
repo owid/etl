@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/962
+    date_accessed: 2023-08-16 09:57:44.134269
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_962_land_use_map_by_area__owid_based_on_fao (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0ab8bb6ec505aee0f1b2e1517320c667
+  size: 2304
+  path: dataset_962_land_use_map_by_area__owid_based_on_fao_config.json

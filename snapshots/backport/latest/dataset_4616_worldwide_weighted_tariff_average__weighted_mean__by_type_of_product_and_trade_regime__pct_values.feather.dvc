@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4616
+    date_accessed: 2023-08-14 15:16:22.938344
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Worldwide weighted tariff-average (weighted mean), by type of product and
+    trade regime (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0c9176dd989cad629782feaf458a307d
+  size: 106474
+  path: 
+    dataset_4616_worldwide_weighted_tariff_average__weighted_mean__by_type_of_product_and_trade_regime__pct_values.feather
