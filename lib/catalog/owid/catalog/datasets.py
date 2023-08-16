@@ -102,11 +102,9 @@ class Dataset:
 
         # non-unique index might be causing problems down the line and is typically a mistake
         if not table.index.is_unique:
-            # regions are the only exception where this is acceptable (though not ideal)
-            if "garden/regions/2023-01-01/regions" not in self.path:
-                warnings.warn(
-                    f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
-                )
+            warnings.warn(
+                f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
+            )
 
         if not table.primary_key:
             if "OWID_STRICT" in environ:
