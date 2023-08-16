@@ -11,6 +11,13 @@ steps:
   data://grapher/health/2022-12-28/deaths_karlinsky:
     - data://garden/health/2022-12-28/deaths_karlinsky
 
+  data://meadow/health/2023-08-16/deaths_karlinsky:
+  - snapshot://health/2023-08-16/deaths_karlinsky.csv
+  data://garden/health/2023-08-16/deaths_karlinsky:
+  - data://meadow/health/2023-08-16/deaths_karlinsky
+  data://grapher/health/2023-08-16/deaths_karlinsky:
+  - data://garden/health/2023-08-16/deaths_karlinsky
+
   # WHO Vaccination data
   data://meadow/who/2022-07-17/who_vaccination:
     - walden://who/2022-07-17/who_vaccination
