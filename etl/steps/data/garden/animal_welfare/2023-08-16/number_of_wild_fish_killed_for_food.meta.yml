@@ -21,7 +21,7 @@ tables:
         unit: 'fish'
         short_unit: ''
         description: |
-          Midpoint estimate of the number of wild-caught fish killed for food, calculated as the average between the lower and upper limit estimates.
+          Midpoint estimate of the number of wild-caught fish killed for food, calculated as the average between the lower and upper estimates.
 
           {definitions.common}
         display:
