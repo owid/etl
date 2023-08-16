@@ -138,7 +138,7 @@ def download_data(snap: Snapshot) -> pd.DataFrame:
     # Converting all columns to string dtype as feather doesn't like object dtype
     all_df[cols] = all_df[cols].astype("str")
     all_df = pd.DataFrame(all_df)
-
+    assert len(all_df[all_df["Indicator"] == "11.3.1"]) > 0
     return all_df
 
 

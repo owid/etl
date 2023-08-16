@@ -110,7 +110,7 @@ steps:
   data://grapher/un/2022-07-11/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
 
- # UN SDG - current
+ # UN SDG - to archive
   data://meadow/un/2023-01-24/un_sdg:
     - snapshot://un/2023-01-24/un_sdg.feather
   data://garden/un/2023-01-24/un_sdg:
@@ -119,6 +119,16 @@ steps:
     - snapshot://un/2023-01-24/un_sdg_dimension.json
   data://grapher/un/2023-01-24/un_sdg:
     - data://garden/un/2023-01-24/un_sdg
+
+  # UN SDG - current
+  data://meadow/un/2023-08-16/un_sdg:
+    - snapshot://un/2023-08-16/un_sdg.feather
+  data://garden/un/2023-08-16/un_sdg:
+    - data://meadow/un/2023-08-16/un_sdg
+    - snapshot://un/2023-08-16/un_sdg_unit.csv
+    - snapshot://un/2023-08-16/un_sdg_dimension.json
+  data://grapher/un/2023-08-16/un_sdg:
+    - data://garden/un/2023-08-16/un_sdg
 
 # IHME SDG
   data-private://meadow/ihme/2023-05-09/sdg:
