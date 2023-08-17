@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     df.rename(columns={"Series": "indicator_name", "wb_seriescode": "indicator_code"}, inplace=True)
 
     tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb.set_index(["country", "year", "indicator_name"], inplace=True)
+    tb = tb.set_index(["country", "year", "indicator_name"], verify_integrity=True)
 
     # Use metadata from the first snapshot, then edit the descriptions in the garden step
     ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
