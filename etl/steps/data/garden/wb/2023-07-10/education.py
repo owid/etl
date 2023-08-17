@@ -23,15 +23,16 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["education"]
+
+    #
+    # Process data.
+    #
+
     tb.reset_index(inplace=True)
     # Save the metadata df
     metadata_tb = tb.loc[:, ["indicator_code", "indicator_name", "description", "source"]]
     # Drop metadata columns from the dataset table
     tb.drop(["indicator_name", "description", "source"], axis=1, inplace=True)
-
-    #
-    # Process data.
-    #
 
     tb = geo.harmonize_countries(
         df=tb,
@@ -128,9 +129,9 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
 
         # Define a list of keywords associated with percentages.
         percentage_unit = ["%", "percentage", "share of", "rate"]
-
+        other_list = ["ratio", "index", "years", "USD"]
         # Check if any keyword from the percentage_unit list is present in 'name_lower' and ensure "number" is not in 'name_lower'.
-        if any(keyword in name_lower for keyword in percentage_unit) and not ("number" in name_lower):
+        if any(keyword in name_lower for keyword in percentage_unit) and (name_lower not in other_list):
             update_metadata(tb, new_column_name, 1, "%", "%")
         elif "ratio" in name_lower:
             update_metadata(tb, new_column_name, 1, "ratio", " ")
@@ -145,7 +146,7 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
             update_metadata(tb, new_column_name, 1, "index", " ")
         # Check for the presence of currency-related keywords in 'name_lower'.
         elif "USD" in name_lower or "$":
-            update_metadata(tb, new_column_name, 1, "USD", "$")
+            update_metadata(tb, new_column_name, 1, "US dollars", "$")
         else:
             # Default metadata update when no other conditions are met.
             update_metadata(tb, new_column_name, 0, " ", " ")

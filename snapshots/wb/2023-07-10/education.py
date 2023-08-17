@@ -30,7 +30,6 @@ def main(path_to_file: str, upload: bool) -> None:
     Downloads the csv file with indicator IDs for education and then accesses the data using the API to create
     a snapshot of the data.
 
-    :param path_to_file: Path to the CSV file with indicators (not the actual dataset)
     To create a csv with education related indicators and download it:
         - go to this wesbite http://databank.worldbank.org/Data/Views/VariableSelection/SelectVariables.aspx?source=Education%20Statistics
         - on the left click on Country -> select World, series -> select All and Time -> select All.
@@ -77,7 +76,7 @@ def fetch_education_data(education_code: str) -> pd.DataFrame:
 
 def get_data(path_to_file: str) -> pd.DataFrame:
     """
-    Reads the data with indicators from the given file path and fethes the education data for each indicator.
+    Reads the data with indicators from the given file path and fetches the education data for each indicator.
 
     :param path_to_file: Path to the CSV file.
     :return: DataFrame with education data.
