@@ -79,7 +79,7 @@ def create_units(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy(deep=False)
     unit_description = get_attributes_description()
     df["long_unit"] = df["units"].map(unit_description)
-    df["long_unit"][df["seriescode"] == "SL_ISV_IFEM"] = "Percentage"
+    # df["long_unit"][df["seriescode"] == "SL_ISV_IFEM"] = "Percentage"
     assert df["long_unit"].isna().sum() == 0
     df["short_unit"] = create_short_unit(df["long_unit"])
     return df
