@@ -1,0 +1,38 @@
+definitions:
+  common: |-
+    This data is an estimates of the number of fish caught in global fishing each year, using fisheries capture tonnages (from the Food and Agriculture Organization of the United Nations) for 2007-2016 and estimated mean weights for fish species.
+
+    This estimate does not include unrecorded fish capture, such as fish caught illegally and those caught as bycatch and discarded.
+tables:
+  number_of_wild_fish_killed_for_food:
+    variables:
+      n_wild_fish_low:
+        title: Estimated number of wild-caught fish (lower bound)
+        unit: 'fish'
+        short_unit: ''
+        description: |
+          Lower bound estimate of the number of wild-caught fish killed for food.
+
+          {definitions.common}
+        display:
+          numDecimalPlaces: 0
+      n_wild_fish:
+        title: Estimated number of wild-caught fish
+        unit: 'fish'
+        short_unit: ''
+        description: |
+          Midpoint estimate of the number of wild-caught fish killed for food, calculated as the average between the lower and upper estimates.
+
+          {definitions.common}
+        display:
+          numDecimalPlaces: 0
+      n_wild_fish_high:
+        title: Estimated number of wild-caught fish killed for food (upper bound)
+        unit: 'fish'
+        short_unit: ''
+        description: |
+          Upper bound estimate of the number of wild-caught fish killed for food.
+
+          {definitions.common}
+        display:
+          numDecimalPlaces: 0
