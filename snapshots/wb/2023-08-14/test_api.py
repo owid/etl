@@ -11,16 +11,17 @@ from structlog import get_logger
 # Initialize logger.
 log = get_logger()
 
+# Basic parameters to use in the functions
 PARENT_DIR = Path(__file__).parent.absolute()
 MAX_REPEATS = 10
 TIMEOUT = 500
 FILL_GAPS = "true"
-MAX_WORKERS = 10
+MAX_WORKERS = 20
 
 
 def api_health():
     """
-    Check if the API is running and download aux tables if it is.
+    Check if the API is running.
     """
     # Initialize repeat counter
     repeat = 0
@@ -92,7 +93,7 @@ def pip_aux_tables(table="all") -> pd.DataFrame:
 
 def pip_versions() -> dict:
     """
-    Download aux tables if the API is running.
+    Download latest PIP data versions if the API is running.
     """
 
     api_health()
@@ -130,7 +131,7 @@ def pip_query_country(
     download="false",
 ) -> pd.DataFrame:
     """
-    Query the PIP API.
+    Query country data from the PIP API.
     """
 
     api_health()
@@ -199,7 +200,7 @@ def pip_query_region(
     download="false",
 ) -> pd.DataFrame:
     """
-    Query the PIP API.
+    Query regional data from the PIP API.
     """
 
     api_health()
@@ -263,6 +264,8 @@ def generate_key_indicators():
     """
     Generate the main indicators file, from a set of poverty lines and PPP versions
     """
+    start_time = time.time()
+
     povlines_dict = {
         2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
         2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
@@ -321,6 +324,106 @@ def generate_key_indicators():
 
     # Save to csv
     df.to_csv(f"{PARENT_DIR}/pip.csv", index=False)
+
+    end_time = time.time()
+    elapsed_time = round(end_time - start_time, 2)
+    print("Done. Execution time:", elapsed_time, "seconds")
+
+
+def generate_key_indicators_concurrent():
+    """
+    Generate the main indicators file, from a set of poverty lines and PPP versions. Uses concurrent.futures to speed up the process.
+    """
+    start_time = time.time()
+
+    povlines_dict = {
+        2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
+        2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
+    }
+
+    versions = pip_versions()
+
+    def get_country_data(povline, ppp_version, versions):
+        return pip_query_country(
+            popshare_or_povline="povline",
+            value=povline / 100,
+            versions=versions,
+            country_code="all",
+            year="all",
+            fill_gaps=FILL_GAPS,
+            welfare_type="all",
+            reporting_level="all",
+            ppp_version=ppp_version,
+            download="false",
+        )
+
+    def get_region_data(povline, ppp_version, versions):
+        return pip_query_region(
+            popshare_or_povline="povline",
+            value=povline / 100,
+            versions=versions,
+            country_code="all",
+            year="all",
+            welfare_type="all",
+            reporting_level="all",
+            ppp_version=ppp_version,
+            download="false",
+        )
+
+    def concurrent_function():
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            tasks = []
+            for ppp_version, povlines in povlines_dict.items():
+                for povline in povlines:
+                    task = executor.submit(get_country_data, povline, ppp_version, versions)
+                    tasks.append(task)
+            results = [task.result() for task in concurrent.futures.as_completed(tasks)]
+            # Concatenate list of dataframes
+            results = pd.concat(results, ignore_index=True)
+
+        return results
+
+    def concurrent_region_function():
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            tasks = []
+            for ppp_version, povlines in povlines_dict.items():
+                for povline in povlines:
+                    task = executor.submit(get_region_data, povline, ppp_version, versions)
+                    tasks.append(task)
+            results = [task.result() for task in concurrent.futures.as_completed(tasks)]
+            # Concatenate list of dataframes
+            results = pd.concat(results, ignore_index=True)
+
+        return results
+
+    # Run the main function
+    results = concurrent_function()
+    results_region = concurrent_region_function()
+
+    # I check if the set of countries is the same in the df and in the aux table (list of countries)
+    aux_dict = pip_aux_tables(table="countries")
+    assert set(results["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
+        "List of countries is not the same!"
+    )
+
+    # I check if the set of regions is the same in the df and in the aux table (list of regions)
+    aux_dict = pip_aux_tables(table="regions")
+    assert set(results_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
+        "List of regions is not the same!"
+    )
+
+    # Concatenate df_country and df_region
+    df = pd.concat([results, results_region], ignore_index=True)
+
+    # Sort ppp_version, country, year and poverty_line
+    df = df.sort_values(by=["ppp_version", "country", "year", "poverty_line"])
+
+    # Save to csv
+    df.to_csv(f"{PARENT_DIR}/pip.csv", index=False)
+
+    end_time = time.time()
+    elapsed_time = round(end_time - start_time, 2)
+    print("Done. Execution time:", elapsed_time, "seconds")
 
 
 # GENERATE RELATIVE POVERTY INDICATORS FILE
@@ -609,9 +712,11 @@ def generate_percentiles_concurrent():
             for povline in povlines:
                 task = executor.submit(get_percentiles_data, povline, versions)
                 tasks.append(task)
-        #     results = [task.result() for task in concurrent.futures.as_completed(tasks)]
-        #     # Concatenate list of dataframes
-        #     results = pd.concat(results, ignore_index=True)
+
+            # I comment this because the output would be too large to handle
+            # results = [task.result() for task in concurrent.futures.as_completed(tasks)]
+            # # Concatenate list of dataframes
+            # results = pd.concat(results, ignore_index=True)
 
         # return results
 
@@ -627,4 +732,7 @@ def generate_percentiles_concurrent():
 
 
 # generate_relative_poverty_concurrent()
-generate_percentiles_concurrent()
+# generate_percentiles_concurrent()
+
+generate_key_indicators_concurrent()
+# generate_key_indicators()
