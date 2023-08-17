@@ -1351,13 +1351,8 @@ def get_unique_origins_from_tables(tables: List[Table]) -> List[Origin]:
     # Make a list of all origins of all variables in all tables.
     origins = sum([table._fields[column].origins for table in tables for column in list(table.all_columns)], [])
 
-    # Get unique array of tuples of origin fields (respecting the order).
-    unique_origins_array = pd.unique([tuple(origin.to_dict().items()) for origin in origins])
-
-    # Make a list of unique origins.
-    unique_origins = [Origin.from_dict(dict(origin)) for origin in unique_origins_array]  # type: ignore
-
-    return unique_origins
+    # Get unique array of tuples of source fields (respecting the order).
+    return pd.unique(origins).tolist()
 
 
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
