@@ -115,7 +115,7 @@ def preview_file(path: Path, language: str) -> None:
     )
 
 
-def preview_dag(dag_content: str, dag_name: str = DAG_WALKTHROUGH_PATH) -> None:
+def preview_dag(dag_content: str, dag_name: Union[str, Path] = DAG_WALKTHROUGH_PATH) -> None:
     put_widget(
         title=po.put_success(po.put_markdown(f"Steps in {dag_name} were successfully generated")),
         contents=[po.put_markdown(f"```yml\n{dag_content}\n```")],
