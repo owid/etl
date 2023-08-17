@@ -70,13 +70,31 @@ def run(dest_dir: str) -> None:
 
     df_cpi_inv.drop("cpi_adj_2021", axis=1, inplace=True)
 
-    tb = Table(df_cpi_inv, short_name=paths.short_name, underscore=True)
+    # Load population and merge with CSET dataset
+    ds_population = cast(Dataset, paths.load_dependency("population"))
+    tb_population = ds_population["population"].reset_index(drop=False)
+    df_pop_add = pd.merge(
+        df_cpi_inv, tb_population[["country", "year", "population"]], how="left", on=["country", "year"]
+    )
+    # Add per 1 million patents and publications
+    df_pop_add["num_patent_applications_per_mil"] = df_pop_add["num_patent_applications"] / (
+        df_pop_add["population"] / 1e6
+    ).astype("float64")
+    df_pop_add["num_patent_granted_per_mil"] = (
+        df_pop_add["num_patent_granted"] / (df_pop_add["population"] / 1e6)
+    ).astype("float64")
+    df_pop_add["num_articles_per_mil"] = (df_pop_add["num_articles"] / (df_pop_add["population"] / 1e6)).astype(
+        "float64"
+    )
+    df_pop_add = df_pop_add.drop("population", axis=1)
+    tb = Table(df_pop_add, short_name=paths.short_name, underscore=True)
     tb.set_index(["country", "year", "field"], inplace=True)
 
     # Create proportion of patents granted (in time) and citations per article (total across years)
     tb["proportion_patents_granted"] = (tb["num_patent_granted"] / tb["num_patent_applications"]) * 100
     tb["proportion_patents_granted"] = tb["proportion_patents_granted"].astype(float)
     tb["citations_per_article"] = tb["num_citations_summary"] / tb["num_articles_summary"]
+
     #
     # Save outputs.
     #
