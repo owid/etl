@@ -16,6 +16,28 @@ paths = PathFinder(__file__)
 log = get_logger()
 
 
+def add_world(tb: Table, ds_regions: Dataset) -> Table:
+    tb_with_regions = tb.copy()
+    aggregations = {column: "sum" for column in tb_with_regions.columns if column not in ["country", "year", "field"]}
+
+    # Find members of current region.
+    members = geo.list_members_of_region(
+        region="World",
+        ds_regions=ds_regions,
+    )
+    tb_with_regions = geo.add_region_aggregates(
+        df=tb_with_regions,
+        region="World",
+        countries_in_region=members,
+        countries_that_must_have_data=[],
+        num_allowed_nans_per_year=None,
+        frac_allowed_nans_per_year=0.99999,
+        aggregations=aggregations,
+    )
+
+    return tb_with_regions
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -31,19 +53,10 @@ def run(dest_dir: str) -> None:
     #
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # Grouping the DataFrame by 'year' to get the sum for each year
-    # Select the valid numeric columns for aggregation
-    numeric_cols = tb.select_dtypes(include=[np.number]).columns
+    # Add world
+    ds_regions: Dataset = paths.load_dependency("regions")
+    merged_total = add_world(tb=tb, ds_regions=ds_regions)
 
-    # Group by "year" and "field", select valid columns, and apply the custom aggregation function
-    df_total = tb.groupby(["year", "field"])[numeric_cols].agg(sum_with_nan)
-
-    # Resetting the index to convert 'year' from the index to a column
-    df_total.reset_index(inplace=True)
-
-    # Adding a 'Total' row in the 'country' column
-    df_total["country"] = "World"
-    merged_total = pd.concat([df_total, tb])
     # List of columns to include for conversion to millions (investment values)
     _investment_cols = [col for col in merged_total.columns if "investment" in col]
     # Convert all other columns to million
