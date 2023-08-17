@@ -213,3 +213,24 @@ tables:
         short_unit: ''
         display:
           numDecimalPlaces: 0
+
+      num_patent_applications_per_mil:
+        title: Patent applications per 1 million people
+        description: Yearly total number of patent applications per 1 million people.
+        unit: applications
+        display:
+          numDecimalPlaces: 0
+
+      num_patent_granted_per_mil:
+        title: Patent applications granted per 1 million people
+        description: Yearly total number of patents granted per 1 million people.
+        unit: granted applications
+        display:
+          numDecimalPlaces: 0
+
+      num_articles_per_mil:
+        title: Number of articles per 1 million people
+        description: Yearly number of articles published in AI fields per 1 million people
+        unit: articles
+        display:
+          numDecimalPlaces: 0

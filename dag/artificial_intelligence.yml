@@ -206,10 +206,14 @@ steps:
   data://grapher/artificial_intelligence/2023-07-07/semiconductors_cset:
   - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset
 
+
  # CSET data on articles, patents and investment
   data://meadow/artificial_intelligence/2023-07-25/cset:
   - snapshot://artificial_intelligence/2023-07-25/cset.csv
   data://garden/artificial_intelligence/2023-07-25/cset:
   - data://meadow/artificial_intelligence/2023-07-25/cset
+  - data://garden/demography/2023-03-31/population
+  - data://garden/regions/2023-01-01/regions
+
   data://grapher/artificial_intelligence/2023-07-25/cset:
   - data://garden/artificial_intelligence/2023-07-25/cset
