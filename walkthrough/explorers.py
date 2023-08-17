@@ -1,5 +1,4 @@
 import datetime as dt
-import os
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -79,8 +78,7 @@ def app(run_checks: bool) -> None:
                     Options.IS_PRIVATE.value,
                 ],
                 name="options",
-                value=[
-                ],
+                value=[],
             ),
         ],
     )
