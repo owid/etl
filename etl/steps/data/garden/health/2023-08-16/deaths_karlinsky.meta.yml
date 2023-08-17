@@ -18,7 +18,7 @@ tables:
           numDecimalPlaces: 0
         presentation:
           title_public: Expected number of deaths
-          title_variant: WPP 2019
+          producer_short: WPP 2019
 
       expected_gbd:
         title: Expected number of deaths (GBD 2019)
