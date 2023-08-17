@@ -49,6 +49,9 @@ def metadata_export(
     for source in ds_meta.get("sources", []):
         _prune_empty(source)
 
+    for origin in ds_meta.get("origins", []):
+        _prune_empty(origin)
+
     for license in ds_meta.get("licenses", []):
         _prune_empty(license)
 
