@@ -87,6 +87,9 @@ def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
+    if sources_meta_df.empty:
+        return None
+
     sources = sources_meta_df.set_index(0).T.to_dict(orient="records")
 
     if not sources:
@@ -107,6 +110,9 @@ def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
 
 
 def _parse_origins(origins_meta_df: pd.DataFrame) -> Optional[Origin]:
+    if origins_meta_df.empty:
+        return None
+
     origins = origins_meta_df.set_index(0).T.to_dict(orient="records")
 
     if not origins:
