@@ -16,7 +16,7 @@ PARENT_DIR = Path(__file__).parent.absolute()
 MAX_REPEATS = 10
 TIMEOUT = 500
 FILL_GAPS = "true"
-MAX_WORKERS = 20
+MAX_WORKERS = 16
 
 
 def api_health():
@@ -735,4 +735,4 @@ def generate_percentiles_concurrent():
 # generate_percentiles_concurrent()
 
 generate_key_indicators_concurrent()
-# generate_key_indicators()
+generate_key_indicators()
