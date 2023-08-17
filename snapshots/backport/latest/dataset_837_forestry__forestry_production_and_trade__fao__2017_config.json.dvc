@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/837
+    date_accessed: 2023-08-16 07:53:29.922698
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_837_forestry__forestry_production_and_trade__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c21da5c74f4121ddd828580bbef5a631
+  size: 548798
+  path: dataset_837_forestry__forestry_production_and_trade__fao__2017_config.json

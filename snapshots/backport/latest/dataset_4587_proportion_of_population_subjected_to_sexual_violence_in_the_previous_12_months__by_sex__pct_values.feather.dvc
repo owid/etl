@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4587
+    date_accessed: 2023-08-14 14:44:08.382618
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of population subjected to sexual violence in the previous 12 months,
+    by sex (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ff1556b21b69072bd22ad97d2a99752d
+  size: 8938
+  path: 
+    dataset_4587_proportion_of_population_subjected_to_sexual_violence_in_the_previous_12_months__by_sex__pct_values.feather

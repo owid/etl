@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4424
+    date_accessed: 2023-08-10 14:30:46.059120
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4424_ilo__proportion_of_mothers_with_newborns_receiving_maternity_cash_benefit__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 841e0527c96a04820da09a279fe17f19
+  size: 2717
+  path: 
+    dataset_4424_ilo__proportion_of_mothers_with_newborns_receiving_maternity_cash_benefit__pct_config.json

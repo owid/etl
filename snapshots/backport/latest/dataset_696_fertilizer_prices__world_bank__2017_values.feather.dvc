@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/696
+    date_accessed: 2023-08-16 09:28:37.207703
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Fertilizer prices - World Bank (2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3779c7f3637da948cab3ead533d26745
+  size: 7778
+  path: dataset_696_fertilizer_prices__world_bank__2017_values.feather

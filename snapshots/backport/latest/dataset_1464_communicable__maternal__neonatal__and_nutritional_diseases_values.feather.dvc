@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1464
+    date_accessed: 2023-08-10 14:33:19.539789
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Communicable, maternal, neonatal, and nutritional diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ebedfc4db7fc488bed951c6b1e9c7745
+  size: 2012082
+  path: 
+    dataset_1464_communicable__maternal__neonatal__and_nutritional_diseases_values.feather

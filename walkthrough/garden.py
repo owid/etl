@@ -22,7 +22,6 @@ ETL_DIR = Path(etl.__file__).parent.parent
 
 
 class Options(Enum):
-    ADD_TO_DAG = "Add steps into dag.yml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
     GENERATE_NOTEBOOK = "Generate playground notebook"
     LOAD_COUNTRIES_REGIONS = "Load countries regions in the script"
@@ -36,6 +35,7 @@ class GardenForm(BaseModel):
     version: str
     meadow_version: str
     add_to_dag: bool
+    dag_file: str
     load_countries_regions: bool
     load_population: bool
     include_metadata_yaml: bool
@@ -44,7 +44,8 @@ class GardenForm(BaseModel):
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
-        data["add_to_dag"] = Options.ADD_TO_DAG.value in options
+        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+        data["dag_file"] = data["dag_file"]
         data["include_metadata_yaml"] = Options.INCLUDE_METADATA_YAML.value in options
         data["load_countries_regions"] = Options.LOAD_COUNTRIES_REGIONS.value in options
         data["load_population"] = Options.LOAD_POPULATION.value in options
@@ -96,10 +97,10 @@ def app(run_checks: bool) -> None:
                 value=state.get("version", str(dt.date.today())),
                 help_text="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
             ),
+            pi.select("Add to DAG", utils.ADD_DAG_OPTIONS, name="dag_file", value=state.get("dag_file")),
             pi.checkbox(
                 "Additional Options",
                 options=[
-                    Options.ADD_TO_DAG.value,
                     Options.INCLUDE_METADATA_YAML.value,
                     Options.GENERATE_NOTEBOOK.value,
                     Options.LOAD_COUNTRIES_REGIONS.value,
@@ -108,7 +109,6 @@ def app(run_checks: bool) -> None:
                 ],
                 name="options",
                 value=[
-                    Options.ADD_TO_DAG.value,
                     Options.INCLUDE_METADATA_YAML.value,
                     Options.GENERATE_NOTEBOOK.value,
                 ],
@@ -132,7 +132,8 @@ def app(run_checks: bool) -> None:
         if form.load_countries_regions:
             deps.append(utils.DATASET_REGIONS_URI)
         dag_content = utils.add_to_dag(
-            {f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps}
+            dag={f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps},
+            dag_path=CURRENT_DIR / ".." / "dag" / form.dag_file,
         )
     else:
         dag_content = ""
@@ -220,7 +221,7 @@ def app(run_checks: bool) -> None:
     utils.preview_file(step_path, "python")
 
     if dag_content:
-        utils.preview_dag(dag_content)
+        utils.preview_dag(dag_content=dag_content, dag_name=f"`dag/{form.dag_file}`")
 
 
 def _check_dataset_in_meadow(form: GardenForm) -> None:

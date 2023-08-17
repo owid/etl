@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2073
+    date_accessed: 2023-08-14 05:43:37.655132
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Malaria incidence per 1,000 population
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f070996920f382bf02e02fe63dcad1ca
+  size: 12138
+  path: dataset_2073_malaria_incidence_per_1_000_population_values.feather

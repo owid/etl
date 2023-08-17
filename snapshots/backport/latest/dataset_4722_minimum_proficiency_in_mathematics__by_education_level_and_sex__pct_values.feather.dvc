@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4722
+    date_accessed: 2023-08-16 10:32:03.028480
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Minimum proficiency in mathematics, by education level and sex (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7a736563b3d14b2dd9577d6071917278
+  size: 32802
+  path: 
+    dataset_4722_minimum_proficiency_in_mathematics__by_education_level_and_sex__pct_values.feather

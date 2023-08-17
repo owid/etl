@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5313
+    date_accessed: 2023-08-16 10:22:02.195786
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Electricity mix in the UK (BEIS, BP, EMBER)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c21e4c49dadf9e9dfe0643a291ee82f7
+  size: 11914
+  path: dataset_5313_electricity_mix_in_the_uk__beis__bp__ember_values.feather

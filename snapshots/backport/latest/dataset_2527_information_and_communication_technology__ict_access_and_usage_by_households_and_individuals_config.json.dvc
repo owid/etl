@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2527
+    date_accessed: 2023-08-11 07:41:32.033678
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2527_information_and_communication_technology__ict_access_and_usage_by_households_and_individuals
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 61b01f88760a41c67183d1aad1ea464b
+  size: 42041
+  path: 
+    dataset_2527_information_and_communication_technology__ict_access_and_usage_by_households_and_individuals_config.json

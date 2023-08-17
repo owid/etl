@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/799
+    date_accessed: 2023-08-10 14:31:09.623258
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Agri-Environmental Indicators: Emissions intensities - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a858b972721bb09b0dcf3ea5ef0d6826
+  size: 1871826
+  path: 
+    dataset_799_agri_environmental_indicators__emissions_intensities__fao__2017_values.feather

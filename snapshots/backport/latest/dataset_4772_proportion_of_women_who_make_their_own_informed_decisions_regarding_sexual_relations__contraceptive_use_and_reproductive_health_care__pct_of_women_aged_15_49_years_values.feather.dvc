@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4772
+    date_accessed: 2023-08-14 05:36:34.103605
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of women who make their own informed decisions regarding sexual
+    relations, contraceptive use and reproductive health care (% of women aged 15-49
+    years)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1f1b1a5e70e9cbae58969657f7d32bfd
+  size: 9082
+  path: 
+    dataset_4772_proportion_of_women_who_make_their_own_informed_decisions_regarding_sexual_relations__contraceptive_use_and_reproductive_health_care__pct_of_women_aged_15_49_years_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2581
+    date_accessed: 2023-08-14 05:52:00.825766
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environment - Material resources
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 50a95dd3e76c6f4c04ef4adce069414f
+  size: 188210
+  path: dataset_2581_environment__material_resources_values.feather

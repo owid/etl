@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/293
+    date_accessed: 2023-08-11 07:54:39.052557
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_293_number_of_observations_in_povcal_per_decade__owid__2017
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ddeb1cd969d3ca124cb551a7bb15bf13
+  size: 2265
+  path: dataset_293_number_of_observations_in_povcal_per_decade__owid__2017_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2133
+    date_accessed: 2023-08-16 10:04:07.126188
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2133_cataract (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b702bf28ca8f94e3cd8388cf6d17d0e3
+  size: 32251
+  path: dataset_2133_cataract_config.json

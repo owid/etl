@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1774
+    date_accessed: 2023-08-14 14:37:05.061309
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: No access to handwashing facility
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6d349b830513f08dbb849060732b9249
+  size: 1381106
+  path: dataset_1774_no_access_to_handwashing_facility_values.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4613
+    date_accessed: 2023-08-16 10:44:50.925682
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Countries with National Human Rights Institutions and no status with the Paris
+    Principles, C status (1 = YES; 0 = NO)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 76453d73fb8156656a498a8dabe02f73
+  size: 6698
+  path: 
+    dataset_4613_countries_with_national_human_rights_institutions_and_no_status_with_the_paris_principles__c_status__1__yes__0__no_values.feather

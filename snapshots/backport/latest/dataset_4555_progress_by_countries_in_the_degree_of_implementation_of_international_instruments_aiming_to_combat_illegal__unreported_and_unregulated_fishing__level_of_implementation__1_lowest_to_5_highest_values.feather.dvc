@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4555
+    date_accessed: 2023-08-14 16:10:00.036511
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Progress by countries in the degree of implementation of international instruments
+    aiming to combat illegal, unreported and unregulated fishing (level of implementation:
+    1 lowest to 5 highest)'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8bf652a80a82b387246521905a7c4aae
+  size: 10794
+  path: 
+    dataset_4555_progress_by_countries_in_the_degree_of_implementation_of_international_instruments_aiming_to_combat_illegal__unreported_and_unregulated_fishing__level_of_implementation__1_lowest_to_5_highest_values.feather

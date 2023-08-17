@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/818
+    date_accessed: 2023-08-16 08:12:16.648768
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Macro-Statistics: Macro Indicators - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a2c29549a395d78eba04e090ab2e5372
+  size: 3621298
+  path: dataset_818_macro_statistics__macro_indicators__fao__2017_values.feather

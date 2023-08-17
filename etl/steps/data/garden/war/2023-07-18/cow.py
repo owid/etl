@@ -1,4 +1,13 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""COW War data dataset.
+
+- This dataset is built from four different files. Each of them come from the COW site, but have minor differences in
+the fields they contain, etc.
+
+- Each of the source files concerns a specific conflict type (i.e. one file only contains data on "inter-state" conflicts).
+    - Therefore, a conflict (or at least how it is identified in this dataset) never changes its type.
+    - There are fields explaining if a conflict transformed to another conflict (i.e. it stops being in the "inter-state" table with id X, and
+    starts being in the "intra-state" table with id Y).
+"""
 
 import json
 from typing import List, Set, Tuple, cast

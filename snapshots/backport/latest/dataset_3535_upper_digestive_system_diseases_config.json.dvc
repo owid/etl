@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3535
+    date_accessed: 2023-08-10 14:32:35.917017
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3535_upper_digestive_system_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 55522a42fd627f0185b359c370fe331c
+  size: 33268
+  path: dataset_3535_upper_digestive_system_diseases_config.json

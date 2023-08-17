@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2141
+    date_accessed: 2023-08-14 15:23:46.343980
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2141_caries_of_permanent_teeth (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ccec8b461c68278705637170a2083d10
+  size: 32914
+  path: dataset_2141_caries_of_permanent_teeth_config.json

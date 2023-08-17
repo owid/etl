@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4529
+    date_accessed: 2023-08-16 10:04:19.371792
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Compliance with the Rotterdam Convention on hazardous waste and other chemicals
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 93335b7a4d5b308580a78958d7c856d0
+  size: 12122
+  path: 
+    dataset_4529_compliance_with_the_rotterdam_convention_on_hazardous_waste_and_other_chemicals_values.feather

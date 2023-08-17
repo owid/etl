@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5183
+    date_accessed: 2023-08-14 05:37:44.468695
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: UN WPP 2019 - Female dependency ratios (total, child, old-age) for different
+    age groups by region, subregion and country, annually interpolated for 1950-2100
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 89461156fb246939858cf20a860a38a5
+  size: 3657562
+  path: 
+    dataset_5183_un_wpp_2019__female_dependency_ratios__total__child__old_age__for_different_age_groups_by_region__subregion_and_country__annually_interpolated_for_1950_2100_values.feather

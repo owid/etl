@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/969
+    date_accessed: 2023-08-14 11:00:21.668100
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: BP Statistical Review of Global Energy
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: db235f112df5925319fa8fefd4848727
+  size: 791002
+  path: dataset_969_bp_statistical_review_of_global_energy_values.feather

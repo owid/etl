@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5390
+    date_accessed: 2023-08-16 08:14:02.278327
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5390_natural_disasters__emdat__decadal (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9a119fe915d81b7c594785c6260611fa
+  size: 119081
+  path: dataset_5390_natural_disasters__emdat__decadal_config.json

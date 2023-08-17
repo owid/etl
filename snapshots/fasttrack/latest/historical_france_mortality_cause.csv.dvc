@@ -1,0 +1,24 @@
+meta:
+  source:
+    name: Google Sheet
+    url: https://www.demographic-research.org/Volumes/Vol36/21/
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSUInsCt97X8kjDGENSZm5-xLSbE_P4MEAW4bYkGHn-KN5aVWQ4VAm3JzziskCUTkFQuWQVinWtLO_I/pub?output=csv
+    date_accessed: '2023-08-14'
+    publication_year: 2014
+    published_by: Google Sheet
+  name: Database on causes of death in France from 1925 to 1999
+  description: Dataset on mortality rates from each cause of death category in France
+    between 1925 and 1999. The underlying data for this chart comes from the Institut
+    National d'Études Démographiques, which covers causes of deaths nationally in
+    France between 1925 and 1999. Causes of death were categorized into categories
+    according to the 9th edition of the International Classification of Diseases (ICD-9)
+    manual. Mortality rates are given for five-year age bands, as an annual rate out
+    of 100,000 people in that age group.
+  license: {}
+  is_public: false
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 3d0a8271f21243e833aa2c23e6a19094
+  size: 627473
+  path: historical_france_mortality_cause.csv

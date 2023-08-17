@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4422
+    date_accessed: 2023-08-14 15:29:39.508832
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: '[World Bank] Proportion of population covered by labour market programs (%)'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 151417e08e8d8dae1176626ae92483e7
+  size: 10138
+  path: 
+    dataset_4422_world_bank__proportion_of_population_covered_by_labour_market_programs__pct_values.feather

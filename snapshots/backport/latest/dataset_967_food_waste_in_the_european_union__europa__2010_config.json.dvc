@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/967
+    date_accessed: 2023-08-11 07:54:31.890456
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_967_food_waste_in_the_european_union__europa__2010
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: efddbff9fb20686d7a23f0eb404a634b
+  size: 4740
+  path: dataset_967_food_waste_in_the_european_union__europa__2010_config.json

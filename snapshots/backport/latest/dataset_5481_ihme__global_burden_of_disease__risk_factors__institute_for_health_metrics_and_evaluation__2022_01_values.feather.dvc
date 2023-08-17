@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5481
+    date_accessed: 2023-08-16 09:39:52.488733
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: IHME - Global Burden of Disease - Risk Factors - Institute for Health Metrics
+    and Evaluation  (2022-01)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 88fe41d590b9b9d5d040ce28bd4ccb2b
+  size: 9405394
+  path: 
+    dataset_5481_ihme__global_burden_of_disease__risk_factors__institute_for_health_metrics_and_evaluation__2022_01_values.feather

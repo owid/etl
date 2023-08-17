@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1965
+    date_accessed: 2023-08-10 14:39:02.746162
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Level of water stress: freshwater withdrawal as a proportion of available
+    freshwater resources'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 51553e5b3938437df07411546d7ce3e4
+  size: 13058
+  path: 
+    dataset_1965_level_of_water_stress__freshwater_withdrawal_as_a_proportion_of_available_freshwater_resources_values.feather

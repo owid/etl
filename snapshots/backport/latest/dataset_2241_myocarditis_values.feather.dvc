@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2241
+    date_accessed: 2023-08-16 09:49:29.313390
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Myocarditis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 51a836692717a51a123b98276c8e6530
+  size: 2116394
+  path: dataset_2241_myocarditis_values.feather

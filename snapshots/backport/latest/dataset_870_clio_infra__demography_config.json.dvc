@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/870
+    date_accessed: 2023-08-10 15:03:29.657271
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_870_clio_infra__demography (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 71b3057b6e930f393836fb659c752c21
+  size: 12849
+  path: dataset_870_clio_infra__demography_config.json

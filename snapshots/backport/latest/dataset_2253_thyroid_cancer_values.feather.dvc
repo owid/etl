@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2253
+    date_accessed: 2023-08-10 14:51:37.402222
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Thyroid cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6b092524569f8cdee0c9bc45156f7dca
+  size: 1807818
+  path: dataset_2253_thyroid_cancer_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1516
+    date_accessed: 2023-08-14 15:40:23.459557
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1516_other_unintentional_injuries (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d3ae022e926861b93e92b0fe952eb2c2
+  size: 31895
+  path: dataset_1516_other_unintentional_injuries_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4702
+    date_accessed: 2023-08-16 09:37:46.511513
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Adolescent birth rate (per 1,000 women aged 15-19 years)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bcb916543b0827e31683bea1ccbb8a8a
+  size: 26442
+  path: 
+    dataset_4702_adolescent_birth_rate__per_1_000_women_aged_15_19_years_values.feather

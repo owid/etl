@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/247
+    date_accessed: 2023-08-14 05:58:10.991250
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_247_learning_costs__j__doyne_farmer_and_francois_lafond__2016
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ac06e378d78f7b326089c4dd76dbe17c
+  size: 2123
+  path: 
+    dataset_247_learning_costs__j__doyne_farmer_and_francois_lafond__2016_config.json

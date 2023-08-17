@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1796
+    date_accessed: 2023-08-10 14:34:01.155216
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1796_low_physical_activity (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b47938ece2aa6fefec5fc78ed36cacf1
+  size: 22144
+  path: dataset_1796_low_physical_activity_config.json

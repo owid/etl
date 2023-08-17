@@ -3,7 +3,6 @@
 #
 
 import copy
-import dataclasses
 import json
 from collections import defaultdict
 from os.path import dirname, join, splitext
@@ -110,7 +109,9 @@ class Table(pd.DataFrame):
 
         # reuse metadata from a different table
         if like is not None:
-            self.copy_metadata_from(like)
+            copy = self.copy_metadata(like)
+            self._fields = copy._fields
+            self.metadata = copy.metadata
 
     @property
     def primary_key(self) -> List[str]:
@@ -154,10 +155,6 @@ class Table(pd.DataFrame):
             table = cls.read_parquet(path)
         else:
             raise ValueError(f"could not detect a suitable format to read from: {path}")
-
-        # If each variable does not have sources, load them from the dataset.
-        # TODO: I think this is not a good idea, consider removing.
-        # table = assign_dataset_sources_and_licenses_to_each_variable(table=table)
 
         # Add processing log to the metadata of each variable in the table.
         # TODO: For some reason, the snapshot loading entry gets repeated.
@@ -489,43 +486,17 @@ class Table(pd.DataFrame):
     def prune_metadata(self) -> "Table":
         """Prune metadata for columns that are not in the table. This can happen after slicing
         the table by columns."""
-        self._fields = {col: self._fields[col] for col in self.all_columns}
+        self._fields = defaultdict(VariableMeta, {col: self._fields[col] for col in self.all_columns})
         return self
 
     def copy(self, deep: bool = True) -> "Table":
         """Copy table together with all its metadata."""
         tab = super().copy(deep=deep)
-        tab.copy_metadata_from(self)
-        return tab
+        return tab.copy_metadata(self)
 
-    def copy_metadata_from(self, table: "Table", errors: Literal["raise", "ignore", "warn"] = "raise") -> None:
+    def copy_metadata(self, from_table: "Table", deep: bool = False) -> "Table":
         """Copy metadata from a different table to self."""
-        self.metadata = dataclasses.replace(table.metadata)
-
-        extra_columns = set(table.columns) - set(self.columns)
-        missing_columns = set(self.columns) - set(table.columns)
-        common_columns = set(self.columns) & set(table.columns)
-
-        if errors == "raise":
-            if extra_columns:
-                raise ValueError(f"Extra columns in table: {extra_columns}")
-            if missing_columns:
-                raise ValueError(f"Missing columns in table: {missing_columns}")
-        elif errors == "warn":
-            if extra_columns:
-                log.warning(f"Extra columns in table: {extra_columns}")
-            if missing_columns:
-                log.warning(f"Missing columns in table: {missing_columns}")
-
-        new_fields = defaultdict(VariableMeta)
-        for k in common_columns:
-            # copy if we have metadata in the other table
-            if k in table._fields:
-                new_fields[k] = table._fields[k].copy()
-            # otherwise keep current metadata (if it exists)
-            elif k in self._fields:
-                new_fields[k] = self._fields[k]
-        self._fields = new_fields
+        return copy_metadata(to_table=self, from_table=from_table, deep=deep)
 
     @overload
     def set_index(
@@ -588,7 +559,7 @@ class Table(pd.DataFrame):
         """Fix type signature of join."""
         t = super().join(other, *args, **kwargs)
 
-        t.copy_metadata_from(self, errors="ignore")
+        t = t.copy_metadata(self)
 
         # copy variables metadata from other table
         if isinstance(other, Table):
@@ -666,13 +637,6 @@ class Table(pd.DataFrame):
             )
 
         return cast("Table", tb)
-
-    def copy_metadata(
-        self, from_table: "Table", include_missing_variables: bool = False, inplace: bool = False
-    ) -> Optional["Table"]:
-        return copy_metadata(
-            to_table=self, from_table=from_table, include_missing_variables=include_missing_variables, inplace=inplace
-        )
 
     def update_log(
         self,
@@ -1125,10 +1089,38 @@ def read_excel(
 def read_from_records(data: Any, *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs):
     table = Table(pd.DataFrame.from_records(data=data, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
-    # Note: Parents could be passed as arguments, or extracted from metadata.
+    # NOTE: Parents could be passed as arguments, or extracted from metadata.
     table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
 
     return table
+
+
+def read_from_dict(
+    data: Dict[Any, Any], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
+):
+    table = Table(pd.DataFrame.from_dict(data=data, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    # NOTE: Parents could be passed as arguments, or extracted from metadata.
+    table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
+
+    return table
+
+
+def read_json(
+    path_or_buf: Union[str, Path, IO[AnyStr]],
+    metadata: Optional[TableMeta] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_json(path_or_buf=path_or_buf, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    if isinstance(path_or_buf, (str, Path)):
+        table = update_log(table=table, operation="load", parents=[path_or_buf])
+    else:
+        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_json.")
+
+    return cast(Table, table)
 
 
 class ExcelFile(pd.ExcelFile):
@@ -1201,66 +1193,52 @@ def _add_processing_log_entry_to_each_variable(
     return table
 
 
-def assign_dataset_sources_and_licenses_to_each_variable(table: Table) -> Table:
-    # Get sources and licenses from the table dataset.
+def assign_dataset_sources_origins_and_licenses_to_each_variable(table: Table) -> Table:
+    # Get sources, origins and licenses from the table dataset.
     sources = []
+    origins = []
     licenses = []
     if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
         sources = table.metadata.dataset.sources  # type: ignore
+    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "origins"):
+        origins = table.metadata.dataset.origins  # type: ignore
     if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
         licenses = table.metadata.dataset.licenses  # type: ignore
 
-    if len(sources) == len(licenses) == 0:
-        # There are no default sources/licenses to assign to each variable.
+    if len(sources) == len(licenses) == len(origins) == 0:
+        # There are no default sources/origins/licenses to assign to each variable.
         return table
 
-    # If a variable does not have sources/licenses defined, assign the ones from the dataset.
+    # If a variable does not have sources/origins/licenses defined, assign the ones from the dataset.
     # Do this for all columns, including index columns.
     for column in list(table.all_columns):
         if len(table._fields[column].sources) == 0:
             table._fields[column].sources = sources
+        if len(table._fields[column].origins) == 0:
+            table._fields[column].origins = origins
         if len(table._fields[column].licenses) == 0:
             table._fields[column].licenses = licenses
 
     return table
 
 
-@overload
-def copy_metadata(
-    from_table: Table, to_table: Table, include_missing_variables: bool = False, inplace: bool = False
-) -> Table:
-    ...
+def copy_metadata(from_table: Table, to_table: Table, deep=False) -> Table:
+    """Copy metadata from a different table to self."""
+    tab = Table(pd.DataFrame.copy(to_table, deep=deep), metadata=from_table.metadata.copy())
 
+    common_columns = set(to_table.all_columns) & set(from_table.all_columns)
 
-@overload
-def copy_metadata(
-    from_table: Table, to_table: Table, include_missing_variables: bool = False, inplace: bool = True
-) -> None:
-    ...
+    new_fields = defaultdict(VariableMeta)
+    for k in common_columns:
+        # copy if we have metadata in the other table
+        if k in from_table._fields:
+            new_fields[k] = from_table._fields[k].copy()
+        # otherwise keep current metadata (if it exists)
+        elif k in to_table._fields:
+            new_fields[k] = to_table._fields[k]
 
-
-def copy_metadata(
-    from_table: Table, to_table: Table, include_missing_variables: bool = False, inplace: bool = False
-) -> Optional[Table]:
-    if not inplace:
-        to_table = to_table.copy()
-
-    # Copy the table metadata.
-    to_table.metadata = copy.deepcopy(from_table.metadata)
-
-    if include_missing_variables:
-        # Copy metadata from all variables (in case you may need them later).
-        to_table._fields = copy.deepcopy(from_table._fields)
-    else:
-        # Find variables in the destination table that had metadata in the reference table.
-        existing_variables = set(to_table.all_columns) & set(from_table._fields.keys())
-        # Copy the metadata of those variables from the reference table to the destination table.
-        to_table._fields = copy.deepcopy(
-            defaultdict(VariableMeta, {variable: from_table._fields[variable] for variable in existing_variables})
-        )
-
-    if not inplace:
-        return to_table
+    tab._fields = new_fields
+    return tab
 
 
 @overload
@@ -1373,13 +1351,8 @@ def get_unique_origins_from_tables(tables: List[Table]) -> List[Origin]:
     # Make a list of all origins of all variables in all tables.
     origins = sum([table._fields[column].origins for table in tables for column in list(table.all_columns)], [])
 
-    # Get unique array of tuples of origin fields (respecting the order).
-    unique_origins_array = pd.unique([tuple(origin.to_dict().items()) for origin in origins])
-
-    # Make a list of unique origins.
-    unique_origins = [Origin.from_dict(dict(origin)) for origin in unique_origins_array]  # type: ignore
-
-    return unique_origins
+    # Get unique array of tuples of source fields (respecting the order).
+    return pd.unique(origins).tolist()
 
 
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
@@ -1390,28 +1363,30 @@ def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     return pd.unique(licenses).tolist()
 
 
-def _combine_tables_titles_and_descriptions(tables: List[Table], title_or_description: str) -> Optional[str]:
-    # Keep the title only if all tables have exactly the same title.
-    # Otherwise we assume that the table has a different meaning, and its title should be manually handled.
-    title_or_description_combined = None
-    titles_or_descriptions = pd.unique([getattr(table.metadata, title_or_description) for table in tables])
-    if len(titles_or_descriptions) == 1:
-        title_or_description_combined = titles_or_descriptions[0]
+def _get_metadata_value_from_tables_if_all_identical(tables: List[Table], field: str) -> Optional[Any]:
+    # Get unique values from list, ignoring Nones.
+    unique_values = set(
+        [getattr(table.metadata, field) for table in tables if getattr(table.metadata, field) is not None]
+    )
+    if len(unique_values) == 1:
+        combined_value = unique_values.pop()
+    else:
+        combined_value = None
 
-    return title_or_description_combined
-
-
-def combine_tables_titles(tables: List[Table]) -> Optional[str]:
-    return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="title")
+    return combined_value
 
 
-def combine_tables_descriptions(tables: List[Table]) -> Optional[str]:
-    return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="description")
+def combine_tables_title(tables: List[Table]) -> Optional[str]:
+    return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="title")
+
+
+def combine_tables_description(tables: List[Table]) -> Optional[str]:
+    return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="description")
 
 
 def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = None) -> TableMeta:
-    title = combine_tables_titles(tables=tables)
-    description = combine_tables_descriptions(tables=tables)
+    title = combine_tables_title(tables=tables)
+    description = combine_tables_description(tables=tables)
     if short_name is None:
         # If a short name is not specified, take it from the first table.
         short_name = tables[0].metadata.short_name

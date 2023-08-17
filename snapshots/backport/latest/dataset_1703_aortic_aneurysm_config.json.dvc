@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1703
+    date_accessed: 2023-08-16 08:03:19.991592
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1703_aortic_aneurysm (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 23211b7f097e9f6b5f692cab7a2f5db8
+  size: 26693
+  path: dataset_1703_aortic_aneurysm_config.json

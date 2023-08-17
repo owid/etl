@@ -42,3 +42,40 @@ steps:
     - data://meadow/animal_welfare/2023-08-08/farmed_finfishes_used_for_food
   data://grapher/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
     - data://garden/animal_welfare/2023-08-08/farmed_finfishes_used_for_food
+  #
+  # Number of farmed fish (Fishcount, 2018).
+  #
+  data://meadow/animal_welfare/2023-08-14/number_of_farmed_fish:
+    - snapshot://animal_welfare/2023-08-14/number_of_farmed_fish_2015.xlsx
+    - snapshot://animal_welfare/2023-08-14/number_of_farmed_fish_2016.xlsx
+    - snapshot://animal_welfare/2023-08-14/number_of_farmed_fish_2017.xlsx
+  data://garden/animal_welfare/2023-08-14/number_of_farmed_fish:
+    - data://meadow/animal_welfare/2023-08-14/number_of_farmed_fish
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/animal_welfare/2023-08-14/number_of_farmed_fish:
+    - data://garden/animal_welfare/2023-08-14/number_of_farmed_fish
+  #
+  # Number of decapod crustaceans (Fishcount, 2018).
+  #
+  data://meadow/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
+    - snapshot://animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans_2015.xlsx
+    - snapshot://animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans_2016.xlsx
+    - snapshot://animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans_2017.xlsx
+  data://garden/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
+    - data://meadow/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
+    - data://garden/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans
+  #
+  # Number of wild fish killed for food (Fishcount, 2019).
+  #
+  data://meadow/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
+    - snapshot://animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food.xlsx
+  data://garden/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
+    - data://meadow/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
+    - data://garden/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4195
+    date_accessed: 2023-08-14 15:50:43.553990
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Social media use in the US by gender (Pew Research Center)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 633ea91a8333878c0fed8442f36b62ef
+  size: 6450
+  path: 
+    dataset_4195_social_media_use_in_the_us_by_gender__pew_research_center_values.feather

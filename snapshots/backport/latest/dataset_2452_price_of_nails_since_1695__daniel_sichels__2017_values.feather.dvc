@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2452
+    date_accessed: 2023-08-14 16:00:21.323473
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Price of nails since 1695 (Daniel Sichels (2017))
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e35808d90f1719b1ea3fa04172f9eb6a
+  size: 17130
+  path: dataset_2452_price_of_nails_since_1695__daniel_sichels__2017_values.feather

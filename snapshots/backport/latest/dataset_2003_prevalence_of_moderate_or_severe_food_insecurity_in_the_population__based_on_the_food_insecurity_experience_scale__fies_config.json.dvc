@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2003
+    date_accessed: 2023-08-14 08:50:56.448571
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2003_prevalence_of_moderate_or_severe_food_insecurity_in_the_population__based_on_the_food_insecurity_experience_scale__fies
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6a27e3b579cfcb05f6e615634552769c
+  size: 15553
+  path: 
+    dataset_2003_prevalence_of_moderate_or_severe_food_insecurity_in_the_population__based_on_the_food_insecurity_experience_scale__fies_config.json

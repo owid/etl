@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1680
+    date_accessed: 2023-08-16 08:34:25.477422
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1680_exposure_to_forces_of_nature (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b4b4c662b5002349a66a06de874b5ede
+  size: 32130
+  path: dataset_1680_exposure_to_forces_of_nature_config.json

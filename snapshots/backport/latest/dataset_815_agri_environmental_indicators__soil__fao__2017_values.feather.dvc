@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/815
+    date_accessed: 2023-08-14 14:35:31.281719
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Agri-Environmental Indicators: Soil - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5e9bfcd7a307c0db57b3ab7ff3777bb1
+  size: 15746
+  path: dataset_815_agri_environmental_indicators__soil__fao__2017_values.feather

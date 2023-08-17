@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4843
+    date_accessed: 2023-08-16 10:20:06.610202
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Non-fatal occupational injuries among employees, by sex and migrant status
+    (per 100,000 employees)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4a82ebec717ae7f81f55c9811371a777
+  size: 28322
+  path: 
+    dataset_4843_non_fatal_occupational_injuries_among_employees__by_sex_and_migrant_status__per_100_000_employees_values.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4745
+    date_accessed: 2023-08-11 07:41:00.266152
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of population achieving at least a fixed level of proficiency in
+    functional skills, by sex, age and type of skill (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e34dbec411060877236e6bccb918d607
+  size: 9698
+  path: 
+    dataset_4745_proportion_of_population_achieving_at_least_a_fixed_level_of_proficiency_in_functional_skills__by_sex__age_and_type_of_skill__pct_values.feather

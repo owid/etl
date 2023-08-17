@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1497
+    date_accessed: 2023-08-11 07:56:56.063141
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Cerebrovascular disease
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 888ac82c5dec18d1a4d389075459b511
+  size: 2012050
+  path: dataset_1497_cerebrovascular_disease_values.feather

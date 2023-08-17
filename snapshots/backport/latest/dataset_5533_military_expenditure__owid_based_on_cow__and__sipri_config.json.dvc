@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5533
+    date_accessed: 2023-08-16 07:56:02.507803
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5533_military_expenditure__owid_based_on_cow__and__sipri
+    (archived)
+  description: WORK IN PROGRESS - DO NOT USE YET (Ed, 25 Feb 2022)
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 888565e3bc4c7f4ed8cdab4cf888717e
+  size: 6683
+  path: dataset_5533_military_expenditure__owid_based_on_cow__and__sipri_config.json

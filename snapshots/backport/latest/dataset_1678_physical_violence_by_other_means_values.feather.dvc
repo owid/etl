@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1678
+    date_accessed: 2023-08-14 11:02:13.117305
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Physical violence by other means
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7de249054c47d7a140e0221499de31b3
+  size: 2012058
+  path: dataset_1678_physical_violence_by_other_means_values.feather

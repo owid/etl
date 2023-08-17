@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2255
+    date_accessed: 2023-08-16 09:28:51.641317
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2255_hodgkin_lymphoma (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f668403ab6408acd717c1f8749c08fe5
+  size: 32536
+  path: dataset_2255_hodgkin_lymphoma_config.json

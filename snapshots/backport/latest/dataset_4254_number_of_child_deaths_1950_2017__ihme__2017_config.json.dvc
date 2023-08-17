@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4254
+    date_accessed: 2023-08-16 08:49:10.313520
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4254_number_of_child_deaths_1950_2017__ihme__2017
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c5d38c174c94e9472b90ae828b47f63d
+  size: 2403
+  path: dataset_4254_number_of_child_deaths_1950_2017__ihme__2017_config.json

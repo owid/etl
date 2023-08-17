@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1726
+    date_accessed: 2023-08-16 09:33:42.933706
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Brain and nervous system cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9a2880e0651aa3383bc807f4e48a3ab5
+  size: 2012058
+  path: dataset_1726_brain_and_nervous_system_cancer_values.feather

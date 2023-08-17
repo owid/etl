@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1499
+    date_accessed: 2023-08-16 10:34:39.605108
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Hemorrhagic stroke
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e3bd56ae62e72d2e5cc07bbe6a58e3d2
+  size: 2012042
+  path: dataset_1499_hemorrhagic_stroke_values.feather

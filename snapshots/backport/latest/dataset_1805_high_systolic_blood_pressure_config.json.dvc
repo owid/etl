@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1805
+    date_accessed: 2023-08-16 10:40:34.127907
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1805_high_systolic_blood_pressure (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f6b8b3fb7376efe6875b37b58df2d197
+  size: 22430
+  path: dataset_1805_high_systolic_blood_pressure_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1048
+    date_accessed: 2023-08-16 07:30:02.199529
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1048_world_bank_gender_statistics__health (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 925c928e3ae647724f102369a7976f68
+  size: 336736
+  path: dataset_1048_world_bank_gender_statistics__health_config.json

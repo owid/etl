@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1704
+    date_accessed: 2023-08-16 07:14:50.820147
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Peripheral artery disease
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6017698f567c1b7e1b0833c77db04404
+  size: 1389906
+  path: dataset_1704_peripheral_artery_disease_values.feather

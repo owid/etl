@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2071
+    date_accessed: 2023-08-16 09:27:04.080794
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2071_amount_of_water__and_sanitation_related_official_development_assistance_that_is_part_of_a_government_coordinated_spending_plan
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e8d7330b470828edd61ac9e70269893e
+  size: 5719
+  path: 
+    dataset_2071_amount_of_water__and_sanitation_related_official_development_assistance_that_is_part_of_a_government_coordinated_spending_plan_config.json

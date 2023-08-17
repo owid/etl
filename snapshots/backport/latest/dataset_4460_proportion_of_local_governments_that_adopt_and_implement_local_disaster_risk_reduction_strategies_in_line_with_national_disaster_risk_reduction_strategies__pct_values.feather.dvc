@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4460
+    date_accessed: 2023-08-14 15:46:12.723577
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of local governments that adopt and implement local disaster risk
+    reduction strategies in line with national disaster risk reduction strategies
+    (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7a5cdfc8a2736690a39e4e066c0aebb0
+  size: 9418
+  path: 
+    dataset_4460_proportion_of_local_governments_that_adopt_and_implement_local_disaster_risk_reduction_strategies_in_line_with_national_disaster_risk_reduction_strategies__pct_values.feather

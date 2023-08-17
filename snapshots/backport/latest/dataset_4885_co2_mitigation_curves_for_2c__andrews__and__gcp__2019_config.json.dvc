@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4885
+    date_accessed: 2023-08-14 05:34:14.824743
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4885_co2_mitigation_curves_for_2c__andrews__and__gcp__2019
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 086b43fffe28491f025cba94ba160376
+  size: 3308
+  path: dataset_4885_co2_mitigation_curves_for_2c__andrews__and__gcp__2019_config.json

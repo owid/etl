@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4874
+    date_accessed: 2023-08-14 15:05:32.173903
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4874_bp_statistical_review_of_global_energy (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7e944ee664a341932adfb3941e3b4e8c
+  size: 74812
+  path: dataset_4874_bp_statistical_review_of_global_energy_config.json

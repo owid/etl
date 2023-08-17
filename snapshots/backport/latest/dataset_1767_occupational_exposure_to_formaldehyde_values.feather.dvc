@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1767
+    date_accessed: 2023-08-14 14:35:04.121186
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational exposure to formaldehyde
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c5dac87c53dcd45038e1d1171bf0f2b8
+  size: 961154
+  path: dataset_1767_occupational_exposure_to_formaldehyde_values.feather

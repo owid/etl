@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
     tb_garden = Table(df, short_name=paths.short_name)
 
     # Create dataset
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden])
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden.set_index(["entity", "date"])])
 
     # Add all sources from dependencies to dataset
     ds_garden.metadata.sources = ds_hmd.metadata.sources + ds_wmd.metadata.sources + ds_kobak.metadata.sources

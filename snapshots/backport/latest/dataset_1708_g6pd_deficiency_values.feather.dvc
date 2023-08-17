@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1708
+    date_accessed: 2023-08-16 08:23:34.211098
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: G6PD deficiency
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 23390603e2b6ffaa12823c2b987af3da
+  size: 2012042
+  path: dataset_1708_g6pd_deficiency_values.feather

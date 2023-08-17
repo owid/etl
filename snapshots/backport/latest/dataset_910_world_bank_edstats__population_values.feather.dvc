@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/910
+    date_accessed: 2023-08-16 08:35:52.153537
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - Population
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cf93e4befe19596d25bd19813ea21a4b
+  size: 5976298
+  path: dataset_910_world_bank_edstats__population_values.feather

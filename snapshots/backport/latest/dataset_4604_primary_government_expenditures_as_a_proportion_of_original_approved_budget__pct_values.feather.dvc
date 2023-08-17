@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/4604
-    date_accessed: 2023-08-08 07:31:25.346833
+    date_accessed: 2023-08-16 10:24:23.361689
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Primary government expenditures as a proportion of original approved budget
@@ -11,7 +11,7 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2919fd8ac3ab2d812c9a8bf312aa3650
+- md5: 31602960b33f7ede8211f6862e549404
   size: 13498
   path: 
     dataset_4604_primary_government_expenditures_as_a_proportion_of_original_approved_budget__pct_values.feather

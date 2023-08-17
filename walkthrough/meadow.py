@@ -20,7 +20,6 @@ DEFAULT_EXTENSION = "csv"
 
 
 class Options(Enum):
-    ADD_TO_DAG = "Add steps into dag/walkthrough.yaml file"
     GENERATE_NOTEBOOK = "Generate playground notebook"
     IS_PRIVATE = "Make dataset private"
 
@@ -32,6 +31,7 @@ class MeadowForm(BaseModel):
     snapshot_version: str
     file_extension: str
     add_to_dag: bool
+    dag_file: str
     generate_notebook: bool
     is_private: bool
 
@@ -39,7 +39,8 @@ class MeadowForm(BaseModel):
         options = data.pop("options")
         if data["file_extension"] == "":
             data["file_extension"] = DEFAULT_EXTENSION
-        data["add_to_dag"] = Options.ADD_TO_DAG.value in options
+        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+        data["dag_file"] = data["dag_file"]
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
         data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
@@ -95,16 +96,15 @@ def app(run_checks: bool) -> None:
                 value=state.get("file_extension"),
                 help_text="File extension (without the '.') of the snapshot data file. Example: csv",
             ),
+            pi.select("Add to DAG", utils.ADD_DAG_OPTIONS, name="dag_file"),
             pi.checkbox(
                 "Additional Options",
                 options=[
-                    Options.ADD_TO_DAG.value,
                     Options.GENERATE_NOTEBOOK.value,
                     Options.IS_PRIVATE.value,
                 ],
                 name="options",
                 value=[
-                    Options.ADD_TO_DAG.value,
                     Options.GENERATE_NOTEBOOK.value,
                 ],
             ),
@@ -119,11 +119,12 @@ def app(run_checks: bool) -> None:
 
     if form.add_to_dag:
         dag_content = utils.add_to_dag(
-            {
+            dag={
                 f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}": [
                     f"snapshot{private_suffix}://{form.namespace}/{form.snapshot_version}/{form.short_name}.{form.file_extension}",
                 ]
-            }
+            },
+            dag_path=CURRENT_DIR / ".." / "dag" / form.dag_file,
         )
     else:
         dag_content = ""
@@ -164,4 +165,4 @@ def app(run_checks: bool) -> None:
     utils.preview_file(step_path, "python")
 
     if dag_content:
-        utils.preview_dag(dag_content)
+        utils.preview_dag(dag_content=dag_content, dag_name=f"`dag/{form.dag_file}`")

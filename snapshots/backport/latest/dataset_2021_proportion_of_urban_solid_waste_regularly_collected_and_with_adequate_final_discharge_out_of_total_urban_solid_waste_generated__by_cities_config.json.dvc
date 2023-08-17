@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2021
+    date_accessed: 2023-08-16 09:25:53.093564
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2021_proportion_of_urban_solid_waste_regularly_collected_and_with_adequate_final_discharge_out_of_total_urban_solid_waste_generated__by_cities
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 689b37dd9563014a713ac37a9e26002f
+  size: 9062
+  path: 
+    dataset_2021_proportion_of_urban_solid_waste_regularly_collected_and_with_adequate_final_discharge_out_of_total_urban_solid_waste_generated__by_cities_config.json

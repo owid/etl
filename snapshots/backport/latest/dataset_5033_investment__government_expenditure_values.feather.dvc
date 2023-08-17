@@ -1,0 +1,36 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5033
+    date_accessed: 2023-08-16 10:17:29.085995
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Investment: Government Expenditure'
+  description: "The Statistics Division of FAO collects annually data on Government
+    Expenditure on Agriculture through a questionnaire, which was developed in partnership
+    with the International Monetary Fund. The IMF is the responsible institution for
+    the Government Finance Statistics (GFS) methodology and annually collects GFS
+    data, including Expenditure by Functions of Government (COFOG). The Classification
+    of the Functions of Government (COFOG) is an international classification developed
+    by Organisation for Economic Co-operation and Development (OECD) and published
+    by the United Nations Statistical Division (UNSD), with the aim of categorise
+    governments' functions according to their purposes. The FAO questionnaire aligns
+    with Table 7 of the IMF GFS questionnaire, replicates the relevant aggregates
+    and drills down to request additional detail related to Agriculture. The FAO dataset
+    consists of a time series, from 2001 onwards, of Total Government Expenditure
+    and expenditure in: Economic affairs; Agriculture, Forestry, Fishing and Hunting,
+    along with its three disaggregated subsectors of Agriculture, Forestry and Fishing;
+    and Environmental Protection. In addition, expenditure in each detailed function
+    are further disaggregated into Recurrent and Capital expenditure. Additional indicators
+    include the Agriculture Share of Government Expenditure, and the Agriculture Orientation
+    Index (ratio between the Agriculture Share of Government Expenditure and the Agriculture
+    Value Added as Share of GDP). Though the goal is to have complete and consistent
+    coverage for all countries, different stages of implementation of the GFS methodology
+    and COFOG classification, and differences in the data collection and reporting
+    at country level creates some challenges in providing a complete and consistent
+    global dataset."
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 35e0cd0a5fdd9ffe5b2b72ebc13fe12f
+  size: 363682
+  path: dataset_5033_investment__government_expenditure_values.feather

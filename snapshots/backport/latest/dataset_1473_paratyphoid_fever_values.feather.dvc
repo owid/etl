@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1473
+    date_accessed: 2023-08-14 11:00:48.953298
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Paratyphoid fever
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f546f2f31f3752349872a234dfdf2822
+  size: 2012042
+  path: dataset_1473_paratyphoid_fever_values.feather

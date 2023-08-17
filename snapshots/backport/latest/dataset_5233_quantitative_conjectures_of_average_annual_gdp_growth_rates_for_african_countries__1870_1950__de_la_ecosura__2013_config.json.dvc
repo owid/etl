@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5233
+    date_accessed: 2023-08-11 07:38:49.605710
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_5233_quantitative_conjectures_of_average_annual_gdp_growth_rates_for_african_countries__1870_1950__de_la_ecosura__2013
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3ee0f0dfb9fcb0766b65a232d0e810af
+  size: 9044
+  path: 
+    dataset_5233_quantitative_conjectures_of_average_annual_gdp_growth_rates_for_african_countries__1870_1950__de_la_ecosura__2013_config.json

@@ -17,7 +17,6 @@ ETL_DIR = Path(etl.__file__).parent.parent
 
 
 class Options(Enum):
-    ADD_TO_DAG = "Add steps into dag.yml file"
     IS_PRIVATE = "Make dataset private"
 
 
@@ -26,11 +25,13 @@ class ExplorersForm(BaseModel):
     namespace: str
     version: str
     add_to_dag: bool
+    dag_file: str
     is_private: bool
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
-        data["add_to_dag"] = Options.ADD_TO_DAG.value in options
+        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+        data["dag_file"] = data["dag_file"]
         data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
 
@@ -70,16 +71,14 @@ def app(run_checks: bool) -> None:
                 validate=utils.validate_short_name,
                 help_text="Underscored dataset short name. Example: natural_disasters",
             ),
+            pi.select("Add to DAG", utils.ADD_DAG_OPTIONS, name="dag_file", value=state.get("dag_file")),
             pi.checkbox(
                 "Additional Options",
                 options=[
-                    Options.ADD_TO_DAG.value,
                     Options.IS_PRIVATE.value,
                 ],
                 name="options",
-                value=[
-                    Options.ADD_TO_DAG.value,
-                ],
+                value=[],
             ),
         ],
     )
@@ -92,11 +91,12 @@ def app(run_checks: bool) -> None:
 
     if form.add_to_dag:
         dag_content = utils.add_to_dag(
-            {
+            dag={
                 f"data{private_suffix}://explorers/{form.namespace}/{form.version}/{form.short_name}": [
                     f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}"
                 ]
-            }
+            },
+            dag_path=CURRENT_DIR / ".." / "dag" / form.dag_file,
         )
     else:
         dag_content = ""
@@ -130,4 +130,4 @@ as `s3://owid-catalog/explorers/{form.namespace}/{form.version}/{form.short_name
     utils.preview_file(step_path, "python")
 
     if dag_content:
-        utils.preview_dag(dag_content)
+        utils.preview_dag(dag_content=dag_content, dag_name=f"`dag/{form.dag_file}`")

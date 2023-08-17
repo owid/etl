@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/696
+    date_accessed: 2023-08-16 09:27:56.712547
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_696_fertilizer_prices__world_bank__2017 (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3cf1761feadb1a8d344aadd6ad7579bf
+  size: 4377
+  path: dataset_696_fertilizer_prices__world_bank__2017_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3627
+    date_accessed: 2023-08-14 14:35:57.639012
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Cirrhosis due to NASH
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7bf19fe0e14f1f44f06dfa1a24e4a0fa
+  size: 1499290
+  path: dataset_3627_cirrhosis_due_to_nash_values.feather

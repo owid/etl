@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1570
+    date_accessed: 2023-08-10 13:07:56.043663
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Decubitus ulcer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ae1ae770773386e1f59d0694ca3e8f4d
+  size: 2012042
+  path: dataset_1570_decubitus_ulcer_values.feather

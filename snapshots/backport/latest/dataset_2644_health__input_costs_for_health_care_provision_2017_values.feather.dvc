@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2644
+    date_accessed: 2023-08-14 05:34:48.045387
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Health - Input costs for health care provision 2017
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f30449e2b9c752062c2fc93cdb93a446
+  size: 9906
+  path: dataset_2644_health__input_costs_for_health_care_provision_2017_values.feather

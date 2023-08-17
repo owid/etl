@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1848
+    date_accessed: 2023-08-16 10:50:06.116875
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1848_solar_pv_module_costs__and__capacity__lafond_et_al__2017__and__irena
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c7e190ad81456ff9d0f3b07e938b54ff
+  size: 3664
+  path: 
+    dataset_1848_solar_pv_module_costs__and__capacity__lafond_et_al__2017__and__irena_config.json

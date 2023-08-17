@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1956
+    date_accessed: 2023-08-16 07:26:49.197386
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Remittance costs as a proportion of the amount remitted
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4910f6f5d3bd9dc1a0093b44c1b4dce6
+  size: 6562
+  path: 
+    dataset_1956_remittance_costs_as_a_proportion_of_the_amount_remitted_values.feather

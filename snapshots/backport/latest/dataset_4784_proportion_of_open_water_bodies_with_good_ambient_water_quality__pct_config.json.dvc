@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4784
+    date_accessed: 2023-08-16 10:23:51.116386
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4784_proportion_of_open_water_bodies_with_good_ambient_water_quality__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 16b2ed82efb4e1f95136a3a799d6da89
+  size: 19198
+  path: 
+    dataset_4784_proportion_of_open_water_bodies_with_good_ambient_water_quality__pct_config.json

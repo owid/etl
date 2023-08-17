@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2320
+    date_accessed: 2023-08-14 14:54:26.193820
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2320_neglected_tropical_diseases_and_malaria
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b06686b07c2c211433edafea24f6a0d7
+  size: 33502
+  path: dataset_2320_neglected_tropical_diseases_and_malaria_config.json

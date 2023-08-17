@@ -332,44 +332,22 @@ def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
     """Get data values of a variable."""
     q = """
     select
-        d.entityId as entity_id,
-        d.variableId as variable_id,
-        -- it would be more efficient to load entity name and variable name separately and
-        -- then join it before uploading to walden
-        e.name as entity_name,
-        e.code as entity_code,
-        v.name as variable_name,
-        d.year,
-        d.value as value
-    from data_values as d
-    join entities as e on e.id = d.entityId
-    join variables as v on v.id = d.variableId
-    where d.variableId in %(variable_ids)s
+        v.id as variable_id,
+        v.name as variable_name
+    from variables as v
+    where v.id in %(variable_ids)s
     """
-    df: pd.DataFrame = pd.read_sql(q, engine, params={"variable_ids": variable_ids})
-
-    # If df is empty, then data_values don't exist. This shouldn't be happening becase
-    # we don't backport ETL datasets (that don't have data_values), but there's an
-    # exception for SDG dataset that might backport ETL datasets.
-    if df.empty:
-        q = """
-        select
-            v.id as variable_id,
-            v.name as variable_name
-        from variables as v
-        where v.id in %(variable_ids)s
-        """
-        df = variable_data_df_from_s3(engine, variable_ids=variable_ids)
-        df = df.rename(
-            columns={
-                "entityId": "entity_id",
-                "variableId": "variable_id",
-                "entityName": "entity_name",
-                "entityCode": "entity_code",
-            }
-        )
-        vf: pd.DataFrame = pd.read_sql(q, engine, params={"variable_ids": variable_ids})
-        df = df.merge(vf, on="variable_id")
+    df = variable_data_df_from_s3(engine, variable_ids=variable_ids)
+    df = df.rename(
+        columns={
+            "entityId": "entity_id",
+            "variableId": "variable_id",
+            "entityName": "entity_name",
+            "entityCode": "entity_code",
+        }
+    )
+    vf: pd.DataFrame = pd.read_sql(q, engine, params={"variable_ids": variable_ids})
+    df = df.merge(vf, on="variable_id")
 
     # try converting values to float if possible, this can make the data 50% smaller
     # if successful
