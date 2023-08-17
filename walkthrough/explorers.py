@@ -31,7 +31,7 @@ class ExplorersForm(BaseModel):
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
-        data["add_to_dag"] = data["dag_file"] != "(ignore)"
+        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
         data["dag_file"] = data["dag_file"]
         data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
@@ -43,8 +43,6 @@ def app(run_checks: bool) -> None:
     po.put_markdown("# Walkthrough - Explorers")
     with open(CURRENT_DIR / "explorers.md", "r") as f:
         po.put_collapse("Instructions", [po.put_markdown(f.read())])
-
-    dag_files = sorted(os.listdir(CURRENT_DIR / ".." / "dag"))
 
     data = pi.input_group(
         "Options",
@@ -74,18 +72,16 @@ def app(run_checks: bool) -> None:
                 validate=utils.validate_short_name,
                 help_text="Underscored dataset short name. Example: natural_disasters",
             ),
+            pi.select("Add to DAG", utils.ADD_DAG_OPTIONS, name="dag_file"),
             pi.checkbox(
                 "Additional Options",
                 options=[
-                    Options.ADD_TO_DAG.value,
                     Options.IS_PRIVATE.value,
                 ],
                 name="options",
                 value=[
-                    Options.ADD_TO_DAG.value,
                 ],
             ),
-            pi.select("Add to DAG", ["(ignore)"] + dag_files, name="dag_file"),
         ],
     )
     form = ExplorersForm(**data)

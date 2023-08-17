@@ -44,7 +44,7 @@ class GardenForm(BaseModel):
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
-        data["add_to_dag"] = data["dag_file"] != "(ignore)"
+        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
         data["dag_file"] = data["dag_file"]
         data["include_metadata_yaml"] = Options.INCLUDE_METADATA_YAML.value in options
         data["load_countries_regions"] = Options.LOAD_COUNTRIES_REGIONS.value in options
@@ -60,8 +60,6 @@ def app(run_checks: bool) -> None:
     po.put_markdown("# Walkthrough - Garden")
     with open(CURRENT_DIR / "garden.md", "r") as f:
         po.put_collapse("Instructions", [po.put_markdown(f.read())])
-
-    dag_files = sorted(os.listdir(CURRENT_DIR / ".." / "dag"))
 
     data = pi.input_group(
         "Options",
@@ -99,6 +97,7 @@ def app(run_checks: bool) -> None:
                 value=state.get("version", str(dt.date.today())),
                 help_text="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
             ),
+            pi.select("Add to DAG", utils.ADD_DAG_OPTIONS, name="dag_file"),
             pi.checkbox(
                 "Additional Options",
                 options=[
@@ -114,7 +113,6 @@ def app(run_checks: bool) -> None:
                     Options.GENERATE_NOTEBOOK.value,
                 ],
             ),
-            pi.select("Add to DAG", ["(ignore)"] + dag_files, name="dag_file"),
         ],
     )
     form = GardenForm(**data)

@@ -33,7 +33,7 @@ class GrapherForm(BaseModel):
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
-        data["add_to_dag"] = data["dag_file"] != "(ignore)"
+        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
         data["dag_file"] = data["dag_file"]
         data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
@@ -52,8 +52,6 @@ def app(run_checks: bool) -> None:
 
     po.put_markdown("## Environment")
     utils._show_environment()
-
-    dag_files = sorted(os.listdir(CURRENT_DIR / ".." / "dag"))
 
     data = pi.input_group(
         "Options",
@@ -91,6 +89,7 @@ def app(run_checks: bool) -> None:
                 value=state.get("version", str(dt.date.today())),
                 help_text="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
             ),
+            pi.select("Add to DAG", utils.ADD_DAG_OPTIONS, name="dag_file"),
             pi.checkbox(
                 "Additional Options",
                 options=[
@@ -102,7 +101,6 @@ def app(run_checks: bool) -> None:
                     Options.ADD_TO_DAG.value,
                 ],
             ),
-            pi.select("Add to DAG", ["(ignore)"] + dag_files, name="dag_file"),
         ],
     )
     form = GrapherForm(**data)

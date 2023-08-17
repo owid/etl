@@ -39,7 +39,7 @@ class MeadowForm(BaseModel):
         options = data.pop("options")
         if data["file_extension"] == "":
             data["file_extension"] = DEFAULT_EXTENSION
-        data["add_to_dag"] = data["dag_file"] != "(ignore)"
+        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
         data["dag_file"] = data["dag_file"]
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
         data["is_private"] = Options.IS_PRIVATE.value in options
@@ -52,8 +52,6 @@ def app(run_checks: bool) -> None:
     po.put_markdown("# Walkthrough - Meadow")
     with open(CURRENT_DIR / "meadow.md", "r") as f:
         po.put_collapse("Instructions", [po.put_markdown(f.read())])
-
-    dag_files = sorted(os.listdir(CURRENT_DIR / ".." / "dag"))
 
     data = pi.input_group(
         "Options",
@@ -98,6 +96,7 @@ def app(run_checks: bool) -> None:
                 value=state.get("file_extension"),
                 help_text="File extension (without the '.') of the snapshot data file. Example: csv",
             ),
+            pi.select("Add to DAG", utils.ADD_DAG_OPTIONS, name="dag_file"),
             pi.checkbox(
                 "Additional Options",
                 options=[
@@ -109,7 +108,6 @@ def app(run_checks: bool) -> None:
                     Options.GENERATE_NOTEBOOK.value,
                 ],
             ),
-            pi.select("Add to DAG", ["(ignore)"] + dag_files, name="dag_file"),
         ],
     )
     form = MeadowForm(**data)
