@@ -32,6 +32,10 @@ DATASET_REGIONS_URI = f"data://garden/regions/{LATEST_REGIONS_VERSION}/regions"
 # use origins in walkthrough
 WALKTHROUGH_ORIGINS = os.environ.get("WALKTHROUGH_ORIGINS") == "1"
 
+# DAG dropdown options
+dag_files = sorted(os.listdir(DAG_DIR))
+dag_not_add_option = "(do not add to DAG)"
+ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 
 if WALKTHROUGH_ORIGINS:
     DUMMY_DATA = {
@@ -115,7 +119,7 @@ def preview_file(path: Path, language: str) -> None:
     )
 
 
-def preview_dag(dag_content: str, dag_name: str = "dag/main.yml") -> None:
+def preview_dag(dag_content: str, dag_name: Union[str, Path] = DAG_WALKTHROUGH_PATH) -> None:
     put_widget(
         title=po.put_success(po.put_markdown(f"Steps in {dag_name} were successfully generated")),
         contents=[po.put_markdown(f"```yml\n{dag_content}\n```")],
