@@ -92,12 +92,10 @@ def app(run_checks: bool) -> None:
             pi.checkbox(
                 "Additional Options",
                 options=[
-                    Options.ADD_TO_DAG.value,
                     Options.IS_PRIVATE.value,
                 ],
                 name="options",
                 value=[
-                    Options.ADD_TO_DAG.value,
                 ],
             ),
         ],
