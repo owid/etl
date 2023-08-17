@@ -20,6 +20,8 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["cset"]
+    tb = tb.reset_index()
+    tb.set_index(["country", "year", "field"], inplace=True)
 
     # Expand dimensions into columns.
     expanded_tb = gh.expand_dimensions(tb)
