@@ -329,6 +329,8 @@ def generate_key_indicators():
     elapsed_time = round(end_time - start_time, 2)
     print("Done. Execution time:", elapsed_time, "seconds")
 
+    return df
+
 
 def generate_key_indicators_concurrent():
     """
@@ -424,6 +426,8 @@ def generate_key_indicators_concurrent():
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
     print("Done. Execution time:", elapsed_time, "seconds")
+
+    return df
 
 
 # GENERATE RELATIVE POVERTY INDICATORS FILE
@@ -731,8 +735,6 @@ def generate_percentiles_concurrent():
     print("Done. Execution time:", elapsed_time, "seconds")
 
 
+generate_key_indicators_concurrent()
 # generate_relative_poverty_concurrent()
 # generate_percentiles_concurrent()
-
-generate_key_indicators_concurrent()
-generate_key_indicators()
