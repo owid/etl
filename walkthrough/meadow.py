@@ -39,7 +39,7 @@ class MeadowForm(BaseModel):
         options = data.pop("options")
         if data["file_extension"] == "":
             data["file_extension"] = DEFAULT_EXTENSION
-        data["add_to_dag"] = data["dag_file"] != "ignore"
+        data["add_to_dag"] = data["dag_file"] != "(ignore)"
         data["dag_file"] = data["dag_file"]
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
         data["is_private"] = Options.IS_PRIVATE.value in options
@@ -109,7 +109,7 @@ def app(run_checks: bool) -> None:
                     Options.GENERATE_NOTEBOOK.value,
                 ],
             ),
-            pi.select("Add to DAG", ["ignore"] + dag_files, name="dag_file"),
+            pi.select("Add to DAG", ["(ignore)"] + dag_files, name="dag_file"),
         ],
     )
     form = MeadowForm(**data)
