@@ -31,20 +31,33 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
     # Create a deep copy of the input table to avoid modifying the original data
     tb_with_regions = tb.copy()
 
-    # List of members representing different regions (CSET)
-    members = ["North America", "Europe", "Asia Pacific", "Africa", "Latin America and the Caribbean", "Oceania"]
+    # List of members representing different regions CSET
+    members = [
+        "Quad (Australia, India, Japan and the US)",
+        "Five Eyes (Australia, Canada, New Zealand, UK, and the US)",
+        "Global Partnership on Artificial Intelligence",
+        "European Union (27)",
+        "ASEAN (Association of Southeast Asian Nations)",
+        "North America",
+        "Europe",
+        "Asia Pacific",
+        "Africa",
+        "Latin America and the Caribbean",
+        "Oceania",
+        "Nato",
+    ]
 
-    # Filter the table to only include rows corresponding to the specified regions
-    df_regions = tb_with_regions[tb_with_regions["country"].isin(members)]
+    # Filter the table to only include rows corresponding to the countries and not regions
+    df_regions = tb_with_regions[~tb_with_regions["country"].isin(members)]
 
     # Reset the index of the filtered data
     df_regions.reset_index(inplace=True, drop=True)
 
     # Define aggregation rules for each column excluding "country", "year", and "field"
-    aggregations = {column: "sum" for column in df_regions.columns if column not in ["country", "year", "field"]}
+    numeric_cols = [col for col in df_regions.columns if col not in ["country", "year", "field"]]
 
     # Group the filtered data by "year" and "field" and aggregate the data based on the defined rules
-    result = df_regions.groupby(["year", "field"]).agg(aggregations).reset_index()
+    result = df_regions.groupby(["year", "field"])[numeric_cols].agg(sum_with_nan).reset_index()
 
     # Assign the aggregated data to a new country named "World"
     result["country"] = "World"

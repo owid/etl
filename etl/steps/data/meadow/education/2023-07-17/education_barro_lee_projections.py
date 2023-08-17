@@ -55,10 +55,11 @@ def run(dest_dir: str) -> None:
     df["age_group"] = df["Starting Age"].astype(str) + "-" + df["Finishing Age"].astype(str)
 
     # Simple sanity check to see that the values in "Starting Age" and "Finishing Age" are as expected
-    ages_expected = {0, 5, 10, 15}
-    ages_found = set(df["Starting Age"])
-    ages_unexpected = ages_found - ages_expected
-    assert ages_unexpected, f"Unexpected ages in column 'Starting Age': {ages_unexpected}!"
+    starting_ages_expected = {64, 25, 24, 15}
+    ages_found = set(df["Starting Age"].append(df["Finishing Age"]))
+    ages_unexpected = ages_found - starting_ages_expected
+    # Ensure that there are no unexpected ages
+    assert not ages_unexpected, f"Unexpected ages in column 'Starting Age': {ages_unexpected}!"
 
     df.drop(["Starting Age", "Finishing Age"], axis=1, inplace=True)
 
