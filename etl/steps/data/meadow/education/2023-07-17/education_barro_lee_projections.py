@@ -53,11 +53,18 @@ def run(dest_dir: str) -> None:
     df = df.rename(columns=COLUMNS_RENAME)
 
     df["age_group"] = df["Starting Age"].astype(str) + "-" + df["Finishing Age"].astype(str)
+
+    # Simple sanity check to see that the values in "Starting Age" and "Finishing Age" are as expected
+    ages_expected = {0, 5, 10, 15}
+    ages_found = set(df["Starting Age"])
+    ages_unexpected = ages_found - ages_expected
+    assert ages_unexpected, f"Unexpected ages in column 'Starting Age': {ages_unexpected}!"
+
     df.drop(["Starting Age", "Finishing Age"], axis=1, inplace=True)
 
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb.set_index(["country", "year", "sex", "age_group"], inplace=True)
+    tb = tb.set_index(["country", "year", "sex", "age_group"])
 
     # Drop unnecessary columns
     tb.drop(["barro_lee_country_code", "world_bank_country_code", "region"], axis=1, inplace=True)

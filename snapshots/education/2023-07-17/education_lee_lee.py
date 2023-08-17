@@ -1,4 +1,4 @@
-"""Script to create a snapshot of dataset 'Human Capital in the Long Run (Lee and Lee, 2016)'."""
+"""Script to access and download seversal CSVs, concatenate them and save as one snapshot of dataset 'Human Capital in the Long Run (Lee and Lee, 2016)'."""
 
 from pathlib import Path
 

@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
 
     tb.set_index(["country", "year", "sex", "age_group"], inplace=True)
     # Drop unnecessary columns
-    tb.drop("region", axis=1, inplace=True)
+    tb = tb.drop("region", axis=1)
 
     #
     # Save outputs.

@@ -100,8 +100,7 @@ def run(dest_dir: str) -> None:
     # Create a copy of the projections table with a suffix in the column names.
     tb_projections_copy = tb_projections.copy(deep=True)
     suffix = "_projections"
-    tb_projections_copy_columns = tb_projections_copy.columns + suffix
-    tb_projections_copy.columns = tb_projections_copy_columns
+    tb_projections_copy.columns = tb_projections_copy.columns + suffix
 
     # Load historical education data and drop columns related to enrollment rates.
     ds_past = cast(Dataset, paths.load_dependency("education_lee_lee"))
