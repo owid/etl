@@ -156,7 +156,7 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                             plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
                         except Exception:
                             st.error(
-                                "Something went wrong! This can be due to several reasons: One (or both) of the variables are not numeric, `data_values` for one of the variables does not have the columns `entityName` and `year`. Please check the error message below. Report the error #002001"
+                                "Something went wrong! This can be due to several reasons: One (or both) of the variables are not numeric, `values` for one of the variables does not have the columns `entityName` and `year`. Please check the error message below. Report the error #002001"
                             )
             # Remaining variables (editable)
             for i, suggestion in enumerate(suggestions):

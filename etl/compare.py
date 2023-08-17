@@ -269,13 +269,13 @@ def grapher(
     )
 
     if values:
-        remote_data_values_df = read_values_from_s3(remote_env, namespace, version, dataset)
-        local_data_values_df = read_values_from_s3(local_env, namespace, version, dataset)
+        remote_values_df = read_values_from_s3(remote_env, namespace, version, dataset)
+        local_values_df = read_values_from_s3(local_env, namespace, version, dataset)
 
-        print("\n[magenta]=== Comparing data_values ===[/magenta]")
+        print("\n[magenta]=== Comparing values ===[/magenta]")
         diff_print(
-            remote_data_values_df,
-            local_data_values_df,
+            remote_values_df,
+            local_values_df,
             "remote",
             "local",
             **ctx.obj,
