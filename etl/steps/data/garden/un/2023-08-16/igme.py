@@ -24,6 +24,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    tb = fix_sub_saharan_africa(tb)
     tb: Table = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
@@ -37,3 +38,21 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def fix_sub_saharan_africa(tb: Table) -> Table:
+    """
+    Sub-Saharan Africa appears twice in the Table, as it is defined by two different organisations, UNICEF and SDG.
+    This function clarifies this by combining the region and organisation into one.
+    """
+    tb["country"] = tb["country"].astype(str)
+
+    tb.loc[
+        (tb["country"] == "Sub-Saharan Africa") & (tb["regional_group"] == "UNICEF"), "country"
+    ] = "Sub-Saharan Africa (UNICEF)"
+
+    tb.loc[
+        (tb["country"] == "Sub-Saharan Africa") & (tb["regional_group"] == "SDG"), "country"
+    ] = "Sub-Saharan Africa (SDG)"
+
+    return tb

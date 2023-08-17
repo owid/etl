@@ -559,6 +559,14 @@ steps:
   data://grapher/education/2023-08-14/oecd_education:
   - data://garden/education/2023-08-14/oecd_education
 
+# UN IGME Child Mortality
+  data://meadow/un/2023-08-16/igme:
+  - snapshot://un/2023-08-16/igme.zip
+  data://garden/un/2023-08-16/igme:
+  - data://meadow/un/2023-08-16/igme
+  data://grapher/un/2023-08-16/igme:
+  - data://garden/un/2023-08-16/igme
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
