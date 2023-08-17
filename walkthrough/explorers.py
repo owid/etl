@@ -71,7 +71,7 @@ def app(run_checks: bool) -> None:
                 validate=utils.validate_short_name,
                 help_text="Underscored dataset short name. Example: natural_disasters",
             ),
-            pi.select("Add to DAG", utils.ADD_DAG_OPTIONS, name="dag_file"),
+            pi.select("Add to DAG", utils.ADD_DAG_OPTIONS, name="dag_file", value=state.get("dag_file")),
             pi.checkbox(
                 "Additional Options",
                 options=[

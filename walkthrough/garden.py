@@ -97,7 +97,7 @@ def app(run_checks: bool) -> None:
                 value=state.get("version", str(dt.date.today())),
                 help_text="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
             ),
-            pi.select("Add to DAG", utils.ADD_DAG_OPTIONS, name="dag_file"),
+            pi.select("Add to DAG", utils.ADD_DAG_OPTIONS, name="dag_file", value=state.get("dag_file")),
             pi.checkbox(
                 "Additional Options",
                 options=[
