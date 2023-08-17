@@ -382,6 +382,18 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], w
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
             raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
 
+        # there might still be some data_values for old variables
+        try:
+            db.cursor.execute(
+                """
+                DELETE FROM data_values WHERE variableId IN %(variable_ids)s
+            """,
+                {"variable_ids": variable_ids_to_delete},
+            )
+        except Exception:
+            # data_values table might not exist anymore, remove this code then
+            pass
+
         # then variables themselves with related data in other tables
         db.cursor.execute(
             """
