@@ -75,6 +75,11 @@ tables:
           its hostility level.
 
 
+          Consequently, the number of new conflicts globally might be lower than the sum across all regions. This can be due to multiple reasons:
+          (i) the same conflict occurs in multiple regions or (ii) a conflict starting in a region, but it already started earlier globally
+          (in another region).
+
+
           The same conflict can have different "hostility level" for different regions. When this is the case, we classify its global
           hostility level as the most hostile level based on the following rank (from less to most hostile):
 
