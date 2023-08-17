@@ -79,6 +79,7 @@ def create_units(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy(deep=False)
     unit_description = get_attributes_description()
     df["long_unit"] = df["units"].map(unit_description)
+    df["long_unit"][df["seriescode"] == "SL_ISV_IFEM"] = "Percentage"
     assert df["long_unit"].isna().sum() == 0
     df["short_unit"] = create_short_unit(df["long_unit"])
     return df
@@ -102,7 +103,6 @@ def get_dimension_description() -> dict[str, str]:
 
 
 def create_short_unit(long_unit: pd.Series) -> np.ndarray[Any, np.dtype[Any]]:
-
     conditions = [
         (long_unit.str.contains("PERCENT")) | (long_unit.str.contains("Percentage") | (long_unit.str.contains("%"))),
         (long_unit.str.contains("KG")) | (long_unit.str.contains("Kilograms")),
@@ -263,7 +263,6 @@ def generate_tables_for_indicator_and_series(
     data_dimensions: pd.DataFrame,
     dimensions: List[str],
 ) -> pd.DataFrame:
-
     if len(dimensions) == 0:
         return data_dimensions
     else:

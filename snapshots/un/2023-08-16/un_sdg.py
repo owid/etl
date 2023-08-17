@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 import requests
 import yaml
+from pandas.errors import ParserError
 from structlog import get_logger
 
 from etl.snapshot import Snapshot, SnapshotMeta, add_snapshot
@@ -52,7 +53,7 @@ def main(upload: bool) -> None:
         unit_desc = attributes_description(snap)
         unit_desc = pd.DataFrame(unit_desc.items(), columns=["AttCode", "AttValue"])
         log.info("Adding unit descriptions to catalog...")
-        add_snapshot("un/2023-01-24/un_sdg_unit.csv", dataframe=unit_desc, upload=upload)
+        add_snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg_unit.csv", dataframe=unit_desc, upload=upload)
 
         log.info("Downloading dimension descriptions...")
         dim_desc = dimensions_description(snap)
@@ -61,7 +62,7 @@ def main(upload: bool) -> None:
             json.dump(dim_desc, fp)
 
         log.info("Adding dimension descriptions to catalog...")
-        add_snapshot("un/2023-01-24/un_sdg_dimension.json", filename=dim_file, upload=upload)  # type: ignore
+        add_snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg_dimension.json", filename=dim_file, upload=upload)  # type: ignore
 
         # fetch the file locally
         assert metadata.source
@@ -69,7 +70,7 @@ def main(upload: bool) -> None:
         log.info("Downloading data...")
         all_data = download_data(snap)
         log.info("Adding data to catalog...")
-        add_snapshot("un/2023-01-24/un_sdg.feather", dataframe=all_data, upload=upload)
+        add_snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg.feather", dataframe=all_data, upload=upload)
 
 
 def create_metadata(snap: Snapshot) -> SnapshotMeta:
@@ -144,7 +145,6 @@ def download_data(snap: Snapshot) -> pd.DataFrame:
 
 def download_file(url: str, goal: str, area_codes: list, max_retries: int, bytes_read: int = 0) -> bytes:
     """Downloads a file from a url.
-
     Retries download up to {max_retries} times following a ChunkedEncodingError
     exception.
     """
@@ -187,7 +187,7 @@ def download_file(url: str, goal: str, area_codes: list, max_retries: int, bytes
                 "Encountered ChunkedEncodingError, but max_retries has been "
                 "exceeded. Download may not have been fully completed."
             )
-    except pd.errors.ParserError:
+    except ParserError:
         if max_retries > 0:
             log.info("Encountered ParserError, resuming download...")
             content += download_file(
