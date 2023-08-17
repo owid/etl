@@ -652,7 +652,7 @@ class Table(pd.DataFrame):
             parents=parents,
             variable_names=variable_names,
             comment=comment,
-            inplace=inplace,
+            inplace=inplace,  # type: ignore
         )
 
     def amend_log(
@@ -1248,7 +1248,7 @@ def update_log(
     parents: Optional[List[Any]] = None,
     variable_names: Optional[List[str]] = None,
     comment: Optional[str] = None,
-    inplace: bool = True,
+    inplace: Literal[True] = True,
 ) -> None:
     ...
 
@@ -1260,7 +1260,7 @@ def update_log(
     parents: Optional[List[Any]] = None,
     variable_names: Optional[List[str]] = None,
     comment: Optional[str] = None,
-    inplace: bool = False,
+    inplace: Literal[False] = False,
 ) -> Table:
     ...
 
