@@ -1,0 +1,49 @@
+meta:
+  name: Militarized Interstate Events (Gibler and Miller, 2023)
+  publication_year: 2023
+
+  publication_date: '2023-07-17'
+  source_name: Gibler and Miller (2023)
+  source_published_by: >-
+    D. M. Gibler and S. V. Miller, "The Militarized Interstate Events (MIE) Dataset,
+    1816-2014."
+    Conflict Management and Peace Science. Forthcoming.
+  url: https://internationalconflict.ua.edu/data-download/
+  source_data_url: https://www.dropbox.com/s/2aq3xu23a4ril85/events.zip?dl=1
+  license_url: https://internationalconflict.ua.edu/data-download/
+  license_name: International Conflict Data Project terms
+  date_accessed: 2023-08-15
+  is_public: true
+  description: >-
+    A Militarized Interstate Event (MIE) is a threat, display, or use of force by
+    one state in the
+    Correlates of War (CoW) international system against another state. We faithfully
+    implement the
+    coding rules described in Jones, Bremer and Singer (1996) and the changes to the
+    coding rules
+    made by CoW in the years since. Nevertheless, we also do make several coding rule
+    changes to
+    remove ambiguities in the rules and to provide additional information for researchers.
+
+
+    The changes we make and rationale for them are described well in the manuscript
+    cited
+    above. Of particular note, though, is that we have added an action code labeled
+    “war battle”
+    that describes sustained fights between opposing, organized armed forces. We no
+    longer code
+    “beginning a war” or “join ongoing war” as a militarized action; we only code
+    threats, displays,
+    or uses of force. We code fatality ranges for each event, discarding CoW’s use
+    of ordinal fatality
+    scales and the fatality precision variable. This produces minimum and maximum
+    estimated
+    fatalities for each MIE, with no missing values, which can aggregate to meaningful
+    ranges for
+    confrontation-level, confrontation-participant-level, and dyad-year summaries.
+
+wdir: ../../../data/snapshots/war/2023-08-15
+outs:
+- md5: 2582ed859e171c40b313b6d6ecf043a6
+  size: 933170
+  path: mie.zip
