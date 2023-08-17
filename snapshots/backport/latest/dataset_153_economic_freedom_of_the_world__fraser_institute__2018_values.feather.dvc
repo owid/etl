@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/153
+    date_accessed: 2023-08-16 08:39:00.895688
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Economic Freedom of the World - Fraser Institute (2018)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 86c5d1f5660bf513a570e63351b478a7
+  size: 36570
+  path: dataset_153_economic_freedom_of_the_world__fraser_institute__2018_values.feather

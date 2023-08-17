@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4760
+    date_accessed: 2023-08-16 09:50:17.524073
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of women aged 20-24 years who were married or in a union before
+    age 15 (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9abcce5357a68ffa737f99413b5deb6c
+  size: 11570
+  path: 
+    dataset_4760_proportion_of_women_aged_20_24_years_who_were_married_or_in_a_union_before_age_15__pct_values.feather

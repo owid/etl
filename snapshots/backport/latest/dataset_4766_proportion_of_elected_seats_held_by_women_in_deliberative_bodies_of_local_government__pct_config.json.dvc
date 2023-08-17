@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4766
+    date_accessed: 2023-08-10 14:40:29.690470
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4766_proportion_of_elected_seats_held_by_women_in_deliberative_bodies_of_local_government__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 04dbed2416931e2fc84f57d0171a056c
+  size: 1911
+  path: 
+    dataset_4766_proportion_of_elected_seats_held_by_women_in_deliberative_bodies_of_local_government__pct_config.json

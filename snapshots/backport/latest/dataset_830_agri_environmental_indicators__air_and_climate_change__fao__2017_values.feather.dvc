@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/830
+    date_accessed: 2023-08-11 07:44:01.812541
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Agri-Environmental Indicators: Air and climate change - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b60fa1c8535debb8af5fc0725221fafa
+  size: 11394
+  path: 
+    dataset_830_agri_environmental_indicators__air_and_climate_change__fao__2017_values.feather

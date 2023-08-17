@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5366
+    date_accessed: 2023-08-14 15:14:33.004126
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Natural disasters (EMDAT)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1076438d2ca120dc6f8c550fd7e4eda5
+  size: 1340754
+  path: dataset_5366_natural_disasters__emdat_values.feather

@@ -1,18 +1,14 @@
 meta:
-  name: Grapher metadata for dataset_5071_covid_2019__ecdc__2020
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5071
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-19 08:44:17.104294
+    date_accessed: 2023-08-16 08:03:07.697817
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5071_covid_2019__ecdc__2020 (archived)
+  description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a897e1f27c153b09709c3e1b4e1e5a94
-  size: 39704
+- md5: f55a5e38314e8f5a90d31a602f77dbfa
+  size: 48043
   path: dataset_5071_covid_2019__ecdc__2020_config.json

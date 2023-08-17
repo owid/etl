@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2078
+    date_accessed: 2023-08-14 05:43:31.290460
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Typhoid fever
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bc33618c774a94cc1e65ccabf93ecb3f
+  size: 2116386
+  path: dataset_2078_typhoid_fever_values.feather

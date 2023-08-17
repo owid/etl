@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_5641_space_track__number_of_objects_in_space_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:27:06.927658
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5641
+    date_accessed: 2023-08-11 07:59:17.720893
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5641_space_track__number_of_objects_in_space
+    (archived)
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/space_track
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5641
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 41de47fd74d4c55620fd0a8f0554e0d0
-  size: 2179
+- md5: dd1e72133f32a801025323f76119f2cd
+  size: 2330
   path: dataset_5641_space_track__number_of_objects_in_space_config.json

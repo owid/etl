@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2009
+    date_accessed: 2023-08-10 14:38:33.386141
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2009_developing_countries_and_least_developed_countries_share_of_global_exports
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e3dd68c7f914bdceb91ca4e6230385bb
+  size: 6349
+  path: 
+    dataset_2009_developing_countries_and_least_developed_countries_share_of_global_exports_config.json

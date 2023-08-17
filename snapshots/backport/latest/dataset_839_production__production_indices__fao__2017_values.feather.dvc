@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/839
+    date_accessed: 2023-08-16 09:27:24.283082
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Production: Production Indices - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0df3d98c21f15400c007db342f4e574e
+  size: 2663186
+  path: dataset_839_production__production_indices__fao__2017_values.feather

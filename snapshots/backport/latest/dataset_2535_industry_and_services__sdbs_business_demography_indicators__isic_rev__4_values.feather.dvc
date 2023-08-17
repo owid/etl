@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2535
+    date_accessed: 2023-08-14 15:48:59.625690
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Industry and Services - SDBS Business Demography Indicators (ISIC Rev. 4)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2fd5b8ebe47a97edb8d95112204305dd
+  size: 49674
+  path: 
+    dataset_2535_industry_and_services__sdbs_business_demography_indicators__isic_rev__4_values.feather

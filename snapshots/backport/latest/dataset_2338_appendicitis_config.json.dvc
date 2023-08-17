@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2338
+    date_accessed: 2023-08-16 07:20:45.499043
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2338_appendicitis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 74778f2cee7c9789566f37b929f61cbb
+  size: 32368
+  path: dataset_2338_appendicitis_config.json

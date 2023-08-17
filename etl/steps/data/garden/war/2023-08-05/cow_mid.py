@@ -1,4 +1,19 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""COW Militarised Inter-state Dispute dataset.
+
+
+- This dataset only contains inter-state conflicts. We use the hostility level to differentiate different "types" of conflicts.
+
+- The same conflict might be happening in different regions, with different hostility levels. This is important to consider when
+estimating the global number of ongoing (or new) conflicts by broken down by hostility level
+
+    - Such a conflict (occuring in mutliple regions at the same time with different hostility levels) has been coded using the
+    most hostile category at global level.
+
+- Each entry in this dataset describes a conflict (its participants and period). Therefore we need to "explode" it to add observations
+for each year of the conflict.
+
+- The number of deaths is not estimated for each hostile level, but rather only the aggregate is obtained.
+"""
 
 from typing import cast
 
@@ -228,11 +243,12 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     ## By region and hostility_level
     tb_ongoing = tb.groupby(["year", "region", "hostility_level"], as_index=False).agg(ops)
     ## region='World' and by hostility_level
-    tb_ongoing_world = tb.groupby(["year", "hostility_level"], as_index=False).agg(ops)
+    tb_ = tb.groupby(["dispnum", "year"], as_index=False).agg({"hostility_level": max})
+    tb_ongoing_world = tb_.groupby(["year", "hostility_level"], as_index=False).agg(ops)
     tb_ongoing_world["region"] = "World"
 
     ops = {"dispnum": "nunique", "fatalpre": sum}
-    ## By region and hostility_level='all
+    ## By region and hostility_level='all'
     tb_ongoing_alltypes = tb.groupby(["year", "region"], as_index=False).agg(ops)
     tb_ongoing_alltypes["hostility_level"] = "all"
     ## region='World' and hostility_level='all'
@@ -271,12 +287,13 @@ def _add_new_metrics(tb: Table) -> Table:
 
     # World
     ## Keep one row per (dispnum). Otherwise, we might count the same dispute in multiple years!
-    tb_ = tb.sort_values("styear").drop_duplicates(subset=["dispnum"], keep="first")
+    tb_ = tb.groupby(["dispnum", "styear"], as_index=False).agg({"hostility_level": max})
+    # tb_ = tb.sort_values("styear").drop_duplicates(subset=["dispnum"], keep="first")
     ## region='World' and by hostility_level
-    tb_new_world = tb.groupby(["styear", "hostility_level"], as_index=False).agg(ops)
+    tb_new_world = tb_.groupby(["styear", "hostility_level"], as_index=False).agg(ops)
     tb_new_world["region"] = "World"
     ## World and hostility_level='all'
-    tb_new_world_alltypes = tb.groupby(["styear"], as_index=False).agg(ops)
+    tb_new_world_alltypes = tb_.groupby(["styear"], as_index=False).agg(ops)
     tb_new_world_alltypes["region"] = "World"
     tb_new_world_alltypes["hostility_level"] = "all"
 

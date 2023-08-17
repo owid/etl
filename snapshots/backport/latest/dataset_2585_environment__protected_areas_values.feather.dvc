@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2585
+    date_accessed: 2023-08-14 16:04:31.168956
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environment - Protected areas
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fb6541e31e2bcd3de90d93af75a4b4a0
+  size: 60258
+  path: dataset_2585_environment__protected_areas_values.feather

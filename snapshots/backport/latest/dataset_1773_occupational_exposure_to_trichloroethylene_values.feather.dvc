@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1773
+    date_accessed: 2023-08-16 09:51:22.673922
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational exposure to trichloroethylene
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ad40f72890640e28a1abc47895f5ab30
+  size: 961162
+  path: dataset_1773_occupational_exposure_to_trichloroethylene_values.feather

@@ -279,7 +279,7 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     ## By region and conflict_type
     tb_ongoing = tb.groupby(["year", "region", "conflict_type"], as_index=False).agg(ops)
 
-    ## All conflicts
+    ## All conflict types
     tb_ongoing_all_conf = tb.groupby(["year", "region"], as_index=False).agg(ops)
     tb_ongoing_all_conf["conflict_type"] = "all"
 

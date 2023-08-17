@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/914
+    date_accessed: 2023-08-16 10:16:13.161504
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_914_year_of_last_recorded_wild_poliomyelitis_virus__who__gpei__2017
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e598f0262fb97ffea4395d48451b32b2
+  size: 2604
+  path: 
+    dataset_914_year_of_last_recorded_wild_poliomyelitis_virus__who__gpei__2017_config.json

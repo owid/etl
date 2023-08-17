@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2446
+    date_accessed: 2023-08-16 10:19:49.179517
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Economy
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b7055b455772231d806ec336ce551a18
+  size: 51354
+  path: dataset_2446_economy_values.feather

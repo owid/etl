@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4727
+    date_accessed: 2023-08-14 16:04:48.249635
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4727_proportion_of_youth_and_adults_with_information_and_communications_technology__ict__skills__by_sex_and_type_of_skill__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0faa65b6d882deb4fa754a817a55b73d
+  size: 32250
+  path: 
+    dataset_4727_proportion_of_youth_and_adults_with_information_and_communications_technology__ict__skills__by_sex_and_type_of_skill__pct_config.json

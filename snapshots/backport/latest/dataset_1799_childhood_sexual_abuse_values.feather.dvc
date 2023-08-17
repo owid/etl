@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1799
+    date_accessed: 2023-08-14 15:29:19.977914
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Childhood sexual abuse
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6bde2debe6c3b10276fb1f0e6affc88f
+  size: 1173514
+  path: dataset_1799_childhood_sexual_abuse_values.feather

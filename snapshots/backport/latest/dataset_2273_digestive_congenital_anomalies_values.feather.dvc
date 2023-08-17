@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2273
+    date_accessed: 2023-08-10 14:45:49.732850
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Digestive congenital anomalies
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e602bfc4877fdc9dab5be4279ceb9e03
+  size: 1489578
+  path: dataset_2273_digestive_congenital_anomalies_values.feather

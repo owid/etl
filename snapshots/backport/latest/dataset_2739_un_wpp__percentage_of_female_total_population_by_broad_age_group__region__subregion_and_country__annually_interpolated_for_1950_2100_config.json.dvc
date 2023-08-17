@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2739
+    date_accessed: 2023-08-14 15:44:33.890163
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2739_un_wpp__percentage_of_female_total_population_by_broad_age_group__region__subregion_and_country__annually_interpolated_for_1950_2100
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 574c83c354effe0582e98689af3bb0f8
+  size: 102074
+  path: 
+    dataset_2739_un_wpp__percentage_of_female_total_population_by_broad_age_group__region__subregion_and_country__annually_interpolated_for_1950_2100_config.json

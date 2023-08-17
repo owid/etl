@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2173
+    date_accessed: 2023-08-16 10:47:19.796693
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2173_drug_susceptible_tuberculosis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8b58e9395429e6153dde2e674774db08
+  size: 33082
+  path: dataset_2173_drug_susceptible_tuberculosis_config.json

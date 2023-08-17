@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1696
+    date_accessed: 2023-08-16 09:20:46.861351
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Caries of permanent teeth
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eb9ca969bde92b6242c1ab9971082b32
+  size: 857202
+  path: dataset_1696_caries_of_permanent_teeth_values.feather

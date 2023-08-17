@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5879
+    date_accessed: 2023-08-10 14:47:10.774818
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: '[TESTING] COVID-19 - Cases and deaths (WHO)'
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6a8ed81833b8028d445204e32650e867
+  size: 1520546
+  path: dataset_5879_testing__covid_19__cases_and_deaths__who_values.feather

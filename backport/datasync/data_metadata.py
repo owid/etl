@@ -270,7 +270,7 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
 
 
 def _infer_variable_type(values: pd.Series) -> str:
-    # data_values does not contain null values
+    # values don't contain null values
     assert values.notnull().all(), "values must not contain nulls"
     assert values.map(lambda x: isinstance(x, str)).all(), "only works for strings"
     if values.empty:

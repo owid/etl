@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/802
+    date_accessed: 2023-08-10 14:43:22.162512
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Production: Livestock Processed - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cbeef2040bbd633f6b0e3da631bf393b
+  size: 398858
+  path: dataset_802_production__livestock_processed__fao__2017_values.feather

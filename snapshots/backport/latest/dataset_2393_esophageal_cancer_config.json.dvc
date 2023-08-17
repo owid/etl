@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2393
+    date_accessed: 2023-08-16 09:52:41.261700
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2393_esophageal_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6c848eea09a65e9df5d0527fa5a8f83a
+  size: 32578
+  path: dataset_2393_esophageal_cancer_config.json

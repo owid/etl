@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/878
+    date_accessed: 2023-08-16 09:36:58.023187
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - Attainment
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 61a0c225fe415784735b3c7d2001c195
+  size: 4608130
+  path: dataset_878_world_bank_edstats__attainment_values.feather

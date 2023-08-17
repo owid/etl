@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/783
+    date_accessed: 2023-08-16 08:15:45.112707
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_783_trade__live_animals__fao__2017 (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ed9854ff7076849330c76f29f80cddbb
+  size: 147907
+  path: dataset_783_trade__live_animals__fao__2017_config.json

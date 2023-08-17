@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/1770
-    date_accessed: 2023-08-08 07:08:21.605930
+    date_accessed: 2023-08-16 08:38:37.424365
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Occupational exposure to silica
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 159afcc90a551fb662224b6b442e2b6e
+- md5: 3e193bc6d9acb3eb78deacd3441e9e73
   size: 1070562
   path: dataset_1770_occupational_exposure_to_silica_values.feather

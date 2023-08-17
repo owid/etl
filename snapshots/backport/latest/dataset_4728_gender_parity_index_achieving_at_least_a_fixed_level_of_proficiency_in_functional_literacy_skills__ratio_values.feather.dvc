@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4728
+    date_accessed: 2023-08-14 16:06:24.954111
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Gender parity index achieving at least a fixed level of proficiency in functional
+    literacy skills (ratio)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1a71229878cef9951efe7fac87411263
+  size: 7970
+  path: 
+    dataset_4728_gender_parity_index_achieving_at_least_a_fixed_level_of_proficiency_in_functional_literacy_skills__ratio_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2176
+    date_accessed: 2023-08-16 07:53:29.541658
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2176_uterine_fibroids (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 686db8804a73fa975808fd19cbc9982a
+  size: 32536
+  path: dataset_2176_uterine_fibroids_config.json

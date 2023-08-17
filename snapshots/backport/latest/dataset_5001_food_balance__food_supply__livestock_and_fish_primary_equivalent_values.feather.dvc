@@ -1,0 +1,20 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5001
+    date_accessed: 2023-08-14 15:53:13.275081
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Food Balance: Food Supply - Livestock and Fish Primary Equivalent'
+  description: Food supply data is some of the most important data in FAOSTAT. In
+    fact, this data is for the basis for estimation of global and national undernourishment
+    assessment, when it is combined with parameters and other data sets. This data
+    has been the foundation of food balance sheets ever since they were first constructed.
+    The data is accessed by both business and governments for economic analysis and
+    policy setting, as well as being used by the academic community.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0bd1b3f882bafcfbf79a0864218e5348
+  size: 6104018
+  path: 
+    dataset_5001_food_balance__food_supply__livestock_and_fish_primary_equivalent_values.feather

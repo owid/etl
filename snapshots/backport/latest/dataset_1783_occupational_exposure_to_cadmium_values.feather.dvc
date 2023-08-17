@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1783
+    date_accessed: 2023-08-16 08:11:55.498753
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational exposure to cadmium
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fd04513c1818085ba0bd3048425c027b
+  size: 961154
+  path: dataset_1783_occupational_exposure_to_cadmium_values.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2066
+    date_accessed: 2023-08-14 05:49:43.135260
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2066_dollar_value_of_all_resources_made_available_to_strengthen_statistical_capacity_in_developing_countries
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c6ca08454a11d8686c269748c34c27a7
+  size: 3581
+  path: 
+    dataset_2066_dollar_value_of_all_resources_made_available_to_strengthen_statistical_capacity_in_developing_countries_config.json

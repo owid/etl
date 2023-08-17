@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5431
+    date_accessed: 2023-08-14 15:47:42.206171
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Life-cycle impacts of energy sources (UNECE)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1f1a7f232f7b0fcd60ff83702506fbae
+  size: 8714
+  path: dataset_5431_life_cycle_impacts_of_energy_sources__unece_values.feather

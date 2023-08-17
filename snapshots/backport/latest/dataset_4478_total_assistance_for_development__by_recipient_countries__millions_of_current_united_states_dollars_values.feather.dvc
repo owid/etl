@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4478
+    date_accessed: 2023-08-16 08:16:38.550648
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total assistance for development, by recipient countries (millions of current
+    United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ceea542dbc0eb4cc62fee5c59aa17536
+  size: 32146
+  path: 
+    dataset_4478_total_assistance_for_development__by_recipient_countries__millions_of_current_united_states_dollars_values.feather

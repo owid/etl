@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1752
+    date_accessed: 2023-08-16 08:50:34.896496
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1752_urticaria (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a624bf5bdbed0cc44a8c46157867e4ca
+  size: 16397
+  path: dataset_1752_urticaria_config.json

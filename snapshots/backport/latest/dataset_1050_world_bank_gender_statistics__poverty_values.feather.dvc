@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1050
+    date_accessed: 2023-08-10 14:45:16.956915
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank Gender Statistics - Poverty
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a08293a8429c736c739b87c84509c12a
+  size: 31866
+  path: dataset_1050_world_bank_gender_statistics__poverty_values.feather

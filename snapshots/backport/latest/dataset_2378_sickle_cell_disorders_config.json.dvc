@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2378
+    date_accessed: 2023-08-14 16:08:37.130828
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2378_sickle_cell_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f04cc996359f064aa6c77736b10785a6
+  size: 32746
+  path: dataset_2378_sickle_cell_disorders_config.json

@@ -1,0 +1,37 @@
+definitions:
+  common: |-
+    Decapods are an order of crustaceans that includes crabs, lobsters, crayfish, shrimp and prawns.
+    This study estimates the annual number of farmed decapod crustaceans slaughtered for food using data on aquaculture production tonnages (from the Food and Agriculture Organization of the United Nations) and mean weights estimated from available decapod crustaceans size data (from a range of internet sources). For species categories where no estimated mean weight was obtained, a generic mean weight was used to estimate numbers.
+tables:
+  number_of_farmed_decapod_crustaceans:
+    variables:
+      n_farmed_decapod_crustaceans_low:
+        title: Estimated number of farmed fish (lower bound)
+        unit: 'decapod crustaceans'
+        short_unit: ''
+        description: |
+          Lower bound estimate of the number of farmed decapod crustaceans.
+
+          {definitions.common}
+        display:
+          numDecimalPlaces: 0
+      n_farmed_decapod_crustaceans:
+        title: Estimated number of farmed decapod crustaceans
+        unit: 'decapod crustaceans'
+        short_unit: ''
+        description: |
+          Midpoint estimate of the number of farmed decapod crustaceans, calculated as the average between the lower and upper estimates.
+
+          {definitions.common}
+        display:
+          numDecimalPlaces: 0
+      n_farmed_decapod_crustaceans_high:
+        title: Estimated number of farmed decapod crustaceans (upper bound)
+        unit: 'decapod crustaceans'
+        short_unit: ''
+        description: |
+          Upper bound estimate of the number of farmed decapod crustaceans.
+
+          {definitions.common}
+        display:
+          numDecimalPlaces: 0

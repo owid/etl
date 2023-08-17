@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4529
+    date_accessed: 2023-08-16 10:03:40.287592
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4529_compliance_with_the_rotterdam_convention_on_hazardous_waste_and_other_chemicals
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3ab505ff524fae02353bc2215a870e56
+  size: 16999
+  path: 
+    dataset_4529_compliance_with_the_rotterdam_convention_on_hazardous_waste_and_other_chemicals_config.json

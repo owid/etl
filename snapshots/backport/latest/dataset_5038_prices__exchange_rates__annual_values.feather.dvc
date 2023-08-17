@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5038
+    date_accessed: 2023-08-16 08:41:20.589255
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Prices: Exchange rates - Annual'
+  description: Annual exchange rates, national currency units per U.S. dollar.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0352ea8328575730fae88c0de2ac622d
+  size: 56330
+  path: dataset_5038_prices__exchange_rates__annual_values.feather

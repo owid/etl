@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5168
+    date_accessed: 2023-08-14 08:15:15.670871
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Household expenditure on Housing, water, electricity, gas and other fuels
+    as a share of GDP - UN
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 033a7f6acc74a0492c8e243290bd7c5a
+  size: 26314
+  path: 
+    dataset_5168_household_expenditure_on_housing__water__electricity__gas_and_other_fuels_as_a_share_of_gdp__un_values.feather

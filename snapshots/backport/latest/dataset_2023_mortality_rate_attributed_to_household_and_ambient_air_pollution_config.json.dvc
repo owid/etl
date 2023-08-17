@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2023
+    date_accessed: 2023-08-14 05:37:59.809924
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2023_mortality_rate_attributed_to_household_and_ambient_air_pollution
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9a4bbf2b1aca50416d5a500d1b9232a2
+  size: 7968
+  path: 
+    dataset_2023_mortality_rate_attributed_to_household_and_ambient_air_pollution_config.json

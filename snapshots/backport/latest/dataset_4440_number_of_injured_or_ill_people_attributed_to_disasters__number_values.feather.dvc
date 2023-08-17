@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4440
+    date_accessed: 2023-08-10 14:48:41.627749
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of injured or ill people attributed to disasters (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bdecab5ec11a8a2cd79c906de3411c86
+  size: 15906
+  path: 
+    dataset_4440_number_of_injured_or_ill_people_attributed_to_disasters__number_values.feather

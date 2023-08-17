@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4870
+    date_accessed: 2023-08-14 05:33:19.585822
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Infant mortality rate (IHME - 2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1de8c08164f7fafc52a09fd68b132832
+  size: 65730
+  path: dataset_4870_infant_mortality_rate__ihme__2017_values.feather

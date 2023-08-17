@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/863
+    date_accessed: 2023-08-14 05:41:33.085234
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Clio-Infra - Gender Equality
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3ee316b7d7cf75a1ded799fe3612bf38
+  size: 29202
+  path: dataset_863_clio_infra__gender_equality_values.feather

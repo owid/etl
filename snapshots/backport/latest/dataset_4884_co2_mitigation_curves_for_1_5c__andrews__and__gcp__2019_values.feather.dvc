@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4884
+    date_accessed: 2023-08-16 10:41:53.099856
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: CO2 mitigation curves for 1.5C (Andrews & GCP, 2019)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3438c938cdec39efabb0bb2d0cafa930
+  size: 26386
+  path: 
+    dataset_4884_co2_mitigation_curves_for_1_5c__andrews__and__gcp__2019_values.feather

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_699_real_commodity_price_index_since_1850__jacks__2016_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:51:11.954316
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/699
+    date_accessed: 2023-08-16 10:02:58.526078
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Real Commodity Price Index since 1850 - Jacks (2016)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/699
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2d66f422b03ce9fe6aad9889950b0daf
+- md5: 562250b20407b3c57d39af0afe708009
   size: 56690
   path: dataset_699_real_commodity_price_index_since_1850__jacks__2016_values.feather

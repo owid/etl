@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4123
+    date_accessed: 2023-08-16 10:25:19.689833
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4123_child_mortality__1950_2017__ihme__2017 (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 00f2da1d7e2692c4756a8575fbfb6bbb
+  size: 2554
+  path: dataset_4123_child_mortality__1950_2017__ihme__2017_config.json

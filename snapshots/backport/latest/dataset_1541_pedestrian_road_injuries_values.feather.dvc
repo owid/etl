@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1541
+    date_accessed: 2023-08-16 10:02:06.501664
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Pedestrian road injuries
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 52d90d8f13237a745c069c9e00a2198d
+  size: 2012050
+  path: dataset_1541_pedestrian_road_injuries_values.feather

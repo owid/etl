@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5219
+    date_accessed: 2023-08-16 08:00:06.777429
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5219_maddison_project_database_2020__bolt_and_van_zanden__2020
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ec8cb45c395742a0ffe8b0ede78b43ed
+  size: 23619
+  path: 
+    dataset_5219_maddison_project_database_2020__bolt_and_van_zanden__2020_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2539
+    date_accessed: 2023-08-14 14:35:13.014617
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Development - Total receipts by country and region (ODA+OOF+private)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c7c3c2e392628cb56a3e9ffa168549bc
+  size: 34442
+  path: 
+    dataset_2539_development__total_receipts_by_country_and_region__odaplusoofplusprivate_values.feather

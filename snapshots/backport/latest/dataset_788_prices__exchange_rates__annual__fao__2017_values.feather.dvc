@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/788
+    date_accessed: 2023-08-16 08:48:20.670716
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Prices: Exchange rates - Annual - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1d431671709bbb450d6efebe0242445b
+  size: 51842
+  path: dataset_788_prices__exchange_rates__annual__fao__2017_values.feather

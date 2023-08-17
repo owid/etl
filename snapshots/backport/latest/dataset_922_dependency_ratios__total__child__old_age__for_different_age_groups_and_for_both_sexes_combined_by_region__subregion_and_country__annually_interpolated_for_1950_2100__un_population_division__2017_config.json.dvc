@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/922
+    date_accessed: 2023-08-16 10:21:01.397851
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_922_dependency_ratios__total__child__old_age__for_different_age_groups_and_for_both_sexes_combined_by_region__subregion_and_country__annually_interpolated_for_1950_2100__un_population_division__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 873cb332aab57faffaa2583560e97860
+  size: 36267
+  path: 
+    dataset_922_dependency_ratios__total__child__old_age__for_different_age_groups_and_for_both_sexes_combined_by_region__subregion_and_country__annually_interpolated_for_1950_2100__un_population_division__2017_config.json

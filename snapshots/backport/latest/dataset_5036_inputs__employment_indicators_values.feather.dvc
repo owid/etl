@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5036
+    date_accessed: 2023-08-16 10:04:34.623378
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Inputs: Employment Indicators'
+  description: The FAOSTAT Employment indicators module contains data on:- Agriculture
+    value added per worker;- Employment in agriculture (absolute numbers and shares,
+    by sex);- Share of Employees in agriculture (by sex);- Labour force participation
+    in rural areas (by sex);- Employment-to-population ratio in rural areas (by sex).The
+    series consist of data taken from Labour Force Surveys as available from the original
+    sources, namely the International Labour Organization (ILO).
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 16b021aa2d96c1aa8ba71fabae57188b
+  size: 200818
+  path: dataset_5036_inputs__employment_indicators_values.feather

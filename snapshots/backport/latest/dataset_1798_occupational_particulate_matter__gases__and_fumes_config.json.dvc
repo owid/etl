@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1798
+    date_accessed: 2023-08-14 10:58:45.195617
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1798_occupational_particulate_matter__gases__and_fumes
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fbe948374c671dc25c6eb7d9a40f2d6c
+  size: 22724
+  path: dataset_1798_occupational_particulate_matter__gases__and_fumes_config.json

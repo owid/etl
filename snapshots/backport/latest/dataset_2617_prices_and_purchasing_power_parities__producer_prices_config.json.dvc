@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2617
+    date_accessed: 2023-08-16 07:23:58.442165
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2617_prices_and_purchasing_power_parities__producer_prices
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: db1214940f30afbf52939e4f800aa480
+  size: 26220
+  path: dataset_2617_prices_and_purchasing_power_parities__producer_prices_config.json

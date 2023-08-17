@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1472
+    date_accessed: 2023-08-16 10:12:48.256777
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1472_typhoid_fever (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ec513b13ee14a452d321ef7b0a26900f
+  size: 31295
+  path: dataset_1472_typhoid_fever_config.json

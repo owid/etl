@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/813
+    date_accessed: 2023-08-14 05:43:53.362542
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_813_inputs__land_use__fao__2017 (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 53e8686535d1da37a6b2341e091c312f
+  size: 59914
+  path: dataset_813_inputs__land_use__fao__2017_config.json

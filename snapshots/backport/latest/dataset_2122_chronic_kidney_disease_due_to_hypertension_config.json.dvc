@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2122
+    date_accessed: 2023-08-14 16:02:58.955748
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2122_chronic_kidney_disease_due_to_hypertension
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6af93ff6279fadccea35ff7b8832323c
+  size: 33628
+  path: dataset_2122_chronic_kidney_disease_due_to_hypertension_config.json

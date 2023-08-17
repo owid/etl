@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2676
+    date_accessed: 2023-08-14 15:19:53.772167
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2676_mental_and_substance_use_disorder_disaggregated__ihme
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6a383b9dd70ce24c46ae22ccbefcc725
+  size: 15110
+  path: dataset_2676_mental_and_substance_use_disorder_disaggregated__ihme_config.json

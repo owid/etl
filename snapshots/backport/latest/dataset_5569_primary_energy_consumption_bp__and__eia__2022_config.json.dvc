@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5569
+    date_accessed: 2023-08-14 16:10:51.559570
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5569_primary_energy_consumption_bp__and__eia__2022
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6bdb86f2be2bf3d7791dab8e3ea1b804
+  size: 6883
+  path: dataset_5569_primary_energy_consumption_bp__and__eia__2022_config.json

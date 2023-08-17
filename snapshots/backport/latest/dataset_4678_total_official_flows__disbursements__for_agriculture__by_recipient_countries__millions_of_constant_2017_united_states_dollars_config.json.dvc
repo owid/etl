@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4678
+    date_accessed: 2023-08-16 09:40:28.896837
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4678_total_official_flows__disbursements__for_agriculture__by_recipient_countries__millions_of_constant_2017_united_states_dollars
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a19aca34fe876546bcafd7124648f5f6
+  size: 2024
+  path: 
+    dataset_4678_total_official_flows__disbursements__for_agriculture__by_recipient_countries__millions_of_constant_2017_united_states_dollars_config.json

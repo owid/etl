@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1649
+    date_accessed: 2023-08-10 15:04:53.779555
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1649_acute_lymphoid_leukemia (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: acadb22344f93839a187ee4fbd5f5396
+  size: 31695
+  path: dataset_1649_acute_lymphoid_leukemia_config.json
