@@ -16,6 +16,28 @@ paths = PathFinder(__file__)
 log = get_logger()
 
 
+def add_world(tb: Table, ds_regions: Dataset) -> Table:
+    tb_with_regions = tb.copy()
+    aggregations = {column: "sum" for column in tb_with_regions.columns if column not in ["country", "year", "field"]}
+
+    # Find members of current region.
+    members = geo.list_members_of_region(
+        region="World",
+        ds_regions=ds_regions,
+    )
+    tb_with_regions = geo.add_region_aggregates(
+        df=tb_with_regions,
+        region="World",
+        countries_in_region=members,
+        countries_that_must_have_data=[],
+        num_allowed_nans_per_year=None,
+        frac_allowed_nans_per_year=0.99999,
+        aggregations=aggregations,
+    )
+
+    return tb_with_regions
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -31,19 +53,10 @@ def run(dest_dir: str) -> None:
     #
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # Grouping the DataFrame by 'year' to get the sum for each year
-    # Select the valid numeric columns for aggregation
-    numeric_cols = tb.select_dtypes(include=[np.number]).columns
+    # Add world
+    ds_regions: Dataset = paths.load_dependency("regions")
+    merged_total = add_world(tb=tb, ds_regions=ds_regions)
 
-    # Group by "year" and "field", select valid columns, and apply the custom aggregation function
-    df_total = tb.groupby(["year", "field"])[numeric_cols].agg(sum_with_nan)
-
-    # Resetting the index to convert 'year' from the index to a column
-    df_total.reset_index(inplace=True)
-
-    # Adding a 'Total' row in the 'country' column
-    df_total["country"] = "World"
-    merged_total = pd.concat([df_total, tb])
     # List of columns to include for conversion to millions (investment values)
     _investment_cols = [col for col in merged_total.columns if "investment" in col]
     # Convert all other columns to million
@@ -70,13 +83,31 @@ def run(dest_dir: str) -> None:
 
     df_cpi_inv.drop("cpi_adj_2021", axis=1, inplace=True)
 
-    tb = Table(df_cpi_inv, short_name=paths.short_name, underscore=True)
+    # Load population and merge with CSET dataset
+    ds_population = cast(Dataset, paths.load_dependency("population"))
+    tb_population = ds_population["population"].reset_index(drop=False)
+    df_pop_add = pd.merge(
+        df_cpi_inv, tb_population[["country", "year", "population"]], how="left", on=["country", "year"]
+    )
+    # Add per 1 million patents and publications
+    df_pop_add["num_patent_applications_per_mil"] = df_pop_add["num_patent_applications"] / (
+        df_pop_add["population"] / 1e6
+    ).astype("float64")
+    df_pop_add["num_patent_granted_per_mil"] = (
+        df_pop_add["num_patent_granted"] / (df_pop_add["population"] / 1e6)
+    ).astype("float64")
+    df_pop_add["num_articles_per_mil"] = (df_pop_add["num_articles"] / (df_pop_add["population"] / 1e6)).astype(
+        "float64"
+    )
+    df_pop_add = df_pop_add.drop("population", axis=1)
+    tb = Table(df_pop_add, short_name=paths.short_name, underscore=True)
     tb.set_index(["country", "year", "field"], inplace=True)
 
     # Create proportion of patents granted (in time) and citations per article (total across years)
     tb["proportion_patents_granted"] = (tb["num_patent_granted"] / tb["num_patent_applications"]) * 100
     tb["proportion_patents_granted"] = tb["proportion_patents_granted"].astype(float)
     tb["citations_per_article"] = tb["num_citations_summary"] / tb["num_articles_summary"]
+
     #
     # Save outputs.
     #
