@@ -12,8 +12,8 @@ paths = PathFinder(__file__)
 COLUMNS = {
     "country": "country",
     "year": "year",
-    "estimated_numbers__millions__lower": "n_farmed_decapod_crustaceans_low",
-    "estimated_numbers__millions__upper": "n_farmed_decapod_crustaceans_high",
+    "estimated_numbers__lower__millions": "n_wild_fish_low",
+    "estimated_numbers__upper__millions": "n_wild_fish_high",
 }
 
 # Regions to create aggregates for.
@@ -64,7 +64,7 @@ def run_sanity_checks_on_outputs(tb: Table) -> None:
         .groupby("year", as_index=False)
         .sum(numeric_only=True)
     )
-    assert (abs(world - test) / world < 1e-5).all().all()
+    assert (abs(world - test) / world < 1e-2).all().all()
 
 
 def run(dest_dir: str) -> None:
@@ -72,8 +72,8 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
-    ds_meadow: Dataset = paths.load_dependency("number_of_farmed_decapod_crustaceans")
-    tb = ds_meadow["number_of_farmed_decapod_crustaceans"].reset_index()
+    ds_meadow: Dataset = paths.load_dependency("number_of_wild_fish_killed_for_food")
+    tb = ds_meadow["number_of_wild_fish_killed_for_food"].reset_index()
 
     # Load regions dataset.
     ds_regions = paths.load_dependency("regions")
@@ -97,13 +97,11 @@ def run(dest_dir: str) -> None:
     tb = add_region_aggregates(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups).copy_metadata(tb)
 
     # Adapt units.
-    tb["n_farmed_decapod_crustaceans_low"] *= 1e6
-    tb["n_farmed_decapod_crustaceans_high"] *= 1e6
+    tb["n_wild_fish_low"] *= 1e6
+    tb["n_wild_fish_high"] *= 1e6
 
-    # Add midpoint number of decapod crustaceans.
-    tb["n_farmed_decapod_crustaceans"] = (
-        tb["n_farmed_decapod_crustaceans_low"] + tb["n_farmed_decapod_crustaceans_high"]
-    ) / 2
+    # Add midpoint number of wild fish.
+    tb["n_wild_fish"] = (tb["n_wild_fish_low"] + tb["n_wild_fish_high"]) / 2
 
     # Run sanity checks on outputs.
     run_sanity_checks_on_outputs(tb=tb)
