@@ -95,8 +95,7 @@ def app(run_checks: bool) -> None:
                     Options.IS_PRIVATE.value,
                 ],
                 name="options",
-                value=[
-                ],
+                value=[],
             ),
         ],
     )
