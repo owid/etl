@@ -1097,7 +1097,7 @@ def read_from_records(data: Any, *args, metadata: Optional[TableMeta] = None, un
 
 def read_from_dict(
     data: Dict[Any, Any], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
-):
+) -> Table:
     table = Table(pd.DataFrame.from_dict(data=data, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
     # NOTE: Parents could be passed as arguments, or extracted from metadata.

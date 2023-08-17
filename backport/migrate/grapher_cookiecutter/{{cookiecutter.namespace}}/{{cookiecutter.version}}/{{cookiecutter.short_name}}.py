@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset_dependency()
+    ds_garden = paths.load_dataset()
 
     # Read table from garden dataset.
     tb = ds_garden["{{cookiecutter.short_name}}"]

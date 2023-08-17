@@ -8,7 +8,7 @@ def run(dest_dir: str, paths: PathFinder) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset_dependency()
+    ds_garden = paths.load_dataset()
 
     # Read table from garden dataset.
     tb = ds_garden[paths.short_name]
