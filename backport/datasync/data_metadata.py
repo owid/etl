@@ -7,6 +7,7 @@ from urllib.error import HTTPError, URLError
 import numpy as np
 import pandas as pd
 from sqlalchemy.engine import Engine
+from sqlmodel import Session
 from tenacity import Retrying
 from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
@@ -54,26 +55,33 @@ def variable_data_df_from_s3(engine: Engine, variable_ids: List[int] = [], worke
     # we work with strings and convert to specific types later
     df["value"] = df["value"].astype(str)
 
-    return add_entity_code_and_name(engine, df)
+    with Session(engine) as session:
+        return add_entity_code_and_name(session, df)
 
 
-def add_entity_code_and_name(engine: Engine, df: pd.DataFrame) -> pd.DataFrame:
+def add_entity_code_and_name(session: Session, df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         df["entityName"] = []
         df["entityCode"] = []
         return df
 
-    # add entities from DB
+    # Query entities from the database
     q = """
     SELECT
         id AS entityId,
         name AS entityName,
         code AS entityCode
     FROM entities
-    WHERE id in %(entity_ids)s
+    WHERE id in :entity_ids
     """
-    entities = pd.read_sql(q, engine, params={"entity_ids": list(df["entityId"].unique())})
-    return pd.DataFrame(df).merge(entities, on="entityId")
+
+    # Execute the SQL using session
+    result_proxy = session.execute(q, {"entity_ids": tuple(df["entityId"].unique())})  # type: ignore
+
+    # Convert the result into a DataFrame
+    entities = pd.DataFrame(result_proxy.fetchall(), columns=result_proxy.keys())
+
+    return pd.merge(df, entities, on="entityId")
 
 
 def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
@@ -89,7 +97,7 @@ def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
     return data  # type: ignore
 
 
-def _load_variable(engine: Engine, variable_id: int) -> Dict[str, Any]:
+def _load_variable(session: Session, variable_id: int) -> Dict[str, Any]:
     sql = """
     SELECT
         variables.*,
@@ -102,45 +110,67 @@ def _load_variable(engine: Engine, variable_id: int) -> Dict[str, Any]:
     FROM variables
     JOIN datasets ON variables.datasetId = datasets.id
     LEFT JOIN sources ON variables.sourceId = sources.id
-    WHERE variables.id = %(variable_id)s
+    WHERE variables.id = :variable_id
     """
-    df = pd.read_sql(sql, engine, params={"variable_id": variable_id})
-    assert not df.empty, f"variableId `{variable_id}` not found"
-    return df.iloc[0].to_dict()
+
+    # Using the session to execute raw SQL and fetching one row as a result
+    result = session.execute(sql, {"variable_id": variable_id}).fetchone()  # type: ignore
+
+    # Ensure result exists and convert to dictionary
+    assert result, f"variableId `{variable_id}` not found"
+    return dict(result)
 
 
-def _load_topic_tags(engine: Engine, variable_id: int) -> list[str]:
+def _load_topic_tags(session: Session, variable_id: int) -> List[str]:
     sql = """
     SELECT
         tags.name
     FROM tags_variables_topic_tags
     JOIN tags ON tags_variables_topic_tags.tagId = tags.id
-    WHERE variableId = %(variable_id)s
+    WHERE variableId = :variable_id
     """
-    return pd.read_sql(sql, engine, params={"variable_id": variable_id})["name"].tolist()
+
+    # Using the session to execute raw SQL
+    result = session.execute(sql, {"variable_id": variable_id}).fetchall()  # type: ignore
+
+    # Extract tag names from the result and return as a list
+    return [row[0] for row in result]
 
 
-def _load_faqs(engine: Engine, variable_id: int) -> list[dict]:
+def _load_faqs(session: Session, variable_id: int) -> List[Dict[str, Any]]:
     sql = """
     SELECT
         gdocId,
         fragmentId
     FROM posts_gdocs_variables_faqs
-    WHERE variableId = %(variable_id)s
+    WHERE variableId = :variable_id
     """
-    return pd.read_sql(sql, engine, params={"variable_id": variable_id}).to_dict(orient="records")
+
+    # Using the session to execute raw SQL
+    result = session.execute(sql, {"variable_id": variable_id}).fetchall()  # type: ignore
+
+    # Convert the result rows to a list of dictionaries
+    return [dict(row) for row in result]
 
 
-def _load_origins_df(engine: Engine, variable_id: int) -> pd.DataFrame:
+def _load_origins_df(session: Session, variable_id: int) -> pd.DataFrame:
     sql = """
     SELECT
         origins.*
     FROM origins
     JOIN origins_variables ON origins.id = origins_variables.originId
-    WHERE origins_variables.variableId = %(variable_id)s
+    WHERE origins_variables.variableId = :variable_id
     """
-    df = pd.read_sql(sql, engine, params={"variable_id": variable_id})
+
+    # Use the session to execute the raw SQL
+    result_proxy = session.execute(sql, {"variable_id": variable_id})  # type: ignore
+
+    # Fetch the results into a DataFrame
+    df = pd.DataFrame(result_proxy.fetchall(), columns=result_proxy.keys())
+
+    # Process the 'license' column
     df["license"] = df["license"].map(lambda x: json.loads(x) if x else None)
+
     return df
 
 
@@ -255,17 +285,17 @@ def _variable_metadata(
     return variableMetadata
 
 
-def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
+def variable_metadata(session: Session, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
     """Fetch metadata for a single variable from database. This function was initially based on the
     one from owid-grapher repository and uses raw SQL commands. It'd be interesting to rewrite it
     using SQLAlchemy ORM in grapher_model.py.
     """
     return _variable_metadata(
-        db_variable_row=_load_variable(engine, variable_id),
+        db_variable_row=_load_variable(session, variable_id),
         variable_data=variable_data,
-        db_origins_df=_load_origins_df(engine, variable_id),
-        db_topic_tags=_load_topic_tags(engine, variable_id),
-        db_faqs=_load_faqs(engine, variable_id),
+        db_origins_df=_load_origins_df(session, variable_id),
+        db_topic_tags=_load_topic_tags(session, variable_id),
+        db_faqs=_load_faqs(session, variable_id),
     )
 
 

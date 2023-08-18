@@ -156,7 +156,7 @@ def _add_or_update_source(
     if not source_id:
         # Not exists, upsert it
         # NOTE: this could be quite inefficient as we upsert source for every variable
-        #   optimize this if this turns out to be a bottleneck
+        #   luckily we are moving away from sources towards origins
         source_id = _upsert_source_to_db(session, source, dataset_upsert_result.dataset_id)
 
     return source_id
@@ -263,7 +263,8 @@ def upsert_table(
             catalog_path=catalog_path,
             dimensions=dimensions,
         ).upsert(session)
-        assert db_variable.id
+        db_variable_id = db_variable.id
+        assert db_variable_id
 
         df = table.rename(columns={column_name: "value", "entity_id": "entityId"})
 
@@ -272,17 +273,10 @@ def upsert_table(
 
         # NOTE: we could prefetch all entities in advance, but it's not a bottleneck as it takes
         # less than 10ms per variable
-        df = add_entity_code_and_name(engine, df)
+        df = add_entity_code_and_name(session, df)
 
         # delete all previous relationships
         db_variable.delete_links(session)
-
-        # TODO: is this necessary?
-        session.add(db_variable)
-
-        # we need to commit changes because we use SQL command in `variable_metadata`. We wouldn't
-        # have to if we used ORM instead
-        session.commit()
 
         # create links, we need to do it after we commit deleted relationships above
         db_variable.create_links(
@@ -291,6 +285,10 @@ def upsert_table(
             faqs=variable_meta.presentation.faqs if variable_meta.presentation else [],
             tag_names=variable_meta.presentation.topic_tags_links if variable_meta.presentation else [],
         )
+        session.add(db_variable)
+
+        # we need to commit changes because we use SQL command in `variable_metadata`. We wouldn't
+        # have to if we used ORM instead
         session.commit()
 
         # process and upload data to S3
@@ -298,15 +296,12 @@ def upsert_table(
         upload_gzip_dict(var_data, db_variable.s3_data_path(), r2=True)
 
         # process and upload metadata to S3
-        var_metadata = variable_metadata(engine, db_variable.id, df)
+        var_metadata = variable_metadata(session, db_variable_id, df)
         upload_gzip_dict(var_metadata, db_variable.s3_metadata_path(), r2=True)
 
-        session.add(db_variable)
-        session.commit()
+        log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
 
-        log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable.id)
-
-        return VariableUpsertResult(db_variable.id, source_id)  # type: ignore
+        return VariableUpsertResult(db_variable_id, source_id)  # type: ignore
 
 
 def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:

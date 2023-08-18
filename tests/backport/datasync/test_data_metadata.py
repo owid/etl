@@ -2,6 +2,7 @@ from unittest import mock
 
 import pandas as pd
 import pytest
+from sqlmodel import Session
 
 from backport.datasync.data_metadata import (
     _convert_strings_to_numeric,
@@ -71,11 +72,12 @@ def test_variable_metadata():
         }
     ]
     topic_tags = ["Population"]
-    with mock.patch("backport.datasync.data_metadata._load_variable", return_value=variable_meta):
-        with mock.patch("backport.datasync.data_metadata._load_origins_df", return_value=origins_df):
-            with mock.patch("backport.datasync.data_metadata._load_faqs", return_value=faqs):
-                with mock.patch("backport.datasync.data_metadata._load_topic_tags", return_value=topic_tags):
-                    meta = variable_metadata(engine, 525715, variable_df)
+    with Session(engine) as session:
+        with mock.patch("backport.datasync.data_metadata._load_variable", return_value=variable_meta):
+            with mock.patch("backport.datasync.data_metadata._load_origins_df", return_value=origins_df):
+                with mock.patch("backport.datasync.data_metadata._load_faqs", return_value=faqs):
+                    with mock.patch("backport.datasync.data_metadata._load_topic_tags", return_value=topic_tags):
+                        meta = variable_metadata(session, 525715, variable_df)
 
     assert meta == {
         "catalogPath": "grapher/owid/latest/key_indicators/population_density",
