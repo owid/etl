@@ -6818,6 +6818,20 @@ watchdog = {version = ">=2.1.5", markers = "platform_system != \"Darwin\""}
 snowflake = ["snowflake-snowpark-python"]
 
 [[package]]
+name = "streamlit-ace"
+version = "0.1.1"
+description = "Ace editor component for Streamlit."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "streamlit_ace-0.1.1-py3-none-any.whl", hash = "sha256:cdf908a90058fa831fb720d29e2aef35a0f5799eac33e2b2e58ba9f3631b1aa5"},
+    {file = "streamlit_ace-0.1.1.tar.gz", hash = "sha256:1852fa19707685fd4241be9256c1ab1a89da4a3b8c28ab286e3bff122d3a1686"},
+]
+
+[package.dependencies]
+streamlit = ">=0.63"
+
+[[package]]
 name = "stringcase"
 version = "1.2.0"
 description = "String case converter."
@@ -7686,4 +7700,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "170fb8cb20d36d44533c89914762afde9b4cef0a650b59e847672bd13911df87"
+content-hash = "96c429be72335af93ef2e6c64f3f7f855773c9f3416625a379dd30de63be7129"

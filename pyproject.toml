@@ -80,6 +80,7 @@ pyhumps = "^3.8.0"
 wbgapi = "^1.0.12"
 odfpy = "^1.4.1"
 questionary = "^2.0.0"
+streamlit-ace = "^0.1.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"
