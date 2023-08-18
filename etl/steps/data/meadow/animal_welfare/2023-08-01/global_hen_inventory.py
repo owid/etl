@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("global_hen_inventory.csv")
 
     # Load data from snapshot.
-    tb = snap.read_csv(sep="\t", encoding="utf-16", engine="python")
+    tb = snap.read(sep="\t", encoding="utf-16", engine="python")
 
     #
     # Process data.

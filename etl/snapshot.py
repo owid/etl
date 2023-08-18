@@ -120,6 +120,17 @@ class Snapshot:
     def to_table_metadata(self):
         return self.metadata.to_table_metadata()
 
+    def read(self, *args, **kwargs) -> Table:
+        """Read file based on its Snapshot extension."""
+        if self.metadata.file_extension == "csv":
+            return self.read_csv(*args, **kwargs)
+        elif self.metadata.file_extension == "xlsx":
+            return self.read_excel(*args, **kwargs)
+        elif self.metadata.file_extension == "json":
+            return self.read_json(*args, **kwargs)
+        else:
+            raise ValueError(f"Unknown extension {self.metadata.file_extension}")
+
     def read_csv(self, *args, **kwargs) -> Table:
         """Read CSV file into a Table and populate it with metadata."""
         return pr.read_csv(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
