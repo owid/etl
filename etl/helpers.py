@@ -549,15 +549,15 @@ class PathFinder:
 
         return dataset
 
-    def load_snapshot_dependency(self) -> Snapshot:
-        """Load snapshot dependency with the same name."""
-        snap = self.load_dependency(channel="snapshot", short_name=self.short_name)
+    def load_snapshot(self, short_name: Optional[str] = None) -> Snapshot:
+        """Load snapshot dependency. short_name defaults to the current step's short_name."""
+        snap = self.load_dependency(channel="snapshot", short_name=short_name or self.short_name)
         assert isinstance(snap, Snapshot)
         return snap
 
-    def load_dataset_dependency(self) -> catalog.Dataset:
-        """Load dataset dependency with the same name."""
-        dataset = self.load_dependency(short_name=self.short_name)
+    def load_dataset(self, short_name: Optional[str] = None) -> catalog.Dataset:
+        """Load dataset dependency. short_name defaults to the current step's short_name."""
+        dataset = self.load_dependency(short_name=short_name or self.short_name)
         assert isinstance(dataset, catalog.Dataset)
         return dataset
 

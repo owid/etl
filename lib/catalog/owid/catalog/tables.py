@@ -652,7 +652,7 @@ class Table(pd.DataFrame):
             parents=parents,
             variable_names=variable_names,
             comment=comment,
-            inplace=inplace,
+            inplace=inplace,  # type: ignore
         )
 
     def amend_log(
@@ -1097,7 +1097,7 @@ def read_from_records(data: Any, *args, metadata: Optional[TableMeta] = None, un
 
 def read_from_dict(
     data: Dict[Any, Any], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
-):
+) -> Table:
     table = Table(pd.DataFrame.from_dict(data=data, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
     # NOTE: Parents could be passed as arguments, or extracted from metadata.
@@ -1248,7 +1248,7 @@ def update_log(
     parents: Optional[List[Any]] = None,
     variable_names: Optional[List[str]] = None,
     comment: Optional[str] = None,
-    inplace: bool = True,
+    inplace: Literal[True] = True,
 ) -> None:
     ...
 
@@ -1260,7 +1260,7 @@ def update_log(
     parents: Optional[List[Any]] = None,
     variable_names: Optional[List[str]] = None,
     comment: Optional[str] = None,
-    inplace: bool = False,
+    inplace: Literal[False] = False,
 ) -> Table:
     ...
 

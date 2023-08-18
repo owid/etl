@@ -290,7 +290,7 @@ class Variable(pd.Series):
             operation=operation,
             variable_name=variable_name,
             comment=comment,
-            inplace=inplace,
+            inplace=inplace,  # type: ignore
         )
 
     def amend_log(
@@ -309,11 +309,11 @@ class Variable(pd.Series):
             operation=operation,
             comment=comment,
             entry_num=entry_num,
-            inplace=inplace,
+            inplace=inplace,  # type: ignore
         )
 
     def copy_metadata(self, from_variable: "Variable", inplace: bool = False) -> Optional["Variable"]:
-        return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)
+        return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)  # type: ignore
 
     def copy(self, deep: bool = True) -> "Variable":
         new_var = super().copy(deep=deep)
@@ -538,7 +538,7 @@ def update_log(
     operation: str,
     variable_name: Optional[str] = None,
     comment: Optional[str] = None,
-    inplace: bool = True,
+    inplace: Literal[True] = True,
 ) -> None:
     ...
 
@@ -550,7 +550,7 @@ def update_log(
     operation: str,
     variable_name: Optional[str] = None,
     comment: Optional[str] = None,
-    inplace: bool = False,
+    inplace: Literal[False] = False,
 ) -> Variable:
     ...
 
@@ -614,7 +614,7 @@ def amend_log(
     operation: Optional[str] = None,
     comment: Optional[str] = None,
     entry_num: int = -1,
-    inplace: bool = True,
+    inplace: Literal[True] = True,
 ) -> None:
     ...
 
@@ -627,7 +627,7 @@ def amend_log(
     operation: Optional[str] = None,
     comment: Optional[str] = None,
     entry_num: int = -1,
-    inplace: bool = False,
+    inplace: Literal[False] = False,
 ) -> Variable:
     ...
 
@@ -689,12 +689,12 @@ def update_variable_name(variable: Variable, name: str) -> None:
 
 
 @overload
-def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool = False) -> Variable:
+def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Literal[False] = False) -> Variable:
     ...
 
 
 @overload
-def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool = True) -> None:
+def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Literal[True] = True) -> None:
     ...
 
 

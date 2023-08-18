@@ -8,9 +8,11 @@ from pathlib import Path
 from threading import Lock
 from typing import Any, Dict, Iterator, Optional, Union
 
+import owid.catalog.processing as pr
 import pandas as pd
 import yaml
 from dataclasses_json import dataclass_json
+from owid.catalog import Table
 from owid.catalog.meta import (
     DatasetMeta,
     License,
@@ -117,6 +119,29 @@ class Snapshot:
 
     def to_table_metadata(self):
         return self.metadata.to_table_metadata()
+
+    def read(self, *args, **kwargs) -> Table:
+        """Read file based on its Snapshot extension."""
+        if self.metadata.file_extension == "csv":
+            return self.read_csv(*args, **kwargs)
+        elif self.metadata.file_extension == "xlsx":
+            return self.read_excel(*args, **kwargs)
+        elif self.metadata.file_extension == "json":
+            return self.read_json(*args, **kwargs)
+        else:
+            raise ValueError(f"Unknown extension {self.metadata.file_extension}")
+
+    def read_csv(self, *args, **kwargs) -> Table:
+        """Read CSV file into a Table and populate it with metadata."""
+        return pr.read_csv(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+
+    def read_excel(self, *args, **kwargs) -> Table:
+        """Read excel file into a Table and populate it with metadata."""
+        return pr.read_excel(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+
+    def read_json(self, *args, **kwargs) -> Table:
+        """Read JSON file into a Table and populate it with metadata."""
+        return pr.read_json(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
 
 
 @pruned_json
