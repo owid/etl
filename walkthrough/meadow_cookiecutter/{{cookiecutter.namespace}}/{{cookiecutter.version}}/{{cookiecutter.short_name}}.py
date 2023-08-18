@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-from owid.catalog import Table
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -16,20 +14,19 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("{{cookiecutter.short_name}}.{{cookiecutter.file_extension}}")
 
     # Load data from snapshot.
-    df = snap.read_csv()
+    tb = snap.read_csv()
 
     #
     # Process data.
     #
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True)
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata, check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

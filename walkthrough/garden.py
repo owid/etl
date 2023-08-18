@@ -293,7 +293,7 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
 
         doc["tables"]["dummy"]["variables"] = {"dummy_variable": variable_meta}
     else:
-        doc["tables"]["dummy"]["variables"] = {"dummy_variable": {"unit": "dummy unit"}}
+        doc["tables"]["dummy"]["variables"] = {"dummy_variable": {"unit": "dummy unit", "title": "Dummy"}}
 
     with open(metadata_path, "w") as f:
         ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
