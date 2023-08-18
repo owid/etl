@@ -27,6 +27,8 @@ etl-chart-suggester = 'etl.chart_revision.cli:main_cli'
 etl-metadata-export = 'etl.metadata_export:cli'
 etl-datadiff = 'etl.datadiff:cli'
 etl-chartgpt = 'etl.chart_revision.v2.chartgpt:cli'
+etl-metaplay = 'apps.metadata_playground.cli:cli'
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
