@@ -338,8 +338,8 @@ def generate_key_indicators_concurrent(workers):
     start_time = time.time()
 
     povlines_dict = {
-        2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
-        2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
+        2011: np.random.randint(100, 10000, size=3),
+        2017: np.random.randint(100, 10000, size=4),
     }
 
     versions = pip_versions()
@@ -740,7 +740,7 @@ def generate_percentiles_concurrent():
 
 workers_results = {}
 
-for workers in range(10, 21):
+for workers in range(5, 31):
     elapsed_time = generate_key_indicators_concurrent(workers=workers)
     # Update workers_results dictionary with the elapsed time
     workers_results[workers] = elapsed_time

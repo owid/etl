@@ -735,6 +735,6 @@ def generate_percentiles_concurrent():
     print("Done. Execution time:", elapsed_time, "seconds")
 
 
-generate_key_indicators_concurrent()
+# generate_key_indicators_concurrent()
 # generate_relative_poverty_concurrent()
 # generate_percentiles_concurrent()
