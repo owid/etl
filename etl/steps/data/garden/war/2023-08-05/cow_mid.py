@@ -1,18 +1,19 @@
 """COW Militarised Inter-state Dispute dataset.
 
 
-- This dataset only contains inter-state conflicts. We use the hostility level to differentiate different "types" of conflicts.
+- This dataset only contains inter-state conflicts.
 
-- The same conflict might be happening in different regions, with different hostility levels. This is important to consider when
-estimating the global number of ongoing (or new) conflicts by broken down by hostility level
-
-    - Such a conflict (occuring in mutliple regions at the same time with different hostility levels) has been coded using the
-    most hostile category at global level.
+- We use the "fatality" level to differentiate different "types" of conflicts. The "fatality" level provides a range of fatalities (e.g. 1-25 deaths)
 
 - Each entry in this dataset describes a conflict (its participants and period). Therefore we need to "explode" it to add observations
 for each year of the conflict.
 
-- The number of deaths is not estimated for each hostile level, but rather only the aggregate is obtained.
+- Due to missing data in the number of deaths, we are not estimating this metric. Instead, we are using the "fatality" level to group by the different conflicts.
+
+- We also do not report "number of new conflicts".
+
+- The "number of ongoing conflicts" for a particular fatality can be understood as "the number of conflicts ongoing in a particular year that will have X fatalities
+over their complete lifetime globally".
 """
 
 from typing import cast
@@ -108,8 +109,8 @@ def process_mida_table(tb: Table) -> Table:
     """
     # Sanity checks
     assert tb["dispnum"].value_counts().max() == 1, "The same conflict (with same `dispnum`) appears multiple times"
-    assert tb["styear"].notna().all() and (tb["styear"] >= 0).all(), "NA values (or negative) found in `styear`"
-    assert tb["endyear"].notna().all() and (tb["endyear"] >= 0).all(), "NA values (or negative) found in `endyear`"
+    assert (tb["styear"] >= 0).all(), "NA values (or negative) found in `styear`"
+    assert (tb["endyear"] >= 0).all(), "NA values (or negative) found in `endyear`"
     assert not set(tb["fatality"]) - set(FATALITY_LEVEL_MAP), "Unnexpected values for `fatality`!"
 
     # Keep relevant columns
@@ -178,8 +179,9 @@ def combine_tables(tb_a: Table, tb_b: Table) -> Table:
     tb = tb_a.merge(tb_b, on=["dispnum", "year"], how="left")
 
     # Fill NaNs
+    ## Some disputes (identified by codes) have no region information in MIDB. We fill them manually.
     ## Sanity check (1)
-    dispnum_nans_expected = {2044, 2328, 4005}
+    dispnum_nans_expected = {2044, 2328, 4005}  # dispute codes with no region information
     dispnum_nans_found = set(tb.loc[tb["region"].isna()])
     dispnum_nans_unexpected = dispnum_nans_found - dispnum_nans_expected
     assert dispnum_nans_unexpected, f"Unexpected dispnum with NaN regions: {dispnum_nans_unexpected}"
@@ -193,7 +195,7 @@ def combine_tables(tb_a: Table, tb_b: Table) -> Table:
     tb.loc[tb["dispnum"] == 4005, "region"] = "Asia"
 
     # Check there is no NaN!
-    assert (tb.isna().sum() == 0).all(), "NaN in some field!"
+    assert tb.notna().all().all(), "NaN in some field!"
 
     return tb
 
@@ -204,17 +206,36 @@ def add_regions(tb: Table) -> Table:
     The region is assigned based on the country code (ccode) of the participant.
     """
     ## COW uses custom country codes, so we need the following custom mapping.
-    tb.loc[(tb["ccode"] >= 1) & (tb["ccode"] < 200), "region"] = "Americas"
-    tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] < 400), "region"] = "Europe"
-    tb.loc[(tb["ccode"] >= 400) & (tb["ccode"] < 627), "region"] = "Africa"
-    tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] < 699), "region"] = "Middle East"
-    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] < 1000), "region"] = "Asia"
+    tb.loc[(tb["ccode"] >= 1) & (tb["ccode"] <= 165), "region"] = "Americas"
+    tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] <= 395), "region"] = "Europe"
+    tb.loc[(tb["ccode"] >= 400) & (tb["ccode"] <= 626), "region"] = "Africa"
+    tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] <= 698), "region"] = "Middle East"
+    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 990), "region"] = "Asia"
 
+    # Sanity check: No missing regions
+    assert tb["region"].notna().all(), f"Missing regions! {tb.loc[tb['region'].isna(), ['dispnum', 'ccode']]}"
     return tb
 
 
 def expand_observations(tb: Table) -> Table:
     """Expand to have a row per (year, dispute).
+
+    Example
+
+        Input:
+
+        | dispnum | year_start | year_end |
+        |---------|------------|----------|
+        | 1       | 1990       | 1993     |
+
+        Output:
+
+        |  year | warcode |
+        |-------|---------|
+        |  1990 |    1    |
+        |  1991 |    1    |
+        |  1992 |    1    |
+        |  1993 |    1    |
 
     Parameters
     ----------
@@ -244,8 +265,6 @@ def estimate_metrics(tb: Table) -> Table:
 
     These metrics are:
         - number_ongoing_disputes
-        - number_new_disputes
-        - number_deaths_ongoing_disputes
 
     Parameters
     ----------
