@@ -82,7 +82,7 @@ questionary = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"
-flake8 = ">=3.9.2"
+flake8 = "6.1.0"
 watchdog = ">=2.1.5"
 PyYAML = ">=5.4.1"
 argh = ">=0.26.2"

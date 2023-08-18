@@ -2,5 +2,6 @@
 # Ignore some errors, since we autoformat them away already wherever possible
 # from https://github.com/psf/black/blob/main/.flake8
 # ignore = E203, E266, E501, W503
-ignore = D107, W503, E203, B028, S202  # should align black and flake8 'rules'
+# should align black and flake8 'rules'
+ignore = D107, W503, E203, B028, S202
 max-line-length = 120
