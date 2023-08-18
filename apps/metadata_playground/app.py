@@ -66,6 +66,15 @@ def get_data_page_url() -> str:
     return url
 
 
+def reset_metadata_files():
+    """Reset metadata files"""
+    # Reset YAML files
+    with open(PATH_METADATA_SNAPSHOT, 'w') as f:
+        f.write(METADATA_SNAPSHOT_BASE)
+    with open(PATH_METADATA_GARDEN, 'w') as f:
+        f.write(METADATA_GARDEN_BASE)
+
+
 ###################################################
 # Show header #####################################
 ###################################################
@@ -133,34 +142,36 @@ with col_garden:
 ###################################################
 # Run steps & update data page ####################
 ###################################################
-with col2:
-    clicked = st.button("Render data page", use_container_width=False, type="primary")
+try:
+    with col2:
+        clicked = st.button("Render data page", use_container_width=False, type="primary")
 
-    if clicked:
-        # Update YAML files
-        with open(PATH_METADATA_SNAPSHOT, 'w') as f:
-            content_snapshot += f"{SNAPSHOT_META_TOKEN_SPLIT}{METADATA_SNAPSHOT_EXTRA}"
-            f.write(content_snapshot)
-        with open(PATH_METADATA_GARDEN, 'w') as f:
-            f.write(content_garden)
-        # Send toast
-        st.toast("Running steps...", icon="⚙️")
-        with st.spinner('Running ETL steps...'):
-            # Run ETL steps
-            run_steps()
-        # Get URL of data page
-        url = get_data_page_url()
+        if clicked:
+            # Update YAML files
+            with open(PATH_METADATA_SNAPSHOT, 'w') as f:
+                content_snapshot += f"{SNAPSHOT_META_TOKEN_SPLIT}{METADATA_SNAPSHOT_EXTRA}"
+                f.write(content_snapshot)
+            with open(PATH_METADATA_GARDEN, 'w') as f:
+                f.write(content_garden)
+            # Send toast
+            st.toast("Running steps...", icon="⚙️")
+            with st.spinner('Running ETL steps...'):
+                # Run ETL steps
+                run_steps()
+            # Get URL of data page
+            url = get_data_page_url()
 
-        # Show url (toast + message)
-        text_data_page_url = f"Done! [See data page]({url})"
-        st.toast(text_data_page_url, icon="🎉")
-        st.markdown(text_data_page_url)
+            # Show url (toast + message)
+            text_data_page_url = f"Done! [See data page]({url})"
+            st.toast(text_data_page_url, icon="🎉")
+            st.markdown(text_data_page_url)
 
-        # Automatically open data page
-        webbrowser.open_new_tab(url)
+            # Automatically open data page
+            webbrowser.open_new_tab(url)
 
-        # Reset YAML files
-        with open(PATH_METADATA_SNAPSHOT, 'w') as f:
-            f.write(METADATA_SNAPSHOT_BASE)
-        with open(PATH_METADATA_GARDEN, 'w') as f:
-            f.write(METADATA_GARDEN_BASE)
+            reset_metadata_files()
+except Exception as e:
+    st.toast(f"[There was an error](#error).", icon="❌")
+    reset_metadata_files()
+    st.markdown("### Error")
+    raise e
