@@ -36,7 +36,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("{{cookiecutter.short_name}}"))
+    ds_meadow = paths.load_dataset("{{cookiecutter.short_name}}")
 
     # Read table from meadow dataset.
     tb = ds_meadow["{{cookiecutter.short_name}}"].reset_index()
