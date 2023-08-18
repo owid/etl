@@ -745,21 +745,21 @@ for workers in range(5, 31):
     # Update workers_results dictionary with the elapsed time
     workers_results[workers] = elapsed_time
 
-# Plot results in a line graph. Export the file
-plt.figure(figsize=(10, 5))
-plt.xlabel("Number of workers")
-plt.ylabel("Execution time (seconds)")
-plt.title("Execution time vs number of workers")
-plt.plot(list(workers_results.keys()), list(workers_results.values()))
-# Add labels to the points
-for x, y in zip(list(workers_results.keys()), list(workers_results.values())):
-    label = "{:.2f}".format(y)
-    plt.annotate(
-        label,  # this is the text
-        (x, y),  # this is the point to label
-        textcoords="offset points",  # how to position the text
-        xytext=(0, 10),  # distance from text to points (x,y)
-        ha="center",
-    )  # horizontal alignment can be left, right or center
-plt.savefig(f"{PARENT_DIR}/pip_workers.png")
-plt.close()
+    # Plot results in a line graph. Export the file
+    plt.figure(figsize=(10, 5))
+    plt.xlabel("Number of workers")
+    plt.ylabel("Execution time (seconds)")
+    plt.title("Execution time vs number of workers")
+    plt.plot(list(workers_results.keys()), list(workers_results.values()))
+    # Add labels to the points
+    for x, y in zip(list(workers_results.keys()), list(workers_results.values())):
+        label = "{:.2f}".format(y)
+        plt.annotate(
+            label,  # this is the text
+            (x, y),  # this is the point to label
+            textcoords="offset points",  # how to position the text
+            xytext=(0, 10),  # distance from text to points (x,y)
+            ha="center",
+        )  # horizontal alignment can be left, right or center
+    plt.savefig(f"{PARENT_DIR}/pip_workers.png")
+    plt.close()

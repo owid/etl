@@ -725,10 +725,7 @@ def generate_percentiles_concurrent():
         # return results
 
     # Run the main function
-    results = concurrent_percentiles_function()
-
-    # Save to csv
-    results.to_csv(f"{PARENT_DIR}/pip_percentiles.csv", index=False)
+    concurrent_percentiles_function()
 
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
