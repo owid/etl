@@ -96,7 +96,7 @@ def compare(
 
     """
     # Ensure dataframes can be compared.
-    if (type(df1) != pd.DataFrame) or (type(df2) != pd.DataFrame):
+    if (not isinstance(df1, pd.DataFrame)) or (not isinstance(df2, pd.DataFrame)):
         raise ObjectsAreNotDataframes
     if len(df1) != len(df2):
         raise DataFramesHaveDifferentLengths

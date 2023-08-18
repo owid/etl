@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     #
     # Load data from snapshot.
     #
-    snap = paths.load_snapshot_dependency()
+    snap = paths.load_snapshot()
     df = pd.read_feather(snap.path)
 
     # Convert long to wide format.

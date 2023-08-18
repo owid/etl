@@ -1,12 +1,8 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
-
-import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -17,10 +13,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("autopsy.csv"))
+    snap = paths.load_snapshot("autopsy.csv")
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
+    df = snap.read_csv()
     df = df.dropna(subset="VALUE")
     df["COUNTRY"] = df["COUNTRY"].fillna(df["COUNTRY_GRP"])
     df = df.drop(columns="COUNTRY_GRP")

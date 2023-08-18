@@ -17,25 +17,58 @@ log = get_logger()
 
 
 def add_world(tb: Table, ds_regions: Dataset) -> Table:
+    """
+    Append aggregated data for 'World' based on specified regions to the given table.
+
+    Parameters:
+    - tb (Table): The original table containing country-specific data.
+    - ds_regions (Dataset): Not used in the function, but retained for backward compatibility.
+
+    Returns:
+    - Table: Updated table with an additional 'World' entry aggregating data from the specified regions.
+    """
+
+    # Create a deep copy of the input table to avoid modifying the original data
     tb_with_regions = tb.copy()
-    aggregations = {column: "sum" for column in tb_with_regions.columns if column not in ["country", "year", "field"]}
 
-    # Find members of current region.
-    members = geo.list_members_of_region(
-        region="World",
-        ds_regions=ds_regions,
-    )
-    tb_with_regions = geo.add_region_aggregates(
-        df=tb_with_regions,
-        region="World",
-        countries_in_region=members,
-        countries_that_must_have_data=[],
-        num_allowed_nans_per_year=None,
-        frac_allowed_nans_per_year=0.99999,
-        aggregations=aggregations,
-    )
+    # List of members representing different regions CSET
+    members = [
+        "Quad (Australia, India, Japan and the US)",
+        "Five Eyes (Australia, Canada, New Zealand, UK, and the US)",
+        "Global Partnership on Artificial Intelligence",
+        "European Union (27)",
+        "ASEAN (Association of Southeast Asian Nations)",
+        "North America",
+        "Europe",
+        "Asia Pacific",
+        "Africa",
+        "Latin America and the Caribbean",
+        "Oceania",
+        "Nato",
+    ]
 
-    return tb_with_regions
+    # Filter the table to only include rows corresponding to the countries and not regions
+    df_regions = tb_with_regions[~tb_with_regions["country"].isin(members)]
+
+    # Reset the index of the filtered data
+    df_regions.reset_index(inplace=True, drop=True)
+
+    # Define aggregation rules for each column excluding "country", "year", and "field"
+    numeric_cols = [col for col in df_regions.columns if col not in ["country", "year", "field"]]
+
+    # Group the filtered data by "year" and "field" and aggregate the data based on the defined rules
+    result = df_regions.groupby(["year", "field"])[numeric_cols].agg(sum_with_nan).reset_index()
+
+    # Assign the aggregated data to a new country named "World"
+    result["country"] = "World"
+
+    # Concatenate the aggregated 'World' data with the original table
+    tb = pd.concat([tb_with_regions, result])
+
+    # Reset the index of the concatenated table
+    tb.reset_index(inplace=True, drop=True)
+
+    return tb
 
 
 def run(dest_dir: str) -> None:
@@ -48,6 +81,7 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["cset"]
     tb.reset_index(inplace=True)
+
     #
     # Process data.
     #
@@ -55,12 +89,12 @@ def run(dest_dir: str) -> None:
 
     # Add world
     ds_regions: Dataset = paths.load_dependency("regions")
-    merged_total = add_world(tb=tb, ds_regions=ds_regions)
+    tb = add_world(tb=tb, ds_regions=ds_regions)
 
     # List of columns to include for conversion to millions (investment values)
-    _investment_cols = [col for col in merged_total.columns if "investment" in col]
+    _investment_cols = [col for col in tb.columns if "investment" in col]
     # Convert all other columns to million
-    merged_total.loc[:, _investment_cols] *= 1e6
+    tb.loc[:, _investment_cols] *= 1e6
 
     # Import US CPI data from the API (to adjust investment indicators for inflation)
     df_wdi_cpi_us = us_cpi.import_US_cpi_API()
@@ -75,7 +109,7 @@ def run(dest_dir: str) -> None:
 
     # Drop original CPI
     df_wdi_cpi_us.drop("fp_cpi_totl", axis=1, inplace=True)
-    df_cpi_inv = pd.merge(df_wdi_cpi_us, merged_total, on="year", how="inner")
+    df_cpi_inv = pd.merge(df_wdi_cpi_us, tb, on="year", how="inner")
 
     # Updating the investment columns with inflation adjusted values
     for col in df_cpi_inv[_investment_cols]:
@@ -104,9 +138,9 @@ def run(dest_dir: str) -> None:
     tb.set_index(["country", "year", "field"], inplace=True)
 
     # Create proportion of patents granted (in time) and citations per article (total across years)
-    tb["proportion_patents_granted"] = (tb["num_patent_granted"] / tb["num_patent_applications"]) * 100
+    tb["proportion_patents_granted"] = ((tb["num_patent_granted"] / tb["num_patent_applications"]) * 100).astype(float)
     tb["proportion_patents_granted"] = tb["proportion_patents_granted"].astype(float)
-    tb["citations_per_article"] = tb["num_citations_summary"] / tb["num_articles_summary"]
+    tb["citations_per_article"] = (tb["num_citations_summary"] / tb["num_articles_summary"]).astype(float)
 
     #
     # Save outputs.
