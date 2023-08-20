@@ -29,7 +29,6 @@ etl-datadiff = 'etl.datadiff:cli'
 etl-chartgpt = 'etl.chart_revision.v2.chartgpt:cli'
 etl-metaplay = 'apps.metadata_playground.cli:cli'
 
-
 [tool.poetry.dependencies]
 python = "^3.10"
 owid-catalog = {path = "lib/catalog", develop = true}
