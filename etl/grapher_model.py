@@ -978,6 +978,18 @@ class Variable(SQLModel, table=True):
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
         return session.exec(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
 
+    @classmethod
+    def load_from_catalog_path(cls, catalog_path: str, session: Session = None) -> "Variable":
+        def _run():
+            return session.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
+
+        if session is None:
+            with Session(get_engine()) as session:
+                variable = _run()
+        else:
+            variable = _run()
+        return variable
+
     def delete_links(self, session: Session):
         """
         Deletes all previous relationships with origins and gdoc posts for this variable.
@@ -1038,7 +1050,6 @@ class Variable(SQLModel, table=True):
         """Path to S3 with metadata in JSON format for Grapher. Typically
         s3://owid-api/v1/indicators/123.metadata.json."""
         return f"{config.BAKED_VARIABLES_PATH}/{self.id}.metadata.json"
-
 
 class ChartDimensions(SQLModel, table=True):
     __tablename__: str = "chart_dimensions"
