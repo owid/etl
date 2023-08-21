@@ -1,175 +1,81 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "meta": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "source_name": {
-            "type": "string"
-          },
-          "publication_year": {
-            "type": "integer"
-          },
-          "publication_date": {
-            "type": ["string", "null"],
-            "format": "date"
-          },
-          "url": {
-            "type": "string"
-          },
-          "source_data_url": {
-            "type": ["string", "null"]
-          },
-          "source_published_by": {
-            "type": "string"
-          },
-          "license_url": {
-            "type": ["string", "null"]
-          },
-          "license_name": {
-            "type": ["string", "null"]
-          },
-          "date_accessed": {
-            "type": "string",
-            "format": "date"
-          },
-          "description": {
-            "type": "string"
-          },
-          "access_notes": {
-            "type": "string"
-          },
-          "is_public": {
-            "type": "boolean"
-          },
-          "origin": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "dataset_title_owid"
-            ],
-            "properties": {
-              "dataset_title_owid": {
-                "type": "string"
-              },
-              "dataset_title_producer": {
-                "type": "string"
-              },
-              "dataset_description_owid": {
-                "type": "string"
-              },
-              "dataset_description_producer": {
-                "type": "string"
-              },
-              "producer": {
-                "type": "string"
-              },
-              "citation_producer": {
-                "type": "string"
-              },
-              "attribution": {
-                "type": "string"
-              },
-              "attribution_short": {
-                "type": "string"
-              },
-              "version": {
-                "type": "string"
-              },
-              "dataset_url_main": {
-                "type": "string"
-              },
-              "dataset_url_download": {
-                "type": "string"
-              },
-              "date_accessed": {
-                "type": "string",
-                "format": "date"
-              },
-              "date_published": {
-                "anyOf": [
-                  {
-                    "type": "string",
-                    "format": "date"
-                  },
-                  {
-                    "type": "string",
-                    "pattern": "^[0-9]{4}$"
-                  },
-                  {
-                    "type": "string",
-                    "enum": ["latest"]
-                  },
-                  {
-                    "type": "integer"
-                  }
-                ]
-              },
-              "license": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "url": {
-                    "type": "string"
-                  },
-                  "name": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          },
-          "license": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "url": {
-                "type": "string"
-              },
-              "name": {
-                "type": "string"
-              }
-            }
-          }
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
         },
-        "required": []
-      },
-      "wdir": {
-        "type": "string"
-      },
-      "outs": {
-        "type": "array",
-        "items": [
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "md5": {
-                "type": "string"
-              },
-              "size": {
-                "type": "integer"
-              },
-              "path": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "md5",
-              "size",
-              "path"
-            ]
-          }
-        ]
+        "source_name": {
+          "type": "string"
+        },
+        "publication_year": {
+          "type": "integer"
+        },
+        "publication_date": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "url": {
+          "type": "string"
+        },
+        "source_data_url": {
+          "type": ["string", "null"]
+        },
+        "source_published_by": {
+          "type": "string"
+        },
+        "license_url": {
+          "type": ["string", "null"]
+        },
+        "license_name": {
+          "type": ["string", "null"]
+        },
+        "date_accessed": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": {
+          "type": "string"
+        },
+        "access_notes": {
+          "type": "string"
+        },
+        "is_public": {
+          "type": "boolean"
+        },
+        "origin": { "$ref": "definitions.json#/origin" },
+        "license": { "$ref": "definitions.json#/license" }
       }
     },
-    "required": [
-      "meta"
-    ]
-  }
+    "wdir": {
+      "type": "string"
+    },
+    "outs": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "md5": {
+              "type": "string"
+            },
+            "size": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["md5", "size", "path"]
+        }
+      ]
+    }
+  },
+  "required": ["meta"]
+}
