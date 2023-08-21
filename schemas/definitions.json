@@ -1,0 +1,211 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "license": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "url": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  "source": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "url": {
+        "type": "string"
+      },
+      "owid_data_url": {
+        "type": "string"
+      },
+      "source_data_url": {
+        "type": "string"
+      },
+      "date_accessed": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "type": "string",
+            "pattern": "^\\{.*\\}$"
+          }
+        ]
+      },
+      "description": {
+        "type": "string"
+      },
+      "publication_year": {
+        "type": "integer"
+      },
+      "publication_date": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "type": "string",
+            "pattern": "^\\{.*\\}$"
+          }
+        ]
+      },
+      "published_by": {
+        "type": "string"
+      }
+    },
+    "required": ["name"]
+  },
+  "origin": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["dataset_title_owid"],
+    "properties": {
+      "dataset_title_owid": {
+        "type": "string"
+      },
+      "dataset_title_producer": {
+        "type": "string"
+      },
+      "dataset_description_owid": {
+        "type": "string"
+      },
+      "dataset_description_producer": {
+        "type": "string"
+      },
+      "producer": {
+        "type": "string"
+      },
+      "citation_producer": {
+        "type": "string"
+      },
+      "attribution": {
+        "type": "string"
+      },
+      "attribution_short": {
+        "type": "string"
+      },
+      "version": {
+        "type": "string"
+      },
+      "dataset_url_main": {
+        "type": "string"
+      },
+      "dataset_url_download": {
+        "type": "string"
+      },
+      "date_accessed": {
+        "type": "string",
+        "format": "date"
+      },
+      "date_published": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "type": "string",
+            "pattern": "^[0-9]{4}$"
+          },
+          {
+            "type": "string",
+            "enum": ["latest"]
+          },
+          {
+            "type": "integer"
+          }
+        ]
+      },
+      "license": { "$ref": "#/license" }
+    }
+  },
+  "display": {
+    "type": "object",
+    "properties": {
+      "isProjection": {
+        "type": "boolean",
+        "default": false,
+        "description": "Indicates if this time series is a forward projection (if yes then this is rendered\ndifferently in e.g. line charts)\n"
+      },
+      "name": {
+        "type": "string",
+        "description": "The display string for this variable"
+      },
+      "description": {
+        "type": "string",
+        "description": "Variable description",
+        "$comment": "This is a new field that did not exist prior to November 2021 in the DB. It overrides the description on the variable DB table."
+      },
+      "tableDisplay": {
+        "type": "object",
+        "description": "Configuration for the table sheet for this variable",
+        "properties": {
+          "hideAbsoluteChange": {
+            "type": "boolean",
+            "default": false
+          },
+          "hideRelativeChange": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "tolerance": {
+        "type": "integer",
+        "default": 0,
+        "description": "Tolerance to use. If data points are missing for a time point, a match is accepted if it lies\nwithin the specified time period. The unit is the dominating time unit, either years or days.\n",
+        "minimum": 0
+      },
+      "entityAnnotationsMap": {
+        "type": "string",
+        "description": "Entity annotations"
+      },
+      "yearIsDay": {
+        "type": "boolean",
+        "default": false,
+        "description": "Switch to indicate if the number in the year column represents a day (since zeroDay) or not i.e. a year"
+      },
+      "color": {
+        "type": "string",
+        "description": "Default color for this time series"
+      },
+      "includeInTable": {
+        "type": "boolean",
+        "default": true,
+        "description": "Whether to render this time series in the table sheet"
+      },
+      "shortUnit": {
+        "type": "string",
+        "description": "Short unit symbol - This is used in tight UI spaces when the value is shown"
+      },
+      "conversionFactor": {
+        "type": "number",
+        "description": "Conversion factor to apply before showing values"
+      },
+      "unit": {
+        "type": "string",
+        "description": "Long unit text - This is shown in the UI when there is more space (e.g. tooltips) after values"
+      },
+      "numDecimalPlaces": {
+        "type": "integer",
+        "description": "Number of decimal places to show",
+        "minimum": 0
+      },
+      "zeroDay": {
+        "type": "string",
+        "description": "Iso date day string for the starting date if yearIsDay is used"
+      }
+    },
+    "additionalProperties": false
+  }
+}
