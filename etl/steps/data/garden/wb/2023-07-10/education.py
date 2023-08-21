@@ -156,9 +156,9 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
         elif "index" in name_lower:
             update_metadata(tb, new_column_name, 1, "index", " ")
         # Check for the presence of currency-related keywords in 'name_lower'.
-        elif "usd" in name_lower or "$":
+        elif "usd" in name_lower or "$" in name_lower:
             update_metadata(tb, new_column_name, 1, "US dollars", "$")
-        elif "scores" in name_lower:
+        elif "score" in name_lower:
             update_metadata(tb, new_column_name, 1, "score", " ")
 
         else:
