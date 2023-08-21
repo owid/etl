@@ -134,10 +134,13 @@ def pip_query_country(
     Query country data from the PIP API.
     """
 
+    # Test health of the API
     api_health()
 
+    # Round povline (popshare) to 2 decimals to work with cents as the minimum unit
     value = round(value, 2)
 
+    # Extract version and release_version from versions dict
     version = versions[ppp_version]["version"]
     release_version = versions[ppp_version]["release_version"]
 
@@ -203,10 +206,13 @@ def pip_query_region(
     Query regional data from the PIP API.
     """
 
+    # Test health of the API
     api_health()
 
+    # Round povline (popshare) to 2 decimals to work with cents as the minimum unit
     value = round(value, 2)
 
+    # Extract version and release_version from versions dict
     version = versions[ppp_version]["version"]
     release_version = versions[ppp_version]["release_version"]
 
@@ -246,90 +252,17 @@ def pip_query_region(
             index=False,
         )
 
-    log.info(f"Regional data extracted for {popshare_or_povline} = {value} ({ppp_version} PPPs)")
+    if country_code == "all":
+        log.info(f"Regional data extracted for {popshare_or_povline} = {value} ({ppp_version} PPPs)")
+    else:
+        log.info(
+            f"Regional data extracted for {popshare_or_povline} = {value} ({ppp_version} PPPs) in {country_code} {year}"
+        )
 
     return df
 
-
-#############################################
-#                                           #
-#               MAIN FUNCTION               #
-#                                           #
-#############################################
 
 # GENERATE MAIN INDICATORS FILE
-
-
-def generate_key_indicators():
-    """
-    Generate the main indicators file, from a set of poverty lines and PPP versions
-    """
-    start_time = time.time()
-
-    povlines_dict = {
-        2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
-        2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
-    }
-
-    versions = pip_versions()
-
-    df_country = pd.DataFrame()
-    df_region = pd.DataFrame()
-    for ppp_version, povlines in povlines_dict.items():
-        for povline in povlines:
-            df_query = pip_query_country(
-                popshare_or_povline="povline",
-                value=povline / 100,
-                versions=versions,
-                country_code="all",
-                year="all",
-                fill_gaps=FILL_GAPS,
-                welfare_type="all",
-                reporting_level="all",
-                ppp_version=ppp_version,
-            )
-            df_country = pd.concat([df_country, df_query], ignore_index=True)
-
-    # I check if the set of countries is the same in the df and in the aux table (list of countries)
-    aux_dict = pip_aux_tables(table="countries")
-    assert set(df_country["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
-        "List of countries is not the same!"
-    )
-
-    for ppp_version, povlines in povlines_dict.items():
-        for povline in povlines:
-            df_query = pip_query_region(
-                popshare_or_povline="povline",
-                value=povline / 100,
-                versions=versions,
-                country_code="all",
-                year="all",
-                welfare_type="all",
-                reporting_level="all",
-                ppp_version=ppp_version,
-            )
-            df_region = pd.concat([df_region, df_query], ignore_index=True)
-
-    # I check if the set of regions is the same in the df and in the aux table (list of regions)
-    aux_dict = pip_aux_tables(table="regions")
-    assert set(df_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
-        "List of regions is not the same!"
-    )
-
-    # Concatenate df_country and df_region
-    df = pd.concat([df_country, df_region], ignore_index=True)
-
-    # Sort ppp_version, country, year and poverty_line
-    df = df.sort_values(by=["ppp_version", "country", "year", "poverty_line"])
-
-    # Save to csv
-    df.to_csv(f"{PARENT_DIR}/pip.csv", index=False)
-
-    end_time = time.time()
-    elapsed_time = round(end_time - start_time, 2)
-    print("Done. Execution time:", elapsed_time, "seconds")
-
-    return df
 
 
 def generate_key_indicators_concurrent():
@@ -338,14 +271,17 @@ def generate_key_indicators_concurrent():
     """
     start_time = time.time()
 
+    # Define poverty lines, depending on the PPP version. It includes the international poverty line, lower and upper-middle income lines, and some other lines.
     povlines_dict = {
         2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
         2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
     }
 
-    versions = pip_versions()
-
     def get_country_data(povline, ppp_version, versions):
+        """
+        This function is defined inside the main function because it needs to be called by concurrent.futures.
+        For country data.
+        """
         return pip_query_country(
             popshare_or_povline="povline",
             value=povline / 100,
@@ -360,6 +296,10 @@ def generate_key_indicators_concurrent():
         )
 
     def get_region_data(povline, ppp_version, versions):
+        """
+        This function is defined inside the main function because it needs to be called by concurrent.futures.
+        For regional data.
+        """
         return pip_query_region(
             popshare_or_povline="povline",
             value=povline / 100,
@@ -373,6 +313,9 @@ def generate_key_indicators_concurrent():
         )
 
     def concurrent_function():
+        """
+        This function makes concurrency work for country data.
+        """
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             tasks = []
             for ppp_version, povlines in povlines_dict.items():
@@ -386,6 +329,9 @@ def generate_key_indicators_concurrent():
         return results
 
     def concurrent_region_function():
+        """
+        This function makes concurrency work for regional data.
+        """
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             tasks = []
             for ppp_version, povlines in povlines_dict.items():
@@ -397,6 +343,9 @@ def generate_key_indicators_concurrent():
             results = pd.concat(results, ignore_index=True)
 
         return results
+
+    # Obtain latest versions of the PIP dataset
+    versions = pip_versions()
 
     # Run the main function
     results = concurrent_function()
@@ -421,7 +370,7 @@ def generate_key_indicators_concurrent():
     df = df.sort_values(by=["ppp_version", "country", "year", "poverty_line"])
 
     # Save to csv
-    df.to_csv(f"{PARENT_DIR}/pip.csv", index=False)
+    df.to_csv(f"{PARENT_DIR}/pip_raw.csv", index=False)
 
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
@@ -435,76 +384,6 @@ def generate_key_indicators_concurrent():
 # NOTE: Medians need to be patched first in order to get data for all country-years (there are several missing values)
 
 
-def generate_relative_poverty():
-    """
-    Generates relative poverty indicators from query results
-    """
-    start_time = time.time()
-
-    versions = pip_versions()
-    # Get data from the most common query
-    df = pip_query_country(
-        popshare_or_povline="povline",
-        value=2.15,
-        versions=versions,
-        country_code="all",
-        year="all",
-        fill_gaps=FILL_GAPS,
-        welfare_type="all",
-        reporting_level="all",
-        ppp_version=2017,
-    )
-
-    df = median_patch(df)
-
-    for pct in [40, 50, 60]:
-        # Initialize lists
-        headcount_ratio_list = []
-        pgi_list = []
-        pov_severity_list = []
-        watts_list = []
-        for i in range(len(df)):
-            if ~np.isnan(df["median"].iloc[i]):
-                df_relative = pip_query_country(
-                    popshare_or_povline="povline",
-                    value=df["median"].iloc[i] * pct / 100,
-                    versions=versions,
-                    country_code=df["country_code"].iloc[i],
-                    year=df["year"].iloc[i],
-                    fill_gaps=FILL_GAPS,
-                    welfare_type=df["welfare_type"].iloc[i],
-                    reporting_level=df["reporting_level"].iloc[i],
-                    ppp_version=2017,
-                )
-
-                headcount_ratio_value = df_relative["headcount"][0]
-                headcount_ratio_list.append(headcount_ratio_value)
-                pgi_value = df_relative["poverty_gap"][0]
-                pgi_list.append(pgi_value)
-                pov_severity_value = df_relative["poverty_severity"][0]
-                pov_severity_list.append(pov_severity_value)
-                watts_value = df_relative["watts"][0]
-                watts_list.append(watts_value)
-            else:
-                headcount_ratio_list.append(np.nan)
-                pgi_list.append(np.nan)
-                pov_severity_list.append(np.nan)
-                watts_list.append(np.nan)
-
-        # Add the lists as columns to the df
-        df[f"headcount_ratio_{pct}_median"] = headcount_ratio_list
-        df[f"poverty_gap_index_{pct}_median"] = pgi_list
-        df[f"poverty_severity_{pct}_median"] = pov_severity_list
-        df[f"watts_{pct}_median"] = watts_list
-
-    # Save to csv
-    df.to_csv(f"{PARENT_DIR}/pip_relative.csv", index=False)
-
-    end_time = time.time()
-    elapsed_time = round(end_time - start_time, 2)
-    print("Done. Execution time:", elapsed_time, "seconds")
-
-
 def generate_relative_poverty_concurrent():
     """
     Generates relative poverty indicators from query results. Uses concurrent.futures to speed up the process.
@@ -512,6 +391,10 @@ def generate_relative_poverty_concurrent():
     start_time = time.time()
 
     def get_relative_data(df_row, pct, versions):
+        """
+        This function is structured in a way to make it work with concurrent.futures.
+        It processes country data.
+        """
         if ~np.isnan(df_row["median"]):
             return pip_query_country(
                 popshare_or_povline="povline",
@@ -527,6 +410,9 @@ def generate_relative_poverty_concurrent():
             )
 
     def concurrent_relative_function():
+        """
+        This is the main function to make concurrency work for country data.
+        """
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             tasks = []
             for pct in [40, 50, 60]:
@@ -539,9 +425,101 @@ def generate_relative_poverty_concurrent():
 
         return results
 
+    def get_relative_data_region(df_row, pct, versions):
+        """
+        This function is structured in a way to make it work with concurrent.futures.
+        It processes regional data.
+        """
+        if ~np.isnan(df_row["median"]):
+            return pip_query_region(
+                popshare_or_povline="povline",
+                value=df_row["median"] * pct / 100,
+                versions=versions,
+                country_code=df_row["country_code"],
+                year=df_row["year"],
+                welfare_type=df_row["welfare_type"],
+                reporting_level=df_row["reporting_level"],
+                ppp_version=2017,
+                download="false",
+            )
+
+    def concurrent_relative_region_function():
+        """
+        This is the main function to make concurrency work for regional data.
+        """
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            tasks = []
+            for pct in [40, 50, 60]:
+                for i in range(len(df)):
+                    task = executor.submit(get_relative_data_region, df.iloc[i], pct, versions)
+                    tasks.append(task)
+            results = [task.result() for task in concurrent.futures.as_completed(tasks)]
+            # Concatenate list of dataframes
+            results = pd.concat(results, ignore_index=True)
+
+        return results
+
+    def add_relative_indicators(df, results, country_or_region):
+        """
+        Integrates the relative indicators to the df.
+        """
+        for pct in [40, 50, 60]:
+            # Initialize lists
+            headcount_ratio_list = []
+            pgi_list = []
+            pov_severity_list = []
+            watts_list = []
+            for i in range(len(df)):
+                if ~np.isnan(df["median"].iloc[i]):
+                    povline = round(df["median"].iloc[i] * pct / 100, 2)
+
+                    if country_or_region == "country":
+                        mask = (
+                            (results["poverty_line"] == povline)
+                            & (results["country"] == df["country"].iloc[i])
+                            & (results["year"] == df["year"].iloc[i])
+                            & (results["welfare_type"] == df["welfare_type"].iloc[i])
+                            & (results["reporting_level"] == df["reporting_level"].iloc[i])
+                        )
+                    elif country_or_region == "region":
+                        mask = (
+                            (results["poverty_line"] == povline)
+                            & (results["country"] == df["country"].iloc[i])
+                            & (results["year"] == df["year"].iloc[i])
+                        )
+
+                    headcount_ratio_value = results[mask]["headcount"].iloc[0]
+                    headcount_ratio_list.append(headcount_ratio_value)
+
+                    pgi_value = results[mask]["poverty_gap"].iloc[0]
+                    pgi_list.append(pgi_value)
+
+                    pov_severity_value = results[mask]["poverty_severity"].iloc[0]
+                    pov_severity_list.append(pov_severity_value)
+
+                    watts_value = results[mask]["watts"].iloc[0]
+                    watts_list.append(watts_value)
+
+                else:
+                    headcount_ratio_list.append(np.nan)
+                    pgi_list.append(np.nan)
+                    pov_severity_list.append(np.nan)
+                    watts_list.append(np.nan)
+
+            # Add the lists as columns to the df
+            df[f"headcount_ratio_{pct}_median"] = headcount_ratio_list
+            df[f"poverty_gap_index_{pct}_median"] = pgi_list
+            df[f"poverty_severity_{pct}_median"] = pov_severity_list
+            df[f"watts_{pct}_median"] = watts_list
+
+        return df
+
+    # Obtain versions
     versions = pip_versions()
+
+    # FOR COUNTRIES
     # Get data from the most common query
-    df = pip_query_country(
+    df_country = pip_query_country(
         popshare_or_povline="povline",
         value=2.15,
         versions=versions,
@@ -553,52 +531,39 @@ def generate_relative_poverty_concurrent():
         ppp_version=2017,
     )
 
-    df = median_patch(df)
+    # Patch medians
+    df_country = median_patch(df_country)
 
-    # Run the main function
-    results = concurrent_relative_function()
+    # Run the main function to get the data
+    results_country = concurrent_relative_function()
 
-    for pct in [40, 50, 60]:
-        # Initialize lists
-        headcount_ratio_list = []
-        pgi_list = []
-        pov_severity_list = []
-        watts_list = []
-        for i in range(len(df)):
-            if ~np.isnan(df["median"].iloc[i]):
-                povline = round(df["median"].iloc[i] * pct / 100, 2)
+    # Add relative indicators from the results above
+    df_country = add_relative_indicators(df_country, results_country, "country")
 
-                mask = (
-                    (results["poverty_line"] == povline)
-                    & (results["country"] == df["country"].iloc[i])
-                    & (results["year"] == df["year"].iloc[i])
-                    & (results["welfare_type"] == df["welfare_type"].iloc[i])
-                    & (results["reporting_level"] == df["reporting_level"].iloc[i])
-                )
+    # FOR REGIONS
+    # Get data from the most common query
+    df_region = pip_query_region(
+        popshare_or_povline="povline",
+        value=2.15,
+        versions=versions,
+        country_code="all",
+        year="all",
+        welfare_type="all",
+        reporting_level="all",
+        ppp_version=2017,
+    )
 
-                headcount_ratio_value = results[mask]["headcount"].iloc[0]
-                headcount_ratio_list.append(headcount_ratio_value)
+    # Patch medians
+    df_region = median_patch(df_region)
 
-                pgi_value = results[mask]["poverty_gap"].iloc[0]
-                pgi_list.append(pgi_value)
+    # Run the main function to get the data
+    results_region = concurrent_relative_region_function()
 
-                pov_severity_value = results[mask]["poverty_severity"].iloc[0]
-                pov_severity_list.append(pov_severity_value)
+    # Add relative indicators from the results above
+    df_region = add_relative_indicators(df_region, results_region, "region")
 
-                watts_value = results[mask]["watts"].iloc[0]
-                watts_list.append(watts_value)
-
-            else:
-                headcount_ratio_list.append(np.nan)
-                pgi_list.append(np.nan)
-                pov_severity_list.append(np.nan)
-                watts_list.append(np.nan)
-
-        # Add the lists as columns to the df
-        df[f"headcount_ratio_{pct}_median"] = headcount_ratio_list
-        df[f"poverty_gap_index_{pct}_median"] = pgi_list
-        df[f"poverty_severity_{pct}_median"] = pov_severity_list
-        df[f"watts_{pct}_median"] = watts_list
+    # Concatenate df_country and df_region
+    df = pd.concat([df_country, df_region], ignore_index=True)
 
     # Save to csv
     df.to_csv(f"{PARENT_DIR}/pip_relative.csv", index=False)
@@ -607,120 +572,11 @@ def generate_relative_poverty_concurrent():
     elapsed_time = round(end_time - start_time, 2)
     print("Done. Execution time:", elapsed_time, "seconds")
 
+    return df
+
 
 # GENERATE PERCENTILES FILES
 # This is data not given directly by the query, but we can get it by querying a huge set of poverty lines and assign percentiles according to headcount ratio results.
-
-
-def generate_percentiles_raw():
-    """
-    Generates percentiles data from query results. This is the raw data to get the percentiles.
-    """
-    start_time = time.time()
-
-    versions = pip_versions()
-
-    # Define poverty lines and their increase
-
-    under_5_dollars = list(range(1, 500, 1))
-    between_5_and_10_dollars = list(range(500, 1000, 1))
-    between_10_and_20_dollars = list(range(1000, 2000, 2))
-    between_20_and_30_dollars = list(range(2000, 3000, 2))
-    between_30_and_55_dollars = list(range(3000, 5500, 5))
-    between_55_and_80_dollars = list(range(5500, 8000, 5))
-    between_80_and_100_dollars = list(range(8000, 10000, 5))
-    between_100_and_150_dollars = list(range(10000, 15000, 10))
-    between_150_and_175_dollars = list(range(15000, 17500, 10))
-
-    # povlines is all these lists toghether
-    povlines = (
-        under_5_dollars
-        + between_5_and_10_dollars
-        + between_10_and_20_dollars
-        + between_20_and_30_dollars
-        + between_30_and_55_dollars
-        + between_55_and_80_dollars
-        + between_80_and_100_dollars
-        + between_100_and_150_dollars
-        + between_150_and_175_dollars
-    )
-
-    # Extract data for countries
-    for povline in povlines:
-        # If file exists, skip
-        if Path(
-            f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_2017.csv"
-        ).is_file():
-            continue
-        else:
-            pip_query_country(
-                popshare_or_povline="povline",
-                value=povline / 100,
-                versions=versions,
-                country_code="all",
-                year="all",
-                fill_gaps=FILL_GAPS,
-                welfare_type="all",
-                reporting_level="all",
-                ppp_version=2017,
-                download="true",
-            )
-
-    # Extract data for regions
-    for povline in povlines:
-        # If file exists, skip
-        if Path(
-            f"{PARENT_DIR}/pip_region_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_ppp_2017.csv"
-        ).is_file():
-            continue
-        else:
-            pip_query_region(
-                popshare_or_povline="povline",
-                value=povline / 100,
-                versions=versions,
-                country_code="all",
-                year="all",
-                welfare_type="all",
-                reporting_level="all",
-                ppp_version=2017,
-                download="true",
-            )
-
-        # Concatenate country and region files
-    df_country = pd.DataFrame()
-    df_region = pd.DataFrame()
-
-    for povline in povlines:
-        df_query_country = pd.read_csv(
-            f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_2017.csv"
-        )
-        df_country = pd.concat([df_country, df_query_country], ignore_index=True)
-
-        df_query_region = pd.read_csv(
-            f"{PARENT_DIR}/pip_region_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_ppp_2017.csv"
-        )
-        df_region = pd.concat([df_region, df_query_region], ignore_index=True)
-
-    # I check if the set of countries is the same in the df and in the aux table (list of countries)
-    aux_dict = pip_aux_tables(table="countries")
-    assert set(df_country["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
-        "List of countries is not the same!"
-    )
-
-    # I check if the set of regions is the same in the df and in the aux table (list of regions)
-    aux_dict = pip_aux_tables(table="regions")
-    assert set(df_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
-        "List of regions is not the same!"
-    )
-
-    # Concatenate df_country and df_region
-    df = pd.concat([df_country, df_region], ignore_index=True)
-
-    end_time = time.time()
-    elapsed_time = round(end_time - start_time, 2)
-    print("Done. Execution time:", elapsed_time, "seconds")
-
-    return df
 
 
 def generate_percentiles_raw_concurrent():
@@ -729,8 +585,6 @@ def generate_percentiles_raw_concurrent():
     Uses concurrent.futures to speed up the process.
     """
     start_time = time.time()
-
-    versions = pip_versions()
 
     # Define poverty lines and their increase
 
@@ -823,6 +677,9 @@ def generate_percentiles_raw_concurrent():
             # results = pd.concat(results, ignore_index=True)
 
         # return results
+
+    # Obtain latest versions of the PIP dataset
+    versions = pip_versions()
 
     # Run the main function
     concurrent_percentiles_function()
@@ -920,6 +777,8 @@ def median_patch(df):
     Patch missing values in the median column.
     PIP queries do not return all the medians, so they are patched with the results of the percentile file.
     """
+
+    # Read percentile file
     df_percentiles = pd.read_csv(f"{PARENT_DIR}/pip_percentiles.csv")
 
     # In df_percentiles, keep only the rows with target_percentile = 50
@@ -936,9 +795,55 @@ def median_patch(df):
     # Replace missing values in median with thr
     df["median"] = df["median"].fillna(df["thr"])
 
+    # Drop thr column
+    df = df.drop(columns=["thr"])
+
     return df
 
 
+#############################################
+#                                           #
+#               MAIN FUNCTION               #
+#                                           #
+#############################################
+
+# Generate percentiles by extracting the raw files and processing them afterward
+generate_consolidated_percentiles(generate_percentiles_raw_concurrent())
+
+# Generate relative poverty indicators file
+df_relative = generate_relative_poverty_concurrent()
+
+# Generate key indicators file and patch medians
 df = generate_key_indicators_concurrent()
-# generate_relative_poverty_concurrent()
-# generate_percentiles_concurrent()
+df = median_patch(df)
+
+# Add relative poverty indicators
+df = pd.merge(
+    df,
+    df_relative[
+        [
+            "ppp_version",
+            "country",
+            "year",
+            "reporting_level",
+            "welfare_type",
+            "headcount_ratio_40_median",
+            "poverty_gap_index_40_median",
+            "poverty_severity_40_median",
+            "watts_40_median",
+            "headcount_ratio_50_median",
+            "poverty_gap_index_50_median",
+            "poverty_severity_50_median",
+            "watts_50_median",
+            "headcount_ratio_60_median",
+            "poverty_gap_index_60_median",
+            "poverty_severity_60_median",
+            "watts_60_median",
+        ]
+    ],
+    on=["ppp_version", "country", "year", "reporting_level", "welfare_type"],
+    how="left",
+)
+
+# Save key indicators file with patched medians
+df.to_csv(f"{PARENT_DIR}/world_bank_pip.csv", index=False)
