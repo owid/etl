@@ -1,29 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
-{% if cookiecutter.load_population == "True" or cookiecutter.load_countries_regions == "True" %}
-from owid.catalog import Table
-
-{% endif %}
-
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-{% if cookiecutter.load_countries_regions == "True" %}
-
-
-def load_countries_regions() -> Table:
-    """Load countries-regions table from reference dataset (e.g. to map from iso codes to country names)."""
-    return paths.load_dataset("regions")["regions"]
-{% endif -%}
-{% if cookiecutter.load_population == "True" %}
-
-
-def load_population() -> Table:
-    """Load population table from population OMM dataset."""
-    return paths.load_dataset("population")["population"]
-{% endif -%}
 
 
 def run(dest_dir: str) -> None:
