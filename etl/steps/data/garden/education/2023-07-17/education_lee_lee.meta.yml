@@ -33,8 +33,7 @@ tables:
           education, and multiplying by 100.
 
 
-          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.           Regional aggregates are calculated by Our World in Data and represent yearly medians across countries.
-
+          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank. Regional aggregates are calculated by Our World in Data and represent yearly medians across countries.
         unit: '%'
         short_unit: '%'
         display:
@@ -49,7 +48,7 @@ tables:
 
 
           Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank. Regional aggregates are calculated by Our World in Data and represent yearly medians across countries.
-       unit: '%'
+        unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
