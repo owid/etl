@@ -1,0 +1,25 @@
+tables:
+  world_bank_pip:
+    variables:
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description: Full description of testing variable.
+      #   description_short: Short description of testing variable.
+      #   description_from_producer: Description of testing variable from producer.
+      #   processing_level: minor
+      #   display:
+      #     name: Testing variable
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0
+      #     conversionFactor: 1
+      #   presentation:
+      #     grapher_config
+      #     title_public
+      #     title_variant
+      #     producer_short
+      #     attribution
+      #     topic_tags_links
+      #     faqs
+      #     key_info_text
