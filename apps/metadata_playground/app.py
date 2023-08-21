@@ -1,16 +1,17 @@
-import os
+"""Python code to run the metadata playground app.
+
+streamlit run app.py
+"""
 import subprocess
 import webbrowser
 from pathlib import Path
 
 import streamlit as st
-from sqlmodel import Session, select
-from streamlit.components.v1 import html
 from streamlit_ace import st_ace
 
 import etl.grapher_model as gm
 from etl import paths
-from etl.db import get_engine
+from etl import config
 
 ###################################################
 # Initial configuration ###########################
@@ -51,17 +52,10 @@ def run_steps() -> None:
     subprocess.run(["poetry", "run", "etl", "dummy", "--grapher"])
 
 
-def get_variable_id() -> int:
-    """Get variable ID"""
-    with Session(get_engine()) as session:
-        variable = session.exec(select(gm.Variable).where(gm.Variable.catalogPath == CATALOG_PATH)).one()
-    return variable.id
-
-
 def get_data_page_url() -> str:
     """Get data page URL"""
-    HOST = os.environ.get("DB_HOST")
-    VARIABLE_ID = get_variable_id()
+    HOST = config.DB_HOST
+    VARIABLE_ID = gm.Variable.load_from_catalog_path(CATALOG_PATH).id
     url = f"http://{HOST}/admin/datapage-preview/{VARIABLE_ID}"
     return url
 
@@ -87,21 +81,23 @@ col1, col2 = st.columns(2)
 with col1:
     # Link to metadata v2 docs
     st.markdown(f"📚 [Metadata v2 documentation]({URL_METADATA})")
-    WRAP = st.checkbox("Wrap enabled", value=False)
+    WRAP = st.checkbox("Wrap YAML enabled", value=False)
 
     # Explanation
     with st.expander("How does this work?"):
         st.markdown("""
             This tool lets you visualise how your metadata edits are reflected in a data page.
 
-            To the left, we show the snapshot metadata (YAML content) of a fictional dataset. And to the right, we show the garden metadata (YAML content) of the same dataset.
-            Feel free to edit both.
+            You are shown the Snapshot and the Garden metadata (YAML files) to the left and right, respectively. Feel free to edit both.
 
 
             Once you are happy with your edits, click on the "Render data page" button. This will run the ETL steps for this fictional dataset and open the data page in a new tab.
 
 
             The data page shown corresponds the single indicator of the fictional dataset: `dummy_variable`.
+
+
+            ❗ **Note that this tool works best with a staging server. [Learn how to create yours](https://www.notion.so/owid/Setting-up-a-staging-server-3e5a6591a23846ad83fba1ad6dfed4d4)!**
         """)
 
 
