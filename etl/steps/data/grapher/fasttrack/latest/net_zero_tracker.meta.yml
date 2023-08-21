@@ -17,3 +17,6 @@ tables:
           vary, with some countries pledging to reach net-zero greenhouse gas emissions, while others define this as carbon
           emissions only.
         unit: ''
+      has_net_zero_target:
+        title: has_net_zero_target
+        unit: ''

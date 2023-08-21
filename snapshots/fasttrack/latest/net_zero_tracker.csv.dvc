@@ -12,6 +12,6 @@ meta:
   license: {}
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: a2b75ce832689f41bfc6214e1a60ca2a
-  size: 5112
+- md5: 39916c2f8ceadc7b7dd76dd8fedb8067
+  size: 5728
   path: net_zero_tracker.csv
