@@ -56,3 +56,31 @@ def fix_sub_saharan_africa(tb: Table) -> Table:
     ] = "Sub-Saharan Africa (SDG)"
 
     return tb
+
+
+def filter_data(tb: Table) -> Table:
+    """
+    Filtering out the unnecessary columns and rows from the data.
+    We just want the UN IGME estimates, rather than the individual results from the survey data.
+    """
+    # Keeping only the UN IGME estimates.
+    tb = tb.loc[tb["series_name"] == "UN IGME estimate"]
+
+    # Removing the unnecessary columns.
+    tb.drop(
+        columns=[
+            "series_name",
+            "regional_group",
+            "series_year",
+            "time_period",
+            "country_notes",
+            "connection",
+            "status",
+            "year_to_achieve",
+            "model_used",
+            "age_group_of_women",
+            "series_method",
+            "definition",
+            "interval",
+        ]
+    )
