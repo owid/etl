@@ -59,12 +59,7 @@ def variable_data_df_from_s3(engine: Engine, variable_ids: List[int] = [], worke
         return add_entity_code_and_name(session, df)
 
 
-def add_entity_code_and_name(session: Session, df: pd.DataFrame) -> pd.DataFrame:
-    if df.empty:
-        df["entityName"] = []
-        df["entityCode"] = []
-        return df
-
+def _fetch_entities(session: Session, entity_ids: List[int]) -> pd.DataFrame:
     # Query entities from the database
     q = """
     SELECT
@@ -76,10 +71,19 @@ def add_entity_code_and_name(session: Session, df: pd.DataFrame) -> pd.DataFrame
     """
 
     # Execute the SQL using session
-    result_proxy = session.execute(q, {"entity_ids": tuple(df["entityId"].unique())})  # type: ignore
+    result_proxy = session.execute(q, {"entity_ids": entity_ids})  # type: ignore
 
     # Convert the result into a DataFrame
-    entities = pd.DataFrame(result_proxy.fetchall(), columns=result_proxy.keys())
+    return pd.DataFrame(result_proxy.fetchall(), columns=result_proxy.keys())
+
+
+def add_entity_code_and_name(session: Session, df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty:
+        df["entityName"] = []
+        df["entityCode"] = []
+        return df
+
+    entities = _fetch_entities(session, list(df["entityId"].unique()))
 
     return pd.merge(df, entities, on="entityId")
 

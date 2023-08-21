@@ -171,7 +171,7 @@ def test_variable_data_df_from_s3():
     )
     s3_data = pd.DataFrame({"entities": [1, 1], "values": ["a", 2], "years": [2000, 2001]})
 
-    with mock.patch("pandas.read_sql", return_value=entities):
+    with mock.patch("backport.datasync.data_metadata._fetch_entities", return_value=entities):
         with mock.patch("pandas.read_json", return_value=s3_data):
             df = variable_data_df_from_s3(engine, [123])
 
