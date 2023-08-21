@@ -44,6 +44,9 @@ DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")
 DB_PASS = env.get("DB_PASS", "")
 
+# metaplay config
+METAPLAY_PORT = int(env.get("METAPLAY_PORT", "8051"))
+
 
 def get_username():
     return pwd.getpwuid(os.getuid())[0]

@@ -978,6 +978,18 @@ class Variable(SQLModel, table=True):
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
         return session.exec(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
 
+    @classmethod
+    def load_from_catalog_path(cls, catalog_path: str, session: Optional[Session] = None) -> "Variable":
+        def _run(ses: Session):
+            return ses.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
+
+        if session is None:
+            with Session(get_engine()) as session:
+                variable = _run(session)
+        else:
+            variable = _run(session)
+        return variable
+
     def delete_links(self, session: Session):
         """
         Deletes all previous relationships with origins and gdoc posts for this variable.
