@@ -90,6 +90,8 @@ def app(run_checks: bool) -> None:
 
     po.put_markdown("# Walkthrough - Snapshot")
     with open(CURRENT_DIR / "snapshot.md", "r") as f:
+        if utils.WALKTHROUGH_ORIGINS:
+            po.put_info(po.put_markdown("To use **Sources**, call it with `WALKTHROUGH_ORIGINS=0 walkthrough ...` "))
         po.put_collapse("Instructions", [po.put_markdown(f.read())])
 
     # run checks
@@ -384,6 +386,11 @@ def app(run_checks: bool) -> None:
     ingest_path = SNAPSHOTS_DIR / form.namespace / form.snapshot_version / (form.short_name + ".py")
     meta_path = SNAPSHOTS_DIR / form.namespace / form.snapshot_version / f"{form.short_name}.{form.file_extension}.dvc"
 
+    if form.dataset_manual_import:
+        manual_import_instructions = "--path-to-file **relative path of file**"
+    else:
+        manual_import_instructions = ""
+
     po.put_markdown(
         f"""
 ## Next steps
@@ -392,7 +399,7 @@ def app(run_checks: bool) -> None:
 
 2. Run the snapshot step to upload files to S3
 ```bash
-python snapshots/{form.namespace}/{form.snapshot_version}/{form.short_name}.py
+python snapshots/{form.namespace}/{form.snapshot_version}/{form.short_name}.py {manual_import_instructions}
 ```
 
 3. Continue to the meadow step

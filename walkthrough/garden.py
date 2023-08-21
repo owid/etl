@@ -24,8 +24,6 @@ ETL_DIR = Path(etl.__file__).parent.parent
 class Options(Enum):
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
     GENERATE_NOTEBOOK = "Generate playground notebook"
-    LOAD_COUNTRIES_REGIONS = "Load countries regions in the script"
-    LOAD_POPULATION = "Load population in the script"
     IS_PRIVATE = "Make dataset private"
 
 
@@ -36,8 +34,6 @@ class GardenForm(BaseModel):
     meadow_version: str
     add_to_dag: bool
     dag_file: str
-    load_countries_regions: bool
-    load_population: bool
     include_metadata_yaml: bool
     generate_notebook: bool
     is_private: bool
@@ -47,8 +43,6 @@ class GardenForm(BaseModel):
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
         data["dag_file"] = data["dag_file"]
         data["include_metadata_yaml"] = Options.INCLUDE_METADATA_YAML.value in options
-        data["load_countries_regions"] = Options.LOAD_COUNTRIES_REGIONS.value in options
-        data["load_population"] = Options.LOAD_POPULATION.value in options
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
         data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
@@ -103,8 +97,6 @@ def app(run_checks: bool) -> None:
                 options=[
                     Options.INCLUDE_METADATA_YAML.value,
                     Options.GENERATE_NOTEBOOK.value,
-                    Options.LOAD_COUNTRIES_REGIONS.value,
-                    Options.LOAD_POPULATION.value,
                     Options.IS_PRIVATE.value,
                 ],
                 name="options",
@@ -127,10 +119,6 @@ def app(run_checks: bool) -> None:
 
     if form.add_to_dag:
         deps = [f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"]
-        if form.load_population:
-            deps.append(utils.DATASET_POPULATION_URI)
-        if form.load_countries_regions:
-            deps.append(utils.DATASET_REGIONS_URI)
         dag_content = utils.add_to_dag(
             dag={f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps},
             dag_path=CURRENT_DIR / ".." / "dag" / form.dag_file,
@@ -293,7 +281,7 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
 
         doc["tables"]["dummy"]["variables"] = {"dummy_variable": variable_meta}
     else:
-        doc["tables"]["dummy"]["variables"] = {"dummy_variable": {"unit": "dummy unit"}}
+        doc["tables"]["dummy"]["variables"] = {"dummy_variable": {"unit": "dummy unit", "title": "Dummy"}}
 
     with open(metadata_path, "w") as f:
         ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)

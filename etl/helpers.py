@@ -183,6 +183,10 @@ def create_dataset(
         for k, v in match.groupdict().items():
             assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
 
+    # run grapher checks
+    if ds.metadata.channel == "grapher":
+        grapher_checks(ds)
+
     return ds
 
 

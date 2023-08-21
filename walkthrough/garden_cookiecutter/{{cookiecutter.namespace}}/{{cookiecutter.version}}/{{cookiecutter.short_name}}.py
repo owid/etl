@@ -1,34 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
-from owid.catalog import Dataset, Table
-
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-{% if cookiecutter.load_countries_regions == "True" %}
-
-
-def load_countries_regions() -> Table:
-    """Load countries-regions table from reference dataset (e.g. to map from iso codes to country names)."""
-    ds_reference = cast(Dataset, paths.load_dependency("regions"))
-    tb_countries_regions = ds_reference["regions"]
-
-    return tb_countries_regions
-{% endif -%}
-{% if cookiecutter.load_population == "True" %}
-
-
-def load_population() -> Table:
-    """Load population table from population OMM dataset."""
-    ds_indicators = cast(Dataset, paths.load_dependency(channel="garden", namespace="demography", short_name="population"))
-    tb_population = ds_indicators["population"]
-
-    return tb_population
-{% endif -%}
 
 
 def run(dest_dir: str) -> None:
@@ -36,7 +12,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("{{cookiecutter.short_name}}"))
+    ds_meadow = paths.load_dataset("{{cookiecutter.short_name}}")
 
     # Read table from meadow dataset.
     tb = ds_meadow["{{cookiecutter.short_name}}"].reset_index()
@@ -44,7 +20,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb: Table = geo.harmonize_countries(
+    tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
     tb = tb.set_index(["country", "year"], verify_integrity=True)
@@ -53,7 +29,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
