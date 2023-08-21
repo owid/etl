@@ -26,11 +26,12 @@
   "World": "World",
   "ZAF": "South Africa",
   "East Asia (EA)": "East Asia (OECD)",
-  "Eastern Europe    (EE)": "Eastern Europe (OECD)",
   "Latin America and Caribbean (LA)": "Latin America and Caribbean (OECD)",
   "Middle East and North Africa (MENA)": "Middle East and North Africa (OECD)",
-  "South and South-East Asia      (SSEA)": "South and South-East Asia (OECD)",
-  "Western Europe    (WE)": "Western Europe (OECD)",
-  "Western Offshoots (WO)": "Western Offshoots (OECD)",
-  "Sub-Saharan Africa (OECD)": "Sub-Saharan Africa (OECD)"
+  "Eastern Europe (EE)": "Eastern Europe (OECD)",
+  "South and South-East Asia (SSEA)": "South and South-East Asia (OECD)",
+  "Sub-Sahara Africa (SSA)": "Sub-Sahara Africa (OECD)",
+  "Western Europe (WE)":  "Western Europe (OECD)",
+  "Western Offshoots (WO)": "Western Offshoots (OECD)"
+
 }

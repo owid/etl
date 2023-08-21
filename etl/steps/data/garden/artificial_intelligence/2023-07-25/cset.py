@@ -44,7 +44,7 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
         "Africa",
         "Latin America and the Caribbean",
         "Oceania",
-        "Nato",
+        "NATO",
     ]
 
     # Filter the table to only include rows corresponding to the countries and not regions

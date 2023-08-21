@@ -28,12 +28,12 @@ tables:
       mf_primary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, primary, both sexes
         description: >
-          Adjusted net enrollment rate in primary education is calculated by dividing the number of children in
-          the official primary school age who are enrolled in primary or secondary education by the population of the same
-          age group and multiplying by 100.
+          Net enrollment rate for primary school is calculated by dividing the number of students of official
+          school age enrolled in primary education by the population of the age group which officially corresponds to primary
+          education, and multiplying by 100.
 
 
-          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.
+          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank. Regional aggregates are calculated by Our World in Data and represent yearly medians across countries.
         unit: '%'
         short_unit: '%'
         display:
@@ -42,12 +42,12 @@ tables:
       f_primary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, primary, female
         description: >
-          Adjusted net enrollment rate in primary education is calculated by dividing the number of children in
-          the official primary school age who are enrolled in primary or secondary education by the population of the same
-          age group and multiplying by 100.
+          Net enrollment rate for primary school is calculated by dividing the number of students of official
+          school age enrolled in primary education by the population of the age group which officially corresponds to primary
+          education, and multiplying by 100.
 
 
-          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.
+          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank. Regional aggregates are calculated by Our World in Data and represent yearly medians across countries.
         unit: '%'
         short_unit: '%'
         display:
@@ -56,12 +56,12 @@ tables:
       m_primary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, primary, male
         description: >
-          Adjusted net enrollment rate in primary education is calculated by dividing the number of children in
-          the official primary school age who are enrolled in primary or secondary education by the population of the same
-          age group and multiplying by 100.
+          Net enrollment rate for primary school is calculated by dividing the number of students of official
+          school age enrolled in primary education by the population of the age group which officially corresponds to primary
+          education, and multiplying by 100.
 
 
-          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.
+          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank. Regional aggregates are calculated by Our World in Data and represent yearly medians across countries.
         unit: '%'
         short_unit: '%'
         display:
@@ -75,7 +75,7 @@ tables:
           education, and multiplying by 100.
 
 
-          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.
+          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank. Regional aggregates are calculated by Our World in Data and represent yearly medians across countries.
         unit: '%'
         short_unit: '%'
         display:
@@ -89,7 +89,7 @@ tables:
           education, and multiplying by 100.
 
 
-          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.
+          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank. Regional aggregates are calculated by Our World in Data and represent yearly medians across countries.
         unit: '%'
         short_unit: '%'
         display:
@@ -103,7 +103,7 @@ tables:
           education, and multiplying by 100.
 
 
-          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.
+          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank. Regional aggregates are calculated by Our World in Data and represent yearly medians across countries.
         unit: '%'
         short_unit: '%'
         display:
@@ -116,7 +116,7 @@ tables:
           the 5-year age group immediately following upper secondary education.
 
 
-          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.
+          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank. Regional aggregates are calculated by Our World in Data and represent yearly medians across countries.
         unit: '%'
         short_unit: '%'
         display:
@@ -129,7 +129,7 @@ tables:
           the 5-year age group immediately following upper secondary education.
 
 
-          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.
+          Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank. Regional aggregates are calculated by Our World in Data and represent yearly medians across countries.
         unit: '%'
         short_unit: '%'
         display:
@@ -143,6 +143,9 @@ tables:
 
 
           Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.
+
+
+          Regional aggregates are calculated by Our World in Data and represent yearly medians across countries.
         unit: '%'
         short_unit: '%'
         display:
@@ -150,27 +153,27 @@ tables:
 
       mf_primary_enrollment_rates:
         title: Total net enrolment rate, primary, both sexes
-        description: Adjusted net enrollment rate in primary education is calculated by dividing the number of children in
-          the official primary school age who are enrolled in primary or secondary education by the population of the same
-          age group and multiplying by 100.
+        description:  Net enrollment rate for primary school is calculated by dividing the number of students of official
+          school age enrolled in primary education by the population of the age group which officially corresponds to primary
+          education, and multiplying by 100.
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
       f_primary_enrollment_rates:
         title: Total net enrolment rate, primary, female
-        description: Adjusted net enrollment rate in primary education is calculated by dividing the number of children in
-          the official primary school age who are enrolled in primary or secondary education by the population of the same
-          age group and multiplying by 100.
+        description: Net enrollment rate for primary school is calculated by dividing the number of students of official
+          school age enrolled in primary education by the population of the age group which officially corresponds to primary
+          education, and multiplying by 100.
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
       m_primary_enrollment_rates:
         title: Total net enrolment rate, primary, male
-        description: Adjusted net enrollment rate in primary education is calculated by dividing the number of children in
-          the official primary school age who are enrolled in primary or secondary education by the population of the same
-          age group and multiplying by 100.
+        description:  Net enrollment rate for primary school is calculated by dividing the number of students of official
+          school age enrolled in primary education by the population of the age group which officially corresponds to primary
+          education, and multiplying by 100.
         unit: '%'
         short_unit: '%'
         display:

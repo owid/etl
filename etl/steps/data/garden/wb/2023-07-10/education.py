@@ -93,13 +93,24 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
 
         # Update the column names and metadata
         tb.rename(columns={column: new_column_name}, inplace=True)
-        tb[new_column_name].metadata.description = " ".join(
+        description_string = " ".join(
             [
                 description + "." "World Bank variable id: " + indicator_to_find + ".",
-                source,  # Change this when the new metadata format is ready
+                source,
             ]
         )
+
+        # Replace any occurrences of '..' with '.'
+        description_string = description_string.replace("..", ".")
+        description_string = description_string.replace(".W", ". W")
+
+        tb[new_column_name].metadata.description = description_string
         tb[new_column_name].metadata.title = name
+
+        # Conver Witthgenstein projections to %
+        if "wittgenstein_projection__percentage" in new_column_name:
+            tb[new_column_name] *= 100
+
         tb[new_column_name].metadata.display = {}
 
         #
@@ -133,20 +144,23 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
         # Check if any keyword from the percentage_unit list is present in 'name_lower' and ensure "number" is not in 'name_lower'.
         if any(keyword in name_lower for keyword in percentage_unit) and (name_lower not in other_list):
             update_metadata(tb, new_column_name, 1, "%", "%")
-        elif "ratio" in name_lower:
+        elif "ratio" in name_lower and not ("duration" in name_lower):
             update_metadata(tb, new_column_name, 1, "ratio", " ")
         elif "number of pupils" in name_lower:
             update_metadata(tb, new_column_name, 0, "pupils", " ")
         # Check if the column name contains "number", but not "rate" or "pasec".
         elif "number" in name_lower and not ("rate" in name_lower) and not ("pasec" in name_lower):
             update_metadata(tb, new_column_name, 0, "people", " ")
-        elif "(years)" in name_lower or "years" in name_lower:
+        elif "years" in name_lower:
             update_metadata(tb, new_column_name, 1, "years", " ")
         elif "index" in name_lower:
             update_metadata(tb, new_column_name, 1, "index", " ")
         # Check for the presence of currency-related keywords in 'name_lower'.
-        elif "USD" in name_lower or "$":
+        elif "usd" in name_lower or "$" in name_lower:
             update_metadata(tb, new_column_name, 1, "US dollars", "$")
+        elif "score" in name_lower:
+            update_metadata(tb, new_column_name, 1, "score", " ")
+
         else:
             # Default metadata update when no other conditions are met.
             update_metadata(tb, new_column_name, 0, " ", " ")
