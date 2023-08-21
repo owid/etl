@@ -7,11 +7,11 @@ Simply execute
 poetry run etl-metaplay
 ```
 
-!!! note "Use the correct environemnt variables"
+!!! note "Use the correct environment variables"
 
     Make sure to run this with the appropriate environment variables set (you need access to the database). This works best with your staging environment (accessible via Tailscale).
 
-    You can define custom environemnt variables in the file `.env.staging` and then run:
+    You can define custom environment variables in the file `.env.staging` and then run:
 
     ```shell
     ENV=.env.staging poetry run etl-metaplay

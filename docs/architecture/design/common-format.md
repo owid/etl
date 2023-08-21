@@ -28,7 +28,7 @@ tb --> vb3[variable B3]
 
 ### Catalog ([`owid.catalog.CatalogMixin`](https://github.com/owid/etl/blob/master/lib/catalog/owid/catalog/catalogs.py))
 
-A catalog is set of datasets, represented on disk as a folder of folders.
+A catalog is a collection of datasets, represented on disk as a folder of folders.
 
 ### Datasets ([`owid.catalog.Dataset`](https://github.com/owid/etl/blob/master/lib/catalog/owid/catalog/datasets.py))
 
