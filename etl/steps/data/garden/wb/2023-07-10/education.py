@@ -50,10 +50,6 @@ def run(dest_dir: str) -> None:
     # Add metadata by finding the descriptions and sources using the indicator codes.
     tb = add_metadata(tb, metadata_tb)
 
-    # Conver Witthgenstein projections to %
-    for col in tb.columns:
-        if "wittgenstein_projection__percentage" in col:
-            tb[col] *= 100
     #
     # Save outputs.
     #
@@ -110,6 +106,11 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
 
         tb[new_column_name].metadata.description = description_string
         tb[new_column_name].metadata.title = name
+
+        # Conver Witthgenstein projections to %
+        if "wittgenstein_projection__percentage" in new_column_name:
+            tb[new_column_name] *= 100
+
         tb[new_column_name].metadata.display = {}
 
         #
