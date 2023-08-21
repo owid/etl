@@ -410,6 +410,14 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], w
             {"variable_ids": variable_ids_to_delete},
         )
 
+        # delete them from explorers
+        db.cursor.execute(
+            """
+            DELETE FROM explorer_variables WHERE variableId IN %(variable_ids)s
+        """,
+            {"variable_ids": variable_ids_to_delete},
+        )
+
         # finally delete variables
         db.cursor.execute(
             """
