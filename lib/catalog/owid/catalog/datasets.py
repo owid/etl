@@ -72,7 +72,7 @@ class Dataset:
                 raise Exception(f"refuse to overwrite non-dataset dir at: {path}")
             shutil.rmtree(path)
 
-        mkdir(path)
+        path.mkdir(parents=True, exist_ok=True)
 
         metadata = metadata or DatasetMeta()
 
