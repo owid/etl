@@ -144,14 +144,14 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
         # Check if any keyword from the percentage_unit list is present in 'name_lower' and ensure "number" is not in 'name_lower'.
         if any(keyword in name_lower for keyword in percentage_unit) and (name_lower not in other_list):
             update_metadata(tb, new_column_name, 1, "%", "%")
-        elif "ratio" in name_lower:
+        elif "ratio" in name_lower and not ("duration" in name_lower):
             update_metadata(tb, new_column_name, 1, "ratio", " ")
         elif "number of pupils" in name_lower:
             update_metadata(tb, new_column_name, 0, "pupils", " ")
         # Check if the column name contains "number", but not "rate" or "pasec".
         elif "number" in name_lower and not ("rate" in name_lower) and not ("pasec" in name_lower):
             update_metadata(tb, new_column_name, 0, "people", " ")
-        elif "(years)" in name_lower or "years" in name_lower:
+        elif "years" in name_lower:
             update_metadata(tb, new_column_name, 1, "years", " ")
         elif "index" in name_lower:
             update_metadata(tb, new_column_name, 1, "index", " ")
