@@ -155,6 +155,10 @@ def sync_folder(
     Perform a content-based sync of a local folder with a "folder" on an S3 bucket,
     by comparing checksums and only uploading files that have changed.
     """
+    # make sure we're not syncing other folders with the same prefix
+    if not dest_path.endswith("/"):
+        dest_path += "/"
+
     existing = {o["Key"]: object_md5(s3, bucket, o["Key"], o) for o in walk_s3(s3, bucket, dest_path)}
 
     # some datasets like `open_numbers/open_numbers/latest/gapminder__gapminder_world`
@@ -214,6 +218,10 @@ def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[Dict[str, Any]]:
 
 
 def delete_dataset(s3: Any, bucket: str, relative_path: str) -> None:
+    # make sure we're not syncing other folders with the same prefix
+    if not relative_path.endswith("/"):
+        relative_path += "/"
+
     to_delete = [o["Key"] for o in walk_s3(s3, bucket, relative_path)]
     while to_delete:
         chunk = to_delete[:1000]
