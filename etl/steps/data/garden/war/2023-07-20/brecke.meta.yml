@@ -86,6 +86,14 @@ tables:
           deaths defined by the source for a violent conflict to be recorded in the dataset.
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
 
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
@@ -97,6 +105,14 @@ tables:
           We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
       number_new_conflicts:
         title: Number of new conflicts
         unit: conflicts
@@ -109,3 +125,11 @@ tables:
           The sum across all regions can therefore be higher than the total number of new conflicts.
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East

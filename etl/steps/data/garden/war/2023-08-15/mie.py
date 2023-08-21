@@ -143,7 +143,8 @@ def add_regions(tb: Table) -> Table:
     tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] < 400), "region"] = "Europe"
     tb.loc[(tb["ccode"] >= 400) & (tb["ccode"] < 627), "region"] = "Africa"
     tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] < 699), "region"] = "Middle East"
-    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] < 1000), "region"] = "Asia"
+    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 899), "region"] = "Asia"
+    tb.loc[(tb["ccode"] >= 900) & (tb["ccode"] <= 999), "region"] = "Oceania"
 
     return tb
 

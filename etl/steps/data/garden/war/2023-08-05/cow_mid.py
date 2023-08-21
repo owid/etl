@@ -210,7 +210,8 @@ def add_regions(tb: Table) -> Table:
     tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] <= 395), "region"] = "Europe"
     tb.loc[(tb["ccode"] >= 400) & (tb["ccode"] <= 626), "region"] = "Africa"
     tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] <= 698), "region"] = "Middle East"
-    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 990), "region"] = "Asia"
+    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 899), "region"] = "Asia"
+    tb.loc[(tb["ccode"] >= 900) & (tb["ccode"] <= 999), "region"] = "Oceania"
 
     # Sanity check: No missing regions
     assert tb["region"].notna().all(), f"Missing regions! {tb.loc[tb['region'].isna(), ['dispnum', 'ccode']]}"
