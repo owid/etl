@@ -980,14 +980,14 @@ class Variable(SQLModel, table=True):
 
     @classmethod
     def load_from_catalog_path(cls, catalog_path: str, session: Optional[Session] = None) -> "Variable":
-        def _run():
-            return session.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
+        def _run(ses: Session):
+            return ses.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
 
         if session is None:
             with Session(get_engine()) as session:
-                variable = _run()
+                variable = _run(session)
         else:
-            variable = _run()
+            variable = _run(session)
         return variable
 
     def delete_links(self, session: Session):
