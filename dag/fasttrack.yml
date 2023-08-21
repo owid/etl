@@ -102,3 +102,5 @@ steps:
   - snapshot://fasttrack/latest/net_zero_tracker.csv
   data://grapher/fasttrack/latest/survey_livestock_oklahoma:
   - snapshot://fasttrack/latest/survey_livestock_oklahoma.csv
+  data://grapher/fasttrack/2023-08-21/survey_livestock_oklahoma:
+  - snapshot://fasttrack/2023-08-21/survey_livestock_oklahoma.csv
