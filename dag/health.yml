@@ -7,6 +7,7 @@ steps:
   - snapshot://health/2023-08-16/deaths_karlinsky.csv
   data://garden/health/2023-08-16/deaths_karlinsky:
   - data://meadow/health/2023-08-16/deaths_karlinsky
+  - data://garden/demography/2023-03-31/population
   data://grapher/health/2023-08-16/deaths_karlinsky:
   - data://garden/health/2023-08-16/deaths_karlinsky
 
