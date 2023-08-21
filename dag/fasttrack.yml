@@ -98,3 +98,5 @@ steps:
   - snapshot-private://fasttrack/latest/welfare_broiler_chickens.csv
   data-private://grapher/fasttrack/2023-08-14/gbif_animal_presence:
   - snapshot-private://fasttrack/2023-08-14/gbif_animal_presence.csv
+  data://grapher/fasttrack/latest/net_zero_tracker:
+  - snapshot://fasttrack/latest/net_zero_tracker.csv
