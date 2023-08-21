@@ -17,8 +17,9 @@ import os
 from copy import deepcopy
 from typing import List, cast
 
+import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Origin, Table
 from owid.catalog.utils import underscore_table
 from structlog import get_logger
 
@@ -55,13 +56,16 @@ def run(dest_dir: str) -> None:
     # create table
     tb = make_table()
 
+    # create new table with condensed origins
+    tb_original = tb.copy(deep=True)
+    tb_original.metadata.short_name = "population_original"
+
+    # condensed origin
+    tb.population.metadata.origins = [Origin(dataset_title_owid="Various origins")]
+
     # create dataset
     log.info("population: create dataset")
-    ds = create_dataset(dest_dir, tables=[tb])
-
-    # manage metadata
-    log.info("population: add metadata")
-    ds.update_metadata(METADATA_PATH)
+    ds = create_dataset(dest_dir, tables=[tb, tb_original])
 
     # save dataset
     ds.save()
@@ -95,7 +99,7 @@ def load_data() -> pd.DataFrame:
     gapminder_comp = load_gapminder_sys_glob_complement()
     log.info("population: loading data (Hyde)")
     hyde = load_hyde()
-    tb = pd.DataFrame(pd.concat([gapminder, gapminder_comp, hyde, unwpp], ignore_index=True))
+    tb = pr.concat([gapminder, gapminder_comp, hyde, unwpp], ignore_index=True)
     return tb
 
 
