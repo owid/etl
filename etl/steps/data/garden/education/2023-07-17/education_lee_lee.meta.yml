@@ -28,9 +28,9 @@ tables:
       mf_primary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, primary, both sexes
         description: >
-          Adjusted net enrollment rate in primary education is calculated by dividing the number of children in
-          the official primary school age who are enrolled in primary or secondary education by the population of the same
-          age group and multiplying by 100.
+          Net enrollment rate for primary school is calculated by dividing the number of students of official
+          school age enrolled in primary education by the population of the age group which officially corresponds to primary
+          education, and multiplying by 100.
 
 
           Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.
@@ -42,9 +42,9 @@ tables:
       f_primary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, primary, female
         description: >
-          Adjusted net enrollment rate in primary education is calculated by dividing the number of children in
-          the official primary school age who are enrolled in primary or secondary education by the population of the same
-          age group and multiplying by 100.
+          Net enrollment rate for primary school is calculated by dividing the number of students of official
+          school age enrolled in primary education by the population of the age group which officially corresponds to primary
+          education, and multiplying by 100.
 
 
           Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.
@@ -56,9 +56,9 @@ tables:
       m_primary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, primary, male
         description: >
-          Adjusted net enrollment rate in primary education is calculated by dividing the number of children in
-          the official primary school age who are enrolled in primary or secondary education by the population of the same
-          age group and multiplying by 100.
+          Net enrollment rate for primary school is calculated by dividing the number of students of official
+          school age enrolled in primary education by the population of the age group which officially corresponds to primary
+          education, and multiplying by 100.
 
 
           Historical data from Human Capital in the Long Run (Lee and Lee, 2016) up until 2010 combined with recent estimates from 2010 by World Bank.

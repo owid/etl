@@ -22,9 +22,7 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     df = pd.read_csv(snap.path)
     df.rename(columns={"country_or_region": "country"}, inplace=True)
-    # Clean up Sub-Saharan Africa names
-    df["country"].replace("Sub-Sahara Africa     (SSA)", "Sub-Saharan Africa (OECD)")
-    df["country"].replace("Sub-Sahara Africa   (SSA)", "Sub-Saharan Africa (OECD)")
+
     #
     # Process data.
     #

@@ -50,6 +50,10 @@ def run(dest_dir: str) -> None:
     # Add metadata by finding the descriptions and sources using the indicator codes.
     tb = add_metadata(tb, metadata_tb)
 
+    # Conver Witthgenstein projections to %
+    for col in tb.columns:
+        if "wittgenstein_projection__percentage" in col:
+            tb[col] *= 100
     #
     # Save outputs.
     #
@@ -93,12 +97,18 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
 
         # Update the column names and metadata
         tb.rename(columns={column: new_column_name}, inplace=True)
-        tb[new_column_name].metadata.description = " ".join(
+        description_string = " ".join(
             [
                 description + "." "World Bank variable id: " + indicator_to_find + ".",
-                source,  # Change this when the new metadata format is ready
+                source,
             ]
         )
+
+        # Replace any occurrences of '..' with '.'
+        description_string = description_string.replace("..", ".")
+        description_string = description_string.replace(".W", ". W")
+
+        tb[new_column_name].metadata.description = description_string
         tb[new_column_name].metadata.title = name
         tb[new_column_name].metadata.display = {}
 
@@ -145,8 +155,11 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
         elif "index" in name_lower:
             update_metadata(tb, new_column_name, 1, "index", " ")
         # Check for the presence of currency-related keywords in 'name_lower'.
-        elif "USD" in name_lower or "$":
+        elif "usd" in name_lower or "$":
             update_metadata(tb, new_column_name, 1, "US dollars", "$")
+        elif "scores" in name_lower:
+            update_metadata(tb, new_column_name, 1, "score", " ")
+
         else:
             # Default metadata update when no other conditions are met.
             update_metadata(tb, new_column_name, 0, " ", " ")

@@ -10,7 +10,7 @@ meta:
   date_accessed: 2023-07-26
   is_public: true
   description: |
-    The World Bank EdStats database holds over 4,000 internationally comparable indicators that describe education access, progression, completion, literacy, teachers, population, and expenditures. The indicators cover the education cycle from pre-primary to vocational and tertiary education. The database also holds learning outcome data from international and regional learning assessments (e.g. PISA, TIMSS, PIRLS), equity data from household surveys, and projection/attainment data to 2050. For further information, please visit the [EdStats website](https://datatopics.worldbank.org/education/).
+    The World Bank EdStats database holds over 4,000 internationally comparable indicators that describe education access, progression, completion, literacy, teachers, population, and expenditures. The indicators cover the education cycle from pre-primary to vocational and tertiary education. The database also holds learning outcome data from international and regional learning assessments (e.g. PISA, TIMSS, PIRLS), equity data from household surveys, and projection/attainment data to 2050. For further information, please visit the EdStats website - https://datatopics.worldbank.org/education/.
 wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
 - md5: d9cc0b529e0871fe7de2c3f7f519f5cf
