@@ -8,7 +8,7 @@ import shutil
 import warnings
 from dataclasses import dataclass
 from glob import glob
-from os import environ, mkdir
+from os import environ
 from os.path import join
 from pathlib import Path
 from typing import Any, Iterator, List, Literal, Optional, Union
