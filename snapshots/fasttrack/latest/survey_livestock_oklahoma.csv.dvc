@@ -13,6 +13,6 @@ meta:
   license: {}
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: ba9bee1e23d9a527d45557c5a51dcc73
-  size: 1226
+- md5: b5d54c9c99616a0f61523365746d0e81
+  size: 1195
   path: survey_livestock_oklahoma.csv
