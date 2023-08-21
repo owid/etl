@@ -54,12 +54,6 @@ tables:
         display:
           numDecimalPlaces: 2
 
-      some_formal_education:
-        title: Share of population with some formal education, 1820-2020
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 2
       no_formal_education:
         title: Share of population with no formal education, 1820-2020
         unit: '%'

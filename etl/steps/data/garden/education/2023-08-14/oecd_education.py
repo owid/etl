@@ -30,24 +30,27 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    # Convert columns to numeric type and set the multi-index
+    for column in tb.columns:
+        if column not in ["country", "year"]:
+            tb[column] = pd.to_numeric(tb[column], errors="coerce")
+            tb[column] = tb[column].astype("float64")
+
     # Combine best guess (1820) with educational attainment (1870 > ) of estimates for some formal education
-    tb["some_formal_education"] = tb["educational_attainment"] + tb["best_guess"]
+    mask = (tb["year"] == 1820) & (tb["country"] == "World")
+    value_to_assign = tb.loc[mask, "best_guess"].values[0]  # Get the specific value
+    tb.loc[mask, "population_with_basic_education"] = value_to_assign
+
     # Create an indicator with historical estimates of share of population with no education
-    tb["no_formal_education"] = 100 - tb["some_formal_education"]
+    tb["no_formal_education"] = 100 - tb["population_with_basic_education"]
 
     # Extract literacy and formal education indicators from World Bank Education Dataset post-2010
     df_above_2010 = extract_related_world_bank_data(tb_wb)
 
     # Merge data with World Bank literacy and education data
-    merge_cols = ["country", "year", "some_formal_education", "no_formal_education", "literacy"]
-    merged_wb = pd.merge(tb, df_above_2010, on=merge_cols, how="outer")
+    merged_wb = pd.concat([tb, df_above_2010])
     merged_wb["illiterate"] = 100 - merged_wb["literacy"]
 
-    # Convert columns to numeric type and set the multi-index
-    for column in merged_wb.columns:
-        if column not in ["country", "year"]:
-            merged_wb[column] = pd.to_numeric(merged_wb[column], errors="coerce")
-            merged_wb[column] = merged_wb[column].astype("float64")
     merged_wb.set_index(["country", "year"], verify_integrity=True, inplace=True)
 
     tb = Table(merged_wb, short_name=paths.short_name, underscore=True)
@@ -84,7 +87,7 @@ def extract_related_world_bank_data(tb_wb: Table) -> pd.DataFrame:
 
     # Filter the DataFrame for years above 2010 (OECD dataset stops in 2010)
     df_above_2010 = df_wb[(df_wb.index.get_level_values("year") > 2010)]
-    df_above_2010["some_formal_education"] = 100 - df_above_2010["no_formal_education"]
+    df_above_2010["population_with_basic_education"] = 100 - df_above_2010["no_formal_education"]
     df_above_2010.reset_index(inplace=True)
 
     return df_above_2010
