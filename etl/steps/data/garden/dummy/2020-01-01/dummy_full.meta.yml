@@ -13,6 +13,7 @@ tables:
           name: "[indicator.license.name]"
           url: "[indicator.license.url]"
         display:
+          name: "[display.name > indicator.title]"
           isProjection: true
           conversionFactor: 9999
           numDecimalPlaces: 9
@@ -23,7 +24,7 @@ tables:
           includeInTable: true
         presentation:
           grapher_config:
-            title: "[grapher-config.title > indicator.title]"
+            title: "[grapher-config.title > display.name > indicator.title]"
             subtitle: "[grapher-config.subtitle > indicator.description-short]"
             hasMapTab: true
             selectedEntityNames:
