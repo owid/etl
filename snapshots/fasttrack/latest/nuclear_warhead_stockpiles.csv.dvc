@@ -12,7 +12,7 @@ meta:
     This dataset provides information on the number of stockpiled nuclear warheads
     by the nuclear powers, using data from
     the Federation of American Scientists, prepared by Hans M. Kristensen, Matt Korda,
-    and Robert Norris.
+    Eliana Reynolds, and Robert Norris.
 
 
     You can download the code and complete dataset, including supplementary variables,
@@ -22,6 +22,6 @@ meta:
   license: {}
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: a2a197de85970c33e1cd54976a44f9b0
-  size: 13968
+- md5: 3ae0bc86faefa1734117ba84f4761adc
+  size: 15471
   path: nuclear_warhead_stockpiles.csv
