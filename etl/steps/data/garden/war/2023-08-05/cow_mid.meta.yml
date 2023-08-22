@@ -1,7 +1,7 @@
 dataset:
   title: History of war (COW MID, 2020)
   description: >-
-      This dataset contains information on interstate conflicts in the period of 1816 and 2014.
+      This dataset contains information on interstate disputes in the period of 1816 and 2014.
 
 
       It has been constructed using the Correlates of War - Militarised Interstate Disputes v5.0 dataset.
@@ -42,8 +42,8 @@ tables:
           Number of ongoing disputes in a given year.
 
 
-          We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions.
-          The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+          We count a dispute as ongoing in a region even if the dispute is also ongoing in other regions.
+          The sum across all regions can therefore be higher than the total number of ongoing disputes.
 
 
           The data is disaggregated by region and "hostility" or "fatality".
@@ -97,8 +97,8 @@ tables:
           Number of new disputes in a given year.
 
 
-          We count a conflict as new in a region even if the conflict is also ongoing in other regions.
-          The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+          We count a dispute as new in a region even if the dispute is also ongoing in other regions.
+          The sum across all regions can therefore be higher than the total number of ongoing disputes.
 
 
           The data is disaggregated by region and "hostility" or "fatality".

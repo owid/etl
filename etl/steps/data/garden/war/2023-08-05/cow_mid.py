@@ -1,18 +1,23 @@
 """COW Militarised Inter-state Dispute dataset.
 
 
-- This dataset only contains inter-state conflicts.
+- This dataset only contains inter-state disputes.
 
-- We use the "fatality" level to differentiate different "types" of conflicts. The "fatality" level provides a range of fatalities (e.g. 1-25 deaths)
+- We use the "fatality" and "hostility" levels to differentiate different "types" of disputes.
 
-- Each entry in this dataset describes a conflict (its participants and period). Therefore we need to "explode" it to add observations
-for each year of the conflict.
+    - The "fatality" level provides a range of fatalities (e.g. '1-25 deaths')
+
+    - The "hostility" level provides a short summary of the hostility degree of the dispute ('Use of force', 'War', etc.)
+
+- Each entry in the source dataset describes a dispute (its participants and period). Therefore we need to "explode" it to add observations
+for each year of the dispute.
 
 - Due to missing data in the number of deaths, we are not estimating this metric. Instead, we are using the "fatality" level to group by the different conflicts.
 
-- We also do not report "number of new conflicts".
+- The "number of ongoing disputes" for a particular fatality level can be understood as "the number of conflicts ongoing in a particular year that will have between X1-X2 fatalities
+over their complete lifetime globally".
 
-- The "number of ongoing conflicts" for a particular fatality can be understood as "the number of conflicts ongoing in a particular year that will have X fatalities
+- The "number of ongoing disputes" for a particular hostility level can be understood as "the number of conflicts ongoing in a particular year that will reach this hostility level
 over their complete lifetime globally".
 """
 
