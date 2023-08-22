@@ -14,13 +14,10 @@ Four sources are used overall:
         More on this dataset please refer to module gapminder_sg.
 """
 import os
-from copy import deepcopy
-from typing import List, cast
+from typing import List
 
 import owid.catalog.processing as pr
-import pandas as pd
-from owid.catalog import Origin, Table
-from owid.catalog.utils import underscore_table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -56,16 +53,9 @@ def run(dest_dir: str) -> None:
     # create table
     tb = make_table()
 
-    # create new table with condensed origins
-    tb_original = tb.copy(deep=True)
-    tb_original.metadata.short_name = "population_original"
-
-    # condensed origin
-    tb.population.metadata.origins = [Origin(dataset_title_owid="Various origins")]
-
     # create dataset
     log.info("population: create dataset")
-    ds = create_dataset(dest_dir, tables=[tb, tb_original])
+    ds = create_dataset(dest_dir, tables=[tb])
 
     # save dataset
     ds.save()
@@ -83,12 +73,12 @@ def make_table() -> Table:
         .pipe(fix_anomalies)
         .pipe(set_dtypes)
         .pipe(add_world_population_share)
-        .pipe(df_to_table)
+        .pipe(postprocess_table)
     )
     return tb
 
 
-def load_data() -> pd.DataFrame:
+def load_data() -> Table:
     """Load data from all sources and concatenate them into a single dataframe."""
     log.info("population: loading data...")
     log.info("population: loading data (WPP)")
@@ -103,7 +93,7 @@ def load_data() -> pd.DataFrame:
     return tb
 
 
-def select_source(df: pd.DataFrame) -> pd.DataFrame:
+def select_source(df: Table) -> Table:
     """Select adequate source for each country-year.
 
     Rows are selected based on the following relevance scale: "unwpp" > "gapminder_v7" > "hyde"
@@ -134,7 +124,7 @@ def select_source(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _assert_unique(df: pd.DataFrame, subset: List[str]) -> None:
+def _assert_unique(df: Table, subset: List[str]) -> None:
     """Ensure that dataframe has only one row per columns in subset"""
     # NOTE: this could be moved to helpers
     df_deduped = df.drop_duplicates(subset=subset)
@@ -143,7 +133,7 @@ def _assert_unique(df: pd.DataFrame, subset: List[str]) -> None:
         raise AssertionError(f"Duplicate rows:\n {diff}")
 
 
-def add_regions(df: pd.DataFrame) -> pd.DataFrame:
+def add_regions(df: Table) -> Table:
     """Add continents and income groups."""
     log.info("population: adding regions...")
     regions = [
@@ -185,7 +175,7 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def add_world(df: pd.DataFrame) -> pd.DataFrame:
+def add_world(df: Table) -> Table:
     """Add world aggregate.
 
     We do this by adding the values for all continents.
@@ -194,7 +184,7 @@ def add_world(df: pd.DataFrame) -> pd.DataFrame:
     contain 'World' data but others don't.
     """
     log.info("population: adding World...")
-    df_ = deepcopy(df)
+    df_ = df.copy()
     year_threshold = df_.loc[df_["country"] == "World", "year"].min()
     assert (
         year_threshold == 1950  # This is the year that the UN data starts.
@@ -214,14 +204,14 @@ def add_world(df: pd.DataFrame) -> pd.DataFrame:
         .sum(numeric_only=True)
         .assign(country="World")
     )
-    df = pd.concat([df, df_], ignore_index=True).sort_values(["country", "year"])
+    df = pr.concat([df, df_], ignore_index=True).sort_values(["country", "year"])
 
     # add sources for world
     df.loc[df["country"] == "World", "source"] = "; ".join(sorted(SOURCES_NAMES.values()))
     return df
 
 
-def add_historical_regions(df: pd.DataFrame) -> pd.DataFrame:
+def add_historical_regions(df: Table) -> Table:
     """Add historical regions.
 
     Systema Globalis from Gapminder contains historical regions. We add them to the data. These include
@@ -234,11 +224,10 @@ def add_historical_regions(df: pd.DataFrame) -> pd.DataFrame:
     # map source name
     gapminder_sg["source"] = SOURCES_NAMES["gapminder_sg"]
 
-    df = pd.DataFrame(pd.concat([df, gapminder_sg], ignore_index=True))
-    return df
+    return pr.concat([df, gapminder_sg], ignore_index=True)
 
 
-def fix_anomalies(df: pd.DataFrame) -> pd.DataFrame:
+def fix_anomalies(df: Table) -> Table:
     """Make sure that all rows make sense.
 
     - Remove rows with population = 0.
@@ -246,13 +235,13 @@ def fix_anomalies(df: pd.DataFrame) -> pd.DataFrame:
     """
     log.info("population: filter rows...")
     # remove datapoints with population = 0
-    df = cast(pd.DataFrame, df[df["population"] > 0].copy())
+    df = df[df["population"] > 0].copy()
     # remove datapoints for the Netherland Antilles after 2010 (it was dissolved then)
     df = df[~((df["country"] == "Netherlands Antilles") & (df["year"] > 2010))]
     return df
 
 
-def set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
+def set_dtypes(df: Table) -> Table:
     """Assign adequate dtypes to columns."""
     log.info("population: setting dtypes...")
     # correct dtypes
@@ -262,7 +251,7 @@ def set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def add_world_population_share(df: pd.DataFrame) -> pd.DataFrame:
+def add_world_population_share(df: Table) -> Table:
     """Obtain world's population share for each country/region and year."""
     log.info("population: adding world population share...")
     # Add a metric "% of world population"
@@ -273,19 +262,9 @@ def add_world_population_share(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def df_to_table(df: pd.DataFrame) -> Table:
-    """Create table from dataframe."""
-    log.info("population: converting df to table...")
+def postprocess_table(df: Table) -> Table:
     # fine tune df (sort rows, columns, set index)
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index()[
         ["population", "world_pop_share", "source"]
     ]
-    # create table, sort rows
-    tb = Table(df, short_name="population")
-    # add metadata to columns
-    tb["population"].title = "Total population (Gapminder, HYDE & UN)"
-    tb["world_pop_share"].title = "Share of World Population"
-    tb["source"].title = "Source"
-    # underscore
-    tb = underscore_table(tb)
-    return tb
+    return df

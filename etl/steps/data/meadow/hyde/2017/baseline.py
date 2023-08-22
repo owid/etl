@@ -4,8 +4,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-import pandas as pd
-from owid.catalog import Table
+import owid.catalog.processing as pr
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -32,7 +31,7 @@ def run(dest_dir: str) -> None:
         # Population table
         country_path = Path(temp_dir) / "baseline" / "txt" / "popc_c.txt"
         population = (
-            pd.read_csv(country_path.as_posix(), sep=" ")
+            pr.read_csv(country_path, sep=" ", metadata=snap.to_table_metadata())
             .rename({"region": "country_code"}, axis=1)
             .melt(id_vars="country_code", var_name="year", value_name="population")
         )
@@ -41,16 +40,18 @@ def run(dest_dir: str) -> None:
     population["year"] = population.year.astype(int)
     population["country_code"] = population.country_code.astype(int)
 
-    population_norm = pd.merge(codes, population, on="country_code", how="inner", validate="one_to_many").drop(
-        columns="country_code"
-    )
-    population_norm.set_index(["country", "year"], inplace=True)
+    population_norm = pr.merge(
+        codes.reset_index(), population, on="country_code", how="inner", validate="one_to_many"
+    ).drop(columns="country_code")
 
-    tb = Table(population_norm, short_name="population")
+    population_norm.set_index(["country", "year"], inplace=True)
+    population_norm.metadata.short_name = "population"
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds = create_dataset(
+        dest_dir, tables=[population_norm], default_metadata=snap.metadata, check_variables_metadata=True
+    )
     ds.save()
