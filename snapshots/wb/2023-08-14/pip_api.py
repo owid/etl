@@ -157,7 +157,9 @@ def pip_query_country(
         repeat += 1
 
     # After MAX_REPEATS, log fatal error
-    assert repeat < MAX_REPEATS, log.fatal(f"Repeated {repeat} times, can't extract data")
+    assert repeat < MAX_REPEATS, log.fatal(
+        f"Repeated {repeat} times, can't extract data ({popshare_or_povline} = {value}, {ppp_version} PPPs)"
+    )
 
     df = pd.read_csv(io.StringIO(content.decode("utf-8")))
 
@@ -229,7 +231,9 @@ def pip_query_region(
         repeat += 1
 
     # After MAX_REPEATS, log fatal error
-    assert repeat < MAX_REPEATS, log.fatal(f"Repeated {repeat} times, can't extract data")
+    assert repeat < MAX_REPEATS, log.fatal(
+        f"Repeated {repeat} times, can't extract data ({popshare_or_povline} = {value}, {ppp_version} PPPs)"
+    )
 
     df = pd.read_csv(io.StringIO(content.decode("utf-8")))
 

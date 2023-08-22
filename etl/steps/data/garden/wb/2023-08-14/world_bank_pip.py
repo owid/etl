@@ -10,10 +10,20 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define absolute poverty lines used depending on PPP version
+povlines_dict = {
+    2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
+    2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
+}
+
 
 def process_data(tb: Table) -> Table:
     # rename columns
     tb = tb.rename(columns={"headcount": "headcount_ratio", "poverty_gap": "poverty_gap_index"})
+
+    # Changing the decile(i) variables for decile(i)_share
+    for i in range(1, 11):
+        tb = tb.rename(columns={f"decile{i}": f"decile{i}_share"})
 
     # Calculate number in poverty
     tb["headcount"] = tb["headcount_ratio"] * tb["reporting_pop"]
@@ -64,16 +74,25 @@ def process_data(tb: Table) -> Table:
             "mld",
             "gini",
             "polarization",
-            "decile1",
-            "decile2",
-            "decile3",
-            "decile4",
-            "decile5",
-            "decile6",
-            "decile7",
-            "decile8",
-            "decile9",
-            "decile10",
+            "decile1_share",
+            "decile2_share",
+            "decile3_share",
+            "decile4_share",
+            "decile5_share",
+            "decile6_share",
+            "decile7_share",
+            "decile8_share",
+            "decile9_share",
+            "decile10_share",
+            "decile1_thr",
+            "decile2_thr",
+            "decile3_thr",
+            "decile4_thr",
+            "decile5_thr",
+            "decile6_thr",
+            "decile7_thr",
+            "decile8_thr",
+            "decile9_thr",
             "is_interpolated",
             "distribution_type",
             "estimation_type",
@@ -121,14 +140,95 @@ def process_data(tb: Table) -> Table:
     # Reset index
     tb = tb.reset_index()
 
-    # Changing the decile(i) variables for decile(i)_share
-    for i in range(1, 11):
-        tb = tb.rename(columns={f"decile{i}": f"decile{i}_share"})
-
     return tb
 
 
 # NOTE: Create stacked variables
+def create_stacked_variables(tb: Table, povline_dict: dict, ppp_version: int) -> Table:
+    """
+    Create stacked variables from the indicators to plot them as stacked area/bar charts
+    """
+
+    # Filter table to include only the right ppp_version
+    tb = tb[tb["ppp_version"] == ppp_version].reset_index(drop=True)
+
+    # Select poverty lines between 2011 and 2017 and sort in case they are not in order
+    povlines = povlines_dict[ppp_version].sort()
+
+    # Above variables
+
+    col_above_n = []
+    col_above_pct = []
+
+    for p in povlines:
+        varname_n = f"headcount_above_{p}"
+        varname_pct = f"headcount_ratio_above_{p}"
+
+        tb[varname_n] = tb["reporting_pop"] - tb[f"headcount_{p}"]
+        tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
+
+        col_above_n.append(varname_n)
+        col_above_pct.append(varname_pct)
+
+    tb.loc[:, col_above_pct] = tb[col_above_pct] * 100
+
+    # Stacked variables
+
+    col_stacked_n = []
+    col_stacked_pct = []
+
+    for i in range(len(povlines)):
+        # if it's the first value only get people below this poverty line (and percentage)
+        if i == 0:
+            varname_n = f"headcount_stacked_below_{povlines[i]}"
+            varname_pct = f"headcount_ratio_stacked_below_{povlines[i]}"
+            tb[varname_n] = tb[f"headcount_{povlines[i]}"]
+            tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
+            col_stacked_n.append(varname_n)
+            col_stacked_pct.append(varname_pct)
+
+        # If it's the last value calculate the people between this value and the previous
+        # and also the people over this poverty line (and percentages)
+        elif i == len(povlines) - 1:
+            varname_n = f"headcount_stacked_below_{povlines[i]}"
+            varname_pct = f"headcount_ratio_stacked_below_{povlines[i]}"
+            tb[varname_n] = tb[f"headcount_{povlines[i]}"] - tb[f"headcount_{povlines[i-1]}"]
+            tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
+            col_stacked_n.append(varname_n)
+            col_stacked_pct.append(varname_pct)
+            varname_n = f"headcount_stacked_above_{povlines[i]}"
+            varname_pct = f"headcount_ratio_stacked_above_{povlines[i]}"
+            tb[varname_n] = tb["reporting_pop"] - tb[f"headcount_{povlines[i]}"]
+            tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
+            col_stacked_n.append(varname_n)
+            col_stacked_pct.append(varname_pct)
+
+        # If it's any value between the first and the last calculate the people between this value and the previous (and percentage)
+        else:
+            varname_n = f"headcount_stacked_below_{povlines[i]}"
+            varname_pct = f"headcount_ratio_stacked_below_{povlines[i]}"
+            tb[varname_n] = tb[f"headcount_{povlines[i]}"] - tb[f"headcount_{povlines[i-1]}"]
+            tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
+            col_stacked_n.append(varname_n)
+            col_stacked_pct.append(varname_pct)
+
+    tb.loc[:, col_stacked_pct] = tb[col_stacked_pct] * 100
+
+    # Calculate stacked variables which "jump" the original order
+
+    tb[f"headcount_stacked_between_{povlines[1]}_{povlines[4]}"] = (
+        tb[f"headcount_{povlines[4]}"] - tb[f"headcount_{povlines[1]}"]
+    )
+    tb[f"headcount_stacked_between_{povlines[4]}_{povlines[6]}"] = (
+        tb[f"headcount_{povlines[6]}"] - tb[f"headcount_{povlines[4]}"]
+    )
+
+    tb[f"headcount_ratio_stacked_between_{povlines[1]}_{povlines[4]}"] = (
+        tb[f"headcount_ratio_{povlines[4]}"] - tb[f"headcount_ratio_{povlines[1]}"]
+    )
+    tb[f"headcount_ratio_stacked_between_{povlines[4]}_{povlines[6]}"] = (
+        tb[f"headcount_ratio_{povlines[6]}"] - tb[f"headcount_ratio_{povlines[4]}"]
+    )
 
 
 def calculate_inequality(tb: Table) -> Table:
@@ -166,39 +266,85 @@ def calculate_inequality(tb: Table) -> Table:
     tb["p50_p10_ratio"] = tb["decile5_thr"] / tb["decile1_thr"]
 
 
-def sanity_check(tb: Table) -> Table:
-    # Dropping errors
+def identify_rural_urban(tb: Table) -> Table:
+    """
+    Amend the entity to reflect if data refers to urban or rural only
+    """
 
-    print("Dropping rows with issues...")
-    start_time = time.time()
+    tb.loc[(tb["reporting_level"].isin(["urban", "rural"])), "country"] = (
+        tb.loc[(tb["reporting_level"].isin(["urban", "rural"])), "country"]
+        + " ("
+        + tb.loc[(tb["reporting_level"].isin(["urban", "rural"])), "reporting_level"]
+        + ")"
+    )
+
+    return tb
+
+
+def sanity_checks(tb: Table, povlines_dict: dict, ppp_version: int) -> Table:
+    """
+    Sanity checks for the table
+    """
 
     # stacked values not adding up to 100%
-    print(f"{len(df_final)} rows before stacked values check")
-    df_final["sum_pct"] = df_final[col_stacked_pct].sum(axis=1)
-    df_final = df_final[~((df_final["sum_pct"] >= 100.1) | (df_final["sum_pct"] <= 99.9))].reset_index(drop=True)
-    print(f"{len(df_final)} rows after stacked values check")
+    print(f"{len(tb)} rows before stacked values check")
+    tb["sum_pct"] = tb[col_stacked_pct].sum(axis=1)
+    tb = tb[~((tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9))].reset_index(drop=True)
+    print(f"{len(tb)} rows after stacked values check")
 
     # missing poverty values (headcount, poverty gap, total shortfall)
-    print(f"{len(df_final)} rows before missing values check")
+    print(f"{len(tb)} rows before missing values check")
     cols_to_check = (
         col_headcount + col_headcount_ratio + col_povertygap + col_tot_shortfall + col_stacked_n + col_stacked_pct
     )
-    df_final = df_final[~df_final[cols_to_check].isna().any(1)].reset_index(drop=True)
-    print(f"{len(df_final)} rows after missing values check")
+    tb = tb[~tb[cols_to_check].isna().any(1)].reset_index(drop=True)
+    print(f"{len(tb)} rows after missing values check")
 
     # headcount monotonicity check
-    print(f"{len(df_final)} rows before headcount monotonicity check")
+    print(f"{len(tb)} rows before headcount monotonicity check")
     m_check_vars = []
     for i in range(len(col_headcount)):
         if i > 0:
             check_varname = f"m_check_{i}"
-            df_final[check_varname] = df_final[f"{col_headcount[i]}"] >= df_final[f"{col_headcount[i-1]}"]
+            tb[check_varname] = tb[f"{col_headcount[i]}"] >= tb[f"{col_headcount[i-1]}"]
             m_check_vars.append(check_varname)
-    df_final["check_total"] = df_final[m_check_vars].all(1)
-    df_final = df_final[df_final["check_total"] == True].reset_index(drop=True)
-    print(f"{len(df_final)} rows after headcount monotonicity check")
+    tb["check_total"] = tb[m_check_vars].all(1)
+    tb = tb[tb["check_total"] == True].reset_index(drop=True)
+    print(f"{len(tb)} rows after headcount monotonicity check")
 
     return tb
+
+
+def inc_or_cons_data(tb: Table) -> Table:
+    """
+    Separate income and consumption data
+    """
+
+    # Separate out consumption-only, income-only. Also, create a table with both income and consumption
+    tb_inc = tb[tb["welfare_type"] == "income"].reset_index(drop=True)
+    tb_cons = tb[tb["welfare_type"] == "consumption"].reset_index(drop=True)
+    tb_inc_or_cons = tb.copy()
+
+    # If both inc and cons are available in a given year, drop inc
+
+    # Flag duplicates – indicating multiple welfare_types
+    # Sort values to ensure the welfare_type consumption is marked as False when there are multiple welfare types
+    tb_inc_or_cons = tb_inc_or_cons.sort_values(
+        by=["ppp_version", "country", "year", "reporting_level", "welfare_type"], ignore_index=True
+    )
+    tb_inc_or_cons["duplicate_flag"] = tb_inc_or_cons.duplicated(
+        subset=["ppp_version", "country", "year", "reporting_level"]
+    )
+
+    # Drop income where income and consumption are available
+    tb_inc_or_cons = tb_inc_or_cons[
+        (tb_inc_or_cons["duplicate_flag"] == False) | (tb_inc_or_cons["welfare_type"] == "consumption")
+    ]
+    tb_inc_or_cons.drop(columns=["duplicate_flag"], inplace=True)
+
+    # print(f'After dropping duplicates there were {len(tb_inc_or_cons)} rows.')
+
+    return tb_inc, tb_cons, tb_inc_or_cons
 
 
 def run(dest_dir: str) -> None:
@@ -223,13 +369,33 @@ def run(dest_dir: str) -> None:
     # NOTE: Separate income and consumption data.
 
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.set_index(["ppp_version", "country", "year", "reporting_level", "welfare_type"], verify_integrity=True)
+
+    # Amend the entity to reflect if data refers to urban or rural only
+    tb = identify_rural_urban(tb)
+
+    tb_2011 = create_stacked_variables(tb, povlines_dict, ppp_version=2011)
+    tb_2017 = create_stacked_variables(tb, povlines_dict, ppp_version=2017)
+
+    # Sanity checks
+    tb_2011 = sanity_checks(tb_2011, povlines_dict, ppp_version=2011)
+    tb_2017 = sanity_checks(tb_2017, povlines_dict, ppp_version=2017)
+
+    # Separate out consumption-only, income-only. Also, create a table with both income and consumption
+    tb_inc_2011, tb_cons_2011, tb_inc_or_cons_2011 = inc_or_cons_data(tb_2011)
+    tb_inc_2017, tb_cons_2017, tb_inc_or_cons_2017 = inc_or_cons_data(tb_2017)
+
+    # Define tables to upload
+    tables = [tb_inc_2011, tb_cons_2011, tb_inc_or_cons_2011, tb_inc_2017, tb_cons_2017, tb_inc_or_cons_2017]
+
+    # Set index and sort
+    for tb in tables:
+        tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tables], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
