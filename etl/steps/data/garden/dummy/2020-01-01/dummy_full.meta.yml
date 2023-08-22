@@ -34,9 +34,9 @@ tables:
           title_public: "[presentation.title-public > indicator.title]"
           title_variant: "[presentation.title-variant]"
           producer_short: "[presentation.producer-short]"
-          attribution: "[presentation.attribution > indicator.attribution]"
+          attribution: "[presentation.attribution > origin.attribution > origin.producer (year)]"
           topic_tags_links:
-          - "[presentation.topic-tags-links example 1]"
+          - "Internet"
           - "[presentation.topic-tags-links example 2]"
           key_info_text:
           - "[presentation.key-info-text example 1]"
