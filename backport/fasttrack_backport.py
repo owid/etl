@@ -29,10 +29,17 @@ log = structlog.get_logger()
     type=bool,
     help="Backport dataset before migrating",
 )
+@click.option(
+    "--recreate/--no-recreate",
+    default=False,
+    type=bool,
+    help="Recreate the spreadsheet if it already exists",
+)
 def cli(
     dataset_id: int,
     short_name: Optional[str] = None,
     backport: bool = True,
+    recreate: bool = False,
 ) -> None:
     """Create Fast-track ready spreadsheet from an existing dataset.
 
@@ -41,12 +48,12 @@ def cli(
     1. Add Google Sheets API and Google Drive API to your project in the Google Cloud Platform Console.
     2. Download the credentials as a JSON file and save it in the same directory as this notebook.
     3. Point env variable GOOGLE_APPLICATION_CREDENTIALS to the credentials file.
-    4. Share [Fast-track template](https://docs.google.com/spreadsheets/d/1J0IEK60ih8QE4Ju6Bc_H1a1cRPtnItBkr-p5-5m2abU/edit#gid=1898134479) with the service account email address (e.g. 937270026338-compute@developer.gserviceaccount.com)
+    4. Share [Fast-track template](https://docs.google.com/spreadsheets/d/1j_mclAffQ2_jpbVEmI3VOiWRBeclBAIr-U7NpGAdV9A/edit#gid=1898134479) with the service account email address (e.g. 937270026338-compute@developer.gserviceaccount.com)
 
     Example usage:
         ENV=.env.prod backport-fasttrack --dataset-id 5546 --short-name democracy_lexical_index --no-backport
     """
-    return migrate(dataset_id=dataset_id, short_name=short_name, backport=backport)
+    return migrate(dataset_id=dataset_id, short_name=short_name, backport=backport, recreate=recreate)
 
 
 def _create_client():
@@ -166,6 +173,7 @@ def migrate(
     dataset_id: int,
     short_name: Optional[str] = None,
     backport: bool = True,
+    recreate: bool = False,
 ) -> None:
     lg = log.bind(dataset_id=dataset_id)
 
@@ -182,6 +190,13 @@ def migrate(
     # copy template and use new title
     spreadsheet_title = f"Fast-track: {pb.ds.name}"
 
+    if recreate:
+        try:
+            spreadsheet = client.open(spreadsheet_title)
+            client.del_spreadsheet(spreadsheet.id)
+        except gspread.exceptions.SpreadsheetNotFound:
+            pass
+
     try:
         spreadsheet = client.open(spreadsheet_title)
     except gspread.exceptions.SpreadsheetNotFound:
@@ -195,6 +210,14 @@ def migrate(
         # backport to refresh snapshots in S3
         if pb.needs_update():
             pb.upload(upload=True, dry_run=False, engine=engine)
+        # run ETL on backport
+        else:
+            from etl.command import main
+
+            main(
+                [pb.short_name],
+                backport=True,
+            )
 
     spreadsheet = client.open(spreadsheet_title)
 
@@ -209,8 +232,11 @@ def migrate(
     log.info("migrate.data")
     _fill_data(spreadsheet, ds)
 
-    lg.info("1. Add spreadsheet to Google Drive with: File -> Add a shortcut to Drive")
-    lg.info("2. Import spreadsheet with Fast-track on http://etl-prod-1:8082/")
+    lg.info(f"1. Open spreadsheet at {spreadsheet.url}")
+    lg.info("2. Add spreadsheet to Google Drive with: File -> Add a shortcut to Drive")
+    lg.info("3. Import spreadsheet with Fast-track on http://etl-prod-1:8082/")
+    lg.info("4. Run walkthrough charts to migrate charts to the new dataset")
+    lg.info("4. Delete old dataset")
 
     lg.info("migrate.finish")
 
