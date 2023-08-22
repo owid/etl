@@ -17,5 +17,5 @@ def run(dest_dir: str) -> None:
     tb_garden = ds_garden["{{cookiecutter.short_name}}"]
 
     # Create explorer dataset, with garden table and metadata in csv format
-    ds_explorer = create_dataset(dest_dir, tables=[tb_garden], formats=["csv"])
+    ds_explorer = create_dataset(dest_dir, tables=[tb_garden], formats=["csv"], default_metadata=ds_garden.metadata)
     ds_explorer.save()

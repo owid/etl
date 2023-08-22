@@ -90,8 +90,10 @@ def app(run_checks: bool) -> None:
 
     po.put_markdown("# Walkthrough - Snapshot")
     with open(CURRENT_DIR / "snapshot.md", "r") as f:
-        if utils.WALKTHROUGH_ORIGINS:
-            po.put_info(po.put_markdown("To use **Sources**, call it with `WALKTHROUGH_ORIGINS=0 walkthrough ...` "))
+        # if utils.WALKTHROUGH_ORIGINS:
+        #     po.put_info(po.put_markdown("To use **Sources**, call it with `WALKTHROUGH_ORIGINS=0 walkthrough ...` "))
+        if not utils.WALKTHROUGH_ORIGINS:
+            po.put_info(po.put_markdown("To use **Origins**, call it with `WALKTHROUGH_ORIGINS=1 walkthrough ...` "))
         po.put_collapse("Instructions", [po.put_markdown(f.read())])
 
     # run checks
