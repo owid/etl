@@ -46,8 +46,9 @@ tables:
           The sum across all regions can therefore be higher than the total number of ongoing conflicts.
 
 
-          The data is disaggregated by region and "fatality". "Fatality" gives lower and upper estimates on the total number of
-          fatalities over the complete span of a dispute. These are the types:
+          The data is disaggregated by region, "fatality" and "hostility".
+
+          "Fatality" gives lower and upper estimates on the total number of fatalities over the complete span of a dispute. These are the types:
 
             - No deaths
 
@@ -64,6 +65,75 @@ tables:
             - > 999 deaths
 
             - Unknown
+
+
+          "Hostility" provides a short description of the type of hostility. These are the types:
+
+            - No militarized action
+
+            - Threat to use force
+
+            - Display of force
+
+            - Use of force
+
+            - War
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+      number_new_disputes:
+        title: Number of new disputes
+        unit: disputes
+        description_short: The annual number of new disputes
+        description: >-
+          Number of new disputes in a given year.
+
+
+          We count a conflict as new in a region even if the conflict is also ongoing in other regions.
+          The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+
+
+          The data is disaggregated by region, "hostility".
+
+
+          "Hostility" provides a short description of the type of hostility. These are the types:
+
+            - No militarized action
+
+            - Threat to use force
+
+            - Display of force
+
+            - Use of force
+
+            - War
+
+
+
+          • New disputes for the 'World': We only count a dispute as new when the dispute overall started that year, not if it restarted
+          or its hostility level changed.
+
+          • New disputes for all regions (except 'World'): We count a dispute as new in a region even if the dispute overall started
+          earlier in another region. The sum across all regions can therefore be higher than the total number of new disputes.
+
+          • New disputes by hostility level: We only count a dispute as new when the dispute overall started that year, not if it changed
+          its hostility level.
+
+          The same conflict can have different "hostility level" for different regions. When this is the case, we classify its global
+          hostility level as the most hostile level based on the following rank (from less to most hostile):
+            1: No militarized action
+            2: Threat to use force
+            3: Display of force
+            4: Use of force
+            5: War
         processing_level: major
         display:
           numDecimalPlaces: 0
