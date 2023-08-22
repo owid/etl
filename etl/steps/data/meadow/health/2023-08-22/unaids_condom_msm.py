@@ -2,7 +2,6 @@
 
 from typing import cast
 
-import numpy as np
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
