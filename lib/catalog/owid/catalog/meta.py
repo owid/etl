@@ -135,6 +135,13 @@ class Origin:
     # License of the dataset
     license: Optional[License] = None
 
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def __str__(self) -> str:
+        attributes = [f"{key}={value!r}" for key, value in self.__dict__.items() if value is not None]
+        return f"{self.__class__.__name__}({', '.join(attributes)})"
+
     def __hash__(self):
         """Hash that uniquely identifies an origin."""
         return _hash_dataclass(self)
@@ -266,6 +273,13 @@ class VariableMeta:
 
     # This is the old sources that we keep for compatibility. Use is strongly discouraged going forward
     sources: List[Source] = field(default_factory=list)
+
+    def __repr__(self) -> str:
+        attributes = [f"{key}={value!r}" for key, value in self.__dict__.items() if value is not None and value != []]
+        return f"{self.__class__.__name__}({', '.join(attributes)})"
+
+    def __str__(self) -> str:
+        return self.__repr__()
 
     def __hash__(self):
         """Hash that uniquely identifies VariableMeta."""
