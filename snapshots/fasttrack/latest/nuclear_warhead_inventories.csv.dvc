@@ -22,6 +22,6 @@ meta:
   license: {}
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: ddcc73579e79846f261ff7980ddf98c9
-  size: 423
+- md5: e1269c0f219efe73d1c408caa13c3ba8
+  size: 694
   path: nuclear_warhead_inventories.csv
