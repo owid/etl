@@ -1,0 +1,23 @@
+meta:
+  origin:
+    dataset_title_owid: '[origin.dataset-title-owid]'
+    dataset_title_producer: '[origin.dataset-title-producer]'
+    dataset_description_owid: '[origin.dataset-description-owid]'
+    dataset_description_producer: '[origin.dataset-description-producer]'
+    producer: '[origin.producer]'
+    citation_producer: '[origin.citation-producer]'
+    attribution: '[origin.attribution > origin.producer (year)]'
+    attribution_short: '[origin.attribution-short]'
+    version: '[origin.version]'
+    dataset_url_main: '[origin.dataset-url-main]'
+    dataset_url_download: https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv
+    date_published: 2000-01-01
+    date_accessed: 2020-01-01
+  license:
+    name: '[license.name]'
+    url: '[license.url]'
+wdir: ../../../data/snapshots/dummy/2020-01-01
+outs:
+- md5: becb9bc64792f7372580683b384e5411
+  size: 96
+  path: dummy_full.csv
