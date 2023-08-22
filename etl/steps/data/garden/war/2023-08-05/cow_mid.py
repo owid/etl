@@ -431,6 +431,9 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     new_idx = pd.MultiIndex.from_product(
         [years, regions, fatality_types, hostility_types], names=["year", "region", "fatality", "hostility"]
     )
+    # Only keep rows with "all" in fatality or hostility
+    # That is, either break down indicators by fatality or by hostility
+    new_idx = [i for i in new_idx if (i[2] == "all") or (i[3] == "all")]
     tb = tb.set_index(["year", "region", "fatality", "hostility"], verify_integrity=True).reindex(new_idx).reset_index()
 
     # Change NaNs for 0 for specific rows
