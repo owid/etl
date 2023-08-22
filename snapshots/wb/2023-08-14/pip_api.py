@@ -611,7 +611,7 @@ def generate_percentiles_raw_concurrent():
         + between_150_and_175_dollars
     )
 
-    def get_percentiles_data(povline, versions):
+    def get_percentiles_data(povline, versions, ppp_version):
         return pip_query_country(
             popshare_or_povline="povline",
             value=povline / 100,
@@ -621,31 +621,32 @@ def generate_percentiles_raw_concurrent():
             fill_gaps=FILL_GAPS,
             welfare_type="all",
             reporting_level="all",
-            ppp_version=2017,
+            ppp_version=ppp_version,
             download="true",
         )
 
     def concurrent_percentiles_function():
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             tasks = []
-            for povline in povlines:
-                if Path(
-                    f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_2017.csv"
-                ).is_file():
-                    continue
-                else:
-                    task = executor.submit(get_percentiles_data, povline, versions)
-                    tasks.append(task)
+            for ppp_version in [2011, 2017]:
+                for povline in povlines:
+                    if Path(
+                        f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
+                    ).is_file():
+                        continue
+                    else:
+                        task = executor.submit(get_percentiles_data, povline, versions, ppp_version)
+                        tasks.append(task)
 
-            # NOTE: I comment this because the output would be too large to handle
+                # NOTE: I comment this because the output would be too large to handle
 
-            # results = [task.result() for task in concurrent.futures.as_completed(tasks)]
-            # # Concatenate list of dataframes
-            # results = pd.concat(results, ignore_index=True)
+                # results = [task.result() for task in concurrent.futures.as_completed(tasks)]
+                # # Concatenate list of dataframes
+                # results = pd.concat(results, ignore_index=True)
 
         # return results
 
-    def get_percentiles_data_region(povline, versions):
+    def get_percentiles_data_region(povline, versions, ppp_version):
         return pip_query_region(
             popshare_or_povline="povline",
             value=povline / 100,
@@ -654,27 +655,28 @@ def generate_percentiles_raw_concurrent():
             year="all",
             welfare_type="all",
             reporting_level="all",
-            ppp_version=2017,
+            ppp_version=ppp_version,
             download="true",
         )
 
     def concurrent_percentiles_region_function():
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             tasks = []
-            for povline in povlines:
-                if Path(
-                    f"{PARENT_DIR}/pip_region_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_ppp_2017.csv"
-                ).is_file():
-                    continue
-                else:
-                    task = executor.submit(get_percentiles_data_region, povline, versions)
-                    tasks.append(task)
+            for ppp_version in [2011, 2017]:
+                for povline in povlines:
+                    if Path(
+                        f"{PARENT_DIR}/pip_region_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_ppp_{ppp_version}.csv"
+                    ).is_file():
+                        continue
+                    else:
+                        task = executor.submit(get_percentiles_data_region, povline, versions, ppp_version)
+                        tasks.append(task)
 
-            # NOTE: I comment this because the output would be too large to handle
+                # NOTE: I comment this because the output would be too large to handle
 
-            # results = [task.result() for task in concurrent.futures.as_completed(tasks)]
-            # # Concatenate list of dataframes
-            # results = pd.concat(results, ignore_index=True)
+                # results = [task.result() for task in concurrent.futures.as_completed(tasks)]
+                # # Concatenate list of dataframes
+                # results = pd.concat(results, ignore_index=True)
 
         # return results
 
@@ -689,16 +691,17 @@ def generate_percentiles_raw_concurrent():
     df_country = pd.DataFrame()
     df_region = pd.DataFrame()
 
-    for povline in povlines:
-        df_query_country = pd.read_csv(
-            f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_2017.csv"
-        )
-        df_country = pd.concat([df_country, df_query_country], ignore_index=True)
+    for ppp_version in [2011, 2017]:
+        for povline in povlines:
+            df_query_country = pd.read_csv(
+                f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
+            )
+            df_country = pd.concat([df_country, df_query_country], ignore_index=True)
 
-        df_query_region = pd.read_csv(
-            f"{PARENT_DIR}/pip_region_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_ppp_2017.csv"
-        )
-        df_region = pd.concat([df_region, df_query_region], ignore_index=True)
+            df_query_region = pd.read_csv(
+                f"{PARENT_DIR}/pip_region_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_ppp_{ppp_version}.csv"
+            )
+            df_region = pd.concat([df_region, df_query_region], ignore_index=True)
 
     # I check if the set of countries is the same in the df and in the aux table (list of countries)
     aux_dict = pip_aux_tables(table="countries")
@@ -771,6 +774,8 @@ def generate_consolidated_percentiles(df):
     elapsed_time = round(end_time - start_time, 2)
     print("Done. Execution time:", elapsed_time, "seconds")
 
+    return df_percentiles
+
 
 def median_patch(df):
     """
@@ -801,6 +806,83 @@ def median_patch(df):
     return df
 
 
+def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
+    """
+    Add relative poverty indicators and decile thresholds to the key indicators file.
+    """
+
+    # Add relative poverty indicators
+    df = pd.merge(
+        df,
+        df_relative[
+            [
+                "country",
+                "year",
+                "reporting_level",
+                "welfare_type",
+                "headcount_ratio_40_median",
+                "poverty_gap_index_40_median",
+                "poverty_severity_40_median",
+                "watts_40_median",
+                "headcount_ratio_50_median",
+                "poverty_gap_index_50_median",
+                "poverty_severity_50_median",
+                "watts_50_median",
+                "headcount_ratio_60_median",
+                "poverty_gap_index_60_median",
+                "poverty_severity_60_median",
+                "watts_60_median",
+            ]
+        ],
+        on=["country", "year", "reporting_level", "welfare_type"],
+        how="left",
+    )
+
+    # In df_percentiles, keep only the rows with target_percentile = 10, 20, 30, ... 90
+    df_percentiles = df_percentiles[df_percentiles["target_percentile"] % 10 == 0].reset_index()
+
+    # Make tb_percentile wide, with target_percentile as columns
+    df_percentiles = df_percentiles.pivot(
+        index=["ppp_version", "country", "year", "reporting_level", "welfare_type"],
+        columns="target_percentile",
+        values="thr",
+    )
+
+    # Flatten column names
+    df_percentiles.columns = ["".join(col).strip() for col in df_percentiles.columns.values]
+
+    # Reset index
+    df_percentiles = df_percentiles.reset_index()
+
+    # Replace column names from thr to decile
+    df_percentiles = df_percentiles.rename(
+        columns={
+            "thr10": "decile1_thr",
+            "thr20": "decile2_thr",
+            "thr30": "decile3_thr",
+            "thr40": "decile4_thr",
+            "thr50": "decile5_thr",
+            "thr60": "decile6_thr",
+            "thr70": "decile7_thr",
+            "thr80": "decile8_thr",
+            "thr90": "decile9_thr",
+        }
+    )
+
+    # Merge df and df_percentiles
+    df = pd.merge(
+        df,
+        df_percentiles,
+        on=["ppp_version", "country", "year", "reporting_level", "welfare_type"],
+        how="left",
+    )
+
+    # Save key indicators file
+    df.to_csv(f"{PARENT_DIR}/world_bank_pip.csv", index=False)
+
+    return df
+
+
 #############################################
 #                                           #
 #               MAIN FUNCTION               #
@@ -808,7 +890,7 @@ def median_patch(df):
 #############################################
 
 # Generate percentiles by extracting the raw files and processing them afterward
-generate_consolidated_percentiles(generate_percentiles_raw_concurrent())
+df_percentiles = generate_consolidated_percentiles(generate_percentiles_raw_concurrent())
 
 # Generate relative poverty indicators file
 df_relative = generate_relative_poverty_concurrent()
@@ -817,33 +899,5 @@ df_relative = generate_relative_poverty_concurrent()
 df = generate_key_indicators_concurrent()
 df = median_patch(df)
 
-# Add relative poverty indicators
-df = pd.merge(
-    df,
-    df_relative[
-        [
-            "ppp_version",
-            "country",
-            "year",
-            "reporting_level",
-            "welfare_type",
-            "headcount_ratio_40_median",
-            "poverty_gap_index_40_median",
-            "poverty_severity_40_median",
-            "watts_40_median",
-            "headcount_ratio_50_median",
-            "poverty_gap_index_50_median",
-            "poverty_severity_50_median",
-            "watts_50_median",
-            "headcount_ratio_60_median",
-            "poverty_gap_index_60_median",
-            "poverty_severity_60_median",
-            "watts_60_median",
-        ]
-    ],
-    on=["ppp_version", "country", "year", "reporting_level", "welfare_type"],
-    how="left",
-)
-
-# Save key indicators file with patched medians
-df.to_csv(f"{PARENT_DIR}/world_bank_pip.csv", index=False)
+# Add relative poverty indicators and decile thresholds to the key indicators file
+df = add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles)
