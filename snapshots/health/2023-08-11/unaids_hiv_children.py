@@ -1,4 +1,8 @@
-"""Script to create a snapshot of dataset."""
+"""This is an auxiliary file.
+
+This file was shared privately by UNAIDS to complement the numbers on HIV prevalence in children. These numbers
+were not present via their official API.
+"""
 
 from pathlib import Path
 
