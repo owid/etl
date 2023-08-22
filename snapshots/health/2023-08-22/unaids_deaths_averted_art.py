@@ -1,6 +1,6 @@
 """This is an auxiliary file.
 
-This file was shared privately by UNAIDS to complement the numbers on HIV prevalence in children. These numbers
+This file was shared privately by UNAIDS to complement the numbers on deaths averted due to ART. These numbers
 were not present via their official API.
 """
 
@@ -24,7 +24,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"health/{SNAPSHOT_VERSION}/unaids_hiv_children.xlsx")
+    snap = Snapshot(f"health/{SNAPSHOT_VERSION}/unaids_deaths_averted_art.xlsx")
 
     # Ensure destination folder exists.
     snap.path.parent.mkdir(exist_ok=True, parents=True)

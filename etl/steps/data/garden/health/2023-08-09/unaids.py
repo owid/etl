@@ -4,6 +4,7 @@ from typing import cast
 
 import numpy as np
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
@@ -22,15 +23,12 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = cast(Dataset, paths.load_dependency("unaids"))
-    # Auxiliary dataset, contains HIV prevalence data for children (0-14)
-    ds_meadow_aux = cast(Dataset, paths.load_dependency("unaids_hiv_children"))
 
     # Load population dataset.
     ds_population: Dataset = paths.load_dependency("population")
 
     # Read tables from meadow datasets.
     tb = ds_meadow["unaids"].reset_index()
-    tb_aux = ds_meadow_aux["unaids_hiv_children"].reset_index()
 
     #
     # Process data.
@@ -54,15 +52,22 @@ def run(dest_dir: str) -> None:
     log.info("health.unaids: underscore column names")
     tb = tb.underscore()
 
-    # Harmonize country names (auxiliary table)
-    log.info("health.unaids: harmonize countries (aux table)")
-    tb_aux: Table = geo.harmonize_countries(
-        df=tb_aux, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    # Load auxiliary tables
+    log.info("health.unaids: load auxiliary table with HIV prevalence estimates for children (0-14)")
+    tb_hiv_child = load_aux_table("unaids_hiv_children")
+
+    log.info("health.unaids: load auxiliary table with gap to target ART coverage (old years)")
+    tb_gap_art = load_aux_table("unaids_gap_art")
+
+    log.info("health.unaids: Load auxiliary table with condom usage among men that have sex with men (old years)")
+    tb_condom = load_aux_table("unaids_condom_msm")
+
+    log.info("health.unaids: Load auxiliary table with deaths averted due to ART coverage (old years)")
+    tb_deaths_art = load_aux_table("unaids_deaths_averted_art")
 
     # Combine tables
-    log.info("health.unaids: combine tables")
-    tb = pr.concat([tb, tb_aux], ignore_index=True)
+    log.info("health.unaids: combine main table with auxiliary tables")
+    tb = combine_tables(tb, tb_hiv_child, tb_gap_art, tb_deaths_art, tb_condom)
 
     # Rename columns
     log.info("health.unaids: rename columns")
@@ -156,5 +161,39 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
 
     # Drop unnecessary column.
     tb = tb.drop(columns=["population"])
+
+    return tb
+
+
+def load_aux_table(short_name: str) -> Table:
+    """Load auxiliary table."""
+    # Load dataset
+    ds = cast(Dataset, paths.load_dependency(short_name))
+    # Etract table
+    tb = ds[short_name].reset_index()
+
+    # Harmonize country names
+    log.info(f"health.unaids: harmonize countries ({short_name})")
+    tb: Table = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
+    return tb
+
+
+def combine_tables(tb: Table, tb_hiv_child: Table, tb_gap_art: Table, tb_deaths_art: Table, tb_condom: Table) -> Table:
+    """Combine all tables."""
+    tb = pr.concat([tb, tb_hiv_child], ignore_index=True)
+
+    # Add remaining data from auxiliary tables
+
+    # Indicator names and their corresponding auxiliary tables
+    indicators = ["msm_condom_use", "deaths_averted_art", "gap_on_art"]
+    tables = [tb_condom, tb_deaths_art, tb_gap_art]
+    for metric, tb_aux in zip(indicators, tables):
+        tb = tb.merge(tb_aux, on=["country", "year", "subgroup_description"], how="outer", suffixes=("", "__aux"))
+        tb[metric] = tb[metric].fillna(pd.Series(tb[f"{metric}__aux"]))
+
+    # Drop auxiliary columns
+    tb = tb.drop(columns=["msm_condom_use__aux", "deaths_averted_art__aux", "gap_on_art__aux"])
 
     return tb

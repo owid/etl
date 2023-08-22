@@ -1,7 +1,7 @@
 """This is an auxiliary file.
 
-This file was shared privately by UNAIDS to complement the numbers on HIV prevalence in children. These numbers
-were not present via their official API.
+This file was shared privately by UNAIDS to complement the numbers on the condom use among men who have sex with men.
+These numbers were not present via their official API.
 """
 
 from pathlib import Path
@@ -24,7 +24,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"health/{SNAPSHOT_VERSION}/unaids_hiv_children.xlsx")
+    snap = Snapshot(f"health/{SNAPSHOT_VERSION}/unaids_condom_msm.xlsx")
 
     # Ensure destination folder exists.
     snap.path.parent.mkdir(exist_ok=True, parents=True)
