@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
     tb["country"] = tb["country"].str.replace(r" \(.+\)", "", regex=True)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["year", "country", "fatality"])
+    tb = tb.set_index(["year", "country", "fatality", "hostility"]).sort_index()
 
     #
     # Save outputs.
