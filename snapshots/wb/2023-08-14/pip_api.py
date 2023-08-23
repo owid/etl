@@ -635,7 +635,7 @@ def generate_percentiles_raw_concurrent():
             for ppp_version in [2011, 2017]:
                 for povline in povlines:
                     if Path(
-                        f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
+                        f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
                     ).is_file():
                         continue
                     else:
@@ -669,7 +669,7 @@ def generate_percentiles_raw_concurrent():
             for ppp_version in [2011, 2017]:
                 for povline in povlines:
                     if Path(
-                        f"{PARENT_DIR}/pip_region_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_ppp_{ppp_version}.csv"
+                        f"{PARENT_DIR}/pip_region_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_ppp_{ppp_version}.csv"
                     ).is_file():
                         continue
                     else:
@@ -698,12 +698,12 @@ def generate_percentiles_raw_concurrent():
     for ppp_version in [2011, 2017]:
         for povline in povlines:
             df_query_country = pd.read_csv(
-                f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
+                f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
             )
             df_country = pd.concat([df_country, df_query_country], ignore_index=True)
 
             df_query_region = pd.read_csv(
-                f"{PARENT_DIR}/pip_region_data/pip_country_all_year_all_povline_{round(povline/100,2)}_welfare_all_rep_all_ppp_{ppp_version}.csv"
+                f"{PARENT_DIR}/pip_region_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_ppp_{ppp_version}.csv"
             )
             df_region = pd.concat([df_region, df_query_region], ignore_index=True)
 
