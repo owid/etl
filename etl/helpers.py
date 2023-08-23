@@ -100,6 +100,7 @@ def create_dataset(
     camel_to_snake: bool = False,
     formats: List[FileFormat] = DEFAULT_FORMATS,
     check_variables_metadata: bool = False,
+    run_grapher_checks: bool = True,
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -115,6 +116,7 @@ def create_dataset(
     :param underscore_table: Whether to underscore the table name before adding it to the dataset.
     :param camel_to_snake: Whether to convert camel case to snake case for the table name.
     :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
+    :param run_grapher_checks: Run grapher checks on the dataset, only applies to grapher channel.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -184,7 +186,7 @@ def create_dataset(
             assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
 
     # run grapher checks
-    if ds.metadata.channel == "grapher":
+    if ds.metadata.channel == "grapher" and run_grapher_checks:
         grapher_checks(ds)
 
     return ds
