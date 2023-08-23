@@ -8,7 +8,3 @@ steps:
   - data://garden/dummy/2020-01-01/dummy
   data://explorers/dummy/2020-01-01/dummy:
   - data://garden/dummy/2020-01-01/dummy
-  data://meadow/wb/2023-08-14/world_bank_pip:
-  - snapshot://wb/2023-08-14/world_bank_pip.csv
-  data://garden/wb/2023-08-14/world_bank_pip:
-  - data://meadow/wb/2023-08-14/world_bank_pip
