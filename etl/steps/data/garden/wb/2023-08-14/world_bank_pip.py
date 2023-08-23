@@ -3,12 +3,16 @@
 from typing import cast
 
 from owid.catalog import Dataset, Table
+from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Initialize logger.
+log = get_logger()
 
 # Define absolute poverty lines used depending on PPP version
 povlines_dict = {
@@ -143,14 +147,10 @@ def process_data(tb: Table) -> Table:
     return tb
 
 
-# NOTE: Create stacked variables
-def create_stacked_variables(tb: Table, povline_dict: dict, ppp_version: int) -> Table:
+def create_stacked_variables(tb: Table, povline_dict: dict, ppp_version: int) -> tuple([Table, list, list]):
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
-
-    # Filter table to include only the right ppp_version
-    tb = tb[tb["ppp_version"] == ppp_version].reset_index(drop=True)
 
     # Select poverty lines between 2011 and 2017 and sort in case they are not in order
     povlines = povlines_dict[ppp_version].sort()
@@ -230,12 +230,13 @@ def create_stacked_variables(tb: Table, povline_dict: dict, ppp_version: int) ->
         tb[f"headcount_ratio_{povlines[6]}"] - tb[f"headcount_ratio_{povlines[4]}"]
     )
 
+    return tb, col_stacked_n, col_stacked_pct
+
 
 def calculate_inequality(tb: Table) -> Table:
     """
     Calculate inequality measures: decile averages and ratios
     """
-    # NOTE: I need the thresholds to complete this function
 
     col_decile_share = []
     col_decile_avg = []
@@ -281,27 +282,144 @@ def identify_rural_urban(tb: Table) -> Table:
     return tb
 
 
-def sanity_checks(tb: Table, povlines_dict: dict, ppp_version: int) -> Table:
+def sanity_checks(
+    tb: Table, povlines_dict: dict, ppp_version: int, col_stacked_n: list, col_stacked_pct: list
+) -> Table:
     """
     Sanity checks for the table
     """
 
+    # Select poverty lines between 2011 and 2017 and sort in case they are not in order
+    povlines = povlines_dict[ppp_version].sort()
+
+    obs_before_checks = len(tb)
+
+    # Create lists of variables to check
+    col_headcount = []
+    col_headcount_ratio = []
+    col_povertygap = []
+    col_tot_shortfall = []
+    col_watts = []
+    col_poverty_severity = []
+    col_decile_share = []
+    col_decile_thr = []
+
+    for p in povlines:
+        col_headcount.append(f"headcount_{p}")
+        col_headcount_ratio.append(f"headcount_ratio_{p}")
+        col_povertygap.append(f"poverty_gap_index_{p}")
+        col_tot_shortfall.append(f"total_shortfall_{p}")
+        col_watts.append(f"watts_{p}")
+        col_poverty_severity.append(f"poverty_severity_{p}")
+
+    for i in range(1, 11):
+        col_decile_share.append(f"decile{i}_share")
+        if i != 10:
+            col_decile_thr.append(f"decile{i}_thr")
+
+    # Negative values
+    mask = (
+        tb[
+            col_headcount
+            + col_headcount_ratio
+            + col_povertygap
+            + col_tot_shortfall
+            + col_watts
+            + col_poverty_severity
+            + col_decile_share
+            + col_decile_thr
+            + ["mean", "median", "mld", "gini", "polarization"]
+        ]
+        .lt(0)
+        .any(1)
+    )
+    tb_error = tb[mask].reset_index(drop=True)
+
+    if len(tb_error) > 0:
+        log.fatal(
+            f"""There are {len(tb_error)} observations with negative values!
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+        )
+        # NOTE: Check if we want to delete these observations
+        # tb = tb[~mask].reset_index(drop=True)
+
     # stacked values not adding up to 100%
-    print(f"{len(tb)} rows before stacked values check")
     tb["sum_pct"] = tb[col_stacked_pct].sum(axis=1)
-    tb = tb[~((tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9))].reset_index(drop=True)
-    print(f"{len(tb)} rows after stacked values check")
+    mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9)
+    tb_error = tb[mask].reset_index(drop=True)
+
+    if len(tb_error) > 0:
+        log.warning(
+            f"""{len(tb_error)} observations of stacked values are not adding up to 100% and will be deleted:
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']]}"""
+        )
+        tb = tb[~mask].reset_index(drop=True)
 
     # missing poverty values (headcount, poverty gap, total shortfall)
-    print(f"{len(tb)} rows before missing values check")
     cols_to_check = (
         col_headcount + col_headcount_ratio + col_povertygap + col_tot_shortfall + col_stacked_n + col_stacked_pct
     )
-    tb = tb[~tb[cols_to_check].isna().any(1)].reset_index(drop=True)
-    print(f"{len(tb)} rows after missing values check")
+    mask = tb[cols_to_check].isna().any(1)
+    tb_error = tb[mask].reset_index(drop=True)
+
+    if len(tb_error) > 0:
+        log.warning(
+            f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+        )
+        tb = tb[~mask].reset_index(drop=True)
+
+    # Missing median
+    mask = tb["median"].isna()
+    tb_error = tb[mask].reset_index(drop=True)
+
+    if len(tb_error) > 0:
+        log.warning(
+            f"""There are {len(tb_error)} observations with missing median. They will be not deleted:
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+        )
+
+    # Missing mean
+    mask = tb["mean"].isna()
+    tb_error = tb[mask].reset_index(drop=True)
+
+    if len(tb_error) > 0:
+        log.warning(
+            f"""There are {len(tb_error)} observations with missing mean. They will be not deleted:
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+        )
+
+    # Missing gini
+    mask = tb["gini"].isna()
+    tb_error = tb[mask].reset_index(drop=True)
+
+    if len(tb_error) > 0:
+        log.warning(
+            f"""There are {len(tb_error)} observations with missing gini. They will be not deleted:
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+        )
+
+    # Missing decile shares
+    mask = tb[col_decile_share].isna().any(1)
+    tb_error = tb[mask].reset_index(drop=True)
+
+    if len(tb_error) > 0:
+        log.warning(
+            f"""There are {len(tb_error)} observations with missing decile shares. They will be not deleted:
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+        )
+
+    # Missing decile thresholds
+    mask = tb[col_decile_thr].isna().any(1)
+    tb_error = tb[mask].reset_index(drop=True)
+
+    if len(tb_error) > 0:
+        log.warning(
+            f"""There are {len(tb_error)} observations with missing decile thresholds. They will be not deleted:
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+        )
 
     # headcount monotonicity check
-    print(f"{len(tb)} rows before headcount monotonicity check")
     m_check_vars = []
     for i in range(len(col_headcount)):
         if i > 0:
@@ -309,13 +427,100 @@ def sanity_checks(tb: Table, povlines_dict: dict, ppp_version: int) -> Table:
             tb[check_varname] = tb[f"{col_headcount[i]}"] >= tb[f"{col_headcount[i-1]}"]
             m_check_vars.append(check_varname)
     tb["check_total"] = tb[m_check_vars].all(1)
-    tb = tb[tb["check_total"] == True].reset_index(drop=True)
-    print(f"{len(tb)} rows after headcount monotonicity check")
+
+    tb_error = tb[~tb["check_total"]].reset_index(drop=True)
+
+    if len(tb_error) > 0:
+        log.warning(
+            f"""There are {len(tb_error)} observations with headcount not monotonically increasing and will be deleted:
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+        )
+        tb = tb[tb["check_total"]].reset_index(drop=True)
+
+    # Threshold monotonicity check
+    m_check_vars = []
+    for i in range(1, 10):
+        if i > 1:
+            check_varname = f"m_check_{i}"
+            tb[check_varname] = tb[f"decile{i}_thr"] >= tb[f"decile{i-1}_thr"]
+            m_check_vars.append(check_varname)
+
+    tb["check_total"] = tb[m_check_vars].all(1)
+
+    tb_error = tb[~tb["check_total"]].reset_index(drop=True)
+
+    if len(tb_error) > 0:
+        log.warning(
+            f"""There are {len(tb_error)} observations with thresholds not monotonically increasing and will be deleted:
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+        )
+        tb = tb[tb["check_total"]].reset_index(drop=True)
+
+    # Shares monotonicity check
+    m_check_vars = []
+    for i in range(1, 11):
+        if i > 1:
+            check_varname = f"m_check_{i}"
+            tb[check_varname] = tb[f"decile{i}_share"] >= tb[f"decile{i-1}_share"]
+            m_check_vars.append(check_varname)
+
+    tb["check_total"] = tb[m_check_vars].all(1)
+
+    tb_error = tb[~tb["check_total"]].reset_index(drop=True)
+
+    if len(tb_error) > 0:
+        log.warning(
+            f"""There are {len(tb_error)} observations with shares not monotonically increasing and will be deleted:
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+        )
+        tb = tb[tb["check_total"]].reset_index(drop=True)
+
+    # Shares not adding up to 100%
+    tb["sum_pct"] = tb[col_decile_share].sum(axis=1)
+    mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9)
+    tb_error = tb[mask].reset_index(drop=True)
+
+    if len(tb_error) > 0:
+        log.warning(
+            f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']]}"""
+        )
+        tb = tb[~mask].reset_index(drop=True)
+
+    # delete columns created for the checks
+    tb = tb.drop(columns=m_check_vars + ["check_total", "sum_pct"])
+
+    obs_after_checks = len(tb)
+    log.info(f"Sanity checks deleted {obs_before_checks - obs_after_checks} observations.")
 
     return tb
 
 
-def inc_or_cons_data(tb: Table) -> Table:
+def separate_ppp_data(tb: Table) -> tuple([Table, Table]):
+    """
+    Separate out ppp data from the main dataset
+    """
+
+    # Filter table to include only the right ppp_version
+    # Also, drop columns with all NaNs (which are the ones that are not relevant for the ppp_version)
+    tb_2011 = tb[tb["ppp_version"] == 2011].reset_index(drop=True).dropna(axis=1, how="all", ignore_index=True)
+    tb_2017 = tb[tb["ppp_version"] == 2017].reset_index(drop=True).dropna(axis=1, how="all", ignore_index=True)
+
+    return tb_2011, tb_2017
+
+
+def separate_filled_data(tb: Table) -> Table:
+    """
+    Separate out filled data from the main dataset
+    """
+    # Regions are not marked as interpolated: we keep them in the dataset anyway, by including nulls
+
+    tb = tb[(tb["is_interpolated"] == 0) | (tb["is_interpolated"].isnull())].reset_index(drop=True)
+
+    return tb
+
+
+def inc_or_cons_data(tb: Table) -> tuple([Table, Table, Table]):
     """
     Separate income and consumption data
     """
@@ -338,7 +543,7 @@ def inc_or_cons_data(tb: Table) -> Table:
 
     # Drop income where income and consumption are available
     tb_inc_or_cons = tb_inc_or_cons[
-        (tb_inc_or_cons["duplicate_flag"] == False) | (tb_inc_or_cons["welfare_type"] == "consumption")
+        (~tb_inc_or_cons["duplicate_flag"]) | (tb_inc_or_cons["welfare_type"] == "consumption")
     ]
     tb_inc_or_cons.drop(columns=["duplicate_flag"], inplace=True)
 
@@ -357,35 +562,69 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["world_bank_pip"].reset_index()
 
-    #
-
-    # Process data: Make table wide and change column names
+    # Process data
+    # Make table wide and change column names
     tb = process_data(tb)
 
     # Calculate inequality measures
     tb = calculate_inequality(tb)
 
-    #
-    # NOTE: Separate income and consumption data.
-
+    # Harmonize country names
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Amend the entity to reflect if data refers to urban or rural only
     tb = identify_rural_urban(tb)
 
-    tb_2011 = create_stacked_variables(tb, povlines_dict, ppp_version=2011)
-    tb_2017 = create_stacked_variables(tb, povlines_dict, ppp_version=2017)
+    # Separate out ppp and filled data from the main dataset
+    tb_2011, tb_2017 = separate_ppp_data(tb)
+
+    # Create stacked variables from headcount and headcount_ratio
+    tb_2011, col_stacked_n_2011, col_stacked_pct_2011 = create_stacked_variables(
+        tb_2011, povlines_dict, ppp_version=2011
+    )
+    tb_2017, col_stacked_n_2017, col_stacked_pct_2017 = create_stacked_variables(
+        tb_2017, povlines_dict, ppp_version=2017
+    )
 
     # Sanity checks
-    tb_2011 = sanity_checks(tb_2011, povlines_dict, ppp_version=2011)
-    tb_2017 = sanity_checks(tb_2017, povlines_dict, ppp_version=2017)
+    tb_2011 = sanity_checks(
+        tb_2011, povlines_dict, ppp_version=2011, col_stacked_n=col_stacked_n_2011, col_stacked_pct=col_stacked_pct_2011
+    )
+    tb_2017 = sanity_checks(
+        tb_2017, povlines_dict, ppp_version=2017, col_stacked_n=col_stacked_n_2017, col_stacked_pct=col_stacked_pct_2017
+    )
+
+    # Separate out filled data from the main dataset
+    tb_2011_non_filled = separate_filled_data(tb_2011)
+    tb_2017_non_filled = separate_filled_data(tb_2017)
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
     tb_inc_2011, tb_cons_2011, tb_inc_or_cons_2011 = inc_or_cons_data(tb_2011)
     tb_inc_2017, tb_cons_2017, tb_inc_or_cons_2017 = inc_or_cons_data(tb_2017)
+    tb_inc_2011_non_filled, tb_cons_2011_non_filled, tb_inc_or_cons_2011_non_filled = inc_or_cons_data(
+        tb_2011_non_filled
+    )
+    tb_inc_2017_non_filled, tb_cons_2017_non_filled, tb_inc_or_cons_2017_non_filled = inc_or_cons_data(
+        tb_2017_non_filled
+    )
 
     # Define tables to upload
-    tables = [tb_inc_2011, tb_cons_2011, tb_inc_or_cons_2011, tb_inc_2017, tb_cons_2017, tb_inc_or_cons_2017]
+    tables = [
+        tb_inc_2011,
+        tb_cons_2011,
+        tb_inc_or_cons_2011,
+        tb_inc_2017,
+        tb_cons_2017,
+        tb_inc_or_cons_2017,
+        tb_2011_non_filled,
+        tb_2017_non_filled,
+        tb_inc_2011_non_filled,
+        tb_cons_2011_non_filled,
+        tb_inc_or_cons_2011_non_filled,
+        tb_inc_2017_non_filled,
+        tb_cons_2017_non_filled,
+        tb_inc_or_cons_2017_non_filled,
+    ]
 
     # Set index and sort
     for tb in tables:
