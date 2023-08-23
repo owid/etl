@@ -62,6 +62,12 @@ def run(dest_dir: str) -> None:
 
     # Replace '...' with NaN
     tb["obs_value"] = tb["obs_value"].replace("...", np.nan)
+    # Remove unwanted indicators
+    id_desc_rm = [
+        "National AIDS strategy/policy",
+        "National AIDS strategy/policy includes dedicated budget for gender transformative interventions",
+    ]
+    tb = tb[~tb["indicator_description"].isin(id_desc_rm)]
     # Type
     tb = tb.astype(
         {
