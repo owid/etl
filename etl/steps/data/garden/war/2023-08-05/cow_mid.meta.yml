@@ -1,7 +1,7 @@
 dataset:
   title: History of war (COW MID, 2020)
   description: >-
-      This dataset contains information on interstate conflicts in the period of 1816 and 2014.
+      This dataset contains information on interstate disputes in the period of 1816 and 2014.
 
 
       It has been constructed using the Correlates of War - Militarised Interstate Disputes v5.0 dataset.
@@ -42,12 +42,13 @@ tables:
           Number of ongoing disputes in a given year.
 
 
-          We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions.
-          The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+          We count a dispute as ongoing in a region even if the dispute is also ongoing in other regions.
+          The sum across all regions can therefore be higher than the total number of ongoing disputes.
 
 
-          The data is disaggregated by region and "fatality". "Fatality" gives lower and upper estimates on the total number of
-          fatalities over the complete span of a dispute. These are the types:
+          The data is disaggregated by region and "hostility" or "fatality".
+
+          "Fatality" gives lower and upper estimates on the total number of fatalities over the complete span of a dispute. These are the types:
 
             - No deaths
 
@@ -64,6 +65,19 @@ tables:
             - > 999 deaths
 
             - Unknown
+
+
+          "Hostility" provides a short description of the type of hostility. These are the types:
+
+            - No militarized action
+
+            - Threat to use force
+
+            - Display of force
+
+            - Use of force
+
+            - War
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -75,3 +89,67 @@ tables:
               - Asia
               - Europe
               - Middle East
+      number_new_disputes:
+        title: Number of new disputes
+        unit: disputes
+        description_short: The annual number of new disputes
+        description: >-
+          Number of new disputes in a given year.
+
+
+          We count a dispute as new in a region even if the dispute is also ongoing in other regions.
+          The sum across all regions can therefore be higher than the total number of ongoing disputes.
+
+
+          The data is disaggregated by region and "hostility" or "fatality".
+
+
+          "Fatality" gives lower and upper estimates on the total number of fatalities over the complete span of a dispute. These are the types:
+
+            - No deaths
+
+            - 1-25 deaths
+
+            - 26-100 deaths
+
+            - 101-250 deaths
+
+            - 251-500 deaths
+
+            - 501-999 deaths
+
+            - > 999 deaths
+
+            - Unknown
+
+
+          "Hostility" provides a short description of the type of hostility. These are the types:
+
+            - No militarized action
+
+            - Threat to use force
+
+            - Display of force
+
+            - Use of force
+
+            - War
+
+
+          NOTES:
+
+
+          • New disputes for all regions (except 'World'): We count a dispute as new in a region even if the dispute overall started
+          earlier in another region. The sum across all regions can therefore be higher than the total number of new disputes.
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+              - Oceania

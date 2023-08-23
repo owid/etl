@@ -1,0 +1,46 @@
+tables:
+  dummy_full:
+    variables:
+      dummy_variable:
+        title: "[indicator.title]"
+        unit: "[indicator.unit]"
+        short_unit: "[indicator.short-unit]"
+        description: "[indicator.description]"
+        description_short: "[indicator.description-short]"
+        description_from_producer: "[indicator.description-from-producer]"
+        processing_level: "[indicator.processing-level]"
+        license:
+          name: "[indicator.license.name]"
+          url: "[indicator.license.url]"
+        display:
+          name: "[display.name > indicator.title]"
+          isProjection: true
+          conversionFactor: 9999
+          numDecimalPlaces: 9
+          tolerance: 9
+          yearIsDay: false
+          zeroDay: '1900-01-01'
+          entityAnnotationsMap: 'France: [display.entityAnnotationsMap example France]'
+          includeInTable: true
+        presentation:
+          grapher_config:
+            title: "[grapher-config.title > display.name > indicator.title]"
+            subtitle: "[grapher-config.subtitle > indicator.description-short]"
+            hasMapTab: true
+            selectedEntityNames:
+            - Germany
+            - Italy
+            - France
+          title_public: "[presentation.title-public > indicator.title]"
+          title_variant: "[presentation.title-variant]"
+          producer_short: "[presentation.producer-short]"
+          attribution: "[presentation.attribution > origin.attribution > origin.producer (year)]"
+          topic_tags_links:
+          - "Internet"
+          - "[presentation.topic-tags-links example 2]"
+          key_info_text:
+          - "[presentation.key-info-text example 1]"
+          - "[presentation.key-info-text example 2]"
+          faqs:
+          - fragment_id: cherries
+            gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE

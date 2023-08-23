@@ -17,28 +17,28 @@ from etl import config
 # Initial configuration ###########################
 ###################################################
 # Set page config
-# st.title("Metadata v2 preview")
 st.set_page_config(page_title="Metadata v2 preview", layout="wide", page_icon="🎨")
 st.title("Metadata v2 preview")
+DUMMY = st.selectbox('Choose ETL step to play with', ["dummy_full", "dummy"], index=0)
 
 # Current directory
 CURRENT_DIR = Path(__file__).parent.absolute()
 
 # Load metadata from Snapshot
-PATH_METADATA_SNAPSHOT = paths.SNAPSHOTS_DIR / "dummy" / "2020-01-01" / "dummy.csv.dvc"
+PATH_METADATA_SNAPSHOT = paths.SNAPSHOTS_DIR / "dummy" / "2020-01-01" / f"{DUMMY}.csv.dvc"
 with open(PATH_METADATA_SNAPSHOT, 'r') as f:
     METADATA_SNAPSHOT_BASE = f.read()
 SNAPSHOT_META_TOKEN_SPLIT = "outs:"
 METADATA_SNAPSHOT_DISPLAY = METADATA_SNAPSHOT_BASE.split(SNAPSHOT_META_TOKEN_SPLIT)[0]
 METADATA_SNAPSHOT_EXTRA = METADATA_SNAPSHOT_BASE.split(SNAPSHOT_META_TOKEN_SPLIT)[1]
 # Load metadata from Garden
-PATH_METADATA_GARDEN = paths.STEP_DIR / "data" / "garden" / "dummy" / "2020-01-01" / "dummy.meta.yml"
+PATH_METADATA_GARDEN = paths.STEP_DIR / "data" / "garden" / "dummy" / "2020-01-01" / f"{DUMMY}.meta.yml"
 with open(PATH_METADATA_GARDEN, 'r') as f:
     METADATA_GARDEN_BASE = f.read()
 METADATA_GARDEN_DISPLAY = METADATA_GARDEN_BASE
 
 # Catalog path
-CATALOG_PATH = "grapher/dummy/2020-01-01/dummy/dummy"
+CATALOG_PATH = f"grapher/dummy/2020-01-01/{DUMMY}/{DUMMY}"
 
 
 # Functions
@@ -49,7 +49,7 @@ def run_steps() -> None:
     """
     # env_path = paths.BASE_DIR / ".env.X"
     # subprocess.run(f"export $(cat {env_path} | xargs)", shell=True)
-    subprocess.run(["poetry", "run", "etl", "dummy", "--grapher"])
+    subprocess.run(["poetry", "run", "etl", DUMMY, "--grapher"])
 
 
 def get_data_page_url() -> str:

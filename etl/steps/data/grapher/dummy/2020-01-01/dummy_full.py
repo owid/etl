@@ -11,10 +11,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("dummy")
+    ds_garden = paths.load_dataset("dummy_full")
 
     # Read table from garden dataset.
-    tb = ds_garden["dummy"]
+    tb = ds_garden["dummy_full"]
 
     #
     # Process data.
@@ -24,9 +24,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
-    )
+    ds_grapher = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

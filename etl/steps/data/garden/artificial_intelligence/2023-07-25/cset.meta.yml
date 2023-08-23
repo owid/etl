@@ -1,17 +1,14 @@
 dataset:
   title: 'Country Activity Tracker: Artificial Intelligence (Center for Security and     Emerging Technology, 2023)'
   description: >-
-    CAT, or Country Attributes and Topics, is a research tool curated by CSET that offers a wealth of data about artificial
+    CAT, or Country Activity Tracker, is a research tool curated by CSET that offers a wealth of data about artificial
     intelligence (AI) globally. This data comes from a vast repository known as the Merged Academic Corpus (MAC), which contains
     details about more than 270 million academic articles worldwide. In CAT, only those articles that are related to AI are
     utilized.
 
 
     CSET determines the country of origin for each article by looking at the affiliations of the authors. If an author is
-    associated with an organization in a specific country, that article is attributed to that country. These articles are
-    then grouped into various AI sub-categories. This categorization is based on a scoring system that assigns scores to each
-    article according to its subject. However, this scoring system only applies to English-language articles. For non-English
-    articles, scores are estimated based on the average scores of articles they either cite or are cited by.
+    associated with an organization in a specific country, that article is attributed to that country.
 
 
     CAT also provides patent data sourced from 1790 Analytics and Dimensions, encompassing AI-related patents. However, instead

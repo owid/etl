@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("{{cookiecutter.short_name}}.{{cookiecutter.file_extension}}")
+    snap = paths.load_snapshot("dummy_full.csv")
 
     # Load data from snapshot.
     tb = snap.read()
@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
