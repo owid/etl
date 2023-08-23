@@ -52,22 +52,9 @@ def run(dest_dir: str) -> None:
     log.info("health.unaids: underscore column names")
     tb = tb.underscore()
 
-    # Load auxiliary tables
-    log.info("health.unaids: load auxiliary table with HIV prevalence estimates for children (0-14)")
-    tb_hiv_child = load_aux_table("unaids_hiv_children")
-
-    log.info("health.unaids: load auxiliary table with gap to target ART coverage (old years)")
-    tb_gap_art = load_aux_table("unaids_gap_art")
-
-    log.info("health.unaids: Load auxiliary table with condom usage among men that have sex with men (old years)")
-    tb_condom = load_aux_table("unaids_condom_msm")
-
-    log.info("health.unaids: Load auxiliary table with deaths averted due to ART coverage (old years)")
-    tb_deaths_art = load_aux_table("unaids_deaths_averted_art")
-
-    # Combine tables
-    log.info("health.unaids: combine main table with auxiliary tables")
-    tb = combine_tables(tb, tb_hiv_child, tb_gap_art, tb_deaths_art, tb_condom)
+    # Complement table with auxiliary data
+    log.info("health.unaids: complement with auxiliary data")
+    tb = complement_with_auxiliary_data(tb)
 
     # Rename columns
     log.info("health.unaids: rename columns")
@@ -161,6 +148,28 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
 
     # Drop unnecessary column.
     tb = tb.drop(columns=["population"])
+
+    return tb
+
+
+def complement_with_auxiliary_data(tb: Table) -> Table:
+    """Complement data with tables shared by UNAIDS via mail correspondance."""
+    # Load auxiliary tables
+    log.info("health.unaids: load auxiliary table with HIV prevalence estimates for children (0-14)")
+    tb_hiv_child = load_aux_table("unaids_hiv_children")
+
+    log.info("health.unaids: load auxiliary table with gap to target ART coverage (old years)")
+    tb_gap_art = load_aux_table("unaids_gap_art")
+
+    log.info("health.unaids: Load auxiliary table with condom usage among men that have sex with men (old years)")
+    tb_condom = load_aux_table("unaids_condom_msm")
+
+    log.info("health.unaids: Load auxiliary table with deaths averted due to ART coverage (old years)")
+    tb_deaths_art = load_aux_table("unaids_deaths_averted_art")
+
+    # Combine tables
+    log.info("health.unaids: combine main table with auxiliary tables")
+    tb = combine_tables(tb, tb_hiv_child, tb_gap_art, tb_deaths_art, tb_condom)
 
     return tb
 
