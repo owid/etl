@@ -175,7 +175,10 @@ def complement_with_auxiliary_data(tb: Table) -> Table:
 
 
 def load_aux_table(short_name: str) -> Table:
-    """Load auxiliary table."""
+    """Load auxiliary table.
+
+    An auxiliary table is a table coming from a dataset that was not sourced from the official API.
+    """
     # Load dataset
     ds = cast(Dataset, paths.load_dependency(short_name))
     # Etract table
