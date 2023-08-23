@@ -52,22 +52,16 @@ def run(dest_dir: str) -> None:
     log.info("health.unaids: underscore column names")
     tb = tb.underscore()
 
-    # Load auxiliary tables
-    log.info("health.unaids: load auxiliary table with HIV prevalence estimates for children (0-14)")
-    tb_hiv_child = load_aux_table("unaids_hiv_children")
-
-    log.info("health.unaids: load auxiliary table with gap to target ART coverage (old years)")
-    tb_gap_art = load_aux_table("unaids_gap_art")
-
-    log.info("health.unaids: Load auxiliary table with condom usage among men that have sex with men (old years)")
-    tb_condom = load_aux_table("unaids_condom_msm")
-
-    log.info("health.unaids: Load auxiliary table with deaths averted due to ART coverage (old years)")
-    tb_deaths_art = load_aux_table("unaids_deaths_averted_art")
-
-    # Combine tables
-    log.info("health.unaids: combine main table with auxiliary tables")
-    tb = combine_tables(tb, tb_hiv_child, tb_gap_art, tb_deaths_art, tb_condom)
+    # Scale indicators
+    indicators = [
+        "resource_avail_constant",
+        "resource_needs_ft",
+    ]
+    scale_factor = 1e6
+    tb[indicators] *= scale_factor
+    # Complement table with auxiliary data
+    log.info("health.unaids: complement with auxiliary data")
+    tb = complement_with_auxiliary_data(tb)
 
     # Rename columns
     log.info("health.unaids: rename columns")
@@ -121,7 +115,7 @@ def handle_nans(tb: Table) -> Table:
     assert not tb.loc[-tb["is_textualdata"], "obs_value"].isna().any(), "NaN values detected for not textual data"
     # Drop NaNs & check that all textual data has been removed
     tb = tb.dropna(subset="obs_value")
-    assert tb.is_textualdata.sum() == 0, "NaN"
+    assert tb["is_textualdata"].sum() == 0, "NaN"
 
     return tb
 
@@ -165,8 +159,33 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
     return tb
 
 
+def complement_with_auxiliary_data(tb: Table) -> Table:
+    """Complement data with tables shared by UNAIDS via mail correspondance."""
+    # Load auxiliary tables
+    log.info("health.unaids: load auxiliary table with HIV prevalence estimates for children (0-14)")
+    tb_hiv_child = load_aux_table("unaids_hiv_children")
+
+    log.info("health.unaids: load auxiliary table with gap to target ART coverage (old years)")
+    tb_gap_art = load_aux_table("unaids_gap_art")
+
+    log.info("health.unaids: Load auxiliary table with condom usage among men that have sex with men (old years)")
+    tb_condom = load_aux_table("unaids_condom_msm")
+
+    log.info("health.unaids: Load auxiliary table with deaths averted due to ART coverage (old years)")
+    tb_deaths_art = load_aux_table("unaids_deaths_averted_art")
+
+    # Combine tables
+    log.info("health.unaids: combine main table with auxiliary tables")
+    tb = combine_tables(tb, tb_hiv_child, tb_gap_art, tb_deaths_art, tb_condom)
+
+    return tb
+
+
 def load_aux_table(short_name: str) -> Table:
-    """Load auxiliary table."""
+    """Load auxiliary table.
+
+    An auxiliary table is a table coming from a dataset that was not sourced from the official API.
+    """
     # Load dataset
     ds = cast(Dataset, paths.load_dependency(short_name))
     # Etract table
