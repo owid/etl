@@ -2,6 +2,7 @@
 
 from typing import cast
 
+import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
@@ -564,109 +565,85 @@ def regional_headcount(tb: Table) -> Table:
     tb_regions = tb_regions.pivot(index="year", columns="country", values="headcount_215")
 
     # Drop rows with more than one region with null headcount
-    cols_to_check = [e for e in list(tb_regions.columns) if e not in ["year"]]
-    tb_regions["check_total"] = tb_regions[cols_to_check].isnull().sum(1)
-    tb_regions = tb_regions[tb_regions["check_total"] <= 1].reset_index()
-    tb_regions = tb_regions.drop(columns="check_total")
-    print(f"{len(tb_regions)} rows after missing values check")
+    tb_regions["check_total"] = tb_regions[tb_regions.columns].isnull().sum(1)
+    mask = tb_regions["check_total"] > 1
+
+    tb_out = tb_regions[mask].reset_index()
+    if len(tb_out) > 0:
+        log.warning(
+            f"""There are {len(tb_out)} years with more than one null region and will be deleted:
+            {list(tb_out.year.unique())}"""
+        )
+        tb_regions = tb_regions[~mask].reset_index()
+        tb_regions = tb_regions.drop(columns="check_total")
 
     # Get difference between world and (total) regional headcount, to patch rows with one missing value
-    cols_to_sum = [e for e in list(df_regions.columns) if e not in ["Year", "World"]]
-    df_regions["incomplete_sum"] = df_regions[cols_to_sum].sum(1)
-    df_regions["difference_for_missing"] = df_regions["World"] - df_regions["incomplete_sum"]
+    cols_to_sum = [e for e in list(tb_regions.columns) if e not in ["year", "World"]]
+    tb_regions["sum_regions"] = tb_regions[cols_to_sum].sum(1)
+    tb_regions["diff_world_regions"] = tb_regions["World"] - tb_regions["sum_regions"]
 
     # Fill null values with the difference and drop aux variables
-    col_dictionary = dict.fromkeys(cols_to_sum, df_regions["difference_for_missing"])
-    df_regions.loc[:, cols_to_sum] = df_regions[cols_to_sum].fillna(col_dictionary)
-    df_regions = df_regions.drop(columns=["World", "incomplete_sum", "difference_for_missing"])
+    col_dictionary = dict.fromkeys(cols_to_sum, tb_regions["diff_world_regions"])
+    tb_regions.loc[:, cols_to_sum] = tb_regions[cols_to_sum].fillna(col_dictionary)
+    tb_regions = tb_regions.drop(columns=["World", "sum_regions", "diff_world_regions"])
 
     # Get headcount values for China and India
-    df_chn_ind = df_country_filled[
-        (df_country_filled["Entity"].isin(["China", "India"])) & (df_country_filled["reporting_level"] == "national")
-    ].reset_index(drop=True)
-
-    df_chn_ind["number_extreme_poverty"] = df_chn_ind["headcount"] * df_chn_ind["reporting_pop"]
-    df_chn_ind["number_extreme_poverty"] = df_chn_ind["number_extreme_poverty"].round(0)
-
-    df_chn_ind = df_chn_ind[["Entity", "Year", "number_extreme_poverty"]]
+    df_chn_ind = tb[(tb["country"].isin(["China", "India"])) & (tb["reporting_level"] == "national")].reset_index(
+        drop=True
+    )
+    df_chn_ind = df_chn_ind[["country", "year", "headcount_215"]]
 
     # Make table wide and merge with regional data
-    df_chn_ind = df_chn_ind.pivot(index="Year", columns="Entity", values="number_extreme_poverty")
+    df_chn_ind = df_chn_ind.pivot(index="year", columns="country", values="headcount_215").reset_index()
+    tb_regions = pr.merge(tb_regions, df_chn_ind, on="year", how="left")
 
-    df_final = pd.merge(df_regions, df_chn_ind, on="Year", how="left")
+    tb_regions["East Asia and Pacific excluding China"] = tb_regions["East Asia and Pacific"] - tb_regions["China"]
+    tb_regions["South Asia excluding India"] = tb_regions["South Asia"] - tb_regions["India"]
 
-    df_final["East Asia and Pacific excluding China"] = df_final["East Asia and Pacific"] - df_final["China"]
-    df_final["South Asia excluding India"] = df_final["South Asia"] - df_final["India"]
+    tb_regions = pr.melt(tb_regions, id_vars=["year"], value_name="headcount_215")
+    tb_regions = tb_regions[["country", "year", "headcount_215"]]
 
-    df_final = pd.melt(df_final, id_vars=["Year"], value_name="number_extreme_poverty")
-    df_final = df_final[["Entity", "Year", "number_extreme_poverty"]]
-
-    df_final = df_final.rename(
-        columns={"number_extreme_poverty": "Number of people living in extreme poverty - by world region"}
-    )
-
-    # Export the dataset
-    df_final.to_csv(f"data/ppp_{ppp}/final/OWID_internal_upload/admin_database/pip_regional_headcount.csv", index=False)
-
-    # upload_to_s3(df_final, 'PIP/datasets', f'pip_regional_headcount.csv')
-
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print("Done. Execution time:", elapsed_time, "seconds")
+    return tb_regions
 
 
-def survey_count(df_country, ppp):
-    print("Creating dataset which counts the surveys in the recent decade...")
-    start_time = time.time()
+def survey_count(tb: Table) -> Table:
+    """
+    Create survey count dataset, by counting the number of surveys available for each country in the past decade
+    """
+    # Remove regions from the table
+    tb = tb[~tb["reporting_level"].isnull()].reset_index(drop=True)
 
-    df_country = standardise(df_country, ppp)
-
-    # Generate a new dataset to count the surveys available for each entity
-    # Create a list of all the years and entities available
-
-    min_year = df_country["Year"].min()
-    max_year = df_country["Year"].max()
+    min_year = tb["year"].min()
+    max_year = tb["year"].max()
     year_list = list(range(min_year, max_year + 1))
-    entity_list = list(df_country["Entity"].unique())
+    country_list = list(tb["country"].unique())
 
     # Create two dataframes with all the years and entities
-    year_df = pd.DataFrame(year_list)
-    entity_df = pd.DataFrame(entity_list)
+    year_tb = Table(year_list)
+    entity_tb = Table(country_list)
 
     # Make a cartesian product of both dataframes: join all the combinations between all the entities and all the years
-    cross = pd.merge(entity_df, year_df, how="cross")
-    cross = cross.rename(columns={"0_x": "Entity", "0_y": "Year"})
+    cross = pr.merge(entity_tb, year_tb, how="cross")
+    cross = cross.rename(columns={"0_x": "country", "0_y": "year"})
 
     # Merge cross and df_country, to include all the possible rows in the dataset
-    df_country = pd.merge(
-        cross, df_country[["Entity", "Year", "reporting_level"]], on=["Entity", "Year"], how="left", indicator=True
-    )
+    tb = pr.merge(cross, tb[["country", "year", "reporting_level"]], on=["country", "year"], how="left", indicator=True)
 
-    # Mark with 1 if there are surveys available, 0 if not
-    df_country["survey_available"] = np.where(df_country["_merge"] == "both", 1, 0)
+    # Mark with 1 if there are surveys available, 0 if not (this is done by checking if the row is in both datasets)
+    tb.loc[tb["_merge"] == "both", "survey_available"] = 1
 
     # Sum for each entity the surveys available for the previous 9 years and the current year
-    df_country["surveys_past_decade"] = (
-        df_country["survey_available"]
-        .groupby(df_country["Entity"], sort=False)
+    tb["surveys_past_decade"] = (
+        tb["survey_available"]
+        .groupby(tb["country"], sort=False)
         .rolling(min_periods=1, window=10)
         .sum()
         .astype(int)
         .values
     )
-    df_country = df_country[["Entity", "Year", "surveys_past_decade"]]
-    df_country = df_country.rename(columns={"surveys_past_decade": "Number of surveys in the past decade"})
+    tb = tb[["country", "year", "surveys_past_decade"]]
 
-    df_country.sort_values(by=["Entity", "Year"], ignore_index=True, inplace=True)
-
-    # Export the dataset
-    df_country.to_csv(f"data/ppp_{ppp}/final/OWID_internal_upload/admin_database/pip_survey_count.csv", index=False)
-
-    # upload_to_s3(df_country, 'PIP/datasets', f'pip_survey_count.csv')
-
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print("Done. Execution time:", elapsed_time, "seconds")
+    return tb
 
 
 def run(dest_dir: str) -> None:
@@ -725,6 +702,12 @@ def run(dest_dir: str) -> None:
         tb_2017_non_filled
     )
 
+    # Create regional headcount dataset, by patching missing values with the difference between world and regional headcount
+    tb_regions = regional_headcount(tb_inc_or_cons_2017_non_filled)
+
+    # Create survey count dataset, by counting the number of surveys available for each country in the past decade
+    tb_survey_count = survey_count(tb_inc_or_cons_2017_non_filled)
+
     # Define tables to upload
     tables = [
         tb_inc_2011,
@@ -741,6 +724,8 @@ def run(dest_dir: str) -> None:
         tb_inc_2017_non_filled,
         tb_cons_2017_non_filled,
         tb_inc_or_cons_2017_non_filled,
+        tb_regions,
+        tb_survey_count,
     ]
 
     # Set index and sort
