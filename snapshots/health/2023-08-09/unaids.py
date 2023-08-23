@@ -80,6 +80,7 @@ def get_all_data_from_api(path: str) -> pd.DataFrame:
             "Estimated TB-related deaths among people living with HIV",
             "TB patients living with HIV receiving ART",
             "TB patients tested positive for HIV",
+            "Estimated HIV resource availability for low- and middle-income countries in constant 2019 USD",
         ],
     }
 
