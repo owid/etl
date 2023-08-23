@@ -108,3 +108,5 @@ steps:
   - snapshot://fasttrack/latest/nuclear_warhead_stockpiles.csv
   data://grapher/fasttrack/latest/nuclear_warhead_inventories:
   - snapshot://fasttrack/latest/nuclear_warhead_inventories.csv
+  data://grapher/fasttrack/latest/smallpox_cases:
+  - snapshot://fasttrack/latest/smallpox_cases.csv
