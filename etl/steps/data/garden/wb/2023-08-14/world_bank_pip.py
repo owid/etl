@@ -709,6 +709,7 @@ def run(dest_dir: str) -> None:
     tb_survey_count = survey_count(tb_inc_or_cons_2017_non_filled)
 
     # Define tables to upload
+    # The ones we need in Grapher admin would be tb_inc_or_cons_2011_non_filled, tb_inc_or_cons_2017_non_filled, tb_regions and tb_survey_count
     tables = [
         tb_inc_2011,
         tb_cons_2011,
