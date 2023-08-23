@@ -52,6 +52,13 @@ def run(dest_dir: str) -> None:
     log.info("health.unaids: underscore column names")
     tb = tb.underscore()
 
+    # Scale indicators
+    indicators = [
+        "resource_avail_constant",
+        "resource_needs_ft",
+    ]
+    scale_factor = 1e6
+    tb[indicators] *= scale_factor
     # Complement table with auxiliary data
     log.info("health.unaids: complement with auxiliary data")
     tb = complement_with_auxiliary_data(tb)
@@ -108,7 +115,7 @@ def handle_nans(tb: Table) -> Table:
     assert not tb.loc[-tb["is_textualdata"], "obs_value"].isna().any(), "NaN values detected for not textual data"
     # Drop NaNs & check that all textual data has been removed
     tb = tb.dropna(subset="obs_value")
-    assert tb.is_textualdata.sum() == 0, "NaN"
+    assert tb["is_textualdata"].sum() == 0, "NaN"
 
     return tb
 
