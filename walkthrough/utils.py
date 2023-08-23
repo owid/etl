@@ -30,7 +30,8 @@ DATASET_POPULATION_URI = f"data://garden/demography/{LATEST_POPULATION_VERSION}/
 DATASET_REGIONS_URI = f"data://garden/regions/{LATEST_REGIONS_VERSION}/regions"
 
 # use origins in walkthrough
-WALKTHROUGH_ORIGINS = os.environ.get("WALKTHROUGH_ORIGINS", "1") == "1"
+# WALKTHROUGH_ORIGINS = os.environ.get("WALKTHROUGH_ORIGINS", "1") == "1"
+WALKTHROUGH_ORIGINS = os.environ.get("WALKTHROUGH_ORIGINS", "0") == "1"
 
 # DAG dropdown options
 dag_files = sorted(os.listdir(DAG_DIR))
