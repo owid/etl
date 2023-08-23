@@ -25,4 +25,5 @@ tables:
         description: Number of yearly smallpox cases.
         unit: cases
         display:
+          name: Number of reported smallpox cases
           numDecimalPlaces: 0
