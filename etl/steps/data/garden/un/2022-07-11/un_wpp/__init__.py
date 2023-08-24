@@ -134,5 +134,5 @@ def run(dest_dir: str) -> None:
     tables.append(table_long)
 
     # create dataset
-    ds_garden = create_dataset(dest_dir, tables, default_metadata=ds.metadata, update_from_yaml=False)
+    ds_garden = create_dataset(dest_dir, tables, default_metadata=ds.metadata)
     ds_garden.save()

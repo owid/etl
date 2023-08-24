@@ -1,6 +1,6 @@
 dataset:
   title: Population (various sources, 2023.1)
-  description: >-
+  description: &dataset-description >-
     This dataset has been created using multiple sources:
 
 
@@ -50,7 +50,7 @@ dataset:
     - name: Creative Commons BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
 tables:
-  population:
+  population: &population_table
     title: Population (various sources)
     description: >-
       Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on three key sources: HYDE, Gapminder, and the UN World Population Prospects.
@@ -101,3 +101,11 @@ tables:
         description: |
           Name of the source for a specific data point. The name includes a short name for the source and a link.
         unit: ""
+
+  population_original: *population_table
+
+
+origin_combined:
+  dataset_title_owid: Population (various sources)
+  dataset_description_owid: *dataset-description
+  producer: Gapminder, HYDE, UN Population Division
