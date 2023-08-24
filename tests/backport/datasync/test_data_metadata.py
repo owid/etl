@@ -75,7 +75,7 @@ def test_variable_metadata():
     with Session(engine) as session:
         with mock.patch("apps.backport.datasync.data_metadata._load_variable", return_value=variable_meta):
             with mock.patch("apps.backport.datasync.data_metadata._load_origins_df", return_value=origins_df):
-                with mock.patch("bapps.ackport.datasync.data_metadata._load_faqs", return_value=faqs):
+                with mock.patch("apps.ackport.datasync.data_metadata._load_faqs", return_value=faqs):
                     with mock.patch("apps.backport.datasync.data_metadata._load_topic_tags", return_value=topic_tags):
                         meta = variable_metadata(session, 525715, variable_df)
 
