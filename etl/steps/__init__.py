@@ -14,6 +14,7 @@ import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field
 from glob import glob
+from importlib import import_module
 from pathlib import Path
 from threading import Lock
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, Union, cast
@@ -381,7 +382,10 @@ class DataStep(Step):
 
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
-            self._run_py()
+            if config.DEBUG:
+                self._run_py_isolated()
+            else:
+                self._run_py()
 
         elif sp.with_suffix(".ipynb").exists():
             self._run_notebook()
@@ -476,6 +480,25 @@ class DataStep(Step):
     @property
     def _dest_dir(self) -> Path:
         return paths.DATA_DIR / self.path.lstrip("/")
+
+    def _run_py_isolated(self) -> None:
+        """
+        Import the Python module for this step and call run() on it. This method
+        does not have overhead from forking an extra process like _run_py and
+        should be used with caution.
+        """
+        from etl.helpers import isolated_env
+
+        module_path = self.path.lstrip("/").replace("/", ".")
+        module_dir = (paths.STEP_DIR / "data" / self.path).parent
+
+        with isolated_env(module_dir):
+            step_module = import_module(f"{paths.BASE_PACKAGE}.steps.data.{module_path}")
+            if not hasattr(step_module, "run"):
+                raise Exception(f'no run() method defined for module "{step_module}"')
+
+            # data steps
+            step_module.run(self._dest_dir.as_posix())  # type: ignore
 
     def _run_py(self) -> None:
         """

@@ -2,7 +2,6 @@
 
 streamlit run app.py
 """
-import subprocess
 import webbrowser
 from pathlib import Path
 
@@ -10,8 +9,8 @@ import streamlit as st
 from streamlit_ace import st_ace
 
 import etl.grapher_model as gm
-from etl import paths
-from etl import config
+from etl import config, paths
+from etl.command import main as etl_main
 
 ###################################################
 # Initial configuration ###########################
@@ -19,21 +18,21 @@ from etl import config
 # Set page config
 st.set_page_config(page_title="Metadata v2 preview", layout="wide", page_icon="🎨")
 st.title("Metadata v2 preview")
-DUMMY = st.selectbox('Choose ETL step to play with', ["dummy_full", "dummy"], index=0)
+DUMMY = st.selectbox("Choose ETL step to play with", ["dummy_full", "dummy"], index=0)
 
 # Current directory
 CURRENT_DIR = Path(__file__).parent.absolute()
 
 # Load metadata from Snapshot
 PATH_METADATA_SNAPSHOT = paths.SNAPSHOTS_DIR / "dummy" / "2020-01-01" / f"{DUMMY}.csv.dvc"
-with open(PATH_METADATA_SNAPSHOT, 'r') as f:
+with open(PATH_METADATA_SNAPSHOT, "r") as f:
     METADATA_SNAPSHOT_BASE = f.read()
 SNAPSHOT_META_TOKEN_SPLIT = "outs:"
 METADATA_SNAPSHOT_DISPLAY = METADATA_SNAPSHOT_BASE.split(SNAPSHOT_META_TOKEN_SPLIT)[0]
 METADATA_SNAPSHOT_EXTRA = METADATA_SNAPSHOT_BASE.split(SNAPSHOT_META_TOKEN_SPLIT)[1]
 # Load metadata from Garden
 PATH_METADATA_GARDEN = paths.STEP_DIR / "data" / "garden" / "dummy" / "2020-01-01" / f"{DUMMY}.meta.yml"
-with open(PATH_METADATA_GARDEN, 'r') as f:
+with open(PATH_METADATA_GARDEN, "r") as f:
     METADATA_GARDEN_BASE = f.read()
 METADATA_GARDEN_DISPLAY = METADATA_GARDEN_BASE
 
@@ -49,7 +48,10 @@ def run_steps() -> None:
     """
     # env_path = paths.BASE_DIR / ".env.X"
     # subprocess.run(f"export $(cat {env_path} | xargs)", shell=True)
-    subprocess.run(["poetry", "run", "etl", DUMMY, "--grapher"])
+    # subprocess.run(["poetry", "run", "etl", DUMMY, "--grapher"], env=dict(**os.environ, DEBUG="1"))
+    # setting DEBUG to true runs much faster
+    config.DEBUG = True
+    etl_main([DUMMY], grapher=True, workers=1)
 
 
 def get_data_page_url() -> str:
@@ -63,9 +65,9 @@ def get_data_page_url() -> str:
 def reset_metadata_files():
     """Reset metadata files"""
     # Reset YAML files
-    with open(PATH_METADATA_SNAPSHOT, 'w') as f:
+    with open(PATH_METADATA_SNAPSHOT, "w") as f:
         f.write(METADATA_SNAPSHOT_BASE)
-    with open(PATH_METADATA_GARDEN, 'w') as f:
+    with open(PATH_METADATA_GARDEN, "w") as f:
         f.write(METADATA_GARDEN_BASE)
 
 
@@ -85,7 +87,8 @@ with col1:
 
     # Explanation
     with st.expander("How does this work?"):
-        st.markdown("""
+        st.markdown(
+            """
             This tool lets you visualise how your metadata edits are reflected in a data page.
 
             You are shown the Snapshot and the Garden metadata (YAML files) to the left and right, respectively. Feel free to edit both.
@@ -98,7 +101,8 @@ with col1:
 
 
             ❗ **Note that this tool works best with a staging server. [Learn how to create yours](https://www.notion.so/owid/Setting-up-a-staging-server-3e5a6591a23846ad83fba1ad6dfed4d4)!**
-        """)
+        """
+        )
 
 
 ###################################################
@@ -122,17 +126,11 @@ ACE_DEFAULT = {
 }
 with col_snapshot:
     st.markdown("### Snapshot", help="Edit metadata from Snapshot")
-    content_snapshot = st_ace(
-        value=METADATA_SNAPSHOT_DISPLAY,
-        **ACE_DEFAULT
-    )
+    content_snapshot = st_ace(value=METADATA_SNAPSHOT_DISPLAY, **ACE_DEFAULT)
 
 with col_garden:
     st.markdown("### Garden", help="Edit metadata from Garden")
-    content_garden = st_ace(
-        value=METADATA_GARDEN_DISPLAY,
-        **ACE_DEFAULT
-    )
+    content_garden = st_ace(value=METADATA_GARDEN_DISPLAY, **ACE_DEFAULT)
 
 
 ###################################################
@@ -144,14 +142,14 @@ try:
 
         if clicked:
             # Update YAML files
-            with open(PATH_METADATA_SNAPSHOT, 'w') as f:
+            with open(PATH_METADATA_SNAPSHOT, "w") as f:
                 content_snapshot += f"{SNAPSHOT_META_TOKEN_SPLIT}{METADATA_SNAPSHOT_EXTRA}"
                 f.write(content_snapshot)
-            with open(PATH_METADATA_GARDEN, 'w') as f:
+            with open(PATH_METADATA_GARDEN, "w") as f:
                 f.write(content_garden)
             # Send toast
             st.toast("Running steps...", icon="⚙️")
-            with st.spinner('Running ETL steps...'):
+            with st.spinner("Running ETL steps..."):
                 # Run ETL steps
                 run_steps()
             # Get URL of data page

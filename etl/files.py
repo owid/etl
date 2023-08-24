@@ -3,6 +3,7 @@
 #
 
 import hashlib
+import os
 from collections import OrderedDict
 from pathlib import Path
 from threading import Lock
@@ -64,10 +65,13 @@ def checksum_file(filename: Union[str, Path]) -> str:
     if isinstance(filename, Path):
         filename = filename.as_posix()
 
-    if filename not in CACHE_CHECKSUM_FILE:
-        CACHE_CHECKSUM_FILE.add(filename, checksum_file_nocache(filename))
+    mtime = os.path.getmtime(filename)
+    key = f'{filename}-{mtime}'
 
-    return CACHE_CHECKSUM_FILE[filename]
+    if filename not in CACHE_CHECKSUM_FILE:
+        CACHE_CHECKSUM_FILE.add(key, checksum_file_nocache(filename))
+
+    return CACHE_CHECKSUM_FILE[key]
 
 
 def checksum_str(s: str) -> str:
