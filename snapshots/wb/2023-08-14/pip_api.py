@@ -252,7 +252,7 @@ def pip_query_region(
         Path(f"{PARENT_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
         # Save to csv
         df.to_csv(
-            f"{PARENT_DIR}/pip_region_data/pip_country_{country_code}_year_{year}_{popshare_or_povline}_{int(value*100)}_welfare_{welfare_type}_rep_{reporting_level}_ppp_{ppp_version}.csv",
+            f"{PARENT_DIR}/pip_region_data/pip_region_{country_code}_year_{year}_{popshare_or_povline}_{int(value*100)}_ppp_{ppp_version}.csv",
             index=False,
         )
 
@@ -410,7 +410,7 @@ def generate_relative_poverty_concurrent():
                 welfare_type=df_row["welfare_type"],
                 reporting_level=df_row["reporting_level"],
                 ppp_version=2017,
-                download="false",
+                download="true",
             )
 
     def concurrent_relative_function():
@@ -418,16 +418,14 @@ def generate_relative_poverty_concurrent():
         This is the main function to make concurrency work for country data.
         """
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            tasks = []
             for pct in [40, 50, 60]:
                 for i in range(len(df)):
-                    task = executor.submit(get_relative_data, df.iloc[i], pct, versions)
-                    tasks.append(task)
-            results = [task.result() for task in concurrent.futures.as_completed(tasks)]
-            # Concatenate list of dataframes
-            results = pd.concat(results, ignore_index=True)
-
-        return results
+                    if Path(
+                        f"{PARENT_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_2017.csv"
+                    ).is_file():
+                        continue
+                    else:
+                        executor.submit(get_relative_data, df.iloc[i], pct, versions)
 
     def get_relative_data_region(df_row, pct, versions):
         """
@@ -444,7 +442,7 @@ def generate_relative_poverty_concurrent():
                 welfare_type=df_row["welfare_type"],
                 reporting_level=df_row["reporting_level"],
                 ppp_version=2017,
-                download="false",
+                download="true",
             )
 
     def concurrent_relative_region_function():
@@ -452,18 +450,16 @@ def generate_relative_poverty_concurrent():
         This is the main function to make concurrency work for regional data.
         """
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            tasks = []
             for pct in [40, 50, 60]:
                 for i in range(len(df)):
-                    task = executor.submit(get_relative_data_region, df.iloc[i], pct, versions)
-                    tasks.append(task)
-            results = [task.result() for task in concurrent.futures.as_completed(tasks)]
-            # Concatenate list of dataframes
-            results = pd.concat(results, ignore_index=True)
+                    if Path(
+                        f"{PARENT_DIR}/pip_region_data/pip_region_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_ppp_2017.csv"
+                    ).is_file():
+                        continue
+                    else:
+                        executor.submit(get_relative_data_region, df.iloc[i], pct, versions)
 
-        return results
-
-    def add_relative_indicators(df, results, country_or_region):
+    def add_relative_indicators(df, country_or_region):
         """
         Integrates the relative indicators to the df.
         """
@@ -475,33 +471,26 @@ def generate_relative_poverty_concurrent():
             watts_list = []
             for i in range(len(df)):
                 if ~np.isnan(df["median"].iloc[i]):
-                    povline = round(df["median"].iloc[i] * pct / 100, 2)
-
                     if country_or_region == "country":
-                        mask = (
-                            (results["poverty_line"] == povline)
-                            & (results["country"] == df["country"].iloc[i])
-                            & (results["year"] == df["year"].iloc[i])
-                            & (results["welfare_type"] == df["welfare_type"].iloc[i])
-                            & (results["reporting_level"] == df["reporting_level"].iloc[i])
-                        )
-                    elif country_or_region == "region":
-                        mask = (
-                            (results["poverty_line"] == povline)
-                            & (results["country"] == df["country"].iloc[i])
-                            & (results["year"] == df["year"].iloc[i])
+                        results = pd.read_csv(
+                            f"{PARENT_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_2017.csv"
                         )
 
-                    headcount_ratio_value = results[mask]["headcount"].iloc[0]
+                    elif country_or_region == "region":
+                        results = pd.read_csv(
+                            f"{PARENT_DIR}/pip_region_data/pip_region_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_ppp_2017.csv"
+                        )
+
+                    headcount_ratio_value = results["headcount"].iloc[0]
                     headcount_ratio_list.append(headcount_ratio_value)
 
-                    pgi_value = results[mask]["poverty_gap"].iloc[0]
+                    pgi_value = results["poverty_gap"].iloc[0]
                     pgi_list.append(pgi_value)
 
-                    pov_severity_value = results[mask]["poverty_severity"].iloc[0]
+                    pov_severity_value = results["poverty_severity"].iloc[0]
                     pov_severity_list.append(pov_severity_value)
 
-                    watts_value = results[mask]["watts"].iloc[0]
+                    watts_value = results["watts"].iloc[0]
                     watts_list.append(watts_value)
 
                 else:
@@ -539,10 +528,10 @@ def generate_relative_poverty_concurrent():
     df_country = median_patch(df_country)
 
     # Run the main function to get the data
-    results_country = concurrent_relative_function()
+    concurrent_relative_function()
 
     # Add relative indicators from the results above
-    df_country = add_relative_indicators(df_country, results_country, "country")
+    df_country = add_relative_indicators(df=df_country, country_or_region="country")
 
     # FOR REGIONS
     # Get data from the most common query
@@ -561,10 +550,10 @@ def generate_relative_poverty_concurrent():
     df_region = median_patch(df_region)
 
     # Run the main function to get the data
-    results_region = concurrent_relative_region_function()
+    concurrent_relative_region_function()
 
     # Add relative indicators from the results above
-    df_region = add_relative_indicators(df_region, results_region, "region")
+    df_region = add_relative_indicators(df=df_region, country_or_region="region")
 
     # Concatenate df_country and df_region
     df = pd.concat([df_country, df_region], ignore_index=True)
@@ -631,7 +620,6 @@ def generate_percentiles_raw_concurrent():
 
     def concurrent_percentiles_function():
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            tasks = []
             for ppp_version in [2011, 2017]:
                 for povline in povlines:
                     if Path(
@@ -639,16 +627,7 @@ def generate_percentiles_raw_concurrent():
                     ).is_file():
                         continue
                     else:
-                        task = executor.submit(get_percentiles_data, povline, versions, ppp_version)
-                        tasks.append(task)
-
-                # NOTE: I comment this because the output would be too large to handle
-
-                # results = [task.result() for task in concurrent.futures.as_completed(tasks)]
-                # # Concatenate list of dataframes
-                # results = pd.concat(results, ignore_index=True)
-
-        # return results
+                        executor.submit(get_percentiles_data, povline, versions, ppp_version)
 
     def get_percentiles_data_region(povline, versions, ppp_version):
         return pip_query_region(
@@ -665,24 +644,14 @@ def generate_percentiles_raw_concurrent():
 
     def concurrent_percentiles_region_function():
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            tasks = []
             for ppp_version in [2011, 2017]:
                 for povline in povlines:
                     if Path(
-                        f"{PARENT_DIR}/pip_region_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_ppp_{ppp_version}.csv"
+                        f"{PARENT_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
                     ).is_file():
                         continue
                     else:
-                        task = executor.submit(get_percentiles_data_region, povline, versions, ppp_version)
-                        tasks.append(task)
-
-                # NOTE: I comment this because the output would be too large to handle
-
-                # results = [task.result() for task in concurrent.futures.as_completed(tasks)]
-                # # Concatenate list of dataframes
-                # results = pd.concat(results, ignore_index=True)
-
-        # return results
+                        executor.submit(get_percentiles_data_region, povline, versions, ppp_version)
 
     # Obtain latest versions of the PIP dataset
     versions = pip_versions()
@@ -703,7 +672,7 @@ def generate_percentiles_raw_concurrent():
             df_country = pd.concat([df_country, df_query_country], ignore_index=True)
 
             df_query_region = pd.read_csv(
-                f"{PARENT_DIR}/pip_region_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_ppp_{ppp_version}.csv"
+                f"{PARENT_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
             )
             df_region = pd.concat([df_region, df_query_region], ignore_index=True)
 
