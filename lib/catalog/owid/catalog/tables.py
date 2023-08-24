@@ -709,7 +709,7 @@ class Table(pd.DataFrame):
         return variable
 
     def assign(self, *args, **kwargs) -> "Table":
-        return super().assign(*args, **kwargs)
+        return super().assign(*args, **kwargs)  # type: ignore
 
     def __add__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
