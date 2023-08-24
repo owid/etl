@@ -66,7 +66,7 @@ def checksum_file(filename: Union[str, Path]) -> str:
         filename = filename.as_posix()
 
     mtime = os.path.getmtime(filename)
-    key = f'{filename}-{mtime}'
+    key = f"{filename}-{mtime}"
 
     if filename not in CACHE_CHECKSUM_FILE:
         CACHE_CHECKSUM_FILE.add(key, checksum_file_nocache(filename))

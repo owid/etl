@@ -231,13 +231,13 @@ def test_isolated_env(tmp_path):
     (tmp_path / "test_abc.py").write_text("B = 1")
 
     with isolated_env(tmp_path):
-        import shared
+        import shared  # type: ignore
 
         assert shared.A == 1
         assert shared.test_abc.B == 1
         assert "test_abc" in sys.modules.keys()
 
     with pytest.raises(ModuleNotFoundError):
-        import shared
+        import shared  # type: ignore
 
     assert "test_abc" not in sys.modules.keys()

@@ -18,7 +18,7 @@ from etl.command import main as etl_main
 # Set page config
 st.set_page_config(page_title="Metadata v2 preview", layout="wide", page_icon="🎨")
 st.title("Metadata v2 preview")
-DUMMY = st.selectbox("Choose ETL step to play with", ["dummy_full", "dummy"], index=0)
+DUMMY = str(st.selectbox("Choose ETL step to play with", ["dummy_full", "dummy"], index=0))
 
 # Current directory
 CURRENT_DIR = Path(__file__).parent.absolute()
@@ -165,7 +165,7 @@ try:
 
             reset_metadata_files()
 except Exception as e:
-    st.toast(f"[There was an error](#error).", icon="❌")
+    st.toast("[There was an error](#error).", icon="❌")
     reset_metadata_files()
     st.markdown("### Error")
     raise e
