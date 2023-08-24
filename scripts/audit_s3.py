@@ -7,7 +7,7 @@ import pandas as pd
 import rich_click as click
 import structlog
 
-from backport.datasync.datasync import upload_gzip_dict
+from apps.backport.datasync.datasync import upload_gzip_dict
 from etl.db import get_engine
 from etl.publish import connect_s3
 

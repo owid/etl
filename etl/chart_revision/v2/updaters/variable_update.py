@@ -11,7 +11,7 @@ from sqlmodel import Session, select
 from structlog import get_logger
 
 import etl.grapher_model as gm
-from backport.datasync.data_metadata import variable_data_df_from_s3
+from apps.backport.datasync.data_metadata import variable_data_df_from_s3
 from etl.chart_revision.v2.base import ChartUpdater
 from etl.chart_revision.v2.schema import (
     fix_errors_in_schema,

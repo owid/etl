@@ -22,12 +22,12 @@ from owid.catalog import utils
 from sqlalchemy.engine.base import Engine
 from sqlmodel import Session, select, update
 
-from backport.datasync.data_metadata import (
+from apps.backport.datasync.data_metadata import (
     add_entity_code_and_name,
     variable_data,
     variable_metadata,
 )
-from backport.datasync.datasync import upload_gzip_dict
+from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config
 from etl.db import open_db
 

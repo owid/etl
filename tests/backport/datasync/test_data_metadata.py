@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 from sqlmodel import Session
 
-from backport.datasync.data_metadata import (
+from apps.backport.datasync.data_metadata import (
     _convert_strings_to_numeric,
     _infer_variable_type,
     variable_data,
