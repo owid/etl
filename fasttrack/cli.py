@@ -45,7 +45,7 @@ from etl.paths import (
     STEP_DIR,
 )
 from etl.snapshot import Snapshot, SnapshotMeta
-from walkthrough import utils as walkthrough_utils
+from apps.walkthrough import utils as walkthrough_utils
 
 from . import csv, sheets
 
