@@ -52,7 +52,8 @@ nav:
           - Private steps: "architecture/workflow/other-steps/private.md"
       - Metadata:
         - Metadata: "architecture/metadata/index.md"
-        - Metadata fields: "architecture/metadata/fields.md"
+        - Workflow with metadata: "architecture/metadata/workflow.md"
+        - Metadata reference: "architecture/metadata/reference.md"
         - Propagation of metadata: "architecture/metadata/propagation.md"
         - Using metadata: "architecture/metadata/using.md"
   - Dataset catalog:
@@ -110,6 +111,8 @@ markdown_extensions:
   - attr_list
   - pymdownx.details
   - pymdownx.snippets
+  - md_in_html
+  - pymdownx.superfences
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
