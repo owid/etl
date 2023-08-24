@@ -276,20 +276,28 @@ steps:
     - data://garden/lis/2023-01-18/luxembourg_income_study
 
   # World Inequality Database
-  data://meadow/wid/2023-01-27/world_inequality_database:
+  data://meadow/wid/2023-08-24/world_inequality_database:
     - data://garden/regions/2023-01-01/regions
-    - snapshot://wid/2023-01-27/world_inequality_database.csv
-    - snapshot://wid/2023-01-27/world_inequality_database_with_extrapolations.csv
-  data://garden/wid/2023-01-27/world_inequality_database:
-    - data://meadow/wid/2023-01-27/world_inequality_database
-  data://grapher/wid/2023-01-27/world_inequality_database:
-    - data://garden/wid/2023-01-27/world_inequality_database
-  data://explorers/wid/2023-01-27/world_inequality_database:
-    - data://garden/wid/2023-01-27/world_inequality_database
+    - snapshot://wid/2023-08-24/world_inequality_database.csv
+    - snapshot://wid/2023-08-24/world_inequality_database_with_extrapolations.csv
+  data://garden/wid/2023-08-24/world_inequality_database:
+    - data://meadow/wid/2023-08-24/world_inequality_database
+  data://grapher/wid/2023-08-24/world_inequality_database:
+    - data://garden/wid/2023-08-24/world_inequality_database
+  data://explorers/wid/2023-08-24/world_inequality_database:
+    - data://garden/wid/2023-08-24/world_inequality_database
+
+  # World Inequality Database - Distributional data
+  data://meadow/wid/2023-08-24/world_inequality_database_distribution:
+  - snapshot://wid/2023-08-24/world_inequality_database_distribution.csv
+  - snapshot://wid/2023-08-24/world_inequality_database_distribution_with_extrapolations.csv
+  - data://garden/regions/2023-01-01/regions
+  data://garden/wid/2023-08-24/world_inequality_database_distribution:
+  - data://meadow/wid/2023-08-24/world_inequality_database_distribution
 
   # Poverty and inequality dataset for comparison explorers
-  data://explorers/poverty_inequality/2023-03-01/poverty_inequality:
-    - data://explorers/wid/2023-01-27/world_inequality_database
+  data://explorers/poverty_inequality/2023-08-24/poverty_inequality:
+    - data://explorers/wid/2023-08-24/world_inequality_database
     - data://explorers/lis/2023-01-18/luxembourg_income_study
 
   # Global mobile money dataset (GSMA)
