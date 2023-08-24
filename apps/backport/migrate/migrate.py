@@ -7,7 +7,7 @@ import structlog
 from owid.catalog.utils import underscore
 from sqlalchemy.engine import Engine
 
-from apps.backport import PotentialBackport
+from apps.backport.backport import PotentialBackport
 from apps.walkthrough.utils import add_to_dag, generate_step
 from etl import config
 from etl.backport_helpers import create_dataset
