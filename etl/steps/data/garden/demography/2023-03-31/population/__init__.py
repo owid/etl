@@ -13,11 +13,11 @@ Four sources are used overall:
         Provides data on former countries, and complements other sources with data on missing years for some countries.
         More on this dataset please refer to module gapminder_sg.
 """
-import os
 from typing import List
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
+import yaml
+from owid.catalog import Origin, Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -34,8 +34,7 @@ from .unwpp import load_unwpp
 log = get_logger()
 
 # naming conventions
-N = PathFinder(__file__)
-METADATA_PATH = os.path.join(N.directory, "meta.yml")
+paths = PathFinder(__file__)
 
 # sources names
 # this dictionary maps source short names to complete source names
@@ -50,12 +49,21 @@ SOURCES_NAMES = {
 def run(dest_dir: str) -> None:
     log.info("population.start")
 
-    # create table
     tb = make_table()
+
+    # keep original table with all origins, population table has only one origin
+    # defined in YAML file
+    tb_original = tb.copy().update_metadata(short_name="population_original")
+
+    # set collapsed origin for population table
+    with open(paths.metadata_path, "r") as file:
+        origin = Origin(**yaml.safe_load(file)["origin_combined"])
+    for col in tb.columns:
+        tb[col].metadata.origins = [origin]
 
     # create dataset
     log.info("population: create dataset")
-    ds = create_dataset(dest_dir, tables=[tb])
+    ds = create_dataset(dest_dir, tables=[tb, tb_original])
 
     # save dataset
     ds.save()

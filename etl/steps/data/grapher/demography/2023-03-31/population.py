@@ -4,7 +4,7 @@ from copy import deepcopy
 from typing import Any, List
 
 import numpy as np
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
 
@@ -23,10 +23,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden: Dataset = paths.load_dependency("population")
+    ds_garden = paths.load_dataset("population")
 
     # Read table from garden dataset.
-    tb_garden = ds_garden["population"]
+    tb_garden = ds_garden["population_original"].update_metadata(short_name="population")
 
     #
     # Process data.
