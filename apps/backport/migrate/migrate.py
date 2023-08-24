@@ -15,7 +15,7 @@ from etl.metadata_export import metadata_export
 from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
 from apps.walkthrough.utils import add_to_dag, generate_step
 
-from ..backport import PotentialBackport
+from apps.backport import PotentialBackport
 
 config.enable_bugsnag()
 
