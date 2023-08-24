@@ -228,14 +228,12 @@ class SnapshotMeta:
             if "file_extension" not in meta:
                 meta["file_extension"] = _parse_snapshot_path(Path(filename))[3]
 
-            # we can have either source or origin in YAML
-            if "origin" in meta and "source" in meta:
-                raise ValueError("Cannot have both `origin` and `source` in metadata")
-            elif "origin" in meta:
+            if "origin" in meta:
                 meta["origin"] = Origin.from_dict(meta["origin"])
-            elif "source" in meta:
+
+            if "source" in meta:
                 meta["source"] = Source.from_dict(meta["source"])
-            else:
+            elif "source_name" in meta:
                 # convert legacy fields to source
                 publication_date = meta.pop("publication_date", None)
                 meta["source"] = Source(
