@@ -13,7 +13,7 @@ from apps.backport.backport import PotentialBackport
 from etl.backport_helpers import create_dataset
 from etl.db import get_engine
 from etl.metadata_export import metadata_export
-from fasttrack.sheets import SHEET_TO_GID
+from apps.fasttrack.sheets import SHEET_TO_GID
 
 log = structlog.get_logger()
 
