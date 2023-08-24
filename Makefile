@@ -6,7 +6,7 @@
 
 include default.mk
 
-SRC = etl snapshots backport walkthrough fasttrack apps tests
+SRC = etl snapshots backport fasttrack apps tests
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 LIBS = lib/*
 
