@@ -29,7 +29,7 @@ examples/data/*
 
 playground*
 playground.ipynb
-!walkthrough/**/playground.ipynb
+!apps/walkthrough/**/playground.ipynb
 
 docs/_build
 docs/.vscode

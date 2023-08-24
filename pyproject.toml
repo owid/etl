@@ -14,7 +14,7 @@ backport = 'backport.backport:backport_cli'
 bulk_backport = 'backport.bulk_backport:bulk_backport'
 backport-migrate = 'backport.migrate.migrate:cli'
 backport-fasttrack = 'backport.fasttrack_backport:cli'
-walkthrough = 'walkthrough.cli:cli'
+walkthrough = 'apps.walkthrough.cli:cli'
 fasttrack = 'fasttrack.cli:cli'
 run_python_step = 'etl.run_python_step:main'
 compare = 'etl.compare:cli'
@@ -111,12 +111,12 @@ dataclasses-json = "0.5.7"
 
 
 [tool.black]
-exclude = ".ipynb_checkpoints|walkthrough/.*_cookiecutter|.*playground.*.ipynb"
+exclude = ".ipynb_checkpoints|apps/walkthrough/.*_cookiecutter|.*playground.*.ipynb"
 line-length = 120
 
 [tool.isort]
 profile = "black"
-extend_skip = [".ipynb_checkpoints", "walkthrough/meadow_cookiecutter"]
+extend_skip = [".ipynb_checkpoints", "apps/walkthrough/meadow_cookiecutter"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -124,7 +124,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pyright]
 exclude = [
-    "walkthrough/*_cookiecutter",
+    "apps/walkthrough/*_cookiecutter",
     "**/node_modules",
     "**/__pycache__",
     ".git",
