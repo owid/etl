@@ -7,15 +7,14 @@ import structlog
 from owid.catalog.utils import underscore
 from sqlalchemy.engine import Engine
 
+from apps.backport import PotentialBackport
+from apps.walkthrough.utils import add_to_dag, generate_step
 from etl import config
 from etl.backport_helpers import create_dataset
 from etl.db import get_engine
 from etl.files import yaml_dump
 from etl.metadata_export import metadata_export
 from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
-from apps.walkthrough.utils import add_to_dag, generate_step
-
-from apps.backport import PotentialBackport
 
 config.enable_bugsnag()
 

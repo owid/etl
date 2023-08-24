@@ -8,10 +8,10 @@ from pydantic import BaseModel
 from structlog import get_logger
 
 from apps.backport.datasync.data_metadata import variable_data_df_from_s3
-from etl.db import get_engine
-from etl.match_variables import find_mapping_suggestions, preliminary_mapping
 from apps.walkthrough.charts_v2.utils import get_variables_from_datasets
 from apps.walkthrough.utils import OWIDEnv
+from etl.db import get_engine
+from etl.match_variables import find_mapping_suggestions, preliminary_mapping
 
 # Logger
 log = get_logger()

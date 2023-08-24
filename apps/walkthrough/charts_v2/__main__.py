@@ -6,13 +6,13 @@ Run as `walkthrough charts` or python -m walkthrough.charts_v2
 import streamlit as st
 from structlog import get_logger
 
-from etl.match_variables import SIMILARITY_NAMES
 from apps.walkthrough.charts_v2.init_config import init_app, set_session_states
 from apps.walkthrough.charts_v2.search_config import build_dataset_form
 from apps.walkthrough.charts_v2.submission import create_submission, push_submission
 from apps.walkthrough.charts_v2.utils import get_datasets, get_schema
 from apps.walkthrough.charts_v2.variable_config import ask_and_get_variable_mapping
 from apps.walkthrough.utils import OWIDEnv
+from etl.match_variables import SIMILARITY_NAMES
 
 # logger
 log = get_logger()

@@ -29,6 +29,7 @@ from rich import print
 from rich.console import Console
 from sqlmodel import Session
 
+from apps.walkthrough import utils as walkthrough_utils
 from etl import config
 from etl import grapher_model as gm
 from etl.command import main as etl_main
@@ -45,7 +46,6 @@ from etl.paths import (
     STEP_DIR,
 )
 from etl.snapshot import Snapshot, SnapshotMeta
-from apps.walkthrough import utils as walkthrough_utils
 
 from . import csv, sheets
 
