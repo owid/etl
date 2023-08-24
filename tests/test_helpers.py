@@ -1,11 +1,13 @@
+import sys
 import unittest
 from unittest.mock import patch
 
+import pytest
 from owid import catalog
 
 import etl.helpers
 from etl import paths
-from etl.helpers import PathFinder, VersionTracker, create_dataset
+from etl.helpers import PathFinder, VersionTracker, create_dataset, isolated_env
 
 # Dag of active steps.
 mock_dag = {
@@ -222,3 +224,20 @@ def test_PathFinder_with_private_steps():
     }
     assert pf.step == "data-private://garden/namespace/2023/name"
     assert pf.get_dependency_step_name("name") == "snapshot-private://namespace/2023/name"
+
+
+def test_isolated_env(tmp_path):
+    (tmp_path / "shared.py").write_text("A = 1; import test_abc")
+    (tmp_path / "test_abc.py").write_text("B = 1")
+
+    with isolated_env(tmp_path):
+        import shared  # type: ignore
+
+        assert shared.A == 1
+        assert shared.test_abc.B == 1
+        assert "test_abc" in sys.modules.keys()
+
+    with pytest.raises(ModuleNotFoundError):
+        import shared  # type: ignore
+
+    assert "test_abc" not in sys.modules.keys()

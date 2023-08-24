@@ -8,12 +8,14 @@ import sys
 
 from streamlit.web import cli as stcli
 
-from etl.paths import APPS_DIR
 from etl.config import METAPLAY_PORT
+from etl.paths import APPS_DIR
 
 SCRIPT_PATH = APPS_DIR / "metadata_playground" / "app.py"
 
 print(SCRIPT_PATH)
+
+
 def cli():
     """Run app."""
     sys.argv = ["streamlit", "run", str(SCRIPT_PATH), "--server.port", str(METAPLAY_PORT)]

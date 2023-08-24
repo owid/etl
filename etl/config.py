@@ -20,7 +20,9 @@ ENV_FILE = env.get("ENV", BASE_DIR / ".env")
 
 load_dotenv(ENV_FILE)
 
-DEBUG = env.get("DEBUG") == "True"
+# When DEBUG is on
+# - run steps in the same process (speeding up ETL)
+DEBUG = env.get("DEBUG") in ("True", "true", "1")
 
 # publishing to OWID's public data catalog
 S3_BUCKET = "owid-catalog"
