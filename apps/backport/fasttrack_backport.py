@@ -9,7 +9,7 @@ import structlog
 from google.oauth2.service_account import Credentials
 from owid.catalog.utils import underscore
 
-from backport.backport import PotentialBackport
+from apps.backport.backport import PotentialBackport
 from etl.backport_helpers import create_dataset
 from etl.db import get_engine
 from etl.metadata_export import metadata_export
