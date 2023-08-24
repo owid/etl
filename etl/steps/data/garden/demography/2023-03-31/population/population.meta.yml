@@ -59,7 +59,7 @@ tables:
 
     variables:
       population:
-        title: Total population (Gapminder, HYDE & UN)
+        title: Population
         description: >-
           Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
 
