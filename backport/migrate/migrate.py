@@ -13,7 +13,7 @@ from etl.db import get_engine
 from etl.files import yaml_dump
 from etl.metadata_export import metadata_export
 from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
-from walkthrough.utils import add_to_dag, generate_step
+from apps.walkthrough.utils import add_to_dag, generate_step
 
 from ..backport import PotentialBackport
 
