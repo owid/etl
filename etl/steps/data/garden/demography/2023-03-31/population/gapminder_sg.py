@@ -19,7 +19,12 @@ DATASET_GAPMINDER_SYSTEMA_GLOBALIS = (
 
 SOURCE_NAME = "gapminder_sg"
 
-GAPMINDER_ORIGINS = [Origin(dataset_title_owid="Gapminder (Systema Globalis)")]
+GAPMINDER_ORIGINS = [
+    Origin(
+        dataset_title_owid="Gapminder (Systema Globalis)",
+        dataset_url_main="https://github.com/open-numbers/ddf--gapminder--systema_globalis",
+    )
+]
 
 
 # former countries

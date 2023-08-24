@@ -77,7 +77,6 @@ tables:
           includeInTable: true
           numDecimalPlaces: 0
         sources: *population-sources
-        origins: *population-origins
       world_pop_share:
         title: Share of world population
         description: >-
