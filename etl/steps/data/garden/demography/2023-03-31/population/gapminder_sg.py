@@ -9,7 +9,7 @@ In there, open sheet "Data" and check the Source per country and year to find ou
 obtained that data.
 
 """
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Origin, Table
 
 from etl.paths import DATA_DIR
 
@@ -18,6 +18,14 @@ DATASET_GAPMINDER_SYSTEMA_GLOBALIS = (
 )
 
 SOURCE_NAME = "gapminder_sg"
+
+GAPMINDER_ORIGINS = [
+    Origin(
+        dataset_title_owid="Gapminder (Systema Globalis)",
+        dataset_url_main="https://github.com/open-numbers/ddf--gapminder--systema_globalis",
+    )
+]
+
 
 # former countries
 # to translate code to name:
@@ -90,7 +98,7 @@ COMPLEMENT_COUNTRIES = {
 }
 
 
-def load_gapminder_sys_glob_former():
+def load_gapminder_sys_glob_former() -> Table:
     """load gapminder dataset's table only with former countries."""
     ds = Dataset(DATASET_GAPMINDER_SYSTEMA_GLOBALIS)
     tb = ds["total_population_with_projections"]
@@ -122,10 +130,14 @@ def load_gapminder_sys_glob_former():
 
     # reset index
     tb = tb.reset_index(drop=True)
+
+    # add origins
+    tb.population.metadata.origins = GAPMINDER_ORIGINS
+
     return tb
 
 
-def load_gapminder_sys_glob_complement():
+def load_gapminder_sys_glob_complement() -> Table:
     """load gapminder dataset's table only with non-former countries needed to complement the rest of sources."""
     ds = Dataset(DATASET_GAPMINDER_SYSTEMA_GLOBALIS)
     tb = ds["total_population_with_projections"]
@@ -151,5 +163,8 @@ def load_gapminder_sys_glob_complement():
 
     # reset index
     tb = tb.reset_index(drop=True)
+
+    # add origins
+    tb.population.metadata.origins = GAPMINDER_ORIGINS
 
     return tb

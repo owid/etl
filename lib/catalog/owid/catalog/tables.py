@@ -291,6 +291,13 @@ class Table(pd.DataFrame):
 
         return df
 
+    def update_metadata(self, **kwargs) -> "Table":
+        """Set Table metadata."""
+        for k, v in kwargs.items():
+            assert hasattr(self.metadata, k), f"unknown metadata field {k} in TableMeta"
+            setattr(self.metadata, k, v)
+        return self
+
     @classmethod
     def _add_metadata(cls, df: pd.DataFrame, path: str) -> None:
         """Read metadata from JSON sidecar and add it to the dataframe."""
@@ -701,6 +708,9 @@ class Table(pd.DataFrame):
 
         return variable
 
+    def assign(self, *args, **kwargs) -> "Table":
+        return super().assign(*args, **kwargs)  # type: ignore
+
     def __add__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
         # The following would have a parents only the scalar, not the scalar and the corresponding variable.
@@ -1078,6 +1088,7 @@ def read_csv(
 def read_excel(
     io: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
 ) -> Table:
+    assert not isinstance(kwargs.get("sheet_name"), list), "Argument 'sheet_name' must be a string or an integer."
     table = Table(pd.read_excel(io=io, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
     # Note: Maybe we should include the sheet name in parents.
