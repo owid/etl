@@ -30,6 +30,7 @@ examples/data/*
 playground*
 playground.ipynb
 !apps/walkthrough/**/playground.ipynb
+!apps/wizzard/**/playground.ipynb
 
 docs/_build
 docs/.vscode
