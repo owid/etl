@@ -6,12 +6,14 @@ import streamlit as st
 from etl.helpers import read_json_schema
 from etl.paths import SCHEMAS_DIR
 
+# Read schema
 SNAPSHOT_SCHEMA = read_json_schema(SCHEMAS_DIR / "snapshot-schema.json")
-
+# Get properties for origin in schema
 schema_origin = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["properties"]
+# Lists with fields of special types. By default, fields are text inputs.
+FIELD_TYPES_TEXTAREA = ["dataset_description_owid", "dataset_description_producer"]
 
 form_fields = []
-FIELD_TYPES_TEXTAREA = ["dataset_description_owid", "dataset_description_producer"]
 
 
 def _pretty_req_level(requirement_level: str) -> str:
@@ -58,9 +60,7 @@ def create_display_name_snap_section(props: Dict[str, Any], name: str, property_
     return display_name
 
 
-def render_fields_from_schema(
-    schema: Dict[str, Any], property_name: str, form_fields: List[str]
-) -> List[str]:
+def render_fields_from_schema(schema: Dict[str, Any], property_name: str, form_fields: List[str]) -> List[str]:
     """Render fields from schema."""
     for name, props in schema.items():
         if "properties" in props:
