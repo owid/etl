@@ -3,7 +3,7 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, Optional
 
 import ruamel.yaml
 import yaml
@@ -11,7 +11,6 @@ from cookiecutter.main import cookiecutter
 from owid import walden
 from owid.catalog.utils import validate_underscore
 
-from etl import config
 from etl.files import apply_black_formatter_to_files
 from etl.paths import (
     DAG_DIR,
@@ -107,16 +106,6 @@ WIDGET_TEMPLATE = """
 #             "contents": contents,
 #         },
 #     )
-
-
-def preview_file(path: Path, language: str) -> None:
-    with open(path) as f:
-        t = f.read()
-
-    put_widget(
-        title=st.success(f"File `{path}` was successfully generated"),
-        contents=[po.put_markdown(f"```{language}\n{t}```")],
-    )
 
 
 # def preview_dag(dag_content: str, dag_name: Union[str, Path] = DAG_WALKTHROUGH_PATH) -> None:
