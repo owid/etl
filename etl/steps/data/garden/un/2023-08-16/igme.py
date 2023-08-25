@@ -36,11 +36,7 @@ def run(dest_dir: str) -> None:
     tb = tb.pivot(
         index=["country", "year"],
         values=["Observation value", "Lower bound", "Upper bound"],
-        columns=[
-            "unit_of_measure",
-            "indicator",
-            "sex",
-        ],
+        columns=["unit_of_measure", "indicator", "sex", "wealth_quintile"],
     )
     tb.columns = [" - ".join(col).strip() for col in tb.columns.values]
     tb = tb.reset_index()
@@ -63,13 +59,49 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
+def filter_data(tb: Table) -> Table:
+    """
+    Filtering out the unnecessary columns and rows from the data.
+    We just want the UN IGME estimates, rather than the individual results from the survey data.
+    """
+    # Keeping only the UN IGME estimates and the total wealth quintile
+    tb = tb.loc[(tb["series_name"] == "UN IGME estimate")]
+
+    cols_to_keep = [
+        "country",
+        "year",
+        "indicator",
+        "sex",
+        "unit_of_measure",
+        "wealth_quintile",
+        "obs_value",
+        "lower_bound",
+        "upper_bound",
+    ]
+    # Keeping only the necessary columns.
+    tb = tb[cols_to_keep]
+
+    return tb
+
+
 def clean_values(tb: Table) -> Table:
     """
-    Add some more meaning to the values in the table.
+    Adding clearer meanings to the values in the table.
     """
     sex_dict = {"Total": "Both sexes"}
 
+    wealth_dict = {
+        "Total": "All wealth quintiles",
+        "Lowest": "Poorest quintile",
+        "Highest": "Richest quintile",
+        "Middle": "Middle wealth quintile",
+        "Second": "Second poorest quintile",
+        "Fourth": "Fourth poorest quintile",
+    }
+
     tb["sex"] = tb["sex"].replace(sex_dict)
+
+    tb["wealth_quintile"] = tb["wealth_quintile"].replace(wealth_dict)
 
     return tb
 
@@ -88,30 +120,6 @@ def fix_sub_saharan_africa(tb: Table) -> Table:
     tb.loc[
         (tb["country"] == "Sub-Saharan Africa") & (tb["regional_group"] == "SDG"), "country"
     ] = "Sub-Saharan Africa (SDG)"
-
-    return tb
-
-
-def filter_data(tb: Table) -> Table:
-    """
-    Filtering out the unnecessary columns and rows from the data.
-    We just want the UN IGME estimates, rather than the individual results from the survey data.
-    """
-    # Keeping only the UN IGME estimates and the total wealth quintile
-    tb = tb.loc[(tb["series_name"] == "UN IGME estimate") & (tb["wealth_quintile"] == "Total")]
-
-    cols_to_keep = [
-        "country",
-        "year",
-        "indicator",
-        "sex",
-        "unit_of_measure",
-        "obs_value",
-        "lower_bound",
-        "upper_bound",
-    ]
-    # Keeping only the necessary columns.
-    tb = tb[cols_to_keep]
 
     return tb
 
