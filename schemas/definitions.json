@@ -93,7 +93,7 @@
   "origin": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["producer", "date_published"],
+    "required": ["producer", "date_published", "date_accessed", "citation_producer", "dataset_url_main", "dataset_title_owid"],
     "properties": {
       "producer": {
         "title": "Name of the producer",
