@@ -323,17 +323,36 @@ def add_region_aggregates(
     df_region = pd.DataFrame({country_col: [], year_col: []}).astype(dtype={country_col: "object", year_col: "int"})
     # Select data for countries in the region.
     df_countries = df[df[country_col].isin(countries_in_region)]
+    # Add population for doing weighted average aggregations
+    df_countries = add_population_to_dataframe(df_countries)
     for variable in variables:
-        df_added = groupby_agg(
-            df=df_countries,
-            groupby_columns=year_col,
-            aggregations={
-                country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
-                variable: aggregations[variable],
-            },
-            num_allowed_nans=num_allowed_nans_per_year,
-            frac_allowed_nans=frac_allowed_nans_per_year,
-        ).reset_index()
+        # If aggreggate is mean then do weighted average using population data, replacing `aggregations[variable]` with a lambda function
+        if aggregations[variable] == "mean":
+            df_added = groupby_agg(
+                df=df_countries,
+                groupby_columns=year_col,
+                aggregations={
+                    country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
+                    variable: lambda x: np.ma.average(
+                        np.ma.masked_invalid(x.astype("float64")),
+                        weights=np.ma.masked_invalid(df_countries.loc[x.index, "population"].astype("float64")),
+                    ),
+                },
+                num_allowed_nans=num_allowed_nans_per_year,
+                frac_allowed_nans=frac_allowed_nans_per_year,
+            ).reset_index()
+        else:
+            # Existing code for other aggregation types
+            df_added = groupby_agg(
+                df=df_countries,
+                groupby_columns=year_col,
+                aggregations={
+                    country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
+                    variable: aggregations[variable],
+                },
+                num_allowed_nans=num_allowed_nans_per_year,
+                frac_allowed_nans=frac_allowed_nans_per_year,
+            ).reset_index()
         # Make nan all aggregates if the most contributing countries were not present.
         df_added.loc[~df_added[country_col], variable] = np.nan
         # Replace the column that was used to check if most contributing countries were present by the region's name.
