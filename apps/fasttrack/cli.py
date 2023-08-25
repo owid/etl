@@ -58,7 +58,7 @@ CURRENT_DIR = Path(__file__).parent
 DAG_FASTTRACK_PATH = DAG_DIR / "fasttrack.yml"
 DUMMY_DATA = {}
 
-with open("fasttrack/styles.css", "r") as f:
+with open("apps/fasttrack/styles.css", "r") as f:
     pywebio.config(css_style=f.read())
 
 
