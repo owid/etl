@@ -95,25 +95,43 @@
     "additionalProperties": false,
     "required": ["producer", "date_published", "date_accessed", "citation_producer", "dataset_url_main", "dataset_title_owid"],
     "properties": {
-      "producer": {
-        "title": "Name of the producer",
+      "dataset_title_owid": {
         "type": "string",
-        "description": "Name of the institution or the author(s) that produced the dataset.",
+        "title": "Dataset title by OWID",
+        "description": "Title of the dataset (written by OWID) which is a one-line description of the dataset.",
+        "requirement_level": "required",
         "examples": [
-          "World Bank",
-          "UN Population Division"
+          "Neutron star mergers"
         ],
         "examples_bad": [],
-        "requirement_level": "required",
-        "guidelines": [
-          ["Must start with a capital letter.", {"exceptions": ["The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."]}],
-          ["Must not end with a period.", {"exceptions": ["When using `et al.` (for papers with multiple authors)."]}],
-          ["Must not include a date or year."],
-          ["Must not mention `Our World in Data` or `OWID`."],
-          ["Must not include any semicolon `;`."],
-          ["Regarding authors:", {"list": ["One author: `Williams`.", "Two authors: `Williams and Jones`.", "Three or more authors: `Williams et al.`."]}],
-          ["Regarding acronyms:", {"list": ["If the acronym is more well known than the full name, use just the acronym, e.g. `NASA`.", "If the acronym is not well known, use the full name, e.g. `Energy Institute`.", "If the institution explicitly asks, follow their guidelines, e.g. `Food and Agriculture Organization of the United Nations` (instead of `FAO`)."]}]
-        ]
+        "guidelines": []
+      },
+      "dataset_description_owid": {
+        "type": "string",
+        "title": "Dataset description by OWID",
+        "description": "Description of the dataset (written by OWID), usually a one- (or a few) paragraph explanation of the dataset.\n\nNote: Currently, this field won’t appear in charts or data pages. It will be useful internally, and will be seen by users who download the dataset via data catalog.",
+        "requirement_level": "recommended",
+        "examples": [],
+        "examples_bad": [],
+        "guidelines": []
+      },
+      "dataset_title_producer": {
+        "type": "string",
+        "title": "Dataset title by the producer",
+        "description": "Title of the dataset (written by the producer) which is a one-line description of the dataset.",
+        "requirement_level": "recommended",
+        "examples": [],
+        "examples_bad": [],
+        "guidelines": []
+      },
+      "version": {
+        "type": "string",
+        "title": "Dataset version by the producer",
+        "description": "Producer's version of the dataset.",
+        "requirement_level": "recommended",
+        "examples": [],
+        "examples_bad": [],
+        "guidelines": []
       },
       "date_published": {
         "anyOf": [
@@ -135,85 +153,14 @@
             "type": "integer"
           }
         ],
+        "title": "Date of publication",
+        "description": "Exact day (or year, if exact day is unknown) when the producer's dataset (in its current version) was published.",
         "examples": [
           "2022-07-11",
           "1998",
           "latest"
         ],
         "requirement_level": "required",
-        "examples_bad": [],
-        "guidelines": []
-      },
-      "date_accessed": {
-        "type": "string",
-        "format": "date",
-        "title": "Date of access",
-        "description": "Exact day when the producer’s dataset (in its current version) was downloaded by OWID.",
-        "requirement_level": "required",
-        "examples": [
-          "2023-07-13"
-        ],
-        "examples_bad": [],
-        "guidelines": []
-
-      },
-      "citation_producer": {
-        "type": "string",
-        "title": "Citation of the producer",
-        "description": "Full citation of the original dataset, as expressed by the producer.",
-        "requirement_level": "required",
-        "examples": [],
-        "examples_bad": [],
-        "guidelines": []
-      },
-      "dataset_url_main": {
-        "type": "string",
-        "title": "URL of the dataset website",
-        "description": "Producer's URL leading to the main website of the dataset. This is not the URL To the specific file.",
-        "requirement_level": "required",
-        "examples": [
-          "https://data.some_institution.com/dataset_12"
-        ],
-        "examples_bad": [],
-        "guidelines": []
-      },
-      "dataset_url_download": {
-        "type": "string",
-        "title": "Download URL of the dataset",
-        "description": "Producer's URL that directly downloads the dataset as a single file.",
-        "requirement_level": "required",
-        "examples": [
-          "https://data.some_institution.com/dataset_12/data.csv"
-        ],
-        "examples_bad": [],
-        "guidelines": []
-      },
-      "dataset_title_owid": {
-        "type": "string",
-        "title": "Dataset title by OWID",
-        "description": "Title of the dataset (written by OWID) which is a one-line description of the dataset.",
-        "requirement_level": "required",
-        "examples": [
-          "Neutron star mergers"
-        ],
-        "examples_bad": [],
-        "guidelines": []
-      },
-      "dataset_title_producer": {
-        "type": "string",
-        "title": "Dataset title by the producer",
-        "description": "Title of the dataset (written by the producer) which is a one-line description of the dataset.",
-        "requirement_level": "recommended",
-        "examples": [],
-        "examples_bad": [],
-        "guidelines": []
-      },
-      "dataset_description_owid": {
-        "type": "string",
-        "title": "Dataset description by OWID",
-        "description": "Description of the dataset (written by OWID), usually a one- (or a few) paragraph explanation of the dataset.\n\nNote: Currently, this field won’t appear in charts or data pages. It will be useful internally, and will be seen by users who download the dataset via data catalog.",
-        "requirement_level": "recommended",
-        "examples": [],
         "examples_bad": [],
         "guidelines": []
       },
@@ -226,10 +173,39 @@
         "examples_bad": [],
         "guidelines": []
       },
+      "producer": {
+        "title": "Producer name",
+        "type": "string",
+        "description": "Name of the institution or the author(s) that produced the dataset.",
+        "examples": [
+          "World Bank",
+          "UN Population Division"
+        ],
+        "examples_bad": [],
+        "requirement_level": "required",
+        "guidelines": [
+          ["Must start with a capital letter.", {"exceptions": ["The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."]}],
+          ["Must not end with a period.", {"exceptions": ["When using `et al.` (for papers with multiple authors)."]}],
+          ["Must not include a date or year."],
+          ["Must not mention `Our World in Data` or `OWID`."],
+          ["Must not include any semicolon `;`."],
+          ["Regarding authors:", {"list": ["One author: `Williams`.", "Two authors: `Williams and Jones`.", "Three or more authors: `Williams et al.`."]}],
+          ["Regarding acronyms:", {"list": ["If the acronym is more well known than the full name, use just the acronym, e.g. `NASA`.", "If the acronym is not well known, use the full name, e.g. `Energy Institute`.", "If the institution explicitly asks, follow their guidelines, e.g. `Food and Agriculture Organization of the United Nations` (instead of `FAO`)."]}]
+        ]
+      },
+      "citation_producer": {
+        "type": "string",
+        "title": "Citation by the producer",
+        "description": "Full citation of the original dataset, as expressed by the producer.",
+        "requirement_level": "required",
+        "examples": [],
+        "examples_bad": [],
+        "guidelines": []
+      },
       "attribution": {
         "type": "string",
         "title": "Attribution name",
-        "description": "Citation of the producer and publication year (and sometimes the dataset) that overrides the automatic attribution format '$producer ($year)' (where the $year is automatically extracted from $date_published).",
+        "description": "Citation of the producer and publication year (and sometimes the dataset) that overrides the automatic attribution format `producer (year)` (where the `year` is automatically extracted from `date_published`).",
         "requirement_level": "optional",
         "examples": [
           "Statistical Review of World Energy, Energy Institute (2023)"
@@ -250,12 +226,38 @@
         "examples_bad": [],
         "guidelines": []
       },
-      "version": {
+      "date_accessed": {
         "type": "string",
-        "title": "Dataset version by the producer",
-        "description": "Producer's version of the dataset.",
-        "requirement_level": "recommended",
-        "examples": [],
+        "format": "date",
+        "title": "Date of access",
+        "description": "Exact day when the producer’s dataset (in its current version) was downloaded by OWID.",
+        "requirement_level": "required",
+        "examples": [
+          "2023-07-13"
+        ],
+        "examples_bad": [],
+        "guidelines": []
+
+      },
+      "dataset_url_main": {
+        "type": "string",
+        "title": "URL of the dataset website",
+        "description": "Producer's URL leading to the main website of the dataset. This is not the URL To the specific file.",
+        "requirement_level": "required",
+        "examples": [
+          "https://data.some_institution.com/dataset_12"
+        ],
+        "examples_bad": [],
+        "guidelines": []
+      },
+      "dataset_url_download": {
+        "type": "string",
+        "title": "Download URL of the dataset",
+        "description": "Producer's URL that directly downloads the dataset as a single file.",
+        "requirement_level": "required",
+        "examples": [
+          "https://data.some_institution.com/dataset_12/data.csv"
+        ],
         "examples_bad": [],
         "guidelines": []
       },
