@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Any, Callable, List
+from typing import Any, Dict, List
 
 import streamlit as st
 
@@ -49,7 +49,7 @@ def create_display_name_init_section(name: str) -> str:
     return display_name
 
 
-def create_display_name_snap_section(props: str, name: str, property_name: str) -> str:
+def create_display_name_snap_section(props: Dict[str, Any], name: str, property_name: str) -> str:
     """Create display name for a field."""
     # Get requirement level colored
     req_level = _color_req_level(props["requirement_level"])
@@ -58,7 +58,9 @@ def create_display_name_snap_section(props: str, name: str, property_name: str) 
     return display_name
 
 
-def render_fields_from_schema(schema: List[Any], property_name: str, form_fields: List[Callable]) -> List[Callable]:
+def render_fields_from_schema(
+    schema: Dict[str, Any], property_name: str, form_fields: List[str]
+) -> List[str]:
     """Render fields from schema."""
     for name, props in schema.items():
         if "properties" in props:
@@ -92,7 +94,7 @@ def render_fields_init() -> List[Any]:
     for field in fields:
         field = st.text_input(create_display_name_init_section(field[0]), help=field[1], placeholder=field[2])
         form.append(field)
-    pass
+    return form
 
 
 st.title("Walkthrough: Snapshot")
