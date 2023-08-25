@@ -5,17 +5,9 @@
     "title": "License of the dataset",
     "description": "An origin's license is the license, decided by a producer, of the dataset (or paper or database) from where we extracted the indicator's original data and metadata. The license metadata fields are the attributes of the 'License' object in ETL.\n\nNote 1: When the license is not specified, temporarily assume 'CC BY 4.0' and leave url empty. Contact the producer before publishing. If there is no response after a few days, ask the team and decide on a case-by-case basis.\nNote 2: If the license is 'CC', but the version is not specified, assume 'CC BY 4.0'.",
     "requirement_level": "required",
+    "category": "license",
     "additionalProperties": false,
     "properties": {
-      "url": {
-        "type": "string",
-        "title": "License URL",
-        "description": "URL leading to the producer's website where the dataset license is specified.",
-        "requirement_level": "required",
-        "examples": [],
-        "examples_bad": [],
-        "guidelines": []
-      },
       "name": {
         "type": "string",
         "title": "License name",
@@ -27,14 +19,32 @@
           "PDM",
           "CC BY 4.0",
           "CC BY-SA 4.0",
+          "© GISAID 2023"
+        ],
+        "options": [
+          "Public domain",
+          "CC0",
+          "PDM",
+          "CC BY 4.0",
+          "CC BY-SA 4.0",
           "CC BY-ND 4.0",
           "CC BY-NC 4.0",
           "CC BY-NC-SA 4.0",
-          "CC BY-NC-ND 4.0",
-          "© PRODUCER YEAR"
+          "CC BY-NC-ND 4.0"
         ],
         "examples_bad": [],
-        "guidelines": []
+        "guidelines": [],
+        "category": "license"
+      },
+      "url": {
+        "type": "string",
+        "title": "License URL",
+        "description": "URL leading to the producer's website where the dataset license is specified.",
+        "requirement_level": "required",
+        "examples": [],
+        "examples_bad": [],
+        "guidelines": [],
+        "category": "license"
       }
     }
   },
@@ -104,7 +114,8 @@
           "Neutron star mergers"
         ],
         "examples_bad": [],
-        "guidelines": []
+        "guidelines": [],
+        "category": "dataset"
       },
       "dataset_description_owid": {
         "type": "string",
@@ -113,7 +124,8 @@
         "requirement_level": "recommended",
         "examples": [],
         "examples_bad": [],
-        "guidelines": []
+        "guidelines": [],
+        "category": "dataset"
       },
       "dataset_title_producer": {
         "type": "string",
@@ -122,7 +134,8 @@
         "requirement_level": "recommended",
         "examples": [],
         "examples_bad": [],
-        "guidelines": []
+        "guidelines": [],
+        "category": "dataset"
       },
       "version": {
         "type": "string",
@@ -131,7 +144,8 @@
         "requirement_level": "recommended",
         "examples": [],
         "examples_bad": [],
-        "guidelines": []
+        "guidelines": [],
+        "category": "dataset"
       },
       "date_published": {
         "anyOf": [
@@ -153,7 +167,7 @@
             "type": "integer"
           }
         ],
-        "title": "Date of publication",
+        "title": "Date of publication of the dataset",
         "description": "Exact day (or year, if exact day is unknown) when the producer's dataset (in its current version) was published.",
         "examples": [
           "2022-07-11",
@@ -162,7 +176,8 @@
         ],
         "requirement_level": "required",
         "examples_bad": [],
-        "guidelines": []
+        "guidelines": [],
+        "category": "dataset"
       },
       "dataset_description_producer": {
         "type": "string",
@@ -171,7 +186,8 @@
         "requirement_level": "recommended",
         "examples": [],
         "examples_bad": [],
-        "guidelines": []
+        "guidelines": [],
+        "category": "dataset"
       },
       "producer": {
         "title": "Producer name",
@@ -191,7 +207,8 @@
           ["Must not include any semicolon `;`."],
           ["Regarding authors:", {"list": ["One author: `Williams`.", "Two authors: `Williams and Jones`.", "Three or more authors: `Williams et al.`."]}],
           ["Regarding acronyms:", {"list": ["If the acronym is more well known than the full name, use just the acronym, e.g. `NASA`.", "If the acronym is not well known, use the full name, e.g. `Energy Institute`.", "If the institution explicitly asks, follow their guidelines, e.g. `Food and Agriculture Organization of the United Nations` (instead of `FAO`)."]}]
-        ]
+        ],
+        "category": "citation"
       },
       "citation_producer": {
         "type": "string",
@@ -200,7 +217,8 @@
         "requirement_level": "required",
         "examples": [],
         "examples_bad": [],
-        "guidelines": []
+        "guidelines": [],
+        "category": "citation"
       },
       "attribution": {
         "type": "string",
@@ -211,7 +229,8 @@
           "Statistical Review of World Energy, Energy Institute (2023)"
         ],
         "examples_bad": [],
-        "guidelines": []
+        "guidelines": [],
+        "category": "citation"
       },
       "attribution_short": {
         "type": "string",
@@ -224,7 +243,32 @@
           "IHME"
         ],
         "examples_bad": [],
-        "guidelines": []
+        "guidelines": [],
+        "category": "citation"
+      },
+      "dataset_url_main": {
+        "type": "string",
+        "title": "URL of the dataset website",
+        "description": "Producer's URL leading to the main website of the dataset. This is not the URL To the specific file.",
+        "requirement_level": "required",
+        "examples": [
+          "https://data.some_institution.com/dataset_12"
+        ],
+        "examples_bad": [],
+        "guidelines": [],
+        "category": "files"
+      },
+      "dataset_url_download": {
+        "type": "string",
+        "title": "Download URL of the dataset",
+        "description": "Producer's URL that directly downloads the dataset as a single file.",
+        "requirement_level": "required",
+        "examples": [
+          "https://data.some_institution.com/dataset_12/data.csv"
+        ],
+        "examples_bad": [],
+        "guidelines": [],
+        "category": "files"
       },
       "date_accessed": {
         "type": "string",
@@ -236,30 +280,9 @@
           "2023-07-13"
         ],
         "examples_bad": [],
-        "guidelines": []
+        "guidelines": [],
+        "category": "files"
 
-      },
-      "dataset_url_main": {
-        "type": "string",
-        "title": "URL of the dataset website",
-        "description": "Producer's URL leading to the main website of the dataset. This is not the URL To the specific file.",
-        "requirement_level": "required",
-        "examples": [
-          "https://data.some_institution.com/dataset_12"
-        ],
-        "examples_bad": [],
-        "guidelines": []
-      },
-      "dataset_url_download": {
-        "type": "string",
-        "title": "Download URL of the dataset",
-        "description": "Producer's URL that directly downloads the dataset as a single file.",
-        "requirement_level": "required",
-        "examples": [
-          "https://data.some_institution.com/dataset_12/data.csv"
-        ],
-        "examples_bad": [],
-        "guidelines": []
       },
       "license": { "$ref": "#/license" }
     }
