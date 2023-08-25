@@ -26,9 +26,10 @@ REGIONS = [
 ]
 
 
-def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     tb_with_regions = tb.copy()
     aggregations = {column: "mean" for column in tb_with_regions.columns if column not in ["country", "year"]}
+    tb_with_regions = geo.add_population_to_dataframe(tb_with_regions)
 
     for region in REGIONS:
         # Find members of current region.
@@ -45,10 +46,8 @@ def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset, ds_
             num_allowed_nans_per_year=None,
             frac_allowed_nans_per_year=0.2,
             aggregations=aggregations,
+            weights="population",
         )
-    tb_with_regions = tb_with_regions.copy_metadata(from_table=tb)
-
-    return tb_with_regions
 
 
 def run(dest_dir: str) -> None:
@@ -101,9 +100,7 @@ def run(dest_dir: str) -> None:
     # Drop columns related to historic population values
     merged_df = merged_df.drop(columns=[column for column in merged_df.columns if "__thousands" in column])
     merged_df.columns = [underscore(col) for col in merged_df.columns]
-    merged_df = add_data_for_regions(
-        tb=merged_df, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
+    merged_df = add_data_for_regions(tb=merged_df, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Concatenate historical and more recent enrollment data
     hist_1985_df = merged_df[merged_df["year"] < 1985]

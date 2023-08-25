@@ -240,6 +240,7 @@ def add_region_aggregates(
     aggregations: Optional[Dict[str, Any]] = None,
     keep_original_region_with_suffix: Optional[str] = None,
     population: Optional[pd.DataFrame] = None,
+    weights: Optional[pd.DataFrame] = None,
 ) -> pd.DataFrame:
     """Add data for regions (e.g. income groups or continents) to a dataset.
 
@@ -323,15 +324,22 @@ def add_region_aggregates(
     df_region = pd.DataFrame({country_col: [], year_col: []}).astype(dtype={country_col: "object", year_col: "int"})
     # Select data for countries in the region.
     df_countries = df[df[country_col].isin(countries_in_region)]
-    # Add population for doing weighted average aggregations
-    df_countries = add_population_to_dataframe(df_countries)
+
     for variable in variables:
         # If aggreggate is mean then do weighted average using population data, replacing `aggregations[variable]` with a lambda function
-        if aggregations[variable] == "mean":
+
+        if weights is not None:
+            # Ensure the 'population' column exists in df_countries
+            assert (
+                "population" in df_countries.columns
+            ), "'population' column is missing in df_countries, add population to proceed"
+
+            assert aggregations[variable] == "mean", "Weights only work mean aggregation"
             variable_agg = lambda x: np.ma.average(
                 np.ma.masked_invalid(x.astype("float64")),
                 weights=np.ma.masked_invalid(df_countries.loc[x.index, "population"].astype("float64")),
             )
+
         else:
             variable_agg = aggregations[variable]
 
