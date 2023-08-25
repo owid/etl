@@ -1,7 +1,7 @@
 """Fertility table."""
 from typing import Any, Dict, List
 
-from owid.catalog import Table
+import pandas as pd
 
 from .dtypes import optimize_dtypes
 
@@ -35,7 +35,7 @@ COLUMNS_ORDER: List[str] = [
 ]
 
 
-def process(df: Table, country_std: str) -> Table:
+def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
     # Unpivot
     df = df.reset_index()
     df = df.melt(COLUMNS_ID.keys(), COLUMNS_METRICS.keys(), "metric", "value")

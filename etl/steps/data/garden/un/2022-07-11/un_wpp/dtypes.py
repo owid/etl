@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from owid.catalog import Table
+import pandas as pd
 from pandas.api.types import CategoricalDtype
 
 with open(Path(__file__).parent / "un_wpp.countries.json") as f:
@@ -82,7 +82,7 @@ dtypes_simple = {
 }
 
 
-def optimize_dtypes(df: Table, simple: bool = False) -> Table:
+def optimize_dtypes(df: pd.DataFrame, simple: bool = False) -> pd.DataFrame:
     if simple:
         return df.astype(dtypes_simple)
     return df.astype(dtypes)
