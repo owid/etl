@@ -108,6 +108,7 @@ gspread = "^5.10.0"
 pyright = "1.1.288"
 pandas-stubs = "1.2.0.62"
 dataclasses-json = "0.5.7"
+jsonref = "^1.1.0"
 
 
 [tool.black]
