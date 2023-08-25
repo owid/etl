@@ -28,7 +28,9 @@ REGIONS = [
 
 def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     tb_with_regions = tb.copy()
-    aggregations = {column: "mean" for column in tb_with_regions.columns if column not in ["country", "year"]}
+    aggregations = {
+        column: "mean" for column in tb_with_regions.columns if column not in ["country", "year", "population"]
+    }
     tb_with_regions = geo.add_population_to_dataframe(tb_with_regions)
 
     for region in REGIONS:
@@ -46,7 +48,7 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Datas
             num_allowed_nans_per_year=None,
             frac_allowed_nans_per_year=0.2,
             aggregations=aggregations,
-            weights="population",
+            weights=tb_with_regions["population"],
         )
 
 

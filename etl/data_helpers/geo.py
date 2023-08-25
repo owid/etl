@@ -228,6 +228,12 @@ def list_countries_in_region_that_must_have_data(
     return countries
 
 
+def weighted_mean(x, w):
+    values = np.ma.masked_invalid(x.astype("float64"))
+    weights = np.ma.masked_invalid(w.astype("float64"))
+    return np.ma.average(values, weights=weights)
+
+
 def add_region_aggregates(
     df: pd.DataFrame,
     region: str,
@@ -329,16 +335,8 @@ def add_region_aggregates(
         # If aggreggate is mean then do weighted average using population data, replacing `aggregations[variable]` with a lambda function
 
         if weights is not None:
-            # Ensure the 'population' column exists in df_countries
-            assert (
-                "population" in df_countries.columns
-            ), "'population' column is missing in df_countries, add population to proceed"
-
             assert aggregations[variable] == "mean", "Weights only work mean aggregation"
-            variable_agg = lambda x: np.ma.average(
-                np.ma.masked_invalid(x.astype("float64")),
-                weights=np.ma.masked_invalid(df_countries.loc[x.index, "population"].astype("float64")),
-            )
+            variable_agg = lambda x: weighted_mean(x, weights.loc[x.index])
 
         else:
             variable_agg = aggregations[variable]
