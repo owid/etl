@@ -417,6 +417,8 @@ def generate_relative_poverty_concurrent():
         """
         This is the main function to make concurrency work for country data.
         """
+        # Make sure the directory exists. If not, create it
+        Path(f"{PARENT_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             for pct in [40, 50, 60]:
                 for i in range(len(df)):
@@ -449,6 +451,8 @@ def generate_relative_poverty_concurrent():
         """
         This is the main function to make concurrency work for regional data.
         """
+        # Make sure the directory exists. If not, create it
+        Path(f"{PARENT_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             for pct in [40, 50, 60]:
                 for i in range(len(df)):
@@ -619,6 +623,8 @@ def generate_percentiles_raw_concurrent():
         )
 
     def concurrent_percentiles_function():
+        # Make sure the directory exists. If not, create it
+        Path(f"{PARENT_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             for ppp_version in [2011, 2017]:
                 for povline in povlines:
@@ -643,6 +649,8 @@ def generate_percentiles_raw_concurrent():
         )
 
     def concurrent_percentiles_region_function():
+        # Make sure the directory exists. If not, create it
+        Path(f"{PARENT_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             for ppp_version in [2011, 2017]:
                 for povline in povlines:
