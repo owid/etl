@@ -112,7 +112,7 @@ jsonref = "^1.1.0"
 
 
 [tool.black]
-exclude = ".ipynb_checkpoints|apps/walkthrough/.*_cookiecutter|.*playground.*.ipynb"
+exclude = ".ipynb_checkpoints|apps/walkthrough/.*_cookiecutter|apps/wizard/.*_cookiecutter|.*playground.*.ipynb"
 line-length = 120
 
 [tool.isort]
@@ -126,6 +126,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.pyright]
 exclude = [
     "apps/walkthrough/*_cookiecutter",
+    "apps/wizard/*_cookiecutter",
     "**/node_modules",
     "**/__pycache__",
     ".git",
