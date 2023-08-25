@@ -10,7 +10,9 @@ from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast
+from urllib.parse import urljoin
 
+import jsonref
 import pandas as pd
 import structlog
 import yaml
@@ -986,3 +988,14 @@ def isolated_env(
 
     # remove module dir from pythonpath
     sys.path.remove(working_dir.as_posix())
+
+
+def read_json_schema(path: Union[Path, str]) -> dict:
+    """Read JSON schema with resolved references."""
+    path = Path(path)
+
+    # pathlib does not append trailing slashes, but jsonref needs that.
+    base_dir_url = path.parent.absolute().as_uri() + "/"
+    base_file_url = urljoin(base_dir_url, path.name)
+    with path.open("r") as f:
+        return jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
