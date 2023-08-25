@@ -26,9 +26,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = fix_sub_saharan_africa(tb)
-    tb: Table = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = filter_data(tb)
     tb = round_down_year(tb)
     tb = clean_values(tb)
