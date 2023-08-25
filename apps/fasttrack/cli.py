@@ -29,6 +29,7 @@ from rich import print
 from rich.console import Console
 from sqlmodel import Session
 
+from apps.walkthrough import utils as walkthrough_utils
 from etl import config
 from etl import grapher_model as gm
 from etl.command import main as etl_main
@@ -45,7 +46,6 @@ from etl.paths import (
     STEP_DIR,
 )
 from etl.snapshot import Snapshot, SnapshotMeta
-from walkthrough import utils as walkthrough_utils
 
 from . import csv, sheets
 
@@ -58,7 +58,7 @@ CURRENT_DIR = Path(__file__).parent
 DAG_FASTTRACK_PATH = DAG_DIR / "fasttrack.yml"
 DUMMY_DATA = {}
 
-with open("fasttrack/styles.css", "r") as f:
+with open("apps/fasttrack/styles.css", "r") as f:
     pywebio.config(css_style=f.read())
 
 

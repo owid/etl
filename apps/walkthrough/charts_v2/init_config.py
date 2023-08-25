@@ -1,6 +1,6 @@
 import streamlit as st
 
-from walkthrough.charts_v2.utils import _check_env_and_environment
+from apps.walkthrough.charts_v2.utils import _check_env_and_environment
 
 
 def init_app():

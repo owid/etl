@@ -7,16 +7,16 @@ from pydantic import BaseModel
 from structlog import get_logger
 
 import etl.grapher_model as gm
+from apps.walkthrough.charts_v2.variable_config import VariableConfig
+
+# from etl.chart_revision.v2.base import ChartUpdater
+from apps.walkthrough.utils import OWIDEnv
 from etl.chart_revision.v2.core import (
     build_updaters_and_get_charts,
     create_chart_comparison,
     submit_chart_comparisons,
     update_chart_config,
 )
-from walkthrough.charts_v2.variable_config import VariableConfig
-
-# from etl.chart_revision.v2.base import ChartUpdater
-from walkthrough.utils import OWIDEnv
 
 # Logger
 log = get_logger()

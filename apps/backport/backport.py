@@ -11,12 +11,12 @@ from owid.catalog import Source
 from sqlalchemy.engine import Engine
 from sqlmodel import Session
 
-from backport.datasync.data_metadata import (
+from apps.backport.datasync.data_metadata import (
     _variable_metadata,
     variable_data,
     variable_data_df_from_s3,
 )
-from backport.datasync.datasync import upload_gzip_dict
+from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config
 from etl import grapher_model as gm
 from etl import paths
