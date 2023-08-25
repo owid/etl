@@ -1,6 +1,6 @@
 import datetime as dt
 from pathlib import Path
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Optional, Set, cast
 
 import streamlit as st
 from botocore.exceptions import ClientError
@@ -176,7 +176,11 @@ def render_fields_init() -> List[Any]:
 
 
 def render_fields_from_schema(
-    schema: Dict[str, Any], property_name: str, form_fields: List[str], categories: Set = None, container: Any = None
+    schema: Dict[str, Any],
+    property_name: str,
+    form_fields: List[str],
+    categories: Optional[Set] = None,
+    container: List[str] = None,
 ) -> List[str]:
     """Render fields from schema.
 
@@ -194,7 +198,7 @@ def render_fields_from_schema(
         if "properties" in props:
             if categories:
                 form_fields = render_fields_from_schema(
-                    props["properties"], prop_uri, form_fields, container=containers[cat]
+                    props["properties"], prop_uri, form_fields, container=containers[cat]  # type: ignore
                 )
             else:
                 form_fields = render_fields_from_schema(props["properties"], prop_uri, form_fields)
@@ -205,7 +209,7 @@ def render_fields_from_schema(
             if prop_uri in FIELD_TYPES_TEXTAREA:
                 # Use text area for these fields
                 if categories:
-                    field = containers[props["category"]].text_area(
+                    field = containers[props["category"]].text_area(  # type: ignore
                         display_name, help=props["description"], placeholder="", key=prop_uri
                     )
                 elif container:
@@ -215,7 +219,7 @@ def render_fields_from_schema(
             elif prop_uri == "origin.license.name":
                 # Special one, need to have responsive behaviour inside form (work around)
                 if categories:
-                    field = [containers[props["category"]].empty(), containers[props["category"]].empty()]
+                    field = [containers[props["category"]].empty(), containers[props["category"]].empty()]  # type: ignore
                 elif container:
                     field = [container.empty(), container.empty()]
                 else:
@@ -223,7 +227,7 @@ def render_fields_from_schema(
             else:
                 # Simple text input for the rest
                 if categories:
-                    field = containers[props["category"]].text_input(
+                    field = containers[props["category"]].text_input(  # type: ignore
                         display_name, help=props["description"], placeholder="", key=prop_uri
                     )
                 elif container:
@@ -231,7 +235,7 @@ def render_fields_from_schema(
                 else:
                     field = st.text_input(display_name, help=props["description"], placeholder="", key=prop_uri)
             # Add field to list
-            form_fields.append(field)
+            form_fields.append(cast(str, field))
     return form_fields
 
 
@@ -242,7 +246,7 @@ def load_instructions() -> str:
         return f.read()
 
 
-def render_license_field(form: List[Any]) -> str:
+def render_license_field(form: List[str]) -> List[str]:
     """Render the license field within the form.
 
     We want the license field to be a selectbox, but with the option to add a custom license.
@@ -286,10 +290,10 @@ def render_license_field(form: List[Any]) -> str:
                     )
 
     # Remove list from form (former license st.empty tuple)
-    form = [f for f in form if not isinstance(field, list)]
+    form = [f for f in form if not isinstance(f, list)]
 
     # Add license field
-    form.append(license_field)
+    form.append(license_field)  # type: ignore
 
     return form
 
@@ -339,7 +343,7 @@ def run_checks() -> None:
         # st.toast(text, icon="✅")
         st.success(text)
 
-        bucket_names = [b["Name"] for b in buckets_or_error]
+        bucket_names = [b["Name"] for b in buckets_or_error]  # type: ignore
         if "owid-catalog" not in bucket_names:
             text = "`owid-catalog` bucket not found"
             st.error(text)
@@ -399,7 +403,7 @@ print(form_metadata)
 #########################################################
 if submitted:
     # Create form
-    form = SnapshotForm(**st.session_state)
+    form = SnapshotForm(**cast(Dict[str, Any], st.session_state))
     st.write(st.session_state)
     # Generate step
     cookiecutter_path = APPS_DIR / "walkthrough" / "snapshot_origins_cookiecutter/"
