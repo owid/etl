@@ -1,6 +1,6 @@
 import datetime as dt
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, cast
+from typing import Any, Dict, List, Optional, cast
 
 import streamlit as st
 from botocore.exceptions import ClientError
@@ -179,8 +179,8 @@ def render_fields_from_schema(
     schema: Dict[str, Any],
     property_name: str,
     form_fields: List[str],
-    categories: Optional[Set] = None,
-    container: List[str] = None,
+    categories: Optional[List[Any]] = None,
+    container: Optional[Any] = None,
 ) -> List[str]:
     """Render fields from schema.
 
@@ -246,7 +246,7 @@ def load_instructions() -> str:
         return f.read()
 
 
-def render_license_field(form: List[str]) -> List[str]:
+def render_license_field(form: List[Any]) -> List[str]:
     """Render the license field within the form.
 
     We want the license field to be a selectbox, but with the option to add a custom license.
