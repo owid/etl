@@ -68,7 +68,6 @@ def render_fields_from_schema(schema: List[Any], property_name: str, form_fields
             display_name = create_display_name_snap_section(props, name, property_name)
             # Render field
             if name in FIELD_TYPES_TEXTAREA:
-                print(name)
                 field = st.text_area(display_name, help=props["description"], placeholder="")
             else:
                 field = st.text_input(display_name, help=props["description"], placeholder="")
