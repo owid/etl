@@ -2,7 +2,6 @@
 from typing import Any, Dict
 
 import pandas as pd
-from owid.catalog import Table
 
 from .dtypes import optimize_dtypes
 
@@ -36,7 +35,7 @@ MAPPING_SEX = {
 COLUMNS_ORDER = ["location", "year", "metric", "sex", "age", "variant", "value"]
 
 
-def process(df: Table, country_std: str) -> Table:
+def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
     df = df.reset_index()
     # Melt
     df = df.melt(COLUMNS_ID.keys(), COLUMNS_METRICS.keys(), "metric", "value")
@@ -62,7 +61,7 @@ def process(df: Table, country_std: str) -> Table:
     return df
 
 
-def add_age_groups(df: Table) -> Table:
+def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     # <1
     df_0 = df[df.age == "0"].copy()
     # 1-4
