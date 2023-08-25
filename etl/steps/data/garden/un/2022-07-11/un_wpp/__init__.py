@@ -2,12 +2,13 @@ import json
 from pathlib import Path
 from typing import Any, List
 
-import owid.catalog.processing as pr
 import pandas as pd
 import structlog
+from owid import catalog
 from owid.catalog import Table
+from owid.catalog.meta import TableMeta
 
-from etl.helpers import PathFinder, create_dataset
+from etl.paths import BASE_DIR as base_path
 
 from .deaths import process as process_deaths
 from .demographics import process as process_demographics
@@ -15,10 +16,8 @@ from .dep_ratio import process as process_depratio
 from .fertility import process as process_fertility
 from .population import process as process_population
 
-# Get paths and naming conventions for current step.
-paths = PathFinder(__file__)
-
 YEAR_SPLIT = 2022
+METADATA_PATH = Path(__file__).parent / "un_wpp.meta.yml"
 
 log = structlog.get_logger()
 
@@ -54,9 +53,9 @@ metric_categories = {
 }
 
 
-def merge_dfs(dfs: List[Table]) -> Table:
+def merge_dfs(dfs: List[pd.DataFrame]) -> pd.DataFrame:
     """Merge all datasets"""
-    df = pr.concat(dfs, ignore_index=True)
+    df = pd.concat(dfs, ignore_index=True)
     # Fix variant name
     df.loc[df.year < YEAR_SPLIT, "variant"] = "estimates"
     # Index
@@ -64,6 +63,12 @@ def merge_dfs(dfs: List[Table]) -> Table:
     df = df.dropna(subset=["value"])
     # df = df.sort_index()
     return df
+
+
+def df_to_table(df: pd.DataFrame, **kwargs: Any) -> Table:
+    """DataFrame to Table"""
+    t = Table(df, metadata=TableMeta(**kwargs))
+    return t
 
 
 def load_country_mapping() -> Any:
@@ -81,8 +86,21 @@ def get_wide_df(df: pd.DataFrame) -> pd.DataFrame:
     return df_wide
 
 
+def dataset_to_garden(tables: List[Table], metadata: TableMeta, dest_dir: str) -> None:
+    """Push dataset to garden"""
+    ds_garden = catalog.Dataset.create_empty(dest_dir)
+    ds_garden.metadata = metadata
+    ds_garden.save()
+    # Add tables
+    for table in tables:
+        ds_garden.add(table)
+        ds_garden.save()
+
+
 def run(dest_dir: str) -> None:
-    ds = paths.load_dataset("un_wpp")
+    log.info("Loading meadow dataset...")
+    meadow_path = base_path / "data/meadow/un/2022-07-11/un_wpp"
+    ds = catalog.Dataset(meadow_path)
     # country rename
     log.info("Loading country standardised names...")
     country_std = load_country_mapping()
@@ -101,7 +119,9 @@ def run(dest_dir: str) -> None:
     log.info("Merging tables...")
     df = merge_dfs([df_population, df_fertility, df_demographics, df_depratio, df_deaths])
     # create tables
-    table_long = df.update_metadata(
+    log.info("Transforming DataFrame into Table...")
+    table_long = df_to_table(
+        df,
         short_name="un_wpp",
         description=(
             "Main UN WPP dataset by OWID. It comes in 'long' format, i.e. column"
@@ -113,17 +133,18 @@ def run(dest_dir: str) -> None:
     tables = []
     for category, metrics in metric_categories.items():
         log.info(f"Generating table for category {category}...")
+        df_c = df.query(f"metric in {metrics}")
         tables.append(
-            df.query(f"metric in {metrics}")
-            .copy()
-            .update_metadata(
+            df_to_table(
+                df_c,
                 short_name=category,
                 description=f"UN WPP dataset by OWID. Contains only metrics corresponding to sub-group {category}.",
             )
         )
     # add dataset with single-year age group population
     tables.append(
-        df_population_granular.update_metadata(
+        df_to_table(
+            df_population_granular,
             short_name="population_granular",
             description=(
                 "UN WPP dataset by OWID. Contains only metrics corresponding to population for all dimensions (age and"
@@ -131,8 +152,7 @@ def run(dest_dir: str) -> None:
             ),
         )
     )
-    tables.append(table_long)
-
+    tables += [table_long]
     # create dataset
-    ds_garden = create_dataset(dest_dir, tables, default_metadata=ds.metadata, update_from_yaml=False)
-    ds_garden.save()
+    log.info("Loading dataset to Garden...")
+    dataset_to_garden(tables, ds.metadata, dest_dir)

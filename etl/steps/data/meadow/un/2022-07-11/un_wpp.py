@@ -1,21 +1,14 @@
 import os
 import tempfile
 import zipfile
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
-import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table, TableMeta
+from owid.catalog import Dataset, Table, utils
 from pandas.api.types import CategoricalDtype
-from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
-
-# Get paths and naming conventions for current step.
-paths = PathFinder(__file__)
-
-log = get_logger()
+from etl.steps.data.converters import convert_snapshot_metadata
 
 
 def extract_data(snap: Snapshot, output_dir: str) -> None:
@@ -23,19 +16,18 @@ def extract_data(snap: Snapshot, output_dir: str) -> None:
     z.extractall(output_dir)
 
 
-def load_data(tmp_dir: str, metadata: TableMeta) -> Tuple[Table, ...]:
+def load_data(tmp_dir: str) -> Tuple[pd.DataFrame, ...]:
     return (
-        _load_population(tmp_dir, metadata),
-        _load_fertility(tmp_dir, metadata),
-        _load_demographics(tmp_dir, metadata),
-        _load_dependency_ratio(tmp_dir, metadata),
-        _load_deaths(tmp_dir, metadata),
+        _load_population(tmp_dir),
+        _load_fertility(tmp_dir),
+        _load_demographics(tmp_dir),
+        _load_dependency_ratio(tmp_dir),
+        _load_deaths(tmp_dir),
     )
 
 
-def _load_population(tmp_dir: str, metadata: TableMeta) -> Table:
+def _load_population(tmp_dir: str) -> pd.DataFrame:
     """Load population dataset (CSV)"""
-    log.info("un_wpp._load_population")
     filenames = list(filter(lambda x: "PopulationBySingleAgeSex" in x, sorted(os.listdir(tmp_dir))))
     dtype = {
         "SortOrder": "category",
@@ -59,14 +51,13 @@ def _load_population(tmp_dir: str, metadata: TableMeta) -> Table:
         "PopFemale": "float",
         "PopTotal": "float",
     }
-    return pr.concat(
-        [pr.read_csv(os.path.join(tmp_dir, filename), dtype=dtype, metadata=metadata) for filename in filenames],
+    return pd.concat(
+        [pd.read_csv(os.path.join(tmp_dir, filename), dtype=dtype) for filename in filenames],
         ignore_index=True,
     )
 
 
-def _load_fertility(tmp_dir: str, metadata: TableMeta) -> Table:
-    log.info("un_wpp._load_fertility")
+def _load_fertility(tmp_dir: str) -> pd.DataFrame:
     """Load fertility dataset (CSV)"""
     (filename,) = [f for f in filter(lambda x: "Fertility" in x, sorted(os.listdir(tmp_dir))) if "notes" not in f]
     dtype = {
@@ -91,12 +82,11 @@ def _load_fertility(tmp_dir: str, metadata: TableMeta) -> Table:
         "PASFR": "float",
         "Births": "float",
     }
-    return pr.read_csv(os.path.join(tmp_dir, filename), dtype=dtype, metadata=metadata)
+    return pd.read_csv(os.path.join(tmp_dir, filename), dtype=dtype)
 
 
-def _load_demographics(tmp_dir: str, metadata: TableMeta) -> Table:
+def _load_demographics(tmp_dir: str) -> pd.DataFrame:
     """Load demographics dataset (CSV)"""
-    log.info("un_wpp._load_demographics")
     filenames = [f for f in filter(lambda x: "Demographic" in x, sorted(os.listdir(tmp_dir))) if "notes" not in f]
     dtype = {
         "SortOrder": "category",
@@ -131,31 +121,29 @@ def _load_demographics(tmp_dir: str, metadata: TableMeta) -> Table:
         ),
         "Time": "uint16",
     }
-    return pr.concat(
-        [pr.read_csv(os.path.join(tmp_dir, filename), dtype=dtype, metadata=metadata) for filename in filenames],
+    return pd.concat(
+        [pd.read_csv(os.path.join(tmp_dir, filename), dtype=dtype) for filename in filenames],
         ignore_index=True,
     )
 
 
-def _load_deaths(tmp_dir: str, metadata: TableMeta) -> Table:
+def _load_deaths(tmp_dir: str) -> Any:
     """Load deaths dataset (XLSX)"""
-    log.info("un_wpp._load_deaths")
     filenames = list(filter(lambda x: "DEATHS" in x, sorted(os.listdir(tmp_dir))))
     # Load
-    dfs = [_read_xlsx_file(tmp_dir, filename, metadata=metadata) for filename in filenames]
-    return pr.concat(dfs, ignore_index=True)
+    dfs = [_read_xlsx_file(tmp_dir, filename) for filename in filenames]
+    return pd.concat(dfs, ignore_index=True)
 
 
-def _load_dependency_ratio(tmp_dir: str, metadata: TableMeta) -> Table:
+def _load_dependency_ratio(tmp_dir: str) -> Any:
     """Load dependency ratio dataset (XLSX)"""
-    log.info("un_wpp._load_dependency_ratio")
     filenames = list(filter(lambda x: "DEPENDENCY_RATIOS" in x, sorted(os.listdir(tmp_dir))))
     # Load
-    dfs = [_read_xlsx_file(tmp_dir, filename, metadata=metadata) for filename in filenames]
-    return pr.concat(dfs, ignore_index=True)
+    dfs = [_read_xlsx_file(tmp_dir, filename) for filename in filenames]
+    return pd.concat(dfs, ignore_index=True)
 
 
-def _read_xlsx_file(tmp_dir: str, filename: str, metadata: TableMeta) -> Table:
+def _read_xlsx_file(tmp_dir: str, filename: str) -> Any:
     dtype_base = {
         "Index": "category",
         "Variant": "category",
@@ -170,21 +158,15 @@ def _read_xlsx_file(tmp_dir: str, filename: str, metadata: TableMeta) -> Table:
         "Year": "uint16",
     }
     # Load excel
-    dfs = []
-    for sheet_name in ["Estimates", "Medium variant", "High variant", "Low variant"]:
-        dfs.append(
-            pr.read_excel(
-                os.path.join(tmp_dir, filename),
-                skiprows=16,
-                sheet_name=sheet_name,
-                metadata=metadata,
-            )
-        )
-
-    # Check that all dataframes have same columns
-    assert len(set(str(set(df.columns)) for df in dfs)) == 1
+    df = pd.read_excel(
+        os.path.join(tmp_dir, filename),
+        skiprows=16,
+        sheet_name=["Estimates", "Medium variant", "High variant", "Low variant"],
+    )
+    # Check
+    assert len(set(str(set(d.columns)) for _, d in df.items())) == 1
     # Concatenate
-    df = pr.concat(dfs, ignore_index=True)
+    df = pd.concat(list(df.values()), ignore_index=True)
     # Filter
     df = df[df["Type"] != "Label/Separator"]
     # Dtypes
@@ -200,12 +182,12 @@ def _read_xlsx_file(tmp_dir: str, filename: str, metadata: TableMeta) -> Table:
 
 
 def process(
-    df_population: Table,
-    df_fertility: Table,
-    df_demographics: Table,
-    df_depratio: Table,
-    df_deaths: Table,
-) -> Tuple[Table, ...]:
+    df_population: pd.DataFrame,
+    df_fertility: pd.DataFrame,
+    df_demographics: pd.DataFrame,
+    df_depratio: pd.DataFrame,
+    df_deaths: pd.DataFrame,
+) -> Tuple[pd.DataFrame, ...]:
     # Sanity checks
     (
         df_population,
@@ -234,12 +216,12 @@ def process(
 
 
 def sanity_checks(
-    df_population: Table,
-    df_fertility: Table,
-    df_demographics: Table,
-    df_depratio: Table,
-    df_deaths: Table,
-) -> Tuple[Table, ...]:
+    df_population: pd.DataFrame,
+    df_fertility: pd.DataFrame,
+    df_demographics: pd.DataFrame,
+    df_depratio: pd.DataFrame,
+    df_deaths: pd.DataFrame,
+) -> Tuple[pd.DataFrame, ...]:
     df_population = _sanity_checks(
         df_population,
         "Location",
@@ -278,7 +260,7 @@ def sanity_checks(
     return df_population, df_fertility, df_demographics, df_depratio, df_deaths
 
 
-def std_columns(df_depratio: Table, df_deaths: Table) -> Tuple[Table, ...]:
+def std_columns(df_depratio: pd.DataFrame, df_deaths: pd.DataFrame) -> Tuple[pd.DataFrame, ...]:
     columns_rename = {
         "Variant": "Variant",
         "Region, subregion, country or area *": "Location",
@@ -298,12 +280,12 @@ def std_columns(df_depratio: Table, df_deaths: Table) -> Tuple[Table, ...]:
 
 
 def set_index(
-    df_population: Table,
-    df_fertility: Table,
-    df_demographics: Table,
-    df_depratio: Table,
-    df_deaths: Table,
-) -> Tuple[Table, ...]:
+    df_population: pd.DataFrame,
+    df_fertility: pd.DataFrame,
+    df_demographics: pd.DataFrame,
+    df_depratio: pd.DataFrame,
+    df_deaths: pd.DataFrame,
+) -> Tuple[pd.DataFrame, ...]:
     df_population = df_population.set_index(
         ["Location", "Time", "Variant", "AgeGrp"],
         verify_integrity=True,
@@ -328,12 +310,12 @@ def set_index(
 
 
 def df_cols_as_str(
-    df_population: Table,
-    df_fertility: Table,
-    df_demographics: Table,
-    df_depratio: Table,
-    df_deaths: Table,
-) -> Tuple[Table, ...]:
+    df_population: pd.DataFrame,
+    df_fertility: pd.DataFrame,
+    df_demographics: pd.DataFrame,
+    df_depratio: pd.DataFrame,
+    df_deaths: pd.DataFrame,
+) -> Tuple[pd.DataFrame, ...]:
     df_population = _df_cols_as_str(df_population)
     df_fertility = _df_cols_as_str(df_fertility)
     df_demographics = _df_cols_as_str(df_demographics)
@@ -342,25 +324,25 @@ def df_cols_as_str(
     return df_population, df_fertility, df_demographics, df_depratio, df_deaths
 
 
-def fix_types(df_depratio: Table, df_deaths: Table) -> Tuple[Table, ...]:
+def fix_types(df_depratio: pd.DataFrame, df_deaths: pd.DataFrame) -> Tuple[pd.DataFrame, ...]:
     _type = pd.StringDtype()
     df_depratio = df_depratio.assign(Notes=df_depratio.Notes.astype(_type))
     df_deaths = df_deaths.assign(Notes=df_deaths.Notes.astype(_type))
     return df_depratio, df_deaths
 
 
-def _df_cols_as_str(df: Table) -> Table:
+def _df_cols_as_str(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = df.columns.astype(str)
     return df
 
 
 def _sanity_checks(
-    df: Table,
+    df: pd.DataFrame,
     column_location: str,
     column_location_id: str,
     column_location_type: Optional[str] = None,
     location_type_values: List[str] = [],
-) -> Table:
+) -> pd.DataFrame:
     # Quick filter
     # df = df[-((df[column_location] == "Latin America and Caribbean") & (df[column_location_type] == "SDG region"))]
     # There are some duplicates. Some locations appear with two different location IDs, but same data.
@@ -373,36 +355,54 @@ def _sanity_checks(
     return df
 
 
+def init_dataset(dest_dir: str, snap: Snapshot) -> Dataset:
+    ds = Dataset.create_empty(dest_dir)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
+    ds.metadata.short_name = "un_wpp"
+    ds.save()
+    return ds
+
+
+def add_tables_to_ds(
+    ds: Dataset,
+    df_population: pd.DataFrame,
+    df_fertility: pd.DataFrame,
+    df_demographics: pd.DataFrame,
+    df_depratio: pd.DataFrame,
+    df_deaths: pd.DataFrame,
+) -> Dataset:
+    data = [
+        (df_population, "population"),
+        (df_fertility, "fertility"),
+        (df_demographics, "demographics"),
+        (df_depratio, "dependency_ratio"),
+        (df_deaths, "deaths"),
+    ]
+    for elem in data:
+        print(elem[1])
+        t = Table(elem[0])
+        t.metadata.short_name = elem[1]
+        ds.add(utils.underscore_table(t))
+    return ds
+
+
 def run(dest_dir: str) -> None:
     # Load
-    snap = paths.load_snapshot("un_wpp.zip")
+    snap = Snapshot("un/2022-07-11/un_wpp.zip")
     with tempfile.TemporaryDirectory() as tmp_dir:
-        log.info("un_wpp.extract_data")
         extract_data(snap, tmp_dir)
-        log.info("un_wpp.load_data")
         (
             df_population,
             df_fertility,
             df_demographics,
             df_depratio,
             df_deaths,
-        ) = load_data(tmp_dir, metadata=snap.to_table_metadata())
+        ) = load_data(tmp_dir)
     # Process
-    log.info("un_wpp.process")
     df_population, df_fertility, df_demographics, df_depratio, df_deaths = process(
         df_population, df_fertility, df_demographics, df_depratio, df_deaths
     )
-
-    # Create dataset
-    ds = create_dataset(
-        dest_dir,
-        [
-            df_population.underscore().update_metadata(short_name="population"),
-            df_fertility.underscore().update_metadata(short_name="fertility"),
-            df_demographics.underscore().update_metadata(short_name="demographics"),
-            df_depratio.underscore().update_metadata(short_name="dependency_ratio"),
-            df_deaths.underscore().update_metadata(short_name="deaths"),
-        ],
-        default_metadata=snap.metadata,
-    )
-    ds.save()
+    # Initiate dataset
+    ds = init_dataset(dest_dir, snap)
+    # Add tables to dataset
+    ds = add_tables_to_ds(ds, df_population, df_fertility, df_demographics, df_depratio, df_deaths)

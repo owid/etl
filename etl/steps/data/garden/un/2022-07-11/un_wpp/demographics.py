@@ -1,7 +1,7 @@
 """Demographics table."""
 from typing import Any, Dict
 
-from owid.catalog import Table
+import pandas as pd
 
 from .dtypes import optimize_dtypes
 
@@ -179,7 +179,7 @@ COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
 COLUMNS_ORDER = ["location", "year", "metric", "sex", "age", "variant", "value"]
 
 
-def process(df: Table, country_std: str) -> Table:
+def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
     # Unpivot
     df = df.reset_index()
     df = df.melt(COLUMNNS_ID.keys(), COLUMNS_METRICS.keys(), "metric", "value")
