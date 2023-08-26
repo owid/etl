@@ -40,9 +40,9 @@ with st.expander("**Instructions**"):
 # Form
 with st.form("meadow"):
     st.markdown("#### Meadow")
-    namespace = st.text_input("Namespace", help="Institution or topic name", placeholder="Example: emdat, health")
+    namespace = st.text_input("Namespace", help="Institution or topic name", placeholder="Example: emdat, health", value=st.session_state["namespace"])
     version_meadow = st.text_input(
-        "Meadow dataset version", help="Institution or topic name", placeholder=f"Example: {DATE_TODAY}"
+        "Meadow dataset version", help="Institution or topic name", placeholder=f"Example: {DATE_TODAY}",
     )
     short_name_meadow = st.text_input(
         "Meadow dataset short name", help="Institution or topic name", placeholder="Example: cherry_blossom"
@@ -67,3 +67,6 @@ with st.form("meadow"):
 
     # Submit
     submitted = st.form_submit_button("Submit", type="primary", use_container_width=True)
+
+
+st.write(st.session_state)
