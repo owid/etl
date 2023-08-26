@@ -14,6 +14,8 @@ from etl.paths import APPS_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
 #########################################################
 # CONSTANTS #############################################
 #########################################################
+# Page config
+st.set_page_config(page_title="Wizard (snapshot)", page_icon="🪄")
 # Read schema
 SNAPSHOT_SCHEMA = read_json_schema(SCHEMAS_DIR / "snapshot-schema.json")
 # Get properties for origin in schema
@@ -25,7 +27,11 @@ FIELD_TYPES_SELECT = ["origin.license.name"]
 CURRENT_DIR = Path(__file__).parent
 # Accepted schema categories
 ACCEPTED_CATEGORIES = ["dataset", "citation", "files", "license"]
-form_fields = []
+# Default values
+DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
+DEFAULT_VALUES = {
+    "origin.version": DATE_TODAY,
+}
 
 # Session state variables initialitzatio
 
@@ -138,21 +144,35 @@ def render_fields_init() -> List[Any]:
     form = []
     # Text inputs
     fields = [
-        ("Namespace", "Institution or topic name", "Example: emdat, health"),
-        (
-            "Snapshot Version",
-            "Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
-            f"Example: {dt.date.today()}",
-        ),
-        ("Short name", "Underscored dataset short name. Example: natural_disasters", "Example: cherry_blossom"),
-        ("File extension", "File extension (without the '.') of the file to be downloaded.", "Example: csv, xls, zip"),
+        {
+            "title": "Namespace",
+            "description": "Institution or topic name",
+            "placeholder": "emdat, health",
+        },
+        {
+            "title": "Snapshot Version",
+            "description": "Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
+            "placeholder": DATE_TODAY,
+            "value": DATE_TODAY,
+        },
+        {
+            "title": "Short name",
+            "description": "Underscored dataset short name.",
+            "placeholder": "cherry_blossom",
+        },
+        {
+            "title": "File extension",
+            "description": "File extension (without the '.') of the file to be downloaded.",
+            "placeholder": "csv, xls, zip",
+        },
     ]
     for field in fields:
         field = st.text_input(
-            create_display_name_init_section(field[0]),
-            help=field[1],
-            placeholder=field[2],
-            key=field[0].replace(" ", "_").lower(),
+            create_display_name_init_section(field["title"]),
+            help=field["description"],
+            placeholder=field["placeholder"],
+            key=field["title"].replace(" ", "_").lower(),
+            value=field.get("value", ""),
         )
         form.append(field)
 
@@ -225,15 +245,25 @@ def render_fields_from_schema(
                 else:
                     field = [st.empty(), st.empty()]
             else:
+                default_value = DEFAULT_VALUES.get(prop_uri, "")
                 # Simple text input for the rest
                 if categories:
                     field = containers[props["category"]].text_input(  # type: ignore
-                        display_name, help=props["description"], placeholder="", key=prop_uri
+                        display_name, help=props["description"], placeholder="", key=prop_uri, value=default_value
                     )
                 elif container:
-                    field = container.text_input(display_name, help=props["description"], placeholder="", key=prop_uri)
+                    field = container.text_input(
+                        display_name, help=props["description"], placeholder="", key=prop_uri, value=default_value
+                    )
                 else:
-                    field = st.text_input(display_name, help=props["description"], placeholder="", key=prop_uri)
+                    if prop_uri in DEFAULT_VALUES:
+                        field = st.text_input(
+                            display_name, help=props["description"], placeholder="", key=prop_uri, value=default_value
+                        )
+                    else:
+                        field = st.text_input(
+                            display_name, help=props["description"], placeholder="", key=prop_uri, value=default_value
+                        )
             # Add field to list
             form_fields.append(cast(str, field))
     return form_fields
@@ -356,7 +386,7 @@ def run_checks() -> None:
 #########################################################
 
 # TITLE
-st.title("Wizard: Snapshot")
+st.title("Wizard **:gray[Snapshot]**")
 
 # INSTRUCTIONS
 with st.expander("**Instructions**"):
@@ -396,8 +426,7 @@ with st.form("form"):
 # 2.1) Create fields for License (responsive within form)
 form = render_license_field(form_metadata)
 
-print(form_init)
-print(form_metadata)
+
 #########################################################
 # AFTER SUBMISSION ######################################
 #########################################################
