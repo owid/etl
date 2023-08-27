@@ -1,11 +1,13 @@
-import datetime as dt
+import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
+import ruamel.yaml
 import streamlit as st
-from pydantic import BaseModel
+from owid.catalog import Dataset
 
 from apps.wizard import utils
+from etl.paths import DAG_DIR, DATA_DIR, ETL_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -15,7 +17,10 @@ st.set_page_config(page_title="Wizard (garden)", page_icon="🪄")
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
 # FIELDS FROM OTHER STEPS
-SESSION_STATE = utils.SessionState("garden")
+st.session_state["step_name"] = "garden"
+APP_STATE = utils.AppState()
+# Config style
+utils.config_style_html()
 
 #########################################################
 # FUNCTIONS & CLASSES ###################################
@@ -27,7 +32,9 @@ def load_instructions() -> str:
         return f.read()
 
 
-class GardenForm(BaseModel):
+class GardenForm(utils.StepForm):
+    """Garden step form."""
+
     short_name: str
     namespace: str
     version: str
@@ -37,14 +44,100 @@ class GardenForm(BaseModel):
     include_metadata_yaml: bool
     generate_notebook: bool
     is_private: bool
+    update_period_days: int
 
     def __init__(self, **data: Any) -> None:
-        data = self.filter_relevant_fields(data)
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
         super().__init__(**data)
 
-    def filter_relevant_fields(self, data: Any) -> Dict[str, Any]:
-        return {k.replace("garden.", ""): v for k, v in data.items() if k.startswith("garden.")}
+    def validate(self: "GardenForm") -> None:
+        """Check that fields in form are valid.
+
+        - Add error message for each field (to be displayed in the form).
+        - Return True if all fields are valid, False otherwise.
+        """
+        if self.short_name == "not_allowed":
+            self.errors["short_name"] = "not_allowed is not allowed"
+        else:
+            self.errors = {}
+
+
+def update_state() -> None:
+    """Submit form."""
+    # Create form
+    form = GardenForm.from_state()
+    # Update states with values from form
+    APP_STATE.update_from_form(form)
+
+
+def _check_dataset_in_meadow(form: GardenForm) -> None:
+    private_suffix = "-private" if form.is_private else ""
+
+    st.markdown("""## Checking Meadow dataset...""")
+    dataset_uri = f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"
+
+    try:
+        ds = Dataset(DATA_DIR / "meadow" / form.namespace / form.meadow_version / form.short_name)
+        if form.short_name not in ds.table_names:
+            st.warning(f"Table `{form.short_name}` not found in Meadow dataset. Have you run ```etl {dataset_uri}```?")
+        else:
+            st.success(f"Dataset ```{dataset_uri}``` found in Meadow!")
+    except FileNotFoundError:
+        # raise a warning, but continue
+        st.warning(f"Dataset not found in Meadow! Have you run ```etl {dataset_uri}```?")
+
+
+def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
+    """Fill dummy metadata yaml file with some dummy values. Only useful when
+    --dummy-data is used. We need this to avoid errors in `walkthrough grapher --dummy-data`."""
+    with open(metadata_path, "r") as f:
+        doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+
+    # add all available metadata fields to dummy variable
+    variable_meta = {
+        "title": "Dummy",
+        "description": "This is a dummy indicator with full metadata.",
+        "licenses": [],
+        "unit": "Dummy unit",
+        "short_unit": "Du",
+        "display": {
+            "isProjection": True,
+            "conversionFactor": 1000,
+            "numDecimalPlaces": 1,
+            "tolerance": 5,
+            "yearIsDay": False,
+            "zeroDay": "1900-01-01",
+            "entityAnnotationsMap": "Germany: dummy annotation",
+            "includeInTable": True,
+        },
+        "description_short": "Short description of the dummy indicator.",
+        "description_from_producer": "The description of the dummy indicator by the producer, shown separately on a data page.",
+        "processing_level": "major",
+        "license": {"name": "CC-BY 4.0", "url": ""},
+        "presentation": {
+            "grapher_config": {
+                "title": "The dummy indicator - chart title",
+                "subtitle": "You'll never guess where the line will go",
+                "hasMapTab": True,
+                "selectedEntityNames": ["Germany", "Italy", "France"],
+            },
+            "title_public": "The dummy indicator - data page title",
+            "title_variant": "historical data",
+            "producer_short": "ACME",
+            "attribution": "ACME project",
+            "topic_tags_links": ["Internet"],
+            "key_info_text": [
+                "First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)",
+                "Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)",
+            ],
+            "faqs": [{"fragment_id": "cherries", "gdoc_id": "16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE"}],
+        },
+    }
+
+    doc["tables"]["dummy"]["variables"] = {"dummy_variable": variable_meta}
+
+    with open(metadata_path, "w") as f:
+        ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
 
 
 #########################################################
@@ -60,75 +153,85 @@ with st.sidebar:
         st.markdown(text)
 
 # FORM
-with st.form("garden"):
-    namespace = st.text_input(
-        "Namespace",
+form_widget = st.empty()
+with form_widget.form("garden"):
+    # Get default version (used in multiple fields)
+    if (default_version := APP_STATE.default_value("meadow_version")) == "":
+        default_version = APP_STATE.default_value("version", default_last=utils.DATE_TODAY)
+
+    # Namespace
+    APP_STATE.st_widget(
+        st.text_input,
+        label="Namespace",
         help="Institution or topic name",
         placeholder="Example: 'emdat', 'health'",
-        value=SESSION_STATE.default_value("garden.namespace"),
-        key="garden.namespace",
+        key="namespace",
     )
-    version_garden = st.text_input(
-        "Garden dataset version",
+    # Garden version
+    APP_STATE.st_widget(
+        st.text_input,
+        label="Garden dataset version",
         help="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
-        key="garden.version",
-        value=SESSION_STATE.default_value("garden.version", default_last=utils.DATE_TODAY),
+        key="version",
+        default_last=default_version,
     )
-    short_name_garden = st.text_input(
-        "Garden dataset short name",
+    # Garden short name
+    APP_STATE.st_widget(
+        st.text_input,
+        label="Garden dataset short name",
         help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
         placeholder="Example: 'cherry_blossom'",
-        key="garden.short_name",
-        value=SESSION_STATE.default_value("garden.short_name"),
+        key="short_name",
     )
 
     st.markdown("#### Dataset")
-    import numpy as np
-    version_snap = st.number_input(
+    # Update frequency
+    APP_STATE.st_widget(
+        st.number_input,
         label="Dataset update frequency (days)",
         help="Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`.",
-        # placeholder=f"Example: {DATE_TODAY}",
-        key="garden.update_period_days",
-        value=SESSION_STATE.default_value("garden.update_period_days", default_last=np.nan),
-        step=1.,
-        min_value=1.,
+        key="update_period_days",
+        step=1,
+        min_value=1,
+        default_last=365,
     )
 
     st.markdown("#### Dependencies")
-    if (default_version := SESSION_STATE.default_value("garden.meadow_version")) == "":
-        default_version = SESSION_STATE.default_value("garden.version", default_last=utils.DATE_TODAY)
-    version_snap = st.text_input(
-        label="Meadow dataset version",
+    # Meadow version
+    APP_STATE.st_widget(
+        st.text_input,
+        label="Meadow version",
         help="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
-        # placeholder=f"Example: {DATE_TODAY}",
-        key="garden.meadow_version",
-        value=default_version,
+        key="meadow_version",
+        default_last=default_version,
     )
 
     st.markdown("#### Others")
-    dag_selected = SESSION_STATE.default_value("garden.dag_file")
-    dag_index = utils.ADD_DAG_OPTIONS.index(dag_selected) if dag_selected in utils.ADD_DAG_OPTIONS else 0
-    dag_file = st.selectbox(
+    # Add to DAG
+    APP_STATE.st_widget(
+        st.selectbox,
         label="Add to DAG",
         options=utils.ADD_DAG_OPTIONS,
-        index=dag_index,
-        key="garden.dag_file",
+        key="dag_file",
         help="Add ETL step to a DAG file. This will allow it to be tracked and executed by the `etl` command.",
     )
-    include_metadata_yaml = st.toggle(
+    APP_STATE.st_widget(
+        st.toggle,
         label="Include *.meta.yaml file with metadata",
-        key="garden.include_metadata_yaml",
-        value=SESSION_STATE.default_value("meadow.include_metadata_yaml", default_last=True),
+        key="include_metadata_yaml",
+        default_last=True,
     )
-    playground = st.toggle(
+    APP_STATE.st_widget(
+        st.toggle,
         label="Generate playground notebook",
         key="garden.generate_notebook",
-        value=SESSION_STATE.default_value("meadow.generate_notebook", default_last=True),
+        default_last=True,
     )
-    private = st.toggle(
+    APP_STATE.st_widget(
+        st.toggle,
         label="Make dataset private",
         key="garden.is_private",
-        value=SESSION_STATE.default_value("garden.is_private", default_last=False),
+        default_last=False,
     )
 
     # Submit
@@ -136,14 +239,117 @@ with st.form("garden"):
         "Submit",
         type="primary",
         use_container_width=True,
-        on_click=SESSION_STATE.update,
+        on_click=update_state,
     )
 
-# st.session_state["DEBUG_M"] = st.session_state.get("snapshot.namespace", "")
-# st.write(st.session_state)
-# st.write(SESSION_STATE.states)
-# print("Meadow: fin")
 
+#########################################################
+# SUBMISSION ############################################
+#########################################################
 if submitted:
-    st.divider()
-    st.write(st.session_state)
+    # Create form
+    form = GardenForm.from_state()
+
+    if not form.errors:
+        # Remove form from UI
+        form_widget.empty()
+
+        # Private dataset?
+        private_suffix = "-private" if form.is_private else ""
+
+        # Run checks on dependency
+        _check_dataset_in_meadow(form)
+
+        # Add to dag
+        dag_path = DAG_DIR / form.dag_file
+        if form.add_to_dag:
+            deps = [f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"]
+            dag_content = utils.add_to_dag(
+                dag={f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps},
+                dag_path=dag_path,
+            )
+        else:
+            dag_content = ""
+
+        # Create necessary files
+        DATASET_DIR = utils.generate_step_to_channel(
+            CURRENT_DIR / "garden_cookiecutter/", dict(**form.dict(), channel="garden")
+        )
+
+        step_path = DATASET_DIR / (form.short_name + ".py")
+        notebook_path = DATASET_DIR / "playground.ipynb"
+        metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
+
+        if not form.generate_notebook:
+            os.remove(notebook_path)
+
+        if not form.include_metadata_yaml:
+            os.remove(metadata_path)
+
+        # Fill with dummy metadata
+        if form.namespace == "dummy":
+            _fill_dummy_metadata_yaml(metadata_path)
+
+        # Display next steps
+        with st.expander("## Next steps", expanded=True):
+            st.markdown(
+                f"""
+        1. Harmonize country names with the following command (assuming country field is called `country`). Check out a [short demo](https://drive.google.com/file/d/1tBFMkgOgy4MmB7E7NmfMlfa4noWaiG3t/view) of the tool
+
+            ```
+            poetry run etl-harmonize data/meadow/{form.namespace}/{form.meadow_version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json
+            ```
+
+            you can also add more countries manually there or to `{form.short_name}.country_excluded.json` file.
+
+        2. Run `etl` to generate the dataset
+
+            ```
+            poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
+            ```
+
+        2. (Optional) Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
+
+        3. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
+
+            ```
+            poetry run etl-metadata-export data/garden/{form.namespace}/{form.version}/{form.short_name} -o etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.meta.yml
+            ```
+
+            then manual edit it and rerun the step again with
+
+            ```
+            poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
+            ```
+
+            Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
+
+        4. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
+
+        5. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+
+        6. (Optional) Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
+
+            ```python
+            from owid.catalog import find_one
+            tab = find_one(table="{form.short_name}", namespace="{form.namespace}", dataset="{form.short_name}")
+            print(tab.metadata)
+            print(tab.head())
+            ```
+
+        7. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
+        """
+            )
+
+        # Preview generated files
+        st.subheader("Generated files")
+        if form.include_metadata_yaml:
+            utils.preview_file(metadata_path, "yaml")
+        utils.preview_file(step_path, "python")
+        utils.preview_dag_additions(dag_content, dag_path)
+
+        # User message
+        st.toast("Templates generated. Read the next steps.", icon="✅")
+    else:
+        st.write(form.errors)
+        st.error("Form not submitted! Check errors!")

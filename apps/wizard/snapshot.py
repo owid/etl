@@ -28,7 +28,8 @@ CURRENT_DIR = Path(__file__).parent
 # Accepted schema categories
 ACCEPTED_CATEGORIES = ["dataset", "citation", "files", "license"]
 # FIELDS FROM OTHER STEPS
-SESSION_STATE = utils.SessionState("snapshot")
+st.session_state["step_name"] = "snapshot"
+APP_STATE = utils.AppState()
 
 # Session state variables initialitzatio
 
@@ -173,7 +174,7 @@ def render_fields_init() -> List[Any]:
             help=field["description"],
             placeholder=f"Example: {field['placeholder']}",
             key=key,
-            value=SESSION_STATE.default_value(key, default_last=field.get("value", "")),
+            value=APP_STATE.default_value(key, default_last=field.get("value", "")),
         )
         form.append(field)
 
@@ -183,13 +184,13 @@ def render_fields_init() -> List[Any]:
                 label="Make dataset private",
                 help="Check if you want to make the dataset private.",
                 key="snapshot.is_private",
-                value=SESSION_STATE.default_value("snapshot.is_private", default_last=False),
+                value=APP_STATE.default_value("snapshot.is_private", default_last=False),
             ),
             st.toggle(
                 label="Import dataset from local file",
                 help="Check if you want to import the snapshot from a local file.",
                 key="snapshot.local_import",
-                value=SESSION_STATE.default_value("snapshot.local_import", default_last=False),
+                value=APP_STATE.default_value("snapshot.local_import", default_last=False),
             ),
         ]
     )
@@ -264,7 +265,7 @@ def render_fields_from_schema(
                     if props["examples"]
                     else "",
                     "key": key,
-                    "value": SESSION_STATE.default_value(key),
+                    "value": APP_STATE.default_value(key),
                 }
                 if categories:
                     field = containers[props["category"]].text_input(**args)  # type: ignore
@@ -435,7 +436,7 @@ with st.form("form"):
     form_metadata = render_fields_from_schema(schema_origin, "origin", [], categories=ACCEPTED_CATEGORIES)
 
     # 3) Submit
-    submitted = st.form_submit_button("Submit", type="primary", use_container_width=True, on_click=SESSION_STATE.update)
+    submitted = st.form_submit_button("Submit", type="primary", use_container_width=True, on_click=APP_STATE.update)
 
 # 2.1) Create fields for License (responsive within form)
 form = render_license_field(form_metadata)
@@ -449,6 +450,10 @@ if submitted:
 
     # Create form
     form = SnapshotForm(**cast(Dict[str, Any], st.session_state))
+    # Validate form
+    # Update APP_STATE
+    st.write(form.dict())
+
     # st.write(st.session_state)
     # Generate step
     cookiecutter_path = APPS_DIR / "walkthrough" / "snapshot_origins_cookiecutter/"
@@ -500,5 +505,5 @@ if submitted:
 
 # st.session_state["DEBUG_S"] = st.session_state.get("meadow.namespace", "")
 # st.write(st.session_state)
-# st.write(SESSION_STATE.states)
+# st.write(APP_STATE.states)
 # print("Snapshot: fin")

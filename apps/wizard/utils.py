@@ -3,8 +3,9 @@ import json
 import os
 import shutil
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import ruamel.yaml
 import streamlit as st
@@ -12,7 +13,9 @@ import yaml
 from cookiecutter.main import cookiecutter
 from owid import walden
 from owid.catalog.utils import validate_underscore
+from pydantic import BaseModel
 
+from etl import config
 from etl.files import apply_black_formatter_to_files
 from etl.paths import (
     DAG_DIR,
@@ -40,6 +43,9 @@ ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 
 # Date today
 DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
+
+# Get current directory
+CURRENT_DIR = Path(__file__).parent
 
 
 if WALKTHROUGH_ORIGINS:
@@ -145,17 +151,17 @@ def generate_step_to_channel(cookiecutter_path: Path, data: Dict[str, Any]) -> P
     return target_dir / data["namespace"] / data["version"]
 
 
-class SessionState:
+class AppState:
     """Management of state variables shared across different apps."""
 
     steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers"]
 
-    def __init__(self: "SessionState", step: str) -> "SessionState":
+    def __init__(self: "AppState") -> "AppState":
         """Construct variable."""
-        self.step = step
+        self.step = st.session_state["step_name"]
         self._init_steps()
 
-    def _init_steps(self: "SessionState") -> None:
+    def _init_steps(self: "AppState") -> None:
         if "steps" not in st.session_state:
             st.session_state["steps"] = {}
         for step in self.steps:
@@ -168,22 +174,24 @@ class SessionState:
                         **{
                             f"{step}.snapshot_version": DATE_TODAY,
                             f"{step}.origin.date_accessed": DATE_TODAY,
+                            "snapshot_version": DATE_TODAY,
+                            "origin.date_accessed": DATE_TODAY,
                         },
                     }
 
-    def _check_step(self: "SessionState") -> None:
+    def _check_step(self: "AppState") -> None:
         """Check that the value for step is valid."""
         if self.step is None or self.step not in self.steps:
             raise ValueError(f"Step {self.step} not in {self.steps}.")
 
-    def get_variables_of_step(self: "SessionState") -> Dict[str, Any]:
+    def get_variables_of_step(self: "AppState") -> Dict[str, Any]:
         """Get variables of a specific step.
 
         Variables are assumed to have keys `step.NAME`, based on the keys given in the widgets within a form.
         """
         return {k: v for k, v in st.session_state.items() if k.startswith(f"{self.step}.")}
 
-    def update(self: "SessionState") -> None:
+    def update(self: "AppState") -> None:
         """Update global variables of step.
 
         This is expected to be called when submitting the step's form.
@@ -192,8 +200,18 @@ class SessionState:
         print(f"Updating {self.step}...")
         st.session_state["steps"][self.step] = self.get_variables_of_step()
 
+    def update_from_form(self, form: Dict[str, Any]) -> None:
+        self._check_step()
+        st.session_state["steps"][self.step] = form.dict()
+
+    @property
+    def state_step(self: "AppState") -> Dict[str, Any]:
+        """Get state variables of step."""
+        self._check_step()
+        return st.session_state["steps"][self.step]
+
     def default_value(
-        self: "SessionState", key: str, previous_step: Optional[str] = None, default_last: Optional[Any] = ""
+        self: "AppState", key: str, previous_step: Optional[str] = None, default_last: Optional[Any] = ""
     ) -> str:
         """Get the default value of a variable.
 
@@ -209,15 +227,21 @@ class SessionState:
         if previous_step is None:
             previous_step = self.previous_step
         # (1) Get value stored for this field (in current step)
-        value_step = st.session_state["steps"][self.step].get(key)
+        value_step = self.state_step.get(key)
         if value_step:
             return value_step
         # (2) If none, check if previous step has a value and use that one, otherwise (3) use empty string.
         key = key.replace(f"{self.step}.", f"{self.previous_step}.")
         return st.session_state["steps"][self.previous_step].get(key, default_last)
 
+    def display_error(self: "AppState", key: str) -> None:
+        """Get error message for a given key."""
+        if "errors" in self.state_step:
+            if msg := self.state_step.get("errors", {}).get(key, ""):
+                st.error(msg)
+
     @property
-    def previous_step(self: "SessionState") -> str:
+    def previous_step(self: "AppState") -> str:
         """Get the name of the previous step.
 
         E.g. 'snapshot' is the step prior to 'meadow', etc.
@@ -225,3 +249,113 @@ class SessionState:
         self._check_step()
         idx = max(self.steps.index(self.step) - 1, 0)
         return self.steps[idx]
+
+    def st_widget(
+        self: "AppState", st_widget: Callable, default_last: Optional[str] = "", **kwargs: Dict[str, Any]
+    ) -> None:
+        """Wrap a streamlit widget with a default value."""
+        key = kwargs["key"]
+        # Get default value (either from previous edits, or from previous steps)
+        default_value = self.default_value(key, default_last=default_last)
+        # Change key name, to be stored it in general st.session_state
+        kwargs["key"] = f"{self.step}.{key}"
+        # Default value for selectbox (and other widgets with selectbox-like behavior)
+        if "options" in kwargs:
+            index = kwargs["options"].index(default_value) if default_value in kwargs["options"] else 0
+            kwargs["index"] = index
+        # Default value for other widgets (if none is given)
+        elif "value" not in kwargs:
+            kwargs["value"] = default_value
+
+        # Create widget
+        widget = st_widget(**kwargs)
+        # Show error message
+        self.display_error(key)
+        return widget
+
+
+class StepForm(BaseModel):
+    """Form abstract class."""
+
+    errors: Dict[str, Any] = {}
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.validate()
+
+    @classmethod
+    def filter_relevant_fields(cls: "StepForm", step_name: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Filter relevant fields from form."""
+        return {k.replace(f"{step_name}.", ""): v for k, v in data.items() if k.startswith(f"{step_name}.")}
+
+    @classmethod
+    def from_state(cls: "StepForm", validate: bool = True) -> "StepForm":
+        """Build object from session_state variables."""
+        data = cls.filter_relevant_fields(step_name=st.session_state["step_name"], data=st.session_state)
+        return cls(**data)
+
+    def validate(self):
+        raise NotImplementedError("Needs to be implemented in the child class!")
+
+
+def config_style_html():
+    st.markdown(
+        """
+    <style>
+    .streamlit-expanderHeader {
+        font-size: x-large;
+    }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
+
+def preview_file(file_path: str, language: str = "python") -> None:
+    """Preview file in streamlit."""
+    with open(file_path, "r") as f:
+        code = f.read()
+    with st.expander(f"File: `{file_path}`", expanded=False):
+        st.code(code, language=language)
+
+
+def preview_dag_additions(dag_content, dag_path):
+    if dag_content:
+        with st.expander(f"File: `{dag_path}`", expanded=False):
+            st.code(dag_content, "yaml")
+
+
+@st.cache_data
+def load_instructions() -> str:
+    """Load snapshot step instruction text."""
+    with open(CURRENT_DIR / f"{st.session_state['step_name']}.md", "r") as f:
+        return f.read()
+
+
+def _check_env() -> bool:
+    """Check if environment variables are set correctly."""
+    ok = True
+    for env_name in ("GRAPHER_USER_ID", "DB_USER", "DB_NAME", "DB_HOST"):
+        if getattr(config, env_name) is None:
+            ok = False
+            st.warning(f"Environment variable `{env_name}` not found, do you have it in your `.env` file?")
+
+    if ok:
+        st.success(("`.env` configured correctly"))
+    return ok
+
+
+def _show_environment() -> None:
+    """Show environment variables."""
+    st.info(
+        f"""
+    **Environment variables**:
+
+    ```
+    GRAPHER_USER_ID: {config.GRAPHER_USER_ID}
+    DB_USER: {config.DB_USER}
+    DB_NAME: {config.DB_NAME}
+    DB_HOST: {config.DB_HOST}
+    ```
+    """
+    )

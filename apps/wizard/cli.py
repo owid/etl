@@ -14,9 +14,9 @@ st.title("Wizard")
 # should be
 show_pages(
     [
-        Page(CURRENT_DIR / "snapshot.py", "1️⃣ Snapshot", in_section=True),
-        Page(CURRENT_DIR / "meadow.py", "2️⃣ Meadow", in_section=True),
-        Page(CURRENT_DIR / "garden.py", "3️⃣ Garden", in_section=True),
-        Page(CURRENT_DIR / "grapher.py", "4️⃣ Grapher", in_section=True),
+        Page(CURRENT_DIR / "snapshot.py", "Snapshot", in_section=False),
+        Page(CURRENT_DIR / "meadow.py", "Meadow", in_section=False),
+        Page(CURRENT_DIR / "garden.py", "Garden", in_section=False),
+        Page(CURRENT_DIR / "grapher.py", "Grapher", in_section=False),
     ]
 )
