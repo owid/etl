@@ -1,11 +1,13 @@
+import datetime as dt
 import json
 import os
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import ruamel.yaml
+import streamlit as st
 import yaml
 from cookiecutter.main import cookiecutter
 from owid import walden
@@ -35,6 +37,10 @@ WALKTHROUGH_ORIGINS = os.environ.get("WALKTHROUGH_ORIGINS", "0") == "1"
 dag_files = sorted(os.listdir(DAG_DIR))
 dag_not_add_option = "(do not add to DAG)"
 ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
+
+# Date today
+DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
+
 
 if WALKTHROUGH_ORIGINS:
     DUMMY_DATA = {
@@ -80,39 +86,6 @@ def validate_short_name(short_name: str) -> Optional[str]:
         return None
     except Exception as e:
         return str(e)
-
-
-WIDGET_TEMPLATE = """
-<details {{#open}}open{{/open}}>
-    <summary>
-    {{#title}}
-        {{& pywebio_output_parse}}
-    {{/title}}
-    </summary>
-    {{#contents}}
-        {{& pywebio_output_parse}}
-    {{/contents}}
-</details>
-"""
-
-
-# def put_widget(title: Any, contents: List[Any]) -> None:
-#     """Widget that allows markdown in title."""
-#     po.put_widget(
-#         WIDGET_TEMPLATE,
-#         {
-#             "open": False,
-#             "title": title,
-#             "contents": contents,
-#         },
-#     )
-
-
-# def preview_dag(dag_content: str, dag_name: Union[str, Path] = DAG_WALKTHROUGH_PATH) -> None:
-#     put_widget(
-#         title=po.put_success(po.put_markdown(f"Steps in {dag_name} were successfully generated")),
-#         contents=[po.put_markdown(f"```yml\n{dag_content}\n```")],
-#     )
 
 
 def add_to_dag(dag: DAG, dag_path: Path = DAG_WALKTHROUGH_PATH) -> str:
@@ -170,3 +143,85 @@ def generate_step_to_channel(cookiecutter_path: Path, data: Dict[str, Any]) -> P
     target_dir = STEP_DIR / "data" / data["channel"]
     generate_step(cookiecutter_path, data, target_dir)
     return target_dir / data["namespace"] / data["version"]
+
+
+class SessionState:
+    """Management of state variables shared across different apps."""
+
+    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers"]
+
+    def __init__(self: "SessionState", step: str) -> "SessionState":
+        """Construct variable."""
+        self.step = step
+        self._init_steps()
+
+    def _init_steps(self: "SessionState") -> None:
+        if "steps" not in st.session_state:
+            st.session_state["steps"] = {}
+        for step in self.steps:
+            if step not in st.session_state["steps"]:
+                st.session_state["steps"][step] = {}
+                # Defaults for Snapshot
+                if step == "snapshot":
+                    st.session_state["steps"][step] = {
+                        **st.session_state["steps"][step],
+                        **{
+                            f"{step}.snapshot_version": DATE_TODAY,
+                            f"{step}.origin.date_accessed": DATE_TODAY,
+                        },
+                    }
+
+    def _check_step(self: "SessionState") -> None:
+        """Check that the value for step is valid."""
+        if self.step is None or self.step not in self.steps:
+            raise ValueError(f"Step {self.step} not in {self.steps}.")
+
+    def get_variables_of_step(self: "SessionState") -> Dict[str, Any]:
+        """Get variables of a specific step.
+
+        Variables are assumed to have keys `step.NAME`, based on the keys given in the widgets within a form.
+        """
+        return {k: v for k, v in st.session_state.items() if k.startswith(f"{self.step}.")}
+
+    def update(self: "SessionState") -> None:
+        """Update global variables of step.
+
+        This is expected to be called when submitting the step's form.
+        """
+        self._check_step()
+        print(f"Updating {self.step}...")
+        st.session_state["steps"][self.step] = self.get_variables_of_step()
+
+    def default_value(
+        self: "SessionState", key: str, previous_step: Optional[str] = None, default_last: Optional[Any] = ""
+    ) -> str:
+        """Get the default value of a variable.
+
+        This is useful when setting good defaults in widgets (e.g. text_input).
+
+        Priority of default value is:
+            - Check if there is a value stored for this field in the current step.
+            - If not, check if there is a value stored for this field in the previous step.
+            - If not, use value given by `default_last`.
+        """
+        self._check_step()
+        # Get name of previous step
+        if previous_step is None:
+            previous_step = self.previous_step
+        # (1) Get value stored for this field (in current step)
+        value_step = st.session_state["steps"][self.step].get(key)
+        if value_step:
+            return value_step
+        # (2) If none, check if previous step has a value and use that one, otherwise (3) use empty string.
+        key = key.replace(f"{self.step}.", f"{self.previous_step}.")
+        return st.session_state["steps"][self.previous_step].get(key, default_last)
+
+    @property
+    def previous_step(self: "SessionState") -> str:
+        """Get the name of the previous step.
+
+        E.g. 'snapshot' is the step prior to 'meadow', etc.
+        """
+        self._check_step()
+        idx = max(self.steps.index(self.step) - 1, 0)
+        return self.steps[idx]

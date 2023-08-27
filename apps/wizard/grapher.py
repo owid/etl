@@ -11,11 +11,11 @@ from apps.wizard import utils
 # CONSTANTS #############################################
 #########################################################
 # Page config
-st.set_page_config(page_title="Wizard (meadow)", page_icon="🪄")
+st.set_page_config(page_title="Wizard (grapher)", page_icon="🪄")
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
 # FIELDS FROM OTHER STEPS
-SESSION_STATE = utils.SessionState("meadow")
+SESSION_STATE = utils.SessionState("grapher")
 
 #########################################################
 # FUNCTIONS & CLASSES ###################################
@@ -23,19 +23,17 @@ SESSION_STATE = utils.SessionState("meadow")
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(CURRENT_DIR / "meadow.md", "r") as f:
+    with open(CURRENT_DIR / "grapher.md", "r") as f:
         return f.read()
 
 
-class MeadowForm(BaseModel):
+class GrapherForm(BaseModel):
     short_name: str
     namespace: str
     version: str
-    snapshot_version: str
-    file_extension: str
+    garden_version: str
     add_to_dag: bool
     dag_file: str
-    generate_notebook: bool
     is_private: bool
 
     def __init__(self, **data: Any) -> None:
@@ -44,14 +42,14 @@ class MeadowForm(BaseModel):
         super().__init__(**data)
 
     def filter_relevant_fields(self, data: Any) -> Dict[str, Any]:
-        return {k.replace("meadow.", ""): v for k, v in data.items() if k.startswith("meadow.")}
+        return {k.replace("grapher.", ""): v for k, v in data.items() if k.startswith("grapher.")}
 
 
 #########################################################
 # MAIN ##################################################
 #########################################################
 # TITLE
-st.title("Wizard  **:gray[Meadow]**")
+st.title("Wizard  **:gray[Grapher]**")
 
 # SIDEBAR
 with st.sidebar:
@@ -60,65 +58,53 @@ with st.sidebar:
         st.markdown(text)
 
 # FORM
-with st.form("meadow"):
+with st.form("grapher"):
     namespace = st.text_input(
         "Namespace",
         help="Institution or topic name",
         placeholder="Example: 'emdat', 'health'",
-        value=SESSION_STATE.default_value("meadow.namespace"),
-        key="meadow.namespace",
+        value=SESSION_STATE.default_value("grapher.namespace"),
+        key="grapher.namespace",
     )
-    if (default_version := SESSION_STATE.default_value("meadow.version")) == "":
-        default_version = SESSION_STATE.default_value("meadow.snapshot_version")
-    version_meadow = st.text_input(
-        "Meadow dataset version",
-        help="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
-        key="meadow.version",
-        value=default_version,
+    version_grapher = st.text_input(
+        "Grapher dataset version",
+        help="Version of the grapher dataset (by default, the current date, or exceptionally the publication date).",
+        key="grapher.version",
+        value=SESSION_STATE.default_value("grapher.version", default_last=utils.DATE_TODAY),
     )
-    short_name_meadow = st.text_input(
-        "Meadow dataset short name",
+    short_name_grapher = st.text_input(
+        "Garden dataset short name",
         help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
         placeholder="Example: 'cherry_blossom'",
-        key="meadow.short_name",
-        value=SESSION_STATE.default_value("meadow.short_name"),
+        key="grapher.short_name",
+        value=SESSION_STATE.default_value("grapher.short_name"),
     )
 
     st.markdown("#### Dependencies")
+    if (default_version := SESSION_STATE.default_value("grapher.garden_version")) == "":
+        default_version = SESSION_STATE.default_value("grapher.version", default_last=utils.DATE_TODAY)
     version_snap = st.text_input(
-        "Snapshot version",
-        help="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
+        label="Garden dataset version",
+        help="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
         # placeholder=f"Example: {DATE_TODAY}",
-        key="meadow.snapshot_version",
-        value=SESSION_STATE.default_value("meadow.snapshot_version"),
-    )
-    file_extension = st.text_input(
-        "Snapshot version",
-        help="File extension (without the '.') of the file to be downloaded.",
-        placeholder="Example: 'csv', 'xls', 'zip'",
-        key="meadow.file_extension",
-        value=SESSION_STATE.default_value("meadow.file_extension"),
+        key="grapher.garden_version",
+        value=default_version,
     )
 
     st.markdown("#### Others")
-    dag_selected = SESSION_STATE.default_value("meadow.dag_file")
+    dag_selected = SESSION_STATE.default_value("grapher.dag_file")
     dag_index = utils.ADD_DAG_OPTIONS.index(dag_selected) if dag_selected in utils.ADD_DAG_OPTIONS else 0
     dag_file = st.selectbox(
         label="Add to DAG",
         options=utils.ADD_DAG_OPTIONS,
         index=dag_index,
-        key="meadow.dag_file",
+        key="grapher.dag_file",
         help="Add ETL step to a DAG file. This will allow it to be tracked and executed by the `etl` command.",
-    )
-    playground = st.toggle(
-        label="Generate playground notebook",
-        key="meadow.generate_notebook",
-        value=SESSION_STATE.default_value("meadow.generate_notebook", default_last=True),
     )
     private = st.toggle(
         label="Make dataset private",
-        key="meadow.is_private",
-        value=SESSION_STATE.default_value("meadow.is_private", default_last=False),
+        key="grapher.is_private",
+        value=SESSION_STATE.default_value("grapher.is_private", default_last=False),
     )
 
     # Submit

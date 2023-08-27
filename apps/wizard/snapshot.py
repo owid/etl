@@ -27,11 +27,8 @@ FIELD_TYPES_SELECT = ["origin.license.name"]
 CURRENT_DIR = Path(__file__).parent
 # Accepted schema categories
 ACCEPTED_CATEGORIES = ["dataset", "citation", "files", "license"]
-# Default values
-DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
-DEFAULT_VALUES = {
-    "origin.version": DATE_TODAY,
-}
+# FIELDS FROM OTHER STEPS
+SESSION_STATE = utils.SessionState("snapshot")
 
 # Session state variables initialitzatio
 
@@ -70,6 +67,7 @@ class SnapshotForm(BaseModel):
     license_name: str
 
     def __init__(self, **data: Any) -> None:
+        data = self.filter_relevant_fields(data)
         # Change name for certain fields (and remove old ones)
         data["license_url"] = data["origin.license.url"]
         if "origin.license.name_custom" in data:
@@ -77,7 +75,6 @@ class SnapshotForm(BaseModel):
         else:
             data["license_name"] = data["origin.license.name"]
         data["origin_version"] = data["origin.version"]
-        data["is_private"] = data["private"]
         data["dataset_manual_import"] = data["local_import"]
         data = {
             k: v for k, v in data.items() if k not in ["origin.license.url", "origin.license.name", "origin.version"]
@@ -85,6 +82,9 @@ class SnapshotForm(BaseModel):
         # Remove 'origin.' prefix from keys
         data = {k.replace("origin.", ""): v for k, v in data.items()}
         super().__init__(**data)
+
+    def filter_relevant_fields(self, data: Any) -> Dict[str, Any]:
+        return {k.replace("snapshot.", ""): v for k, v in data.items() if k.startswith("snapshot.")}
 
     @property
     def version_producer(self):
@@ -147,48 +147,49 @@ def render_fields_init() -> List[Any]:
         {
             "title": "Namespace",
             "description": "Institution or topic name",
-            "placeholder": "emdat, health",
+            "placeholder": "'emdat', 'health'",
         },
         {
             "title": "Snapshot Version",
             "description": "Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
-            "placeholder": DATE_TODAY,
-            "value": DATE_TODAY,
+            "placeholder": f"'{utils.DATE_TODAY}'",
+            "value": utils.DATE_TODAY,
         },
         {
             "title": "Short name",
-            "description": "Underscored dataset short name.",
-            "placeholder": "cherry_blossom",
+            "description": "Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
+            "placeholder": "'cherry_blossom'",
         },
         {
             "title": "File extension",
             "description": "File extension (without the '.') of the file to be downloaded.",
-            "placeholder": "csv, xls, zip",
+            "placeholder": "'csv', 'xls', 'zip'",
         },
     ]
     for field in fields:
+        key = f"snapshot.{field['title'].replace(' ', '_').lower()}"
         field = st.text_input(
-            create_display_name_init_section(field["title"]),
+            label=create_display_name_init_section(field["title"]),
             help=field["description"],
-            placeholder=field["placeholder"],
-            key=field["title"].replace(" ", "_").lower(),
-            value=field.get("value", ""),
+            placeholder=f"Example: {field['placeholder']}",
+            key=key,
+            value=SESSION_STATE.default_value(key, default_last=field.get("value", "")),
         )
         form.append(field)
 
     form.extend(
         [
-            st.checkbox(
+            st.toggle(
                 label="Make dataset private",
-                value=False,
-                key="private",
                 help="Check if you want to make the dataset private.",
+                key="snapshot.is_private",
+                value=SESSION_STATE.default_value("snapshot.is_private", default_last=False),
             ),
-            st.checkbox(
+            st.toggle(
                 label="Import dataset from local file",
-                value=False,
-                key="local_import",
                 help="Check if you want to import the snapshot from a local file.",
+                key="snapshot.local_import",
+                value=SESSION_STATE.default_value("snapshot.local_import", default_last=False),
             ),
         ]
     )
@@ -225,17 +226,25 @@ def render_fields_from_schema(
         else:
             # Define display, help and placeholder texts
             display_name = create_display_name_snap_section(props, name, property_name)
+            # Define keys
+            key = f"snapshot.{prop_uri}"
             # Render field
+            ## Text areas
             if prop_uri in FIELD_TYPES_TEXTAREA:
                 # Use text area for these fields
+                args = {
+                    "label": display_name,
+                    "help": props["description"],
+                    "placeholder": props["examples"] if props["examples"] else "",
+                    "key": key,
+                }
                 if categories:
-                    field = containers[props["category"]].text_area(  # type: ignore
-                        display_name, help=props["description"], placeholder="", key=prop_uri
-                    )
+                    field = containers[props["category"]].text_area(**args)  # type: ignore
                 elif container:
-                    field = container.text_area(display_name, help=props["description"], placeholder="", key=prop_uri)
+                    field = container.text_area(**args)
                 else:
-                    field = st.text_area(display_name, help=props["description"], placeholder="", key=prop_uri)
+                    field = st.text_area(**args)
+            ## Special case: license name (select box)
             elif prop_uri == "origin.license.name":
                 # Special one, need to have responsive behaviour inside form (work around)
                 if categories:
@@ -244,26 +253,25 @@ def render_fields_from_schema(
                     field = [container.empty(), container.empty()]
                 else:
                     field = [st.empty(), st.empty()]
+            ## Text input
             else:
-                default_value = DEFAULT_VALUES.get(prop_uri, "")
+                # default_value = DEFAULT_VALUES.get(prop_uri, "")
                 # Simple text input for the rest
+                args = {
+                    "label": display_name,
+                    "help": props["description"],
+                    "placeholder": "Examples: " + ", ".join([f"'{ex}'" for ex in props["examples"]])
+                    if props["examples"]
+                    else "",
+                    "key": key,
+                    "value": SESSION_STATE.default_value(key),
+                }
                 if categories:
-                    field = containers[props["category"]].text_input(  # type: ignore
-                        display_name, help=props["description"], placeholder="", key=prop_uri, value=default_value
-                    )
+                    field = containers[props["category"]].text_input(**args)  # type: ignore
                 elif container:
-                    field = container.text_input(
-                        display_name, help=props["description"], placeholder="", key=prop_uri, value=default_value
-                    )
+                    field = container.text_input(**args)
                 else:
-                    if prop_uri in DEFAULT_VALUES:
-                        field = st.text_input(
-                            display_name, help=props["description"], placeholder="", key=prop_uri, value=default_value
-                        )
-                    else:
-                        field = st.text_input(
-                            display_name, help=props["description"], placeholder="", key=prop_uri, value=default_value
-                        )
+                    field = st.text_input(**args)
             # Add field to list
             form_fields.append(cast(str, field))
     return form_fields
@@ -308,7 +316,11 @@ def render_license_field(form: List[Any]) -> List[str]:
         if isinstance(field, list):
             with field[0]:
                 license_field = st.selectbox(
-                    display_name, options=["Custom license..."] + sorted(options), index=1, help=help_text, key=prop_uri
+                    display_name,
+                    options=["Custom license..."] + sorted(options),
+                    index=1,
+                    help=help_text,
+                    key=f"snapshot.{prop_uri}",
                 )
             with field[1]:
                 if license_field == CUSTOM_OPTION:
@@ -316,7 +328,7 @@ def render_license_field(form: List[Any]) -> List[str]:
                         "↳ *Custom license*",
                         placeholder="© GISAID 2023",
                         help="Enter custom license",
-                        key=f"{prop_uri}_custom",
+                        key=f"snapshot.{prop_uri}_custom",
                     )
 
     # Remove list from form (former license st.empty tuple)
@@ -388,29 +400,31 @@ def run_checks() -> None:
 # TITLE
 st.title("Wizard **:gray[Snapshot]**")
 
-# INSTRUCTIONS
-with st.expander("**Instructions**"):
-    text = load_instructions()
-    st.markdown(text)
-    st.markdown("3. **Only supports `origin`**. To work with `source` instead, use the former version of the app.")
+# SIDEBAR
+with st.sidebar:
+    # CONNECT AND CHECK
+    with st.expander("**Environment checks**", expanded=True):
+        run_checks()
 
-# CONNECT AND CHECK
-with st.expander("Environment checks", expanded=True):
-    run_checks()
+    # INSTRUCTIONS
+    with st.expander("**Instructions**", expanded=True):
+        text = load_instructions()
+        st.markdown(text)
+        st.markdown("3. **Only supports `origin`**. To work with `source` instead, use `walkthrough`.")
 
 # FORM
 with st.form("form"):
 
     # 1) Show fields for initial configuration (create directories, etc.)
-    st.header("Config")
-    st.markdown("Fill the following fields to help us create all the required files for you!")
+    # st.header("Config")
+    st.markdown("Note that sometimes some fields might not be available (even if they are labelled as required)")
     form_init = render_fields_init()
 
     # 2) Show fields for metadata fields
-    st.header("Metadata")
-    st.markdown(
-        "Fill the following fields to help us fill all the created files for you! Note that sometimes some fields might not be available (even if they are labelled as required)."
-    )
+    # st.header("Metadata")
+    # st.markdown(
+    #     "Fill the following fields to help us fill all the created files for you! Note that sometimes some fields might not be available (even if they are labelled as required)."
+    # )
 
     # Get categories
     categories_in_schema = {v["category"] for k, v in schema_origin.items()}
@@ -421,19 +435,21 @@ with st.form("form"):
     form_metadata = render_fields_from_schema(schema_origin, "origin", [], categories=ACCEPTED_CATEGORIES)
 
     # 3) Submit
-    submitted = st.form_submit_button("Submit", type="primary", use_container_width=True)
+    submitted = st.form_submit_button("Submit", type="primary", use_container_width=True, on_click=SESSION_STATE.update)
 
 # 2.1) Create fields for License (responsive within form)
 form = render_license_field(form_metadata)
 
-
+# st.write(st.session_state)
 #########################################################
 # AFTER SUBMISSION ######################################
 #########################################################
 if submitted:
+    st.write(st.session_state)
+
     # Create form
     form = SnapshotForm(**cast(Dict[str, Any], st.session_state))
-    st.write(st.session_state)
+    # st.write(st.session_state)
     # Generate step
     cookiecutter_path = APPS_DIR / "walkthrough" / "snapshot_origins_cookiecutter/"
     utils.generate_step(
@@ -481,5 +497,8 @@ if submitted:
         t = f.read()
     st.success(f"File `{ingest_path}` was successfully generated")
     st.code(t, "python")
-    # utils.preview_file(meta_path, "yaml")
-    # utils.preview_file(ingest_path, "python")
+
+# st.session_state["DEBUG_S"] = st.session_state.get("meadow.namespace", "")
+# st.write(st.session_state)
+# st.write(SESSION_STATE.states)
+# print("Snapshot: fin")
