@@ -94,30 +94,14 @@ class SnapshotForm(utils.StepForm):
 
         # 1) Validate using schema
         # This only applies to SnapshotMeta fields
-        validator = jsonschema.Draft7Validator(SNAPSHOT_SCHEMA)
-        errors = sorted(validator.iter_errors(self.metadata), key=str)  # get all validation errors
-        for error in errors:
-            error_type = error.schema_path[-1]
-            uri = [ll for ll in error.schema_path if ll not in ["properties", "meta"]]
-            uri = uri[:-1]
-            # required but missing fields
-            if error_type == "required":
-                rex = r"'(.*)' is a required property"
-                uri += [re.findall(rex, error.message)[0]]
-                uri = ".".join(uri)
-                self.errors[uri] = "This field is required!"
-            # wrong types
-            elif error_type == "type":
-                uri = ".".join(uri)
-                self.errors[uri] = "Invalid type!"
-            elif error_type == "pattern":
-                uri = ".".join(uri)
-                self.errors[uri] = "Invalid format!"
-            # unknown validation error
-            else:
-                raise Exception(f"Unknown error type {error_type} with message {error.message}")
+        self.validate_schema(["meta"])
 
-        # Check other fields (non meta)
+        # 2) Check other fields (non meta)
+        fields_required = ["namespace", "snapshot_version", "short_name", "file_extension"]
+        fields_snake = ["namespace", "short_name"]
+
+        check_required(fields_required)
+
         def _is_snake(s):
             rex = r"[a-z][a-z0-9]+(?:_[a-z0-9]+)*"
             return bool(re.fullmatch(rex, s))
@@ -169,18 +153,6 @@ class SnapshotForm(utils.StepForm):
         return meta
 
 
-def _pretty_req_level(requirement_level: str) -> str:
-    """Prettify the requirement level with coloring."""
-    if requirement_level == "required":
-        return f"_:red[{requirement_level}]_"
-    elif requirement_level == "recommended":
-        return f"_:orange[{requirement_level}]_"
-    elif requirement_level == "optional":
-        return f"_:blue[{requirement_level}]_"
-    else:
-        raise ValueError(f"Unknown requirement level: {requirement_level}")
-
-
 def _color_req_level(req_level: str) -> str:
     if req_level == "required":
         # color = "red"
@@ -211,6 +183,13 @@ def create_display_name_snap_section(props: Dict[str, Any], name: str, property_
     # Create display name
     display_name = f"{props['title']} (`{property_name}.{name}`) ┃ {req_level}"
     return display_name
+
+
+@st.cache_data
+def load_instructions() -> str:
+    """Load snapshot step instruction text."""
+    with open(CURRENT_DIR / "snapshot.md", "r") as f:
+        return f.read()
 
 
 def render_fields_init() -> None:
@@ -350,13 +329,6 @@ def render_fields_from_schema(
             # Add field to list
             form_fields.append(cast(str, field))
     return form_fields
-
-
-@st.cache_data
-def load_instructions() -> str:
-    """Load snapshot step instruction text."""
-    with open(CURRENT_DIR / "snapshot.md", "r") as f:
-        return f.read()
 
 
 def render_license_field(form: List[Any]) -> List[str]:

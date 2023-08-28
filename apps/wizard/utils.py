@@ -7,6 +7,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
+import jsonschema
 import ruamel.yaml
 import streamlit as st
 import yaml
@@ -306,6 +307,38 @@ class StepForm(BaseModel):
         with open(path, "w") as f:
             ruamel.yaml.dump(self.metadata, f, Dumper=ruamel.yaml.RoundTripDumper)
 
+    def validate_schema(self, schema_path: str, ignore_keywords: List[str] = []):
+        validator = jsonschema.Draft7Validator(schema_path)
+        errors = sorted(validator.iter_errors(self.metadata), key=str)  # get all validation errors
+        for error in errors:
+            error_type = error.schema_path[-1]
+            uri = [ll for ll in error.schema_path if ll not in ["properties"] + ignore_keywords]
+            uri = uri[:-1]
+            # required but missing fields
+            if error_type == "required":
+                rex = r"'(.*)' is a required property"
+                uri += [re.findall(rex, error.message)[0]]
+                uri = ".".join(uri)
+                self.errors[uri] = f"`{uri}` field is required!"
+            # wrong types
+            elif error_type == "type":
+                uri = ".".join(uri)
+                self.errors[uri] = f"Invalid type for field `{uri}`!"
+            elif error_type == "pattern":
+                uri = ".".join(uri)
+                self.errors[uri] = f"Invalid format of field `{uri}`!"
+            # unknown validation error
+            else:
+                raise Exception(f"Unknown error type {error_type} with message {error.message}")
+
+    def check_required(self, field_names: List[str]):
+        for field in field_names:
+            pass
+
+    def check_snake(self, field_names: List[str]):
+        for field in field_names:
+            pass
+
 
 def extract(error_message: str):
     """Get field name that caused the error."""
@@ -386,3 +419,5 @@ def clean_empty_dict(d: Dict[str, Any]) -> Dict[str, Any]:
     if isinstance(d, list):
         return [v for v in map(clean_empty_dict, d) if v]
     return d
+
+
