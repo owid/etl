@@ -148,27 +148,9 @@
         "category": "dataset"
       },
       "date_published": {
-        "anyOf": [
-          {
-            "type": "string",
-            "format": "date",
-            "title": "Date of publication",
-            "description": "Exact day (or year, if exact day is unknown) when the producer's dataset (in its current version) was published."
-          },
-          {
-            "type": "string",
-            "pattern": "^[0-9]{4}$"
-          },
-          {
-            "type": "string",
-            "enum": ["latest"]
-          },
-          {
-            "type": "integer"
-          }
-        ],
         "title": "Date of publication of the dataset",
         "description": "Exact day (or year, if exact day is unknown) when the producer's dataset (in its current version) was published.",
+        "pattern": "\\d\\d\\d\\d-\\d\\d-\\d\\d|\\d\\d\\d\\d|latest",
         "examples": [
           "2022-07-11",
           "1998",
@@ -250,6 +232,7 @@
         "type": "string",
         "title": "URL of the dataset website",
         "description": "Producer's URL leading to the main website of the dataset. This is not the URL To the specific file.",
+        "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
         "requirement_level": "required",
         "examples": [
           "https://data.some_institution.com/dataset_12"
@@ -262,6 +245,7 @@
         "type": "string",
         "title": "Download URL of the dataset",
         "description": "Producer's URL that directly downloads the dataset as a single file.",
+        "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
         "requirement_level": "required",
         "examples": [
           "https://data.some_institution.com/dataset_12/data.csv"
@@ -274,7 +258,8 @@
         "type": "string",
         "format": "date",
         "title": "Date of access",
-        "description": "Exact day when the producer’s dataset (in its current version) was downloaded by OWID.",
+        "description": "Exact day when the producer's dataset (in its current version) was downloaded by OWID.",
+        "pattern": "\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d",
         "requirement_level": "required",
         "examples": [
           "2023-07-13"
