@@ -1,3 +1,4 @@
+import argparse
 import datetime as dt
 import json
 import os
@@ -5,7 +6,7 @@ import re
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Literal, Optional
 
 import jsonschema
 import ruamel.yaml
@@ -47,6 +48,9 @@ DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
 
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
+
+# Phases accepted
+PHASES = Literal["all", "snapshot", "meadow", "garden", "grapher"]
 
 
 if WALKTHROUGH_ORIGINS:
@@ -150,6 +154,11 @@ def generate_step_to_channel(cookiecutter_path: Path, data: Dict[str, Any]) -> P
     target_dir = STEP_DIR / "data" / data["channel"]
     generate_step(cookiecutter_path, data, target_dir)
     return target_dir / data["namespace"] / data["version"]
+
+
+class classproperty(property):
+    def __get__(self, owner_self, owner_cls):
+        return self.fget(owner_cls)
 
 
 class AppState:
@@ -275,6 +284,20 @@ class AppState:
         self.display_error(key)
         return widget
 
+    @classproperty
+    def args(cls: "AppState") -> argparse.Namespace:
+        """Get arguments passed from command line."""
+        if "args" in st.session_state:
+            return st.session_state["args"]
+        else:
+            parser = argparse.ArgumentParser(description='This app lists animals')
+            parser.add_argument('--phase')
+            parser.add_argument('--run-checks', action='store_true')
+            parser.add_argument('--dummy-data', action='store_true')
+            args = parser.parse_args()
+            st.session_state["args"] = args
+        return st.session_state["args"]
+
 
 class StepForm(BaseModel):
     """Form abstract class."""
@@ -331,13 +354,29 @@ class StepForm(BaseModel):
             else:
                 raise Exception(f"Unknown error type {error_type} with message {error.message}")
 
-    def check_required(self, field_names: List[str]):
-        for field in field_names:
-            pass
+    def check_required(self, fields_names: List[str]):
+        """Check that all fields in `fields_names` are not empty."""
+        for field_name in fields_names:
+            attr = getattr(self, field_name)
+            if attr == "":
+                self.errors[field_name] = f"{field_name} cannot be empty"
 
-    def check_snake(self, field_names: List[str]):
-        for field in field_names:
-            pass
+    def check_snake(self, fields_names: List[str]):
+        """Check that all fields in `fields_names` are in snake case."""
+        for field_name in fields_names:
+            attr = getattr(self, field_name)
+            snake = is_snake(attr)
+            if snake:
+                self.errors[field_name] = f"{field_name} must be in snake case"
+
+
+def is_snake(s: str) -> bool:
+    """Check that `s` is in snake case.
+
+    First character is not allowed to be a number!
+    """
+    rex = r"[a-z][a-z0-9]+(?:_[a-z0-9]+)*"
+    return bool(re.fullmatch(rex, s))
 
 
 def extract(error_message: str):
@@ -419,5 +458,3 @@ def clean_empty_dict(d: Dict[str, Any]) -> Dict[str, Any]:
     if isinstance(d, list):
         return [v for v in map(clean_empty_dict, d) if v]
     return d
-
-

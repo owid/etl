@@ -1,22 +1,65 @@
-from pathlib import Path
+"""Interface to run the app from python.
 
-import streamlit as st
-from st_pages import Page, show_pages
+This module is implemented so that we can run the app with the `python` keyword:
 
-# Get current directory
-CURRENT_DIR = Path(__file__).parent
-# Page config
-st.set_page_config(page_title="Wizard", page_icon="🪄")
-st.title("Wizard")
+python cli.py
+"""
+import sys
+from typing import Iterable, Literal
+
+import click
+import streamlit.web.cli as stcli
+from rich_click.rich_command import RichCommand
+
+from apps.wizard.utils import CURRENT_DIR, PHASES
 
 
-# Specify what pages should be shown in the sidebar, and what their titles and icons
-# should be
-show_pages(
-    [
-        Page(CURRENT_DIR / "snapshot.py", "Snapshot", in_section=False),
-        Page(CURRENT_DIR / "meadow.py", "Meadow", in_section=False),
-        Page(CURRENT_DIR / "garden.py", "Garden", in_section=False),
-        Page(CURRENT_DIR / "grapher.py", "Grapher", in_section=False),
-    ]
+# NOTE: Any new arguments here need to be in sync with the arguments defined in
+# wizard.utils.APP_STATE.args property method
+@click.command(cls=RichCommand)
+@click.argument(
+    "phase",
+    type=click.Choice(PHASES.__args__),  # type: ignore
+    default="all",
 )
+@click.option(
+    "--run-checks/--skip-checks",
+    default=True,
+    type=bool,
+    help="Environment checks",
+)
+@click.option(
+    "--dummy-data",
+    is_flag=True,
+    help="Prefill form with dummy data, useful for development",
+)
+@click.option(
+    "--port",
+    default=8053,
+    type=int,
+    help="Application port",
+)
+def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, port: int) -> None:
+    """Generate template fo each step of ETL."""
+    script_path = CURRENT_DIR / "app.py"
+
+    # Define command with arguments
+    args = [
+        "streamlit",
+        "run",
+        str(script_path),
+        "--server.port",
+        str(port),
+        "--",
+        "--phase",
+        phase,
+    ]
+    if run_checks:
+        args.append("--run-checks")
+    if dummy_data:
+        args.append("--dummy-data")
+    sys.argv = args
+    print(args)
+
+    # Call
+    sys.exit(stcli.main())
