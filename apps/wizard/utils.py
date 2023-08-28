@@ -172,22 +172,22 @@ class AppState:
         self._init_steps()
 
     def _init_steps(self: "AppState") -> None:
+        # Initiate dictionary
         if "steps" not in st.session_state:
             st.session_state["steps"] = {}
         for step in self.steps:
             if step not in st.session_state["steps"]:
                 st.session_state["steps"][step] = {}
-                # Defaults for Snapshot
-                if step == "snapshot":
-                    st.session_state["steps"][step] = {
-                        **st.session_state["steps"][step],
-                        **{
-                            f"{step}.snapshot_version": DATE_TODAY,
-                            f"{step}.origin.date_accessed": DATE_TODAY,
-                            "snapshot_version": DATE_TODAY,
-                            "origin.date_accessed": DATE_TODAY,
-                        },
-                    }
+
+        # Add defaults
+        st.session_state["steps"]["snapshot"]["snapshot_version"] = DATE_TODAY
+        st.session_state["steps"]["snapshot"]["origin.date_accessed"] = DATE_TODAY
+        st.session_state["steps"]["meadow"]["version"] = DATE_TODAY
+        st.session_state["steps"]["meadow"]["snapshot_version"] = DATE_TODAY
+        st.session_state["steps"]["garden"]["version"] = DATE_TODAY
+        st.session_state["steps"]["garden"]["meadow_version"] = DATE_TODAY
+        st.session_state["steps"]["grapher"]["version"] = DATE_TODAY
+        st.session_state["steps"]["grapher"]["garden_version"] = DATE_TODAY
 
     def _check_step(self: "AppState") -> None:
         """Check that the value for step is valid."""
@@ -290,10 +290,10 @@ class AppState:
         if "args" in st.session_state:
             return st.session_state["args"]
         else:
-            parser = argparse.ArgumentParser(description='This app lists animals')
-            parser.add_argument('--phase')
-            parser.add_argument('--run-checks', action='store_true')
-            parser.add_argument('--dummy-data', action='store_true')
+            parser = argparse.ArgumentParser(description="This app lists animals")
+            parser.add_argument("--phase")
+            parser.add_argument("--run-checks", action="store_true")
+            parser.add_argument("--dummy-data", action="store_true")
             args = parser.parse_args()
             st.session_state["args"] = args
         return st.session_state["args"]
