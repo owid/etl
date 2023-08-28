@@ -9,7 +9,6 @@ from owid.catalog import Dataset
 from apps.wizard import utils
 from etl.paths import DAG_DIR, DATA_DIR, ETL_DIR
 
-
 #########################################################
 # CONSTANTS #############################################
 #########################################################
@@ -74,7 +73,6 @@ def update_state() -> None:
 def _check_dataset_in_meadow(form: GardenForm) -> None:
     private_suffix = "-private" if form.is_private else ""
 
-    st.markdown("""## Checking Meadow dataset...""")
     dataset_uri = f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"
 
     try:
