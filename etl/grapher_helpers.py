@@ -5,9 +5,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 
+import jinja2
 import numpy as np
 import pandas as pd
 import structlog
+from jinja2 import Environment
 from owid import catalog
 from owid.catalog.utils import underscore
 
@@ -16,6 +18,16 @@ from etl.db_utils import DBUtils
 
 log = structlog.get_logger()
 
+jinja_env = Environment(
+    block_start_string="<%",
+    block_end_string="%>",
+    variable_start_string="<<",
+    variable_end_string=">>",
+    comment_start_string="<#",
+    comment_end_string="#>",
+    trim_blocks=True,
+    lstrip_blocks=True,
+)
 
 # this might work too pd.api.types.is_integer_dtype(col)
 INT_TYPES = tuple({f"{n}{b}" for n in ("int", "Int", "uint", "UInt") for b in ("8", "16", "32", "64")})
@@ -100,8 +112,8 @@ def _yield_wide_table(
         # a situation when there's only year and entity_id in index with no additional dimensions
         grouped = [([], table)]
 
-    for dims, table_to_yield in grouped:
-        dims = [dims] if isinstance(dims, str) else dims
+    for dim_values, table_to_yield in grouped:
+        dim_values = [dim_values] if isinstance(dim_values, str) else dim_values
 
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
@@ -109,7 +121,7 @@ def _yield_wide_table(
             # If all values are null, skip variable
             if table_to_yield[column].isnull().all():
                 if warn_null_variables:
-                    log.warning("yield_wide_table.null_variable", column=column, dims=dims)
+                    log.warning("yield_wide_table.null_variable", column=column, dims=dim_values)
                 continue
 
             # Safety check to see if the metadata is still intact
@@ -119,26 +131,25 @@ def _yield_wide_table(
 
             # Select only one column and dimensions for performance
             tab = table_to_yield[[column]].copy()
-            tab.metadata = copy.deepcopy(tab.metadata)
 
             # Drop NA values
             tab = tab.dropna() if na_action == "drop" else tab
 
             # Create underscored name of a new column from the combination of column and dimensions
-            short_name = _underscore_column_and_dimensions(column, dims, dim_names)
+            short_name = _underscore_column_and_dimensions(column, dim_values, dim_names)
 
             # set new metadata with dimensions
             tab.metadata.short_name = short_name
             tab = tab.rename(columns={column: short_name})
 
             # add info about dimensions to metadata
-            if dims:
+            if dim_values:
                 tab[short_name].metadata.additional_info = {
                     "dimensions": {
                         "originalShortName": column,
                         "originalName": tab[short_name].metadata.title,
                         "filters": [
-                            {"name": dim_name, "value": dim_value} for dim_name, dim_value in zip(dim_names, dims)
+                            {"name": dim_name, "value": dim_value} for dim_name, dim_value in zip(dim_names, dim_values)
                         ],
                     }
                 }
@@ -146,10 +157,25 @@ def _yield_wide_table(
             # Add dimensions to title (which will be used as variable name in grapher)
             title_with_dims: Optional[str]
             if tab[short_name].metadata.title:
-                title_with_dims = _title_column_and_dimensions(tab[short_name].metadata.title, dims, dim_titles)
+                title_with_dims = _title_column_and_dimensions(tab[short_name].metadata.title, dim_values, dim_titles)
                 tab[short_name].metadata.title = title_with_dims
             else:
                 title_with_dims = None
+
+            # expand metadata with Jinja template
+            if dim_values and "<%" in tab[short_name].metadata.description:
+                try:
+                    tab[short_name].metadata.description = jinja_env.from_string(
+                        tab[short_name].metadata.description
+                    ).render(dict(zip(dim_names, dim_values)))
+                except jinja2.exceptions.TemplateSyntaxError:
+                    log.warning(
+                        "yield_wide_table.jinja_syntax_error",
+                        column=column,
+                        dims=dim_values,
+                        description="\n" + tab[short_name].metadata.description,
+                    )
+                    raise
 
             # Keep only entity_id and year in index
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
