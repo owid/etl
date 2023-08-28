@@ -66,7 +66,7 @@ if WALKTHROUGH_ORIGINS:
         "date_published": "2020-01-01",
         "producer": "Dummy producer",
         "citation_producer": "Dummy producer citation",
-        "dataset_url_download": "https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv",
+        "dataset_url_download": "https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv",
         "dataset_url_main": "https://www.url-dummy.com/",
         "license_name": "MIT dummy license",
     }
@@ -80,7 +80,7 @@ else:
         "name": "Dummy dataset",
         "description": "This\nis\na\ndummy\ndataset",
         "file_extension": "csv",
-        "source_data_url": "https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv",
+        "source_data_url": "https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv",
         "publication_date": "2020-01-01",
         "source_name": "Dummy short source citation",
         "source_published_by": "Dummy full source citation",
