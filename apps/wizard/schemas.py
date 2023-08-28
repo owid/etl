@@ -1,0 +1,2 @@
+class SnapshotSchema:
+    pass

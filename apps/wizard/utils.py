@@ -1,9 +1,9 @@
 import datetime as dt
 import json
 import os
+import re
 import shutil
 import tempfile
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
@@ -237,6 +237,7 @@ class AppState:
     def display_error(self: "AppState", key: str) -> None:
         """Get error message for a given key."""
         if "errors" in self.state_step:
+            print(key)
             if msg := self.state_step.get("errors", {}).get(key, ""):
                 st.error(msg)
 
@@ -296,6 +297,20 @@ class StepForm(BaseModel):
 
     def validate(self):
         raise NotImplementedError("Needs to be implemented in the child class!")
+
+    @property
+    def metadata(self):
+        raise NotADirectoryError("Needs to be implemented in the child class!")
+
+    def to_yaml(self, path: Path) -> None:
+        with open(path, "w") as f:
+            ruamel.yaml.dump(self.metadata, f, Dumper=ruamel.yaml.RoundTripDumper)
+
+
+def extract(error_message: str):
+    """Get field name that caused the error."""
+    rex = r"'(.*)' is a required property"
+    return re.findall(rex, error_message)[0]
 
 
 def config_style_html():
@@ -359,3 +374,15 @@ def _show_environment() -> None:
     ```
     """
     )
+
+
+def clean_empty_dict(d: Dict[str, Any]) -> Dict[str, Any]:
+    """Remove empty values from dict.
+
+    REference: https://stackoverflow.com/a/27974027/5056599
+    """
+    if isinstance(d, dict):
+        return {k: v for k, v in ((k, clean_empty_dict(v)) for k, v in d.items()) if v}
+    if isinstance(d, list):
+        return [v for v in map(clean_empty_dict, d) if v]
+    return d
