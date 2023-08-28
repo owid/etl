@@ -185,7 +185,7 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
             tb[column].metadata.unit = "US dollars"
             tb[column].metadata.short_unit = "$"
         elif column == "percentage_of_female_tertiary_teachers":
-            tb[column].metadata.title = "Share of teachers who are in female, tertiary"
+            tb[column].metadata.title = "Share of teachers who are female, tertiary"
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 1
             tb[column].metadata.unit = "%"
