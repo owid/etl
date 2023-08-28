@@ -121,64 +121,80 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
             if "wittgenstein_projection__percentage" in new_column_name:
                 tb[new_column_name] *= 100
 
+            tb[new_column_name].metadata.display = {}
+
+            #
+            # Update metadata units, short_units and number of decimal places to display depending on what keywords the variable name contains
+            #
+
+            def update_metadata(table, column, display_decimals, unit, short_unit=" "):
+                """
+                Update metadata attributes of a specified column in the given table.
+
+                Args:
+                table (obj): The table object containing the column.
+                column (str): Name of the column whose metadata is to be updated.
+                display_decimals (int): Number of decimal places to display.
+                unit (str): The full name of the unit of measurement for the column data.
+                short_unit (str, optional): The abbreviated form of the unit. Defaults to an empty space.
+
+                Returns:
+                None: The function updates the table in-place.
+                """
+                table[column].metadata.display["numDecimalPlaces"] = display_decimals
+                table[column].metadata.unit = unit
+                table[column].metadata.short_unit = short_unit
+
+            # Convert the 'name' variable to lowercase for easier text matching.
+            name_lower = name.lower()
+
+            # Define a list of keywords associated with percentages.
+            percentage_unit = ["%", "percentage", "share of", "rate"]
+            other_list = ["ratio", "index", "years", "USD"]
+            # Check if any keyword from the percentage_unit list is present in 'name_lower' and ensure "number" is not in 'name_lower'.
+            if any(keyword in name_lower for keyword in percentage_unit) and (name_lower not in other_list):
+                update_metadata(tb, new_column_name, 1, "%", "%")
+            elif "ratio" in name_lower and not ("duration" in name_lower):
+                update_metadata(tb, new_column_name, 1, "ratio", " ")
+            elif "number of pupils" in name_lower:
+                update_metadata(tb, new_column_name, 0, "pupils", " ")
+            # Check if the column name contains "number", but not "rate" or "pasec".
+            elif "number" in name_lower and not ("rate" in name_lower) and not ("pasec" in name_lower):
+                update_metadata(tb, new_column_name, 0, "people", " ")
+            elif "years" in name_lower:
+                update_metadata(tb, new_column_name, 1, "years", " ")
+            elif "index" in name_lower:
+                update_metadata(tb, new_column_name, 1, "index", " ")
+            # Check for the presence of currency-related keywords in 'name_lower'.
+            elif "usd" in name_lower or "$" in name_lower:
+                update_metadata(tb, new_column_name, 1, "US dollars", "$")
+            elif "score" in name_lower:
+                update_metadata(tb, new_column_name, 1, "score", " ")
+
+            else:
+                # Default metadata update when no other conditions are met.
+                update_metadata(tb, new_column_name, 0, " ", " ")
         elif column == "total_funding_per_student_ppp":
-            new_column_name = column
+            tb[column].metadata.title = "Total funding per student (in PPP)"
+            tb[column].metadata.display = {}
             tb[
                 column
             ].metadata.description = "Combined total payments of households and governmental funding per primary student. Total payments of households (pupils, students and their families) for educational institutions (such as for tuition fees, exam and registration fees, contribution to Parent-Teacher associations or other school funds, and fees for canteen, boarding and transport) and purchases outside of educational institutions (such as for uniforms, textbooks, teaching materials, or private classes). 'Initial funding' means that government transfers to households, such as scholarships and other financial aid for education, are subtracted from what is spent by households. Note that in some countries for some education levels, the value of this indicator may be 0, since on average households may be receiving as much, or more, in financial aid from the government than what they are spending on education. Calculation: Total payments of households (pupils, students and their families) for educational institutions (such as for tuition fees, exam and registration fees, contribution to Parent-Teacher associations or other school funds, and fees for canteen, boarding and transport), plus purchases outside of educational institutions (such as for uniforms, textbooks, teaching materials, or private classes), minus government education transfers to households (such as scholarships or other education-specific financial aid). Limitations: Indicators for household expenditure on education should be interpreted with caution since data comes from household surveys which may not all follow the same definitions and concepts. These types of surveys are also not carried out in all countries with regularity, and for some categories (such as pupils in pre-primary education), the sample sizes may be low. In some cases where data on government transfers to households (scholarships and other financial aid) was not available, they could not be subtracted from amounts paid by households. Total general (local, regional and central, current and capital) initial government funding of education per student, which includes transfers paid (such as scholarships to students), but excludes transfers received, in this case international transfers to government for education (when foreign donors provide education sector budget support or other support integrated in the government budget). Calculation Method: Total general (local, regional and central) government expenditure (current and capital) on a given level of education (primary, secondary, etc) minus international transfers to government for education, divided by the number of student enrolled at that level of education. This is then expressed at constant purchasing power parity (constant PPP$). Limitations: In some instances data on total government expenditure on education refers only to the Ministry of Education, excluding other ministries which may also spend a part of their budget on educational activities. There are also cases where it may not be possible to separate international transfers to government from general government expenditure on education, in which cases they have not been subtracted in the formula. "
 
-        tb[new_column_name].metadata.display = {}
-
-        #
-        # Update metadata units, short_units and number of decimal places to display depending on what keywords the variable name contains
-        #
-
-        def update_metadata(table, column, display_decimals, unit, short_unit=" "):
-            """
-            Update metadata attributes of a specified column in the given table.
-
-            Args:
-            table (obj): The table object containing the column.
-            column (str): Name of the column whose metadata is to be updated.
-            display_decimals (int): Number of decimal places to display.
-            unit (str): The full name of the unit of measurement for the column data.
-            short_unit (str, optional): The abbreviated form of the unit. Defaults to an empty space.
-
-            Returns:
-            None: The function updates the table in-place.
-            """
-            table[column].metadata.display["numDecimalPlaces"] = display_decimals
-            table[column].metadata.unit = unit
-            table[column].metadata.short_unit = short_unit
-
-        # Convert the 'name' variable to lowercase for easier text matching.
-        name_lower = name.lower()
-
-        # Define a list of keywords associated with percentages.
-        percentage_unit = ["%", "percentage", "share of", "rate"]
-        other_list = ["ratio", "index", "years", "USD"]
-        # Check if any keyword from the percentage_unit list is present in 'name_lower' and ensure "number" is not in 'name_lower'.
-        if any(keyword in name_lower for keyword in percentage_unit) and (name_lower not in other_list):
-            update_metadata(tb, new_column_name, 1, "%", "%")
-        elif "ratio" in name_lower and not ("duration" in name_lower):
-            update_metadata(tb, new_column_name, 1, "ratio", " ")
-        elif "number of pupils" in name_lower:
-            update_metadata(tb, new_column_name, 0, "pupils", " ")
-        # Check if the column name contains "number", but not "rate" or "pasec".
-        elif "number" in name_lower and not ("rate" in name_lower) and not ("pasec" in name_lower):
-            update_metadata(tb, new_column_name, 0, "people", " ")
-        elif "years" in name_lower:
-            update_metadata(tb, new_column_name, 1, "years", " ")
-        elif "index" in name_lower:
-            update_metadata(tb, new_column_name, 1, "index", " ")
-        # Check for the presence of currency-related keywords in 'name_lower'.
-        elif "usd" in name_lower or "$" in name_lower:
-            update_metadata(tb, new_column_name, 1, "US dollars", "$")
-        elif "score" in name_lower:
-            update_metadata(tb, new_column_name, 1, "score", " ")
-
-        else:
-            # Default metadata update when no other conditions are met.
-            update_metadata(tb, new_column_name, 0, " ", " ")
+            tb[column].metadata.display["numDecimalPlaces"] = 0
+            tb[column].metadata.unit = "US dollars"
+            tb[column].metadata.short_unit = "$"
+        elif column == "percentage_of_female_tertiary_teachers":
+            tb[column].metadata.title = "Share of teachers who are in female, tertiary"
+            tb[column].metadata.display = {}
+            tb[column].metadata.display["numDecimalPlaces"] = 1
+            tb[column].metadata.unit = "%"
+            tb[column].metadata.short_unit = "%"
+        elif column == "percentage_of_female_pre_primary_students":
+            tb[column].metadata.title = "Share of female students, primary"
+            tb[column].metadata.display = {}
+            tb[column].metadata.display["numDecimalPlaces"] = 1
+            tb[column].metadata.unit = "%"
+            tb[column].metadata.short_unit = "%"
 
     return tb
