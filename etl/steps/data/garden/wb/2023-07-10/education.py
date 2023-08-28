@@ -42,6 +42,10 @@ def run(dest_dir: str) -> None:
     # Pivot the dataframe so that each indicator is a separate column
     tb = tb.pivot(index=["country", "year"], columns="indicator_code", values="value")
     tb.reset_index(inplace=True)
+    # Adding share of female students in pre-primary school, share of female teachers in tertiary education and total funding per student (household + government)
+    tb["percentage_of_female_pre_primary_students)"] = (tb["SE.PRE.ENRL.FE"] / tb["SE.PRE.ENRL"]) * 100
+    tb["percentage_of_female_tertiary_teachers"] = (tb["UIS.T.5"] / tb["UIS.T.5.F"]) * 100
+    tb["total_funding_per_student_ppp"] = tb["UIS.XUNIT.PPPCONST.1.FSGOV"] + tb["UIS.XUNIT.PPPCONST.1.FSHH"]
 
     # Set an appropriate index and sort.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
@@ -72,44 +76,56 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
         Table: The table with updated metadata.
     """
     # Loop through the DataFrame columns
+    custom_cols = [
+        "percentage_of_female_pre_primary_students",
+        "percentage_of_female_tertiary_teachers",
+        "total_funding_per_student_ppp",
+    ]
     for column in tqdm(tb.columns, desc="Processing metadata for indicators"):
-        # Extract the title from the default metadata to find the corresponding World Bank indicator
-        indicator_to_find = tb[column].metadata.title
+        if column not in custom_cols:
+            # Extract the title from the default metadata to find the corresponding World Bank indicator
+            indicator_to_find = tb[column].metadata.title
 
-        # Extract relevant name, description and source from the metadata table using the WB code
-        name = (
-            metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "indicator_name"]
-            .str.replace("‚", "")  # commas caused problems when renaming variables later on
-            .iloc[0]
-        )
-        description = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "description"].iloc[0]
-        source = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "source"].iloc[0]
-        new_column_name = underscore(name)  # Convert extracted name to underscore format
+            # Extract relevant name, description and source from the metadata table using the WB code
+            name = (
+                metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "indicator_name"]
+                .str.replace("‚", "")  # commas caused problems when renaming variables later on
+                .iloc[0]
+            )
+            description = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "description"].iloc[0]
+            source = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "source"].iloc[0]
+            new_column_name = underscore(name)  # Convert extracted name to underscore format
 
-        # If more detailed description is currently missing in the API --> use the long title as a description
-        if str(description) == "nan":
-            description = name
-            source = " "
+            # If more detailed description is currently missing in the API --> use the long title as a description
+            if str(description) == "nan":
+                description = name
+                source = " "
 
-        # Update the column names and metadata
-        tb.rename(columns={column: new_column_name}, inplace=True)
-        description_string = " ".join(
-            [
-                description + "." "World Bank variable id: " + indicator_to_find + ".",
-                source,
-            ]
-        )
+            # Update the column names and metadata
+            tb.rename(columns={column: new_column_name}, inplace=True)
+            description_string = " ".join(
+                [
+                    description + "." "World Bank variable id: " + indicator_to_find + ".",
+                    source,
+                ]
+            )
 
-        # Replace any occurrences of '..' with '.'
-        description_string = description_string.replace("..", ".")
-        description_string = description_string.replace(".W", ". W")
+            # Replace any occurrences of '..' with '.'
+            description_string = description_string.replace("..", ".")
+            description_string = description_string.replace(".W", ". W")
 
-        tb[new_column_name].metadata.description = description_string
-        tb[new_column_name].metadata.title = name
+            tb[new_column_name].metadata.description = description_string
+            tb[new_column_name].metadata.title = name
 
-        # Conver Witthgenstein projections to %
-        if "wittgenstein_projection__percentage" in new_column_name:
-            tb[new_column_name] *= 100
+            # Conver Witthgenstein projections to %
+            if "wittgenstein_projection__percentage" in new_column_name:
+                tb[new_column_name] *= 100
+
+        elif column == "total_funding_per_student_ppp":
+            new_column_name = column
+            tb[
+                column
+            ].metadata.description = "Combined total payments of households and governmental funding per primary student. Total payments of households (pupils, students and their families) for educational institutions (such as for tuition fees, exam and registration fees, contribution to Parent-Teacher associations or other school funds, and fees for canteen, boarding and transport) and purchases outside of educational institutions (such as for uniforms, textbooks, teaching materials, or private classes). 'Initial funding' means that government transfers to households, such as scholarships and other financial aid for education, are subtracted from what is spent by households. Note that in some countries for some education levels, the value of this indicator may be 0, since on average households may be receiving as much, or more, in financial aid from the government than what they are spending on education. Calculation: Total payments of households (pupils, students and their families) for educational institutions (such as for tuition fees, exam and registration fees, contribution to Parent-Teacher associations or other school funds, and fees for canteen, boarding and transport), plus purchases outside of educational institutions (such as for uniforms, textbooks, teaching materials, or private classes), minus government education transfers to households (such as scholarships or other education-specific financial aid). Limitations: Indicators for household expenditure on education should be interpreted with caution since data comes from household surveys which may not all follow the same definitions and concepts. These types of surveys are also not carried out in all countries with regularity, and for some categories (such as pupils in pre-primary education), the sample sizes may be low. In some cases where data on government transfers to households (scholarships and other financial aid) was not available, they could not be subtracted from amounts paid by households. Total general (local, regional and central, current and capital) initial government funding of education per student, which includes transfers paid (such as scholarships to students), but excludes transfers received, in this case international transfers to government for education (when foreign donors provide education sector budget support or other support integrated in the government budget). Calculation Method: Total general (local, regional and central) government expenditure (current and capital) on a given level of education (primary, secondary, etc) minus international transfers to government for education, divided by the number of student enrolled at that level of education. This is then expressed at constant purchasing power parity (constant PPP$). Limitations: In some instances data on total government expenditure on education refers only to the Ministry of Education, excluding other ministries which may also spend a part of their budget on educational activities. There are also cases where it may not be possible to separate international transfers to government from general government expenditure on education, in which cases they have not been subtracted in the formula. "
 
         tb[new_column_name].metadata.display = {}
 
