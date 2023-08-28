@@ -105,6 +105,9 @@ def run(dest_dir: str) -> None:
 
     # Process data to calculate statistics related to terrorism incidents.
     tb: Table = geo.harmonize_countries(df=tb_terrorism, countries_file=paths.country_mapping_path)
+    # Make sure year and country are correct datatypes to ensure aggregations are done correctly
+    tb["year"] = tb["year"].astype(int)
+    tb["country"] = tb["country"].astype(str)
     total_df = pd.DataFrame()
     total_df["total_killed"] = tb.groupby(["country", "year"])["nkill"].sum()
     total_df["total_wounded"] = tb.groupby(["country", "year"])["nwound"].sum()
