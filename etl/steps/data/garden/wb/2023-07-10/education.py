@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
     tb.reset_index(inplace=True)
     # Adding share of female students in pre-primary school, share of female teachers in tertiary education and total funding per student (household + government)
     tb["percentage_of_female_pre_primary_students)"] = (tb["SE.PRE.ENRL.FE"] / tb["SE.PRE.ENRL"]) * 100
-    tb["percentage_of_female_tertiary_teachers"] = (tb["UIS.T.5"] / tb["UIS.T.5.F"]) * 100
+    tb["percentage_of_female_tertiary_teachers"] = (tb["UIS.T.5.F"] / tb["UIS.T.5"]) * 100
     tb["total_funding_per_student_ppp"] = tb["UIS.XUNIT.PPPCONST.1.FSGOV"] + tb["UIS.XUNIT.PPPCONST.1.FSHH"]
 
     # Set an appropriate index and sort.
