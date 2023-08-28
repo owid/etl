@@ -6,7 +6,6 @@ import streamlit as st
 from apps.wizard import utils
 from etl.paths import DAG_DIR
 
-
 #########################################################
 # CONSTANTS #############################################
 #########################################################
@@ -71,15 +70,16 @@ st.title("Wizard  **:gray[Grapher]**")
 
 # SIDEBAR
 with st.sidebar:
-    # CONNECT AND CHECK
-    with st.expander("**Environment checks**", expanded=True):
-        utils._check_env()
-        utils._show_environment()
+    # CONNECT AND
+    if APP_STATE.args.run_checks:
+        with st.expander("**Environment checks**", expanded=True):
+            utils._check_env()
+            utils._show_environment()
 
-    # INSTRUCTIONS
-    with st.expander("**Instructions**", expanded=True):
-        text = load_instructions()
-        st.markdown(text)
+        # INSTRUCTIONS
+        with st.expander("**Instructions**", expanded=True):
+            text = load_instructions()
+            st.markdown(text)
 
 
 # FORM

@@ -439,15 +439,16 @@ st.title("Wizard **:gray[Snapshot]**")
 
 # SIDEBAR
 with st.sidebar:
-    # CONNECT AND CHECK
-    with st.expander("**Environment checks**", expanded=True):
-        run_checks()
+    if APP_STATE.args.run_checks:
+        # CONNECT AND CHECK
+        with st.expander("**Environment checks**", expanded=True):
+            run_checks()
 
-    # INSTRUCTIONS
-    with st.expander("**Instructions**", expanded=True):
-        text = load_instructions()
-        st.markdown(text)
-        st.markdown("3. **Only supports `origin`**. To work with `source` instead, use `walkthrough`.")
+        # INSTRUCTIONS
+        with st.expander("**Instructions**", expanded=True):
+            text = load_instructions()
+            st.markdown(text)
+            st.markdown("3. **Only supports `origin`**. To work with `source` instead, use `walkthrough`.")
 
 # FORM
 form_widget = st.empty()
