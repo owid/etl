@@ -9,6 +9,7 @@ from owid.catalog import Dataset
 from apps.wizard import utils
 from etl.paths import DAG_DIR, DATA_DIR, ETL_DIR
 
+
 #########################################################
 # CONSTANTS #############################################
 #########################################################
@@ -258,7 +259,8 @@ if submitted:
         private_suffix = "-private" if form.is_private else ""
 
         # Run checks on dependency
-        _check_dataset_in_meadow(form)
+        if APP_STATE.args.run_checks:
+            _check_dataset_in_meadow(form)
 
         # Add to dag
         dag_path = DAG_DIR / form.dag_file

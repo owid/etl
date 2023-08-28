@@ -1,11 +1,8 @@
-import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, cast
 
-import jsonschema
 import streamlit as st
 from botocore.exceptions import ClientError
-from jsonschema.exceptions import ErrorTree
 from owid.catalog import s3_utils
 
 from apps.wizard import utils
@@ -90,41 +87,24 @@ class SnapshotForm(utils.StepForm):
         - Add error message for each field (to be displayed in the form).
         - Return True if all fields are valid, False otherwise.
         """
-        self.errors = {}
-
         # 1) Validate using schema
         # This only applies to SnapshotMeta fields
-        self.validate_schema(["meta"])
+        self.validate_schema(SNAPSHOT_SCHEMA, ["meta"])
 
         # 2) Check other fields (non meta)
         fields_required = ["namespace", "snapshot_version", "short_name", "file_extension"]
         fields_snake = ["namespace", "short_name"]
 
-        check_required(fields_required)
-
-        def _is_snake(s):
-            rex = r"[a-z][a-z0-9]+(?:_[a-z0-9]+)*"
-            return bool(re.fullmatch(rex, s))
-
-        if self.namespace == "":
-            self.errors["namespace"] = "`namespace` cannot be empty"
-        elif not _is_snake(self.namespace):
-            self.errors["namespace"] = "`namespace` must be in snake case"
-        if self.snapshot_version == "":
-            self.errors["snapshot_version"] = "`snapshot_version` cannot be empty"
-        if self.short_name == "":
-            self.errors["short_name"] = "`short_name` cannot be empty"
-        elif not _is_snake(self.short_name):
-            self.errors["short_name"] = "`short_name` must be in snake case"
-        if self.file_extension == "":
-            self.errors["file_extension"] = "`file_extension` cannot be empty"
+        self.check_required(fields_required)
+        self.check_snake(fields_snake)
 
         # License
         if self.license_name == "":
             self.errors["origin.license.name_custom"] = "Please introduce the name of the custom license!"
 
     @property
-    def metadata(self):
+    def metadata(self) -> dict[str, Any]:
+        """Define metadata for easy YAML-export."""
         meta = {
             "meta": {
                 "origin": {
