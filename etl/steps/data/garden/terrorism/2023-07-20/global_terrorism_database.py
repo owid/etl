@@ -109,12 +109,13 @@ def run(dest_dir: str) -> None:
     tb["year"] = tb["year"].astype(int)
     tb["country"] = tb["country"].astype(str)
     total_df = pd.DataFrame()
+
     total_df["total_killed"] = tb.groupby(["country", "year"])["nkill"].sum()
     total_df["total_wounded"] = tb.groupby(["country", "year"])["nwound"].sum()
     total_df["total_incident_counts"] = tb.groupby(["country", "year"]).size()
+
     # Add GTD regions to number of deaths, attacks and wounded
     total_df = add_regions(tb, total_df)
-
     tb.loc[tb["nkill"] == 0, "severity"] = "0 deaths"
     tb.loc[(tb["nkill"] >= 1) & (tb["nkill"] <= 5), "severity"] = "1-5 deaths"
     tb.loc[(tb["nkill"] >= 6) & (tb["nkill"] <= 10), "severity"] = "6-10 deaths"
