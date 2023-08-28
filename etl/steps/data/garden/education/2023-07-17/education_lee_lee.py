@@ -22,7 +22,7 @@ REGIONS = [
     "Upper-middle-income countries",
     "Lower-middle-income countries",
     "High-income countries",
-    "World",
+    # "World",
 ]
 
 
@@ -50,6 +50,8 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Datas
             aggregations=aggregations,
             weights=tb_with_regions["population"],
         )
+    tb_with_regions.drop("population", axis=1, inplace=True)
+    return tb_with_regions
 
 
 def run(dest_dir: str) -> None:
@@ -103,7 +105,7 @@ def run(dest_dir: str) -> None:
     merged_df = merged_df.drop(columns=[column for column in merged_df.columns if "__thousands" in column])
     merged_df.columns = [underscore(col) for col in merged_df.columns]
     merged_df = add_data_for_regions(tb=merged_df, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-
+    print(merged_df)
     # Concatenate historical and more recent enrollment data
     hist_1985_df = merged_df[merged_df["year"] < 1985]
     df_merged_enrollment = pd.concat([enrolment_wb, hist_1985_df[world_bank_indicators]])
