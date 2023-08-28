@@ -3,6 +3,7 @@
 from typing import List, cast
 
 import pandas as pd
+import shared
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
 
@@ -22,16 +23,13 @@ REGIONS = [
     "Upper-middle-income countries",
     "Lower-middle-income countries",
     "High-income countries",
-    # "World",
+    "World",
 ]
 
 
 def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     tb_with_regions = tb.copy()
-    aggregations = {
-        column: "mean" for column in tb_with_regions.columns if column not in ["country", "year", "population"]
-    }
-    tb_with_regions = geo.add_population_to_dataframe(tb_with_regions)
+    aggregations = {column: "mean" for column in tb_with_regions.columns if column not in ["country", "year"]}
 
     for region in REGIONS:
         # Find members of current region.
@@ -40,7 +38,7 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Datas
             ds_regions=ds_regions,
             ds_income_groups=ds_income_groups,
         )
-        tb_with_regions = geo.add_region_aggregates(
+        tb_with_regions = shared.add_region_aggregates_education(
             df=tb_with_regions,
             region=region,
             countries_in_region=members,
@@ -48,9 +46,7 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Datas
             num_allowed_nans_per_year=None,
             frac_allowed_nans_per_year=0.2,
             aggregations=aggregations,
-            weights=tb_with_regions["population"],
         )
-    tb_with_regions.drop("population", axis=1, inplace=True)
     return tb_with_regions
 
 
