@@ -88,9 +88,7 @@ def run(dest_dir: str) -> None:
     tb_projections = Table(df_projections, short_name=paths.short_name, underscore=True)
 
     # Add regional and income group data to the projections.
-    tb_projections = add_data_for_regions(
-        tb=tb_projections, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
+    tb_projections = add_data_for_regions(tb=tb_projections, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Set the index to be based on country and year.
     tb_projections.set_index(["country", "year"], inplace=True)
