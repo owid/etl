@@ -1,7 +1,7 @@
 tables:
   long_run_child_mortality:
     variables:
-      # testing_variable:
+        under_five_mortality_rate:
       #   title: Testing variable title
       #   unit: arbitrary units
       #   short_unit: au
