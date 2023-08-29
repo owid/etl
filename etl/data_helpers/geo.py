@@ -240,7 +240,6 @@ def add_region_aggregates(
     aggregations: Optional[Dict[str, Any]] = None,
     keep_original_region_with_suffix: Optional[str] = None,
     population: Optional[pd.DataFrame] = None,
-    weights: Optional[pd.DataFrame] = None,
 ) -> pd.DataFrame:
     """Add data for regions (e.g. income groups or continents) to a dataset.
 
