@@ -19,6 +19,6 @@ meta:
     The units the data is measured in.
 wdir: ../../../data/snapshots/un/2023-01-24
 outs:
-- md5: 244c8941b3637432bcb48244a3d47d49
+- md5: 67dfdabe0de459ba98027b924486fcff
   size: 2555
   path: un_sdg_unit.csv

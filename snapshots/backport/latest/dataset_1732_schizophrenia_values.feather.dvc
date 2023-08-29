@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1732
+    date_accessed: 2023-08-16 10:34:54.300688
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Schizophrenia
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1ee2b828a60f67f03881f33f6c6e0bdb
+  size: 857210
+  path: dataset_1732_schizophrenia_values.feather

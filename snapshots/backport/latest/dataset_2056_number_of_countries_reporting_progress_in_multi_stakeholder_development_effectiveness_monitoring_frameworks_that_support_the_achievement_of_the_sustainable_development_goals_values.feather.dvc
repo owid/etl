@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2056
+    date_accessed: 2023-08-11 07:36:20.252621
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of countries reporting progress in multi-stakeholder development effectiveness
+    monitoring frameworks that support the achievement of the sustainable development
+    goals
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f43f067a0efdbc577001bdc84c788713
+  size: 9666
+  path: 
+    dataset_2056_number_of_countries_reporting_progress_in_multi_stakeholder_development_effectiveness_monitoring_frameworks_that_support_the_achievement_of_the_sustainable_development_goals_values.feather

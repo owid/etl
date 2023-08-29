@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1969
+    date_accessed: 2023-08-11 07:45:03.805049
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1969_proportion_of_children_and_young_people__a__in_grades_2_3__b__at_the_end_of_primary__and__c__at_the_end_of_lower_secondary_achieving_at_least_a_minimum_proficiency_level_in__i__reading_and__ii__mathematics__by_sex
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d31502c983ffe26e82decae2950d0b14
+  size: 18958
+  path: 
+    dataset_1969_proportion_of_children_and_young_people__a__in_grades_2_3__b__at_the_end_of_primary__and__c__at_the_end_of_lower_secondary_achieving_at_least_a_minimum_proficiency_level_in__i__reading_and__ii__mathematics__by_sex_config.json

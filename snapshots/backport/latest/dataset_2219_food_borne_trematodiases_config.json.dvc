@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2219
+    date_accessed: 2023-08-16 07:58:30.739737
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2219_food_borne_trematodiases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0398daaebe70d6157981ab284bb47c4e
+  size: 32872
+  path: dataset_2219_food_borne_trematodiases_config.json

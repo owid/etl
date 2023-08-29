@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3974
+    date_accessed: 2023-08-10 14:33:37.165875
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3974_benign_and_in_situ_intestinal_neoplasms
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f25f39081c9811d4d55856884307850a
+  size: 17078
+  path: dataset_3974_benign_and_in_situ_intestinal_neoplasms_config.json

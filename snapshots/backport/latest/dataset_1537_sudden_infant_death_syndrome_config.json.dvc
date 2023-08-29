@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1537
+    date_accessed: 2023-08-10 14:44:32.939525
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1537_sudden_infant_death_syndrome (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9cbd0d7a0d7655f92a64f33a32c0a7b8
+  size: 22348
+  path: dataset_1537_sudden_infant_death_syndrome_config.json

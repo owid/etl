@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1659
+    date_accessed: 2023-08-14 14:28:34.875808
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1659_alcoholic_cardiomyopathy (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4bf916be9d5e3aed4f716769c2b85dc1
+  size: 26999
+  path: dataset_1659_alcoholic_cardiomyopathy_config.json

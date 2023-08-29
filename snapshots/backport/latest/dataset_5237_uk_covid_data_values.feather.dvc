@@ -1,19 +1,15 @@
 meta:
-  name: uk_covid_data
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5237
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-17 16:54:20.127394
+    date_accessed: 2023-08-14 15:41:17.229359
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: uk_covid_data
+  description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 153ad78957cb230c263674758b5caf70
-  size: 9321450
+- md5: 58acc108a697d0db8fcd8d1d0c986a23
+  size: 9497970
   path: dataset_5237_uk_covid_data_values.feather

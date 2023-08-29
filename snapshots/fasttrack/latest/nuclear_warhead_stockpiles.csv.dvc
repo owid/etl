@@ -1,0 +1,27 @@
+meta:
+  source:
+    name: Google Sheet
+    url: https://fas.org/issues/nuclear-weapons/status-world-nuclear-forces/
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9gi-5QBEFuGclzGkfwv9NY_DavklY4DmA9-6QFG7KVFXTvuDf6fe4ETT7_e2zko4akSlAAqGduasG/pub?output=csv
+    date_accessed: '2023-08-22'
+    publication_year: .nan
+    published_by: Google Sheet
+  name: Nuclear warhead stockpiles – Federation of American Scientists
+  description: >-
+    This dataset provides information on the number of stockpiled nuclear warheads
+    by the nuclear powers, using data from
+    the Federation of American Scientists, prepared by Hans M. Kristensen, Matt Korda,
+    Eliana Reynolds, and Robert Norris.
+
+
+    You can download the code and complete dataset, including supplementary variables,
+    from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/nuclear_weapons
+
+    Publisher source: None
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 3ae0bc86faefa1734117ba84f4761adc
+  size: 15471
+  path: nuclear_warhead_stockpiles.csv

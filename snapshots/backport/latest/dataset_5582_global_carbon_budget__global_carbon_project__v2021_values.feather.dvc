@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5582
+    date_accessed: 2023-08-16 07:26:06.372533
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Global Carbon Budget - Global Carbon Project (v2021)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 72e91744c1cc33acb0b0e7f366cfbc0c
+  size: 4373562
+  path: dataset_5582_global_carbon_budget__global_carbon_project__v2021_values.feather

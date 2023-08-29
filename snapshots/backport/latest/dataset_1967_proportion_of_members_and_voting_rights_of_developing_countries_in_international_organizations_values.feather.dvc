@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1967
+    date_accessed: 2023-08-16 08:03:43.331446
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of members and voting rights of developing countries in international
+    organizations
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fa2e6731260aff78b7b503378aa8ba69
+  size: 48258
+  path: 
+    dataset_1967_proportion_of_members_and_voting_rights_of_developing_countries_in_international_organizations_values.feather

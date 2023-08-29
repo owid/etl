@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1556
+    date_accessed: 2023-08-16 10:32:48.194606
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Peptic ulcer disease
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7c5274febdfd61bc6e16bcab9aba252d
+  size: 2012042
+  path: dataset_1556_peptic_ulcer_disease_values.feather

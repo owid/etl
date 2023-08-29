@@ -1,52 +1,36 @@
 dataset:
+  title: Welfare of broiler chickens (Welfare Footprint)
+  description: ''
+  licenses:
+  - {}
   sources:
   - name: Welfare Footprint
-    published_by: Welfare Footprint
-    publication_year: 2022
     url: https://welfarefootprint.org/broilers/
+    publication_year: '2022'
+    published_by: Welfare Footprint
 tables:
   welfare_broiler_chickens:
     variables:
       excrutiating_pain_seconds:
         title: excrutiating_pain_seconds
-        short_unit: seconds
-        unit: seconds
         description: The number of seconds the average broiler chicken spends in excrutiating pain over its lifespan.
-        sources:
-        - name: Welfare Footprint
-          published_by: Welfare Footprint
-          publication_year: 2022
-          url: https://welfarefootprint.org/broilers/
+        unit: seconds
+        short_unit: seconds
       disabling_pain_days:
         title: disabling_pain_days
-        short_unit: days
-        unit: days
         description: The number of waking days that the average broiler chicken spends in disabling pain over its lifespan.
           A 'waking day' is 16 hours long.
-        sources:
-        - name: Welfare Footprint
-          published_by: Welfare Footprint
-          publication_year: 2022
-          url: https://welfarefootprint.org/broilers/
+        unit: days
+        short_unit: days
       hurtful_pain_days:
         title: hurtful_pain_days
-        short_unit: days
-        unit: days
         description: The number of waking days that the average broiler chicken spends in hurtful pain over its lifespan.
           A 'waking day' is 16 hours long.
-        sources:
-        - name: Welfare Footprint
-          published_by: Welfare Footprint
-          publication_year: 2022
-          url: https://welfarefootprint.org/broilers/
+        unit: days
+        short_unit: days
       annoying_pain_days:
         title: annoying_pain_days
-        short_unit: days
-        unit: days
         description: The number of waking days that the average broiler chicken spends in annoying pain over its lifespan.
           A 'waking day' is 16 hours long.
-        sources:
-        - name: Welfare Footprint
-          published_by: Welfare Footprint
-          publication_year: 2022
-          url: https://welfarefootprint.org/broilers/
+        unit: days
+        short_unit: days

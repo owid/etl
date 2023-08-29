@@ -1,0 +1,22 @@
+dataset:
+  title: Net Zero Targets (Net Zero Tracker)
+  description: ''
+  licenses:
+  - {}
+  sources:
+  - name: Net Zero Tracker
+    url: https://zerotracker.net/
+    publication_year: .nan
+    published_by: Energy and Climate Intelligence Unit, Data-Driven EnviroLab, NewClimate Institute, Oxford Net Zero
+tables:
+  net_zero_tracker:
+    variables:
+      net_zero_status:
+        title: net_zero_status
+        description: The status of each country's commitment to 'net-zero' emissions. The specifics of this commitment can
+          vary, with some countries pledging to reach net-zero greenhouse gas emissions, while others define this as carbon
+          emissions only.
+        unit: ''
+      has_net_zero_target:
+        title: has_net_zero_target
+        unit: ''

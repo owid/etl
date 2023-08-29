@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4714
+    date_accessed: 2023-08-16 07:55:41.159291
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Age-standardized prevalence of current tobacco use among persons aged 15 years
+    and older, by sex (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c618e1cf89fe8f5fb3c5ab1ee5fba1e2
+  size: 17738
+  path: 
+    dataset_4714_age_standardized_prevalence_of_current_tobacco_use_among_persons_aged_15_years_and_older__by_sex__pct_values.feather

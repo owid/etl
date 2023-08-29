@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2209
+    date_accessed: 2023-08-16 08:37:17.589693
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: All causes
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 980af03bcc8a702a43370074156496cb
+  size: 1399850
+  path: dataset_2209_all_causes_values.feather

@@ -10,11 +10,25 @@ nav:
     - Working environment: "getting-started/working-environment.md"
     - Building datasets: "getting-started/building-datasets.md"
     - Consuming datasets: "getting-started/consuming-datasets.md"
+  - Tutorials:
+    - Tutorials: "tutorials/index.md"
+    - Adding data:
+      - Adding data: "tutorials/adding-data/index.md"
+      - Walkthrough: "tutorials/adding-data/walkthrough.md"
+      - Manually add: "tutorials/adding-data/manual.md"
+      - Fast-track: "tutorials/adding-data/fast-track.md"
+    - Updating charts:
+      - Submitting chart revisions: "tutorials/charts/updating-charts.md"
+      - Reviewing chart revisions: "tutorials/charts/reviewing-charts.md"
+      - Using chatGPT: "tutorials/charts/chatgpt.md"
+    - Harmonize country names: "tutorials/harmonize-countries.md"
+    - Metadata in data pages: "tutorials/metadata-play.md"
+    - Backporting Grapher datasets to ETL: "tutorials/backport.md"
+    - Importing a private dataset to ETL: "tutorials/private-import.md"
   - Architecture:
       - Architecture: architecture/index.md
       - Our journey: "architecture/our-journey.md"
       - Design principles:
-        - Design principles: "architecture/design/index.md"
         - Computational graph:
           - Computational graph: "architecture/design/compute-graph/index.md"
         - ETL model: "architecture/design/phases.md"
@@ -29,27 +43,18 @@ nav:
         - Garden: "architecture/workflow/garden.md"
         - Grapher: "architecture/workflow/grapher.md"
         - Special steps:
-          - Special steps: "architecture/workflow/other-steps/index.md"
+          # - Special steps: "architecture/workflow/other-steps/index.md"
           - Explorers: "architecture/workflow/other-steps/explorers.md"
           - Backport: "architecture/workflow/other-steps/backport.md"
           - Open Numbers: "architecture/workflow/other-steps/open-numbers.md"
           - ETag: "architecture/workflow/other-steps/etag.md"
           - GitHub: "architecture/workflow/other-steps/github.md"
           - Private steps: "architecture/workflow/other-steps/private.md"
-  - Tutorials:
-    - Tutorials: "tutorials/index.md"
-    - Adding data:
-      - Adding data: "tutorials/adding-data/index.md"
-      - Walkthrough: "tutorials/adding-data/walkthrough.md"
-      - Manually add: "tutorials/adding-data/manual.md"
-      - Fast-track: "tutorials/adding-data/fast-track.md"
-    - Updating charts:
-      - Submitting chart revisions: "tutorials/charts/updating-charts.md"
-      - Reviewing chart revisions: "tutorials/charts/reviewing-charts.md"
-      - Using chatGPT: "tutorials/charts/chatgpt.md"
-    - Harmonize country names: "tutorials/harmonize-countries.md"
-    - Backporting Grapher datasets to ETL: "tutorials/backport.md"
-    - Importing a private dataset to ETL: "tutorials/private-import.md"
+      - Metadata:
+        - Metadata: "architecture/metadata/index.md"
+        - Metadata fields: "architecture/metadata/fields.md"
+        - Propagation of metadata: "architecture/metadata/propagation.md"
+        - Using metadata: "architecture/metadata/using.md"
   - Dataset catalog:
     - Dataset catalog: "data/index.md"
     - Faostat: "data/faostat.md"
@@ -93,7 +98,7 @@ theme:
     - navigation.tabs.sticky
     - navigation.indexes
     - content.tooltips
-    - navigation.expand
+    # - navigation.expand
     # - navigation.sections
     # - toc.follow
     - navigation.top

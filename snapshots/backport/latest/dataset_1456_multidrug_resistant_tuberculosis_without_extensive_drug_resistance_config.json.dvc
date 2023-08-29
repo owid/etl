@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1456
+    date_accessed: 2023-08-16 07:15:39.131475
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1456_multidrug_resistant_tuberculosis_without_extensive_drug_resistance
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 45d21862c1f8d3cecbd2621616c73f30
+  size: 33415
+  path: 
+    dataset_1456_multidrug_resistant_tuberculosis_without_extensive_drug_resistance_config.json

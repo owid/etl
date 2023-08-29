@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2586
+    date_accessed: 2023-08-16 08:49:26.422761
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environment - Emissions of air pollutants
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9725e996c138ed41fe579f5c13c1b9ff
+  size: 377674
+  path: dataset_2586_environment__emissions_of_air_pollutants_values.feather

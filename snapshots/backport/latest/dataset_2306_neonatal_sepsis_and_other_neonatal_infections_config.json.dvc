@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2306
+    date_accessed: 2023-08-16 09:50:14.458978
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2306_neonatal_sepsis_and_other_neonatal_infections
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 27e42fc00316255db3a716398546b5a0
+  size: 33805
+  path: dataset_2306_neonatal_sepsis_and_other_neonatal_infections_config.json

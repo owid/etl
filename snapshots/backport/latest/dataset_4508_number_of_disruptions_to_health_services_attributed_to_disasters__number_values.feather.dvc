@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4508
+    date_accessed: 2023-08-16 08:30:27.122755
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of disruptions to health services attributed to disasters (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e9d3ce4ad9a341808d5bb47ada4420bd
+  size: 12482
+  path: 
+    dataset_4508_number_of_disruptions_to_health_services_attributed_to_disasters__number_values.feather

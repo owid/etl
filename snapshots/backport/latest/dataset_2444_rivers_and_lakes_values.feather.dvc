@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2444
+    date_accessed: 2023-08-16 08:47:10.871682
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Rivers and Lakes
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bc58273a3ea3a13e8d5803bdd9c16a0f
+  size: 47130
+  path: dataset_2444_rivers_and_lakes_values.feather

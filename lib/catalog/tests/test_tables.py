@@ -289,7 +289,7 @@ def test_copy() -> None:
     assert t2.primary_key == []
 
 
-def test_copy_metadata_from() -> None:
+def test_copy_metadata() -> None:
     t: Table = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
     t.metadata.title = "GDP table"
     t.gdp.metadata.title = "GDP"
@@ -297,7 +297,7 @@ def test_copy_metadata_from() -> None:
     t2: Table = Table(pd.DataFrame(t))
     t2.country.metadata.title = "Country"
 
-    t2.copy_metadata_from(t)
+    t2 = t2.copy_metadata(t)
 
     assert t2.gdp.metadata.title == "GDP"
     assert t2.country.metadata.title == "Country"

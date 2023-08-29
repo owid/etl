@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1995
+    date_accessed: 2023-08-16 08:37:34.221401
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of countries that have national statistical legislation that complies
+    with the Fundamental Principles of Official Statistics
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 34e1b6e0cd2d2d0ecd8a9274d942d09a
+  size: 9562
+  path: 
+    dataset_1995_number_of_countries_that_have_national_statistical_legislation_that_complies_with_the_fundamental_principles_of_official_statistics_values.feather

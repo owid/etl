@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1823
+    date_accessed: 2023-08-10 15:02:37.589849
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1823_smokeless_tobacco (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d027aa65baa0c26b79f9adddc65d25da
+  size: 21831
+  path: dataset_1823_smokeless_tobacco_config.json

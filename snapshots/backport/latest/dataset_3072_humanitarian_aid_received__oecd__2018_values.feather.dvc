@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3072
+    date_accessed: 2023-08-16 10:18:14.339799
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Humanitarian Aid received (OECD, 2018)
+  description: Data supplied by OECD contacts for its annual report. Please do not
+    delete.
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b31371fa28b293fbefe2e00d649419a7
+  size: 21970
+  path: dataset_3072_humanitarian_aid_received__oecd__2018_values.feather

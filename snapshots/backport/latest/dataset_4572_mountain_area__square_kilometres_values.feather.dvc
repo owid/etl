@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4572
+    date_accessed: 2023-08-16 10:31:53.913539
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Mountain area (square kilometres)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b244a1f2d608b5102d8c5dc649ef35e0
+  size: 13066
+  path: dataset_4572_mountain_area__square_kilometres_values.feather

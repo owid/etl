@@ -1,10 +1,30 @@
 dataset:
   title: History of war (UCDP, 2023)
   description: >-
-    This dataset contains information on armed conflicts, both internal and external, in the period of 1989 and 2022.
+    This dataset contains information on armed conflicts - state, non-state and one-sided conflicts, in the period of 1989 and 2022.
 
 
     It has been constructed using the Georeferenced Event Dataset version 23.1 by the UCDP.
+
+
+    Note that the Geo-referenced Event Dataset has been extracted from the UCDP systems at a certaian point in time.
+    However, the UCDP team works with the data all year round, including revisions and updates. Therefore, their dashboard
+    might show slightly more up-to-date data, which sometimes result in minor discrepancies in the data.
+
+
+    Regions: The regions are defined based on Gleditsch and Ward codes (GWno). Find complete mapping at
+    https://dornsife.usc.edu/assets/sites/298/docs/country_to_gwno_PUBLIC_6-5-2015.txt
+
+      • Americas: 2-199
+
+      • Europe: 200-399
+
+      • Africa: 400-626
+
+      • Middle East: 630-699
+
+      • Asia: 700-999
+
 
 
     More details about Georeferenced Event Dataset version 23.1 by the UCDP:
@@ -25,6 +45,14 @@ tables:
           Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
       number_deaths_ongoing_conflicts_high:
         title: Number of deaths in ongoing conflicts (high estimate)
         unit: deaths
@@ -36,6 +64,14 @@ tables:
           Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
       number_deaths_ongoing_conflicts_low:
         title: Number of deaths in ongoing conflicts (low estimate)
         unit: deaths
@@ -52,6 +88,14 @@ tables:
           Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
 
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
@@ -65,6 +109,14 @@ tables:
           Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
       number_new_conflicts:
         title: Number of new conflicts
         unit: deaths
@@ -84,3 +136,11 @@ tables:
           Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East

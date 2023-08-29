@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2637
+    date_accessed: 2023-08-10 14:40:47.949971
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Health - Pharmaceutical Market
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: deae36b0b1fb19d54201fe952fce8069
+  size: 64370
+  path: dataset_2637_health__pharmaceutical_market_values.feather

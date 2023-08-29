@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4561
+    date_accessed: 2023-08-16 07:21:57.623705
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Average proportion of Freshwater Key Biodiversity Areas (KBAs) covered by
+    protected areas (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 96316739d87d37926be6ff784bc299e1
+  size: 28130
+  path: 
+    dataset_4561_average_proportion_of_freshwater_key_biodiversity_areas__kbas__covered_by_protected_areas__pct_values.feather

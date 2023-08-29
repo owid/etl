@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2425
+    date_accessed: 2023-08-16 10:08:50.973908
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labor productivity in cotton spinning and weaving (Ellison (1886))
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6d9fcc1c0d5bb3e60524c64252dc2488
+  size: 6586
+  path: 
+    dataset_2425_labor_productivity_in_cotton_spinning_and_weaving__ellison__1886_values.feather

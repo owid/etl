@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1956
+    date_accessed: 2023-08-16 07:26:07.447070
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1956_remittance_costs_as_a_proportion_of_the_amount_remitted
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 715f8fbfa872540204a8bc8862ba12f5
+  size: 2853
+  path: dataset_1956_remittance_costs_as_a_proportion_of_the_amount_remitted_config.json

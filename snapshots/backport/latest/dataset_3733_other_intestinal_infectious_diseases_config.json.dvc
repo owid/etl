@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3733
+    date_accessed: 2023-08-16 09:26:08.984111
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3733_other_intestinal_infectious_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0495162c64692c4556ab80a37f4d8863
+  size: 33478
+  path: dataset_3733_other_intestinal_infectious_diseases_config.json

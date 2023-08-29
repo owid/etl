@@ -103,8 +103,6 @@ class Entity(SQLModel, table=True):
     displayName: str = Field(sa_column=Column("displayName", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     code: Optional[str] = Field(default=None, sa_column=Column("code", String(255, "utf8mb4_0900_as_cs")))
 
-    data_values: List["DataValues"] = Relationship(back_populates="entities")
-
 
 class Namespace(SQLModel, table=True):
     __tablename__: str = "namespaces"  # type: ignore
@@ -422,7 +420,7 @@ class Dataset(SQLModel, table=True):
     @classmethod
     def load_variables_for_dataset(cls, session: Session, dataset_id: int) -> list["Variable"]:
         vars = session.exec(select(Variable).where(Variable.datasetId == dataset_id)).all()
-        assert vars
+        assert vars, f"Dataset {dataset_id} has no variables"
         return vars
 
 
@@ -842,7 +840,6 @@ class Variable(SQLModel, table=True):
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="variables")
-    data_values: List["DataValues"] = Relationship(back_populates="variables")
     origins: List["Origin"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
     posts_gdocs: List["PostsGdocs"] = Relationship(back_populates="posts_gdocs", link_model=PostsGdocsVariablesFaqsLink)
 
@@ -981,6 +978,18 @@ class Variable(SQLModel, table=True):
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
         return session.exec(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
 
+    @classmethod
+    def load_from_catalog_path(cls, catalog_path: str, session: Optional[Session] = None) -> "Variable":
+        def _run(ses: Session):
+            return ses.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
+
+        if session is None:
+            with Session(get_engine()) as session:
+                variable = _run(session)
+        else:
+            variable = _run(session)
+        return variable
+
     def delete_links(self, session: Session):
         """
         Deletes all previous relationships with origins and gdoc posts for this variable.
@@ -1077,27 +1086,6 @@ t_country_latest_data = Table(
     Index("country_latest_data_variable_id_foreign", "variable_id"),
     extend_existing=True,
 )
-
-
-# data_values table is gonna be deprecated!
-class DataValues(SQLModel, table=True):
-    __tablename__: str = "data_values"  # type: ignore
-    __table_args__ = (
-        ForeignKeyConstraint(["entityId"], ["entities.id"], name="data_values_entityId_entities_id"),
-        ForeignKeyConstraint(["variableId"], ["variables.id"], name="data_values_variableId_variables_id"),
-        Index("data_values_fk_ent_id_fk_var_id_year_e0eee895_uniq", "entityId", "variableId", "year", unique=True),
-        Index("data_values_variableId_variables_id", "variableId"),
-        Index("data_values_year", "year"),
-        {"extend_existing": True},
-    )
-
-    value: str = Field(sa_column=Column("value", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    year: int = Field(sa_column=Column("year", Integer, primary_key=True, nullable=False))
-    entityId: int = Field(sa_column=Column("entityId", Integer, primary_key=True, nullable=False))
-    variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
-
-    entities: Optional["Entity"] = Relationship(back_populates="data_values")
-    variables: Optional["Variable"] = Relationship(back_populates="data_values")
 
 
 class Origin(SQLModel, table=True):

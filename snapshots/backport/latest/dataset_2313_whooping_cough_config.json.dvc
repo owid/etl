@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2313
+    date_accessed: 2023-08-14 15:36:26.894326
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2313_whooping_cough (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c023d77ebeb4d0df2d51ba9931246f45
+  size: 32452
+  path: dataset_2313_whooping_cough_config.json

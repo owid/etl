@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_4906_lgbt_marital_status_in_the_us__gallup_2017_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:51:38.289513
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4906
+    date_accessed: 2023-08-10 14:58:15.397659
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4906_lgbt_marital_status_in_the_us__gallup_2017
+    (archived)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4906
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+  is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 499245c9957c497ea154227f6d612f4e
-  size: 7008
+- md5: 0cfa414b273a761e4dcf643edfebd488
+  size: 8034
   path: dataset_4906_lgbt_marital_status_in_the_us__gallup_2017_config.json

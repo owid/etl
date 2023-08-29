@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1750
+    date_accessed: 2023-08-10 15:05:02.861299
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Alopecia areata
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3bb326c530c5b2067decdfe4b012dd13
+  size: 1011346
+  path: dataset_1750_alopecia_areata_values.feather

@@ -1,23 +1,24 @@
 dataset:
   title: History of war (COW MID, 2020)
   description: >-
-      This dataset contains information on armed conflicts, both internal and external, in the period of 1816 and 2014.
+      This dataset contains information on interstate disputes in the period of 1816 and 2014.
 
 
       It has been constructed using the Correlates of War - Militarised Interstate Disputes v5.0 dataset.
 
+
       Regions: The regions are defined based on Gleditsch and Ward codes (GWno). Find complete mapping at
       https://dornsife.usc.edu/assets/sites/298/docs/country_to_gwno_PUBLIC_6-5-2015.txt
 
-      • Americas: 2-199
+      • Americas: 2-165
 
-      • Europe: 200-399
+      • Europe: 200-395
 
       • Africa: 400-626
 
-      • Middle East: 630-699
+      • Middle East: 630-698
 
-      • Asia: 700-999
+      • Asia: 700-990
 
 
 tables:
@@ -41,8 +42,42 @@ tables:
           Number of ongoing disputes in a given year.
 
 
-          We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions.
-          The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+          We count a dispute as ongoing in a region even if the dispute is also ongoing in other regions.
+          The sum across all regions can therefore be higher than the total number of ongoing disputes.
+
+
+          The data is disaggregated by region and "hostility" or "fatality".
+
+          "Fatality" gives lower and upper estimates on the total number of fatalities over the complete span of a dispute. These are the types:
+
+            - No deaths
+
+            - 1-25 deaths
+
+            - 26-100 deaths
+
+            - 101-250 deaths
+
+            - 251-500 deaths
+
+            - 501-999 deaths
+
+            - > 999 deaths
+
+            - Unknown
+
+
+          "Hostility" provides a short description of the type of hostility. These are the types:
+
+            - No militarized action
+
+            - Threat to use force
+
+            - Display of force
+
+            - Use of force
+
+            - War
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -62,14 +97,50 @@ tables:
           Number of new disputes in a given year.
 
 
-          • New disputes for the 'World': We only count a dispute as new when the dispute overall started that year, not if it restarted
-          or its hostility level changed.
+          We count a dispute as new in a region even if the dispute is also ongoing in other regions.
+          The sum across all regions can therefore be higher than the total number of ongoing disputes.
+
+
+          The data is disaggregated by region and "hostility" or "fatality".
+
+
+          "Fatality" gives lower and upper estimates on the total number of fatalities over the complete span of a dispute. These are the types:
+
+            - No deaths
+
+            - 1-25 deaths
+
+            - 26-100 deaths
+
+            - 101-250 deaths
+
+            - 251-500 deaths
+
+            - 501-999 deaths
+
+            - > 999 deaths
+
+            - Unknown
+
+
+          "Hostility" provides a short description of the type of hostility. These are the types:
+
+            - No militarized action
+
+            - Threat to use force
+
+            - Display of force
+
+            - Use of force
+
+            - War
+
+
+          NOTES:
+
 
           • New disputes for all regions (except 'World'): We count a dispute as new in a region even if the dispute overall started
           earlier in another region. The sum across all regions can therefore be higher than the total number of new disputes.
-
-          • New disputes by hostility level: We only count a dispute as new when the dispute overall started that year, not if it changed
-          its hostility level.
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -81,44 +152,4 @@ tables:
               - Asia
               - Europe
               - Middle East
-      number_deaths_ongoing_disputes:
-        title: Number of deaths in ongoing disputes
-        unit: deaths
-        description_short: Annual number of deaths in ongoing disputes
-        description: >-
-          The estimated number of fatalities in a year over the course of disputes.
-
-
-          For some conflicts, data on the number of fatalities was missing (source field "FatalPre"). In such cases, we have used the lower bound from the range
-          specified by the source field "Fatality". If this was also missing, we have set the value to zero. Consequently, the number of fatalities in ongoing
-          disputes is likely to be underestimated.
-        description_from_producer: >-
-          The Participant Fatalities section of the dispute coding spreadsheet is used to record the fatalities of each and every
-          participant in the dispute. These values should be derived from the incidents related to the dispute and may require a good
-          deal of work in complex disputes.
-
-          Assessment of each participant's fatalities should be based on the following categories:
-
-          • -9 — No overall assessment of military fatalities for this participant was possible.
-          • 0 — No military fatalities were suffered by this participant.
-          • 1 — Participant fatalities were between 1 and 25.
-          • 2 — Participant fatalities were between 26 and 100.
-          • 3 — Participant fatalities were between 101 and 250.
-          • 4 — Participant fatalities were between 251 and 500.
-          • 5 — Participant fatalities were between 501 and 999.
-          • 6 — Participant fatalities were 1,000 or more.
-
-          If an exact value for total military fatalities can be determined from the related incidents, then that number should
-          be entered in the precise fatality cell of the coding spreadsheet
-        processing_level: major
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames:
-              - Africa
-              - Americas
-              - Asia
-              - Europe
-              - Middle East
-
+              - Oceania

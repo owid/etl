@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2692
+    date_accessed: 2023-08-10 14:49:55.609573
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Sustainable development goals
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0ae2cac932a09f9af99028c692f4ee4a
+  size: 115466
+  path: dataset_2692_sustainable_development_goals_values.feather

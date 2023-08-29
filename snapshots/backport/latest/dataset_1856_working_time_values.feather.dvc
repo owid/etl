@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1856
+    date_accessed: 2023-08-14 05:57:09.748373
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Working time
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0b8761cd2b806aa9443f47d5a374d593
+  size: 46730
+  path: dataset_1856_working_time_values.feather

@@ -20,6 +20,14 @@ tables:
           The number of battle fatalities in a year over the course of wars. This is the high estimate of those who were killed.
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
       number_deaths_ongoing_conflicts_battle_low:
         title: Number of battle deaths in ongoing conflicts (low estimate)
         unit: deaths
@@ -27,13 +35,32 @@ tables:
           The number of battle fatalities in a year over the course of wars. This is the low estimate of those who were killed.
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
       number_deaths_ongoing_conflicts_battle:
         title: Number of battle deaths in ongoing conflicts (best estimate)
         unit: deaths
         description: >-
           The number of battle fatalities in a year over the course of wars.
+
+          For some conflicts, data on the number of battle deaths is missing. In such cases, we have used the lower estimate as
+          a lower bound.
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
 
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
@@ -46,6 +73,14 @@ tables:
 
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
       number_new_conflicts:
         title: Number of new conflicts
         unit: conflicts
@@ -61,3 +96,11 @@ tables:
 
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East

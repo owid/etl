@@ -12,11 +12,11 @@ meta:
     dataset_url_main: https://www.url-dummy.com/
     dataset_url_download: https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv
     date_published: 2020-01-01
-    date_accessed: 2023-08-07
+    date_accessed: 2023-08-22
   license:
     name: MIT dummy license
+wdir: ../../../data/snapshots/dummy/2020-01-01
 outs:
 - md5: becb9bc64792f7372580683b384e5411
   size: 96
   path: dummy.csv
-wdir: ../../../data/snapshots/dummy/2020-01-01

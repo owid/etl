@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5112
+    date_accessed: 2023-08-14 15:04:35.928432
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Energy mix from BP (2020)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f35b79f694486e870fcbf5cf470d74a7
+  size: 1090194
+  path: dataset_5112_energy_mix_from_bp__2020_values.feather

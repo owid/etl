@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1803
+    date_accessed: 2023-08-16 08:01:08.144427
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: High fasting plasma glucose
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 74cece5ef1f98225b1ea0796dbe86868
+  size: 1381098
+  path: dataset_1803_high_fasting_plasma_glucose_values.feather

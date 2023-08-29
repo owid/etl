@@ -20,7 +20,7 @@ tables:
         unit: 'decapod crustaceans'
         short_unit: ''
         description: |
-          Midpoint estimate of the number of farmed decapod crustaceans in the world, calculated as the average between the lower and upper limit estimates.
+          Midpoint estimate of the number of farmed decapod crustaceans, calculated as the average between the lower and upper estimates.
 
           {definitions.common}
         display:

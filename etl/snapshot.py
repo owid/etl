@@ -8,9 +8,11 @@ from pathlib import Path
 from threading import Lock
 from typing import Any, Dict, Iterator, Optional, Union
 
+import owid.catalog.processing as pr
 import pandas as pd
 import yaml
 from dataclasses_json import dataclass_json
+from owid.catalog import Table
 from owid.catalog.meta import (
     DatasetMeta,
     License,
@@ -118,6 +120,29 @@ class Snapshot:
     def to_table_metadata(self):
         return self.metadata.to_table_metadata()
 
+    def read(self, *args, **kwargs) -> Table:
+        """Read file based on its Snapshot extension."""
+        if self.metadata.file_extension == "csv":
+            return self.read_csv(*args, **kwargs)
+        elif self.metadata.file_extension == "xlsx":
+            return self.read_excel(*args, **kwargs)
+        elif self.metadata.file_extension == "json":
+            return self.read_json(*args, **kwargs)
+        else:
+            raise ValueError(f"Unknown extension {self.metadata.file_extension}")
+
+    def read_csv(self, *args, **kwargs) -> Table:
+        """Read CSV file into a Table and populate it with metadata."""
+        return pr.read_csv(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+
+    def read_excel(self, *args, **kwargs) -> Table:
+        """Read excel file into a Table and populate it with metadata."""
+        return pr.read_excel(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+
+    def read_json(self, *args, **kwargs) -> Table:
+        """Read JSON file into a Table and populate it with metadata."""
+        return pr.read_json(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+
 
 @pruned_json
 @dataclass_json
@@ -203,14 +228,12 @@ class SnapshotMeta:
             if "file_extension" not in meta:
                 meta["file_extension"] = _parse_snapshot_path(Path(filename))[3]
 
-            # we can have either source or origin in YAML
-            if "origin" in meta and "source" in meta:
-                raise ValueError("Cannot have both `origin` and `source` in metadata")
-            elif "origin" in meta:
+            if "origin" in meta:
                 meta["origin"] = Origin.from_dict(meta["origin"])
-            elif "source" in meta:
+
+            if "source" in meta:
                 meta["source"] = Source.from_dict(meta["source"])
-            else:
+            elif "source_name" in meta:
                 # convert legacy fields to source
                 publication_date = meta.pop("publication_date", None)
                 meta["source"] = Source(

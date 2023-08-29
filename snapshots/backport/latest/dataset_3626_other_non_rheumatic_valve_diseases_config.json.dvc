@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3626
+    date_accessed: 2023-08-14 05:40:22.591201
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3626_other_non_rheumatic_valve_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4be63991024fc5ce217ce3265e3cd171
+  size: 33394
+  path: dataset_3626_other_non_rheumatic_valve_diseases_config.json

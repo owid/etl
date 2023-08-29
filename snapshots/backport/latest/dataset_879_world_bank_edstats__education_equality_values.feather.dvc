@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/879
+    date_accessed: 2023-08-14 15:37:10.745417
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - Education Equality
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5e9d4cd975031c0810b41518425000fe
+  size: 439154
+  path: dataset_879_world_bank_edstats__education_equality_values.feather

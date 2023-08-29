@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/2558
-    date_accessed: 2023-08-08 07:36:05.472129
+    date_accessed: 2023-08-14 05:49:26.012176
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for dataset_2558_transport__indicators
+  name: Grapher metadata for dataset_2558_transport__indicators (archived)
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1dbdcf6229e05286966a5078d463bd71
-  size: 19913
+- md5: 7eb2d7ff77e408e431a62a4994170eeb
+  size: 16713
   path: dataset_2558_transport__indicators_config.json

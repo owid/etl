@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4759
+    date_accessed: 2023-08-11 07:52:48.379926
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4759_proportion_of_ever_partnered_women_and_girls_subjected_to_physical_and_or_sexual_violence_by_a_current_or_former_intimate_partner_in_the_previous_12_months__by_age__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e0f6dc14f1178f38c90a52960e714a6c
+  size: 35958
+  path: 
+    dataset_4759_proportion_of_ever_partnered_women_and_girls_subjected_to_physical_and_or_sexual_violence_by_a_current_or_former_intimate_partner_in_the_previous_12_months__by_age__pct_config.json

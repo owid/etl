@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1761
+    date_accessed: 2023-08-10 14:41:16.812571
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1761_idiopathic_developmental_intellectual_disability
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: baabde54b8f05026add1e5de6fbbc9c1
+  size: 17216
+  path: dataset_1761_idiopathic_developmental_intellectual_disability_config.json

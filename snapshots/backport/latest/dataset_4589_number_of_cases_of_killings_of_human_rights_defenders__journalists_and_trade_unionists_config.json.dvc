@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4589
+    date_accessed: 2023-08-14 15:13:26.981870
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4589_number_of_cases_of_killings_of_human_rights_defenders__journalists_and_trade_unionists
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 67a3f19cf0ca0d8fdd395df20b3c3762
+  size: 34395
+  path: 
+    dataset_4589_number_of_cases_of_killings_of_human_rights_defenders__journalists_and_trade_unionists_config.json

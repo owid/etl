@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5665
+    date_accessed: 2023-08-14 15:21:27.489462
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5665_plastic_waste_trade__un_comtrade__2022
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1d41adac06bca1080df0cdea4709b31b
+  size: 13723
+  path: dataset_5665_plastic_waste_trade__un_comtrade__2022_config.json

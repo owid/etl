@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/593
+    date_accessed: 2023-08-14 05:58:15.307146
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_593_global_hunger_index__ifpri__2018 (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1c74908db43a6f78897ba24d99f4f844
+  size: 7455
+  path: dataset_593_global_hunger_index__ifpri__2018_config.json

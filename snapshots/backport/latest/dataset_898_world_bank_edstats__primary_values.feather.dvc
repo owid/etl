@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/898
-    date_accessed: 2023-08-07 14:46:59.358226
+    date_accessed: 2023-08-14 15:25:27.213496
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: World Bank EdStats - Primary
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 62f4cdedaed482acf58a23c6640d756d
+- md5: ac5da7f0b704767c6bf4116d2bc38152
   size: 4820274
   path: dataset_898_world_bank_edstats__primary_values.feather

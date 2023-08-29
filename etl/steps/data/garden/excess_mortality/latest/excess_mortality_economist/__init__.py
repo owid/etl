@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    ds_meadow = paths.load_dataset_dependency()
+    ds_meadow = paths.load_dataset()
 
     tb = cast(Table, ds_meadow["excess_mortality_economist"])
 

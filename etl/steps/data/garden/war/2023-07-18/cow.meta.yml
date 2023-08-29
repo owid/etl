@@ -1,7 +1,7 @@
 dataset:
   title: History of war (COW, 2020)
   description: >-
-    This dataset contains information on armed conflicts, both internal and external, in the period of 1816 and 2007.
+    This dataset contains information on armed conflicts (inter-, intra-, extra- and non-state) in the period of 1816 and 2007.
 
 
     It has been constructed using the Correlates of War - War data dataset.
@@ -34,6 +34,15 @@ tables:
           Number of battle-related combatant fatalities suffered by all participants in wars.
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+              - Oceania
 
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
@@ -43,6 +52,15 @@ tables:
 
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+              - Oceania
       number_new_conflicts:
         title: Number of new conflicts
         unit: conflicts
@@ -51,3 +69,12 @@ tables:
 
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+              - Oceania

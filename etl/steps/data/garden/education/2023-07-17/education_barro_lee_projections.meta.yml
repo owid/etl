@@ -1,0 +1,1118 @@
+tables:
+  education_barro_lee_projections:
+    variables:
+      mf_youth_and_adults__15_64_years__percentage_of_no_education_projections:
+        title: Projections - percentage of youth and adults aged between 15 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_no_education_projections:
+        title: Projections - percentage of female youth and adults aged between 15 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_no_education_projections:
+        title: Projections - percentage of male youth and adults aged between 15 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_no_education_projections:
+        title: Projections - percentage of male and female youth aged between 15 and 24 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_no_education_projections:
+        title: Projections - percentage of female youth aged between 15 and 24 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_no_education_projections:
+        title: Projections - percentage of male youth aged between 15 and 24 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_no_education_projections:
+        title: Projections - percentage of male and female adults aged between 25 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_no_education_projections:
+        title: Projections - percentage of female adults aged between 25 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_no_education_projections:
+        title: Projections - percentage of male adults aged between 25 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__percentage_of_primary_education_projections:
+        title: Projections - percentage of male and female youth and adults aged between 15 and 64 years with incomplete primary
+          education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_primary_education_projections:
+        title: Projections - percentage of female youth and adults aged between 15 and 64 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_primary_education_projections:
+        title: Projections - percentage of male youth and adults aged between 15 and 64 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_primary_education_projections:
+        title: Projections - percentage of male and female youth aged between 15 and 24 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_primary_education_projections:
+        title: Projections - percentage of female youth aged between 15 and 24 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_primary_education_projections:
+        title: Projections - percentage of male youth aged between 15 and 24 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_primary_education_projections:
+        title: Projections - percentage of male and female adults aged between 25 and 64 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_primary_education_projections:
+        title: Projections - percentage of female adults aged between 25 and 64 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_primary_education_projections:
+        title: Projections - percentage of male adults aged between 25 and 64 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__percentage_of_complete_primary_education_attained_projections:
+        title: Projections - percentage of 15-64 years youth and adults who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_complete_primary_education_attained_projections:
+        title: Projections - percentage of 15-64 years female youth and adults who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_complete_primary_education_attained_projections:
+        title: Projections - percentage of 15-64 years male youth and adults who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_complete_primary_education_attained_projections:
+        title: Projections - percentage of 15-24 years youth who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_complete_primary_education_attained_projections:
+        title: Projections - percentage of 15-24 years female youth who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_complete_primary_education_attained_projections:
+        title: Projections - percentage of 15-24 years male youth who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_complete_primary_education_attained_projections:
+        title: Projections - percentage of 25-64 years adults who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_complete_primary_education_attained_projections:
+        title: Projections - percentage of 25-64 years female adults who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_complete_primary_education_attained_projections:
+        title: Projections - percentage of 25-64 years male adults who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__percentage_of_secondary_education_projections:
+        title: Projections - percentage of 15-64 years youth and adults with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_secondary_education_projections:
+        title: Projections - percentage of 15-64 years female youth and adults with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_secondary_education_projections:
+        title: Projections - percentage of 15-64 years male youth and adults with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_secondary_education_projections:
+        title: Projections - percentage of 15-24 years youth with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_secondary_education_projections:
+        title: Projections - percentage of 15-24 years female youth with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_secondary_education_projections:
+        title: Projections - percentage of 15-24 years male youth with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_secondary_education_projections:
+        title: Projections - percentage of 25-64 years adults with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_secondary_education_projections:
+        title: Projections - percentage of 25-64 years female adults with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_secondary_education_projections:
+        title: Projections - percentage of 25-64 years male adults with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__percentage_of_complete_secondary_education_attained_projections:
+        title: Projections - percentage of 15-64 years youth and adults who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_complete_secondary_education_attained_projections:
+        title: Projections - percentage of 15-64 years female youth and adults who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_complete_secondary_education_attained_projections:
+        title: Projections - percentage of 15-64 years male youth and adults who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_complete_secondary_education_attained_projections:
+        title: Projections - percentage of 15-24 years youth who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_complete_secondary_education_attained_projections:
+        title: Projections - percentage of 15-24 years female youth who completed secondary education
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_complete_secondary_education_attained_projections:
+        title: Projections - percentage of 15-24 years male youth who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_complete_secondary_education_attained_projections:
+        title: Projections - percentage of 25-64 years adults who completed secondary education
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_complete_secondary_education_attained_projections:
+        title: Projections - percentage of 25-64 years female adults who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_complete_secondary_education_attained_projections:
+        title: Projections - percentage of 25-64 years male adults who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__percentage_of_tertiary_education_projections:
+        title: Projections - percentage of 15-64 years youth and adults with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_tertiary_education_projections:
+        title: Projections - percentage of 15-64 years female youth and adults with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_tertiary_education_projections:
+        title: Projections - percentage of 15-64 years male youth and adults with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_tertiary_education_projections:
+        title: Projections - percentage of 15-24 years youth with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_tertiary_education_projections:
+        title: Projections - percentage of 15-24 years female youth with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_tertiary_education_projections:
+        title: Projections - percentage of 15-24 years male youth with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_tertiary_education_projections:
+        title: Projections - percentage of 25-64 years adults with incomplete tertiary education
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_tertiary_education_projections:
+        title: Projections - percentage of 25-64 years female adults with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_tertiary_education_projections:
+        title: Projections - percentage of 25-64 years male adults with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__percentage_of_complete_tertiary_education_attained_projections:
+        title: Projections - percentage of 15-64 years youth and adults who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_complete_tertiary_education_attained_projections:
+        title: Projections - percentage of 15-64 years female youth and adults who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_complete_tertiary_education_attained_projections:
+        title: Projections - percentage of 15-64 years male youth and adults who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_complete_tertiary_education_attained_projections:
+        title: Projections - percentage of 15-24 years youth who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_complete_tertiary_education_attained_projections:
+        title: Projections - percentage of 15-24 years female youth who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_complete_tertiary_education_attained_projections:
+        title: Projections - percentage of 15-24 years male youth who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_complete_tertiary_education_attained_projections:
+        title: Projections - percentage of 25-64 years male and female adults who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_complete_tertiary_education_attained_projections:
+        title: Projections - percentage of 25-64 years female adults who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_complete_tertiary_education_attained_projections:
+        title: Projections - percentage of 25-64 years male adults who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+
+      mf_youth_and_adults__15_64_years__average_years_of_education_projections:
+        title: Projections - average years of education for 15-64 years male and female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__average_years_of_education_projections:
+        title: Projections - average years of education for 15-64 years female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__average_years_of_education_projections:
+        title: Projections - average years of education for 15-64 years male youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__average_years_of_education_projections:
+        title: Projections - average years of education for 15-24 years male and female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__average_years_of_education_projections:
+        title: Projections - average years of education for 15-24 years female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__average_years_of_education_projections:
+        title: Projections - average years of education for 15-24 years male youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__average_years_of_education_projections:
+        title: Projections - average years of education for 25-64 years male and female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__average_years_of_education_projections:
+        title: Projections - average years of education for 25-64 years female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__average_years_of_education_projections:
+        title: Projections - average years of education for 25-64 years male adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__average_years_of_primary_education_projections:
+        title: Projections - average years of primary education for 15-64 years male and female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__average_years_of_primary_education_projections:
+        title: Projections - average years of primary education for 15-64 years female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__average_years_of_primary_education_projections:
+        title: Projections - average years of primary education for 15-64 years male youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__average_years_of_primary_education_projections:
+        title: Projections - average years of primary education for 15-24 years male and female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__average_years_of_primary_education_projections:
+        title: Projections - average years of primary education for 15-24 years female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__average_years_of_primary_education_projections:
+        title: Projections - average years of primary education for 15-24 years male youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__average_years_of_primary_education_projections:
+        title: Projections - average years of primary education for 25-64 years male and female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__average_years_of_primary_education_projections:
+        title: Projections - average years of primary education for 25-64 years female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__average_years_of_primary_education_projections:
+        title: Projections - average years of primary education for 25-64 years male adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__average_years_of_secondary_education_projections:
+        title: Projections - average years of secondary education for 15-64 years male and female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__average_years_of_secondary_education_projections:
+        title: Projections - average years of secondary education for 15-64 years female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__average_years_of_secondary_education_projections:
+        title: Projections - average years of secondary education for 15-64 years male youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__average_years_of_secondary_education_projections:
+        title: Projections - average years of secondary education for 15-24 years male and female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__average_years_of_secondary_education_projections:
+        title: Projections - average years of secondary education for 15-24 years female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__average_years_of_secondary_education_projections:
+        title: Projections - average years of secondary education for 15-24 years male youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__average_years_of_secondary_education_projections:
+        title: Projections - average years of secondary education for 25-64 years male and female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__average_years_of_secondary_education_projections:
+        title: Projections - average years of secondary education for 25-64 years female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__average_years_of_secondary_education_projections:
+        title: Projections - average years of secondary education for 25-64 years male adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__average_years_of_tertiary_education_projections:
+        title: Projections - average years of tertiary education for 15-64 years male and female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__average_years_of_tertiary_education_projections:
+        title: Projections - average years of tertiary education for 15-64 years female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__average_years_of_tertiary_education_projections:
+        title: Projections - average years of tertiary education for 15-64 years male youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__average_years_of_tertiary_education_projections:
+        title: Projections - average years of tertiary education for 15-24 years male and female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__average_years_of_tertiary_education_projections:
+        title: Projections - average years of tertiary education for 15-24 years female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__average_years_of_tertiary_education_projections:
+        title: Projections - average years of tertiary education for 15-24 years male youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__average_years_of_tertiary_education_projections:
+        title: Projections - average years of tertiary education for 25-64 years male and female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__average_years_of_tertiary_education_projections:
+        title: Projections - average years of tertiary education for 25-64 years female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__average_years_of_tertiary_education_projections:
+        title: Projections-average years of tertiary education for 25-64 years male adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+
+
+
+      mf_youth_and_adults__15_64_years__percentage_of_no_education:
+        title: Combined - percentage of youth and adults aged between 15 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_no_education:
+        title: Combined - percentage of female youth and adults aged between 15 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_no_education:
+        title: Combined - percentage of male youth and adults aged between 15 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_no_education:
+        title: Combined - percentage of male and female youth aged between 15 and 24 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_no_education:
+        title: Combined - percentage of female youth aged between 15 and 24 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_no_education:
+        title: Combined - percentage of male youth aged between 15 and 24 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_no_education:
+        title: Combined - percentage of male and female adults aged between 25 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_no_education:
+        title: Combined - percentage of female adults aged between 25 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_no_education:
+        title: Combined - percentage of male adults aged between 25 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__percentage_of_primary_education:
+        title: Combined - percentage of male and female youth and adults aged between 15 and 64 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_primary_education:
+        title: Combined - percentage of female youth and adults aged between 15 and 64 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_primary_education:
+        title: Combined - percentage of male youth and adults aged between 15 and 64 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_primary_education:
+        title: Combined - percentage of male and female youth aged between 15 and 24 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_primary_education:
+        title: Combined - percentage of female youth aged between 15 and 24 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_primary_education:
+        title: Combined - percentage of male youth aged between 15 and 24 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_primary_education:
+        title: Combined - percentage of male and female adults aged between 25 and 64 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_primary_education:
+        title: Combined - percentage of female adults aged between 25 and 64 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_primary_education:
+        title: Combined - percentage of male adults aged between 25 and 64 years with incomplete primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__percentage_of_complete_primary_education_attained:
+        title: Combined - percentage of 15-64 years youth and adults who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_complete_primary_education_attained:
+        title: Combined - percentage of 15-64 years female youth and adults who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_complete_primary_education_attained:
+        title: Combined - percentage of 15-64 years male youth and adults who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_complete_primary_education_attained:
+        title: Combined - percentage of 15-24 years youth who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_complete_primary_education_attained:
+        title: Combined - percentage of 15-24 years female youth who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_complete_primary_education_attained:
+        title: Combined - percentage of 15-24 years male youth who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_complete_primary_education_attained:
+        title: Combined - percentage of 25-64 years adults who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_complete_primary_education_attained:
+        title: Combined - percentage of 25-64 years female adults who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_complete_primary_education_attained:
+        title: Combined - percentage of 25-64 years male adults who completed primary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__percentage_of_secondary_education:
+        title: Combined - percentage of 15-64 years youth and adults with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_secondary_education:
+        title: Combined - percentage of 15-64 years female youth and adults with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_secondary_education:
+        title: Combined - percentage of 15-64 years male youth and adults with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_secondary_education:
+        title: Combined - percentage of 15-24 years youth with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_secondary_education:
+        title: Combined - percentage of 15-24 years female youth with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_secondary_education:
+        title: Combined - percentage of 15-24 years male youth with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_secondary_education:
+        title: Combined - percentage of 25-64 years adults with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_secondary_education:
+        title: Combined - percentage of 25-64 years female adults with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_secondary_education:
+        title: Combined - percentage of 25-64 years male adults with incomplete secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__percentage_of_complete_secondary_education_attained:
+        title: Combined - percentage of 15-64 years youth and adults who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_complete_secondary_education_attained:
+        title: Combined - percentage of 15-64 years female youth and adults who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_complete_secondary_education_attained:
+        title: Combined - percentage of 15-64 years male youth and adults who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_complete_secondary_education_attained:
+        title: Combined - percentage of 15-24 years youth who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_complete_secondary_education_attained:
+        title: Combined - percentage of 15-24 years female youth who completed secondary education
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_complete_secondary_education_attained:
+        title: Combined - percentage of 15-24 years male youth who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_complete_secondary_education_attained:
+        title: Combined - percentage of 25-64 years adults who completed secondary education
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_complete_secondary_education_attained:
+        title: Combined - percentage of 25-64 years female adults who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_complete_secondary_education_attained:
+        title: Combined - percentage of 25-64 years male adults who completed secondary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__percentage_of_tertiary_education:
+        title: Combined - percentage of 15-64 years youth and adults with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_tertiary_education:
+        title: Combined - percentage of 15-64 years female youth and adults with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_tertiary_education:
+        title: Combined - percentage of 15-64 years male youth and adults with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_tertiary_education:
+        title: Combined - percentage of 15-24 years youth with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_tertiary_education:
+        title: Combined - percentage of 15-24 years female youth with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_tertiary_education:
+        title: Combined - percentage of 15-24 years male youth with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_tertiary_education:
+        title: Combined - percentage of 25-64 years adults with incomplete tertiary education
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_tertiary_education:
+        title: Combined - percentage of 25-64 years female adults with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_tertiary_education:
+        title: Combined - percentage of 25-64 years male adults with incomplete tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__percentage_of_complete_tertiary_education_attained:
+        title: Combined - percentage of 15-64 years youth and adults who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__percentage_of_complete_tertiary_education_attained:
+        title: Combined - percentage of 15-64 years female youth and adults who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__percentage_of_complete_tertiary_education_attained:
+        title: Combined - percentage of 15-64 years male youth and adults who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__percentage_of_complete_tertiary_education_attained:
+        title: Combined - percentage of 15-24 years youth who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__percentage_of_complete_tertiary_education_attained:
+        title: Combined - percentage of 15-24 years female youth who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__percentage_of_complete_tertiary_education_attained:
+        title: Combined - percentage of 15-24 years male youth who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__percentage_of_complete_tertiary_education_attained:
+        title: Combined - percentage of 25-64 years male and female adults who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__percentage_of_complete_tertiary_education_attained:
+        title: Combined - percentage of 25-64 years female adults who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__percentage_of_complete_tertiary_education_attained:
+        title: Combined - percentage of 25-64 years male adults who completed tertiary education
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__average_years_of_education:
+        title: Combined - average years of education for 15-64 years male and female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__average_years_of_education:
+        title: Combined - average years of education for 15-64 years female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__average_years_of_education:
+        title: Combined - average years of education for 15-64 years male youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__average_years_of_education:
+        title: Combined - average years of education for 15-24 years male and female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__average_years_of_education:
+        title: Combined - average years of education for 15-24 years female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__average_years_of_education:
+        title: Combined - average years of education for 15-24 years male youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__average_years_of_education:
+        title: Combined - average years of education for 25-64 years male and female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__average_years_of_education:
+        title: Combined - average years of education for 25-64 years female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__average_years_of_education:
+        title: Combined - average years of education for 25-64 years male adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__average_years_of_primary_education:
+        title: Combined - average years of primary education for 15-64 years male and female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__average_years_of_primary_education:
+        title: Combined - average years of primary education for 15-64 years female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__average_years_of_primary_education:
+        title: Combined - average years of primary education for 15-64 years male youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__average_years_of_primary_education:
+        title: Combined - average years of primary education for 15-24 years male and female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__average_years_of_primary_education:
+        title: Combined - average years of primary education for 15-24 years female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__average_years_of_primary_education:
+        title: Combined - average years of primary education for 15-24 years male youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__average_years_of_primary_education:
+        title: Combined - average years of primary education for 25-64 years male and female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__average_years_of_primary_education:
+        title: Combined - average years of primary education for 25-64 years female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__average_years_of_primary_education:
+        title: Combined - average years of primary education for 25-64 years male adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__average_years_of_secondary_education:
+        title: Combined - average years of secondary education for 15-64 years male and female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__average_years_of_secondary_education:
+        title: Combined - average years of secondary education for 15-64 years female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__average_years_of_secondary_education:
+        title: Combined - average years of secondary education for 15-64 years male youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__average_years_of_secondary_education:
+        title: Combined - average years of secondary education for 15-24 years male and female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__average_years_of_secondary_education:
+        title: Combined - average years of secondary education for 15-24 years female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__average_years_of_secondary_education:
+        title: Combined - average years of secondary education for 15-24 years male youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__average_years_of_secondary_education:
+        title: Combined - average years of secondary education for 25-64 years male and female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__average_years_of_secondary_education:
+        title: Combined - average years of secondary education for 25-64 years female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__average_years_of_secondary_education:
+        title: Combined - average years of secondary education for 25-64 years male adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth_and_adults__15_64_years__average_years_of_tertiary_education:
+        title: Combined - average years of tertiary education for 15-64 years male and female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth_and_adults__15_64_years__average_years_of_tertiary_education:
+        title: Combined - average years of tertiary education for 15-64 years female youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth_and_adults__15_64_years__average_years_of_tertiary_education:
+        title: Combined - average years of tertiary education for 15-64 years male youth and adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_youth__15_24_years__average_years_of_tertiary_education:
+        title: Combined - average years of tertiary education for 15-24 years male and female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_youth__15_24_years__average_years_of_tertiary_education:
+        title: Combined - average years of tertiary education for 15-24 years female youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_youth__15_24_years__average_years_of_tertiary_education:
+        title: Combined - average years of tertiary education for 15-24 years male youth
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      mf_adults__25_64_years__average_years_of_tertiary_education:
+        title: Combined - average years of tertiary education for 25-64 years male and female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      f_adults__25_64_years__average_years_of_tertiary_education:
+        title: Combined - average years of tertiary education for 25-64 years female adults
+        unit: years
+        display:
+          numDecimalPlaces: 1
+      m_adults__25_64_years__average_years_of_tertiary_education:
+        title: Combined - average years of tertiary education for 25-64 years male adults
+        unit: years
+        display:
+          numDecimalPlaces: 1

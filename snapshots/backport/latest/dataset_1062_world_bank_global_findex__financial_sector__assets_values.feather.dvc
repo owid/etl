@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1062
+    date_accessed: 2023-08-14 15:16:47.530488
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank Global Findex - Financial Sector: Assets'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 66d752ea216405e869cfa00e7744c655
+  size: 11882
+  path: dataset_1062_world_bank_global_findex__financial_sector__assets_values.feather

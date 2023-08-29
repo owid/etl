@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4695
+    date_accessed: 2023-08-11 07:17:36.234424
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Mortality rate attributed to cardiovascular disease, cancer, diabetes or chronic
+    respiratory disease (probability)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bddcf509a39f6a32283e471145c01446
+  size: 24250
+  path: 
+    dataset_4695_mortality_rate_attributed_to_cardiovascular_disease__cancer__diabetes_or_chronic_respiratory_disease__probability_values.feather

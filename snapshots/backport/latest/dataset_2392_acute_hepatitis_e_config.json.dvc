@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2392
+    date_accessed: 2023-08-16 09:35:37.462656
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2392_acute_hepatitis_e (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 55a0ed907a311825a7ea76def7126a73
+  size: 32578
+  path: dataset_2392_acute_hepatitis_e_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2548
+    date_accessed: 2023-08-14 15:30:16.501813
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Public Sector, Taxation and Market Regulation - Table I.7. Top statutory personal
+    income tax rate and top marginal tax rates for employees
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a7286266f8c22090f1d66f0983c09664
+  size: 26202
+  path: 
+    dataset_2548_public_sector__taxation_and_market_regulation__table_i_7__top_statutory_personal_income_tax_rate_and_top_marginal_tax_rates_for_employees_values.feather

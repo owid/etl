@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2545
+    date_accessed: 2023-08-16 10:11:15.126643
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Public Sector, Taxation and Market Regulation - Government at a Glance
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 23ebf4c76b45f547f2da205dbb66ab16
+  size: 9266
+  path: 
+    dataset_2545_public_sector__taxation_and_market_regulation__government_at_a_glance_values.feather

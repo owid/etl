@@ -1,0 +1,58 @@
+steps:
+  # World Bank EdStats
+  data://meadow/wb/2023-07-10/education:
+  - snapshot://wb/2023-07-10/education.csv
+
+  data://garden/wb/2023-07-10/education:
+  - data://meadow/wb/2023-07-10/education
+  - data://garden/regions/2023-01-01/regions
+  - data://garden/wb/2023-04-30/income_groups
+  data://grapher/wb/2023-07-10/education:
+  - data://garden/wb/2023-07-10/education
+
+
+  # Barro and Lee projections dataset
+  data://meadow/education/2023-07-17/education_barro_lee_projections:
+  - snapshot://education/2023-07-17/education_barro_lee_projections.csv
+  # Garden step includes combined data where available with Lee and Lee historical data
+  data://garden/education/2023-07-17/education_barro_lee_projections:
+  - data://meadow/education/2023-07-17/education_barro_lee_projections
+  - data://garden/regions/2023-01-01/regions
+  - data://garden/wb/2023-04-30/income_groups
+  - data://garden/education/2023-07-17/education_lee_lee
+  data://grapher/education/2023-07-17/education_barro_lee_projections:
+  - data://garden/education/2023-07-17/education_barro_lee_projections
+
+
+  # Barro and Lee historical estimates
+  data://meadow/education/2023-07-17/education_lee_lee:
+  - snapshot://education/2023-07-17/education_lee_lee.xlsx
+  # Garden step includes combined data where available with Lee and Lee historical data
+  data://garden/education/2023-07-17/education_lee_lee:
+  - data://meadow/education/2023-07-17/education_lee_lee
+  - data://garden/regions/2023-01-01/regions
+  - data://garden/wb/2023-04-30/income_groups
+  - data://garden/wb/2023-07-10/education
+  data://grapher/education/2023-07-17/education_lee_lee:
+  - data://garden/education/2023-07-17/education_lee_lee
+
+
+# OECD historical education data
+  data://meadow/education/2023-08-09/clio_infra_education:
+  - snapshot://education/2023-08-09/years_of_education.xlsx
+  - snapshot://education/2023-08-09/years_of_education_gini.xlsx
+  - snapshot://education/2023-08-09/years_of_education_gender.xlsx
+  - snapshot://education/2023-08-09/numeracy.xlsx
+  - snapshot://education/2023-08-09/numeracy_gender.xlsx
+  data://garden/education/2023-08-09/clio_infra_education:
+  - data://meadow/education/2023-08-09/clio_infra_education
+  data://grapher/education/2023-08-09/clio_infra_education:
+  - data://garden/education/2023-08-09/clio_infra_education
+
+  data://meadow/education/2023-08-14/oecd_education:
+  - snapshot://education/2023-08-14/oecd_education.csv
+  data://garden/education/2023-08-14/oecd_education:
+  - data://meadow/education/2023-08-14/oecd_education
+  - data://garden/wb/2023-07-10/education
+  data://grapher/education/2023-08-14/oecd_education:
+  - data://garden/education/2023-08-14/oecd_education

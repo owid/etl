@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2175
+    date_accessed: 2023-08-14 14:40:37.861285
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Stomach cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f5c9be650dc000d8572ee5e7b0c45be0
+  size: 1499602
+  path: dataset_2175_stomach_cancer_values.feather

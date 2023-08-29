@@ -1,3 +1,7 @@
+default_display: &default_display
+  yearIsDay: true
+  zeroDay: '2020-01-21'
+
 dataset:
   title: COVID-19 - Variants
   description: >-
@@ -39,532 +43,329 @@ tables:
         title: Alpha
         description: The share of analyzed sequences that correspond to the Alpha COVID-19 variant. Only a fraction of all
           cases are sequenced.
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       alpha_percentage:
         title: Alpha_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       b_1_1_277:
         title: B.1.1.277
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       b_1_1_277_percentage:
         title: B.1.1.277_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       b_1_1_302:
         title: B.1.1.302
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       b_1_1_302_percentage:
         title: B.1.1.302_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       b_1_1_519:
         title: B.1.1.519
-        unit: '%'
-        short_unit: '%'
-        display:
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: ''
+        display: *default_display
       b_1_1_519_percentage:
         title: B.1.1.519_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       b_1_160:
         title: B.1.160
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       b_1_160_percentage:
         title: B.1.160_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       b_1_177:
         title: B.1.177
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       b_1_177_percentage:
         title: B.1.177_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       b_1_221:
         title: B.1.221
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       b_1_221_percentage:
         title: B.1.221_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       b_1_258:
         title: B.1.258
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       b_1_258_percentage:
         title: B.1.258_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       b_1_367:
         title: B.1.367
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       b_1_367_percentage:
         title: B.1.367_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       b_1_620:
         title: B.1.620
-        unit: '%'
-        short_unit: '%'
-        display:
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: ''
+        display: *default_display
       b_1_620_percentage:
         title: B.1.620_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       beta:
         title: Beta
         description: The share of analyzed sequences that correspond to the Beta COVID-19 variant. Only a fraction of all
           cases are sequenced.
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       beta_percentage:
         title: Beta_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       delta:
         title: Delta
         description: The share of analyzed sequences that correspond to the Delta COVID-19 variant. Only a fraction of all
           cases are sequenced.
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       delta_percentage:
         title: Delta_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       epsilon:
         title: Epsilon
         description: The share of analyzed sequences that correspond to the Epsilon COVID-19 variant. Only a fraction of all
           cases are sequenced.
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       epsilon_percentage:
         title: Epsilon_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       eta:
         title: Eta
         description: The share of analyzed sequences that correspond to the Eta COVID-19 variant. Only a fraction of all cases
           are sequenced.
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       eta_percentage:
         title: Eta_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       gamma:
         title: Gamma
         description: The share of analyzed sequences that correspond to the Gamma COVID-19 variant. Only a fraction of all
           cases are sequenced.
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       gamma_percentage:
         title: Gamma_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       iota:
         title: Iota
         description: The share of analyzed sequences that correspond to the Iota COVID-19 variant. Only a fraction of all
           cases are sequenced.
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       iota_percentage:
         title: Iota_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       kappa:
         title: Kappa
         description: The share of analyzed sequences that correspond to the Kappa variant. Only a fraction of all cases are
           sequenced.
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       kappa_percentage:
         title: Kappa_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       lambda:
         title: Lambda
-        unit: '%'
-        short_unit: '%'
-        display:
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: ''
+        display: *default_display
       lambda_percentage:
         title: Lambda_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       mu:
         title: Mu
         unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       mu_percentage:
         title: Mu_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       omicron:
         title: Omicron
         unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       omicron__ba_1:
         title: Omicron (BA.1)
         unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       omicron__ba_1__percentage:
         title: Omicron (BA.1)_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       omicron__ba_2:
         title: Omicron (BA.2)
         unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       omicron__ba_2__percentage:
         title: Omicron (BA.2)_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       omicron__ba_2_12_1:
         title: Omicron (BA.2.12.1)
         unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       omicron__ba_2_12_1__percentage:
         title: Omicron (BA.2.12.1)_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       omicron__ba_2_75:
         title: Omicron (BA.2.75)
         unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       omicron__ba_2_75__percentage:
         title: Omicron (BA.2.75)_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       omicron__ba_4:
         title: Omicron (BA.4)
         unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       omicron__ba_4__percentage:
         title: Omicron (BA.4)_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       omicron__ba_5:
         title: Omicron (BA.5)
         unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       omicron__ba_5__percentage:
         title: Omicron (BA.5)_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       omicron__bq_1:
         title: Omicron (BQ.1)
-        unit: '%'
-        short_unit: '%'
-        display:
-          includeInTable: true
-          shortUnit: ''
-          unit: ''
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: ''
+        display: *default_display
       omicron__bq_1__percentage:
         title: Omicron (BQ.1)_percentage
         unit: '%'
-        short_unit: '%'
-        display:
-          includeInTable: true
-          shortUnit: ''
-          unit: ''
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       omicron__xbb:
         title: Omicron (XBB)
-        unit: '%'
-        short_unit: '%'
-        display:
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: ''
+        display: *default_display
       omicron__xbb__percentage:
         title: Omicron (XBB)_percentage
         unit: '%'
-        short_unit: '%'
-        display:
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       omicron__xbb_1_16:
         title: Omicron (XBB.1.16)
-        unit: '%'
-        short_unit: '%'
-        display:
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: ''
+        display: *default_display
       omicron__xbb_1_16__percentage:
         title: Omicron (XBB.1.16)_percentage
         unit: '%'
-        short_unit: '%'
-        display:
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       omicron__xbb_1_5:
         title: Omicron (XBB.1.5)
         unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       omicron__xbb_1_5__percentage:
         title: Omicron (XBB.1.5)_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       omicron_percentage:
         title: Omicron_percentage
+        unit: '%'
+        display: *default_display
+      omicron__ch_1_1:
+        title: Omicron (CH.1.1)
         unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
+      omicron__ch_1_1__percentage:
+        title: Omicron (CH.1.1)_percentage
+        unit: '%'
+        display: *default_display
+      omicron__eg_5_1:
+        title: Omicron (EG.5.1)
+        unit: ''
+        display: *default_display
+      omicron__eg_5_1__percentage:
+        title: Omicron (EG.5.1)_percentage
+        unit: '%'
+        display: *default_display
+      omicron__xbb_1_9:
+        title: Omicron (XBB.1.9)
+        unit: ''
+        display: *default_display
+      omicron__xbb_1_9__percentage:
+        title: Omicron (XBB.1.9)_percentage
+        unit: '%'
+        display: *default_display
+      omicron__xbb_2_3:
+        title: Omicron (XBB.2.3)
+        unit: ''
+        display: *default_display
+      omicron__xbb_2_3__percentage:
+        title: Omicron (XBB.2.3)_percentage
+        unit: '%'
+        display: *default_display
       recombinant:
         title: Recombinant
-        unit: '%'
-        short_unit: '%'
-        display:
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: ''
+        display: *default_display
       recombinant_percentage:
         title: Recombinant_percentage
         unit: '%'
-        short_unit: '%'
-        display:
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        display: *default_display
       s__677h_robin1:
         title: S:677H.Robin1
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       s__677h_robin1_percentage:
         title: S:677H.Robin1_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       s__677p_pelican:
         title: S:677P.Pelican
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       s__677p_pelican_percentage:
         title: S:677P.Pelican_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       non_who:
         title: non_who
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       non_who_percentage:
         title: non_who_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display
       others:
         title: others
         description: The share of analyzed sequences that correspond to each variant group. Only a fraction of all cases are
           sequenced.
-        unit: '%'
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
-        short_unit: '%'
+        unit: ''
+        display: *default_display
       others_percentage:
         title: others_percentage
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2020-01-21'
+        unit: '%'
+        display: *default_display

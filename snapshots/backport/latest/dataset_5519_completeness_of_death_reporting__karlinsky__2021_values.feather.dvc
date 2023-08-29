@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5519
+    date_accessed: 2023-08-10 14:30:27.683226
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Completeness of Death Reporting – Karlinsky (2021)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f46bc56a7d17d453da0ced92c389eaaa
+  size: 15730
+  path: dataset_5519_completeness_of_death_reporting__karlinsky__2021_values.feather

@@ -1,4 +1,25 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""COW Militarised Inter-state Dispute dataset.
+
+
+- This dataset only contains inter-state disputes.
+
+- We use the "fatality" and "hostility" levels to differentiate different "types" of disputes.
+
+    - The "fatality" level provides a range of fatalities (e.g. '1-25 deaths')
+
+    - The "hostility" level provides a short summary of the hostility degree of the dispute ('Use of force', 'War', etc.)
+
+- Each entry in the source dataset describes a dispute (its participants and period). Therefore we need to "explode" it to add observations
+for each year of the dispute.
+
+- Due to missing data in the number of deaths, we are not estimating this metric. Instead, we are using the "fatality" level to group by the different conflicts.
+
+- The "number of ongoing disputes" for a particular fatality level can be understood as "the number of conflicts ongoing in a particular year that will have between X1-X2 fatalities
+over their complete lifetime globally".
+
+- The "number of ongoing disputes" for a particular hostility level can be understood as "the number of conflicts ongoing in a particular year that will reach this hostility level
+over their complete lifetime globally".
+"""
 
 from typing import cast
 
@@ -14,6 +35,17 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 # Log
 log = get_logger()
+# Mapping from fatality code to name
+FATALITY_LEVEL_MAP = {
+    0: "No deaths",
+    1: "1-25 deaths",
+    2: "26-100 deaths",
+    3: "101-250 deaths",
+    4: "251-500 deaths",
+    5: "501-999 deaths",
+    6: "> 999 deaths",
+    -9: "Unknown",
+}
 # Mapping from hostility level code to name
 HOSTILITY_LEVEL_MAP = {
     1: "No militarized action",
@@ -24,14 +56,6 @@ HOSTILITY_LEVEL_MAP = {
 }
 
 
-def load_countries_regions() -> Table:
-    """Load countries-regions table from reference dataset (e.g. to map from iso codes to country names)."""
-    ds_reference = cast(Dataset, paths.load_dependency("regions"))
-    tb_countries_regions = ds_reference["regions"]
-
-    return tb_countries_regions
-
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -40,51 +64,38 @@ def run(dest_dir: str) -> None:
     ds_meadow = cast(Dataset, paths.load_dependency("cow_mid"))
 
     # Read table from meadow dataset.
-    tb = ds_meadow["midb"]
+    tb_a = ds_meadow["mida"].reset_index()
+    tb_b = ds_meadow["midb"].reset_index()
 
     #
     # Process data.
     #
-    log.info("war.cow_mid: complete number of deaths with lower bounds")
-    tb = complete_num_deaths(tb)
+    # MIDA contains data at conflict level
+    log.info("war.cow_mid: read and process MIDA table")
+    tb_a = process_mida_table(tb_a)
 
-    log.info("war.cow_mid: sanity checks")
-    _sanity_checks(tb)
+    # MIDB contains data at dispute-country level, and helps us identify the region of each dispute
+    # by looking at the countries involved.
+    log.info("war.cow_mid: read and process MIDB table")
+    tb_b = process_midb_table(tb_b)
 
-    log.info("war.cow_mid: keep relevant columns")
-    COLUMNS_RELEVANT = [
-        "dispnum",
-        "ccode",
-        "stabb",
-        "hostlev",
-        "styear",
-        "endyear",
-        "fatalpre",
-    ]
-    tb = tb[COLUMNS_RELEVANT]
-
-    log.info("war.cow_mid: add regions")
-    tb = add_regions(tb)
-
-    log.info("war.cow_mid: rename column")
-    tb = tb.rename(columns={"hostlev": "hostility_level"})
-
-    log.info("war.cow_mid: aggregate entries")
-    tb = tb.groupby(["dispnum", "region", "styear", "endyear"], as_index=False).agg(
-        {"fatalpre": "sum", "hostility_level": "max"}
-    )
-
-    log.info("war.cow_mid: expand observations")
-    tb = expand_observations(tb)
+    log.info("war.cow_mid: combine tables")
+    tb = combine_tables(tb_a, tb_b)
 
     # Estimate metrics
     log.info("war.cow_mid: estimate metrics")
     tb = estimate_metrics(tb)
 
-    # Rename hotility levels
-    log.info("war.cow_mid: rename hostility_level")
-    tb["hostility_level"] = tb["hostility_level"].map(HOSTILITY_LEVEL_MAP | {"all": "all"})
-    assert tb["hostility_level"].isna().sum() == 0, "Unmapped regions!"
+    # Map fatality codes to names
+    log.info("war.cow_mid: map fatality codes to names")
+    tb["fatality"] = tb["fatality"].map(FATALITY_LEVEL_MAP | {"all": "all"})
+    assert tb["fatality"].notna().all(), "Unmapped fatality codes!"
+
+    # Map fatality codes to names
+    log.info("war.cow_mid: map hostility codes to names")
+    tb["hostility"] = tb["hostility"].map(HOSTILITY_LEVEL_MAP | {"all": "all"})
+    assert tb["hostility"].notna().all(), "Unmapped hostility codes!"
+
     # Add suffix with source name
     msk = tb["region"] != "World"
     tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (COW)"
@@ -94,7 +105,7 @@ def run(dest_dir: str) -> None:
 
     # Set index
     log.info("war.cow_mid: set index")
-    tb = tb.set_index(["year", "region", "hostility_level"], verify_integrity=True)
+    tb = tb.set_index(["year", "region", "fatality", "hostility"], verify_integrity=True).sort_index()
 
     # Add short_name to table
     log.info("war.cow_mid: add shortname to table")
@@ -110,39 +121,106 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def complete_num_deaths(tb: Table) -> Table:
-    """Complement `fatalpre` with information from `fatality`.
+def process_mida_table(tb: Table) -> Table:
+    """Process MIDA table.
 
-    `fatalpre` gives the precise number of deaths. However, this value is sometimes missing. In these cases, we can
-    use the information from `fatality` to get a lower bound for the number of deaths.
-
-    When information is missing in both fields, we set the value to 0.
+    - Sanity checks
+    - Keep relevant columns
+    - Add observation per year
     """
-    # Reduce NaNs in `fatalpre`
-    fatality_lower_bound = {
-        0: 0,
-        1: 1,
-        2: 26,
-        3: 101,
-        4: 251,
-        5: 501,
-        6: 1000,
-        -9: np.nan,
-    }
-    mask = tb["fatalpre"] == -9
-    tb.loc[mask, "fatalpre"] = tb.loc[mask, "fatality"].map(fatality_lower_bound)
+    # Sanity checks
+    assert tb["dispnum"].value_counts().max() == 1, "The same conflict (with same `dispnum`) appears multiple times"
+    assert (tb["styear"] >= 0).all(), "NA values (or negative) found in `styear`"
+    assert (tb["endyear"] >= 0).all(), "NA values (or negative) found in `endyear`"
+    assert not set(tb["fatality"]) - set(FATALITY_LEVEL_MAP), "Unnexpected values for `fatality`!"
+    assert not set(tb["hostlev"]) - set(HOSTILITY_LEVEL_MAP), "Unnexpected values for `fatality`!"
 
-    assert tb["fatalpre"].isna().sum() == 599, "Different number of NaNs found. Expected was 599."
-    tb["fatalpre"] = tb["fatalpre"].fillna(0)
+    # Keep relevant columns
+    COLUMNS_RELEVANT = [
+        "dispnum",
+        "styear",
+        "endyear",
+        "fatality",
+        "hostlev",
+    ]
+    tb = tb[COLUMNS_RELEVANT]
+
+    # Add observation for each year
+    tb = expand_observations(tb)
+
+    # Drop columns
+    tb = tb.drop(columns=["styear", "endyear"])
 
     return tb
 
 
-def _sanity_checks(tb: Table) -> Table:
-    # sanity checks
-    assert tb.groupby(["dispnum", "ccode", "styear", "endyear"]).size().max() == 1
-    assert set(tb["hostlev"]) == {1, 2, 3, 4, 5}, "Set of hostlev values should be {1, 2, 3, 4, 5}."
-    assert ((tb["ccode"] > 1) & (tb["ccode"] < 1000)).all(), "ccode should be between 1 and 1000."
+def process_midb_table(tb: Table) -> Table:
+    """Process MIDB table.
+
+    - Sanity checks
+    - Keep relevant columns
+    - Add observation per year
+    - Add regions
+    """
+    # Sanity checks
+    assert (
+        tb.groupby(["dispnum", "ccode", "styear", "endyear"]).size().max() == 1
+    ), "Multiple entries for a conflict-country-start_year-end_year"
+    assert tb["styear"].notna().all() and (tb["styear"] >= 0).all(), "NA values (or negative) found in `styear`"
+    assert tb["endyear"].notna().all() and (tb["endyear"] >= 0).all(), "NA values (or negative) found in `endyear`"
+
+    # Add regions
+    tb = add_regions(tb)
+
+    # Keep relevant columns
+    COLUMNS_RELEVANT = [
+        "dispnum",
+        "styear",
+        "endyear",
+        "region",
+    ]
+    tb = tb[COLUMNS_RELEVANT]
+
+    # Drop duplicates
+    tb = tb.drop_duplicates()
+
+    # Add observation for each year
+    tb = expand_observations(tb)
+
+    # Drop columns
+    tb = tb.drop(columns=["styear", "endyear"])
+
+    return tb
+
+
+def combine_tables(tb_a: Table, tb_b: Table) -> Table:
+    """Combine MIDA and MIDB processed tables.
+
+    Basically, we add region information (from MIDB) to MIDA.
+    """
+    # Merge
+    tb = tb_a.merge(tb_b, on=["dispnum", "year"], how="left")
+
+    # Fill NaNs
+    ## Some disputes (identified by codes) have no region information in MIDB. We fill them manually.
+    ## Sanity check (1)
+    dispnum_nans_expected = {2044, 2328, 4005}  # dispute codes with no region information
+    dispnum_nans_found = set(tb.loc[tb["region"].isna()])
+    dispnum_nans_unexpected = dispnum_nans_found - dispnum_nans_expected
+    assert dispnum_nans_unexpected, f"Unexpected dispnum with NaN regions: {dispnum_nans_unexpected}"
+    ## Sanity check (2)
+    assert (
+        tb_b[tb_b["dispnum"].isin(dispnum_nans_expected)].groupby("dispnum")["region"].nunique().max() == 1
+    ), f"More than one region for some dispnum in {dispnum_nans_expected}"
+    ## Actually fill NaNs
+    tb.loc[tb["dispnum"] == 2044, "region"] = "Americas"
+    tb.loc[tb["dispnum"] == 2328, "region"] = "Europe"
+    tb.loc[tb["dispnum"] == 4005, "region"] = "Asia"
+
+    # Check there is no NaN!
+    assert tb.notna().all().all(), "NaN in some field!"
+
+    return tb
 
 
 def add_regions(tb: Table) -> Table:
@@ -151,17 +229,37 @@ def add_regions(tb: Table) -> Table:
     The region is assigned based on the country code (ccode) of the participant.
     """
     ## COW uses custom country codes, so we need the following custom mapping.
-    tb.loc[(tb["ccode"] >= 1) & (tb["ccode"] < 200), "region"] = "Americas"
-    tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] < 400), "region"] = "Europe"
-    tb.loc[(tb["ccode"] >= 400) & (tb["ccode"] < 627), "region"] = "Africa"
-    tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] < 699), "region"] = "Middle East"
-    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] < 1000), "region"] = "Asia"
+    tb.loc[(tb["ccode"] >= 1) & (tb["ccode"] <= 165), "region"] = "Americas"
+    tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] <= 395), "region"] = "Europe"
+    tb.loc[(tb["ccode"] >= 400) & (tb["ccode"] <= 626), "region"] = "Africa"
+    tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] <= 698), "region"] = "Middle East"
+    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 899), "region"] = "Asia"
+    tb.loc[(tb["ccode"] >= 900) & (tb["ccode"] <= 999), "region"] = "Oceania"
 
+    # Sanity check: No missing regions
+    assert tb["region"].notna().all(), f"Missing regions! {tb.loc[tb['region'].isna(), ['dispnum', 'ccode']]}"
     return tb
 
 
 def expand_observations(tb: Table) -> Table:
     """Expand to have a row per (year, dispute).
+
+    Example
+
+        Input:
+
+        | dispnum | year_start | year_end |
+        |---------|------------|----------|
+        | 1       | 1990       | 1993     |
+
+        Output:
+
+        |  year | warcode |
+        |-------|---------|
+        |  1990 |    1    |
+        |  1991 |    1    |
+        |  1992 |    1    |
+        |  1993 |    1    |
 
     Parameters
     ----------
@@ -173,9 +271,6 @@ def expand_observations(tb: Table) -> Table:
     Table
         Here, each dispute has as many rows as years of activity. Its deaths have been uniformly distributed among the years of activity.
     """
-    # For that we scale the number of deaths proportional to the duration of the dispute.
-    tb[["fatalpre"]] = tb[["fatalpre"]].div(tb["endyear"] - tb["styear"] + 1, "index").round()
-
     # Add missing years for each triplet ("warcode", "campcode", "ccode")
     YEAR_MIN = tb["styear"].min()
     YEAR_MAX = tb["endyear"].max()
@@ -194,106 +289,140 @@ def estimate_metrics(tb: Table) -> Table:
 
     These metrics are:
         - number_ongoing_disputes
-        - number_new_disputes
-        - number_deaths_ongoing_disputes
 
     Parameters
     ----------
     tb : Table
-        Table with a row per dispute and year of observation.
+        Table with a row per dispute and year of observation. It also contains info on hostility, fatality and participant states.
 
     Returns
     -------
     Table
         Table with a row per year, and the corresponding metrics of interest.
     """
-    # Get metrics (ongoing and new)
-    tb_ongoing = _add_ongoing_metrics(tb)
-    tb_new = _add_new_metrics(tb)
+    # Estimate metrics broken down by fatality
+    tb_fatality = _estimate_metrics_fatality(tb.copy())
+    # Estimate metrics broken down by hostility
+    tb_hostility = _estimate_metrics_hostility(tb.copy())
 
     # Combine
-    columns_idx = ["year", "region", "hostility_level"]
-    tb = tb_ongoing.merge(tb_new, on=columns_idx, how="outer").sort_values(columns_idx)
+    tb = pr.concat([tb_fatality, tb_hostility], ignore_index=False)
 
     return tb
 
 
-def _add_ongoing_metrics(tb: Table) -> Table:
-    ## Aggregate by (dispute, region, year)
-    ## The same dispute may appear more than once in the same region and year with a different hostility_level.
-    ## We want a single hostility_level per dispute, region and year. Therefore, we assign the highest hostility level.
-    tb = tb.groupby(["dispnum", "region", "year"], as_index=False).agg({"hostility_level": "max", "fatalpre": "sum"})
+def _estimate_metrics_fatality(tb: Table) -> Table:
+    """Estimate metrics broken down by fatality level.
 
-    ops = {"dispnum": "nunique"}
-    ## By region and hostility_level
-    tb_ongoing = tb.groupby(["year", "region", "hostility_level"], as_index=False).agg(ops)
-    ## region='World' and by hostility_level
-    tb_ongoing_world = tb.groupby(["year", "hostility_level"], as_index=False).agg(ops)
-    tb_ongoing_world["region"] = "World"
+    Also include fatality="all".
 
-    ops = {"dispnum": "nunique", "fatalpre": sum}
-    ## By region and hostility_level='all
-    tb_ongoing_alltypes = tb.groupby(["year", "region"], as_index=False).agg(ops)
-    tb_ongoing_alltypes["hostility_level"] = "all"
-    ## region='World' and hostility_level='all'
-    tb_ongoing_world_alltypes = tb.groupby(["year"], as_index=False).agg(ops)
-    tb_ongoing_world_alltypes["region"] = "World"
-    tb_ongoing_world_alltypes["hostility_level"] = "all"
+    We assign hostility="all".
+    """
+    assert (
+        tb.groupby(["dispnum"])["fatality"].nunique().max() == 1
+    ), "The same conflict appears with multiple fatality levels!"
 
-    ## Combine tables
-    tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_world, tb_ongoing_alltypes, tb_ongoing_world_alltypes], ignore_index=True).sort_values(  # type: ignore
-        by=["year", "region", "hostility_level"]
-    )
-
-    ## Rename columns
-    tb_ongoing = tb_ongoing.rename(  # type: ignore
-        columns={
-            "dispnum": "number_ongoing_disputes",
-            "fatalpre": "number_deaths_ongoing_disputes",
-        }
-    )
-
-    return tb_ongoing
-
-
-def _add_new_metrics(tb: Table) -> Table:
-    # Operations
+    # Operations to apply
     ops = {"dispnum": "nunique"}
 
-    # Regions
-    ## Keep one row per (dispnum, region).
-    tb_ = tb.sort_values("styear").drop_duplicates(subset=["dispnum", "region"], keep="first")
-    ## By region and hostility_level
-    tb_new = tb_.groupby(["styear", "region", "hostility_level"], as_index=False).agg(ops)
-    ## By region and hostility_level='all'
-    tb_new_alltypes = tb_.groupby(["styear", "region"], as_index=False).agg(ops)
-    tb_new_alltypes["hostility_level"] = "all"
-
+    # By regions
+    tb_regions = tb.groupby(["year", "fatality", "region"], as_index=False).agg(ops)
     # World
-    ## Keep one row per (dispnum). Otherwise, we might count the same dispute in multiple years!
-    tb_ = tb.sort_values("styear").drop_duplicates(subset=["dispnum"], keep="first")
-    ## region='World' and by hostility_level
-    tb_new_world = tb.groupby(["styear", "hostility_level"], as_index=False).agg(ops)
-    tb_new_world["region"] = "World"
-    ## World and hostility_level='all'
-    tb_new_world_alltypes = tb.groupby(["styear"], as_index=False).agg(ops)
-    tb_new_world_alltypes["region"] = "World"
-    tb_new_world_alltypes["hostility_level"] = "all"
+    tb_world = tb.groupby(["year", "fatality"], as_index=False).agg(ops)
+    tb_world["region"] = "World"
 
     # Combine
-    tb_new = pd.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True).sort_values(  # type: ignore
-        by=["styear", "region", "hostility_level"]
-    )
+    tb = pr.concat([tb_regions, tb_world], ignore_index=False)
 
-    # Rename columns
-    tb_new = tb_new.rename(  # type: ignore
+    # Rename indicator column
+    tb = tb.rename(columns={"dispnum": "number_ongoing_disputes"})
+
+    # Add fatality="all"
+    ops = {"number_ongoing_disputes": "sum"}
+    tb_all = tb.groupby(["year", "region"], as_index=False).agg(ops)
+    tb_all["fatality"] = "all"
+    tb = pr.concat([tb, tb_all], ignore_index=False)
+
+    # Add hostility level
+    tb["hostility"] = "all"
+
+    return tb
+
+
+def _estimate_metrics_hostility(tb: Table) -> Table:
+    """Estimate metrics broken down by hostility level.
+
+    We assign fatality="all".
+    """
+    tb_ongoing = _estimate_metrics_hostility_ongoing(tb)
+    tb_new = _estimate_metrics_hostility_new(tb)
+
+    # Combine
+    tb = tb_ongoing.merge(tb_new, on=["year", "region", "hostility"], how="outer")
+
+    # Add hostility level
+    tb["fatality"] = "all"
+
+    return tb
+
+
+def _estimate_metrics_hostility_ongoing(tb: Table) -> Table:
+    assert (
+        tb.groupby(["dispnum"])["hostlev"].nunique().max() == 1
+    ), "The same conflict appears with multiple hostlev levels!"
+
+    # Operations to apply
+    ops = {"dispnum": "nunique"}
+
+    # By regions
+    tb_regions = tb.groupby(["year", "hostlev", "region"], as_index=False).agg(ops)
+    # World
+    tb_world = tb.groupby(["year", "hostlev"], as_index=False).agg(ops)
+    tb_world["region"] = "World"
+
+    # Combine
+    tb = pr.concat([tb_regions, tb_world], ignore_index=False)
+
+    # Rename indicator column
+    tb = tb.rename(
         columns={
-            "styear": "year",
-            "dispnum": "number_new_disputes",
+            "dispnum": "number_ongoing_disputes",
+            "hostlev": "hostility",
         }
     )
 
-    return tb_new
+    return tb
+
+
+def _estimate_metrics_hostility_new(tb: Table) -> Table:
+    assert (
+        tb.groupby(["dispnum"])["hostlev"].nunique().max() == 1
+    ), "The same conflict appears with multiple hostlev levels!"
+
+    # Drop 'duplicates'
+    tb = tb.sort_values("year").drop_duplicates(subset=["dispnum", "region"], keep="first")
+
+    # Operations to apply
+    ops = {"dispnum": "nunique"}
+
+    # By regions
+    tb_regions = tb.groupby(["year", "hostlev", "region"], as_index=False).agg(ops)
+    # World
+    tb_world = tb.groupby(["year", "hostlev"], as_index=False).agg(ops)
+    tb_world["region"] = "World"
+
+    # Combine
+    tb = pr.concat([tb_regions, tb_world], ignore_index=False)
+
+    # Rename indicator column
+    tb = tb.rename(
+        columns={
+            "dispnum": "number_new_disputes",
+            "hostlev": "hostility",
+        }
+    )
+
+    return tb
 
 
 def replace_missing_data_with_zeros(tb: Table) -> Table:
@@ -303,9 +432,15 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     # Add missing (year, region, hostility_type) entries (filled with NaNs)
     years = np.arange(tb["year"].min(), tb["year"].max() + 1)
     regions = set(tb["region"])
-    hostility_types = set(tb["hostility_level"])
-    new_idx = pd.MultiIndex.from_product([years, regions, hostility_types], names=["year", "region", "hostility_level"])
-    tb = tb.set_index(["year", "region", "hostility_level"], verify_integrity=True).reindex(new_idx).reset_index()
+    fatality_types = set(tb["fatality"])
+    hostility_types = set(tb["hostility"])
+    new_idx = pd.MultiIndex.from_product(
+        [years, regions, fatality_types, hostility_types], names=["year", "region", "fatality", "hostility"]
+    )
+    # Only keep rows with "all" in fatality or hostility
+    # That is, either break down indicators by fatality or by hostility
+    new_idx = [i for i in new_idx if (i[2] == "all") or (i[3] == "all")]
+    tb = tb.set_index(["year", "region", "fatality", "hostility"], verify_integrity=True).reindex(new_idx).reset_index()
 
     # Change NaNs for 0 for specific rows
     ## For columns "number_ongoing_disputes", "number_new_disputes"
@@ -314,11 +449,6 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
         "number_new_disputes",
     ]
     tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
-
-    # We are only reporting number of deaths for hostility_level='all'
-    ## for hostility_level != 'all' we don't mind having NaNs
-    mask = tb["hostility_level"] == "all"
-    tb.loc[mask, "number_deaths_ongoing_disputes"] = tb.loc[mask, "number_deaths_ongoing_disputes"].fillna(0)
 
     # Drop all-NaN rows
     tb = tb.dropna(subset=columns, how="all")

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/817
+    date_accessed: 2023-08-14 05:35:51.300454
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Investment: Machinery - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 247b7ecd9bbdea8996bca88345898c68
+  size: 721994
+  path: dataset_817_investment__machinery__fao__2017_values.feather

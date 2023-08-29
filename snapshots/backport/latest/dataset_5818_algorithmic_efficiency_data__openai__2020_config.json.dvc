@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5818_algorithmic_efficiency_data__openai__2020_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:23:29.079344
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5818
+    date_accessed: 2023-08-16 09:34:27.490565
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5818_algorithmic_efficiency_data__openai__2020
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5818
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e5aebba614d7da3da472cd664e529c88
-  size: 2886
+- md5: 3380e8b5e07d8ba83d48b863a14f7501
+  size: 3162
   path: dataset_5818_algorithmic_efficiency_data__openai__2020_config.json

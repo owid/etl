@@ -1,7 +1,7 @@
 dataset:
   title: History of war (Project Mars, 2020)
   description: >-
-    This dataset contains information on armed conflicts, both internal and external, in the period of 1800 and 2011.
+    This dataset contains information on armed conflicts, both civil and non-civil, in the period of 1800 and 2011.
 
 
     It has been constructed using the Project Mars dataset by Lyall, Jason.
@@ -22,6 +22,16 @@ tables:
           died from illness and/or disease. This is the high estimate of those who were killed.
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Asia
+              - Eastern Europe
+              - Latin America
+              - North Africa and the Middle East
+              - North America
+              - Sub-Saharan Africa
+              - Western Europe
       number_deaths_ongoing_conflicts_low:
         title: Number of soldier deaths in ongoing conflicts (low estimate)
         unit: deaths
@@ -30,7 +40,16 @@ tables:
           died from illness and/or disease. This is the low estimate of those who were killed.
         display:
           numDecimalPlaces: 0
-
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Asia
+              - Eastern Europe
+              - Latin America
+              - North Africa and the Middle East
+              - North America
+              - Sub-Saharan Africa
+              - Western Europe
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
         unit: conflicts
@@ -42,9 +61,18 @@ tables:
 
 
           For the wars that had campaigns within it that were a civil war and a non-civil war, we coded them as non-civil wars.
-
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Asia
+              - Eastern Europe
+              - Latin America
+              - North Africa and the Middle East
+              - North America
+              - Sub-Saharan Africa
+              - Western Europe
       number_new_conflicts:
         title: Number of new conflicts
         unit: conflicts
@@ -64,3 +92,13 @@ tables:
 
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Asia
+              - Eastern Europe
+              - Latin America
+              - North Africa and the Middle East
+              - North America
+              - Sub-Saharan Africa
+              - Western Europe

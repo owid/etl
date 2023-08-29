@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1785
+    date_accessed: 2023-08-16 09:49:04.533803
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1785_occupational_exposure_to_diesel_engine_exhaust
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ee12a5c0f0d55fd02bb85e9f5a235986
+  size: 22640
+  path: dataset_1785_occupational_exposure_to_diesel_engine_exhaust_config.json

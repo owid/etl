@@ -1,0 +1,25 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5015
+    date_accessed: 2023-08-11 07:55:43.348005
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Agriculture: Crop Residues'
+  description: Greenhouse gas (GHG) emissions from crop residues consist of direct
+    and indirect nitrous oxide (N2O) emissions from nitrogen (N) in crop residues
+    and forage/pasture renewal left on agricultural fields by farmers. Specifically,
+    N2O is produced by microbial processes of nitrification and de-nitrification taking
+    place on the deposition site (direct emissions), and after volatilization/re-deposition
+    and leaching processes (indirect emissions).  The FAOSTAT emissions database is
+    computed following Tier 1 IPCC 2006 Guidelines for National GHG Inventories, Vol.
+    4, Ch. 2 and 11(http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol4.html). GHG
+    emissions are provided as direct, indirect and total by country, regions and special
+    groups, with global coverage, relative to the period 1961-present (with annual
+    updates) and with projections for 2030 and 2050, expressed as Gg N2O and Gg CO2eq,
+    by crop and N content in residues.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c90ae5e422f10a1055568308201a1f01
+  size: 3726706
+  path: dataset_5015_emissions__agriculture__crop_residues_values.feather

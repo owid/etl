@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/974
+    date_accessed: 2023-08-14 05:57:33.678075
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_974_fossil_fuel_consumption_per_capita__bp__and__un__2017_revision
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a59add3da9506147df89da42b2ab92a1
+  size: 4327
+  path: 
+    dataset_974_fossil_fuel_consumption_per_capita__bp__and__un__2017_revision_config.json

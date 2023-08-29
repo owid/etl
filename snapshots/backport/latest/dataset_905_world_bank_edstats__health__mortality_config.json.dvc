@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/905
+    date_accessed: 2023-08-14 16:00:35.341336
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_905_world_bank_edstats__health__mortality (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 49a609b175a20a42998d36469dd1d8d6
+  size: 3716
+  path: dataset_905_world_bank_edstats__health__mortality_config.json

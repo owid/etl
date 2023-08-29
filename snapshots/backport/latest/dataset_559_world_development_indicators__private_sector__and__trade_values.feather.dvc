@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/559
+    date_accessed: 2023-08-14 05:39:37.670602
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Development Indicators - Private Sector & Trade
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b64eeb5100fe8934d97785d0d88373ad
+  size: 5125170
+  path: 
+    dataset_559_world_development_indicators__private_sector__and__trade_values.feather

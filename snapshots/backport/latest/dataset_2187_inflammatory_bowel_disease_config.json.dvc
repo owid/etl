@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2187
+    date_accessed: 2023-08-14 15:09:35.893113
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2187_inflammatory_bowel_disease (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 656244a7fdc3fbbb74926dbbc8e9d428
+  size: 32956
+  path: dataset_2187_inflammatory_bowel_disease_config.json

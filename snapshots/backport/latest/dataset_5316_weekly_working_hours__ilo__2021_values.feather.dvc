@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5316
+    date_accessed: 2023-08-14 05:37:05.777261
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Weekly Working Hours — ILO (2021)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1f2ef16eca3253f19b2ba603bd24a7fb
+  size: 80338
+  path: dataset_5316_weekly_working_hours__ilo__2021_values.feather

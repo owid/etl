@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3086
+    date_accessed: 2023-08-14 16:00:25.714887
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3086_top_net_personal_wealth_shares__wid__2018
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9312e25b7aba7b614cfa85d0a2d5c1bb
+  size: 2361
+  path: dataset_3086_top_net_personal_wealth_shares__wid__2018_config.json

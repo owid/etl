@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4518
+    date_accessed: 2023-08-16 09:26:05.938177
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4518_countries_with_coordination_mechanism_for_sustainable_consumption_and_production__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6c35817c36b826c5ae666567a72fd7ae
+  size: 21114
+  path: 
+    dataset_4518_countries_with_coordination_mechanism_for_sustainable_consumption_and_production__1__yes__0__no_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1468
+    date_accessed: 2023-08-16 09:36:04.508436
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: HIV/AIDS resulting in other diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 603a3176dca407332f702462254b9aaf
+  size: 2012066
+  path: dataset_1468_hiv_aids_resulting_in_other_diseases_values.feather

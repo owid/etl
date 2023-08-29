@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2162
+    date_accessed: 2023-08-16 08:29:37.416216
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Sickle cell trait
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 697a73d7b3e5d72e96f51a5fd93d6e1f
+  size: 1490874
+  path: dataset_2162_sickle_cell_trait_values.feather

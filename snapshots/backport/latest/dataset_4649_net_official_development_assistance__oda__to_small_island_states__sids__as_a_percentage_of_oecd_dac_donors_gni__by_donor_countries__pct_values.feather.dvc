@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4649
+    date_accessed: 2023-08-16 08:00:57.082785
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Net official development assistance (ODA) to small island states (SIDS) as
+    a percentage of OECD-DAC donors' GNI, by donor countries (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d9007f0b6b2681a2f9f4276806207335
+  size: 10842
+  path: 
+    dataset_4649_net_official_development_assistance__oda__to_small_island_states__sids__as_a_percentage_of_oecd_dac_donors_gni__by_donor_countries__pct_values.feather

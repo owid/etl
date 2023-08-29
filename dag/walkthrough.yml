@@ -8,3 +8,11 @@ steps:
   - data://garden/dummy/2020-01-01/dummy
   data://explorers/dummy/2020-01-01/dummy:
   - data://garden/dummy/2020-01-01/dummy
+  data://meadow/dummy/2020-01-01/dummy_full:
+  - snapshot://dummy/2020-01-01/dummy_full.csv
+  data://garden/dummy/2020-01-01/dummy_full:
+  - data://meadow/dummy/2020-01-01/dummy_full
+  data://grapher/dummy/2020-01-01/dummy_full:
+  - data://garden/dummy/2020-01-01/dummy_full
+  # data://explorers/dummy/2020-01-01/dummy_full:
+  # - data://garden/dummy/2020-01-01/dummy_full

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/225
+    date_accessed: 2023-08-16 09:54:09.305460
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_225_global_projection__medium_ssp2__iiasa__2016
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b21eb9ad54bbd8c3fd46211b4f904b27
+  size: 6723
+  path: dataset_225_global_projection__medium_ssp2__iiasa__2016_config.json

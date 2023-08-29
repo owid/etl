@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5457
+    date_accessed: 2023-08-10 13:08:19.269862
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: IHME - Global Burden of Disease - Deaths and DALYs - Institute for Health
+    Metrics and Evaluation  (2021-09)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e674ed1cc0c661eea559caf6d81659a2
+  size: 35040818
+  path: 
+    dataset_5457_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2021_09_values.feather
