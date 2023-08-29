@@ -42,9 +42,8 @@ def run(dest_dir: str) -> None:
     # Pivot the dataframe so that each indicator is a separate column
     tb = tb.pivot(index=["country", "year"], columns="indicator_code", values="value")
     tb.reset_index(inplace=True)
-    # Adding share of female students in pre-primary school, share of female teachers in tertiary education and total funding per student (household + government)
+    # Adding share of female students in pre-primary school and total funding per student (household + government)
     tb["percentage_of_female_pre_primary_students)"] = (tb["SE.PRE.ENRL.FE"] / tb["SE.PRE.ENRL"]) * 100
-    tb["percentage_of_female_tertiary_teachers"] = (tb["UIS.T.5.F"] / tb["UIS.T.5"]) * 100
     tb["total_funding_per_student_ppp"] = tb["UIS.XUNIT.PPPCONST.1.FSGOV"] + tb["UIS.XUNIT.PPPCONST.1.FSHH"]
 
     # Set an appropriate index and sort.
@@ -184,12 +183,6 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
             tb[column].metadata.display["numDecimalPlaces"] = 0
             tb[column].metadata.unit = "US dollars"
             tb[column].metadata.short_unit = "$"
-        elif column == "percentage_of_female_tertiary_teachers":
-            tb[column].metadata.title = "Share of teachers who are female, tertiary"
-            tb[column].metadata.display = {}
-            tb[column].metadata.display["numDecimalPlaces"] = 1
-            tb[column].metadata.unit = "%"
-            tb[column].metadata.short_unit = "%"
         elif column == "percentage_of_female_pre_primary_students":
             tb[column].metadata.title = "Share of female students, primary"
             tb[column].metadata.display = {}
