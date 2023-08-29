@@ -2,7 +2,7 @@
 from pathlib import Path
 
 import streamlit as st
-from st_pages import Page, show_pages
+from st_pages import Page, Section, add_indentation, show_pages
 from streamlit_extras.switch_page_button import switch_page
 
 from apps.wizard import utils
@@ -18,13 +18,16 @@ st.title("Wizard")
 # should be
 show_pages(
     [
-        Page(CURRENT_DIR / "snapshot.py", "Snapshot", in_section=False),
-        Page(CURRENT_DIR / "meadow.py", "Meadow", in_section=False),
-        Page(CURRENT_DIR / "garden.py", "Garden", in_section=False),
-        Page(CURRENT_DIR / "grapher.py", "Grapher", in_section=False),
-        Page(CURRENT_DIR / "charts/__main__.py", "Charts", in_section=False),
+        Section("Create new ETL steps"),
+        Page(CURRENT_DIR / "snapshot.py", "Snapshot", icon="1️⃣"),
+        Page(CURRENT_DIR / "meadow.py", "Meadow", icon="2️⃣"),
+        Page(CURRENT_DIR / "garden.py", "Garden", icon="3️⃣"),
+        Page(CURRENT_DIR / "grapher.py", "Grapher", icon="4️⃣"),
+        Page(CURRENT_DIR / "charts/__main__.py", "Charts", icon="📊", in_section=False),
     ]
 )
+
+add_indentation()
 
 if utils.AppState.args.phase != "all":
     switch_page(utils.AppState.args.phase.title())
