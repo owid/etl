@@ -1,11 +1,12 @@
+"""Garden page."""
 import os
 from pathlib import Path
-from typing import Any
 
 import ruamel.yaml
 import streamlit as st
 from owid.catalog import Dataset
 from st_pages import add_indentation
+from typing_extensions import Self
 
 from apps.wizard import utils
 from etl.paths import DAG_DIR, DATA_DIR, ETL_DIR
@@ -48,11 +49,12 @@ class GardenForm(utils.StepForm):
     is_private: bool
     update_period_days: int
 
-    def __init__(self, **data: Any) -> None:
+    def __init__(self: Self, **data: str) -> Self:
+        """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
         super().__init__(**data)
 
-    def validate(self: "GardenForm") -> None:
+    def validate(self: Self) -> None:
         """Check that fields in form are valid.
 
         - Add error message for each field (to be displayed in the form).
@@ -93,8 +95,10 @@ def _check_dataset_in_meadow(form: GardenForm) -> None:
 
 
 def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
-    """Fill dummy metadata yaml file with some dummy values. Only useful when
-    --dummy-data is used. We need this to avoid errors in `walkthrough grapher --dummy-data`."""
+    """Fill dummy metadata yaml file with some dummy values.
+
+    Only useful when `--dummy-data` is used. We need this to avoid errors in `walkthrough grapher --dummy-data`.
+    """
     with open(metadata_path, "r") as f:
         doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
 

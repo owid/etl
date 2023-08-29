@@ -19,15 +19,15 @@ st.title("Wizard")
 show_pages(
     [
         Section("Create new ETL steps"),
-        Page(CURRENT_DIR / "snapshot.py", "Snapshot", icon="1️⃣"),
-        Page(CURRENT_DIR / "meadow.py", "Meadow", icon="2️⃣"),
-        Page(CURRENT_DIR / "garden.py", "Garden", icon="3️⃣"),
-        Page(CURRENT_DIR / "grapher.py", "Grapher", icon="4️⃣"),
-        Page(CURRENT_DIR / "charts/__main__.py", "Charts", icon="📊", in_section=False),
+        Page(str(CURRENT_DIR / "snapshot.py"), "Snapshot", icon="1️⃣"),
+        Page(str(CURRENT_DIR / "meadow.py"), "Meadow", icon="2️⃣"),
+        Page(str(CURRENT_DIR / "garden.py"), "Garden", icon="3️⃣"),
+        Page(str(CURRENT_DIR / "grapher.py"), "Grapher", icon="4️⃣"),
+        Page(str(CURRENT_DIR / "charts/__main__.py"), "Charts", icon="📊", in_section=False),
     ]
 )
 
 add_indentation()
 
-if utils.AppState.args.phase != "all":
-    switch_page(utils.AppState.args.phase.title())
+if utils.AppState.args.phase != "all":  # type: ignore
+    switch_page(utils.AppState.args.phase.title())  # type: ignore

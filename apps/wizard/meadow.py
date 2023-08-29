@@ -1,9 +1,10 @@
+"""Meadow page."""
 import os
 from pathlib import Path
-from typing import Any, Dict
 
 import streamlit as st
 from st_pages import add_indentation
+from typing_extensions import Self
 
 from apps.wizard import utils
 from etl.paths import DAG_DIR, ETL_DIR
@@ -47,7 +48,7 @@ class MeadowForm(utils.StepForm):
     generate_notebook: bool
     is_private: bool
 
-    def __init__(self: "MeadowForm", **data: Dict[str, Any]) -> None:
+    def __init__(self: Self, **data: str) -> Self:
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
         super().__init__(**data, step_name="meadow")

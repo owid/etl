@@ -1,8 +1,9 @@
+"""Grapher page."""
 from pathlib import Path
-from typing import Any
 
 import streamlit as st
 from st_pages import add_indentation
+from typing_extensions import Self
 
 from apps.wizard import utils
 from etl.paths import DAG_DIR
@@ -32,6 +33,8 @@ def load_instructions() -> str:
 
 
 class GrapherForm(utils.StepForm):
+    """Grapher form."""
+
     short_name: str
     namespace: str
     version: str
@@ -40,7 +43,8 @@ class GrapherForm(utils.StepForm):
     dag_file: str
     is_private: bool
 
-    def __init__(self, **data: Any) -> None:
+    def __init__(self: Self, **data: str) -> Self:
+        """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
         super().__init__(**data)
 

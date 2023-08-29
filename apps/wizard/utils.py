@@ -17,6 +17,7 @@ from MySQLdb import OperationalError
 from owid import walden
 from owid.catalog.utils import validate_underscore
 from pydantic import BaseModel
+from typing_extensions import Self
 
 from etl import config
 from etl.db import get_connection
@@ -263,9 +264,7 @@ class AppState:
         idx = max(self.steps.index(self.step) - 1, 0)
         return self.steps[idx]
 
-    def st_widget(
-        self: "AppState", st_widget: Callable, default_last: Optional[str] = "", **kwargs: Dict[str, Any]
-    ) -> None:
+    def st_widget(self: "AppState", st_widget: Callable, default_last: Optional[str] = "", **kwargs: str) -> None:
         """Wrap a streamlit widget with a default value."""
         key = kwargs["key"]
         # Get default value (either from previous edits, or from previous steps)
@@ -306,33 +305,43 @@ class StepForm(BaseModel):
 
     errors: Dict[str, Any] = {}
 
-    def __init__(self, **kwargs):
+    def __init__(self: type(Self), **kwargs: str) -> None:
+        """Construct parent class."""
         super().__init__(**kwargs)
         self.validate()
 
     @classmethod
-    def filter_relevant_fields(cls: "StepForm", step_name: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    def filter_relevant_fields(cls: type(Self), step_name: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """Filter relevant fields from form."""
         return {k.replace(f"{step_name}.", ""): v for k, v in data.items() if k.startswith(f"{step_name}.")}
 
     @classmethod
-    def from_state(cls: "StepForm", validate: bool = True) -> "StepForm":
+    def from_state(cls: type(Self)) -> Self:
         """Build object from session_state variables."""
         data = cls.filter_relevant_fields(step_name=st.session_state["step_name"], data=st.session_state)
         return cls(**data)
 
-    def validate(self):
+    def validate(self: type(Self)) -> None:
+        """Validate form fields."""
         raise NotImplementedError("Needs to be implemented in the child class!")
 
     @property
-    def metadata(self):
+    def metadata(self: type(Self)) -> None:
+        """Get metadata as dictionary."""
         raise NotADirectoryError("Needs to be implemented in the child class!")
 
-    def to_yaml(self, path: Path) -> None:
+    def to_yaml(self: type(Self), path: Path) -> None:
+        """Export form (metadata) to yaml file."""
         with open(path, "w") as f:
             ruamel.yaml.dump(self.metadata, f, Dumper=ruamel.yaml.RoundTripDumper)
 
-    def validate_schema(self, schema_path: str, ignore_keywords: List[str] = []):
+    def validate_schema(self: type(Self), schema_path: str, ignore_keywords: List[str] = None) -> None:
+        """Validate form fields against schema.
+
+        Note that not all form fields are present in the schema (some do not belong to metadata, but are needed to generate the e.g. dataset URI)
+        """
+        if ignore_keywords == []:
+            ignore_keywords = []
         validator = jsonschema.Draft7Validator(schema_path)
         errors = sorted(validator.iter_errors(self.metadata), key=str)  # get all validation errors
         for error in errors:
@@ -356,21 +365,21 @@ class StepForm(BaseModel):
             else:
                 raise Exception(f"Unknown error type {error_type} with message {error.message}")
 
-    def check_required(self, fields_names: List[str]):
+    def check_required(self: type(Self), fields_names: List[str]) -> None:
         """Check that all fields in `fields_names` are not empty."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
             if attr == "":
                 self.errors[field_name] = f"{field_name} cannot be empty"
 
-    def check_snake(self, fields_names: List[str]):
+    def check_snake(self: type(Self), fields_names: List[str]) -> None:
         """Check that all fields in `fields_names` are in snake case."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
             if not is_snake(attr):
                 self.errors[field_name] = f"`{field_name}` must be in snake case"
 
-    def check_is_version(self, fields_names: List[str]):
+    def check_is_version(self: type(Self), fields_names: List[str]) -> None:
         """Check that all fields in `fields_names` are in snake case."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
@@ -388,13 +397,13 @@ def is_snake(s: str) -> bool:
     return bool(re.fullmatch(rex, s))
 
 
-def extract(error_message: str):
+def extract(error_message: str) -> List[Any]:
     """Get field name that caused the error."""
     rex = r"'(.*)' is a required property"
     return re.findall(rex, error_message)[0]
 
 
-def config_style_html():
+def config_style_html() -> None:
     st.markdown(
         """
     <style>
@@ -415,7 +424,7 @@ def preview_file(file_path: str, language: str = "python") -> None:
         st.code(code, language=language)
 
 
-def preview_dag_additions(dag_content, dag_path):
+def preview_dag_additions(dag_content: str, dag_path: str):
     if dag_content:
         with st.expander(f"File: `{dag_path}`", expanded=False):
             st.code(dag_content, "yaml")
