@@ -10,8 +10,8 @@ tables:
         description_from_producer: "[indicator.description-from-producer]"
         processing_level: "[indicator.processing-level]"
         description_key:
-          - "[presentation.key-info-text example 1]"
-          - "[presentation.key-info-text example 2]"
+          - "[indicator.description-key example 1]"
+          - "[indicator.description-key example 2]"
         license:
           name: "[indicator.license.name]"
           url: "[indicator.license.url]"
