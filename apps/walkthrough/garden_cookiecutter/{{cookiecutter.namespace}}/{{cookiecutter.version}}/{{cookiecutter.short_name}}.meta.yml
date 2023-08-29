@@ -9,6 +9,7 @@ tables:
       #   description_short: Short description of testing variable.
       #   description_from_producer: Description of testing variable from producer.
       #   processing_level: minor
+      #   description_key
       #   display:
       #     name: Testing variable
       #     entityAnnotationsMap: Test annotation
@@ -22,4 +23,4 @@ tables:
       #     attribution
       #     topic_tags_links
       #     faqs
-      #     key_info_text
+
