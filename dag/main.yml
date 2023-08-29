@@ -558,6 +558,11 @@ steps:
   data://grapher/un/2023-08-16/igme:
   - data://garden/un/2023-08-16/igme
 
+# Long-run child mortality, Gapminder + UN IGME
+  data://garden/un/2023-08-29/long_run_child_mortality:
+    - data://garden/un/2023-08-16/igme
+    - data://open_numbers/open_numbers/latest/gapminder__child_mortality
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
