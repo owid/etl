@@ -1,7 +1,8 @@
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any
 
 import streamlit as st
+from st_pages import add_indentation
 
 from apps.wizard import utils
 from etl.paths import DAG_DIR
@@ -11,6 +12,7 @@ from etl.paths import DAG_DIR
 #########################################################
 # Page config
 st.set_page_config(page_title="Wizard (grapher)", page_icon="🪄")
+add_indentation()
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
 # FIELDS FROM OTHER STEPS
@@ -48,10 +50,14 @@ class GrapherForm(utils.StepForm):
         - Add error message for each field (to be displayed in the form).
         - Return True if all fields are valid, False otherwise.
         """
-        if self.short_name == "not_allowed":
-            self.errors["short_name"] = "not_allowed is not allowed"
-        else:
-            self.errors = {}
+        # Check other fields (non meta)
+        fields_required = ["namespace", "version", "short_name", "garden_version"]
+        fields_snake = ["namespace", "short_name"]
+        fields_version = ["version", "garden_version"]
+
+        self.check_required(fields_required)
+        self.check_snake(fields_snake)
+        self.check_is_version(fields_version)
 
 
 def update_state() -> None:

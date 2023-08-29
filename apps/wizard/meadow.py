@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 import streamlit as st
+from st_pages import add_indentation
 
 from apps.wizard import utils
 from etl.paths import DAG_DIR, ETL_DIR
@@ -10,8 +11,11 @@ from etl.paths import DAG_DIR, ETL_DIR
 #########################################################
 # CONSTANTS #############################################
 #########################################################
+
 # Page config
 st.set_page_config(page_title="Wizard (meadow)", page_icon="🪄")
+add_indentation()
+
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
 # State management
@@ -54,10 +58,14 @@ class MeadowForm(utils.StepForm):
         - Add error message for each field (to be displayed in the form).
         - Return True if all fields are valid, False otherwise.
         """
-        if self.short_name == "not_allowed":
-            self.errors["short_name"] = "not_allowed is not allowed"
-        else:
-            self.errors = {}
+        # Check other fields (non meta)
+        fields_required = ["namespace", "version", "short_name", "snapshot_version", "file_extension"]
+        fields_snake = ["namespace", "short_name"]
+        fields_version = ["version", "snapshot_version"]
+
+        self.check_required(fields_required)
+        self.check_snake(fields_snake)
+        self.check_is_version(fields_version)
 
 
 def update_state() -> None:
