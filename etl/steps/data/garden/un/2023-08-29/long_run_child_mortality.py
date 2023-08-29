@@ -63,7 +63,7 @@ def run(dest_dir: str) -> None:
     ds_garden = create_dataset(
         dest_dir, tables=[tb_combined], check_variables_metadata=True, default_metadata=ds_gapminder.metadata
     )
-
+    ds_garden.update_metadata(metadata_path=paths.metadata_path)
     # Save changes in the new garden dataset.
     ds_garden.save()
 
