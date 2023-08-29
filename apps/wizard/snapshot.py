@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, cast
 import streamlit as st
 from botocore.exceptions import ClientError
 from owid.catalog import s3_utils
+from st_pages import add_indentation
 
 from apps.wizard import utils
 from etl.helpers import read_json_schema
@@ -12,8 +13,11 @@ from etl.paths import APPS_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
 #########################################################
 # CONSTANTS #############################################
 #########################################################
-# Page config
 st.set_page_config(page_title="Wizard (snapshot)", page_icon="🪄")
+add_indentation()
+
+# Page config
+# st.set_page_config(page_title="Wizard (snapshot)", page_icon="🪄")
 # Read schema
 SNAPSHOT_SCHEMA = read_json_schema(SCHEMAS_DIR / "snapshot-schema.json")
 # Get properties for origin in schema
