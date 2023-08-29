@@ -142,6 +142,10 @@ def run(dest_dir: str) -> None:
     tb["proportion_patents_granted"] = tb["proportion_patents_granted"].astype(float)
     tb["citations_per_article"] = (tb["num_citations_summary"] / tb["num_articles_summary"]).astype(float)
 
+    # Set a threshold of a total of 1000 articles between 2010-2022 for evalulating citations per article to avoid artificially high numbers arising from low number of publications
+    condition = (tb["num_articles_summary"] < 1000) & pd.notna(tb["num_articles_summary"])
+    tb["citations_per_article"] = np.where(condition, np.nan, tb["citations_per_article"])
+
     #
     # Save outputs.
     #
