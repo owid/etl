@@ -324,37 +324,13 @@ def add_region_aggregates(
     df_region = pd.DataFrame({country_col: [], year_col: []}).astype(dtype={country_col: "object", year_col: "int"})
     # Select data for countries in the region.
     df_countries = df[df[country_col].isin(countries_in_region)]
-
     for variable in variables:
-        # If aggreggate is mean then do weighted average using population data, replacing `aggregations[variable]` with a lambda function
-
-        if weights is not None:
-            assert aggregations[variable] == "mean", "Weights only work mean aggregation"
-
-            # Define your weighted mean function
-            def weighted_mean(x, w):
-                values = np.ma.masked_invalid(x.astype("float64"))
-                weights = np.ma.masked_invalid(w.astype("float64"))
-                return np.ma.average(values, weights=weights)
-
-            # Create a closure to define variable_agg with specific weights
-            def make_weighted_mean(weights):
-                def variable_agg(x):
-                    return weighted_mean(x, weights.loc[x.index])
-
-                return variable_agg
-
-            variable_agg = make_weighted_mean(weights)
-
-        else:
-            variable_agg = aggregations[variable]
-
         df_added = groupby_agg(
             df=df_countries,
             groupby_columns=year_col,
             aggregations={
                 country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
-                variable: variable_agg,
+                variable: aggregations[variable],
             },
             num_allowed_nans=num_allowed_nans_per_year,
             frac_allowed_nans=frac_allowed_nans_per_year,
