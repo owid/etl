@@ -217,7 +217,6 @@ def _variable_metadata(
         attribution=row.pop("attribution"),
         topicTagsLinks=db_topic_tags,
         faqs=db_faqs,
-        processingInfo=row.pop("processingInfo"),
     )
 
     variableMetadata = dict(

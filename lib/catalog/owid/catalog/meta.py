@@ -205,9 +205,6 @@ class VariablePresentationMeta:
     # List of google doc ids + fragment id
     faqs: List[FaqLink] = field(default_factory=list)
 
-    # A short summary of what was done to process this indicator
-    processing_info: Optional[str] = None
-
     def __hash__(self):
         """Hash that uniquely identifies VariablePresentationMeta."""
         return _hash_dataclass(self)
@@ -258,6 +255,9 @@ class VariableMeta:
     processing_log: List[Dict[str, Any]] = field(default_factory=list)
 
     presentation: Optional[VariablePresentationMeta] = None
+
+    # A short summary of what was done to process this indicator
+    description_processing: Optional[str] = None
 
     # This one is the license that we give the data. Normally it will be empty and then it will
     # be our usual license (CC-BY) but in cases where special restriction apply this is where

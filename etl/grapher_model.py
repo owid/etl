@@ -833,7 +833,7 @@ class Variable(SQLModel, table=True):
     descriptionShort: Optional[str] = Field(default=None, sa_column=Column("descriptionShort", LONGTEXT))
     descriptionFromProducer: Optional[str] = Field(default=None, sa_column=Column("descriptionFromProducer", LONGTEXT))
     descriptionKey: Optional[List[str]] = Field(default=None, sa_column=Column("descriptionKey", JSON))
-    processingInfo: Optional[str] = Field(default=None, sa_column=Column("processingInfo", LONGTEXT))
+    descriptionProcessing: Optional[str] = Field(default=None, sa_column=Column("descriptionProcessing", LONGTEXT))
     licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
     license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
 
@@ -893,7 +893,7 @@ class Variable(SQLModel, table=True):
             ds.descriptionShort = self.descriptionShort
             ds.descriptionFromProducer = self.descriptionFromProducer
             ds.descriptionKey = self.descriptionKey
-            ds.processingInfo = self.processingInfo
+            ds.descriptionProcessing = self.descriptionProcessing
             ds.licenses = self.licenses
             ds.license = self.license
             ds.updatedAt = datetime.utcnow()
