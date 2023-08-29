@@ -93,7 +93,7 @@
       "attribution_short": {
         "type": "string"
       },
-      "version": {
+      "version_producer": {
         "type": "string"
       },
       "dataset_url_main": {

@@ -1109,7 +1109,7 @@ class Origin(SQLModel, table=True):
     citationProducer: Optional[str] = None
     attribution: Optional[str] = None
     attributionShort: Optional[str] = None
-    version: Optional[str] = None
+    versionProducer: Optional[str] = None
     datasetUrlMain: Optional[str] = None
     datasetUrlDownload: Optional[str] = None
     dateAccessed: Optional[date] = None
@@ -1130,7 +1130,7 @@ class Origin(SQLModel, table=True):
             datasetTitleProducer=origin.dataset_title_producer,
             attribution=origin.attribution,
             attributionShort=origin.attribution_short,
-            version=origin.version,
+            versionProducer=origin.version_producer,
             license=origin.license.to_dict() if origin.license else None,
             datasetUrlMain=origin.dataset_url_main,
             datasetUrlDownload=origin.dataset_url_download,
@@ -1153,7 +1153,7 @@ class Origin(SQLModel, table=True):
             cls.datasetTitleProducer == self.datasetTitleProducer,
             cls.attribution == self.attribution,
             cls.attributionShort == self.attributionShort,
-            cls.version == self.version,
+            cls.versionProducer == self.versionProducer,
             cls.datasetUrlMain == self.datasetUrlMain,
             cls.datasetUrlDownload == self.datasetUrlDownload,
             cls.datasetDescriptionOwid == self.datasetDescriptionOwid,

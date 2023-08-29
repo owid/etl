@@ -123,7 +123,7 @@ class Origin:
     attribution: Optional[str] = None
     attribution_short: Optional[str] = None
     # This is also often empty but if not then it will be part of the short citation (e.g. for VDEM)
-    version: Optional[str] = None
+    version_producer: Optional[str] = None
     # The authorative URL of the dataset
     dataset_url_main: Optional[str] = None
     # Direct URL to download the dataset

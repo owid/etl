@@ -25,7 +25,7 @@ meta:
     attribution_short: {{cookiecutter.attribution_short}}
     {%- endif %}
     {%- if cookiecutter.origin_version %}
-    version: {{cookiecutter.origin_version}}
+    version_producer: {{cookiecutter.origin_version}}
     {%- endif %}
     {%- if cookiecutter.dataset_url_main %}
     dataset_url_main: {{cookiecutter.dataset_url_main}}
