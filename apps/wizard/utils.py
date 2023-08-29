@@ -13,11 +13,13 @@ import ruamel.yaml
 import streamlit as st
 import yaml
 from cookiecutter.main import cookiecutter
+from MySQLdb import OperationalError
 from owid import walden
 from owid.catalog.utils import validate_underscore
 from pydantic import BaseModel
 
 from etl import config
+from etl.db import get_connection
 from etl.files import apply_black_formatter_to_files
 from etl.paths import (
     DAG_DIR,
@@ -50,7 +52,7 @@ DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
 CURRENT_DIR = Path(__file__).parent
 
 # Phases accepted
-PHASES = Literal["all", "snapshot", "meadow", "garden", "grapher"]
+PHASES = Literal["all", "snapshot", "meadow", "garden", "grapher", "charts"]
 
 
 if WALKTHROUGH_ORIGINS:
@@ -365,9 +367,16 @@ class StepForm(BaseModel):
         """Check that all fields in `fields_names` are in snake case."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
-            snake = is_snake(attr)
-            if snake:
-                self.errors[field_name] = f"{field_name} must be in snake case"
+            if not is_snake(attr):
+                self.errors[field_name] = f"`{field_name}` must be in snake case"
+
+    def check_is_version(self, fields_names: List[str]):
+        """Check that all fields in `fields_names` are in snake case."""
+        for field_name in fields_names:
+            attr = getattr(self, field_name)
+            rex = r"^\d{4}-\d{2}-\d{2}$|^\d{4}$|^latest$"
+            if not re.fullmatch(rex, attr):
+                self.errors[field_name] = f"`{field_name}` must be a date in the format YYYY-MM-DD or YYYY or 'latest'."
 
 
 def is_snake(s: str) -> bool:
@@ -430,6 +439,22 @@ def _check_env() -> bool:
     if ok:
         st.success(("`.env` configured correctly"))
     return ok
+
+
+def _check_db() -> None:
+    try:
+        with st.spinner():
+            _ = get_connection()
+    except OperationalError as e:
+        st.error(
+            "We could not connect to the database. If connecting to a remote database, remember to"
+            f" ssh-tunel into it using the appropriate ports and then try again.\n\nError:\n{e}"
+        )
+        return False
+    except Exception as e:
+        raise e
+    st.success("Connection to the Grapher database was successfull!")
+    return True
 
 
 def _show_environment() -> None:
