@@ -1,5 +1,6 @@
 """Grapher page."""
 from pathlib import Path
+from typing import cast
 
 import streamlit as st
 from st_pages import add_indentation
@@ -163,7 +164,7 @@ with form_widget.form("grapher"):
 #########################################################
 if submitted:
     # Create form
-    form = GrapherForm.from_state()
+    form = cast(GrapherForm, GrapherForm.from_state())
 
     if not form.errors:
         # Remove form from UI

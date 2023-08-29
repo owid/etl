@@ -1,6 +1,7 @@
 """Meadow page."""
 import os
 from pathlib import Path
+from typing import cast
 
 import streamlit as st
 from st_pages import add_indentation
@@ -175,7 +176,7 @@ with form_widget.form("meadow"):
 #########################################################
 if submitted:
     # Create form
-    form = MeadowForm.from_state()
+    form = cast(MeadowForm, MeadowForm.from_state())
 
     if not form.errors:
         # Remove form from UI

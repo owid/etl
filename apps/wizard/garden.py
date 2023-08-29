@@ -1,6 +1,7 @@
 """Garden page."""
 import os
 from pathlib import Path
+from typing import cast
 
 import ruamel.yaml
 import streamlit as st
@@ -257,7 +258,7 @@ with form_widget.form("garden"):
 #########################################################
 if submitted:
     # Create form
-    form = GardenForm.from_state()
+    form = cast(GardenForm, GardenForm.from_state())
 
     if not form.errors:
         # Remove form from UI

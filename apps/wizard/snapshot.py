@@ -488,7 +488,7 @@ form = render_license_field(form_metadata)
 #########################################################
 if submitted:
     # Create form
-    form = SnapshotForm.from_state()
+    form = cast(SnapshotForm, SnapshotForm.from_state())
 
     if not form.errors:
         form_widget.empty()

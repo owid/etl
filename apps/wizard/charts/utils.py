@@ -3,6 +3,7 @@ from typing import Any, Dict, Literal, Optional, Union
 import streamlit as st
 from MySQLdb import OperationalError
 from structlog import get_logger
+from typing_extensions import Self
 
 from etl.chart_revision.v2.schema import get_schema_chart_config
 from etl.db import config, get_all_datasets, get_connection, get_variables_in_dataset
@@ -112,7 +113,7 @@ class OWIDEnv:
         else:
             self.env_type_id = env_type_id
 
-    def detect_env_type(self) -> OWIDEnvType:
+    def detect_env_type(self: Self) -> OWIDEnvType:
         # live
         if config.DB_NAME == "live_grapher":
             return "live"

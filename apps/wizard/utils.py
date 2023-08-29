@@ -6,7 +6,7 @@ import re
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Optional
+from typing import Any, Callable, Dict, List, Literal, Optional, Union
 
 import jsonschema
 import ruamel.yaml
@@ -305,37 +305,37 @@ class StepForm(BaseModel):
 
     errors: Dict[str, Any] = {}
 
-    def __init__(self: type(Self), **kwargs: str) -> None:
+    def __init__(self: Self, **kwargs: str) -> None:
         """Construct parent class."""
         super().__init__(**kwargs)
         self.validate()
 
     @classmethod
-    def filter_relevant_fields(cls: type(Self), step_name: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    def filter_relevant_fields(cls: Self, step_name: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """Filter relevant fields from form."""
         return {k.replace(f"{step_name}.", ""): v for k, v in data.items() if k.startswith(f"{step_name}.")}
 
     @classmethod
-    def from_state(cls: type(Self)) -> Self:
+    def from_state(cls: Self) -> Self:
         """Build object from session_state variables."""
         data = cls.filter_relevant_fields(step_name=st.session_state["step_name"], data=st.session_state)
         return cls(**data)
 
-    def validate(self: type(Self)) -> None:
+    def validate(self: Self) -> None:
         """Validate form fields."""
         raise NotImplementedError("Needs to be implemented in the child class!")
 
     @property
-    def metadata(self: type(Self)) -> None:
+    def metadata(self: Self) -> None:
         """Get metadata as dictionary."""
         raise NotADirectoryError("Needs to be implemented in the child class!")
 
-    def to_yaml(self: type(Self), path: Path) -> None:
+    def to_yaml(self: Self, path: Path) -> None:
         """Export form (metadata) to yaml file."""
         with open(path, "w") as f:
             ruamel.yaml.dump(self.metadata, f, Dumper=ruamel.yaml.RoundTripDumper)
 
-    def validate_schema(self: type(Self), schema_path: str, ignore_keywords: List[str] = None) -> None:
+    def validate_schema(self: Self, schema_path: str, ignore_keywords: List[str] = None) -> None:
         """Validate form fields against schema.
 
         Note that not all form fields are present in the schema (some do not belong to metadata, but are needed to generate the e.g. dataset URI)
@@ -365,21 +365,21 @@ class StepForm(BaseModel):
             else:
                 raise Exception(f"Unknown error type {error_type} with message {error.message}")
 
-    def check_required(self: type(Self), fields_names: List[str]) -> None:
+    def check_required(self: Self, fields_names: List[str]) -> None:
         """Check that all fields in `fields_names` are not empty."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
             if attr == "":
                 self.errors[field_name] = f"{field_name} cannot be empty"
 
-    def check_snake(self: type(Self), fields_names: List[str]) -> None:
+    def check_snake(self: Self, fields_names: List[str]) -> None:
         """Check that all fields in `fields_names` are in snake case."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
             if not is_snake(attr):
                 self.errors[field_name] = f"`{field_name}` must be in snake case"
 
-    def check_is_version(self: type(Self), fields_names: List[str]) -> None:
+    def check_is_version(self: Self, fields_names: List[str]) -> None:
         """Check that all fields in `fields_names` are in snake case."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
@@ -482,7 +482,7 @@ def _show_environment() -> None:
     )
 
 
-def clean_empty_dict(d: Dict[str, Any]) -> Dict[str, Any]:
+def clean_empty_dict(d: Dict[str, Any]) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
     """Remove empty values from dict.
 
     REference: https://stackoverflow.com/a/27974027/5056599
