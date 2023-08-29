@@ -1,6 +1,7 @@
 import streamlit as st
+from st_pages import add_indentation
 
-from apps.wizard.charts.utils import _check_env_and_environment
+from apps.wizard import utils
 
 
 def init_app():
@@ -24,10 +25,17 @@ def init_app():
         },
     )
     st.title("🧑‍🍳 Chart revisions baker")
+    add_indentation()
 
     # CONFIGURATION SIDEBAR
     with st.sidebar:
-        _check_env_and_environment()
+        if utils.AppState.args.run_checks:
+            with st.expander("**Environment checks**", expanded=True):
+                env_ok = utils._check_env()
+                if env_ok:
+                    db_ok = utils._check_db()
+                    if db_ok:
+                        utils._show_environment()
 
 
 def set_session_states():
