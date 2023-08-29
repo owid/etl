@@ -12,7 +12,7 @@ from pywebio import output as po
 from pywebio.session import go_app
 
 import etl
-from etl.paths import DATA_DIR
+from etl.paths import DAG_DIR, DATA_DIR
 
 from . import utils
 
@@ -121,7 +121,7 @@ def app(run_checks: bool) -> None:
         deps = [f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"]
         dag_content = utils.add_to_dag(
             dag={f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps},
-            dag_path=CURRENT_DIR / ".." / "dag" / form.dag_file,
+            dag_path=DAG_DIR / form.dag_file,
         )
     else:
         dag_content = ""

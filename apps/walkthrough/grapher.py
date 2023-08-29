@@ -9,6 +9,7 @@ from pywebio import output as po
 from pywebio.session import go_app
 
 import etl
+from etl.paths import DAG_DIR
 
 from . import utils
 
@@ -113,7 +114,7 @@ def app(run_checks: bool) -> None:
                     f"data{private_suffix}://garden/{form.namespace}/{form.garden_version}/{form.short_name}"
                 ]
             },
-            dag_path=CURRENT_DIR / ".." / "dag" / form.dag_file,
+            dag_path=DAG_DIR / form.dag_file,
         )
     else:
         dag_content = ""
