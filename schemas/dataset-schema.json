@@ -325,7 +325,6 @@
                       "items": { "type": "string" }
                     },
                     "grapher_config": {
-                      "required": ["title"],
                       "type": "object",
                       "description": "Our World In Data grapher configuration. Most of the fields can be left empty and will be\nfilled with reasonable default values.\n",
                       "properties": {
