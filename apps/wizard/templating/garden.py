@@ -10,7 +10,7 @@ from st_pages import add_indentation
 from typing_extensions import Self
 
 from apps.wizard import utils
-from etl.paths import DAG_DIR, DATA_DIR, ETL_DIR
+from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -320,7 +320,7 @@ if submitted:
             poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
             ```
 
-        2. (Optional) Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
+        2. (Optional) Generated notebook `{notebook_path.relative_to(BASE_DIR)}` can be used to examine the dataset output interactively.
 
         3. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
 

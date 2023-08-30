@@ -10,7 +10,7 @@ from typing_extensions import Self
 
 from apps.wizard import utils
 from etl.helpers import read_json_schema
-from etl.paths import SCHEMAS_DIR, SNAPSHOTS_DIR
+from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -578,7 +578,7 @@ if submitted:
 
             2. Run the snapshot step to upload files to S3
             ```bash
-            python snapshots/{form.namespace}/{form.snapshot_version}/{form.short_name}.py {manual_import_instructions}
+            python {ingest_path.relative_to(BASE_DIR)} {manual_import_instructions}
             ```
 
             3. Continue to the meadow step
