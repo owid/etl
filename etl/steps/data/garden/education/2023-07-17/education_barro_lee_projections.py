@@ -1,9 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List, cast
+from typing import cast
 
 import education_lee_lee
 import pandas as pd
+import shared
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
@@ -15,22 +16,17 @@ REGIONS = [
     "North America",
     "South America",
     "Europe",
-    "European Union (27)",
     "Africa",
     "Asia",
     "Oceania",
-    "Low-income countries",
-    "Upper-middle-income countries",
-    "Lower-middle-income countries",
-    "High-income countries",
     "World",
 ]
 
 
-def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     tb_with_regions = tb.copy()
+    aggregations = {column: "mean" for column in tb_with_regions.columns if column not in ["country", "year"]}
 
-    aggregations = {column: "median" for column in tb_with_regions.columns if column not in ["country", "year"]}
     for region in REGIONS:
         # Find members of current region.
         members = geo.list_members_of_region(
@@ -38,17 +34,15 @@ def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset, ds_
             ds_regions=ds_regions,
             ds_income_groups=ds_income_groups,
         )
-        tb_with_regions = geo.add_region_aggregates(
+        tb_with_regions = shared.add_region_aggregates_education(
             df=tb_with_regions,
             region=region,
             countries_in_region=members,
             countries_that_must_have_data=[],
             num_allowed_nans_per_year=None,
-            frac_allowed_nans_per_year=0.99999,
+            frac_allowed_nans_per_year=0.2,
             aggregations=aggregations,
         )
-    tb_with_regions = tb_with_regions.copy_metadata(from_table=tb)
-
     return tb_with_regions
 
 
@@ -90,9 +84,7 @@ def run(dest_dir: str) -> None:
     tb_projections = Table(df_projections, short_name=paths.short_name, underscore=True)
 
     # Add regional and income group data to the projections.
-    tb_projections = add_data_for_regions(
-        tb=tb_projections, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
+    tb_projections = add_data_for_regions(tb=tb_projections, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Set the index to be based on country and year.
     tb_projections.set_index(["country", "year"], inplace=True)
@@ -118,6 +110,31 @@ def run(dest_dir: str) -> None:
         stiched,
         on=["country", "year"],
         how="outer",
+    )
+    # Create share with some formal education indicators
+    stiched_projections["some_formal_education_female"] = (
+        100 - stiched_projections["f_youth_and_adults__15_64_years__percentage_of_no_education"]
+    )
+    stiched_projections["some_formal_education_male"] = (
+        100 - stiched_projections["m_youth_and_adults__15_64_years__percentage_of_no_education"]
+    )
+    stiched_projections["some_formal_education_both_sexes"] = (
+        100 - stiched_projections["mf_youth_and_adults__15_64_years__percentage_of_no_education"]
+    )
+
+    # Create female to male ratios for key variables
+    stiched_projections["female_over_male_average_years_of_schooling"] = (
+        stiched_projections["f_youth_and_adults__15_64_years__average_years_of_education"]
+        / stiched_projections["m_youth_and_adults__15_64_years__average_years_of_education"]
+    )
+
+    stiched_projections["female_over_male_share_with_no_education"] = (
+        stiched_projections["f_youth_and_adults__15_64_years__percentage_of_no_education"]
+        / stiched_projections["m_youth_and_adults__15_64_years__percentage_of_no_education"]
+    )
+
+    stiched_projections["female_over_male_share_some_formal_education"] = (
+        stiched_projections["some_formal_education_female"] / stiched_projections["some_formal_education_male"]
     )
 
     # Convert the merged data into a Table object.

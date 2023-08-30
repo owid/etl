@@ -19,6 +19,9 @@ tables:
         description_short: Short description of the dummy indicator.
         description_from_producer: The description of the dummy indicator by the producer,
           shown separately on a data page.
+        description_key:
+          - First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)
+          - Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)
         processing_level: major
         license:
           name: CC-BY 4.0
@@ -38,9 +41,6 @@ tables:
           attribution: ACME project
           topic_tags_links:
           - Internet
-          key_info_text:
-          - First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)
-          - Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)
           faqs:
           - fragment_id: cherries
             gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE

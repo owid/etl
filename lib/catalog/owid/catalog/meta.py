@@ -123,7 +123,7 @@ class Origin:
     attribution: Optional[str] = None
     attribution_short: Optional[str] = None
     # This is also often empty but if not then it will be part of the short citation (e.g. for VDEM)
-    version: Optional[str] = None
+    version_producer: Optional[str] = None
     # The authorative URL of the dataset
     dataset_url_main: Optional[str] = None
     # Direct URL to download the dataset
@@ -204,11 +204,6 @@ class VariablePresentationMeta:
 
     # List of google doc ids + fragment id
     faqs: List[FaqLink] = field(default_factory=list)
-    # List of bullet points for the key info text (can use markdown formatting)
-    key_info_text: List[str] = field(default_factory=list)
-
-    # A short summary of what was done to process this indicator
-    processing_info: Optional[str] = None
 
     def __hash__(self):
         """Hash that uniquely identifies VariablePresentationMeta."""
@@ -240,10 +235,12 @@ class VariableMeta:
 
     title: Optional[str] = None
     description: Optional[str] = None
-    # A 1-2 sentence description - used internally or as fallback for key_info_text
+    # A 1-2 sentence description - used internally or as fallback for description_key
     description_short: Optional[str] = None
     # How did the origin describe this variable?
     description_from_producer: Optional[str] = None
+    # List of bullet points for the description key (can use markdown formatting)
+    description_key: List[str] = field(default_factory=list)
     origins: List[Origin] = field(default_factory=list)  # Origins is the new replacement for sources
     licenses: List[License] = field(default_factory=list)
     unit: Optional[str] = None
@@ -258,6 +255,9 @@ class VariableMeta:
     processing_log: List[Dict[str, Any]] = field(default_factory=list)
 
     presentation: Optional[VariablePresentationMeta] = None
+
+    # A short summary of what was done to process this indicator
+    description_processing: Optional[str] = None
 
     # This one is the license that we give the data. Normally it will be empty and then it will
     # be our usual license (CC-BY) but in cases where special restriction apply this is where

@@ -559,8 +559,6 @@ tables:
         display:
           numDecimalPlaces: 1
 
-
-
       mf_youth_and_adults__15_64_years__percentage_of_no_education:
         title: Combined - percentage of youth and adults aged between 15 and 64 years with no education
         unit: '%'
@@ -1116,3 +1114,37 @@ tables:
         unit: years
         display:
           numDecimalPlaces: 1
+      female_over_male_average_years_of_schooling:
+        title: Average years of schooling gender ratio, 15-64 year olds
+        unit: ratio
+        display:
+          numDecimalPlaces: 1
+      female_over_male_share_with_no_education:
+        title: Share of populaton with no education gender ratio, 15-64 year olds
+        unit: ratio
+        display:
+          numDecimalPlaces: 1
+      female_over_male_share_some_formal_education:
+        title: Share of populaton with some formal education gender ratio, 15-64 year olds
+        unit: ratio
+        display:
+          numDecimalPlaces: 1
+      some_formal_education_female:
+        title: Share of female population aged 15-64 years with some formal education
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      some_formal_education_male:
+        title: Share of male population aged 15-64 years with some formal education
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      some_formal_education_both_sexes:
+        title: Share of total population aged 15-64 years with some formal education
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+

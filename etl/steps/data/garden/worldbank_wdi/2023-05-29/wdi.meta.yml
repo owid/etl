@@ -1969,6 +1969,11 @@ tables:
           license:
             name: Creative Commons Attribution 4.0
             url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+        description_key:
+          - An Internet user is defined by the International Telecommunication Union as anyone
+            who has accessed the Internet from any location in the last three months.
+          - This can be from any type of device, including a computer, mobile phone, personal digital
+            assistant, games machine, digital TV, and other technological devices.
         processing_level: minor
         presentation:
           title_public: Share of the population using the Internet
@@ -1980,11 +1985,6 @@ tables:
           faqs: []
           # - gdoc_id: 1E1sLXZmwU1SSVDFvMsJNbOAreHaKnRXqmJDqCAUfdDE
           #   fragment_id: test
-          key_info_text:
-          - An Internet user is defined by the International Telecommunication Union as anyone
-            who has accessed the Internet from any location in the last three months.
-          - This can be from any type of device, including a computer, mobile phone, personal digital
-            assistant, games machine, digital TV, and other technological devices.
           grapher_config:
             title: Share of the population using the Internet
             subtitle: 'Share of the population who [used the Internet](#dod:internetuser) in the last three months.'

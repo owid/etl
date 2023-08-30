@@ -269,6 +269,10 @@
                 },
                 "description_short": { "type": "string" },
                 "description_from_producer": { "type": "string" },
+                "description_key": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
                 "sources": {
                   "type": "array",
                   "items": { "$ref": "definitions.json#/source" }
@@ -319,10 +323,6 @@
                           "fragment_id": { "type": "string" }
                         }
                       }
-                    },
-                    "key_info_text": {
-                      "type": "array",
-                      "items": { "type": "string" }
                     },
                     "grapher_config": {
                       "type": "object",

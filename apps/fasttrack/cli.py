@@ -153,7 +153,7 @@ class FasttrackImport:
             origin.date_accessed = str(dt.date.today())
 
             # Misuse the version field and dataset_url_download fields to store info about the spreadsheet
-            origin.version = source_name
+            origin.version_producer = source_name
             origin.dataset_url_download = sheets_url
             license = self.meta.licenses[0]
         else:
@@ -552,7 +552,7 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
     existing_sheets = []
     for meta in metas:
         # exclude local CSVs
-        if (getattr(meta.source, "name", None) or getattr(meta.origin, "version")) == "Local CSV":
+        if (getattr(meta.source, "name", None) or getattr(meta.origin, "version_producer")) == "Local CSV":
             continue
 
         if meta.source:

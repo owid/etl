@@ -138,7 +138,7 @@
         "guidelines": [],
         "category": "dataset"
       },
-      "version": {
+      "version_producer": {
         "type": "string",
         "title": "Dataset version by the producer",
         "description": "Producer's version of the dataset.",

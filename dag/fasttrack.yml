@@ -110,3 +110,5 @@ steps:
   - snapshot://fasttrack/latest/nuclear_warhead_inventories.csv
   data://grapher/fasttrack/latest/smallpox_cases:
   - snapshot://fasttrack/latest/smallpox_cases.csv
+  data://grapher/fasttrack/latest/transport_co2_emissions_modes:
+  - snapshot://fasttrack/latest/transport_co2_emissions_modes.csv
