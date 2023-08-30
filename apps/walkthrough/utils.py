@@ -225,7 +225,7 @@ class OWIDEnv:
     def __init__(
         self: Self,
         env_type_id: Optional[OWIDEnvType] = None,
-    ) -> Self:
+    ) -> None:
         """Construct class."""
         if env_type_id is None:
             self.env_type_id = self.detect_env_type()

@@ -1,3 +1,7 @@
+"""General utils.
+
+TODO: Should probably re-order this file and split it into multiple files.
+"""
 import argparse
 import datetime as dt
 import json
@@ -6,7 +10,7 @@ import re
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Optional, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Type, cast
 
 import jsonref
 import jsonschema
@@ -24,6 +28,7 @@ from etl import config
 from etl.db import get_connection
 from etl.files import apply_black_formatter_to_files
 from etl.paths import (
+    APPS_DIR,
     DAG_DIR,
     LATEST_POPULATION_VERSION,
     LATEST_REGIONS_VERSION,
@@ -55,6 +60,17 @@ CURRENT_DIR = Path(__file__).parent
 
 # Phases accepted
 PHASES = Literal["all", "snapshot", "meadow", "garden", "grapher", "charts"]
+
+# Paths to cookiecutter files
+COOKIE_SNAPSHOT = APPS_DIR / "wizard" / "templating" / "cookiecutter" / "snapshot"
+COOKIE_MEADOW = APPS_DIR / "wizard" / "templating" / "cookiecutter" / "meadow"
+COOKIE_GARDEN = APPS_DIR / "wizard" / "templating" / "cookiecutter" / "garden"
+COOKIE_GRAPHER = APPS_DIR / "wizard" / "templating" / "cookiecutter" / "grapher"
+# Paths to markdown templates
+MD_SNAPSHOT = APPS_DIR / "wizard" / "templating" / "markdown" / "snapshot.md"
+MD_MEADOW = APPS_DIR / "wizard" / "templating" / "markdown" / "meadow.md"
+MD_GARDEN = APPS_DIR / "wizard" / "templating" / "markdown" / "garden.md"
+MD_GRAPHER = APPS_DIR / "wizard" / "templating" / "markdown" / "grapher.md"
 
 
 if WALKTHROUGH_ORIGINS:
@@ -96,6 +112,7 @@ APP_STATE = {}
 
 
 def validate_short_name(short_name: str) -> Optional[str]:
+    """Validate short name."""
     try:
         validate_underscore(short_name, "Short name")
         return None
@@ -104,6 +121,7 @@ def validate_short_name(short_name: str) -> Optional[str]:
 
 
 def add_to_dag(dag: DAG, dag_path: Path = DAG_WALKTHROUGH_PATH) -> str:
+    """Add dag to dag_path file."""
     with open(dag_path, "r") as f:
         doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
 
@@ -161,8 +179,10 @@ def generate_step_to_channel(cookiecutter_path: Path, data: Dict[str, Any]) -> P
 
 
 class classproperty(property):
-    def __get__(self, owner_self, owner_cls):
-        return self.fget(owner_cls)
+    """Decorator."""
+
+    def __get__(self, owner_self: Self, owner_cls: Self):
+        return self.fget(owner_cls)  # type: ignore
 
 
 class AppState:
@@ -170,7 +190,7 @@ class AppState:
 
     steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers"]
 
-    def __init__(self: "AppState") -> "AppState":
+    def __init__(self: "AppState") -> None:
         """Construct variable."""
         self.step = st.session_state["step_name"]
         self._init_steps()
@@ -203,7 +223,9 @@ class AppState:
 
         Variables are assumed to have keys `step.NAME`, based on the keys given in the widgets within a form.
         """
-        return {k: v for k, v in st.session_state.items() if k.startswith(f"{self.step}.")}
+        return {
+            cast(str, k): v for k, v in st.session_state.items() if isinstance(k, str) and k.startswith(f"{self.step}.")
+        }
 
     def update(self: "AppState") -> None:
         """Update global variables of step.
@@ -214,7 +236,7 @@ class AppState:
         print(f"Updating {self.step}...")
         st.session_state["steps"][self.step] = self.get_variables_of_step()
 
-    def update_from_form(self, form: Dict[str, Any]) -> None:
+    def update_from_form(self, form: "StepForm") -> None:
         self._check_step()
         st.session_state["steps"][self.step] = form.dict()
 
@@ -265,16 +287,22 @@ class AppState:
         idx = max(self.steps.index(self.step) - 1, 0)
         return self.steps[idx]
 
-    def st_widget(self: "AppState", st_widget: Callable, default_last: Optional[str] = "", **kwargs: str) -> None:
+    def st_widget(
+        self: "AppState",
+        st_widget: Callable,
+        default_last: Optional[str | bool | int] = "",
+        **kwargs: str | int | List[str],
+    ) -> None:
         """Wrap a streamlit widget with a default value."""
-        key = kwargs["key"]
+        key = cast(str, kwargs["key"])
         # Get default value (either from previous edits, or from previous steps)
         default_value = self.default_value(key, default_last=default_last)
         # Change key name, to be stored it in general st.session_state
         kwargs["key"] = f"{self.step}.{key}"
         # Default value for selectbox (and other widgets with selectbox-like behavior)
         if "options" in kwargs:
-            index = kwargs["options"].index(default_value) if default_value in kwargs["options"] else 0
+            options = cast(List[str], kwargs["options"])
+            index = options.index(default_value) if default_value in options else 0
             kwargs["index"] = index
         # Default value for other widgets (if none is given)
         elif "value" not in kwargs:
@@ -306,20 +334,21 @@ class StepForm(BaseModel):
 
     errors: Dict[str, Any] = {}
 
-    def __init__(self: Self, **kwargs: str) -> None:
+    def __init__(self: Self, **kwargs: str | int) -> None:
         """Construct parent class."""
         super().__init__(**kwargs)
         self.validate()
 
     @classmethod
-    def filter_relevant_fields(cls: Self, step_name: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    def filter_relevant_fields(cls: Type[Self], step_name: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """Filter relevant fields from form."""
         return {k.replace(f"{step_name}.", ""): v for k, v in data.items() if k.startswith(f"{step_name}.")}
 
     @classmethod
-    def from_state(cls: Self) -> Self:
+    def from_state(cls: Type[Self]) -> Self:
         """Build object from session_state variables."""
-        data = cls.filter_relevant_fields(step_name=st.session_state["step_name"], data=st.session_state)
+        session_state = cast(Dict[str, Any], dict(st.session_state))
+        data = cls.filter_relevant_fields(step_name=st.session_state["step_name"], data=session_state)
         return cls(**data)
 
     def validate(self: Self) -> None:
@@ -336,7 +365,7 @@ class StepForm(BaseModel):
         with open(path, "w") as f:
             ruamel.yaml.dump(self.metadata, f, Dumper=ruamel.yaml.RoundTripDumper)
 
-    def validate_schema(self: Self, schema: str, ignore_keywords: List[str] = None) -> None:
+    def validate_schema(self: Self, schema: Dict[str, Any], ignore_keywords: Optional[List[str]] = None) -> None:
         """Validate form fields against schema.
 
         Note that not all form fields are present in the schema (some do not belong to metadata, but are needed to generate the e.g. dataset URI)
@@ -429,7 +458,7 @@ def config_style_html() -> None:
     )
 
 
-def preview_file(file_path: str, language: str = "python") -> None:
+def preview_file(file_path: str | Path, language: str = "python") -> None:
     """Preview file in streamlit."""
     with open(file_path, "r") as f:
         code = f.read()
@@ -437,7 +466,8 @@ def preview_file(file_path: str, language: str = "python") -> None:
         st.code(code, language=language)
 
 
-def preview_dag_additions(dag_content: str, dag_path: str):
+def preview_dag_additions(dag_content: str, dag_path: str | Path) -> None:
+    """Preview DAG additions."""
     if dag_content:
         with st.expander(f"File: `{dag_path}`", expanded=False):
             st.code(dag_content, "yaml")
@@ -463,7 +493,7 @@ def _check_env() -> bool:
     return ok
 
 
-def _check_db() -> None:
+def _check_db() -> bool:
     try:
         with st.spinner():
             _ = get_connection()
@@ -495,7 +525,7 @@ def _show_environment():
     )
 
 
-def clean_empty_dict(d: Dict[str, Any]) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
+def clean_empty_dict(d: Dict[str, Any]) -> Dict[str, Any] | List[Any]:
     """Remove empty values from dict.
 
     REference: https://stackoverflow.com/a/27974027/5056599

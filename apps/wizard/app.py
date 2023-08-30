@@ -19,10 +19,10 @@ st.title("Wizard")
 show_pages(
     [
         Section("Create new ETL steps"),
-        Page(str(CURRENT_DIR / "snapshot.py"), "Snapshot", icon="1️⃣"),
-        Page(str(CURRENT_DIR / "meadow.py"), "Meadow", icon="2️⃣"),
-        Page(str(CURRENT_DIR / "garden.py"), "Garden", icon="3️⃣"),
-        Page(str(CURRENT_DIR / "grapher.py"), "Grapher", icon="4️⃣"),
+        Page(str(CURRENT_DIR / "templating/snapshot.py"), "Snapshot", icon="1️⃣"),
+        Page(str(CURRENT_DIR / "templating/meadow.py"), "Meadow", icon="2️⃣"),
+        Page(str(CURRENT_DIR / "templating/garden.py"), "Garden", icon="3️⃣"),
+        Page(str(CURRENT_DIR / "templating/grapher.py"), "Grapher", icon="4️⃣"),
         Page(str(CURRENT_DIR / "charts/__main__.py"), "Charts", icon="📊", in_section=False),
     ]
 )

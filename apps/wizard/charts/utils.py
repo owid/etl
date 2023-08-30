@@ -1,5 +1,7 @@
-from typing import Any, Dict, Literal, Optional, Union
+"""Utils for chart revision tool."""
+from typing import Any, Dict, Literal, Optional, Tuple
 
+import pandas as pd
 import streamlit as st
 from MySQLdb import OperationalError
 from structlog import get_logger
@@ -13,7 +15,7 @@ log = get_logger()
 
 
 @st.cache_data(show_spinner=False)
-def get_datasets():
+def get_datasets() -> pd.DataFrame:
     """Load datasets."""
     with st.spinner("Retrieving datasets..."):
         try:
@@ -40,7 +42,7 @@ def get_schema() -> Dict[str, Any]:
             return schema
 
 
-def get_variables_from_datasets(dataset_id_1: int, dataset_id_2: int):
+def get_variables_from_datasets(dataset_id_1: int, dataset_id_2: int) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Get variables from two datasets."""
     with get_connection() as db_conn:
         # Get variables from old dataset that have been used in at least one chart.
@@ -63,7 +65,8 @@ def _check_env() -> bool:
     return ok
 
 
-def _show_environment():
+def _show_environment() -> None:
+    """Show environment variables (streamlit)."""
     # show variables (from .env)
     st.info(
         f"""
@@ -76,7 +79,8 @@ def _show_environment():
 
 
 @st.cache_resource
-def _check_env_and_environment():
+def _check_env_and_environment() -> None:
+    """Check if environment variables are set correctly."""
     ok = _check_env()
     if ok:
         # check that you can connect to DB
@@ -102,18 +106,21 @@ OWIDEnvType = Literal["live", "staging", "local", "unknown"]
 
 
 class OWIDEnv:
+    """OWID environment."""
+
     env_type_id: OWIDEnvType
 
     def __init__(
-        self,
+        self: Self,
         env_type_id: Optional[OWIDEnvType] = None,
-    ):
+    ) -> None:
         if env_type_id is None:
             self.env_type_id = self.detect_env_type()
         else:
             self.env_type_id = env_type_id
 
     def detect_env_type(self: Self) -> OWIDEnvType:
+        """Detect environment type."""
         # live
         if config.DB_NAME == "live_grapher":
             return "live"
@@ -126,7 +133,10 @@ class OWIDEnv:
         return "unknown"
 
     @property
-    def admin_url(self):
+    def admin_url(
+        self: Self,
+    ) -> Literal["https://owid.cloud/admin", "https://staging.owid.cloud/admin", "http://localhost:3030/admin"] | None:
+        """Get admin url."""
         if self.env_type_id == "live":
             return "https://owid.cloud/admin"
         elif self.env_type_id == "staging":
@@ -136,14 +146,18 @@ class OWIDEnv:
         return None
 
     @property
-    def chart_approval_tool_url(self):
+    def chart_approval_tool_url(self: Self) -> str:
+        """Get chart approval tool url."""
         return f"{self.admin_url}/suggested-chart-revisions/review"
 
-    def dataset_admin_url(self, dataset_id: Union[str, int]):
+    def dataset_admin_url(self: Self, dataset_id: str | int) -> str:
+        """Get dataset admin url."""
         return f"{self.admin_url}/datasets/{dataset_id}/"
 
-    def variable_admin_url(self, variable_id: Union[str, int]):
+    def variable_admin_url(self: Self, variable_id: str | int) -> str:
+        """Get variable admin url."""
         return f"{self.admin_url}/variables/{variable_id}/"
 
-    def chart_admin_url(self, chart_id: Union[str, int]):
+    def chart_admin_url(self: Self, chart_id: str | int) -> str:
+        """Get chart admin url."""
         return f"{self.admin_url}/charts/{chart_id}/edit"

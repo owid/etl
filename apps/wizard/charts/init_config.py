@@ -1,7 +1,11 @@
+"""Initiate app."""
 import streamlit as st
 from st_pages import add_indentation
 
 from apps.wizard import utils
+
+st.session_state["step_name"] = "charts"
+APP_STATE = utils.AppState()
 
 
 def init_app():
@@ -29,7 +33,7 @@ def init_app():
 
     # CONFIGURATION SIDEBAR
     with st.sidebar:
-        if utils.AppState.args.run_checks:
+        if APP_STATE.args.run_checks:
             with st.expander("**Environment checks**", expanded=True):
                 env_ok = utils._check_env()
                 if env_ok:

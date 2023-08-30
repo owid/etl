@@ -1,3 +1,4 @@
+"""Handle submission of chart revisions."""
 from http.client import RemoteDisconnected
 from typing import Any, Dict, List
 from urllib.error import URLError

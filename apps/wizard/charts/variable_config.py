@@ -24,6 +24,7 @@ ignore_all = False
 
 
 def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableConfig":
+    """Ask and get variable mapping."""
     variable_config = VariableConfig()
 
     # 2.1 INTERNAL PROCESSING
