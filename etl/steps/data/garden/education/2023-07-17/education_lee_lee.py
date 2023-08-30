@@ -19,10 +19,6 @@ REGIONS = [
     "Africa",
     "Asia",
     "Oceania",
-    "Low-income countries",
-    "Upper-middle-income countries",
-    "Lower-middle-income countries",
-    "High-income countries",
     "World",
 ]
 
@@ -101,7 +97,7 @@ def run(dest_dir: str) -> None:
     merged_df = merged_df.drop(columns=[column for column in merged_df.columns if "__thousands" in column])
     merged_df.columns = [underscore(col) for col in merged_df.columns]
     merged_df = add_data_for_regions(tb=merged_df, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-    print(merged_df)
+
     # Concatenate historical and more recent enrollment data
     hist_1985_df = merged_df[merged_df["year"] < 1985]
     df_merged_enrollment = pd.concat([enrolment_wb, hist_1985_df[world_bank_indicators]])
@@ -112,6 +108,19 @@ def run(dest_dir: str) -> None:
     # Merge historical data with combined enrollment data
     df_merged_wb = pd.merge(df_merged_enrollment, merged_df, on=["country", "year"], how="outer")
     df_merged_wb = df_merged_wb.dropna(how="all")
+
+    # Create female to male enrollment ratios
+    df_merged_wb["female_over_male_enrollment_rates_primary"] = (
+        df_merged_wb["f_primary_enrollment_rates_combined_wb"] / df_merged_wb["m_primary_enrollment_rates_combined_wb"]
+    )
+    df_merged_wb["female_over_male_enrollment_rates_secondary"] = (
+        df_merged_wb["f_secondary_enrollment_rates_combined_wb"]
+        / df_merged_wb["m_secondary_enrollment_rates_combined_wb"]
+    )
+    df_merged_wb["female_over_male_enrollment_rates_tertiary"] = (
+        df_merged_wb["f_tertiary_enrollment_rates_combined_wb"]
+        / df_merged_wb["m_tertiary_enrollment_rates_combined_wb"]
+    )
 
     tb = Table(df_merged_wb, short_name=paths.short_name, underscore=True)
     tb.set_index(["country", "year"], inplace=True)

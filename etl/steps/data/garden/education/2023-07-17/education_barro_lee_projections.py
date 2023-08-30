@@ -19,10 +19,6 @@ REGIONS = [
     "Africa",
     "Asia",
     "Oceania",
-    "Low-income countries",
-    "Upper-middle-income countries",
-    "Lower-middle-income countries",
-    "High-income countries",
     "World",
 ]
 
@@ -114,6 +110,31 @@ def run(dest_dir: str) -> None:
         stiched,
         on=["country", "year"],
         how="outer",
+    )
+    # Create share with some formal education indicators
+    stiched_projections["some_formal_education_female"] = (
+        100 - stiched_projections["f_youth_and_adults__15_64_years__percentage_of_no_education"]
+    )
+    stiched_projections["some_formal_education_male"] = (
+        100 - stiched_projections["m_youth_and_adults__15_64_years__percentage_of_no_education"]
+    )
+    stiched_projections["some_formal_education_both_sexes"] = (
+        100 - stiched_projections["mf_youth_and_adults__15_64_years__percentage_of_no_education"]
+    )
+
+    # Create female to male ratios for key variables
+    stiched_projections["female_over_male_average_years_of_schooling"] = (
+        stiched_projections["f_youth_and_adults__15_64_years__average_years_of_education"]
+        / stiched_projections["m_youth_and_adults__15_64_years__average_years_of_education"]
+    )
+
+    stiched_projections["female_over_male_share_with_no_education"] = (
+        stiched_projections["f_youth_and_adults__15_64_years__percentage_of_no_education"]
+        / stiched_projections["m_youth_and_adults__15_64_years__percentage_of_no_education"]
+    )
+
+    stiched_projections["female_over_male_share_some_formal_education"] = (
+        stiched_projections["some_formal_education_female"] / stiched_projections["some_formal_education_male"]
     )
 
     # Convert the merged data into a Table object.
