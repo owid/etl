@@ -1,4 +1,4 @@
-"""Meadow page."""
+"""Meadow phase."""
 import os
 from pathlib import Path
 from typing import cast
@@ -32,7 +32,7 @@ utils.config_style_html()
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(CURRENT_DIR / "meadow.md", "r") as f:
+    with open(file=utils.MD_MEADOW, mode="r") as f:
         return f.read()
 
 
@@ -49,7 +49,7 @@ class MeadowForm(utils.StepForm):
     generate_notebook: bool
     is_private: bool
 
-    def __init__(self: Self, **data: str) -> Self:
+    def __init__(self: Self, **data: str | bool) -> None:
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
         super().__init__(**data, step_name="meadow")
@@ -202,7 +202,7 @@ if submitted:
 
         # Create necessary files
         DATASET_DIR = utils.generate_step_to_channel(
-            CURRENT_DIR / "meadow_cookiecutter/", dict(**form.dict(), channel="meadow")
+            cookiecutter_path=utils.COOKIE_MEADOW, data=dict(**form.dict(), channel="meadow")
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")

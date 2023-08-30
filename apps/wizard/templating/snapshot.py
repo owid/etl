@@ -1,14 +1,16 @@
+"""Snapshot phase."""
 from pathlib import Path
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 import streamlit as st
 from botocore.exceptions import ClientError
 from owid.catalog import s3_utils
 from st_pages import add_indentation
+from typing_extensions import Self
 
 from apps.wizard import utils
 from etl.helpers import read_json_schema
-from etl.paths import APPS_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
+from etl.paths import SCHEMAS_DIR, SNAPSHOTS_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -69,7 +71,8 @@ class SnapshotForm(utils.StepForm):
     license_url: str
     license_name: str
 
-    def __init__(self, **data: Any) -> None:
+    def __init__(self: Self, **data: str | int) -> None:
+        """Construct form."""
         # Change name for certain fields (and remove old ones)
         data["license_url"] = data["origin.license.url"]
         if "origin.license.name_custom" in data:
@@ -109,7 +112,7 @@ class SnapshotForm(utils.StepForm):
             self.errors["origin.license.name_custom"] = "Please introduce the name of the custom license!"
 
     @property
-    def metadata(self) -> dict[str, Any]:
+    def metadata(self: Self) -> Dict[str, Any]:
         """Define metadata for easy YAML-export."""
         meta = {
             "meta": {
@@ -135,7 +138,7 @@ class SnapshotForm(utils.StepForm):
                 "is_public": not self.is_private,
             }
         }
-        meta = utils.clean_empty_dict(meta)
+        meta = cast(Dict[str, Any], utils.clean_empty_dict(meta))
         return meta
 
 
@@ -175,7 +178,7 @@ def create_display_name_snap_section(props: Dict[str, Any], name: str, property_
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(CURRENT_DIR / "snapshot.md", "r") as f:
+    with open(file=utils.MD_SNAPSHOT, mode="r") as f:
         return f.read()
 
 
@@ -246,8 +249,8 @@ def render_fields_from_schema(
     This function is quite complex, and includes some recursion. Could probably be improved, but it is OK for now.
     """
     # Define containers (if applicable)
+    containers = {}
     if categories:
-        containers = {}
         for cat in categories:
             containers[cat] = st.container()
             containers[cat].markdown(f"#### {cat.capitalize()}")
@@ -377,7 +380,7 @@ def render_license_field(form: List[Any]) -> List[str]:
 
 
 @st.cache_resource
-def _aws_is_ok():
+def _aws_is_ok() -> None | s3_utils.MissingCredentialsError:
     try:
         s3_utils.check_for_default_profile()
     except s3_utils.MissingCredentialsError as e:
@@ -385,7 +388,7 @@ def _aws_is_ok():
 
 
 @st.cache_resource
-def _get_s3_buckets():
+def _get_s3_buckets() -> Tuple[bool, Any]:
     s3 = s3_utils.connect()
     try:
         buckets = s3.list_buckets()["Buckets"]
@@ -503,11 +506,10 @@ if submitted:
         form_widget.empty()
 
         # Create files
-        cookiecutter_path = APPS_DIR / "wizard" / "snapshot_origins_cookiecutter/"
         utils.generate_step(
-            cookiecutter_path,
-            dict(**form.dict(), channel="snapshots", walkthrough_origins=utils.WALKTHROUGH_ORIGINS),
-            SNAPSHOTS_DIR,
+            cookiecutter_path=utils.COOKIE_SNAPSHOT,
+            data=dict(**form.dict(), channel="snapshots", walkthrough_origins=utils.WALKTHROUGH_ORIGINS),
+            target_dir=SNAPSHOTS_DIR,
         )
         ingest_path = SNAPSHOTS_DIR / form.namespace / form.snapshot_version / (form.short_name + ".py")
         meta_path = (

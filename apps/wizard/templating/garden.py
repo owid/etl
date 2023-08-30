@@ -1,4 +1,4 @@
-"""Garden page."""
+"""Garden phase."""
 import os
 from pathlib import Path
 from typing import cast
@@ -32,7 +32,7 @@ utils.config_style_html()
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(CURRENT_DIR / "garden.md", "r") as f:
+    with open(file=utils.MD_GARDEN, mode="r") as f:
         return f.read()
 
 
@@ -50,7 +50,7 @@ class GardenForm(utils.StepForm):
     is_private: bool
     update_period_days: int
 
-    def __init__(self: Self, **data: str) -> Self:
+    def __init__(self: Self, **data: str | bool) -> None:
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
         super().__init__(**data)
@@ -172,7 +172,7 @@ with form_widget.form("garden"):
 
     # Namespace
     APP_STATE.st_widget(
-        st.text_input,
+        st_widget=st.text_input,
         label="Namespace",
         help="Institution or topic name",
         placeholder="Example: 'emdat', 'health'",
@@ -180,7 +180,7 @@ with form_widget.form("garden"):
     )
     # Garden version
     APP_STATE.st_widget(
-        st.text_input,
+        st_widget=st.text_input,
         label="Garden dataset version",
         help="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
         key="version",
@@ -188,7 +188,7 @@ with form_widget.form("garden"):
     )
     # Garden short name
     APP_STATE.st_widget(
-        st.text_input,
+        st_widget=st.text_input,
         label="Garden dataset short name",
         help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
         placeholder="Example: 'cherry_blossom'",
@@ -198,7 +198,7 @@ with form_widget.form("garden"):
     st.markdown("#### Dataset")
     # Update frequency
     APP_STATE.st_widget(
-        st.number_input,
+        st_widget=st.number_input,
         label="Dataset update frequency (days)",
         help="Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`.",
         key="update_period_days",
@@ -210,7 +210,7 @@ with form_widget.form("garden"):
     st.markdown("#### Dependencies")
     # Meadow version
     APP_STATE.st_widget(
-        st.text_input,
+        st_widget=st.text_input,
         label="Meadow version",
         help="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
         key="meadow_version",
@@ -285,7 +285,7 @@ if submitted:
 
         # Create necessary files
         DATASET_DIR = utils.generate_step_to_channel(
-            CURRENT_DIR / "garden_cookiecutter/", dict(**form.dict(), channel="garden")
+            cookiecutter_path=utils.COOKIE_GARDEN, data=dict(**form.dict(), channel="garden")
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")
