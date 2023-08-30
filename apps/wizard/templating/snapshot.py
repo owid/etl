@@ -182,6 +182,58 @@ def load_instructions() -> str:
         return f.read()
 
 
+def create_description(field: Dict[str, Any]) -> str:
+    """Create description for field, using values `description` and `guidelines`."""
+    description = field["description"]
+    if "guidelines" in field:
+        description += "\n\n" + guidelines_to_markdown(guidelines=field["guidelines"])
+    return description
+
+
+def guidelines_to_markdown(guidelines: List[Any]) -> str:
+    """Render guidelines to markdown from given list in schema."""
+    text = "**Guidelines**\n\n"
+    for guideline in guidelines:
+        # Main guideline
+        if isinstance(guideline[0], str):
+            # Add main guideline
+            text += f"\n- {guideline[0]}"
+        else:
+            raise TypeError("The first element of an element in `guidelines` must be a string!")
+
+        # Additions to the guideline (nested bullet points, exceptions, etc.)
+        if len(guideline) == 2:
+            if isinstance(guideline[1], dict):
+                # Sanity checks
+                if "type" not in guideline[1]:
+                    raise ValueError("The second element of an element in `guidelines` must have a `type` key!")
+                if "value" not in guideline[1]:
+                    raise ValueError("The second element of an element in `guidelines` must have a `value` key!")
+
+                # Render exceptions
+                if guideline[1]["type"] == "exceptions":
+                    text += " Exceptions:\n"
+                    for exception in guideline[1]["value"]:
+                        text += f"\t- {exception}"
+                # Render nested list
+                elif guideline[1]["type"] == "list":
+                    for subitem in guideline[1]["value"]:
+                        text += f"\t- {subitem}"
+                # Exception
+                else:
+                    raise ValueError(f"Unknown guideline type: {guideline[1]['type']}!")
+                text += "\n"
+                for exception in guideline[1]:
+                    text += f"  - {exception}"
+            else:
+                raise TypeError("The second element of an element in `guidelines` must be a dictionary!")
+
+        # Element in guideliens is more than 2 items long
+        if len(guideline) > 2:
+            raise ValueError("Each element in `guidelines` must have at most 2 elements!")
+    return text
+
+
 def render_fields_init() -> None:
     """Render fields to create directories and all."""
     # Text inputs
@@ -273,7 +325,7 @@ def render_fields_from_schema(
                 # Use text area for these fields
                 kwargs = {
                     "label": display_name,
-                    "help": props["description"],
+                    "help": create_description(field=props),
                     "placeholder": props["examples"] if props["examples"] else "",
                     "key": prop_uri,
                 }
@@ -302,7 +354,7 @@ def render_fields_from_schema(
                 # Simple text input for the rest
                 kwargs = {
                     "label": display_name,
-                    "help": props["description"],
+                    "help": create_description(field=props),
                     "placeholder": "Examples: " + ", ".join([f"'{ex}'" for ex in props["examples"]])
                     if props["examples"]
                     else "",
