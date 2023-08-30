@@ -79,7 +79,7 @@ class SnapshotForm(utils.StepForm):
             data["license_name"] = data["origin.license.name_custom"]
         else:
             data["license_name"] = data["origin.license.name"]
-        data["origin_version"] = data["origin.version"]
+        data["origin_version"] = data["origin.version_producer"]
         data["dataset_manual_import"] = data["local_import"]
         data = {
             k: v for k, v in data.items() if k not in ["origin.license.url", "origin.license.name", "origin.version"]
@@ -150,7 +150,7 @@ def _color_req_level(req_level: str) -> str:
     elif "recommended" in req_level:
         color = "orange"
     elif "optional" in req_level:
-        color = ""
+        return req_level
     else:
         raise ValueError(f"Unknown requirement level: {req_level}")
     req_level = f":{color}[{req_level}]"
@@ -185,14 +185,14 @@ def load_instructions() -> str:
 def create_description(field: Dict[str, Any]) -> str:
     """Create description for field, using values `description` and `guidelines`."""
     description = field["description"]
-    if "guidelines" in field:
+    if field.get("guidelines"):
         description += "\n\n" + guidelines_to_markdown(guidelines=field["guidelines"])
     return description
 
 
 def guidelines_to_markdown(guidelines: List[Any]) -> str:
     """Render guidelines to markdown from given list in schema."""
-    text = "**Guidelines**\n\n"
+    text = "**Guidelines**\n"
     for guideline in guidelines:
         # Main guideline
         if isinstance(guideline[0], str):
@@ -212,19 +212,16 @@ def guidelines_to_markdown(guidelines: List[Any]) -> str:
 
                 # Render exceptions
                 if guideline[1]["type"] == "exceptions":
-                    text += " Exceptions:\n"
+                    text += " Exceptions:"
                     for exception in guideline[1]["value"]:
-                        text += f"\t- {exception}"
+                        text += f"\n\t- {exception}"
                 # Render nested list
                 elif guideline[1]["type"] == "list":
                     for subitem in guideline[1]["value"]:
-                        text += f"\t- {subitem}"
+                        text += f"\n\t- {subitem}"
                 # Exception
                 else:
                     raise ValueError(f"Unknown guideline type: {guideline[1]['type']}!")
-                text += "\n"
-                for exception in guideline[1]:
-                    text += f"  - {exception}"
             else:
                 raise TypeError("The second element of an element in `guidelines` must be a dictionary!")
 
