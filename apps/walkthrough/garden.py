@@ -259,6 +259,10 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
             "description_from_producer": "The description of the dummy indicator by the producer, shown separately on a data page.",
             "processing_level": "major",
             "license": {"name": "CC-BY 4.0", "url": ""},
+            "description_key": [
+                "First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)",
+                "Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)",
+            ],
             "presentation": {
                 "grapher_config": {
                     "title": "The dummy indicator - chart title",
@@ -271,10 +275,6 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
                 "producer_short": "ACME",
                 "attribution": "ACME project",
                 "topic_tags_links": ["Internet"],
-                "key_info_text": [
-                    "First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)",
-                    "Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)",
-                ],
                 "faqs": [{"fragment_id": "cherries", "gdoc_id": "16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE"}],
             },
         }
