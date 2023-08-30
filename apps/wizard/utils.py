@@ -128,7 +128,9 @@ def add_to_dag(dag: DAG, dag_path: Path = DAG_WALKTHROUGH_PATH) -> str:
     doc["steps"].update(dag)
 
     with open(dag_path, "w") as f:
-        ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
+        yml = ruamel.yaml.YAML()
+        yml.indent(mapping=2, sequence=4, offset=2)
+        yml.dump(doc, f)
 
     return yaml.dump({"steps": dag})
 
