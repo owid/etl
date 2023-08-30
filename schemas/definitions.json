@@ -184,13 +184,13 @@
         "examples_bad": [],
         "requirement_level": "required",
         "guidelines": [
-          ["Must start with a capital letter.", {"exceptions": ["The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."]}],
-          ["Must not end with a period.", {"exceptions": ["When using `et al.` (for papers with multiple authors)."]}],
+          ["Must start with a capital letter.", {"type": "exceptions", "value": ["The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."]}],
+          ["Must not end with a period.", {"type": "exceptions", "value": ["When using `et al.` (for papers with multiple authors)."]}],
           ["Must not include a date or year."],
           ["Must not mention `Our World in Data` or `OWID`."],
           ["Must not include any semicolon `;`."],
-          ["Regarding authors:", {"list": ["One author: `Williams`.", "Two authors: `Williams and Jones`.", "Three or more authors: `Williams et al.`."]}],
-          ["Regarding acronyms:", {"list": ["If the acronym is more well known than the full name, use just the acronym, e.g. `NASA`.", "If the acronym is not well known, use the full name, e.g. `Energy Institute`.", "If the institution explicitly asks, follow their guidelines, e.g. `Food and Agriculture Organization of the United Nations` (instead of `FAO`)."]}]
+          ["Regarding authors:", {"type": "list", "value": ["One author: `Williams`.", "Two authors: `Williams and Jones`.", "Three or more authors: `Williams et al.`."]}],
+          ["Regarding acronyms:", {"type": "list", "value": ["If the acronym is more well known than the full name, use just the acronym, e.g. `NASA`.", "If the acronym is not well known, use the full name, e.g. `Energy Institute`.", "If the institution explicitly asks, follow their guidelines, e.g. `Food and Agriculture Organization of the United Nations` (instead of `FAO`)."]}]
         ],
         "category": "citation"
       },
