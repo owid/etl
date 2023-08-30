@@ -11,6 +11,7 @@ from cookiecutter.main import cookiecutter
 from owid import walden
 from owid.catalog.utils import validate_underscore
 from pywebio import output as po
+from typing_extensions import Self
 
 from etl import config
 from etl.files import apply_black_formatter_to_files
@@ -51,7 +52,7 @@ if WALKTHROUGH_ORIGINS:
         "date_published": "2020-01-01",
         "producer": "Dummy producer",
         "citation_producer": "Dummy producer citation",
-        "dataset_url_download": "https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv",
+        "dataset_url_download": "https://raw.githubusercontent.com/owid/etl/master/apps/walkthrough/dummy_data.csv",
         "dataset_url_main": "https://www.url-dummy.com/",
         "license_name": "MIT dummy license",
     }
@@ -65,7 +66,7 @@ else:
         "name": "Dummy dataset",
         "description": "This\nis\na\ndummy\ndataset",
         "file_extension": "csv",
-        "source_data_url": "https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv",
+        "source_data_url": "https://raw.githubusercontent.com/owid/etl/master/apps/walkthrough/dummy_data.csv",
         "publication_date": "2020-01-01",
         "source_name": "Dummy short source citation",
         "source_published_by": "Dummy full source citation",
@@ -217,18 +218,22 @@ OWIDEnvType = Literal["live", "staging", "local", "unknown"]
 
 
 class OWIDEnv:
+    """Detect environment type."""
+
     env_type_id: OWIDEnvType
 
     def __init__(
-        self,
+        self: Self,
         env_type_id: Optional[OWIDEnvType] = None,
-    ):
+    ) -> None:
+        """Construct class."""
         if env_type_id is None:
             self.env_type_id = self.detect_env_type()
         else:
             self.env_type_id = env_type_id
 
-    def detect_env_type(self) -> OWIDEnvType:
+    def detect_env_type(self: Self) -> OWIDEnvType:
+        """Detect environment type."""
         # live
         if config.DB_NAME == "live_grapher":
             return "live"
@@ -241,7 +246,8 @@ class OWIDEnv:
         return "unknown"
 
     @property
-    def admin_url(self):
+    def admin_url(self: Self) -> Optional[str]:
+        """Get admin URL."""
         if self.env_type_id == "live":
             return "https://owid.cloud/admin"
         elif self.env_type_id == "staging":
@@ -251,14 +257,18 @@ class OWIDEnv:
         return None
 
     @property
-    def chart_approval_tool_url(self):
+    def chart_approval_tool_url(self: Self) -> str:
+        """Get chart approval tool URL."""
         return f"{self.admin_url}/suggested-chart-revisions/review"
 
-    def dataset_admin_url(self, dataset_id: Union[str, int]):
+    def dataset_admin_url(self: Self, dataset_id: Union[str, int]) -> str:
+        """Get dataset admin URL."""
         return f"{self.admin_url}/datasets/{dataset_id}/"
 
-    def variable_admin_url(self, variable_id: Union[str, int]):
+    def variable_admin_url(self: Self, variable_id: Union[str, int]) -> str:
+        """Get variable admin URL."""
         return f"{self.admin_url}/variables/{variable_id}/"
 
-    def chart_admin_url(self, chart_id: Union[str, int]):
+    def chart_admin_url(self: Self, chart_id: Union[str, int]) -> str:
+        """Get chart admin URL."""
         return f"{self.admin_url}/charts/{chart_id}/edit"
