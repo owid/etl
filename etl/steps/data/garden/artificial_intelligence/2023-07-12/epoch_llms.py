@@ -22,7 +22,6 @@ def run(dest_dir: str) -> None:
     df["training_computation_petaflop"] = df["Approx Compute (FLOP)"] / 1e15
     df.drop("Approx Compute (FLOP)", axis=1, inplace=True)
     df["MMLU avg"] *= 100
-    df["MMLU avg"] *= 100
     df["Architecture"] = df["Architecture"].str.replace("Llama", "LLaMA", regex=True)
 
     tb = Table(df, short_name=paths.short_name, underscore=True)
