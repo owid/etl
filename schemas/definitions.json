@@ -37,10 +37,11 @@
         "category": "license"
       },
       "url": {
-        "type": "string",
         "title": "License URL",
         "description": "URL leading to the producer's website where the dataset license is specified.",
-        "requirement_level": "required",
+        "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
+        "errorMessage": "'license.url' must be a valid URL",
+        "requirement_level": "required (if existing)",
         "examples": [],
         "examples_bad": [],
         "guidelines": [],
@@ -120,7 +121,7 @@
       "dataset_description_owid": {
         "type": "string",
         "title": "Dataset description by OWID",
-        "description": "Description of the dataset (written by OWID), usually a one- (or a few) paragraph explanation of the dataset.\n\nNote: Currently, this field won’t appear in charts or data pages. It will be useful internally, and will be seen by users who download the dataset via data catalog.",
+        "description": "Description of the dataset (written by OWID), usually a one- (or a few) paragraph explanation of the dataset.\n\nNote: Currently, this field won't appear in charts or data pages. It will be useful internally, and will be seen by users who download the dataset via data catalog.",
         "requirement_level": "recommended",
         "examples": [],
         "examples_bad": [],
@@ -131,7 +132,7 @@
         "type": "string",
         "title": "Dataset title by the producer",
         "description": "Title of the dataset (written by the producer) which is a one-line description of the dataset.",
-        "requirement_level": "recommended",
+        "requirement_level": "recommended (if existing)",
         "examples": [],
         "examples_bad": [],
         "guidelines": [],
@@ -141,7 +142,7 @@
         "type": "string",
         "title": "Dataset version by the producer",
         "description": "Producer's version of the dataset.",
-        "requirement_level": "recommended",
+        "requirement_level": "recommended (if existing)",
         "examples": [],
         "examples_bad": [],
         "guidelines": [],
@@ -150,7 +151,8 @@
       "date_published": {
         "title": "Date of publication of the dataset",
         "description": "Exact day (or year, if exact day is unknown) when the producer's dataset (in its current version) was published.",
-        "pattern": "\\d\\d\\d\\d-\\d\\d-\\d\\d|\\d\\d\\d\\d|latest",
+        "pattern": "(^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$)|(^\\d{4}$)|(^latest$)",
+        "errorMessage": "`date_published` must have format YYYY-MM-DD, YYYY or 'latest'",
         "examples": [
           "2022-07-11",
           "1998",
@@ -165,7 +167,7 @@
         "type": "string",
         "title": "Dataset description by the producer",
         "description": "Description of the original dataset (written by the producer), if any was given.",
-        "requirement_level": "recommended",
+        "requirement_level": "recommended (if existing)",
         "examples": [],
         "examples_bad": [],
         "guidelines": [],
@@ -229,10 +231,10 @@
         "category": "citation"
       },
       "dataset_url_main": {
-        "type": "string",
         "title": "URL of the dataset website",
         "description": "Producer's URL leading to the main website of the dataset. This is not the URL To the specific file.",
         "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
+        "errorMessage": "'dataset_url_main' must be valid URL",
         "requirement_level": "required",
         "examples": [
           "https://data.some_institution.com/dataset_12"
@@ -242,11 +244,11 @@
         "category": "files"
       },
       "dataset_url_download": {
-        "type": "string",
         "title": "Download URL of the dataset",
         "description": "Producer's URL that directly downloads the dataset as a single file.",
         "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
-        "requirement_level": "required",
+        "errorMessage": "'dataset_url_download' must be a valid URL",
+        "requirement_level": "required (if existing)",
         "examples": [
           "https://data.some_institution.com/dataset_12/data.csv"
         ],
@@ -259,7 +261,8 @@
         "format": "date",
         "title": "Date of access",
         "description": "Exact day when the producer's dataset (in its current version) was downloaded by OWID.",
-        "pattern": "\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d",
+        "pattern": "^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$",
+        "errorMessage": "`date_accessed` must have format YYYY-MM-DD",
         "requirement_level": "required",
         "examples": [
           "2023-07-13"

@@ -98,9 +98,11 @@ class SnapshotForm(utils.StepForm):
         # 2) Check other fields (non meta)
         fields_required = ["namespace", "snapshot_version", "short_name", "file_extension"]
         fields_snake = ["namespace", "short_name"]
+        fields_version = ["snapshot_version"]
 
         self.check_required(fields_required)
         self.check_snake(fields_snake)
+        self.check_is_version(fields_version)
 
         # License
         if self.license_name == "":
@@ -139,12 +141,13 @@ class SnapshotForm(utils.StepForm):
 
 def _color_req_level(req_level: str) -> str:
     if req_level == "required":
-        # color = "red"
         return f"**:red[{req_level}]**"
-    elif req_level == "recommended":
+    elif "required" in req_level:
+        color = "red"
+    elif "recommended" in req_level:
         color = "orange"
-    elif req_level == "optional":
-        color = "blue"
+    elif "optional" in req_level:
+        color = ""
     else:
         raise ValueError(f"Unknown requirement level: {req_level}")
     req_level = f":{color}[{req_level}]"
@@ -443,16 +446,17 @@ st.title("Wizard **:gray[Snapshot]**")
 
 # SIDEBAR
 with st.sidebar:
+    utils.warning_notion_latest()
     if APP_STATE.args.run_checks:
         # CONNECT AND CHECK
         with st.expander("**Environment checks**", expanded=True):
             run_checks()
 
-        # INSTRUCTIONS
-        with st.expander("**Instructions**", expanded=True):
-            text = load_instructions()
-            st.markdown(text)
-            st.markdown("3. **Only supports `origin`**. To work with `source` instead, use `walkthrough`.")
+    # INSTRUCTIONS
+    with st.expander("**Instructions**", expanded=True):
+        text = load_instructions()
+        st.markdown(text)
+        st.markdown("3. **Only supports `origin`**. To work with `source` instead, use `walkthrough`.")
 
 # FORM
 form_widget = st.empty()
@@ -469,6 +473,11 @@ with form_widget.form("form"):
     #     "Fill the following fields to help us fill all the created files for you! Note that sometimes some fields might not be available (even if they are labelled as required)."
     # )
     # Get categories
+    for k, v in schema_origin.items():
+        if "category" not in v:
+            print(k)
+            print(v)
+            # raise ValueError(f"Category not found for {k}")
     categories_in_schema = {v["category"] for k, v in schema_origin.items()}
     assert categories_in_schema == set(
         ACCEPTED_CATEGORIES

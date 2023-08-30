@@ -8,6 +8,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, Union
 
+import jsonref
 import jsonschema
 import ruamel.yaml
 import streamlit as st
@@ -335,42 +336,54 @@ class StepForm(BaseModel):
         with open(path, "w") as f:
             ruamel.yaml.dump(self.metadata, f, Dumper=ruamel.yaml.RoundTripDumper)
 
-    def validate_schema(self: Self, schema_path: str, ignore_keywords: List[str] = None) -> None:
+    def validate_schema(self: Self, schema: str, ignore_keywords: List[str] = None) -> None:
         """Validate form fields against schema.
 
         Note that not all form fields are present in the schema (some do not belong to metadata, but are needed to generate the e.g. dataset URI)
         """
         if ignore_keywords == []:
             ignore_keywords = []
-        validator = jsonschema.Draft7Validator(schema_path)
+        # Validator
+        validator = jsonschema.Draft7Validator(schema)
+        # Plain JSON
+        schema_full = jsonref.replace_refs(schema)
+        # Process each error
         errors = sorted(validator.iter_errors(self.metadata), key=str)  # get all validation errors
         for error in errors:
-            error_type = error.schema_path[-1]
-            uri = [ll for ll in error.schema_path if ll not in ["properties"] + ignore_keywords]
-            uri = uri[:-1]
-            # required but missing fields
+            # Get error type
+            error_type = error.validator
+            if error_type not in {"required", "type", "pattern"}:
+                raise Exception(f"Unknown error type {error_type} with message {error.message}")
+            # Get field values
+            values = self.get_invalid_field(error, schema_full)
+            # Get uri of problematic field
+            uri = error.json_path.replace("$.meta.", "")
+            # Some fixes when error type is "required"
             if error_type == "required":
                 rex = r"'(.*)' is a required property"
-                uri += [re.findall(rex, error.message)[0]]
-                uri = ".".join(uri)
-                self.errors[uri] = f"`{uri}` field is required!"
-            # wrong types
-            elif error_type == "type":
-                uri = ".".join(uri)
-                self.errors[uri] = f"Invalid type for field `{uri}`!"
-            elif error_type == "pattern":
-                uri = ".".join(uri)
-                self.errors[uri] = f"Invalid format of field `{uri}`!"
-            # unknown validation error
+                uri = f"{uri}.{re.findall(rex, error.message)[0]}"
+                if "errorMessage" not in values:
+                    values["errorMessage"] = error.message.replace("'", "`")
+            # Save error message
+            if "errorMessage" in values:
+                self.errors[uri] = values["errorMessage"]
             else:
-                raise Exception(f"Unknown error type {error_type} with message {error.message}")
+                self.errors[uri] = error.message
+
+    def get_invalid_field(self: Self, error, schema_full) -> Any:
+        """Get all key-values for the field that did not validate."""
+        queue = list(error.schema_path)[:-1]
+        values = schema_full.copy()
+        for key in queue:
+            values = values[key]
+        return values
 
     def check_required(self: Self, fields_names: List[str]) -> None:
         """Check that all fields in `fields_names` are not empty."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
             if attr == "":
-                self.errors[field_name] = f"{field_name} cannot be empty"
+                self.errors[field_name] = f"`{field_name}` is a required property"
 
     def check_snake(self: Self, fields_names: List[str]) -> None:
         """Check that all fields in `fields_names` are in snake case."""
@@ -385,7 +398,7 @@ class StepForm(BaseModel):
             attr = getattr(self, field_name)
             rex = r"^\d{4}-\d{2}-\d{2}$|^\d{4}$|^latest$"
             if not re.fullmatch(rex, attr):
-                self.errors[field_name] = f"`{field_name}` must be a date in the format YYYY-MM-DD or YYYY or 'latest'."
+                self.errors[field_name] = f"`{field_name}` must have format YYYY-MM-DD, YYYY or 'latest'"
 
 
 def is_snake(s: str) -> bool:
@@ -466,7 +479,7 @@ def _check_db() -> None:
     return True
 
 
-def _show_environment() -> None:
+def _show_environment():
     """Show environment variables."""
     st.info(
         f"""
@@ -492,3 +505,10 @@ def clean_empty_dict(d: Dict[str, Any]) -> Union[Dict[str, Any], List[Dict[str, 
     if isinstance(d, list):
         return [v for v in map(clean_empty_dict, d) if v]
     return d
+
+
+def warning_notion_latest() -> None:
+    """Show warning on latest metadata definitions being available in Notion."""
+    st.warning(
+        "Documentation for new metadata is almost complete, but still being finalised. For latest definitions refer to [Notion](https://www.notion.so/owid/Metadata-guidelines-29ca6e19b6f1409ea6826a88dbb18bcc)."
+    )
