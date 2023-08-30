@@ -199,13 +199,13 @@ def _variable_metadata(
     grapherConfigETLJson = row.pop("grapherConfigETL")
     grapherConfigAdminJson = row.pop("grapherConfigAdmin")
     licenseJson = row.pop("license")
-    keyInfoTextJson = row.pop("keyInfoText")
+    descriptionKeyJson = row.pop("descriptionKey")
 
     display = json.loads(displayJson)
     grapherConfigETL = json.loads(grapherConfigETLJson) if grapherConfigETLJson else None
     grapherConfigAdmin = json.loads(grapherConfigAdminJson) if grapherConfigAdminJson else None
     license = json.loads(licenseJson) if licenseJson else None
-    keyInfoText = json.loads(keyInfoTextJson) if keyInfoTextJson else None
+    descriptionKey = json.loads(descriptionKeyJson) if descriptionKeyJson else None
 
     # group fields from flat structure into presentation field
     presentation = dict(
@@ -217,8 +217,6 @@ def _variable_metadata(
         attribution=row.pop("attribution"),
         topicTagsLinks=db_topic_tags,
         faqs=db_faqs,
-        keyInfoText=keyInfoText,
-        processingInfo=row.pop("processingInfo"),
     )
 
     variableMetadata = dict(
@@ -230,7 +228,7 @@ def _variable_metadata(
         processingLevel=processingLevel,
         presentation=_omit_nullable_values(presentation),
         license=license,
-        keyInfoText=keyInfoText,
+        descriptionKey=descriptionKey,
     )
 
     # add source

@@ -43,6 +43,9 @@ tables:
 
 
           Imagine you're teaching a computer to recognize different types of fruits. The training data size would refer to the number of fruit images you show to the computer during the training process. If you show it 100 images of various fruits, then the training data size would be 100. The more training data you provide, the better the computer can learn to identify different fruits accurately.
+
+
+          The size of the GPT-4 dataset is an estimate and has not been officially disclosed.
         display:
           numDecimalPlaces: 0
 
