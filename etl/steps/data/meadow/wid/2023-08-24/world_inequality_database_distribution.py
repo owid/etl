@@ -200,7 +200,9 @@ def run(dest_dir: str) -> None:
 
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb = tb.set_index(["country", "year", "welfare", "percentile", "p"], verify_integrity=True).sort_index()
+    # Sort table by country, year, welfare
+    tb = tb.sort_values(["country", "year", "welfare"]).reset_index(drop=True)
+    tb = tb.set_index(["country", "year", "welfare", "percentile", "p"], verify_integrity=True)
 
     #
     # Save outputs.
