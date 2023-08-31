@@ -88,6 +88,19 @@ def add_entity_code_and_name(session: Session, df: pd.DataFrame) -> pd.DataFrame
     return pd.merge(df, entities, on="entityId")
 
 
+def variable_data_df(data_df: pd.DataFrame) -> pd.DataFrame:
+    data_df = data_df.rename(
+        columns={
+            "value": "values",
+            "entityId": "entities",
+            "year": "years",
+        }
+    )
+    # TODO: fix this! keep it as objects
+    data_df["values"] = data_df["values"].map(_convert_string_to_numeric)
+    return data_df[["values", "years", "entities"]]
+
+
 def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
     data_df = data_df.rename(
         columns={
@@ -344,6 +357,17 @@ def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
             num = item
         result.append(num)
     return result
+
+
+def _convert_string_to_numeric(item) -> Union[int, float, str]:
+    assert isinstance(item, str)
+    try:
+        num = float(item)
+        if num.is_integer():
+            num = int(num)
+    except ValueError:
+        num = item
+    return num
 
 
 def _omit_nullable_values(d: dict) -> dict:
