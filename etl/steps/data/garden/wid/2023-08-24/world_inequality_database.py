@@ -1,6 +1,5 @@
 """Load World Inequality Database meadow dataset and create a garden dataset."""
 
-from typing import cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
