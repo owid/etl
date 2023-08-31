@@ -25,10 +25,22 @@ snapshots_dict = {
     "lis_keyvars": ["country", "year", "dataset", "variable", "eq"],
     "lis_abs_poverty": ["country", "year", "dataset", "variable", "eq", "povline"],
     "lis_distribution": ["country", "year", "dataset", "variable", "eq", "percentile"],
+    "lis_percentiles": ["country", "year", "dataset", "variable", "eq", "percentile"],
 }
 
 # Define a dictionary with the age suffixes for the different snapshots
 age_dict = {"all": "", "adults": "_adults"}
+
+# Define a list of datasets to drop
+# NOTE: These datasets are dropped because LIS decided to not show key indicators. From a conversation with LIS:
+"""
+AT87 is still accessible for ongoing research, but we advise not to use it.
+The years FR78/FR89/FR94 are not wrong per-se, but inequality numbers are rather different from the HBS based series, and we are not promoting both series at this stage. So all data points available through lissydata are based on the taxregister based series.
+DE81 is not in line with the EVS data, nor GSOEP (so we equally do not promote these numbers.
+ML13, ML11 or SE67 have high proportion of 0s and/or missing values in DHI, so far we do not show statistics for those.
+"""
+
+drop_datasets_list = ["AT87", "DE81", "FR78", "FR89", "FR94", "ML11", "ML13", "SE67"]
 
 
 def run(dest_dir: str) -> None:
@@ -59,6 +71,9 @@ def run(dest_dir: str) -> None:
                 [col for col in df.columns if col not in ds_ids]
             ].apply(pd.to_numeric, errors="coerce")
 
+            # Drop datasets LIS is not promoting
+            df = df[~df["dataset"].isin(drop_datasets_list)].reset_index()
+
             # Extract country and year from dataset
             df["country"] = df["dataset"].str[:2].str.upper()
             df["year"] = df["dataset"].str[2:4].astype(int)
@@ -77,6 +92,9 @@ def run(dest_dir: str) -> None:
             # Move country and year to the beginning
             cols_to_move = ["country", "year"]
             df = df[cols_to_move + [col for col in df.columns if col not in cols_to_move]]
+
+            # Set indices and sort.
+            df = df.set_index(ds_ids, verify_integrity=True).sort_index()
 
             # Create a new table and ensure all columns are snake-case.
             tb = Table(df, short_name=f"{ds_name}{age_suffix}", underscore=True)

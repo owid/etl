@@ -7,8 +7,9 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # Initialize logger.
 log = get_logger()
@@ -109,6 +110,12 @@ iso2_missing = {
 #     "XS-MER": "South & South-East Asia (at market exchange rate) (WID)",
 # }
 
+# Create a dictionary with the names of the snapshots and their id variables
+snapshots_dict = {
+    "world_inequality_database": ["country", "year"],
+    "world_inequality_database_distribution": ["country", "year", "welfare", "p", "percentile"],
+}
+
 
 # Country harmonization function, using both the reference country/regional OWID dataset and WID's `iso2_missing` list
 def harmonize_countries(df: pd.DataFrame, iso2_missing: dict) -> pd.DataFrame:
@@ -133,7 +140,7 @@ def harmonize_countries(df: pd.DataFrame, iso2_missing: dict) -> pd.DataFrame:
     # Warns if there are still entities missing
     if missing_count > 0:
         log.warning(
-            f"There are still {missing_count} WID countries/regions without a name and will be deleted! Take a look at this list:\n {missing_list}"
+            f"There are still unnamed {missing_count} WID countries/regions and will be deleted! Take a look at this list:\n {missing_list}"
         )
 
     # Drop rows without match
@@ -152,69 +159,75 @@ def harmonize_countries(df: pd.DataFrame, iso2_missing: dict) -> pd.DataFrame:
 def run(dest_dir: str) -> None:
     log.info("world_inequality_database.start")
 
+    # Create a new meadow dataset with the same metadata as the snapshot.
+    snap = paths.load_dependency("world_inequality_database.csv")
+    ds_meadow = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
+
+    # Ensure the version of the new dataset corresponds to the version of current step.
+    ds_meadow.metadata.version = paths.version
+    ds_meadow.metadata.short_name = "world_inequality_database"
+
     #
     # Load inputs.
 
-    # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("world_inequality_database.csv")
+    for ds_name, ds_ids in snapshots_dict.items():
+        # Load data from snapshot.
+        # `keep_default_na` and `na_values` are included because there is a country labeled NA, Namibia, which becomes null without the parameters
+        na_values = [
+            "-1.#IND",
+            "1.#QNAN",
+            "1.#IND",
+            "-1.#QNAN",
+            "#N/A N/A",
+            "#N/A",
+            "N/A",
+            "n/a",
+            "",
+            "#NA",
+            "NULL",
+            "null",
+            "NaN",
+            "-NaN",
+            "nan",
+            "-nan",
+            "",
+        ]
 
-    # Load data from snapshot.
-    # `keep_default_na` and `na_values` are included because there is a country labeled NA, Namibia, which becomes null without the parameters
-    na_values = [
-        "-1.#IND",
-        "1.#QNAN",
-        "1.#IND",
-        "-1.#QNAN",
-        "#N/A N/A",
-        "#N/A",
-        "N/A",
-        "n/a",
-        "",
-        "#NA",
-        "NULL",
-        "null",
-        "NaN",
-        "-NaN",
-        "nan",
-        "-nan",
-        "",
-    ]
-    df = pd.read_csv(
-        snap.path,
-        keep_default_na=False,
-        na_values=na_values,
-    )
+        # Retrieve snapshot.
+        snap: Snapshot = paths.load_dependency(f"{ds_name}.csv")
+        df = pd.read_csv(
+            snap.path,
+            keep_default_na=False,
+            na_values=na_values,
+        )
 
-    # Retrieve snapshot with extrapolations
-    snap: Snapshot = paths.load_dependency("world_inequality_database_with_extrapolations.csv")
-    # Load data from snapshot.
-    # `keep_default_na` and `na_values` are included because there is a country labeled NA, Namibia, which becomes null without the parameters
-    df_extrapolations = pd.read_csv(
-        snap.path,
-        keep_default_na=False,
-        na_values=na_values,
-    )
+        # Retrieve snapshot with extrapolations
+        snap: Snapshot = paths.load_dependency(f"{ds_name}_with_extrapolations.csv")
+        # Load data from snapshot.
+        # `keep_default_na` and `na_values` are included because there is a country labeled NA, Namibia, which becomes null without the parameters
+        df_extrapolations = pd.read_csv(
+            snap.path,
+            keep_default_na=False,
+            na_values=na_values,
+        )
 
-    # Combine both datasets
-    df = pd.merge(df, df_extrapolations, on=["country", "year"], how="outer", suffixes=("", "_extrapolated"))
+        # Combine both datasets
+        df = pd.merge(df, df_extrapolations, on=ds_ids, how="outer", suffixes=("", "_extrapolated"))
 
-    #
-    # Process data.
-    #
-    # Harmonize countries
-    df = harmonize_countries(df, iso2_missing)
+        #
+        # Process data.
+        #
+        # Harmonize countries
+        df = harmonize_countries(df, iso2_missing)
 
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+        # Create a new table and ensure all columns are snake-case.
+        tb = Table(df, short_name=ds_name, underscore=True)
 
-    # Set index and sort
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+        # Set index and sort
+        tb = tb.set_index(ds_ids, verify_integrity=True).sort_index()
 
-    #
-    # Save outputs.
-    #
-    # Create a new meadow dataset with the same metadata as the snapshot and add the table.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+        # Add the new table to the meadow dataset.
+        ds_meadow.add(tb)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

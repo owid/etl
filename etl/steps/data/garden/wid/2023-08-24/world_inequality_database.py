@@ -1,8 +1,10 @@
 """Load World Inequality Database meadow dataset and create a garden dataset."""
 
+from typing import cast
+
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import add_metadata_vars
+from shared import add_metadata_vars, add_metadata_vars_distribution
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -58,11 +60,26 @@ def run(dest_dir: str) -> None:
 
     tb_garden = add_metadata_vars(tb_garden)
 
+    ########################################
+    # Percentile data
+    ########################################
+
+    # Read table from meadow dataset.
+    tb_percentiles = ds_meadow["world_inequality_database_distribution"]
+
+    #
+    # Process data.
+    # Multiple share and share_extrapolated columns by 100
+    tb_percentiles[["share", "share_extrapolated"]] *= 100
+
+    # Add metadata by code
+    tb_percentiles = add_metadata_vars_distribution(tb_percentiles)
+
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset and add the garden table.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden, tb_percentiles], default_metadata=ds_meadow.metadata)
 
     # Update dataset and table metadata using the adjacent yaml file.
     ds_garden.update_metadata(paths.metadata_path)

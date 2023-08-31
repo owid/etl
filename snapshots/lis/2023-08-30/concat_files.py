@@ -25,10 +25,10 @@ for file in file_list:
         df.to_csv(f"{DIRECTORY}/lis_{file}{age}.csv", index=False)
 
 # Concatenate percentile files
-# Initialize empty dataframes
-df_equivalized = pd.DataFrame()
-df_pc = pd.DataFrame()
 for age in age_list:
+    # Initialize empty dataframes
+    df_equivalized = pd.DataFrame()
+    df_pc = pd.DataFrame()
     for i in range(1, NUMBER_OF_PERCENTILE_FILES + 1):
         df_e = pd.read_csv(f"{DIRECTORY}/lis_percentiles_equivalized{age}_{i}.csv")
         df_p = pd.read_csv(f"{DIRECTORY}/lis_percentiles_pc{age}_{i}.csv")

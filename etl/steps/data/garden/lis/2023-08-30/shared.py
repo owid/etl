@@ -186,12 +186,13 @@ inc_cons_dict = {
         "verb": "received",
         "description": "Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received.",
     },
-    "hcexp": {
-        "name": "Total consumption",
-        "type": "consumption",
-        "verb": "spent",
-        "description": "This measure is related to total consumption, including that stemming from goods and services that have been purchased by the household, and goods ans services that have not been purchased, but either given to the household from somebody else, or self-produced.",
-    },
+    # # Omitted until changing the code to include this variable
+    # "hcexp": {
+    #     "name": "Total consumption",
+    #     "type": "consumption",
+    #     "verb": "spent",
+    #     "description": "This measure is related to total consumption, including that stemming from goods and services that have been purchased by the household, and goods ans services that have not been purchased, but either given to the household from somebody else, or self-produced.",
+    # },
 }
 
 # Details for each equivalence scale (equivalized with LIS scale and per capita)
@@ -481,4 +482,95 @@ def var_metadata_income_equivalence_scale_percentiles(var, wel, e, pct) -> Varia
             "name": meta.title,
             "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
         }
+    return meta
+
+
+##############################################################################################################
+# This is the code for the distribution variables
+##############################################################################################################
+
+var_dict_distribution = {
+    # "avg": {
+    #     "title": "Average",
+    #     "description": "The mean income per year within each percentile.",
+    #     "unit": "international-$ in 2017 prices",
+    #     "short_unit": "$",
+    #     "numDecimalPlaces": 0,
+    # },
+    "share": {
+        "title": "Share",
+        "description": "The share of income received by each percentile.",
+        "unit": "%",
+        "short_unit": "%",
+        "numDecimalPlaces": 1,
+    },
+    "thr": {
+        "title": "Threshold",
+        "description": "The level of income per year below which 1%, 2%, 3%, ... , 99% of the population falls.",
+        "unit": "international-$ in 2017 prices",
+        "short_unit": "$",
+        "numDecimalPlaces": 0,
+    },
+}
+
+
+def add_metadata_vars_distribution(tb_garden: Table) -> Table:
+    # Get a list of all the variables available
+    cols = list(tb_garden.columns)
+
+    for var in var_dict_distribution:
+        # All the variables follow whis structure
+        col_name = f"{var}"
+
+        if col_name in cols:
+            # Create metadata for these variables
+            tb_garden[col_name].metadata = var_metadata_distribution(var)
+
+    return tb_garden
+
+
+def var_metadata_distribution(var: str) -> VariableMeta:
+    """
+    This function assigns each of the metadata fields for the distribution variables
+    """
+    # Shares do not include PPP description
+    if var == "share":
+        meta = VariableMeta(
+            title=f"Income {var_dict_distribution[var]['title'].lower()}",
+            description=f"""{var_dict_distribution[var]['description']}
+
+            {notes_title}
+
+            {processing_description}
+
+            {processing_distribution}""",
+            unit=var_dict_distribution[var]["unit"],
+            short_unit=var_dict_distribution[var]["short_unit"],
+        )
+        meta.display = {
+            "name": meta.title,
+            "numDecimalPlaces": var_dict_distribution[var]["numDecimalPlaces"],
+        }
+
+    # For monetary variables I include the PPP description
+    else:
+        meta = VariableMeta(
+            title=f"{var_dict_distribution[var]['title']} income",
+            description=f"""{var_dict_distribution[var]['description']}
+
+            {ppp_description}
+
+            {notes_title}
+
+            {processing_description}
+
+            {processing_distribution}""",
+            unit=var_dict_distribution[var]["unit"],
+            short_unit=var_dict_distribution[var]["short_unit"],
+        )
+        meta.display = {
+            "name": meta.title,
+            "numDecimalPlaces": var_dict_distribution[var]["numDecimalPlaces"],
+        }
+
     return meta
