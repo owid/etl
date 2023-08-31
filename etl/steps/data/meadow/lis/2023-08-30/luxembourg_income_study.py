@@ -27,6 +27,9 @@ snapshots_dict = {
     "lis_distribution": ["country", "year", "dataset", "variable", "eq", "percentile"],
 }
 
+# Define a dictionary with the age suffixes for the different snapshots
+age_dict = {"all": "", "adults": "_adults"}
+
 
 def run(dest_dir: str) -> None:
     log.info("luxembourg_income_study.start")
@@ -44,44 +47,42 @@ def run(dest_dir: str) -> None:
     ds_meadow.metadata.version = paths.version
     ds_meadow.metadata.short_name = "luxembourg_income_study"
 
-    for ds_name, ds_ids in snapshots_dict.items():
-        # Retrieve snapshot.
-        snap: Snapshot = paths.load_dependency(f"{ds_name}.csv")
+    for age, age_suffix in age_dict.items():
+        for ds_name, ds_ids in snapshots_dict.items():
+            # Retrieve snapshot.
+            snap: Snapshot = paths.load_dependency(f"{ds_name}{age_suffix}.csv")
 
-        # Load data from snapshot.
-        df = pd.read_csv(snap.path)
+            # Load data from snapshot.
+            df = pd.read_csv(snap.path)
 
-        df[[col for col in df.columns if col not in ds_ids]] = df[
-            [col for col in df.columns if col not in ds_ids]
-        ].apply(pd.to_numeric, errors="coerce")
+            df[[col for col in df.columns if col not in ds_ids]] = df[
+                [col for col in df.columns if col not in ds_ids]
+            ].apply(pd.to_numeric, errors="coerce")
 
-        # Extract country and year from dataset
-        df["country"] = df["dataset"].str[:2].str.upper()
-        df["year"] = df["dataset"].str[2:4].astype(int)
+            # Extract country and year from dataset
+            df["country"] = df["dataset"].str[:2].str.upper()
+            df["year"] = df["dataset"].str[2:4].astype(int)
 
-        # Replace "UK" with "GB" (official ISO-2 name for the United Kingdom)
-        df["country"] = np.where(df["country"] == "UK", "GB", df["country"])
+            # Replace "UK" with "GB" (official ISO-2 name for the United Kingdom)
+            df["country"] = np.where(df["country"] == "UK", "GB", df["country"])
 
-        # Create year variable in the format YYYY instead of YY
-        df["year"] = np.where(df["year"] > 50, df["year"] + 1900, df["year"] + 2000)
+            # Create year variable in the format YYYY instead of YY
+            df["year"] = np.where(df["year"] > 50, df["year"] + 1900, df["year"] + 2000)
 
-        # Merge dataset and country dictionary to get the name of the country (and rename it as "country")
-        df = pd.merge(df, df_countries_regions, left_on="country", right_on="iso_alpha2", how="left")
-        df = df.drop(columns=["country", "iso_alpha2"])
-        df = df.rename(columns={"name": "country"})
+            # Merge dataset and country dictionary to get the name of the country (and rename it as "country")
+            df = pd.merge(df, df_countries_regions, left_on="country", right_on="iso_alpha2", how="left")
+            df = df.drop(columns=["country", "iso_alpha2"])
+            df = df.rename(columns={"name": "country"})
 
-        # Move country and year to the beginning
-        cols_to_move = ["country", "year"]
-        df = df[cols_to_move + [col for col in df.columns if col not in cols_to_move]]
+            # Move country and year to the beginning
+            cols_to_move = ["country", "year"]
+            df = df[cols_to_move + [col for col in df.columns if col not in cols_to_move]]
 
-        #
-        # Process data.
-        #
-        # Create a new table and ensure all columns are snake-case.
-        tb = Table(df, short_name=ds_name, underscore=True)
+            # Create a new table and ensure all columns are snake-case.
+            tb = Table(df, short_name=f"{ds_name}{age_suffix}", underscore=True)
 
-        # Add the new table to the meadow dataset.
-        ds_meadow.add(tb)
+            # Add the new table to the meadow dataset.
+            ds_meadow.add(tb)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

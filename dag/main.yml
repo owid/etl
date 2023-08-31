@@ -267,6 +267,9 @@ steps:
     - snapshot://lis/2023-08-30/lis_keyvars.csv
     - snapshot://lis/2023-08-30/lis_abs_poverty.csv
     - snapshot://lis/2023-08-30/lis_distribution.csv
+    - snapshot://lis/2023-08-30/lis_keyvars_adults.csv
+    - snapshot://lis/2023-08-30/lis_abs_poverty_adults.csv
+    - snapshot://lis/2023-08-30/lis_distribution_adults.csv
     - data://garden/regions/2023-01-01/regions
   data://garden/lis/2023-08-30/luxembourg_income_study:
     - data://meadow/lis/2023-08-30/luxembourg_income_study
