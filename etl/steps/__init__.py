@@ -742,30 +742,30 @@ class GrapherStep(Step):
             dataset.metadata.sources,
         )
 
-        thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS)
-        futures = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
+            futures = []
 
-        # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
-        # is fetching the whole dataset from data-api as they would receive all tables merged in a single
-        # table. This won't be a problem after we introduce the concept of "tables"
-        for table in dataset:
-            catalog_path = f"{self.path}/{table.metadata.short_name}"
+            # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
+            # is fetching the whole dataset from data-api as they would receive all tables merged in a single
+            # table. This won't be a problem after we introduce the concept of "tables"
+            for table in dataset:
+                catalog_path = f"{self.path}/{table.metadata.short_name}"
 
-            table = gh._adapt_table_for_grapher(table)
+                table = gh._adapt_table_for_grapher(table)
 
-            # generate table with entity_id, year and value for every column
-            upsert = lambda t: gi.upsert_table(  # noqa: E731
-                engine,
-                t,
-                dataset_upsert_results,
-                catalog_path=catalog_path,
-                dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
-            )
+                # generate table with entity_id, year and value for every column
+                upsert = lambda t: gi.upsert_table(  # noqa: E731
+                    engine,
+                    t,
+                    dataset_upsert_results,
+                    catalog_path=catalog_path,
+                    dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                )
 
-            for t in gh._yield_wide_table(table, na_action="drop"):
-                futures.append(thread_pool.submit(upsert, t))
+                for t in gh._yield_wide_table(table, na_action="drop"):
+                    futures.append(thread_pool.submit(upsert, t))
 
-        variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
+            variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
 
         self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
@@ -797,7 +797,6 @@ class GrapherStep(Step):
         gi.cleanup_ghost_variables(
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
-            workers=config.GRAPHER_INSERT_WORKERS,
         )
         gi.cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
         # TODO: cleanup origins that are not used by any variable
