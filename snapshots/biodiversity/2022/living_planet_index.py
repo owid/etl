@@ -19,16 +19,16 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 def main(upload: bool) -> None:
     # Load backported snapshot.
-    snap_values = Snapshot("backport/latest/{{cookiecutter.backport_short_name}}_values.feather")
+    snap_values = Snapshot("backport/latest/dataset_5175_living_planet_index__wwf__2022_values.feather")
     snap_values.pull()
-    snap_config = Snapshot("backport/latest/{{cookiecutter.backport_short_name}}_config.json")
+    snap_config = Snapshot("backport/latest/dataset_5175_living_planet_index__wwf__2022_config.json")
     snap_config.pull()
 
     # Create snapshot metadata for the new file
     meta = SnapshotMeta(**snap_values.metadata.to_dict())
     meta.namespace = SNAPSHOT_NAMESPACE
     meta.version = SNAPSHOT_VERSION
-    meta.short_name = "{{cookiecutter.short_name}}"
+    meta.short_name = "living_planet_index"
     meta.fill_from_backport_snapshot(snap_config.path)
     meta.save()
 

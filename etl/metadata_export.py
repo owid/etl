@@ -4,7 +4,7 @@ from typing import Any, Dict, Tuple
 
 import pandas as pd
 import rich_click as click
-from owid.catalog import Dataset
+from owid.catalog import Dataset, utils
 
 from etl.files import yaml_dump
 
@@ -82,12 +82,28 @@ def metadata_export(
                 continue
             variable = tab[col].metadata.to_dict()
 
-            # move units and short units from display
             if "display" in variable:
+                display = variable["display"]
+                # move units and short units from display
                 if not variable.get("unit"):
-                    variable["unit"] = variable["display"].pop("unit", "")
+                    variable["unit"] = display.pop("unit", "")
                 if not variable.get("short_unit"):
-                    variable["short_unit"] = variable["display"].pop("shortUnit", "")
+                    variable["short_unit"] = display.pop("shortUnit", "")
+
+                # includeInTable: true is default, no need to have it here
+                if display.get("includeInTable"):
+                    display.pop("includeInTable")
+
+                # if title is underscored and identical to column name, try to use display name as title
+                if (
+                    col == variable["title"]
+                    and utils.underscore(variable["title"]) == variable["title"]
+                    and display.get("name")
+                ):
+                    variable["title"] = display.pop("name")
+
+                if not display:
+                    variable.pop("display")
 
             # remove empty descriptions and short units
             if variable.get("description") == "":

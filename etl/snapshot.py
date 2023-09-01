@@ -124,6 +124,8 @@ class Snapshot:
         """Read file based on its Snapshot extension."""
         if self.metadata.file_extension == "csv":
             return self.read_csv(*args, **kwargs)
+        elif self.metadata.file_extension == "feather":
+            return self.read_feather(*args, **kwargs)
         elif self.metadata.file_extension == "xlsx":
             return self.read_excel(*args, **kwargs)
         elif self.metadata.file_extension == "json":
@@ -134,6 +136,10 @@ class Snapshot:
     def read_csv(self, *args, **kwargs) -> Table:
         """Read CSV file into a Table and populate it with metadata."""
         return pr.read_csv(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+
+    def read_feather(self, *args, **kwargs) -> Table:
+        """Read feather file into a Table and populate it with metadata."""
+        return pr.read_feather(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
 
     def read_excel(self, *args, **kwargs) -> Table:
         """Read excel file into a Table and populate it with metadata."""
@@ -312,8 +318,8 @@ class SnapshotMeta:
                             "short_name": self.short_name,
                             "title": self.origin.dataset_title_owid,  # type: ignore
                             "description": self.origin.dataset_description_owid,  # type: ignore
-                            "origins": [self.origin],
-                            "licenses": [self.license],
+                            "origins": [self.origin] if self.origin else [],
+                            "licenses": [self.license] if self.license else [],
                             "is_public": self.is_public,
                             "version": self.version,
                         }
@@ -335,8 +341,8 @@ class SnapshotMeta:
                             "short_name": self.short_name,
                             "title": self.name,
                             "version": self.version,
-                            "sources": [self.source],
-                            "licenses": [self.license],
+                            "sources": [self.source] if self.source else [],
+                            "licenses": [self.license] if self.license else [],
                         }
                     ),
                 }
