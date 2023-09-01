@@ -38,8 +38,14 @@ def upload_gzip_df(df: pd.DataFrame, s3_path: str, private: bool = False, r2: bo
         extra_args = {"ACL": "private" if private else "public-read"}
 
     # compare md5 of the file with the one in S3, if different, upload
+    import time
+
+    t = time.time()
     md5 = hashlib.sha256(pd.util.hash_pandas_object(df, index=False).values).hexdigest()
-    # md5 = joblib.hash(df)
+    print("hash time sha256", time.time() - t)
+    t = time.time()
+    md5 = joblib.hash(df)
+    print("hash time joblib", time.time() - t)
 
     try:
         response = client.head_object(Bucket=bucket, Key=key)
