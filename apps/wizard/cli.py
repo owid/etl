@@ -4,6 +4,7 @@ This module is implemented so that we can run the app with the `python` keyword:
 
 python cli.py
 """
+import logging
 import sys
 from typing import Iterable
 
@@ -13,6 +14,9 @@ from rich_click.rich_command import RichCommand
 
 from apps.wizard.utils import CURRENT_DIR, PHASES
 
+# Disable streamlit cache data API logging
+# ref: @kajarenc from https://github.com/streamlit/streamlit/issues/6620#issuecomment-1564735996
+logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.ERROR)
 
 # NOTE: Any new arguments here need to be in sync with the arguments defined in
 # wizard.utils.APP_STATE.args property method
