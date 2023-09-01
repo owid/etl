@@ -1,0 +1,33 @@
+meta:
+  origin:
+    dataset_title_owid: Chick culling laws or lack thereof
+    dataset_description_owid: Male baby chicks are commonly killed in laying hens
+      hatcheries all around the world, as they provide no value for the egg production
+      industry. Only a minority of country has laws to ban this practice. This dataset
+      is a compilation of evidence (mostly from the news) of chick culling happening
+      in a country, and exceptionally, of existing laws banning it.
+    producer: Various sources
+    citation_producer: |
+      Laws banning chick culling are enforced in a small number of countries (see [this summary](https://animallaweurope.com/wp-content/uploads/2023/01/Animal-Law-Europe-%E2%80%93-Chick-Killing-Report-2023.pdf) by The European Institute for Animal Law & Policy). This dataset includes additional evidence for laws banning chick culling, as well as evidence for countries (presumably lacking laws on the topic) where culling is commonly practiced.
+
+      Evidence of a laws banning chick culling:
+        * Luxembourg (2018) according to [The Luxembourg Government](https://gouvernement.lu/en/dossiers/2018/tierschutz.html).
+      Evidence of the practice of chick culling:
+        * Australia: [RSPCA, 2021-09-22](https://kb.rspca.org.au/knowledge-base/what-happens-with-male-chicks-in-the-egg-industry/).
+        * Canada: [Canadian Poultry Magazine, 2016-12-19](https://www.canadianpoultrymag.com/hypereye-a-game-changer-30033/).
+        * New Zealand: [SAFE for animals, 2023](https://safe.org.nz/our-work/animals-in-aotearoa/male-chicks/).
+        * Switzerland: Banned grinding in 2019, but gassing is still legal, according to [Swissinfo](https://www.swissinfo.ch/eng/society/animal-protection_-switzerland-bans-shredding-of-male-chicks-/45240798).
+        * United Kingdom: [The Humane League, 2021-07-29](https://thehumaneleague.org.uk/article/what-happens-to-male-chicks-in-the-egg-industry).
+        * United States: [Vox, 2021-04-12](https://www.vox.com/future-perfect/22374193/eggs-chickens-animal-welfare-culling).
+        * Rest of the EU (except countries with a ban mentioned above) [European Parliamentary Research Service, 2022-12](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf).
+    dataset_url_main: https://gouvernement.lu/en/dossiers/2018/tierschutz.html
+    date_published: '2023-09-01'
+    date_accessed: '2023-09-01'
+  license:
+    name: CC BY 4.0
+  is_public: true
+wdir: ../../../data/snapshots/animal_welfare/2023-09-01
+outs:
+- md5: 160f3f05c11b88faf3538c6160ac3553
+  size: 4876
+  path: chick_culling_laws_or_lack_thereof.csv

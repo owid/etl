@@ -26,7 +26,7 @@ meta:
       Killing: Achieving an EU-Wide Prohibition" (White paper, January 2023) by Alice
       Di Concetto, Olivier Morice, Matthias Corion, Simão Santos.'
     dataset_url_main: https://animallaweurope.com/news/
-    dataset_url_download:
+    dataset_url_download: 
       https://animallaweurope.com/wp-content/uploads/2023/01/Animal-Law-Europe-%E2%80%93-Chick-Killing-Report-2023.pdf
     date_published: '2023-01-01'
     date_accessed: '2023-09-01'
