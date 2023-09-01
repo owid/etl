@@ -1075,6 +1075,20 @@ def read_csv(
     return cast(Table, table)
 
 
+def read_feather(
+    filepath: Union[str, Path],
+    metadata: Optional[TableMeta] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_feather(filepath, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = update_log(table=table, operation="load", parents=[filepath])
+
+    return cast(Table, table)
+
+
 def read_excel(
     io: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
 ) -> Table:
