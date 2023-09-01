@@ -18,6 +18,8 @@ TIMEOUT = 500
 FILL_GAPS = "true"
 MAX_WORKERS = 10
 
+# NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
+
 
 def api_health():
     """
@@ -269,7 +271,7 @@ def pip_query_region(
 # GENERATE MAIN INDICATORS FILE
 
 
-def generate_key_indicators_concurrent():
+def generate_key_indicators():
     """
     Generate the main indicators file, from a set of poverty lines and PPP versions. Uses concurrent.futures to speed up the process.
     """
@@ -336,7 +338,7 @@ def generate_key_indicators_concurrent():
         """
         This function makes concurrency work for regional data.
         """
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=int(round(MAX_WORKERS / 2))) as executor:
             tasks = []
             for ppp_version, povlines in povlines_dict.items():
                 for povline in povlines:
@@ -388,7 +390,7 @@ def generate_key_indicators_concurrent():
 # NOTE: Medians need to be patched first in order to get data for all country-years (there are several missing values)
 
 
-def generate_relative_poverty_concurrent():
+def generate_relative_poverty():
     """
     Generates relative poverty indicators from query results. Uses concurrent.futures to speed up the process.
     """
@@ -453,7 +455,7 @@ def generate_relative_poverty_concurrent():
         """
         # Make sure the directory exists. If not, create it
         Path(f"{PARENT_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=int(round(MAX_WORKERS / 2))) as executor:
             for pct in [40, 50, 60]:
                 for i in range(len(df)):
                     if Path(
@@ -576,7 +578,7 @@ def generate_relative_poverty_concurrent():
 # This is data not given directly by the query, but we can get it by querying a huge set of poverty lines and assign percentiles according to headcount ratio results.
 
 
-def generate_percentiles_raw_concurrent():
+def generate_percentiles_raw():
     """
     Generates percentiles data from query results. This is the raw data to get the percentiles.
     Uses concurrent.futures to speed up the process.
@@ -651,7 +653,7 @@ def generate_percentiles_raw_concurrent():
     def concurrent_percentiles_region_function():
         # Make sure the directory exists. If not, create it
         Path(f"{PARENT_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=int(round(MAX_WORKERS / 2))) as executor:
             for ppp_version in [2011, 2017]:
                 for povline in povlines:
                     if Path(
@@ -871,13 +873,13 @@ def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
 #############################################
 
 # Generate percentiles by extracting the raw files and processing them afterward
-df_percentiles = generate_consolidated_percentiles(generate_percentiles_raw_concurrent())
+df_percentiles = generate_consolidated_percentiles(generate_percentiles_raw())
 
 # Generate relative poverty indicators file
-df_relative = generate_relative_poverty_concurrent()
+df_relative = generate_relative_poverty()
 
 # Generate key indicators file and patch medians
-df = generate_key_indicators_concurrent()
+df = generate_key_indicators()
 df = median_patch(df)
 
 # Add relative poverty indicators and decile thresholds to the key indicators file
