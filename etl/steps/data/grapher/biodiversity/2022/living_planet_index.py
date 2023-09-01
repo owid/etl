@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset()
 
     # Read table from garden dataset.
-    tb = ds_garden["{{cookiecutter.short_name}}"]
+    tb = ds_garden["living_planet_index"]
 
     #
     # Save outputs.

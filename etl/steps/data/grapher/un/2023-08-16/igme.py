@@ -1,5 +1,9 @@
 """Load a garden dataset and create a grapher dataset."""
 
+from typing import cast
+
+from owid.catalog import Dataset
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -11,10 +15,14 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset()
+    ds_garden = cast(Dataset, paths.load_dependency("igme"))
 
     # Read table from garden dataset.
-    tb = ds_garden["{{cookiecutter.short_name}}"]
+    tb = ds_garden["igme"]
+
+    #
+    # Process data.
+    #
 
     #
     # Save outputs.
