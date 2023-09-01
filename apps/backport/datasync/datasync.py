@@ -40,12 +40,10 @@ def upload_gzip_df(df: pd.DataFrame, s3_path: str, private: bool = False, r2: bo
     # compare md5 of the file with the one in S3, if different, upload
     import time
 
-    t = time.time()
-    md5 = hashlib.sha256(pd.util.hash_pandas_object(df, index=False).values).hexdigest()
-    print("hash time sha256", time.time() - t)
-    t = time.time()
+    # t = time.time()
+    # md5 = hashlib.sha256(pd.util.hash_pandas_object(df, index=False).values).hexdigest()
+    # print("hash time sha256", time.time() - t)
     md5 = joblib.hash(df)
-    print("hash time joblib", time.time() - t)
 
     try:
         response = client.head_object(Bucket=bucket, Key=key)
@@ -74,6 +72,8 @@ def upload_gzip_df(df: pd.DataFrame, s3_path: str, private: bool = False, r2: bo
                     Metadata={"original-hash": md5},
                     **extra_args,
                 )
+    else:
+        print("Dataframe already exists")
 
 
 def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False, r2: bool = False) -> None:
@@ -119,3 +119,5 @@ def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False, r2:
                     Metadata={"original-hash": md5},
                     **extra_args,
                 )
+    else:
+        print("Dictionary already exists")
