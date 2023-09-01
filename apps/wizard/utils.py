@@ -213,9 +213,7 @@ class AppState:
             if step not in st.session_state["steps"]:
                 st.session_state["steps"][step] = {}
         # Initiate default
-        self.default_steps = {
-            step: {} for step in self.steps
-        }
+        self.default_steps = {step: {} for step in self.steps}
 
         # Load config from .wizard
         config = load_wizard_config()
@@ -302,7 +300,9 @@ class AppState:
             return value_defaults
         # (4) Use default_last as last resource
         if default_last is None:
-            raise ValueError(f"No value found for {key} in current, previous or defaults. Must provide a valid `default_value`!")
+            raise ValueError(
+                f"No value found for {key} in current, previous or defaults. Must provide a valid `default_value`!"
+            )
         return cast(str | bool | int, default_last)
 
     def display_error(self: "AppState", key: str) -> None:
