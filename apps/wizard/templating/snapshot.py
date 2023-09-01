@@ -120,6 +120,10 @@ class SnapshotForm(utils.StepForm):
     @property
     def metadata(self: Self) -> Dict[str, Any]:
         """Define metadata for easy YAML-export."""
+        license_field = {
+            "name": self.license_name,
+            "url": self.license_url,
+        }
         meta = {
             "meta": {
                 "origin": {
@@ -136,11 +140,9 @@ class SnapshotForm(utils.StepForm):
                     "dataset_url_download": self.dataset_url_download,
                     "date_published": self.date_published,
                     "date_accessed": self.date_accessed,
-                    "license": {
-                        "name": self.license_name,
-                        "url": self.license_url,
-                    },
+                    "license": license_field,
                 },
+                "license": license_field,
                 "is_public": not self.is_private,
             }
         }
