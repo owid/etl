@@ -282,7 +282,7 @@ def var_metadata_income(var, wel, ext) -> VariableMeta:
     if var == "p0p100_avg" or var == "median":
         meta = VariableMeta(
             title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"""var_dict[var]['description']
+            description=f"""{var_dict[var]['description']}
 
             {inc_cons_dict[wel]['description']}
 
@@ -300,7 +300,7 @@ def var_metadata_income(var, wel, ext) -> VariableMeta:
     else:
         meta = VariableMeta(
             title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"""var_dict[var]['description']
+            description=f"""{var_dict[var]['description']}
 
             {inc_cons_dict[wel]['description']}
 
@@ -323,7 +323,7 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
     if var == "thr":
         meta = VariableMeta(
             title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"""var_dict[var]['description']
+            description=f"""{var_dict[var]['description']}
 
             {inc_cons_dict[wel]['description']}
 
@@ -341,7 +341,7 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
     elif var == "avg":
         meta = VariableMeta(
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"""var_dict[var]['description']
+            description=f"""{var_dict[var]['description']}
 
             {inc_cons_dict[wel]['description']}
 
@@ -360,7 +360,7 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
     else:
         meta = VariableMeta(
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"""var_dict[var]['description']
+            description=f"""{var_dict[var]['description']}
 
             {inc_cons_dict[wel]['description']}
 
@@ -403,6 +403,19 @@ var_dict_distribution = {
     },
 }
 
+# Define welfare variables
+
+welfare_definitions = """Data refers to four types of welfare measures:
+
+- `welfare = "pretax"` is ‘pre-tax’ income — measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.
+
+- `welfare = "posttax_dis"` is ‘post-tax’ income — measured after taxes have been paid and most government benefits have been received, but does not include in-kind benefits and therefore does not add up to national income.
+
+- `welfare = "posttax_nat"` is ‘post-tax’ income — measured after taxes have been paid and most government benefits have been received.
+
+- `welfare = "wealth"` is net national wealth, which is the total value of non-financial and financial assets (housing, land, deposits, bonds, equities, etc.) held by households, minus their debts.
+"""
+
 
 def add_metadata_vars_distribution(tb_garden: Table) -> Table:
     # Get a list of all the variables available
@@ -430,6 +443,8 @@ def var_metadata_distribution(var: str, ext: str) -> VariableMeta:
             title=f"Income or wealth {var_dict_distribution[var]['title'].lower()} ({extrapolation_dict[ext]})",
             description=f"""{var_dict_distribution[var]['description']}
 
+            {welfare_definitions}
+
             {additional_description}""",
             unit=var_dict_distribution[var]["unit"],
             short_unit=var_dict_distribution[var]["short_unit"],
@@ -444,6 +459,8 @@ def var_metadata_distribution(var: str, ext: str) -> VariableMeta:
         meta = VariableMeta(
             title=f"{var_dict_distribution[var]['title']} income or wealth ({extrapolation_dict[ext]})",
             description=f"""{var_dict_distribution[var]['description']}
+
+            {welfare_definitions}
 
             {ppp_description}
 
