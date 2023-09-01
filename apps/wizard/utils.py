@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 import tempfile
+from io import StringIO
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, Type, cast
 
@@ -16,7 +17,6 @@ import jsonref
 import jsonschema
 import ruamel.yaml
 import streamlit as st
-import yaml
 from cookiecutter.main import cookiecutter
 from MySQLdb import OperationalError
 from owid import walden
@@ -128,11 +128,15 @@ def add_to_dag(dag: DAG, dag_path: Path = DAG_WALKTHROUGH_PATH) -> str:
     doc["steps"].update(dag)
 
     with open(dag_path, "w") as f:
+        # Add new step to DAG
         yml = ruamel.yaml.YAML()
         yml.indent(mapping=2, sequence=4, offset=2)
-        yml.dump(doc, f)
-
-    return yaml.dump({"steps": dag})
+        yml.dump(doc, stream=f)
+        # Get subdag as string
+        with StringIO() as string_stream:
+            yml.dump({"steps": dag}, stream=string_stream)
+            output_str = string_stream.getvalue()
+    return output_str
 
 
 def remove_from_dag(step: str, dag_path: Path = DAG_WALKTHROUGH_PATH) -> None:
@@ -142,7 +146,10 @@ def remove_from_dag(step: str, dag_path: Path = DAG_WALKTHROUGH_PATH) -> None:
     doc["steps"].pop(step, None)
 
     with open(dag_path, "w") as f:
-        ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
+        # Add new step to DAG
+        yml = ruamel.yaml.YAML()
+        yml.indent(mapping=2, sequence=4, offset=2)
+        yml.dump(doc, f)
 
 
 def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Path) -> None:
