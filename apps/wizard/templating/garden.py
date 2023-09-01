@@ -39,6 +39,8 @@ def load_instructions() -> str:
 class GardenForm(utils.StepForm):
     """Garden step form."""
 
+    step_name: str = "garden"
+
     short_name: str
     namespace: str
     version: str
@@ -235,13 +237,13 @@ with form_widget.form("garden"):
     APP_STATE.st_widget(
         st.toggle,
         label="Generate playground notebook",
-        key="garden.generate_notebook",
-        default_last=True,
+        key="generate_notebook",
+        default_last=False,
     )
     APP_STATE.st_widget(
         st.toggle,
         label="Make dataset private",
-        key="garden.is_private",
+        key="is_private",
         default_last=False,
     )
 
@@ -362,6 +364,9 @@ if submitted:
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")
+
+        # Update config
+        utils.update_wizard_config(form=form)
     else:
         st.write(form.errors)
         st.error("Form not submitted! Check errors!")

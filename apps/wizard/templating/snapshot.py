@@ -25,7 +25,7 @@ SNAPSHOT_SCHEMA = read_json_schema(SCHEMAS_DIR / "snapshot-schema.json")
 # Get properties for origin in schema
 schema_origin = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["properties"]
 # Lists with fields of special types. By default, fields are text inputs.
-FIELD_TYPES_TEXTAREA = ["origin.dataset_description_owid", "origin.dataset_description_producer"]
+FIELD_TYPES_TEXTAREA = ["origin.dataset_description_owid", "origin.dataset_description_producer", "origin.citation_producer"]
 FIELD_TYPES_SELECT = ["origin.license.name"]
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
@@ -43,6 +43,8 @@ APP_STATE = utils.AppState()
 #########################################################
 class SnapshotForm(utils.StepForm):
     """Interface for snapshot form."""
+
+    step_name: str = "snapshot"
 
     # config
     namespace: str
@@ -592,6 +594,9 @@ if submitted:
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")
+
+        # Update config
+        utils.update_wizard_config(form=form)
     else:
         st.write(form.errors)
         st.error("Form not submitted! Check errors!")
