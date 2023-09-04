@@ -153,11 +153,11 @@ def main(upload: bool) -> None:
     sources_text = """Evidence of laws banning chick culling, and evidence of chick culling being practiced without any ban, has been gathered from various sources for different countries.\n Some of those sources were extracted from [a report by the European Institute for Animal Law & Policy](https://animallaweurope.com/wp-content/uploads/2023/01/Animal-Law-Europe-%E2%80%93-Chick-Killing-Report-2023.pdf): "Chick and Duckling Killing: Achieving an EU-Wide Prohibition" (White paper, January 2023) by Alice Di Concetto, Olivier Morice, Matthias Corion, Simão Santos.\n"""
     for i, row in tb.iterrows():
         sources_text += f"* {row['country']}: {row['status']}. Source: [{row['evidence']}]({row['url']})."
-        if len(row['comments']) > 0:
+        if len(row["comments"]) > 0:
             sources_text += f" {row['comments']}"
         sources_text += "\n"
     # Replace the full citation in the metadata.
-    snap.metadata.origin.citation_producer = sources_text
+    snap.metadata.origin.citation_producer = sources_text  # type: ignore
     # Rewrite metadata to dvc file.
     snap.metadata_path.write_text(snap.metadata.to_yaml())
 

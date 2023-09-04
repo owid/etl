@@ -1,7 +1,6 @@
 import datetime as dt
 import json
 import re
-import shutil
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
