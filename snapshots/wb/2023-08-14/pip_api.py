@@ -478,14 +478,24 @@ def generate_relative_poverty():
             for i in range(len(df)):
                 if ~np.isnan(df["median"].iloc[i]):
                     if country_or_region == "country":
-                        results = pd.read_csv(
-                            f"{PARENT_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_2017.csv"
-                        )
+                        # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
+                        file_path = f"{PARENT_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_2017.csv"
+                        if Path(file_path).is_file():
+                            results = pd.read_csv(file_path)
+                        else:
+                            # Run the main function to get the data
+                            concurrent_relative_function()
+                            results = pd.read_csv(file_path)
 
                     elif country_or_region == "region":
-                        results = pd.read_csv(
-                            f"{PARENT_DIR}/pip_region_data/pip_region_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_ppp_2017.csv"
-                        )
+                        # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
+                        file_path = f"{PARENT_DIR}/pip_region_data/pip_region_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_ppp_2017.csv"
+                        if Path(file_path).is_file():
+                            results = pd.read_csv(file_path)
+                        else:
+                            # Run the main function to get the data
+                            concurrent_relative_region_function()
+                            results = pd.read_csv(file_path)
 
                     headcount_ratio_value = results["headcount"].iloc[0]
                     headcount_ratio_list.append(headcount_ratio_value)
@@ -676,26 +686,40 @@ def generate_percentiles_raw():
 
     for ppp_version in [2011, 2017]:
         for povline in povlines:
-            df_query_country = pd.read_csv(
-                f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
-            )
+            # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
+            file_path_country = f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
+            if Path(file_path_country).is_file():
+                df_query_country = pd.read_csv(file_path_country)
+            else:
+                # Run the main function to get the data
+                concurrent_percentiles_function()
+                df_query_country = pd.read_csv(file_path_country)
+
             df_country = pd.concat([df_country, df_query_country], ignore_index=True)
 
-            df_query_region = pd.read_csv(
+            # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
+            file_path_region = (
                 f"{PARENT_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
             )
+            if Path(file_path_region).is_file():
+                df_query_region = pd.read_csv(file_path_region)
+            else:
+                # Run the main function to get the data
+                concurrent_percentiles_region_function()
+                df_query_region = pd.read_csv(file_path_region)
+
             df_region = pd.concat([df_region, df_query_region], ignore_index=True)
 
     # I check if the set of countries is the same in the df and in the aux table (list of countries)
     aux_dict = pip_aux_tables(table="countries")
     assert set(df_country["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
-        "List of countries is not the same!"
+        "List of countries is not the same as the one defined in PIP!"
     )
 
     # I check if the set of regions is the same in the df and in the aux table (list of regions)
     aux_dict = pip_aux_tables(table="regions")
     assert set(df_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
-        "List of regions is not the same!"
+        "List of regions is not the same as the one defined in PIP!"
     )
 
     # Concatenate df_country and df_region
