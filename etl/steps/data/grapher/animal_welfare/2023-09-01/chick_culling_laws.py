@@ -10,6 +10,13 @@ paths = PathFinder(__file__)
 # Current year.
 CURRENT_YEAR = int(paths.version.split("-")[0])
 
+# Define available status names (they should coincide with those used in snapshot).
+STATUS_BANNED = "Banned"
+STATUS_BANNED_NOT_EFFECTIVE = "Banned but not yet effective"
+STATUS_BANNED_PARTIALLY = "Partially banned"
+STATUS_NOT_BANNED = "No laws"
+STATUS_ALL = {STATUS_BANNED, STATUS_BANNED_NOT_EFFECTIVE, STATUS_BANNED_PARTIALLY, STATUS_NOT_BANNED}
+
 
 def generate_annotations_for_each_country(tb: Table):
     tb_updated = tb.copy()
@@ -17,7 +24,7 @@ def generate_annotations_for_each_country(tb: Table):
     # Add annotations for each country.
     annotations = {}
     # Select countries that have some laws regarding chick culling.
-    countries_with_ban = tb[tb["status"] != "No laws"]["country"].unique()
+    countries_with_ban = tb[tb["status"] != STATUS_NOT_BANNED]["country"].unique()
     for country in countries_with_ban:
         year_effective = tb[tb["country"] == country]["year_effective"].item()
         if year_effective <= CURRENT_YEAR:
@@ -58,6 +65,11 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Check that all status values are defined.
+    assert (
+        status_unknown := (set(tb["status"]) - STATUS_ALL)
+    ) == set(), f"Undefined status of banning: {status_unknown}"
+
     # Add annotations for each country to metadata.
     # NOTE: For now annotations are not shown in map tabs. Possibly in the future they will appear in map tab tooltips.
     tb = generate_annotations_for_each_country(tb=tb)
