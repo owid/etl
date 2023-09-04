@@ -19,8 +19,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Create a new table and ensure all columns are snake-case.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True)
+    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
+    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
@@ -28,5 +28,5 @@ def run(dest_dir: str) -> None:
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
-    # Save changes in the new garden dataset.
+    # Save changes in the new meadow dataset.
     ds_meadow.save()
