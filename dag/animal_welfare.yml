@@ -79,3 +79,12 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
   data://grapher/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
     - data://garden/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food
+  #
+  # Chick culling laws (Various sources, 2023).
+  #
+  data://meadow/animal_welfare/2023-09-01/chick_culling_laws:
+    - snapshot://animal_welfare/2023-09-01/chick_culling_laws.csv
+  data://garden/animal_welfare/2023-09-01/chick_culling_laws:
+    - data://meadow/animal_welfare/2023-09-01/chick_culling_laws
+  data://grapher/animal_welfare/2023-09-01/chick_culling_laws:
+    - data://garden/animal_welfare/2023-09-01/chick_culling_laws
