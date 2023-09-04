@@ -1,0 +1,11 @@
+tables:
+  chick_culling_laws:
+    variables:
+      enforcement_year:
+        title: Enforcement year for a law banning chick culling
+        unit: ""
+        short_unit: ""
+        description_short: A year in the future means that the law is not yet enforce, but it is planned.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
