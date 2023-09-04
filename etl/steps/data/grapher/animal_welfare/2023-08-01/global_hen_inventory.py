@@ -20,7 +20,6 @@ def run(dest_dir: str) -> None:
 
     for col in tb.columns:
         orig_unit = tb[col].metadata.unit
-        tb[col] = tb[col] * 10000
         tb[col].metadata.unit = orig_unit
 
     #
