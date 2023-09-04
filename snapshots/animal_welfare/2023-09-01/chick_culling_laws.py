@@ -25,8 +25,8 @@ def main(upload: bool) -> None:
             "Austria",
             "Banned",
             2023,
-            "Date effective: 2022-07-18. The prohibition was adopted in July 2022 through a law amending the Animal Welfare Act (130. Bundesgesetz, mit dem das Tierschutzgesetz-TSchG und das Tiertransportgesetz geändert werden). Scope excludes male chicks used as feed in zoos or for birds of prey. Destruction of non-hatched is allowed up until 14 day of incubation.",
-            "Section 6(2), Animal Welfare Act",
+            "Date effective: 2022-07-18. The prohibition was adopted in July 2022 through a law amending the Animal Welfare Act. Scope excludes male chicks used as feed in zoos or for birds of prey. Destruction of non-hatched is allowed up until 14 day of incubation.",
+            "Section 6(2), Animal Welfare Act.",
             "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=20003541",
             "Excludes male chicks used as feed in zoos or for birds of prey.",
         ),
@@ -34,8 +34,8 @@ def main(upload: bool) -> None:
             "France",
             "Banned",
             2023,
-            "Date effective: 2022-12-31. The prohibition was adopted on January 2022, through a regulation (Décret n° 2022-137 du 5 février 2022 relatif à l'interdiction de mise à mort des poussins des lignées de l'espèce Gallus gallus destinées à la production d'oeufs de consommation et à la protection des animaux dans le cadre de leur mise à mort en dehors des établissements d'abattage). In ovo sexing technologies benefit from a five-year nonobsolescence clause. Male chicks for animal food production benefit from an exemption. Destruction of non-hatched is allowed up until 15 day of incubation.",
-            "R 214-17 of the Rural Code",
+            "Date effective: 2022-12-31. The prohibition was adopted on January 2022 through a regulation. In ovo sexing technologies benefit from a five-year nonobsolescence clause. Male chicks for animal food production benefit from an exemption. Destruction of non-hatched is allowed up until 15 day of incubation.",
+            "R 214-17 of the Rural Code.",
             "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000028969470",
             "Male chicks for animal food production benefit from an exemption.",
         ),
@@ -44,7 +44,7 @@ def main(upload: bool) -> None:
             "Banned",
             2022,
             "Date effective: 2022-01-01. The prohibition was adopted on January 2022, through a regulation which prohibits the culling of one-day old chicks by 2022, and the culling of fertilized eggs passed the 6th day of incubation. Note: No derogation.",
-            "Section 3 (4c), Animal Welfare Act",
+            "Section 3 (4c), Animal Welfare Act.",
             "https://www.gesetze-im-internet.de/tierschg/BJNR012770972.html",
             "",
         ),
@@ -53,7 +53,7 @@ def main(upload: bool) -> None:
             "Banned but not yet effective",
             2027,
             "Date effective: 2026-12-31. The law prohibits the selective killing of male chicks by December 31st, 2026 and provides exemptions for animal protection purposes only. A decree will later specify the ways in which the law should be implemented. The law does not provide a rule regarding the destruction of non-hatched eggs nor exemptions, other than exemptions for animal health and protection purposes. A decree will likely specify these two aspects.",
-            "Article 18, European Delegation Law (22G00136)",
+            "Article 18, European Delegation Law (22G00136).",
             "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2022-08-04;127",
             "Provides exemptions for animal protection purposes only.",
         ),
@@ -90,7 +90,7 @@ def main(upload: bool) -> None:
             "No laws",
             np.nan,
             "",
-            "Canadian Poultry Magazine (2016-12-19)",
+            "Canadian Poultry Magazine (2016-12-19).",
             "https://www.canadianpoultrymag.com/hypereye-a-game-changer-30033/",
             "",
         ),
@@ -164,7 +164,7 @@ def main(upload: bool) -> None:
     # Add all individual sources to the full citation in the metadata.
     sources_text = """Evidence of laws banning chick culling, and evidence of chick culling being practiced without any ban, has been gathered from various sources for different countries.\n Some of those sources were extracted from [a report by the European Institute for Animal Law & Policy](https://animallaweurope.com/wp-content/uploads/2023/01/Animal-Law-Europe-%E2%80%93-Chick-Killing-Report-2023.pdf): "Chick and Duckling Killing: Achieving an EU-Wide Prohibition" (White paper, January 2023) by Alice Di Concetto, Olivier Morice, Matthias Corion, Simão Santos.\n"""
     for i, row in tb.iterrows():
-        sources_text += f"- {row['country']}: {row['status']}. Source: [{row['evidence']}]({row['url']})."
+        sources_text += f"- {row['country']}: {row['status']}. Source: [{row['evidence']}]({row['url']})"
         if len(row["comments"]) > 0:
             sources_text += f" {row['comments']}"
         sources_text += "\n"
