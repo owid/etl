@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 import tempfile
+from io import StringIO
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, Type, cast
 
@@ -16,7 +17,6 @@ import jsonref
 import jsonschema
 import ruamel.yaml
 import streamlit as st
-import yaml
 from cookiecutter.main import cookiecutter
 from MySQLdb import OperationalError
 from owid import walden
@@ -29,6 +29,7 @@ from etl.db import get_connection
 from etl.files import apply_black_formatter_to_files
 from etl.paths import (
     APPS_DIR,
+    BASE_DIR,
     DAG_DIR,
     LATEST_POPULATION_VERSION,
     LATEST_REGIONS_VERSION,
@@ -72,6 +73,9 @@ MD_MEADOW = APPS_DIR / "wizard" / "templating" / "markdown" / "meadow.md"
 MD_GARDEN = APPS_DIR / "wizard" / "templating" / "markdown" / "garden.md"
 MD_GRAPHER = APPS_DIR / "wizard" / "templating" / "markdown" / "grapher.md"
 
+# PATH WIZARD CONFIG
+WIZARD_CONFIG = BASE_DIR / ".wizard"
+
 
 if WALKTHROUGH_ORIGINS:
     DUMMY_DATA = {
@@ -107,9 +111,6 @@ else:
         "url": "https://www.url-dummy.com/",
     }
 
-# state shared between steps
-APP_STATE = {}
-
 
 def validate_short_name(short_name: str) -> Optional[str]:
     """Validate short name."""
@@ -128,11 +129,15 @@ def add_to_dag(dag: DAG, dag_path: Path = DAG_WALKTHROUGH_PATH) -> str:
     doc["steps"].update(dag)
 
     with open(dag_path, "w") as f:
+        # Add new step to DAG
         yml = ruamel.yaml.YAML()
         yml.indent(mapping=2, sequence=4, offset=2)
-        yml.dump(doc, f)
-
-    return yaml.dump({"steps": dag})
+        yml.dump(doc, stream=f)
+        # Get subdag as string
+        with StringIO() as string_stream:
+            yml.dump({"steps": dag}, stream=string_stream)
+            output_str = string_stream.getvalue()
+    return output_str
 
 
 def remove_from_dag(step: str, dag_path: Path = DAG_WALKTHROUGH_PATH) -> None:
@@ -142,7 +147,10 @@ def remove_from_dag(step: str, dag_path: Path = DAG_WALKTHROUGH_PATH) -> None:
     doc["steps"].pop(step, None)
 
     with open(dag_path, "w") as f:
-        ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
+        # Add new step to DAG
+        yml = ruamel.yaml.YAML()
+        yml.indent(mapping=2, sequence=4, offset=2)
+        yml.dump(doc, f)
 
 
 def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Path) -> None:
@@ -204,16 +212,25 @@ class AppState:
         for step in self.steps:
             if step not in st.session_state["steps"]:
                 st.session_state["steps"][step] = {}
+        # Initiate default
+        self.default_steps = {step: {} for step in self.steps}
 
-        # Add defaults
-        st.session_state["steps"]["snapshot"]["snapshot_version"] = DATE_TODAY
-        st.session_state["steps"]["snapshot"]["origin.date_accessed"] = DATE_TODAY
-        st.session_state["steps"]["meadow"]["version"] = DATE_TODAY
-        st.session_state["steps"]["meadow"]["snapshot_version"] = DATE_TODAY
-        st.session_state["steps"]["garden"]["version"] = DATE_TODAY
-        st.session_state["steps"]["garden"]["meadow_version"] = DATE_TODAY
-        st.session_state["steps"]["grapher"]["version"] = DATE_TODAY
-        st.session_state["steps"]["grapher"]["garden_version"] = DATE_TODAY
+        # Load config from .wizard
+        config = load_wizard_config()
+        # Add defaults (these are used when not value is found in current or previous step)
+        self.default_steps["snapshot"]["snapshot_version"] = DATE_TODAY
+        self.default_steps["snapshot"]["origin.date_accessed"] = DATE_TODAY
+
+        self.default_steps["meadow"]["version"] = DATE_TODAY
+        self.default_steps["meadow"]["snapshot_version"] = DATE_TODAY
+        self.default_steps["meadow"]["generate_notebook"] = config["template"]["meadow"]["generate_notebook"]
+
+        self.default_steps["garden"]["version"] = DATE_TODAY
+        self.default_steps["garden"]["meadow_version"] = DATE_TODAY
+        self.default_steps["garden"]["generate_notebook"] = config["template"]["garden"]["generate_notebook"]
+
+        self.default_steps["grapher"]["version"] = DATE_TODAY
+        self.default_steps["grapher"]["garden_version"] = DATE_TODAY
 
     def _check_step(self: "AppState") -> None:
         """Check that the value for step is valid."""
@@ -249,8 +266,8 @@ class AppState:
         return st.session_state["steps"][self.step]
 
     def default_value(
-        self: "AppState", key: str, previous_step: Optional[str] = None, default_last: Optional[Any] = ""
-    ) -> str:
+        self: "AppState", key: str, previous_step: Optional[str] = None, default_last: Optional[str | bool | int] = ""
+    ) -> str | bool | int:
         """Get the default value of a variable.
 
         This is useful when setting good defaults in widgets (e.g. text_input).
@@ -265,12 +282,28 @@ class AppState:
         if previous_step is None:
             previous_step = self.previous_step
         # (1) Get value stored for this field (in current step)
+        # st.write(f"KEY: {key}")
         value_step = self.state_step.get(key)
-        if value_step:
+        # st.write(f"value_step: {value_step}")
+        if value_step is not None:
             return value_step
         # (2) If none, check if previous step has a value and use that one, otherwise (3) use empty string.
         key = key.replace(f"{self.step}.", f"{self.previous_step}.")
-        return st.session_state["steps"][self.previous_step].get(key, default_last)
+        value_previous_step = st.session_state["steps"][self.previous_step].get(key)
+        # st.write(f"value_previous_step: {value_previous_step}")
+        if value_previous_step is not None:
+            return value_previous_step
+        # (3) If none, use self.default_steps
+        value_defaults = self.default_steps[self.step].get(key)
+        # st.write(f"value_defaults: {value_defaults}")
+        if value_defaults is not None:
+            return value_defaults
+        # (4) Use default_last as last resource
+        if default_last is None:
+            raise ValueError(
+                f"No value found for {key} in current, previous or defaults. Must provide a valid `default_value`!"
+            )
+        return cast(str | bool | int, default_last)
 
     def display_error(self: "AppState", key: str) -> None:
         """Get error message for a given key."""
@@ -335,6 +368,7 @@ class StepForm(BaseModel):
     """Form abstract class."""
 
     errors: Dict[str, Any] = {}
+    step_name: str
 
     def __init__(self: Self, **kwargs: str | int) -> None:
         """Construct parent class."""
@@ -544,3 +578,31 @@ def warning_notion_latest() -> None:
     st.warning(
         "Documentation for new metadata is almost complete, but still being finalised. For latest definitions refer to [Notion](https://www.notion.so/owid/Metadata-guidelines-29ca6e19b6f1409ea6826a88dbb18bcc)."
     )
+
+
+def load_wizard_config() -> Dict[str, Any]:
+    """Load default wizard config."""
+    if os.path.exists(WIZARD_CONFIG):
+        with open(WIZARD_CONFIG, "r") as f:
+            return json.load(f)
+    return {
+        "template": {
+            "meadow": {"generate_notebook": False},
+            "garden": {"generate_notebook": False},
+        }
+    }
+
+
+def update_wizard_config(form: StepForm) -> None:
+    """Update wizard config file."""
+    # Load config
+    config = load_wizard_config()
+
+    # Update config
+    if form.step_name in ["meadow", "garden"]:
+        form_dix = form.dict()
+        config["template"][form.step_name]["generate_notebook"] = form_dix.get("generate_notebook", False)
+
+    # Export config
+    with open(WIZARD_CONFIG, "w") as f:
+        json.dump(config, f)

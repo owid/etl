@@ -18,11 +18,6 @@ def run(dest_dir: str) -> None:
     ds_garden = cast(Dataset, paths.load_dependency("global_hen_inventory"))
     tb = ds_garden["global_hen_inventory"]
 
-    for col in tb.columns:
-        orig_unit = tb[col].metadata.unit
-        tb[col] = tb[col] * 10000
-        tb[col].metadata.unit = orig_unit
-
     #
     # Save outputs.
     #

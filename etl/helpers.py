@@ -987,7 +987,7 @@ def isolated_env(
     sys.path.remove(working_dir.as_posix())
 
 
-def read_json_schema(path: Union[Path, str]) -> dict:
+def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
     """Read JSON schema with resolved references."""
     path = Path(path)
 
@@ -995,4 +995,5 @@ def read_json_schema(path: Union[Path, str]) -> dict:
     base_dir_url = path.parent.absolute().as_uri() + "/"
     base_file_url = urljoin(base_dir_url, path.name)
     with path.open("r") as f:
-        return jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
+        dix = jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
+        return cast(Dict[str, Any], dix)

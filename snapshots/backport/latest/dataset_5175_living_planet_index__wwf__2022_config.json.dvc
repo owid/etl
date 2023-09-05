@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/5175
-    date_accessed: 2023-08-10 09:00:49.444185
+    date_accessed: 2023-08-31 11:19:10.207992
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5175_living_planet_index__wwf__2022
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 304f5e8a80475cb2527a1281263ee8e6
-  size: 4779
+- md5: 767849ad286175cd6b08e0240466454d
+  size: 4809
   path: dataset_5175_living_planet_index__wwf__2022_config.json
