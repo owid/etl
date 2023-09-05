@@ -113,7 +113,7 @@ meta:
       - Sweden: No laws. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
     dataset_url_main: https://animallaweurope.com/news/
     date_accessed: '2023-09-01'
-    date_published: '2023-01-01'
+    date_published: '2023-09-01'
   license:
     name: CC BY 4.0
 wdir: ../../../data/snapshots/animal_welfare/2023-09-01
