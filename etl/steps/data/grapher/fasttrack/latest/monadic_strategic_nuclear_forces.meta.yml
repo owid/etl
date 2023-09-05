@@ -42,7 +42,8 @@ tables:
 
           Equivalent megatons, meaning that small warheads (equal or less than one megaton) are weighted more because they
           are relatively more destructive than large ones.
-        unit: megaton
+        unit: equivalent megatons
+        short_unit: Mt
       nuclwarh_firststr_area:
         title: nuclwarh_firststr_area
         description: >-
@@ -59,4 +60,5 @@ tables:
 
           Approximate area destroyed by one megaton based on: Richelson, Jeffrey. 1980. Evaluating the Strategic Balance.
           American Journal of Political Science 24(4): 782.
-        unit: square kilometer
+        unit: square kilometers
+        short_unit: km²
