@@ -17,16 +17,6 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-
-def combine_extrapolated(df: pd.DataFrame, df_extrapolations: pd.DataFrame) -> pd.DataFrame:
-    """Combine extrapolated and non-extrapolated values in the dataset."""
-
-    # Combine both datasets
-    df = pd.merge(df, df_extrapolations, on=["country", "year"], how="outer", suffixes=("", "_extrapolated"))
-
-    return df
-
-
 # List of countries/regions not included in the ISO2 standard, but added by WID
 iso2_missing = {
     "CN-RU": "China (rural)",
