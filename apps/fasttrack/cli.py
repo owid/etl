@@ -143,7 +143,9 @@ class FasttrackImport:
                 published_by=source_name,
                 source_data_url=sheets_url,
                 date_accessed=str(dt.date.today()),
-                publication_year=dataset_source.publication_year,
+                publication_year=dataset_source.publication_year
+                if not pd.isnull(dataset_source.publication_year)
+                else None,
             )
             origin = None
             license = self.meta.licenses[0]

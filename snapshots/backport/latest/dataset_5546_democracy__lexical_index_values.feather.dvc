@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/5546
-    date_accessed: 2023-08-10 09:19:27.396803
+    date_accessed: 2023-09-05 07:01:42.142676
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Democracy - Lexical Index
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4aa8c3740d70d4fa3e4ee6ea5388851f
-  size: 2807690
+- md5: 03ecb17b370d40f0313e7768ed4a6208
+  size: 5289546
   path: dataset_5546_democracy__lexical_index_values.feather

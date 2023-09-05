@@ -36,6 +36,8 @@ def load_instructions() -> str:
 class GrapherForm(utils.StepForm):
     """Grapher form."""
 
+    step_name: str = "grapher"
+
     short_name: str
     namespace: str
     version: str
@@ -269,6 +271,9 @@ if submitted:
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")
+
+        # Update config
+        utils.update_wizard_config(form=form)
     else:
         st.write(form.errors)
         st.error("Form not submitted! Check errors!")

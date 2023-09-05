@@ -77,6 +77,7 @@ def metadata_export(
 
         # transform variables metadata
         t["variables"] = {}
+        used_titles = {tab[col].metadata.title for col in tab.columns if tab[col].metadata.title}
         for col in tab.columns:
             if col in ("country", "year"):
                 continue
@@ -99,11 +100,16 @@ def metadata_export(
                     col == variable["title"]
                     and utils.underscore(variable["title"]) == variable["title"]
                     and display.get("name")
+                    and display["name"] not in used_titles
                 ):
                     variable["title"] = display.pop("name")
 
                 if not display:
                     variable.pop("display")
+
+            # we can't have duplicate titles
+            if "title" in variable:
+                used_titles.add(variable["title"])
 
             # remove empty descriptions and short units
             if variable.get("description") == "":

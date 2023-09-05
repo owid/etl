@@ -10,12 +10,8 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
 @click.command()
-@click.option(
-    "--upload/--skip-upload",
-    default=True,
-    type=bool,
-    help="Upload dataset to Snapshot",
-){% if cookiecutter.dataset_manual_import == "True" %}
+@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
+{% if cookiecutter.dataset_manual_import == True %}
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
