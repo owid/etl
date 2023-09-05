@@ -1,0 +1,12 @@
+tables:
+  bullfighting_laws:
+    variables:
+      status:
+        title: Banning of bullfighting
+        unit: ""
+        short_unit: ""
+        processing_level: minor
+        presentation:
+          grapher_config:
+            map:
+              hideTimeline: true
