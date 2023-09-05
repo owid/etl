@@ -20,6 +20,6 @@ meta:
   license: {}
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 764596e1eb4bb850ee36d0d2106248b1
-  size: 4786297
+- md5: caa6e9ee99e19b0a648473828f206bfa
+  size: 4811347
   path: democracy_lexical_index.csv
