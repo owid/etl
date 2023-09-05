@@ -4,6 +4,7 @@ steps:
   - snapshot://dummy/2020-01-01/dummy.csv
   data://garden/dummy/2020-01-01/dummy:
   - data://meadow/dummy/2020-01-01/dummy
+  - data://garden/demography/2023-03-31/population
   data://grapher/dummy/2020-01-01/dummy:
   - data://garden/dummy/2020-01-01/dummy
   data://explorers/dummy/2020-01-01/dummy:
