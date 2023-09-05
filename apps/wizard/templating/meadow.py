@@ -39,6 +39,8 @@ def load_instructions() -> str:
 class MeadowForm(utils.StepForm):
     """Meadow step form."""
 
+    step_name: str = "meadow"
+
     short_name: str
     namespace: str
     version: str
@@ -52,7 +54,7 @@ class MeadowForm(utils.StepForm):
     def __init__(self: Self, **data: str | bool) -> None:
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
-        super().__init__(**data, step_name="meadow")
+        super().__init__(**data)
 
     def validate(self: "MeadowForm") -> None:
         """Check that fields in form are valid.
@@ -153,7 +155,7 @@ with form_widget.form("meadow"):
         st.toggle,
         label="Generate playground notebook",
         key="generate_notebook",
-        default_last=True,
+        default_last=False,
     )
     # Private?
     APP_STATE.st_widget(
@@ -231,11 +233,13 @@ if submitted:
         # Preview generated
         st.subheader("Generated files")
         utils.preview_file(step_path, "python")
-        utils.preview_dag_additions(dag_content, dag_path)
+        utils.preview_dag_additions(dag_content=dag_content, dag_path=dag_path)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")
 
+        # Update config
+        utils.update_wizard_config(form=form)
     else:
         st.write(form.errors)
         st.error("Form not submitted! Check errors!")
