@@ -1,18 +1,21 @@
 meta:
-  name: World Bank Poverty and Inequality Platform (WB, 2023)
-  publication_date: '2023-03-28'
-  source_name: World Bank Poverty and Inequality Platform (2023)
-  source_published_by: 'World Bank. (2023). Poverty and Inequality Platform (version
-    {version_ID}) [Data set]. World Bank Group. https://pip.worldbank.org/. Accessed  {date}. '
-  url: https://pip.worldbank.org/
-  source_data_url:
-  license_url: https://datacatalog.worldbank.org/public-licenses
-  license_name: 'Creative Commons Attribution 4.0 (CC-BY 4.0)'
-  date_accessed: 2023-08-14
-  is_public: true
-  description: |
-    The Poverty and Inequality Platform (PIP) is an interactive computational tool that offers users quick access to the World Bank’s estimates of poverty, inequality, and shared prosperity. PIP provides a comprehensive view of global, regional, and country-level trends for more than 160 economies around the world.
-
+  origin:
+    dataset_title_owid: World Bank Poverty and Inequality Platform
+    dataset_title_producer: World Bank Poverty and Inequality Platform
+    dataset_description_producer: |-
+      The Poverty and Inequality Platform (PIP) is an interactive computational tool that offers users quick access to the World Bank’s estimates of poverty, inequality, and shared prosperity. PIP provides a comprehensive view of global, regional, and country-level trends for more than 160 economies around the world.
+    producer: World Bank Poverty and Inequality Platform
+    citation_producer: World Bank (2023). Poverty and Inequality Platform (version
+      20230328_2017 and 20230328_2011) [Data set]. World Bank Group. https://pip.worldbank.org/.
+      Accessed  {date}.
+    attribution_short: World Bank PIP
+    version: 20230328_2017, 20230328_2011
+    dataset_url_main: https://pip.worldbank.org/
+    date_published: 2023-03-28
+    date_accessed: 2023-09-05
+  license:
+    url: https://datacatalog.worldbank.org/public-licenses
+    name: Creative Commons Attribution 4.0 (CC-BY 4.0)
 wdir: ../../../data/snapshots/wb/2023-08-14
 outs:
 - md5: 1e6a63c20394e4768015d0c5b0c30bb5

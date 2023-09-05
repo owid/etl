@@ -2,9 +2,6 @@
 
 from typing import cast
 
-import pandas as pd
-from owid.catalog import Table
-
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
 
@@ -20,13 +17,11 @@ def run(dest_dir: str) -> None:
     snap = cast(Snapshot, paths.load_dependency("world_bank_pip.csv"))
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
+    tb = snap.read()
 
     #
     # Process data.
     #
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
     tb = tb.set_index(
         ["ppp_version", "poverty_line", "country", "year", "reporting_level", "welfare_type"], verify_integrity=True
     ).sort_index()

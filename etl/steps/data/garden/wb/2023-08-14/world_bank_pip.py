@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+# NOTE: Eliminate all notes once I have all the data
 
 from typing import cast
 
@@ -16,6 +17,7 @@ paths = PathFinder(__file__)
 log = get_logger()
 
 # Define absolute poverty lines used depending on PPP version
+# NOTE: Modify if poverty lines are updated from source
 povlines_dict = {
     2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
     2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
@@ -43,17 +45,18 @@ def process_data(tb: Table) -> Table:
     # Calculate income gap ratio (according to Ravallion's definition)
     tb["income_gap_ratio"] = (tb["total_shortfall"] / tb["headcount"]) / tb["poverty_line"]
 
-    # Same for relative poverty
-    for pct in [40, 50, 60]:
-        tb[f"headcount_{pct}_median"] = tb[f"headcount_ratio_{pct}_median"] * tb["reporting_pop"]
-        tb[f"headcount_{pct}_median"] = tb[f"headcount_{pct}_median"].round(0)
-        tb[f"total_shortfall_{pct}_median"] = (
-            tb[f"poverty_gap_index_{pct}_median"] * tb["median"] * pct / 100 * tb["reporting_pop"]
-        )
-        tb[f"avg_shortfall_{pct}_median"] = tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]
-        tb[f"income_gap_ratio_{pct}_median"] = (tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]) / (
-            tb["median"] * pct / 100
-        )
+    # NOTE: Commenting this out for now, waiting for the definitive file.
+    # # Same for relative poverty
+    # for pct in [40, 50, 60]:
+    #     tb[f"headcount_{pct}_median"] = tb[f"headcount_ratio_{pct}_median"] * tb["reporting_pop"]
+    #     tb[f"headcount_{pct}_median"] = tb[f"headcount_{pct}_median"].round(0)
+    #     tb[f"total_shortfall_{pct}_median"] = (
+    #         tb[f"poverty_gap_index_{pct}_median"] * tb["median"] * pct / 100 * tb["reporting_pop"]
+    #     )
+    #     tb[f"avg_shortfall_{pct}_median"] = tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]
+    #     tb[f"income_gap_ratio_{pct}_median"] = (tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]) / (
+    #         tb["median"] * pct / 100
+    #     )
 
     # Shares to percentages
     # executing the function over list of vars
@@ -61,7 +64,7 @@ def process_data(tb: Table) -> Table:
     tb.loc[:, pct_indicators] = tb[pct_indicators] * 100
 
     # Create a new column for the poverty line in cents and string
-    tb["poverty_line_cents"] = (tb["poverty_line"] * 100).astype(int).astype(str)
+    tb["poverty_line_cents"] = round(tb["poverty_line"] * 100).astype(int).astype(str)
 
     # Make the table wide, with poverty_line_cents as columns
     tb = tb.pivot(
@@ -89,42 +92,44 @@ def process_data(tb: Table) -> Table:
             "decile8_share",
             "decile9_share",
             "decile10_share",
-            "decile1_thr",
-            "decile2_thr",
-            "decile3_thr",
-            "decile4_thr",
-            "decile5_thr",
-            "decile6_thr",
-            "decile7_thr",
-            "decile8_thr",
-            "decile9_thr",
+            # NOTE: Commenting this out for now, waiting for the definitive file.
+            # "decile1_thr",
+            # "decile2_thr",
+            # "decile3_thr",
+            # "decile4_thr",
+            # "decile5_thr",
+            # "decile6_thr",
+            # "decile7_thr",
+            # "decile8_thr",
+            # "decile9_thr",
             "is_interpolated",
             "distribution_type",
             "estimation_type",
-            "headcount_40_median",
-            "headcount_50_median",
-            "headcount_60_median",
-            "headcount_ratio_40_median",
-            "headcount_ratio_50_median",
-            "headcount_ratio_60_median",
-            "income_gap_ratio_40_median",
-            "income_gap_ratio_50_median",
-            "income_gap_ratio_60_median",
-            "poverty_gap_index_40_median",
-            "poverty_gap_index_50_median",
-            "poverty_gap_index_60_median",
-            "avg_shortfall_40_median",
-            "avg_shortfall_50_median",
-            "avg_shortfall_60_median",
-            "total_shortfall_40_median",
-            "total_shortfall_50_median",
-            "total_shortfall_60_median",
-            "poverty_severity_40_median",
-            "poverty_severity_50_median",
-            "poverty_severity_60_median",
-            "watts_40_median",
-            "watts_50_median",
-            "watts_60_median",
+            # NOTE: Commenting this out for now, waiting for the definitive file.
+            # "headcount_40_median",
+            # "headcount_50_median",
+            # "headcount_60_median",
+            # "headcount_ratio_40_median",
+            # "headcount_ratio_50_median",
+            # "headcount_ratio_60_median",
+            # "income_gap_ratio_40_median",
+            # "income_gap_ratio_50_median",
+            # "income_gap_ratio_60_median",
+            # "poverty_gap_index_40_median",
+            # "poverty_gap_index_50_median",
+            # "poverty_gap_index_60_median",
+            # "avg_shortfall_40_median",
+            # "avg_shortfall_50_median",
+            # "avg_shortfall_60_median",
+            # "total_shortfall_40_median",
+            # "total_shortfall_50_median",
+            # "total_shortfall_60_median",
+            # "poverty_severity_40_median",
+            # "poverty_severity_50_median",
+            # "poverty_severity_60_median",
+            # "watts_40_median",
+            # "watts_50_median",
+            # "watts_60_median",
         ],
         columns="poverty_line_cents",
         values=[
@@ -148,13 +153,13 @@ def process_data(tb: Table) -> Table:
     return tb
 
 
-def create_stacked_variables(tb: Table, povline_dict: dict, ppp_version: int) -> tuple([Table, list, list]):
+def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -> tuple([Table, list, list]):
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
-
     # Select poverty lines between 2011 and 2017 and sort in case they are not in order
-    povlines = povlines_dict[ppp_version].sort()
+    povlines = povlines_dict[ppp_version]
+    povlines.sort()
 
     # Above variables
 
@@ -258,20 +263,33 @@ def calculate_inequality(tb: Table) -> Table:
     # Multiplies decile columns by 100
     tb.loc[:, col_decile_share] = tb[col_decile_share] * 100
 
+    # Create bottom 50 and middle 40% shares
+    tb["bottom50_share"] = (
+        tb["decile1_share"] + tb["decile2_share"] + tb["decile3_share"] + tb["decile4_share"] + tb["decile5_share"]
+    )
+    tb["middle40_share"] = tb["decile6_share"] + tb["decile7_share"] + tb["decile8_share"] + tb["decile9_share"]
+
     # Palma ratio and other average/share ratios
     tb["palma_ratio"] = tb["decile10_share"] / (
         tb["decile1_share"] + tb["decile2_share"] + tb["decile3_share"] + tb["decile4_share"]
     )
     tb["s80_s20_ratio"] = (tb["decile9_share"] + tb["decile10_share"]) / (tb["decile1_share"] + tb["decile2_share"])
-    tb["p90_p10_ratio"] = tb["decile9_thr"] / tb["decile1_thr"]
-    tb["p90_p50_ratio"] = tb["decile9_thr"] / tb["decile5_thr"]
-    tb["p50_p10_ratio"] = tb["decile5_thr"] / tb["decile1_thr"]
+    # NOTE: Commenting this out for now, waiting for the definitive file.
+    # tb["p90_p10_ratio"] = tb["decile9_thr"] / tb["decile1_thr"]
+    # tb["p90_p50_ratio"] = tb["decile9_thr"] / tb["decile5_thr"]
+    # tb["p50_p10_ratio"] = tb["decile5_thr"] / tb["decile1_thr"]
+
+    return tb
 
 
 def identify_rural_urban(tb: Table) -> Table:
     """
     Amend the entity to reflect if data refers to urban or rural only
     """
+
+    # Make country and reporting_level columns into strings
+    tb["country"] = tb["country"].astype(str)
+    tb["reporting_level"] = tb["reporting_level"].astype(str)
 
     tb.loc[(tb["reporting_level"].isin(["urban", "rural"])), "country"] = (
         tb.loc[(tb["reporting_level"].isin(["urban", "rural"])), "country"]
@@ -291,7 +309,8 @@ def sanity_checks(
     """
 
     # Select poverty lines between 2011 and 2017 and sort in case they are not in order
-    povlines = povlines_dict[ppp_version].sort()
+    povlines = povlines_dict[ppp_version]
+    povlines.sort()
 
     obs_before_checks = len(tb)
 
@@ -313,11 +332,13 @@ def sanity_checks(
         col_watts.append(f"watts_{p}")
         col_poverty_severity.append(f"poverty_severity_{p}")
 
+    # NOTE: Commenting this out for now, waiting for the definitive file.
     for i in range(1, 11):
         col_decile_share.append(f"decile{i}_share")
-        if i != 10:
-            col_decile_thr.append(f"decile{i}_thr")
+    #     if i != 10:
+    #         col_decile_thr.append(f"decile{i}_thr")
 
+    ############################
     # Negative values
     mask = (
         tb[
@@ -332,7 +353,7 @@ def sanity_checks(
             + ["mean", "median", "mld", "gini", "polarization"]
         ]
         .lt(0)
-        .any(1)
+        .any(axis=1)
     )
     tb_error = tb[mask].reset_index(drop=True)
 
@@ -344,6 +365,7 @@ def sanity_checks(
         # NOTE: Check if we want to delete these observations
         # tb = tb[~mask].reset_index(drop=True)
 
+    ############################
     # stacked values not adding up to 100%
     tb["sum_pct"] = tb[col_stacked_pct].sum(axis=1)
     mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9)
@@ -356,70 +378,64 @@ def sanity_checks(
         )
         tb = tb[~mask].reset_index(drop=True)
 
+    ############################
     # missing poverty values (headcount, poverty gap, total shortfall)
     cols_to_check = (
         col_headcount + col_headcount_ratio + col_povertygap + col_tot_shortfall + col_stacked_n + col_stacked_pct
     )
-    mask = tb[cols_to_check].isna().any(1)
+    mask = tb[cols_to_check].isna().any(axis=1)
     tb_error = tb[mask].reset_index(drop=True)
 
     if len(tb_error) > 0:
         log.warning(
             f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount]}"""
         )
         tb = tb[~mask].reset_index(drop=True)
 
+    ############################
     # Missing median
     mask = tb["median"].isna()
     tb_error = tb[mask].reset_index(drop=True)
 
     if len(tb_error) > 0:
-        log.warning(
-            f"""There are {len(tb_error)} observations with missing median. They will be not deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
-        )
+        log.warning(f"""There are {len(tb_error)} observations with missing median. They will be not deleted.""")
 
+    ############################
     # Missing mean
     mask = tb["mean"].isna()
     tb_error = tb[mask].reset_index(drop=True)
 
     if len(tb_error) > 0:
-        log.warning(
-            f"""There are {len(tb_error)} observations with missing mean. They will be not deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
-        )
+        log.warning(f"""There are {len(tb_error)} observations with missing mean. They will be not deleted.""")
 
+    ############################
     # Missing gini
     mask = tb["gini"].isna()
     tb_error = tb[mask].reset_index(drop=True)
 
     if len(tb_error) > 0:
-        log.warning(
-            f"""There are {len(tb_error)} observations with missing gini. They will be not deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
-        )
+        log.warning(f"""There are {len(tb_error)} observations with missing gini. They will be not deleted.""")
 
+    ############################
     # Missing decile shares
-    mask = tb[col_decile_share].isna().any(1)
+    mask = tb[col_decile_share].isna().any(axis=1)
     tb_error = tb[mask].reset_index(drop=True)
 
     if len(tb_error) > 0:
-        log.warning(
-            f"""There are {len(tb_error)} observations with missing decile shares. They will be not deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
-        )
+        log.warning(f"""There are {len(tb_error)} observations with missing decile shares. They will be not deleted.""")
 
+    ############################
     # Missing decile thresholds
-    mask = tb[col_decile_thr].isna().any(1)
+    mask = tb[col_decile_thr].isna().any(axis=1)
     tb_error = tb[mask].reset_index(drop=True)
 
     if len(tb_error) > 0:
         log.warning(
-            f"""There are {len(tb_error)} observations with missing decile thresholds. They will be not deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+            f"""There are {len(tb_error)} observations with missing decile thresholds. They will be not deleted."""
         )
 
+    ############################
     # headcount monotonicity check
     m_check_vars = []
     for i in range(len(col_headcount)):
@@ -427,36 +443,42 @@ def sanity_checks(
             check_varname = f"m_check_{i}"
             tb[check_varname] = tb[f"{col_headcount[i]}"] >= tb[f"{col_headcount[i-1]}"]
             m_check_vars.append(check_varname)
-    tb["check_total"] = tb[m_check_vars].all(1)
+    tb["check_total"] = tb[m_check_vars].all(axis=1)
 
     tb_error = tb[~tb["check_total"]].reset_index(drop=True)
 
     if len(tb_error) > 0:
         log.warning(
             f"""There are {len(tb_error)} observations with headcount not monotonically increasing and will be deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount]}"""
         )
         tb = tb[tb["check_total"]].reset_index(drop=True)
 
-    # Threshold monotonicity check
-    m_check_vars = []
-    for i in range(1, 10):
-        if i > 1:
-            check_varname = f"m_check_{i}"
-            tb[check_varname] = tb[f"decile{i}_thr"] >= tb[f"decile{i-1}_thr"]
-            m_check_vars.append(check_varname)
+    ############################
+    # NOTE: Commenting this out for now, waiting for the definitive file.
+    # # Threshold monotonicity check
+    # m_check_vars = []
+    # for i in range(1, 10):
+    #     if i > 1:
+    #         check_varname = f"m_check_{i}"
+    #         tb[check_varname] = tb[f"decile{i}_thr"] >= tb[f"decile{i-1}_thr"]
+    #         m_check_vars.append(check_varname)
 
-    tb["check_total"] = tb[m_check_vars].all(1)
+    tb["check_total"] = tb[m_check_vars].all(axis=1)
 
-    tb_error = tb[~tb["check_total"]].reset_index(drop=True)
+    # Drop rows if columns in col_decile_thr are all null. Keep if some are null
+    mask = (~tb["check_total"]) & (tb[col_decile_thr].notnull().any(axis=1))
+
+    tb_error = tb[mask].reset_index(drop=True)
 
     if len(tb_error) > 0:
         log.warning(
             f"""There are {len(tb_error)} observations with thresholds not monotonically increasing and will be deleted:
             {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
         )
-        tb = tb[tb["check_total"]].reset_index(drop=True)
+        tb = tb[~mask].reset_index(drop=True)
 
+    ############################
     # Shares monotonicity check
     m_check_vars = []
     for i in range(1, 11):
@@ -465,20 +487,26 @@ def sanity_checks(
             tb[check_varname] = tb[f"decile{i}_share"] >= tb[f"decile{i-1}_share"]
             m_check_vars.append(check_varname)
 
-    tb["check_total"] = tb[m_check_vars].all(1)
+    tb["check_total"] = tb[m_check_vars].all(axis=1)
 
-    tb_error = tb[~tb["check_total"]].reset_index(drop=True)
+    # Drop rows if columns in col_decile_share are all null. Keep if some are null
+    mask = (~tb["check_total"]) & (tb[col_decile_share].notnull().any(axis=1))
+    tb_error = tb[mask].reset_index(drop=True)
 
     if len(tb_error) > 0:
         log.warning(
             f"""There are {len(tb_error)} observations with shares not monotonically increasing and will be deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+            {tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_decile_share]}"""
         )
-        tb = tb[tb["check_total"]].reset_index(drop=True)
+        tb = tb[~mask].reset_index(drop=True)
 
+    ############################
     # Shares not adding up to 100%
+
     tb["sum_pct"] = tb[col_decile_share].sum(axis=1)
-    mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9)
+
+    # Drop rows if columns in col_decile_share are all null. Keep if some are null
+    mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9) & (tb[col_decile_share].notnull().any(axis=1))
     tb_error = tb[mask].reset_index(drop=True)
 
     if len(tb_error) > 0:
@@ -488,11 +516,12 @@ def sanity_checks(
         )
         tb = tb[~mask].reset_index(drop=True)
 
+    ############################
     # delete columns created for the checks
     tb = tb.drop(columns=m_check_vars + ["check_total", "sum_pct"])
 
     obs_after_checks = len(tb)
-    log.info(f"Sanity checks deleted {obs_before_checks - obs_after_checks} observations.")
+    log.info(f"Sanity checks deleted {obs_before_checks - obs_after_checks} observations for {ppp_version} PPPs.")
 
     return tb
 
@@ -504,8 +533,8 @@ def separate_ppp_data(tb: Table) -> tuple([Table, Table]):
 
     # Filter table to include only the right ppp_version
     # Also, drop columns with all NaNs (which are the ones that are not relevant for the ppp_version)
-    tb_2011 = tb[tb["ppp_version"] == 2011].reset_index(drop=True).dropna(axis=1, how="all", ignore_index=True)
-    tb_2017 = tb[tb["ppp_version"] == 2017].reset_index(drop=True).dropna(axis=1, how="all", ignore_index=True)
+    tb_2011 = tb[tb["ppp_version"] == 2011].dropna(axis=1, how="all").reset_index(drop=True)
+    tb_2017 = tb[tb["ppp_version"] == 2017].dropna(axis=1, how="all").reset_index(drop=True)
 
     return tb_2011, tb_2017
 
@@ -557,15 +586,17 @@ def regional_headcount(tb: Table) -> Table:
     """
     Create regional headcount dataset, by patching missing values with the difference between world and regional headcount
     """
+    # Select on
 
     # Keep only regional data: for regions, reporting_level is null
-    tb_regions = tb[tb["reporting_level"].isnull()].reset_index(drop=True)
+    tb_regions = tb[tb["reporting_level"] == "nan"].reset_index(drop=True)
 
     tb_regions = tb_regions[["country", "year", "headcount_215"]]
+
     tb_regions = tb_regions.pivot(index="year", columns="country", values="headcount_215")
 
     # Drop rows with more than one region with null headcount
-    tb_regions["check_total"] = tb_regions[tb_regions.columns].isnull().sum(1)
+    tb_regions["check_total"] = tb_regions[tb_regions.columns].isnull().sum(axis=1)
     mask = tb_regions["check_total"] > 1
 
     tb_out = tb_regions[mask].reset_index()
@@ -579,7 +610,8 @@ def regional_headcount(tb: Table) -> Table:
 
     # Get difference between world and (total) regional headcount, to patch rows with one missing value
     cols_to_sum = [e for e in list(tb_regions.columns) if e not in ["year", "World"]]
-    tb_regions["sum_regions"] = tb_regions[cols_to_sum].sum(1)
+    tb_regions["sum_regions"] = tb_regions[cols_to_sum].sum(axis=1)
+
     tb_regions["diff_world_regions"] = tb_regions["World"] - tb_regions["sum_regions"]
 
     # Fill null values with the difference and drop aux variables
@@ -597,10 +629,12 @@ def regional_headcount(tb: Table) -> Table:
     df_chn_ind = df_chn_ind.pivot(index="year", columns="country", values="headcount_215").reset_index()
     tb_regions = pr.merge(tb_regions, df_chn_ind, on="year", how="left")
 
-    tb_regions["East Asia and Pacific excluding China"] = tb_regions["East Asia and Pacific"] - tb_regions["China"]
-    tb_regions["South Asia excluding India"] = tb_regions["South Asia"] - tb_regions["India"]
+    tb_regions["East Asia and Pacific excluding China"] = (
+        tb_regions["East Asia and Pacific (PIP)"] - tb_regions["China"]
+    )
+    tb_regions["South Asia excluding India"] = tb_regions["South Asia (PIP)"] - tb_regions["India"]
 
-    tb_regions = pr.melt(tb_regions, id_vars=["year"], value_name="headcount_215")
+    tb_regions = pr.melt(tb_regions, id_vars=["year"], var_name="country", value_name="headcount_215")
     tb_regions = tb_regions[["country", "year", "headcount_215"]]
 
     return tb_regions
@@ -613,8 +647,8 @@ def survey_count(tb: Table) -> Table:
     # Remove regions from the table
     tb = tb[~tb["reporting_level"].isnull()].reset_index(drop=True)
 
-    min_year = tb["year"].min()
-    max_year = tb["year"].max()
+    min_year = int(tb["year"].min())
+    max_year = int(tb["year"].max())
     year_list = list(range(min_year, max_year + 1))
     country_list = list(tb["country"].unique())
 
@@ -634,12 +668,7 @@ def survey_count(tb: Table) -> Table:
 
     # Sum for each entity the surveys available for the previous 9 years and the current year
     tb["surveys_past_decade"] = (
-        tb["survey_available"]
-        .groupby(tb["country"], sort=False)
-        .rolling(min_periods=1, window=10)
-        .sum()
-        .astype(int)
-        .values
+        tb["survey_available"].groupby(tb["country"], sort=False).rolling(min_periods=1, window=10).sum().values
     )
     tb = tb[["country", "year", "surveys_past_decade"]]
 
@@ -737,7 +766,11 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tables], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir,
+        tables=[tables],
+        default_metadata=ds_meadow.metadata,
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
