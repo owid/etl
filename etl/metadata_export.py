@@ -77,7 +77,7 @@ def metadata_export(
 
         # transform variables metadata
         t["variables"] = {}
-        used_titles = set()
+        used_titles = {tab[col].metadata.title for col in tab.columns if tab[col].metadata.title}
         for col in tab.columns:
             if col in ("country", "year"):
                 continue

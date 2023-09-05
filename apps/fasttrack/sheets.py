@@ -101,6 +101,9 @@ def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
     if pd.isnull(source.get("date_accessed")):
         source.pop("date_accessed")
 
+    if pd.isnull(source.get("publication_year")):
+        source.pop("publication_year")
+
     # publisher_source is not used anymore
     source.pop("publisher_source", None)
     # short_name is not used anymore
