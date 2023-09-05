@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset.
 
-The data is manually extracted from the snapshot pdf file, specifically from pages 16 and 17.
-
 """
 
 from etl.helpers import PathFinder, create_dataset
