@@ -20,7 +20,9 @@ ENV_FILE = env.get("ENV", BASE_DIR / ".env")
 
 load_dotenv(ENV_FILE)
 
-DEBUG = env.get("DEBUG") == "True"
+# When DEBUG is on
+# - run steps in the same process (speeding up ETL)
+DEBUG = env.get("DEBUG") in ("True", "true", "1")
 
 # publishing to OWID's public data catalog
 S3_BUCKET = "owid-catalog"
@@ -43,6 +45,9 @@ DB_HOST = env.get("DB_HOST", "localhost")
 DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")
 DB_PASS = env.get("DB_PASS", "")
+
+# metaplay config
+METAPLAY_PORT = int(env.get("METAPLAY_PORT", "8051"))
 
 
 def get_username():

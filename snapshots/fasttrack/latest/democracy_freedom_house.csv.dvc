@@ -1,0 +1,25 @@
+meta:
+  source:
+    name: Google Sheet
+    url: https://freedomhouse.org/report/freedom-world
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRXOAxs_t6f-Y3kMGmKc0trQiH2PMWjOxxlHZ1uKd88g_sFMq1zvgaeGO3G15lJdSixh9dCIIqUcBHI/pub?output=csv
+    date_accessed: '2023-09-05'
+    published_by: Google Sheet
+  name: Democracy - Freedom House (2023)
+  description: >-
+    This dataset provides information on political regimes, using data from Freedom
+    House's Freedom in the World (2023).
+
+
+    You can read a description of the data in this post: https://ourworldindata.org/democracies-measurement
+
+
+    You can download the code and complete dataset, including supplementary variables,
+    from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/democracy
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 5407777c1c32eae16bdc68a7dab2dcef
+  size: 629063
+  path: democracy_freedom_house.csv

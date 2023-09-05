@@ -45,6 +45,14 @@ tables:
           Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
       number_deaths_ongoing_conflicts_high:
         title: Number of deaths in ongoing conflicts (high estimate)
         unit: deaths
@@ -56,6 +64,14 @@ tables:
           Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
       number_deaths_ongoing_conflicts_low:
         title: Number of deaths in ongoing conflicts (low estimate)
         unit: deaths
@@ -72,6 +88,14 @@ tables:
           Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
 
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
@@ -85,6 +109,14 @@ tables:
           Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
       number_new_conflicts:
         title: Number of new conflicts
         unit: deaths
@@ -104,3 +136,11 @@ tables:
           Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East

@@ -40,35 +40,42 @@ def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
     Copy metadata for a dataset directly from what we have in Snapshot.
     """
     if snap.origin:
-        assert not snap.source, "Snapshot cannot have both origin and source"
-        return DatasetMeta(
+        ds_meta = DatasetMeta(
             short_name=snap.short_name,
             namespace=snap.namespace,
             version=snap.version,
             # dataset title and description are filled from origin
             title=snap.origin.dataset_title_owid,
             description=snap.origin.dataset_description_owid,
-            origins=[snap.origin],
             licenses=[snap.license] if snap.license else [],
         )
     elif snap.source:
-        assert not snap.origin, "Snapshot cannot have both origin and source"
-        return DatasetMeta(
+        ds_meta = DatasetMeta(
             short_name=snap.short_name,
             namespace=snap.namespace,
             title=snap.name,
             version=snap.version,
             description=snap.description,
-            sources=[snap.source],
             licenses=[snap.license] if snap.license else [],
         )
     else:
         raise ValueError("Snapshot must have either origin or source")
 
+    # we allow both origin and source for backward compatiblity
+    if snap.origin:
+        ds_meta.origins = [snap.origin]
+    if snap.source:
+        ds_meta.sources = [snap.source]
+
+    return ds_meta
+
 
 def convert_grapher_source(s: gm.Source) -> Source:
+    description = s.description.get("additionalInfo") or ""
+
     # append publisher source to description
-    description = f"{s.description.get('additionalInfo')}\nPublisher source: {s.description.get('dataPublisherSource')}"
+    if s.description.get("dataPublisherSource"):
+        description += f"\nPublisher source: {s.description.get('dataPublisherSource')}"
 
     return Source(
         name=s.name,

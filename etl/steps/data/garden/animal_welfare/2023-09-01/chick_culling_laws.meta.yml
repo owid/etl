@@ -1,0 +1,12 @@
+tables:
+  chick_culling_laws:
+    variables:
+      status:
+        title: Banning of chick culling
+        unit: ""
+        short_unit: ""
+        processing_level: minor
+        presentation:
+          grapher_config:
+            map:
+              hideTimeline: true

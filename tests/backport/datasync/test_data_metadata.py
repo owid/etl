@@ -2,8 +2,9 @@ from unittest import mock
 
 import pandas as pd
 import pytest
+from sqlmodel import Session
 
-from backport.datasync.data_metadata import (
+from apps.backport.datasync.data_metadata import (
     _convert_strings_to_numeric,
     _infer_variable_type,
     variable_data,
@@ -50,12 +51,12 @@ def test_variable_metadata():
         "processingLevel": "minor",
         "grapherConfigETL": '{"title": "Population density"}',
         "license": '{"name": "License"}',
-        "keyInfoText": '["Population density"]',
+        "descriptionKey": '["Population density"]',
         "titlePublic": "Population density title",
         "titleVariant": "Population density variant",
         "producerShort": "Gapminder",
         "attribution": None,
-        "processingInfo": None,
+        "descriptionProcessing": None,
         "sourceName": "Gapminder (v6); UN (2022); HYDE (v3.2); Food and Agriculture Organization of the United Nations",
         "sourceDescription": '{"link": "https://www.gapminder.org/data/documentation/gd003/", "retrievedDate": "October 8, 2021", "additionalInfo": "Our World in Data builds...", "dataPublishedBy": "Gapminder (v6); United Nations - Population Division (2022); HYDE (v3.2); World Bank", "dataPublisherSource": null}',
     }
@@ -71,11 +72,12 @@ def test_variable_metadata():
         }
     ]
     topic_tags = ["Population"]
-    with mock.patch("backport.datasync.data_metadata._load_variable", return_value=variable_meta):
-        with mock.patch("backport.datasync.data_metadata._load_origins_df", return_value=origins_df):
-            with mock.patch("backport.datasync.data_metadata._load_faqs", return_value=faqs):
-                with mock.patch("backport.datasync.data_metadata._load_topic_tags", return_value=topic_tags):
-                    meta = variable_metadata(engine, 525715, variable_df)
+    with Session(engine) as session:
+        with mock.patch("apps.backport.datasync.data_metadata._load_variable", return_value=variable_meta):
+            with mock.patch("apps.backport.datasync.data_metadata._load_origins_df", return_value=origins_df):
+                with mock.patch("apps.backport.datasync.data_metadata._load_faqs", return_value=faqs):
+                    with mock.patch("apps.backport.datasync.data_metadata._load_topic_tags", return_value=topic_tags):
+                        meta = variable_metadata(session, 525715, variable_df)
 
     assert meta == {
         "catalogPath": "grapher/owid/latest/key_indicators/population_density",
@@ -105,14 +107,13 @@ def test_variable_metadata():
             "unit": "people per km²",
         },
         "id": 525715,
-        "keyInfoText": ["Population density"],
+        "descriptionKey": ["Population density"],
         "name": "Population density",
         "nonRedistributable": False,
         "origins": [{"datasetDescriptionOwid": "Origin A"}, {"datasetDescriptionOwid": "Origin B"}],
         "presentation": {
             "faqs": [{"fragmentId": "test", "gdocId": "1"}],
             "grapherConfigETL": {"title": "Population density"},
-            "keyInfoText": ["Population density"],
             "producerShort": "Gapminder",
             "titlePublic": "Population density title",
             "titleVariant": "Population density variant",
@@ -169,7 +170,7 @@ def test_variable_data_df_from_s3():
     )
     s3_data = pd.DataFrame({"entities": [1, 1], "values": ["a", 2], "years": [2000, 2001]})
 
-    with mock.patch("pandas.read_sql", return_value=entities):
+    with mock.patch("apps.backport.datasync.data_metadata._fetch_entities", return_value=entities):
         with mock.patch("pandas.read_json", return_value=s3_data):
             df = variable_data_df_from_s3(engine, [123])
 

@@ -60,8 +60,17 @@ def run(dest_dir: str) -> None:
     # Set index
     tb = tb.set_index(["country", "year", "indicator", "subgroup"], verify_integrity=True)
 
+    log.info("health.unaids: fix observed values (NaNs and typos)")
     # Replace '...' with NaN
     tb["obs_value"] = tb["obs_value"].replace("...", np.nan)
+    tb["obs_value"] = tb["obs_value"].replace("3488-56", np.nan)
+    # Remove unwanted indicators
+    log.info("health.unaids: remove unwanted indicators")
+    id_desc_rm = [
+        "National AIDS strategy/policy",
+        "National AIDS strategy/policy includes dedicated budget for gender transformative interventions",
+    ]
+    tb = tb[~tb["indicator_description"].isin(id_desc_rm)]
     # Type
     tb = tb.astype(
         {

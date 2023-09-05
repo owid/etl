@@ -26,11 +26,11 @@ tb --> vb2[variable B2]
 tb --> vb3[variable B3]
 ```
 
-### Catalog ([`owid.catalog.CatalogMixin`](https://github.com/owid/owid-catalog-py/blob/master/owid/catalog/catalogs.py))
+### Catalog ([`owid.catalog.CatalogMixin`](https://github.com/owid/etl/blob/master/lib/catalog/owid/catalog/catalogs.py))
 
-A catalog is set of datasets, represented on disk as a folder of folders.
+A catalog is a collection of datasets, represented on disk as a folder of folders.
 
-### Datasets ([`owid.catalog.Dataset`](https://github.com/owid/owid-catalog-py/blob/master/owid/catalog/datasets.py))
+### Datasets ([`owid.catalog.Dataset`](https://github.com/owid/etl/blob/master/lib/catalog/owid/catalog/datasets.py))
 
 A dataset is a group tables, represented on disk as a folder. Inside the folder, an `index.json` file containing metadata about the dataset as a whole.
 
@@ -38,7 +38,7 @@ The dataset folder is named after the dataset's _short name_, which is a unique 
 
 The folder contains one or more Feather files, each of which represents a _table_.
 
-### Tables ([`owid.catalog.Table`](https://github.com/owid/owid-catalog-py/blob/master/owid/catalog/tables.py))
+### Tables ([`owid.catalog.Table`](https://github.com/owid/etl/blob/master/lib/catalog/owid/catalog/tables.py))
 
 A table is a data file in Feather format (`<short_name>.feather`) or Parquet format (`<short_name>.parquet`) with an accompanying JSON metadata file (`<short_name>.meta.json`).
 
@@ -48,13 +48,13 @@ In Python, the `Table` class is a Pandas `DataFrame` extended to support metadat
 
 The metadata file indicates the primary key of the table, for example:
 
-```yaml
+```json
 { primary_key: ["country", "year"] }
 ```
 
 All variables in the table share the same primary key. Any column of the table that is not in the primary key is considered to be a _variable_.
 
-### Variables ([`owid.catalog.Variable`](https://github.com/owid/owid-catalog-py/blob/master/owid/catalog/variables.py))
+### Variables ([`owid.catalog.Variable`](https://github.com/owid/etl/blob/master/lib/catalog/owid/catalog/variables.py))
 
 Each variable represents a single indicator, and is equivalent to a Pandas `Series`, including its index.
 

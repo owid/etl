@@ -4,11 +4,15 @@
 #
 
 import re
+import sys
 import tempfile
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast
+from urllib.parse import urljoin
 
+import jsonref
 import pandas as pd
 import structlog
 import yaml
@@ -83,7 +87,7 @@ def grapher_checks(ds: catalog.Dataset) -> None:
         assert {"year", "country"} <= set(tab.reset_index().columns), "Table must have columns country and year."
         assert (
             tab.reset_index()["year"].dtype in gh.INT_TYPES
-        ), f"year must be of an integer type but was: {tab['country'].dtype}"
+        ), f"year must be of an integer type but was: {tab['year'].dtype}"
         for col in tab:
             if col in ("year", "country"):
                 continue
@@ -100,6 +104,7 @@ def create_dataset(
     camel_to_snake: bool = False,
     formats: List[FileFormat] = DEFAULT_FORMATS,
     check_variables_metadata: bool = False,
+    run_grapher_checks: bool = True,
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -115,6 +120,7 @@ def create_dataset(
     :param underscore_table: Whether to underscore the table name before adding it to the dataset.
     :param camel_to_snake: Whether to convert camel case to snake case for the table name.
     :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
+    :param run_grapher_checks: Run grapher checks on the dataset, only applies to grapher channel.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -182,6 +188,10 @@ def create_dataset(
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():
             assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
+
+    # run grapher checks
+    if ds.metadata.channel == "grapher" and run_grapher_checks:
+        grapher_checks(ds)
 
     return ds
 
@@ -549,15 +559,15 @@ class PathFinder:
 
         return dataset
 
-    def load_snapshot_dependency(self) -> Snapshot:
-        """Load snapshot dependency with the same name."""
-        snap = self.load_dependency(channel="snapshot", short_name=self.short_name)
+    def load_snapshot(self, short_name: Optional[str] = None) -> Snapshot:
+        """Load snapshot dependency. short_name defaults to the current step's short_name."""
+        snap = self.load_dependency(channel="snapshot", short_name=short_name or self.short_name)
         assert isinstance(snap, Snapshot)
         return snap
 
-    def load_dataset_dependency(self) -> catalog.Dataset:
-        """Load dataset dependency with the same name."""
-        dataset = self.load_dependency(short_name=self.short_name)
+    def load_dataset(self, short_name: Optional[str] = None) -> catalog.Dataset:
+        """Load dataset dependency. short_name defaults to the current step's short_name."""
+        dataset = self.load_dependency(short_name=short_name or self.short_name)
         assert isinstance(dataset, catalog.Dataset)
         return dataset
 
@@ -946,3 +956,44 @@ def print_tables_metadata_template(tables: List[Table]):
     dict_output = {"tables": dict_tables}
 
     print(yaml.dump(dict_output, default_flow_style=False, sort_keys=False))
+
+
+@contextmanager
+def isolated_env(
+    working_dir: Path, keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas"
+) -> Generator[None, None, None]:
+    """Add given directory to pythonpath, run code in context, and
+    then remove from pythonpath and unimport modules imported in context.
+
+    Note that unimporting modules means they'll have to be imported again, but
+    it has minimal impact on performance (ms).
+
+    :param keep_modules: regex of modules to keep imported
+    """
+    # add module dir to pythonpath
+    sys.path.append(working_dir.as_posix())
+
+    # remember modules that were imported before
+    imported_modules = set(sys.modules.keys())
+
+    yield
+
+    # unimport modules imported during execution unless they match `keep_modules`
+    for module_name in set(sys.modules.keys()) - imported_modules:
+        if not re.search(keep_modules, module_name):
+            sys.modules.pop(module_name)
+
+    # remove module dir from pythonpath
+    sys.path.remove(working_dir.as_posix())
+
+
+def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
+    """Read JSON schema with resolved references."""
+    path = Path(path)
+
+    # pathlib does not append trailing slashes, but jsonref needs that.
+    base_dir_url = path.parent.absolute().as_uri() + "/"
+    base_file_url = urljoin(base_dir_url, path.name)
+    with path.open("r") as f:
+        dix = jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
+        return cast(Dict[str, Any], dix)

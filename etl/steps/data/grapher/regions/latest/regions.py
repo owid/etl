@@ -304,7 +304,9 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[regions], default_metadata=ds_garden.metadata, formats=["csv"])
+    ds_grapher = create_dataset(
+        dest_dir, tables=[regions], default_metadata=ds_garden.metadata, formats=["csv"], run_grapher_checks=False
+    )
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

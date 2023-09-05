@@ -2,7 +2,7 @@
 
 ??? warning "Our API is in beta"
 
-    We currently only provide a python API. Our hope is to extend this to other languages in the future. Please [report any issue](https://github.com/owid/owid-catalog-py) that you may find.
+    We currently only provide a python API. Our hope is to extend this to other languages in the future. Please [report any issue](https://github.com/owid/etl) that you may find.
 
 Our mission is to make research and data on the world's biggest problems accessible and understandable to the public. As part of this work, we provide an experimental API to the datasets.
 

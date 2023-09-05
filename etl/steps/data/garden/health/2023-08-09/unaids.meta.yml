@@ -259,3 +259,26 @@ tables:
         description: >-
           Number of newly HIV infected people in a year.
         processing_level: minor
+
+      resource_avail_constant:
+        title: "Estimated HIV resource availability for low- and middle-income countries in constant 2019 USD"
+        short_unit: "$"
+        unit: "constant 2019 US$"
+        description: >-
+          Availability of resources for HIV in low- and middle-income countries in constant 2019 USD.
+        processing_level: minor
+        display:
+          name: Estimated HIV resource availability for low- and middle-income countries
+          numDecimalPlaces: 0
+
+      resource_needs_ft:
+        title: "Estimated resource needs"
+        short_unit: "$"
+        unit: "constant 2019 US$"
+        description: >-
+          Estimated resource needs for HIV in low- and middle-income countries in constant 2019 USD.
+        processing_level: minor
+        display:
+          name: Estimated resource needs to meet HIV targets
+          numDecimalPlaces: 0
+

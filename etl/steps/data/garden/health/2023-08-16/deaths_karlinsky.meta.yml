@@ -1,0 +1,63 @@
+tables:
+  deaths_karlinsky:
+    variables:
+      reg_deaths:
+        title: Registered deaths
+        unit: "deaths"
+        description: >-
+          The number of deaths registered in the vital registration system for the country-year.
+        display:
+          numDecimalPlaces: 0
+
+      expected_wpp:
+        title: Expected number of deaths (WPP 2019)
+        unit: deaths
+        description: >-
+          The number of deaths expected to occur for the country-year from World Population Prospects 2019.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Expected number of deaths
+          producer_short: WPP 2019
+
+      expected_gbd:
+        title: Expected number of deaths (GBD 2019)
+        unit: deaths
+        description: >-
+          The number of deaths expected to occur for the country-year from Global Burden of Disease 2019.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Expected number of deaths
+          producer_short: GBD 2019
+
+      expected_ghe:
+        title: Expected number of deaths (GHE 2019)
+        unit: deaths
+        description: >-
+          The number of deaths expected to occur for the country-year from Global Health Estimates 2019.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Expected number of deaths
+          producer_short: GHE 2019
+
+      expected_deaths:
+        title: Expected number of deaths
+        unit: deaths
+        description: >-
+          The mean of the expected number of deaths from sources: WPP 2019, GBD 2019 and GHE 2019.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Expected number of deaths
+          producer_short: WPP 2019
+
+      death_comp:
+        title: Estimated completeness of death reporting
+        short_unit: "%"
+        unit: "%"
+        description: >-
+          It ranges from 0 to 100. Derived as "Registered deaths" divided by "Expected number of deaths". See paper (https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1) for details.
+        display:
+          numDecimalPlaces: 1

@@ -1,0 +1,172 @@
+dataset:
+  title: History of war (Gibler and Miller, 2020)
+  description: >-
+      This dataset contains information on interstate conflicts in the period of 1816 and 2014.
+
+
+      It has been constructed using the Militarized Interstate Events (MIE) Dataset (version 1) by D. M. Gibler and S. V. Miller.
+
+      Regions: The regions are defined based on Gleditsch and Ward codes (GWno). Find complete mapping at
+      https://dornsife.usc.edu/assets/sites/298/docs/country_to_gwno_PUBLIC_6-5-2015.txt
+
+      • Americas: 2-199
+
+      • Europe: 200-399
+
+      • Africa: 400-626
+
+      • Middle East: 630-699
+
+      • Asia: 700-999
+
+
+tables:
+  mie:
+    variables:
+      number_ongoing_conflicts:
+        title: Number of ongoing conflicts
+        unit: conflicts
+        description: >-
+          Number of ongoing disputes in a given year.
+
+
+          We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions.
+          The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+
+
+          The same conflict can have different "hostility level" for different regions. When this is the case, we classify its global
+          hostility level as the most hostile level based on the following rank (from less to most hostile):
+
+
+            1: No militarized action
+
+            2: Threat to use force
+
+            3: Display of force
+
+            4: Use of force
+
+            5: War
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+              - Oceania
+      number_new_conflicts:
+        title: Number of new conflicts
+        unit: conflicts
+        description: >-
+          Number of new disputes in a given year.
+
+
+          • New disputes for the 'World': We only count a dispute as new when the dispute overall started that year, not if it restarted
+          or its hostility level changed.
+
+          • New disputes for all regions (except 'World'): We count a dispute as new in a region even if the dispute overall started
+          earlier in another region. The sum across all regions can therefore be higher than the total number of new disputes.
+
+          • New disputes by hostility level: We only count a dispute as new when the dispute overall started that year, not if it changed
+          its hostility level.
+
+
+          Consequently, the number of new conflicts globally might be lower than the sum across all regions. This can be due to multiple reasons:
+          (i) the same conflict occurs in multiple regions or (ii) a conflict starting in a region, but it already started earlier globally
+          (in another region).
+
+
+          The same conflict can have different "hostility level" for different regions. When this is the case, we classify its global
+          hostility level as the most hostile level based on the following rank (from less to most hostile):
+
+
+            1: No militarized action
+
+            2: Threat to use force
+
+            3: Display of force
+
+            4: Use of force
+
+            5: War
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+              - Oceania
+      number_deaths_ongoing_conflicts_low:
+        title: Number of deaths in ongoing conflicts (low estimate)
+        unit: deaths
+        description: >-
+          Sum of all low-estimates of military battle-deaths in a year.
+
+
+          The same conflict can have different "hostility level" for different regions. When this is the case, we classify its global
+          hostility level as the most hostile level based on the following rank (from less to most hostile):
+
+
+            1: No militarized action
+
+            2: Threat to use force
+
+            3: Display of force
+
+            4: Use of force
+
+            5: War
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+              - Oceania
+      number_deaths_ongoing_conflicts_high:
+        title: Number of deaths in ongoing conflicts (high estimate)
+        unit: deaths
+        description: >-
+          Sum of all high-estimates of military battle-deaths in a year.
+
+
+          The same conflict can have different "hostility level" for different regions. When this is the case, we classify its global
+          hostility level as the most hostile level based on the following rank (from less to most hostile):
+
+
+            1: No militarized action
+
+            2: Threat to use force
+
+            3: Display of force
+
+            4: Use of force
+
+            5: War
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+              - Oceania

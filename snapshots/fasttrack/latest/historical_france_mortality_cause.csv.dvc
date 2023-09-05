@@ -4,21 +4,62 @@ meta:
     url: https://www.demographic-research.org/Volumes/Vol36/21/
     source_data_url: 
       https://docs.google.com/spreadsheets/d/e/2PACX-1vSUInsCt97X8kjDGENSZm5-xLSbE_P4MEAW4bYkGHn-KN5aVWQ4VAm3JzziskCUTkFQuWQVinWtLO_I/pub?output=csv
-    date_accessed: '2023-08-14'
-    publication_year: 2014
+    date_accessed: '2023-08-18'
+    publication_year: '2014'
     published_by: Google Sheet
   name: Database on causes of death in France from 1925 to 1999
-  description: Dataset on mortality rates from each cause of death category in France
-    between 1925 and 1999. The underlying data for this chart comes from the Institut
-    National d'Études Démographiques, which covers causes of deaths nationally in
-    France between 1925 and 1999. Causes of death were categorized into categories
-    according to the 9th edition of the International Classification of Diseases (ICD-9)
-    manual. Mortality rates are given for five-year age bands, as an annual rate out
-    of 100,000 people in that age group.
+  description: >-
+    Dataset on mortality rates from each cause of death category in France between
+    1925 and 1999. The underlying data for
+    this chart comes from the Institut National d'Études Démographiques, published
+    by Jacques Vallin and France Meslé, and
+    covers causes of deaths nationally in France between 1925 and 1999. Causes of
+    death were categorized into categories according
+    to the 9th edition of the International Classification of Diseases (ICD-9) manual.
+    Mortality rates are given for five-year
+    age bands, as an annual rate out of 100,000 people in that age group. Below are
+    the ICD codes used for each cause category:
+    All causes = 000*-999*,
+
+    Infectious and parasitic diseases = 001*-139*,
+
+    Neoplasms = 140*-239*,
+
+    Endocrine nutritional and metabolic diseases and immunity disorders = 240*-279*,
+
+    Diseases of the blood and blood-forming organs = 280*-289*,
+
+    Mental disorders = 290*-319*,
+
+    Diseases of the nervous system = 320*-359*,
+
+    Diseases of the sense organs = 360*-389*,
+
+    Diseases of the circulatory system = 390*-459*,
+
+    Diseases of the respiratory system = 460*-519*,
+
+    Diseases of the digestive system = 520*-579*,
+
+    Diseases of the genitourinary system = 580*-629*,
+
+    Complications of pregnancy childbirth and the puerperium = 630*-679*,
+
+    Diseases of the skin and subcutaneous tissue = 680*-709*,
+
+    Diseases of the musculoskeletal system and connective tissue = 710*-739*,
+
+    Congenital anomalies = 740*-759*,
+
+    Certain conditions originating in the perinatal period = 760*-779*,
+
+    Symptoms signs and ill-defined conditions = 780*-799*,
+
+    External causes (injury and poisoning) = 800*-999*
   license: {}
   is_public: false
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 3d0a8271f21243e833aa2c23e6a19094
-  size: 627473
+- md5: 856b79cf2b8b9e0ba868c7d4084c7c4a
+  size: 629827
   path: historical_france_mortality_cause.csv

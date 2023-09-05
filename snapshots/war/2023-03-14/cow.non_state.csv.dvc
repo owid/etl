@@ -1,7 +1,7 @@
 meta:
   namespace: war
   short_name: war_cow
-  name: "War data: Non-State Wars v4.0 (COW, 2010)"
+  name: 'War data: Non-State Wars v4.0 (COW, 2010)'
   version: 2023-03-14
   publication_year: 2010
   publication_date: 2010-01-27

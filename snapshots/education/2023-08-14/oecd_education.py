@@ -65,15 +65,20 @@ def main(upload: bool) -> None:
     # Extract data from each regional file and store in separate DataFrames
     for variable_name, file_name in zip(variable_names, region_files):
         filepath = os.path.join(directory, file_name)
-        dfs_regions.append(extract_ed_attainment_average_years_regions(filepath, variable_name))
+        df = extract_ed_attainment_average_years_regions(filepath, variable_name)
+        df["country_or_region"] = df["country_or_region"].str.replace(r"\s+", " ", regex=True)
+        dfs_regions.append(df)
     # Combine the extracted regional DataFrames into one
     dfs_regions = pd.merge(dfs_regions[0], dfs_regions[1], on=["year", "country_or_region"], how="outer")
 
     # Extract data related to literacy and average years of education
     filepath_literacy = os.path.join(directory, "9789264214262-graph27-en.xls")
     df_literacy = extract_literacy_ed_attainment(filepath_literacy)
+    df_literacy["country_or_region"] = df_literacy["country_or_region"].str.replace(r"\s+", " ", regex=True)
+
     filepath_ed_years = os.path.join(directory, "9789264214262-table30-en.xls")
     df_ed_years = extract_average_years_education_countries(filepath_ed_years)
+    df_ed_years["country_or_region"] = df_ed_years["country_or_region"].str.replace(r"\s+", " ", regex=True)
 
     # Merge the three datasets on year and country/region
     all_dfs = pd.merge(dfs_regions, df_literacy, on=["year", "country_or_region"], how="outer")

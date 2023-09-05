@@ -100,7 +100,7 @@ def run(dest_dir: str) -> None:
     tb["n_farmed_decapod_crustaceans_low"] *= 1e6
     tb["n_farmed_decapod_crustaceans_high"] *= 1e6
 
-    # Add midpoint number of farmed fish.
+    # Add midpoint number of decapod crustaceans.
     tb["n_farmed_decapod_crustaceans"] = (
         tb["n_farmed_decapod_crustaceans_low"] + tb["n_farmed_decapod_crustaceans_high"]
     ) / 2

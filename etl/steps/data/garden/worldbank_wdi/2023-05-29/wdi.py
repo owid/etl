@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset_dependency()
+    ds_meadow = paths.load_dataset()
 
     #
     # Process data.
@@ -339,7 +339,7 @@ def mk_custom_entities(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def load_variable_metadata() -> pd.DataFrame:
-    snap = paths.load_snapshot_dependency()
+    snap = paths.load_snapshot()
     zf = zipfile.ZipFile(snap.path)
     df_vars = pd.read_csv(zf.open("WDISeries.csv"))
 

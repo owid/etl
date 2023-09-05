@@ -652,7 +652,7 @@ class Table(pd.DataFrame):
             parents=parents,
             variable_names=variable_names,
             comment=comment,
-            inplace=inplace,
+            inplace=inplace,  # type: ignore
         )
 
     def amend_log(
@@ -1075,6 +1075,20 @@ def read_csv(
     return cast(Table, table)
 
 
+def read_feather(
+    filepath: Union[str, Path],
+    metadata: Optional[TableMeta] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_feather(filepath, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = update_log(table=table, operation="load", parents=[filepath])
+
+    return cast(Table, table)
+
+
 def read_excel(
     io: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
 ) -> Table:
@@ -1097,7 +1111,7 @@ def read_from_records(data: Any, *args, metadata: Optional[TableMeta] = None, un
 
 def read_from_dict(
     data: Dict[Any, Any], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
-):
+) -> Table:
     table = Table(pd.DataFrame.from_dict(data=data, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
     # NOTE: Parents could be passed as arguments, or extracted from metadata.
@@ -1248,7 +1262,7 @@ def update_log(
     parents: Optional[List[Any]] = None,
     variable_names: Optional[List[str]] = None,
     comment: Optional[str] = None,
-    inplace: bool = True,
+    inplace: Literal[True] = True,
 ) -> None:
     ...
 
@@ -1260,7 +1274,7 @@ def update_log(
     parents: Optional[List[Any]] = None,
     variable_names: Optional[List[str]] = None,
     comment: Optional[str] = None,
-    inplace: bool = False,
+    inplace: Literal[False] = False,
 ) -> Table:
     ...
 
@@ -1351,13 +1365,8 @@ def get_unique_origins_from_tables(tables: List[Table]) -> List[Origin]:
     # Make a list of all origins of all variables in all tables.
     origins = sum([table._fields[column].origins for table in tables for column in list(table.all_columns)], [])
 
-    # Get unique array of tuples of origin fields (respecting the order).
-    unique_origins_array = pd.unique([tuple(origin.to_dict().items()) for origin in origins])
-
-    # Make a list of unique origins.
-    unique_origins = [Origin.from_dict(dict(origin)) for origin in unique_origins_array]  # type: ignore
-
-    return unique_origins
+    # Get unique array of tuples of source fields (respecting the order).
+    return pd.unique(origins).tolist()
 
 
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:

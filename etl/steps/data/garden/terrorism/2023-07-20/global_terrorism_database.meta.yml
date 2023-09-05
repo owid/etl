@@ -7,6 +7,9 @@ dataset:
 
 
     For target and attack type OWID GTD typically records only one attack/target type for each incident, recorded in columns targtype1 and attacktype1. OWID uses these two indicators, even though there are some events with several targets/methods.
+
+
+    Because the data is based on news reports, attacks and deaths may be underreported in countries with sparser media, especially during early years.
   licenses:
   - name: Copyright University of Maryland 2022
     url: https://www.start.umd.edu/gtd/terms-of-use/
@@ -19,6 +22,9 @@ dataset:
 
 
       For target and attack type OWID GTD typically records only one attack/target type for each incident, recorded in columns targtype1 and attacktype1. OWID uses these two indicators, even though there are some events with several targets/methods.
+
+
+      Because the data is based on news reports, attacks and deaths may be underreported in countries with sparser media, especially during early years.
     url: https://www.start.umd.edu/gtd/
     date_accessed: '2023-07-20'
     publication_year: 2022

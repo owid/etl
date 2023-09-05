@@ -103,8 +103,6 @@ class Entity(SQLModel, table=True):
     displayName: str = Field(sa_column=Column("displayName", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     code: Optional[str] = Field(default=None, sa_column=Column("code", String(255, "utf8mb4_0900_as_cs")))
 
-    data_values: List["DataValues"] = Relationship(back_populates="entities")
-
 
 class Namespace(SQLModel, table=True):
     __tablename__: str = "namespaces"  # type: ignore
@@ -834,15 +832,14 @@ class Variable(SQLModel, table=True):
     attribution: Optional[str] = Field(default=None, sa_column=Column("attribution", LONGTEXT))
     descriptionShort: Optional[str] = Field(default=None, sa_column=Column("descriptionShort", LONGTEXT))
     descriptionFromProducer: Optional[str] = Field(default=None, sa_column=Column("descriptionFromProducer", LONGTEXT))
-    keyInfoText: Optional[List[str]] = Field(default=None, sa_column=Column("keyInfoText", JSON))
-    processingInfo: Optional[str] = Field(default=None, sa_column=Column("processingInfo", LONGTEXT))
+    descriptionKey: Optional[List[str]] = Field(default=None, sa_column=Column("descriptionKey", JSON))
+    descriptionProcessing: Optional[str] = Field(default=None, sa_column=Column("descriptionProcessing", LONGTEXT))
     licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
     license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="variables")
-    data_values: List["DataValues"] = Relationship(back_populates="variables")
     origins: List["Origin"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
     posts_gdocs: List["PostsGdocs"] = Relationship(back_populates="posts_gdocs", link_model=PostsGdocsVariablesFaqsLink)
 
@@ -895,8 +892,8 @@ class Variable(SQLModel, table=True):
             ds.attribution = self.attribution
             ds.descriptionShort = self.descriptionShort
             ds.descriptionFromProducer = self.descriptionFromProducer
-            ds.keyInfoText = self.keyInfoText
-            ds.processingInfo = self.processingInfo
+            ds.descriptionKey = self.descriptionKey
+            ds.descriptionProcessing = self.descriptionProcessing
             ds.licenses = self.licenses
             ds.license = self.license
             ds.updatedAt = datetime.utcnow()
@@ -944,8 +941,8 @@ class Variable(SQLModel, table=True):
         # TODO: implement `topicTagsLinks`
         presentation_dict.pop("topicTagsLinks", None)
 
-        if "keyInfoText" in presentation_dict:
-            assert isinstance(presentation_dict["keyInfoText"], list), "keyInfoText should be a list of bullet points"
+        if metadata.description_key:
+            assert isinstance(metadata.description_key, list), "descriptionKey should be a list of bullet points"
 
         # rename grapherConfig to grapherConfigETL
         if "grapherConfig" in presentation_dict:
@@ -968,6 +965,7 @@ class Variable(SQLModel, table=True):
             processingLevel=metadata.processing_level,
             descriptionShort=metadata.description_short,
             descriptionFromProducer=metadata.description_from_producer,
+            descriptionKey=metadata.description_key,
             licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
             license=metadata.license.to_dict() if metadata.license else None,
             **presentation_dict,
@@ -980,6 +978,18 @@ class Variable(SQLModel, table=True):
     @classmethod
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
         return session.exec(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
+
+    @classmethod
+    def load_from_catalog_path(cls, catalog_path: str, session: Optional[Session] = None) -> "Variable":
+        def _run(ses: Session):
+            return ses.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
+
+        if session is None:
+            with Session(get_engine()) as session:
+                variable = _run(session)
+        else:
+            variable = _run(session)
+        return variable
 
     def delete_links(self, session: Session):
         """
@@ -1079,27 +1089,6 @@ t_country_latest_data = Table(
 )
 
 
-# data_values table is gonna be deprecated!
-class DataValues(SQLModel, table=True):
-    __tablename__: str = "data_values"  # type: ignore
-    __table_args__ = (
-        ForeignKeyConstraint(["entityId"], ["entities.id"], name="data_values_entityId_entities_id"),
-        ForeignKeyConstraint(["variableId"], ["variables.id"], name="data_values_variableId_variables_id"),
-        Index("data_values_fk_ent_id_fk_var_id_year_e0eee895_uniq", "entityId", "variableId", "year", unique=True),
-        Index("data_values_variableId_variables_id", "variableId"),
-        Index("data_values_year", "year"),
-        {"extend_existing": True},
-    )
-
-    value: str = Field(sa_column=Column("value", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    year: int = Field(sa_column=Column("year", Integer, primary_key=True, nullable=False))
-    entityId: int = Field(sa_column=Column("entityId", Integer, primary_key=True, nullable=False))
-    variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
-
-    entities: Optional["Entity"] = Relationship(back_populates="data_values")
-    variables: Optional["Variable"] = Relationship(back_populates="data_values")
-
-
 class Origin(SQLModel, table=True):
     """Get CREATE TABLE statement for origins table with
     ```
@@ -1121,7 +1110,7 @@ class Origin(SQLModel, table=True):
     citationProducer: Optional[str] = None
     attribution: Optional[str] = None
     attributionShort: Optional[str] = None
-    version: Optional[str] = None
+    versionProducer: Optional[str] = None
     datasetUrlMain: Optional[str] = None
     datasetUrlDownload: Optional[str] = None
     dateAccessed: Optional[date] = None
@@ -1142,7 +1131,7 @@ class Origin(SQLModel, table=True):
             datasetTitleProducer=origin.dataset_title_producer,
             attribution=origin.attribution,
             attributionShort=origin.attribution_short,
-            version=origin.version,
+            versionProducer=origin.version_producer,
             license=origin.license.to_dict() if origin.license else None,
             datasetUrlMain=origin.dataset_url_main,
             datasetUrlDownload=origin.dataset_url_download,
@@ -1165,7 +1154,7 @@ class Origin(SQLModel, table=True):
             cls.datasetTitleProducer == self.datasetTitleProducer,
             cls.attribution == self.attribution,
             cls.attributionShort == self.attributionShort,
-            cls.version == self.version,
+            cls.versionProducer == self.versionProducer,
             cls.datasetUrlMain == self.datasetUrlMain,
             cls.datasetUrlDownload == self.datasetUrlDownload,
             cls.datasetDescriptionOwid == self.datasetDescriptionOwid,
