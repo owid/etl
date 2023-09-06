@@ -8,5 +8,7 @@ tables:
         processing_level: minor
         presentation:
           grapher_config:
+            title: Which countries have banned chick culling?
             map:
               hideTimeline: true
+            note: "Switzerland has only partially banned chick culling because grinding is banned but gassing is still allowed."
