@@ -72,7 +72,7 @@ def run(dest_dir: str) -> None:
             ].apply(pd.to_numeric, errors="coerce")
 
             # Drop datasets LIS is not promoting
-            df = df[~df["dataset"].isin(drop_datasets_list)].reset_index()
+            df = df[~df["dataset"].isin(drop_datasets_list)].reset_index(drop=True)
 
             # Extract country and year from dataset
             df["country"] = df["dataset"].str[:2].str.upper()
