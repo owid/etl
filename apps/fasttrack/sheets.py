@@ -154,10 +154,10 @@ def _parse_dataset(dataset_meta_df: pd.DataFrame) -> DatasetMeta:
     # deprecated field
     dataset_dict.pop("sources", None)
 
+    license = License(name=dataset_dict.pop("license_name", None), url=dataset_dict.pop("license_url", None))
+
     dataset_meta = DatasetMeta(**dataset_dict)
-    dataset_meta.licenses = [
-        License(name=dataset_dict.pop("license_name", None), url=dataset_dict.pop("license_url", None))
-    ]
+    dataset_meta.licenses = [license]
 
     return dataset_meta
 
