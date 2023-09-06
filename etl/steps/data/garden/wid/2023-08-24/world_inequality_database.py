@@ -81,8 +81,12 @@ def add_relative_poverty(tb: Table, tb_percentiles: Table, extrapolated_dict: di
                     tb_percentiles[f"abs_diff{pct}pct_{var}{extrapolated}"]
                     == tb_percentiles[f"min{pct}pct_{var}{extrapolated}"]
                 ]
+                # The result generates multiple values for some countries and years, so we need to drop duplicates
+                tb_min = tb_min.drop_duplicates(subset=["country", "year"], keep="last")
+
+                # Select only what is needed
                 tb_min = tb_min[["country", "year", "p"]]
-                # Multiply by 100 to get the headcount ratio in percentage
+                # Multiply by 100 to get the headcount ratio in percentage and rename
                 tb_min["p"] *= 100
                 tb_min = tb_min.rename(columns={"p": f"headcount_ratio_{pct}_median_{var}{extrapolated}"})
 
@@ -91,9 +95,6 @@ def add_relative_poverty(tb: Table, tb_percentiles: Table, extrapolated_dict: di
                     tb_relative_poverty = tb_min
                 else:
                     tb_relative_poverty = pr.merge(tb_relative_poverty, tb_min, on=["country", "year"], how="outer")
-
-    # Export to csv
-    tb_relative_poverty.to_csv("wid_relative_poverty.csv")
 
     return tb_relative_poverty
 
@@ -137,9 +138,11 @@ def run(dest_dir: str) -> None:
     # Add metadata by code
     tb_percentiles = add_metadata_vars_distribution(tb_percentiles)
 
-    # Add index and sort
-    tb = tb.set_index(["country", "year"]).sort_index()
-    tb_percentiles = tb_percentiles.set_index(["country", "year", "welfare", "p", "percentile"]).sort_index()
+    # Set index and sort
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_percentiles = tb_percentiles.set_index(
+        ["country", "year", "welfare", "p", "percentile"], verify_integrity=True
+    ).sort_index()
 
     #
     # Save outputs.
