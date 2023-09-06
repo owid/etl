@@ -1,9 +1,11 @@
 """Load the three LIS meadow datasets and create one garden dataset, `luxembourg_income_study`."""
 
+from typing import cast
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import add_metadata_vars
+from shared import add_metadata_vars, add_metadata_vars_distribution
 from structlog import get_logger
 
 from etl.helpers import PathFinder
@@ -98,11 +100,19 @@ def run(dest_dir: str) -> None:
         # Add table of processed data to the new dataset.
         ds_garden.add(tb_garden)
 
-        # Update dataset and table metadata using the adjacent yaml file.
-        ds_garden.update_metadata(paths.metadata_path)
+    ######################################################
+    # Percentile data
+    ######################################################
 
-        # Save changes in the new garden dataset.
-        ds_garden.save()
+    # Add percentile data
+    add_percentiles(tb_name="lis_percentiles", ds_garden=ds_garden)
+    add_percentiles(tb_name="lis_percentiles_adults", ds_garden=ds_garden)
+
+    # Update dataset and table metadata using the adjacent yaml file.
+    ds_garden.update_metadata(paths.metadata_path)
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
 
     log.info("luxembourg_income_study.end")
 
@@ -131,7 +141,7 @@ def make_table_wide(df: pd.DataFrame, cols_to_wide: list) -> pd.DataFrame:
 # Load `keyvars` meadow dataset, rename and drop variables
 def load_keyvars(age: str) -> pd.DataFrame:
     ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
-    tb_meadow = ds_meadow[f"lis_keyvars{age}"]
+    tb_meadow = ds_meadow[f"lis_keyvars{age}"].reset_index()
     df_keyvars = pd.DataFrame(tb_meadow)
 
     # Use less technical names for some variables
@@ -201,7 +211,7 @@ def create_relative_pov_variables(df_keyvars: pd.DataFrame, relative_povlines: l
 # Load `abs_poverty` meadow dataset, rename variables
 def load_abs_poverty(df_keyvars: pd.DataFrame, age: str) -> pd.DataFrame:
     ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
-    tb_meadow = ds_meadow[f"lis_abs_poverty{age}"]
+    tb_meadow = ds_meadow[f"lis_abs_poverty{age}"].reset_index()
     df_abs_poverty = pd.DataFrame(tb_meadow)
 
     # Add population variable from keyvars
@@ -249,7 +259,7 @@ def create_absolute_pov_variables(df_abs_poverty: pd.DataFrame) -> pd.DataFrame:
 # Load `distribution` meadow dataset, rename variables
 def load_distribution(age: str) -> pd.DataFrame:
     ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
-    tb_meadow = ds_meadow[f"lis_distribution{age}"]
+    tb_meadow = ds_meadow[f"lis_distribution{age}"].reset_index()
     df_distribution = pd.DataFrame(tb_meadow)
 
     # Transform percentile variable to `pxx`
@@ -314,3 +324,32 @@ def create_distributional_variables(df_distribution: pd.DataFrame, age: str) -> 
     df_distribution = df_distribution.drop(columns=["mean"])
 
     return df_distribution
+
+
+def add_percentiles(tb_name: str, ds_garden: Dataset) -> Table:
+    # Load meadow dataset.
+    ds_meadow = cast(Dataset, paths.load_dependency("luxembourg_income_study"))
+
+    # Read table from meadow dataset.
+    tb = ds_meadow[tb_name].reset_index()
+
+    # Drop dataset variable
+    tb = tb.drop(columns=["dataset"])
+
+    # Change names of equivalized variable, to create a distinguishable name
+    tb["eq"] = tb["eq"].replace({1: "eq", 0: "pc"})
+
+    # Rename variable column to welfare
+    tb = tb.rename(columns={"variable": "welfare", "eq": "equivalization"})
+
+    # Set indices and sort.
+    tb = tb.set_index(
+        ["country", "year", "welfare", "equivalization", "percentile"], verify_integrity=True
+    ).sort_index()
+
+    # Add metadata by code
+    tb = add_metadata_vars_distribution(tb)
+
+    ds_garden.add(tb)
+
+    return tb

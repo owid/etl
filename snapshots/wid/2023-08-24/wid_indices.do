@@ -12,10 +12,12 @@ When needed, values are converted to PPP (2011 vintage) adjusted to prices of th
 
 HOW TO EXECUTE:
 
-1. Open this do-file in a local installation of Stata (execution time: ~5-10 minutes)
-2. It generates two files, wid_indices_992j_exclude.csv and wid_indices_992j_include.csv, which exclude and include extrapolations. They need to be imported as snapshots in the ETL, as
-	python snapshots/wid/2023-01-27/world_inequality_database.py --path-to-file snapshots/wid/2023-01-27/wid_indices_992j_exclude.csv
-	python snapshots/wid/2023-01-27/world_inequality_database_with_extrapolations.py --path-to-file snapshots/wid/2023-01-27/wid_indices_992j_include.csv
+1. Open this do-file in a local installation of Stata (execution time: ~40 minutes)
+2. It generates four files, which exclude and include extrapolations. They need to be imported as snapshots in the ETL, as
+	python snapshots/wid/2023-08-24/world_inequality_database.py --path-to-file snapshots/wid/2023-08-24/wid_indices_992j_exclude.csv
+	python snapshots/wid/2023-08-24/world_inequality_database_with_extrapolations.py --path-to-file snapshots/wid/2023-08-24/wid_indices_992j_include.csv
+	python snapshots/wid/2023-08-24/world_inequality_database_distribution.py --path-to-file snapshots/wid/2023-08-24/wid_distribution_992j_exclude.csv
+	python snapshots/wid/2023-08-24/world_inequality_database_distribution_with_extrapolations.py --path-to-file snapshots/wid/2023-08-24/wid_distribution_992j_include.csv
 
 	(Change the date for future updates)
 
@@ -44,7 +46,7 @@ global dataset = "all"
 
 * If condition to select all the data or a part of it
 if "$dataset" == "all" {
-	global areas _all 
+	global areas _all
 }
 
 else if "$dataset" == "test" {
@@ -72,7 +74,7 @@ tempfile ppp
 save "`ppp'"
 
 foreach option in $options {
-	
+
 	* Define different indicators and percentiles depending on the dataset
 	if `option' == 1 {
 		global indicators_gini_share sptinc gptinc sdiinc gdiinc scainc gcainc shweal ghweal
@@ -83,9 +85,9 @@ foreach option in $options {
 		global indicators_gini_share sptinc sdiinc scainc shweal
 		global percentiles p0p1 p1p2 p2p3 p3p4 p4p5 p5p6 p6p7 p7p8 p8p9 p9p10 p10p11 p11p12 p12p13 p13p14 p14p15 p15p16 p16p17 p17p18 p18p19 p19p20 p20p21 p21p22 p22p23 p23p24 p24p25 p25p26 p26p27 p27p28 p28p29 p29p30 p30p31 p31p32 p32p33 p33p34 p34p35 p35p36 p36p37 p37p38 p38p39 p39p40 p40p41 p41p42 p42p43 p43p44 p44p45 p45p46 p46p47 p47p48 p48p49 p49p50 p50p51 p51p52 p52p53 p53p54 p54p55 p55p56 p56p57 p57p58 p58p59 p59p60 p60p61 p61p62 p62p63 p63p64 p64p65 p65p66 p66p67 p67p68 p68p69 p69p70 p70p71 p71p72 p72p73 p73p74 p74p75 p75p76 p76p77 p77p78 p78p79 p79p80 p80p81 p81p82 p82p83 p83p84 p84p85 p85p86 p86p87 p87p88 p88p89 p89p90 p90p91 p91p92 p92p93 p93p94 p94p95 p95p96 p96p97 p97p98 p98p99 p99p100 p99p99.1 p99.1p99.2 p99.2p99.3 p99.3p99.4 p99.4p99.5 p99.5p99.6 p99.6p99.7 p99.7p99.8 p99.8p99.9 p99.9p100 p99.9p99.91 p99.91p99.92 p99.92p99.93 p99.93p99.94 p99.94p99.95 p99.95p99.96 p99.96p99.97 p99.97p99.98 p99.98p99.99 p99.99p100 p99.99p99.991 p99.991p99.992 p99.992p99.993 p99.993p99.994 p99.994p99.995 p99.995p99.996 p99.996p99.997 p99.997p99.998 p99.998p99.999 p99.999p100
 	}
-	
+
 	foreach excl_option in $exclude_extrapolations {
-		
+
 		* If excl_option is 1 we will add exclude_option to the wid command and add "exclude" as a variable suffix
 		if `excl_option' == 1 {
 			global exclude_option exclude
@@ -114,9 +116,9 @@ foreach option in $options {
 
 		*Union with average and threshold income
 		append using "`avgthr'"
-		
+
 		if `option' == 1 {
-		
+
 			*Variable adjustments to create a wide dataset
 
 			*Create percentile-variable and country-year variables (used as indices when the table is reshaped)
@@ -173,7 +175,7 @@ foreach option in $options {
 			foreach var in `var_names' {
 
 				gen p0p50_share_`var' = p0p10_share_`var' + p10p20_share_`var' + p20p30_share_`var' + p30p40_share_`var' + p40p50_share_`var'
-				
+
 				gen palma_ratio_`var' = p90p100_share_`var' / (p0p50_share_`var' - p40p50_share_`var')
 				gen s90_s10_ratio_`var' = p90p100_share_`var' / p0p10_share_`var'
 				gen s80_s20_ratio_`var' = (p80p90_share_`var' + p90p100_share_`var') / (p0p10_share_`var' + p10p20_share_`var')
@@ -198,15 +200,15 @@ foreach option in $options {
 
 			*Export csv
 			export delimited using "wid_indices_${age}${unit}_`excl_option_slug'.csv", replace
-		
+
 		}
-		
+
 		else if `option' == 2 {
-			
+
 			* Extract from variable the indicator (a,t,s) and welfare (ptinc, diinc, cainc, hweal)
 			gen indicator = substr(variable, 1, 1)
 			gen welfare = substr(variable, 2, 5)
-			
+
 			* Create an index variable to make the table wide
 			egen couypw = concat(country year percentile welfare), punct(+)
 			drop country year percentile welfare variable age pop
@@ -216,7 +218,7 @@ foreach option in $options {
 
 			* Split the index variable to recover the columns
 			split couypw, p(+) destring
-			
+
 			* Rename resulting columns and drop what's not needed
 			rename couypw1 country
 			rename couypw2 year
@@ -224,35 +226,35 @@ foreach option in $options {
 			rename couypw4 welfare
 
 			drop couyp
-			
+
 			* Rename resulting average, share and threshold columns
 			rename valuea avg
 			rename values share
 			rename valuet thr
-			
+
 			* Replace welfare codes with new text
 			replace welfare = "pretax" if welfare == "ptinc"
 			replace welfare = "posttax_nat" if welfare == "diinc"
 			replace welfare = "posttax_dis" if welfare == "cainc"
 			replace welfare = "wealth" if welfare == "hweal"
-			
+
 			* Extract percentile from WID's name
 			split percentile, p(p)
 			destring percentile2, generate(p)
 			replace p = p/100
 			drop percentile1 percentile2 percentile3
-			
+
 			* Sort, order and save
 			sort country year p welfare
 
 			order country year welfare percentile p thr avg share
 
 			export delimited using "wid_distribution_${age}${unit}_`excl_option_slug'.csv", replace
-			
+
 		}
 
 	}
-	
+
 }
 
 exit, clear
