@@ -70,7 +70,7 @@ def main(upload: bool) -> None:
             "Costa Rica",
             "Partially banned",
             1989,
-            'Although bullfighting is not banned, the bull cannot be killed during the event.',
+            "Although bullfighting is not banned, the bull cannot be killed during the event.",
             "Bullfighting Activities Regulations 19183-G-S, July 7th, 1989.",
             "https://www.cbsnews.com/sanfrancisco/news/bloodless-bullfighting-a-portuguese-tradition-kept-alive-in-central-valley/",
             "",
