@@ -81,7 +81,7 @@ def main(upload: bool) -> None:
             np.nan,
             "",
             "Animal Legal and Historical Center (2023).",
-            "http://196.40.56.11/scij/Busqueda/Normativa/Normas/nrm_texto_completo.aspx?nValor1=1&nValor2=11967",
+            "http://web.archive.org/web/20230906141841/http://196.40.56.11/scij/Busqueda/Normativa/Normas/nrm_texto_completo.aspx?nValor1=1&nValor2=11967",
             "",
         ),
         (
@@ -102,15 +102,16 @@ def main(upload: bool) -> None:
             "https://www.cubanet.org/opiniones/corridas-de-toros-en-cuba-la-historia-no-contada/",
             "",
         ),
-        (
-            "Denmark",
-            "Banned",
-            np.nan,
-            "",
-            "Humane Society International (2023).",
-            "https://www.hsi.org/news-resources/bullfighting/",
-            "",
-        ),
+        # Although Denmark's ban is mentioned by Humane Society International, I haven't found any evidence for this ban, or for any bullfighting in Denmark.
+        # (
+        #     "Denmark",
+        #     "Banned",
+        #     np.nan,
+        #     "",
+        #     "Humane Society International (2023).",
+        #     "https://www.hsi.org/news-resources/bullfighting/",
+        #     "",
+        # ),
         (
             "Dominican Republic",
             "Partially banned",
@@ -129,11 +130,21 @@ def main(upload: bool) -> None:
             "https://www.petalatino.com/blog/las-corridas-de-toros-siguen-siendo-legales-en-estos-paises/",
             "",
         ),
+        # I have found some evidence that bullfighting also takes place in Guatemala, but no good sources.
+        (
+            "Guatemala",
+            "Not banned",
+            np.nan,
+            "",
+            "Portal taurino (2020-03-26).",
+            "http://www.portaltaurino.net/enciclopedia/doku.php/guatemala",
+            "",
+        ),
         (
             "Honduras",
             "Partially banned",
             2016,
-            "Although bullfighting is not banned, the use of spears, swords, fires or other objects that may cause pain to the animal is prohibited.",
+            "Although bullfighting is not banned, the use of spears, swords, fires or other objects that may kill or cause pain to the animal is prohibited.",
             "Animal Protection and Welfare Law, Decree 115-2015, April 5th, 2016",
             "https://www.poderjudicial.gob.hn/CEDIJ/Leyes/Documents/Ley%20de%20Proteccion%20y%20Bienestar%20Animal.pdf",
             "",
@@ -176,11 +187,11 @@ def main(upload: bool) -> None:
         ),
         (
             "Nicaragua",
-            "Banned",
-            np.nan,
-            "",
-            "Humane Society International (2023).",
-            "https://www.hsi.org/news-resources/bullfighting/",
+            "Partially banned",
+            2011,
+            "Although bullfighting is not banned, the use of spears, swords, fires or other objects that may kill or cause pain to the animal is prohibited.",
+            "Law 747, Law for the protection and welfare of domestic animals and domesticated wild animals, May 11th, 2011.",
+            "http://legislacion.asamblea.gob.ni/normaweb.nsf/b92aaea87dac762406257265005d21f7/cf820e2a63b1b690062578b00074ec1b",
             "",
         ),
         (
@@ -231,9 +242,9 @@ def main(upload: bool) -> None:
         (
             "United Kingdom",
             "Banned",
-            np.nan,
-            "",
-            "Humane Society International (2023).",
+            1835,
+            "Although bullfighting has not been practiced, other similar events like bull-baiting used to take place prior to the enactment of the Cruelty to Animals Act 1835.",
+            "5 & 6 William 4 c.59: Cruelty to Animals Act, 1835.",
             "https://www.hsi.org/news-resources/bullfighting/",
             "",
         ),
@@ -268,7 +279,7 @@ def main(upload: bool) -> None:
     tb = snap.read_from_records(data=data, columns=columns)
 
     # Add all individual sources to the full citation in the metadata.
-    sources_text = """Evidence of laws banning bullfighting, and evidence of bullfighting being practiced without any ban, has been gathered from various sources for different countries. Some of them come from [Humane Society International](https://www.hsi.org/news-resources/bullfighting/).\n"""
+    sources_text = """Evidence of laws banning bullfighting, and evidence of bullfighting being practiced without any ban, has been gathered from various sources for different countries.\n"""
     for i, row in tb.iterrows():
         sources_text += f"- {row['country']}: {row['status']}. Source: [{row['evidence']}]({row['url']})"
         if len(row["comments"]) > 0:
