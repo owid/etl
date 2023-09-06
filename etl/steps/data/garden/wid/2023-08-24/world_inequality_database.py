@@ -93,7 +93,7 @@ def add_relative_poverty(tb: Table, tb_percentiles: Table, extrapolated_dict: di
                     tb_relative_poverty = pr.merge(tb_relative_poverty, tb_min, on=["country", "year"], how="outer")
 
     # Export to csv
-    tb_relative_poverty.to_csv("wid_relative_poverty.csv", index=False)
+    tb_relative_poverty.to_csv("wid_relative_poverty.csv")
 
     return tb_relative_poverty
 
