@@ -13,8 +13,8 @@ meta:
       - Argentina: Banned. Source: [Law 2786 - Buenos Aires, July 25th, 1891.](https://www.argentina.gob.ar/normativa/nacional/ley-2786-283995/texto)
       Last bullfight took place [in 1899](https://www.animanaturalis.org/p/883).
 
-      - Bolivia: Banned. Source: [Law for the defense of animals against acts of cruelty
-      and mistreatment, Law 700, June 1st,
+      - Bolivia: Banned. Source: [Law 700, Law for the defense of animals against
+      acts of cruelty and mistreatment, June 1st,
       2015.](https://faolex.fao.org/docs/pdf/bol146525.pdf)
 
       - Brazil: Banned. Source: [Decree 24645, July 10th, 1934.](https://www2.camara.leg.br/legin/fed/decret/1930-1939/decreto-24645-10-julho-1934-516837-publicacaooriginal-1-pe.html)
@@ -41,18 +41,21 @@ meta:
 
       - Cuba: Banned. Source: [Cubanet (2022-02-10).](https://www.cubanet.org/opiniones/corridas-de-toros-en-cuba-la-historia-no-contada/)
 
-      - Dominican Republic: Partially banned. Source: [Although bullfighting is not
-      banned, the bull cannot be harmed during
-      the event. Bullfighting is practiced only in El Seibo province, where it is
-      considered Cultural Heritage.](https://memoriahistorica.senadord.gob.do/handle/123456789/23159)
+      - Dominican Republic: Partially banned. Source: [Law 1311, Declaring Bullfighting
+      Cultural Heritage, approval published
+      on April 15th, 2022.](https://memoriahistorica.senadord.gob.do/handle/123456789/23159)
+      Although bullfighting is not
+      banned, the bull cannot be harmed during the event. Bullfighting is practiced
+      only in El Seibo province, where it is
+      considered Cultural Heritage.
 
       - Ecuador: Not banned. Source: [People for the Ethical Treatment of Animals
       (PETA) Latino.](https://www.petalatino.com/blog/las-corridas-de-toros-siguen-siendo-legales-en-estos-paises/)
 
       - Guatemala: Not banned. Source: [Portal taurino (2020-03-26).](http://www.portaltaurino.net/enciclopedia/doku.php/guatemala)
 
-      - Honduras: Partially banned. Source: [Animal Protection and Welfare Law, Decree
-      115-2015, April 5th, 2016.](https://www.poderjudicial.gob.hn/CEDIJ/Leyes/Documents/Ley%20de%20Proteccion%20y%20Bienestar%20Animal.pdf)
+      - Honduras: Partially banned. Source: [Decree 115-2015, Animal Protection and
+      Welfare Law, April 5th, 2016.](https://www.poderjudicial.gob.hn/CEDIJ/Leyes/Documents/Ley%20de%20Proteccion%20y%20Bienestar%20Animal.pdf)
       Although bullfighting is not banned, the use of spears, swords, fires or other
       objects that may kill or cause pain to
       the animal is prohibited.
@@ -112,7 +115,7 @@ meta:
       the event - a ["bloodless" bullfight](https://madridbullfighting.com/blog/ufaqs/how-is-american-bullfighting-still-legal/).
       Velcro spears are used to simulate the stabbing of the bulls.
 
-      - Uruguay: Banned. Source: [Animal health legislation, Law 4.277, October 30th,
+      - Uruguay: Banned. Source: [Law 4277, Animal Health Legislation, October 30th,
       1912.](https://www.gub.uy/ministerio-ganaderia-agricultura-pesca/comunicacion/publicaciones/legislacion-sanitaria-animal/introduccion/c-organismo-responsable)
 
       - Venezuela: Not banned. Source: [France24 (2023-04-05).](https://www.france24.com/en/live-news/20230405-look-brave-children-taught-bullfighting-at-venezuelan-torero-school)
@@ -126,6 +129,6 @@ meta:
     name: CC BY 4.0
 wdir: ../../../data/snapshots/animal_welfare/2023-09-05
 outs:
-- md5: ffee635cba8f765e3a0f98512e4057a4
-  size: 7072
+- md5: bbfd0d23ea9a0b19324fc1eeb76016a7
+  size: 7164
   path: bullfighting_laws.csv
