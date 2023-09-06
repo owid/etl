@@ -1,8 +1,6 @@
 # Metadata for variables is defined by code, because they are 800+, with different definitions
 
 dataset:
-  namespace: lis
-  short_name: luxembourg_income_study
   title: Luxembourg Income Study (LIS, 2023)
   description: |-
     The Luxembourg Income Study Database (LIS) is the largest available income database of harmonized microdata collected from about 50 countries in Europe, North America, Latin America, Africa, Asia, and Australasia spanning five decades.
@@ -47,7 +45,6 @@ dataset:
     ## Purchasing power parities
 
     All LIS income and consumption variables are originally reported in annual amounts and in units of the national currency in use today. In Our World in Data, we use international-$ in 2017 prices to account for inflation and for differences in the cost of living between countries. LIS provides conversion tables in its platform.
-  version: "2023-01-18"
   sources:
     - name: Luxembourg Income Study (2023)
       url: https://www.lisdatacenter.org/our-data/lis-database/

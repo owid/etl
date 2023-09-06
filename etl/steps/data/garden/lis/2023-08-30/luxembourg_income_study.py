@@ -1,14 +1,12 @@
 """Load the three LIS meadow datasets and create one garden dataset, `luxembourg_income_study`."""
 
-from typing import cast
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from shared import add_metadata_vars, add_metadata_vars_distribution
 from structlog import get_logger
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
 
@@ -26,8 +24,9 @@ def run(dest_dir: str) -> None:
     log.info("luxembourg_income_study.start")
 
     # Create a new garden dataset
-    ds_garden = Dataset.create_empty(dest_dir)
+    ds_meadow = paths.load_dataset("luxembourg_income_study")
 
+    tables = []
     for age, age_suffix in age_dict.items():
         # Load inputs.
 
@@ -36,7 +35,7 @@ def run(dest_dir: str) -> None:
         ######################################################
 
         # Load `keyvars` meadow dataset, rename and drop variables
-        df_keyvars = load_keyvars(age=age_suffix)
+        df_keyvars = load_keyvars(age=age_suffix, ds_meadow=ds_meadow)
 
         # Create additional (relative) poverty variables
         df_keyvars = create_relative_pov_variables(df_keyvars, relative_povlines)
@@ -53,7 +52,7 @@ def run(dest_dir: str) -> None:
         ######################################################
 
         # Load `abs_poverty` meadow dataset, rename variables
-        df_abs_poverty = load_abs_poverty(df_keyvars, age_suffix)
+        df_abs_poverty = load_abs_poverty(df_keyvars, age_suffix, ds_meadow=ds_meadow)
 
         # Calculate additional absolute poverty variables
         df_abs_poverty = create_absolute_pov_variables(df_abs_poverty)
@@ -66,10 +65,10 @@ def run(dest_dir: str) -> None:
         ######################################################
 
         # Load `distribution` meadow dataset, rename variables
-        df_distribution = load_distribution(age=age_suffix)
+        df_distribution = load_distribution(age=age_suffix, ds_meadow=ds_meadow)
 
         # Calculate income ratios, decile averages and groups of shares
-        df_distribution = create_distributional_variables(df_distribution, age_suffix)
+        df_distribution = create_distributional_variables(df_distribution, age_suffix, ds_meadow=ds_meadow)
 
         # Make table wide
         df_distribution = make_table_wide(df_distribution, ["variable", "eq"])
@@ -98,20 +97,20 @@ def run(dest_dir: str) -> None:
         # Save outputs.
 
         # Add table of processed data to the new dataset.
-        ds_garden.add(tb_garden)
+        tables.append(tb_garden)
 
     ######################################################
     # Percentile data
     ######################################################
 
     # Add percentile data
-    add_percentiles(tb_name="lis_percentiles", ds_garden=ds_garden)
-    add_percentiles(tb_name="lis_percentiles_adults", ds_garden=ds_garden)
+    tables.append(percentiles_table(tb_name="lis_percentiles", ds_meadow=ds_meadow))
+    tables.append(percentiles_table(tb_name="lis_percentiles_adults", ds_meadow=ds_meadow))
 
-    # Update dataset and table metadata using the adjacent yaml file.
-    ds_garden.update_metadata(paths.metadata_path)
-
-    # Save changes in the new garden dataset.
+    # Add tables to dataset
+    ds_garden = create_dataset(
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
     ds_garden.save()
 
     log.info("luxembourg_income_study.end")
@@ -139,8 +138,7 @@ def make_table_wide(df: pd.DataFrame, cols_to_wide: list) -> pd.DataFrame:
 
 
 # Load `keyvars` meadow dataset, rename and drop variables
-def load_keyvars(age: str) -> pd.DataFrame:
-    ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
+def load_keyvars(age: str, ds_meadow: Dataset) -> pd.DataFrame:
     tb_meadow = ds_meadow[f"lis_keyvars{age}"].reset_index()
     df_keyvars = pd.DataFrame(tb_meadow)
 
@@ -209,8 +207,7 @@ def create_relative_pov_variables(df_keyvars: pd.DataFrame, relative_povlines: l
 
 
 # Load `abs_poverty` meadow dataset, rename variables
-def load_abs_poverty(df_keyvars: pd.DataFrame, age: str) -> pd.DataFrame:
-    ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
+def load_abs_poverty(df_keyvars: pd.DataFrame, age: str, ds_meadow: Dataset) -> pd.DataFrame:
     tb_meadow = ds_meadow[f"lis_abs_poverty{age}"].reset_index()
     df_abs_poverty = pd.DataFrame(tb_meadow)
 
@@ -257,8 +254,7 @@ def create_absolute_pov_variables(df_abs_poverty: pd.DataFrame) -> pd.DataFrame:
 
 
 # Load `distribution` meadow dataset, rename variables
-def load_distribution(age: str) -> pd.DataFrame:
-    ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
+def load_distribution(age: str, ds_meadow: Dataset) -> pd.DataFrame:
     tb_meadow = ds_meadow[f"lis_distribution{age}"].reset_index()
     df_distribution = pd.DataFrame(tb_meadow)
 
@@ -275,7 +271,7 @@ def load_distribution(age: str) -> pd.DataFrame:
 
 
 # Calculate income ratios and decile averages
-def create_distributional_variables(df_distribution: pd.DataFrame, age: str) -> pd.DataFrame:
+def create_distributional_variables(df_distribution: pd.DataFrame, age: str, ds_meadow: Dataset) -> pd.DataFrame:
     # Calculate Palma ratio and other average/share ratios
     df_distribution["palma_ratio"] = df_distribution["share_p100"] / (
         df_distribution["share_p10"]
@@ -311,7 +307,7 @@ def create_distributional_variables(df_distribution: pd.DataFrame, age: str) -> 
     # Add mean data to dataframe
 
     # Load keyvars again
-    df_mean = load_keyvars(age=age)
+    df_mean = load_keyvars(age=age, ds_meadow=ds_meadow)
     df_mean = df_mean[["country", "year", "variable", "eq", "mean"]]
 
     df_distribution = pd.merge(df_distribution, df_mean, on=["country", "year", "variable", "eq"], how="left")
@@ -326,10 +322,7 @@ def create_distributional_variables(df_distribution: pd.DataFrame, age: str) -> 
     return df_distribution
 
 
-def add_percentiles(tb_name: str, ds_garden: Dataset) -> Table:
-    # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("luxembourg_income_study"))
-
+def percentiles_table(tb_name: str, ds_meadow: Dataset) -> Table:
     # Read table from meadow dataset.
     tb = ds_meadow[tb_name].reset_index()
 
@@ -349,7 +342,5 @@ def add_percentiles(tb_name: str, ds_garden: Dataset) -> Table:
 
     # Add metadata by code
     tb = add_metadata_vars_distribution(tb)
-
-    ds_garden.add(tb)
 
     return tb
