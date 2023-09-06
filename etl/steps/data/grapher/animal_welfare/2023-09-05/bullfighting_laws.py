@@ -19,40 +19,6 @@ STATUS_NOT_BANNED = "Not banned"
 STATUS_ALL = {STATUS_BANNED, STATUS_BANNED_NOT_EFFECTIVE, STATUS_BANNED_PARTIALLY, STATUS_NOT_BANNED}
 
 
-def generate_annotations_for_each_country(tb: Table):
-    tb_updated = tb.copy()
-
-    # Add annotations for each country.
-    annotations = {}
-    # Select countries that have some laws regarding bullfighting.
-    countries_with_ban = tb[tb["status"] != STATUS_NOT_BANNED]["country"].unique()
-    for country in countries_with_ban:
-        year_effective = tb[tb["country"] == country]["year_effective"].item()
-        if (not pd.isna(year_effective)) and (year_effective <= CURRENT_YEAR):
-            annotations[country] = f"{country}: Banned since {year_effective}."
-        else:
-            annotations[country] = f"{country}: Ban starts in {year_effective}."
-
-    # Add any other annotation.
-    countries_with_annotations = tb[~tb["annotation"].isnull()]["country"].unique()
-    for country in countries_with_annotations:
-        additional_annotation = tb[tb["country"] == country]["annotation"].item()
-        if country in annotations:
-            annotations[country] += " " + additional_annotation
-        else:
-            annotations[country] = f"{country}: {additional_annotation}"
-
-    # Convert to list.
-    annotations = list(annotations.values())
-
-    # Update display metadata.
-    if tb_updated["status"].metadata.display is None:
-        tb_updated["status"].metadata.display = {}
-    tb_updated["status"].metadata.display["annotations"] = annotations
-
-    return tb_updated
-
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -73,7 +39,8 @@ def run(dest_dir: str) -> None:
 
     # Add annotations for each country to metadata.
     # NOTE: For now annotations are not shown in map tabs. Possibly in the future they will appear in map tab tooltips.
-    tb = generate_annotations_for_each_country(tb=tb)
+    # If so, copy the function generate_annotations_for_each_country() from the chick_culling_laws grapher step.
+    # tb = generate_annotations_for_each_country(tb=tb)
 
     # Select relevant columns.
     tb = tb[["country", "status"]]
