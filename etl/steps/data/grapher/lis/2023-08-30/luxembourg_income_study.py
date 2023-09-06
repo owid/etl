@@ -1,7 +1,5 @@
 """Load luxembourg_income_Study garden dataset and create the luxembourg_income_study grapher dataset."""
 
-from owid.catalog import Dataset
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
