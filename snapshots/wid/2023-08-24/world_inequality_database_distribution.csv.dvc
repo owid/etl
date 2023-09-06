@@ -80,6 +80,6 @@ meta:
     More information is available at https://wid.world/methodology/
 wdir: ../../../data/snapshots/wid/2023-08-24
 outs:
-- md5: ece50de8ef603a2f90f2fb7abdf2fabf
+- md5: 2bdfe452e53d1484fb0907b87bcc9a4d
   size: 129967622
   path: world_inequality_database_distribution.csv
