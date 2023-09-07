@@ -41,6 +41,10 @@ def add_relative_poverty(tb: Table, tb_percentiles: Table, extrapolated_dict: di
     """
     log.info("add_relative_poverty.start")
 
+    # Make copies of the tables
+    tb = tb.copy()
+    tb_percentiles = tb_percentiles.copy()
+
     # Make tb_percentiles wide, by creating a column for each welfare
     tb_percentiles = tb_percentiles.pivot(
         index=["country", "year", "p", "percentile"], columns="welfare", values=["thr", "thr_extrapolated"]
@@ -130,6 +134,8 @@ def run(dest_dir: str) -> None:
 
     # Add relative poverty values
     tb_relative_poverty = add_relative_poverty(tb, tb_percentiles, extrapolated_dict, welfare_vars)
+
+    # Merge tables
     tb = pr.merge(tb, tb_relative_poverty, on=["country", "year"], how="left")
 
     # Add metadata by code

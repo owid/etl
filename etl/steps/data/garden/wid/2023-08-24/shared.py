@@ -12,6 +12,10 @@ The data is estimated from a combination of household surveys, tax records and n
 These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries.
 """
 
+relative_poverty_descritption = """
+This data has been estimated by calculating the {povline}, and then checking that value against the closest threshold in the percentile distribution. The headcount ratio is then the percentile, the share of the population below that threshold.
+"""
+
 
 # NOTE: Change the year when needed
 ppp_description = "The data is measured in international-$ at 2022 prices – this adjusts for inflation and for differences in the cost of living between countries."
@@ -101,6 +105,13 @@ var_dict = {
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
+    },
+    "headcount_ratio": {
+        "title": "Share of population in poverty",
+        "description": "Share of the population living below the poverty line of {povline}",
+        "unit": "%",
+        "short_unit": "%",
+        "numDecimalPlaces": 0,
     },
 }
 
@@ -210,12 +221,15 @@ pct_dict = {
     },
     "p0p50": {"decile10": "Bottom 50%", "decile9": "Bottom 50%", "thr_number": "", "decile10_extra": "Poorest 50%"},
     "p90p99": {
-        "decile10": "Between 90th and 99th percentiles%",
+        "decile10": "Between 90th and 99th percentiles",
         "decile9": "",
         "thr_number": "",
         "decile10_extra": "People between the 90th and 99th percentiles",
     },
 }
+
+# Details for each relative poverty line
+rel_dict = {40: "40% of the median", 50: "50% of the median", 60: "60% of the median"}
 
 # Details for extrapolations or estimations
 extrapolation_dict = {"": "Estimated", "_extrapolated": "Extrapolated"}
@@ -241,6 +255,19 @@ def add_metadata_vars(tb_garden: Table) -> Table:
                     tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
                         "{inc_cons_dict[wel]['type']}", str(inc_cons_dict[wel]["type"])
                     )
+
+                for rel in rel_dict:
+                    # For variables that use income variable, equivalence scale and relative poverty lines
+                    col_name = f"{var}_{rel}_median_{wel}{ext}"
+
+                    if col_name in cols:
+                        # Create metadata for these variables
+                        tb_garden[col_name].metadata = var_metadata_income_relative(var, wel, rel, ext)
+
+                        # Replace values in description according to `rel`
+                        tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                            "{povline}", rel_dict[rel]
+                        )
 
                 for pct in pct_dict:
                     # For variables that use income variable and percentiles (deciles)
@@ -372,6 +399,28 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
             "name": meta.title,
             "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
         }
+    return meta
+
+
+def var_metadata_income_relative(var, wel, rel, ext) -> VariableMeta:
+    meta = VariableMeta(
+        title=f"{rel_dict[rel]} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
+        description=f"""{var_dict[var]['description']}
+
+        {inc_cons_dict[wel]['description']}
+
+        {additional_description}
+
+        {relative_poverty_descritption}""",
+        unit=var_dict[var]["unit"],
+        short_unit=var_dict[var]["short_unit"],
+    )
+
+    meta.display = {
+        "name": meta.title,
+        "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
+    }
+
     return meta
 
 
