@@ -154,31 +154,49 @@ def _yield_wide_table(
                     }
                 }
 
+            dim_dict = dict(zip(dim_names, dim_values))
+
             # Add dimensions to title (which will be used as variable name in grapher)
-            title_with_dims: Optional[str]
             if tab[short_name].metadata.title:
-                title_with_dims = _title_column_and_dimensions(tab[short_name].metadata.title, dim_values, dim_titles)
+                # We use template as a title
+                if _uses_jinja(tab[short_name].metadata.title):
+                    title_with_dims = _expand_jinja_template(tab[short_name].metadata.title, dim_dict)
+                # Otherwise use default
+                else:
+                    title_with_dims = _title_column_and_dimensions(
+                        tab[short_name].metadata.title, dim_values, dim_titles
+                    )
+
                 tab[short_name].metadata.title = title_with_dims
-            else:
-                title_with_dims = None
 
             # expand metadata with Jinja template
-            if dim_values and "<%" in tab[short_name].metadata.description:
-                try:
-                    tab[short_name].metadata.description = jinja_env.from_string(
-                        tab[short_name].metadata.description
-                    ).render(dict(zip(dim_names, dim_values)))
-                except jinja2.exceptions.TemplateSyntaxError:
-                    log.warning(
-                        "yield_wide_table.jinja_syntax_error",
-                        column=column,
-                        dims=dim_values,
-                        description="\n" + tab[short_name].metadata.description,
-                    )
-                    raise
+            tab[short_name].metadata.description = _expand_jinja_template(
+                tab[short_name].metadata.description, dim_dict
+            )
 
             # Keep only entity_id and year in index
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
+
+
+def _uses_jinja(text: Optional[str]):
+    if not text:
+        return False
+    return "<%" in text or "<<" in text
+
+
+def _expand_jinja_template(text: str, dim_dict: Dict[str, str]) -> str:
+    if not _uses_jinja(text) or not dim_dict:
+        return text
+
+    try:
+        return jinja_env.from_string(text).render(dim_dict)
+    except jinja2.exceptions.TemplateSyntaxError:
+        log.warning(
+            "yield_wide_table.jinja_syntax_error",
+            dims=dim_dict,
+            description="\n" + text,
+        )
+        raise
 
 
 def _title_column_and_dimensions(title: str, dims: List[str], dim_names: List[str]) -> str:
