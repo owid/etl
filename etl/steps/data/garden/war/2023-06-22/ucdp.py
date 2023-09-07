@@ -69,6 +69,9 @@ def run(dest_dir: str) -> None:
     log.info("war.ucdp: keep active conflicts")
     tb_geo = tb_geo[tb_geo["active_year"] == 1]
 
+    # Change region named "Asia" with "Asia and Oceania"
+    tb_geo["region"] = tb_geo["region"].replace(to_replace={"Asia": "Asia and Oceania"})
+
     # Create `conflict_type` column
     log.info("war.ucdp: add field `conflict_type`")
     tb = add_conflict_type(tb_geo, tb_conflict)
