@@ -11,4 +11,4 @@ tables:
             title: Which countries have banned bullfighting?
             map:
               hideTimeline: true
-            note: "Countries where bullfighting is not banned may have sub-national bans. Partially banned means that, while bullfighting is not illegal, the bull cannot be severely injured or killed during the event."
+            note: "Countries where bullfighting is not banned may have sub-national bans. Partially banned means that the bull cannot be severely injured or killed during the event."
