@@ -1,4 +1,12 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Data from UCDP.
+
+
+Notes:
+    - conflict types for state-based violence is sourced from UCDP/PRIO dataset. non-state and one-sided violence is sourced from GED dataset.
+    - incompatibilities in oceania are encoded in "Asia". We therefore use region "Asia and Oceania".
+    - there can be some missmatches with latest official reported data (UCDP's live dashboard). This is because UCDP uses latest data for their
+    dashboard, which might not be available yet as bulk download.
+"""
 
 from typing import cast
 
@@ -30,7 +38,7 @@ TYPE_OF_CONFLICT_MAPPING = {
 REGIONS_MAPPING = {
     1: "Europe",
     2: "Middle East",
-    3: "Asia",
+    3: "Asia and Oceania",
     4: "Africa",
     5: "Americas",
 }
