@@ -1,11 +1,22 @@
 """Data from UCDP.
 
-
 Notes:
     - conflict types for state-based violence is sourced from UCDP/PRIO dataset. non-state and one-sided violence is sourced from GED dataset.
-    - incompatibilities in oceania are encoded in "Asia". We therefore use region "Asia and Oceania".
     - there can be some missmatches with latest official reported data (UCDP's live dashboard). This is because UCDP uses latest data for their
     dashboard, which might not be available yet as bulk download.
+    - regions:
+        - incompatibilities in oceania are encoded in "Asia". We therefore use region "Asia and Oceania".
+        - GED: Dataset uses names (not codes!)
+            - You can learn countries included in each region from section "Appendix 5 Main sources consulted during the 2022 update" in page 40,
+            document: https://ucdp.uu.se/downloads/ged/ged231.pdf.
+                - Note that countris from Oceania are included in Asia!
+        - UCDP/PRIO: Dataset uses codes (note we changed "Asia" -> "Asia and Oceania")
+            1 = Europe (GWNo: 200-399)
+            2 = Middle East (GWNo: 630-699)
+            3 = Asia (GWNo: 700-999)
+            4 = Africa (GWNo: 400-626)
+            5 = Americas (GWNo: 2-199)
+
 """
 
 from typing import cast
@@ -34,13 +45,13 @@ TYPE_OF_CONFLICT_MAPPING = {
     3: "intrastate (non-internationalized)",
     4: "intrastate (internationalized)",
 }
-# Regions mapping (for PRIO/UCDP dataset)
+# Regions mapping (for PRIO/UCDP dataset, see function `_prepare_prio_table`)
 REGIONS_MAPPING = {
-    1: "Europe",
-    2: "Middle East",
-    3: "Asia and Oceania",
-    4: "Africa",
-    5: "Americas",
+    1: "Europe (UCDP)",
+    2: "Middle East (UCDP)",
+    3: "Asia and Oceania (UCDP)",
+    4: "Africa (UCDP)",
+    5: "Americas (UCDP)",
 }
 REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 
@@ -69,8 +80,8 @@ def run(dest_dir: str) -> None:
     log.info("war.ucdp: keep active conflicts")
     tb_geo = tb_geo[tb_geo["active_year"] == 1]
 
-    # Change region named "Asia" with "Asia and Oceania"
-    tb_geo["region"] = tb_geo["region"].replace(to_replace={"Asia": "Asia and Oceania"})
+    # Change region named "Asia" with "Asia and Oceania" (in GED)
+    tb_geo["region"] = tb_geo["region"].replace(to_replace={"Asia": "Asia and Oceania (UCDP)"})
 
     # Create `conflict_type` column
     log.info("war.ucdp: add field `conflict_type`")
