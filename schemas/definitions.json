@@ -3,7 +3,7 @@
   "license": {
     "type": "object",
     "title": "License of the dataset",
-    "description": "An origin's license is the license, decided by a producer, of the dataset (or paper or database) from where we extracted the indicator's original data and metadata. The license metadata fields are the attributes of the 'License' object in ETL.\n\nNote 1: When the license is not specified, temporarily assume 'CC BY 4.0' and leave url empty. Contact the producer before publishing. If there is no response after a few days, ask the team and decide on a case-by-case basis.\nNote 2: If the license is 'CC', but the version is not specified, assume 'CC BY 4.0'.",
+    "description": "An origin's license is the license, assigned by a producer, of the data product from where we extracted the indicator's original data and metadata.",
     "requirement_level": "required",
     "category": "license",
     "additionalProperties": false,
@@ -30,10 +30,17 @@
           "CC BY-ND 4.0",
           "CC BY-NC 4.0",
           "CC BY-NC-SA 4.0",
-          "CC BY-NC-ND 4.0"
+          "CC BY-NC-ND 4.0",
+          "©producer year",
+          "custom license"
         ],
         "examples_bad": [],
-        "guidelines": [],
+        "guidelines": [
+          "If it's a standard license, e.g. CC, it should be one of the acronyms in the examples below.",
+          "If the license is CC, but the version is not specified, assume 4.0.",
+          "If it's a custom license defined by the producer, it should follow the producer's text.",
+          "When the license of an external dataset is not specified, temporarily assume `CC BY 4.0`. Contact the producer before publishing. If there is no response after a few days, ask Ed or Este and decide on a case-by-case basis."
+        ],
         "category": "license"
       },
       "url": {
@@ -44,7 +51,12 @@
         "requirement_level": "required (if existing)",
         "examples": [],
         "examples_bad": [],
-        "guidelines": [],
+        "guidelines": [
+          "Must be a complete URL, i.e. `http...` .",
+          "Must not lead to a Creative Commons website or any other generic page, but to the place where the producer specifies the license of the data.",
+          "If the license is specified inside, say, a PDF document, the URL should be the download link of that document.",
+          "When the license of an external dataset is not specified, leave `url` empty. Do not use the URL of the main page of the dataset if the license is not mentioned anywhere."
+        ],
         "category": "license"
       }
     }
@@ -103,85 +115,41 @@
   },
   "origin": {
     "type": "object",
+    "description": "An indicator's origin is the information about the snapshot where the indicator's data and metadata came from. A snapshot is a subset of data (a 'slice') taken on a specific day from a data product (often a public dataset, but sometimes a paper or a database). The producer of the data product is typically an institution or a set of authors. Note: A snapshot often coincides with the data product (e.g. the dataset is a public csv file, and we download the entire file). But sometimes the data product is a bigger object (e.g. a set of files, a paper or a database) and the snapshot is just a particular subset of the data product (e.g. one of the files, or a table from a paper, or the result of a query). The origin fields are the attributes of the `Origin` object in ETL.",
     "additionalProperties": false,
     "required": ["producer", "date_published", "date_accessed", "citation_producer", "dataset_url_main", "dataset_title_owid"],
     "properties": {
-      "dataset_title_owid": {
-        "type": "string",
-        "title": "Dataset title by OWID",
-        "description": "Title of the dataset (written by OWID) which is a one-line description of the dataset.",
-        "requirement_level": "required",
-        "examples": [
-          "Neutron star mergers"
-        ],
-        "examples_bad": [],
-        "guidelines": [],
-        "category": "dataset"
-      },
-      "dataset_description_owid": {
-        "type": "string",
-        "title": "Dataset description by OWID",
-        "description": "Description of the dataset (written by OWID), usually a one- (or a few) paragraph explanation of the dataset.\n\nNote: Currently, this field won't appear in charts or data pages. It will be useful internally, and will be seen by users who download the dataset via data catalog.",
-        "requirement_level": "recommended",
-        "examples": [],
-        "examples_bad": [],
-        "guidelines": [],
-        "category": "dataset"
-      },
-      "dataset_title_producer": {
-        "type": "string",
-        "title": "Dataset title by the producer",
-        "description": "Title of the dataset (written by the producer) which is a one-line description of the dataset.",
-        "requirement_level": "recommended (if existing)",
-        "examples": [],
-        "examples_bad": [],
-        "guidelines": [],
-        "category": "dataset"
-      },
-      "version_producer": {
-        "type": "string",
-        "title": "Dataset version by the producer",
-        "description": "Producer's version of the dataset.",
-        "requirement_level": "recommended (if existing)",
-        "examples": [],
-        "examples_bad": [],
-        "guidelines": [],
-        "category": "dataset"
-      },
-      "date_published": {
-        "title": "Date of publication of the dataset",
-        "description": "Exact day (or year, if exact day is unknown) when the producer's dataset (in its current version) was published.",
-        "pattern": "(^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$)|(^\\d{4}$)|(^latest$)",
-        "errorMessage": "`date_published` must have format YYYY-MM-DD, YYYY or 'latest'",
-        "examples": [
-          "2022-07-11",
-          "1998",
-          "latest"
-        ],
-        "requirement_level": "required",
-        "examples_bad": [],
-        "guidelines": [],
-        "category": "dataset"
-      },
-      "dataset_description_producer": {
-        "type": "string",
-        "title": "Dataset description by the producer",
-        "description": "Description of the original dataset (written by the producer), if any was given.",
-        "requirement_level": "recommended (if existing)",
-        "examples": [],
-        "examples_bad": [],
-        "guidelines": [],
-        "category": "dataset"
-      },
       "producer": {
         "title": "Producer name",
         "type": "string",
-        "description": "Name of the institution or the author(s) that produced the dataset.",
+        "description": "Name of the institution or the author(s) that produced the data product.",
         "examples": [
+          "NASA",
+          "NASA",
+          "NASA",
+          "NASA",
           "World Bank",
-          "UN Population Division"
+          "Williams et al.",
+          "Williams et al.",
+          "Williams et al.",
+          "van Haasteren et al.",
+          "Williams and Jones",
+          "Williams and Jones"
         ],
-        "examples_bad": [],
+        "examples_bad": [
+          "NASA (2023)",
+          "N.A.S.A.",
+          "N A S A",
+          "National Aeronautics and Space Administration",
+          "Our World in Data based on NASA",
+          "WB",
+          "Williams et al. (2023)",
+          "Williams et al",
+          "John Williams et al.",
+          "Van Haasteren et al.",
+          "Williams & Jones",
+          "John Williams and Indiana Jones"
+        ],
         "requirement_level": "required",
         "guidelines": [
           ["Must start with a capital letter.", {"type": "exceptions", "value": ["The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."]}],
@@ -194,107 +162,233 @@
         ],
         "category": "citation"
       },
-      "citation_producer": {
+      "date_published": {
+        "title": "Date of publication of the original data",
         "type": "string",
-        "title": "Citation by the producer",
-        "description": "Full citation of the original dataset, as expressed by the producer.",
+        "description": "Exact day (or year, if exact day is unknown) when the producer's data (in its current version) was published.",
+        "examples": ["2023-09-07", "2023", "latest"],
+        "examples_bad": [],
         "requirement_level": "required",
+        "guidelines": [
+          "Must be a date with format `YYYY-MM-DD`, or, exceptionally, `YYYY`.",
+          "Must be the date when the current version of the dataset was published (not when the dataset was first released)."
+        ],
+        "pattern": "(^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$)|(^\\d{4}$)|(^latest$)",
+        "errorMessage": "`date_published` must have format YYYY-MM-DD, YYYY or 'latest'",
+        "category": "dataset"
+      },
+      "date_accessed": {
+        "title": "Date when we accessed the producer's original data",
+        "type": "string",
+        "format": "date",
+        "description": "Exact day when the producer's data (in its current version) was downloaded by OWID.",
+        "examples": ["2023-09-07"],
+        "examples_bad": [],
+        "requirement_level": "required",
+        "guidelines": [
+          "Must be a date with format `YYYY-MM-DD`.",
+          "Must be the date when the current version of the producer's data was accessed (not any other previous version)."
+        ],
+        "pattern": "^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$",
+        "errorMessage": "`date_accessed` must have format YYYY-MM-DD",
+        "category": "files"
+      },
+      "citation_producer": {
+        "title": "Full citation TODO: Rename `citation_full` (this is not necessarily written by the producer, and is the only place where we can host a full citation).",
+        "type": "string",
+        "description": "Full citation of the origin. If the producer expressed how to cite them, we should follow their recommendations.",
         "examples": [],
         "examples_bad": [],
-        "guidelines": [],
-        "category": "citation"
-      },
-      "attribution": {
-        "type": "string",
-        "title": "Attribution name",
-        "description": "Citation of the producer and publication year (and sometimes the dataset) that overrides the automatic attribution format `producer (year)` (where the `year` is automatically extracted from `date_published`).",
-        "requirement_level": "optional",
-        "examples": [
-          "Statistical Review of World Energy, Energy Institute (2023)"
+        "requirement_level": "required",
+        "guidelines": [
+          "Must start with a capital letter.",
+          "Must end with a period.",
+          "If the producer specified how to cite them, this field should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits. This field can be as long as necessary to follow the producer's guidelines.",
+          "If the origin is the compilation of multiple sources, they can be added here as a list."
         ],
-        "examples_bad": [],
-        "guidelines": [],
-        "category": "citation"
-      },
-      "attribution_short": {
-        "type": "string",
-        "title": "Attribution short name",
-        "description": "Shorter version of attribution, usually an acronym.",
-        "requirement_level": "optional",
-        "examples": [
-          "WB",
-          "UN",
-          "IHME"
-        ],
-        "examples_bad": [],
-        "guidelines": [],
         "category": "citation"
       },
       "dataset_url_main": {
-        "title": "URL of the dataset website",
-        "description": "Producer's URL leading to the main website of the dataset. This is not the URL To the specific file.",
+        "title": "URL of the main website of the data product TODO: Rename `url_main`.",
+        "type": "string",
+        "description": "Producer's URL leading to the main website of the original dataset.",
+        "requirement_level": "required",
+        "guidelines": [
+          "Must be a complete URL, i.e. `http...`.",
+          "Should lead to a website where the dataset is described."
+        ],
         "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
         "errorMessage": "'dataset_url_main' must be valid URL",
-        "requirement_level": "required",
         "examples": [
           "https://data.some_institution.com/dataset_12"
         ],
         "examples_bad": [],
-        "guidelines": [],
         "category": "files"
       },
       "dataset_url_download": {
-        "title": "Download URL of the dataset",
-        "description": "Producer's URL that directly downloads the dataset as a single file.",
+        "title": "URL to download the data product TODO: Rename `url_download`.",
+        "type": "string",
+        "description": "Producer's URL that directly downloads the data product as a single file.",
         "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
         "errorMessage": "'dataset_url_download' must be a valid URL",
         "requirement_level": "required (if existing)",
+        "guidelines": [
+          "Must be a complete URL, i.e. `http...`.",
+          "Must be a direct download link. The URL must not lead to a website that requires user input to download the dataset. If there is no direct download URL, this field should be empty."
+        ],
         "examples": [
           "https://data.some_institution.com/dataset_12/data.csv"
         ],
         "examples_bad": [],
-        "guidelines": [],
         "category": "files"
       },
-      "date_accessed": {
+      "dataset_title_producer": {
+        "title": "Dataset Title Producer TODO: Rename `data_product_title` (the title of the data product to show in data pages). If not given, fall back to `title`.",
         "type": "string",
-        "format": "date",
-        "title": "Date of access",
-        "description": "Exact day when the producer's dataset (in its current version) was downloaded by OWID.",
-        "pattern": "^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$",
-        "errorMessage": "`date_accessed` must have format YYYY-MM-DD",
-        "requirement_level": "required",
-        "examples": [
-          "2023-07-13"
+        "description": "Title of the original data product.",
+        "examples": ["Global Carbon Budget"],
+        "examples_bad": ["Global Carbon Budget (fossil fuels)"],
+        "requirement_level": "recommended (if existing)",
+        "guidelines": [
+          "Must start with a capital letter.",
+          "Must not end with a period.",
+          "Should identify the data product, not the subset of data we extract from it."
         ],
+        "category": "dataset"
+      },
+      "dataset_description_producer": {
+        "title": "Description of the data product TODO: Rename `data_product_description` (the description of the data product to show in data pages). If not given, fall back to `description`.",
+        "type": "string",
+        "description": "Description of the original data product.",
+        "examples": [],
         "examples_bad": [],
-        "guidelines": [],
-        "category": "files"
-
+        "requirement_level": "recommended",
+        "guidelines": [
+          "Must start with a capital letter.",
+          "Must end with a period.",
+          "Should describe the data product, not the snapshot (i.e. the subset of data we extract from the data product)."
+        ],
+        "category": "dataset"
+      },
+      "dataset_title_owid": {
+        "title": "Title of the snapshot TODO: Rename `title` (the title of the snapshot).",
+        "type": "string",
+        "description": "Title of the snapshot (i.e. the subset of data that we extract from the data product) which in most cases will coincide with the title of the data product.",
+        "examples": [
+          "Neutron star mergers",
+          "Neutron star mergers",
+          "Neutron star mergers"
+        ],
+        "examples_bad": [
+          "Neutron star mergers (NASA, 2023)",
+          "Data on neutron star mergers",
+          "Neutron star mergers dataset"
+        ],
+        "requirement_level": "recommended (if different from `data_product_title`)",
+        "guidelines": [
+          "Must start with a capital letter.",
+          "Must not end with a period.",
+          "Must not mention other metadata fields like `producer` or `version_producer`. Exceptions: The name of the origin is well known and includes other metadata fields.",
+          "Must not include any semicolon `;`.",
+          "Should not include words like `data`, `dataset` or `database`, unless that's part of a well-known name of the origin.",
+          "Should be descriptive of the content of the origin. Exceptions: The origin's title is well known but not descriptive, e.g. `Penn World Table`."
+        ],
+        "category": "dataset"
+      },
+      "dataset_description_owid": {
+        "title": "Description of the snapshot TODO: Rename `description` (the description of the snapshot, which in most cases will coincide with the title of the data product, but not always).",
+        "type": "string",
+        "description": "Description of the snapshot (i.e. the subset of data that we extract from the data product) which in most cases will coincide with the description of the data product.",
+        "requirement_level": "recommended",
+        "guidelines": [
+          "Must start with a capital letter.",
+          "Must end with a period.",
+          "Should not mention other metadata fields. If fields like `producer` or `date_published` are mentioned, placeholders should be used."
+        ],
+        "examples": [],
+        "examples_bad": [],
+        "category": "dataset"
+      },
+      "attribution": {
+        "type": "string",
+        "title": "Attribution",
+        "description": "Short citation of the producer and publication year (and sometimes the dataset) that overrides the automatic attribution format `producer (year)` (where the year is automatically extracted from `date_published`).",
+        "requirement_level": "optional",
+        "examples": [
+          "Statistical Review of World Energy, Energy Institute (2023)"
+        ],
+        "examples_bad": [
+          "Energy Institute - Statistical Review of World Energy (2023)"
+        ],
+        "guidelines": [
+          "Must start with a capital letter. Exceptions: The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`.",
+          "Must not end with a period.",
+          "Must end with the year of `date_published` in parenthesis.",
+          "Must not include any semicolon `;`.",
+          "Should only be used if the automatic attribution format `producer (year)`is incomplete. For example, when the dataset title is well known and should be cited along with the producer, or when the original dataset version should also be mentioned.",
+          "Should be constructed using placeholders, e.g. `{dataset_title_owid}, {producer} ({year})`."
+        ],
+        "category": "citation"
+      },
+      "attribution_short": {
+        "type": "string",
+        "title": "Attribution (shorter version)",
+        "description": "Shorter version of `attribution` (without the year), usually an acronym, to be used in public places that are short on space.",
+        "requirement_level": "recommended",
+        "examples": [
+          "FAO",
+          "FAO",
+          "World Bank"
+        ],
+        "examples_bad": [
+          "UN FAO",
+          "FAO (2023)",
+          "WB"
+        ],
+        "guidelines": [
+          "Must start with a capital letter. Exceptions: The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`.",
+          "Must not end with a period.",
+          "Should refer to the producer or the dataset title (if well known), not the year or any other field.",
+          "Should be an acronym, if the acronym is well-known, otherwise a brief name."
+        ],
+        "category": "citation"
+      },
+      "version_producer": {
+        "type": "string",
+        "title": "Version of the data as given by the producer",
+        "description": "Producer's version of the dataset.",
+        "requirement_level": "recommended (if existing)",
+        "examples": [],
+        "examples_bad": [],
+        "guidelines": [
+          "Should be used if the producer specifies the dataset version.",
+          "Should follow the same naming as the producer, e.g. `v13`, `2023.a`, `version II`."
+      ],
+        "category": "dataset"
       },
       "license": { "$ref": "#/license" }
     }
   },
   "display": {
     "type": "object",
+    "description": "We keep display for the time being as the 'less powerful sibling' of grapher config.",
     "properties": {
       "isProjection": {
         "type": "boolean",
         "default": false,
-        "description": "Indicates if this time series is a forward projection (if yes then this is rendered\ndifferently in e.g. line charts)\n"
+        "description": "Indicates if this time series is a forward projection (if so then this is rendered differently in e.g. line charts)."
       },
       "name": {
         "type": "string",
-        "description": "The display string for this variable"
+        "description": "Title to display for the indicator, to replace the indicator's `title`. NOTE: Currently, `grapher_config.title` will be used only in charts, whereas `display.name` will be used in other places, like the table tab."
       },
       "description": {
         "type": "string",
-        "description": "Variable description",
-        "$comment": "This is a new field that did not exist prior to November 2021 in the DB. It overrides the description on the variable DB table."
+        "description": "Description to display for the indicator, to replace the indicator's `description`."
       },
       "tableDisplay": {
         "type": "object",
-        "description": "Configuration for the table sheet for this variable",
+        "description": "Configuration for the table tab for this indicator, with options `hideAbsoluteChange` and `hideRelativeChange`.",
         "properties": {
           "hideAbsoluteChange": {
             "type": "boolean",
@@ -310,7 +404,7 @@
       "tolerance": {
         "type": "integer",
         "default": 0,
-        "description": "Tolerance to use. If data points are missing for a time point, a match is accepted if it lies\nwithin the specified time period. The unit is the dominating time unit, either years or days.\n",
+        "description": "Tolerance (in years or days) to use in charts. If data points are missing, the closest data point will be shown, if it lies within the specified tolerance.",
         "minimum": 0
       },
       "entityAnnotationsMap": {
@@ -320,37 +414,37 @@
       "yearIsDay": {
         "type": "boolean",
         "default": false,
-        "description": "Switch to indicate if the number in the year column represents a day (since zeroDay) or not i.e. a year"
+        "description": "Switch to indicate if the number in the year column represents a day (since zeroDay) or a year."
       },
       "color": {
         "type": "string",
-        "description": "Default color for this time series"
+        "description": "Color to use for the indicator in e.g. line charts."
       },
       "includeInTable": {
         "type": "boolean",
         "default": true,
-        "description": "Whether to render this time series in the table sheet"
+        "description": "Whether to render this indicator in the table sheet."
       },
       "shortUnit": {
         "type": "string",
-        "description": "Short unit symbol - This is used in tight UI spaces when the value is shown"
+        "description": "Short unit to use in charts instead of the indicator's `short_unit`."
       },
       "conversionFactor": {
         "type": "number",
-        "description": "Conversion factor to apply before showing values"
+        "description": "Conversion factor to apply to indicator values. NOTE: We should avoid using this, and instead convert data and units (and possibly other metadata fields where the units are mentioned) consistently in the ETL grapher step."
       },
       "unit": {
         "type": "string",
-        "description": "Long unit text - This is shown in the UI when there is more space (e.g. tooltips) after values"
+        "description": "Unit to use in charts instead of the indicator's `unit`."
       },
       "numDecimalPlaces": {
         "type": "integer",
-        "description": "Number of decimal places to show",
+        "description": "Number of decimal places to show in charts (and in the table tab).",
         "minimum": 0
       },
       "zeroDay": {
         "type": "string",
-        "description": "Iso date day string for the starting date if yearIsDay is used"
+        "description": "ISO date day string for the starting date if `yearIsDay` is `True`."
       }
     },
     "additionalProperties": false
