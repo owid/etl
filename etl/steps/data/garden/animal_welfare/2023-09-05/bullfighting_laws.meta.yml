@@ -1,0 +1,14 @@
+tables:
+  bullfighting_laws:
+    variables:
+      status:
+        title: Banning of bullfighting
+        unit: ""
+        short_unit: ""
+        processing_level: minor
+        presentation:
+          grapher_config:
+            title: Which countries have banned bullfighting?
+            map:
+              hideTimeline: true
+            note: "Countries where bullfighting is not banned may have sub-national bans. Partially banned means that the bull cannot be severely injured or killed during the event."
