@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    tb = paths.load_snapshot("chick_culling_laws.csv").read()
+    tb = paths.load_snapshot("bullfighting_laws.csv").read()
 
     #
     # Process data.

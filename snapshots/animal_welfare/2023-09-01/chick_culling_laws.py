@@ -78,7 +78,7 @@ def main(upload: bool) -> None:
         # Add countries for which there is evidence of chick culling with no ban.
         (
             "Australia",
-            "No laws",
+            "Not banned",
             np.nan,
             "",
             "Royal Society for the Prevention of Cruelty to Animals (RSPCA) Australia (2021-09-22).",
@@ -87,7 +87,7 @@ def main(upload: bool) -> None:
         ),
         (
             "Canada",
-            "No laws",
+            "Not banned",
             np.nan,
             "",
             "Canadian Poultry Magazine (2016-12-19).",
@@ -96,7 +96,7 @@ def main(upload: bool) -> None:
         ),
         (
             "New Zealand",
-            "No laws",
+            "Not banned",
             np.nan,
             "",
             "Save Animals From Exploitation (SAFE) New Zealand (2023).",
@@ -105,7 +105,7 @@ def main(upload: bool) -> None:
         ),
         (
             "United Kingdom",
-            "No laws",
+            "Not banned",
             np.nan,
             "",
             "The Humane League (2021-07-29).",
@@ -114,7 +114,7 @@ def main(upload: bool) -> None:
         ),
         (
             "United States",
-            "No laws",
+            "Not banned",
             np.nan,
             "",
             "Vox (2021-04-12).",
@@ -151,7 +151,7 @@ def main(upload: bool) -> None:
         data += (
             (
                 country,
-                "No laws",
+                "Not banned",
                 np.nan,
                 "",
                 "European Parliamentary Research Service (2022-12).",
