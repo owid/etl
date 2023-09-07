@@ -7,22 +7,23 @@ dataset:
     It has been constructed using the Correlates of War - War data dataset.
 
 
-    The regions defined by the source are:
+    Regions: The regions are defined based on Gleditsch and Ward codes (GWno). Find complete mapping at
+    https://correlatesofwar.org/wp-content/uploads/system2016.csv
 
-      • W. Hemisphere (we have renamed this to "Americas")
+    The regions defined by the source are the following.
 
-      • Europe
+      • W. Hemisphere (we have renamed this to "Americas"): 2-199
 
-      • Africa
+      • Europe: 200-399
 
-      • Middle East
+      • Africa: 400-626
 
-      • Asia
+      • Middle East: 630-699
 
-      • Oceania
+      • Asia: 700-859
 
+      • Oceania: 860-999
 
-      The source does not specify the countries within each region.
 
 tables:
   cow:

@@ -7,6 +7,70 @@ the fields they contain, etc.
     - Therefore, a conflict (or at least how it is identified in this dataset) never changes its type.
     - There are fields explaining if a conflict transformed to another conflict (i.e. it stops being in the "inter-state" table with id X, and
     starts being in the "intra-state" table with id Y).
+
+
+ON REGIONS
+
+    - Handling regions in COW dataset is complex because we are integrating four different datasets:
+        - Extra-state: Regions are as defined by REGIONS_RENAME.
+
+                        Originally encoded regions:
+
+                        1 = W. Hemisphere
+                        2 = Europe
+                        4 = Africa
+                        6 = Middle East
+                        7 = Asia
+                        9 = Oceania
+
+        - Non-state: Regions are as defined by REGIONS_RENAME.
+
+                        Originally encoded regions:
+
+                        1 = W. Hemisphere
+                        2 = Europe
+                        4 = Africa
+                        6 = Middle East
+                        7 = Asia
+                        9 = Oceania
+
+        - Inter-state: Contains several region composites*. We de-aggregate these and distribute deaths uniformly across its regions.
+                        If there are 10 deaths in "Asia & Europe", we assign 5 deaths to Asia and 5 deaths to Europe.
+
+                        Originally encoded regions:
+
+                        1 = W. Hemisphere
+                        2 = Europe
+                        4 = Africa
+                        6 = Middle East
+                        7 = Asia
+                        9 = Oceania
+                        11 = Europe & Middle East
+                        12 = Europe & Asia
+                        13 = W. Hemisphere & Asia
+                        14 = Europe, Africa & Middle East
+                        15 = Europe, Africa, Middle East, & Asia
+                        16 = Africa, Middle East, Asia & Oceania
+                        17 = Asia & Oceania
+                        18 = Africa & Middle East
+                        19 = Europe, Africa, Middle East, Asia & Oceania
+
+        - Intra-state: For some reason, regions follow a different numbering. Therefore we standardise this in `standardise_region_ids` (i.e. assign the correct numbers).
+                        Also, we have "undone" region composites. Note that we can't assign a conflict to multiple regions, since these are intra-state (i.e. should only be mapped to one region!).
+
+                        TODO: Why does intra-state use a different region numbering? (contact people from COW)
+
+                        Originally encoded regions:
+
+                        1 = North America
+                        2 = South America
+                        3 = Europe
+                        4 = Sub-Saharan Africa
+                        5 = Middle East and North Africa
+                        6 = Asia and Oceania.
+
+* A "region composite" is a regions such that it is a combination of several regions, e.g. "Europe & Asia".
+
 """
 
 import json
@@ -24,14 +88,14 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 # Logger
 log = get_logger()
-# Region mapping (extra- and non-state, inter after de-aggregating)
+# Region mapping (extra- and non-state, intra after region code standardisation, and inter after de-aggregating composite regions)
 REGIONS_RENAME = {
-    1: "Americas",
-    2: "Europe",
-    4: "Africa",
-    6: "Middle East",
-    7: "Asia",
-    9: "Oceania",
+    1: "Americas (COW)",
+    2: "Europe (COW)",
+    4: "Africa (COW)",
+    6: "Middle East (COW)",
+    7: "Asia (COW)",
+    9: "Oceania (COW)",
 }
 # Mapping conflicts to regions for some intra-state conflicts
 ## We map intrastate conflicts to only one region. We have region composites (ME & NA, Asia & Oceania) and we need to find the actual region.
@@ -464,23 +528,23 @@ def split_regions_composites(tb: Table) -> Table:
     to Europe and Asia, respectively.
     """
     REGIONS_INTER_SPLIT = {
-        # Europe & Middle East
+        # Europe & Middle East -> Europe, Middle East
         11: [2, 6],
-        # Europe & Asia
+        # Europe & Asia -> Europe, Asia
         12: [2, 7],
-        # Americas & Asia
+        # Americas & Asia -> Americas, Asia
         13: [1, 7],
-        # Europe & Africa & Middle East
+        # Europe & Africa & Middle East -> Europe, Africa, Middle East
         14: [2, 4, 6],
-        # Europe & Africa & Middle East & Asia
+        # Europe & Africa & Middle East & Asia -> Europe, Africa, Middle East, Asia
         15: [2, 4, 6, 7],
-        # Africa, Middle East, Asia & Oceania
+        # Africa, Middle East, Asia & Oceania -> Africa, Middle East, Asia, Oceania
         16: [4, 6, 7, 9],
-        # Asia & Oceania
+        # Asia & Oceania -> Asia, Oceania
         17: [7, 9],
-        # Africa & Middle East
+        # Africa & Middle East -> Africa, Middle East
         18: [4, 6],
-        # Europe, Africa, Middle East, Asia & Oceania
+        # Europe, Africa, Middle East, Asia & Oceania -> Europe, Africa, Middle East, Asia, Oceania
         19: [2, 4, 6, 7, 9],
     }
     tb["region"] = tb["region"].map(REGIONS_INTER_SPLIT).fillna(tb["region"])
@@ -565,10 +629,10 @@ def standardise_region_ids(tb: Table) -> Table:
 
     Also, this dataset uses composite regions, such as "Middle East and Northern Africa" or "Asia and Oceania". This function
     replaces rows with these composites with individual valid regions. That is, assigns "Africa" to a conflict labeled with region
-    "Middle East and Northern Afrrica", if that's the actual region. This has been done manually, bu carefully assigning regions to
+    "Middle East and Northern Africa", if that's the actual region. This has been done manually, by carefully assigning regions to
     each conflict.
     """
-    # Map to standard numbering
+    # Map to standard numbering (COW Intra-state uses different numbering)
     regions_mapping = {
         1: 1,  # Americas (NA)
         2: 1,  # Americas (SA)
