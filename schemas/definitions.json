@@ -203,8 +203,8 @@
         "guidelines": [
           ["Must start with a capital letter."],
           ["Must end with a period."],
-          ["If the producer specified how to cite them, this field should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits. This field can be as long as necessary to follow the producer's guidelines.",
-          "If the origin is the compilation of multiple sources, they can be added here as a list."]
+          ["If the producer specified how to cite them, this field should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits. This field can be as long as necessary to follow the producer's guidelines."],
+          ["If the origin is the compilation of multiple sources, they can be added here as a list."]
         ],
         "category": "citation"
       },
