@@ -22,8 +22,8 @@ paths = PathFinder(__file__)
 log = get_logger()
 # Region mapping
 REGIONS_RENAME = {
-    1: "America",  # "North America, Central America, and the Caribbean (Brecke)",
-    2: "America",  # "South America (Brecke)",
+    1: "Americas",  # "North America, Central America, and the Caribbean (Brecke)",
+    2: "Americas",  # "South America (Brecke)",
     3: "Europe",  # "Western Europe (Brecke)",
     4: "Europe",  # "Eastern Europe (Brecke)",
     5: "Middle East (Brecke)",

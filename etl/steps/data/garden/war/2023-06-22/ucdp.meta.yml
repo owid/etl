@@ -23,7 +23,7 @@ dataset:
 
       • Middle East: 630-699
 
-      • Asia: 700-999
+      • Asia and Oceania: 700-999
 
 
 
@@ -50,7 +50,7 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
       number_deaths_ongoing_conflicts_high:
@@ -69,7 +69,7 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
       number_deaths_ongoing_conflicts_low:
@@ -93,7 +93,7 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
 
@@ -114,7 +114,7 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
       number_new_conflicts:
@@ -141,6 +141,6 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East

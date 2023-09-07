@@ -7,7 +7,18 @@ dataset:
     It has been constructed using the Battledeaths PRIO v3.1 dataset.
 
 
-    Regions equivalent to COW War dataset.
+    Regions: The regions are defined based on Gleditsch and Ward codes (GWno). Find complete mapping at
+    https://dornsife.usc.edu/assets/sites/298/docs/country_to_gwno_PUBLIC_6-5-2015.txt
+
+      • Americas: 2-199
+
+      • Europe: 200-399
+
+      • Africa: 400-626
+
+      • Middle East: 630-699
+
+      • Asia and Oceania: 700-999
 
 tables:
   prio_v31:
@@ -25,7 +36,7 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
       number_deaths_ongoing_conflicts_battle_low:
@@ -40,7 +51,7 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
       number_deaths_ongoing_conflicts_battle:
@@ -58,7 +69,7 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
 
@@ -78,7 +89,7 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
       number_new_conflicts:
@@ -101,6 +112,6 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
