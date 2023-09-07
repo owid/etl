@@ -11,8 +11,8 @@ meta:
   url: https://ucdp.uu.se/downloads/index.html
   source_data_url: https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-221-csv.zip
   file_extension: zip
-  license_url:
-  license_name:
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_name: CC BY 4.0
   date_accessed: 2023-03-14
   is_public: true
   description: |
