@@ -55,17 +55,18 @@ nav:
         - Metadata fields: "architecture/metadata/fields.md"
         - Propagation of metadata: "architecture/metadata/propagation.md"
         - Using metadata: "architecture/metadata/using.md"
-  - Dataset catalog:
-    - Dataset catalog: "data/index.md"
-    - Faostat: "data/faostat.md"
-    - Regions: "data/regions.md"
-  - API:
+  - API and catalog:
     - API: "api/index.md"
     - Python: "api/python.ipynb"
-  - Development:
-    - Development: "dev/index.md"
-    - Documentation: "dev/docs.md"
-  - Contributing: "contributing.md"
+    - Dataset catalog:
+      - Dataset catalog: "data/index.md"
+      - Faostat: "data/faostat.md"
+      - Regions: "data/regions.md"
+  - Contributing:
+    - Contributing: "contributing.md"
+    - Maintenance:
+      - Maintenance: "dev/index.md"
+      - Documentation: "dev/docs.md"
 
 theme:
   # logo: assets/logo.png
