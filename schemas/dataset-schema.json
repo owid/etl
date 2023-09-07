@@ -230,8 +230,8 @@
           "title": "Number of days between OWID updates",
           "description": "Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`.",
           "guidelines": [
-            "Must be defined in the garden step.",
-            "Must be an integer."
+            ["Must be defined in the garden step."],
+            ["Must be an integer."]
           ],
           "examples": ["7", "30", "90", "365"],
           "examples_bad": ["2023-10-10", "monthly", "1/365", "0.25"],
@@ -297,11 +297,11 @@
                   ],
                   "requirement_level": "required",
                   "guidelines": [
-                    "Must start with a capital letter.",
-                    "Must not end with a period.",
-                    "Must be one short sentence (a few words).",
-                    "Should not mention other metadata fields like `producer` or `version`.",
-                    "For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), consider using other metadata fields to improve the public appearance of the title (namely `presentation.title_public` and `grapher_config.title`)."
+                    ["Must start with a capital letter."],
+                    ["Must not end with a period."],
+                    ["Must be one short sentence (a few words)."],
+                    ["Should not mention other metadata fields like `producer` or `version`."],
+                    ["For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), consider using other metadata fields to improve the public appearance of the title (namely `presentation.title_public` and `grapher_config.title`)."]
                   ],
                   "category": "metadata"
                 },
@@ -311,10 +311,10 @@
                   "description": "One or a few lines that complement the title, so you have a short description of the indicator.",
                   "requirement_level": "required",
                   "guidelines": [
-                    "Must start with a capital letter.",
-                    "Must end with a period.",
-                    "Must be one short paragraph, suitable to fit in a chart subtitle.",
-                    "Should not mention any other metadata fields (like information about the processing, or the origins, or the units). Exceptions: The unit can be mentioned if it is crucial for the description."
+                    ["Must start with a capital letter."],
+                    ["Must end with a period."],
+                    ["Must be one short paragraph, suitable to fit in a chart subtitle."],
+                    ["Should not mention any other metadata fields (like information about the processing, or the origins, or the units). Exceptions: The unit can be mentioned if it is crucial for the description."]
                   ],
                   "category": "metadata"
                 },
@@ -327,12 +327,12 @@
                   "description": "List of key points about the indicator.",
                   "requirement_level": "recommended (only for curated data pages)",
                   "guidelines": [
-                    "Must be a list of one or more short paragraphs.",
-                    "Each paragraph must start with a capital letter.",
-                    "Each paragraph must end with a period.",
-                    "Should contain all the key information given in other description fields, like `description_short`, `grapher_config.subtitle` or `grapher_config.note`.",
-                    "Should not contain information about processing (which should be in `description_processing`).",
-                    "Should only contain information that is key to the public. Anything that is too detailed or technical should be left in the code."
+                    ["Must be a list of one or more short paragraphs."],
+                    ["Each paragraph must start with a capital letter."],
+                    ["Each paragraph must end with a period."],
+                    ["Should contain all the key information given in other description fields, like `description_short`, `grapher_config.subtitle` or `grapher_config.note`."],
+                    ["Should not contain information about processing (which should be in `description_processing`)."],
+                    ["Should only contain information that is key to the public. Anything that is too detailed or technical should be left in the code."]
                   ],
                   "category": "metadata"
                 },
@@ -342,11 +342,11 @@
                   "description": "Relevant information about the processing of the indicator done by OWID.",
                   "requirement_level": "mandatory (if applicable)",
                   "guidelines": [
-                    "Must start with a capital letter.",
-                    "Must end with a period.",
-                    "Must be used if important editorial decisions have been taken during data processing.",
-                    "Must not be used to describe common processing steps like country harmonization.",
-                    "Should only contain key processing information to the public. Anything that is too detailed or technical should be left in the code."
+                    ["Must start with a capital letter."],
+                    ["Must end with a period."],
+                    ["Must be used if important editorial decisions have been taken during data processing."],
+                    ["Must not be used to describe common processing steps like country harmonization."],
+                    ["Should only contain key processing information to the public. Anything that is too detailed or technical should be left in the code."]
                   ],
                   "category": "metadata"
                 },
@@ -356,10 +356,10 @@
                   "description": "Description of the indicator written by the producer, if any was given.",
                   "requirement_level": "recommended (if existing)",
                   "guidelines": [
-                    "Must start with a capital letter.",
-                    "Must end with a period.",
-                    "Should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits.",
-                    "Should only be given if the producer clearly provides such definitions in a structured way. Avoid spending time searching for a definition given by the producer elsewhere."
+                    ["Must start with a capital letter."],
+                    ["Must end with a period."],
+                    ["Should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits."],
+                    ["Should only be given if the producer clearly provides such definitions in a structured way. Avoid spending time searching for a definition given by the producer elsewhere."]
                   ],
                   "category": "metadata"
                 },
@@ -371,13 +371,13 @@
                   "examples_bad": ["tonnes/hectare", "kilowatts per capita"],
                   "requirement_level": "required",
                   "guidelines": [
-                    "Must not start with a capital letter.",
-                    "Must not end with a period.",
-                    "Must be empty if the indicator has no units.",
-                    "Must be in plural.",
-                    "Must be a metric unit when applicable.",
-                    "Should not use symbols like “/”. If it is a derived unit, use “per” to denote a division, e.g. '... per hectare', or '... per person'.",
-                    "Should be '%' for percentages."
+                    ["Must not start with a capital letter."],
+                    ["Must not end with a period."],
+                    ["Must be empty if the indicator has no units."],
+                    ["Must be in plural."],
+                    ["Must be a metric unit when applicable."],
+                    ["Should not use symbols like “/”. If it is a derived unit, use “per” to denote a division, e.g. '... per hectare', or '... per person'."],
+                    ["Should be '%' for percentages."]
                   ],
                   "category": "metadata"
                 },
@@ -389,11 +389,11 @@
                   "examples_bad": ["t / ha", "pct", "pc"],
                   "requirement_level": "required",
                   "guidelines": [
-                    "Must follow the rules of capitalization of the International System of Units, when applicable.",
-                    "Must not end with a period.",
-                    "Must be empty if the indicator has no units.",
-                    "Should not contain spaces.",
-                    "If, for clarity, we prefer to simplify the units in a chart, e.g. to show `kWh` instead of `kWh/person`, use `display.short_unit` for the simplified units, and keep the correct one in `indicator.short_unit` (and ensure there is no ambiguity in the chart)."
+                    ["Must follow the rules of capitalization of the International System of Units, when applicable."],
+                    ["Must not end with a period."],
+                    ["Must be empty if the indicator has no units."],
+                    ["Should not contain spaces."],
+                    ["If, for clarity, we prefer to simplify the units in a chart, e.g. to show `kWh` instead of `kWh/person`, use `display.short_unit` for the simplified units, and keep the correct one in `indicator.short_unit` (and ensure there is no ambiguity in the chart)."]
                   ],
                   "category": "metadata"
                 },
@@ -404,8 +404,8 @@
                   "description": "Level of processing that the indicator values have experienced.",
                   "requirement_level": "mandatory (in the future this could be automatic).",
                   "guidelines": [
-                    "Must be `minor` if the indicator has undergone only minor operations since its origin: rename entities (e.g. countries or columns), multiplication by a constant (e.g. unit change), or drop missing values.",
-                    "Must be `major` if any other operation is used: data aggregates (e.g. sum data for continents or income groups), operations between indicators (e.g. per capita, percentages, annual changes), concatenation of indicators, etc."
+                    ["Must be `minor` if the indicator has undergone only minor operations since its origin: rename entities (e.g. countries or columns), multiplication by a constant (e.g. unit change), or drop missing values."],
+                    ["Must be `major` if any other operation is used: data aggregates (e.g. sum data for continents or income groups), operations between indicators (e.g. per capita, percentages, annual changes), concatenation of indicators, etc."]
                   ],
                   "category": "metadata"
                 },
@@ -415,8 +415,8 @@
                   "description": "License of the indicator, which depends on the indicator's processing level and the origins' licenses.",
                   "requirement_level": "required (in the future this could be automatic)",
                   "guidelines": [
-                    "If the indicator's `processing_level` is major, assign `CC BY 4.0`.",
-                    "If the indicator's `processing_level` is minor, choose the most strict license among the origins' `licenses`."
+                    ["If the indicator's `processing_level` is major, assign `CC BY 4.0`."],
+                    ["If the indicator's `processing_level` is minor, choose the most strict license among the origins' `licenses`."]
                   ],
                   "category": "metadata"
                 },
@@ -460,10 +460,10 @@
                       "description": "Short disambiguation of the title that references a special feature of the methods or nature of the data.",
                       "requirement_level": "optional",
                       "guidelines": [
-                        "Must start with a capital letter.",
-                        "Must not end in a period.",
-                        "Should be very short.",
-                        "Should only be used if the indicator's title is ambiguous (e.g. if there are multiple indicators with the same title)."
+                        ["Must start with a capital letter."],
+                        ["Must not end in a period."],
+                        ["Should be very short."],
+                        ["Should only be used if the indicator's title is ambiguous (e.g. if there are multiple indicators with the same title)."]
                       ],
                       "examples": [
                         "Age-standardized",
@@ -478,10 +478,10 @@
                       "type": "string",
                       "description": "",
                       "guidelines": [
-                        "Must start with a capital letter.",
-                        "Must join multiple attributions by a `;`.",
-                        "Must not end in a period (and must **not** end in `;`).",
-                        "Should only be used when the automatic attribution format (of one or multiple origins) needs to be manually edited."
+                        ["Must start with a capital letter."],
+                        ["Must join multiple attributions by a `;`."],
+                        ["Must not end in a period (and must **not** end in `;`)."],
+                        ["Should only be used when the automatic attribution format (of one or multiple origins) needs to be manually edited."]
                       ],
                       "requirement_level": "optional"
                     },
@@ -490,10 +490,10 @@
                       "description": "Very short citation of the indicator's main producer(s). TODO: Rename `attribution_short` (given that it could also be a dataset name, in the same way that we have `attribution_short` at the origin level). TODO: By default, this field should automatically be filled out by concatenating the `origin.attribution_short` of all the origins in an indicator. But when there are multiple origins and this field is too long (we could raise a warning when running the step), this field can be used to manually edit the resulting attribution.",
                       "requirement_level": "recommended (for curated data pages)",
                       "guidelines": [
-                        "Must start with a capital letter.",
-                        "Must not end in a period.",
-                        "Should be very short.",
-                        "Should be used if the automatic concatenation of origin's `attribution_short` are too long. In those cases, choose the most important `attribution` (e.g. the main producer of the data)."
+                        ["Must start with a capital letter."],
+                        ["Must not end in a period."],
+                        ["Should be very short."],
+                        ["Should be used if the automatic concatenation of origin's `attribution_short` are too long. In those cases, choose the most important `attribution` (e.g. the main producer of the data)."]
                       ]
                     },
                     "topic_tags_links": {
@@ -501,9 +501,9 @@
                       "description": "List of topics where the indicator is relevant. TODO: Rename `topic_tags`.",
                       "requirement_level": "recommended (only for curated data pages)",
                       "guidelines": [
-                        "Must be an existing topic tag, and be spelled correctly (see the list of topic tags in http://datasette-private/owid?sql=SELECT+tags.%60name%60+from+tags+where+isTopic+%3D+1+ORDER+BY+tags.%60name%60%0D%0A).",
-                        "The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator).",
-                        "Should contain 1, 2, or at most 3 tags."
+                        ["Must be an existing topic tag, and be spelled correctly (see the list of topic tags in http://datasette-private/owid?sql=SELECT+tags.%60name%60+from+tags+where+isTopic+%3D+1+ORDER+BY+tags.%60name%60%0D%0A)."],
+                        ["The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator)."],
+                        ["Should contain 1, 2, or at most 3 tags."]
                       ],
                       "items": { "type": "string" }
                     },
@@ -512,7 +512,7 @@
                       "description": "List of references to questions in an FAQ google document, relevant to the indicator.",
                       "requirement_level": "recommended (only for curated data pages)",
                       "guidelines": [
-                        "Each reference must contain `fragment_id` (question identifier) and `gdoc_id` (document identifier)."
+                        ["Each reference must contain `fragment_id` (question identifier) and `gdoc_id` (document identifier)."]
                       ],
                       "items": {
                         "type": "object",
@@ -625,9 +625,9 @@
                           "type": "string",
                           "description": "Default subtitle to use in charts for the indicator. NOTE: Use this field to override an indicator's `description_short` with information that is more suitable for a chart subtitle.",
                           "guidelines": [
-                            "Must start with a capital letter.",
-                            "Must end with a period.",
-                            "Must be one short paragraph, suitable to fit in a chart subtitle."
+                            ["Must start with a capital letter."],
+                            ["Must end with a period."],
+                            ["Must be one short paragraph, suitable to fit in a chart subtitle."]
                           ]
                         },
                         "selectedEntityNames": {
@@ -781,11 +781,11 @@
                           "type": "string",
                           "description": "Default footer note to use in charts for the indicator.",
                           "guidelines": [
-                            "Must start with a capital letter.",
-                            "Must end with a period.",
-                            "Must not include 'Note:' at the beginning (this is added automatically).",
-                            "Must be one short paragraph, usually one sentence, suitable to fit in a chart footer note.",
-                            "Should not mention any other metadata fields."
+                            ["Must start with a capital letter."],
+                            ["Must end with a period."],
+                            ["Must not include 'Note:' at the beginning (this is added automatically)."],
+                            ["Must be one short paragraph, usually one sentence, suitable to fit in a chart footer note."],
+                            ["Should not mention any other metadata fields."]
                           ]
                         },
                         "dimensions": {

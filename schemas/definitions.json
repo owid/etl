@@ -36,10 +36,10 @@
         ],
         "examples_bad": [],
         "guidelines": [
-          "If it's a standard license, e.g. CC, it should be one of the acronyms in the examples below.",
-          "If the license is CC, but the version is not specified, assume 4.0.",
-          "If it's a custom license defined by the producer, it should follow the producer's text.",
-          "When the license of an external dataset is not specified, temporarily assume `CC BY 4.0`. Contact the producer before publishing. If there is no response after a few days, ask Ed or Este and decide on a case-by-case basis."
+          ["If it's a standard license, e.g. CC, it should be one of the acronyms in the examples below."],
+          ["If the license is CC, but the version is not specified, assume 4.0."],
+          ["If it's a custom license defined by the producer, it should follow the producer's text."],
+          ["When the license of an external dataset is not specified, temporarily assume `CC BY 4.0`. Contact the producer before publishing. If there is no response after a few days, ask Ed or Este and decide on a case-by-case basis."]
         ],
         "category": "license"
       },
@@ -52,10 +52,10 @@
         "examples": [],
         "examples_bad": [],
         "guidelines": [
-          "Must be a complete URL, i.e. `http...` .",
-          "Must not lead to a Creative Commons website or any other generic page, but to the place where the producer specifies the license of the data.",
-          "If the license is specified inside, say, a PDF document, the URL should be the download link of that document.",
-          "When the license of an external dataset is not specified, leave `url` empty. Do not use the URL of the main page of the dataset if the license is not mentioned anywhere."
+          ["Must be a complete URL, i.e. `http...` ."],
+          ["Must not lead to a Creative Commons website or any other generic page, but to the place where the producer specifies the license of the data."],
+          ["If the license is specified inside, say, a PDF document, the URL should be the download link of that document."],
+          ["When the license of an external dataset is not specified, leave `url` empty. Do not use the URL of the main page of the dataset if the license is not mentioned anywhere."]
         ],
         "category": "license"
       }
@@ -170,8 +170,8 @@
         "examples_bad": [],
         "requirement_level": "required",
         "guidelines": [
-          "Must be a date with format `YYYY-MM-DD`, or, exceptionally, `YYYY`.",
-          "Must be the date when the current version of the dataset was published (not when the dataset was first released)."
+          ["Must be a date with format `YYYY-MM-DD`, or, exceptionally, `YYYY`."],
+          ["Must be the date when the current version of the dataset was published (not when the dataset was first released)."]
         ],
         "pattern": "(^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$)|(^\\d{4}$)|(^latest$)",
         "errorMessage": "`date_published` must have format YYYY-MM-DD, YYYY or 'latest'",
@@ -186,8 +186,8 @@
         "examples_bad": [],
         "requirement_level": "required",
         "guidelines": [
-          "Must be a date with format `YYYY-MM-DD`.",
-          "Must be the date when the current version of the producer's data was accessed (not any other previous version)."
+          ["Must be a date with format `YYYY-MM-DD`."],
+          ["Must be the date when the current version of the producer's data was accessed (not any other previous version)."]
         ],
         "pattern": "^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$",
         "errorMessage": "`date_accessed` must have format YYYY-MM-DD",
@@ -201,10 +201,10 @@
         "examples_bad": [],
         "requirement_level": "required",
         "guidelines": [
-          "Must start with a capital letter.",
-          "Must end with a period.",
-          "If the producer specified how to cite them, this field should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits. This field can be as long as necessary to follow the producer's guidelines.",
-          "If the origin is the compilation of multiple sources, they can be added here as a list."
+          ["Must start with a capital letter."],
+          ["Must end with a period."],
+          ["If the producer specified how to cite them, this field should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits. This field can be as long as necessary to follow the producer's guidelines.",
+          "If the origin is the compilation of multiple sources, they can be added here as a list."]
         ],
         "category": "citation"
       },
@@ -214,8 +214,8 @@
         "description": "Producer's URL leading to the main website of the original dataset.",
         "requirement_level": "required",
         "guidelines": [
-          "Must be a complete URL, i.e. `http...`.",
-          "Should lead to a website where the dataset is described."
+          ["Must be a complete URL, i.e. `http...`."],
+          ["Should lead to a website where the dataset is described."]
         ],
         "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
         "errorMessage": "'dataset_url_main' must be valid URL",
@@ -233,8 +233,8 @@
         "errorMessage": "'dataset_url_download' must be a valid URL",
         "requirement_level": "required (if existing)",
         "guidelines": [
-          "Must be a complete URL, i.e. `http...`.",
-          "Must be a direct download link. The URL must not lead to a website that requires user input to download the dataset. If there is no direct download URL, this field should be empty."
+          ["Must be a complete URL, i.e. `http...`."],
+          ["Must be a direct download link. The URL must not lead to a website that requires user input to download the dataset. If there is no direct download URL, this field should be empty."]
         ],
         "examples": [
           "https://data.some_institution.com/dataset_12/data.csv"
@@ -250,9 +250,9 @@
         "examples_bad": ["Global Carbon Budget (fossil fuels)"],
         "requirement_level": "recommended (if existing)",
         "guidelines": [
-          "Must start with a capital letter.",
-          "Must not end with a period.",
-          "Should identify the data product, not the subset of data we extract from it."
+          ["Must start with a capital letter."],
+          ["Must not end with a period."],
+          ["Should identify the data product, not the subset of data we extract from it."]
         ],
         "category": "dataset"
       },
@@ -264,9 +264,9 @@
         "examples_bad": [],
         "requirement_level": "recommended",
         "guidelines": [
-          "Must start with a capital letter.",
-          "Must end with a period.",
-          "Should describe the data product, not the snapshot (i.e. the subset of data we extract from the data product)."
+          ["Must start with a capital letter."],
+          ["Must end with a period."],
+          ["Should describe the data product, not the snapshot (i.e. the subset of data we extract from the data product)."]
         ],
         "category": "dataset"
       },
@@ -286,12 +286,12 @@
         ],
         "requirement_level": "recommended (if different from `data_product_title`)",
         "guidelines": [
-          "Must start with a capital letter.",
-          "Must not end with a period.",
-          "Must not mention other metadata fields like `producer` or `version_producer`. Exceptions: The name of the origin is well known and includes other metadata fields.",
-          "Must not include any semicolon `;`.",
-          "Should not include words like `data`, `dataset` or `database`, unless that's part of a well-known name of the origin.",
-          "Should be descriptive of the content of the origin. Exceptions: The origin's title is well known but not descriptive, e.g. `Penn World Table`."
+          ["Must start with a capital letter."],
+          ["Must not end with a period."],
+          ["Must not mention other metadata fields like `producer` or `version_producer`. Exceptions: The name of the origin is well known and includes other metadata fields."],
+          ["Must not include any semicolon `;`."],
+          ["Should not include words like `data`, `dataset` or `database`, unless that's part of a well-known name of the origin."],
+          ["Should be descriptive of the content of the origin. Exceptions: The origin's title is well known but not descriptive, e.g. `Penn World Table`."]
         ],
         "category": "dataset"
       },
@@ -301,9 +301,9 @@
         "description": "Description of the snapshot (i.e. the subset of data that we extract from the data product) which in most cases will coincide with the description of the data product.",
         "requirement_level": "recommended",
         "guidelines": [
-          "Must start with a capital letter.",
-          "Must end with a period.",
-          "Should not mention other metadata fields. If fields like `producer` or `date_published` are mentioned, placeholders should be used."
+          ["Must start with a capital letter."],
+          ["Must end with a period."],
+          ["Should not mention other metadata fields. If fields like `producer` or `date_published` are mentioned, placeholders should be used."]
         ],
         "examples": [],
         "examples_bad": [],
@@ -321,12 +321,12 @@
           "Energy Institute - Statistical Review of World Energy (2023)"
         ],
         "guidelines": [
-          "Must start with a capital letter. Exceptions: The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`.",
-          "Must not end with a period.",
-          "Must end with the year of `date_published` in parenthesis.",
-          "Must not include any semicolon `;`.",
-          "Should only be used if the automatic attribution format `producer (year)`is incomplete. For example, when the dataset title is well known and should be cited along with the producer, or when the original dataset version should also be mentioned.",
-          "Should be constructed using placeholders, e.g. `{dataset_title_owid}, {producer} ({year})`."
+          ["Must start with a capital letter. Exceptions: The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."],
+          ["Must not end with a period."],
+          ["Must end with the year of `date_published` in parenthesis."],
+          ["Must not include any semicolon `;`."],
+          ["Should only be used if the automatic attribution format `producer (year)`is incomplete. For example, when the dataset title is well known and should be cited along with the producer, or when the original dataset version should also be mentioned."],
+          ["Should be constructed using placeholders, e.g. `{dataset_title_owid}, {producer} ({year})`."]
         ],
         "category": "citation"
       },
@@ -346,10 +346,10 @@
           "WB"
         ],
         "guidelines": [
-          "Must start with a capital letter. Exceptions: The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`.",
-          "Must not end with a period.",
-          "Should refer to the producer or the dataset title (if well known), not the year or any other field.",
-          "Should be an acronym, if the acronym is well-known, otherwise a brief name."
+          ["Must start with a capital letter. Exceptions: The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."],
+          ["Must not end with a period."],
+          ["Should refer to the producer or the dataset title (if well known), not the year or any other field."],
+          ["Should be an acronym, if the acronym is well-known, otherwise a brief name."]
         ],
         "category": "citation"
       },
@@ -361,8 +361,8 @@
         "examples": [],
         "examples_bad": [],
         "guidelines": [
-          "Should be used if the producer specifies the dataset version.",
-          "Should follow the same naming as the producer, e.g. `v13`, `2023.a`, `version II`."
+          ["Should be used if the producer specifies the dataset version."],
+          ["Should follow the same naming as the producer, e.g. `v13`, `2023.a`, `version II`."]
       ],
         "category": "dataset"
       },
