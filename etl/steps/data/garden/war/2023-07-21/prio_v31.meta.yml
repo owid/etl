@@ -8,7 +8,7 @@ dataset:
 
 
     Regions: The regions are defined based on Gleditsch and Ward codes (GWno), as in "UCDP/PRIO Armed Conflict Dataset".
-    Find complete mapping at https://dornsife.usc.edu/assets/sites/298/docs/country_to_gwno_PUBLIC_6-5-2015.txt.
+    Find complete mapping at http://ksgleditsch.com/data/iisystem.dat (states) and http://ksgleditsch.com/data/microstatessystem.dat (micro-states)
 
       • Americas: 2-199
 
