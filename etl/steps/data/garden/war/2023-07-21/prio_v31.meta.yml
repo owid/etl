@@ -8,7 +8,7 @@ dataset:
     Deaths of combatants and civilians due to fighting are included.
 
     We use the world regions as defined by PRIO: Africa, Americas, Asia, Europe, and Middle East. The regions are defined based on Gleditsch and Ward codes, as in "UCDP/PRIO Armed Conflict Dataset".
-    Find complete mapping at http://ksgleditsch.com/data/iisystem.dat (states) and http://ksgleditsch.com/data/microstatessystem.dat (micro-states).
+    Find the complete mapping at http://ksgleditsch.com/data/iisystem.dat (states) and http://ksgleditsch.com/data/microstatessystem.dat (micro-states).
 
       • Americas: 2-199
 

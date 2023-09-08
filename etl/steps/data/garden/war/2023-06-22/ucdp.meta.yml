@@ -109,7 +109,7 @@ dataset:
     The Georeferenced Event Dataset has been extracted from the UCDP systems at a certaian point in time. However, the UCDP team works with the data all year round, including revisions and updates. Therefore, their dashboard
     might show slightly more up-to-date data, which sometimes result in minor discrepancies in the data.
 
-    We use the world regions as defined by UCDP/PRIO: Africa, Americas, Asia, Europe, and Middle East. These are defined based on Gleditsch and Ward codes. Find complete mapping at
+    We use the world regions as defined by UCDP/PRIO: Africa, Americas, Asia, Europe, and Middle East. These are defined based on Gleditsch and Ward codes. Find the complete mapping at
     http://ksgleditsch.com/data/iisystem.dat (states) and http://ksgleditsch.com/data/microstatessystem.dat (micro-states):
 
       • Americas: 2-199
