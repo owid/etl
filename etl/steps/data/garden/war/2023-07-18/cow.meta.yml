@@ -11,8 +11,6 @@ dataset:
 
     You can find more information about the data in our article:
 
-    More details about Project Mars:
-
 tables:
   cow:
     variables:
@@ -52,7 +50,6 @@ tables:
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
           For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
-
           <% elif conflict_type == "intra-state (internationalized)" %>
           The estimated number of deaths in ongoing internationalized intrastate wars in each year.
 
@@ -63,7 +60,6 @@ tables:
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
           For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
-
           <% elif conflict_type == "intra-state (non-internationalized)" %>
           The estimated number of deaths in ongoing non-internationalized intrastate wars in each year.
 
@@ -74,7 +70,6 @@ tables:
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
           For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
-
           <% elif conflict_type == "extra-state" %>
           The estimated number of deaths in ongoing extrastate wars in each year.
 
@@ -85,7 +80,6 @@ tables:
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
           For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
-
           <% elif conflict_type == "non-state" %>
           The estimated number of deaths in ongoing non-state wars in each year.
 

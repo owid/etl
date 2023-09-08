@@ -46,8 +46,6 @@ dataset:
 
     You can find more information about the data in our article:
 
-    More details about Project Mars:
-
 tables:
   mars:
     # (Inherited from meadow, remove if not different.)
