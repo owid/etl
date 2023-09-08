@@ -67,6 +67,8 @@ qui wid, indicators(xlcusp) clear
 qui sum year
 global max_year = r(max)
 
+dis "Year of PPP data: $max_year"
+
 *Get ppp data to convert to USD
 wid, indicators(xlcusp) year($max_year) clear
 rename value ppp
@@ -78,7 +80,7 @@ foreach option in $options {
 	* Define different indicators and percentiles depending on the dataset
 	if `option' == 1 {
 		global indicators_gini_share sptinc gptinc sdiinc gdiinc scainc gcainc shweal ghweal
-		global percentiles p0p10 p10p20 p20p30 p30p40 p40p50 p50p60 p60p70 p70p80 p80p90 p90p100 p0p100 p99p100 p99.9p100 p99.99p100 p99.999p100
+		global percentiles p0p10 p10p20 p20p30 p30p40 p40p50 p50p60 p60p70 p70p80 p80p90 p90p100 p0p100 p0p50 p99p100 p99.9p100 p99.99p100 p99.999p100
 	}
 
 	else if `option' == 2 {
@@ -164,8 +166,11 @@ foreach option in $options {
 			rename *thweal* *thr_wealth
 
 			*Drop shares and thresholds for the entire distribution, as they do not have relevance for analysis (or they repeat other numbers from the dataset)
+			*Same for some p0p50 indicators
 			drop p0p100_share*
 			drop p0p100_thr*
+			drop p0p50_avg*
+			drop p0p50_thr*
 
 			*Define each income/wealth variable
 			local var_names pretax posttax_nat posttax_dis wealth
@@ -173,8 +178,6 @@ foreach option in $options {
 			*Calculate ratios for each variable + create a duplicate variable for median
 			* Also, generate a variable for the share between p90 and p99 and recalculate p50p90_share, because their components are more available.
 			foreach var in `var_names' {
-
-				gen p0p50_share_`var' = p0p10_share_`var' + p10p20_share_`var' + p20p30_share_`var' + p30p40_share_`var' + p40p50_share_`var'
 
 				gen palma_ratio_`var' = p90p100_share_`var' / (p0p50_share_`var' - p40p50_share_`var')
 				gen s90_s10_ratio_`var' = p90p100_share_`var' / p0p10_share_`var'

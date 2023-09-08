@@ -1,5 +1,6 @@
 """Data from UCDP.
 
+
 Notes:
     - conflict types for state-based violence is sourced from UCDP/PRIO dataset. non-state and one-sided violence is sourced from GED dataset.
     - there can be some missmatches with latest official reported data (UCDP's live dashboard). This is because UCDP uses latest data for their
@@ -16,7 +17,6 @@ Notes:
             3 = Asia (GWNo: 700-999)
             4 = Africa (GWNo: 400-626)
             5 = Americas (GWNo: 2-199)
-
 """
 
 from typing import cast
