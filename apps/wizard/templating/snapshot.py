@@ -192,15 +192,28 @@ def load_instructions() -> str:
 
 def create_description(field: Dict[str, Any]) -> str:
     """Create description for field, using values `description` and `guidelines`."""
-    description = field["description"]
+    # Main description
+    toc = "[Description](#description) "
+    description = f"## Description\n\n {field['description']}"
+    # Guidelines
     if field.get("guidelines"):
-        description += "\n\n" + guidelines_to_markdown(guidelines=field["guidelines"])
+        description += "\n" + guidelines_to_markdown(guidelines=field["guidelines"])
+        toc += "| [Guidelines](#guidelines) "
+    # Examples (good vs bad)
+    if field.get("examples"):
+        if "examples_bad" in field:
+            description += "\n" + examples_to_markdown(examples=field["examples"], examples_bad=field["examples_bad"])
+        else:
+            description += "\n" + examples_to_markdown(examples=field["examples"], examples_bad=[])
+        toc += "| [Examples](#examples) "
+    # Insert TOC at the beginnining of description
+    description = toc.strip() + "\n\n" + description
     return description
 
 
 def guidelines_to_markdown(guidelines: List[Any]) -> str:
     """Render guidelines to markdown from given list in schema."""
-    text = "**Guidelines**\n"
+    text = "## Guidelines\n\n"
     for guideline in guidelines:
         # Main guideline
         if isinstance(guideline[0], str):
@@ -239,29 +252,51 @@ def guidelines_to_markdown(guidelines: List[Any]) -> str:
     return text
 
 
+def examples_to_markdown(examples: List[str], examples_bad: List[Any]) -> str:
+    """Render examples (good and bad) to markdown from given lists in schema."""
+    text = "## Examples\n\n"
+    # Only good examples
+    if len(examples_bad) == 0:
+        print("No bad examples for this property!")
+        for example in examples:
+            text += f"\n- ✅ '{example}'"
+        return text
+    # Sanity check
+    elif len(examples) != len(examples_bad):
+        raise ValueError(
+            f"Examples and examples_bad must have the same length! Examples: {examples}, examples_bad: {examples_bad}"
+        )
+    # Combine good and bad examples
+    for good, bad in zip(examples, examples_bad):
+        assert isinstance(bad, list), "Bad examples must be a list!"
+        bad = [f"'{b}'" for b in bad]
+        text += f"\n- ✅ '{good}'. ❌ {', '.join(bad)}"
+    return text
+
+
 def render_fields_init() -> None:
     """Render fields to create directories and all."""
     # Text inputs
     fields = [
         {
             "title": "Namespace",
-            "description": "Institution or topic name",
+            "description": "## Description\n\nInstitution or topic name",
             "placeholder": "'emdat', 'health'",
         },
         {
             "title": "Snapshot version",
-            "description": "Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
+            "description": "## Description\n\nVersion of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
             "placeholder": f"'{utils.DATE_TODAY}'",
             "value": utils.DATE_TODAY,
         },
         {
             "title": "Short name",
-            "description": "Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
+            "description": "## Description\n\nDataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
             "placeholder": "'cherry_blossom'",
         },
         {
             "title": "File extension",
-            "description": "File extension (without the '.') of the file to be downloaded.",
+            "description": "## Description\n\nFile extension (without the '.') of the file to be downloaded.",
             "placeholder": "'csv', 'xls', 'zip'",
         },
     ]
@@ -331,7 +366,7 @@ def render_fields_from_schema(
                 kwargs = {
                     "label": display_name,
                     "help": create_description(field=props),
-                    "placeholder": props["examples"] if props["examples"] else "",
+                    "placeholder": props["examples"][:3] if isinstance(props["examples"], str) else "",
                     "key": prop_uri,
                 }
                 if categories:
@@ -400,7 +435,23 @@ def render_license_field(form: List[Any]) -> List[str]:
     props = props_license["properties"][name]
     display_name = create_display_name_snap_section(props, name, property_name)
 
-    help_text = props["description"] + "\n\n" + props_license["description"].replace("\n", "\n\n\n")
+    # Main decription
+    toc = "[Description](#description) "
+    help_text = (
+        "## Description\n\n" + props["description"] + "\n\n" + props_license["description"].replace("\n", "\n\n\n")
+    )
+    # Guidelines
+    if props.get("guidelines"):
+        help_text += "\n" + guidelines_to_markdown(guidelines=props["guidelines"])
+        toc += "| [Guidelines](#guidelines) "
+    # Examples (good vs bad)
+    if props.get("examples"):
+        if "examples_bad" in props:
+            help_text += "\n" + examples_to_markdown(examples=props["examples"], examples_bad=props["examples_bad"])
+        else:
+            help_text += "\n" + examples_to_markdown(examples=props["examples"], examples_bad=[])
+        toc += "| [Examples](#examples) "
+    help_text = toc.strip() + "\n\n" + help_text
     options = sorted(props["options"])
 
     # Default option in select box for custom license
