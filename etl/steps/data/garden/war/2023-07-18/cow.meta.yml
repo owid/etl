@@ -10,15 +10,15 @@ dataset:
     We align the world regions across the datasets to be Africa, Americas, Asia, Europe, Middle East, and Oceania. This meant we sometimes had to identify the regions manually. The regions are defined based on Gleditsch and Ward codes. Find complete mapping at
     https://correlatesofwar.org/wp-content/uploads/system2016.csv
 
-      • Americas: 2-199
+      • Americas: 2-165
 
       • Europe: 200-399
 
-      • Africa: 400-626
+      • Africa: 402-626
 
-      • Middle East: 630-699
+      • Middle East: 630-698
 
-      • Asia: 700-859
+      • Asia: 700-850
 
       • Oceania: 860-999
 
