@@ -39,7 +39,7 @@
           ["If it's a standard license, e.g. CC, it should be one of the acronyms in the examples below."],
           ["If the license is CC, but the version is not specified, assume 4.0."],
           ["If it's a custom license defined by the producer, it should follow the producer's text."],
-          ["When the license of an external dataset is not specified, temporarily assume `CC BY 4.0`. Contact the producer before publishing. If there is no response after a few days, ask Ed or Este and decide on a case-by-case basis."]
+          ["When the license of an external dataset is not specified, temporarily assume `CC BY 4.0`. Contact the producer before publishing.", {"type": "list", "value": ["If there is no response after a few days, ask Ed or Este and decide on a case-by-case basis."]}]
         ],
         "category": "license"
       },
@@ -55,7 +55,7 @@
           ["Must be a complete URL, i.e. `http...` ."],
           ["Must not lead to a Creative Commons website or any other generic page, but to the place where the producer specifies the license of the data."],
           ["If the license is specified inside, say, a PDF document, the URL should be the download link of that document."],
-          ["When the license of an external dataset is not specified, leave `url` empty. Do not use the URL of the main page of the dataset if the license is not mentioned anywhere."]
+          ["When the license of an external dataset is not specified, leave `url` empty.", {"type": "list", "value": ["Do not use the URL of the main page of the dataset if the license is not mentioned anywhere."]}]
         ],
         "category": "license"
       }
@@ -125,30 +125,32 @@
         "description": "Name of the institution or the author(s) that produced the data product.",
         "examples": [
           "NASA",
-          "NASA",
-          "NASA",
-          "NASA",
           "World Bank",
           "Williams et al.",
-          "Williams et al.",
-          "Williams et al.",
           "van Haasteren et al.",
-          "Williams and Jones",
           "Williams and Jones"
         ],
         "examples_bad": [
-          "NASA (2023)",
-          "N.A.S.A.",
-          "N A S A",
-          "National Aeronautics and Space Administration",
-          "Our World in Data based on NASA",
-          "WB",
-          "Williams et al. (2023)",
-          "Williams et al",
-          "John Williams et al.",
-          "Van Haasteren et al.",
-          "Williams & Jones",
-          "John Williams and Indiana Jones"
+          [
+            "NASA (2023)",
+            "N.A.S.A.",
+            "N A S A",
+            "National Aeronautics and Space Administration",
+            "Our World in Data based on NASA"
+          ],
+          ["WB"],
+          [
+            "Williams et al. (2023)",
+            "Williams et al",
+            "John Williams et al."
+          ],
+          [
+            "Van Haasteren et al."
+          ],
+          [
+            "Williams & Jones",
+            "John Williams and Indiana Jones"
+          ]
         ],
         "requirement_level": "required",
         "guidelines": [
@@ -203,7 +205,7 @@
         "guidelines": [
           ["Must start with a capital letter."],
           ["Must end with a period."],
-          ["If the producer specified how to cite them, this field should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits. This field can be as long as necessary to follow the producer's guidelines."],
+          ["If the producer specified how to cite them, this field should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits.", {"type": "list", "value": ["**Note:** This field can be as long as necessary to follow the producer's guidelines."]}],
           ["If the origin is the compilation of multiple sources, they can be added here as a list."]
         ],
         "category": "citation"
@@ -234,7 +236,7 @@
         "requirement_level": "required (if existing)",
         "guidelines": [
           ["Must be a complete URL, i.e. `http...`."],
-          ["Must be a direct download link. The URL must not lead to a website that requires user input to download the dataset. If there is no direct download URL, this field should be empty."]
+          ["Must be a direct download link.", {"type": "list", "value": ["The URL must not lead to a website that requires user input to download the dataset. If there is no direct download URL, this field should be empty."]}]
         ],
         "examples": [
           "https://data.some_institution.com/dataset_12/data.csv"
@@ -247,7 +249,7 @@
         "type": "string",
         "description": "Title of the original data product.",
         "examples": ["Global Carbon Budget"],
-        "examples_bad": ["Global Carbon Budget (fossil fuels)"],
+        "examples_bad": [["Global Carbon Budget (fossil fuels)"]],
         "requirement_level": "recommended (if existing)",
         "guidelines": [
           ["Must start with a capital letter."],
@@ -275,23 +277,23 @@
         "type": "string",
         "description": "Title of the snapshot (i.e. the subset of data that we extract from the data product) which in most cases will coincide with the title of the data product.",
         "examples": [
-          "Neutron star mergers",
-          "Neutron star mergers",
           "Neutron star mergers"
         ],
         "examples_bad": [
-          "Neutron star mergers (NASA, 2023)",
-          "Data on neutron star mergers",
-          "Neutron star mergers dataset"
+          [
+            "Neutron star mergers (NASA, 2023)",
+            "Data on neutron star mergers",
+            "Neutron star mergers dataset"
+          ]
         ],
         "requirement_level": "recommended (if different from `data_product_title`)",
         "guidelines": [
           ["Must start with a capital letter."],
           ["Must not end with a period."],
-          ["Must not mention other metadata fields like `producer` or `version_producer`. Exceptions: The name of the origin is well known and includes other metadata fields."],
+          ["Must not mention other metadata fields like `producer` or `version_producer`.", {"type": "exceptions", "value": ["The name of the origin is well known and includes other metadata fields."]}],
           ["Must not include any semicolon `;`."],
           ["Should not include words like `data`, `dataset` or `database`, unless that's part of a well-known name of the origin."],
-          ["Should be descriptive of the content of the origin. Exceptions: The origin's title is well known but not descriptive, e.g. `Penn World Table`."]
+          ["Should be descriptive of the content of the origin.", {"type": "exceptions", "value": ["The origin's title is well known but not descriptive, e.g. `Penn World Table`."]}]
         ],
         "category": "dataset"
       },
@@ -303,7 +305,7 @@
         "guidelines": [
           ["Must start with a capital letter."],
           ["Must end with a period."],
-          ["Should not mention other metadata fields. If fields like `producer` or `date_published` are mentioned, placeholders should be used."]
+          ["Should not mention other metadata fields.", {"type": "list", "value": ["If fields like `producer` or `date_published` are mentioned, placeholders should be used."]}]
         ],
         "examples": [],
         "examples_bad": [],
@@ -318,10 +320,10 @@
           "Statistical Review of World Energy, Energy Institute (2023)"
         ],
         "examples_bad": [
-          "Energy Institute - Statistical Review of World Energy (2023)"
+          ["Energy Institute - Statistical Review of World Energy (2023)"]
         ],
         "guidelines": [
-          ["Must start with a capital letter. Exceptions: The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."],
+          ["Must start with a capital letter.", {"type": "exceptions", "value": ["The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."]}],
           ["Must not end with a period."],
           ["Must end with the year of `date_published` in parenthesis."],
           ["Must not include any semicolon `;`."],
@@ -337,16 +339,17 @@
         "requirement_level": "recommended",
         "examples": [
           "FAO",
-          "FAO",
           "World Bank"
         ],
         "examples_bad": [
-          "UN FAO",
-          "FAO (2023)",
-          "WB"
+          [
+            "UN FAO",
+            "FAO (2023)"
+          ],
+          ["WB"]
         ],
         "guidelines": [
-          ["Must start with a capital letter. Exceptions: The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."],
+          ["Must start with a capital letter.", {"type": "exceptions", "value": ["The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."]}],
           ["Must not end with a period."],
           ["Should refer to the producer or the dataset title (if well known), not the year or any other field."],
           ["Should be an acronym, if the acronym is well-known, otherwise a brief name."]
