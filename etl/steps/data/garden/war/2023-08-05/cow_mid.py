@@ -19,6 +19,15 @@ over their complete lifetime globally".
 
 - The "number of ongoing disputes" for a particular hostility level can be understood as "the number of conflicts ongoing in a particular year that will reach this hostility level
 over their complete lifetime globally".
+
+
+On regions:
+
+- The information on regions is sourced from MIDB dataset. That's why we use it along with MIDA (our main source of data).
+
+- Note that we obtain the information on regions from the participants in the conflict (not the location of the conflict), e.g. `ccode`.
+
+- We encode the region using the codes from COW (based on GW).
 """
 
 from typing import cast
