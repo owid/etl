@@ -217,7 +217,7 @@
           "type": "string",
           "title": "Title of this ETL dataset",
           "description": "Title of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one-line description of the dataset (follow the guidelines of the origin's `data_product_title`). NOTE: Dataset titles should be propagated automatically from snapshots. By default, the title of the dataset will be the title of the containing table. But, if there are multiple tables, or if the user wants to manually edit the dataset title, it can be done by editing `dataset.title`.",
-          "requirement_level": "mandatory (often automatic)"
+          "requirement_level": "required (often automatic)"
         },
         "description": {
           "type": "string",
@@ -268,7 +268,7 @@
             "type": "string",
             "title": "Title of this ETL table",
             "description": "Title of the table (mostly for internal purposes, or for users of our data catalog) which is a few words description of the table (follow the guidelines as origin's `title`). NOTE: Table titles should be propagated automatically from snapshots (from origin's `title`). But, if there are multiple tables, or if the user wants to manually edit the title, it can be done by editing `table.title`.",
-            "requirement_level": "mandatory (often automatic)"
+            "requirement_level": "required (often automatic)"
           },
           "description": {
             "type": "string",
@@ -341,7 +341,7 @@
                   "title": "Indicator's processing description",
                   "type": "string",
                   "description": "Relevant information about the processing of the indicator done by OWID.",
-                  "requirement_level": "mandatory (if applicable)",
+                  "requirement_level": "required (if applicable)",
                   "guidelines": [
                     ["Must start with a capital letter."],
                     ["Must end with a period."],
@@ -403,7 +403,7 @@
                   "type": "string",
                   "enum": ["minor", "major"],
                   "description": "Level of processing that the indicator values have experienced.",
-                  "requirement_level": "mandatory (in the future this could be automatic).",
+                  "requirement_level": "required (in the future this could be automatic).",
                   "guidelines": [
                     ["Must be `minor` if the indicator has undergone only minor operations since its origin:", {"type": "list", "value": ["Rename entities (e.g. countries or columns)", "Multiplication by a constant (e.g. unit change)", "Drop missing values."]}],
                     ["Must be `major` if any other operation is used:", {"type": "list", "value": ["Data aggregates (e.g. sum data for continents or income groups)", "Operations between indicators (e.g. per capita, percentages, annual changes)", "Concatenation of indicators, etc."]}]
