@@ -229,12 +229,12 @@ def add_regions(tb: Table) -> Table:
     The region is assigned based on the country code (ccode) of the participant.
     """
     ## COW uses custom country codes, so we need the following custom mapping.
-    tb.loc[(tb["ccode"] >= 1) & (tb["ccode"] <= 165), "region"] = "Americas (COW)"
-    tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] <= 395), "region"] = "Europe (COW)"
-    tb.loc[(tb["ccode"] >= 400) & (tb["ccode"] <= 626), "region"] = "Africa (COW)"
-    tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] <= 698), "region"] = "Middle East (COW)"
-    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 859), "region"] = "Asia (COW)"
-    tb.loc[(tb["ccode"] >= 860) & (tb["ccode"] <= 999), "region"] = "Oceania (COW)"
+    tb.loc[(tb["ccode"] >= 1) & (tb["ccode"] <= 165), "region"] = "Americas"
+    tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] <= 395), "region"] = "Europe"
+    tb.loc[(tb["ccode"] >= 402) & (tb["ccode"] <= 626), "region"] = "Africa"
+    tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] <= 698), "region"] = "Middle East"
+    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 850), "region"] = "Asia"
+    tb.loc[(tb["ccode"] >= 860) & (tb["ccode"] <= 999), "region"] = "Oceania"
 
     # Sanity check: No missing regions
     assert tb["region"].notna().all(), f"Missing regions! {tb.loc[tb['region'].isna(), ['dispnum', 'ccode']]}"

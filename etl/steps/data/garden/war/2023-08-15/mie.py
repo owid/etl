@@ -139,12 +139,12 @@ def add_regions(tb: Table) -> Table:
     The region is assigned based on the country code (ccode) of the participant.
     """
     ## COW uses custom country codes, so we need the following custom mapping.
-    tb.loc[(tb["ccode"] >= 1) & (tb["ccode"] < 200), "region"] = "Americas (MIC)"
-    tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] < 400), "region"] = "Europe (MIC)"
-    tb.loc[(tb["ccode"] >= 400) & (tb["ccode"] < 627), "region"] = "Africa (MIC)"
-    tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] < 699), "region"] = "Middle East (MIC)"
-    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 899), "region"] = "Asia (MIC)"
-    tb.loc[(tb["ccode"] >= 900) & (tb["ccode"] <= 999), "region"] = "Oceania (MIC)"
+    tb.loc[(tb["ccode"] >= 1) & (tb["ccode"] < 200), "region"] = "Americas"
+    tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] < 400), "region"] = "Europe"
+    tb.loc[(tb["ccode"] >= 400) & (tb["ccode"] < 627), "region"] = "Africa"
+    tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] < 699), "region"] = "Middle East"
+    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 899), "region"] = "Asia"
+    tb.loc[(tb["ccode"] >= 900) & (tb["ccode"] <= 999), "region"] = "Oceania"
 
     return tb
 

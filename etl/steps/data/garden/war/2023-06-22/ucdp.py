@@ -10,7 +10,7 @@ Notes:
         - GED: Dataset uses names (not codes!)
             - You can learn countries included in each region from section "Appendix 5 Main sources consulted during the 2022 update" in page 40,
             document: https://ucdp.uu.se/downloads/ged/ged231.pdf.
-                - Note that countris from Oceania are included in Asia!
+                - Note that countries from Oceania are included in Asia!
         - UCDP/PRIO: Dataset uses codes (note we changed "Asia" -> "Asia and Oceania")
             1 = Europe (GWNo: 200-399)
             2 = Middle East (GWNo: 630-699)
@@ -47,11 +47,11 @@ TYPE_OF_CONFLICT_MAPPING = {
 }
 # Regions mapping (for PRIO/UCDP dataset, see function `_prepare_prio_table`)
 REGIONS_MAPPING = {
-    1: "Europe (UCDP)",
-    2: "Middle East (UCDP)",
-    3: "Asia and Oceania (UCDP)",
-    4: "Africa (UCDP)",
-    5: "Americas (UCDP)",
+    1: "Europe",
+    2: "Middle East",
+    3: "Asia and Oceania",
+    4: "Africa",
+    5: "Americas",
 }
 REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 
@@ -81,7 +81,7 @@ def run(dest_dir: str) -> None:
     tb_geo = tb_geo[tb_geo["active_year"] == 1]
 
     # Change region named "Asia" with "Asia and Oceania" (in GED)
-    tb_geo["region"] = tb_geo["region"].replace(to_replace={"Asia": "Asia and Oceania (UCDP)"})
+    tb_geo["region"] = tb_geo["region"].replace(to_replace={"Asia": "Asia and Oceania"})
 
     # Create `conflict_type` column
     log.info("war.ucdp: add field `conflict_type`")

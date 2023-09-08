@@ -48,6 +48,12 @@ def run(dest_dir: str) -> None:
         log.info(f"cow: creating table from {snap.path}")
         df = pd.read_csv(snap.path, encoding=encoding)
         tb = Table(df, short_name=short_name, underscore=True)
+        if short_name == "extra_state":
+            tb = tb.set_index(["warnum", "wartype", "ccode1", "ccode2"], verify_integrity=True)
+        elif short_name == "inter_state":
+            tb = tb.set_index(["warnum", "wartype", "ccode", "side"], verify_integrity=True)
+        elif short_name == "non_state":
+            tb = tb.set_index(["warnum", "wartype", "warname"], verify_integrity=True)
         tables.append(tb)
     # ZIP to table
     ## Intra-state
@@ -61,6 +67,7 @@ def run(dest_dir: str) -> None:
         log.info(f"cow: creating table from {snap.path}")
         df = pd.read_csv(path, encoding=encoding)
         tb = Table(df, short_name="intra_state", underscore=True)
+        tb = tb.set_index(["warnum", "wartype", "ccodea"], verify_integrity=True)
         tables.append(tb)
     ## Inter-state (dydadic)
     snap = cast(Snapshot, paths.load_dependency("cow.inter_state_dyadic.zip"))
@@ -73,6 +80,7 @@ def run(dest_dir: str) -> None:
         log.info(f"cow: creating table from {snap.path}")
         df = pd.read_csv(path, encoding=encoding)
         tb = Table(df, short_name="inter_state_dyadic", underscore=True)
+        tb = tb.set_index(["warnum", "year", "statea", "stateb"], verify_integrity=True)
         tables.append(tb)
     #
     # Save outputs.
@@ -85,3 +93,4 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
     log.info("cow: end")
+

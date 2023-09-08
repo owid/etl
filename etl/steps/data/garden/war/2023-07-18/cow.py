@@ -89,13 +89,14 @@ paths = PathFinder(__file__)
 # Logger
 log = get_logger()
 # Region mapping (extra- and non-state, intra after region code standardisation, and inter after de-aggregating composite regions)
+# Source suffix (e.g. '(COW)') is added later, in `combine_tables`
 REGIONS_RENAME = {
-    1: "Americas (COW)",
-    2: "Europe (COW)",
-    4: "Africa (COW)",
-    6: "Middle East (COW)",
-    7: "Asia (COW)",
-    9: "Oceania (COW)",
+    1: "Americas",
+    2: "Europe",
+    4: "Africa",
+    6: "Middle East",
+    7: "Asia",
+    9: "Oceania",
 }
 # Mapping conflicts to regions for some intra-state conflicts
 ## We map intrastate conflicts to only one region. We have region composites (ME & NA, Asia & Oceania) and we need to find the actual region.
@@ -697,7 +698,7 @@ def load_cow_table(
     check_unique_for_location: bool = True,
 ):
     """Read table from dataset."""
-    tb = ds[table_name]
+    tb = ds[table_name].reset_index()
 
     # Check year start/end (missing?)
     assert (tb[column_start_year] != -9).all(), "There is at least one entry with unknown `column_start_year`"
