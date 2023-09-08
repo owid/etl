@@ -249,7 +249,7 @@ def render_fields_init() -> None:
             "placeholder": "'emdat', 'health'",
         },
         {
-            "title": "Snapshot Version",
+            "title": "Snapshot version",
             "description": "Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
             "placeholder": f"'{utils.DATE_TODAY}'",
             "value": utils.DATE_TODAY,
