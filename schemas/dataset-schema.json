@@ -217,7 +217,7 @@
           "type": "string",
           "title": "Title of this ETL dataset",
           "description": "Title of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one-line description of the dataset (follow the guidelines of the origin's `data_product_title`). NOTE: Dataset titles should be propagated automatically from snapshots. By default, the title of the dataset will be the title of the containing table. But, if there are multiple tables, or if the user wants to manually edit the dataset title, it can be done by editing `dataset.title`.",
-          "requirement_level": "mandatory (often automatic)"
+          "requirement_level": "required (often automatic)"
         },
         "description": {
           "type": "string",
@@ -234,7 +234,7 @@
             ["Must be an integer."]
           ],
           "examples": ["7", "30", "90", "365"],
-          "examples_bad": ["2023-10-10", "monthly", "1/365", "0.25"],
+          "examples_bad": ["2023-01-07", "monthly", "0.2", "1/365"],
           "requirement_level": "required"
         },
         "licenses": {
@@ -268,7 +268,7 @@
             "type": "string",
             "title": "Title of this ETL table",
             "description": "Title of the table (mostly for internal purposes, or for users of our data catalog) which is a few words description of the table (follow the guidelines as origin's `title`). NOTE: Table titles should be propagated automatically from snapshots (from origin's `title`). But, if there are multiple tables, or if the user wants to manually edit the title, it can be done by editing `table.title`.",
-            "requirement_level": "mandatory (often automatic)"
+            "requirement_level": "required (often automatic)"
           },
           "description": {
             "type": "string",
@@ -290,7 +290,10 @@
                   "title": "Indicator's title",
                   "type": "string",
                   "description": "Title of the indicator, which is a few words definition of the indicator.",
-                  "examples": ["Number of neutron star mergers in the Milky Way", "Share of neutron star mergers that happen in the Milky Way"],
+                  "examples": [
+                    "Number of neutron star mergers in the Milky Way",
+                    "Share of neutron star mergers that happen in the Milky Way"
+                  ],
                   "examples_bad": [
                     "Number of neutron stars (NASA)",
                     "Share of neutron star mergers that happen in the Milky Way (2023)"
@@ -314,7 +317,7 @@
                     ["Must start with a capital letter."],
                     ["Must end with a period."],
                     ["Must be one short paragraph, suitable to fit in a chart subtitle."],
-                    ["Should not mention any other metadata fields (like information about the processing, or the origins, or the units). Exceptions: The unit can be mentioned if it is crucial for the description."]
+                    ["Should not mention any other metadata fields (like information about the processing, or the origins, or the units).", {"type": "exceptions", "value": "The unit can be mentioned if it is crucial for the description."}]
                   ],
                   "category": "metadata"
                 },
@@ -327,12 +330,10 @@
                   "description": "List of key points about the indicator.",
                   "requirement_level": "recommended (only for curated data pages)",
                   "guidelines": [
-                    ["Must be a list of one or more short paragraphs."],
-                    ["Each paragraph must start with a capital letter."],
-                    ["Each paragraph must end with a period."],
+                    ["Must be a list of one or more short paragraphs.", {"type": "list", "value": ["Each paragraph must start with a capital letter.", "Each paragraph must end with a period."]}],
                     ["Should contain all the key information given in other description fields, like `description_short`, `grapher_config.subtitle` or `grapher_config.note`."],
                     ["Should not contain information about processing (which should be in `description_processing`)."],
-                    ["Should only contain information that is key to the public. Anything that is too detailed or technical should be left in the code."]
+                    ["Should only contain information that is key to the public.", {"type": "list", "value": "Anything that is too detailed or technical should be left in the code."}]
                   ],
                   "category": "metadata"
                 },
@@ -340,13 +341,13 @@
                   "title": "Indicator's processing description",
                   "type": "string",
                   "description": "Relevant information about the processing of the indicator done by OWID.",
-                  "requirement_level": "mandatory (if applicable)",
+                  "requirement_level": "required (if applicable)",
                   "guidelines": [
                     ["Must start with a capital letter."],
                     ["Must end with a period."],
                     ["Must be used if important editorial decisions have been taken during data processing."],
                     ["Must not be used to describe common processing steps like country harmonization."],
-                    ["Should only contain key processing information to the public. Anything that is too detailed or technical should be left in the code."]
+                    ["Should only contain key processing information to the public.", {"type": "list", "value": "Anything that is too detailed or technical should be left in the code."}]
                   ],
                   "category": "metadata"
                 },
@@ -376,7 +377,7 @@
                     ["Must be empty if the indicator has no units."],
                     ["Must be in plural."],
                     ["Must be a metric unit when applicable."],
-                    ["Should not use symbols like “/”. If it is a derived unit, use “per” to denote a division, e.g. '... per hectare', or '... per person'."],
+                    ["Should not use symbols like “/”.", {"type": "list", "value": "If it is a derived unit, use “per” to denote a division, e.g. '... per hectare', or '... per person'."}],
                     ["Should be '%' for percentages."]
                   ],
                   "category": "metadata"
@@ -402,10 +403,10 @@
                   "type": "string",
                   "enum": ["minor", "major"],
                   "description": "Level of processing that the indicator values have experienced.",
-                  "requirement_level": "mandatory (in the future this could be automatic).",
+                  "requirement_level": "required (in the future this could be automatic).",
                   "guidelines": [
-                    ["Must be `minor` if the indicator has undergone only minor operations since its origin: rename entities (e.g. countries or columns), multiplication by a constant (e.g. unit change), or drop missing values."],
-                    ["Must be `major` if any other operation is used: data aggregates (e.g. sum data for continents or income groups), operations between indicators (e.g. per capita, percentages, annual changes), concatenation of indicators, etc."]
+                    ["Must be `minor` if the indicator has undergone only minor operations since its origin:", {"type": "list", "value": ["Rename entities (e.g. countries or columns)", "Multiplication by a constant (e.g. unit change)", "Drop missing values."]}],
+                    ["Must be `major` if any other operation is used:", {"type": "list", "value": ["Data aggregates (e.g. sum data for continents or income groups)", "Operations between indicators (e.g. per capita, percentages, annual changes)", "Concatenation of indicators, etc."]}]
                   ],
                   "category": "metadata"
                 },
