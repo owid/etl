@@ -936,7 +936,7 @@ def print_tables_metadata_template(tables: List[Table]):
         dict_variables = {}
         for column in tb.columns:
             dict_values = {}
-            for field in ["title", "unit", "short_unit", "description"]:
+            for field in ["title", "unit", "short_unit", "description_short", "processing_level"]:
                 value = getattr(tb[column].metadata, field) or ""
 
                 # Add some simple rules to simplify some common cases.
@@ -949,6 +949,10 @@ def print_tables_metadata_template(tables: List[Table]):
                 # If unit or short_unit is empty, and the column name contains 'pct', set it to '%'.
                 if (value == "") and (field in ["unit", "short_unit"]) and "pct" in column:
                     value = "%"
+
+                if field == "processing_level":
+                    # Assume a minor processing level (it will be manually overwritten, if needed).
+                    value = "minor"
 
                 dict_values[field] = value
             dict_variables[column] = dict_values
