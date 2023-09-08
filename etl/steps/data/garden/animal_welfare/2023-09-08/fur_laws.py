@@ -24,7 +24,7 @@ FUR_FARMING_BAN_STATUS = {
     "YES": "Banned",
     "NO": "Not banned",
     "PARTIAL": "Partially banned",
-    "Parliamentary debate": "Debated",
+    "Parliamentary debate": "Not banned",
     "": "Not banned",
 }
 # Define label for fur farming status that are not yet effective.

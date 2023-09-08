@@ -7,12 +7,24 @@ tables:
         short_unit: ''
         description_short: 'Whether a country has banned fur farming at a national level.'
         processing_level: minor
+        presentation:
+          grapher_config:
+            title: Which countries have banned fur farming?
+            map:
+              hideTimeline: true
+            note: "Partially banned means that farming is phasing out due to strong regulation, that there are bans at sub-national level, or that only certain species are banned."
       fur_trading_status:
         title: Fur trade status
         unit: ''
         short_unit: ''
         description_short: 'Whether a country has banned fur trading at a national level.'
         processing_level: minor
+        presentation:
+          grapher_config:
+            title: Which countries have banned fur trading?
+            map:
+              hideTimeline: true
+            note: "Partially banned means that there are bans at sub-national level or that only certain species are banned."
       ban_effective_year:
         title: Ban effective year
         unit: ''
@@ -25,3 +37,9 @@ tables:
         short_unit: ''
         description_short: 'Whether a country has operating fur farms.'
         processing_level: minor
+        presentation:
+          grapher_config:
+            title: Which countries have active fur farms?
+            map:
+              hideTimeline: true
+
