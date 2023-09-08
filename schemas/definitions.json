@@ -194,7 +194,7 @@
         "category": "files"
       },
       "citation_producer": {
-        "title": "Full citation TODO: Rename `citation_full` (this is not necessarily written by the producer, and is the only place where we can host a full citation).",
+        "title": "Full citation",
         "type": "string",
         "description": "Full citation of the origin. If the producer expressed how to cite them, we should follow their recommendations.",
         "examples": [],
@@ -209,7 +209,7 @@
         "category": "citation"
       },
       "dataset_url_main": {
-        "title": "URL of the main website of the data product TODO: Rename `url_main`.",
+        "title": "URL of the main website of the data product",
         "type": "string",
         "description": "Producer's URL leading to the main website of the original dataset.",
         "requirement_level": "required",
@@ -226,7 +226,7 @@
         "category": "files"
       },
       "dataset_url_download": {
-        "title": "URL to download the data product TODO: Rename `url_download`.",
+        "title": "URL to download the data product",
         "type": "string",
         "description": "Producer's URL that directly downloads the data product as a single file.",
         "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
@@ -243,7 +243,7 @@
         "category": "files"
       },
       "dataset_title_producer": {
-        "title": "Dataset Title Producer TODO: Rename `data_product_title` (the title of the data product to show in data pages). If not given, fall back to `title`.",
+        "title": "Title of the original data product",
         "type": "string",
         "description": "Title of the original data product.",
         "examples": ["Global Carbon Budget"],
@@ -257,7 +257,7 @@
         "category": "dataset"
       },
       "dataset_description_producer": {
-        "title": "Description of the data product TODO: Rename `data_product_description` (the description of the data product to show in data pages). If not given, fall back to `description`.",
+        "title": "Description of the data product",
         "type": "string",
         "description": "Description of the original data product.",
         "examples": [],
@@ -271,7 +271,7 @@
         "category": "dataset"
       },
       "dataset_title_owid": {
-        "title": "Title of the snapshot TODO: Rename `title` (the title of the snapshot).",
+        "title": "Title of the snapshot",
         "type": "string",
         "description": "Title of the snapshot (i.e. the subset of data that we extract from the data product) which in most cases will coincide with the title of the data product.",
         "examples": [
@@ -296,7 +296,7 @@
         "category": "dataset"
       },
       "dataset_description_owid": {
-        "title": "Description of the snapshot TODO: Rename `description` (the description of the snapshot, which in most cases will coincide with the title of the data product, but not always).",
+        "title": "Description of the snapshot",
         "type": "string",
         "description": "Description of the snapshot (i.e. the subset of data that we extract from the data product) which in most cases will coincide with the description of the data product.",
         "requirement_level": "recommended",

@@ -306,7 +306,7 @@
                   "category": "metadata"
                 },
                 "description_short": {
-                  "title": "Indicator's short description TODO: When creating new charts and data pages, we could construct the subtitle as '{description_short} Measured in {unit}'.",
+                  "title": "Indicator's short description",
                   "type": "string",
                   "description": "One or a few lines that complement the title, so you have a short description of the indicator.",
                   "requirement_level": "required",
@@ -457,6 +457,7 @@
                     },
                     "title_variant": {
                       "type": "string",
+                      "title": "Indicator's title variant",
                       "description": "Short disambiguation of the title that references a special feature of the methods or nature of the data.",
                       "requirement_level": "optional",
                       "guidelines": [
@@ -476,6 +477,7 @@
                     },
                     "attribution": {
                       "type": "string",
+                      "title": "Indicator's attribution",
                       "description": "",
                       "guidelines": [
                         ["Must start with a capital letter."],
@@ -487,7 +489,8 @@
                     },
                     "producer_short": {
                       "type": "string",
-                      "description": "Very short citation of the indicator's main producer(s). TODO: Rename `attribution_short` (given that it could also be a dataset name, in the same way that we have `attribution_short` at the origin level). TODO: By default, this field should automatically be filled out by concatenating the `origin.attribution_short` of all the origins in an indicator. But when there are multiple origins and this field is too long (we could raise a warning when running the step), this field can be used to manually edit the resulting attribution.",
+                      "title": "Indicator's attribution (shorter version)",
+                      "description": "Very short citation of the indicator's main producer(s).",
                       "requirement_level": "recommended (for curated data pages)",
                       "guidelines": [
                         ["Must start with a capital letter."],
@@ -498,7 +501,8 @@
                     },
                     "topic_tags_links": {
                       "type": "array",
-                      "description": "List of topics where the indicator is relevant. TODO: Rename `topic_tags`.",
+                      "title": "Indicator's topic tags",
+                      "description": "List of topics where the indicator is relevant.",
                       "requirement_level": "recommended (only for curated data pages)",
                       "guidelines": [
                         ["Must be an existing topic tag, and be spelled correctly (see the list of topic tags in http://datasette-private/owid?sql=SELECT+tags.%60name%60+from+tags+where+isTopic+%3D+1+ORDER+BY+tags.%60name%60%0D%0A)."],
@@ -509,6 +513,7 @@
                     },
                     "faqs": {
                       "type": "array",
+                      "title": "Indicator's FAQs",
                       "description": "List of references to questions in an FAQ google document, relevant to the indicator.",
                       "requirement_level": "recommended (only for curated data pages)",
                       "guidelines": [
