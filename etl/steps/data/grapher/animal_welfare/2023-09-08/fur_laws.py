@@ -17,16 +17,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("fur_laws")
 
     # Read table from garden dataset.
-    tb = ds_garden["fur_laws"].reset_index()
-
-    #
-    # Process data.
-    #
-    # Add a year column.
-    tb["year"] = CURRENT_YEAR
-
-    # Set an appropriate index.
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = ds_garden["fur_laws"]
 
     #
     # Save outputs.
