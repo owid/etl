@@ -1,0 +1,48 @@
+tables:
+  fur_laws:
+    variables:
+      fur_farming_status:
+        title: Fur farming status
+        unit: ''
+        short_unit: ''
+        description_short: 'Whether a country has banned fur farming at a national level.'
+        processing_level: minor
+      fur_trading_status:
+        title: Fur trade status
+        unit: ''
+        short_unit: ''
+        description_short: 'Whether a country has banned fur trading at a national level.'
+        processing_level: minor
+      ban_effective_year:
+        title: Ban effective year
+        unit: ''
+        short_unit: ''
+        description_short: 'Year when the ban becomes effective. If the year is in the future, the ban is enacted but not yet in effect.'
+        processing_level: minor
+      fur_farms_active:
+        title: Active fur farms
+        unit: ''
+        short_unit: ''
+        description_short: 'Whether a country has operating fur farms.'
+        processing_level: minor
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description: Full description of testing variable.
+      #   description_short: Short description of testing variable.
+      #   description_from_producer: Description of testing variable from producer.
+      #   processing_level: minor
+      #   display:
+      #     name: Testing variable
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0
+      #     conversionFactor: 1
+      #   presentation:
+      #     grapher_config
+      #     title_public
+      #     title_variant
+      #     producer_short
+      #     attribution
+      #     topic_tags_links
+      #     faqs
+      #     key_info_text
