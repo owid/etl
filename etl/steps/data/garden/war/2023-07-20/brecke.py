@@ -22,18 +22,18 @@ paths = PathFinder(__file__)
 log = get_logger()
 # Region mapping
 REGIONS_RENAME = {
-    1: "Americas",  # "North America, Central America, and the Caribbean (Brecke)",
-    2: "Americas",  # "South America (Brecke)",
-    3: "Europe",  # "Western Europe (Brecke)",
-    4: "Europe",  # "Eastern Europe (Brecke)",
+    1: "Americas (Brecke)",  # "North America, Central America, and the Caribbean (Brecke)",
+    2: "Americas (Brecke)",  # "South America (Brecke)",
+    3: "Europe (Brecke)",  # "Western Europe (Brecke)",
+    4: "Europe (Brecke)",  # "Eastern Europe (Brecke)",
     5: "Middle East (Brecke)",
-    6: "Africa",  # "North Africa (Brecke)",
-    7: "Africa",  # "West & Central Africa (Brecke)",
-    8: "Africa",  # "East & South Africa (Brecke)",
-    9: "Asia",  # "Central Asia (Brecke)",
-    10: "Asia",  # "South Asia (Brecke)",
-    11: "Asia",  # "Southeast Asia (Brecke)",
-    12: "Asia",  # "East Asia (Brecke)",
+    6: "Africa (Brecke)",  # "North Africa (Brecke)",
+    7: "Africa (Brecke)",  # "West & Central Africa (Brecke)",
+    8: "Africa (Brecke)",  # "East & South Africa (Brecke)",
+    9: "Asia (Brecke)",  # "Central Asia (Brecke)",
+    10: "Asia (Brecke)",  # "South Asia (Brecke)",
+    11: "Asia (Brecke)",  # "Southeast Asia (Brecke)",
+    12: "Asia (Brecke)",  # "East Asia (Brecke)",
     -9: -9,  # Unknown
 }
 
