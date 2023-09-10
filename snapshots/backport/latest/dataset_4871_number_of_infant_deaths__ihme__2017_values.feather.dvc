@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4871
+    date_accessed: 2023-08-16 08:13:22.505688
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of infant deaths (IHME - 2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ef0fbd8a4e5fce1f42c73bd01aeb9bb1
+  size: 41074
+  path: dataset_4871_number_of_infant_deaths__ihme__2017_values.feather

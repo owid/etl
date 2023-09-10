@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1829
+    date_accessed: 2023-08-14 15:13:22.823029
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational noise
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 48cd4259628c379a8d99b4d0252f8a6f
+  size: 486170
+  path: dataset_1829_occupational_noise_values.feather

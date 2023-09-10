@@ -1,0 +1,39 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5035
+    date_accessed: 2023-08-11 07:11:56.161521
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Macro-Statistics: Macro Indicators'
+  description: TheFAOSTAT Macro Indicatorsdatabase provides a selection of country-level
+    macroeconomic indicators relating to total economy (TE); agriculture (Ag); agriculture,
+    forestry and fishing (AFF); manufacturing (MAN); manufacturing of food products
+    and beverages (FB); manufacturing of tobacco products (Tob); and manufacturing
+    of food, beverage and tobacco products (FBT). It releases time series for a selection
+    of National Accounts variables, including gross domestic product, gross fixed
+    capital formation, industry-level value added and gross output. The database also
+    proposes additional indicators such as per capita GDP, year-on-year growth rates
+    and measures ofindustry contribution to GDP.  All data relating to TE, AFF, and
+    to MAN originates from the United Nations Statistics Division (UNSD) National
+    Accounts Estimates of Main Aggregates database, which consists of a complete and
+    consistent set of time series of the main National Accounts (NA) aggregates of
+    all UN Members States and other territories in the world for which National Accounts
+    information is available. The UNSD database's content is based on the countries'
+    official NA data reported to UNSD through the annual National Accounts Questionnaire,
+    supplemented with data estimates for any years and countries with incomplete or
+    inconsistent information (Seehttp://unstats.un.org/unsd/snaama/Introduction.asp).  Series
+    relating to the sub-industry Ag are obtained from the OECD Annual National Accounts
+    and UNSD NA Official Country Data databases while serieson the FBT industry originates
+    - in order of priority - from OECD Annual National Accounts and UNIDO INDSTAT2
+    databases. In order to ensure that sub-industry series are consistent in levels
+    with National Accounts based series, which is needed to support comparability
+    across industries (agriculture vs. agro-industry and sub-industries), we proceed
+    to a rescaling exercise of UNIDO originating series on UNSD National Accounts
+    Estimates of Main Aggregates data series (See Section 20 for a more detailed description
+    of the data processing steps)
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c99b026eb469f58dd7a94ec1805c4274
+  size: 5544442
+  path: dataset_5035_macro_statistics__macro_indicators_values.feather

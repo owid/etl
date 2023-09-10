@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_666_half_index__land_use__alexander_et_al__2016_values
-  file_extension: feather
-  date_accessed: 2023-06-01 15:29:47.525883
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/666
+    date_accessed: 2023-08-09 14:53:11.719361
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: HALF Index (Land Use) - Alexander et al. (2016)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/666
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a7335329e2ea79541b64abcf214d6fd0
+- md5: f5b5979e8a317af6a878e8c62ab3b3dc
   size: 12922
   path: dataset_666_half_index__land_use__alexander_et_al__2016_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1812
+    date_accessed: 2023-08-16 07:56:22.013119
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1812_secondhand_smoke (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7f9ef1e3ffc20af9418dc13abacb18f4
+  size: 21936
+  path: dataset_1812_secondhand_smoke_config.json

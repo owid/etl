@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4664
+    date_accessed: 2023-08-16 10:15:57.877454
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of children moderately or severely stunted (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ae2d92cb3b63cd03efbf33ae87e36a2e
+  size: 16354
+  path: 
+    dataset_4664_proportion_of_children_moderately_or_severely_stunted__pct_values.feather

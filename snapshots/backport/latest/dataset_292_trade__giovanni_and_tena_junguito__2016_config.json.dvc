@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_292_trade__giovanni_and_tena_junguito__2016_config
-  file_extension: json
-  date_accessed: 2023-02-23 15:13:03.138694
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/292
+    date_accessed: 2023-08-10 08:08:51.468917
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_292_trade__giovanni_and_tena_junguito__2016
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/292
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 09038848ec7e6dda000d8da47d37eb3e
-  size: 2074
+- md5: 9bdcf2e34d2ab1ffee953ea34f56b144
+  size: 2229
   path: dataset_292_trade__giovanni_and_tena_junguito__2016_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1591
+    date_accessed: 2023-08-14 05:39:59.282123
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1591_drug_use_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c8940f493ccdbb1140dacec7985ae3b6
+  size: 31677
+  path: dataset_1591_drug_use_disorders_config.json

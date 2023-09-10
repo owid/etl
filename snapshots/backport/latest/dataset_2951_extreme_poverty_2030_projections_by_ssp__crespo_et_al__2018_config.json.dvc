@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_2951_extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:14:30.966098
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2951
+    date_accessed: 2023-08-10 09:03:43.796209
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2951_extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2951
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 88a8211f125bc7a9e98fb34dc77811c2
-  size: 9840
-  path: dataset_2951_extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018_config.json
+- md5: 2303aea0ff4c4c5aac4259accb0aa049
+  size: 11009
+  path: 
+    dataset_2951_extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018_config.json

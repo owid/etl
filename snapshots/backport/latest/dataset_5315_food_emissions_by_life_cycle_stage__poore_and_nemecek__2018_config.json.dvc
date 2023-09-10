@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_5315_food_emissions_by_life_cycle_stage__poore_and_nemecek__2018_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:38:24.837039
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5315
+    date_accessed: 2023-08-10 07:50:23.684293
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5315_food_emissions_by_life_cycle_stage__poore_and_nemecek__2018
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5315
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d59f52951cb3ae83b310d77996bcb67a
-  size: 8742
-  path: dataset_5315_food_emissions_by_life_cycle_stage__poore_and_nemecek__2018_config.json
+- md5: 8b5b7fa79e41c670fcc5e54e37914323
+  size: 10018
+  path: 
+    dataset_5315_food_emissions_by_life_cycle_stage__poore_and_nemecek__2018_config.json

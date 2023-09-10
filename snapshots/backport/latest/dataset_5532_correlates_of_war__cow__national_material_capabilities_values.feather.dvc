@@ -1,19 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_5532_correlates_of_war__cow__national_material_capabilities_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:47:44.092024
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5532
+    date_accessed: 2023-08-10 09:25:07.367951
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Correlates of War (CoW) - National Material Capabilities
   description: https://github.com/owid/importers/tree/master/cow
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5532
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e54ab9ad50f13319a20c5d0feca4f057
+- md5: d9cfe830678ed6b184479fd8a34f576b
   size: 240042
   path: 
     dataset_5532_correlates_of_war__cow__national_material_capabilities_values.feather

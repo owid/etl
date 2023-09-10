@@ -46,13 +46,17 @@ Select data to extract:
 1. Population, mean, median, gini and relative poverty variables
 2. Absolute poverty variables
 3. Decile thresholds and shares
-4. Additional dataset information
+4. Percentiles thresholds and shares
+5. Additional dataset information
 */
 
 global menu_option = 1
 
 *Select if the code extracts equivalized (1) or per capita (0) aggregation
 global equivalized = 1
+
+*Select if the metrics are calculated for the entire household ("all") or just for adults ("adults")
+global age "all"
 
 *Select the dataset to extract. "all" for the entire LIS data, "test" for test data, small [from(2015) to(2020) iso2(cl uk za)]
 global dataset = "all"
@@ -83,6 +87,16 @@ program define make_variables
 	gen miss_comp = 0
 	quietly replace miss_comp=1 if dhi==. | dhci==. | hifactor==. | hiprivate==. | hi33==. | hcexp==.
 	quietly drop if miss_comp==1
+	
+	*Defines different number of member of households depending on age selected
+	if "$age" == "all" {
+		gen number_household = nhhmem
+	}
+
+	else if "$age" == "adults" {
+		quietly drop if nhhmem17 > nhhmem
+		gen number_household = nhhmem - nhhmem17
+	}
 
 	*Create market income variable
 	*Obtain maximum value of component variables
@@ -141,12 +155,12 @@ program define make_variables
 
 			* If equivalization is selected, the household income is divided by the LIS equivalence scale (squared root of the number of household members)
 			if "$equivalized" == "1" {
-				replace e`var'_b = (e`var'_b/(nhhmem^0.5))
+				replace e`var'_b = (e`var'_b/(number_household^0.5))
 			}
 
 			*If equivalization is not selected, the household income is divided by the number of household members
 			else if "$equivalized" == "0" {
-				replace e`var'_b = (e`var'_b/(nhhmem))
+				replace e`var'_b = (e`var'_b/(number_household))
 			}
 		}
 
@@ -165,7 +179,7 @@ program define make_variables
 		*If this option is selected, the relative poverty is estimated considering the median of each welfare variable
 		if "$relative_poverty_dhi" == "0" {
 
-			quietly sum e`var'_b [w=hwgt*nhhmem], de
+			quietly sum e`var'_b [w=hwgt*number_household], de
 			forvalues pct = 40(10)60 {
 				global povline_`pct'_`var' = r(p50)*`pct'/100
 			}
@@ -174,7 +188,7 @@ program define make_variables
 
 	*If this option is selected, the relative poverty is estimated using the median DHI
 	if "$relative_poverty_dhi" == "1" {
-		quietly sum edhi_b [w=hwgt*nhhmem], de
+		quietly sum edhi_b [w=hwgt*number_household], de
 		*Why edhi_b and not e`var'_b???
 		*LIS methodology always uses (equivalized) disposable household income for the relative poverty line
 		forvalues pct = 40(10)60 {
@@ -183,7 +197,7 @@ program define make_variables
 	}
 
 	*Get total population
-	quietly sum nhhmem [w=hpopwgt]
+	quietly sum number_household [w=hpopwgt]
 	global pop: di %10.0f r(sum)
 end
 
@@ -237,7 +251,7 @@ foreach c in `countries' {
 * Gets the data
 
 foreach ccyy in `countries' {
-	quietly use dhi dhci hifactor hiprivate hi33 hcexp hwgt hpopwgt nhhmem grossnet iso2 year using $`ccyy'h, clear
+	quietly use dhi dhci hifactor hiprivate hi33 hcexp hwgt hpopwgt nhhmem nhhmem17 grossnet iso2 year using $`ccyy'h, clear
 
 	*Merge with PPP data to get deflator (if PPPs are selected and only for countries with PPP data)
 	if "$ppp_values" == "1" {
@@ -261,12 +275,12 @@ foreach ccyy in `countries' {
 					*Calculate poverty metrics
 					*If median DHI is selected
 					if "$relative_poverty_dhi" == "1" {
-						quietly povdeco e`var'_b [w=hwgt*nhhmem], pline(${povline_`pct'})
+						quietly povdeco e`var'_b [w=hwgt*number_household], pline(${povline_`pct'})
 					}
 
 					*If relative poverty is measured from the median of each welfare variable
 					else if "$relative_poverty_dhi" == "0" {
-						quietly povdeco e`var'_b [w=hwgt*nhhmem], pline(${povline_`pct'_`var'})
+						quietly povdeco e`var'_b [w=hwgt*number_household], pline(${povline_`pct'_`var'})
 					}
 
 					*fgt0 is headcount ratio
@@ -279,7 +293,7 @@ foreach ccyy in `countries' {
 				}
 
 				*Calculate and store gini for equivalized income
-				quietly ineqdec0 e`var'_b [w=hwgt*nhhmem]
+				quietly ineqdec0 e`var'_b [w=hwgt*number_household]
 				local gini_`var' : di %9.3f r(gini)
 
 				*Get mean and median income
@@ -328,7 +342,7 @@ foreach ccyy in `countries' {
 
 					*Calculate poverty metrics
 					local pline_year = `pline'/100*365
-					quietly povdeco e`var'_b [w=hwgt*nhhmem], pline(`pline_year')
+					quietly povdeco e`var'_b [w=hwgt*number_household], pline(`pline_year')
 
 					*fgt0 is headcount ratio
 					local fgt0_`var'_`pline': di %9.2f r(fgt0) *100
@@ -372,7 +386,7 @@ foreach ccyy in `countries' {
 			if `n_`var'' > 0 {
 
 				*Estimate percentile shares
-				qui sumdist e`var'_b [w=hwgt*nhhmem], ngp(10)
+				qui sumdist e`var'_b [w=hwgt*number_household], ngp(10)
 				*Print percentile thresholds and shares for each country, year, and income
 				forvalues j = 1/10 {
 					local thr`j': di %16.2f r(q`j')
@@ -395,8 +409,45 @@ foreach ccyy in `countries' {
 			}
 		}
 	}
-	* Option 4 is to get `grossnet' values, the variable that identifies if the dataset contains gross or net income and also the number of observations per dataset
+	
+	* Option 4 is to get percentile thresholds and shares of the income distribution
 	else if "$menu_option" == "4" {
+		foreach var in $inc_cons_vars {
+
+			quietly sum e`var'_b
+			local n_`var' = r(N)
+
+			*Print dataset header
+			if "`ccyy'" == "`first_country'" & "`var'" == "`first_inc_cons'" di "dataset,variable,eq,percentile,thr,share"
+
+			if `n_`var'' > 0 {
+
+				*Estimate percentile shares
+				qui sumdist e`var'_b [w=hwgt*number_household], ngp(100)
+				*Print percentile thresholds and shares for each country, year, and income
+				forvalues j = 1/100 {
+					local thr`j': di %16.2f r(q`j')
+					local s`j': di %9.4f r(sh`j')*100
+					local perc = `j'
+					di "`ccyy',`var',$equivalized,`perc',`thr`j'',`s`j''"
+				}
+			}
+
+			else {
+
+				*Print percentile thresholds and shares for each country, year, and income
+				forvalues j = 1/100 {
+					local thr`j' = .
+					local s`j' = .
+					local perc = `j'
+					di "`ccyy',`var',$equivalized,`perc',`thr`j'',`s`j''"
+				}
+
+			}
+		}
+	}
+	* Option 5 is to get `grossnet' values, the variable that identifies if the dataset contains gross or net income and also the number of observations per dataset
+	else if "$menu_option" == "5" {
 		*Create unique values of grossnet (one per dataset)
 		qui levelsof grossnet, local(uniq_gross) clean
 

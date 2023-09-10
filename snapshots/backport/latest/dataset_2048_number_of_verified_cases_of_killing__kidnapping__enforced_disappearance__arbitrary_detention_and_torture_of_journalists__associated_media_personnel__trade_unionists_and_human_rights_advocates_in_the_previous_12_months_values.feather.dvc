@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2048
+    date_accessed: 2023-08-14 08:49:35.576117
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of verified cases of killing, kidnapping, enforced disappearance, arbitrary
+    detention and torture of journalists, associated media personnel, trade unionists
+    and human rights advocates in the previous 12 months
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b9193ebaa566c86680b279063c43c404
+  size: 15818
+  path: 
+    dataset_2048_number_of_verified_cases_of_killing__kidnapping__enforced_disappearance__arbitrary_detention_and_torture_of_journalists__associated_media_personnel__trade_unionists_and_human_rights_advocates_in_the_previous_12_months_values.feather

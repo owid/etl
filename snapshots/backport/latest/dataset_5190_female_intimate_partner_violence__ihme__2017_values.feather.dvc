@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5190_female_intimate_partner_violence__ihme__2017_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:39:55.879319
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5190
+    date_accessed: 2023-08-10 08:26:41.574493
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Female intimate partner violence (IHME, 2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5190
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0d634d61a7bc210448db20a3f89d0c45
+- md5: 60e677ae18dd17161e49b874b0b49936
   size: 39090
   path: dataset_5190_female_intimate_partner_violence__ihme__2017_values.feather

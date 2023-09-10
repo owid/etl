@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4473
+    date_accessed: 2023-08-14 15:54:43.817029
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4473_proportion_of_members_of_developing_countries_in_international_organizations__by_organization__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8ae14091d3576049051d2f684978f317
+  size: 27303
+  path: 
+    dataset_4473_proportion_of_members_of_developing_countries_in_international_organizations__by_organization__pct_config.json

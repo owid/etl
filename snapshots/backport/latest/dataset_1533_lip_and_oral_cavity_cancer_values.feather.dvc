@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1533
+    date_accessed: 2023-08-14 16:09:55.817943
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Lip and oral cavity cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ce3c9d6e0c097c3b1844dfe23da1d673
+  size: 1389922
+  path: dataset_1533_lip_and_oral_cavity_cancer_values.feather

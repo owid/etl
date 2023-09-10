@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4523
+    date_accessed: 2023-08-10 14:42:22.557493
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4523_material_footprint__by_type_of_raw_material__tonnes
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 03a2e36a3a9e09721a5ef457a9912823
+  size: 8409
+  path: dataset_4523_material_footprint__by_type_of_raw_material__tonnes_config.json

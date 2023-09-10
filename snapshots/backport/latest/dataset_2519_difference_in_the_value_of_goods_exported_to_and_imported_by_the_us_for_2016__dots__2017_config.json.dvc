@@ -1,21 +1,16 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_2519_difference_in_the_value_of_goods_exported_to_and_imported_by_the_us_for_2016__dots__2017_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:37:12.687429
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2519
+    date_accessed: 2023-08-10 08:04:07.202472
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for 
     dataset_2519_difference_in_the_value_of_goods_exported_to_and_imported_by_the_us_for_2016__dots__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2519
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 735b038db27e63e80b750b4196569d34
-  size: 2365
+- md5: 3dcccc7b30432ab45cdb43f51d337a53
+  size: 2518
   path: 
     dataset_2519_difference_in_the_value_of_goods_exported_to_and_imported_by_the_us_for_2016__dots__2017_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/6007
+    date_accessed: 2023-08-16 07:29:13.328469
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Global Health Observatory: Age-standardized suicide rates (WHO, Invented)'
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f87f9e274f9d302d88a4a82c6dc4c747
+  size: 106698
+  path: 
+    dataset_6007_global_health_observatory__age_standardized_suicide_rates__who__invented_values.feather

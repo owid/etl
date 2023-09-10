@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2542
+    date_accessed: 2023-08-10 14:38:26.879602
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Public Sector, Taxation and Market Regulation - Taxing Wages - Comparative
+    tables
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 02829524213d6cf2980e9f2854a03507
+  size: 483122
+  path: 
+    dataset_2542_public_sector__taxation_and_market_regulation__taxing_wages__comparative_tables_values.feather

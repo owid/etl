@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2445
+    date_accessed: 2023-08-10 14:50:29.800719
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Human Settlements
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 03fcb8e20c8dc9cd32d86e2225c46377
+  size: 33562
+  path: dataset_2445_human_settlements_values.feather

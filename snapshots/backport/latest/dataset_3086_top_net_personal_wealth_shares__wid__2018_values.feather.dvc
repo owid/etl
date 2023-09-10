@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3086
+    date_accessed: 2023-08-14 16:00:29.810150
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Top Net Personal Wealth Shares – WID (2018)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8ebb783e95739438c519d641c1d66bb3
+  size: 13138
+  path: dataset_3086_top_net_personal_wealth_shares__wid__2018_values.feather

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_1932_patents_awarded_in_england__scotland_and_wales__bottomley_values
-  file_extension: feather
-  date_accessed: 2023-05-05 09:41:42.170394
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1932
+    date_accessed: 2023-08-10 08:02:31.744733
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Patents awarded in England, Scotland and Wales - Bottomley
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1932
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 17f72e0d4fda1db4d320652e26c39b1c
+- md5: e057470f134a32306a8e89b0bf706798
   size: 8074
-  path: dataset_1932_patents_awarded_in_england__scotland_and_wales__bottomley_values.feather
+  path: 
+    dataset_1932_patents_awarded_in_england__scotland_and_wales__bottomley_values.feather

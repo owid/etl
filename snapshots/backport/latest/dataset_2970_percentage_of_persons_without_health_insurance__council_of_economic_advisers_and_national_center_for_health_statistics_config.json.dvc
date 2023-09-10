@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_2970_percentage_of_persons_without_health_insurance__council_of_economic_advisers_and_national_center_for_health_statistics_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:01:59.282971
-  name: Grapher metadata for dataset_2970_percentage_of_persons_without_health_insurance__council_of_economic_advisers_and_national_center_for_health_statistics
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2970
+    date_accessed: 2023-08-10 09:15:07.484411
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2970_percentage_of_persons_without_health_insurance__council_of_economic_advisers_and_national_center_for_health_statistics
   description: Split from https://owid.cloud/admin/datasets/204 - Jaiden
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2970
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 176c94bfed58e7e3141fcf960d27e483
-  size: 2332
-  path: dataset_2970_percentage_of_persons_without_health_insurance__council_of_economic_advisers_and_national_center_for_health_statistics_config.json
+- md5: 0c608469abd13ee7a0be16735692a0b0
+  size: 2485
+  path: 
+    dataset_2970_percentage_of_persons_without_health_insurance__council_of_economic_advisers_and_national_center_for_health_statistics_config.json

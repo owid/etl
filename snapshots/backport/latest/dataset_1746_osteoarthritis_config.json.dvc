@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1746
+    date_accessed: 2023-08-14 15:46:24.032590
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1746_osteoarthritis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a75002b9f0efe0261137c5a674c97c48
+  size: 16502
+  path: dataset_1746_osteoarthritis_config.json

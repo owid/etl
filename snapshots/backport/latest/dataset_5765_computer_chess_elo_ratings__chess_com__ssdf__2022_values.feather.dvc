@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5765_computer_chess_elo_ratings__chess_com__ssdf__2022_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:51:43.863808
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5765
+    date_accessed: 2023-08-10 09:08:38.795142
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Computer Chess Elo Ratings – Chess.com, SSDF (2022)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5765
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b68456e5f08d46ca8547a2e440e24cd1
+- md5: f728b4ff59422c418c89f3b6a62a3ff5
   size: 6394
   path: dataset_5765_computer_chess_elo_ratings__chess_com__ssdf__2022_values.feather

@@ -1,0 +1,40 @@
+meta:
+  namespace: war
+  short_name: war_cow
+  name: 'War data: The Directed Dyadic Interstate War Dataset v3.0 (COW, 2019)'
+  version: 2023-03-14
+  publication_year: 2019
+  source_name: COW (2019)
+  source_published_by: >-
+    Zeev Maoz, Paul L. Johnson, Jasper Kaplan, Fiona Ogunkoya, and Aaron Shreve 2019.
+    The Dyadic Militarized Interstate Disputes
+    (MIDs) Dataset Version 3.0: Logic, Characteristics, and Comparisons to Alternative
+    Datasets, Journal of Conflict Resolution
+    (forthcoming)
+  url: https://correlatesofwar.org/data-sets/cow-war/
+  source_data_url: https://correlatesofwar.org/wp-content/uploads/Dyadic-Interstate-War-Dataset.zip
+  file_extension: zip
+  license_url:
+  license_name:
+  is_public: true
+  description: >-
+    The Correlates of War (COW) Project has utilized a classification of wars that
+    is based upon the status of territorial entities,
+    in particular focusing on those that are classified as members of the inter-state
+    system (referred to as “states”). This dataset
+    encompasses wars that take place between or among the recognized states, or inter-state
+    wars.
+
+
+    The dyadic war dataset is built and fully compatible with the dyadic MID dataset
+    (Maoz et al. 2019). It provides dyadic
+    records of interstate wars over the period of 1816-2010, with a dyad-year unit
+    of analysis.
+
+
+    Dyad refers to the fact that the dataset is structured at country-conflict level (instead of conflict-level).
+wdir: ../../../data/snapshots/war/2023-03-14
+outs:
+- md5: ebdf452ee71231abba84080db47d2fa0
+  size: 346286
+  path: cow.inter_state_dyadic.zip

@@ -102,13 +102,8 @@ def validate_chart_config_and_set_defaults(
 def fix_errors_in_schema(config: Dict[str, Any]) -> Dict[str, Any]:
     """Fix common errors in schema and tries to catch up with latest schema version."""
     config_new = copy.deepcopy(config)
-    # Remove map.columnSlug. This should be map.variableId instead.
     if "map" in config_new:
-        if "columnSlug" in config_new["map"]:
-            print("DELETE")
-            if "variableId" not in config_new["map"]:
-                config_new["map"]["variableId"] = config_new["map"]["columnSlug"]
-            del config_new["map"]["columnSlug"]
+        assert "variableId" not in config_new["map"], "map.variableId has been deprecated by map.columnSlug"
     if ("timelineMaxTime" in config_new) and (config_new["timelineMaxTime"] is None):
         del config_new["timelineMaxTime"]
     if ("timelineMinTime" in config_new) and (config_new["timelineMinTime"] is None):

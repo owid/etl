@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1755
+    date_accessed: 2023-08-14 05:52:56.433482
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1755_leprosy (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 94924d6ad3e7d75367ed341449d961db
+  size: 16355
+  path: dataset_1755_leprosy_config.json

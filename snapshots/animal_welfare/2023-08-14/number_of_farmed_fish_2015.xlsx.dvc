@@ -1,0 +1,21 @@
+meta:
+  origin:
+    dataset_title_owid: Number of farmed fish in 2015
+    dataset_title_producer: Estimated numbers of individuals in annual global aquaculture
+      production (FAO) of fish species (2015).
+    dataset_description_owid: |-
+      Estimated number of individual fish in annual aquaculture production in 2015.
+    producer: Fishcount
+    citation_producer: Fishcount.org.uk based on data from the Food and Agriculture
+      Organization of the United Nations.
+    dataset_url_main: http://fishcount.org.uk/
+    dataset_url_download: http://fishcount.org.uk/studydatascreens2/2015/Farmed-fishes-2015.xlsx
+    date_published: '2016'
+    date_accessed: 2023-08-14
+  license:
+    name: CC BY
+wdir: ../../../data/snapshots/animal_welfare/2023-08-14
+outs:
+- md5: 8766421d56b0d4c350d6db47b5a43d6f
+  size: 240536
+  path: number_of_farmed_fish_2015.xlsx

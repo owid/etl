@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/868
+    date_accessed: 2023-08-16 08:23:24.201907
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_868_clio_infra__national_accounts (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2196ceeec52bae000cd2110f51ad07a1
+  size: 1865
+  path: dataset_868_clio_infra__national_accounts_config.json

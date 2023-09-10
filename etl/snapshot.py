@@ -1,16 +1,17 @@
 import datetime as dt
 import json
 import re
-import shutil
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Iterator, Optional, Union
 
+import owid.catalog.processing as pr
 import pandas as pd
 import yaml
 from dataclasses_json import dataclass_json
+from owid.catalog import Table
 from owid.catalog.meta import (
     DatasetMeta,
     License,
@@ -75,7 +76,8 @@ class Snapshot:
     def pull(self, force=True) -> None:
         """Pull file from S3."""
         with _unignore_backports(self.path):
-            get_dvc().pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
+            dvc = get_dvc()
+            dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -114,50 +116,56 @@ class Snapshot:
                     with attempt:
                         dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
 
-    def to_table_metadata(self):
-        if "origin" in self.metadata.to_dict():
-            table_meta = TableMeta.from_dict(
-                {
-                    "short_name": self.metadata.short_name,
-                    "title": self.metadata.origin.dataset_title_owid,  # type: ignore
-                    "description": self.metadata.origin.dataset_description_owid,  # type: ignore
-                    "dataset": DatasetMeta.from_dict(
-                        {
-                            "channel": "snapshots",
-                            "namespace": self.metadata.namespace,
-                            "short_name": self.metadata.short_name,
-                            "title": self.metadata.origin.dataset_title_owid,  # type: ignore
-                            "description": self.metadata.origin.dataset_description_owid,  # type: ignore
-                            "origins": [self.metadata.origin],
-                            "licenses": [self.metadata.license],
-                            "is_public": self.metadata.is_public,
-                            "version": self.metadata.version,
-                        }
-                    ),
-                }
-            )
+    def create_snapshot(
+        self,
+        filename: Optional[Union[str, Path]] = None,
+        data: Optional[Union[Table, pd.DataFrame]] = None,
+        upload: bool = False,
+    ) -> None:
+        """Create a new snapshot from a local file, or from data in memory, or from a download link."""
+        if (filename is not None) or (data is not None):
+            # Create snapshot from either a local file or from data in memory.
+            add_snapshot(uri=self.uri, filename=filename, dataframe=data, upload=upload)
         else:
-            table_meta = TableMeta.from_dict(
-                {
-                    "short_name": self.metadata.short_name,
-                    "title": self.metadata.name,
-                    "description": self.metadata.description,
-                    "dataset": DatasetMeta.from_dict(
-                        {
-                            "channel": "snapshots",
-                            "description": self.metadata.description,
-                            "is_public": self.metadata.is_public,
-                            "namespace": self.metadata.namespace,
-                            "short_name": self.metadata.short_name,
-                            "title": self.metadata.name,
-                            "version": self.metadata.version,
-                            "sources": [self.metadata.source],
-                            "licenses": [self.metadata.license],
-                        }
-                    ),
-                }
-            )
-        return table_meta
+            # Create snapshot by downloading data from a URL.
+            self.download_from_source()
+            self.dvc_add(upload=upload)
+
+    def to_table_metadata(self):
+        return self.metadata.to_table_metadata()
+
+    def read(self, *args, **kwargs) -> Table:
+        """Read file based on its Snapshot extension."""
+        if self.metadata.file_extension == "csv":
+            return self.read_csv(*args, **kwargs)
+        elif self.metadata.file_extension == "feather":
+            return self.read_feather(*args, **kwargs)
+        elif self.metadata.file_extension == "xlsx":
+            return self.read_excel(*args, **kwargs)
+        elif self.metadata.file_extension == "json":
+            return self.read_json(*args, **kwargs)
+        else:
+            raise ValueError(f"Unknown extension {self.metadata.file_extension}")
+
+    def read_csv(self, *args, **kwargs) -> Table:
+        """Read CSV file into a Table and populate it with metadata."""
+        return pr.read_csv(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+
+    def read_feather(self, *args, **kwargs) -> Table:
+        """Read feather file into a Table and populate it with metadata."""
+        return pr.read_feather(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+
+    def read_excel(self, *args, **kwargs) -> Table:
+        """Read excel file into a Table and populate it with metadata."""
+        return pr.read_excel(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+
+    def read_json(self, *args, **kwargs) -> Table:
+        """Read JSON file into a Table and populate it with metadata."""
+        return pr.read_json(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+
+    def read_from_records(self, *args, **kwargs) -> Table:
+        """Read records into a Table and populate it with metadata."""
+        return pr.read_from_records(*args, metadata=self.to_table_metadata(), **kwargs)
 
 
 @pruned_json
@@ -244,14 +252,12 @@ class SnapshotMeta:
             if "file_extension" not in meta:
                 meta["file_extension"] = _parse_snapshot_path(Path(filename))[3]
 
-            # we can have either source or origin in YAML
-            if "origin" in meta and "source" in meta:
-                raise ValueError("Cannot have both `origin` and `source` in metadata")
-            elif "origin" in meta:
+            if "origin" in meta:
                 meta["origin"] = Origin.from_dict(meta["origin"])
-            elif "source" in meta:
+
+            if "source" in meta:
                 meta["source"] = Source.from_dict(meta["source"])
-            else:
+            elif "source_name" in meta:
                 # convert legacy fields to source
                 publication_date = meta.pop("publication_date", None)
                 meta["source"] = Source(
@@ -316,11 +322,56 @@ class SnapshotMeta:
             date_accessed=pd.to_datetime(s["description"].get("retrievedDate") or dt.date.today()).date(),
         )
 
+    def to_table_metadata(self):
+        if "origin" in self.to_dict():
+            table_meta = TableMeta.from_dict(
+                {
+                    "short_name": self.short_name,
+                    "title": self.origin.dataset_title_owid,  # type: ignore
+                    "description": self.origin.dataset_description_owid,  # type: ignore
+                    "dataset": DatasetMeta.from_dict(
+                        {
+                            "channel": "snapshots",
+                            "namespace": self.namespace,
+                            "short_name": self.short_name,
+                            "title": self.origin.dataset_title_owid,  # type: ignore
+                            "description": self.origin.dataset_description_owid,  # type: ignore
+                            "origins": [self.origin] if self.origin else [],
+                            "licenses": [self.license] if self.license else [],
+                            "is_public": self.is_public,
+                            "version": self.version,
+                        }
+                    ),
+                }
+            )
+        else:
+            table_meta = TableMeta.from_dict(
+                {
+                    "short_name": self.short_name,
+                    "title": self.name,
+                    "description": self.description,
+                    "dataset": DatasetMeta.from_dict(
+                        {
+                            "channel": "snapshots",
+                            "description": self.description,
+                            "is_public": self.is_public,
+                            "namespace": self.namespace,
+                            "short_name": self.short_name,
+                            "title": self.name,
+                            "version": self.version,
+                            "sources": [self.source] if self.source else [],
+                            "licenses": [self.license] if self.license else [],
+                        }
+                    ),
+                }
+            )
+        return table_meta
+
 
 def add_snapshot(
     uri: str,
     filename: Optional[Union[str, Path]] = None,
-    dataframe: Optional[pd.DataFrame] = None,
+    dataframe: Optional[Union[Table, pd.DataFrame]] = None,
     upload: bool = False,
 ) -> None:
     """Helper function for adding snapshots with metadata, where the data is either
@@ -330,33 +381,34 @@ def add_snapshot(
         uri (str): URI of the snapshot file, typically `namespace/version/short_name.ext`. Metadata file
             `namespace/version/short_name.ext.dvc` must exist!
         filename (str or None): Path to local data file (if dataframe is not given).
-        dataframe (pd.DataFrame or None): Dataframe to upload (if filename is not given).
+        dataframe (Table or pd.DataFrame or None): Data to upload (if filename is not given).
         upload (bool): True to upload data to Walden bucket.
     """
     snap = Snapshot(uri)
 
     if (filename is not None) and (dataframe is None):
-        # copy file to correct location
-        shutil.copyfile(filename, snap.path)
+        # Ensure destination folder exists.
+        snap.path.parent.mkdir(exist_ok=True, parents=True)
+
+        # Copy local data file to snapshots data folder.
+        snap.path.write_bytes(Path(filename).read_bytes())
     elif (dataframe is not None) and (filename is None):
         dataframes.to_file(dataframe, file_path=snap.path)
     else:
-        raise ValueError("Use either 'filename' or 'dataframe' argument, but not both.")
+        raise ValueError("Pass either a filename or data, but not both.")
 
     snap.dvc_add(upload=upload)
 
 
-def snapshot_catalog(match: str = r".*") -> List[Snapshot]:
+def snapshot_catalog(match: str = r".*") -> Iterator[Snapshot]:
     """Return a catalog of all snapshots. It can take more than 10s to load the entire catalog,
     so it's recommended to use `match` to filter the snapshots.
     :param match: pattern to match uri
     """
-    catalog = []
     for path in paths.SNAPSHOTS_DIR.glob("**/*.dvc"):
         uri = str(path.relative_to(paths.SNAPSHOTS_DIR)).replace(".dvc", "")
         if re.search(match, uri):
-            catalog.append(Snapshot(uri))
-    return catalog
+            yield Snapshot(uri)
 
 
 @contextmanager
@@ -369,16 +421,23 @@ def _unignore_backports(path: Path):
     Changing .dvcignore in-place is not great, but no other way was working (tried monkey-patching
     DVC and subrepos).
     """
+    dvc_ignore_path = paths.BASE_DIR / ".dvcignore"
     if "backport/" in str(path):
         with unignore_backports_lock:
-            with open(".dvcignore") as f:
+            with open(dvc_ignore_path) as f:
                 s = f.read()
             try:
-                with open(".dvcignore", "w") as f:
-                    f.write(s.replace("snapshots/backport/", "# snapshots/backport/"))
+                with open(dvc_ignore_path, "w") as f:
+                    dataset_id = path.name.split("_")[1]
+                    f.write(
+                        s.replace(
+                            "snapshots/backport/latest/*",
+                            f"snapshots/backport/latest/*\n!snapshots/backport/latest/dataset_{dataset_id}*",
+                        )
+                    )
                 yield
             finally:
-                with open(".dvcignore", "w") as f:
+                with open(dvc_ignore_path, "w") as f:
                     f.write(s)
     else:
         yield

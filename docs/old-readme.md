@@ -403,7 +403,7 @@ cd etl-staging
 
 _Internal OWID staff only_
 
-Grapher step writes metadata to mysql and stores data as parquet files in the grapher channel. Admin still uses two ways of loading data - from table `data_values` for manually uploaded datasets and now from bucket `owid-catalog` in S3 (proxied by https://owid-catalog.nyc3.digitaloceanspaces.com/) for ETL datasets.
+Grapher step writes metadata to mysql and stores data as parquet files in the grapher channel. Admin loads data from bucket `owid-catalog` in S3 (proxied by https://owid-catalog.nyc3.digitaloceanspaces.com/) for ETL datasets.
 
 During local development your data isn't yet in S3 catalog, but is stored in your local catalog. You have to add the following env variable to `owid-grapher/.env`
 

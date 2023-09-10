@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1859
+    date_accessed: 2023-08-14 14:32:34.403812
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1859_industrial_relations (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0fcc1dc2939f2b889af13641fa4bc47f
+  size: 3540
+  path: dataset_1859_industrial_relations_config.json

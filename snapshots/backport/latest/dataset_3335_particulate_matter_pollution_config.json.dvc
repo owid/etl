@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3335
+    date_accessed: 2023-08-11 07:53:13.950150
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3335_particulate_matter_pollution (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ec3269225002cc4ccf6664f477de4fc2
+  size: 22219
+  path: dataset_3335_particulate_matter_pollution_config.json

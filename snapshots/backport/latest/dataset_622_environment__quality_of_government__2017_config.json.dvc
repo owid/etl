@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/622
+    date_accessed: 2023-08-16 10:24:32.327975
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_622_environment__quality_of_government__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5b3578e71f5ab41a218ee94f59206497
+  size: 46611
+  path: dataset_622_environment__quality_of_government__2017_config.json

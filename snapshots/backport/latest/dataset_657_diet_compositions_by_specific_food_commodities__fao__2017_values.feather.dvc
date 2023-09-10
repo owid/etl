@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/657
+    date_accessed: 2023-08-10 14:31:00.911348
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diet compositions by specific food commodities - FAO (2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b04db1162146fc4e745a6c866aa0c5e6
+  size: 562554
+  path: 
+    dataset_657_diet_compositions_by_specific_food_commodities__fao__2017_values.feather

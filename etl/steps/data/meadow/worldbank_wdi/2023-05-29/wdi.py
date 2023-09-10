@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot_dependency()
+    snap = paths.load_snapshot()
 
     # Load data from snapshot.
     zf = zipfile.ZipFile(snap.path)

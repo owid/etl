@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Google Sheet
+    url: https://www.sentienceinstitute.org/aft-survey-2021
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTHuvrVzfeof4Srke_7bxUlu6eKNZ7RHrjrP6GD184aqrlIiojtSdGH4Hzu48JNynpiES7CX4nf1kUI/pub?output=csv
+    date_accessed: '2023-08-21'
+    publication_year: '2021'
+    published_by: Google Sheet
+  name: Survey attitudes to livestock farming (Sentience Institute)
+  description: ''
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: b14999718893c98ee49d49464c64f026
+  size: 1541
+  path: sentience_institute.csv

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2740
+    date_accessed: 2023-08-14 15:38:19.933547
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: UN WPP - Annual male population by five-year age group, region, subregion
+    and country, 1950-2100 (thousands)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9417413dd58c5b6fae1d2f21e5ec5a4a
+  size: 3954634
+  path: 
+    dataset_2740_un_wpp__annual_male_population_by_five_year_age_group__region__subregion_and_country__1950_2100__thousands_values.feather

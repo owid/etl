@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2518
+    date_accessed: 2023-08-10 14:38:29.842244
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2518_poverty_rate__lt_50pct_of_median__lis_key_figures__2018
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 26a08ec2262bae20c268004e8c0f233a
+  size: 1697
+  path: dataset_2518_poverty_rate__lt_50pct_of_median__lis_key_figures__2018_config.json

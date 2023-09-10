@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/557
+    date_accessed: 2023-08-10 14:32:22.355772
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Development Indicators - Financial Sector
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2a953381b9d80f11b5a9676d7f5cb349
+  size: 1883786
+  path: dataset_557_world_development_indicators__financial_sector_values.feather

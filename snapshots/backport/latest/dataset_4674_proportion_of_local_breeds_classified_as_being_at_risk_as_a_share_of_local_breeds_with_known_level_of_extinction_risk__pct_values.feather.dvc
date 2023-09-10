@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4674
+    date_accessed: 2023-08-16 07:27:03.764509
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of local breeds classified as being at risk as a share of local
+    breeds with known level of extinction risk (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7ce88ccfdaac0286380422cc7143f923
+  size: 12698
+  path: 
+    dataset_4674_proportion_of_local_breeds_classified_as_being_at_risk_as_a_share_of_local_breeds_with_known_level_of_extinction_risk__pct_values.feather

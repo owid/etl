@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1565
+    date_accessed: 2023-08-14 15:56:14.010720
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other digestive diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 23665e9e82a9c6267a6c755caf11f0b0
+  size: 2012050
+  path: dataset_1565_other_digestive_diseases_values.feather

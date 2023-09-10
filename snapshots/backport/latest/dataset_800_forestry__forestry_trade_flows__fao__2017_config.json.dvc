@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/800
+    date_accessed: 2023-08-14 05:46:28.962895
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_800_forestry__forestry_trade_flows__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 601c95e475add101552130b53548c568
+  size: 139999
+  path: dataset_800_forestry__forestry_trade_flows__fao__2017_config.json

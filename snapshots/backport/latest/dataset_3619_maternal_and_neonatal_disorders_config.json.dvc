@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3619
+    date_accessed: 2023-08-16 10:39:57.168930
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3619_maternal_and_neonatal_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 94949297f50a70e634492e52890280da
+  size: 33268
+  path: dataset_3619_maternal_and_neonatal_disorders_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1681
+    date_accessed: 2023-08-16 10:11:37.734321
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1681_maternal_deaths_aggravated_by_hiv_aids (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dabffe506404a18120cd6259f974fa6a
+  size: 27478
+  path: dataset_1681_maternal_deaths_aggravated_by_hiv_aids_config.json

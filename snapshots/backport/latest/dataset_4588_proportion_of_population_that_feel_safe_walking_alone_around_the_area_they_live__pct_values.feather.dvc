@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4588
+    date_accessed: 2023-08-11 07:58:19.076036
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of population that feel safe walking alone around the area they
+    live (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3d2ba30d558a5e43120348d5410eb83a
+  size: 7242
+  path: 
+    dataset_4588_proportion_of_population_that_feel_safe_walking_alone_around_the_area_they_live__pct_values.feather

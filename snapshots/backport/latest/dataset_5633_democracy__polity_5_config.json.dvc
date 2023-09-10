@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5633_democracy__polity_5_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:08:17.302725
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5633
+    date_accessed: 2023-08-10 10:26:51.560799
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5633_democracy__polity_5
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5633
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c0a76db6fd290c73aa53000cb8116f2a
-  size: 27948
+- md5: 459610cb08b54b4849707b48598373cf
+  size: 31831
   path: dataset_5633_democracy__polity_5_config.json

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2811_ozone_depleting_emissions_since_1960__scientific_assessment__2014_config
-  file_extension: json
-  date_accessed: 2023-03-23 17:24:17.458372
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2811
+    date_accessed: 2023-08-09 14:54:56.208889
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2811_ozone_depleting_emissions_since_1960__scientific_assessment__2014
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2811
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e6811be89b3a4b3285f18d39f0e05e12
-  size: 2481
-  path: dataset_2811_ozone_depleting_emissions_since_1960__scientific_assessment__2014_config.json
+- md5: 9b48ad27df3df2bd48518f00a7b02edc
+  size: 2634
+  path: 
+    dataset_2811_ozone_depleting_emissions_since_1960__scientific_assessment__2014_config.json

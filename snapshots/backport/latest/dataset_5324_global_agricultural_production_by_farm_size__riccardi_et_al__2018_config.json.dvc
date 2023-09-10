@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_5324_global_agricultural_production_by_farm_size__riccardi_et_al__2018_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:35:46.477878
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5324
+    date_accessed: 2023-08-10 08:07:40.307599
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5324_global_agricultural_production_by_farm_size__riccardi_et_al__2018
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5324
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 17d8f78a8c9af0ef341f5e9739e00fae
-  size: 9328
-  path: dataset_5324_global_agricultural_production_by_farm_size__riccardi_et_al__2018_config.json
+- md5: 33b56be9f41575d58393f0088e8105b1
+  size: 11104
+  path: 
+    dataset_5324_global_agricultural_production_by_farm_size__riccardi_et_al__2018_config.json

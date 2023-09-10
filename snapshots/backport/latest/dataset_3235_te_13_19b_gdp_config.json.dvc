@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3235_te_13_19b_gdp_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:17:35.903091
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3235
+    date_accessed: 2023-08-10 08:45:21.216340
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3235_te_13_19b_gdp
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3235
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 46efbd6ddb46f64d02260f0a2ed1c9a2
-  size: 1383
+- md5: 6a3cf6d99352c7b1f1853ec0e27cae45
+  size: 1601
   path: dataset_3235_te_13_19b_gdp_config.json

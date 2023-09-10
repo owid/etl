@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2651
+    date_accessed: 2023-08-16 10:00:43.446691
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2651_social_protection_and_well_being__socr__reference_series
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 08d05474d006dec38d3439d9599cd27f
+  size: 6762
+  path: 
+    dataset_2651_social_protection_and_well_being__socr__reference_series_config.json

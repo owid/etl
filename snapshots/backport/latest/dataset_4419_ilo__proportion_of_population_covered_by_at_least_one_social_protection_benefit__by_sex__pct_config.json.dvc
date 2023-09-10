@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4419
+    date_accessed: 2023-08-14 05:52:41.319417
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4419_ilo__proportion_of_population_covered_by_at_least_one_social_protection_benefit__by_sex__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8d0c2d7c9e30abb239a33db772eb749e
+  size: 3613
+  path: 
+    dataset_4419_ilo__proportion_of_population_covered_by_at_least_one_social_protection_benefit__by_sex__pct_config.json

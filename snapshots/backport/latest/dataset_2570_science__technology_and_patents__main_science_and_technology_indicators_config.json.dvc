@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2570
+    date_accessed: 2023-08-14 15:05:35.870122
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2570_science__technology_and_patents__main_science_and_technology_indicators
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bc1e62ec4f3c4eebfec8c5740daec87d
+  size: 115916
+  path: 
+    dataset_2570_science__technology_and_patents__main_science_and_technology_indicators_config.json

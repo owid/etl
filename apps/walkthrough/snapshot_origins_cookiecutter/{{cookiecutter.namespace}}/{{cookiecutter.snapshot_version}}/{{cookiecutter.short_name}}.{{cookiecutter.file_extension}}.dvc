@@ -1,0 +1,49 @@
+meta:
+  origin:
+    dataset_title_owid: {{cookiecutter.dataset_title_owid}}
+    {%- if cookiecutter.dataset_title_producer %}
+    dataset_title_producer: {{cookiecutter.dataset_title_producer}}
+    {%- endif %}
+    {%- if cookiecutter.dataset_description_owid %}
+    dataset_description_owid: |-
+      {{cookiecutter.dataset_description_owid.replace("\n", "\n      ")}}
+    {%- endif %}
+    {%- if cookiecutter.dataset_description_producer %}
+    dataset_description_producer: |-
+      {{cookiecutter.dataset_description_producer.replace("\n", "\n      ")}}
+    {%- endif %}
+    {%- if cookiecutter.producer %}
+    producer: {{cookiecutter.producer}}
+    {%- endif %}
+    {%- if cookiecutter.citation_producer %}
+    citation_producer: {{cookiecutter.citation_producer}}
+    {%- endif %}
+    {%- if cookiecutter.attribution %}
+    attribution: {{cookiecutter.attribution}}
+    {%- endif %}
+    {%- if cookiecutter.attribution_short %}
+    attribution_short: {{cookiecutter.attribution_short}}
+    {%- endif %}
+    {%- if cookiecutter.origin_version %}
+    version_producer: {{cookiecutter.origin_version}}
+    {%- endif %}
+    {%- if cookiecutter.dataset_url_main %}
+    dataset_url_main: {{cookiecutter.dataset_url_main}}
+    {%- endif %}
+    {%- if cookiecutter.dataset_url_download %}
+    dataset_url_download: {{cookiecutter.dataset_url_download}}
+    {%- endif %}
+    {%- if cookiecutter.date_published %}
+    date_published: {{cookiecutter.date_published}}
+    {%- endif %}
+    date_accessed: {% now 'local', '%Y-%m-%d' %}
+  license:
+    {%- if cookiecutter.license_url %}
+    url: {{cookiecutter.license_url}}
+    {%- endif -%}
+    {%- if cookiecutter.license_name %}
+    name: {{cookiecutter.license_name}}
+    {%- endif -%}
+  {% if cookiecutter.is_private == "True" %}
+  is_public: false
+  {%- endif -%}

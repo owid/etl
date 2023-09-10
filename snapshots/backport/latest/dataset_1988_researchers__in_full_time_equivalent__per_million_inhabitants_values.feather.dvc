@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1988
+    date_accessed: 2023-08-14 15:39:37.096027
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Researchers (in full-time equivalent) per million inhabitants
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cb6d99353c8f5dc5d8d9c2684564e183
+  size: 12858
+  path: 
+    dataset_1988_researchers__in_full_time_equivalent__per_million_inhabitants_values.feather

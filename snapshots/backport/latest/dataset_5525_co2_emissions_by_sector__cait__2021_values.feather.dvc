@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5525
+    date_accessed: 2023-08-14 10:59:59.742092
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: CO2 emissions by sector (CAIT, 2021)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e99a629ed398be16a40791906bff138d
+  size: 703954
+  path: dataset_5525_co2_emissions_by_sector__cait__2021_values.feather

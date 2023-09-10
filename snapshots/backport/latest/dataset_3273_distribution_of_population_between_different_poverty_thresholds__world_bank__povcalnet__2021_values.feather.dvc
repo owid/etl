@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3273
+    date_accessed: 2023-08-14 15:36:27.594225
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Distribution of population between different poverty thresholds (World Bank,
+    PovcalNet (2021))
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5b76c7e071dbfe9980424e63f365eede
+  size: 619282
+  path: 
+    dataset_3273_distribution_of_population_between_different_poverty_thresholds__world_bank__povcalnet__2021_values.feather

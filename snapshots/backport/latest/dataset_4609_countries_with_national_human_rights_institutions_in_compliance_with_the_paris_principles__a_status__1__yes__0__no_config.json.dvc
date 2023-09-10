@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4609
+    date_accessed: 2023-08-16 10:26:42.521072
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4609_countries_with_national_human_rights_institutions_in_compliance_with_the_paris_principles__a_status__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 70a2bc11fa9b1b52c461ca9ccefa54a4
+  size: 1993
+  path: 
+    dataset_4609_countries_with_national_human_rights_institutions_in_compliance_with_the_paris_principles__a_status__1__yes__0__no_config.json

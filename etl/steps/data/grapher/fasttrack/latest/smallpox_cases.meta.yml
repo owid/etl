@@ -1,0 +1,32 @@
+dataset:
+  title: Reported Smallpox Cases (WHO, 2023)
+  description: |-
+    Because smallpox was eradicated in 1977, there were no new cases since 2010 so we extended the time series.
+
+    More details by the WHO: https://www.who.int/health-topics/smallpox#tab=tab_1.
+  origins:
+  - dataset_title_owid: Reported Smallpox Cases (WHO, 2023)
+    dataset_description_owid: |-
+      Because smallpox was eradicated in 1977, there were no new cases since 2010 so we extended the time series.
+
+      More details by the WHO: https://www.who.int/health-topics/smallpox#tab=tab_1.
+    producer: WHO
+    citation_producer: World Health Organisation
+    version: Google Sheet
+    dataset_url_main: http://www.earth-policy.org/data_highlights/2011/highlights19
+    dataset_url_download: https://docs.google.com/spreadsheets/d/e/2PACX-1vTdzSim9woEMb9zZNDCihyD5nr6YWpfDxLftbn-qS1SEoJjRNwv8vyJ5EaSnwJEiD5KAfFro3c79Dp-/pub?output=csv
+    date_accessed: '2023-08-23'
+    date_published: '2011'
+  licenses:
+  - {}
+  sources: []
+tables:
+  smallpox_cases:
+    variables:
+      reported_smallpox_cases:
+        title: reported_smallpox_cases
+        description: Number of yearly smallpox cases.
+        unit: cases
+        display:
+          name: Number of reported smallpox cases
+          numDecimalPlaces: 0

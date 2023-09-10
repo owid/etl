@@ -1,19 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_2803_historical_urban_fraction_estimates_and_total_computed_urban_areas__hyde_3_1__2010_values
-  file_extension: feather
-  date_accessed: 2023-02-23 15:08:00.452922
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2803
+    date_accessed: 2023-08-10 08:30:16.221791
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Historical urban fraction estimates and total computed urban areas - HYDE
     3.1 (2010)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2803
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f09edbb55f66891a9bd6b9be193d5b89
+- md5: 1cd7d64ce2372cb55bde006982993b5f
   size: 10602
-  path: dataset_2803_historical_urban_fraction_estimates_and_total_computed_urban_areas__hyde_3_1__2010_values.feather
+  path: 
+    dataset_2803_historical_urban_fraction_estimates_and_total_computed_urban_areas__hyde_3_1__2010_values.feather

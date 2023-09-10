@@ -1,29 +1,37 @@
 meta:
-  namespace: backport
-  short_name: dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:19:34.403832
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5498
+    date_accessed: 2023-08-10 08:48:12.782855
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Causes of child mortality – IHME Global Burden of Disease study (2019)
-  description: |-
+  description: >-
     The permalink to download data: http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/7a483ad2f2e1b646bc258b7fd4cf3492
 
+
     The following selection was made and downloaded:
+
     Location: Global
+
     Years: 1990 & most recent year
+
     Context: Cause
+
     Age: Under 5
+
     Metric: Number
+
     Measure: Deaths
+
     Sex: Both
-    Cause: 'Select only most detailed causes' but remove causes where the estimates are 0.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5498
-  source_published_by: Our World in Data catalog backport
+
+    Cause: 'Select only most detailed causes' but remove causes where the estimates
+    are 0.
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 329cec3d97d154ef5e415b94e0912ac3
+- md5: 4f9e0d0d1af37877d4afbae9b99f5009
   size: 12186
-  path: dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019_values.feather
+  path: 
+    dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019_values.feather

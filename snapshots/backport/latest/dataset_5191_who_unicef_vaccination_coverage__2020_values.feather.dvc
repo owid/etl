@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5191
+    date_accessed: 2023-08-11 07:38:57.998352
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: WHO-UNICEF Vaccination Coverage (2020)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 43ed998aa130c700265df77c867b4ba4
+  size: 470250
+  path: dataset_5191_who_unicef_vaccination_coverage__2020_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4464
+    date_accessed: 2023-08-10 14:44:29.232267
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Growth rates of household expenditure or income per capita (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bcd21dccb7f1e179dc5b7fdbe5b950a3
+  size: 9258
+  path: 
+    dataset_4464_growth_rates_of_household_expenditure_or_income_per_capita__pct_values.feather

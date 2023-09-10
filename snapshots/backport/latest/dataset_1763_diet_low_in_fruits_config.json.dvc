@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1763
+    date_accessed: 2023-08-10 13:05:57.594595
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1763_diet_low_in_fruits (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e4e29cd226a0c058a51f5b7e29b4d940
+  size: 22048
+  path: dataset_1763_diet_low_in_fruits_config.json

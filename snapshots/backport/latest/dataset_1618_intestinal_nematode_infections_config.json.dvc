@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1618
+    date_accessed: 2023-08-16 08:44:51.992084
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1618_intestinal_nematode_infections (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7cb1333f1dfb3e8ef87e39213508d3cc
+  size: 31975
+  path: dataset_1618_intestinal_nematode_infections_config.json

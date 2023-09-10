@@ -11,7 +11,7 @@ from sqlmodel import Session, select
 from structlog import get_logger
 
 import etl.grapher_model as gm
-from backport.datasync.data_metadata import variable_data_df_from_s3
+from apps.backport.datasync.data_metadata import variable_data_df_from_s3
 from etl.chart_revision.v2.base import ChartUpdater
 from etl.chart_revision.v2.schema import (
     fix_errors_in_schema,
@@ -190,16 +190,15 @@ class ChartVariableUpdater(ChartUpdater):
         # Proceed only if chart uses map
         if config["hasMapTab"]:
             log.info("variable_update: chart uses map")
-            # Get map_variable_id
+            # Get map.columnSlug
             map_var_id = config["map"].get(
-                "variableId", variable_id_default_for_map
+                "columnSlug", variable_id_default_for_map
             )  # chart.config["dimensions"][0]["variableId"]
             # Proceed only if variable ID used for map is in variable_mapping (i.e. needs update)
             if map_var_id in self.variable_mapping:
                 # Get and set new map variable ID in the chart config
                 map_var_id_new = self.variable_mapping[map_var_id]
-                config["map"]["variableId"] = map_var_id_new
-
+                config["map"]["columnSlug"] = str(map_var_id_new)
                 if self.slider_range_check:
                     # Get year ranges from new variables
                     year_range_new_min = self.variable_meta[map_var_id_new]["minYear"]

@@ -1,0 +1,25 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5022
+    date_accessed: 2023-08-16 07:19:48.626148
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5022_emissions__land_use__burning__biomass (archived)
+  description: "Greenhouse Gas (GHG) emissions from burning of biomass consist of
+    methane and nitrous oxide gases from biomass combustion of forest land cover classes
+    \x91Humid and Tropical Forest\x92 and \x91Other Forests\x92, and of methane, nitrous
+    oxide, and carbon dioxide gases from combustion of organic soils. The FAOSTAT
+    emissions database is computed following Tier 1 IPCC 2006 Guidelines for National
+    GHG Inventories (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol4.html). GHG
+    emissions are provided by country, with global coverage, relative to the period
+    1990-present (with annual updates), expressed as Gg CH4, Gg N2O, Gg CO2, Gg CO2eq
+    and Gg CO2eq from both CH4 and N2O, by land cover class (humid tropical forest,
+    other forest, organic soils) and by aggregate (burning - all categories). Implied
+    emission factors for N2O, CH4 and CO2  as well activity data (burned area and
+    biomass burned) are also provided."
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 364902df9b6fbff90727b07d41bf37f3
+  size: 69653
+  path: dataset_5022_emissions__land_use__burning__biomass_config.json

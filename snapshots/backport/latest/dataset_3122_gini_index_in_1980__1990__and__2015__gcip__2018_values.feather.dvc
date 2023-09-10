@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3122_gini_index_in_1980__1990__and__2015__gcip__2018_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:31:47.675039
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3122
+    date_accessed: 2023-08-10 09:20:45.983711
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Gini index in 1980, 1990 & 2015 – GCIP (2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3122
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b175dae8a9c2d07f48f6fdd4ea6bd228
+- md5: ee192a57d86191afc5886e5e08e3df0b
   size: 26386
   path: dataset_3122_gini_index_in_1980__1990__and__2015__gcip__2018_values.feather

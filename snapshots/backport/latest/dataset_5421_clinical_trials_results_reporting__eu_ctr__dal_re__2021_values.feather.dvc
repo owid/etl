@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_5421_clinical_trials_results_reporting__eu_ctr__dal_re__2021_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:46:50.828076
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5421
+    date_accessed: 2023-08-10 08:55:14.919231
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Clinical trials results reporting – EU-CTR (Dal-Ré, 2021)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5421
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d1ed3a052f489d797ebaace0a61f140f
+- md5: b4ca52c45539bc238a5b5a46e00bac76
   size: 6162
-  path: dataset_5421_clinical_trials_results_reporting__eu_ctr__dal_re__2021_values.feather
+  path: 
+    dataset_5421_clinical_trials_results_reporting__eu_ctr__dal_re__2021_values.feather

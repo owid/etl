@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3248_te_20_25b_env_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:38:09.960583
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3248
+    date_accessed: 2023-08-10 09:07:31.228183
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: TE-20.25b_env
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3248
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cbca6c54aee26a91f1e56e5ad3ea608e
+- md5: 2c659d79e27b105d1dc533a386747264
   size: 11962
   path: dataset_3248_te_20_25b_env_values.feather

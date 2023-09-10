@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2580
+    date_accessed: 2023-08-16 08:26:53.678710
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environment - Environmental Policy Stringency Index
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3ae0e71f8f37965aa9fb36a5420c035e
+  size: 27634
+  path: dataset_2580_environment__environmental_policy_stringency_index_values.feather

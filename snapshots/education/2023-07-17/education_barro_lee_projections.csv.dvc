@@ -1,0 +1,21 @@
+meta:
+  name: Projections of Educational Attainment (Lee and Lee, 2015)
+  publication_year: 2016
+  source_name: Barro and Lee (2015)
+  source_published_by: 'Barro, Robert J. and Jong-Wha Lee, Education Matters: Global
+    Schooling Gains from the 19th to the 21st Century (Oxford University Press, 2015).'
+  url: http://www.barrolee.com/
+  source_data_url:
+  license_url: https://barrolee.github.io/BarroLeeDataSet/OUPProj.html
+  license_name: 2021 by Robert J. Barro and Jong-Wha Lee.
+  date_accessed: 2023-07-17
+  is_public: true
+  description: |
+    Using the estimates on school enrollment and population structure, Lee and Lee (2016) have constructed projections of educational attainment for the population, disaggregated by gender and age group (15–24, 25–64, and 15–64) for 146 countries from 2015 to 2040 at five-year intervals.
+
+    They first use the 2010 data on educational attainment by age group as benchmark figures to project the educational attainment of the population by age group for the next three decades. They then estimate the distribution of educational attainment for the younger population, aged 15-24, at the five-year intervals from 2015 to 2040 and then forward-extrapolate the estimates to construct the distribution of educational attainment for the older population groups. For the population structure, they use existing U.N. projections. For the detailed explanation of the estimation method, see Barro and Lee (2015, chapter 3).
+wdir: ../../../data/snapshots/education/2023-07-17
+outs:
+- md5: 2e017fd88e0977e3d25cd1b045be7219
+  size: 867310
+  path: education_barro_lee_projections.csv

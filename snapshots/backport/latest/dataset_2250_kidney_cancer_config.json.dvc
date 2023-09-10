@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2250
+    date_accessed: 2023-08-16 08:13:05.874298
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2250_kidney_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a53b6b8c457de6b375a9bf60a201504c
+  size: 32410
+  path: dataset_2250_kidney_cancer_config.json

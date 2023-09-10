@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5670
+    date_accessed: 2023-08-14 16:05:16.299685
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Air pollution emissions by fuel (CEDS, 2022)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cf508002fef2a1ddacc7f9de9a9f71d0
+  size: 11588570
+  path: dataset_5670_air_pollution_emissions_by_fuel__ceds__2022_values.feather

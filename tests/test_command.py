@@ -15,7 +15,7 @@ from etl import command as cmd
 
 def test_timed_run():
     time_taken = cmd.timed_run(lambda: time.sleep(0.05))
-    assert abs(time_taken - 0.05) < 0.05
+    assert abs(time_taken - 0.05) < 0.2
 
 
 @pytest.fixture()

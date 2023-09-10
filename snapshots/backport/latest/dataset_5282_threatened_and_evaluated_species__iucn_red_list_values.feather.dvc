@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5282_threatened_and_evaluated_species__iucn_red_list_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:19:31.586049
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5282
+    date_accessed: 2023-08-10 08:29:05.361965
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Threatened and evaluated species (IUCN Red List)
   description: Manually update spreadsheet
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5282
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 29d0479bb09e577d23fedb236f2d10d3
+- md5: 6549362291cddef4e13f8f5aae8a98fa
   size: 8370
   path: dataset_5282_threatened_and_evaluated_species__iucn_red_list_values.feather

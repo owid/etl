@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5184
+    date_accessed: 2023-08-14 14:28:35.576387
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_5184_un_wpp_2019__male_population_by_single_age__region__subregion_and_country__annually_for_1950_2100__thousands
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 193a177f8f12932a5e565d8f134499ee
+  size: 159814
+  path: 
+    dataset_5184_un_wpp_2019__male_population_by_single_age__region__subregion_and_country__annually_for_1950_2100__thousands_config.json

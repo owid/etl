@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/803
+    date_accessed: 2023-08-14 15:27:46.157894
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Production: Value of Agricultural Production - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4815e3baed42df5cb2406cc0d3967423
+  size: 19742346
+  path: 
+    dataset_803_production__value_of_agricultural_production__fao__2017_values.feather

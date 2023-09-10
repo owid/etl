@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_271_us__public_trust_in_government__pew_research_center_config
-  file_extension: json
-  date_accessed: 2023-03-01 12:05:45.180776
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/271
+    date_accessed: 2023-08-09 14:50:56.092149
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_271_us__public_trust_in_government__pew_research_center
-  description: Generated with https://github.com/owid/notebooks/tree/main/EdouardMathieu/us_public_trust_government_pew_research_center
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/271
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+  description: Generated with 
+    https://github.com/owid/notebooks/tree/main/EdouardMathieu/us_public_trust_government_pew_research_center
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 29ac8c0d194e4baaa03683af92c23288
-  size: 2012
+- md5: 14b12ceeead262fba1179ac110ec9639
+  size: 2167
   path: dataset_271_us__public_trust_in_government__pew_research_center_config.json

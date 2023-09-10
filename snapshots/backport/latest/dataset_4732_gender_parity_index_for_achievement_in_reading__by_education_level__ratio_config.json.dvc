@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4732
+    date_accessed: 2023-08-14 05:55:17.298863
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4732_gender_parity_index_for_achievement_in_reading__by_education_level__ratio
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ee2dd5a93cf7bc84894943a733bef851
+  size: 6977
+  path: 
+    dataset_4732_gender_parity_index_for_achievement_in_reading__by_education_level__ratio_config.json

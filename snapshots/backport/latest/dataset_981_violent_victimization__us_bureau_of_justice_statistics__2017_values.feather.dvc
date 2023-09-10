@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_981_violent_victimization__us_bureau_of_justice_statistics__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:34:32.691132
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/981
+    date_accessed: 2023-08-10 08:47:06.883490
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Violent Victimization - US Bureau of Justice Statistics (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/981
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d659e5ea30c1a3979880cb0a4b399ca0
+- md5: e40eb40b8c54e7d9927ad66c0b2f0a44
   size: 6498
-  path: dataset_981_violent_victimization__us_bureau_of_justice_statistics__2017_values.feather
+  path: 
+    dataset_981_violent_victimization__us_bureau_of_justice_statistics__2017_values.feather

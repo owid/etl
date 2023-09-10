@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/821
+    date_accessed: 2023-08-16 07:26:36.539936
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Agriculture: Energy Use - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3389940c0c2b259f8d7f2619eda11c2a
+  size: 1386866
+  path: dataset_821_emissions__agriculture__energy_use__fao__2017_values.feather

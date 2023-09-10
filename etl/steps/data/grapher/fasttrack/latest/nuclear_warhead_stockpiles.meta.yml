@@ -1,0 +1,28 @@
+dataset:
+  title: Nuclear warhead stockpiles – Federation of American Scientists
+  description: >-
+    This dataset provides information on the number of stockpiled nuclear warheads by the nuclear powers, using data from
+    the Federation of American Scientists, prepared by Hans M. Kristensen, Matt Korda, Eliana Reynolds, and Robert Norris.
+
+
+    You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/nuclear_weapons
+
+    Publisher source: None
+  licenses:
+  - {}
+  sources:
+  - name: Federation of American Scientists (2023)
+    url: https://fas.org/issues/nuclear-weapons/status-world-nuclear-forces/
+    date_accessed: '2023-03-28'
+    publication_year: .nan
+    published_by: Hans M. Kristensen, Matt Korda, Eliana Reynolds, and Robert Norris.
+tables:
+  nuclear_warhead_stockpiles:
+    variables:
+      nuclear_weapons_stockpile:
+        title: nuclear_weapons_stockpile
+        description: |-
+          The variable denotes the estimated number of nuclear warheads in the stockpiles of the nuclear powers.
+
+          Stockpiles include warheads assigned to military forces, but exclude retired warheads queued for dismantlement.
+        unit: ''

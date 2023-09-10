@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4466
+    date_accessed: 2023-08-16 09:28:21.136464
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4466_non_performing_loans_to_total_gross_loans__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 53e9b1d2076d89897d9ba4ee934b11a0
+  size: 14734
+  path: dataset_4466_non_performing_loans_to_total_gross_loans__pct_config.json

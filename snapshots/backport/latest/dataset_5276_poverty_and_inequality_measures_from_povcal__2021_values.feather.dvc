@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5276
+    date_accessed: 2023-08-14 15:49:10.312657
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Poverty and inequality measures from PovCal (2021)
+  description: Povcal is a website in which the World Bank’s data on poverty is made
+    available.
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ceda50404d1feb41d7afff5d40ebfbb0
+  size: 2745986
+  path: dataset_5276_poverty_and_inequality_measures_from_povcal__2021_values.feather

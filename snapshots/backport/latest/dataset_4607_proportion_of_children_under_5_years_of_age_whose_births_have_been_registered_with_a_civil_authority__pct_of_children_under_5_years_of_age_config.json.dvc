@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4607
+    date_accessed: 2023-08-16 10:28:05.960608
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4607_proportion_of_children_under_5_years_of_age_whose_births_have_been_registered_with_a_civil_authority__pct_of_children_under_5_years_of_age
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4772af03ef3fe76e8fc0029ea429d7f4
+  size: 11346
+  path: 
+    dataset_4607_proportion_of_children_under_5_years_of_age_whose_births_have_been_registered_with_a_civil_authority__pct_of_children_under_5_years_of_age_config.json

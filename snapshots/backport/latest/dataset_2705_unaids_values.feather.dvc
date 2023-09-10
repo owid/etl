@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2705_unaids_values
-  file_extension: feather
-  date_accessed: 2023-06-01 15:02:29.464523
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2705
+    date_accessed: 2023-08-10 09:16:10.813854
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: UNAIDS
   description: This is a dataset imported by the automated fetcher
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2705
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3d85a67300ca02b955b446eab7e630a8
+- md5: 5f52fdd8e0fe3d1a429f56e7715fd738
   size: 4098314
   path: dataset_2705_unaids_values.feather

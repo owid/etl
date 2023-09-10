@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1712
+    date_accessed: 2023-08-16 07:55:16.261282
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Acute hepatitis A
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 05947591c679e4144fd412f9e8a2880c
+  size: 2012042
+  path: dataset_1712_acute_hepatitis_a_values.feather

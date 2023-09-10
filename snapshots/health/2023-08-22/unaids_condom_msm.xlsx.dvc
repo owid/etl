@@ -1,0 +1,45 @@
+meta:
+  name: Global AIDS Update (UNAIDS, 2023)
+  publication_year: 2023
+  source_name: UNAIDS
+  source_published_by: >-
+    The path that ends AIDS: UNAIDS Global AIDS Update 2023. Geneva: Joint United
+    Nations Programme on HIV/AIDS; 2023.
+    Licence: CC BY-NC-SA 3.0 IGO.
+  url: https://aidsinfo.unaids.org/
+  source_data_url:
+  license_url: https://www.unaids.org/en/terms-of-use
+  license_name: UNAIDS terms
+  date_accessed: 2023-08-09
+  is_public: true
+  description: >-
+    UNAIDS leads the world's most extensive data collection on HIV epidemiology, programme
+    coverage and finance and
+    publishes the most authoritative and up-to-date information on the HIV epidemic.
+
+
+
+    In some cases there is no data for some country and year. This can be a result
+    of very small epidemics among women
+    in the reproductive age which makes estimation of the mother to child transmission
+    very unstable. Another reason for missing data
+    is that relevant authorities may have asked UNAIDS not to share their estimates.
+
+
+    This report makes clear that there is a path to end AIDS. Taking that path will
+    help ensure preparedness to address
+    other pandemic challenges, and advance progress across the Sustainable Development
+    Goals. The data and real-world
+    examples in the report make it very clear what that path is. It is not a mystery.
+    It is a choice. Some leaders are
+    already following the path—and succeeding. It is inspiring to note that Botswana,
+    Eswatini, Rwanda, the United Republic
+    of Tanzania and Zimbabwe have already achieved the 95–95–95 targets, and at least
+    16 other countries (including eight
+    in sub-Saharan Africa) are close to doing so.
+
+wdir: ../../../data/snapshots/health/2023-08-22
+outs:
+- md5: ab395a8b5af0a5c460a5ca0f0b786226
+  size: 50997
+  path: unaids_condom_msm.xlsx

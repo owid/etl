@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3269
+    date_accessed: 2023-08-14 05:41:59.379054
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3269_sex_ratio_by_age__owid_based_on_unwpp__2017
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5788c4e59afb5bfe8f31ecc3ec7ec27e
+  size: 12842
+  path: dataset_3269_sex_ratio_by_age__owid_based_on_unwpp__2017_config.json

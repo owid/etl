@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5072
+    date_accessed: 2023-08-14 15:31:57.489409
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5072_population_data_for_2020__unwpp__2019 (archived)
+  description: Only contains 2020 data from latest UNWPP release – mainly for use
+    in COVID-19 work. Separates out Serbia and Kosovo using CIA population data.
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3125c03e546b9941016f4476c0889c60
+  size: 3101
+  path: dataset_5072_population_data_for_2020__unwpp__2019_config.json

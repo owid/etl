@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_282_world_population_by_political_regime_they_live_in__owid__2016_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:04:27.021799
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/282
+    date_accessed: 2023-08-10 08:50:28.696612
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: World Population by Political Regime they live in - OWID (2016)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/282
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4ec5c04e38bb3b8d05218dd9e2b652c2
+- md5: ab5bb47650ce6d7cde3c84d3f230b573
   size: 14506
-  path: dataset_282_world_population_by_political_regime_they_live_in__owid__2016_values.feather
+  path: 
+    dataset_282_world_population_by_political_regime_they_live_in__owid__2016_values.feather

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2892_urbanization_share__european_commission__atlas_of_the_human_planet_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:41:11.923751
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2892
+    date_accessed: 2023-08-10 09:40:33.668748
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2892_urbanization_share__european_commission__atlas_of_the_human_planet
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2892
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 846a33f897b1e0d65c38eef1ae2cd65d
-  size: 2895
-  path: dataset_2892_urbanization_share__european_commission__atlas_of_the_human_planet_config.json
+- md5: 379bf1df1f28cc8b2ab5f8503eaf0b78
+  size: 3048
+  path: 
+    dataset_2892_urbanization_share__european_commission__atlas_of_the_human_planet_config.json
