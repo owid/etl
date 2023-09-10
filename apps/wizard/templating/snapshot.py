@@ -21,7 +21,7 @@ add_indentation()
 # Page config
 # st.set_page_config(page_title="Wizard (snapshot)", page_icon="🪄")
 # Read schema
-SNAPSHOT_SCHEMA = read_json_schema(SCHEMAS_DIR / "snapshot-schema.json")
+SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
 # Get properties for origin in schema
 schema_origin = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["properties"]
 # Lists with fields of special types. By default, fields are text inputs.
