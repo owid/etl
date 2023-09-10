@@ -1,9 +1,8 @@
 import json
 from pathlib import Path
-from typing import List
+from typing import List, cast
 
 import pandas as pd
-from owid.catalog import Table
 from pandas.api.types import CategoricalDtype
 
 from etl.helpers import PathFinder
@@ -15,7 +14,7 @@ EXCLUDE_COUNTRIES_UNWPP = paths.directory / "excluded_countries.unwpp.json"
 SOURCE_NAME = "unwpp"
 
 
-def load_unwpp() -> Table:
+def load_unwpp() -> pd.DataFrame:
     # load wpp data
     ds = paths.load_dependency(short_name="un_wpp", namespace="un")
     df = ds["population"]  # type: ignore
@@ -72,6 +71,6 @@ def load_excluded_countries(excluded_countries_path: Path) -> List[str]:
     return data
 
 
-def exclude_countries(df: Table, excluded_countries_path: Path) -> Table:
+def exclude_countries(df: pd.DataFrame, excluded_countries_path: Path) -> pd.DataFrame:
     excluded_countries = load_excluded_countries(excluded_countries_path)
-    return df.loc[~df.country.isin(excluded_countries)]
+    return cast(pd.DataFrame, df.loc[~df.country.isin(excluded_countries)])

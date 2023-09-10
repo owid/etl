@@ -22,12 +22,12 @@ from owid.catalog import utils
 from sqlalchemy.engine.base import Engine
 from sqlmodel import Session, select, update
 
-from backport.datasync.data_metadata import (
+from apps.backport.datasync.data_metadata import (
     add_entity_code_and_name,
     variable_data,
     variable_metadata,
 )
-from backport.datasync.datasync import upload_gzip_dict
+from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config
 from etl.db import open_db
 
@@ -338,7 +338,7 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
         session.commit()
 
 
-def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], workers: int = 1) -> None:
+def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -> None:
     """Remove all leftover variables that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete a variable in ETL.
     Raise an error if we try to delete variable used by any chart.
@@ -376,18 +376,6 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], w
         if rows:
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
             raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
-
-        # there might still be some data_values for old variables
-        try:
-            db.cursor.execute(
-                """
-                DELETE FROM data_values WHERE variableId IN %(variable_ids)s
-            """,
-                {"variable_ids": variable_ids_to_delete},
-            )
-        except Exception:
-            # data_values table might not exist anymore, remove this code then
-            pass
 
         # then variables themselves with related data in other tables
         db.cursor.execute(

@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/5624
-    date_accessed: 2023-08-10 08:32:29.733226
+    date_accessed: 2023-09-05 07:26:50.543505
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Democracy - Freedom House (2022)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 773889d505b406c3edffdde28334e376
-  size: 342498
+- md5: f5623a88de7e29290c12bfa91c4f7849
+  size: 616402
   path: dataset_5624_democracy__freedom_house__2022_values.feather

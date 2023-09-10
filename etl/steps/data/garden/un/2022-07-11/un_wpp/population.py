@@ -2,9 +2,7 @@
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
-import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
 
 from .dtypes import optimize_dtypes
 
@@ -47,7 +45,8 @@ COLUMNS_ORDER: List[str] = [
 ]
 
 
-def process_base(df: Table, country_std: str) -> Table:
+def process_base(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
+    df = pd.DataFrame(df)
     df = df.reset_index()
     df = df.assign(location=df.location.map(country_std).astype("category"))
     # Discard unmapped regions
@@ -75,7 +74,7 @@ def process_base(df: Table, country_std: str) -> Table:
     return df
 
 
-def process(df: Table, country_std: str) -> Tuple[Table, Table]:
+def process(df: pd.DataFrame, country_std: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Re-organizes age groups and complements some metrics."""
     df_base = process_base(df, country_std)
     # Add metrics
@@ -85,7 +84,7 @@ def process(df: Table, country_std: str) -> Tuple[Table, Table]:
     return df_base, df
 
 
-def add_metrics(df: Table) -> Table:
+def add_metrics(df: pd.DataFrame) -> pd.DataFrame:
     # Build metrics (e.g. age groups)
     df_sr = _add_metric_sexratio(df)
     df_p_granular, df_p_broad = _add_metric_population(df)
@@ -98,14 +97,14 @@ def add_metrics(df: Table) -> Table:
     df_p_broad = optimize_dtypes(df_p_broad)
     df_p_diff = optimize_dtypes(df_p_diff)
     # Concatenate
-    df = pr.concat([df_sr, df_sr_all, df_p_granular, df_p_broad, df_p_diff], ignore_index=True)
+    df = pd.concat([df_sr, df_sr_all, df_p_granular, df_p_broad, df_p_diff], ignore_index=True)
     # Remove infs
     msk = np.isinf(df["value"])
     df.loc[msk, "value"] = np.nan
     return df
 
 
-def remove_outliers(df: Table) -> Table:
+def remove_outliers(df: pd.DataFrame) -> pd.DataFrame:
     """Remove outliers from the population table.
 
     So far, detected ones are:
@@ -121,8 +120,8 @@ def remove_outliers(df: Table) -> Table:
     return df
 
 
-def _add_metric_sexratio(df: Table) -> Table:
-    df_sr = df.loc[df.metric == "sex_ratio"]
+def _add_metric_sexratio(df: pd.DataFrame) -> pd.DataFrame:
+    df_sr: pd.DataFrame = df.loc[df.metric == "sex_ratio"]
     df_sr = df_sr.loc[
         df_sr.age.isin(
             [
@@ -146,7 +145,7 @@ def _add_metric_sexratio(df: Table) -> Table:
     return df_sr
 
 
-def _add_metric_population(df: Table) -> Tuple[Table, Table]:
+def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     df_p = df.loc[df.metric == "population"]
     # Basic age groups
     age_map = {
@@ -218,9 +217,9 @@ def _add_metric_population(df: Table) -> Tuple[Table, Table]:
     return df_p_granular, df_p_broad
 
 
-def _add_age_group(df: Table, age_min: int, age_max: int, age_group: Optional[str] = None) -> Table:
+def _add_age_group(df: pd.DataFrame, age_min: int, age_max: int, age_group: Optional[str] = None) -> pd.DataFrame:
     ages_accepted = [str(i) for i in range(age_min, age_max + 1)]
-    dfx: Table = df.loc[df.age.isin(ages_accepted)].drop(columns="age").copy()
+    dfx: pd.DataFrame = df.loc[df.age.isin(ages_accepted)].drop(columns="age").copy()
     dfx = dfx.groupby(
         ["location", "year", "metric", "sex", "variant"],
         as_index=False,
@@ -249,7 +248,7 @@ def map_broad_age(age: str) -> str:
         return "65+"
 
 
-def _add_metric_population_change(df_p_granular: Table) -> Table:
+def _add_metric_population_change(df_p_granular: pd.DataFrame) -> pd.DataFrame:
     pop_diff = (
         df_p_granular.sort_values("year")
         .groupby(["location", "sex", "age", "variant"])[["value"]]
@@ -267,7 +266,7 @@ def _add_metric_population_change(df_p_granular: Table) -> Table:
     return df_p_diff
 
 
-def _add_metric_sexratio_all(df_p_granular: Table) -> Any:
+def _add_metric_sexratio_all(df_p_granular: pd.DataFrame) -> Any:
     # print(df_p_granular.head())
     # Check
     (df_p_granular.metric.unique() == ["population"]).all()

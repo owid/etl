@@ -242,18 +242,18 @@ def run_dag(
         )
 
     if not force:
-        print("Detecting which steps need rebuilding...")
+        print("--- Detecting which steps need rebuilding...")
         start_time = time.time()
         steps = select_dirty_steps(steps, workers)
         click.echo(f"{click.style('OK', fg='blue')} ({time.time() - start_time:.1f}s)")
 
     if not steps:
-        print("All datasets up to date!")
+        print("--- All datasets up to date!")
         return
 
-    print(f"Running {len(steps)} steps:")
+    print(f"--- Running {len(steps)} steps:")
     for i, step in enumerate(steps, 1):
-        print(f"{i}. {step}...")
+        print(f"--- {i}. {step}...")
         if not dry_run:
             strict = _detect_strictness_level(step, strict)
             with strictness_level(strict):

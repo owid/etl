@@ -1,0 +1,17 @@
+dataset:
+  title: Living Planet Index – WWF (2022)
+tables:
+  living_planet_index:
+    variables:
+      living_planet_index_average:
+        title: Living Planet Index
+        description: The Living Planet Index (LPI) is a measure of the state of global biological diversity based on population
+          trends of vertebrate species from around the world. The index value is measured relative to species' populations
+          in 1970 (i.e. 1970 = 1).
+        unit: (1970 = 1)
+      living_planet_index_lower:
+        title: Lower CI
+        unit: (1970 = 1)
+      living_planet_index_upper:
+        title: Upper CI
+        unit: (1970 = 1)

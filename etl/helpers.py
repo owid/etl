@@ -10,7 +10,9 @@ from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast
+from urllib.parse import urljoin
 
+import jsonref
 import pandas as pd
 import structlog
 import yaml
@@ -85,7 +87,7 @@ def grapher_checks(ds: catalog.Dataset) -> None:
         assert {"year", "country"} <= set(tab.reset_index().columns), "Table must have columns country and year."
         assert (
             tab.reset_index()["year"].dtype in gh.INT_TYPES
-        ), f"year must be of an integer type but was: {tab['country'].dtype}"
+        ), f"year must be of an integer type but was: {tab['year'].dtype}"
         for col in tab:
             if col in ("year", "country"):
                 continue
@@ -103,7 +105,6 @@ def create_dataset(
     formats: List[FileFormat] = DEFAULT_FORMATS,
     check_variables_metadata: bool = False,
     run_grapher_checks: bool = True,
-    update_from_yaml: bool = True,
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -120,7 +121,6 @@ def create_dataset(
     :param camel_to_snake: Whether to convert camel case to snake case for the table name.
     :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
     :param run_grapher_checks: Run grapher checks on the dataset, only applies to grapher channel.
-    :param update_from_yaml: Update from corresponding metadata YAML file if it exists
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -181,14 +181,13 @@ def create_dataset(
         setattr(ds.metadata, k, v)
 
     # update metadata from yaml file
-    if update_from_yaml:
-        N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
-        if N.metadata_path.exists():
-            ds.update_metadata(N.metadata_path)
+    N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
+    if N.metadata_path.exists():
+        ds.update_metadata(N.metadata_path)
 
-            # check that we are not using metadata inconsistent with path
-            for k, v in match.groupdict().items():
-                assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
+        # check that we are not using metadata inconsistent with path
+        for k, v in match.groupdict().items():
+            assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
 
     # run grapher checks
     if ds.metadata.channel == "grapher" and run_grapher_checks:
@@ -986,3 +985,15 @@ def isolated_env(
 
     # remove module dir from pythonpath
     sys.path.remove(working_dir.as_posix())
+
+
+def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
+    """Read JSON schema with resolved references."""
+    path = Path(path)
+
+    # pathlib does not append trailing slashes, but jsonref needs that.
+    base_dir_url = path.parent.absolute().as_uri() + "/"
+    base_file_url = urljoin(base_dir_url, path.name)
+    with path.open("r") as f:
+        dix = jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
+        return cast(Dict[str, Any], dix)

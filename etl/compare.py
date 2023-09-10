@@ -18,7 +18,7 @@ from rich_click.rich_group import RichGroup
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
-from backport.datasync.data_metadata import variable_data_df_from_s3
+from apps.backport.datasync.data_metadata import variable_data_df_from_s3
 from etl import tempcompare
 
 

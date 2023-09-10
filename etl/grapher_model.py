@@ -832,8 +832,8 @@ class Variable(SQLModel, table=True):
     attribution: Optional[str] = Field(default=None, sa_column=Column("attribution", LONGTEXT))
     descriptionShort: Optional[str] = Field(default=None, sa_column=Column("descriptionShort", LONGTEXT))
     descriptionFromProducer: Optional[str] = Field(default=None, sa_column=Column("descriptionFromProducer", LONGTEXT))
-    keyInfoText: Optional[List[str]] = Field(default=None, sa_column=Column("keyInfoText", JSON))
-    processingInfo: Optional[str] = Field(default=None, sa_column=Column("processingInfo", LONGTEXT))
+    descriptionKey: Optional[List[str]] = Field(default=None, sa_column=Column("descriptionKey", JSON))
+    descriptionProcessing: Optional[str] = Field(default=None, sa_column=Column("descriptionProcessing", LONGTEXT))
     licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
     license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
 
@@ -892,8 +892,8 @@ class Variable(SQLModel, table=True):
             ds.attribution = self.attribution
             ds.descriptionShort = self.descriptionShort
             ds.descriptionFromProducer = self.descriptionFromProducer
-            ds.keyInfoText = self.keyInfoText
-            ds.processingInfo = self.processingInfo
+            ds.descriptionKey = self.descriptionKey
+            ds.descriptionProcessing = self.descriptionProcessing
             ds.licenses = self.licenses
             ds.license = self.license
             ds.updatedAt = datetime.utcnow()
@@ -941,8 +941,8 @@ class Variable(SQLModel, table=True):
         # TODO: implement `topicTagsLinks`
         presentation_dict.pop("topicTagsLinks", None)
 
-        if "keyInfoText" in presentation_dict:
-            assert isinstance(presentation_dict["keyInfoText"], list), "keyInfoText should be a list of bullet points"
+        if metadata.description_key:
+            assert isinstance(metadata.description_key, list), "descriptionKey should be a list of bullet points"
 
         # rename grapherConfig to grapherConfigETL
         if "grapherConfig" in presentation_dict:
@@ -965,6 +965,7 @@ class Variable(SQLModel, table=True):
             processingLevel=metadata.processing_level,
             descriptionShort=metadata.description_short,
             descriptionFromProducer=metadata.description_from_producer,
+            descriptionKey=metadata.description_key,
             licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
             license=metadata.license.to_dict() if metadata.license else None,
             **presentation_dict,
@@ -1109,7 +1110,7 @@ class Origin(SQLModel, table=True):
     citationProducer: Optional[str] = None
     attribution: Optional[str] = None
     attributionShort: Optional[str] = None
-    version: Optional[str] = None
+    versionProducer: Optional[str] = None
     datasetUrlMain: Optional[str] = None
     datasetUrlDownload: Optional[str] = None
     dateAccessed: Optional[date] = None
@@ -1130,7 +1131,7 @@ class Origin(SQLModel, table=True):
             datasetTitleProducer=origin.dataset_title_producer,
             attribution=origin.attribution,
             attributionShort=origin.attribution_short,
-            version=origin.version,
+            versionProducer=origin.version_producer,
             license=origin.license.to_dict() if origin.license else None,
             datasetUrlMain=origin.dataset_url_main,
             datasetUrlDownload=origin.dataset_url_download,
@@ -1153,7 +1154,7 @@ class Origin(SQLModel, table=True):
             cls.datasetTitleProducer == self.datasetTitleProducer,
             cls.attribution == self.attribution,
             cls.attributionShort == self.attributionShort,
-            cls.version == self.version,
+            cls.versionProducer == self.versionProducer,
             cls.datasetUrlMain == self.datasetUrlMain,
             cls.datasetUrlDownload == self.datasetUrlDownload,
             cls.datasetDescriptionOwid == self.datasetDescriptionOwid,

@@ -42,6 +42,9 @@ def run(dest_dir: str) -> None:
     # Pivot the dataframe so that each indicator is a separate column
     tb = tb.pivot(index=["country", "year"], columns="indicator_code", values="value")
     tb.reset_index(inplace=True)
+    # Adding share of female students in pre-primary school and total funding per student (household + government)
+    tb["percentage_of_female_pre_primary_students)"] = (tb["SE.PRE.ENRL.FE"] / tb["SE.PRE.ENRL"]) * 100
+    tb["total_funding_per_student_ppp"] = tb["UIS.XUNIT.PPPCONST.1.FSGOV"] + tb["UIS.XUNIT.PPPCONST.1.FSHH"]
 
     # Set an appropriate index and sort.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
@@ -72,97 +75,118 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
         Table: The table with updated metadata.
     """
     # Loop through the DataFrame columns
+    custom_cols = [
+        "percentage_of_female_pre_primary_students",
+        "percentage_of_female_tertiary_teachers",
+        "total_funding_per_student_ppp",
+    ]
     for column in tqdm(tb.columns, desc="Processing metadata for indicators"):
-        # Extract the title from the default metadata to find the corresponding World Bank indicator
-        indicator_to_find = tb[column].metadata.title
+        if column not in custom_cols:
+            # Extract the title from the default metadata to find the corresponding World Bank indicator
+            indicator_to_find = tb[column].metadata.title
 
-        # Extract relevant name, description and source from the metadata table using the WB code
-        name = (
-            metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "indicator_name"]
-            .str.replace("‚", "")  # commas caused problems when renaming variables later on
-            .iloc[0]
-        )
-        description = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "description"].iloc[0]
-        source = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "source"].iloc[0]
-        new_column_name = underscore(name)  # Convert extracted name to underscore format
+            # Extract relevant name, description and source from the metadata table using the WB code
+            name = (
+                metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "indicator_name"]
+                .str.replace("‚", "")  # commas caused problems when renaming variables later on
+                .iloc[0]
+            )
+            description = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "description"].iloc[0]
+            source = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "source"].iloc[0]
+            new_column_name = underscore(name)  # Convert extracted name to underscore format
 
-        # If more detailed description is currently missing in the API --> use the long title as a description
-        if str(description) == "nan":
-            description = name
-            source = " "
+            # If more detailed description is currently missing in the API --> use the long title as a description
+            if str(description) == "nan":
+                description = name
+                source = " "
 
-        # Update the column names and metadata
-        tb.rename(columns={column: new_column_name}, inplace=True)
-        description_string = " ".join(
-            [
-                description + "." "World Bank variable id: " + indicator_to_find + ".",
-                source,
-            ]
-        )
+            # Update the column names and metadata
+            tb.rename(columns={column: new_column_name}, inplace=True)
+            description_string = " ".join(
+                [
+                    description + "." "World Bank variable id: " + indicator_to_find + ".",
+                    source,
+                ]
+            )
 
-        # Replace any occurrences of '..' with '.'
-        description_string = description_string.replace("..", ".")
-        description_string = description_string.replace(".W", ". W")
+            # Replace any occurrences of '..' with '.'
+            description_string = description_string.replace("..", ".")
+            description_string = description_string.replace(".W", ". W")
 
-        tb[new_column_name].metadata.description = description_string
-        tb[new_column_name].metadata.title = name
+            tb[new_column_name].metadata.description = description_string
+            tb[new_column_name].metadata.title = name
 
-        # Conver Witthgenstein projections to %
-        if "wittgenstein_projection__percentage" in new_column_name:
-            tb[new_column_name] *= 100
+            # Conver Witthgenstein projections to %
+            if "wittgenstein_projection__percentage" in new_column_name:
+                tb[new_column_name] *= 100
 
-        tb[new_column_name].metadata.display = {}
+            tb[new_column_name].metadata.display = {}
 
-        #
-        # Update metadata units, short_units and number of decimal places to display depending on what keywords the variable name contains
-        #
+            #
+            # Update metadata units, short_units and number of decimal places to display depending on what keywords the variable name contains
+            #
 
-        def update_metadata(table, column, display_decimals, unit, short_unit=" "):
-            """
-            Update metadata attributes of a specified column in the given table.
+            def update_metadata(table, column, display_decimals, unit, short_unit=" "):
+                """
+                Update metadata attributes of a specified column in the given table.
 
-            Args:
-            table (obj): The table object containing the column.
-            column (str): Name of the column whose metadata is to be updated.
-            display_decimals (int): Number of decimal places to display.
-            unit (str): The full name of the unit of measurement for the column data.
-            short_unit (str, optional): The abbreviated form of the unit. Defaults to an empty space.
+                Args:
+                table (obj): The table object containing the column.
+                column (str): Name of the column whose metadata is to be updated.
+                display_decimals (int): Number of decimal places to display.
+                unit (str): The full name of the unit of measurement for the column data.
+                short_unit (str, optional): The abbreviated form of the unit. Defaults to an empty space.
 
-            Returns:
-            None: The function updates the table in-place.
-            """
-            table[column].metadata.display["numDecimalPlaces"] = display_decimals
-            table[column].metadata.unit = unit
-            table[column].metadata.short_unit = short_unit
+                Returns:
+                None: The function updates the table in-place.
+                """
+                table[column].metadata.display["numDecimalPlaces"] = display_decimals
+                table[column].metadata.unit = unit
+                table[column].metadata.short_unit = short_unit
 
-        # Convert the 'name' variable to lowercase for easier text matching.
-        name_lower = name.lower()
+            # Convert the 'name' variable to lowercase for easier text matching.
+            name_lower = name.lower()
 
-        # Define a list of keywords associated with percentages.
-        percentage_unit = ["%", "percentage", "share of", "rate"]
-        other_list = ["ratio", "index", "years", "USD"]
-        # Check if any keyword from the percentage_unit list is present in 'name_lower' and ensure "number" is not in 'name_lower'.
-        if any(keyword in name_lower for keyword in percentage_unit) and (name_lower not in other_list):
-            update_metadata(tb, new_column_name, 1, "%", "%")
-        elif "ratio" in name_lower and not ("duration" in name_lower):
-            update_metadata(tb, new_column_name, 1, "ratio", " ")
-        elif "number of pupils" in name_lower:
-            update_metadata(tb, new_column_name, 0, "pupils", " ")
-        # Check if the column name contains "number", but not "rate" or "pasec".
-        elif "number" in name_lower and not ("rate" in name_lower) and not ("pasec" in name_lower):
-            update_metadata(tb, new_column_name, 0, "people", " ")
-        elif "years" in name_lower:
-            update_metadata(tb, new_column_name, 1, "years", " ")
-        elif "index" in name_lower:
-            update_metadata(tb, new_column_name, 1, "index", " ")
-        # Check for the presence of currency-related keywords in 'name_lower'.
-        elif "usd" in name_lower or "$" in name_lower:
-            update_metadata(tb, new_column_name, 1, "US dollars", "$")
-        elif "score" in name_lower:
-            update_metadata(tb, new_column_name, 1, "score", " ")
+            # Define a list of keywords associated with percentages.
+            percentage_unit = ["%", "percentage", "share of", "rate"]
+            other_list = ["ratio", "index", "years", "USD"]
+            # Check if any keyword from the percentage_unit list is present in 'name_lower' and ensure "number" is not in 'name_lower'.
+            if any(keyword in name_lower for keyword in percentage_unit) and (name_lower not in other_list):
+                update_metadata(tb, new_column_name, 1, "%", "%")
+            elif "ratio" in name_lower and not ("duration" in name_lower):
+                update_metadata(tb, new_column_name, 1, "ratio", " ")
+            elif "number of pupils" in name_lower:
+                update_metadata(tb, new_column_name, 0, "pupils", " ")
+            # Check if the column name contains "number", but not "rate" or "pasec".
+            elif "number" in name_lower and not ("rate" in name_lower) and not ("pasec" in name_lower):
+                update_metadata(tb, new_column_name, 0, "people", " ")
+            elif "years" in name_lower:
+                update_metadata(tb, new_column_name, 1, "years", " ")
+            elif "index" in name_lower:
+                update_metadata(tb, new_column_name, 1, "index", " ")
+            # Check for the presence of currency-related keywords in 'name_lower'.
+            elif "usd" in name_lower or "$" in name_lower:
+                update_metadata(tb, new_column_name, 1, "US dollars", "$")
+            elif "score" in name_lower:
+                update_metadata(tb, new_column_name, 1, "score", " ")
 
-        else:
-            # Default metadata update when no other conditions are met.
-            update_metadata(tb, new_column_name, 0, " ", " ")
+            else:
+                # Default metadata update when no other conditions are met.
+                update_metadata(tb, new_column_name, 0, " ", " ")
+        elif column == "total_funding_per_student_ppp":
+            tb[column].metadata.title = "Total funding per student (in PPP)"
+            tb[column].metadata.display = {}
+            tb[
+                column
+            ].metadata.description = "Combined total payments of households and governmental funding per primary student. The total payments of households (pupils, students and their families) for educational institutions (such as for tuition fees, exam and registration fees, contribution to Parent-Teacher associations or other school funds, and fees for canteen, boarding and transport) and purchases outside of educational institutions (such as for uniforms, textbooks, teaching materials, or private classes). 'Initial funding' means that government transfers to households, such as scholarships and other financial aid for education, are subtracted from what is spent by households. Note that in some countries for some education levels, the value of this indicator may be 0, since on average households may be receiving as much, or more, in financial aid from the government than what they are spending on education. Indicators for household expenditure on education should be interpreted with caution since data comes from household surveys which may not all follow the same definitions and concepts. These types of surveys are also not carried out in all countries with regularity, and for some categories (such as pupils in pre-primary education), the sample sizes may be low. In some cases where data on government transfers to households (scholarships and other financial aid) was not available, they could not be subtracted from amounts paid by households. Total general (local, regional and central, current and capital) initial government funding of education per student, includes transfers paid (such as scholarships to students), but excludes transfers received, in this case international transfers to government for education (when foreign donors provide education sector budget support or other support integrated in the government budget). Limitations: In some instances data on total government expenditure on education refers only to the Ministry of Education, excluding other ministries which may also spend a part of their budget on educational activities. There are also cases where it may not be possible to separate international transfers to government from general government expenditure on education, in which cases they have not been subtracted in the formula. "
+            tb[column].metadata.display["numDecimalPlaces"] = 0
+            tb[column].metadata.unit = "international-$"
+            tb[column].metadata.short_unit = "$"
+        elif column == "percentage_of_female_pre_primary_students":
+            tb[column].metadata.title = "Share of female students in pre-primary education"
+            tb[column].metadata.display = {}
+            tb[column].metadata.display["numDecimalPlaces"] = 1
+            tb[column].metadata.unit = "%"
+            tb[column].metadata.short_unit = "%"
 
     return tb
