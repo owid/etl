@@ -5,6 +5,40 @@ This dataset provides data since 1400, where each row in it denotes a certain co
 Drawback of this dataset is that the field `name` encodes the conflict name and conflict type together as a flat string.
 
 Conflicts in this dataset always occur in the same region, and have the same conflict type. Conflict type can either be "inter-state" or "intra-state".
+
+On regions:
+
+- This dataset provides more granularity in terms of regions. For instance, it includes "Eastern Europe" and "Western Europe".
+
+- We map these regions to more standardised regions (those used in other datasets, e.g. COW or UCDP). E.g. we map "Eastern Europe" to "Europe".
+    For more details, see variable `REGIONS_RENAME`.
+
+- It is not evident which region accounts for data from countries in Oceania.
+
+- It is unclear from the source which countries are included in each region. Some details can be inferred from page 10 in Brecke's 1999 paper "Violent Conflicts 1400 A.D. to the Present in Different Regions of the World" (https://bpb-us-w2.wpmucdn.com/sites.gatech.edu/dist/1/19/files/2018/09/Brecke-PSS-1999-paper-Violent-Conflicts-1400-AD-to-the-Present.pdf).
+
+    We have manually inferred the mappings using COW codes. Our current estimate for the original regions is as follows:
+
+    - North America, Central America, and the Caribbean: 2-95 (US-Panama)
+    - South America: 100-165 (Colombia-Uruguay)
+    - Western Europe: 200-280 (UK-Mecklenburg Schwerin), 305 (Autria), 325-338 (Italy-Malta), 380-395 (Sweden-Iceland)
+    - Eastern Europe: 290-300 (Poland-Austria-Hungary), 310-317 (Hungary-Slovakia), 339-375 (Albania-Finland), 640 (Turkey)
+    - Middle East: 630-645 (Iran-Iraq), 652-698
+    - North Africa: 600-626 (Morocco-South Sudan), 651 (Egypt), mauritania, mauritania, mali, niger, chad, sudan, south sudan
+    - West & Central Africa:
+    - East & South Africa:
+    - Central Asia:
+    - South Asia:
+    - Southeast Asia:
+    - East Asia:
+
+    With the mapping done with `REGIONS_RENAME`, we have:
+
+    - Americas:
+    - Europe:
+    - Middle East:
+    - Africa:
+    - Asia and Oceania:
 """
 
 from typing import cast
@@ -30,10 +64,10 @@ REGIONS_RENAME = {
     6: "Africa (Brecke)",  # "North Africa (Brecke)",
     7: "Africa (Brecke)",  # "West & Central Africa (Brecke)",
     8: "Africa (Brecke)",  # "East & South Africa (Brecke)",
-    9: "Asia (Brecke)",  # "Central Asia (Brecke)",
-    10: "Asia (Brecke)",  # "South Asia (Brecke)",
-    11: "Asia (Brecke)",  # "Southeast Asia (Brecke)",
-    12: "Asia (Brecke)",  # "East Asia (Brecke)",
+    9: "Asia and Oceania (Brecke)",  # "Central Asia (Brecke)",
+    10: "Asia and Oceania (Brecke)",  # "South Asia (Brecke)",
+    11: "Asia and Oceania (Brecke)",  # "Southeast Asia (Brecke)",
+    12: "Asia and Oceania (Brecke)",  # "East Asia (Brecke)",
     -9: -9,  # Unknown
 }
 
