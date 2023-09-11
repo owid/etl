@@ -181,7 +181,11 @@ def create_dataset(
         setattr(ds.metadata, k, v)
 
     # update metadata from yaml file
-    N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
+    N_archive = PathFinder(str(paths.STEP_DIR / "archive" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
+    if N_archive.metadata_path.exists():
+        N = N_archive
+    else:
+        N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
     if N.metadata_path.exists():
         ds.update_metadata(N.metadata_path)
 
@@ -332,7 +336,10 @@ class PathFinder:
         self.f = Path(__file__)
 
         # Load dag.
-        self.dag = load_dag()
+        if "/archive/" in __file__:
+            self.dag = load_dag(paths.DAG_ARCHIVE_FILE)
+        else:
+            self.dag = load_dag()
 
         # Current file should be a data step.
         if not self.f.as_posix().startswith(paths.STEP_DIR.as_posix()):
