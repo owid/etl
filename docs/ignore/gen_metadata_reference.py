@@ -1,7 +1,8 @@
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import mkdocs_gen_files
 
+from etl.docs import examples_to_markdown, guidelines_to_markdown
 from etl.helpers import read_json_schema
 from etl.paths import SCHEMAS_DIR
 
@@ -10,81 +11,16 @@ DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
 TEMPLATE_PROPERTY = """
 {name}
 
-!!! abstract "{type}{requirement_level}"
+*type*: {type}{requirement_level}
 
-    === "Description"
-        {description}
+{description}
 
-    {guidelines}
-    {examples}
+{guidelines}
+{examples}
+
+---
+
 """
-
-
-def guidelines_to_markdown(guidelines: List[Any]) -> str:
-    """Render guidelines to markdown from given list in schema."""
-    text = ""
-    for guideline in guidelines:
-        # Main guideline
-        if isinstance(guideline[0], str):
-            # Add main guideline
-            text += f"\n\t\t- {guideline[0]}"
-        else:
-            raise TypeError("The first element of an element in `guidelines` must be a string!")
-
-        # Additions to the guideline (nested bullet points, exceptions, etc.)
-        if len(guideline) == 2:
-            if isinstance(guideline[1], dict):
-                # Sanity checks
-                if "type" not in guideline[1]:
-                    raise ValueError("The second element of an element in `guidelines` must have a `type` key!")
-                if "value" not in guideline[1]:
-                    raise ValueError("The second element of an element in `guidelines` must have a `value` key!")
-
-                # Render exceptions
-                if guideline[1]["type"] == "exceptions":
-                    text += " Exceptions:"
-                    for exception in guideline[1]["value"]:
-                        text += f"\n\t\t\t- {exception}"
-                # Render nested list
-                elif guideline[1]["type"] == "list":
-                    for subitem in guideline[1]["value"]:
-                        text += f"\n\t\t\t- {subitem}"
-                # Exception
-                else:
-                    raise ValueError(f"Unknown guideline type: {guideline[1]['type']}!")
-            else:
-                raise TypeError("The second element of an element in `guidelines` must be a dictionary!")
-
-        # Element in guideliens is more than 2 items long
-        if len(guideline) > 2:
-            raise ValueError("Each element in `guidelines` must have at most 2 elements!")
-    return text
-
-
-def examples_to_markdown(examples: List[str], examples_bad: List[Any]) -> str:
-    """Render examples (good and bad) to markdown from given lists in schema."""
-    text = ""
-    # Only good examples
-    if len(examples_bad) == 0:
-        print("No bad examples for this property!")
-        text = ""
-        for example in examples:
-            text += f"\n\t\t- «`{example}`» "
-        return text
-    # Sanity check
-    elif len(examples) != len(examples_bad):
-        raise ValueError(
-            f"Examples and examples_bad must have the same length! Examples: {examples}, examples_bad: {examples_bad}"
-        )
-    # Combine good and bad examples
-    text = """
-        | ✅ DO      | ❌ DON'T  |
-        | ----------- | --------- |"""
-    for good, bad in zip(examples, examples_bad):
-        assert isinstance(bad, list), "Bad examples must be a list!"
-        bad = [f"«`{b}`»" for b in bad]
-        text += f"\n\t\t| «`{good}`» | {', '.join(bad)} |"
-    return text
 
 
 def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_level: bool = False) -> str:
@@ -103,16 +39,14 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
     # Prepare guidelines
     guidelines = ""
     if "guidelines" in prop and prop.get("guidelines"):
-        guidelines = f"""
-    === "Guidelines"
-        {guidelines_to_markdown(prop['guidelines'])}
+        guidelines = f"""=== ":fontawesome-solid-list:  Guidelines"
+        {guidelines_to_markdown(prop['guidelines'], extra_tab=1)}
     """
     # Prepare examples
     examples = ""
     if "examples" in prop and prop.get("examples"):
-        examples = f"""
-    === "Examples"
-        {examples_to_markdown(prop['examples'], prop['examples_bad'])}
+        examples = f"""=== ":material-note-edit: Examples"
+        {examples_to_markdown(prop['examples'], prop['examples_bad'], extra_tab=1)}
     """
 
     # Bake documentation for property
