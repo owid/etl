@@ -9,6 +9,7 @@ from st_pages import add_indentation
 from typing_extensions import Self
 
 from apps.wizard import utils
+from etl.docs import examples_to_markdown, guidelines_to_markdown
 from etl.helpers import read_json_schema
 from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
 
@@ -197,81 +198,22 @@ def create_description(field: Dict[str, Any]) -> str:
     description = f"## Description\n\n {field['description']}"
     # Guidelines
     if field.get("guidelines"):
-        description += "\n" + guidelines_to_markdown(guidelines=field["guidelines"])
+        description += "\n## Guidelines\n\n" + guidelines_to_markdown(guidelines=field["guidelines"], extra_tab=0)
         toc += "| [Guidelines](#guidelines) "
     # Examples (good vs bad)
     if field.get("examples"):
         if "examples_bad" in field:
-            description += "\n" + examples_to_markdown(examples=field["examples"], examples_bad=field["examples_bad"])
+            description += "\n## Examples\n\n" + examples_to_markdown(
+                examples=field["examples"], examples_bad=field["examples_bad"], extra_tab=0, do_sign="✅", dont_sign="❌"
+            )
         else:
-            description += "\n" + examples_to_markdown(examples=field["examples"], examples_bad=[])
+            description += "\n## Examples\n\n" + examples_to_markdown(
+                examples=field["examples"], examples_bad=[], extra_tab=0, do_sign="✅", dont_sign="❌"
+            )
         toc += "| [Examples](#examples) "
     # Insert TOC at the beginnining of description
     description = toc.strip() + "\n\n" + description
     return description
-
-
-def guidelines_to_markdown(guidelines: List[Any]) -> str:
-    """Render guidelines to markdown from given list in schema."""
-    text = "## Guidelines\n\n"
-    for guideline in guidelines:
-        # Main guideline
-        if isinstance(guideline[0], str):
-            # Add main guideline
-            text += f"\n- {guideline[0]}"
-        else:
-            raise TypeError("The first element of an element in `guidelines` must be a string!")
-
-        # Additions to the guideline (nested bullet points, exceptions, etc.)
-        if len(guideline) == 2:
-            if isinstance(guideline[1], dict):
-                # Sanity checks
-                if "type" not in guideline[1]:
-                    raise ValueError("The second element of an element in `guidelines` must have a `type` key!")
-                if "value" not in guideline[1]:
-                    raise ValueError("The second element of an element in `guidelines` must have a `value` key!")
-
-                # Render exceptions
-                if guideline[1]["type"] == "exceptions":
-                    text += " Exceptions:"
-                    for exception in guideline[1]["value"]:
-                        text += f"\n\t- {exception}"
-                # Render nested list
-                elif guideline[1]["type"] == "list":
-                    for subitem in guideline[1]["value"]:
-                        text += f"\n\t- {subitem}"
-                # Exception
-                else:
-                    raise ValueError(f"Unknown guideline type: {guideline[1]['type']}!")
-            else:
-                raise TypeError("The second element of an element in `guidelines` must be a dictionary!")
-
-        # Element in guideliens is more than 2 items long
-        if len(guideline) > 2:
-            raise ValueError("Each element in `guidelines` must have at most 2 elements!")
-    return text
-
-
-def examples_to_markdown(examples: List[str], examples_bad: List[Any]) -> str:
-    """Render examples (good and bad) to markdown from given lists in schema."""
-    text = "## Examples\n\n"
-    # Only good examples
-    if len(examples_bad) == 0:
-        print("No bad examples for this property!")
-        for example in examples:
-            text += f"\n- ✅ '{example}'"
-        return text
-    # Sanity check
-    elif len(examples) != len(examples_bad):
-        raise ValueError(
-            f"Examples and examples_bad must have the same length! Examples: {examples}, examples_bad: {examples_bad}"
-        )
-    # Combine good and bad examples
-    for good, bad in zip(examples, examples_bad):
-        assert isinstance(bad, list), "Bad examples must be a list!"
-        bad = [f"'{b}'" for b in bad]
-        text += f"\n- ✅ '{good}'. ❌ {', '.join(bad)}"
-    return text
 
 
 def render_fields_init() -> None:
@@ -442,14 +384,18 @@ def render_license_field(form: List[Any]) -> List[str]:
     )
     # Guidelines
     if props.get("guidelines"):
-        help_text += "\n" + guidelines_to_markdown(guidelines=props["guidelines"])
+        help_text += "\n## Guidelines" + guidelines_to_markdown(guidelines=props["guidelines"])
         toc += "| [Guidelines](#guidelines) "
     # Examples (good vs bad)
     if props.get("examples"):
         if "examples_bad" in props:
-            help_text += "\n" + examples_to_markdown(examples=props["examples"], examples_bad=props["examples_bad"])
+            help_text += "\n## Examples" + examples_to_markdown(
+                examples=props["examples"], examples_bad=props["examples_bad"], extra_tab=0, do_sign="✅", dont_sign="❌"
+            )
         else:
-            help_text += "\n" + examples_to_markdown(examples=props["examples"], examples_bad=[])
+            help_text += "\n## Examples" + examples_to_markdown(
+                examples=props["examples"], examples_bad=[], extra_tab=0, do_sign="✅", dont_sign="❌"
+            )
         toc += "| [Examples](#examples) "
     help_text = toc.strip() + "\n\n" + help_text
     options = sorted(props["options"])
