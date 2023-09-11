@@ -110,11 +110,13 @@ theme:
   custom_dir: docs/overrides
 
 markdown_extensions:
+  - pymdownx.critic
   - admonition
   - abbr
   - attr_list
   - pymdownx.details
   - pymdownx.snippets
+  - pymdownx.superfences
   - md_in_html
   - pymdownx.superfences
   - pymdownx.superfences:
