@@ -25,9 +25,11 @@
     "**/*.ipynb"
   ],
   "files.exclude": {
-    "etl/steps/archive": true
+    "etl/steps/archive": true,
+    "snapshots/archive": true
   },
   "search.exclude": {
-      "etl/steps/archive": true
+      "etl/steps/archive": true,
+      "snapshots/archive": true
   }
 }
