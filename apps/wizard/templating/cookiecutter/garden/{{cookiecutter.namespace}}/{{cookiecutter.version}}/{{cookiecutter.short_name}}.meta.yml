@@ -1,3 +1,6 @@
+dataset:
+  update_period_days: {{cookiecutter.update_period_days}}
+
 tables:
   {{cookiecutter.short_name}}:
     variables:
