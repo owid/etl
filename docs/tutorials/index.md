@@ -8,6 +8,9 @@
 :material-music-clef-treble: Harmonize country names from a table<br>
 [Read more :octicons-arrow-right-24:](harmonize-countries.md)
 
+:material-chart-bar: Metadata in the context of data pages<br>
+[Read more :octicons-arrow-right-24:](metadata-play.md)
+
 :fontawesome-solid-backward-step: Import datasets from Grapher to ETL<br>
 [Read more :octicons-arrow-right-24:](backport.md)
 

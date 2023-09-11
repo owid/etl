@@ -4,9 +4,11 @@
   "$defs": {
     "axis": {
       "type": "object",
+      "description": "Axis definition",
       "properties": {
         "removePointsOutsideDomain": {
           "type": "boolean",
+          "description": "",
           "default": false
         },
         "label": {
@@ -234,7 +236,7 @@
             ["Must be an integer."]
           ],
           "examples": ["7", "30", "90", "365"],
-          "examples_bad": ["2023-01-07", "monthly", "0.2", "1/365"],
+          "examples_bad": [["2023-01-07"], ["monthly"], ["0.2"], ["1/365"]],
           "requirement_level": "required"
         },
         "licenses": {
@@ -244,6 +246,7 @@
         },
         "sources": {
           "type": "array",
+          "description": "List of all sources of the indicators in this dataset. NOTE: This is no longer in use, you should use origins.",
           "items": { "$ref": "definitions.json#/source" }
         },
         "origins": {
@@ -295,8 +298,8 @@
                     "Share of neutron star mergers that happen in the Milky Way"
                   ],
                   "examples_bad": [
-                    "Number of neutron stars (NASA)",
-                    "Share of neutron star mergers that happen in the Milky Way (2023)"
+                    ["Number of neutron stars (NASA)"],
+                    ["Share of neutron star mergers that happen in the Milky Way (2023)"]
                   ],
                   "requirement_level": "required",
                   "guidelines": [
@@ -317,7 +320,7 @@
                     ["Must start with a capital letter."],
                     ["Must end with a period."],
                     ["Must be one short paragraph, suitable to fit in a chart subtitle."],
-                    ["Should not mention any other metadata fields (like information about the processing, or the origins, or the units).", {"type": "exceptions", "value": "The unit can be mentioned if it is crucial for the description."}]
+                    ["Should not mention any other metadata fields (like information about the processing, or the origins, or the units).", {"type": "exceptions", "value": ["The unit can be mentioned if it is crucial for the description."]}]
                   ],
                   "category": "metadata"
                 },
@@ -333,7 +336,7 @@
                     ["Must be a list of one or more short paragraphs.", {"type": "list", "value": ["Each paragraph must start with a capital letter.", "Each paragraph must end with a period."]}],
                     ["Should contain all the key information given in other description fields, like `description_short`, `grapher_config.subtitle` or `grapher_config.note`."],
                     ["Should not contain information about processing (which should be in `description_processing`)."],
-                    ["Should only contain information that is key to the public.", {"type": "list", "value": "Anything that is too detailed or technical should be left in the code."}]
+                    ["Should only contain information that is key to the public.", {"type": "list", "value": ["Anything that is too detailed or technical should be left in the code."]}]
                   ],
                   "category": "metadata"
                 },
@@ -347,7 +350,7 @@
                     ["Must end with a period."],
                     ["Must be used if important editorial decisions have been taken during data processing."],
                     ["Must not be used to describe common processing steps like country harmonization."],
-                    ["Should only contain key processing information to the public.", {"type": "list", "value": "Anything that is too detailed or technical should be left in the code."}]
+                    ["Should only contain key processing information to the public.", {"type": "list", "value": ["Anything that is too detailed or technical should be left in the code."]}]
                   ],
                   "category": "metadata"
                 },
@@ -369,7 +372,7 @@
                   "type": "string",
                   "description": "Very concise name of the unit we use to measure the indicator values.",
                   "examples": ["tonnes per hectare", "kilowatts per person"],
-                  "examples_bad": ["tonnes/hectare", "kilowatts per capita"],
+                  "examples_bad": [["tonnes/hectare"], ["kilowatts per capita"]],
                   "requirement_level": "required",
                   "guidelines": [
                     ["Must not start with a capital letter."],
@@ -377,7 +380,7 @@
                     ["Must be empty if the indicator has no units."],
                     ["Must be in plural."],
                     ["Must be a metric unit when applicable."],
-                    ["Should not use symbols like “/”.", {"type": "list", "value": "If it is a derived unit, use “per” to denote a division, e.g. '... per hectare', or '... per person'."}],
+                    ["Should not use symbols like “/”.", {"type": "list", "value": ["If it is a derived unit, use “per” to denote a division, e.g. '... per hectare', or '... per person'."]}],
                     ["Should be '%' for percentages."]
                   ],
                   "category": "metadata"
@@ -387,7 +390,7 @@
                   "type": "string",
                   "description": "Characters that represent the unit we use to measure the indicator value.",
                   "examples": ["t/ha", "%", ".../person"],
-                  "examples_bad": ["t / ha", "pct", "pc"],
+                  "examples_bad": [["t / ha"], ["pct"], ["pc"]],
                   "requirement_level": "required",
                   "guidelines": [
                     ["Must follow the rules of capitalization of the International System of Units, when applicable."],
@@ -423,25 +426,31 @@
                 },
                 "sources": {
                   "type": "array",
+                  "description": "List of all sources of the indicator. Automatically filled. NOTE: This is no longer in use, you should use origins.",
                   "items": { "$ref": "definitions.json#/source" }
                 },
                 "origins": {
                   "type": "array",
+                  "description": "List of all origins of the indicator. Automatically filled.",
                   "items": { "$ref": "definitions.json#/origin" }
                 },
                 "licenses": {
                   "type": "array",
+                  "description": "List of all licenses that have been involved in the processing history of the indicator. Automatically filled.",
                   "items": { "$ref": "definitions.json#/license" }
                 },
                 "display": { "$ref": "definitions.json#/display" },
                 "presentation_license": {
                   "type": "object",
+                  "description": "Custom license for the indicator. This is usally not needed and the value from `license` is used.",
                   "additionalProperties": false,
                   "properties": {
                     "url": {
+                      "description": "",
                       "type": "string"
                     },
                     "name": {
+                      "description": "",
                       "type": "string"
                     }
                   }
@@ -472,8 +481,8 @@
                         "Historical data"
                       ],
                       "examples_bad": [
-                        "The data is age-standardized",
-                        "Historical data from 1800 to 2010"
+                        ["The data is age-standardized"],
+                        ["Historical data from 1800 to 2010"]
                       ]
                     },
                     "attribution": {
@@ -683,10 +692,12 @@
                         },
                         "hideLegend": {
                           "type": "boolean",
+                          "description": "Hide legend in chart.",
                           "default": false
                         },
                         "hideLogo": {
                           "type": "boolean",
+                          "description": "Hide logo in chart.",
                           "default": false
                         },
                         "timelineMinTime": {
@@ -760,10 +771,12 @@
                           "description": "Slug of the chart on Our World In Data"
                         },
                         "internalNotes": {
+                          "description": "Internal notes.",
                           "type": "string"
                         },
                         "version": {
                           "type": "integer",
+                          "description": "",
                           "default": 1,
                           "minimum": 0
                         },
