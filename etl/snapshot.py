@@ -71,7 +71,11 @@ class Snapshot:
     @property
     def metadata_path(self) -> Path:
         """Path to metadata file."""
-        return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
+        archive_path = Path(f"{paths.SNAPSHOTS_DIR_ARCHIVE / self.uri}.dvc")
+        if archive_path.exists():
+            return archive_path
+        else:
+            return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
     def pull(self, force=True) -> None:
         """Pull file from S3."""
