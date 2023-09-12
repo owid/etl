@@ -23,5 +23,13 @@
     "**/site-packages/**/*.py",
     ".vscode/*.py",
     "**/*.ipynb"
-  ]
+  ],
+  "files.exclude": {
+    "etl/steps/archive": true,
+    "snapshots/archive": true
+  },
+  "search.exclude": {
+      "etl/steps/archive": true,
+      "snapshots/archive": true
+  }
 }

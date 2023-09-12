@@ -475,7 +475,12 @@ class DataStep(Step):
 
     @property
     def _search_path(self) -> Path:
-        return paths.STEP_DIR / "data" / self.path
+        # step might have been moved to an archive folder, try that folder first
+        archive_path = paths.STEP_DIR / "archive" / self.path
+        if list(archive_path.parent.glob(archive_path.name + "*")):
+            return archive_path
+        else:
+            return paths.STEP_DIR / "data" / self.path
 
     @property
     def _dest_dir(self) -> Path:
@@ -489,11 +494,10 @@ class DataStep(Step):
         """
         from etl.helpers import isolated_env
 
-        module_path = self.path.lstrip("/").replace("/", ".")
-        module_dir = (paths.STEP_DIR / "data" / self.path).parent
+        module_dir = self._search_path.parent
 
         with isolated_env(module_dir):
-            step_module = import_module(f"{paths.BASE_PACKAGE}.steps.data.{module_path}")
+            step_module = import_module(self._search_path.relative_to(paths.BASE_DIR).as_posix().replace("/", "."))
             if not hasattr(step_module, "run"):
                 raise Exception(f'no run() method defined for module "{step_module}"')
 

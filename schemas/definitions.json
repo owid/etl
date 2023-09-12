@@ -44,6 +44,7 @@
         "category": "license"
       },
       "url": {
+        "type": "string",
         "title": "License URL",
         "description": "URL leading to the producer's website where the dataset license is specified.",
         "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
@@ -395,10 +396,12 @@
         "properties": {
           "hideAbsoluteChange": {
             "type": "boolean",
+            "description": "Whether to hide the absolute change.",
             "default": false
           },
           "hideRelativeChange": {
             "type": "boolean",
+            "description": "Whether to hide the relative change.",
             "default": false
           }
         },
