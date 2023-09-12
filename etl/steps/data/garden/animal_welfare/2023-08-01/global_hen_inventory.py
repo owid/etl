@@ -71,7 +71,13 @@ def add_individual_sources_to_metadata(tb: Table) -> Table:
 
     # Gather the data source for each country.
     original_sources = (
-        "- " + tb["country"].astype(str) + ": [" + tb["source"].astype(str) + "](" + tb["available_at"].astype(str) + ")"
+        "- "
+        + tb["country"].astype(str)
+        + ": ["
+        + tb["source"].astype(str)
+        + "]("
+        + tb["available_at"].astype(str)
+        + ")"
     )
     # Check that each variable has only one origin.
     assert all(
