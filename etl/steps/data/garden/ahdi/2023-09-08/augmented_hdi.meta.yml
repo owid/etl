@@ -1,3 +1,5 @@
+common:
+  entity_annotations: "Western offshoots (AHDI): United States, Canada, Australia and New Zealand"
 dataset:
   title: Augmented Human Development Index (AHDI)
   update_period_days: 1095
@@ -44,7 +46,7 @@ tables:
             Where LEB is life expectancy, EDU is years of schooling, LD is liberal democracy and UNY is adjusted GDP per capita.
         display:
           name: AHDI
-          entityAnnotationsMap: ""
+          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 2
           conversionFactor: 1
         presentation:
@@ -111,7 +113,7 @@ tables:
             Where LEB is life expectancy, EDU is years of schooling and LD is liberal democracy.
         display:
           name: AHDI excluding income
-          entityAnnotationsMap: ""
+          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 2
           conversionFactor: 1
         presentation:
@@ -170,7 +172,7 @@ tables:
         processing_level: minor
         display:
           name: Life expectancy
-          entityAnnotationsMap: ""
+          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 2
           conversionFactor: 1
 
@@ -185,7 +187,7 @@ tables:
         processing_level: minor
         display:
           name: Years of schooling
-          entityAnnotationsMap: ""
+          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 2
           conversionFactor: 1
 
@@ -209,7 +211,7 @@ tables:
         processing_level: minor
         display:
           name: Liberal Democracy Index
-          entityAnnotationsMap: ""
+          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 2
           conversionFactor: 1
 
@@ -223,7 +225,7 @@ tables:
         processing_level: minor
         display:
           name: GDP per capita
-          entityAnnotationsMap: ""
+          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 2
           conversionFactor: 1
 
@@ -247,7 +249,7 @@ tables:
         processing_level: minor
         display:
           name: Life expectancy indecx
-          entityAnnotationsMap: ""
+          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 2
           conversionFactor: 1
 
@@ -270,7 +272,7 @@ tables:
         processing_level: minor
         display:
           name: Schooling index
-          entityAnnotationsMap: ""
+          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 2
           conversionFactor: 1
 
@@ -294,6 +296,6 @@ tables:
         processing_level: minor
         display:
           name: Adjusted income index
-          entityAnnotationsMap: ""
+          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 2
           conversionFactor: 1

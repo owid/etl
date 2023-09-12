@@ -80,7 +80,7 @@ def run(dest_dir: str) -> None:
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(
         dest_dir, tables=[tb_merged], check_variables_metadata=True, default_metadata=snap.metadata
-    )
+    )  # type: ignore
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
