@@ -31,10 +31,44 @@ COLUMNS = {
 }
 
 
+def fix_typos_in_original_metadata(tb: Table) -> Table:
+    tb_fixed = tb.copy()
+
+    # Ensure that certain columns are strings, to avoid issues when modifying a categorical column.
+    tb_fixed = tb_fixed.astype({"source": str, "available_at": str})
+
+    # The url for Uruguay is placed in "source" instead of "available_at".
+    uruguay_mask = tb_fixed["country"] == "Uruguay"
+    expected_text = " Available at: "
+    assert (
+        expected_text in tb_fixed[uruguay_mask]["source"].item()
+    ), f"Expected '{expected_text}' in source for Uruguay."
+    uruguay_url = tb_fixed[uruguay_mask]["source"].item().split(expected_text)[1]
+    tb_fixed.loc[uruguay_mask, "available_at"] = uruguay_url
+    tb_fixed.loc[uruguay_mask, "source"] = tb_fixed.loc[uruguay_mask, "source"].item().split(expected_text)[0]
+
+    # TODO: Malta has no link, and the source seems to be wrong.
+
+    # Fix some typos in the metadata, and ensure sources end in a period.
+    tb_fixed["source"] = (
+        tb_fixed["source"]
+        .str.replace("husbndry", "husbandry")
+        .replace("(Ministry of Agriculture). '", "(Ministry of Agriculture)'")
+        .replace("Regulation (EC) 617/2008)", "Regulation (EC) 617/2008")
+    )
+    tb_fixed["source"] = [source if source.endswith(".") else source + "." for source in tb_fixed["source"]]
+
+    # Copy metadata from the original table to the new one.
+    tb_fixed = tb_fixed.copy_metadata(from_table=tb)
+
+    return tb_fixed
+
+
 def add_individual_sources_to_metadata(tb: Table) -> Table:
     tb = tb.copy()
     # Check that each country has only one source.
     assert (tb.groupby("country").agg({"source": "nunique"})["source"] == 1).all(), "Expected one source per country."
+
     # Gather the data source for each country.
     original_sources = (
         "- "
@@ -104,6 +138,9 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names.
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Fix some typos in the columns related to metadata.
+    tb = fix_typos_in_original_metadata(tb=tb)
 
     # The sources and URLs of the data for each country are given as separate columns.
     # Gather them and add them to the source description of each variable.
