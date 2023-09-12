@@ -1099,20 +1099,19 @@ class Origin(SQLModel, table=True):
     """
 
     __tablename__: str = "origins"  # type: ignore
-    __table_args__ = (Index("dataset_title_owid_unique", "datasetTitleOwid", unique=True),)
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    datasetTitleOwid: Optional[str] = Field(default=None, index=True)
-    datasetTitleProducer: Optional[str] = Field(default=None, index=True)
-    datasetDescriptionOwid: Optional[str] = None
-    datasetDescriptionProducer: Optional[str] = None
+    titleSnapshot: Optional[str] = Field(default=None, index=True)
+    title: Optional[str] = Field(default=None, index=True)
+    descriptionSnapshot: Optional[str] = None
+    description: Optional[str] = None
     producer: Optional[str] = None
     citationProducer: Optional[str] = None
     attribution: Optional[str] = None
     attributionShort: Optional[str] = None
     versionProducer: Optional[str] = None
-    datasetUrlMain: Optional[str] = None
-    datasetUrlDownload: Optional[str] = None
+    urlMain: Optional[str] = None
+    urlDownload: Optional[str] = None
     dateAccessed: Optional[date] = None
     datePublished: Optional[date] = None
     license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
@@ -1127,16 +1126,16 @@ class Origin(SQLModel, table=True):
         return cls(
             producer=origin.producer,
             citationProducer=origin.citation_producer,
-            datasetTitleOwid=origin.dataset_title_owid,
-            datasetTitleProducer=origin.dataset_title_producer,
+            titleSnapshot=origin.dataset_title_owid,
+            title=origin.dataset_title_producer,
             attribution=origin.attribution,
             attributionShort=origin.attribution_short,
             versionProducer=origin.version_producer,
             license=origin.license.to_dict() if origin.license else None,
-            datasetUrlMain=origin.dataset_url_main,
-            datasetUrlDownload=origin.dataset_url_download,
-            datasetDescriptionOwid=origin.dataset_description_owid,
-            datasetDescriptionProducer=origin.dataset_description_producer,
+            urlMain=origin.url_main,
+            urlDownload=origin.dataset_url_download,
+            descriptionSnapshot=origin.dataset_description_owid,
+            description=origin.dataset_description_producer,
             datePublished=origin.date_published,
             dateAccessed=origin.date_accessed,
         )
@@ -1150,15 +1149,15 @@ class Origin(SQLModel, table=True):
         return select(cls).where(
             cls.producer == self.producer,
             cls.citationProducer == self.citationProducer,
-            cls.datasetTitleOwid == self.datasetTitleOwid,
-            cls.datasetTitleProducer == self.datasetTitleProducer,
+            cls.titleSnapshot == self.titleSnapshot,
+            cls.title == self.title,
             cls.attribution == self.attribution,
             cls.attributionShort == self.attributionShort,
             cls.versionProducer == self.versionProducer,
-            cls.datasetUrlMain == self.datasetUrlMain,
-            cls.datasetUrlDownload == self.datasetUrlDownload,
-            cls.datasetDescriptionOwid == self.datasetDescriptionOwid,
-            cls.datasetDescriptionProducer == self.datasetDescriptionProducer,
+            cls.urlMain == self.urlMain,
+            cls.urlDownloadf.urlDownload,
+            cls.descriptionSnapshot == self.descriptionSnapshot,
+            cls.description == self.description,
             cls.datePublished == self.datePublished,
             cls.dateAccessed == self.dateAccessed,
         )  # type: ignore

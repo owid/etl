@@ -125,7 +125,7 @@ class Origin:
     # This is also often empty but if not then it will be part of the short citation (e.g. for VDEM)
     version_producer: Optional[str] = None
     # The authorative URL of the dataset
-    dataset_url_main: Optional[str] = None
+    url_main: Optional[str] = None
     # Direct URL to download the dataset
     dataset_url_download: Optional[str] = None
     # Date when the dataset was accessed

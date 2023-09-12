@@ -40,7 +40,7 @@ class SnapshotFormWithOrigin(BaseModel):
     attribution: str
     attribution_short: str
     origin_version: str
-    dataset_url_main: str
+    url_main: str
     dataset_url_download: str
     date_accessed: str
     date_published: str
@@ -196,9 +196,9 @@ def app(run_checks: bool) -> None:
                 ),
                 pi.input(
                     "Origin: Dataset main URL",
-                    name="dataset_url_main",
+                    name="url_main",
                     placeholder="https://url_of_testing_source.com/",
-                    value=state.get("dataset_url_main"),
+                    value=state.get("url_main"),
                     help_text="URL to the main page of the project.",
                 ),
                 pi.input(

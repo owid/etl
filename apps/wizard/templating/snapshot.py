@@ -70,7 +70,7 @@ class SnapshotForm(utils.StepForm):
     citation_producer: str
     attribution: str
     attribution_short: str
-    dataset_url_main: str
+    url_main: str
     dataset_url_download: str
     date_accessed: str
 
@@ -137,7 +137,7 @@ class SnapshotForm(utils.StepForm):
                     "attribution": self.attribution,
                     "attribution_short": self.attribution_short,
                     "version": self.origin_version,
-                    "dataset_url_main": self.dataset_url_main,
+                    "url_main": self.url_main,
                     "dataset_url_download": self.dataset_url_download,
                     "date_published": self.date_published,
                     "date_accessed": self.date_accessed,
@@ -518,7 +518,6 @@ with st.sidebar:
 # FORM
 form_widget = st.empty()
 with form_widget.form("form"):
-
     # 1) Show fields for initial configuration (create directories, etc.)
     # st.header("Config")
     st.markdown("Note that sometimes some fields might not be available (even if they are labelled as required)")

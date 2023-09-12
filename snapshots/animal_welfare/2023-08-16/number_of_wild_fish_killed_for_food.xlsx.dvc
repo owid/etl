@@ -8,8 +8,8 @@ meta:
     producer: Fishcount
     citation_producer: |-
       Fishcount.org.uk based on data from the Food and Agriculture Organization of the United Nations.
-    dataset_url_main: http://fishcount.org.uk/
-    dataset_url_download: 
+    url_main: http://fishcount.org.uk/
+    dataset_url_download:
       http://fishcount.org.uk/studydatascreens/2016/fishcount_estimated_wild_fish_2007-2016.xlsx
     date_published: 2019-01-21
     date_accessed: 2023-08-16

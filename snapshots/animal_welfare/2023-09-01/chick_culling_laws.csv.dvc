@@ -112,7 +112,7 @@ meta:
       - Spain: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
 
       - Sweden: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
-    dataset_url_main: https://animallaweurope.com/news/
+    url_main: https://animallaweurope.com/news/
     date_accessed: '2023-09-01'
     date_published: '2023-09-01'
   license:

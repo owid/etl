@@ -118,7 +118,7 @@
     "type": "object",
     "description": "An indicator's origin is the information about the snapshot where the indicator's data and metadata came from. A snapshot is a subset of data (a 'slice') taken on a specific day from a data product (often a public dataset, but sometimes a paper or a database). The producer of the data product is typically an institution or a set of authors. Note: A snapshot often coincides with the data product (e.g. the dataset is a public csv file, and we download the entire file). But sometimes the data product is a bigger object (e.g. a set of files, a paper or a database) and the snapshot is just a particular subset of the data product (e.g. one of the files, or a table from a paper, or the result of a query). The origin fields are the attributes of the `Origin` object in ETL.",
     "additionalProperties": false,
-    "required": ["producer", "date_published", "date_accessed", "citation_producer", "dataset_url_main", "dataset_title_owid"],
+    "required": ["producer", "date_published", "date_accessed", "citation_producer", "url_main", "dataset_title_owid"],
     "properties": {
       "producer": {
         "title": "Producer name",
@@ -211,7 +211,7 @@
         ],
         "category": "citation"
       },
-      "dataset_url_main": {
+      "url_main": {
         "title": "URL of the main website of the data product",
         "type": "string",
         "description": "Producer's URL leading to the main website of the original dataset.",
@@ -221,7 +221,7 @@
           ["Should lead to a website where the dataset is described."]
         ],
         "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
-        "errorMessage": "'dataset_url_main' must be valid URL",
+        "errorMessage": "'url_main' must be valid URL",
         "examples": [
           "https://data.some_institution.com/dataset_12"
         ],

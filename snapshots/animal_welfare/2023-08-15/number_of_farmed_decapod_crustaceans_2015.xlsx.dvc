@@ -8,7 +8,7 @@ meta:
     producer: Fishcount
     citation_producer: |-
       Fishcount.org.uk based on data from the Food and Agriculture Organization of the United Nations.
-    dataset_url_main: http://fishcount.org.uk/
+    url_main: http://fishcount.org.uk/
     dataset_url_download: http://fishcount.org.uk/studydatascreens2/2015/Farmed-decapods-2015.xlsx
     date_published: '2016'
     date_accessed: 2023-08-15

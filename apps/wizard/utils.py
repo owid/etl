@@ -91,7 +91,7 @@ if WALKTHROUGH_ORIGINS:
         "producer": "Dummy producer",
         "citation_producer": "Dummy producer citation",
         "dataset_url_download": "https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv",
-        "dataset_url_main": "https://www.url-dummy.com/",
+        "url_main": "https://www.url-dummy.com/",
         "license_name": "MIT dummy license",
     }
 else:

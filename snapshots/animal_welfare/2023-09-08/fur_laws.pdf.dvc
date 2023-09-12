@@ -3,8 +3,8 @@ meta:
     dataset_title_owid: Fur banning
     producer: Fur Free Alliance
     citation_producer: Overview national fur legislation, Fur Free Alliance (2023).
-    dataset_url_main: https://www.furfreealliance.com/fur-bans/
-    dataset_url_download: 
+    url_main: https://www.furfreealliance.com/fur-bans/
+    dataset_url_download:
       https://www.furfreealliance.com/wp-content/uploads/2023/04/Overview-national-fur-legislation-General-Provisions.pdf
     date_published: '2023-04-01'
     date_accessed: '2023-09-08'

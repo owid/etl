@@ -32,7 +32,7 @@ meta:
       Johannes, Houghton, Richard A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023). National contributions
       to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide [Data set]. In Scientific
       Data (2023.1). Zenodo.
-    dataset_url_main: https://zenodo.org/record/7636699#.ZFCy4exBweZ
+    url_main: https://zenodo.org/record/7636699#.ZFCy4exBweZ
     dataset_url_download: https://zenodo.org/record/7636699/files/EMISSIONS_ANNUAL_1830-2021.csv
     date_accessed: 2023-05-02
     date_published: 2023-02-13

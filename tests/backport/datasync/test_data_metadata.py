@@ -62,7 +62,7 @@ def test_variable_metadata():
     }
     origins_df = pd.DataFrame(
         {
-            "datasetDescriptionOwid": ["Origin A", "Origin B"],
+            "descriptionSnapshot": ["Origin A", "Origin B"],
         }
     )
     faqs = [
@@ -110,7 +110,7 @@ def test_variable_metadata():
         "descriptionKey": ["Population density"],
         "name": "Population density",
         "nonRedistributable": False,
-        "origins": [{"datasetDescriptionOwid": "Origin A"}, {"datasetDescriptionOwid": "Origin B"}],
+        "origins": [{"descriptionSnapshot": "Origin A"}, {"descriptionSnapshot": "Origin B"}],
         "presentation": {
             "faqs": [{"fragmentId": "test", "gdocId": "1"}],
             "grapherConfigETL": {"title": "Population density"},

@@ -9,7 +9,7 @@ meta:
       dataset
     producer: Dummy producer
     citation_producer: Dummy producer citation
-    dataset_url_main: https://www.url-dummy.com/
+    url_main: https://www.url-dummy.com/
     dataset_url_download: https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv
     date_published: 2020-01-01
     date_accessed: 2023-08-22
