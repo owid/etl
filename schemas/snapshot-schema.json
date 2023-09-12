@@ -65,6 +65,9 @@
         },
         "license": {
           "$ref": "definitions.json#/license"
+        },
+        "source": {
+          "$ref": "definitions.json#/source"
         }
       }
     },
