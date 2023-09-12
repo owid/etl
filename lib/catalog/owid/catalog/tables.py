@@ -478,6 +478,12 @@ class Table(pd.DataFrame):
                     else:
                         setattr(self[v_short_name].metadata, k, v)
 
+                    # we allow `- *descriptions` which needs to be flattened
+                    if k == "description_key":
+                        self[v_short_name].metadata.description_key = _flatten(
+                            self[v_short_name].metadata.description_key
+                        )
+
         # update table attributes
         for k, v in t_annot.items():
             if k != "variables":
@@ -1419,3 +1425,8 @@ def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List
             for field in fields:
                 if not getattr(table[column].metadata, field):
                     log.warning(f"Table {table_name}, column {column} has no {field}.")
+
+
+def _flatten(lst: List[Any]) -> List[str]:
+    """Flatten list that contains either strings or lists."""
+    return [item for sublist in lst for item in ([sublist] if isinstance(sublist, str) else sublist)]
