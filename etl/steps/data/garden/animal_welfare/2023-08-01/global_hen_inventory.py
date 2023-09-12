@@ -71,24 +71,19 @@ def add_individual_sources_to_metadata(tb: Table) -> Table:
 
     # Gather the data source for each country.
     original_sources = (
-        "- "
-        + tb["country"].astype(str)
-        + ": "
-        + tb["source"].astype(str)
-        + " Available at "
-        + tb["available_at"].astype(str)
+        "- " + tb["country"].astype(str) + ": [" + tb["source"].astype(str) + "](" + tb["available_at"].astype(str) + ")"
     )
-    # Check that each variable has only one source.
+    # Check that each variable has only one origin.
     assert all(
-        [len(tb[column].metadata.sources) == 1 for column in tb.columns if column not in ["country", "year"]]
-    ), "Expected only one source. Something has changed."
-    # Take the source from any of those variables.
-    source = tb[tb.columns[-1]].metadata.sources[0]
-    # Add the full list of original sources to the variable source.
-    source.published_by = source.published_by + "\n" + "\n".join(original_sources)
-    # Replace the source of each variable with the new one that has the full list of original sources.
+        [len(tb[column].metadata.origins) == 1 for column in tb.columns if column not in ["country", "year"]]
+    ), "Expected only one origin. Something has changed."
+    # Take the origin from any of those variables.
+    origin = tb[tb.columns[-1]].metadata.origins[0]
+    # Add the full list of original sources to the variable origin.
+    origin.citation_producer = origin.citation_producer + "\n" + "\n".join(original_sources)
+    # Replace the origin of each variable with the new one that has the full list of original sources.
     for column in tb.columns:
-        tb[column].metadata.sources = [source]
+        tb[column].metadata.origins = [origin]
 
     return tb
 
