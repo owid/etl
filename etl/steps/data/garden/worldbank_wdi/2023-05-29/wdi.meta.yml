@@ -1951,7 +1951,8 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
         origins:  # Going forward this will usually come from snapshots in this form but you could also set it here
-        - title_snapshot: World Development Indicators
+        - producer: World Bank
+          title: World Development Indicators
           description: >
             The World Development Indicators (WDI) is the primary
             World Bank collection of development indicators, compiled
@@ -1959,9 +1960,9 @@ tables:
             presents the most current and accurate global development
             data available, and includes national, regional and
             global estimates.
-          producer: World Bank
           attribution: International Telecommunication Union (via World Bank) # This is an override that we would want to do for many indicators in the WDI especially
           attribution_short: World Bank
+          citation_full: ""
           url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
           url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
           date_accessed: 2023-05-29

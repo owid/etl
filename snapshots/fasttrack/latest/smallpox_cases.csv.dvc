@@ -1,6 +1,6 @@
 meta:
   origin:
-    title_snapshot: Reported Smallpox Cases (WHO, 2023)
+    title: Reported Smallpox Cases (WHO, 2023)
     description_snapshot: |-
       Because smallpox was eradicated in 1977, there were no new cases since 2010 so we extended the time series.
 
