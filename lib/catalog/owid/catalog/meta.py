@@ -237,6 +237,7 @@ class VariableMeta:
     """
 
     title: Optional[str] = None
+    # This shouldn't be used for data pages, use `description_short` or `description_key` instead
     description: Optional[str] = None
     # A 1-2 sentence description - used internally or as fallback for description_key
     description_short: Optional[str] = None
