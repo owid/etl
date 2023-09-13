@@ -217,15 +217,29 @@
       "properties": {
         "title": {
           "type": "string",
-          "title": "Title of this ETL dataset",
-          "description": "Title of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one-line description of the dataset (follow the guidelines of the origin's `data_product_title`). NOTE: Dataset titles should be propagated automatically from snapshots. By default, the title of the dataset will be the title of the containing table. But, if there are multiple tables, or if the user wants to manually edit the dataset title, it can be done by editing `dataset.title`.",
-          "requirement_level": "required (often automatic)"
+          "title": "Title of the ETL dataset",
+          "description": "Title of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one-line description of the dataset. NOTE: Dataset titles should be propagated automatically from snapshots. By default, the title of the dataset will be the title of the containing table. But, if there are multiple tables, or if the user wants to manually edit the dataset title, it can be done by editing `dataset.title`.",
+          "requirement_level": "required (often automatic)",
+          "guidelines": [
+            ["Must start with a capital letter."],
+            ["Must not end with a period."],
+            ["Should identify the dataset (i.e. the collection of tables resulting from one or more original data products)."],
+            ["If the dataset contains only one table, use its title (which usually coincides with the title of a data product or a snapshot)."]
+          ]
         },
         "description": {
           "type": "string",
-          "title": "Description of this ETL dataset",
-          "description": "Description of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the dataset (follow the guidelines of the origin's `description`). NOTE: Dataset descriptions should be propagated automatically from snapshots. By default, the description of the dataset will be the description of the containing table. But, if there are multiple tables, or if the user wants to manually edit the dataset description, it can be done by editing `dataset.description`.",
-          "requirement_level": "recommended (often automatic)"
+          "title": "Description of the ETL dataset",
+          "description": "Description of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the content of the tables. NOTE: Dataset descriptions should be propagated automatically from snapshots. By default, the description of the dataset will be the description of the containing table. But, if there are multiple tables, or if the user wants to manually edit the dataset description, it can be done by editing `dataset.description`.",
+          "requirement_level": "recommended (often automatic)",
+          "guidelines": [
+            ["Must start with a capital letter."],
+            ["Must end with a period."],
+            ["Must not mention other metadata fields like `producer`.", {"type": "exceptions", "value": ["Other metadata fields are crucial in the description of the data product."]}],
+            ["Should describe the dataset (i.e. the collection of tables resulting from one or more original data products)."],
+            ["Should ideally contain just one or a few paragraphs, that describe its content succinctly."],
+            ["If the dataset contains only one table, use its description (which usually coincides with the title of a data product or a snapshot)."]
+          ]  
         },
         "update_period_days": {
           "type": "integer",
@@ -233,7 +247,8 @@
           "description": "Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`.",
           "guidelines": [
             ["Must be defined in the garden step."],
-            ["Must be an integer."]
+            ["Must be an integer."],
+            ["Must specify the update period of OWID's data, not the producer's data (although they may often coincide, e.g. `365`)."]
           ],
           "examples": ["7", "30", "90", "365"],
           "examples_bad": [["2023-01-07"], ["monthly"], ["0.2"], ["1/365"]],
@@ -269,15 +284,28 @@
         "properties": {
           "title": {
             "type": "string",
-            "title": "Title of this ETL table",
-            "description": "Title of the table (mostly for internal purposes, or for users of our data catalog) which is a few words description of the table (follow the guidelines as origin's `title`). NOTE: Table titles should be propagated automatically from snapshots (from origin's `title`). But, if there are multiple tables, or if the user wants to manually edit the title, it can be done by editing `table.title`.",
-            "requirement_level": "required (often automatic)"
+            "title": "Title of the ETL table",
+            "description": "Title of the table (mostly for internal purposes, or for users of our data catalog) which is a few words description of the table. NOTE: Table titles should be propagated automatically from snapshots (from origin's `title`). But, if there are multiple tables, or if the user wants to manually edit the title, it can be done by editing `table.title`.",
+            "requirement_level": "required (often automatic)",
+            "guidelines": [
+              ["Must start with a capital letter."],
+              ["Must not end with a period."],
+              ["Should identify the table."],
+              ["If the table has only one origin, use the title of the data product or snapshot."]
+            ]
           },
           "description": {
             "type": "string",
             "title": "Description of this ETL table",
-            "description": "Description of the table (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the table (follow the guidelines of origin's `description`). NOTE: Table descriptions should be propagated automatically from snapshots (from origin's `description`). But, if there are multiple tables, or if the user wants to manually edit the description, it can be done by editing `table.description`.",
-            "requirement_level": "recommended (often automatic)"
+            "description": "Description of the table (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the table. NOTE: Table descriptions should be propagated automatically from snapshots (from origin's `description`). But, if there are multiple tables, or if the user wants to manually edit the description, it can be done by editing `table.description`.",
+            "requirement_level": "recommended (often automatic)",
+            "guidelines": [
+              ["Must start with a capital letter."],
+              ["Must end with a period."],
+              ["Must not mention other metadata fields like `producer`.", {"type": "exceptions", "value": ["Other metadata fields are crucial in the description of the table."]}],
+              ["Should ideally contain just one or a few paragraphs, that describe its content succinctly."],
+              ["If the table has only one origin, use its description."]
+            ]  
           },
           "variables": {
             "type": "object",
@@ -314,24 +342,24 @@
                 "description_short": {
                   "title": "Indicator's short description",
                   "type": "string",
-                  "description": "One or a few lines that complement the title, so you have a short description of the indicator.",
+                  "description": "One or a few lines that complement the title to have a short description of the indicator.",
                   "requirement_level": "required",
                   "guidelines": [
                     ["Must start with a capital letter."],
                     ["Must end with a period."],
-                    ["Must be one short paragraph, suitable to fit in a chart subtitle."],
+                    ["Must be one short paragraph (for example suitable to fit in a chart subtitle)."],
                     ["Should not mention any other metadata fields (like information about the processing, or the origins, or the units).", {"type": "exceptions", "value": ["The unit can be mentioned if it is crucial for the description."]}]
                   ],
                   "category": "metadata"
                 },
                 "description_key": {
-                  "title": "Indicator's key description points",
+                  "title": "Indicator's key information",
                   "type": "array",
                   "items": {
                     "type": "string"
                   },
-                  "description": "List of key points about the indicator.",
-                  "requirement_level": "recommended (only for curated data pages)",
+                  "description": "List of key pieces of information about the indicator.",
+                  "requirement_level": "recommended (for curated indicators)",
                   "guidelines": [
                     ["Must be a list of one or more short paragraphs.", {"type": "list", "value": ["Each paragraph must start with a capital letter.", "Each paragraph must end with a period."]}],
                     ["Should contain all the key information given in other description fields, like `description_short`, `grapher_config.subtitle` or `grapher_config.note`."],
@@ -380,7 +408,7 @@
                     ["Must be empty if the indicator has no units."],
                     ["Must be in plural."],
                     ["Must be a metric unit when applicable."],
-                    ["Should not use symbols like “/”.", {"type": "list", "value": ["If it is a derived unit, use “per” to denote a division, e.g. '... per hectare', or '... per person'."]}],
+                    ["Should not use symbols like “/”.", {"type": "list", "value": ["If it is a derived unit, use 'per' to denote a division, e.g. '... per hectare', or '... per person'."]}],
                     ["Should be '%' for percentages."]
                   ],
                   "category": "metadata"
@@ -389,7 +417,7 @@
                   "title": "Indicator's unit (short version)",
                   "type": "string",
                   "description": "Characters that represent the unit we use to measure the indicator value.",
-                  "examples": ["t/ha", "%", ".../person"],
+                  "examples": ["t/ha", "%", "kWh/person"],
                   "examples_bad": [["t / ha"], ["pct"], ["pc"]],
                   "requirement_level": "required",
                   "guidelines": [
@@ -442,7 +470,7 @@
                 "display": { "$ref": "definitions.json#/display" },
                 "presentation_license": {
                   "type": "object",
-                  "description": "Custom license for the indicator. This is usally not needed and the value from `license` is used.",
+                  "description": "License to display for the indicator, overriding `license`.",
                   "additionalProperties": false,
                   "properties": {
                     "url": {
@@ -462,8 +490,16 @@
                   "properties": {
                     "title_public": {
                       "type": "string",
-                      "description": "Indicator title to be shown in data pages (follow the guidelines of indicator's `title`). NOTE: This may be needed, for example, when the indicator comes from a big dataset where titles can't easily be curated manually. For those cases, `title_public` will override the indicator's `title`.",
-                      "requirement_level": "optional"
+                      "description": "Indicator title to be shown in data pages. NOTE: This may be needed, for example, when the indicator comes from a big dataset where titles can't easily be curated manually. For those cases, `title_public` will override the indicator's `title`.",
+                      "requirement_level": "optional",
+                      "guidelines": [
+                        ["Must start with a capital letter."],
+                        ["Must not end with a period."],
+                        ["Must be one short sentence (a few words)."],
+                        ["Should not mention other metadata fields like `producer` or `version`."],
+                        ["Should help OWID and expert users identify the indicator."],
+                        ["For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), consider using other metadata fields to improve the public appearance of the title (namely `presentation.title_public` and `grapher_config.title`)."]
+                      ]
                     },
                     "title_variant": {
                       "type": "string",
@@ -488,22 +524,29 @@
                     "attribution": {
                       "type": "string",
                       "title": "Indicator's attribution",
-                      "description": "",
+                      "description": "Citation of the indicator's origins, to be used when the automatic format `producer1 (year1); producer2 (year2)` needs to be overridden.",
                       "guidelines": [
-                        ["Must start with a capital letter."],
+                        ["Must start with a capital letter.", {"type": "exceptions", "value": ["The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."]}],
                         ["Must join multiple attributions by a `;`."],
                         ["Must not end in a period (and must **not** end in `;`)."],
-                        ["Should only be used when the automatic attribution format (of one or multiple origins) needs to be manually edited."]
+                        ["Must contain the year of `date_published`, for each origin, in parenthesis."],
+                        ["Should only be used when the automatic format `producer1 (year1); producer2 (year2)` needs to be overridden."]
                       ],
-                      "requirement_level": "optional"
+                      "requirement_level": "optional",
+                      "examples": [
+                        "Energy Institute - Statistical Review of World Energy (2023); Ember (2022)"
+                      ],
+                      "examples_bad": [
+                        ["UN (2023), WHO (2023)"]
+                      ]
                     },
                     "attribution_short": {
                       "type": "string",
                       "title": "Indicator's attribution (shorter version)",
                       "description": "Very short citation of the indicator's main producer(s).",
-                      "requirement_level": "recommended (for curated data pages)",
+                      "requirement_level": "recommended (for curated indicators)",
                       "guidelines": [
-                        ["Must start with a capital letter."],
+                        ["Must start with a capital letter.", {"type": "exceptions", "value": ["The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."]}],
                         ["Must not end in a period."],
                         ["Should be very short."],
                         ["Should be used if the automatic concatenation of origin's `attribution_short` are too long. In those cases, choose the most important `attribution` (e.g. the main producer of the data)."]
@@ -513,7 +556,7 @@
                       "type": "array",
                       "title": "Indicator's topic tags",
                       "description": "List of topics where the indicator is relevant.",
-                      "requirement_level": "recommended (only for curated data pages)",
+                      "requirement_level": "recommended (for curated indicators)",
                       "guidelines": [
                         ["Must be an existing topic tag, and be spelled correctly (see the list of topic tags in http://datasette-private/owid?sql=SELECT+tags.%60name%60+from+tags+where+isTopic+%3D+1+ORDER+BY+tags.%60name%60%0D%0A)."],
                         ["The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator)."],
@@ -525,7 +568,7 @@
                       "type": "array",
                       "title": "Indicator's FAQs",
                       "description": "List of references to questions in an FAQ google document, relevant to the indicator.",
-                      "requirement_level": "recommended (only for curated data pages)",
+                      "requirement_level": "recommended (for curated indicators)",
                       "guidelines": [
                         ["Each reference must contain `fragment_id` (question identifier) and `gdoc_id` (document identifier)."]
                       ],
@@ -570,7 +613,7 @@
                                 "Europe",
                                 "Africa",
                                 "Asia",
-                                "NortAmerica",
+                                "NorthAmerica",
                                 "SouthAmerica",
                                 "Oceania"
                               ],
@@ -873,7 +916,14 @@
                         },
                         "title": {
                           "type": "string",
-                          "description": "Default title to use in charts for the indicator (follow guidelines of indicator's `title`)."
+                          "description": "Default title to use in charts for the indicator, overriding the indicator's `title`.",
+                          "guidelines": [
+                            ["Must start with a capital letter."],
+                            ["Must not end with a period."],
+                            ["Must be one short sentence (a few words)."],
+                            ["Must fit and be an appropriate choice for a chart's public title."],
+                            ["Should not mention other metadata fields like `producer` or `version`."]
+                          ]
                         },
                         "type": {
                           "type": "string",
