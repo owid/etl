@@ -56,6 +56,7 @@ def underscore(name: Optional[str], validate: bool = True, camel_to_snake: bool 
         .replace("-", "_")
         .replace("—", "_")
         .replace("–", "_")
+        .replace("‑", "_")
         .replace(",", "_")
         .replace(".", "_")
         .replace("\t", "_")
@@ -210,7 +211,8 @@ def underscore_table(
 
     # put original names as titles into metadata by default
     for c_old, c_new in columns_map.items():
-        if t[c_new].metadata.title is None:
+        # if underscoring didn't change anything, don't add title
+        if t[c_new].metadata.title is None and c_old != c_new:
             t[c_new].metadata.title = c_old
 
     return t

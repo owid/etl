@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_202_health_expenditure_us_1929_2013_public__us_census_and_wdi__2013_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:39:57.387852
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/202
+    date_accessed: 2023-08-10 08:34:28.709701
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Health Expenditure US 1929-2013 Public - US Census and WDI (2013)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/202
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5c4e558457b523e33d9fd51ce486c91e
+- md5: e27b0e3e635f34d4345c4b1f6d37cfdf
   size: 6450
-  path: dataset_202_health_expenditure_us_1929_2013_public__us_census_and_wdi__2013_values.feather
+  path: 
+    dataset_202_health_expenditure_us_1929_2013_public__us_census_and_wdi__2013_values.feather

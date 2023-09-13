@@ -1,19 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_5203_time_spent_on_primary_childcare_activities__sayer__bianchi__and_robinson__2004_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:16:20.025787
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5203
+    date_accessed: 2023-08-10 07:51:53.111803
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Time spent on primary childcare activities - Sayer, Bianchi, and Robinson
     (2004)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5203
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 01f59cf9d32703eba9cde4c34f342475
+- md5: fa88ffccf9f7dc29250a8b60fc8ce8aa
   size: 6410
-  path: dataset_5203_time_spent_on_primary_childcare_activities__sayer__bianchi__and_robinson__2004_values.feather
+  path: 
+    dataset_5203_time_spent_on_primary_childcare_activities__sayer__bianchi__and_robinson__2004_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2358
+    date_accessed: 2023-08-11 07:38:19.175472
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Genital herpes
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 83a8069f0a31df9cb00900dc524d6c84
+  size: 1807818
+  path: dataset_2358_genital_herpes_values.feather

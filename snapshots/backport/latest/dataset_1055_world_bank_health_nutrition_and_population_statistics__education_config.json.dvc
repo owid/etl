@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1055
+    date_accessed: 2023-08-14 08:50:00.988195
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1055_world_bank_health_nutrition_and_population_statistics__education
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3ad14452d5610177ae237fb568676962
+  size: 90170
+  path: 
+    dataset_1055_world_bank_health_nutrition_and_population_statistics__education_config.json

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_316_subnational_inequality__oecd_based_on_royuela_et_al__2014_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:21:30.721584
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/316
+    date_accessed: 2023-08-10 08:41:55.092701
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Subnational inequality - OECD based on Royuela et al. (2014))
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/316
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5dfabde183e6ba74985faf0eb2ca11b6
+- md5: 89af5d65e4218695561a7b341721a0e5
   size: 8186
-  path: dataset_316_subnational_inequality__oecd_based_on_royuela_et_al__2014_values.feather
+  path: 
+    dataset_316_subnational_inequality__oecd_based_on_royuela_et_al__2014_values.feather

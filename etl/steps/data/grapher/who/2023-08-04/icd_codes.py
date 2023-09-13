@@ -21,10 +21,6 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["icd_country_year"]
     tb_sum = ds_garden["icd_totals"]
     #
-    # Process data.
-    #
-
-    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2428
+    date_accessed: 2023-08-16 09:41:52.346277
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2428_fertilizer_and_pesticides_consumption_and_production
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0bc65c58117815c68294b67186079c41
+  size: 18557
+  path: dataset_2428_fertilizer_and_pesticides_consumption_and_production_config.json

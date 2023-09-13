@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1664
+    date_accessed: 2023-08-16 10:33:25.998623
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1664_hookworm_disease (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5bcf62c32516cc0b3eeef6c3923cd7a4
+  size: 16544
+  path: dataset_1664_hookworm_disease_config.json

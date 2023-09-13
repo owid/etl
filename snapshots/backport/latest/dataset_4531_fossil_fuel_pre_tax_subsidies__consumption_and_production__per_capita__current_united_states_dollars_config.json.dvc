@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4531
+    date_accessed: 2023-08-16 07:14:29.496924
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4531_fossil_fuel_pre_tax_subsidies__consumption_and_production__per_capita__current_united_states_dollars
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 85c94c4dc1a96e315e7ff0849e6d260e
+  size: 13366
+  path: 
+    dataset_4531_fossil_fuel_pre_tax_subsidies__consumption_and_production__per_capita__current_united_states_dollars_config.json

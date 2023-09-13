@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5626_covid_19__vaccinations__debug_config
-  file_extension: json
-  date_accessed: 2023-02-23 15:12:08.846541
-  name: Grapher metadata for dataset_5626_covid_19__vaccinations__debug
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5626
+    date_accessed: 2023-08-16 08:46:06.915699
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5626_covid_19__vaccinations__debug (archived)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5626
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d55bdc1d690eff4b238a9562537c37cc
-  size: 9797
+- md5: ac093b89787055a7bcd4d448245e4bde
+  size: 11698
   path: dataset_5626_covid_19__vaccinations__debug_config.json

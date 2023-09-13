@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2282
+    date_accessed: 2023-08-16 10:40:07.921736
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2282_visceral_leishmaniasis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d914a882e9180c806878271aa6b42f32
+  size: 32788
+  path: dataset_2282_visceral_leishmaniasis_config.json

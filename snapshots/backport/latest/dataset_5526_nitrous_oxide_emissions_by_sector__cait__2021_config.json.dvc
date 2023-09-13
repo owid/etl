@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5526
+    date_accessed: 2023-08-16 10:47:57.053614
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5526_nitrous_oxide_emissions_by_sector__cait__2021
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3cbeec4fcda7955d429b27dadb3f6361
+  size: 16903
+  path: dataset_5526_nitrous_oxide_emissions_by_sector__cait__2021_config.json

@@ -1,4 +1,4 @@
-site_name: Data pipeline
+site_name: Data workflow
 
 repo_name: owid/etl
 repo_url: https://github.com/owid/etl
@@ -10,11 +10,25 @@ nav:
     - Working environment: "getting-started/working-environment.md"
     - Building datasets: "getting-started/building-datasets.md"
     - Consuming datasets: "getting-started/consuming-datasets.md"
+  - Tutorials:
+    - Tutorials: "tutorials/index.md"
+    - Adding data:
+      - Adding data: "tutorials/adding-data/index.md"
+      - Walkthrough: "tutorials/adding-data/walkthrough.md"
+      - Manually add: "tutorials/adding-data/manual.md"
+      - Fast-track: "tutorials/adding-data/fast-track.md"
+    - Updating charts:
+      - Submitting chart revisions: "tutorials/charts/updating-charts.md"
+      - Reviewing chart revisions: "tutorials/charts/reviewing-charts.md"
+      - Using chatGPT: "tutorials/charts/chatgpt.md"
+    - Harmonize country names: "tutorials/harmonize-countries.md"
+    - Metadata in data pages: "tutorials/metadata-play.md"
+    - Backporting Grapher datasets to ETL: "tutorials/backport.md"
+    - Importing a private dataset to ETL: "tutorials/private-import.md"
   - Architecture:
       - Architecture: architecture/index.md
       - Our journey: "architecture/our-journey.md"
       - Design principles:
-        - Design principles: "architecture/design/index.md"
         - Computational graph:
           - Computational graph: "architecture/design/compute-graph/index.md"
         - ETL model: "architecture/design/phases.md"
@@ -29,38 +43,34 @@ nav:
         - Garden: "architecture/workflow/garden.md"
         - Grapher: "architecture/workflow/grapher.md"
         - Special steps:
-          - Special steps: "architecture/workflow/other-steps/index.md"
+          # - Special steps: "architecture/workflow/other-steps/index.md"
           - Explorers: "architecture/workflow/other-steps/explorers.md"
           - Backport: "architecture/workflow/other-steps/backport.md"
           - Open Numbers: "architecture/workflow/other-steps/open-numbers.md"
           - ETag: "architecture/workflow/other-steps/etag.md"
           - GitHub: "architecture/workflow/other-steps/github.md"
           - Private steps: "architecture/workflow/other-steps/private.md"
-  - Tutorials:
-    - Tutorials: "tutorials/index.md"
-    - Adding data:
-      - Adding data: "tutorials/adding-data/index.md"
-      - Walkthrough: "tutorials/adding-data/walkthrough.md"
-      - Manually add: "tutorials/adding-data/manual.md"
-      - Fast-track: "tutorials/adding-data/fast-track.md"
-    - Updating charts:
-      - Submitting chart revisions: "tutorials/charts/updating-charts.md"
-      - Reviewing chart revisions: "tutorials/charts/reviewing-charts.md"
-      - Using chatGPT: "tutorials/charts/chatgpt.md"
-    - Harmonize country names: "tutorials/harmonize-countries.md"
-    - Backporting Grapher datasets to ETL: "tutorials/backport.md"
-    - Importing a private dataset to ETL: "tutorials/private-import.md"
-  - Dataset catalog:
-    - Dataset catalog: "data/index.md"
-    - Faostat: "data/faostat.md"
-    - Regions: "data/regions.md"
-  - API:
+      - Metadata:
+        - Metadata: "architecture/metadata/index.md"
+        - Workflow with metadata: "architecture/metadata/workflow.md"
+        - Reference:
+          - origin reference: "architecture/metadata/reference-origin.md"
+          - dataset reference: "architecture/metadata/reference-dataset.md"
+          - tables reference: "architecture/metadata/reference-tables.md"
+        - Propagation of metadata: "architecture/metadata/propagation.md"
+        - Using metadata: "architecture/metadata/using.md"
+  - API and catalog:
     - API: "api/index.md"
     - Python: "api/python.ipynb"
-  - Development:
-    - Development: "dev/index.md"
-    - Documentation: "dev/docs.md"
-  - Contributing: "contributing.md"
+    - Dataset catalog:
+      - Dataset catalog: "data/index.md"
+      - Faostat: "data/faostat.md"
+      - Regions: "data/regions.md"
+  - Contributing:
+    - Contributing: "contributing.md"
+    - Maintenance:
+      - Maintenance: "dev/index.md"
+      - Documentation: "dev/docs.md"
 
 theme:
   # logo: assets/logo.png
@@ -93,18 +103,22 @@ theme:
     - navigation.tabs.sticky
     - navigation.indexes
     - content.tooltips
-    - navigation.expand
+    # - navigation.expand
     # - navigation.sections
     # - toc.follow
     - navigation.top
   custom_dir: docs/overrides
 
 markdown_extensions:
+  - pymdownx.critic
   - admonition
   - abbr
   - attr_list
   - pymdownx.details
   - pymdownx.snippets
+  - pymdownx.superfences
+  - md_in_html
+  - pymdownx.superfences
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -120,6 +134,12 @@ plugins:
   - mkdocs-jupyter:
       ignore_h1_titles: True
   - search
+  - exclude:
+      glob:
+        - ignore/
+  - gen-files:
+      scripts:
+        - docs/ignore/gen_metadata_reference.py  # or any other name or path
 
 extra_css:
   - css/extra.css

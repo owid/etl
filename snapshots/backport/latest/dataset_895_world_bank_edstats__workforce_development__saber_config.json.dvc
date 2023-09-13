@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/895
+    date_accessed: 2023-08-16 07:59:56.881353
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_895_world_bank_edstats__workforce_development__saber
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 50306a39e554589c8e4a45143e0e9781
+  size: 18892
+  path: dataset_895_world_bank_edstats__workforce_development__saber_config.json

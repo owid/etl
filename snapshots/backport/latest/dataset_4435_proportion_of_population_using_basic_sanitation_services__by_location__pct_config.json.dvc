@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4435
+    date_accessed: 2023-08-16 08:45:08.648645
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4435_proportion_of_population_using_basic_sanitation_services__by_location__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0d1e260d2fec26df603482a28c2e5f48
+  size: 25356
+  path: 
+    dataset_4435_proportion_of_population_using_basic_sanitation_services__by_location__pct_config.json

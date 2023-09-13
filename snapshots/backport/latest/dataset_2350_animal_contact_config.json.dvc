@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2350
+    date_accessed: 2023-08-16 09:49:12.145868
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2350_animal_contact (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7178332a9c0e69020f744a2a8b5d8e30
+  size: 32452
+  path: dataset_2350_animal_contact_config.json

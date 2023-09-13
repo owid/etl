@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_4246_job_search_methods_us__pew_research_center__2015_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:09:46.384528
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4246
+    date_accessed: 2023-08-10 09:42:57.647246
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Job search methods US - Pew Research Center (2015)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4246
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 34fc4d49bbcd9925290392a938031a55
+- md5: ebca9486e06288c0bfbbf94ac22d394c
   size: 6522
   path: dataset_4246_job_search_methods_us__pew_research_center__2015_values.feather

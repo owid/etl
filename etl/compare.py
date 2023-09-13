@@ -18,7 +18,7 @@ from rich_click.rich_group import RichGroup
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
-from backport.datasync.data_metadata import variable_data_df_from_s3
+from apps.backport.datasync.data_metadata import variable_data_df_from_s3
 from etl import tempcompare
 
 
@@ -269,13 +269,13 @@ def grapher(
     )
 
     if values:
-        remote_data_values_df = read_values_from_s3(remote_env, namespace, version, dataset)
-        local_data_values_df = read_values_from_s3(local_env, namespace, version, dataset)
+        remote_values_df = read_values_from_s3(remote_env, namespace, version, dataset)
+        local_values_df = read_values_from_s3(local_env, namespace, version, dataset)
 
-        print("\n[magenta]=== Comparing data_values ===[/magenta]")
+        print("\n[magenta]=== Comparing values ===[/magenta]")
         diff_print(
-            remote_data_values_df,
-            local_data_values_df,
+            remote_values_df,
+            local_values_df,
             "remote",
             "local",
             **ctx.obj,
@@ -326,7 +326,7 @@ def read_variables_from_db(env_path: str, namespace: str, version: str, dataset:
     )
 
     # drop uninteresting columns
-    df = df.drop(["updatedAt", "createdAt", "dataPath", "metadataPath", "catalogPath"], axis=1)
+    df = df.drop(["updatedAt", "createdAt", "catalogPath"], axis=1)
 
     return cast(pd.DataFrame, df)
 
@@ -363,7 +363,6 @@ def read_values_from_s3(env_path: str, namespace: str, version: str, dataset: st
     q = """
     SELECT
         v.id as variableId,
-        v.dataPath,
         v.name as variable
     FROM variables as v
     JOIN datasets as d ON v.datasetId = d.id
@@ -376,7 +375,7 @@ def read_values_from_s3(env_path: str, namespace: str, version: str, dataset: st
     )
 
     # read them from S3
-    df = variable_data_df_from_s3(engine, vf.dataPath.tolist(), workers=10)
+    df = variable_data_df_from_s3(engine, variable_ids=vf.variableId.tolist(), workers=10)
 
     # add variable name
     df = df.merge(vf[["variableId", "variable"]], on="variableId")

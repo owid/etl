@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5093_covid_19_model_estimates__icl__2022_values
-  file_extension: feather
-  date_accessed: 2023-06-01 15:38:18.698533
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5093
+    date_accessed: 2023-08-10 08:38:46.641586
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: COVID-19 Model Estimates – ICL (2022)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5093
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8e2484e4ca753ff1f91c26ec49e8afcd
+- md5: cdd2521a329f3e1c4a7e67085d7bd018
   size: 2713922
   path: dataset_5093_covid_19_model_estimates__icl__2022_values.feather

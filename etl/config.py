@@ -20,7 +20,9 @@ ENV_FILE = env.get("ENV", BASE_DIR / ".env")
 
 load_dotenv(ENV_FILE)
 
-DEBUG = env.get("DEBUG") == "True"
+# When DEBUG is on
+# - run steps in the same process (speeding up ETL)
+DEBUG = env.get("DEBUG") in ("True", "true", "1")
 
 # publishing to OWID's public data catalog
 S3_BUCKET = "owid-catalog"
@@ -44,18 +46,43 @@ DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")
 DB_PASS = env.get("DB_PASS", "")
 
+# metaplay config
+METAPLAY_PORT = int(env.get("METAPLAY_PORT", "8051"))
+
 
 def get_username():
     return pwd.getpwuid(os.getuid())[0]
 
 
+if "DATA_API_ENV" in env:
+    DATA_API_ENV = env["DATA_API_ENV"]
+else:
+    DATA_API_ENV = env.get("DATA_API_ENV", get_username())
+
+# Production checks
+if DATA_API_ENV == "production":
+    assert DB_NAME == "live_grapher", "DB_NAME must be set to live_grapher when publishing to production"
+
+if DB_NAME == "live_grapher":
+    assert DATA_API_ENV == "production", "DATA_API_ENV must be set to production when publishing to live_grapher"
+
 # if running against live, use s3://owid-api, otherwise use s3://owid-api-staging
 # Cloudflare workers running on https://api.ourworldindata.org/ and https://api-staging.owid.io/ will use them
-if DB_NAME == "live_grapher":
-    DEFAULT_BAKED_VARIABLES_PATH = "s3://owid-api/v1/indicators"
+if DATA_API_ENV == "production":
+    BAKED_VARIABLES_PATH = "s3://owid-api/v1/indicators"
+    DATA_API_URL = "https://api.ourworldindata.org/v1/indicators"
 else:
-    DEFAULT_BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{get_username()}/v1/indicators"
-BAKED_VARIABLES_PATH = env.get("BAKED_VARIABLES_PATH", DEFAULT_BAKED_VARIABLES_PATH)
+    BAKED_VARIABLES_PATH = f"s3://owid-api-staging/{DATA_API_ENV}/v1/indicators"
+    DATA_API_URL = f"https://api-staging.owid.io/{DATA_API_ENV}/v1/indicators"
+
+
+def variable_data_url(variable_id):
+    return f"{DATA_API_URL}/{variable_id}.data.json"
+
+
+def variable_metadata_url(variable_id):
+    return f"{DATA_API_URL}/{variable_id}.metadata.json"
+
 
 # run ETL steps with debugger on exception
 IPDB_ENABLED = False

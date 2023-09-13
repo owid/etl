@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_846_us_maternal_mortality_and_flfp_index__owid__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:50:36.432021
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/846
+    date_accessed: 2023-08-10 08:02:17.942871
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: US Maternal Mortality and FLFP Index - OWID (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/846
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9148f89ff8015b657432f099a25025c2
+- md5: 846b5f66b424d3881ea24d69fc9393ca
   size: 7162
   path: dataset_846_us_maternal_mortality_and_flfp_index__owid__2017_values.feather

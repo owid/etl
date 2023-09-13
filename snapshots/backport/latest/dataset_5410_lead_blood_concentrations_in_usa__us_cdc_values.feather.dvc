@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5410_lead_blood_concentrations_in_usa__us_cdc_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:47:55.269727
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5410
+    date_accessed: 2023-08-10 08:43:33.462728
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Lead blood concentrations in USA (US CDC)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5410
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e899db8699dc6e0415b17be4927f652e
+- md5: baff26726f2c1f646bd7f1c9613b9adf
   size: 6322
   path: dataset_5410_lead_blood_concentrations_in_usa__us_cdc_values.feather

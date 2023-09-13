@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2285
+    date_accessed: 2023-08-16 10:06:07.289578
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2285_schistosomiasis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9a617313fff2169ea22c83a3a5cf3c4d
+  size: 32494
+  path: dataset_2285_schistosomiasis_config.json

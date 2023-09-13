@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1724
+    date_accessed: 2023-08-16 10:15:12.201423
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Pancreatic cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bde1b11c9f99043e57214e9c57e1a19e
+  size: 1389914
+  path: dataset_1724_pancreatic_cancer_values.feather

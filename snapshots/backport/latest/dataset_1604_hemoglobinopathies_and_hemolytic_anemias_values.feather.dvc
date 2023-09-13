@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1604
+    date_accessed: 2023-08-16 08:28:20.313217
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Hemoglobinopathies and hemolytic anemias
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9593621e8d20e221845565483181a472
+  size: 2012066
+  path: dataset_1604_hemoglobinopathies_and_hemolytic_anemias_values.feather

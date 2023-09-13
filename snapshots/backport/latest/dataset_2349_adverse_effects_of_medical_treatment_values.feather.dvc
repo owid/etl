@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2349
+    date_accessed: 2023-08-16 07:22:34.769988
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Adverse effects of medical treatment
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5f84dd9c818f9d9c35081587cacd9458
+  size: 2116410
+  path: dataset_2349_adverse_effects_of_medical_treatment_values.feather

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5411_lead_blood_concentrations_in_lmic__ericson_et_al__2021_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:36:45.666283
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5411
+    date_accessed: 2023-08-10 08:36:39.685282
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5411_lead_blood_concentrations_in_lmic__ericson_et_al__2021
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5411
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d5f13127d3616db5255873294ca5c23c
-  size: 4963
+- md5: 5d489fab2fd0b180e7d914709f1fc439
+  size: 5489
   path: dataset_5411_lead_blood_concentrations_in_lmic__ericson_et_al__2021_config.json

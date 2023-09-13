@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1666
+    date_accessed: 2023-08-11 07:41:40.423996
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Iron-deficiency anemia
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ef92a217acfd5ad6c89c730d80403b24
+  size: 1967770
+  path: dataset_1666_iron_deficiency_anemia_values.feather

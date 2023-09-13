@@ -4,7 +4,7 @@ This dataset is built from four different datasets:
 
     - Non-state wars: The use of armed force between two organised armed groups.
     - Intra-state wars: A conflict between a government and a non-governmental party, with no interference from other countries.
-    - Inter-state wars: A conflict between two or more governments.
+    - Inter-state wars: A conflict between two or more governments. Two flavours of this dataset are available: dyadic and per conflict.
     - Extra-state wars: An extra-systemic conflict is a conflict between a state and a non-state group outside its own territory. These conflicts are by definition territorial, since the government side is fighting to retain control of a territory outside the state system.
 """
 
@@ -30,6 +30,7 @@ def main(upload: bool) -> None:
         f"war/{SNAPSHOT_VERSION}/cow.non_state.csv",
         f"war/{SNAPSHOT_VERSION}/cow.intra_state.zip",
         f"war/{SNAPSHOT_VERSION}/cow.inter_state.csv",
+        f"war/{SNAPSHOT_VERSION}/cow.inter_state_dyadic.zip",
         f"war/{SNAPSHOT_VERSION}/cow.extra_state.csv",
     ]
     for path in snapshot_paths:

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/224
+    date_accessed: 2023-08-16 10:24:49.909289
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_224_fertility__un_population_division__2015_revision
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 695a32defdcf256d84704c3d22864d85
+  size: 2331
+  path: dataset_224_fertility__un_population_division__2015_revision_config.json

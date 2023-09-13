@@ -1,19 +1,15 @@
 meta:
-  name: Grapher metadata for dataset_5338_covid_19__variants
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5338
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-19 08:13:19.472486
+    date_accessed: 2023-08-16 08:51:57.801257
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5338_covid_19__variants (archived)
+  description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fdf1da6fc30f90fb319e2b069e8fd4a0
-  size: 47109
+- md5: a47dc171028ce37dfa6aea60077434f6
+  size: 58546
   path: dataset_5338_covid_19__variants_config.json

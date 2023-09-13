@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1084
+    date_accessed: 2023-08-16 09:30:13.455468
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank Health Nutrition and Population Statistics by Wealth Quintile
+    - Quintile: Population'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ebdc75e4b37f476ea8761a226e57662b
+  size: 64362
+  path: 
+    dataset_1084_world_bank_health_nutrition_and_population_statistics_by_wealth_quintile__quintile__population_values.feather

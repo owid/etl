@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/808
+    date_accessed: 2023-08-16 09:38:15.267890
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_808_emergency_response__food_aid_shipments__wfp__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c8c1041c6ff4d96f760f862dbb8f99e6
+  size: 28791
+  path: dataset_808_emergency_response__food_aid_shipments__wfp__fao__2017_config.json

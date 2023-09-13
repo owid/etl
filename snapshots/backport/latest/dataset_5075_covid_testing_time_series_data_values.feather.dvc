@@ -1,18 +1,14 @@
 meta:
-  name: COVID testing time series data
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5075
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-19 08:43:48.942594
+    date_accessed: 2023-08-16 08:31:36.490037
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: COVID testing time series data
+  description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9f06c7e629849bde31f73667520b36c0
+- md5: 3250f8d8b395ba00634dd94e76452f3f
   size: 7648338
   path: dataset_5075_covid_testing_time_series_data_values.feather

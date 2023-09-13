@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1898
+    date_accessed: 2023-08-16 10:05:23.852116
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Mortality from all forms of violence  (IHME (2016))
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3c4e27e608093991c986612715c856f4
+  size: 34402
+  path: dataset_1898_mortality_from_all_forms_of_violence__ihme__2016_values.feather

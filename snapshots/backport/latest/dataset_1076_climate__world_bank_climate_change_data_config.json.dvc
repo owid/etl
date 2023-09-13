@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1076
+    date_accessed: 2023-08-16 09:40:12.252113
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1076_climate__world_bank_climate_change_data
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e23a1339b4f719fc6a55f62fd5fc5177
+  size: 2296
+  path: dataset_1076_climate__world_bank_climate_change_data_config.json

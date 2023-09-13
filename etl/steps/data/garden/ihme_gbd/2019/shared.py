@@ -155,24 +155,6 @@ def add_share_of_population(df: pd.DataFrame) -> pd.DataFrame:
 
 def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str, rei: str = "None"):
     var_name_dict = {
-        "Deaths - Share of the population": {
-            "title": f"Share of total deaths that are from {cause.lower()}"
-            + (f" attributed to {rei.lower()}" if rei is not None else "")
-            + f", in {sex.lower()} aged {age.lower()}",
-            "description": "",
-            "unit": "%",
-            "short_unit": "%",
-            "num_decimal_places": 1,
-        },
-        "DALYs (Disability-Adjusted Life Years) - Share of the population": {
-            "title": f"Share of total DALYs that are from {cause.lower()}"
-            + (f" attributed to {rei.lower()}" if rei != "None" else "")
-            + f", in {sex.lower()} aged {age.lower()}",
-            "description": "",
-            "unit": "%",
-            "short_unit": "%",
-            "num_decimal_places": 1,
-        },
         "Deaths - Rate": {
             "title": f"Deaths that are from {cause.lower()}"
             + (f" attributed to {rei.lower()}" if rei != "None" else "")
@@ -355,6 +337,8 @@ def run_wrapper(
     tb_meadow = ds_meadow[dataset]
     tb_meadow = tb_meadow.drop(["index"], axis=1, errors="ignore")
     df_garden = pd.DataFrame(tb_meadow)
+    if dataset == "gbd_risk":
+        assert max(df_garden["value"][df_garden["metric"] == "Percent"]) > 1
     df_garden = tidy_countries(country_mapping_path, excluded_countries_path, df_garden)
     df_garden = tidy_sex_dimension(df_garden)
     df_garden = tidy_age_dimension(df_garden)
@@ -362,7 +346,9 @@ def run_wrapper(
 
     omm = omm_metrics(df_garden)
     df_garden = cast(pd.DataFrame, pd.concat([df_garden, omm], axis=0))
-    df_garden = add_share_of_population(df_garden)
+    # Adding the share of the population affected, when the denominator _isn't_ the total number of deaths/DALYs.
+    if dataset in ["gbd_mental_health", "gbd_prevalence"]:
+        df_garden = add_share_of_population(df_garden)
     df_garden = pivot(df_garden, dims)
 
     ds_garden = add_metadata(dest_dir=dest_dir, ds_meadow=ds_meadow, df=df_garden, dims=dims)

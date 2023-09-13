@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5087
+    date_accessed: 2023-08-14 16:03:57.151220
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Nitrous oxide emissions by sector (CAIT, 2020)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 50b0acdfca815e2f1b3e44b161f15b9a
+  size: 309354
+  path: dataset_5087_nitrous_oxide_emissions_by_sector__cait__2020_values.feather

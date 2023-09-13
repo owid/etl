@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4672
+    date_accessed: 2023-08-16 10:46:01.652468
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of local breeds for which sufficient genetic resources are stored
+    for reconstitution (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5ce522075f41f355966eb97c00d0ef27
+  size: 7210
+  path: 
+    dataset_4672_proportion_of_local_breeds_for_which_sufficient_genetic_resources_are_stored_for_reconstitution__pct_values.feather

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5096_covid_19_model_estimates__ihme__2022_config
-  file_extension: json
-  date_accessed: 2023-06-01 13:18:02.921895
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5096
+    date_accessed: 2023-08-09 15:00:56.410155
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5096_covid_19_model_estimates__ihme__2022
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5096
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d2313eef5a0becddc805300c4d79f10a
-  size: 3655
+- md5: d001a578bc33c8a09fbecf8c412b0e6d
+  size: 4056
   path: dataset_5096_covid_19_model_estimates__ihme__2022_config.json

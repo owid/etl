@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2957_global_precipitation_anomaly__noaa_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:09:39.639987
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2957
+    date_accessed: 2023-08-10 08:55:57.392177
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2957_global_precipitation_anomaly__noaa
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2957
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2ea7b625a0fc52acef48f30808ab2301
-  size: 2223
+- md5: 7b7fedd66b69b5b02a64bfbfed48b7ba
+  size: 2376
   path: dataset_2957_global_precipitation_anomaly__noaa_config.json

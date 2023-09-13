@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2048
+    date_accessed: 2023-08-14 08:49:31.805775
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2048_number_of_verified_cases_of_killing__kidnapping__enforced_disappearance__arbitrary_detention_and_torture_of_journalists__associated_media_personnel__trade_unionists_and_human_rights_advocates_in_the_previous_12_months
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 82d9cb51d962ffb4c77fa43576171a2d
+  size: 7474
+  path: 
+    dataset_2048_number_of_verified_cases_of_killing__kidnapping__enforced_disappearance__arbitrary_detention_and_torture_of_journalists__associated_media_personnel__trade_unionists_and_human_rights_advocates_in_the_previous_12_months_config.json

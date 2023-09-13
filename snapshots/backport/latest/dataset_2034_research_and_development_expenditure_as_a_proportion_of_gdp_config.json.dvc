@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2034
+    date_accessed: 2023-08-11 07:35:15.024466
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2034_research_and_development_expenditure_as_a_proportion_of_gdp
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1d7b23087bf3a6cd57dcb830daeb9b0c
+  size: 2570
+  path: 
+    dataset_2034_research_and_development_expenditure_as_a_proportion_of_gdp_config.json

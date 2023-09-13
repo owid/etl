@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4640
+    date_accessed: 2023-08-16 07:30:25.919055
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of countries that have conducted at least one population and housing
+    census in the last 10 years (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8ab94c5a1190ebe20bd82de66920b190
+  size: 6914
+  path: 
+    dataset_4640_proportion_of_countries_that_have_conducted_at_least_one_population_and_housing_census_in_the_last_10_years__pct_values.feather

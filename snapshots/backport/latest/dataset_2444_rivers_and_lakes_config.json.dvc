@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2444
+    date_accessed: 2023-08-16 08:46:29.390156
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2444_rivers_and_lakes (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f9d24df54c4206ea6cde85f386d22f1b
+  size: 6605
+  path: dataset_2444_rivers_and_lakes_config.json

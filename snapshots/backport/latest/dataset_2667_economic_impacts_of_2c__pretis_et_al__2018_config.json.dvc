@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2667_economic_impacts_of_2c__pretis_et_al__2018_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:11:51.694853
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2667
+    date_accessed: 2023-08-10 08:54:52.620134
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2667_economic_impacts_of_2c__pretis_et_al__2018
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2667
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bb648a4ded6205f7f0c2966dcc909bcc
-  size: 4112
+- md5: 1cf7370c430d2b97bc10a9c87cdf225b
+  size: 4773
   path: dataset_2667_economic_impacts_of_2c__pretis_et_al__2018_config.json

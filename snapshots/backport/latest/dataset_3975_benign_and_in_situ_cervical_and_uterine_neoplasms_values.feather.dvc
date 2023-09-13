@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3975
+    date_accessed: 2023-08-16 09:33:33.216616
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Benign and in situ cervical and uterine neoplasms
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0f320ff213925d922bd1b8b6f0c4183e
+  size: 32242
+  path: dataset_3975_benign_and_in_situ_cervical_and_uterine_neoplasms_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/450
+    date_accessed: 2023-08-16 09:47:43.486063
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_450_renewable_energy_capacity_by_technology__irena__2017
+    (archived)
+  description: Renewable Energy Capacity by Energy Technology- IRENA
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d8ca0d45e909a134491d1b4495b3911d
+  size: 2288
+  path: dataset_450_renewable_energy_capacity_by_technology__irena__2017_config.json

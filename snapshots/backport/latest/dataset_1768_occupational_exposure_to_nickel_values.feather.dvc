@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1768
+    date_accessed: 2023-08-14 16:07:45.143890
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational exposure to nickel
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 177e8cf5399d0f17c7a263d78faba13c
+  size: 961154
+  path: dataset_1768_occupational_exposure_to_nickel_values.feather

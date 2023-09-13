@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3623
+    date_accessed: 2023-08-16 10:50:15.742966
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3623_other_benign_and_in_situ_neoplasms (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d4477e5ea89cea5cb4fc07a2f1ce8fda
+  size: 33394
+  path: dataset_3623_other_benign_and_in_situ_neoplasms_config.json

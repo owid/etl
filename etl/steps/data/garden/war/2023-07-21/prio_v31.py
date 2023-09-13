@@ -11,6 +11,8 @@ Also, a conflict (i.e. one specific `id`) can have multiple campaigns. Take `id=
     - Second campaign: 1952 (Bolivia and MNR)
     - Third campaign: 1967 (Bolivia and ELN)
 
+
+Data for incompatibilities in Oceania are included in region Asia (source decision)
 """
 from typing import cast
 
@@ -29,7 +31,7 @@ log = get_logger()
 REGIONS_RENAME = {
     1: "Europe (PRIO)",
     2: "Middle East (PRIO)",
-    3: "Asia (PRIO)",
+    3: "Asia and Oceania (PRIO)",
     4: "Africa (PRIO)",
     5: "Americas (PRIO)",
 }
@@ -61,6 +63,9 @@ def run(dest_dir: str) -> None:
 
     log.info("war.prio_v31: sanity checks")
     _sanity_checks(tb)
+
+    log.info("war.prio_v31: replace NA in best estimate with lower bound")
+    tb["bdeadbes"] = tb["bdeadbes"].fillna(tb["bdeadlow"])
 
     log.info("war.prio_v31: estimate metrics")
     tb = estimate_metrics(tb)
@@ -125,10 +130,10 @@ def _sanity_checks(tb: Table) -> None:
 
     # Check regions
     assert (
-        tb.groupby("id").region.nunique() == 1
+        tb.groupby("id")["region"].nunique() == 1
     ).all(), "Some conflicts occurs in multiple regions! That was not expected."
     assert (
-        tb.groupby(["id", "year"]).type.nunique() == 1
+        tb.groupby(["id", "year"])["type"].nunique() == 1
     ).all(), "Some conflicts has different values for `type` in the same year! That was not expected."
 
 

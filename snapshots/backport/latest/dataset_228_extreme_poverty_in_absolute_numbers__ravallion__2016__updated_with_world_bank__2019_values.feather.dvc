@@ -1,19 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_228_extreme_poverty_in_absolute_numbers__ravallion__2016__updated_with_world_bank__2019_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:55:06.661720
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/228
+    date_accessed: 2023-08-10 08:45:38.012991
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Extreme Poverty in absolute numbers - Ravallion (2016) updated with World
     Bank (2019)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/228
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5c9f1b6b56aed736e0d3ec37f5aeb7a4
+- md5: 5db5997b961964d67db4bd87888fd1cc
   size: 6802
-  path: dataset_228_extreme_poverty_in_absolute_numbers__ravallion__2016__updated_with_world_bank__2019_values.feather
+  path: 
+    dataset_228_extreme_poverty_in_absolute_numbers__ravallion__2016__updated_with_world_bank__2019_values.feather

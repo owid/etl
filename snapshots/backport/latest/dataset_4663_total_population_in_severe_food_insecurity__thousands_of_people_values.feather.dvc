@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4663
+    date_accessed: 2023-08-16 07:28:00.212228
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total population in severe food insecurity (thousands of people)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3d36ee29874e993cd73ba95f11ea83f6
+  size: 12722
+  path: 
+    dataset_4663_total_population_in_severe_food_insecurity__thousands_of_people_values.feather

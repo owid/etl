@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_943_sexual_violence__unicef__2017_values
-  file_extension: feather
-  date_accessed: 2023-06-01 13:02:59.354328
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/943
+    date_accessed: 2023-08-10 09:42:12.269158
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Sexual Violence – UNICEF (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/943
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4d1cef357ad81595895ff3e5fc730c4a
+- md5: 3ea6ae0cda5ecf498e0b22c2b902a909
   size: 8194
   path: dataset_943_sexual_violence__unicef__2017_values.feather

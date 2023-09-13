@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5350_books__buringh_and_van_zanden__2009_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:48:40.938971
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5350
+    date_accessed: 2023-08-10 09:48:24.693863
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Books - Buringh and Van Zanden (2009)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5350
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f7d31deff4755362c32fa2f01514ddc2
+- md5: 48a9ce9bf52d68ef0b94a82a09734cf1
   size: 8874
   path: dataset_5350_books__buringh_and_van_zanden__2009_values.feather

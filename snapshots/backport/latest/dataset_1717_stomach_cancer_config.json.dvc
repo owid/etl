@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1717
+    date_accessed: 2023-08-14 16:11:09.558352
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1717_stomach_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 573714ce0237c0f885e308f9c8993ba1
+  size: 26752
+  path: dataset_1717_stomach_cancer_config.json

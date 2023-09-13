@@ -1,21 +1,16 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_2887_urbanization_in_the_long_run__owid_based_on_the_un_world_urbanization_prospects_2018_and_others_config
-  file_extension: json
-  date_accessed: 2023-06-01 15:26:50.587431
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2887
+    date_accessed: 2023-08-10 08:59:45.108225
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for 
     dataset_2887_urbanization_in_the_long_run__owid_based_on_the_un_world_urbanization_prospects_2018_and_others
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2887
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 902027be4aefd4976fc9930229c08899
-  size: 8338
+- md5: 4b0572bb454184295c17fe6981657be0
+  size: 9380
   path: 
     dataset_2887_urbanization_in_the_long_run__owid_based_on_the_un_world_urbanization_prospects_2018_and_others_config.json

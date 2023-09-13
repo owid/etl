@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1960
+    date_accessed: 2023-08-10 14:51:04.766576
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Harmful use of alcohol, defined according to the national context as alcohol
+    per capita consumption (aged 15 years and older) within a calendar year in litres
+    of pure alcohol
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 01ad5ac7ac4d6bd96c38e0b52c540406
+  size: 13130
+  path: 
+    dataset_1960_harmful_use_of_alcohol__defined_according_to_the_national_context_as_alcohol_per_capita_consumption__aged_15_years_and_older__within_a_calendar_year_in_litres_of_pure_alcohol_values.feather

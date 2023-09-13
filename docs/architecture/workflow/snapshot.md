@@ -30,6 +30,13 @@ Note that we need a DVC file per upstream data file; hence, in some instances, i
 
 
 ## Metadata
+!!! warning "This is still being written."
+
+    Our metadata formats are still in flux, and are likely to change substantially over the coming months.
+
+
+    We are currently working on version 2 of our metadata, for which you can find most up-to-date documentation [on Notion :octicons-arrow-right-24:](https://www.notion.so/owid/Metadata-guidelines-29ca6e19b6f1409ea6826a88dbb18bcc)
+
 
 Snapshots are the raw data provided by upstream data providers. At minimum, they must capture:
 
@@ -37,7 +44,10 @@ Snapshots are the raw data provided by upstream data providers. At minimum, they
 - The license the data was provided under
 - A human readable description of the data
 
-This is captured in a DVC file (similar to a yaml file), which contains all the snapshot metadata fields as key-value pairs. Find the fields described below
+This is captured in a DVC file (similar to a yaml file), which contains all the snapshot metadata fields as key-value pairs.
+
+
+Find the fields described below.
 
 
 | Field      | Description                          |

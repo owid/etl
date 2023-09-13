@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/806
+    date_accessed: 2023-08-14 15:28:26.667647
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Agriculture: Enteric Fermentation - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d49152910c9a136fa5990c84f29ed635
+  size: 1933946
+  path: 
+    dataset_806_emissions__agriculture__enteric_fermentation__fao__2017_values.feather

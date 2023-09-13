@@ -1,0 +1,25 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5024
+    date_accessed: 2023-08-16 09:45:59.583758
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Agriculture: Manure Management'
+  description: Greenhouse gas (GHG) emissions from manure management consist of methane
+    and nitrous oxide gases from aerobic and anaerobic manure decomposition processes.  The
+    FAOSTAT emissions database is computed following Tier 1 IPCC 2006 Guidelines for
+    National GHG Inventories vol. 4, ch. 10 and 11 (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol4.html).
+    GHG emissions are provided by country, with global coverage, relative to the period
+    1961-present (with annual updates) and with projections for 2030 and 2050, expressed
+    both as Gg CH4, Gg N2O and Gg CO2eq, by livestock species (asses, buffaloes, camels,
+    cattle (dairy and non-dairy), chickens (broilers and layers), ducks, goats, horses,
+    llamas, mules, sheep, swine (breeding, market), turkeys) and by species aggregates
+    (all animals, camels and llamas, cattle, chickens, mules and asses, poultry birds,
+    sheep and goats, swine). Implied emission factors, direct and indirect emissions
+    (for both N2O and CO2eq) as well as N content in manure are also provided.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 15c106520296ac170d396c4dd63e230d
+  size: 11691618
+  path: dataset_5024_emissions__agriculture__manure_management_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1971
+    date_accessed: 2023-08-14 05:52:26.241069
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Participation rate of youth and adults in formal and non-formal education
+    and training in the previous 12 months, by sex
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0343c41211d00ddb2bde6ba922cf9a52
+  size: 8114
+  path: 
+    dataset_1971_participation_rate_of_youth_and_adults_in_formal_and_non_formal_education_and_training_in_the_previous_12_months__by_sex_values.feather

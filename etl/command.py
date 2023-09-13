@@ -242,18 +242,18 @@ def run_dag(
         )
 
     if not force:
-        print("Detecting which steps need rebuilding...")
+        print("--- Detecting which steps need rebuilding...")
         start_time = time.time()
         steps = select_dirty_steps(steps, workers)
         click.echo(f"{click.style('OK', fg='blue')} ({time.time() - start_time:.1f}s)")
 
     if not steps:
-        print("All datasets up to date!")
+        print("--- All datasets up to date!")
         return
 
-    print(f"Running {len(steps)} steps:")
+    print(f"--- Running {len(steps)} steps:")
     for i, step in enumerate(steps, 1):
-        print(f"{i}. {step}...")
+        print(f"--- {i}. {step}...")
         if not dry_run:
             strict = _detect_strictness_level(step, strict)
             with strictness_level(strict):
@@ -329,8 +329,12 @@ def _backporting_steps(private: bool, filter_steps: Optional[Set[str]] = None) -
             continue
 
         # two files are generated for each dataset, skip one
-        if snap.metadata.short_name.endswith("_values"):
-            short_name = snap.metadata.short_name.removesuffix("_values")
+        if snap.metadata.short_name.endswith("_config"):
+            # skip archived backported datasets
+            if "(archived)" in snap.metadata.name:  # type: ignore
+                continue
+
+            short_name = snap.metadata.short_name.removesuffix("_config")
 
             private_suffix = "" if snap.metadata.is_public else "-private"
 

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1765
+    date_accessed: 2023-08-16 08:51:41.223535
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diet low in whole grains
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 708264a5df7c3f609f437d72d04e766c
+  size: 962874
+  path: dataset_1765_diet_low_in_whole_grains_values.feather

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5765_computer_chess_elo_ratings__chess_com__ssdf__2022_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:51:08.816257
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5765
+    date_accessed: 2023-08-10 09:08:04.476142
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5765_computer_chess_elo_ratings__chess_com__ssdf__2022
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5765
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 563e435e5136f84d91fb23e964723b0c
-  size: 2540
+- md5: 6bfb07803233cdad5ac7f64faa08ef13
+  size: 2691
   path: dataset_5765_computer_chess_elo_ratings__chess_com__ssdf__2022_config.json

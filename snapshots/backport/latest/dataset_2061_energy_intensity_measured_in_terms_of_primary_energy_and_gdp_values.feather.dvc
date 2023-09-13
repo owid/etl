@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2061
+    date_accessed: 2023-08-11 07:53:45.497755
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Energy intensity measured in terms of primary energy and GDP
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0e148fcd1f203790b0bcbb64aec7013c
+  size: 24890
+  path: 
+    dataset_2061_energy_intensity_measured_in_terms_of_primary_energy_and_gdp_values.feather

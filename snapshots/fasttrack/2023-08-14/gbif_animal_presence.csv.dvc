@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: Google Sheet
+    url: ''
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vR3n4l3eOXbCuUV3SUCRhWF5Dmali4mMQJZnyX_mJc6Pscez3GE4jv1ukYtJmdzO-Kh_FgYU8tAP2Vb/pub?output=csv
+    date_accessed: '2023-08-14'
+    published_by: Google Sheet
+  name: DRAFT Human observation of animal presence
+  description: The number of human observation animal presence records in the Global
+    Biodiversity Information Facility, a proxy for the level broadly available biodiversity
+    monitoring data available from each country.
+  license: {}
+  is_public: false
+wdir: ../../../data/snapshots/fasttrack/2023-08-14
+outs:
+- md5: b54a04d0a163bef7314b860c198f0255
+  size: 5724
+  path: gbif_animal_presence.csv

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2741
+    date_accessed: 2023-08-14 15:46:36.636524
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2741_un_wpp__percentage_of_male_total_population_by_broad_age_group__region__subregion_and_country__annually_interpolated_for_1950_2100
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ca48d7d2acb7934c17279750f1d5fbee
+  size: 101386
+  path: 
+    dataset_2741_un_wpp__percentage_of_male_total_population_by_broad_age_group__region__subregion_and_country__annually_interpolated_for_1950_2100_config.json

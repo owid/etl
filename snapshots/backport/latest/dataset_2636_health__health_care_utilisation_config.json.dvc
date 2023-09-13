@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2636
+    date_accessed: 2023-08-11 07:37:07.172624
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2636_health__health_care_utilisation (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0df12d4888a06873d535fc7f8a805d7d
+  size: 154327
+  path: dataset_2636_health__health_care_utilisation_config.json

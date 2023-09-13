@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2635
+    date_accessed: 2023-08-16 08:01:01.183799
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Health - Health Care Quality Indicators
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bf98f1572d423ae0a435bc9b4939124e
+  size: 100586
+  path: dataset_2635_health__health_care_quality_indicators_values.feather

@@ -1,19 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_706_output_of_key_industrial_sectors_in_england__bank_of_england__2017_config
-  file_extension: json
-  date_accessed: 2023-02-24 15:57:52.895572
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/706
+    date_accessed: 2023-08-10 08:48:59.334133
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_706_output_of_key_industrial_sectors_in_england__bank_of_england__2017
   description: This data consists the measures of output in key industrial sectors
     in England (1270-1870).
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/706
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 82f0a2dc0ddd74a458b3694ef06ca683
-  size: 4771
-  path: dataset_706_output_of_key_industrial_sectors_in_england__bank_of_england__2017_config.json
+- md5: b57193010aee49bffdedb4cf3db1d147
+  size: 5501
+  path: 
+    dataset_706_output_of_key_industrial_sectors_in_england__bank_of_england__2017_config.json

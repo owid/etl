@@ -1,19 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_425_labor_force_participation_rates_of_men_age_65_and_over_in_the_us__owid_based_on_short__2002__and_oecd_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:34:00.005460
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/425
+    date_accessed: 2023-08-10 09:13:45.308321
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Labor Force Participation Rates of Men Age 65 and Over in the US – OWID based
     on Short (2002) and OECD
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/425
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f65a618de2b0dd8dd386ab972ac682ac
+- md5: a35792c6b0d48cc8892153a55f4bbe01
   size: 6586
-  path: dataset_425_labor_force_participation_rates_of_men_age_65_and_over_in_the_us__owid_based_on_short__2002__and_oecd_values.feather
+  path: 
+    dataset_425_labor_force_participation_rates_of_men_age_65_and_over_in_the_us__owid_based_on_short__2002__and_oecd_values.feather

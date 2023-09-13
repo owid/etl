@@ -16,90 +16,93 @@ paths = PathFinder(__file__)
 # Set relative and absolute poverty lines
 relative_povlines = [40, 50, 60]
 
+# Set age suffixes
+age_dict = {"all": "", "adults": "_adults"}
+
 
 def run(dest_dir: str) -> None:
     log.info("luxembourg_income_study.start")
 
-    #
-    # Load inputs.
-
-    ######################################################
-    # Key variables
-    ######################################################
-
-    # Load `keyvars` meadow dataset, rename and drop variables
-    df_keyvars = load_keyvars()
-
-    # Create additional (relative) poverty variables
-    df_keyvars = create_relative_pov_variables(df_keyvars, relative_povlines)
-
-    # Make table wide
-    df_keyvars = make_table_wide(df_keyvars, ["variable", "eq"])
-
-    # Rename one pop variable created to keep it and drop all the others
-    df_keyvars = df_keyvars.rename(columns={"pop_dhi_eq": "pop"})
-    df_keyvars = df_keyvars[df_keyvars.columns.drop(list(df_keyvars.filter(like="pop_")))]
-
-    ######################################################
-    # Absolute poverty
-    ######################################################
-
-    # Load `abs_poverty` meadow dataset, rename variables
-    df_abs_poverty = load_abs_poverty(df_keyvars)
-
-    # Calculate additional absolute poverty variables
-    df_abs_poverty = create_absolute_pov_variables(df_abs_poverty)
-
-    # Make table wide
-    df_abs_poverty = make_table_wide(df_abs_poverty, ["variable", "eq", "povline"])
-
-    ######################################################
-    # Distributional data
-    ######################################################
-
-    # Load `distribution` meadow dataset, rename variables
-    df_distribution = load_distribution()
-
-    # Calculate income ratios, decile averages and groups of shares
-    df_distribution = create_distributional_variables(df_distribution)
-
-    # Make table wide
-    df_distribution = make_table_wide(df_distribution, ["variable", "eq"])
-
-    # Merge tables
-    df = pd.merge(df_keyvars, df_abs_poverty, on=["country", "year"], how="left")
-    df = pd.merge(df, df_distribution, on=["country", "year"], how="left")
-
-    # Replace inf values (division by 0)
-    df = df.replace({np.inf: np.nan})
-
-    # Drop population
-    df = df.drop(columns=["pop"])
-
-    # Verify index and sort
-    df = df.set_index(["country", "year"], verify_integrity=True)
-    df = df.sort_index().sort_index(axis=1)
-
-    # Create a new table with the processed data.
-    tb_garden = Table(df, short_name="luxembourg_income_study")
-
-    # Add metadata by code
-    tb_garden = add_metadata_vars(tb_garden)
-
-    #
-    # Save outputs.
-    #
     # Create a new garden dataset
     ds_garden = Dataset.create_empty(dest_dir)
 
-    # Add table of processed data to the new dataset.
-    ds_garden.add(tb_garden)
+    for age, age_suffix in age_dict.items():
+        # Load inputs.
 
-    # Update dataset and table metadata using the adjacent yaml file.
-    ds_garden.update_metadata(paths.metadata_path)
+        ######################################################
+        # Key variables
+        ######################################################
 
-    # Save changes in the new garden dataset.
-    ds_garden.save()
+        # Load `keyvars` meadow dataset, rename and drop variables
+        df_keyvars = load_keyvars(age=age_suffix)
+
+        # Create additional (relative) poverty variables
+        df_keyvars = create_relative_pov_variables(df_keyvars, relative_povlines)
+
+        # Make table wide
+        df_keyvars = make_table_wide(df_keyvars, ["variable", "eq"])
+
+        # Rename one pop variable created to keep it and drop all the others
+        df_keyvars = df_keyvars.rename(columns={"pop_dhi_eq": "pop"})
+        df_keyvars = df_keyvars[df_keyvars.columns.drop(list(df_keyvars.filter(like="pop_")))]
+
+        ######################################################
+        # Absolute poverty
+        ######################################################
+
+        # Load `abs_poverty` meadow dataset, rename variables
+        df_abs_poverty = load_abs_poverty(df_keyvars, age_suffix)
+
+        # Calculate additional absolute poverty variables
+        df_abs_poverty = create_absolute_pov_variables(df_abs_poverty)
+
+        # Make table wide
+        df_abs_poverty = make_table_wide(df_abs_poverty, ["variable", "eq", "povline"])
+
+        ######################################################
+        # Distributional data
+        ######################################################
+
+        # Load `distribution` meadow dataset, rename variables
+        df_distribution = load_distribution(age=age_suffix)
+
+        # Calculate income ratios, decile averages and groups of shares
+        df_distribution = create_distributional_variables(df_distribution, age_suffix)
+
+        # Make table wide
+        df_distribution = make_table_wide(df_distribution, ["variable", "eq"])
+
+        # Merge tables
+        df = pd.merge(df_keyvars, df_abs_poverty, on=["country", "year"], how="left")
+        df = pd.merge(df, df_distribution, on=["country", "year"], how="left")
+
+        # Replace inf values (division by 0)
+        df = df.replace({np.inf: np.nan})
+
+        # Drop population
+        df = df.drop(columns=["pop"])
+
+        # Verify index and sort
+        df = df.set_index(["country", "year"], verify_integrity=True)
+        df = df.sort_index().sort_index(axis=1)
+
+        # Create a new table with the processed data.
+        tb_garden = Table(df, short_name=f"luxembourg_income_study{age_suffix}")
+
+        # Add metadata by code
+        tb_garden = add_metadata_vars(tb_garden)
+
+        #
+        # Save outputs.
+
+        # Add table of processed data to the new dataset.
+        ds_garden.add(tb_garden)
+
+        # Update dataset and table metadata using the adjacent yaml file.
+        ds_garden.update_metadata(paths.metadata_path)
+
+        # Save changes in the new garden dataset.
+        ds_garden.save()
 
     log.info("luxembourg_income_study.end")
 
@@ -108,10 +111,10 @@ def run(dest_dir: str) -> None:
 # Data processing functions
 #########################################################################
 
+
 # This function makes the table wide and modifies some columns before that
 # It is applied to the three LIS datasets
 def make_table_wide(df: pd.DataFrame, cols_to_wide: list) -> pd.DataFrame:
-
     # Drop dataset variable, to not see it multiplied
     df = df.drop(columns=["dataset"])
 
@@ -126,9 +129,9 @@ def make_table_wide(df: pd.DataFrame, cols_to_wide: list) -> pd.DataFrame:
 
 
 # Load `keyvars` meadow dataset, rename and drop variables
-def load_keyvars() -> pd.DataFrame:
+def load_keyvars(age: str) -> pd.DataFrame:
     ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
-    tb_meadow = ds_meadow["lis_keyvars"]
+    tb_meadow = ds_meadow[f"lis_keyvars{age}"]
     df_keyvars = pd.DataFrame(tb_meadow)
 
     # Use less technical names for some variables
@@ -196,9 +199,9 @@ def create_relative_pov_variables(df_keyvars: pd.DataFrame, relative_povlines: l
 
 
 # Load `abs_poverty` meadow dataset, rename variables
-def load_abs_poverty(df_keyvars: pd.DataFrame) -> pd.DataFrame:
+def load_abs_poverty(df_keyvars: pd.DataFrame, age: str) -> pd.DataFrame:
     ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
-    tb_meadow = ds_meadow["lis_abs_poverty"]
+    tb_meadow = ds_meadow[f"lis_abs_poverty{age}"]
     df_abs_poverty = pd.DataFrame(tb_meadow)
 
     # Add population variable from keyvars
@@ -244,9 +247,9 @@ def create_absolute_pov_variables(df_abs_poverty: pd.DataFrame) -> pd.DataFrame:
 
 
 # Load `distribution` meadow dataset, rename variables
-def load_distribution() -> pd.DataFrame:
+def load_distribution(age: str) -> pd.DataFrame:
     ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
-    tb_meadow = ds_meadow["lis_distribution"]
+    tb_meadow = ds_meadow[f"lis_distribution{age}"]
     df_distribution = pd.DataFrame(tb_meadow)
 
     # Transform percentile variable to `pxx`
@@ -262,8 +265,7 @@ def load_distribution() -> pd.DataFrame:
 
 
 # Calculate income ratios and decile averages
-def create_distributional_variables(df_distribution: pd.DataFrame) -> pd.DataFrame:
-
+def create_distributional_variables(df_distribution: pd.DataFrame, age: str) -> pd.DataFrame:
     # Calculate Palma ratio and other average/share ratios
     df_distribution["palma_ratio"] = df_distribution["share_p100"] / (
         df_distribution["share_p10"]
@@ -299,7 +301,7 @@ def create_distributional_variables(df_distribution: pd.DataFrame) -> pd.DataFra
     # Add mean data to dataframe
 
     # Load keyvars again
-    df_mean = load_keyvars()
+    df_mean = load_keyvars(age=age)
     df_mean = df_mean[["country", "year", "variable", "eq", "mean"]]
 
     df_distribution = pd.merge(df_distribution, df_mean, on=["country", "year", "variable", "eq"], how="left")

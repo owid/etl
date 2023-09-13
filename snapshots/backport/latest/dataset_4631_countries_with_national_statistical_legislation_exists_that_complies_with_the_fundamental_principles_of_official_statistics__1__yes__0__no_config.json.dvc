@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4631
+    date_accessed: 2023-08-16 09:36:08.895937
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4631_countries_with_national_statistical_legislation_exists_that_complies_with_the_fundamental_principles_of_official_statistics__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5f7ec7ad8496b8e6a1bdf833cb3c3f8b
+  size: 9225
+  path: 
+    dataset_4631_countries_with_national_statistical_legislation_exists_that_complies_with_the_fundamental_principles_of_official_statistics__1__yes__0__no_config.json

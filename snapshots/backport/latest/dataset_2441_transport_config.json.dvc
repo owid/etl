@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2441
+    date_accessed: 2023-08-11 07:44:20.838681
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2441_transport (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e137d83bdc13f6085a52e0034fcb9ead
+  size: 5443
+  path: dataset_2441_transport_config.json

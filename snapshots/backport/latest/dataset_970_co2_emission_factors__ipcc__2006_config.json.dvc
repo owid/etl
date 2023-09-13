@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_970_co2_emission_factors__ipcc__2006_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:42:29.852250
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/970
+    date_accessed: 2023-08-10 08:39:04.881772
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_970_co2_emission_factors__ipcc__2006
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/970
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 986d4808ff6a06b84838f764d98486ea
-  size: 1952
+- md5: d96d93a3f3189dcf2d0fd7bcc6985084
+  size: 2105
   path: dataset_970_co2_emission_factors__ipcc__2006_config.json

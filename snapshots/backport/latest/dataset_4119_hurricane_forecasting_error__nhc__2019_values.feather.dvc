@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_4119_hurricane_forecasting_error__nhc__2019_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:02:46.553749
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4119
+    date_accessed: 2023-08-10 09:17:32.361849
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Hurricane Forecasting Error, NHC (2019)
   description: Extracted from PDFs using Tabula
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4119
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9dfa3d323ecbe96bf873447292a26b6f
+- md5: f6c353ec94e2d51c800f7e58c7a9de21
   size: 11578
   path: dataset_4119_hurricane_forecasting_error__nhc__2019_values.feather

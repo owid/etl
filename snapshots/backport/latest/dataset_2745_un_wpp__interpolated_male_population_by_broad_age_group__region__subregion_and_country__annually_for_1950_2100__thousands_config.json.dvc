@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2745
+    date_accessed: 2023-08-14 05:38:22.250287
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2745_un_wpp__interpolated_male_population_by_broad_age_group__region__subregion_and_country__annually_for_1950_2100__thousands
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d6bf3c5848c8a027e6c32a02e516f97b
+  size: 95235
+  path: 
+    dataset_2745_un_wpp__interpolated_male_population_by_broad_age_group__region__subregion_and_country__annually_for_1950_2100__thousands_config.json

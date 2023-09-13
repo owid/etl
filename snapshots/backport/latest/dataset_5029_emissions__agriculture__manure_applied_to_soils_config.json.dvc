@@ -1,0 +1,30 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5029
+    date_accessed: 2023-08-16 09:27:28.535189
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5029_emissions__agriculture__manure_applied_to_soils
+    (archived)
+  description: GHG emissions from manure applied to soils consist of direct and indirect
+    nitrous oxide (N2O) emissions from manure nitrogen (N) added to agricultural soils
+    by farmers. Specifically, N2O is produced by microbial processes of nitrification
+    and de-nitrification taking place on the application site (direct emissions),
+    and after volatilization/re-deposition and leaching processes (indirect emissions).
+    The FAOSTAT emissions database is computed following Tier 1 IPCC 2006 Guidelines
+    for National GHG Inventories vol. 4, ch. 10 and 11 (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol4.html).
+    GHG emissions are provided as direct, indirect and total by country, regions and
+    special groups, with global coverage, relative to the period 1961-present (with
+    annual updates) and with projections for 2030 and 2050, expressed as Gg N2O and
+    Gg CO2eq, by livestock species (asses, buffaloes, camels, cattle (dairy and non-dairy),
+    chickens (broilers and layers), ducks, goats, horses, llamas, mules, sheep, swine
+    (breeding and market) and turkeys) and by species aggregates (all animals, camels
+    and llamas, cattle, chickens, mules and asses, poultry birds, sheep and goats,
+    swine). Implied emission factor for N2O and activity data (N content in manure)
+    are also provided.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1569806b572473e7da8383f9d3973df6
+  size: 538147
+  path: dataset_5029_emissions__agriculture__manure_applied_to_soils_config.json

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2824_cfc_11_expected_and_measured_rate_of_change__montzka_et_al__2018_config
-  file_extension: json
-  date_accessed: 2023-03-23 17:24:52.974856
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2824
+    date_accessed: 2023-08-10 08:52:04.819138
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2824_cfc_11_expected_and_measured_rate_of_change__montzka_et_al__2018
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2824
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 17b5ffbcb99c6810a5bab816ce4266e3
-  size: 2931
-  path: dataset_2824_cfc_11_expected_and_measured_rate_of_change__montzka_et_al__2018_config.json
+- md5: f271455aa72629cbee05da05014fd407
+  size: 3211
+  path: 
+    dataset_2824_cfc_11_expected_and_measured_rate_of_change__montzka_et_al__2018_config.json

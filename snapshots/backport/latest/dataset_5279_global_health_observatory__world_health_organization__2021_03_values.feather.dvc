@@ -1,21 +1,17 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_5279_global_health_observatory__world_health_organization__2021_03_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:41:47.644540
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5279
+    date_accessed: 2023-08-10 09:11:20.688393
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Global Health Observatory - World Health Organization (2021.03)
   description: This is a temporary dataset until the automated bulk import script
     is run.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5279
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b4459850142ad05fb03459d47e63f146
+- md5: ceb765ac485f2dfe11e0112f3a10e000
   size: 321074
   path: 
     dataset_5279_global_health_observatory__world_health_organization__2021_03_values.feather

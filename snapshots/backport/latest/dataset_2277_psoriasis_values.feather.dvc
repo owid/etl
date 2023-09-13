@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2277
+    date_accessed: 2023-08-16 08:34:13.674101
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Psoriasis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 753664a24c67a0d48132744d6cd1cba3
+  size: 2116386
+  path: dataset_2277_psoriasis_values.feather

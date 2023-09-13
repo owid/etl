@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4823
+    date_accessed: 2023-08-10 14:45:53.949877
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: International financial flows to developing countries in support of clean
+    energy research and development and renewable energy production, including in
+    hybrid systems (millions of constant 2016 United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fdafd742a0ecc9965e20835946a40d60
+  size: 20786
+  path: 
+    dataset_4823_international_financial_flows_to_developing_countries_in_support_of_clean_energy_research_and_development_and_renewable_energy_production__including_in_hybrid_systems__millions_of_constant_2016_united_states_dollars_values.feather

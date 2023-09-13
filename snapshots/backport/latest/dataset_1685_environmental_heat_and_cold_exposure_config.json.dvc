@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1685
+    date_accessed: 2023-08-16 08:46:49.888052
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1685_environmental_heat_and_cold_exposure (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b980a55ae8b9976bae3c04b5f080b928
+  size: 32575
+  path: dataset_1685_environmental_heat_and_cold_exposure_config.json

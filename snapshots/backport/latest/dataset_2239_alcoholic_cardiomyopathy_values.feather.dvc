@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2239
+    date_accessed: 2023-08-14 15:40:14.717400
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Alcoholic cardiomyopathy
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ccde70388d47ea68d4dc4ddc5a5232cc
+  size: 760666
+  path: dataset_2239_alcoholic_cardiomyopathy_values.feather

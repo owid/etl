@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5662_joe__compare_wid_and_pip_inequality_measures_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:53:18.828210
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5662
+    date_accessed: 2023-08-10 08:04:33.200427
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: JOE – compare WID and PIP inequality measures
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5662
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 113a8079b3e80b2294b9b29a673cbce2
+- md5: 88f2472ee41d59add4a0e70685954ad2
   size: 6170610
   path: dataset_5662_joe__compare_wid_and_pip_inequality_measures_values.feather

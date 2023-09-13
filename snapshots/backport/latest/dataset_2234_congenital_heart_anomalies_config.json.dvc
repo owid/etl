@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2234
+    date_accessed: 2023-08-14 16:02:14.572153
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2234_congenital_heart_anomalies (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 708f08c45d214ae6bf3bb4d72f3dfcbc
+  size: 33007
+  path: dataset_2234_congenital_heart_anomalies_config.json

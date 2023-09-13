@@ -1,21 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_1872_child_violence__ending_violence_in_childhood_report__2017_values
-  file_extension: feather
-  date_accessed: 2023-06-01 14:54:40.201832
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1872
+    date_accessed: 2023-08-10 09:10:18.368739
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Child violence – Ending Violence in Childhood Report (2017)
   description: Key indicators of inter-personal violence in childhood (2015), from
     Know Violence in Childhood. 2017. Ending Violence in Childhood. Global Report
     2017. Know Violence in Childhood. New Delhi, India.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1872
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b1ffe89cce2abcaa5e47b52af211753b
+- md5: 620f26a97f681d1650ced701a0c02f96
   size: 15914
   path: 
     dataset_1872_child_violence__ending_violence_in_childhood_report__2017_values.feather

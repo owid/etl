@@ -1,21 +1,20 @@
 meta:
-  namespace: backport
-  short_name: dataset_4140_youth_mortality_rates__un_igme__2021_config
-  file_extension: json
-  date_accessed: 2023-06-01 13:20:49.841312
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4140
+    date_accessed: 2023-08-10 07:49:16.865474
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4140_youth_mortality_rates__un_igme__2021
-  description: |-
+  description: >-
     Relevant notebook is here: https://github.com/owid/notebooks/blob/main/FionaSpooner/un_igme_youth_mortality/un_igme_youth_mortality.ipynb
 
-    For the under-fifteen mortality rate there are three variables available, from two vintages (2018, 2021) and a merged version. The 2021 vintage no longer has historical data beyond 1990.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4140
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+
+    For the under-fifteen mortality rate there are three variables available, from
+    two vintages (2018, 2021) and a merged
+    version. The 2021 vintage no longer has historical data beyond 1990.
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 32b9340a6af379d62a49b3f162f9451b
-  size: 24777
+- md5: 1711e449455749239bfe039f91dff3e0
+  size: 29303
   path: dataset_4140_youth_mortality_rates__un_igme__2021_config.json

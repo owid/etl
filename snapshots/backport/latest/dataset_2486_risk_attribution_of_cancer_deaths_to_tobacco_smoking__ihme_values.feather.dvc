@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2486
+    date_accessed: 2023-08-16 09:43:45.057140
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Risk attribution of cancer deaths to tobacco smoking - IHME
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cf7bd37301f314831649c097c79a72e6
+  size: 19002
+  path: 
+    dataset_2486_risk_attribution_of_cancer_deaths_to_tobacco_smoking__ihme_values.feather

@@ -238,6 +238,7 @@ def estimate_metrics(tb: Table) -> Table:
 
     This function also renames columns to fit expected names.
     """
+    # Add metrcs
     tb_ongoing = _create_ongoing_metrics(tb)
     tb_new = _create_metrics_new(tb)
 
@@ -259,6 +260,9 @@ def estimate_metrics(tb: Table) -> Table:
 
 
 def _create_ongoing_metrics(tb: Table) -> Table:
+    # Check that for a given year and conflict, it only has one conflict type
+    tb.groupby(["year", "warcode"])["conflict_type"].nunique().max()
+
     # Estimate number of ongoing conflicts
     agg_ops = {"warcode": "nunique", "kialow": "sum", "kiahigh": "sum"}
     ## Regions

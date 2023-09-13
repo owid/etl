@@ -3,7 +3,7 @@ Overview
 
 At Our World In Data we ingest, transform and curate data from many different sources. We call this process the Our World in Data ETL (ETL is short for Extract, Transform & Load). The `ETL github repository <https://github.com/owid/etl>`_  is a crucial part of this process. It is set up in a way that allows anyone to rebuild and inspect all steps in our data processing on their own computers so that all of curation choices can be understood, alternatives investigated and problems fixed if there are any.
 
-If you only care about the final curated dataset files for your own analysis then you should head over to `owid-catalog-py <https://github.com/owid/owid-catalog-py>`__. This is our python library that can access the OWID data catalog which is our curated catalog of all the data we have collected. You can think of the OWID data catalog of the result of running the code that is collected in the ETL repository.
+If you only care about the final curated dataset files for your own analysis then you should head over to `owid-catalog-py <https://github.com/owid/etl/lib/catalog>`__. This is our python library that can access the OWID data catalog which is our curated catalog of all the data we have collected. You can think of the OWID data catalog of the result of running the code that is collected in the ETL repository.
 
 If you want to rerun our steps to build a dataset, be it to reproduce what we did or to investigate an issue, then the  `ETL github repository`_ is what you are looking for.
 

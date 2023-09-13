@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2955_drought_severity_index_in_us__noaa_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:14:57.529442
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2955
+    date_accessed: 2023-08-10 09:40:08.164528
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Drought Severity Index in US (NOAA)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2955
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b4d9cb2d1538e6d2cd8b0205c553a805
+- md5: 6081a0311faf6a19f3d26af122d54325
   size: 10850
   path: dataset_2955_drought_severity_index_in_us__noaa_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2536
+    date_accessed: 2023-08-14 08:14:26.562437
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2536_development__aid__oda__commitments_to_countries_and_regions__dac3a
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fe75a68ef3cecc35a76c0c1f5759c5f8
+  size: 24092
+  path: 
+    dataset_2536_development__aid__oda__commitments_to_countries_and_regions__dac3a_config.json
