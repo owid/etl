@@ -1,10 +1,10 @@
 meta:
   origin:
-    title_snapshot: Bullfighting laws
-    description_snapshot: This dataset lists countries where bullfighting is banned
+    producer: Various sources
+    title: Bullfighting laws
+    description: This dataset lists countries where bullfighting is banned
       and countries where it is still legal. Note that in some countries bullfighting
       is legal at a national level, although it may be banned in certain regions.
-    producer: Various sources
     citation_full: >-
       Evidence of laws banning bullfighting, and evidence of bullfighting being practiced
       without any ban, has been gathered
