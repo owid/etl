@@ -117,7 +117,8 @@ class Origin:
     # Subset of data that we extract from the data product which in most cases will coincide with the title of the data product.
     title_snapshot: Optional[str] = None
     # Description of the snapshot
-    # Subset of data that we extract from the data product) which in most cases will coincide with the description of the data product.
+    # Subset of data that we extract from the data product). Only when the data product and the snapshot do not coincide, the description_snapshot
+    # will contain additional information to the description of the data product.
     description_snapshot: Optional[str] = None
     # The full citation
     citation_full: Optional[str] = None

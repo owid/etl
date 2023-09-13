@@ -301,7 +301,7 @@
       "description_snapshot": {
         "title": "Description of the snapshot",
         "type": "string",
-        "description": "Description of the snapshot (i.e. the subset of data that we extract from the data product) which in most cases will coincide with the description of the data product.",
+        "description": "Description of the snapshot (i.e. the subset of data that we extract from the data product). Only when the data product and the snapshot do not coincide, the description_snapshot will contain additional information to the description of the data product.",
         "requirement_level": "recommended",
         "guidelines": [
           ["Must start with a capital letter."],

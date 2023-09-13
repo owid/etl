@@ -35,7 +35,7 @@ tables:
             - France
           title_public: "[presentation.title-public > indicator.title]"
           title_variant: "[presentation.title-variant]"
-          attribution_short: "[presentation.producer-short]"
+          attribution_short: "[presentation.attribution-short]"
           attribution: "[presentation.attribution > origin.attribution > origin.producer (year)]"
           topic_tags:
           - "Internet"
