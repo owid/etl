@@ -1,8 +1,7 @@
 meta:
   origin:
-    dataset_title_owid: Augmented Human Development Index (AHDI) - Country data
-    dataset_title_producer: Augmented Human Development Index (AHDI) - Countries
-    dataset_description_producer: |-
+    title: Augmented Human Development Index (AHDI) - Country data
+    description: |-
       The economic historian Leandro Prados de la Escosura has calculated the AHDI over the last 150 years. He refers to it as the Augmented Human Development Index.
 
       ## Dimensions of Augmented Human Development
@@ -30,11 +29,11 @@ meta:
 
       By how much did human development improve over the long run? Given the way in which the index has been computed, the conventional logarithmic rate of variation (as in the case of GDP per head) can be used.
     producer: Leandro Prados de la Escosura
-    citation_producer: Prados de la Escosura, L. (2021), Augmented Human Development
+    citation_full: Prados de la Escosura, L. (2021), Augmented Human Development
       in the Age of Globalisation, Economic History Review.
-    dataset_url_main:
+    url_main:
       https://frdelpino.es/investigacion/en/category/01_social-sciences/02_world-economy/03_human-development-world-economy/
-    dataset_url_download:
+    url_download:
       https://frdelpino.es/investigacion/wp-content/uploads/2023/02/AHDI_countries_1870-2020.xlsx
     date_published: 2021
     date_accessed: 2023-09-08
