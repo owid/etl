@@ -1126,7 +1126,7 @@ class Origin(SQLModel, table=True):
         return cls(
             producer=origin.producer,
             citationFull=origin.citation_producer,
-            titleSnapshot=origin.dataset_title_owid,
+            titleSnapshot=origin.title_snapshot,
             title=origin.title,
             attribution=origin.attribution,
             attributionShort=origin.attribution_short,

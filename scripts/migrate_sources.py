@@ -29,7 +29,7 @@ def cli(
     origin = Origin(
         producer=sm.source_name,
         citation_producer=sm.source_published_by,
-        dataset_title_owid=sm.name,
+        title_snapshot=sm.name,
         url_main=sm.url,
         url_download=sm.source_data_url,
         dataset_description_owid=sm.description,

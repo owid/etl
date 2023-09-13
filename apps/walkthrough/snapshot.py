@@ -31,7 +31,7 @@ class SnapshotFormWithOrigin(BaseModel):
     file_extension: str
 
     # origin
-    dataset_title_owid: str
+    title_snapshot: str
     title: str
     dataset_description_owid: str
     description: str
@@ -133,10 +133,10 @@ def app(run_checks: bool) -> None:
                 ),
                 pi.input(
                     "Origin: Dataset title by OWID",
-                    name="dataset_title_owid",
+                    name="title_snapshot",
                     placeholder="Testing Title OWID",
                     required=True,
-                    value=state.get("dataset_title_owid"),
+                    value=state.get("title_snapshot"),
                     help_text="Dataset title written by OWID (without a year). Example: Natural disasters",
                 ),
                 pi.input(

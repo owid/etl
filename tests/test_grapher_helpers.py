@@ -193,7 +193,7 @@ def test_adapt_table_for_grapher_multiindex():
 def test_add_dataset_origins_to_variables():
     table = _sample_table()
     assert table.deaths.metadata.origins == []
-    origins = [Origin(dataset_title_owid="A")]
+    origins = [Origin(title_snapshot="A")]
     table.metadata.dataset = DatasetMeta(origins=origins)
     table = gh._add_dataset_origins_to_variables(table)
     assert table.deaths.metadata.origins == origins

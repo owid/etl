@@ -1,6 +1,6 @@
 meta:
   origin:
-    dataset_title_owid: National contributions to climate change - Cumulative emissions
+    title_snapshot: National contributions to climate change - Cumulative emissions
     title: National contributions to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide.
     description: >-
       A dataset describing the global warming response to national emissions CO2, CH4 and N2O from fossil and land use sources

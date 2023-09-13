@@ -2,7 +2,6 @@ from collections import defaultdict
 
 import pandas as pd
 import pytest
-
 from owid.catalog.meta import (
     DatasetMeta,
     License,
@@ -30,10 +29,10 @@ def sources():
 @pytest.fixture
 def origins():
     origins = {
-        1: Origin(dataset_title_owid="Name of Origin 1", dataset_description_owid="Description of Origin 1"),
-        2: Origin(dataset_title_owid="Name of Origin 2", dataset_description_owid="Description of Origin 2"),
-        3: Origin(dataset_title_owid="Name of Origin 3", dataset_description_owid="Description of Origin 3"),
-        4: Origin(dataset_title_owid="Name of Origin 4", dataset_description_owid="Description of Origin 4"),
+        1: Origin(title_snapshot="Name of Origin 1", dataset_description_owid="Description of Origin 1"),
+        2: Origin(title_snapshot="Name of Origin 2", dataset_description_owid="Description of Origin 2"),
+        3: Origin(title_snapshot="Name of Origin 3", dataset_description_owid="Description of Origin 3"),
+        4: Origin(title_snapshot="Name of Origin 4", dataset_description_owid="Description of Origin 4"),
     }
     return origins
 

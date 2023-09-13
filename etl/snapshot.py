@@ -331,14 +331,14 @@ class SnapshotMeta:
             table_meta = TableMeta.from_dict(
                 {
                     "short_name": self.short_name,
-                    "title": self.origin.dataset_title_owid,  # type: ignore
+                    "title": self.origin.title_snapshot,  # type: ignore
                     "description": self.origin.dataset_description_owid,  # type: ignore
                     "dataset": DatasetMeta.from_dict(
                         {
                             "channel": "snapshots",
                             "namespace": self.namespace,
                             "short_name": self.short_name,
-                            "title": self.origin.dataset_title_owid,  # type: ignore
+                            "title": self.origin.title_snapshot,  # type: ignore
                             "description": self.origin.dataset_description_owid,  # type: ignore
                             "origins": [self.origin] if self.origin else [],
                             "licenses": [self.license] if self.license else [],

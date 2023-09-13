@@ -1,6 +1,6 @@
 meta:
   origin:
-    dataset_title_owid: {{cookiecutter.dataset_title_owid}}
+    title_snapshot: {{cookiecutter.title_snapshot}}
     {%- if cookiecutter.title %}
     title: {{cookiecutter.title}}
     {%- endif %}

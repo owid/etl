@@ -1,6 +1,6 @@
 meta:
   origin:
-    dataset_title_owid: Number of farmed fish in 2016
+    title_snapshot: Number of farmed fish in 2016
     title: Estimated numbers of individuals in global aquaculture
       production (FAO) of fish species (2016).
     dataset_description_owid: |-

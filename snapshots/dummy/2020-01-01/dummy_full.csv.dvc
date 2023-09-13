@@ -1,6 +1,6 @@
 meta:
   origin:
-    dataset_title_owid: '[origin.dataset-title-owid]'
+    title_snapshot: '[origin.dataset-title-owid]'
     title: '[origin.dataset-title-producer]'
     dataset_description_owid: '[origin.dataset-description-owid]'
     description: '[origin.dataset-description-producer]'

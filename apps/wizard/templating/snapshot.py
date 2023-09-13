@@ -60,7 +60,7 @@ class SnapshotForm(utils.StepForm):
     dataset_manual_import: bool
 
     # origin
-    dataset_title_owid: str
+    title_snapshot: str
     dataset_description_owid: str
     title: str
     origin_version: str
@@ -128,7 +128,7 @@ class SnapshotForm(utils.StepForm):
         meta = {
             "meta": {
                 "origin": {
-                    "dataset_title_owid": self.dataset_title_owid,
+                    "title_snapshot": self.title_snapshot,
                     "title": self.title,
                     "dataset_description_owid": self.dataset_description_owid.replace("\n", "\n      "),
                     "description": self.description.replace("\n", "\n      "),
