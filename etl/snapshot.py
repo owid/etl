@@ -332,14 +332,14 @@ class SnapshotMeta:
                 {
                     "short_name": self.short_name,
                     "title": self.origin.title_snapshot,  # type: ignore
-                    "description": self.origin.dataset_description_owid,  # type: ignore
+                    "description": self.origin.description_snapshot,  # type: ignore
                     "dataset": DatasetMeta.from_dict(
                         {
                             "channel": "snapshots",
                             "namespace": self.namespace,
                             "short_name": self.short_name,
                             "title": self.origin.title_snapshot,  # type: ignore
-                            "description": self.origin.dataset_description_owid,  # type: ignore
+                            "description": self.origin.description_snapshot,  # type: ignore
                             "origins": [self.origin] if self.origin else [],
                             "licenses": [self.license] if self.license else [],
                             "is_public": self.is_public,

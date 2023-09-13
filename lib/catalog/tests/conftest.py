@@ -29,10 +29,10 @@ def sources():
 @pytest.fixture
 def origins():
     origins = {
-        1: Origin(title_snapshot="Name of Origin 1", dataset_description_owid="Description of Origin 1"),
-        2: Origin(title_snapshot="Name of Origin 2", dataset_description_owid="Description of Origin 2"),
-        3: Origin(title_snapshot="Name of Origin 3", dataset_description_owid="Description of Origin 3"),
-        4: Origin(title_snapshot="Name of Origin 4", dataset_description_owid="Description of Origin 4"),
+        1: Origin(title_snapshot="Name of Origin 1", description_snapshot="Description of Origin 1"),
+        2: Origin(title_snapshot="Name of Origin 2", description_snapshot="Description of Origin 2"),
+        3: Origin(title_snapshot="Name of Origin 3", description_snapshot="Description of Origin 3"),
+        4: Origin(title_snapshot="Name of Origin 4", description_snapshot="Description of Origin 4"),
     }
     return origins
 

@@ -3,7 +3,7 @@ meta:
     title_snapshot: Number of individual wild fish killed for food
     title: |-
       Estimated numbers of individuals in annual global recorded capture (FAO) of fish species
-    dataset_description_owid: |-
+    description_snapshot: |-
       Estimated numbers of individual fish killed annually in wild fish capture.
     producer: Fishcount
     citation_producer: |-

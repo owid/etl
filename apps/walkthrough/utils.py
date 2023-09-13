@@ -47,7 +47,7 @@ if WALKTHROUGH_ORIGINS:
         "walden_version": "2020-01-01",
         "snapshot_version": "2020-01-01",
         "title_snapshot": "Dummy OWID dataset title",
-        "dataset_description_owid": "This\nis\na\ndummy\ndataset",
+        "description_snapshot": "This\nis\na\ndummy\ndataset",
         "file_extension": "csv",
         "date_published": "2020-01-01",
         "producer": "Dummy producer",

@@ -4,9 +4,9 @@ meta:
     {%- if cookiecutter.title %}
     title: {{cookiecutter.title}}
     {%- endif %}
-    {%- if cookiecutter.dataset_description_owid %}
-    dataset_description_owid: |-
-      {{cookiecutter.dataset_description_owid.replace("\n", "\n      ")}}
+    {%- if cookiecutter.description_snapshot %}
+    description_snapshot: |-
+      {{cookiecutter.description_snapshot.replace("\n", "\n      ")}}
     {%- endif %}
     {%- if cookiecutter.description %}
     description: |-

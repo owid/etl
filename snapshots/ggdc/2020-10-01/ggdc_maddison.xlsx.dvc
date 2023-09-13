@@ -2,7 +2,7 @@ meta:
   origin:
     title_snapshot: Maddison Project Database
     title: Maddison Project Database
-    dataset_description_owid: |
+    description_snapshot: |
       The Maddison Project Database is based on the work of many researchers that have produced estimates of
       economic growth for individual countries.
 

@@ -298,7 +298,7 @@
         ],
         "category": "dataset"
       },
-      "dataset_description_owid": {
+      "description_snapshot": {
         "title": "Description of the snapshot",
         "type": "string",
         "description": "Description of the snapshot (i.e. the subset of data that we extract from the data product) which in most cases will coincide with the description of the data product.",

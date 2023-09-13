@@ -111,7 +111,7 @@ class Origin:
     # Dataset title written by producer (without a year)
     title: Optional[str] = None
     # Our description of the dataset
-    dataset_description_owid: Optional[str] = None
+    description_snapshot: Optional[str] = None
     # The description for this dataset used by the producer
     description: Optional[str] = None
     # The name of the institution (without a year) or the main authors of the paper

@@ -2,7 +2,7 @@ meta:
   origin:
     title_snapshot: '[origin.dataset-title-owid]'
     title: '[origin.dataset-title-producer]'
-    dataset_description_owid: '[origin.dataset-description-owid]'
+    description_snapshot: '[origin.dataset-description-owid]'
     description: '[origin.dataset-description-producer]'
     producer: '[origin.producer]'
     citation_producer: '[origin.citation-producer]'

@@ -32,14 +32,14 @@ def cli(
         title_snapshot=sm.name,
         url_main=sm.url,
         url_download=sm.source_data_url,
-        dataset_description_owid=sm.description,
+        description_snapshot=sm.description,
         date_published=sm.publication_date,
         date_accessed=sm.date_accessed,
     )
 
     # replace empty strings by None
-    if getattr(origin, "dataset_description_owid") == "":
-        origin.dataset_description_owid = None
+    if getattr(origin, "description_snapshot") == "":
+        origin.description_snapshot = None
 
     del sm.source_name
     del sm.source_published_by

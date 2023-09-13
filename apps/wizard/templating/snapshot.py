@@ -27,7 +27,7 @@ SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
 schema_origin = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["properties"]
 # Lists with fields of special types. By default, fields are text inputs.
 FIELD_TYPES_TEXTAREA = [
-    "origin.dataset_description_owid",
+    "origin.description_snapshot",
     "origin.description",
     "origin.citation_producer",
 ]
@@ -61,7 +61,7 @@ class SnapshotForm(utils.StepForm):
 
     # origin
     title_snapshot: str
-    dataset_description_owid: str
+    description_snapshot: str
     title: str
     origin_version: str
     date_published: str
@@ -130,7 +130,7 @@ class SnapshotForm(utils.StepForm):
                 "origin": {
                     "title_snapshot": self.title_snapshot,
                     "title": self.title,
-                    "dataset_description_owid": self.dataset_description_owid.replace("\n", "\n      "),
+                    "description_snapshot": self.description_snapshot.replace("\n", "\n      "),
                     "description": self.description.replace("\n", "\n      "),
                     "producer": self.producer,
                     "citation_producer": self.citation_producer,

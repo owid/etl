@@ -46,7 +46,7 @@ def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
             version=snap.version,
             # dataset title and description are filled from origin
             title=snap.origin.title_snapshot,
-            description=snap.origin.dataset_description_owid,
+            description=snap.origin.description_snapshot,
             licenses=[snap.license] if snap.license else [],
         )
     elif snap.source:
