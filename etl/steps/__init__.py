@@ -368,6 +368,11 @@ class DataStep(Step):
     def _dataset_index_mtime(self) -> Optional[float]:
         try:
             return os.stat(self._output_dataset._index_file).st_mtime
+        except KeyError as e:
+            if _uses_old_schema(e):
+                return None
+            else:
+                raise e
         except Exception as e:
             if str(e) == "dataset has not been created yet":
                 return None
@@ -414,7 +419,13 @@ class DataStep(Step):
         if not self.has_existing_data() or any(d.is_dirty() for d in self.dependencies):
             return True
 
-        found_source_checksum = catalog.Dataset(self._dest_dir.as_posix()).metadata.source_checksum
+        try:
+            found_source_checksum = catalog.Dataset(self._dest_dir.as_posix()).metadata.source_checksum
+        except KeyError as e:
+            if _uses_old_schema(e):
+                return True
+            else:
+                raise e
         exp_source_checksum = self.checksum_input()
 
         if found_source_checksum != exp_source_checksum:
@@ -955,3 +966,9 @@ def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
+
+
+def _uses_old_schema(e: KeyError) -> bool:
+    """Origins without `title` use old schema before rename. This can be removed once
+    we recompute all datasets."""
+    return e.args[0] == "title"
