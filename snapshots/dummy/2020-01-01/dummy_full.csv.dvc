@@ -1,16 +1,16 @@
 meta:
   origin:
-    dataset_title_owid: '[origin.dataset-title-owid]'
-    dataset_title_producer: '[origin.dataset-title-producer]'
-    dataset_description_owid: '[origin.dataset-description-owid]'
-    dataset_description_producer: '[origin.dataset-description-producer]'
+    title: '[origin.title]'
+    description: '[origin.description]'
+    title_snapshot: '[origin.title_snapshot]'
+    description_snapshot: '[origin.description_snapshot]'
     producer: '[origin.producer]'
-    citation_producer: '[origin.citation-producer]'
+    citation_full: '[origin.citation_full]'
     attribution: '[origin.attribution > origin.producer (year)]'
-    attribution_short: '[origin.attribution-short]'
-    version: '[origin.version]'
-    dataset_url_main: '[origin.dataset-url-main]'
-    dataset_url_download: https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv
+    attribution_short: '[origin.attribution_short]'
+    version_producer: '[origin.version_producer]'
+    url_main: '[origin.url_main]'
+    url_download: https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv
     date_published: 2000-01-01
     date_accessed: 2020-01-01
   license:

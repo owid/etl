@@ -106,18 +106,22 @@ class Source:
 @dataclass_json
 @dataclass
 class Origin:
-    # Dataset title written by OWID (without a year)
-    dataset_title_owid: str
-    # Dataset title written by producer (without a year)
-    dataset_title_producer: Optional[str] = None
-    # Our description of the dataset
-    dataset_description_owid: Optional[str] = None
-    # The description for this dataset used by the producer
-    dataset_description_producer: Optional[str] = None
-    # The name of the institution (without a year) or the main authors of the paper
-    producer: Optional[str] = None
-    # The full citation that the producer asks for
-    citation_producer: Optional[str] = None
+    # Producer name
+    # Name of the institution or the author(s) that produced the data product.
+    producer: str
+    # Title of the original data product
+    title: str
+    # Description of the data product
+    description: Optional[str] = None
+    # Title of the snapshot
+    # Subset of data that we extract from the data product. Only fill if it does not coincide with the title of the data product.
+    title_snapshot: Optional[str] = None
+    # Description of the snapshot
+    # Subset of data that we extract from the data product). Only when the data product and the snapshot do not coincide, the description_snapshot
+    # will contain additional information to the description of the data product.
+    description_snapshot: Optional[str] = None
+    # The full citation
+    citation_full: Optional[str] = None
     # These will be often empty and then producer is used instead, but for the (relatively common) cases
     # where the data product is more famous than the authors we would use this (e.g. VDEM instead of the first authors)
     attribution: Optional[str] = None
@@ -125,9 +129,9 @@ class Origin:
     # This is also often empty but if not then it will be part of the short citation (e.g. for VDEM)
     version_producer: Optional[str] = None
     # The authorative URL of the dataset
-    dataset_url_main: Optional[str] = None
+    url_main: Optional[str] = None
     # Direct URL to download the dataset
-    dataset_url_download: Optional[str] = None
+    url_download: Optional[str] = None
     # Date when the dataset was accessed
     date_accessed: Optional[str] = None
     # Publication date or, if the exact date is not known, publication year
@@ -194,11 +198,11 @@ class VariablePresentationMeta:
     # Shown next to title to differentiate similar indicators e.g. "future projections" or "historical values"
     title_variant: Optional[str] = None
     # Shown next to title to differentiate similar indicators e.g. "WHO" or "IHME"
-    producer_short: Optional[str] = None
+    attribution_short: Optional[str] = None
     # A short text to use to credit the source e.g. at the bottom of charts. Autofilled from the list of origins (see below). Semicolon separated if there are multiple.
     attribution: Optional[str] = None
     # List of topic tags
-    topic_tags_links: List[str] = field(default_factory=list)
+    topic_tags: List[str] = field(default_factory=list)
 
     # Fields that are more work to add but of high value
 
@@ -234,6 +238,7 @@ class VariableMeta:
     """
 
     title: Optional[str] = None
+    # This shouldn't be used for data pages, use `description_short`, `description_key` or `description_processing` instead
     description: Optional[str] = None
     # A 1-2 sentence description - used internally or as fallback for description_key
     description_short: Optional[str] = None

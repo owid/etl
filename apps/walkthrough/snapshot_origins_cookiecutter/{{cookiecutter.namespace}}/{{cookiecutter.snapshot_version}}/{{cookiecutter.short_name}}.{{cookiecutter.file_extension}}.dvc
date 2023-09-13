@@ -1,22 +1,22 @@
 meta:
   origin:
-    dataset_title_owid: {{cookiecutter.dataset_title_owid}}
-    {%- if cookiecutter.dataset_title_producer %}
-    dataset_title_producer: {{cookiecutter.dataset_title_producer}}
+    title_snapshot: {{cookiecutter.title_snapshot}}
+    {%- if cookiecutter.title %}
+    title: {{cookiecutter.title}}
     {%- endif %}
-    {%- if cookiecutter.dataset_description_owid %}
-    dataset_description_owid: |-
-      {{cookiecutter.dataset_description_owid.replace("\n", "\n      ")}}
+    {%- if cookiecutter.description_snapshot %}
+    description_snapshot: |-
+      {{cookiecutter.description_snapshot.replace("\n", "\n      ")}}
     {%- endif %}
-    {%- if cookiecutter.dataset_description_producer %}
-    dataset_description_producer: |-
-      {{cookiecutter.dataset_description_producer.replace("\n", "\n      ")}}
+    {%- if cookiecutter.description %}
+    description: |-
+      {{cookiecutter.description.replace("\n", "\n      ")}}
     {%- endif %}
     {%- if cookiecutter.producer %}
     producer: {{cookiecutter.producer}}
     {%- endif %}
-    {%- if cookiecutter.citation_producer %}
-    citation_producer: {{cookiecutter.citation_producer}}
+    {%- if cookiecutter.citation_full %}
+    citation_full: {{cookiecutter.citation_full}}
     {%- endif %}
     {%- if cookiecutter.attribution %}
     attribution: {{cookiecutter.attribution}}
@@ -27,11 +27,11 @@ meta:
     {%- if cookiecutter.origin_version %}
     version_producer: {{cookiecutter.origin_version}}
     {%- endif %}
-    {%- if cookiecutter.dataset_url_main %}
-    dataset_url_main: {{cookiecutter.dataset_url_main}}
+    {%- if cookiecutter.url_main %}
+    url_main: {{cookiecutter.url_main}}
     {%- endif %}
-    {%- if cookiecutter.dataset_url_download %}
-    dataset_url_download: {{cookiecutter.dataset_url_download}}
+    {%- if cookiecutter.url_download %}
+    url_download: {{cookiecutter.url_download}}
     {%- endif %}
     {%- if cookiecutter.date_published %}
     date_published: {{cookiecutter.date_published}}
