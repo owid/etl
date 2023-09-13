@@ -1,5 +1,5 @@
 ---
-name: "metadata issue"
+name: "🏷️ metadata issue"
 about: For issues that involve our metadata.
 title: "metadata: meaningful title for the issue"
 labels: metadata
