@@ -7,7 +7,13 @@ dataset:
 
     Deaths of combatants and civilians due to fighting, disease, and starvation are included.
 
-    We change the world regions in the data: Africa (from East & South Africa, North Africa, and West & Central Africa), Americas (from North America, Central America, and the Carribean and South America), Asia (from Central Asia, East Asia, South Asia, and Southeast Asia), Europe (from Eastern Europe and Western Europe),  and Middle East (from Arabian Peninsula and Iran west to Syria).
+    We change the world regions in the data. The list belows lists these, along with the codes of the countries in them. Find the complete list of country codes at https://correlatesofwar.org/wp-content/uploads/states2016.csv.
+
+    - Africa (from East & South Africa, North Africa, and West & Central Africa): 402-626
+    - Americas (from North America, Central America, and the Caribbean and South America): 2-165
+    - Asia and Oceania (from Central Asia, East Asia, South Asia, and Southeast Asia): 700-990
+    - Europe (from Eastern Europe and Western Europe): 200-395, 640
+    - Middle East (from Arabian Peninsula and Iran west to Syria): 630, 645-698
 
     You can find more information about the data in our article: [To be published]
 
