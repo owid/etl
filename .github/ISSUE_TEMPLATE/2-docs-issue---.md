@@ -1,5 +1,5 @@
 ---
-name: "documentation issue"
+name: "📚 documentation issue"
 about: For issues related to our ETL documentation.
 title: "docs: meaningful title for the issue"
 labels: docs
