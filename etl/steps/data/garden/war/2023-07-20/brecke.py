@@ -24,8 +24,8 @@ On regions:
     - Western Europe: 200-280 (UK-Mecklenburg Schwerin), 305 (Autria), 325-338 (Italy-Malta), 380-395 (Sweden-Iceland)
     - Eastern Europe: 290-300 (Poland-Austria-Hungary), 310-317 (Hungary-Slovakia), 339-375 (Albania-Finland), 640 (Turkey)
     - Middle East: 630-645 (Iran-Iraq), 652-698
-    - North Africa: 600-626 (Morocco-South Sudan), 651 (Egypt), mauritania, mauritania, mali, niger, chad, sudan, south sudan
-    - West & Central Africa:
+    - North Africa: 600-626 (Morocco-South Sudan) 432 (Mali), 435-436 (Mauritania-Niger), 483 (Niger), 651 (Egypt)
+    - West & Central Africa: 402-420 (Cape Verde, Gambia), 433 (Senegal-)
     - East & South Africa:
     - Central Asia:
     - South Asia:

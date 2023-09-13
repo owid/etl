@@ -69,7 +69,7 @@ ON REGIONS
                         5 = Middle East and North Africa
                         6 = Asia and Oceania.
 
-* A "region composite" is a regions such that it is a combination of several regions, e.g. "Europe & Asia".
+* A "region composite" is a region such that it is a combination of several regions, e.g. "Europe & Asia".
 
 """
 
