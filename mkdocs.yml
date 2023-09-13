@@ -36,12 +36,21 @@ nav:
         - Features and constraints: "architecture/design/features-constraints.md"
         - The DAG: "architecture/design/dag.md"
         - The URI: "architecture/design/uri.md"
-      - ETL steps:
-        - ETL steps: "architecture/workflow/index.md"
-        - Snapshot: "architecture/workflow/snapshot.md"
-        - Meadow: "architecture/workflow/meadow.md"
-        - Garden: "architecture/workflow/garden.md"
-        - Grapher: "architecture/workflow/grapher.md"
+      - Workflow and Metadata:
+        - Workflow: "architecture/workflow/index.md"
+        - Snapshot step: "architecture/workflow/snapshot.md"
+        - Meadow step: "architecture/workflow/meadow.md"
+        - Garden step: "architecture/workflow/garden.md"
+        - Grapher step: "architecture/workflow/grapher.md"
+        - Metadata:
+          - Metadata: "architecture/metadata/index.md"
+          # - Workflow with metadata: "architecture/metadata/workflow.md"
+          # - Reference:
+          - Origin reference: "architecture/metadata/reference-origin.md"
+          - Dataset reference: "architecture/metadata/reference-dataset.md"
+          - Tables reference: "architecture/metadata/reference-tables.md"
+          - Propagation of metadata: "architecture/metadata/propagation.md"
+          - Using metadata: "architecture/metadata/using.md"
         - Special steps:
           # - Special steps: "architecture/workflow/other-steps/index.md"
           - Explorers: "architecture/workflow/other-steps/explorers.md"
@@ -50,15 +59,6 @@ nav:
           - ETag: "architecture/workflow/other-steps/etag.md"
           - GitHub: "architecture/workflow/other-steps/github.md"
           - Private steps: "architecture/workflow/other-steps/private.md"
-      - Metadata:
-        - Metadata: "architecture/metadata/index.md"
-        - Workflow with metadata: "architecture/metadata/workflow.md"
-        - Reference:
-          - origin reference: "architecture/metadata/reference-origin.md"
-          - dataset reference: "architecture/metadata/reference-dataset.md"
-          - tables reference: "architecture/metadata/reference-tables.md"
-        - Propagation of metadata: "architecture/metadata/propagation.md"
-        - Using metadata: "architecture/metadata/using.md"
   - API and catalog:
     - API: "api/index.md"
     - Python: "api/python.ipynb"
@@ -103,7 +103,7 @@ theme:
     - navigation.tabs.sticky
     - navigation.indexes
     - content.tooltips
-    # - navigation.expand
+    - navigation.expand
     # - navigation.sections
     # - toc.follow
     - navigation.top
@@ -118,7 +118,6 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
   - md_in_html
-  - pymdownx.superfences
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid

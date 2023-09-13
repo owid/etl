@@ -1,5 +1,5 @@
 
-Our World In Data has a whole team dedicated to data management that takes data from publicly available sources, such as the _UN Food and Agriculture Organisation_, and makes it available to our researchers to visualise in the articles that they write.
+Our World in Data has a whole team dedicated to data management that takes data from publicly available sources, such as the _UN Food and Agriculture Organisation_, and makes it available to our researchers to visualise in the articles that they write.
 
 ## Five stages
 

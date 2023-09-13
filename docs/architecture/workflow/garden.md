@@ -66,9 +66,9 @@ For example, a `country` column containing the value `Korea` could be referring 
 
 Harmonization is the editorial process by which we modify the indexing columns for a dataset to ensure that the data is consistent and unambiguous.
 
-### What does Our World In Data harmonize?
+### What does Our World in Data harmonize?
 
-Today, Our World In Data makes a best-effort to harmonize countries and regions. We strive to do this in a way that is consistent with the [ISO 3166-1 standard](https://en.wikipedia.org/wiki/ISO_3166-1), however we use custom editorial labels for countries and regions that are often shorter than those in the standard, in order to make data visualisations richer and more understandable.
+Today, Our World in Data makes a best-effort to harmonize countries and regions. We strive to do this in a way that is consistent with the [ISO 3166-1 standard](https://en.wikipedia.org/wiki/ISO_3166-1), however we use custom editorial labels for countries and regions that are often shorter than those in the standard, in order to make data visualisations richer and more understandable.
 
 Since we also present long-run datasets over multiple centuries, a time period in which national borders have changed, split and merged, we also make a best-effort attempt to harmonize the names of historical countries and regions that no longer exist and are not present in the ISO standard.
 
@@ -153,3 +153,8 @@ In our [data model](../design/common-format.md), datasets contain tables of data
 
 
 !!! info "For more up to date details, see the the classes `DatasetMeta`, `TableMeta` and `VariableMeta` in the [`owid.catalog.meta`](https://github.com/owid/etl/blob/master/lib/catalog/owid/catalog/meta.py) module."
+
+
+!!! bug "TODO"
+
+    Add demo video of how to fill the snapshot metadata fields.

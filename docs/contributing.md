@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in contributing to Our World In Data!
+Thank you for your interest in contributing to Our World in Data!
 
 Since collecting and republishing data is part of an editorial process for us, we do not accept contributions of new datasets from the public. However, there are still a few ways you can contribute:
 

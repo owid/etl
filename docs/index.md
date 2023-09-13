@@ -1,6 +1,6 @@
-# Our World In Data's data pipeline
+# Our World in Data's data pipeline
 
-Welcome to the public data pipeline for [Our World In Data](https://ourworldindata.org). This project powers the charts and data explorers on our site, as well as our public APIs.
+Welcome to the public data pipeline for [Our World in Data](https://ourworldindata.org). This project powers the charts and data explorers on our site, as well as our public APIs.
 
 Choose the material that most interests you:
 
