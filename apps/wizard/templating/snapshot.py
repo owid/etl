@@ -180,7 +180,7 @@ def create_display_name_snap_section(props: Dict[str, Any], name: str, property_
     # Get requirement level colored
     req_level = _color_req_level(props["requirement_level"])
     # Create display name
-    display_name = f"{props['title']} (`{property_name}.{name}`) ┃ {req_level}"
+    display_name = f"`{property_name}.{name}` ┃ {props['title']} ┃ {req_level}"
     return display_name
 
 
