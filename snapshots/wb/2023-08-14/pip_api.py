@@ -643,6 +643,7 @@ def generate_percentiles_raw():
                     if Path(
                         f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
                     ).is_file():
+                        log.info(f"Found! (countries, {povline}, {ppp_version} PPPs)")
                         continue
                     else:
                         executor.submit(get_percentiles_data, povline, versions, ppp_version)
@@ -669,6 +670,7 @@ def generate_percentiles_raw():
                     if Path(
                         f"{PARENT_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
                     ).is_file():
+                        log.info(f"Found! (regions, {povline}, {ppp_version} PPPs)")
                         continue
                     else:
                         executor.submit(get_percentiles_data_region, povline, versions, ppp_version)
@@ -680,6 +682,7 @@ def generate_percentiles_raw():
     concurrent_percentiles_function()
     concurrent_percentiles_region_function()
 
+    log.info("Now we are concatenating the files")
     # Concatenate country and region files
     df_country = pd.DataFrame()
     df_region = pd.DataFrame()
@@ -689,9 +692,11 @@ def generate_percentiles_raw():
             # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
             file_path_country = f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
             if Path(file_path_country).is_file():
+                log.info(f"File to concatenate: countries, {povline}, {ppp_version} PPPs)")
                 df_query_country = pd.read_csv(file_path_country)
             else:
                 # Run the main function to get the data
+                log.warning(f"We need to come back to the extraction! countries, {povline}, {ppp_version} PPPs)")
                 concurrent_percentiles_function()
                 df_query_country = pd.read_csv(file_path_country)
 
@@ -702,9 +707,11 @@ def generate_percentiles_raw():
                 f"{PARENT_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
             )
             if Path(file_path_region).is_file():
+                log.info(f"File to concatenate: regions, {povline}, {ppp_version} PPPs)")
                 df_query_region = pd.read_csv(file_path_region)
             else:
                 # Run the main function to get the data
+                log.warning(f"We need to come back to the extraction! regions, {povline}, {ppp_version} PPPs)")
                 concurrent_percentiles_region_function()
                 df_query_region = pd.read_csv(file_path_region)
 
@@ -736,7 +743,7 @@ def generate_consolidated_percentiles(df):
     """
     Generates percentiles from the raw data. This is the final file with percentiles.
     """
-
+    log.info("Consolidating percentiles")
     start_time = time.time()
 
     # Define percentiles, from 1 to 99
@@ -744,6 +751,7 @@ def generate_consolidated_percentiles(df):
     df_percentiles = pd.DataFrame()
 
     for p in percentiles:
+        log.info(f"Calculating percentile {p}")
         df["distance_to_p"] = abs(df["headcount"] - p / 100)
         df_closest = (
             df.sort_values("distance_to_p")
@@ -899,12 +907,12 @@ def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
 # Generate percentiles by extracting the raw files and processing them afterward
 df_percentiles = generate_consolidated_percentiles(generate_percentiles_raw())
 
-# Generate relative poverty indicators file
-df_relative = generate_relative_poverty()
+# # Generate relative poverty indicators file
+# df_relative = generate_relative_poverty()
 
-# Generate key indicators file and patch medians
-df = generate_key_indicators()
-df = median_patch(df)
+# # Generate key indicators file and patch medians
+# df = generate_key_indicators()
+# df = median_patch(df)
 
-# Add relative poverty indicators and decile thresholds to the key indicators file
-df = add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles)
+# # Add relative poverty indicators and decile thresholds to the key indicators file
+# df = add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles)
