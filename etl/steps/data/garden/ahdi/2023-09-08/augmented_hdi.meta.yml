@@ -30,9 +30,7 @@ tables:
 
           If we denote the non-linearly transformed values of life expectancy and education as LEB and EDU, LD to represent those of liberal democracy, and the adjusted per capita income as UNY, the historical index of human development can be expressed as,
 
-          $$
-            AHDI = (LEB * EDU * LD * UNY)^(1/4)
-          $$
+          AHDI = (LEB * EDU * LD * UNY)^1/4^
         processing_level: minor
         description_key:
           - "{tables.augmented_hdi.variables.ahdi.description_short}"
@@ -42,7 +40,7 @@ tables:
           - Liberal democracy is the proxy for freedom, it ranges from 0 to 1, where higher values represents more democracy.
           - Adjusted (log) GDP per capita is the proxy for wellbeing dimensions different from education and health, bounded between 47,000 and 100 international-$ at 1990 prices.
           - The AHDI is then estimated as the geometric of these indices, or
-            $$ AHDI = (LEB * EDU * LD * UNY)^(1/4) $$
+            AHDI = (LEB * EDU * LD * UNY)^1/4^
             Where LEB is life expectancy, EDU is years of schooling, LD is liberal democracy and UNY is adjusted GDP per capita.
         display:
           name: AHDI
@@ -109,7 +107,7 @@ tables:
           - Years of schooling is the proxy for access to knowledge, where 1 represents 15 or more years of education and 0 represents 0 years of education.
           - Liberal democracy is the proxy for freedom, it ranges from 0 to 1, where higher values represents more democracy.
           - The AHDI is then estimated as the geometric of these indices, or
-            $$ AHDI = (LEB * EDU * LD)^(1/3) $$
+            AHDI = (LEB * EDU * LD)^1/3^
             Where LEB is life expectancy, EDU is years of schooling and LD is liberal democracy.
         display:
           name: AHDI excluding income
@@ -201,9 +199,7 @@ tables:
 
           As it measures both quantity and quality changes, a linear transformation has been accepted. Thus,
 
-          $$
-            I = (x – Mo) / (M – Mo),
-          $$
+          I = (x – Mo) / (M – Mo),
 
           Where $I$ is the dimension index, $x$ is an indicator of a country’s standard of living, $M$ and $Mo$ are the maximum and minimum values, respectively, or goalposts, that facilitate comparisons over time and log stands for the natural logarithm. The index for each dimension ranges between 0 and 1.
 
@@ -238,9 +234,8 @@ tables:
           Life expectancy is defined as the average number of years of life which would remain for males and females reaching the ages specified if they continued to be subjected to the same mortality experienced in the year(s) to which these life expectancies refer.
 
           As social variables (longevity and education) have upper and lower bounds (unlike GDP per head that has not known upper bound), they are transformed non-linearly in order to allow for two main facts: that increases of the same absolute size represent greater achievements the higher the level at which they take place, and those quality improvements are associated to increases in quantity. Thus,
-          $$
-            I = f (x, Mo, M) = (log (M – Mo) – log (M – x)) / log (M – Mo),
-          $$
+
+          I = f (x, Mo, M) = (log (M – Mo) – log (M – x)) / log (M – Mo),
 
           Where $I$ is the dimension index, $x$ is an indicator of a country’s standard of living, $M$ and $Mo$ are the maximum and minimum values, respectively, or goalposts, that facilitate comparisons over time and log stands for the natural logarithm. The index for each dimension ranges between 0 and 1.
 
@@ -262,9 +257,8 @@ tables:
           Education attainment is measured by the average years of total schooling (primary, secondary, and tertiary) for the population aged 15 and over.
 
           As social variables (longevity and education) have upper and lower bounds (unlike GDP per head that has not known upper bound), they are transformed non-linearly in order to allow for two main facts: that increases of the same absolute size represent greater achievements the higher the level at which they take place, and those quality improvements are associated to increases in quantity. Thus,
-          $$
-            I = f (x, Mo, M) = (log (M – Mo) – log (M – x)) / log (M – Mo),
-          $$
+
+          I = f (x, Mo, M) = (log (M – Mo) – log (M – x)) / log (M – Mo),
 
           Where $I$ is the dimension index, $x$ is an indicator of a country’s standard of living, $M$ and $Mo$ are the maximum and minimum values, respectively, or goalposts, that facilitate comparisons over time and log stands for the natural logarithm. The index for each dimension ranges between 0 and 1.
 
@@ -286,9 +280,8 @@ tables:
           GDP per head is expressed in 1990 dollars adjusted for its purchasing power adjusted, that it, for the difference in price level across countries (the so-called Geary-Khamis [G-K] 1990 $).
 
           For GDP per head, as it is intended as crude proxy for those dimensions of wellbeing other than education and health, logarithmic transformation has been introduced. The log transformation implies that, in terms of human development, returns of per capita income decline as it reaches higher levels. Given its non-bounded nature, without this transformation, GDP per head would dominate the human development index rendering it redundant. In order to get the income index I have used the same formula used for liberal democracy,
-          $$
-            I = (x – Mo) / (M – Mo),
-          $$
+
+          I = (x – Mo) / (M – Mo),
 
           except that $x$, $M$, and $Mo$ are expressed in logs. Where $I$ is the dimension index, $x$ is an indicator of a country’s standard of living, $M$ and $Mo$ are the maximum and minimum values, respectively, or goalposts, that facilitate comparisons over time and log stands for the natural logarithm. The index for each dimension ranges between 0 and 1.
 
