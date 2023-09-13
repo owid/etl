@@ -54,7 +54,7 @@ def test_variable_metadata():
         "descriptionKey": '["Population density"]',
         "titlePublic": "Population density title",
         "titleVariant": "Population density variant",
-        "producerShort": "Gapminder",
+        "attributionShort": "Gapminder",
         "attribution": None,
         "descriptionProcessing": None,
         "sourceName": "Gapminder (v6); UN (2022); HYDE (v3.2); Food and Agriculture Organization of the United Nations",
@@ -114,7 +114,7 @@ def test_variable_metadata():
         "presentation": {
             "faqs": [{"fragmentId": "test", "gdocId": "1"}],
             "grapherConfigETL": {"title": "Population density"},
-            "producerShort": "Gapminder",
+            "attributionShort": "Gapminder",
             "titlePublic": "Population density title",
             "titleVariant": "Population density variant",
             "topicTagsLinks": ["Population"],

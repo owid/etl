@@ -33,7 +33,7 @@ meta:
       to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide [Data set]. In Scientific
       Data (2023.1). Zenodo.
     url_main: https://zenodo.org/record/7636699#.ZFCy4exBweZ
-    dataset_url_download: https://zenodo.org/record/7636699/files/EMISSIONS_CUMULATIVE_CO2e100_1851-2021.csv
+    url_download: https://zenodo.org/record/7636699/files/EMISSIONS_CUMULATIVE_CO2e100_1851-2021.csv
     date_accessed: 2023-05-02
     date_published: 2023-02-13
   license:

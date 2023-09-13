@@ -31,7 +31,7 @@ def cli(
         citation_producer=sm.source_published_by,
         dataset_title_owid=sm.name,
         url_main=sm.url,
-        dataset_url_download=sm.source_data_url,
+        url_download=sm.source_data_url,
         dataset_description_owid=sm.description,
         date_published=sm.publication_date,
         date_accessed=sm.date_accessed,

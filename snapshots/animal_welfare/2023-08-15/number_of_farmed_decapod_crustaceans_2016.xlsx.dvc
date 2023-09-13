@@ -9,7 +9,7 @@ meta:
     citation_producer: |
       A Mood and P Brooke. Fishcount.org.uk based on data from the Food and Agriculture Organization of the United Nations.
     url_main: http://fishcount.org.uk/
-    dataset_url_download: http://fishcount.org.uk/studydatascreens2/2017/Farmed-decapods-2016.xlsx
+    url_download: http://fishcount.org.uk/studydatascreens2/2017/Farmed-decapods-2016.xlsx
     date_published: 2019-09-01
     date_accessed: 2023-08-15
   license:

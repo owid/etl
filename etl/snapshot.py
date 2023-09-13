@@ -93,8 +93,8 @@ class Snapshot:
     def download_from_source(self) -> None:
         """Download file from source_data_url."""
         if self.metadata.origin:
-            assert self.metadata.origin.dataset_url_download, "dataset_url_download is not set"
-            download_url = self.metadata.origin.dataset_url_download
+            assert self.metadata.origin.url_download, "url_download is not set"
+            download_url = self.metadata.origin.url_download
         elif self.metadata.source:
             assert self.metadata.source.source_data_url, "source_data_url is not set"
             download_url = self.metadata.source.source_data_url

@@ -41,7 +41,7 @@ class SnapshotFormWithOrigin(BaseModel):
     attribution_short: str
     origin_version: str
     url_main: str
-    dataset_url_download: str
+    url_download: str
     date_accessed: str
     date_published: str
 
@@ -203,9 +203,9 @@ def app(run_checks: bool) -> None:
                 ),
                 pi.input(
                     "Origin: Dataset download URL",
-                    name="dataset_url_download",
+                    name="url_download",
                     placeholder="https://url_of_testing_source.com/data.csv",
-                    value=state.get("dataset_url_download"),
+                    value=state.get("url_download"),
                     help_text="Direct URL to download the dataset.",
                 ),
                 pi.input(

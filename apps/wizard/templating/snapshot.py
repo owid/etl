@@ -71,7 +71,7 @@ class SnapshotForm(utils.StepForm):
     attribution: str
     attribution_short: str
     url_main: str
-    dataset_url_download: str
+    url_download: str
     date_accessed: str
 
     # license
@@ -138,7 +138,7 @@ class SnapshotForm(utils.StepForm):
                     "attribution_short": self.attribution_short,
                     "version": self.origin_version,
                     "url_main": self.url_main,
-                    "dataset_url_download": self.dataset_url_download,
+                    "url_download": self.url_download,
                     "date_published": self.date_published,
                     "date_accessed": self.date_accessed,
                     "license": license_field,

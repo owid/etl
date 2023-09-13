@@ -10,7 +10,7 @@ meta:
     attribution_short: '[origin.attribution-short]'
     version: '[origin.version]'
     url_main: '[origin.dataset-url-main]'
-    dataset_url_download: https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv
+    url_download: https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv
     date_published: 2000-01-01
     date_accessed: 2020-01-01
   license:

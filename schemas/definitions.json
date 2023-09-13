@@ -228,12 +228,12 @@
         "examples_bad": [],
         "category": "files"
       },
-      "dataset_url_download": {
+      "url_download": {
         "title": "URL to download the data product",
         "type": "string",
         "description": "Producer's URL that directly downloads the data product as a single file.",
         "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
-        "errorMessage": "'dataset_url_download' must be a valid URL",
+        "errorMessage": "'url_download' must be a valid URL",
         "requirement_level": "required (if existing)",
         "guidelines": [
           ["Must be a complete URL, i.e. `http...`."],

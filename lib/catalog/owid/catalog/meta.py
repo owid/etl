@@ -127,7 +127,7 @@ class Origin:
     # The authorative URL of the dataset
     url_main: Optional[str] = None
     # Direct URL to download the dataset
-    dataset_url_download: Optional[str] = None
+    url_download: Optional[str] = None
     # Date when the dataset was accessed
     date_accessed: Optional[str] = None
     # Publication date or, if the exact date is not known, publication year

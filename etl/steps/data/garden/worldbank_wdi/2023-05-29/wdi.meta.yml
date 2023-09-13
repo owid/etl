@@ -1963,7 +1963,7 @@ tables:
           attribution: International Telecommunication Union (via World Bank) # This is an override that we would want to do for many indicators in the WDI especially
           attribution_short: World Bank
           url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
-          dataset_url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
+          url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
           date_accessed: 2023-05-29
           date_published: '2023-05-11'
           license:

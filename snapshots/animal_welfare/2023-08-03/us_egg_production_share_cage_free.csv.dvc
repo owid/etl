@@ -10,7 +10,7 @@ meta:
     attribution: The Humane League based on the United States Department of Agriculture (2023)
     attribution_short: The Humane League
     url_main: https://thehumaneleague.org/article/E008R01-us-egg-production-data
-    dataset_url_download: https://osf.io/download/56xjc/
+    url_download: https://osf.io/download/56xjc/
     date_published: 2023-04-09
     date_accessed: 2023-08-03
   license:

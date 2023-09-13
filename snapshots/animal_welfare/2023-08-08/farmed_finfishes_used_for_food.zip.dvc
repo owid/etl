@@ -11,7 +11,7 @@ meta:
       Animal Welfare, 32, E12. doi:10.1017/awf.2023.4
     url_main:
       https://www.cambridge.org/core/journals/animal-welfare/article/estimating-global-numbers-of-farmed-fishes-killed-for-food-annually-from-1990-to-2019/765A7CCA23ADA0249EF37CFC5014D351
-    dataset_url_download:
+    url_download:
       https://static.cambridge.org/content/id/urn:cambridge.org:id:article:S0962728623000040/resource/name/S0962728623000040sup001.zip
     date_published: 2023-02-06
     date_accessed: 2023-08-08

@@ -828,7 +828,7 @@ class Variable(SQLModel, table=True):
     processingLog: Optional[dict] = Field(default=None, sa_column=Column("processingLog", JSON))
     titlePublic: Optional[str] = Field(default=None, sa_column=Column("titlePublic", LONGTEXT))
     titleVariant: Optional[str] = Field(default=None, sa_column=Column("titleVariant", LONGTEXT))
-    producerShort: Optional[str] = Field(default=None, sa_column=Column("producerShort", LONGTEXT))
+    attributionShort: Optional[str] = Field(default=None, sa_column=Column("attributionShort", LONGTEXT))
     attribution: Optional[str] = Field(default=None, sa_column=Column("attribution", LONGTEXT))
     descriptionShort: Optional[str] = Field(default=None, sa_column=Column("descriptionShort", LONGTEXT))
     descriptionFromProducer: Optional[str] = Field(default=None, sa_column=Column("descriptionFromProducer", LONGTEXT))
@@ -888,7 +888,7 @@ class Variable(SQLModel, table=True):
             ds.processingLog = self.processingLog
             ds.titlePublic = self.titlePublic
             ds.titleVariant = self.titleVariant
-            ds.producerShort = self.producerShort
+            ds.attributionShort = self.attributionShort
             ds.attribution = self.attribution
             ds.descriptionShort = self.descriptionShort
             ds.descriptionFromProducer = self.descriptionFromProducer
@@ -1106,7 +1106,7 @@ class Origin(SQLModel, table=True):
     descriptionSnapshot: Optional[str] = None
     description: Optional[str] = None
     producer: Optional[str] = None
-    citationProducer: Optional[str] = None
+    citationFull: Optional[str] = None
     attribution: Optional[str] = None
     attributionShort: Optional[str] = None
     versionProducer: Optional[str] = None
@@ -1125,7 +1125,7 @@ class Origin(SQLModel, table=True):
     ) -> "Origin":
         return cls(
             producer=origin.producer,
-            citationProducer=origin.citation_producer,
+            citationFull=origin.citation_producer,
             titleSnapshot=origin.dataset_title_owid,
             title=origin.dataset_title_producer,
             attribution=origin.attribution,
@@ -1133,7 +1133,7 @@ class Origin(SQLModel, table=True):
             versionProducer=origin.version_producer,
             license=origin.license.to_dict() if origin.license else None,
             urlMain=origin.url_main,
-            urlDownload=origin.dataset_url_download,
+            urlDownload=origin.url_download,
             descriptionSnapshot=origin.dataset_description_owid,
             description=origin.dataset_description_producer,
             datePublished=origin.date_published,
@@ -1148,14 +1148,14 @@ class Origin(SQLModel, table=True):
         cls = self.__class__
         return select(cls).where(
             cls.producer == self.producer,
-            cls.citationProducer == self.citationProducer,
+            cls.citationFull == self.citationFull,
             cls.titleSnapshot == self.titleSnapshot,
             cls.title == self.title,
             cls.attribution == self.attribution,
             cls.attributionShort == self.attributionShort,
             cls.versionProducer == self.versionProducer,
             cls.urlMain == self.urlMain,
-            cls.urlDownloadf.urlDownload,
+            cls.urlDownload == self.urlDownload,
             cls.descriptionSnapshot == self.descriptionSnapshot,
             cls.description == self.description,
             cls.datePublished == self.datePublished,

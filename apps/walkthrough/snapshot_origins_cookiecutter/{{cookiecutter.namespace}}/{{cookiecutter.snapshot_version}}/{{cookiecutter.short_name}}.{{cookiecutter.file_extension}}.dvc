@@ -30,8 +30,8 @@ meta:
     {%- if cookiecutter.url_main %}
     url_main: {{cookiecutter.url_main}}
     {%- endif %}
-    {%- if cookiecutter.dataset_url_download %}
-    dataset_url_download: {{cookiecutter.dataset_url_download}}
+    {%- if cookiecutter.url_download %}
+    url_download: {{cookiecutter.url_download}}
     {%- endif %}
     {%- if cookiecutter.date_published %}
     date_published: {{cookiecutter.date_published}}

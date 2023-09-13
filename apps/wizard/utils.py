@@ -90,7 +90,7 @@ if WALKTHROUGH_ORIGINS:
         "date_published": "2020-01-01",
         "producer": "Dummy producer",
         "citation_producer": "Dummy producer citation",
-        "dataset_url_download": "https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv",
+        "url_download": "https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv",
         "url_main": "https://www.url-dummy.com/",
         "license_name": "MIT dummy license",
     }

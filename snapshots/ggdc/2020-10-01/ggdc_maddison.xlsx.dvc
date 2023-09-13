@@ -228,7 +228,7 @@ meta:
       South Africa
       1700–1900 (Cape Colony)	Fourie, J. and Van Zanden, J.L. (2013). GDP in the Dutch Cape Colony: the Nationals Accounts of a Slave-Based Society, South African Journal of Economics, vol. 81 (4): 467 - 490
     url_main: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020
-    dataset_url_download: https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx
+    url_download: https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx
     date_accessed: 2022-04-12
     date_published: 2020-10-01
     attribution: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
