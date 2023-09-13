@@ -1,5 +1,5 @@
 ---
-name: "general issue"
+name: "💬 general issue"
 about: General issue.
 
 ---
