@@ -83,7 +83,7 @@ st.title("Wizard  **:gray[Grapher]**")
 
 # SIDEBAR
 with st.sidebar:
-    utils.warning_notion_latest()
+    utils.warning_metadata_unstable()
     # CONNECT AND
     if APP_STATE.args.run_checks:
         with st.expander("**Environment checks**", expanded=True):

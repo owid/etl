@@ -503,7 +503,7 @@ st.title("Wizard **:gray[Snapshot]**")
 
 # SIDEBAR
 with st.sidebar:
-    utils.warning_notion_latest()
+    utils.warning_metadata_unstable()
     if APP_STATE.args.run_checks:
         # CONNECT AND CHECK
         with st.expander("**Environment checks**", expanded=True):
