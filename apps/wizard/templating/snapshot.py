@@ -29,7 +29,7 @@ schema_origin = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["p
 FIELD_TYPES_TEXTAREA = [
     "origin.description_snapshot",
     "origin.description",
-    "origin.citation_producer",
+    "origin.citation_full",
 ]
 FIELD_TYPES_SELECT = ["origin.license.name"]
 # Get current directory
@@ -67,7 +67,7 @@ class SnapshotForm(utils.StepForm):
     date_published: str
     description: str
     producer: str
-    citation_producer: str
+    citation_full: str
     attribution: str
     attribution_short: str
     url_main: str
@@ -133,7 +133,7 @@ class SnapshotForm(utils.StepForm):
                     "description_snapshot": self.description_snapshot.replace("\n", "\n      "),
                     "description": self.description.replace("\n", "\n      "),
                     "producer": self.producer,
-                    "citation_producer": self.citation_producer,
+                    "citation_full": self.citation_full,
                     "attribution": self.attribution,
                     "attribution_short": self.attribution_short,
                     "version": self.origin_version,

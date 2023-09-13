@@ -28,7 +28,7 @@ def cli(
 
     origin = Origin(
         producer=sm.source_name,
-        citation_producer=sm.source_published_by,
+        citation_full=sm.source_published_by,
         title_snapshot=sm.name,
         url_main=sm.url,
         url_download=sm.source_data_url,

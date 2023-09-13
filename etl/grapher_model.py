@@ -1125,7 +1125,7 @@ class Origin(SQLModel, table=True):
     ) -> "Origin":
         return cls(
             producer=origin.producer,
-            citationFull=origin.citation_producer,
+            citationFull=origin.citation_full,
             titleSnapshot=origin.title_snapshot,
             title=origin.title,
             attribution=origin.attribution,

@@ -28,7 +28,7 @@ meta:
       The data files provide emissions, cumulative emissions and the GMST response by country, gas (CO2, CH4, N2O or 3-GHG
       total) and source (fossil emissions, land use emissions or the total).
     producer: Jones et al.
-    citation_producer: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew, Robbie M., Schwingshackl, Clemens, Gütschow,
+    citation_full: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew, Robbie M., Schwingshackl, Clemens, Gütschow,
       Johannes, Houghton, Richard A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023). National contributions
       to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide [Data set]. In Scientific
       Data (2023.1). Zenodo.

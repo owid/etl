@@ -36,7 +36,7 @@ class SnapshotFormWithOrigin(BaseModel):
     description_snapshot: str
     description: str
     producer: str
-    citation_producer: str
+    citation_full: str
     attribution: str
     attribution_short: str
     origin_version: str
@@ -168,9 +168,9 @@ def app(run_checks: bool) -> None:
                 # TODO: should it contain year too? it would be good to clarify
                 pi.input(
                     "Origin: Citation by the Producer",
-                    name="citation_producer",
+                    name="citation_full",
                     placeholder="Testing Citation",
-                    value=state.get("citation_producer"),
+                    value=state.get("citation_full"),
                     help_text="The full citation that the producer asks for. Example: EM-DAT, CRED / UCLouvain, Brussels, Belgium",
                 ),
                 pi.input(

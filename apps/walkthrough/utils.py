@@ -51,7 +51,7 @@ if WALKTHROUGH_ORIGINS:
         "file_extension": "csv",
         "date_published": "2020-01-01",
         "producer": "Dummy producer",
-        "citation_producer": "Dummy producer citation",
+        "citation_full": "Dummy producer citation",
         "url_download": "https://raw.githubusercontent.com/owid/etl/master/apps/walkthrough/dummy_data.csv",
         "url_main": "https://www.url-dummy.com/",
         "license_name": "MIT dummy license",

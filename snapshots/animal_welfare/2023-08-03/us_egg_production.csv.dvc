@@ -5,7 +5,7 @@ meta:
     description: |-
       This project synthesizes data on the supply of cage-free eggs relative to all food eggs in the United States using United States Department of Agriculture (USDA) data from December 2007 to present. The associated report supplements the data with definitions and a taxonomy of egg products drawn from USDA and industry publications.
     producer: The Humane League
-    citation_producer: The Humane League based on the United States Department of
+    citation_full: The Humane League based on the United States Department of
       Agriculture (USDA).
     attribution: The Humane League based on the United States Department of Agriculture (2023)
     attribution_short: The Humane League

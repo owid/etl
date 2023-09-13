@@ -118,7 +118,7 @@
     "type": "object",
     "description": "An indicator's origin is the information about the snapshot where the indicator's data and metadata came from. A snapshot is a subset of data (a 'slice') taken on a specific day from a data product (often a public dataset, but sometimes a paper or a database). The producer of the data product is typically an institution or a set of authors. Note: A snapshot often coincides with the data product (e.g. the dataset is a public csv file, and we download the entire file). But sometimes the data product is a bigger object (e.g. a set of files, a paper or a database) and the snapshot is just a particular subset of the data product (e.g. one of the files, or a table from a paper, or the result of a query). The origin fields are the attributes of the `Origin` object in ETL.",
     "additionalProperties": false,
-    "required": ["producer", "date_published", "date_accessed", "citation_producer", "url_main", "title_snapshot"],
+    "required": ["producer", "date_published", "date_accessed", "citation_full", "url_main", "title_snapshot"],
     "properties": {
       "producer": {
         "title": "Producer name",
@@ -196,7 +196,7 @@
         "errorMessage": "`date_accessed` must have format YYYY-MM-DD",
         "category": "files"
       },
-      "citation_producer": {
+      "citation_full": {
         "title": "Full citation",
         "type": "string",
         "description": "Full citation of the origin. If the producer expressed how to cite them, we should follow their recommendations.",

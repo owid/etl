@@ -15,8 +15,8 @@ meta:
     {%- if cookiecutter.producer %}
     producer: {{cookiecutter.producer}}
     {%- endif %}
-    {%- if cookiecutter.citation_producer %}
-    citation_producer: {{cookiecutter.citation_producer}}
+    {%- if cookiecutter.citation_full %}
+    citation_full: {{cookiecutter.citation_full}}
     {%- endif %}
     {%- if cookiecutter.attribution %}
     attribution: {{cookiecutter.attribution}}

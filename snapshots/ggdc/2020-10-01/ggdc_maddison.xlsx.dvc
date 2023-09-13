@@ -10,7 +10,7 @@ meta:
       - Tanzania refers only to Mainland Tanzania.
       - Time series for former countries and territories are calculated forward in time by estimating values based on their last official borders.
     producer: Bolt and van Zanden
-    citation_producer: |
+    citation_full: |
       Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update“.
 
       The Maddison Project Database is based on the work of many researchers that have produced estimates of economic growth for individual countries. The full list of sources for this historical data is given for each country below.

@@ -6,7 +6,7 @@ meta:
     description_snapshot: |-
       Estimated number of individual fish in annual aquaculture production.
     producer: Fishcount
-    citation_producer: Fishcount.org.uk based on data from the Food and Agriculture
+    citation_full: Fishcount.org.uk based on data from the Food and Agriculture
       Organization of the United Nations.
     url_main: http://fishcount.org.uk/
     url_download: http://fishcount.org.uk/studydatascreens2/2017/Farmed-fishes-2017-v2.xlsx

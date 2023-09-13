@@ -117,7 +117,7 @@ class Origin:
     # The name of the institution (without a year) or the main authors of the paper
     producer: Optional[str] = None
     # The full citation that the producer asks for
-    citation_producer: Optional[str] = None
+    citation_full: Optional[str] = None
     # These will be often empty and then producer is used instead, but for the (relatively common) cases
     # where the data product is more famous than the authors we would use this (e.g. VDEM instead of the first authors)
     attribution: Optional[str] = None
