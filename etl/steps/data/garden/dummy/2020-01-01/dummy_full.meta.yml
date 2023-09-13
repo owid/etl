@@ -4,14 +4,14 @@ tables:
       dummy_variable:
         title: "[indicator.title]"
         unit: "[indicator.unit]"
-        short_unit: "[indicator.short-unit]"
+        short_unit: "[indicator.short_unit]"
         description: "[indicator.description]"
-        description_short: "[indicator.description-short]"
-        description_from_producer: "[indicator.description-from-producer]"
-        processing_level: "[indicator.processing-level]"
+        description_short: "[indicator.description_short]"
+        description_from_producer: "[indicator.description_from_producer]"
+        processing_level: "[indicator.processing_level]"
         description_key:
-          - "[indicator.description-key example 1]"
-          - "[indicator.description-key example 2]"
+          - "[indicator.description_key example 1]"
+          - "[indicator.description_key example 2]"
         license:
           name: "[indicator.license.name]"
           url: "[indicator.license.url]"
@@ -27,20 +27,20 @@ tables:
           includeInTable: true
         presentation:
           grapher_config:
-            title: "[grapher-config.title > display.name > indicator.title]"
-            subtitle: "[grapher-config.subtitle > indicator.description-short]"
+            title: "[grapher_config.title > display.name > indicator.title]"
+            subtitle: "[grapher_config.subtitle > indicator.description_short]"
             hasMapTab: true
             selectedEntityNames:
             - Germany
             - Italy
             - France
-          title_public: "[presentation.title-public > indicator.title]"
-          title_variant: "[presentation.title-variant]"
-          attribution_short: "[presentation.producer-short]"
+          title_public: "[presentation.title_public > indicator.title]"
+          title_variant: "[presentation.title_variant]"
+          attribution_short: "[presentation.producer_short]"
           attribution: "[presentation.attribution > origin.attribution > origin.producer (year)]"
           topic_tags:
           - "Internet"
-          - "[presentation.topic-tags-links example 2]"
+          - "[presentation.topic_tags example 2]"
           faqs:
           - fragment_id: cherries
             gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE

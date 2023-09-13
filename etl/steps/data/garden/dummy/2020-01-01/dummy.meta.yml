@@ -3,7 +3,6 @@ tables:
     variables:
       dummy_variable:
         title: Dummy
-        description: This is a dummy indicator with full metadata.
         licenses: []
         unit: Dummy unit
         short_unit: Du

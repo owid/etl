@@ -1,15 +1,15 @@
 meta:
   origin:
-    title_snapshot: '[origin.dataset-title-owid]'
-    title: '[origin.dataset-title-producer]'
-    description_snapshot: '[origin.dataset-description-owid]'
-    description: '[origin.dataset-description-producer]'
+    title: '[origin.titla]'
+    description: '[origin.description]'
+    title_snapshot: '[origin.title_snapshot]'
+    description_snapshot: '[origin.description_snapshot]'
     producer: '[origin.producer]'
-    citation_full: '[origin.citation-producer]'
+    citation_full: '[origin.citation_full]'
     attribution: '[origin.attribution > origin.producer (year)]'
-    attribution_short: '[origin.attribution-short]'
-    version: '[origin.version]'
-    url_main: '[origin.dataset-url-main]'
+    attribution_short: '[origin.attribution_short]'
+    version_producer: '[origin.version]'
+    url_main: '[origin.dataset_url_main]'
     url_download: https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv
     date_published: 2000-01-01
     date_accessed: 2020-01-01

@@ -1,7 +1,7 @@
 meta:
   origin:
-    title_snapshot: Dummy OWID dataset title
-    description_snapshot: |-
+    title: Dummy OWID dataset title
+    description: |-
       This
       is
       a
