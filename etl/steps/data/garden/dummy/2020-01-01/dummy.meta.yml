@@ -39,7 +39,7 @@ tables:
           title_variant: historical data
           attribution_short: ACME
           attribution: ACME project
-          topic_tags_links:
+          topic_tags:
           - Internet
           faqs:
           - fragment_id: cherries

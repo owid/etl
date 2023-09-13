@@ -38,7 +38,7 @@ tables:
           title_variant: "[presentation.title-variant]"
           attribution_short: "[presentation.producer-short]"
           attribution: "[presentation.attribution > origin.attribution > origin.producer (year)]"
-          topic_tags_links:
+          topic_tags:
           - "Internet"
           - "[presentation.topic-tags-links example 2]"
           faqs:

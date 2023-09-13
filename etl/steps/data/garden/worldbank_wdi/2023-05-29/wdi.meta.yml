@@ -1979,7 +1979,7 @@ tables:
           title_public: Share of the population using the Internet
           title_variant: WDI
           # attribution: # defaults to origin[*].producer so does not have to be set here
-          topic_tags_links:
+          topic_tags:
           - Technological Progress
           - Internet
           faqs: []

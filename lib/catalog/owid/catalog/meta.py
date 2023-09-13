@@ -201,7 +201,7 @@ class VariablePresentationMeta:
     # A short text to use to credit the source e.g. at the bottom of charts. Autofilled from the list of origins (see below). Semicolon separated if there are multiple.
     attribution: Optional[str] = None
     # List of topic tags
-    topic_tags_links: List[str] = field(default_factory=list)
+    topic_tags: List[str] = field(default_factory=list)
 
     # Fields that are more work to add but of high value
 
