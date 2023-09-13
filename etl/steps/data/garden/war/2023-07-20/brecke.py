@@ -22,7 +22,7 @@ On regions:
     1. North America, Central America, and the Caribbean: 2-95 (US-Panama)
     2. South America: 100-165 (Colombia-Uruguay)
     3. Western Europe: 200-280 (UK-Mecklenburg Schwerin), 305 (Autria), 325-338 (Italy-Malta), 380-395 (Sweden-Iceland)
-    4. Eastern Europe: 290-300 (Poland-Austria-Hungary), 310-317 (Hungary-Slovakia), 339-375 (Albania-Finland), 640 (Turkey)
+    4. Eastern Europe: 290-300 (Poland - Austria-Hungary), 310-317 (Hungary-Slovakia), 339-375 (Albania-Finland), 640 (Turkey)
     5. Middle East: 630 (Iran), 645-698 (Iraq-Oman)
     6. North Africa: 600-626 (Morocco-South Sudan) 432 (Mali), 435-436 (Mauritania-Niger), 483 (Niger), 651 (Egypt)
     7. West & Central Africa: 402-420 (Cape Verde, Gambia), 433-434 (Senegal-Benin), 437-482 (Ivory Coast-Central African Republic), 484-490 (Congo-Democratic Republic of the Congo)
