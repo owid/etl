@@ -8,7 +8,7 @@ dataset:
       Deaths of combatants due to fighting are included.
 
       We use the world regions of the participants to code the conflicts' world region(s). The regions are defined based on Gleditsch and Ward codes. Find the complete mapping at
-      https://correlatesofwar.org/wp-content/uploads/system2016.csv:
+      https://correlatesofwar.org/wp-content/uploads/states2016.csv:
 
         • Americas: 2-165
 
