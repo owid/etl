@@ -259,7 +259,7 @@
         ],
         "category": "dataset"
       },
-      "dataset_description_producer": {
+      "description": {
         "title": "Description of the data product",
         "type": "string",
         "description": "Description of the original data product.",

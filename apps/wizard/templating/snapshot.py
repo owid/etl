@@ -28,7 +28,7 @@ schema_origin = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["p
 # Lists with fields of special types. By default, fields are text inputs.
 FIELD_TYPES_TEXTAREA = [
     "origin.dataset_description_owid",
-    "origin.dataset_description_producer",
+    "origin.description",
     "origin.citation_producer",
 ]
 FIELD_TYPES_SELECT = ["origin.license.name"]
@@ -65,7 +65,7 @@ class SnapshotForm(utils.StepForm):
     title: str
     origin_version: str
     date_published: str
-    dataset_description_producer: str
+    description: str
     producer: str
     citation_producer: str
     attribution: str
@@ -131,7 +131,7 @@ class SnapshotForm(utils.StepForm):
                     "dataset_title_owid": self.dataset_title_owid,
                     "title": self.title,
                     "dataset_description_owid": self.dataset_description_owid.replace("\n", "\n      "),
-                    "dataset_description_producer": self.dataset_description_producer.replace("\n", "\n      "),
+                    "description": self.description.replace("\n", "\n      "),
                     "producer": self.producer,
                     "citation_producer": self.citation_producer,
                     "attribution": self.attribution,

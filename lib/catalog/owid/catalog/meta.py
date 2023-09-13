@@ -113,7 +113,7 @@ class Origin:
     # Our description of the dataset
     dataset_description_owid: Optional[str] = None
     # The description for this dataset used by the producer
-    dataset_description_producer: Optional[str] = None
+    description: Optional[str] = None
     # The name of the institution (without a year) or the main authors of the paper
     producer: Optional[str] = None
     # The full citation that the producer asks for

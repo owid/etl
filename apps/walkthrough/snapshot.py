@@ -34,7 +34,7 @@ class SnapshotFormWithOrigin(BaseModel):
     dataset_title_owid: str
     title: str
     dataset_description_owid: str
-    dataset_description_producer: str
+    description: str
     producer: str
     citation_producer: str
     attribution: str
@@ -154,8 +154,8 @@ def app(run_checks: bool) -> None:
                 ),
                 pi.textarea(
                     "Origin: Dataset description by the Producer",
-                    name="dataset_description_producer",
-                    value=state.get("dataset_description_producer"),
+                    name="description",
+                    value=state.get("description"),
                     help_text="The description for this dataset used by the producer.",
                 ),
                 pi.input(

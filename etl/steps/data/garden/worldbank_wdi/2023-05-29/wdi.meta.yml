@@ -1952,7 +1952,7 @@ tables:
           tolerance: 5
         origins:  # Going forward this will usually come from snapshots in this form but you could also set it here
         - dataset_title_owid: World Development Indicators
-          dataset_description_producer: >
+          description: >
             The World Development Indicators (WDI) is the primary
             World Bank collection of development indicators, compiled
             from officially-recognized international sources. It

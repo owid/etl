@@ -1135,7 +1135,7 @@ class Origin(SQLModel, table=True):
             urlMain=origin.url_main,
             urlDownload=origin.url_download,
             descriptionSnapshot=origin.dataset_description_owid,
-            description=origin.dataset_description_producer,
+            description=origin.description,
             datePublished=origin.date_published,
             dateAccessed=origin.date_accessed,
         )
