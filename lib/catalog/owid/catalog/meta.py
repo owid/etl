@@ -194,7 +194,7 @@ class VariablePresentationMeta:
     # Shown next to title to differentiate similar indicators e.g. "future projections" or "historical values"
     title_variant: Optional[str] = None
     # Shown next to title to differentiate similar indicators e.g. "WHO" or "IHME"
-    producer_short: Optional[str] = None
+    attribution_short: Optional[str] = None
     # A short text to use to credit the source e.g. at the bottom of charts. Autofilled from the list of origins (see below). Semicolon separated if there are multiple.
     attribution: Optional[str] = None
     # List of topic tags

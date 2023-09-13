@@ -19,7 +19,7 @@ tables:
       #     grapher_config
       #     title_public
       #     title_variant
-      #     producer_short
+      #     attribution_short
       #     attribution
       #     topic_tags_links
       #     faqs

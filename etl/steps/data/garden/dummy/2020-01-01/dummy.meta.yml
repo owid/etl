@@ -37,7 +37,7 @@ tables:
             - France
           title_public: The dummy indicator - data page title
           title_variant: historical data
-          producer_short: ACME
+          attribution_short: ACME
           attribution: ACME project
           topic_tags_links:
           - Internet

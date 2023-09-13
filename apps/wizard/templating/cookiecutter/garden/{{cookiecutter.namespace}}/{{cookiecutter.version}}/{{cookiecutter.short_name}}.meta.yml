@@ -24,7 +24,7 @@ tables:
       #     title_public:
       #     title_variant:
       #     attribution:
-      #     producer_short:
+      #     attribution_short:
       #     topic_tags_links:
       #     faqs
       #     grapher_config

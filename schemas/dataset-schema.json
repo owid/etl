@@ -497,7 +497,7 @@
                       ],
                       "requirement_level": "optional"
                     },
-                    "producer_short": {
+                    "attribution_short": {
                       "type": "string",
                       "title": "Indicator's attribution (shorter version)",
                       "description": "Very short citation of the indicator's main producer(s).",
