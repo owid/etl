@@ -28,11 +28,11 @@ def cli(
 
     origin = Origin(
         producer=sm.source_name,
+        title=sm.name,
+        description=sm.description,
         citation_full=sm.source_published_by,
-        title_snapshot=sm.name,
         url_main=sm.url,
         url_download=sm.source_data_url,
-        description_snapshot=sm.description,
         date_published=sm.publication_date,
         date_accessed=sm.date_accessed,
     )

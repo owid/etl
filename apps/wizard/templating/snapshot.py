@@ -60,12 +60,12 @@ class SnapshotForm(utils.StepForm):
     dataset_manual_import: bool
 
     # origin
+    title: str
+    description: str
     title_snapshot: str
     description_snapshot: str
-    title: str
     origin_version: str
     date_published: str
-    description: str
     producer: str
     citation_full: str
     attribution: str
@@ -128,10 +128,10 @@ class SnapshotForm(utils.StepForm):
         meta = {
             "meta": {
                 "origin": {
-                    "title_snapshot": self.title_snapshot,
                     "title": self.title,
-                    "description_snapshot": self.description_snapshot.replace("\n", "\n      "),
                     "description": self.description.replace("\n", "\n      "),
+                    "title_snapshot": self.title_snapshot,
+                    "description_snapshot": self.description_snapshot.replace("\n", "\n      "),
                     "producer": self.producer,
                     "citation_full": self.citation_full,
                     "attribution": self.attribution,

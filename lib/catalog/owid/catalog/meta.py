@@ -106,17 +106,20 @@ class Source:
 @dataclass_json
 @dataclass
 class Origin:
-    # Dataset title written by OWID (without a year)
-    title_snapshot: str
-    # Dataset title written by producer (without a year)
-    title: Optional[str] = None
-    # Our description of the dataset
-    description_snapshot: Optional[str] = None
-    # The description for this dataset used by the producer
+    # Producer name
+    # Name of the institution or the author(s) that produced the data product.
+    producer: str
+    # Title of the original data product
+    title: str
+    # Description of the data product
     description: Optional[str] = None
-    # The name of the institution (without a year) or the main authors of the paper
-    producer: Optional[str] = None
-    # The full citation that the producer asks for
+    # Title of the snapshot
+    # Subset of data that we extract from the data product which in most cases will coincide with the title of the data product.
+    title_snapshot: Optional[str] = None
+    # Description of the snapshot
+    # Subset of data that we extract from the data product) which in most cases will coincide with the description of the data product.
+    description_snapshot: Optional[str] = None
+    # The full citation
     citation_full: Optional[str] = None
     # These will be often empty and then producer is used instead, but for the (relatively common) cases
     # where the data product is more famous than the authors we would use this (e.g. VDEM instead of the first authors)

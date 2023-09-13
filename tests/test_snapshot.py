@@ -27,7 +27,7 @@ def test_snapshot_to_yaml():
         version="2023-04-18",
         short_name="aviation_statistics_by_period",
         file_extension="csv",
-        origin=Origin(title_snapshot="Aviation Statistics by Period"),
+        origin=Origin(title="Aviation Statistics by Period"),
     ).to_dict()
     assert d == {
         "file_extension": "csv",
@@ -35,5 +35,5 @@ def test_snapshot_to_yaml():
         "namespace": "aviation_safety_network",
         "short_name": "aviation_statistics_by_period",
         "version": "2023-04-18",
-        "origin": {"title_snapshot": "Aviation Statistics by Period"},
+        "origin": {"title": "Aviation Statistics by Period"},
     }

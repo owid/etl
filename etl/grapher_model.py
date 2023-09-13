@@ -1101,11 +1101,11 @@ class Origin(SQLModel, table=True):
     __tablename__: str = "origins"  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    titleSnapshot: Optional[str] = Field(default=None, index=True)
-    title: Optional[str] = Field(default=None, index=True)
-    descriptionSnapshot: Optional[str] = None
-    description: Optional[str] = None
     producer: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    titleSnapshot: Optional[str] = None
+    descriptionSnapshot: Optional[str] = None
     citationFull: Optional[str] = None
     attribution: Optional[str] = None
     attributionShort: Optional[str] = None

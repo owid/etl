@@ -329,7 +329,7 @@
           ["Must end with the year of `date_published` in parenthesis."],
           ["Must not include any semicolon `;`."],
           ["Should only be used if the automatic attribution format `producer (year)`is incomplete. For example, when the dataset title is well known and should be cited along with the producer, or when the original dataset version should also be mentioned."],
-          ["Should be constructed using placeholders, e.g. `{title_snapshot}, {producer} ({year})`."]
+          ["Should be constructed using placeholders, e.g. `{title}, {producer} ({year})`."]
         ],
         "category": "citation"
       },

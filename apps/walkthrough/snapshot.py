@@ -31,10 +31,10 @@ class SnapshotFormWithOrigin(BaseModel):
     file_extension: str
 
     # origin
-    title_snapshot: str
     title: str
-    description_snapshot: str
     description: str
+    description_snapshot: str
+    title_snapshot: str
     producer: str
     citation_full: str
     attribution: str
@@ -132,31 +132,31 @@ def app(run_checks: bool) -> None:
                     help_text="Underscored dataset short name. Example: natural_disasters",
                 ),
                 pi.input(
-                    "Origin: Dataset title by OWID",
+                    "Origin: Data product title",
+                    name="title",
+                    placeholder="Testing Title Producer",
+                    value=state.get("title"),
+                    help_text="TODO. Example: TODO",
+                ),
+                pi.textarea(
+                    "Origin: Data product description",
+                    name="description",
+                    value=state.get("description"),
+                    help_text="TODO. Example: TODO",
+                ),
+                pi.input(
+                    "Origin: Snapshot title",
                     name="title_snapshot",
                     placeholder="Testing Title OWID",
                     required=True,
                     value=state.get("title_snapshot"),
-                    help_text="Dataset title written by OWID (without a year). Example: Natural disasters",
-                ),
-                pi.input(
-                    "Origin: Dataset title by the Producer",
-                    name="title",
-                    placeholder="Testing Title Producer",
-                    value=state.get("title"),
-                    help_text="Dataset title written by Producer (without a year). Example: Natural disasters",
+                    help_text="TODO. Example: TODO",
                 ),
                 pi.textarea(
-                    "Origin: Dataset description by OWID",
+                    "Origin: Snapshot description",
                     name="description_snapshot",
                     value=state.get("description_snapshot"),
-                    help_text="Our description of the dataset.",
-                ),
-                pi.textarea(
-                    "Origin: Dataset description by the Producer",
-                    name="description",
-                    value=state.get("description"),
-                    help_text="The description for this dataset used by the producer.",
+                    help_text="TODO. Example: TODO",
                 ),
                 pi.input(
                     "Origin: Producer",
