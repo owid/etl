@@ -1,5 +1,5 @@
 ---
-name: "wizard/walkthrough issue"
+name: "🪄 wizard/walkthrough issue"
 about: For issues that involve `wizard` or `walkthrough` tool.
 title: "[wizard or walkthrough]: meaningful title for the issue"
 labels: wizard,walkthrough
