@@ -26,6 +26,7 @@ APP_STATE = utils.AppState()
 # Config style
 utils.config_style_html()
 
+
 #########################################################
 # FUNCTIONS & CLASSES ###################################
 #########################################################
@@ -135,9 +136,9 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
             },
             "title_public": "The dummy indicator - data page title",
             "title_variant": "historical data",
-            "producer_short": "ACME",
+            "attribution_short": "ACME",
             "attribution": "ACME project",
-            "topic_tags_links": ["Internet"],
+            "topic_tags": ["Internet"],
             "key_info_text": [
                 "First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)",
                 "Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)",

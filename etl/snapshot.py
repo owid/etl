@@ -71,7 +71,11 @@ class Snapshot:
     @property
     def metadata_path(self) -> Path:
         """Path to metadata file."""
-        return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
+        archive_path = Path(f"{paths.SNAPSHOTS_DIR_ARCHIVE / self.uri}.dvc")
+        if archive_path.exists():
+            return archive_path
+        else:
+            return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
     def pull(self, force=True) -> None:
         """Pull file from S3."""
@@ -89,8 +93,8 @@ class Snapshot:
     def download_from_source(self) -> None:
         """Download file from source_data_url."""
         if self.metadata.origin:
-            assert self.metadata.origin.dataset_url_download, "dataset_url_download is not set"
-            download_url = self.metadata.origin.dataset_url_download
+            assert self.metadata.origin.url_download, "url_download is not set"
+            download_url = self.metadata.origin.url_download
         elif self.metadata.source:
             assert self.metadata.source.source_data_url, "source_data_url is not set"
             download_url = self.metadata.source.source_data_url
@@ -327,15 +331,15 @@ class SnapshotMeta:
             table_meta = TableMeta.from_dict(
                 {
                     "short_name": self.short_name,
-                    "title": self.origin.dataset_title_owid,  # type: ignore
-                    "description": self.origin.dataset_description_owid,  # type: ignore
+                    "title": self.origin.title,  # type: ignore
+                    "description": self.origin.description,  # type: ignore
                     "dataset": DatasetMeta.from_dict(
                         {
                             "channel": "snapshots",
                             "namespace": self.namespace,
                             "short_name": self.short_name,
-                            "title": self.origin.dataset_title_owid,  # type: ignore
-                            "description": self.origin.dataset_description_owid,  # type: ignore
+                            "title": self.origin.title,  # type: ignore
+                            "description": self.origin.description,  # type: ignore
                             "origins": [self.origin] if self.origin else [],
                             "licenses": [self.license] if self.license else [],
                             "is_public": self.is_public,

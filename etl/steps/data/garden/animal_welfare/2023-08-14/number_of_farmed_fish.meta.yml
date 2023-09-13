@@ -1,12 +1,14 @@
 definitions:
-  common: |-
-    This study estimates the annual number of farmed fish slaughtered for food using data on aquaculture production tonnages (from the Food and Agriculture Organization of the United Nations) and mean weights estimated from available fish size data (from a range of internet sources).
+  attribution: &attribution Fishcount (2018)
+  description_key: &description_key
+    - This indicator uses data on aquaculture production tonnages and mean weights estimated from available fish size data.
+    - |
+      Note that this study does not include:
+      - Non-fish species, e.g. lobsters.
+      - Fish deaths arising in fish farms prior to harvest, in the capture of wild fish for feed or re-stocking, or from environmental impacts on surrounding wildlife.
+      - Fish farmed for use as bait, whose small production tonnages may comprise large numbers of fish due to their very small size of just a few grams.
+      - Species without estimated mean weight (which could be an additional 17% of total fish production).
 
-    Note that this study does not include:
-    - Non-fish species, e.g. lobsters.
-    - Fish deaths arising in fish farms prior to harvest, in the capture of wild fish for feed or re-stocking, or from environmental impacts on surrounding wildlife.
-    - Fish farmed for use as bait, whose small production tonnages may comprise large numbers of fish due to their very small size of just a few grams.
-    - Species without estimated mean weight (which could be an additional 17% of total fish production).
 tables:
   number_of_farmed_fish:
     variables:
@@ -14,29 +16,29 @@ tables:
         title: Estimated number of farmed fish (lower bound)
         unit: 'fish'
         short_unit: ''
-        description: |
-          Lower bound estimate of the number of farmed fish.
-
-          {definitions.common}
+        description_short: Lower bound estimate of the annual number of farmed fish slaughtered for food.
+        description_key: *description_key
         display:
           numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution
       n_farmed_fish:
         title: Estimated number of farmed fish
         unit: 'fish'
         short_unit: ''
-        description: |
-          Midpoint estimate of the number of farmed fish, calculated as the average between the lower and upper estimates.
-
-          {definitions.common}
+        description_short: Midpoint estimate of the annual number of farmed fish slaughtered for food, calculated as the average between the lower and upper estimates.
+        description_key: *description_key
         display:
           numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution
       n_farmed_fish_high:
         title: Estimated number of farmed fish (upper bound)
         unit: 'fish'
         short_unit: ''
-        description: |
-          Upper bound estimate of the number of farmed fish.
-
-          {definitions.common}
+        description_short: Upper bound estimate of the annual number of farmed fish slaughtered for food.
+        description_key: *description_key
         display:
           numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution

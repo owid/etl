@@ -31,17 +31,17 @@ class SnapshotFormWithOrigin(BaseModel):
     file_extension: str
 
     # origin
-    dataset_title_owid: str
-    dataset_title_producer: str
-    dataset_description_owid: str
-    dataset_description_producer: str
+    title: str
+    description: str
+    description_snapshot: str
+    title_snapshot: str
     producer: str
-    citation_producer: str
+    citation_full: str
     attribution: str
     attribution_short: str
     origin_version: str
-    dataset_url_main: str
-    dataset_url_download: str
+    url_main: str
+    url_download: str
     date_accessed: str
     date_published: str
 
@@ -132,31 +132,31 @@ def app(run_checks: bool) -> None:
                     help_text="Underscored dataset short name. Example: natural_disasters",
                 ),
                 pi.input(
-                    "Origin: Dataset title by OWID",
-                    name="dataset_title_owid",
-                    placeholder="Testing Title OWID",
-                    required=True,
-                    value=state.get("dataset_title_owid"),
-                    help_text="Dataset title written by OWID (without a year). Example: Natural disasters",
+                    "Origin: Data product title",
+                    name="title",
+                    placeholder="Testing Title Producer",
+                    value=state.get("title"),
+                    help_text="TODO. Example: TODO",
+                ),
+                pi.textarea(
+                    "Origin: Data product description",
+                    name="description",
+                    value=state.get("description"),
+                    help_text="TODO. Example: TODO",
                 ),
                 pi.input(
-                    "Origin: Dataset title by the Producer",
-                    name="dataset_title_producer",
-                    placeholder="Testing Title Producer",
-                    value=state.get("dataset_title_producer"),
-                    help_text="Dataset title written by Producer (without a year). Example: Natural disasters",
+                    "Origin: Snapshot title",
+                    name="title_snapshot",
+                    placeholder="Testing Title OWID",
+                    required=True,
+                    value=state.get("title_snapshot"),
+                    help_text="TODO. Example: TODO",
                 ),
                 pi.textarea(
-                    "Origin: Dataset description by OWID",
-                    name="dataset_description_owid",
-                    value=state.get("dataset_description_owid"),
-                    help_text="Our description of the dataset.",
-                ),
-                pi.textarea(
-                    "Origin: Dataset description by the Producer",
-                    name="dataset_description_producer",
-                    value=state.get("dataset_description_producer"),
-                    help_text="The description for this dataset used by the producer.",
+                    "Origin: Snapshot description",
+                    name="description_snapshot",
+                    value=state.get("description_snapshot"),
+                    help_text="TODO. Example: TODO",
                 ),
                 pi.input(
                     "Origin: Producer",
@@ -168,9 +168,9 @@ def app(run_checks: bool) -> None:
                 # TODO: should it contain year too? it would be good to clarify
                 pi.input(
                     "Origin: Citation by the Producer",
-                    name="citation_producer",
+                    name="citation_full",
                     placeholder="Testing Citation",
-                    value=state.get("citation_producer"),
+                    value=state.get("citation_full"),
                     help_text="The full citation that the producer asks for. Example: EM-DAT, CRED / UCLouvain, Brussels, Belgium",
                 ),
                 pi.input(
@@ -196,16 +196,16 @@ def app(run_checks: bool) -> None:
                 ),
                 pi.input(
                     "Origin: Dataset main URL",
-                    name="dataset_url_main",
+                    name="url_main",
                     placeholder="https://url_of_testing_source.com/",
-                    value=state.get("dataset_url_main"),
+                    value=state.get("url_main"),
                     help_text="URL to the main page of the project.",
                 ),
                 pi.input(
                     "Origin: Dataset download URL",
-                    name="dataset_url_download",
+                    name="url_download",
                     placeholder="https://url_of_testing_source.com/data.csv",
-                    value=state.get("dataset_url_download"),
+                    value=state.get("url_download"),
                     help_text="Direct URL to download the dataset.",
                 ),
                 pi.input(

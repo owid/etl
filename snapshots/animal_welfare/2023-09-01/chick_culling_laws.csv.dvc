@@ -1,14 +1,14 @@
 meta:
   origin:
-    dataset_title_owid: Chick culling laws
-    dataset_description_owid: Male baby chicks are commonly killed in laying hens
+    title: Chick culling laws
+    description_snapshot: Male baby chicks are commonly killed in laying hens
       hatcheries all around the world, as they provide no value for the egg production
       industry. Only a minority of country has laws to ban this practice. This dataset
       is a compilation of evidence (from official institutions and in some cases from
       the news) of chick culling taking place in a country, and, in some cases, of
       existing laws banning it.
     producer: Various sources
-    citation_producer: >-
+    citation_full: >-
       Evidence of laws banning chick culling, and evidence of chick culling being
       practiced without any ban, has been gathered
       from various sources for different countries.
@@ -112,7 +112,7 @@ meta:
       - Spain: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
 
       - Sweden: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
-    dataset_url_main: https://animallaweurope.com/news/
+    url_main: https://animallaweurope.com/news/
     date_accessed: '2023-09-01'
     date_published: '2023-09-01'
   license:

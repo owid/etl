@@ -283,7 +283,7 @@ def upsert_table(
             session,
             db_origins,
             faqs=variable_meta.presentation.faqs if variable_meta.presentation else [],
-            tag_names=variable_meta.presentation.topic_tags_links if variable_meta.presentation else [],
+            tag_names=variable_meta.presentation.topic_tags if variable_meta.presentation else [],
         )
         session.add(db_variable)
 
