@@ -27,9 +27,9 @@ SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
 schema_origin = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["properties"]
 # Lists with fields of special types. By default, fields are text inputs.
 FIELD_TYPES_TEXTAREA = [
-    "origin.dataset_description_owid",
-    "origin.dataset_description_producer",
-    "origin.citation_producer",
+    "origin.description_snapshot",
+    "origin.description",
+    "origin.citation_full",
 ]
 FIELD_TYPES_SELECT = ["origin.license.name"]
 # Get current directory
@@ -60,18 +60,18 @@ class SnapshotForm(utils.StepForm):
     dataset_manual_import: bool
 
     # origin
-    dataset_title_owid: str
-    dataset_description_owid: str
-    dataset_title_producer: str
+    title: str
+    description: str
+    title_snapshot: str
+    description_snapshot: str
     origin_version: str
     date_published: str
-    dataset_description_producer: str
     producer: str
-    citation_producer: str
+    citation_full: str
     attribution: str
     attribution_short: str
-    dataset_url_main: str
-    dataset_url_download: str
+    url_main: str
+    url_download: str
     date_accessed: str
 
     # license
@@ -128,17 +128,17 @@ class SnapshotForm(utils.StepForm):
         meta = {
             "meta": {
                 "origin": {
-                    "dataset_title_owid": self.dataset_title_owid,
-                    "dataset_title_producer": self.dataset_title_producer,
-                    "dataset_description_owid": self.dataset_description_owid.replace("\n", "\n      "),
-                    "dataset_description_producer": self.dataset_description_producer.replace("\n", "\n      "),
+                    "title": self.title,
+                    "description": self.description.replace("\n", "\n      "),
+                    "title_snapshot": self.title_snapshot,
+                    "description_snapshot": self.description_snapshot.replace("\n", "\n      "),
                     "producer": self.producer,
-                    "citation_producer": self.citation_producer,
+                    "citation_full": self.citation_full,
                     "attribution": self.attribution,
                     "attribution_short": self.attribution_short,
                     "version": self.origin_version,
-                    "dataset_url_main": self.dataset_url_main,
-                    "dataset_url_download": self.dataset_url_download,
+                    "url_main": self.url_main,
+                    "url_download": self.url_download,
                     "date_published": self.date_published,
                     "date_accessed": self.date_accessed,
                     "license": license_field,
@@ -518,7 +518,6 @@ with st.sidebar:
 # FORM
 form_widget = st.empty()
 with form_widget.form("form"):
-
     # 1) Show fields for initial configuration (create directories, etc.)
     # st.header("Config")
     st.markdown("Note that sometimes some fields might not be available (even if they are labelled as required)")

@@ -18,7 +18,7 @@ tables:
           numDecimalPlaces: 0
         presentation:
           title_public: Expected number of deaths
-          producer_short: WPP 2019
+          attribution_short: WPP 2019
 
       expected_gbd:
         title: Expected number of deaths (GBD 2019)
@@ -29,7 +29,7 @@ tables:
           numDecimalPlaces: 0
         presentation:
           title_public: Expected number of deaths
-          producer_short: GBD 2019
+          attribution_short: GBD 2019
 
       expected_ghe:
         title: Expected number of deaths (GHE 2019)
@@ -40,7 +40,7 @@ tables:
           numDecimalPlaces: 0
         presentation:
           title_public: Expected number of deaths
-          producer_short: GHE 2019
+          attribution_short: GHE 2019
 
       expected_deaths:
         title: Expected number of deaths
@@ -51,7 +51,7 @@ tables:
           numDecimalPlaces: 0
         presentation:
           title_public: Expected number of deaths
-          producer_short: WPP 2019
+          attribution_short: WPP 2019
 
       death_comp:
         title: Estimated completeness of death reporting

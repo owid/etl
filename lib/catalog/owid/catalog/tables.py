@@ -787,6 +787,9 @@ class Table(pd.DataFrame):
     def __ipow__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         return self.__pow__(other)
 
+    def sort_index(self, *args, **kwargs) -> "Table":
+        return super().sort_index(*args, **kwargs)  # type: ignore
+
 
 def merge(
     left,
