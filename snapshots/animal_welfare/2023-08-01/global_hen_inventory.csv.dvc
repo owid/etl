@@ -1,13 +1,12 @@
 meta:
   origin:
-    dataset_title_owid: Global hen inventory
-    dataset_title_producer: Global hen inventory
     producer: Welfare Footprint Project
-    citation_producer: |
+    title: Global hen inventory
+    citation_full: |
       Welfare Footprint Project based on various sources.
     date_published: 2022-12-06
     date_accessed: 2023-08-01
-    dataset_url_main: https://welfarefootprint.org/research-projects/laying-hens/
+    url_main: https://welfarefootprint.org/research-projects/laying-hens/
   license:
     url: https://welfarefootprint.org/research-projects/laying-hens/
     name: CC BY 4.0
