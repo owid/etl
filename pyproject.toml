@@ -131,6 +131,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pyright]
 exclude = [
+    "etl/steps/archive",
+    "etl/snapshots/archive",
     "apps/walkthrough/*_cookiecutter",
     "apps/wizard/templating/cookiecutter",
     "**/node_modules",
