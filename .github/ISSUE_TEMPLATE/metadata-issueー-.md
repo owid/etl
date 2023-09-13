@@ -8,6 +8,10 @@ assignees: pablorosado,lucasrodes
 ---
 
 <!--
+NOTE: If you have a question on how to use a specific metadata field, please open a new [discussion instead](https://github.com/owid/etl/discussions/new?category=metadata).
+-->
+
+<!--
 INSTRUCTIONS
 Write a meaningful title that describes your issue/feedback for our metadata.
 
