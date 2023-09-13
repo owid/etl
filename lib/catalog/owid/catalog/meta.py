@@ -114,7 +114,7 @@ class Origin:
     # Description of the data product
     description: Optional[str] = None
     # Title of the snapshot
-    # Subset of data that we extract from the data product which in most cases will coincide with the title of the data product.
+    # Subset of data that we extract from the data product. Only fill if it does not coincide with the title of the data product.
     title_snapshot: Optional[str] = None
     # Description of the snapshot
     # Subset of data that we extract from the data product). Only when the data product and the snapshot do not coincide, the description_snapshot
@@ -238,7 +238,7 @@ class VariableMeta:
     """
 
     title: Optional[str] = None
-    # This shouldn't be used for data pages, use `description_short` or `description_key` instead
+    # This shouldn't be used for data pages, use `description_short`, `description_key` or `description_processing` instead
     description: Optional[str] = None
     # A 1-2 sentence description - used internally or as fallback for description_key
     description_short: Optional[str] = None

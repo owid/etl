@@ -1,6 +1,6 @@
 meta:
   origin:
-    title: '[origin.titla]'
+    title: '[origin.title]'
     description: '[origin.description]'
     title_snapshot: '[origin.title_snapshot]'
     description_snapshot: '[origin.description_snapshot]'
