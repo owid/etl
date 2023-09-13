@@ -1,7 +1,7 @@
 meta:
   origin:
     dataset_title_owid: Number of individual wild fish killed for food
-    dataset_title_producer: |-
+    title: |-
       Estimated numbers of individuals in annual global recorded capture (FAO) of fish species
     dataset_description_owid: |-
       Estimated numbers of individual fish killed annually in wild fish capture.

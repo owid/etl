@@ -245,7 +245,7 @@
         "examples_bad": [],
         "category": "files"
       },
-      "dataset_title_producer": {
+      "title": {
         "title": "Title of the original data product",
         "type": "string",
         "description": "Title of the original data product.",

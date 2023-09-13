@@ -62,7 +62,7 @@ class SnapshotForm(utils.StepForm):
     # origin
     dataset_title_owid: str
     dataset_description_owid: str
-    dataset_title_producer: str
+    title: str
     origin_version: str
     date_published: str
     dataset_description_producer: str
@@ -129,7 +129,7 @@ class SnapshotForm(utils.StepForm):
             "meta": {
                 "origin": {
                     "dataset_title_owid": self.dataset_title_owid,
-                    "dataset_title_producer": self.dataset_title_producer,
+                    "title": self.title,
                     "dataset_description_owid": self.dataset_description_owid.replace("\n", "\n      "),
                     "dataset_description_producer": self.dataset_description_producer.replace("\n", "\n      "),
                     "producer": self.producer,

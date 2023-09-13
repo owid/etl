@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Yasuyuki Aono
     dataset_title_owid: Peak Cherry Tree Blossom at Kyoto City
-    dataset_title_producer: Historical Series of Phenological data for Cherry Tree Flowering at Kyoto City (and March Mean Temperature Reconstructions)
+    title: Historical Series of Phenological data for Cherry Tree Flowering at Kyoto City (and March Mean Temperature Reconstructions)
     url_main: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
     attribution: Multiple sources compiled by Aono
     attribution_short: Yasuyuki Aono

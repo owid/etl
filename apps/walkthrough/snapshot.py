@@ -32,7 +32,7 @@ class SnapshotFormWithOrigin(BaseModel):
 
     # origin
     dataset_title_owid: str
-    dataset_title_producer: str
+    title: str
     dataset_description_owid: str
     dataset_description_producer: str
     producer: str
@@ -141,9 +141,9 @@ def app(run_checks: bool) -> None:
                 ),
                 pi.input(
                     "Origin: Dataset title by the Producer",
-                    name="dataset_title_producer",
+                    name="title",
                     placeholder="Testing Title Producer",
-                    value=state.get("dataset_title_producer"),
+                    value=state.get("title"),
                     help_text="Dataset title written by Producer (without a year). Example: Natural disasters",
                 ),
                 pi.textarea(
