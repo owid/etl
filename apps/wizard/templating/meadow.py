@@ -210,7 +210,7 @@ if submitted:
         step_path = DATASET_DIR / (form.short_name + ".py")
         notebook_path = DATASET_DIR / "playground.ipynb"
 
-        if not form.generate_notebook:
+        if (not form.generate_notebook) and (notebook_path.is_file()):
             os.remove(notebook_path)
 
         # Display next steps

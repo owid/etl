@@ -4,9 +4,11 @@
   "$defs": {
     "axis": {
       "type": "object",
+      "description": "Axis definition",
       "properties": {
         "removePointsOutsideDomain": {
           "type": "boolean",
+          "description": "",
           "default": false
         },
         "label": {
@@ -210,29 +212,54 @@
   "properties": {
     "dataset": {
       "type": "object",
+      "description": "An ETL dataset is a collection of tables. The dataset metadata fields are the attributes of the `DatasetMeta` object in ETL.",
       "additionalProperties": false,
       "properties": {
         "title": {
-          "type": "string"
+          "type": "string",
+          "title": "Title of this ETL dataset",
+          "description": "Title of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one-line description of the dataset (follow the guidelines of the origin's `data_product_title`). NOTE: Dataset titles should be propagated automatically from snapshots. By default, the title of the dataset will be the title of the containing table. But, if there are multiple tables, or if the user wants to manually edit the dataset title, it can be done by editing `dataset.title`.",
+          "requirement_level": "required (often automatic)"
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "title": "Description of this ETL dataset",
+          "description": "Description of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the dataset (follow the guidelines of the origin's `description`). NOTE: Dataset descriptions should be propagated automatically from snapshots. By default, the description of the dataset will be the description of the containing table. But, if there are multiple tables, or if the user wants to manually edit the dataset description, it can be done by editing `dataset.description`.",
+          "requirement_level": "recommended (often automatic)"
         },
         "update_period_days": {
-          "type": "integer"
+          "type": "integer",
+          "title": "Number of days between OWID updates",
+          "description": "Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`.",
+          "guidelines": [
+            ["Must be defined in the garden step."],
+            ["Must be an integer."]
+          ],
+          "examples": ["7", "30", "90", "365"],
+          "examples_bad": [["2023-01-07"], ["monthly"], ["0.2"], ["1/365"]],
+          "requirement_level": "required"
         },
         "licenses": {
           "type": "array",
+          "description": "List of all licenses that have been involved in the processing history of the indicators in this dataset. NOTE: Licenses should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails. In the near future, this field may not even exist, since `licenses` should only exist inside `origins`.",
           "items": { "$ref": "definitions.json#/license" }
         },
         "sources": {
           "type": "array",
+          "description": "List of all sources of the indicators in this dataset. NOTE: This is no longer in use, you should use origins.",
           "items": { "$ref": "definitions.json#/source" }
+        },
+        "origins": {
+          "type": "array",
+          "description": "List of all origins of the indicators in this dataset. NOTE: Origins should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails.",
+          "requirement_level": "required (automatic)",
+          "items": { "$ref": "definitions.json#/origin" }
         }
       }
     },
     "tables": {
       "type": "object",
+      "description": "A table is a collection of indicators that share the same index. The table metadata fields are the attributes of the `TableMeta` object in ETL.",
       "propertyNames": {
         "pattern": "^[a-z0-9_]*$"
       },
@@ -241,13 +268,20 @@
         "additionalProperties": false,
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "title": "Title of this ETL table",
+            "description": "Title of the table (mostly for internal purposes, or for users of our data catalog) which is a few words description of the table (follow the guidelines as origin's `title`). NOTE: Table titles should be propagated automatically from snapshots (from origin's `title`). But, if there are multiple tables, or if the user wants to manually edit the title, it can be done by editing `table.title`.",
+            "requirement_level": "required (often automatic)"
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "title": "Description of this ETL table",
+            "description": "Description of the table (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the table (follow the guidelines of origin's `description`). NOTE: Table descriptions should be propagated automatically from snapshots (from origin's `description`). But, if there are multiple tables, or if the user wants to manually edit the description, it can be done by editing `table.description`.",
+            "requirement_level": "recommended (often automatic)"
           },
           "variables": {
             "type": "object",
+            "description": "An indicator (also commonly called 'variable') is a collection of data points (usually a time series) with metadata. The indicator metadata fields are the attributes of the `VariableMeta` object in ETL.",
             "propertyNames": {
               "pattern": "^[a-z0-9_]*$"
             },
@@ -256,77 +290,262 @@
               "additionalProperties": false,
               "properties": {
                 "title": {
-                  "type": "string"
+                  "title": "Indicator's title",
+                  "type": "string",
+                  "description": "Title of the indicator, which is a few words definition of the indicator.",
+                  "examples": [
+                    "Number of neutron star mergers in the Milky Way",
+                    "Share of neutron star mergers that happen in the Milky Way"
+                  ],
+                  "examples_bad": [
+                    ["Number of neutron stars (NASA)"],
+                    ["Share of neutron star mergers that happen in the Milky Way (2023)"]
+                  ],
+                  "requirement_level": "required",
+                  "guidelines": [
+                    ["Must start with a capital letter."],
+                    ["Must not end with a period."],
+                    ["Must be one short sentence (a few words)."],
+                    ["Should not mention other metadata fields like `producer` or `version`."],
+                    ["For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), consider using other metadata fields to improve the public appearance of the title (namely `presentation.title_public` and `grapher_config.title`)."]
+                  ],
+                  "category": "metadata"
+                },
+                "description_short": {
+                  "title": "Indicator's short description",
+                  "type": "string",
+                  "description": "One or a few lines that complement the title, so you have a short description of the indicator.",
+                  "requirement_level": "required",
+                  "guidelines": [
+                    ["Must start with a capital letter."],
+                    ["Must end with a period."],
+                    ["Must be one short paragraph, suitable to fit in a chart subtitle."],
+                    ["Should not mention any other metadata fields (like information about the processing, or the origins, or the units).", {"type": "exceptions", "value": ["The unit can be mentioned if it is crucial for the description."]}]
+                  ],
+                  "category": "metadata"
+                },
+                "description_key": {
+                  "title": "Indicator's key description points",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "List of key points about the indicator.",
+                  "requirement_level": "recommended (only for curated data pages)",
+                  "guidelines": [
+                    ["Must be a list of one or more short paragraphs.", {"type": "list", "value": ["Each paragraph must start with a capital letter.", "Each paragraph must end with a period."]}],
+                    ["Should contain all the key information given in other description fields, like `description_short`, `grapher_config.subtitle` or `grapher_config.note`."],
+                    ["Should not contain information about processing (which should be in `description_processing`)."],
+                    ["Should only contain information that is key to the public.", {"type": "list", "value": ["Anything that is too detailed or technical should be left in the code."]}]
+                  ],
+                  "category": "metadata"
+                },
+                "description_processing": {
+                  "title": "Indicator's processing description",
+                  "type": "string",
+                  "description": "Relevant information about the processing of the indicator done by OWID.",
+                  "requirement_level": "required (if applicable)",
+                  "guidelines": [
+                    ["Must start with a capital letter."],
+                    ["Must end with a period."],
+                    ["Must be used if important editorial decisions have been taken during data processing."],
+                    ["Must not be used to describe common processing steps like country harmonization."],
+                    ["Should only contain key processing information to the public.", {"type": "list", "value": ["Anything that is too detailed or technical should be left in the code."]}]
+                  ],
+                  "category": "metadata"
+                },
+                "description_from_producer": {
+                  "title": "Indicator's description given by the producer",
+                  "type": "string",
+                  "description": "Description of the indicator written by the producer, if any was given.",
+                  "requirement_level": "recommended (if existing)",
+                  "guidelines": [
+                    ["Must start with a capital letter."],
+                    ["Must end with a period."],
+                    ["Should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits."],
+                    ["Should only be given if the producer clearly provides such definitions in a structured way. Avoid spending time searching for a definition given by the producer elsewhere."]
+                  ],
+                  "category": "metadata"
                 },
                 "unit": {
-                  "type": ["string", "null"]
+                  "title": "Indicator's unit",
+                  "type": "string",
+                  "description": "Very concise name of the unit we use to measure the indicator values.",
+                  "examples": ["tonnes per hectare", "kilowatts per person"],
+                  "examples_bad": [["tonnes/hectare"], ["kilowatts per capita"]],
+                  "requirement_level": "required",
+                  "guidelines": [
+                    ["Must not start with a capital letter."],
+                    ["Must not end with a period."],
+                    ["Must be empty if the indicator has no units."],
+                    ["Must be in plural."],
+                    ["Must be a metric unit when applicable."],
+                    ["Should not use symbols like “/”.", {"type": "list", "value": ["If it is a derived unit, use “per” to denote a division, e.g. '... per hectare', or '... per person'."]}],
+                    ["Should be '%' for percentages."]
+                  ],
+                  "category": "metadata"
                 },
                 "short_unit": {
-                  "type": ["string", "null"]
+                  "title": "Indicator's unit (short version)",
+                  "type": "string",
+                  "description": "Characters that represent the unit we use to measure the indicator value.",
+                  "examples": ["t/ha", "%", ".../person"],
+                  "examples_bad": [["t / ha"], ["pct"], ["pc"]],
+                  "requirement_level": "required",
+                  "guidelines": [
+                    ["Must follow the rules of capitalization of the International System of Units, when applicable."],
+                    ["Must not end with a period."],
+                    ["Must be empty if the indicator has no units."],
+                    ["Should not contain spaces."],
+                    ["If, for clarity, we prefer to simplify the units in a chart, e.g. to show `kWh` instead of `kWh/person`, use `display.short_unit` for the simplified units, and keep the correct one in `indicator.short_unit` (and ensure there is no ambiguity in the chart)."]
+                  ],
+                  "category": "metadata"
                 },
-                "description": {
-                  "type": ["string", "null"]
+                "processing_level": {
+                  "title": "Indicator's processing level",
+                  "type": "string",
+                  "enum": ["minor", "major"],
+                  "description": "Level of processing that the indicator values have experienced.",
+                  "requirement_level": "required (in the future this could be automatic).",
+                  "guidelines": [
+                    ["Must be `minor` if the indicator has undergone only minor operations since its origin:", {"type": "list", "value": ["Rename entities (e.g. countries or columns)", "Multiplication by a constant (e.g. unit change)", "Drop missing values."]}],
+                    ["Must be `major` if any other operation is used:", {"type": "list", "value": ["Data aggregates (e.g. sum data for continents or income groups)", "Operations between indicators (e.g. per capita, percentages, annual changes)", "Concatenation of indicators, etc."]}]
+                  ],
+                  "category": "metadata"
                 },
-                "description_short": { "type": "string" },
-                "description_from_producer": { "type": "string" },
-                "description_key": {
-                  "type": "array",
-                  "items": { "type": "string" }
+                "license": {
+                  "title": "Indicator's final license",
+                  "type": "string",
+                  "description": "License of the indicator, which depends on the indicator's processing level and the origins' licenses.",
+                  "requirement_level": "required (in the future this could be automatic)",
+                  "guidelines": [
+                    ["If the indicator's `processing_level` is major, assign `CC BY 4.0`."],
+                    ["If the indicator's `processing_level` is minor, choose the most strict license among the origins' `licenses`."]
+                  ],
+                  "category": "metadata"
                 },
                 "sources": {
                   "type": "array",
+                  "description": "List of all sources of the indicator. Automatically filled. NOTE: This is no longer in use, you should use origins.",
                   "items": { "$ref": "definitions.json#/source" }
                 },
                 "origins": {
                   "type": "array",
+                  "description": "List of all origins of the indicator. Automatically filled.",
                   "items": { "$ref": "definitions.json#/origin" }
                 },
                 "licenses": {
                   "type": "array",
+                  "description": "List of all licenses that have been involved in the processing history of the indicator. Automatically filled.",
                   "items": { "$ref": "definitions.json#/license" }
                 },
                 "display": { "$ref": "definitions.json#/display" },
-                "processing_level": {
-                  "type": "string",
-                  "enum": ["minor", "major"]
-                },
                 "presentation_license": {
                   "type": "object",
+                  "description": "Custom license for the indicator. This is usally not needed and the value from `license` is used.",
                   "additionalProperties": false,
                   "properties": {
                     "url": {
+                      "description": "",
                       "type": "string"
                     },
                     "name": {
+                      "description": "",
                       "type": "string"
                     }
                   }
                 },
                 "presentation": {
                   "type": "object",
+                  "description": "An indicator's presentation defines how the indicator's metadata will be shown on our website (e.g. in data pages). The indicator presentation metadata fields are the attributes of the `VariablePresentationMeta`object in ETL.",
                   "additionalProperties": false,
                   "properties": {
-                    "title_public": { "type": "string" },
-                    "title_variant": { "type": "string" },
-                    "attribution": { "type": "string" },
-                    "producer_short": { "type": "string" },
+                    "title_public": {
+                      "type": "string",
+                      "description": "Indicator title to be shown in data pages (follow the guidelines of indicator's `title`). NOTE: This may be needed, for example, when the indicator comes from a big dataset where titles can't easily be curated manually. For those cases, `title_public` will override the indicator's `title`.",
+                      "requirement_level": "optional"
+                    },
+                    "title_variant": {
+                      "type": "string",
+                      "title": "Indicator's title variant",
+                      "description": "Short disambiguation of the title that references a special feature of the methods or nature of the data.",
+                      "requirement_level": "optional",
+                      "guidelines": [
+                        ["Must start with a capital letter."],
+                        ["Must not end in a period."],
+                        ["Should be very short."],
+                        ["Should only be used if the indicator's title is ambiguous (e.g. if there are multiple indicators with the same title)."]
+                      ],
+                      "examples": [
+                        "Age-standardized",
+                        "Historical data"
+                      ],
+                      "examples_bad": [
+                        ["The data is age-standardized"],
+                        ["Historical data from 1800 to 2010"]
+                      ]
+                    },
+                    "attribution": {
+                      "type": "string",
+                      "title": "Indicator's attribution",
+                      "description": "",
+                      "guidelines": [
+                        ["Must start with a capital letter."],
+                        ["Must join multiple attributions by a `;`."],
+                        ["Must not end in a period (and must **not** end in `;`)."],
+                        ["Should only be used when the automatic attribution format (of one or multiple origins) needs to be manually edited."]
+                      ],
+                      "requirement_level": "optional"
+                    },
+                    "producer_short": {
+                      "type": "string",
+                      "title": "Indicator's attribution (shorter version)",
+                      "description": "Very short citation of the indicator's main producer(s).",
+                      "requirement_level": "recommended (for curated data pages)",
+                      "guidelines": [
+                        ["Must start with a capital letter."],
+                        ["Must not end in a period."],
+                        ["Should be very short."],
+                        ["Should be used if the automatic concatenation of origin's `attribution_short` are too long. In those cases, choose the most important `attribution` (e.g. the main producer of the data)."]
+                      ]
+                    },
                     "topic_tags_links": {
                       "type": "array",
+                      "title": "Indicator's topic tags",
+                      "description": "List of topics where the indicator is relevant.",
+                      "requirement_level": "recommended (only for curated data pages)",
+                      "guidelines": [
+                        ["Must be an existing topic tag, and be spelled correctly (see the list of topic tags in http://datasette-private/owid?sql=SELECT+tags.%60name%60+from+tags+where+isTopic+%3D+1+ORDER+BY+tags.%60name%60%0D%0A)."],
+                        ["The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator)."],
+                        ["Should contain 1, 2, or at most 3 tags."]
+                      ],
                       "items": { "type": "string" }
                     },
                     "faqs": {
                       "type": "array",
+                      "title": "Indicator's FAQs",
+                      "description": "List of references to questions in an FAQ google document, relevant to the indicator.",
+                      "requirement_level": "recommended (only for curated data pages)",
+                      "guidelines": [
+                        ["Each reference must contain `fragment_id` (question identifier) and `gdoc_id` (document identifier)."]
+                      ],
                       "items": {
                         "type": "object",
                         "properties": {
-                          "gdoc_id": { "type": "string" },
-                          "fragment_id": { "type": "string" }
+                          "gdoc_id": {
+                            "type": "string",
+                            "examples": ["gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE"]
+                          },
+                          "fragment_id": {
+                            "type": "string",
+                            "examples": ["fragment_id: cherries"]
+                          }
                         }
                       }
                     },
                     "grapher_config": {
                       "type": "object",
-                      "description": "Our World In Data grapher configuration. Most of the fields can be left empty and will be\nfilled with reasonable default values.\n",
+                      "description": "Our World In Data grapher configuration. Most of the fields can be left empty and will be filled with reasonable default values.",
                       "properties": {
                         "$schema": {
                           "type": "string",
@@ -419,11 +638,16 @@
                         },
                         "subtitle": {
                           "type": "string",
-                          "description": "The longer subtitle text to show beneath the title"
+                          "description": "Default subtitle to use in charts for the indicator. NOTE: Use this field to override an indicator's `description_short` with information that is more suitable for a chart subtitle.",
+                          "guidelines": [
+                            ["Must start with a capital letter."],
+                            ["Must end with a period."],
+                            ["Must be one short paragraph, suitable to fit in a chart subtitle."]
+                          ]
                         },
                         "selectedEntityNames": {
                           "type": "array",
-                          "description": "The initial selection of entities",
+                          "description": "List of entities (e.g. harmonized country names) to use by default in charts for the indicator.",
                           "items": {
                             "type": ["string"]
                           }
@@ -468,10 +692,12 @@
                         },
                         "hideLegend": {
                           "type": "boolean",
+                          "description": "Hide legend in chart.",
                           "default": false
                         },
                         "hideLogo": {
                           "type": "boolean",
+                          "description": "Hide logo in chart.",
                           "default": false
                         },
                         "timelineMinTime": {
@@ -545,10 +771,12 @@
                           "description": "Slug of the chart on Our World In Data"
                         },
                         "internalNotes": {
+                          "description": "Internal notes.",
                           "type": "string"
                         },
                         "version": {
                           "type": "integer",
+                          "description": "",
                           "default": 1,
                           "minimum": 0
                         },
@@ -570,7 +798,14 @@
                         },
                         "note": {
                           "type": "string",
-                          "description": "Note displayed in the footer of the chart. To be used for clarifications etc about the data."
+                          "description": "Default footer note to use in charts for the indicator.",
+                          "guidelines": [
+                            ["Must start with a capital letter."],
+                            ["Must end with a period."],
+                            ["Must not include 'Note:' at the beginning (this is added automatically)."],
+                            ["Must be one short paragraph, usually one sentence, suitable to fit in a chart footer note."],
+                            ["Should not mention any other metadata fields."]
+                          ]
                         },
                         "dimensions": {
                           "type": "array",
@@ -638,7 +873,7 @@
                         },
                         "title": {
                           "type": "string",
-                          "description": "Big title text of the chart"
+                          "description": "Default title to use in charts for the indicator (follow guidelines of indicator's `title`)."
                         },
                         "type": {
                           "type": "string",
@@ -659,7 +894,7 @@
                         "hasMapTab": {
                           "type": "boolean",
                           "default": false,
-                          "description": "Indicates if the map tab should be shown"
+                          "description": "Whether the default chart for the indicator should include a map tab."
                         },
                         "stackMode": {
                           "type": ["string", "null"],

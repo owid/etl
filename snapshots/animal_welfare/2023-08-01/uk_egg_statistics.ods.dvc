@@ -7,15 +7,14 @@ meta:
     producer: Department for Environment, Food & Rural Affairs of the United Kingdom
     citation_producer: |
       Quarterly UK statistics on Egg Packing Station Throughput and Prices, by the Department for Environment, Food & Rural Affairs of the United Kingdom.
-    attribution: Department for Environment, Food & Rural Affairs of the United Kingdom
-    attribution_short: Defra
+    attribution_short: UK Defra
     date_published: 2023-07-27
     date_accessed: 2023-08-01
     dataset_url_main: https://www.gov.uk/government/statistics/egg-statistics
-    dataset_url_download: 
+    dataset_url_download:
       https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1173898/egg-packers-27july23.ods
   license:
-    url: 
+    url:
       https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1173898/egg-packers-27july23.ods
     name: Public domain
 

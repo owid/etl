@@ -294,10 +294,10 @@ if submitted:
         notebook_path = DATASET_DIR / "playground.ipynb"
         metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
 
-        if not form.generate_notebook:
+        if (not form.generate_notebook) and (notebook_path.is_file()):
             os.remove(notebook_path)
 
-        if not form.include_metadata_yaml:
+        if (not form.include_metadata_yaml) and (metadata_path.is_file()):
             os.remove(metadata_path)
 
         # Fill with dummy metadata

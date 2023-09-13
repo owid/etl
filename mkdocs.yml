@@ -1,4 +1,4 @@
-site_name: Data pipeline
+site_name: Data workflow
 
 repo_name: owid/etl
 repo_url: https://github.com/owid/etl
@@ -52,7 +52,11 @@ nav:
           - Private steps: "architecture/workflow/other-steps/private.md"
       - Metadata:
         - Metadata: "architecture/metadata/index.md"
-        - Metadata fields: "architecture/metadata/fields.md"
+        - Workflow with metadata: "architecture/metadata/workflow.md"
+        - Reference:
+          - origin reference: "architecture/metadata/reference-origin.md"
+          - dataset reference: "architecture/metadata/reference-dataset.md"
+          - tables reference: "architecture/metadata/reference-tables.md"
         - Propagation of metadata: "architecture/metadata/propagation.md"
         - Using metadata: "architecture/metadata/using.md"
   - API and catalog:
@@ -106,11 +110,15 @@ theme:
   custom_dir: docs/overrides
 
 markdown_extensions:
+  - pymdownx.critic
   - admonition
   - abbr
   - attr_list
   - pymdownx.details
   - pymdownx.snippets
+  - pymdownx.superfences
+  - md_in_html
+  - pymdownx.superfences
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -126,6 +134,12 @@ plugins:
   - mkdocs-jupyter:
       ignore_h1_titles: True
   - search
+  - exclude:
+      glob:
+        - ignore/
+  - gen-files:
+      scripts:
+        - docs/ignore/gen_metadata_reference.py  # or any other name or path
 
 extra_css:
   - css/extra.css

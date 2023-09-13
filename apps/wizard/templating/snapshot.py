@@ -9,6 +9,7 @@ from st_pages import add_indentation
 from typing_extensions import Self
 
 from apps.wizard import utils
+from etl.docs import examples_to_markdown, guidelines_to_markdown
 from etl.helpers import read_json_schema
 from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
 
@@ -21,7 +22,7 @@ add_indentation()
 # Page config
 # st.set_page_config(page_title="Wizard (snapshot)", page_icon="🪄")
 # Read schema
-SNAPSHOT_SCHEMA = read_json_schema(SCHEMAS_DIR / "snapshot-schema.json")
+SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
 # Get properties for origin in schema
 schema_origin = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["properties"]
 # Lists with fields of special types. By default, fields are text inputs.
@@ -192,51 +193,27 @@ def load_instructions() -> str:
 
 def create_description(field: Dict[str, Any]) -> str:
     """Create description for field, using values `description` and `guidelines`."""
-    description = field["description"]
+    # Main description
+    toc = "[Description](#description) "
+    description = f"## Description\n\n {field['description']}"
+    # Guidelines
     if field.get("guidelines"):
-        description += "\n\n" + guidelines_to_markdown(guidelines=field["guidelines"])
-    return description
-
-
-def guidelines_to_markdown(guidelines: List[Any]) -> str:
-    """Render guidelines to markdown from given list in schema."""
-    text = "**Guidelines**\n"
-    for guideline in guidelines:
-        # Main guideline
-        if isinstance(guideline[0], str):
-            # Add main guideline
-            text += f"\n- {guideline[0]}"
+        description += "\n## Guidelines\n\n" + guidelines_to_markdown(guidelines=field["guidelines"], extra_tab=0)
+        toc += "| [Guidelines](#guidelines) "
+    # Examples (good vs bad)
+    if field.get("examples"):
+        if "examples_bad" in field:
+            description += "\n## Examples\n\n" + examples_to_markdown(
+                examples=field["examples"], examples_bad=field["examples_bad"], extra_tab=0, do_sign="✅", dont_sign="❌"
+            )
         else:
-            raise TypeError("The first element of an element in `guidelines` must be a string!")
-
-        # Additions to the guideline (nested bullet points, exceptions, etc.)
-        if len(guideline) == 2:
-            if isinstance(guideline[1], dict):
-                # Sanity checks
-                if "type" not in guideline[1]:
-                    raise ValueError("The second element of an element in `guidelines` must have a `type` key!")
-                if "value" not in guideline[1]:
-                    raise ValueError("The second element of an element in `guidelines` must have a `value` key!")
-
-                # Render exceptions
-                if guideline[1]["type"] == "exceptions":
-                    text += " Exceptions:"
-                    for exception in guideline[1]["value"]:
-                        text += f"\n\t- {exception}"
-                # Render nested list
-                elif guideline[1]["type"] == "list":
-                    for subitem in guideline[1]["value"]:
-                        text += f"\n\t- {subitem}"
-                # Exception
-                else:
-                    raise ValueError(f"Unknown guideline type: {guideline[1]['type']}!")
-            else:
-                raise TypeError("The second element of an element in `guidelines` must be a dictionary!")
-
-        # Element in guideliens is more than 2 items long
-        if len(guideline) > 2:
-            raise ValueError("Each element in `guidelines` must have at most 2 elements!")
-    return text
+            description += "\n## Examples\n\n" + examples_to_markdown(
+                examples=field["examples"], examples_bad=[], extra_tab=0, do_sign="✅", dont_sign="❌"
+            )
+        toc += "| [Examples](#examples) "
+    # Insert TOC at the beginnining of description
+    description = toc.strip() + "\n\n" + description
+    return description
 
 
 def render_fields_init() -> None:
@@ -245,23 +222,23 @@ def render_fields_init() -> None:
     fields = [
         {
             "title": "Namespace",
-            "description": "Institution or topic name",
+            "description": "## Description\n\nInstitution or topic name",
             "placeholder": "'emdat', 'health'",
         },
         {
-            "title": "Snapshot Version",
-            "description": "Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
+            "title": "Snapshot version",
+            "description": "## Description\n\nVersion of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
             "placeholder": f"'{utils.DATE_TODAY}'",
             "value": utils.DATE_TODAY,
         },
         {
             "title": "Short name",
-            "description": "Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
+            "description": "## Description\n\nDataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
             "placeholder": "'cherry_blossom'",
         },
         {
             "title": "File extension",
-            "description": "File extension (without the '.') of the file to be downloaded.",
+            "description": "## Description\n\nFile extension (without the '.') of the file to be downloaded.",
             "placeholder": "'csv', 'xls', 'zip'",
         },
     ]
@@ -331,7 +308,7 @@ def render_fields_from_schema(
                 kwargs = {
                     "label": display_name,
                     "help": create_description(field=props),
-                    "placeholder": props["examples"] if props["examples"] else "",
+                    "placeholder": props["examples"][:3] if isinstance(props["examples"], str) else "",
                     "key": prop_uri,
                 }
                 if categories:
@@ -400,7 +377,27 @@ def render_license_field(form: List[Any]) -> List[str]:
     props = props_license["properties"][name]
     display_name = create_display_name_snap_section(props, name, property_name)
 
-    help_text = props["description"] + "\n\n" + props_license["description"].replace("\n", "\n\n\n")
+    # Main decription
+    toc = "[Description](#description) "
+    help_text = (
+        "## Description\n\n" + props["description"] + "\n\n" + props_license["description"].replace("\n", "\n\n\n")
+    )
+    # Guidelines
+    if props.get("guidelines"):
+        help_text += "\n## Guidelines" + guidelines_to_markdown(guidelines=props["guidelines"])
+        toc += "| [Guidelines](#guidelines) "
+    # Examples (good vs bad)
+    if props.get("examples"):
+        if "examples_bad" in props:
+            help_text += "\n## Examples" + examples_to_markdown(
+                examples=props["examples"], examples_bad=props["examples_bad"], extra_tab=0, do_sign="✅", dont_sign="❌"
+            )
+        else:
+            help_text += "\n## Examples" + examples_to_markdown(
+                examples=props["examples"], examples_bad=[], extra_tab=0, do_sign="✅", dont_sign="❌"
+            )
+        toc += "| [Examples](#examples) "
+    help_text = toc.strip() + "\n\n" + help_text
     options = sorted(props["options"])
 
     # Default option in select box for custom license

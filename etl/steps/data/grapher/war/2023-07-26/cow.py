@@ -4,7 +4,7 @@ from typing import cast
 
 from owid.catalog import Dataset
 
-from etl.helpers import PathFinder, create_dataset, grapher_checks
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

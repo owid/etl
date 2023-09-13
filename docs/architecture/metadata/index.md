@@ -1,29 +1,31 @@
-!!! warning "This is still being written."
+<!-- !!! warning "This is still being written."
 
-    Our metadata formats are still in flux, and are likely to change substantially over the coming months.
-
-
-    We are currently working on version 2 of our metadata, for which you can find most up-to-date documentation [on Notion :octicons-arrow-right-24:](https://www.notion.so/owid/Metadata-guidelines-29ca6e19b6f1409ea6826a88dbb18bcc)
+    Our metadata formats are still in flux, and are likely to change over the coming weeks. -->
 
 
-In our [data model](../design/common-format.md), we have various data objects: _Snapshots_, _datasets_ that contain _tables_ with _variables_, etc.
+One of the main values of our work is the careful documentation that we provide along with our data and articles. In the context of
+ data, we have created a metadata system in ETL that allows us to describe the data that we are working with.
 
 
-At each step, you can tweak, change and add new metadata. However, the most standard places to have metadata defined are in [Snapshot](workflow/snapshot.md) and in [Garden](workflow/garden.md).
+In our [data model](../design/common-format.md) there are various data objects (_Snapshots_, _datasets_ that contain _tables_ with _indicators_, etc.), each of them with different types of metadata.
+
+
+
+The metadata is ingested into ETL in the form of YAML files, which live next to the scripts. Metadata can be ingested at any ETL step to tweak, change and add new metadata. However, the most standard places to have metadata defined are in Snapshot and in Garden.
 
 
 ## Snapshot
 In Snapshot we define metadata attributes for the data source product. We make sure that all the different files, datasets and publications that we ingest to our system are properly documented. This includes making sure that these have licenses, descriptions, titles and other information assigned.
 
 
-[Learn about the fields available in Snapshot :octicons-arrow-right-24:](fields.md)
+[Learn about the fields available in Snapshot :octicons-arrow-right-24:](workflow.md#metadata-in-snapshot)
 
 ## Garden
-In Garden we focus on the metadata of the finished product. After all necessary ETL steps, the initial source file (or files) has (or have) been transformed into a curated dataset. This dataset may have multiple tables, each of which will have various indicators.
+In Garden we focus on the metadata of the finished product. After all necessary ETL steps, the initial source file (or files) has (or have) been transformed into a curated dataset. This dataset may have multiple tables, each of them with various indicators.
 
-In this step we add more metadata content that describe this dataset, these tables and these indicators. Here, we focuss on the output of ETL (and not the input, i.e. the source). This means, that we may elaborate on the processing that a specific indicator has undergone (or how it has been created), how do we want these indicators to be called, etc.
+In this step we add metadata that describes this dataset, these tables and these indicators. We focuss on the output of ETL (and not the input, i.e. the origin). This means, for instance, adding details on the processing that a specific indicator has undergone (or how it has been created), how do we want these indicators to be called, etc.
 
-[Learn about the fields available in Garden :octicons-arrow-right-24:](fields.md)
+[Learn about the fields available in Garden :octicons-arrow-right-24:](workflow.md#metadata-in-garden)
 
 
 ## Propagation of metadata
