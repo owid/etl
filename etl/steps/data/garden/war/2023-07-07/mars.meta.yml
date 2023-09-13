@@ -42,7 +42,15 @@ dataset:
 
     Deaths of combatants due to fighting are included.
 
-    We use the world regions as defined by Project Mars: Asia, Eastern Europe, Latin America, North Africa and the Middle East, North America, Sub-Saharan Africa, and Western Europe.
+    We use the world regions as defined by Project Mars. The regions are shown below, along with the codes of the countries in them. Find the complete list of country codes at https://correlatesofwar.org/wp-content/uploads/states2016.csv.
+
+    - Asia and Oceania: 700-990
+    - Eastern Europe: 200-280, 305, 325-338, 375-395
+    - Latin America: 31-165
+    - North Africa and the Middle East: 432, 435-436, 483, 520-531, 600-698
+    - North America: 2-20
+    - Sub-Saharan Africa: 402-420, 433-434, 437-482, 484-517, 540-591
+    - Western Europe: 290-300, 310-317, 339-373,
 
     You can find more information about the data in our article: [To be published]
 
