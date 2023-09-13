@@ -35,7 +35,10 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
     # Prepare requirement_level
     requirement_level = ""
     if "requirement_level" in prop:
-        requirement_level = f" | {prop['requirement_level']}"
+        if "required" in prop['requirement_level']:
+            requirement_level = f" | {{=={prop['requirement_level']}==}}"
+        else:
+            requirement_level = f" | {prop['requirement_level']}"
     # Prepare guidelines
     guidelines = ""
     if "guidelines" in prop and prop.get("guidelines"):
@@ -87,7 +90,8 @@ def render_props_recursive(prop: Dict[str, Any], prop_name: str, level: int, tex
             props_children = prop["properties"]
         else:
             return text
-        for prop_name_child, prop_child in props_children.items():
+        props_children_sorted = dict(sorted(props_children.items()))
+        for prop_name_child, prop_child in props_children_sorted.items():
             text += render_props_recursive(prop_child, prop_name=f"{prop_name}.{prop_name_child}", level=level + 1, text="")
     else:
         text += render_prop_doc(prop, prop_name=prop_name, level=level)
