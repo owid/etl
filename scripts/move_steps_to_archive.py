@@ -60,6 +60,7 @@ def move_steps_to_archive_cli(include: Optional[None], dry_run=False) -> None:
                     new_path.parent.mkdir(parents=True, exist_ok=True)
                     file.rename(new_path)
 
+            """This is currently disabled, because DVC complains about missing files
             # move snapshots
             for snap in snapshots:
                 old_dir = (paths.SNAPSHOTS_DIR / snap.split("//")[1]).parent
@@ -82,6 +83,7 @@ def move_steps_to_archive_cli(include: Optional[None], dry_run=False) -> None:
                 if not dry_run:
                     new_dir.parent.mkdir(parents=True, exist_ok=True)
                     old_dir.rename(new_dir)
+            """
 
 
 def _load_active_steps() -> Set[str]:
