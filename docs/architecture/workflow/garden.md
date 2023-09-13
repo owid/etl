@@ -38,16 +38,16 @@ flowchart LR
     classDef node_ss fill:#002147,color:#fff
 ```
 
-However, garden steps could also depend on other garden steps. This is often the case for datasets containing _long-run variables_, where different `garden` datasets are combined.
+However, garden steps could also depend on other garden steps. This is often the case for datasets containing _long-run indicators_, where different `garden` datasets are combined.
 
 
-!!! info "Long-run variables"
+!!! info "Long-run indicators"
 
-    A long-run variable is a variable that has datapoints spanning over a broad period of time and that typically relies on multiple sources.
+    A long-run indicator is an indicator that has datapoints spanning over a broad period of time and that typically relies on multiple sources.
 
-    For instance, we have a [population variable](https://ourworldindata.org/population-sources) that combines data from the UN and other sources that goes back to 10,000 BCE. In particular, it uses data from the UN, Gapminder and HYDE.
+    For instance, we have a [population indicator](https://ourworldindata.org/population-sources) that combines data from the UN and other sources that goes back to 10,000 BCE. In particular, it uses data from the UN, Gapminder and HYDE.
 
-    This is how the dependency graph our population variable looks like:
+    This is how the dependency graph our population indicator looks like:
 
     ```yaml
       data://garden/demography/2023-03-31/population:
@@ -142,7 +142,7 @@ To use the tool, you upload a CSV file containing a column called `Country`, and
 
 
 ## Metadata
-In our [data model](../design/common-format.md), datasets contain tables of data, and those tables contain variables. Each of these levels supports metadata.
+In our [data model](../design/common-format.md), datasets contain tables of data, and those tables contain indicators. Each of these levels supports metadata.
 
 !!! warning "This is still being written."
 

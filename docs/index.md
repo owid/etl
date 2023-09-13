@@ -4,7 +4,7 @@ Welcome to the public data pipeline for [Our World In Data](https://ourworldinda
 
 Choose the material that most interests you:
 
-:octicons-terminal-16: I want to **set up my working environment** on my local machine<br>
+:octicons-terminal-16: I want to **set up the working environment** on my local machine<br>
 [Read more :octicons-arrow-right-24:](getting-started/index.md)
 
 :material-school: I want to **learn more about the pipeline** and how it operates<br>
