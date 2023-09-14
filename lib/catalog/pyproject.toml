@@ -2,7 +2,7 @@
 name = "owid-catalog"
 version = "0.3.5"
 description = "Core data types used by OWID for managing data."
-authors = ["Our World In Data <tech@ourworldindata.org>"]
+authors = ["Our World in Data <tech@ourworldindata.org>"]
 license = "MIT"
 packages = [{ include = "owid" }]
 readme = "README.md"

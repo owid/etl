@@ -2,7 +2,7 @@
 name = "owid-repack"
 version = "0.1.2"
 description = "Pack Pandas data frames into smaller, more memory-efficient data types."
-authors = ["Our World In Data <tech@ourworldindata.org>"]
+authors = ["Our World in Data <tech@ourworldindata.org>"]
 license = "MIT"
 packages = [{ include = "owid" }]
 readme = "README.md"
