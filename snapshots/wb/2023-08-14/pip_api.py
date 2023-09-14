@@ -327,7 +327,6 @@ def generate_percentiles_raw():
                     if Path(
                         f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
                     ).is_file():
-                        log.info(f"Found! (countries, {povline}, {ppp_version} PPPs)")
                         continue
                     else:
                         executor.submit(get_percentiles_data, povline, versions, ppp_version)
@@ -354,7 +353,6 @@ def generate_percentiles_raw():
                     if Path(
                         f"{PARENT_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
                     ).is_file():
-                        log.info(f"Found! (regions, {povline}, {ppp_version} PPPs)")
                         continue
                     else:
                         executor.submit(get_percentiles_data_region, povline, versions, ppp_version)
@@ -364,7 +362,9 @@ def generate_percentiles_raw():
 
     # Run the main function
     concurrent_percentiles_function()
+    log.info("Country files downloaded")
     concurrent_percentiles_region_function()
+    log.info("Region files downloaded")
 
     log.info("Now we are concatenating the files")
 
@@ -376,7 +376,6 @@ def generate_percentiles_raw():
         # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
         file_path_country = f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
         if Path(file_path_country).is_file():
-            log.info(f"File to concatenate: countries, {povline}, {ppp_version} PPPs)")
             df_query_country = pd.read_csv(file_path_country)
         else:
             # Run the main function to get the data
@@ -392,7 +391,6 @@ def generate_percentiles_raw():
             f"{PARENT_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
         )
         if Path(file_path_region).is_file():
-            log.info(f"File to concatenate: regions, {povline}, {ppp_version} PPPs)")
             df_query_region = pd.read_csv(file_path_region)
         else:
             # Run the main function to get the data
@@ -412,6 +410,7 @@ def generate_percentiles_raw():
     # now that all futures have been started, wait for them all
     dfs = [f.result() for f in futures_country]
     df_country = pd.concat(dfs, ignore_index=True)
+    log.info("Country files concatenated")
 
     futures_region = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
@@ -423,6 +422,7 @@ def generate_percentiles_raw():
     # now that all futures have been started, wait for them all
     dfs = [f.result() for f in futures_region]
     df_region = pd.concat(dfs, ignore_index=True)
+    log.info("Region files concatenated")
 
     # Create poverty_line_cents column, multiplying by 100, rounding and making it an integer
     df_country["poverty_line_cents"] = round(df_country["poverty_line"] * 100).astype(int)
@@ -457,7 +457,11 @@ def generate_percentiles_raw():
 
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
-    print("Done. Execution time:", elapsed_time, "seconds")
+    print(
+        "Concatenation of raw percentile data for countries and regions completed. Execution time:",
+        elapsed_time,
+        "seconds",
+    )
 
     return df
 
@@ -503,7 +507,7 @@ def generate_consolidated_percentiles(df):
 
     # Estimate percentiles using concurrency
     futures = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         for p in percentiles:
             future = executor.submit(calculate_percentile, p, df)
             futures.append(future)
