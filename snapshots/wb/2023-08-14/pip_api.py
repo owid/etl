@@ -501,11 +501,14 @@ def generate_consolidated_percentiles(df):
     percentiles = range(1, 100, 1)
     df_percentiles = pd.DataFrame()
 
-    # Estimate percentiles using multiprocessing
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        futures = [executor.submit(calculate_percentile, p, df) for p in percentiles]
+    # Estimate percentiles using concurrency
+    futures = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        for p in percentiles:
+            future = executor.submit(calculate_percentile, p, df)
+            futures.append(future)
 
-    # dfs = [f.result() for f in concurrent.futures.as_completed(futures)]
+    # now that all futures have been started, wait for them all
     dfs = [f.result() for f in futures]
     df_percentiles = pd.concat(dfs, ignore_index=True)
 
