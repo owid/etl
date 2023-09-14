@@ -2,13 +2,13 @@
 
 
 # Learn more about the available fields:
-# http://localhost:8000/architecture/metadata/reference-dataset/
+# http://localhost:8000/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: {{cookiecutter.update_period_days}}
 
 
 # Learn more about the available fields:
-# http://localhost:8000/architecture/metadata/reference-tables/
+# http://localhost:8000/architecture/metadata/reference/tables/
 tables:
   {{cookiecutter.short_name}}:
     variables:
