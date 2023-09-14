@@ -546,7 +546,6 @@
         "errorMessage": "`date_accessed` must have format YYYY-MM-DD",
         "category": "files"
       },
-
       "title_snapshot": {
         "title": "Title of the snapshot",
         "type": "string",
