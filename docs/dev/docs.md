@@ -29,5 +29,8 @@ Now, you can test this by modifying one of the files in `docs/` and see how this
 ### Adding a new entry
 To add a new entry, simply create a markdown file in the `docs/` directory (or a directory that falls under it). Next, if you want this entry to be listed in the navigation bar, you'll need to add a reference to the file in the `mkdocs.yml` file.
 
+### Update the metadata reference
+All the reference documentation is generated using the schema files (see files under the `schemas` directory). If you want to tweak the description, examples or other fields in the reference, please take a look at [this guideline](https://github.com/owid/etl/issues/1566#issue-1875783217).
+
 ### Pull request
 Once you are happy with your documentation tweaks, make sure to create a pull request so that others can review your text.
