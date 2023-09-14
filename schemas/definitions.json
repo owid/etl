@@ -272,7 +272,7 @@
         "guidelines": [
           ["Must start with a capital letter."],
           ["Must end with a period."],
-          ["Must not mention other metadata fields like `producer` or `version_producer`.", {"type": "exceptions", "value": ["Other metadata fields are crucial in the description of the data product."]}],
+          ["Must not mention other metadata fields like `producer` or `version_producer`.", {"type": "exceptions", "value": ["These other metadata fields are crucial in the description of the data product."]}],
           ["Should describe the data product, not the snapshot (i.e. the subset of data we extract from the data product)."],
           ["Should ideally contain just one or a few paragraphs, that describe the data product succinctly."],
           ["If the producer provides a good description, use that, either exactly or conveniently rephrased."]
@@ -289,10 +289,10 @@
         ],
         "examples_bad": [
           [
-            "Global Carbon Budget",
-            "Neutron star mergers (NASA, 2023)",
+            ["Global Carbon Budget"],
+            ["Neutron star mergers (NASA, 2023)",
             "Data on neutron star mergers",
-            "Neutron star mergers dataset"
+            "Neutron star mergers dataset"]
           ]
         ],
         "requirement_level": "required (if different from `title`)",
@@ -342,7 +342,7 @@
           ["Must end with the year of `date_published` in parenthesis."],
           ["Must not include any semicolon `;`."],
           ["Should only be used if the automatic attribution format `producer (year)` is considered uninformative. For example, when the title of the data product is well known and should be cited along with the producer, or when the original version of the data product should also be mentioned."],
-          ["Should follow the format `{producer} - {title} {version_producer} ({year})`."],
+          ["If this field is used to mention the data product, follow the preferred format `{producer} - {title} {version_producer} ({year})` (where `version_producer` may be omitted)."],
           ["If the producer explicitly asked for a specific short citation, follow their guidelines and ignore the above."]
         ],
         "category": "citation"

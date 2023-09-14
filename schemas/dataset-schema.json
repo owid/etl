@@ -218,27 +218,27 @@
         "title": {
           "type": "string",
           "title": "Title of the ETL dataset",
-          "description": "Title of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one-line description of the dataset. NOTE: Dataset titles should be propagated automatically from snapshots. By default, the title of the dataset will be the title of the containing table. But, if there are multiple tables, or if the user wants to manually edit the dataset title, it can be done by editing `dataset.title`.",
+          "description": "Title of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one-line description of the dataset.",
           "requirement_level": "required (often automatic)",
           "guidelines": [
             ["Must start with a capital letter."],
             ["Must not end with a period."],
             ["Should identify the dataset (i.e. the collection of tables resulting from one or more original data products)."],
-            ["If the dataset contains only one table, use its title (which usually coincides with the title of a data product or a snapshot)."]
+            ["Should be used only to override the automatic title (which usually is the title of the containing table). For example, use it when the dataset contains multiple tables."]
           ]
         },
         "description": {
           "type": "string",
           "title": "Description of the ETL dataset",
-          "description": "Description of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the content of the tables. NOTE: Dataset descriptions should be propagated automatically from snapshots. By default, the description of the dataset will be the description of the containing table. But, if there are multiple tables, or if the user wants to manually edit the dataset description, it can be done by editing `dataset.description`.",
+          "description": "Description of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the content of the tables.",
           "requirement_level": "recommended (often automatic)",
           "guidelines": [
             ["Must start with a capital letter."],
             ["Must end with a period."],
-            ["Must not mention other metadata fields like `producer`.", {"type": "exceptions", "value": ["Other metadata fields are crucial in the description of the data product."]}],
+            ["Should not mention other metadata fields (e.g. `producer` or `date_published`).", {"type": "exceptions", "value": ["The other metadata fields are crucial in the description of the data product."]}],
             ["Should describe the dataset (i.e. the collection of tables resulting from one or more original data products)."],
             ["Should ideally contain just one or a few paragraphs, that describe its content succinctly."],
-            ["If the dataset contains only one table, use its description (which usually coincides with the title of a data product or a snapshot)."]
+            ["Should be used only to override the automatic description (which usually is the description of the containing table). For example, use it when the dataset contains multiple tables."]
           ]  
         },
         "update_period_days": {
@@ -285,26 +285,26 @@
           "title": {
             "type": "string",
             "title": "Title of the ETL table",
-            "description": "Title of the table (mostly for internal purposes, or for users of our data catalog) which is a few words description of the table. NOTE: Table titles should be propagated automatically from snapshots (from origin's `title`). But, if there are multiple tables, or if the user wants to manually edit the title, it can be done by editing `table.title`.",
+            "description": "Title of the table (mostly for internal purposes, or for users of our data catalog) which is a few words description of the table.",
             "requirement_level": "required (often automatic)",
             "guidelines": [
               ["Must start with a capital letter."],
               ["Must not end with a period."],
               ["Should identify the table."],
-              ["If the table has only one origin, use the title of the data product or snapshot."]
+              ["Should be used only to override the automatic title (which usually is the title of the origin). For example, use it when the table has multiple origins."]
             ]
           },
           "description": {
             "type": "string",
             "title": "Description of this ETL table",
-            "description": "Description of the table (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the table. NOTE: Table descriptions should be propagated automatically from snapshots (from origin's `description`). But, if there are multiple tables, or if the user wants to manually edit the description, it can be done by editing `table.description`.",
+            "description": "Description of the table (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the table.",
             "requirement_level": "recommended (often automatic)",
             "guidelines": [
               ["Must start with a capital letter."],
               ["Must end with a period."],
-              ["Must not mention other metadata fields like `producer`.", {"type": "exceptions", "value": ["Other metadata fields are crucial in the description of the table."]}],
+              ["Should not mention other metadata fields (e.g. `producer` or `date_published`).", {"type": "exceptions", "value": ["The other metadata fields are crucial in the description of the data product."]}],
               ["Should ideally contain just one or a few paragraphs, that describe its content succinctly."],
-              ["If the table has only one origin, use its description."]
+              ["Should be used only to override the automatic description (which usually is the description of the origin). For example, use it when the table has multiple origins."]
             ]  
           },
           "variables": {
@@ -490,7 +490,7 @@
                   "properties": {
                     "title_public": {
                       "type": "string",
-                      "description": "Indicator title to be shown in data pages. NOTE: This may be needed, for example, when the indicator comes from a big dataset where titles can't easily be curated manually. For those cases, `title_public` will override the indicator's `title`.",
+                      "description": "Indicator title to be shown in data pages, that overrides the indicator's title.",
                       "requirement_level": "optional",
                       "guidelines": [
                         ["Must start with a capital letter."],
@@ -524,7 +524,7 @@
                     "attribution": {
                       "type": "string",
                       "title": "Indicator's attribution",
-                      "description": "Citation of the indicator's origins, to be used when the automatic format `producer1 (year1); producer2 (year2)` needs to be overridden.",
+                      "description": "Citation of the indicator's origins, to override the automatic format `producer1 (year1); producer2 (year2)`.",
                       "guidelines": [
                         ["Must start with a capital letter.", {"type": "exceptions", "value": ["The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."]}],
                         ["Must join multiple attributions by a `;`."],
