@@ -402,22 +402,43 @@ def generate_percentiles_raw():
 
         return df_query_region
 
+    futures_country = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         for ppp_version in [2011, 2017]:
             for povline in povlines:
                 future_country = executor.submit(get_query_country, povline, ppp_version)
-                future_region = executor.submit(get_query_region, povline, ppp_version)
+                futures_country.append(future_country)
 
-                df_country = pd.concat([df_country, future_country.result()], ignore_index=True)
-                df_region = pd.concat([df_region, future_region.result()], ignore_index=True)
+    # now that all futures have been started, wait for them all
+    dfs = [f.result() for f in futures_country]
+    df_country = pd.concat(dfs, ignore_index=True)
+
+    futures_region = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        for ppp_version in [2011, 2017]:
+            for povline in povlines:
+                future_region = executor.submit(get_query_region, povline, ppp_version)
+                futures_region.append(future_region)
+
+    # now that all futures have been started, wait for them all
+    dfs = [f.result() for f in futures_region]
+    df_region = pd.concat(dfs, ignore_index=True)
+
+    # Create poverty_line_cents column, multiplying by 100, rounding and making it an integer
+    df_country["poverty_line_cents"] = round(df_country["poverty_line"] * 100).astype(int)
+    df_region["poverty_line_cents"] = round(df_region["poverty_line"] * 100).astype(int)
 
     # Check if all the poverty lines are in the df in country and region df
-    assert set(df_country["poverty_line"].unique()) == set(povlines), log.fatal(
+    assert set(df_country["poverty_line_cents"].unique()) == set(povlines), log.fatal(
         "Not all poverty lines are in the country file!"
     )
-    assert set(df_region["poverty_line"].unique()) == set(povlines), log.fatal(
+    assert set(df_region["poverty_line_cents"].unique()) == set(povlines), log.fatal(
         "Not all poverty lines are in the region file!"
     )
+
+    # Drop poverty_line_cents column
+    df_country = df_country.drop(columns=["poverty_line_cents"])
+    df_region = df_region.drop(columns=["poverty_line_cents"])
 
     # I check if the set of countries is the same in the df and in the aux table (list of countries)
     aux_dict = pip_aux_tables(table="countries")
@@ -445,11 +466,10 @@ def calculate_percentile(p, df):
     """
     Calculates a single percentile and returns a DataFrame with the results.
     """
-    log.info(f"Calculating percentile {p}")
     df["distance_to_p"] = abs(df["headcount"] * 100 - p)
     df_closest = (
         df.sort_values("distance_to_p")
-        .groupby(["country", "year", "reporting_level", "welfare_type"], as_index=False)
+        .groupby(["ppp_version", "country", "year", "reporting_level", "welfare_type"], as_index=False)
         .first()
     )
     df_closest["target_percentile"] = p
@@ -466,6 +486,7 @@ def calculate_percentile(p, df):
             "distance_to_p",
         ]
     ]
+    log.info(f"Percentile {p}: calculated")
     return df_closest
 
 
@@ -480,13 +501,16 @@ def generate_consolidated_percentiles(df):
     percentiles = range(1, 100, 1)
     df_percentiles = pd.DataFrame()
 
+    futures = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        # Submit each percentile calculation to the executor
-        futures = [executor.submit(calculate_percentile, p, df) for p in percentiles]
+        for p in percentiles:
+            # Submit each percentile calculation to the executor
+            future = executor.submit(calculate_percentile, p, df)
+            futures.append(future)
 
-        # Collect the results as they become available
-        for future in concurrent.futures.as_completed(futures):
-            df_percentiles = pd.concat([df_percentiles, future.result()], ignore_index=True)
+    # Concatenate the results
+    dfs = [f.result() for f in futures]
+    df_percentiles = pd.concat(dfs, ignore_index=True)
 
     # Check if every country, year, reporting level, welfare type and ppp version has each percentiles from 1 to 99
     assert (
