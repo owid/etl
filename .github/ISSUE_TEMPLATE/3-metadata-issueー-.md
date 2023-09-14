@@ -1,11 +1,15 @@
 ---
-name: "metadata issue"
+name: "🏷️ metadata issue"
 about: For issues that involve our metadata.
 title: "metadata: meaningful title for the issue"
 labels: metadata
 assignees: pablorosado,lucasrodes
 
 ---
+
+<!--
+NOTE: For questions on how to use a specific metadata field, open a new discussion: https://github.com/owid/etl/discussions/new?category=metadata.
+-->
 
 <!--
 INSTRUCTIONS
