@@ -10,7 +10,7 @@ meta:
     producer: Dummy producer
     citation_full: Dummy producer citation
     url_main: https://www.url-dummy.com/
-    url_download: https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv
+    url_download: https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv
     date_published: 2020-01-01
     date_accessed: 2023-08-22
   license:

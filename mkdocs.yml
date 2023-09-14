@@ -15,7 +15,6 @@ nav:
     - Adding data:
       - Adding data: "tutorials/adding-data/index.md"
       - Wizard: "tutorials/adding-data/wizard.md"
-      - Walkthrough: "tutorials/adding-data/walkthrough.md"
       - Manually add: "tutorials/adding-data/manual.md"
       - Fast-track: "tutorials/adding-data/fast-track.md"
     - Updating charts:

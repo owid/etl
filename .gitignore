@@ -29,7 +29,6 @@ examples/data/*
 
 playground*
 playground.ipynb
-!apps/walkthrough/**/playground.ipynb
 !apps/wizard/**/playground.ipynb
 
 docs/_build

@@ -1,15 +1,15 @@
 ---
-name: "🪄 wizard/walkthrough issue"
-about: For issues that involve `wizard` or `walkthrough` tool.
-title: "[wizard or walkthrough]: meaningful title for the issue"
-labels: wizard,walkthrough
+name: "wizard issue"
+about: For issues that involve `wizard` program.
+title: "wizard: meaningful title for the issue"
+labels: wizard
 assignees: marigold,lucasrodes
 
 ---
 
 <!--
 INSTRUCTIONS
-Write a meaningful title that describes your issue with wizard (or walkthrough).
+Write a meaningful title that describes your issue with wizard.
 -->
 
 ### One-liner
@@ -24,7 +24,7 @@ Write a meaningful title that describes your issue with wizard (or walkthrough).
 
 
 ### Context & details
-<!-- If possible, replace this line with more context and details. Otherwise, remove this section from the template. 
+<!-- If possible, replace this line with more context and details. Otherwise, remove this section from the template.
 
 It helps if you provide screenshots of the webapp response and the logs from the terminal.
 -->

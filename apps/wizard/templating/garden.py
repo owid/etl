@@ -108,7 +108,7 @@ def _check_dataset_in_meadow(form: GardenForm) -> None:
 def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     """Fill dummy metadata yaml file with some dummy values.
 
-    Only useful when `--dummy-data` is used. We need this to avoid errors in `walkthrough grapher --dummy-data`.
+    Only useful when `--dummy-data` is used. We need this to avoid errors in `etl-wizard grapher --dummy-data`.
     """
     with open(metadata_path, "r") as f:
         doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
@@ -349,7 +349,19 @@ if submitted:
 
         4. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
 
-        5. (Optional) Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
+            then manual edit it and rerun the step again with
+
+            ```
+            poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
+            ```
+
+            Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
+
+        4. (Optional) You can manually move steps from `dag/wizard.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
+
+        5. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+
+        6. (Optional) Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
 
             ```python
             from owid.catalog import find_one
