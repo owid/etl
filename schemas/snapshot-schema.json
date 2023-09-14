@@ -17,35 +17,23 @@
           "type": "integer"
         },
         "publication_date": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "format": "date"
         },
         "url": {
           "type": "string"
         },
         "source_data_url": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "source_published_by": {
           "type": "string"
         },
         "license_url": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "license_name": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "date_accessed": {
           "type": "string",
@@ -60,12 +48,8 @@
         "is_public": {
           "type": "boolean"
         },
-        "origin": {
-          "$ref": "definitions.json#/origin"
-        },
-        "license": {
-          "$ref": "definitions.json#/license"
-        }
+        "origin": { "$ref": "definitions.json#/origin" },
+        "license": { "$ref": "definitions.json#/license" }
       }
     },
     "wdir": {
@@ -88,16 +72,10 @@
               "type": "string"
             }
           },
-          "required": [
-            "md5",
-            "size",
-            "path"
-          ]
+          "required": ["md5", "size", "path"]
         }
       ]
     }
   },
-  "required": [
-    "meta"
-  ]
+  "required": ["meta"]
 }
