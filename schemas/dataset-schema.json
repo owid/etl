@@ -917,7 +917,7 @@
                     },
                     "grapher_config": {
                       "type": "object",
-                      "description": "Our World in Data grapher configuration. Most of the fields can be left empty and will be filled with reasonable default values.",
+                      "description": "Our World in Data grapher configuration. Most of the fields can be left empty and will be filled with reasonable default values.\n\nFind more details on its attributes [here](https://files.ourworldindata.org/schemas/grapher-schema.003.json).",
                       "properties": {
                         "$schema": {
                           "type": "string",
