@@ -30,10 +30,6 @@ Note that we need a DVC file per upstream data file; hence, in some instances, i
 
 
 ## Metadata
-!!! warning "This is still being written."
-
-    Our metadata formats are still in flux, and are likely to change over the coming weeks.
-
 
 A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an upstream data provider at a particular point in time.
 
