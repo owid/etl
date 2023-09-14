@@ -14,6 +14,7 @@ nav:
     - Tutorials: "tutorials/index.md"
     - Adding data:
       - Adding data: "tutorials/adding-data/index.md"
+      - Wizard: "tutorials/adding-data/wizard.md"
       - Walkthrough: "tutorials/adding-data/walkthrough.md"
       - Manually add: "tutorials/adding-data/manual.md"
       - Fast-track: "tutorials/adding-data/fast-track.md"
@@ -23,11 +24,10 @@ nav:
       - Using chatGPT: "tutorials/charts/chatgpt.md"
     - Harmonize country names: "tutorials/harmonize-countries.md"
     - Metadata in data pages: "tutorials/metadata-play.md"
-    - Backporting Grapher datasets to ETL: "tutorials/backport.md"
-    - Importing a private dataset to ETL: "tutorials/private-import.md"
+    - Backport a dataset to ETL: "tutorials/backport.md"
+    - Import a private dataset to ETL: "tutorials/private-import.md"
   - Architecture:
       - Architecture: architecture/index.md
-      - Our journey: "architecture/our-journey.md"
       - Design principles:
         - Computational graph:
           - Computational graph: "architecture/design/compute-graph/index.md"
@@ -36,21 +36,12 @@ nav:
         - Features and constraints: "architecture/design/features-constraints.md"
         - The DAG: "architecture/design/dag.md"
         - The URI: "architecture/design/uri.md"
-      - Workflow and Metadata:
+      - Workflow:
         - Workflow: "architecture/workflow/index.md"
         - Snapshot step: "architecture/workflow/snapshot.md"
         - Meadow step: "architecture/workflow/meadow.md"
         - Garden step: "architecture/workflow/garden.md"
         - Grapher step: "architecture/workflow/grapher.md"
-        - Metadata:
-          - Metadata: "architecture/metadata/index.md"
-          # - Workflow with metadata: "architecture/metadata/workflow.md"
-          # - Reference:
-          - Origin reference: "architecture/metadata/reference-origin.md"
-          - Dataset reference: "architecture/metadata/reference-dataset.md"
-          - Tables reference: "architecture/metadata/reference-tables.md"
-          - Propagation of metadata: "architecture/metadata/propagation.md"
-          - Using metadata: "architecture/metadata/using.md"
         - Special steps:
           # - Special steps: "architecture/workflow/other-steps/index.md"
           - Explorers: "architecture/workflow/other-steps/explorers.md"
@@ -59,6 +50,18 @@ nav:
           - ETag: "architecture/workflow/other-steps/etag.md"
           - GitHub: "architecture/workflow/other-steps/github.md"
           - Private steps: "architecture/workflow/other-steps/private.md"
+      - Metadata:
+        - Metadata: "architecture/metadata/index.md"
+        # - Workflow with metadata: "architecture/metadata/workflow.md"
+        # - Reference:
+        - Reference:
+          - Reference: "architecture/metadata/reference/index.md"
+          - Origin: "architecture/metadata/reference/origin.md"
+          - Dataset: "architecture/metadata/reference/dataset.md"
+          - Tables: "architecture/metadata/reference/tables.md"
+        - Propagation of metadata: "architecture/metadata/propagation.md"
+        - Using metadata: "architecture/metadata/using.md"
+      - Our journey: "architecture/our-journey.md"
   - API and catalog:
     - API: "api/index.md"
     - Python: "api/python.ipynb"
@@ -103,7 +106,7 @@ theme:
     - navigation.tabs.sticky
     - navigation.indexes
     - content.tooltips
-    - navigation.expand
+    # - navigation.expand
     # - navigation.sections
     # - toc.follow
     - navigation.top
