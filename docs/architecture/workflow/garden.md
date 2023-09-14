@@ -142,19 +142,8 @@ To use the tool, you upload a CSV file containing a column called `Country`, and
 
 
 ## Metadata
-In our [data model](../design/common-format.md), datasets contain tables of data, and those tables contain indicators. Each of these levels supports metadata.
+After adapting and processing the origin's data, we have a curated dataset. This dataset, contains indicators (maybe not present in the origin) that we need to properly document.
 
-!!! warning "This is still being written."
+The metadata in Garden consists mainly of two objects: `dataset` and `tables`. The metadata comes as a YAML file next to the processing scripts.
 
-    Our metadata formats are still in flux, and are likely to change substantially over the coming months.
-
-
-    We are currently working on version 2 of our metadata, for which you can find most up-to-date documentation [on Notion :octicons-arrow-right-24:](https://www.notion.so/owid/Metadata-guidelines-29ca6e19b6f1409ea6826a88dbb18bcc)
-
-
-!!! info "For more up to date details, see the the classes `DatasetMeta`, `TableMeta` and `VariableMeta` in the [`owid.catalog.meta`](https://github.com/owid/etl/blob/master/lib/catalog/owid/catalog/meta.py) module."
-
-
-!!! bug "TODO"
-
-    Add demo video of how to fill the snapshot metadata fields.
+!!! info "Learn more in our [dataset reference](../metadata/reference/dataset.md) and [tables reference](../metadata/reference/tables.md)."

@@ -40,7 +40,7 @@ A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an 
 
 It is the entrypoint to ETL. This is where we define metadata attributes of the data product and the particular snapshot. This is fundamental to ensure that the data is properly documented and that the metadata is propagated to the rest of the system.
 
-The metadata in Snapshot consists mainly of one object: `meta.origin`. To learn more about it, please refer to [the reference](../reference-origin).
+The metadata in Snapshot consists mainly of one object: `meta.origin`. To learn more about it, please refer to [the reference](../reference/origin).
 
 
 This metadata is captured in a DVC file (similar to a yaml file), which contains all the snapshot metadata fields as key-value pairs.
@@ -73,9 +73,4 @@ This metadata is captured in a DVC file (similar to a yaml file), which contains
     ```
 
 
-!!! info "For more up to date details, see the [`SnapshotMeta`](https://github.com/owid/etl/blob/master/etl/snapshot.py#L81) class for all supported fields."
-
-
-!!! bug "TODO"
-
-    Add demo video of how to fill the snapshot metadata fields.
+!!! info "Learn more in our [reference](../metadata/reference/origin.md)."

@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 import mkdocs_gen_files
 
-from etl.docs import examples_to_markdown, guidelines_to_markdown
+from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
 from etl.helpers import read_json_schema
 from etl.paths import SCHEMAS_DIR
 
@@ -17,6 +17,7 @@ TEMPLATE_PROPERTY = """
 
 {guidelines}
 {examples}
+{faqs}
 
 ---
 
@@ -52,6 +53,13 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
         {examples_to_markdown(prop['examples'], prop['examples_bad'], extra_tab=1)}
     """
 
+    # Prepare FAQs
+    faqs = ""
+    if "faqs" in prop and prop.get("examples"):
+        faqs = f"""=== ":material-chat-question: FAQs"
+        {faqs_to_markdown(prop['faqs'], extra_tab=1)}
+    """
+
     # Bake documentation for property
     if "type" not in prop:
         if "oneOf" not in prop:
@@ -69,6 +77,7 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
         "requirement_level": requirement_level,
         "guidelines": guidelines,
         "examples": examples,
+        "faqs": faqs,
     })
     return prop_docs
 
@@ -126,17 +135,17 @@ def render_table() -> str:
 
 
 # Origin reference
-with mkdocs_gen_files.open("architecture/metadata/reference-origin.md", "w") as f:
+with mkdocs_gen_files.open("architecture/metadata/reference/origin.md", "w") as f:
     text_origin = render_origin()
     print(text_origin, file=f)
 
 # Dataset reference
-with mkdocs_gen_files.open("architecture/metadata/reference-dataset.md", "w") as f:
+with mkdocs_gen_files.open("architecture/metadata/reference/dataset.md", "w") as f:
     text_dataset = render_dataset()
     print(text_dataset, file=f)
 
 # Tables reference
-with mkdocs_gen_files.open("architecture/metadata/reference-tables.md", "w") as f:
+with mkdocs_gen_files.open("architecture/metadata/reference/tables.md", "w") as f:
     text_tables = render_table()
     print(text_tables, file=f)
 
