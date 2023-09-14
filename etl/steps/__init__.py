@@ -197,6 +197,7 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     parts = urlparse(step_name)
     step_type = parts.scheme
     path = parts.netloc + parts.path
+    # dependencies are new objects
     dependencies = [parse_step(s, dag) for s in dag.get(step_name, [])]
 
     step: Step
@@ -368,6 +369,11 @@ class DataStep(Step):
     def _dataset_index_mtime(self) -> Optional[float]:
         try:
             return os.stat(self._output_dataset._index_file).st_mtime
+        except KeyError as e:
+            if _uses_old_schema(e):
+                return None
+            else:
+                raise e
         except Exception as e:
             if str(e) == "dataset has not been created yet":
                 return None
@@ -414,7 +420,13 @@ class DataStep(Step):
         if not self.has_existing_data() or any(d.is_dirty() for d in self.dependencies):
             return True
 
-        found_source_checksum = catalog.Dataset(self._dest_dir.as_posix()).metadata.source_checksum
+        try:
+            found_source_checksum = catalog.Dataset(self._dest_dir.as_posix()).metadata.source_checksum
+        except KeyError as e:
+            if _uses_old_schema(e):
+                return True
+            else:
+                raise e
         exp_source_checksum = self.checksum_input()
 
         if found_source_checksum != exp_source_checksum:
@@ -753,6 +765,10 @@ class GrapherStep(Step):
             # is fetching the whole dataset from data-api as they would receive all tables merged in a single
             # table. This won't be a problem after we introduce the concept of "tables"
             for table in dataset:
+                # if GRAPHER_FILTER is set, only upsert matching columns
+                if config.GRAPHER_FILTER:
+                    table = table.loc[:, table.filter(regex=config.GRAPHER_FILTER).columns]
+
                 catalog_path = f"{self.path}/{table.metadata.short_name}"
 
                 table = gh._adapt_table_for_grapher(table)
@@ -771,7 +787,8 @@ class GrapherStep(Step):
 
             variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
 
-        self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
+        if not config.GRAPHER_FILTER:
+            self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
         # set checksum and updatedAt timestamps after all data got inserted
         gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
@@ -955,3 +972,9 @@ def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
+
+
+def _uses_old_schema(e: KeyError) -> bool:
+    """Origins without `title` use old schema before rename. This can be removed once
+    we recompute all datasets."""
+    return e.args[0] == "title"

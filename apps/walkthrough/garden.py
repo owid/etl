@@ -272,9 +272,9 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
                 },
                 "title_public": "The dummy indicator - data page title",
                 "title_variant": "historical data",
-                "producer_short": "ACME",
+                "attribution_short": "ACME",
                 "attribution": "ACME project",
-                "topic_tags_links": ["Internet"],
+                "topic_tags": ["Internet"],
                 "faqs": [{"fragment_id": "cherries", "gdoc_id": "16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE"}],
             },
         }

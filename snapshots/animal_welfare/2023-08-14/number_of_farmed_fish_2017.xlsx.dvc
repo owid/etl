@@ -1,15 +1,15 @@
 meta:
   origin:
-    dataset_title_owid: Number of farmed fish in 2017
-    dataset_title_producer: Estimated numbers of individuals in global aquaculture
+    title_snapshot: Number of farmed fish in 2017
+    title: Estimated numbers of individuals in global aquaculture
       production (FAO) of fish species (2017)
-    dataset_description_owid: |-
+    description_snapshot: |-
       Estimated number of individual fish in annual aquaculture production.
     producer: Fishcount
-    citation_producer: Fishcount.org.uk based on data from the Food and Agriculture
+    citation_full: Fishcount.org.uk based on data from the Food and Agriculture
       Organization of the United Nations.
-    dataset_url_main: http://fishcount.org.uk/
-    dataset_url_download: http://fishcount.org.uk/studydatascreens2/2017/Farmed-fishes-2017-v2.xlsx
+    url_main: http://fishcount.org.uk/
+    url_download: http://fishcount.org.uk/studydatascreens2/2017/Farmed-fishes-2017-v2.xlsx
     date_published: '2018'
     date_accessed: 2023-08-14
   license:

@@ -86,7 +86,7 @@ def add_individual_sources_to_metadata(tb: Table) -> Table:
     # Take the origin from any of those variables.
     origin = tb[tb.columns[-1]].metadata.origins[0]
     # Add the full list of original sources to the variable origin.
-    origin.citation_producer = origin.citation_producer + "\n" + "\n".join(original_sources)
+    origin.citation_full = origin.citation_full + "\n" + "\n".join(original_sources)
     # Replace the origin of each variable with the new one that has the full list of original sources.
     for column in tb.columns:
         tb[column].metadata.origins = [origin]

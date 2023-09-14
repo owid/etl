@@ -213,7 +213,7 @@ def _variable_metadata(
         grapherConfigAdmin=grapherConfigAdmin,
         titlePublic=row.pop("titlePublic"),
         titleVariant=row.pop("titleVariant"),
-        producerShort=row.pop("producerShort"),
+        attributionShort=row.pop("attributionShort"),
         attribution=row.pop("attribution"),
         topicTagsLinks=db_topic_tags,
         faqs=db_faqs,

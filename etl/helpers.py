@@ -971,7 +971,8 @@ def print_tables_metadata_template(tables: List[Table]):
 
 @contextmanager
 def isolated_env(
-    working_dir: Path, keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas"
+    working_dir: Path,
+    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy",
 ) -> Generator[None, None, None]:
     """Add given directory to pythonpath, run code in context, and
     then remove from pythonpath and unimport modules imported in context.
