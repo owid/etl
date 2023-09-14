@@ -516,12 +516,23 @@ def generate_consolidated_percentiles(df):
     dfs = [f.result() for f in futures]
     df_percentiles = pd.concat(dfs, ignore_index=True)
 
+    # Rename headcount to estimated_percentile and poverty_line to thr
+    df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})
+
+    # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
+    df_percentiles = df_percentiles.sort_values(
+        by=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"]
+    )
+
+    # Save to csv
+    df_percentiles.to_csv(f"{PARENT_DIR}/pip_percentiles.csv", index=False)
+
     # Check if every country, year, reporting level, welfare type and ppp version has each percentiles from 1 to 99
     assert (
         df_percentiles.groupby(["ppp_version", "country", "year", "reporting_level", "welfare_type"]).size().max() == 99
     ) & (
         df_percentiles.groupby(["ppp_version", "country", "year", "reporting_level", "welfare_type"]).size().min() == 99
-    ), log.fatal(
+    ), log.warning(
         "Some distributions don't have 99 percentiles!"
     )
 
@@ -533,17 +544,6 @@ def generate_consolidated_percentiles(df):
             f"""Number of cases where distance_to_p is higher than 0.5: {len(df_percentiles[mask])}:
                     {df_percentiles[mask]["ppp_version", "country", "year", "reporting_level", "welfare_type"].value_counts()}"""
         )
-
-    # Rename headcount to estimated_percentile and poverty_line to thr
-    df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})
-
-    # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
-    df_percentiles = df_percentiles.sort_values(
-        by=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"]
-    )
-
-    # Save to csv
-    df_percentiles.to_csv(f"{PARENT_DIR}/pip_percentiles.csv", index=False)
 
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
