@@ -573,10 +573,10 @@ def clean_empty_dict(d: Dict[str, Any]) -> Dict[str, Any] | List[Any]:
     return d
 
 
-def warning_notion_latest() -> None:
+def warning_metadata_unstable() -> None:
     """Show warning on latest metadata definitions being available in Notion."""
     st.warning(
-        "Documentation for new metadata is almost complete, but still being finalised. For latest definitions refer to [Notion](https://www.notion.so/owid/Metadata-guidelines-29ca6e19b6f1409ea6826a88dbb18bcc)."
+        "Documentation for new metadata is almost complete, but still being finalised based on feedback. Feel free to open a [new issue](https://github.com/owid/etl/issues/new) for any question of suggestion!"
     )
 
 

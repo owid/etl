@@ -88,7 +88,7 @@ st.title("Wizard  **:gray[Meadow]**")
 
 # SIDEBAR
 with st.sidebar:
-    utils.warning_notion_latest()
+    utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
