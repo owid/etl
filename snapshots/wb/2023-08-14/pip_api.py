@@ -807,9 +807,10 @@ def generate_key_indicators():
                 for povline in povlines:
                     task = executor.submit(get_country_data, povline, ppp_version, versions)
                     tasks.append(task)
-            results = [task.result() for task in concurrent.futures.as_completed(tasks)]
-            # Concatenate list of dataframes
-            results = pd.concat(results, ignore_index=True)
+
+        results = [task.result() for task in tasks]
+        # Concatenate list of dataframes
+        results = pd.concat(results, ignore_index=True)
 
         return results
 
@@ -823,9 +824,10 @@ def generate_key_indicators():
                 for povline in povlines:
                     task = executor.submit(get_region_data, povline, ppp_version, versions)
                     tasks.append(task)
-            results = [task.result() for task in concurrent.futures.as_completed(tasks)]
-            # Concatenate list of dataframes
-            results = pd.concat(results, ignore_index=True)
+
+        results = [task.result() for task in tasks]
+        # Concatenate list of dataframes
+        results = pd.concat(results, ignore_index=True)
 
         return results
 
