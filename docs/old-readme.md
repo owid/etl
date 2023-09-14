@@ -180,7 +180,7 @@ The ETL is the place where several key steps can be done:
 The core formats used are the `Dataset` and `Table` formats from [owid-catalog-py](https://github.com/owid/owid-catalog-py).
 
 - Dataset: a folder full of data files (e.g. `my_dataset/`), with overall metadata in `index.json` (e.g. `my_dataset/index.json`)
-- Table: a CSV or Feather file (e.g. `my_table.feather`) with table and variable metadata in a `.meta.json` file (e.g. `my_table.meta.json`)
+- Table: a CSV or Feather file (e.g. `my_table.feather`) with table and indicator metadata in a `.meta.json` file (e.g. `my_table.meta.json`)
 
 Visit the `owid-catalog-py` project for more details on these formats or their Python API.
 

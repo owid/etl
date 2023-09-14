@@ -38,16 +38,16 @@ flowchart LR
     classDef node_ss fill:#002147,color:#fff
 ```
 
-However, garden steps could also depend on other garden steps. This is often the case for datasets containing _long-run variables_, where different `garden` datasets are combined.
+However, garden steps could also depend on other garden steps. This is often the case for datasets containing _long-run indicators_, where different `garden` datasets are combined.
 
 
-!!! info "Long-run variables"
+!!! info "Long-run indicators"
 
-    A long-run variable is a variable that has datapoints spanning over a broad period of time and that typically relies on multiple sources.
+    A long-run indicator is an indicator that has datapoints spanning over a broad period of time and that typically relies on multiple sources.
 
-    For instance, we have a [population variable](https://ourworldindata.org/population-sources) that combines data from the UN and other sources that goes back to 10,000 BCE. In particular, it uses data from the UN, Gapminder and HYDE.
+    For instance, we have a [population indicator](https://ourworldindata.org/population-sources) that combines data from the UN and other sources that goes back to 10,000 BCE. In particular, it uses data from the UN, Gapminder and HYDE.
 
-    This is how the dependency graph our population variable looks like:
+    This is how the dependency graph our population indicator looks like:
 
     ```yaml
       data://garden/demography/2023-03-31/population:
@@ -66,9 +66,9 @@ For example, a `country` column containing the value `Korea` could be referring 
 
 Harmonization is the editorial process by which we modify the indexing columns for a dataset to ensure that the data is consistent and unambiguous.
 
-### What does Our World In Data harmonize?
+### What does Our World in Data harmonize?
 
-Today, Our World In Data makes a best-effort to harmonize countries and regions. We strive to do this in a way that is consistent with the [ISO 3166-1 standard](https://en.wikipedia.org/wiki/ISO_3166-1), however we use custom editorial labels for countries and regions that are often shorter than those in the standard, in order to make data visualisations richer and more understandable.
+Today, Our World in Data makes a best-effort to harmonize countries and regions. We strive to do this in a way that is consistent with the [ISO 3166-1 standard](https://en.wikipedia.org/wiki/ISO_3166-1), however we use custom editorial labels for countries and regions that are often shorter than those in the standard, in order to make data visualisations richer and more understandable.
 
 Since we also present long-run datasets over multiple centuries, a time period in which national borders have changed, split and merged, we also make a best-effort attempt to harmonize the names of historical countries and regions that no longer exist and are not present in the ISO standard.
 
@@ -142,14 +142,8 @@ To use the tool, you upload a CSV file containing a column called `Country`, and
 
 
 ## Metadata
-In our [data model](../design/common-format.md), datasets contain tables of data, and those tables contain variables. Each of these levels supports metadata.
+After adapting and processing the origin's data, we have a curated dataset. This dataset, contains indicators (maybe not present in the origin) that we need to properly document.
 
-!!! warning "This is still being written."
+The metadata in Garden consists mainly of two objects: `dataset` and `tables`. The metadata comes as a YAML file next to the processing scripts.
 
-    Our metadata formats are still in flux, and are likely to change substantially over the coming months.
-
-
-    We are currently working on version 2 of our metadata, for which you can find most up-to-date documentation [on Notion :octicons-arrow-right-24:](https://www.notion.so/owid/Metadata-guidelines-29ca6e19b6f1409ea6826a88dbb18bcc)
-
-
-!!! info "For more up to date details, see the the classes `DatasetMeta`, `TableMeta` and `VariableMeta` in the [`owid.catalog.meta`](https://github.com/owid/etl/blob/master/lib/catalog/owid/catalog/meta.py) module."
+!!! info "Learn more in our [dataset reference](../metadata/reference/dataset.md) and [tables reference](../metadata/reference/tables.md)."
