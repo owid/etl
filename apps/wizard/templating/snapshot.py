@@ -9,7 +9,7 @@ from st_pages import add_indentation
 from typing_extensions import Self
 
 from apps.wizard import utils
-from etl.docs import examples_to_markdown, guidelines_to_markdown
+from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
 from etl.helpers import read_json_schema
 from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
 
@@ -211,6 +211,10 @@ def create_description(field: Dict[str, Any]) -> str:
                 examples=field["examples"], examples_bad=[], extra_tab=0, do_sign="✅", dont_sign="❌"
             )
         toc += "| [Examples](#examples) "
+    # FAQs
+    if field.get("faqs"):
+        description += "\n## FAQs\n\n" + faqs_to_markdown(faqs=field["faqs"], extra_tab=0)
+        toc += "| [FAQs](#faqs) "
     # Insert TOC at the beginnining of description
     description = toc.strip() + "\n\n" + description
     return description
