@@ -469,7 +469,7 @@ def calculate_percentile(p, df):
     df["distance_to_p"] = abs(df["headcount"] * 100 - p)
     df_closest = (
         df.sort_values("distance_to_p")
-        .groupby(["ppp_version", "country", "year", "reporting_level", "welfare_type"], as_index=False)
+        .groupby(["ppp_version", "country", "year", "reporting_level", "welfare_type"], as_index=False, sort=False)
         .first()
     )
     df_closest["target_percentile"] = p
@@ -501,14 +501,11 @@ def generate_consolidated_percentiles(df):
     percentiles = range(1, 100, 1)
     df_percentiles = pd.DataFrame()
 
-    futures = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        for p in percentiles:
-            # Submit each percentile calculation to the executor
-            future = executor.submit(calculate_percentile, p, df)
-            futures.append(future)
+    # Estimate percentiles using multiprocessing
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        futures = [executor.submit(calculate_percentile, p, df) for p in percentiles]
 
-    # Concatenate the results
+    # dfs = [f.result() for f in concurrent.futures.as_completed(futures)]
     dfs = [f.result() for f in futures]
     df_percentiles = pd.concat(dfs, ignore_index=True)
 
