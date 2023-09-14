@@ -288,12 +288,10 @@
           "Neutron star mergers"
         ],
         "examples_bad": [
-          [
-            ["Global Carbon Budget"],
-            ["Neutron star mergers (NASA, 2023)",
-            "Data on neutron star mergers",
-            "Neutron star mergers dataset"]
-          ]
+          ["Global Carbon Budget"],
+          ["Neutron star mergers (NASA, 2023)",
+          "Data on neutron star mergers",
+          "Neutron star mergers dataset"]
         ],
         "requirement_level": "required (if different from `title`)",
         "guidelines": [
