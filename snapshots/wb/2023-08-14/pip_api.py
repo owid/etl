@@ -20,7 +20,7 @@ MAX_WORKERS = 10
 TOLERANCE_PERCENTILES = 0.5
 
 # Select live (1) or internal (0) API
-LIVE_API = 1
+LIVE_API = 0
 
 # NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
 
