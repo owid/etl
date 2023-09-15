@@ -19,7 +19,15 @@ FILL_GAPS = "true"
 MAX_WORKERS = 10
 TOLERANCE_PERCENTILES = 0.5
 
+# Select live (1) or internal (0) API
+LIVE_API = 1
+
 # NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
+
+if LIVE_API == 1:
+    API_ADDRESS = "https://api.worldbank.org/pip/v1"
+elif LIVE_API == 0:
+    API_ADDRESS = "https://apiv2qa.worldbank.org/pip/v1"
 
 
 def api_health():
@@ -30,7 +38,7 @@ def api_health():
     repeat = 0
 
     # health comes from a json containing the status
-    health = pd.read_json("https://api.worldbank.org/pip/v1/health-check")[0][0]
+    health = pd.read_json(f"{API_ADDRESS}/health-check")[0][0]
 
     # If the status is different to "PIP API is running", repeat the request until MAX_REPEATS
     while health != "PIP API is running" and repeat < MAX_REPEATS:
@@ -78,13 +86,13 @@ def pip_aux_tables(table="all") -> pd.DataFrame:
 
         # Download each table and append it to the list
         for tab in aux_tables_list:
-            df = pd.read_csv(f"https://api.worldbank.org/pip/v1/aux?table={tab}&long_format=false&format=csv")
+            df = pd.read_csv(f"{API_ADDRESS}/aux?table={tab}&long_format=false&format=csv")
 
             # Add table to df_dict
             df_dict[tab] = df
 
     else:
-        df = pd.read_csv(f"https://api.worldbank.org/pip/v1/aux?table={table}&long_format=false&format=csv")
+        df = pd.read_csv(f"{API_ADDRESS}/aux?table={table}&long_format=false&format=csv")
 
         # Add table to df_dict
         df_dict = {table: df}
@@ -101,7 +109,7 @@ def pip_versions() -> dict:
 
     api_health()
 
-    df = pd.read_csv("https://api.worldbank.org/pip/v1/versions?format=csv")
+    df = pd.read_csv(f"{API_ADDRESS}/versions?format=csv")
     df = df[["ppp_version", "release_version", "version"]]
 
     # Obtain the max release_version
@@ -148,7 +156,7 @@ def pip_query_country(
     release_version = versions[ppp_version]["release_version"]
 
     # Build query
-    request_url = f"https://api.worldbank.org/pip/v1/pip?{popshare_or_povline}={value}&country={country_code}&year={year}&fill_gaps={fill_gaps}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
+    request_url = f"{API_ADDRESS}/pip?{popshare_or_povline}={value}&country={country_code}&year={year}&fill_gaps={fill_gaps}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
     status = 0
     repeat = 0
 
@@ -222,7 +230,7 @@ def pip_query_region(
     release_version = versions[ppp_version]["release_version"]
 
     # Build query
-    request_url = f"https://api.worldbank.org/pip/v1/pip-grp?{popshare_or_povline}={value}&country={country_code}&year={year}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
+    request_url = f"{API_ADDRESS}/pip-grp?{popshare_or_povline}={value}&country={country_code}&year={year}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
     status = 0
     repeat = 0
 
