@@ -17,6 +17,7 @@ MAX_REPEATS = 10
 TIMEOUT = 500
 FILL_GAPS = "true"
 MAX_WORKERS = 10
+TOLERANCE_PERCENTILES = 0.5
 
 # NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
 
@@ -290,6 +291,8 @@ def generate_percentiles_raw():
     between_80_and_100_dollars = list(range(8000, 10000, 5))
     between_100_and_150_dollars = list(range(10000, 15000, 10))
     between_150_and_175_dollars = list(range(15000, 17500, 10))
+    between_175_and_250_dollars = list(range(17500, 25000, 20))
+    betweeb_250_and_500_dollars = list(range(25000, 50000, 50))
 
     # povlines is all these lists toghether
     povlines = (
@@ -302,6 +305,8 @@ def generate_percentiles_raw():
         + between_80_and_100_dollars
         + between_100_and_150_dollars
         + between_150_and_175_dollars
+        + between_175_and_250_dollars
+        + betweeb_250_and_500_dollars
     )
 
     def get_percentiles_data(povline, versions, ppp_version):
@@ -357,21 +362,6 @@ def generate_percentiles_raw():
                     else:
                         executor.submit(get_percentiles_data_region, povline, versions, ppp_version)
 
-    # Obtain latest versions of the PIP dataset
-    versions = pip_versions()
-
-    # Run the main function
-    concurrent_percentiles_function()
-    log.info("Country files downloaded")
-    concurrent_percentiles_region_function()
-    log.info("Region files downloaded")
-
-    log.info("Now we are concatenating the files")
-
-    # Concatenate country and region files
-    df_country = pd.DataFrame()
-    df_region = pd.DataFrame()
-
     def get_query_country(povline, ppp_version):
         # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
         file_path_country = f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
@@ -400,70 +390,91 @@ def generate_percentiles_raw():
 
         return df_query_region
 
-    futures_country = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        for ppp_version in [2011, 2017]:
-            for povline in povlines:
-                future_country = executor.submit(get_query_country, povline, ppp_version)
-                futures_country.append(future_country)
+    file_path_percentiles = f"{PARENT_DIR}/pip_percentiles.csv"
+    if Path(file_path_percentiles).is_file():
+        log.info("Percentiles file already exists. No need to create raw files.")
+        return pd.read_csv(file_path_percentiles)
 
-    # now that all futures have been started, wait for them all
-    dfs = [f.result() for f in futures_country]
-    df_country = pd.concat(dfs, ignore_index=True)
-    log.info("Country files concatenated")
+    else:
+        # Obtain latest versions of the PIP dataset
+        versions = pip_versions()
 
-    futures_region = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        for ppp_version in [2011, 2017]:
-            for povline in povlines:
-                future_region = executor.submit(get_query_region, povline, ppp_version)
-                futures_region.append(future_region)
+        # Run the main function
+        concurrent_percentiles_function()
+        log.info("Country files downloaded")
+        concurrent_percentiles_region_function()
+        log.info("Region files downloaded")
 
-    # now that all futures have been started, wait for them all
-    dfs = [f.result() for f in futures_region]
-    df_region = pd.concat(dfs, ignore_index=True)
-    log.info("Region files concatenated")
+        log.info("Now we are concatenating the files")
 
-    # Create poverty_line_cents column, multiplying by 100, rounding and making it an integer
-    df_country["poverty_line_cents"] = round(df_country["poverty_line"] * 100).astype(int)
-    df_region["poverty_line_cents"] = round(df_region["poverty_line"] * 100).astype(int)
+        # Concatenate country and region files
+        df_country = pd.DataFrame()
+        df_region = pd.DataFrame()
 
-    # Check if all the poverty lines are in the df in country and region df
-    assert set(df_country["poverty_line_cents"].unique()) == set(povlines), log.fatal(
-        "Not all poverty lines are in the country file!"
-    )
-    assert set(df_region["poverty_line_cents"].unique()) == set(povlines), log.fatal(
-        "Not all poverty lines are in the region file!"
-    )
+        futures_country = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            for ppp_version in [2011, 2017]:
+                for povline in povlines:
+                    future_country = executor.submit(get_query_country, povline, ppp_version)
+                    futures_country.append(future_country)
 
-    # Drop poverty_line_cents column
-    df_country = df_country.drop(columns=["poverty_line_cents"])
-    df_region = df_region.drop(columns=["poverty_line_cents"])
+        # now that all futures have been started, wait for them all
+        dfs = [f.result() for f in futures_country]
+        df_country = pd.concat(dfs, ignore_index=True)
+        log.info("Country files concatenated")
 
-    # I check if the set of countries is the same in the df and in the aux table (list of countries)
-    aux_dict = pip_aux_tables(table="countries")
-    assert set(df_country["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
-        "List of countries is not the same as the one defined in PIP!"
-    )
+        futures_region = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            for ppp_version in [2011, 2017]:
+                for povline in povlines:
+                    future_region = executor.submit(get_query_region, povline, ppp_version)
+                    futures_region.append(future_region)
 
-    # I check if the set of regions is the same in the df and in the aux table (list of regions)
-    aux_dict = pip_aux_tables(table="regions")
-    assert set(df_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
-        "List of regions is not the same as the one defined in PIP!"
-    )
+        # now that all futures have been started, wait for them all
+        dfs = [f.result() for f in futures_region]
+        df_region = pd.concat(dfs, ignore_index=True)
+        log.info("Region files concatenated")
 
-    # Concatenate df_country and df_region
-    df = pd.concat([df_country, df_region], ignore_index=True)
+        # Create poverty_line_cents column, multiplying by 100, rounding and making it an integer
+        df_country["poverty_line_cents"] = round(df_country["poverty_line"] * 100).astype(int)
+        df_region["poverty_line_cents"] = round(df_region["poverty_line"] * 100).astype(int)
 
-    end_time = time.time()
-    elapsed_time = round(end_time - start_time, 2)
-    print(
-        "Concatenation of raw percentile data for countries and regions completed. Execution time:",
-        elapsed_time,
-        "seconds",
-    )
+        # Check if all the poverty lines are in the df in country and region df
+        assert set(df_country["poverty_line_cents"].unique()) == set(povlines), log.fatal(
+            "Not all poverty lines are in the country file!"
+        )
+        assert set(df_region["poverty_line_cents"].unique()) == set(povlines), log.fatal(
+            "Not all poverty lines are in the region file!"
+        )
 
-    return df
+        # Drop poverty_line_cents column
+        df_country = df_country.drop(columns=["poverty_line_cents"])
+        df_region = df_region.drop(columns=["poverty_line_cents"])
+
+        # I check if the set of countries is the same in the df and in the aux table (list of countries)
+        aux_dict = pip_aux_tables(table="countries")
+        assert set(df_country["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
+            "List of countries is not the same as the one defined in PIP!"
+        )
+
+        # I check if the set of regions is the same in the df and in the aux table (list of regions)
+        aux_dict = pip_aux_tables(table="regions")
+        assert set(df_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
+            "List of regions is not the same as the one defined in PIP!"
+        )
+
+        # Concatenate df_country and df_region
+        df = pd.concat([df_country, df_region], ignore_index=True)
+
+        end_time = time.time()
+        elapsed_time = round(end_time - start_time, 2)
+        print(
+            "Concatenation of raw percentile data for countries and regions completed. Execution time:",
+            elapsed_time,
+            "seconds",
+        )
+
+        return df
 
 
 def calculate_percentile(p, df):
@@ -473,7 +484,12 @@ def calculate_percentile(p, df):
     df["distance_to_p"] = abs(df["headcount"] * 100 - p)
     df_closest = (
         df.sort_values("distance_to_p")
-        .groupby(["ppp_version", "country", "year", "reporting_level", "welfare_type"], as_index=False, sort=False)
+        .groupby(
+            ["ppp_version", "country", "year", "reporting_level", "welfare_type"],
+            as_index=False,
+            sort=False,
+            dropna=False,  # This is to avoid dropping rows with NaNs (reporting_level and welfare_type for regions)
+        )
         .first()
     )
     df_closest["target_percentile"] = p
@@ -498,34 +514,41 @@ def generate_consolidated_percentiles(df):
     """
     Generates percentiles from the raw data. This is the final file with percentiles.
     """
-    log.info("Consolidating percentiles")
     start_time = time.time()
 
-    # Define percentiles, from 1 to 99
-    percentiles = range(1, 100, 1)
-    df_percentiles = pd.DataFrame()
+    path_file_percentiles = f"{PARENT_DIR}/pip_percentiles.csv"
 
-    # Estimate percentiles using concurrency
-    futures = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-        for p in percentiles:
-            future = executor.submit(calculate_percentile, p, df)
-            futures.append(future)
+    if Path(path_file_percentiles).is_file():
+        log.info("Percentiles file already exists. No need to consolidate.")
+        df_percentiles = pd.read_csv(path_file_percentiles)
+    else:
+        log.info("Consolidating percentiles")
 
-    # now that all futures have been started, wait for them all
-    dfs = [f.result() for f in futures]
-    df_percentiles = pd.concat(dfs, ignore_index=True)
+        # Define percentiles, from 1 to 99
+        percentiles = range(1, 100, 1)
+        df_percentiles = pd.DataFrame()
 
-    # Rename headcount to estimated_percentile and poverty_line to thr
-    df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})
+        # Estimate percentiles using concurrency
+        futures = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            for p in percentiles:
+                future = executor.submit(calculate_percentile, p, df)
+                futures.append(future)
 
-    # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
-    df_percentiles = df_percentiles.sort_values(
-        by=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"]
-    )
+        # now that all futures have been started, wait for them all
+        dfs = [f.result() for f in futures]
+        df_percentiles = pd.concat(dfs, ignore_index=True)
 
-    # Save to csv
-    df_percentiles.to_csv(f"{PARENT_DIR}/pip_percentiles.csv", index=False)
+        # Rename headcount to estimated_percentile and poverty_line to thr
+        df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})
+
+        # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
+        df_percentiles = df_percentiles.sort_values(
+            by=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"]
+        )
+
+        # Save to csv
+        df_percentiles.to_csv(f"{PARENT_DIR}/pip_percentiles.csv", index=False)
 
     # Check if every country, year, reporting level, welfare type and ppp version has each percentiles from 1 to 99
     assert (
@@ -536,13 +559,13 @@ def generate_consolidated_percentiles(df):
         "Some distributions don't have 99 percentiles!"
     )
 
-    # Count the cases where distance_to_p is higher than 0.5
-    mask = df_percentiles["distance_to_p"] > 0.5
+    # Count the cases where distance_to_p is higher than TOLERANCE_PERCENTILES
+    mask = df_percentiles["distance_to_p"] > TOLERANCE_PERCENTILES
     number_of_cases = len(df_percentiles[mask])
     if number_of_cases > 0:
         log.warning(
-            f"""Number of cases where distance_to_p is higher than 0.5: {len(df_percentiles[mask])}:
-                    {df_percentiles[mask]["ppp_version", "country", "year", "reporting_level", "welfare_type"].value_counts()}"""
+            f"""Number of cases where distance_to_p is higher than {TOLERANCE_PERCENTILES}: {len(df_percentiles[mask])}:
+                {df_percentiles[mask][["ppp_version", "country", "year", "reporting_level", "welfare_type"]].value_counts()}"""
         )
 
     end_time = time.time()
