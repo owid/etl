@@ -294,7 +294,7 @@ def generate_percentiles_raw():
     between_175_and_250_dollars = list(range(17500, 25000, 20))
     betweeb_250_and_500_dollars = list(range(25000, 50000, 50))
 
-    # povlines is all these lists toghether
+    # povlines is all these lists together
     povlines = (
         under_5_dollars
         + between_5_and_10_dollars
@@ -552,9 +552,15 @@ def generate_consolidated_percentiles(df):
 
     # Check if every country, year, reporting level, welfare type and ppp version has each percentiles from 1 to 99
     assert (
-        df_percentiles.groupby(["ppp_version", "country", "year", "reporting_level", "welfare_type"]).size().max() == 99
+        df_percentiles.groupby(["ppp_version", "country", "year", "reporting_level", "welfare_type"], dropna=False)
+        .size()
+        .max()
+        == 99
     ) & (
-        df_percentiles.groupby(["ppp_version", "country", "year", "reporting_level", "welfare_type"]).size().min() == 99
+        df_percentiles.groupby(["ppp_version", "country", "year", "reporting_level", "welfare_type"], dropna=False)
+        .size()
+        .min()
+        == 99
     ), log.warning(
         "Some distributions don't have 99 percentiles!"
     )
@@ -1008,12 +1014,12 @@ def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
 # Generate percentiles by extracting the raw files and processing them afterward
 df_percentiles = generate_consolidated_percentiles(generate_percentiles_raw())
 
-# # Generate relative poverty indicators file
-# df_relative = generate_relative_poverty()
+# Generate relative poverty indicators file
+df_relative = generate_relative_poverty()
 
-# # Generate key indicators file and patch medians
-# df = generate_key_indicators()
-# df = median_patch(df)
+# Generate key indicators file and patch medians
+df = generate_key_indicators()
+df = median_patch(df)
 
-# # Add relative poverty indicators and decile thresholds to the key indicators file
-# df = add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles)
+# Add relative poverty indicators and decile thresholds to the key indicators file
+df = add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles)
