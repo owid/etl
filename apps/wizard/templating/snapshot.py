@@ -622,7 +622,8 @@ if submitted:
             manual_import_instructions = "--path-to-file **relative path of file**"
         else:
             manual_import_instructions = ""
-        with st.expander("## Next steps", expanded=True):
+        st.subheader("Next steps")
+        with st.expander("", expanded=True):
             st.markdown(
                 """
             1. Verify that generated files are correct and update them if necessary.
