@@ -155,8 +155,8 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
         ],
     )
     # Dropping average marine acidity as we don't have a way to visualise it
-    # Also dropping EN_REF_WASCOL and as it is only available at city level which we can't visualise
-    df = df[~df["seriescode"].isin(["ER_OAW_MNACD", "EN_REF_WASCOL"])]
+    # Also dropping EN_REF_WASCOL and SP_TRN_PUBL as they only available at city level which we can't visualise
+    df = df[~(df["seriescode"].isin(["ER_OAW_MNACD", "EN_REF_WASCOL", "SP_TRN_PUBL"])) & (df["cities"] != "_T")]
     df = df.drop(["level_0", "index"], axis=1, errors="ignore")
 
     return df
