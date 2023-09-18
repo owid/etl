@@ -5,7 +5,7 @@ meta:
   version: '2023-06-21'
   publication_year: 2023
 
-  publication_date: '2023-06-06'
+  publication_date: '2023-09-18'
   source_name: Epoch (2023)
   source_published_by: 'Epoch, Parameter, Compute and Data Trends in Machine Learning.
     Published online at epochai.org. Retrieved from: https://epochai.org/mlinputs/visualization'
@@ -36,6 +36,6 @@ meta:
 
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-21
 outs:
-- md5: ad773fc6b1755c3127f8df8a12d37260
-  size: 315577
+- md5: 1b7096c894c96296e92667ab1d39e58e
+  size: 525411
   path: epoch.csv
