@@ -1,8 +1,7 @@
 meta:
   origin:
-    title_snapshot: Number of farmed fish in 2015
-    title: Estimated numbers of individuals in annual global aquaculture
-      production (FAO) of fish species (2015).
+    title_snapshot: Number of individual farmed fish (2015)
+    title: Number of individual farmed fish
     description_snapshot: |-
       Estimated number of individual fish in annual aquaculture production in 2015.
     producer: Fishcount
