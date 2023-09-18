@@ -623,23 +623,29 @@ if submitted:
         else:
             manual_import_instructions = ""
         with st.expander("## Next steps", expanded=True):
-            st.markdown("""
+            st.markdown(
+                """
             1. Verify that generated files are correct and update them if necessary.
 
             2. Run the snapshot step to upload files to S3
-            """)
+            """
+            )
             args = []
             if form.dataset_manual_import:
-                s_file = st.text_input(label="Select local file to import", placeholder="path/to/file.csv", key="snapshot_file")
+                s_file = st.text_input(
+                    label="Select local file to import", placeholder="path/to/file.csv", key="snapshot_file"
+                )
             st.button("Run snapshot step", key="run_snapshot_step", on_click=run_snap_step)  # type: ignore
-            st.markdown(f"""
+            st.markdown(
+                f"""
             You can also run the step from the command line:
             ```bash
             python {ingest_path.relative_to(BASE_DIR)} {manual_import_instructions}
             ```
 
             3. Continue to the meadow step.
-            """)
+            """
+            )
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")
