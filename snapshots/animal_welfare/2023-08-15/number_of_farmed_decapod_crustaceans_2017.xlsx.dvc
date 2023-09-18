@@ -1,8 +1,7 @@
 meta:
   origin:
-    title_snapshot: Number of farmed decapod crustaceans in 2017
-    title: |
-      Estimated numbers of individuals in global aquaculture production (FAO) of decapod species (2017)
+    title_snapshot: Number of individual farmed decapod crustaceans (2017)
+    title: Number of individual farmed decapod crustaceans
     description_snapshot: |-
       Estimated number of individual decapod crustaceans in annual aquaculture production.
     producer: Fishcount
