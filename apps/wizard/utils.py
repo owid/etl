@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 import tempfile
+from copy import deepcopy
 from io import StringIO
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, Type, cast
@@ -308,8 +309,9 @@ class AppState:
     def display_error(self: "AppState", key: str) -> None:
         """Get error message for a given key."""
         if "errors" in self.state_step:
-            print(key)
+            # print("KEY:", key)
             if msg := self.state_step.get("errors", {}).get(key, ""):
+                # print(msg)
                 st.error(msg)
 
     @property
@@ -385,6 +387,7 @@ class StepForm(BaseModel):
         """Build object from session_state variables."""
         session_state = cast(Dict[str, Any], dict(st.session_state))
         data = cls.filter_relevant_fields(step_name=st.session_state["step_name"], data=session_state)
+        # st.write(data)
         return cls(**data)
 
     def validate(self: Self) -> None:
@@ -418,30 +421,57 @@ class StepForm(BaseModel):
             # Get error type
             error_type = error.validator
             if error_type not in {"required", "type", "pattern"}:
-                raise Exception(f"Unknown error type {error_type} with message {error.message}")
+                raise Exception(f"Unknown error type {error_type} with message '{error.message}'")
             # Get field values
             values = self.get_invalid_field(error, schema_full)
             # Get uri of problematic field
             uri = error.json_path.replace("$.meta.", "")
             # Some fixes when error type is "required"
             if error_type == "required":
-                rex = r"'(.*)' is a required property"
-                uri = f"{uri}.{re.findall(rex, error.message)[0]}"
+                # Get uri and values for the actual field!
+                # Note that for errors that are of type 'required', this might contain the top level field. E.g., suppose 'origin.title' is required;
+                # this requirement is defined at 'origin' level, hence error.schema_path will point to 'origin' and not 'origin.title'.
+                field_name = self._get_required_field_name(error)
+                uri = f"{uri}.{field_name}"
+                values = values["properties"][field_name]
                 if "errorMessage" not in values:
+                    # print("DEBUG, replaced errormsg")
                     values["errorMessage"] = error.message.replace("'", "`")
             # Save error message
             if "errorMessage" in values:
                 self.errors[uri] = values["errorMessage"]
             else:
                 self.errors[uri] = error.message
+            print("DEBUG", uri, error.message, values["errorMessage"])
 
     def get_invalid_field(self: Self, error, schema_full) -> Any:
-        """Get all key-values for the field that did not validate."""
+        """Get all key-values for the field that did not validate.
+
+        Note that for errors that are of type 'required', this might contain the top level field. E.g., suppose 'origin.title' is required;
+        this requirement is defined at 'origin' level, hence error.schema_path will point to 'origin' and not 'origin.title'.
+        """
+        # print("schema_path:", error.schema_path)
+        # print("validator_value:", error.validator_value)
+        # print("absolute_schema_path:", error.absolute_schema_path)
+        # print("relative_path:", error.relative_path)
+        # print("absolute_path:", error.absolute_path)
+        # print("json_path:", error.json_path)
         queue = list(error.schema_path)[:-1]
-        values = schema_full.copy()
+        # print(queue)
+        values = deepcopy(schema_full)
         for key in queue:
             values = values[key]
         return values
+
+    def _get_required_field_name(self: Self, error):
+        """Get required field name
+
+        Required field names are defined by the field containing these. Hence, when there is an error, the path points to the top level field,
+        not the actual one that is required and is missing.
+        """
+        rex = r"'(.*)' is a required property"
+        field_name = re.findall(rex, error.message)[0]
+        return field_name
 
     def check_required(self: Self, fields_names: List[str]) -> None:
         """Check that all fields in `fields_names` are not empty."""
