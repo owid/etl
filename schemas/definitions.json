@@ -151,8 +151,8 @@
     "required": [
       "title",
       "date_published",
-      "citation_full",
       "producer",
+      "citation_full",
       "url_main",
       "date_accessed"
     ],
@@ -359,6 +359,13 @@
               ]
             }
           ]
+        ],
+        "faqs": [
+          {
+            "question": "What should be the value if there are multiple producers?",
+            "answer": "We don't have a clear guideline for this at the moment, and depending on the case you might want to specify all the producers. However, a good option is to use 'Various sources'.",
+            "link": "https://github.com/owid/etl/discussions/1608"
+          }
         ],
         "category": "citation"
       },
