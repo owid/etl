@@ -118,3 +118,5 @@ steps:
   - snapshot://fasttrack/latest/democracy_lexical_index.csv
   data://grapher/fasttrack/latest/global_maternal_offspring_loss:
   - snapshot://fasttrack/latest/global_maternal_offspring_loss.csv
+  data://grapher/fasttrack/latest/under_five_mortality_lmics:
+  - snapshot://fasttrack/latest/under_five_mortality_lmics.csv

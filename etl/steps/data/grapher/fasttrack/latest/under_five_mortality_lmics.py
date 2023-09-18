@@ -9,7 +9,7 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     # load snapshot
-    snap = Snapshot("fasttrack/latest/sentience_institute.csv")
+    snap = Snapshot("fasttrack/latest/under_five_mortality_lmics.csv")
 
     # load data
     data = pd.read_csv(snap.path)

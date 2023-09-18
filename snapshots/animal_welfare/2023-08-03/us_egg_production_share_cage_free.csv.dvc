@@ -1,7 +1,7 @@
 meta:
   origin:
-    title_snapshot: US egg production, cage-free percentages
-    title: US Egg Production Data Set
+    title_snapshot: US egg production (cage-free percentages)
+    title: US egg production
     description: |-
       This project synthesizes data on the supply of cage-free eggs relative to all food eggs in the United States using United States Department of Agriculture (USDA) data from December 2007 to present. The associated report supplements the data with definitions and a taxonomy of egg products drawn from USDA and industry publications.
     producer: The Humane League
