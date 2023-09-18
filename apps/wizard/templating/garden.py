@@ -315,6 +315,16 @@ if submitted:
         if form.namespace == "dummy":
             _fill_dummy_metadata_yaml(metadata_path)
 
+        # Preview generated files
+        st.subheader("Generated files")
+        if form.include_metadata_yaml:
+            utils.preview_file(metadata_path, "yaml")
+        utils.preview_file(step_path, "python")
+        if form.generate_notebook:
+            with st.expander(f"File: `{notebook_path}`", expanded=False):
+                st.markdown("Open the file to see the generated notebook.")
+        utils.preview_dag_additions(dag_content, dag_path)
+
         # Display next steps
         with st.expander("## Next steps", expanded=True):
             st.markdown(
@@ -365,13 +375,6 @@ if submitted:
         7. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
         """
             )
-
-        # Preview generated files
-        st.subheader("Generated files")
-        if form.include_metadata_yaml:
-            utils.preview_file(metadata_path, "yaml")
-        utils.preview_file(step_path, "python")
-        utils.preview_dag_additions(dag_content, dag_path)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

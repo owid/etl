@@ -226,9 +226,16 @@ if submitted:
         if (not form.generate_notebook) and (notebook_path.is_file()):
             os.remove(notebook_path)
 
+        # Preview generated
+        st.subheader("Generated files")
+        utils.preview_file(step_path, "python")
+        if form.generate_notebook:
+            with st.expander(f"File: `{notebook_path}`", expanded=False):
+                st.markdown("Open the file to see the generated notebook.")
+        utils.preview_dag_additions(dag_content=dag_content, dag_path=dag_path)
+
         # Display next steps
-        st.subheader("Next steps")
-        with st.expander("", expanded=True):
+        with st.expander("## Next steps", expanded=True):
             st.markdown(
                 f"""
         1. Run `etl` to generate the dataset
@@ -242,11 +249,6 @@ if submitted:
         {"3. Continue to the garden step." if form.generate_notebook else "2. Continue to the garden step."}
         """
             )
-
-        # Preview generated
-        st.subheader("Generated files")
-        utils.preview_file(step_path, "python")
-        utils.preview_dag_additions(dag_content=dag_content, dag_path=dag_path)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")
