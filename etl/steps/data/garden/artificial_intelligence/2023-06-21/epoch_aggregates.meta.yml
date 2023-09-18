@@ -51,6 +51,12 @@ dataset:
 tables:
   epoch_aggregates:
     variables:
+      audio:
+        title: Audio
+        unit: ''
+      reading:
+        title: Reading
+        unit: ''
       _3d_reconstruction:
         title: 3D reconstruction
         unit: ''
@@ -110,4 +116,10 @@ tables:
         unit: ''
       research_collective:
         title: Research collective
+        unit: ''
+      government:
+        title: Government
+        unit: ''
+      non_profit:
+        title: Non-profit
         unit: ''
