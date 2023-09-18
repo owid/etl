@@ -478,6 +478,12 @@ class Table(pd.DataFrame):
                     else:
                         setattr(self[v_short_name].metadata, k, v)
 
+                    # we allow `- *descriptions` which needs to be flattened
+                    if k == "description_key":
+                        self[v_short_name].metadata.description_key = _flatten(
+                            self[v_short_name].metadata.description_key
+                        )
+
         # update table attributes
         for k, v in t_annot.items():
             if k != "variables":
@@ -781,6 +787,9 @@ class Table(pd.DataFrame):
     def __ipow__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         return self.__pow__(other)
 
+    def sort_index(self, *args, **kwargs) -> "Table":
+        return super().sort_index(*args, **kwargs)  # type: ignore
+
 
 def merge(
     left,
@@ -1071,6 +1080,20 @@ def read_csv(
         table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
     else:
         log.warning("Currently, the processing log cannot be updated unless you pass a path to read_csv.")
+
+    return cast(Table, table)
+
+
+def read_feather(
+    filepath: Union[str, Path],
+    metadata: Optional[TableMeta] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_feather(filepath, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = update_log(table=table, operation="load", parents=[filepath])
 
     return cast(Table, table)
 
@@ -1405,3 +1428,8 @@ def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List
             for field in fields:
                 if not getattr(table[column].metadata, field):
                     log.warning(f"Table {table_name}, column {column} has no {field}.")
+
+
+def _flatten(lst: List[Any]) -> List[str]:
+    """Flatten list that contains either strings or lists."""
+    return [item for sublist in lst for item in ([sublist] if isinstance(sublist, str) else sublist)]

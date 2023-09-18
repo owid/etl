@@ -1,8 +1,9 @@
-import shutil
 from pathlib import Path
 
 import click
+import pandas as pd
 
+from etl.backport_helpers import long_to_wide
 from etl.snapshot import Snapshot, SnapshotMeta
 
 SNAPSHOT_NAMESPACE = Path(__file__).parent.parent.name
@@ -34,9 +35,12 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(meta.uri)
 
+    # Convert from long to wide format.
+    df = long_to_wide(pd.read_feather(snap_values.path))
+
     # Copy file to the new snapshot.
     snap.path.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(snap_values.path, snap.path)
+    df.reset_index().to_feather(snap.path)
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)

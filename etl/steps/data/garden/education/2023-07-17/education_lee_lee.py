@@ -3,6 +3,7 @@
 from typing import List, cast
 
 import pandas as pd
+import shared
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
 
@@ -15,21 +16,16 @@ REGIONS = [
     "North America",
     "South America",
     "Europe",
-    "European Union (27)",
     "Africa",
     "Asia",
     "Oceania",
-    "Low-income countries",
-    "Upper-middle-income countries",
-    "Lower-middle-income countries",
-    "High-income countries",
     "World",
 ]
 
 
-def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     tb_with_regions = tb.copy()
-    aggregations = {column: "median" for column in tb_with_regions.columns if column not in ["country", "year"]}
+    aggregations = {column: "mean" for column in tb_with_regions.columns if column not in ["country", "year"]}
 
     for region in REGIONS:
         # Find members of current region.
@@ -38,17 +34,15 @@ def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset, ds_
             ds_regions=ds_regions,
             ds_income_groups=ds_income_groups,
         )
-        tb_with_regions = geo.add_region_aggregates(
+        tb_with_regions = shared.add_region_aggregates_education(
             df=tb_with_regions,
             region=region,
             countries_in_region=members,
             countries_that_must_have_data=[],
             num_allowed_nans_per_year=None,
-            frac_allowed_nans_per_year=0.99999,
+            frac_allowed_nans_per_year=0.2,
             aggregations=aggregations,
         )
-    tb_with_regions = tb_with_regions.copy_metadata(from_table=tb)
-
     return tb_with_regions
 
 
@@ -64,12 +58,12 @@ def run(dest_dir: str) -> None:
     ds_income_groups = paths.load_dependency("income_groups")
 
     # Load the World Bank Education Dataset
-    ds_garden_wb = cast(Dataset, paths.load_dependency("education"))
-    tb_wb = ds_garden_wb["education"]
+    ds_garden_wdi = cast(Dataset, paths.load_dependency("wdi"))
+    tb_wdi = ds_garden_wdi["wdi"]
 
     # Extract enrollment rates from the World Bank Education Dataset starting from 2010
-    df_above_2010 = extract_related_world_bank_data(tb_wb)
-    world_bank_indicators = df_above_2010.columns
+    enrolment_wb = extract_related_world_bank_data(tb_wdi)
+    world_bank_indicators = enrolment_wb.columns
 
     # Read the main education table from the meadow dataset and reset its index
     tb = ds_meadow["education_lee_lee"]
@@ -92,17 +86,9 @@ def run(dest_dir: str) -> None:
 
     # Prepare enrollment and attainment data
     df_enrollment = prepare_enrollment_data(tb)
-    df_enrollment = add_data_for_regions(
-        tb=df_enrollment, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
     df_attainment = prepare_attainment_data(tb)
     df_attainment = df_attainment.dropna(subset=df_attainment.columns.drop(["country", "year"]), how="all")
     df_attainment.reset_index(drop=True, inplace=True)
-
-    # Add regional data for attainment
-    df_attainment = add_data_for_regions(
-        tb=df_attainment, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
 
     # Merge enrollment and attainment data
     merged_df = pd.merge(df_enrollment, df_attainment, on=["year", "country"], how="outer")
@@ -110,22 +96,34 @@ def run(dest_dir: str) -> None:
     # Drop columns related to historic population values
     merged_df = merged_df.drop(columns=[column for column in merged_df.columns if "__thousands" in column])
     merged_df.columns = [underscore(col) for col in merged_df.columns]
+    merged_df = add_data_for_regions(tb=merged_df, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
-    # Add regional data for World Bank indicators
-    df_above_2010 = add_data_for_regions(
-        tb=df_above_2010, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )
-
-    # Concatenate merged data with World Bank indicators and set proper indexes
-    df_merged_enrollment = pd.concat([merged_df[world_bank_indicators], df_above_2010])
+    # Concatenate historical and more recent enrollment data
+    hist_1985_df = merged_df[merged_df["year"] < 1985]
+    df_merged_enrollment = pd.concat([enrolment_wb, hist_1985_df[world_bank_indicators]])
     df_merged_enrollment.set_index(["country", "year"], inplace=True)
+    # Differentiate these columns from the original data
     df_merged_enrollment.columns = df_merged_enrollment.columns + "_combined_wb"
-    merged_df.set_index(["country", "year"], inplace=True)
 
-    # Merge data with World Bank enrollment data
+    # Merge historical data with combined enrollment data
     df_merged_wb = pd.merge(df_merged_enrollment, merged_df, on=["country", "year"], how="outer")
     df_merged_wb = df_merged_wb.dropna(how="all")
+
+    # Create female to male enrollment ratios
+    df_merged_wb["female_over_male_enrollment_rates_primary"] = (
+        df_merged_wb["f_primary_enrollment_rates_combined_wb"] / df_merged_wb["m_primary_enrollment_rates_combined_wb"]
+    )
+    df_merged_wb["female_over_male_enrollment_rates_secondary"] = (
+        df_merged_wb["f_secondary_enrollment_rates_combined_wb"]
+        / df_merged_wb["m_secondary_enrollment_rates_combined_wb"]
+    )
+    df_merged_wb["female_over_male_enrollment_rates_tertiary"] = (
+        df_merged_wb["f_tertiary_enrollment_rates_combined_wb"]
+        / df_merged_wb["m_tertiary_enrollment_rates_combined_wb"]
+    )
+
     tb = Table(df_merged_wb, short_name=paths.short_name, underscore=True)
+    tb.set_index(["country", "year"], inplace=True)
     #
     # Save outputs
     #
@@ -138,7 +136,7 @@ def run(dest_dir: str) -> None:
 
 def extract_related_world_bank_data(tb_wb: Table) -> pd.DataFrame:
     """
-    Extracts enrollment rate indicators from the World Bank dataset.
+    Extracts enrollment rate indicators from the WD Bank dataset.
     The function specifically extracts net enrollment rates up to secondary education and gross enrollment rates for tertiary education.
 
     :param tb_wb: Table containing World Bank education dataset
@@ -148,68 +146,41 @@ def extract_related_world_bank_data(tb_wb: Table) -> pd.DataFrame:
     # Define columns to select for enrolment rates
     select_enrolment_cols = [
         # Primary enrollment columns
-        "total_net_enrolment_rate__primary__both_sexes__pct",
-        "total_net_enrolment_rate__primary__female__pct",
-        "total_net_enrolment_rate__primary__male__pct",
+        "se_prm_nenr",
+        "se_prm_nenr_fe",
+        "se_prm_nenr_ma",
         # Tertiary enrollment columns
-        "school_enrollment__tertiary__pct_gross",
-        "school_enrollment__tertiary__female__pct_gross",
-        "school_enrollment__tertiary__male__pct_gross",
+        "se_ter_enrr",
+        "se_ter_enrr_fe",
+        "se_ter_enrr_ma",
         # Secondary enrollment columns
-        "total_net_enrolment_rate__lower_secondary__both_sexes__pct",
-        "total_net_enrolment_rate__upper_secondary__both_sexes__pct",
-        "total_net_enrolment_rate__lower_secondary__male__pct",
-        "total_net_enrolment_rate__upper_secondary__male__pct",
-        "total_net_enrolment_rate__lower_secondary__female__pct",
-        "total_net_enrolment_rate__upper_secondary__female__pct",
+        "se_sec_nenr",
+        "se_sec_nenr_fe",
+        "se_sec_nenr_ma",
     ]
 
     # Dictionary to rename columns to be consistent with Lee dataset
     dictionary_to_rename_and_combine = {
-        "total_net_enrolment_rate__primary__both_sexes__pct": "mf_primary_enrollment_rates",
-        "total_net_enrolment_rate__primary__female__pct": "f_primary_enrollment_rates",
-        "total_net_enrolment_rate__primary__male__pct": "m_primary_enrollment_rates",
-        "school_enrollment__tertiary__pct_gross": "mf_tertiary_enrollment_rates",
-        "school_enrollment__tertiary__female__pct_gross": "f_tertiary_enrollment_rates",
-        "school_enrollment__tertiary__male__pct_gross": "m_tertiary_enrollment_rates",
+        "se_prm_nenr": "mf_primary_enrollment_rates",
+        "se_prm_nenr_fe": "f_primary_enrollment_rates",
+        "se_prm_nenr_ma": "m_primary_enrollment_rates",
+        "se_ter_enrr": "mf_tertiary_enrollment_rates",
+        "se_ter_enrr_fe": "f_tertiary_enrollment_rates",
+        "se_ter_enrr_ma": "m_tertiary_enrollment_rates",
+        "se_sec_nenr": "mf_secondary_enrollment_rates",
+        "se_sec_nenr_fe": "f_secondary_enrollment_rates",
+        "se_sec_nenr_ma": "m_secondary_enrollment_rates",
     }
 
     # Select and rename columns
     enrolment_wb = tb_wb[select_enrolment_cols]
     enrolment_wb.rename(columns=dictionary_to_rename_and_combine, inplace=True)
 
-    # Calculate secondary enrollment rates by taking an average for lower and upper secondary education
-    enrolment_wb["mf_secondary_enrollment_rates"] = (
-        enrolment_wb["total_net_enrolment_rate__lower_secondary__both_sexes__pct"]
-        + enrolment_wb["total_net_enrolment_rate__upper_secondary__both_sexes__pct"]
-    ) / 2
-    enrolment_wb["m_secondary_enrollment_rates"] = (
-        enrolment_wb["total_net_enrolment_rate__lower_secondary__male__pct"]
-        + enrolment_wb["total_net_enrolment_rate__upper_secondary__male__pct"]
-    ) / 2
-    enrolment_wb["f_secondary_enrollment_rates"] = (
-        enrolment_wb["total_net_enrolment_rate__lower_secondary__female__pct"]
-        + enrolment_wb["total_net_enrolment_rate__upper_secondary__female__pct"]
-    ) / 2
+    # Select data above 1985
+    enrolment_wb = enrolment_wb[(enrolment_wb.index.get_level_values("year") >= 1985)]
+    enrolment_wb.reset_index(inplace=True)
 
-    # Drop original secondary enrolment columns
-    enrolment_wb.drop(
-        columns=[
-            "total_net_enrolment_rate__lower_secondary__both_sexes__pct",
-            "total_net_enrolment_rate__upper_secondary__both_sexes__pct",
-            "total_net_enrolment_rate__lower_secondary__female__pct",
-            "total_net_enrolment_rate__upper_secondary__female__pct",
-            "total_net_enrolment_rate__lower_secondary__male__pct",
-            "total_net_enrolment_rate__upper_secondary__male__pct",
-        ],
-        inplace=True,
-    )
-
-    # Filter the DataFrame for years above 2010 (Lee dataset stop in 2010)
-    df_above_2010 = enrolment_wb[(enrolment_wb.index.get_level_values("year") > 2010)]
-    df_above_2010.reset_index(inplace=True)
-
-    return df_above_2010
+    return enrolment_wb
 
 
 def melt_and_pivot(

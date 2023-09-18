@@ -1,7 +1,6 @@
 import datetime as dt
 import json
 import re
-import shutil
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -72,7 +71,11 @@ class Snapshot:
     @property
     def metadata_path(self) -> Path:
         """Path to metadata file."""
-        return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
+        archive_path = Path(f"{paths.SNAPSHOTS_DIR_ARCHIVE / self.uri}.dvc")
+        if archive_path.exists():
+            return archive_path
+        else:
+            return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
     def pull(self, force=True) -> None:
         """Pull file from S3."""
@@ -90,8 +93,8 @@ class Snapshot:
     def download_from_source(self) -> None:
         """Download file from source_data_url."""
         if self.metadata.origin:
-            assert self.metadata.origin.dataset_url_download, "dataset_url_download is not set"
-            download_url = self.metadata.origin.dataset_url_download
+            assert self.metadata.origin.url_download, "url_download is not set"
+            download_url = self.metadata.origin.url_download
         elif self.metadata.source:
             assert self.metadata.source.source_data_url, "source_data_url is not set"
             download_url = self.metadata.source.source_data_url
@@ -117,6 +120,21 @@ class Snapshot:
                     with attempt:
                         dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
 
+    def create_snapshot(
+        self,
+        filename: Optional[Union[str, Path]] = None,
+        data: Optional[Union[Table, pd.DataFrame]] = None,
+        upload: bool = False,
+    ) -> None:
+        """Create a new snapshot from a local file, or from data in memory, or from a download link."""
+        if (filename is not None) or (data is not None):
+            # Create snapshot from either a local file or from data in memory.
+            add_snapshot(uri=self.uri, filename=filename, dataframe=data, upload=upload)
+        else:
+            # Create snapshot by downloading data from a URL.
+            self.download_from_source()
+            self.dvc_add(upload=upload)
+
     def to_table_metadata(self):
         return self.metadata.to_table_metadata()
 
@@ -124,6 +142,8 @@ class Snapshot:
         """Read file based on its Snapshot extension."""
         if self.metadata.file_extension == "csv":
             return self.read_csv(*args, **kwargs)
+        elif self.metadata.file_extension == "feather":
+            return self.read_feather(*args, **kwargs)
         elif self.metadata.file_extension == "xlsx":
             return self.read_excel(*args, **kwargs)
         elif self.metadata.file_extension == "json":
@@ -135,6 +155,10 @@ class Snapshot:
         """Read CSV file into a Table and populate it with metadata."""
         return pr.read_csv(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
 
+    def read_feather(self, *args, **kwargs) -> Table:
+        """Read feather file into a Table and populate it with metadata."""
+        return pr.read_feather(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+
     def read_excel(self, *args, **kwargs) -> Table:
         """Read excel file into a Table and populate it with metadata."""
         return pr.read_excel(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
@@ -142,6 +166,10 @@ class Snapshot:
     def read_json(self, *args, **kwargs) -> Table:
         """Read JSON file into a Table and populate it with metadata."""
         return pr.read_json(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+
+    def read_from_records(self, *args, **kwargs) -> Table:
+        """Read records into a Table and populate it with metadata."""
+        return pr.read_from_records(*args, metadata=self.to_table_metadata(), **kwargs)
 
 
 @pruned_json
@@ -303,17 +331,17 @@ class SnapshotMeta:
             table_meta = TableMeta.from_dict(
                 {
                     "short_name": self.short_name,
-                    "title": self.origin.dataset_title_owid,  # type: ignore
-                    "description": self.origin.dataset_description_owid,  # type: ignore
+                    "title": self.origin.title,  # type: ignore
+                    "description": self.origin.description,  # type: ignore
                     "dataset": DatasetMeta.from_dict(
                         {
                             "channel": "snapshots",
                             "namespace": self.namespace,
                             "short_name": self.short_name,
-                            "title": self.origin.dataset_title_owid,  # type: ignore
-                            "description": self.origin.dataset_description_owid,  # type: ignore
-                            "origins": [self.origin],
-                            "licenses": [self.license],
+                            "title": self.origin.title,  # type: ignore
+                            "description": self.origin.description,  # type: ignore
+                            "origins": [self.origin] if self.origin else [],
+                            "licenses": [self.license] if self.license else [],
                             "is_public": self.is_public,
                             "version": self.version,
                         }
@@ -335,8 +363,8 @@ class SnapshotMeta:
                             "short_name": self.short_name,
                             "title": self.name,
                             "version": self.version,
-                            "sources": [self.source],
-                            "licenses": [self.license],
+                            "sources": [self.source] if self.source else [],
+                            "licenses": [self.license] if self.license else [],
                         }
                     ),
                 }
@@ -347,7 +375,7 @@ class SnapshotMeta:
 def add_snapshot(
     uri: str,
     filename: Optional[Union[str, Path]] = None,
-    dataframe: Optional[pd.DataFrame] = None,
+    dataframe: Optional[Union[Table, pd.DataFrame]] = None,
     upload: bool = False,
 ) -> None:
     """Helper function for adding snapshots with metadata, where the data is either
@@ -357,18 +385,21 @@ def add_snapshot(
         uri (str): URI of the snapshot file, typically `namespace/version/short_name.ext`. Metadata file
             `namespace/version/short_name.ext.dvc` must exist!
         filename (str or None): Path to local data file (if dataframe is not given).
-        dataframe (pd.DataFrame or None): Dataframe to upload (if filename is not given).
+        dataframe (Table or pd.DataFrame or None): Data to upload (if filename is not given).
         upload (bool): True to upload data to Walden bucket.
     """
     snap = Snapshot(uri)
 
     if (filename is not None) and (dataframe is None):
-        # copy file to correct location
-        shutil.copyfile(filename, snap.path)
+        # Ensure destination folder exists.
+        snap.path.parent.mkdir(exist_ok=True, parents=True)
+
+        # Copy local data file to snapshots data folder.
+        snap.path.write_bytes(Path(filename).read_bytes())
     elif (dataframe is not None) and (filename is None):
         dataframes.to_file(dataframe, file_path=snap.path)
     else:
-        raise ValueError("Use either 'filename' or 'dataframe' argument, but not both.")
+        raise ValueError("Pass either a filename or data, but not both.")
 
     snap.dvc_add(upload=upload)
 

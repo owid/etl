@@ -3,7 +3,6 @@ tables:
     variables:
       dummy_variable:
         title: Dummy
-        description: This is a dummy indicator with full metadata.
         licenses: []
         unit: Dummy unit
         short_unit: Du
@@ -19,6 +18,9 @@ tables:
         description_short: Short description of the dummy indicator.
         description_from_producer: The description of the dummy indicator by the producer,
           shown separately on a data page.
+        description_key:
+          - First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)
+          - Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)
         processing_level: major
         license:
           name: CC-BY 4.0
@@ -34,13 +36,10 @@ tables:
             - France
           title_public: The dummy indicator - data page title
           title_variant: historical data
-          producer_short: ACME
+          attribution_short: ACME
           attribution: ACME project
-          topic_tags_links:
+          topic_tags:
           - Internet
-          key_info_text:
-          - First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)
-          - Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)
           faqs:
           - fragment_id: cherries
             gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE

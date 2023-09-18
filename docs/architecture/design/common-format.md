@@ -9,7 +9,7 @@ Our format is inspired by [Frictionless DataPackage format](https://frictionless
 We have adapted this format to our needs as follows.
 
 ## Levels of data
-The following diagram presents an hypothetical dataset with two tables (`Table A` and `Table B`). Both tables have a primary keys and some variables.
+The following diagram presents an hypothetical dataset with two tables (`Table A` and `Table B`). Both tables have a primary keys and some indicators.
 
 ```mermaid
 graph TB
@@ -52,17 +52,17 @@ The metadata file indicates the primary key of the table, for example:
 { primary_key: ["country", "year"] }
 ```
 
-All variables in the table share the same primary key. Any column of the table that is not in the primary key is considered to be a _variable_.
+All indicators in the table share the same primary key. Any column of the table that is not in the primary key is considered to be a _indicator_.
 
 ### Variables ([`owid.catalog.Variable`](https://github.com/owid/etl/blob/master/lib/catalog/owid/catalog/variables.py))
 
 Each variable represents a single indicator, and is equivalent to a Pandas `Series`, including its index.
 
-For example, a table with the columns (`country`, `year`, `population`) and primary key (`country`, `year`) would have one variables: `population`.
+For example, a table with the columns (`country`, `year`, `population`) and primary key (`country`, `year`) would have one indicator: `population`.
 
 ## Ergonomics
 
-To make these data types easier to work with, datasets, tables and variables must all have a `short_name` property that uniquely identifies them.
+To make these data types easier to work with, datasets, tables and indicators must all have a `short_name` property that uniquely identifies them.
 
 A short name is a lowercase string containing only alphanumeric characters and underscores. It must start with a letter.
 

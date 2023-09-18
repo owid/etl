@@ -1,15 +1,15 @@
 meta:
   origin:
-    dataset_title_owid: Number of individual wild fish killed for food
-    dataset_title_producer: |-
+    title_snapshot: Number of individual wild fish killed for food
+    title: |-
       Estimated numbers of individuals in annual global recorded capture (FAO) of fish species
-    dataset_description_owid: |-
+    description_snapshot: |-
       Estimated numbers of individual fish killed annually in wild fish capture.
     producer: Fishcount
-    citation_producer: |-
+    citation_full: |-
       Fishcount.org.uk based on data from the Food and Agriculture Organization of the United Nations.
-    dataset_url_main: http://fishcount.org.uk/
-    dataset_url_download: 
+    url_main: http://fishcount.org.uk/
+    url_download:
       http://fishcount.org.uk/studydatascreens/2016/fishcount_estimated_wild_fish_2007-2016.xlsx
     date_published: 2019-01-21
     date_accessed: 2023-08-16

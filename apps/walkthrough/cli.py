@@ -45,6 +45,11 @@ def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, auto_open: 
     if phase == "charts":
         import sys
 
+        # Some references
+        # - https://discuss.streamlit.io/t/how-can-i-invoke-streamlit-from-within-python-code/6612
+        # - https://github.com/streamlit/streamlit/issues/5471
+        # - https://stackoverflow.com/questions/62760929/how-can-i-run-a-streamlit-app-from-within-a-python-script
+        # - https://discuss.streamlit.io/t/running-streamlit-inside-my-own-executable-with-the-click-module/1198/4
         from streamlit.web import cli as stcli
 
         script_path = os.path.join(os.path.dirname(__file__), "charts_v2/__main__.py")

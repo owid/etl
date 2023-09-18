@@ -51,18 +51,18 @@ def test_variable_metadata():
         "processingLevel": "minor",
         "grapherConfigETL": '{"title": "Population density"}',
         "license": '{"name": "License"}',
-        "keyInfoText": '["Population density"]',
+        "descriptionKey": '["Population density"]',
         "titlePublic": "Population density title",
         "titleVariant": "Population density variant",
-        "producerShort": "Gapminder",
+        "attributionShort": "Gapminder",
         "attribution": None,
-        "processingInfo": None,
+        "descriptionProcessing": None,
         "sourceName": "Gapminder (v6); UN (2022); HYDE (v3.2); Food and Agriculture Organization of the United Nations",
         "sourceDescription": '{"link": "https://www.gapminder.org/data/documentation/gd003/", "retrievedDate": "October 8, 2021", "additionalInfo": "Our World in Data builds...", "dataPublishedBy": "Gapminder (v6); United Nations - Population Division (2022); HYDE (v3.2); World Bank", "dataPublisherSource": null}',
     }
     origins_df = pd.DataFrame(
         {
-            "datasetDescriptionOwid": ["Origin A", "Origin B"],
+            "descriptionSnapshot": ["Origin A", "Origin B"],
         }
     )
     faqs = [
@@ -107,15 +107,14 @@ def test_variable_metadata():
             "unit": "people per km²",
         },
         "id": 525715,
-        "keyInfoText": ["Population density"],
+        "descriptionKey": ["Population density"],
         "name": "Population density",
         "nonRedistributable": False,
-        "origins": [{"datasetDescriptionOwid": "Origin A"}, {"datasetDescriptionOwid": "Origin B"}],
+        "origins": [{"descriptionSnapshot": "Origin A"}, {"descriptionSnapshot": "Origin B"}],
         "presentation": {
             "faqs": [{"fragmentId": "test", "gdocId": "1"}],
             "grapherConfigETL": {"title": "Population density"},
-            "keyInfoText": ["Population density"],
-            "producerShort": "Gapminder",
+            "attributionShort": "Gapminder",
             "titlePublic": "Population density title",
             "titleVariant": "Population density variant",
             "topicTagsLinks": ["Population"],

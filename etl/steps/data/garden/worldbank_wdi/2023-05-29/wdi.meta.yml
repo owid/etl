@@ -1951,40 +1951,41 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
         origins:  # Going forward this will usually come from snapshots in this form but you could also set it here
-        - dataset_title_owid: World Development Indicators
-          dataset_description_producer: >
+        - producer: World Bank
+          title: World Development Indicators
+          description: >
             The World Development Indicators (WDI) is the primary
             World Bank collection of development indicators, compiled
             from officially-recognized international sources. It
             presents the most current and accurate global development
             data available, and includes national, regional and
             global estimates.
-          producer: World Bank
           attribution: International Telecommunication Union (via World Bank) # This is an override that we would want to do for many indicators in the WDI especially
           attribution_short: World Bank
-          dataset_url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
-          dataset_url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
+          citation_full: ""
+          url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+          url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
           date_accessed: 2023-05-29
           date_published: '2023-05-11'
           license:
             name: Creative Commons Attribution 4.0
             url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+        description_key:
+          - An Internet user is defined by the International Telecommunication Union as anyone
+            who has accessed the Internet from any location in the last three months.
+          - This can be from any type of device, including a computer, mobile phone, personal digital
+            assistant, games machine, digital TV, and other technological devices.
         processing_level: minor
         presentation:
           title_public: Share of the population using the Internet
           title_variant: WDI
           # attribution: # defaults to origin[*].producer so does not have to be set here
-          topic_tags_links:
+          topic_tags:
           - Technological Progress
           - Internet
           faqs: []
           # - gdoc_id: 1E1sLXZmwU1SSVDFvMsJNbOAreHaKnRXqmJDqCAUfdDE
           #   fragment_id: test
-          key_info_text:
-          - An Internet user is defined by the International Telecommunication Union as anyone
-            who has accessed the Internet from any location in the last three months.
-          - This can be from any type of device, including a computer, mobile phone, personal digital
-            assistant, games machine, digital TV, and other technological devices.
           grapher_config:
             title: Share of the population using the Internet
             subtitle: 'Share of the population who [used the Internet](#dod:internetuser) in the last three months.'

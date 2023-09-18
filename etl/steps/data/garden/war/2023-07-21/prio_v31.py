@@ -11,6 +11,8 @@ Also, a conflict (i.e. one specific `id`) can have multiple campaigns. Take `id=
     - Second campaign: 1952 (Bolivia and MNR)
     - Third campaign: 1967 (Bolivia and ELN)
 
+
+Data for incompatibilities in Oceania are included in region Asia (source decision)
 """
 from typing import cast
 
@@ -29,7 +31,7 @@ log = get_logger()
 REGIONS_RENAME = {
     1: "Europe (PRIO)",
     2: "Middle East (PRIO)",
-    3: "Asia (PRIO)",
+    3: "Asia and Oceania (PRIO)",
     4: "Africa (PRIO)",
     5: "Americas (PRIO)",
 }

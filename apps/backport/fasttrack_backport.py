@@ -94,7 +94,8 @@ def _fill_data(spreadsheet, ds):
     for col in df.columns:
         if str(df[col].dtype).startswith("UInt") and df[col].isna().any():
             df[col] = df[col].astype(float)
-    df = df.fillna("").astype(str)
+
+    df = df.astype(str).fillna("").replace("nan", "").replace("<NA>", "")
 
     # Convert the DataFrame to a list of lists and include the header
     values = [df.columns.values.tolist()] + df.values.tolist()
@@ -233,10 +234,12 @@ def migrate(
     _fill_data(spreadsheet, ds)
 
     lg.info(f"1. Open spreadsheet at {spreadsheet.url}")
-    lg.info("2. Add spreadsheet to Google Drive with: File -> Add a shortcut to Drive")
+    lg.info(
+        "2. Add spreadsheet to Google Drive with: File -> Add a shortcut to Drive -> Shared Drives -> OWID Fast-track"
+    )
     lg.info("3. Import spreadsheet with Fast-track on http://etl-prod-1:8082/")
     lg.info("4. Run walkthrough charts to migrate charts to the new dataset")
-    lg.info("4. Delete old dataset")
+    lg.info("5. Delete old dataset")
 
     lg.info("migrate.finish")
 

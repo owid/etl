@@ -197,6 +197,7 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     parts = urlparse(step_name)
     step_type = parts.scheme
     path = parts.netloc + parts.path
+    # dependencies are new objects
     dependencies = [parse_step(s, dag) for s in dag.get(step_name, [])]
 
     step: Step
@@ -368,6 +369,11 @@ class DataStep(Step):
     def _dataset_index_mtime(self) -> Optional[float]:
         try:
             return os.stat(self._output_dataset._index_file).st_mtime
+        except KeyError as e:
+            if _uses_old_schema(e):
+                return None
+            else:
+                raise e
         except Exception as e:
             if str(e) == "dataset has not been created yet":
                 return None
@@ -414,7 +420,13 @@ class DataStep(Step):
         if not self.has_existing_data() or any(d.is_dirty() for d in self.dependencies):
             return True
 
-        found_source_checksum = catalog.Dataset(self._dest_dir.as_posix()).metadata.source_checksum
+        try:
+            found_source_checksum = catalog.Dataset(self._dest_dir.as_posix()).metadata.source_checksum
+        except KeyError as e:
+            if _uses_old_schema(e):
+                return True
+            else:
+                raise e
         exp_source_checksum = self.checksum_input()
 
         if found_source_checksum != exp_source_checksum:
@@ -475,7 +487,12 @@ class DataStep(Step):
 
     @property
     def _search_path(self) -> Path:
-        return paths.STEP_DIR / "data" / self.path
+        # step might have been moved to an archive folder, try that folder first
+        archive_path = paths.STEP_DIR / "archive" / self.path
+        if list(archive_path.parent.glob(archive_path.name + "*")):
+            return archive_path
+        else:
+            return paths.STEP_DIR / "data" / self.path
 
     @property
     def _dest_dir(self) -> Path:
@@ -489,11 +506,10 @@ class DataStep(Step):
         """
         from etl.helpers import isolated_env
 
-        module_path = self.path.lstrip("/").replace("/", ".")
-        module_dir = (paths.STEP_DIR / "data" / self.path).parent
+        module_dir = self._search_path.parent
 
         with isolated_env(module_dir):
-            step_module = import_module(f"{paths.BASE_PACKAGE}.steps.data.{module_path}")
+            step_module = import_module(self._search_path.relative_to(paths.BASE_DIR).as_posix().replace("/", "."))
             if not hasattr(step_module, "run"):
                 raise Exception(f'no run() method defined for module "{step_module}"')
 
@@ -742,32 +758,37 @@ class GrapherStep(Step):
             dataset.metadata.sources,
         )
 
-        thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS)
-        futures = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
+            futures = []
 
-        # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
-        # is fetching the whole dataset from data-api as they would receive all tables merged in a single
-        # table. This won't be a problem after we introduce the concept of "tables"
-        for table in dataset:
-            catalog_path = f"{self.path}/{table.metadata.short_name}"
+            # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
+            # is fetching the whole dataset from data-api as they would receive all tables merged in a single
+            # table. This won't be a problem after we introduce the concept of "tables"
+            for table in dataset:
+                # if GRAPHER_FILTER is set, only upsert matching columns
+                if config.GRAPHER_FILTER:
+                    table = table.loc[:, table.filter(regex=config.GRAPHER_FILTER).columns]
 
-            table = gh._adapt_table_for_grapher(table)
+                catalog_path = f"{self.path}/{table.metadata.short_name}"
 
-            # generate table with entity_id, year and value for every column
-            upsert = lambda t: gi.upsert_table(  # noqa: E731
-                engine,
-                t,
-                dataset_upsert_results,
-                catalog_path=catalog_path,
-                dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
-            )
+                table = gh._adapt_table_for_grapher(table)
 
-            for t in gh._yield_wide_table(table, na_action="drop"):
-                futures.append(thread_pool.submit(upsert, t))
+                # generate table with entity_id, year and value for every column
+                upsert = lambda t: gi.upsert_table(  # noqa: E731
+                    engine,
+                    t,
+                    dataset_upsert_results,
+                    catalog_path=catalog_path,
+                    dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                )
 
-        variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
+                for t in gh._yield_wide_table(table, na_action="drop"):
+                    futures.append(thread_pool.submit(upsert, t))
 
-        self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
+            variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
+
+        if not config.GRAPHER_FILTER:
+            self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
         # set checksum and updatedAt timestamps after all data got inserted
         gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
@@ -797,7 +818,6 @@ class GrapherStep(Step):
         gi.cleanup_ghost_variables(
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
-            workers=config.GRAPHER_INSERT_WORKERS,
         )
         gi.cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
         # TODO: cleanup origins that are not used by any variable
@@ -952,3 +972,9 @@ def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
+
+
+def _uses_old_schema(e: KeyError) -> bool:
+    """Origins without `title` use old schema before rename. This can be removed once
+    we recompute all datasets."""
+    return e.args[0] == "title"

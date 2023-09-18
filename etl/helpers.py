@@ -181,7 +181,11 @@ def create_dataset(
         setattr(ds.metadata, k, v)
 
     # update metadata from yaml file
-    N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
+    N_archive = PathFinder(str(paths.STEP_DIR / "archive" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
+    if N_archive.metadata_path.exists():
+        N = N_archive
+    else:
+        N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
     if N.metadata_path.exists():
         ds.update_metadata(N.metadata_path)
 
@@ -332,7 +336,10 @@ class PathFinder:
         self.f = Path(__file__)
 
         # Load dag.
-        self.dag = load_dag()
+        if "/archive/" in __file__:
+            self.dag = load_dag(paths.DAG_ARCHIVE_FILE)
+        else:
+            self.dag = load_dag()
 
         # Current file should be a data step.
         if not self.f.as_posix().startswith(paths.STEP_DIR.as_posix()):
@@ -936,7 +943,7 @@ def print_tables_metadata_template(tables: List[Table]):
         dict_variables = {}
         for column in tb.columns:
             dict_values = {}
-            for field in ["title", "unit", "short_unit", "description"]:
+            for field in ["title", "unit", "short_unit", "description_short", "processing_level"]:
                 value = getattr(tb[column].metadata, field) or ""
 
                 # Add some simple rules to simplify some common cases.
@@ -950,6 +957,10 @@ def print_tables_metadata_template(tables: List[Table]):
                 if (value == "") and (field in ["unit", "short_unit"]) and "pct" in column:
                     value = "%"
 
+                if field == "processing_level":
+                    # Assume a minor processing level (it will be manually overwritten, if needed).
+                    value = "minor"
+
                 dict_values[field] = value
             dict_variables[column] = dict_values
         dict_tables[tb.metadata.short_name] = {"variables": dict_variables}
@@ -960,7 +971,8 @@ def print_tables_metadata_template(tables: List[Table]):
 
 @contextmanager
 def isolated_env(
-    working_dir: Path, keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas"
+    working_dir: Path,
+    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy",
 ) -> Generator[None, None, None]:
     """Add given directory to pythonpath, run code in context, and
     then remove from pythonpath and unimport modules imported in context.
@@ -987,7 +999,7 @@ def isolated_env(
     sys.path.remove(working_dir.as_posix())
 
 
-def read_json_schema(path: Union[Path, str]) -> dict:
+def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
     """Read JSON schema with resolved references."""
     path = Path(path)
 
@@ -995,4 +1007,5 @@ def read_json_schema(path: Union[Path, str]) -> dict:
     base_dir_url = path.parent.absolute().as_uri() + "/"
     base_file_url = urljoin(base_dir_url, path.name)
     with path.open("r") as f:
-        return jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
+        dix = jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
+        return cast(Dict[str, Any], dix)

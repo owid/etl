@@ -45,8 +45,8 @@ def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
             namespace=snap.namespace,
             version=snap.version,
             # dataset title and description are filled from origin
-            title=snap.origin.dataset_title_owid,
-            description=snap.origin.dataset_description_owid,
+            title=snap.origin.title,
+            description=snap.origin.description,
             licenses=[snap.license] if snap.license else [],
         )
     elif snap.source:
@@ -71,8 +71,11 @@ def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
 
 
 def convert_grapher_source(s: gm.Source) -> Source:
+    description = s.description.get("additionalInfo") or ""
+
     # append publisher source to description
-    description = f"{s.description.get('additionalInfo')}\nPublisher source: {s.description.get('dataPublisherSource')}"
+    if s.description.get("dataPublisherSource"):
+        description += f"\nPublisher source: {s.description.get('dataPublisherSource')}"
 
     return Source(
         name=s.name,

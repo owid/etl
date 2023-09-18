@@ -4,7 +4,7 @@ from typing import cast
 
 from owid.catalog import Dataset
 
-from etl.helpers import PathFinder, create_dataset, grapher_checks
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -38,10 +38,8 @@ def run(dest_dir: str) -> None:
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
 
-    #
-    # Checks.
-    #
-    grapher_checks(ds_grapher)
+    # Remove source description so that it doesn't get appended to the dataset description.
+    ds_grapher.metadata.sources[0].description = ""
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

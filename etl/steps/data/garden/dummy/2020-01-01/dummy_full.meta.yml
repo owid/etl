@@ -5,10 +5,12 @@ tables:
         title: "[indicator.title]"
         unit: "[indicator.unit]"
         short_unit: "[indicator.short-unit]"
-        description: "[indicator.description]"
         description_short: "[indicator.description-short]"
         description_from_producer: "[indicator.description-from-producer]"
         processing_level: "[indicator.processing-level]"
+        description_key:
+          - "[indicator.description-key example 1]"
+          - "[indicator.description-key example 2]"
         license:
           name: "[indicator.license.name]"
           url: "[indicator.license.url]"
@@ -33,14 +35,11 @@ tables:
             - France
           title_public: "[presentation.title-public > indicator.title]"
           title_variant: "[presentation.title-variant]"
-          producer_short: "[presentation.producer-short]"
+          attribution_short: "[presentation.attribution-short]"
           attribution: "[presentation.attribution > origin.attribution > origin.producer (year)]"
-          topic_tags_links:
+          topic_tags:
           - "Internet"
-          - "[presentation.topic-tags-links example 2]"
-          key_info_text:
-          - "[presentation.key-info-text example 1]"
-          - "[presentation.key-info-text example 2]"
+          - "[presentation.topic-tags example 2]"
           faqs:
           - fragment_id: cherries
             gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE

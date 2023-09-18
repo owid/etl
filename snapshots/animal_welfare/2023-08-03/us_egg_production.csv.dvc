@@ -1,17 +1,16 @@
 meta:
   origin:
-    dataset_title_owid: US egg production
-    dataset_title_producer: US Egg Production Data Set
-    dataset_description_producer: |-
+    title_snapshot: US egg production
+    title: US Egg Production Data Set
+    description: |-
       This project synthesizes data on the supply of cage-free eggs relative to all food eggs in the United States using United States Department of Agriculture (USDA) data from December 2007 to present. The associated report supplements the data with definitions and a taxonomy of egg products drawn from USDA and industry publications.
     producer: The Humane League
-    citation_producer: The Humane League based on the United States Department of
+    citation_full: The Humane League based on the United States Department of
       Agriculture (USDA).
-    attribution: The Humane League based on the United States Department of Agriculture
-      (USDA)
+    attribution: The Humane League based on the United States Department of Agriculture (2023)
     attribution_short: The Humane League
-    dataset_url_main: https://thehumaneleague.org/article/E008R01-us-egg-production-data
-    dataset_url_download: https://osf.io/download/hmfn3
+    url_main: https://thehumaneleague.org/article/E008R01-us-egg-production-data
+    url_download: https://osf.io/download/hmfn3
     date_published: 2023-04-09
     date_accessed: 2023-08-03
   license:

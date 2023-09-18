@@ -143,7 +143,9 @@ class FasttrackImport:
                 published_by=source_name,
                 source_data_url=sheets_url,
                 date_accessed=str(dt.date.today()),
-                publication_year=dataset_source.publication_year,
+                publication_year=dataset_source.publication_year
+                if not pd.isnull(dataset_source.publication_year)
+                else None,
             )
             origin = None
             license = self.meta.licenses[0]
@@ -152,9 +154,9 @@ class FasttrackImport:
             origin = self.meta.origins[0]
             origin.date_accessed = str(dt.date.today())
 
-            # Misuse the version field and dataset_url_download fields to store info about the spreadsheet
-            origin.version = source_name
-            origin.dataset_url_download = sheets_url
+            # Misuse the version field and url_download fields to store info about the spreadsheet
+            origin.version_producer = source_name
+            origin.url_download = sheets_url
             license = self.meta.licenses[0]
         else:
             raise ValueError("Dataset must have either one source or one origin")
@@ -552,7 +554,7 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
     existing_sheets = []
     for meta in metas:
         # exclude local CSVs
-        if (getattr(meta.source, "name", None) or getattr(meta.origin, "version")) == "Local CSV":
+        if (getattr(meta.source, "name", None) or getattr(meta.origin, "version_producer")) == "Local CSV":
             continue
 
         if meta.source:
@@ -560,8 +562,8 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
             url = meta.source.source_data_url
             date_accessed = meta.source.date_accessed
         elif meta.origin:
-            assert meta.origin.dataset_url_download
-            url = meta.origin.dataset_url_download
+            assert meta.origin.url_download
+            url = meta.origin.url_download
             date_accessed = meta.origin.date_accessed
         else:
             raise ValueError("Neither source nor origin")

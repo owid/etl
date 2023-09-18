@@ -3,4 +3,4 @@
 # from https://github.com/psf/black/blob/main/.flake8
 # E302 is ignored to support jupytext files
 ignore = E203, E266, E501, W503, E302
-exclude = .ipynb_checkpoints,*_cookiecutter
+exclude = .ipynb_checkpoints,*_cookiecutter,cookiecutter,etl/steps/archive,etl/snapshots/archive

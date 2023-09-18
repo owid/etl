@@ -101,6 +101,9 @@ def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
     if pd.isnull(source.get("date_accessed")):
         source.pop("date_accessed")
 
+    if pd.isnull(source.get("publication_year")):
+        source.pop("publication_year")
+
     # publisher_source is not used anymore
     source.pop("publisher_source", None)
     # short_name is not used anymore
@@ -151,10 +154,10 @@ def _parse_dataset(dataset_meta_df: pd.DataFrame) -> DatasetMeta:
     # deprecated field
     dataset_dict.pop("sources", None)
 
+    license = License(name=dataset_dict.pop("license_name", None), url=dataset_dict.pop("license_url", None))
+
     dataset_meta = DatasetMeta(**dataset_dict)
-    dataset_meta.licenses = [
-        License(name=dataset_dict.pop("license_name", None), url=dataset_dict.pop("license_url", None))
-    ]
+    dataset_meta.licenses = [license]
 
     return dataset_meta
 
