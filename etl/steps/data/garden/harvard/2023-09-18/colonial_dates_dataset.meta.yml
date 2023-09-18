@@ -1,0 +1,32 @@
+dataset:
+  update_period_days: 365
+
+tables:
+  colonial_dates_dataset:
+    variables:
+      colonizer:
+        title: European colonial power
+        unit: ""
+        short_unit: ""
+        description_short: |
+          Name of European colonial power(s) that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Colonizer
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+      total_colonies:
+        title: Number of colonies
+        unit: "countries"
+        short_unit: ""
+        description_short: |
+          Total number of colonies per year colonized by the European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states.
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Number of colonies
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
