@@ -38,6 +38,7 @@ def run(dest_dir: str) -> None:
     df = create_units(df)
 
     df = manual_clean_data(df)
+    df = remove_cities(df)
     #
     # Process data.
     #
@@ -154,12 +155,24 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "SPAR12",
         ],
     )
-    # Dropping average marine acidity as we don't have a way to visualise it
-    # Also dropping EN_REF_WASCOL and SP_TRN_PUBL as they only available at city level which we can't visualise
-    df = df[~(df["seriescode"].isin(["ER_OAW_MNACD", "EN_REF_WASCOL", "SP_TRN_PUBL"])) & (df["cities"] != "_T")]
     df = df.drop(["level_0", "index"], axis=1, errors="ignore")
 
     return df
+
+
+def remove_cities(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Drop out all city level estimates from the data as we can't visualise them
+    """
+    msk = df["seriescode"].isin(["ER_OAW_MNACD", "EN_REF_WASCOL", "SP_TRN_PUBL", "EN_URB_OPENSP", "EN_LND_CNSPOP"])
+    city_df = df[msk]
+    original_df = df[~msk]
+
+    city_df = city_df[city_df["cities"].isin(["NOCITI", "_T"])]
+
+    original_df = pd.concat([original_df, city_df])
+
+    return original_df
 
 
 def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
