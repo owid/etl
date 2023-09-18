@@ -4,19 +4,18 @@ meta:
   name: Parameter, Compute and Data Trends in Machine Learning (Epoch, 2023)
   version: '2023-06-21'
   publication_year: 2023
-
-  publication_date: '2023-09-18'
+  publication_date:
   source_name: Epoch (2023)
   source_published_by: 'Epoch, Parameter, Compute and Data Trends in Machine Learning.
     Published online at epochai.org. Retrieved from: https://epochai.org/mlinputs/visualization'
   url: https://epochai.org/mlinputs/visualization
-  source_data_url: 
+  source_data_url:
     https://docs.google.com/spreadsheets/d/1AAIebjNsnJj_uKALHbXNfn3_YsT6sHXtCU0q7OIPuc4/export?gid=177804471&format=csv
 
   file_extension: csv
   license_url:
   license_name: Public domain
-  date_accessed: 2023-06-21
+  date_accessed: '2023-09-18'
   is_public: true
   description: |
     We update this chart with the latest available data from our source every month.
