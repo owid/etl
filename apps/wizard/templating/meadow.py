@@ -25,6 +25,15 @@ st.session_state["step_name"] = "meadow"
 APP_STATE = utils.AppState()
 # Config style
 utils.config_style_html()
+# DUMMY defaults
+dummy_values = {
+    "namespace": "dummy",
+    "version": utils.DATE_TODAY,
+    "short_name": "dummy",
+    "snapshot_version": utils.DATE_TODAY,
+    "file_extension": "csv",
+}
+
 
 #########################################################
 # FUNCTIONS & CLASSES ###################################
@@ -103,6 +112,7 @@ with form_widget.form("meadow"):
         help="Institution or topic name",
         placeholder="Example: 'emdat', 'health'",
         key="namespace",
+        value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
     )
     # Meadow version
     if (default_version := APP_STATE.default_value("version")) == "":
@@ -112,7 +122,7 @@ with form_widget.form("meadow"):
         label="Meadow dataset version",
         help="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
         key="version",
-        value=default_version,
+        value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
     )
     # Meadow short name
     APP_STATE.st_widget(
@@ -121,6 +131,7 @@ with form_widget.form("meadow"):
         help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
         placeholder="Example: 'cherry_blossom'",
         key="short_name",
+        value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
     )
 
     st.markdown("#### Dependencies")
@@ -131,6 +142,7 @@ with form_widget.form("meadow"):
         help="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
         # placeholder=f"Example: {DATE_TODAY}",
         key="snapshot_version",
+        value=dummy_values["snapshot_version"] if APP_STATE.args.dummy_data else None,
     )
     # File extension
     APP_STATE.st_widget(
@@ -139,6 +151,7 @@ with form_widget.form("meadow"):
         help="File extension (without the '.') of the file to be downloaded.",
         placeholder="Example: 'csv', 'xls', 'zip'",
         key="file_extension",
+        value=dummy_values["file_extension"] if APP_STATE.args.dummy_data else None,
     )
 
     st.markdown("#### Others")

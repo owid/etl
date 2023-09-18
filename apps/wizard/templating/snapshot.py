@@ -39,7 +39,20 @@ ACCEPTED_CATEGORIES = ["dataset", "citation", "files", "license"]
 # FIELDS FROM OTHER STEPS
 st.session_state["step_name"] = "snapshot"
 APP_STATE = utils.AppState()
-
+# DUMMY defaults
+dummy_values = {
+    "namespace": "dummy",
+    "snapshot_version": utils.DATE_TODAY,
+    "short_name": "dummy",
+    "file_extension": "csv",
+    # Programatically generated based on schemas/
+    "origin.title": "Dummy data product",
+    "origin.date_published": utils.DATE_TODAY,
+    "origin.producer": "Non-dummy producer",
+    "origin.citation_full": "Dummy description for a dummy snapshot.",
+    "origin.url_main": "https://dummy.dummy",
+    "origin.date_accessed": utils.DATE_TODAY,
+}
 # Session state variables initialitzatio
 
 
@@ -248,14 +261,18 @@ def render_fields_init() -> None:
     ]
     for field in fields:
         key = field["title"].replace(" ", "_").lower()
-        APP_STATE.st_widget(
-            st.text_input,
-            label=create_display_name_init_section(field["title"]),
-            help=field["description"],
-            placeholder=f"Example: {field['placeholder']}",
-            key=key,
-            default_last=field.get("value", ""),
-        )
+        args = {
+            "st_widget": st.text_input,
+            "label": create_display_name_init_section(field["title"]),
+            "help": field["description"],
+            "placeholder": f"Example: {field['placeholder']}",
+            "key": key,
+            "default_last": field.get("value", ""),
+        }
+        if APP_STATE.args.dummy_data:
+            args["value"] = dummy_values[key]
+
+        APP_STATE.st_widget(**args)
 
     # Private dataset?
     APP_STATE.st_widget(
@@ -315,14 +332,17 @@ def render_fields_from_schema(
                     "placeholder": props["examples"][:3] if isinstance(props["examples"], str) else "",
                     "key": prop_uri,
                 }
+                if APP_STATE.args.dummy_data:
+                    kwargs["value"] = dummy_values.get(prop_uri, "")
+
                 if categories:
                     with containers[props["category"]]:
-                        field = APP_STATE.st_widget(st.text_area, **kwargs)  # type: ignore
+                        field = APP_STATE.st_widget(st_widget=st.text_area, **kwargs)  # type: ignore
                 elif container:
                     with container:
-                        field = APP_STATE.st_widget(st.text_area, **kwargs)
+                        field = APP_STATE.st_widget(st_widget=st.text_area, **kwargs)
                 else:
-                    field = APP_STATE.st_widget(st.text_area, **kwargs)
+                    field = APP_STATE.st_widget(st_widget=st.text_area, **kwargs)
             ## Special case: license name (select box)
             elif prop_uri == "origin.license.name":
                 # Special one, need to have responsive behaviour inside form (work around)
@@ -346,6 +366,9 @@ def render_fields_from_schema(
                     else "",
                     "key": prop_uri,
                 }
+                if APP_STATE.args.dummy_data:
+                    kwargs["value"] = dummy_values.get(prop_uri, "")
+
                 if categories:
                     with containers[props["category"]]:
                         field = APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
@@ -603,6 +626,9 @@ if submitted:
 
         # Update config
         utils.update_wizard_config(form=form)
+
+        # Run snapshot step
+        button = st.button("Run snapshot step", key="run_snapshot_step")
     else:
         st.write(form.errors)
         st.error("Form not submitted! Check errors!")

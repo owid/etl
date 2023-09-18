@@ -25,7 +25,13 @@ st.session_state["step_name"] = "garden"
 APP_STATE = utils.AppState()
 # Config style
 utils.config_style_html()
-
+# DUMMY defaults
+dummy_values = {
+    "namespace": "dummy",
+    "version": utils.DATE_TODAY,
+    "short_name": "dummy",
+    "meadow_version": utils.DATE_TODAY,
+}
 
 #########################################################
 # FUNCTIONS & CLASSES ###################################
@@ -180,6 +186,7 @@ with form_widget.form("garden"):
         help="Institution or topic name",
         placeholder="Example: 'emdat', 'health'",
         key="namespace",
+        value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
     )
     # Garden version
     APP_STATE.st_widget(
@@ -188,6 +195,7 @@ with form_widget.form("garden"):
         help="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
         key="version",
         default_last=default_version,
+        value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
     )
     # Garden short name
     APP_STATE.st_widget(
@@ -196,6 +204,7 @@ with form_widget.form("garden"):
         help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
         placeholder="Example: 'cherry_blossom'",
         key="short_name",
+        value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
     )
 
     st.markdown("#### Dataset")
@@ -218,6 +227,7 @@ with form_widget.form("garden"):
         help="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
         key="meadow_version",
         default_last=default_version,
+        value=dummy_values["meadow_version"] if APP_STATE.args.dummy_data else None,
     )
 
     st.markdown("#### Others")
