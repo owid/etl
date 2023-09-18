@@ -136,7 +136,7 @@ class SnapshotForm(utils.StepForm):
                     "citation_full": self.citation_full,
                     "attribution": self.attribution,
                     "attribution_short": self.attribution_short,
-                    "version": self.origin_version,
+                    "version_producer": self.origin_version,
                     "url_main": self.url_main,
                     "url_download": self.url_download,
                     "date_published": self.date_published,
