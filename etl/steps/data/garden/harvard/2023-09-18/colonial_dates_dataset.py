@@ -40,6 +40,10 @@ def run(dest_dir: str) -> None:
     # Consolidate results in country and year columns, by merging colonizer column in each row
     tb = tb.groupby(["country", "year"]).agg({"colonizer": lambda x: " - ".join(x)}).reset_index().copy_metadata(tb)
 
+    # Create an additional summarized colonizer column, replacing the values with " - " with "More than one colonizer"
+    tb["colonizer"] = tb["colonizer"].astype(str)
+    tb["colonizer_grouped"] = tb["colonizer"].apply(lambda x: "Multiple colonizers" if " - " in x else x)
+
     # Merge both tables
     tb = pr.merge(tb, tb_count, on=["country", "year"], how="left", short_name="colonial_dates_dataset")
 
