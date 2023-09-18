@@ -572,7 +572,7 @@ if submitted:
         meta_path = (
             SNAPSHOTS_DIR / form.namespace / form.snapshot_version / f"{form.short_name}.{form.file_extension}.dvc"
         )
-        form.to_yaml(meta_path)
+        # form.to_yaml(meta_path)
 
         # Display next steps
         if form.dataset_manual_import:
