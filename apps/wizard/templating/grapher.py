@@ -22,6 +22,13 @@ st.session_state["step_name"] = "grapher"
 APP_STATE = utils.AppState()
 # Config style
 utils.config_style_html()
+# DUMMY defaults
+dummy_values = {
+    "namespace": "dummy",
+    "version": utils.DATE_TODAY,
+    "short_name": "dummy",
+    "garden_version": utils.DATE_TODAY,
+}
 
 #########################################################
 # FUNCTIONS & CLASSES ###################################
@@ -101,27 +108,30 @@ form_widget = st.empty()
 with form_widget.form("grapher"):
     # Namespace
     namespace = APP_STATE.st_widget(
-        st.text_input,
+        st_widget=st.text_input,
         label="Namespace",
         help="Institution or topic name",
         placeholder="Example: 'emdat', 'health'",
         key="namespace",
+        value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
     )
     # Grapher version
     version_grapher = APP_STATE.st_widget(
-        st.text_input,
+        st_widget=st.text_input,
         label="Grapher dataset version",
         help="Version of the grapher dataset (by default, the current date, or exceptionally the publication date).",
         key="version",
         default_last=utils.DATE_TODAY,
+        value=dummy_values["version"] if APP_STATE.args.dummy_data else None,
     )
     # Grapher short name
     short_name_grapher = APP_STATE.st_widget(
-        st.text_input,
+        st_widget=st.text_input,
         label="Grapher dataset short name",
         help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
         placeholder="Example: 'cherry_blossom'",
         key="short_name",
+        value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
     )
 
     st.markdown("#### Dependencies")
@@ -129,17 +139,17 @@ with form_widget.form("grapher"):
     if (default_version := APP_STATE.default_value("garden_version")) == "":
         default_version = APP_STATE.default_value("version", default_last=utils.DATE_TODAY)
     version_snap = APP_STATE.st_widget(
-        st.text_input,
+        st_widget=st.text_input,
         label="Garden dataset version",
         help="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
         key="garden_version",
-        value=default_version,
+        value=dummy_values["garden_version"] if APP_STATE.args.dummy_data else default_version,
     )
 
     st.markdown("#### Others")
     # Add to DAG
     dag_file = APP_STATE.st_widget(
-        st.selectbox,
+        st_widget=st.selectbox,
         label="Add to DAG",
         options=utils.ADD_DAG_OPTIONS,
         key="dag_file",
@@ -147,7 +157,7 @@ with form_widget.form("grapher"):
     )
     # Private
     private = APP_STATE.st_widget(
-        st.toggle,
+        st_widget=st.toggle,
         label="Make dataset private",
         key="is_private",
         default_last=False,
@@ -155,7 +165,7 @@ with form_widget.form("grapher"):
 
     # Submit
     submitted = st.form_submit_button(
-        "Submit",
+        label="Submit",
         type="primary",
         use_container_width=True,
         on_click=APP_STATE.update,
