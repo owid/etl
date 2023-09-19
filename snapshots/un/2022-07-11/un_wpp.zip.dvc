@@ -14,14 +14,15 @@ meta:
   publication_year: 2022
   publication_date: '2022-07-11'
   origin:
-    dataset_title_owid: World Population Prospects - UN (2022)
     producer: United Nations, Department of Economic and Social Affairs, Population Division
-    dataset_description_owid: World Population Prospects 2022 is the 27th edition of the official
+    title: World Population Prospects
+    description: World Population Prospects 2022 is the 27th edition of the official
       estimates and projections of the global population that have been published by
       the United Nations since 1951. The estimates are based on all available sources
       of data on population size and levels of fertility, mortality and international
       migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.
-    dataset_url_main: https://population.un.org/wpp/Download/
+    citation_full: United Nations, Department of Economic and Social Affairs, Population Division (2022). World Population Prospects 2022, Online Edition.
+    url_main: https://population.un.org/wpp/Download/
     date_published: '2022-07-11'
     date_accessed: '2022-09-09'
     license:
