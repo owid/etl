@@ -23,6 +23,21 @@ steps:
     - data://meadow/demography/2023-04-07/population_education_wittgenstein
   data://grapher/demography/2023-04-07/population_education_wittgenstein:
     - data://garden/demography/2023-04-07/population_education_wittgenstein
+  ## Population doubling times
+  data://garden/demography/2023-07-03/population_doubling_times:
+    - data://garden/demography/2023-03-31/population
+  data://grapher/demography/2023-07-03/population_doubling_times:
+    - data://garden/demography/2023-07-03/population_doubling_times
+  ## Population comparison
+  data://garden/demography/2023-06-27/world_population_comparison:
+    - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
+    - data://garden/demography/2023-03-31/population
+    - data://garden/hyde/2017/baseline
+    - data://garden/gapminder/2023-03-31/population
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/demography/2023-07-03/world_population_comparison:
+    - data://garden/demography/2023-06-27/world_population_comparison
+
   # Population density
   data://garden/demography/2023-06-12/population_density:
     - data://garden/demography/2023-03-31/population
@@ -51,20 +66,6 @@ steps:
   data://grapher/demography/2022-11-30/life_expectancy:
     - data://garden/demography/2023-02-03/life_expectancy
 
-  # Population doubling times
-  # Garden
-  data://garden/demography/2023-07-03/population_doubling_times:
-    - data://garden/demography/2023-03-31/population
-  # Grapher
-  data://grapher/demography/2023-07-03/population_doubling_times:
-    - data://garden/demography/2023-07-03/population_doubling_times
-
-  # Population comparison
-  data://garden/demography/2023-06-27/world_population_comparison:
-    - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
-    - data://garden/demography/2023-03-31/population
-    - data://garden/hyde/2017/baseline
-    - data://garden/gapminder/2023-03-31/population
-    - data://garden/un/2022-07-11/un_wpp
-  data://grapher/demography/2023-07-03/world_population_comparison:
-    - data://garden/demography/2023-06-27/world_population_comparison
+  # HMD
+  data://meadow/hmd/2023-09-19/hmd:
+    - snapshot://hmd/2023-09-18/hmd.zip
