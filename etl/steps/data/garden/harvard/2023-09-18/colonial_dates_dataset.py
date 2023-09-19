@@ -45,6 +45,12 @@ def run(dest_dir: str) -> None:
         lambda x: "Multiple colonizers" if isinstance(x, str) and " - " in x else x
     )
 
+    # Create last_colonizer column, which is the most recent non-null colonizer for each country and year
+    tb["last_colonizer"] = tb.groupby(["country"])["colonizer"].fillna(method="ffill").fillna(method="bfill")
+    tb["last_colonizer_grouped"] = (
+        tb.groupby(["country"])["colonizer_grouped"].fillna(method="ffill").fillna(method="bfill")
+    )
+
     # Merge both tables
     tb = pr.merge(tb, tb_count, on=["country", "year"], how="left", short_name="colonial_dates_dataset")
 
