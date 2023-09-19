@@ -41,15 +41,14 @@ def run(dest_dir: str) -> None:
     tb = tb.groupby(["country", "year"]).agg({"colonizer": lambda x: " - ".join(x)}).reset_index().copy_metadata(tb)
 
     # Create an additional summarized colonizer column, replacing the values with " - " with "More than one colonizer"
+    # I add the "z." to have this at the last position of the map brackets
     tb["colonizer_grouped"] = tb["colonizer"].apply(
-        lambda x: "Multiple colonizers" if isinstance(x, str) and " - " in x else x
+        lambda x: "z. Multiple colonizers" if isinstance(x, str) and " - " in x else x
     )
 
     # Create last_colonizer column, which is the most recent non-null colonizer for each country and year
-    tb["last_colonizer"] = tb.groupby(["country"])["colonizer"].fillna(method="ffill").fillna(method="bfill")
-    tb["last_colonizer_grouped"] = (
-        tb.groupby(["country"])["colonizer_grouped"].fillna(method="ffill").fillna(method="bfill")
-    )
+    tb["last_colonizer"] = tb.groupby(["country"])["colonizer"].fillna(method="ffill")
+    tb["last_colonizer_grouped"] = tb.groupby(["country"])["colonizer_grouped"].fillna(method="ffill")
 
     # Merge both tables
     tb = pr.merge(tb, tb_count, on=["country", "year"], how="left", short_name="colonial_dates_dataset")
