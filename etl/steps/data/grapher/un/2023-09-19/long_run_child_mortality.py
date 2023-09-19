@@ -16,6 +16,7 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden["long_run_child_mortality"]
     tb_sel = ds_garden["long_run_child_mortality_selected"]
+    tb_sel = tb_sel.rename(columns={"under_five_mortality": "under_five_mortality_selected"})
     #
     # Process data.
     #

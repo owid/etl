@@ -1,7 +1,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Child Mortality Rate, under age five
+    title: Child Mortality Rate (Gapminder)
     description: |-
       Gapminder’s historic estimates compiled by Klara Johansson and Mattias Lindgren.
     date_published: 2015-01-01
@@ -25,6 +25,6 @@ meta:
     name: CC BY 4.0
 wdir: ../../../data/snapshots/gapminder/2023-09-18
 outs:
-- md5: 6efd02f741de246be79c38567d0db20a
-  size: 1455549
-  path: under_five_mortality.xlsx
+  - md5: 6efd02f741de246be79c38567d0db20a
+    size: 1455549
+    path: under_five_mortality.xlsx
