@@ -10,7 +10,7 @@ meta:
     Published online at epochai.org. Retrieved from: https://epochai.org/mlinputs/visualization'
   url: https://epochai.org/mlinputs/visualization
   source_data_url: 
-    https://docs.google.com/spreadsheets/d/1AAIebjNsnJj_uKALHbXNfn3_YsT6sHXtCU0q7OIPuc4/export?gid=177804471&format=csv
+    https://docs.google.com/spreadsheets/d/1AAIebjNsnJj_uKALHbXNfn3_YsT6sHXtCU0q7OIPuc4/export?gid=0&format=csv
 
   file_extension: csv
   license_url:
@@ -35,6 +35,6 @@ meta:
 
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-21
 outs:
-- md5: 1b7096c894c96296e92667ab1d39e58e
-  size: 525411
+- md5: f19e7454da0c55ce2b5e0dd01b1d5617
+  size: 530905
   path: epoch.csv

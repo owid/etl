@@ -89,7 +89,7 @@ tables:
         title: Training compute (FLOP)
         unit: 'FLOP'
         display:
-          title: Training compute
+          title: Training computation (petaFLOP)
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
           yearIsDay: true
