@@ -69,3 +69,7 @@ steps:
   # HMD
   data://meadow/hmd/2023-09-19/hmd:
     - snapshot://hmd/2023-09-18/hmd.zip
+  data://garden/hmd/2023-09-19/hmd:
+    - data://meadow/hmd/2023-09-19/hmd
+  data://grapher/hmd/2023-09-19/hmd:
+    - data://garden/hmd/2023-09-19/hmd
