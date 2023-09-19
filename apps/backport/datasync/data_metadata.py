@@ -333,15 +333,19 @@ def _is_float(x):
 
 
 def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
+    """Convert strings to numeric values. String `nan` remains as string."""
     result = []
     for item in lst:
         assert isinstance(item, str)
-        try:
-            num = float(item)
-            if num.is_integer():
-                num = int(num)
-        except ValueError:
+        if item.lower() == "nan":
             num = item
+        else:
+            try:
+                num = float(item)
+                if num.is_integer():
+                    num = int(num)
+            except ValueError:
+                num = item
         result.append(num)
     return result
 
