@@ -328,7 +328,7 @@ class AppState:
         self: "AppState",
         st_widget: Callable,
         default_last: Optional[str | bool | int] = "",
-        **kwargs: str | int | List[str],
+        **kwargs: Optional[str | int | List[str]],
     ) -> None:
         """Wrap a streamlit widget with a default value."""
         key = cast(str, kwargs["key"])
@@ -342,7 +342,7 @@ class AppState:
             index = options.index(default_value) if default_value in options else 0
             kwargs["index"] = index
         # Default value for other widgets (if none is given)
-        elif "value" not in kwargs:
+        elif ("value" not in kwargs) or ("value" in kwargs and kwargs.get("value") is None):
             kwargs["value"] = default_value
 
         # Create widget

@@ -1,3 +1,5 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/origin/
 meta:
   origin:
     # Data product / Snapshot
