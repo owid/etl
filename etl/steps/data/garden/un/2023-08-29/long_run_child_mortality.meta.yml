@@ -1,14 +1,15 @@
-dataset:
-  title: Long run under-five mortality rate (Gapminder, 2020; UN IGME, 2023)
-  description: "blah blah blah"
-  licenses:
-  - name: CC BY-NC-SA 3.0 IGO
-    url: https://www.who.int/about/policies/publishing/copyright
 tables:
   long_run_child_mortality:
     variables:
-        under_five_mortality_rate:
-          title: Under-five mortality rate
-          unit: Deaths per 1,000 live births
-          display:
-            numDecimalPlaces: 1
+      under_five_mortality:
+        title: Under-five mortality rate (full)
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+  long_run_child_mortality_selected:
+    variables:
+      under_five_mortality:
+        title: Under-five mortality rate (selected)
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1

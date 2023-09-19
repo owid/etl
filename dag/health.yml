@@ -301,9 +301,3 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/health/2023-08-14/avian_influenza_h5n1_kucharski:
     - data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski
-
-  # Gapminder  - Under five mortality
-  data://meadow/gapminder/2023-09-18/under_five_mortality:
-    - snapshot://gapminder/2023-09-18/under_five_mortality.xlsx
-  data://garden/gapminder/2023-09-18/under_five_mortality:
-    - data://meadow/gapminder/2023-09-18/under_five_mortality
