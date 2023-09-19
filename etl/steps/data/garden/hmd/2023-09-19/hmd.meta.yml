@@ -9,9 +9,50 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/tables/
-# tables:
-#   hmd:
-#     variables:
+tables:
+  hmd:
+    variables:
+      central_death_rate:
+        title: Central death rate
+        description_short: Central death rate between ages x and x+n.
+        unit: deaths per people
+      probability_of_death:
+        title: Probability of death
+        unit: ""
+        description_short: Probability of death between ages x and x+n.
+      average_survival_length:
+        title: Average survival length
+        short_unit: years
+        unit: years
+        description_short: Average length of survival between ages x and x+n for persons dying in the interval.
+      number_survivors:
+        title: Number of survivors
+        unit: survivors
+        description_short: Number of survivors at exact age x, assuming survivors at 0 years old is 100,000.
+      number_deaths:
+        title: Number of deaths
+        short_unit: deaths
+        unit: deaths
+        description_short: Number of deaths between ages x and x+n.
+      number_person_years_lived:
+        title: Number of person-years lived
+        unit: person-years
+        description_short: Number of person-years lived between ages x and x+n.
+      number_person_years_remaining:
+        title: Number of person-years remaining
+        unit: person-years
+        description_short: Number of person-years remaining after exact age x.
+      life_expectancy:
+        title: Life expectancy
+        short_unit: years
+        unit: years
+        description_short: Period life expectancy at exact age x (in years).
+      exposure:
+        title: Exposure-to-risk
+        unit: person-years
+        description_short: Total person-years lived in the age interval [x, x + 1) during calendar year t.
+        description_from_producer: |-
+          Estimates of the population exposed to the risk of death during some agetime interval are based on annual (January 1st) population estimates, with small corrections that reflect the timing of deaths during the interval. Period exposure estimations are based on assumptions of uniformity in the distribution of events except when historical monthly birth data are available.
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units
