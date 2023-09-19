@@ -5,7 +5,6 @@ meta:
     description: |-
       Inflation as measured by the consumer price index reflects the annual percentage change in the cost to the average consumer of acquiring a basket of goods and services that may be fixed or changed at specified intervals, such as yearly. The Laspeyres formula is generally used.
     date_published: latest
-    title_snapshot:
 
     # Citation
     producer: World Bank
@@ -19,13 +18,9 @@ meta:
 
     # License
     license:
-      url: 
+      url:
         https://databank.worldbank.org/reports.aspx?source=2&type=metadata&series=FP.CPI.TOTL.ZG
       name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
-  license:
-    url: 
-      https://databank.worldbank.org/reports.aspx?source=2&type=metadata&series=FP.CPI.TOTL.ZG
-    name: CC BY 4.0
 wdir: ../../../data/snapshots/wb/2023-09-19
 outs:
 - md5: c66f547b69d1bf43fc58d17702244ece

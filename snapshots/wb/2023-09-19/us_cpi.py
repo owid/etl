@@ -19,7 +19,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/us_cpi.csv")
-    url = snap.metadata.origin.url_download
+    url = snap.metadata.origin.url_download  # type: ignore
     df = import_US_cpi_API(url)
     # Save the resulting dataframe to a single csv file
     df_to_file(df, file_path=snap.path)
