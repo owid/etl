@@ -21,8 +21,7 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(subset=["under_five_mortality"])
 
     # Remove guesstimated values.
-
-    tb[tb["source"].str.contains("Guesstimate")]
+    tb = tb[~tb["source"].str.contains("Guesstimate")]
 
     #
     # Process data.
@@ -30,14 +29,20 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
 
+    # Create a filtered version which doesn't have 'Model based on Life Expectancy' as source
+
+    tb_sel = tb[tb["source"] != "Model based on Life Expectancy"]
+
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb_sel = tb_sel.set_index(["country", "year"], verify_integrity=True)
+    tb_sel.metadata.short_name = "under_five_mortality_selected"
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb, tb_sel], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
