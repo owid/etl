@@ -21,8 +21,9 @@ SOURCE_NAME = "gapminder_sg"
 
 GAPMINDER_ORIGINS = [
     Origin(
-        dataset_title_owid="Gapminder (Systema Globalis)",
-        dataset_url_main="https://github.com/open-numbers/ddf--gapminder--systema_globalis",
+        producer="Gapminder",
+        title="Systema Globalis",
+        url_main="https://github.com/open-numbers/ddf--gapminder--systema_globalis",
     )
 ]
 

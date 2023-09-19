@@ -10,10 +10,14 @@ meta:
   description: |
     HYDE is an internally consistent combination of updated historical population (gridded) estimates and land use for the past 12,000 years. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area.
   origin:
-    dataset_title_owid: Hyde 3.2 (baseline estimates)
     producer: PBL Netherlands Environmental Assessment Agency
-    dataset_url_main: https://www.pbl.nl/en/image/links/hyde
-    dataset_url_download: https://dataportaal.pbl.nl/downloads/HYDE/HYDE3.2/baseline.zip
+    title: Hyde (baseline estimates)
+    version_producer: "3.2"
+    description: |
+      HYDE is an internally consistent combination of updated historical population (gridded) estimates and land use for the past 12,000 years. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area.
+    citation_full: Klein Goldewijk, K., A. Beusen, J.Doelman and E. Stehfest (2017), Anthropogenic land use estimates for the Holocene; HYDE 3.2, Earth System Science Data, 9, 927-953.
+    url_main: https://www.pbl.nl/en/image/links/hyde
+    url_download: https://dataportaal.pbl.nl/downloads/HYDE/HYDE3.2/baseline.zip
     date_published: 2017
     date_accessed: 2021-10-01
     license:

@@ -111,6 +111,6 @@ tables:
 
 
 origin_combined:
-  dataset_title_owid: Population (various sources)
-  dataset_description_owid: *dataset-description
   producer: Gapminder, HYDE, UN Population Division
+  title: Population (various sources)
+  description: *dataset-description
