@@ -47,7 +47,6 @@ meta:
 
       Although we adhere strictly to a uniform procedure, the data for each population also receive significant individualized attention. Each country or area is assigned to an individual researcher, who takes responsibility for assembling and checking the data for errors. In addition, the person assigned to each country/area checks our data against other available sources. These procedures help to assure a high level of data quality, but assistance from database users in identifying problems is always appreciated!
     date_published: 2023-09-13
-    title_snapshot:
 
     # Citation
     producer: Various sources
@@ -63,7 +62,9 @@ meta:
     # License
     license:
       url: https://www.mortality.org/Data/UserAgreement
-      name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
+      name: CC BY 4.0
+
+  # License (same as origin.license, for backwards compatibility)
   license:
     url: https://www.mortality.org/Data/UserAgreement
     name: CC BY 4.0
