@@ -22,8 +22,8 @@ In Snapshot we define metadata attributes for the data source product. We make s
 
 !!! info "Learn more"
 
-    - [Learn about our workflow in Snapshot :octicons-arrow-right-24:](workflow.md#metadata-in-snapshot)
-    - [Learn about the fields available in `origin` :octicons-arrow-right-24:](reference/origin.md)
+    - [Learn about our workflow in Snapshot :octicons-arrow-right-24:](../workflow/snapshot#metadata)
+    - [Learn about the fields available in `origin` :octicons-arrow-right-24:](reference/origin)
 
 ## Garden
 In Garden we focus on the metadata of the finished product. After all necessary ETL steps, the initial source file (or files) has (or have) been transformed into a curated dataset. This dataset may have multiple tables, each of them with various indicators.
@@ -32,9 +32,9 @@ In this step we add metadata that describes this dataset, these tables and these
 
 !!! info "Learn more"
 
-    - [Learn about our workflow in Garden :octicons-arrow-right-24:](workflow.md#metadata-in-garden)
-    - [Learn about the fields available in `dataset` :octicons-arrow-right-24:](reference/dataset.md)
-    - [Learn about the fields available in `tables` :octicons-arrow-right-24:](reference/tables.md)
+    - [Learn about our workflow in Garden :octicons-arrow-right-24:](../workflow/garden#metadata)
+    - [Learn about the fields available in `dataset` :octicons-arrow-right-24:](reference/dataset)
+    - [Learn about the fields available in `tables` :octicons-arrow-right-24:](reference/tables)
 
 
 ## Propagation of metadata
