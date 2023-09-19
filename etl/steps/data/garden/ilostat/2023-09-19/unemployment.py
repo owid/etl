@@ -43,8 +43,8 @@ def run(dest_dir: str) -> None:
         .str.strip()
     )
 
-    # Filter rows where 'education' contains 'ISCED-11' - most recent classification
-    filtered_ed = tb[tb["education"].str.contains("ISCED-11")]
+    # Filter rows where 'education' contains 'ISCED-11' - most recent classification, and only use both sexes
+    filtered_ed = tb[tb["education"].str.contains("Aggregate levels")]
     filtered_sex = filtered_ed[filtered_ed["sex"].str.contains("Total")]
 
     filtered_sex = filtered_sex.drop(columns="sex")
