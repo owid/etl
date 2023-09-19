@@ -1,15 +1,17 @@
+dataset:
+  title: Long-run child mortality (Gapminder; UN IGME)
 tables:
   long_run_child_mortality:
     variables:
       under_five_mortality:
-        title: Under-five mortality rate (full)
+        title: Under-five mortality rate
         unit: deaths per 1,000 live births
         display:
           numDecimalPlaces: 1
   long_run_child_mortality_selected:
     variables:
       under_five_mortality:
-        title: Under-five mortality rate (selected)
+        title: Under-five mortality rate
         unit: deaths per 1,000 live births
         display:
           numDecimalPlaces: 1

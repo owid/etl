@@ -22,12 +22,12 @@ def run(dest_dir: str) -> None:
     cols = [
         "country",
         "year",
-        "observation_value__deaths_per_1_000_live_births__under_five_mortality_rate__both_sexes__all_wealth_quintiles",
+        "observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_all_wealth_quintiles",
     ]
     tb_igme = tb_igme[cols]
     tb_igme = tb_igme.rename(
         columns={
-            "observation_value__deaths_per_1_000_live_births__under_five_mortality_rate__both_sexes__all_wealth_quintiles": "under_five_mortality"
+            "observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_all_wealth_quintiles": "under_five_mortality"
         }
     )
 
