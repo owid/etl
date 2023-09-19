@@ -56,6 +56,24 @@ tables:
           entityAnnotationsMap: ""
           numDecimalPlaces: 0
           conversionFactor: 1
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            hasChartTab: false
+            hasMapTab: true
+            tab: map
+            map:
+              time: latest
+              hideTimeline: true
+              colorScale:
+                baseColorScheme: Paired
+                colorSchemeInvert: true
+                customCategoryLabels:
+                  z. Multiple colonizers: Multiple colonizers
+                  United Kingdom: United Kingdom
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
       total_colonies:
         title: Number of colonies
         unit: "countries"
