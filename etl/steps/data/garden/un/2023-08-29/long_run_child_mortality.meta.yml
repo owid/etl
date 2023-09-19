@@ -4,14 +4,14 @@ tables:
   long_run_child_mortality:
     variables:
       under_five_mortality:
-        title: Under-five mortality rate
+        title: Under-five mortality rate (full)
         unit: deaths per 1,000 live births
         display:
           numDecimalPlaces: 1
   long_run_child_mortality_selected:
     variables:
       under_five_mortality:
-        title: Under-five mortality rate
+        title: Under-five mortality rate (selected)
         unit: deaths per 1,000 live births
         display:
           numDecimalPlaces: 1
