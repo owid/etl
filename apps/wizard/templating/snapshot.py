@@ -1,4 +1,5 @@
 """Snapshot phase."""
+import subprocess
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, cast
 
@@ -39,8 +40,27 @@ ACCEPTED_CATEGORIES = ["dataset", "citation", "files", "license"]
 # FIELDS FROM OTHER STEPS
 st.session_state["step_name"] = "snapshot"
 APP_STATE = utils.AppState()
-
-# Session state variables initialitzatio
+# DUMMY defaults
+dummy_values = {
+    "namespace": "dummy",
+    "snapshot_version": utils.DATE_TODAY,
+    "short_name": "dummy",
+    "file_extension": "csv",
+    # Programatically generated based on schemas/
+    "origin.title": "Dummy data product",
+    "origin.date_published": utils.DATE_TODAY,
+    "origin.producer": "Non-dummy producer",
+    "origin.citation_full": "Dummy description for a dummy snapshot.",
+    "origin.url_main": "https://dummy.dummy",
+    "origin.date_accessed": utils.DATE_TODAY,
+}
+# Other state vars
+if "show_form" not in st.session_state:
+    st.session_state["show_form"] = True
+if "run_step" not in st.session_state:
+    st.session_state["run_step"] = False
+if "snapshot_file" not in st.session_state:
+    st.session_state["snapshot_file"] = None
 
 
 #########################################################
@@ -248,14 +268,18 @@ def render_fields_init() -> None:
     ]
     for field in fields:
         key = field["title"].replace(" ", "_").lower()
-        APP_STATE.st_widget(
-            st.text_input,
-            label=create_display_name_init_section(field["title"]),
-            help=field["description"],
-            placeholder=f"Example: {field['placeholder']}",
-            key=key,
-            default_last=field.get("value", ""),
-        )
+        args = {
+            "st_widget": st.text_input,
+            "label": create_display_name_init_section(field["title"]),
+            "help": field["description"],
+            "placeholder": f"Example: {field['placeholder']}",
+            "key": key,
+            "default_last": field.get("value", ""),
+        }
+        if APP_STATE.args.dummy_data:
+            args["value"] = dummy_values[key]
+
+        APP_STATE.st_widget(**args)
 
     # Private dataset?
     APP_STATE.st_widget(
@@ -315,14 +339,17 @@ def render_fields_from_schema(
                     "placeholder": props["examples"][:3] if isinstance(props["examples"], str) else "",
                     "key": prop_uri,
                 }
+                if APP_STATE.args.dummy_data:
+                    kwargs["value"] = dummy_values.get(prop_uri, "")
+
                 if categories:
                     with containers[props["category"]]:
-                        field = APP_STATE.st_widget(st.text_area, **kwargs)  # type: ignore
+                        field = APP_STATE.st_widget(st_widget=st.text_area, **kwargs)  # type: ignore
                 elif container:
                     with container:
-                        field = APP_STATE.st_widget(st.text_area, **kwargs)
+                        field = APP_STATE.st_widget(st_widget=st.text_area, **kwargs)
                 else:
-                    field = APP_STATE.st_widget(st.text_area, **kwargs)
+                    field = APP_STATE.st_widget(st_widget=st.text_area, **kwargs)
             ## Special case: license name (select box)
             elif prop_uri == "origin.license.name":
                 # Special one, need to have responsive behaviour inside form (work around)
@@ -346,6 +373,9 @@ def render_fields_from_schema(
                     else "",
                     "key": prop_uri,
                 }
+                if APP_STATE.args.dummy_data:
+                    kwargs["value"] = dummy_values.get(prop_uri, "")
+
                 if categories:
                     with containers[props["category"]]:
                         field = APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
@@ -498,6 +528,12 @@ def update_state() -> None:
     APP_STATE.update_from_form(form)
 
 
+def run_snap_step() -> None:
+    """Update state variables to correctly render the UI."""
+    st.session_state["show_form"] = False
+    st.session_state["run_step"] = True
+
+
 #########################################################
 # MAIN ##################################################
 #########################################################
@@ -520,37 +556,40 @@ with st.sidebar:
         st.markdown("3. **Only supports `origin`**. To work with `source` instead, use `walkthrough`.")
 
 # FORM
-form_widget = st.empty()
-with form_widget.form("form"):
-    # 1) Show fields for initial configuration (create directories, etc.)
-    # st.header("Config")
-    st.markdown("Note that sometimes some fields might not be available (even if they are labelled as required)")
-    render_fields_init()
+if st.session_state["show_form"]:
+    form_widget = st.empty()
+    with form_widget.form("form"):
+        # 1) Show fields for initial configuration (create directories, etc.)
+        # st.header("Config")
+        st.markdown("Note that sometimes some fields might not be available (even if they are labelled as required)")
+        render_fields_init()
 
-    # 2) Show fields for metadata fields
-    # st.header("Metadata")
-    # st.markdown(
-    #     "Fill the following fields to help us fill all the created files for you! Note that sometimes some fields might not be available (even if they are labelled as required)."
-    # )
-    # Get categories
-    for k, v in schema_origin.items():
-        if "category" not in v:
-            print(k)
-            print(v)
-            # raise ValueError(f"Category not found for {k}")
-    categories_in_schema = {v["category"] for k, v in schema_origin.items()}
-    assert categories_in_schema == set(
-        ACCEPTED_CATEGORIES
-    ), f"Unknown categories in schema: {categories_in_schema - set(ACCEPTED_CATEGORIES)}"
+        # 2) Show fields for metadata fields
+        # st.header("Metadata")
+        # st.markdown(
+        #     "Fill the following fields to help us fill all the created files for you! Note that sometimes some fields might not be available (even if they are labelled as required)."
+        # )
+        # Get categories
+        for k, v in schema_origin.items():
+            if "category" not in v:
+                print(k)
+                print(v)
+                # raise ValueError(f"Category not found for {k}")
+        categories_in_schema = {v["category"] for k, v in schema_origin.items()}
+        assert categories_in_schema == set(
+            ACCEPTED_CATEGORIES
+        ), f"Unknown categories in schema: {categories_in_schema - set(ACCEPTED_CATEGORIES)}"
 
-    form_metadata = render_fields_from_schema(schema_origin, "origin", [], categories=ACCEPTED_CATEGORIES)
+        form_metadata = render_fields_from_schema(schema_origin, "origin", [], categories=ACCEPTED_CATEGORIES)
 
-    # 3) Submit
-    submitted = st.form_submit_button("Submit", type="primary", use_container_width=True, on_click=update_state)
+        # 3) Submit
+        submitted = st.form_submit_button("Submit", type="primary", use_container_width=True, on_click=update_state)
 
-# 2.1) Create fields for License (responsive within form)
-form = render_license_field(form_metadata)
-
+    # 2.1) Create fields for License (responsive within form)
+    form = render_license_field(form_metadata)
+else:
+    submitted = False
+    form_widget = st.empty()
 
 #########################################################
 # SUBMISSION ############################################
@@ -572,37 +611,70 @@ if submitted:
         meta_path = (
             SNAPSHOTS_DIR / form.namespace / form.snapshot_version / f"{form.short_name}.{form.file_extension}.dvc"
         )
-        # form.to_yaml(meta_path)
-
-        # Display next steps
-        if form.dataset_manual_import:
-            manual_import_instructions = "--path-to-file **relative path of file**"
-        else:
-            manual_import_instructions = ""
-        with st.expander("## Next steps", expanded=True):
-            st.markdown(
-                f"""
-            1. Verify that generated files are correct and update them if necessary
-
-            2. Run the snapshot step to upload files to S3
-            ```bash
-            python {ingest_path.relative_to(BASE_DIR)} {manual_import_instructions}
-            ```
-
-            3. Continue to the meadow step
-            """
-            )
 
         # Preview generated
         st.subheader("Generated files")
         utils.preview_file(ingest_path, "python")
         utils.preview_file(meta_path, "yaml")
 
+        # Display next steps
+        if form.dataset_manual_import:
+            manual_import_instructions = "--path-to-file **relative path of file**"
+        else:
+            manual_import_instructions = ""
+        st.subheader("Next steps")
+        with st.expander("", expanded=True):
+            st.markdown(
+                """
+            1. Verify that generated files are correct and update them if necessary.
+
+            2. Run the snapshot step to upload files to S3
+            """
+            )
+            args = []
+            if form.dataset_manual_import:
+                s_file = st.text_input(
+                    label="Select local file to import", placeholder="path/to/file.csv", key="snapshot_file"
+                )
+            st.button("Run snapshot step", key="run_snapshot_step", on_click=run_snap_step)  # type: ignore
+            st.markdown(
+                f"""
+            You can also run the step from the command line:
+            ```bash
+            python {ingest_path.relative_to(BASE_DIR)} {manual_import_instructions}
+            ```
+
+            3. Continue to the meadow step.
+            """
+            )
+
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")
 
         # Update config
         utils.update_wizard_config(form=form)
+
     else:
         st.write(form.errors)
         st.error("Form not submitted! Check errors!")
+
+
+#########################################################
+# EXECUTION #############################################
+#########################################################
+if st.session_state["run_step"]:
+    # Get form
+    form = cast(SnapshotForm, SnapshotForm.from_state())
+    # Get snapshot script path
+    script_path = f"{SNAPSHOTS_DIR}/{form.namespace}/{form.snapshot_version}/{form.short_name}.py"
+
+    # Build command
+    command = f"poetry run python {script_path}"
+    commands = ["poetry", "run", "python", script_path]
+    if form.dataset_manual_import:
+        # Get snapshot local file
+        commands.extend(["--path-to-file", st.session_state["snapshot_file"]])
+    st.write(f"Command to be run: `{' '.join(command)}`")
+
+    # Run step
+    subprocess.call(commands)
