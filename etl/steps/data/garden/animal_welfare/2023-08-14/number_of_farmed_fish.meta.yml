@@ -42,3 +42,33 @@ tables:
           numDecimalPlaces: 0
         presentation:
           attribution: *attribution
+      n_farmed_fish_low_per_capita:
+        title: Estimated number of farmed fish per capita (lower bound)
+        unit: 'fish per person'
+        short_unit: ''
+        description_short: Lower bound estimate of the annual number of farmed fish slaughtered for food per person.
+        description_key: *description_key
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          attribution: *attribution
+      n_farmed_fish_per_capita:
+        title: Estimated number of farmed fish per capita
+        unit: 'fish per person'
+        short_unit: ''
+        description_short: Midpoint estimate of the annual number of farmed fish slaughtered for food per person.
+        description_key: *description_key
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          attribution: *attribution
+      n_farmed_fish_high_per_capita:
+        title: Estimated number of farmed fish per capita (upper bound)
+        unit: 'fish per person'
+        short_unit: ''
+        description_short: Upper bound estimate of the annual number of farmed fish slaughtered for food per person.
+        description_key: *description_key
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          attribution: *attribution

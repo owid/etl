@@ -52,3 +52,48 @@ tables:
           attribution: *attribution
           grapher_config:
             note: Upper and lower-bound estimates are shown due to large uncertainties. The map shows midpoint values.
+      n_farmed_decapod_crustaceans_low_per_capita:
+        title: Estimated number of decapod crustaceans per capita (lower bound)
+        unit: decapods per person
+        short_unit: ''
+        description_short: Lower bound estimate of the annual number of farmed decapod crustaceans slaughtered for food per person.
+        description_key:
+          - *description_decapods
+          - *description_method
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          attribution: *attribution
+          grapher_config:
+            subtitle: Decapod crustaceans are animals such as shrimps, crabs, lobsters, prawns, and crayfish.
+            note: Upper and lower-bound estimates are shown due to large uncertainties. The map shows midpoint values.
+      n_farmed_decapod_crustaceans_per_capita:
+        title: Estimated number of farmed decapod crustaceans per capita
+        unit: decapods per person
+        short_unit: ''
+        description_short: Midpoint estimate of the number of farmed decapod crustaceans slaughtered for food per person.
+        description_key:
+          - *description_decapods
+          - *description_method
+          - "The midpoint estimate of the number of farmed decapod crustaceans is calculated as the average between the lower and upper estimates."
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          attribution: *attribution
+          grapher_config:
+            subtitle: Decapod crustaceans are animals such as shrimps, crabs, lobsters, prawns, and crayfish.
+            note: Upper and lower-bound estimates are shown due to large uncertainties. The map shows midpoint values.
+      n_farmed_decapod_crustaceans_high_per_capita:
+        title: Estimated number of farmed decapod crustaceans per capita (upper bound)
+        unit: decapods per person
+        short_unit: ''
+        description_short: Upper bound estimate of the annual number of farmed decapod crustaceans slaughtered for food per person.
+        description_key:
+          - *description_decapods
+          - *description_method
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          attribution: *attribution
+          grapher_config:
+            note: Upper and lower-bound estimates are shown due to large uncertainties. The map shows midpoint values.
