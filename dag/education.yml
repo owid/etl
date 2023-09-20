@@ -66,3 +66,16 @@ steps:
   data://grapher/ilostat/2023-09-19/unemployment:
   - data://garden/ilostat/2023-09-19/unemployment
 
+  data://meadow/ilostat/2023-09-19/employment:
+  - snapshot://ilostat/2023-09-19/employment.csv
+  data://garden/ilostat/2023-09-19/employment:
+  - data://meadow/ilostat/2023-09-19/employment
+  data://grapher/ilostat/2023-09-19/employment:
+  - data://garden/ilostat/2023-09-19/employment
+
+  data://meadow/ilostat/2023-09-19/average_work_hours:
+  - snapshot://ilostat/2023-09-19/average_work_hours.csv
+  data://garden/ilostat/2023-09-19/average_work_hours:
+  - data://meadow/ilostat/2023-09-19/average_work_hours
+  data://grapher/ilostat/2023-09-19/average_work_hours:
+  - data://garden/ilostat/2023-09-19/average_work_hours
