@@ -1420,7 +1420,7 @@ def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = Non
 
 def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List[str]] = None) -> None:
     if fields is None:
-        fields = ["origins", "licenses"]
+        fields = ["origins"]
 
     for table in tables:
         table_name = table.metadata.short_name
