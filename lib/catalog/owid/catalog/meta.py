@@ -247,6 +247,7 @@ class VariableMeta:
     # List of bullet points for the description key (can use markdown formatting)
     description_key: List[str] = field(default_factory=list)
     origins: List[Origin] = field(default_factory=list)  # Origins is the new replacement for sources
+    # Use of `licenses` is discouraged, they should be captured in origins.
     licenses: List[License] = field(default_factory=list)
     unit: Optional[str] = None
     short_unit: Optional[str] = None

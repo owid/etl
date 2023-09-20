@@ -242,7 +242,6 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
         variable_meta = {
             "title": "Dummy",
             "description": "This is a dummy indicator with full metadata.",
-            "licenses": [],
             "unit": "Dummy unit",
             "short_unit": "Du",
             "display": {
