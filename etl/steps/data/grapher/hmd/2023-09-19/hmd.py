@@ -1,5 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -19,15 +21,27 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    ## Filter indicators
-    ## Keep only those with observation period of 1 year (i.e. format = 1x1, 5x1)
+    ## Reset index
     column_index = list(tb.index.names)
     tb = tb.reset_index()
-    tb = tb[tb["format"].str.fullmatch(r"\d+x1")]
+
+    ## Only keep 5-year age groups, and 1-year observation periods
+    tb = tb[tb["format"].str.fullmatch(r"5x1")]
+    tb_5 = tb[tb["format"] == "5x1"].copy()
+    ## TODO: Exceptionally add single-year age groups (maybe 0, 10, 15, etc.)
+    tb_1 = tb[tb["format"] == "1x1"].copy()
+    tb_1 = tb_1[tb_1["age"].isin([0, 10, 15, 25, 45, 65, 80])]
+    ## Combine
+    tb = pr.concat([tb_5, tb_1], ignore_index=True)
+
     ## Set dtype of year to int
     tb["year"] = tb["year"].astype("Int64")
-    # Set index back
+
+    ## Set index back
     tb = tb.set_index(column_index, verify_integrity=True).sort_index()
+
+    ## Only keep subset of columns
+    tb = tb[["central_death_rate", "life_expectancy", "probability_of_death"]]
 
     #
     # Save outputs.
