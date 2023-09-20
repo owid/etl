@@ -40,9 +40,9 @@ paths = PathFinder(__file__)
 # this dictionary maps source short names to complete source names
 SOURCES_NAMES = {
     "unwpp": "United Nations - World Population Prospects (2022) (https://population.un.org/wpp/Download/Standard/Population/)",
-    "gapminder_v7": "Gapminder v7 (https://www.gapminder.org/data/documentation/gd003/)",
-    "gapminder_sg": "Gapminder - Systema Globalis (https://github.com/open-numbers/ddf--gapminder--systema_globalis)",
-    "hyde": "HYDE v3.2 (https://dataportaal.pbl.nl/downloads/HYDE/)",
+    "gapminder_v7": "Gapminder v7 (2022) (https://www.gapminder.org/data/documentation/gd003/)",
+    "gapminder_sg": "Gapminder - Systema Globalis (2023) (https://github.com/open-numbers/ddf--gapminder--systema_globalis)",
+    "hyde": "HYDE v3.2 (2017) (https://dataportaal.pbl.nl/downloads/HYDE/)",
 }
 
 
