@@ -133,7 +133,7 @@ class SnapshotForm(utils.StepForm):
         By default, the field attribution contains the format of the attribution, not the actual attribution. This function
         renders the actual attribution.
         """
-        attribution_template = data["attribution"]
+        attribution_template = cast(str, data["attribution"])
         if attribution_template == "{producer} ({year})":
             return None
         data_extra = {
@@ -226,7 +226,9 @@ def create_display_name_init_section(name: str) -> str:
     return display_name
 
 
-def create_display_name_snap_section(props: Dict[str, Any], name: str, property_name: str, title: str = None) -> str:
+def create_display_name_snap_section(
+    props: Dict[str, Any], name: str, property_name: str, title: Optional[str] = None
+) -> str:
     """Create display name for a field."""
     # Get requirement level colored
     req_level = _color_req_level(props["requirement_level"])
