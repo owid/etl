@@ -23,7 +23,7 @@ definitions:
     • 2022-2100: Projections based on Medium variant by the UN World Population Prospects (2022 revision).
 
 dataset:
-  title: Population
+  title: Population (various sources, 2023.1)
   description: |
     {definitions.dataset-description}
   sources: &population-sources
