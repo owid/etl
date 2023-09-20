@@ -1,0 +1,21 @@
+meta:
+  namespace: emdat
+  short_name: natural_disasters
+  name: Natural disasters
+  source_name: EM-DAT, CRED / UCLouvain, Brussels, Belgium – www.emdat.be
+  publication_year: 2022
+  publication_date: 2022-11-24
+  url: https://emdat.be/
+  source_data_url:
+  file_extension: xlsx
+  license_url: https://public.emdat.be/about
+  license_name: UCLouvain 2022
+  date_accessed: 2022-11-27
+  is_public: true
+  description: |
+
+wdir: ../../../data/snapshots/emdat/2022-11-24
+outs:
+- md5: db2c14d326b89566ffd7a08e3269d29a
+  size: 3813296
+  path: natural_disasters.xlsx
