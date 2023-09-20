@@ -1,60 +1,9 @@
 tables:
   under_five_mortality:
     title: Child Mortality Rate (Gapminder)
-    description: |
-      "This data has been compiled by Klara Johansson and Mattias Lindgren (Gapminder) from a selection of sources:
-      * Human Mortality Database
-      * Child Mortality Estimates from the UN Inter-agency Group for Child Mortality Estimation.
-      * Gapminder model based on infant mortality ratio (version 2) https://www.gapminder.org/data/documentation/gd002/
-      * Model estimates based on Gapminder's life expectancy data combined with model life tables, with some additional adjustments
-
-      We do not include rows marked by Gapminder as 'Guesstimates', which are extrapolations."
     variables:
       under_five_mortality:
         title: Under five mortality
-        origins:
-          - producer: Gapminder
-            title: Child Mortality Rate (Gapminder)
-            description: Gapminder's historic estimates compiled by Klara Johansson and Mattias Lindgren.
-            title_snapshot: Child Mortality Rate (Gapminder)
-            description_snapshot: null
-            citation_full: Child Mortality Rate, v7, Gapminder (2015)
-            attribution: null
-            attribution_short: Gapminder (2015)
-            version_producer: v7
-            url_main: https://www.gapminder.org/data/documentation/gd005/
-            url_download: https://www.gapminder.org/documentation/documentation/gapdata005%20v7.xlsx
-            date_accessed: "2023-09-18"
-            date_published: "2015-01-01"
-            license:
-              name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
-              url: null
-        licenses:
-          - name: CC BY 4.0
-            url: null
-        unit: deaths per 1,000 live births
-      source:
-        title: Source
-        origins:
-          - producer: Gapminder
-            title: Child Mortality Rate (Gapminder)
-            description: Gapminder's historic estimates compiled by Klara Johansson and Mattias Lindgren.
-            title_snapshot: Child Mortality Rate (Gapminder)
-            description_snapshot: null
-            citation_full: Child Mortality Rate, v7, Gapminder (2015)
-            attribution: null
-            attribution_short: Gapminder (2015)
-            version_producer: v7
-            url_main: https://www.gapminder.org/data/documentation/gd005/
-            url_download: https://www.gapminder.org/documentation/documentation/gapdata005%20v7.xlsx
-            date_accessed: "2023-09-18"
-            date_published: "2015-01-01"
-            license:
-              name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
-              url: null
-        licenses:
-          - name: CC BY 4.0
-            url: null
         unit: deaths per 1,000 live births
   under_five_mortality_selected:
     title: Child Mortality Rate (Gapminder)
@@ -68,47 +17,7 @@ tables:
     variables:
       under_five_mortality:
         title: Under five mortality (selected)
-        origins:
-          - producer: Gapminder
-            title: Child Mortality Rate (Gapminder)
-            description: Gapminder's historic estimates compiled by Klara Johansson and Mattias Lindgren.
-            title_snapshot: Child Mortality Rate (Gapminder)
-            description_snapshot: null
-            citation_full: Child Mortality Rate, v7, Gapminder (2015)
-            attribution: null
-            attribution_short: Gapminder (2015)
-            version_producer: v7
-            url_main: https://www.gapminder.org/data/documentation/gd005/
-            url_download: https://www.gapminder.org/documentation/documentation/gapdata005%20v7.xlsx
-            date_accessed: "2023-09-18"
-            date_published: "2015-01-01"
-            license:
-              name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
-              url: null
-        licenses:
-          - name: CC BY 4.0
-            url: null
         unit: deaths per 1,000 live births
       source:
         title: Source
-        origins:
-          - producer: Gapminder
-            title: Child Mortality Rate (Gapminder)
-            description: Gapminder's historic estimates compiled by Klara Johansson and Mattias Lindgren.
-            title_snapshot: Child Mortality Rate (Gapminder)
-            description_snapshot: null
-            citation_full: Child Mortality Rate, v7, Gapminder (2015)
-            attribution: null
-            attribution_short: Gapminder (2015)
-            version_producer: v7
-            url_main: https://www.gapminder.org/data/documentation/gd005/
-            url_download: https://www.gapminder.org/documentation/documentation/gapdata005%20v7.xlsx
-            date_accessed: "2023-09-18"
-            date_published: "2015-01-01"
-            license:
-              name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
-              url: null
-        licenses:
-          - name: CC BY 4.0
-            url: null
-        unit: deaths per 1,000 live births
+        unit: ""

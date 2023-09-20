@@ -1,69 +1,10 @@
 dataset:
   title: Long-run child mortality (Gapminder; UN IGME)
-  origins:
-    - producer: Gapminder
-      title: Child Mortality Rate
-      description: Gapminder's historic estimates compiled by Klara Johansson and Mattias Lindgren.
-      title_snapshot: Child Mortality Rate
-      citation_full: Child Mortality Rate, v7, Gapminder (2015)
-      attribution_short: Gapminder
-      version_producer: v7
-      url_main: https://www.gapminder.org/data/documentation/gd005/
-      url_download: https://www.gapminder.org/documentation/documentation/gapdata005%20v7.xlsx
-      date_accessed: "2023-09-18"
-      date_published: "2015-01-01"
-      license:
-        name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
-        url: null
-    - producer: United Nations Inter-agency Group for Child Mortality Estimation
-      title: Child Mortality Estimates
-      description: |
-        The United Nations Inter-agency Group for Child Mortality Estimation (UN IGME) was formed in 2004 to share data on child mortality, improve methods for child mortality estimation, report on progress towards child survival goals, and enhance country capacity to produce timely and properly assessed estimates of child mortality. The UN IGME is led by the United Nations Children’s Fund (UNICEF) and includes the World Health Organization (WHO), the World Bank Group and the United Nations Population Division of the Department of Economic and Social Affairs as full members.
-        UN IGME’s independent Technical Advisory Group (TAG), comprised of leading academic scholars and independent experts in demography and biostatistics, provides guidance on estimation methods, technical issues, and strategies for data analysis and data quality assessment.
-        UN IGME updates its child mortality estimates annually after reviewing newly available data and assessing data quality. The web portal contains the latest UN IGME estimates of child mortality at the country, regional and global levels, and the data used to derive them.
-      title_snapshot: Child Mortality Rate (Gapminder)
-      citation_full: |
-        "United Nations Inter-agency Group for Child Mortality Estimation
-        (UN IGME), Levels & Trends in Child Mortality: Report 2022, Estimates developed
-        by the United Nations Inter-agency Group for Child Mortality Estimation, United
-        Nations Children’s Fund, New York, 2023."
-      attribution_short: UN IGME
-      version_producer: v7
-      url_main: https://childmortality.org/data
-      url_download: https://childmortality.org/wp-content/uploads/2021/09/UN-IGME-2022.zip
-      date_published: "2023-08-16"
-      license:
-        name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
-        url: null
-  licenses:
-    - url: https://www.unicef.org/legal#copyright
-    - name: CC BY 4.0
-  sources: []
 tables:
   long_run_child_mortality:
     variables:
       under_five_mortality:
         title: Under-five mortality rate (full)
-        origins:
-          - producer: Gapminder
-            title: Child Mortality Rate (Gapminder)
-            description: Gapminder's historic estimates compiled by Klara Johansson and Mattias Lindgren.
-            title_snapshot: Child Mortality Rate (Gapminder)
-            description_snapshot: null
-            citation_full: Child Mortality Rate, v7, Gapminder (2015)
-            attribution: null
-            attribution_short: Gapminder (2015)
-            version_producer: v7
-            url_main: https://www.gapminder.org/data/documentation/gd005/
-            url_download: https://www.gapminder.org/documentation/documentation/gapdata005%20v7.xlsx
-            date_accessed: "2023-09-18"
-            date_published: "2015-01-01"
-            license:
-              name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
-              url: null
-        licenses:
-          - name: CC BY 4.0
-            url: null
         unit: deaths per 1,000 live births
         display:
           numDecimalPlaces: 1
@@ -71,26 +12,17 @@ tables:
     variables:
       under_five_mortality:
         title: Under-five mortality rate (selected)
-        origins:
-          - producer: Gapminder
-            title: Child Mortality Rate (Gapminder)
-            description: Gapminder's historic estimates compiled by Klara Johansson and Mattias Lindgren.
-            title_snapshot: Child Mortality Rate (Gapminder)
-            description_snapshot: null
-            citation_full: Child Mortality Rate, v7, Gapminder (2015)
-            attribution: null
-            attribution_short: Gapminder (2015)
-            version_producer: v7
-            url_main: https://www.gapminder.org/data/documentation/gd005/
-            url_download: https://www.gapminder.org/documentation/documentation/gapdata005%20v7.xlsx
-            date_accessed: "2023-09-18"
-            date_published: "2015-01-01"
-            license:
-              name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
-              url: null
-        licenses:
-          - name: CC BY 4.0
-            url: null
         unit: deaths per 1,000 live births
         display:
           numDecimalPlaces: 1
+  share_surviving_first_five_years:
+    variables:
+      weighted_u5mr:
+        title: Weighted under-five mortality rate
+        unit: deaths per 1,000 live births
+      share_dying_first_five_years:
+        title: Share dying in first five years
+        unit: "%"
+      share_surviving_first_five_years:
+        title: Share surviving first five years
+        unit: "%"

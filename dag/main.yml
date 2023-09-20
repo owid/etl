@@ -572,6 +572,7 @@ steps:
   data://garden/un/2023-08-29/long_run_child_mortality:
     - data://garden/un/2023-08-16/igme
     - data://garden/gapminder/2023-09-18/under_five_mortality
+    - data://garden/un/2022-07-11/un_wpp
   data://grapher/un/2023-09-19/long_run_child_mortality:
     - data://garden/un/2023-08-29/long_run_child_mortality
 include:

@@ -26,9 +26,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Create a filtered version which doesn't have 'Model based on Life Expectancy' as source
 
