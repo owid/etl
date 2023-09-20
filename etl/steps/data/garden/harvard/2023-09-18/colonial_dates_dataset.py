@@ -23,6 +23,7 @@ def run(dest_dir: str) -> None:
     tb["colonizer"] = tb["colonizer"].str.capitalize().replace("Britain", "United Kingdom")
 
     # Create a year column with one value per row representing the range between colstart_max and colend_max
+    # NOTE: I have decided to use last date aggregations, but we could also use mean aggregations
     tb["year"] = tb.apply(lambda x: list(range(x["colstart_max"], x["colend_max"] + 1)), axis=1)
 
     # Explode the year column
