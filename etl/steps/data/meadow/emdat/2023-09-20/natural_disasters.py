@@ -1,23 +1,18 @@
 """Load snapshot of EM-DAT natural disasters data and prepare a table with basic metadata.
 
 """
-
 import warnings
+from pathlib import Path
 
-import pandas as pd
-from owid.catalog import Dataset, Table, TableMeta
+import numpy as np
+import owid.catalog.processing as pr
+from owid.catalog import Table, TableMeta
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
-from etl.steps.data.converters import convert_snapshot_metadata
 
-# Snapshot version.
-SNAPSHOT_VERSION = "2022-11-24"
-# Current Meadow dataset version.
-VERSION = SNAPSHOT_VERSION
-
-# Get naming conventions.
-N = PathFinder(__file__)
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
 
 # Columns to extract from raw data, and how to rename them.
 COLUMNS = {
@@ -49,31 +44,33 @@ COLUMNS = {
 
 
 def run(dest_dir: str) -> None:
+    #
+    # Load and process inputs.
+    #
     # Load snapshot.
-    snap = Snapshot(f"emdat/{SNAPSHOT_VERSION}/natural_disasters.xlsx")
+    snap = paths.load_snapshot("natural_disasters.xlsx")
     with warnings.catch_warnings(record=True):
-        df = pd.read_excel(snap.path, sheet_name="emdat data", skiprows=6)
+        tb = snap.read(sheet_name="emdat data", skiprows=6)
 
+    #
+    # Process data.
+    #
     # Select and rename columns.
-    df = df[list(COLUMNS)].rename(columns=COLUMNS)
+    tb = tb[list(COLUMNS)].rename(columns=COLUMNS)
 
     # Sanity check.
     error = "Expected only 'Natural' in 'group' column."
-    assert set(df["group"]) == set(["Natural"]), error
+    assert set(tb["group"]) == set(["Natural"]), error
 
-    # Create a new dataset and reuse snapshot metadata.
-    ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_snapshot_metadata(snap.metadata)
-    ds.metadata.version = VERSION
-
-    # Create a table with metadata from dataframe.
-    table_metadata = TableMeta(
-        short_name=snap.metadata.short_name,
-        title=snap.metadata.name,
-        description=snap.metadata.description,
+    # Set an appropriate index and sort conveniently.
+    # NOTE: There are multiple rows for certain country-years. This will be handled in the garden step.
+    tb = (
+        tb.set_index(["country", "year"], verify_integrity=False).sort_index().sort_index(axis=1)
     )
-    tb = Table(df, metadata=table_metadata, underscore=True)
 
-    # Add table to new dataset and save dataset.
-    ds.add(tb)
-    ds.save()
+    #
+    # Save outputs.
+    #
+    # Create a new meadow dataset with the same metadata as the snapshot.
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_meadow.save()
