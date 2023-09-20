@@ -8,7 +8,7 @@ definitions:
 
     • [Gapminder - Population v7 (2022)](https://www.gapminder.org/data/documentation/gd003/): Mostly covers the period 1800-1949. In addition, it complements the dataset with population data for the "Vatican" until 2100 (it is missing in UN WPP's estimates).
 
-    • [Gapminder - Systema Globalis](https://github.com/open-numbers/ddf--gapminder--systema_globalis): Covers the period 1555-2008. It complements the dataset with former countries and other data not present in the other sources.
+    • [Gapminder - Systema Globalis (2023)](https://github.com/open-numbers/ddf--gapminder--systema_globalis): Covers the period 1555-2008. It complements the dataset with former countries and other data not present in the other sources.
   dataset-description: |
     Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on various sources.
 
