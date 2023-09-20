@@ -40,6 +40,7 @@ log = structlog.get_logger()
 
 source_table_lock = Lock()
 origins_table_lock = Lock()
+variable_commit_lock = Lock()
 
 
 CURRENT_DIR = os.path.dirname(__file__)
@@ -288,9 +289,14 @@ def upsert_table(
         )
         session.add(db_variable)
 
-        # we need to commit changes because we use SQL command in `variable_metadata`. We wouldn't
-        # have to if we used ORM instead
-        session.commit()
+        # We're sometimes getting deadlock from inserts into origins_variables table
+        # I hope this lock will fix it. If we still get deadlocks, we might have to include everything
+        # from `delete_links` below, the downside is that it gets about 30% slower. Another option is
+        # retry on deadlock
+        with variable_commit_lock:
+            # we need to commit changes because we use SQL command in `variable_metadata`. We wouldn't
+            # have to if we used ORM instead
+            session.commit()
 
         # process data and metadata
         var_data = variable_data(df)
