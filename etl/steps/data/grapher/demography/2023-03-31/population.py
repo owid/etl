@@ -184,8 +184,10 @@ def _create_metric_version_from_mask(
     if title_suffix:
         table[metric_new].metadata.title = f"{table[metric_new].metadata.title} {title_suffix}"
     if display_name_suffix:
-        table[metric_new].metadata.display[
-            "name"
-        ] = f"{table[metric_new].metadata.display['name']} {display_name_suffix}"
+        if "name" in table[metric_new].metadata.display:
+            display_name = table[metric_new].metadata.display["name"]
+        else:
+            display_name = table[metric_new].metadata.title
+        table[metric_new].metadata.display["name"] = f"{display_name} {display_name_suffix}"
     table[metric_new].metadata.description = description
     return table.astype({metric_new: dtype})
