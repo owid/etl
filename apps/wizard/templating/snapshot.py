@@ -674,7 +674,9 @@ if st.session_state["run_step"]:
     if form.dataset_manual_import:
         # Get snapshot local file
         commands.extend(["--path-to-file", st.session_state["snapshot_file"]])
-    st.write(f"Command to be run: `{' '.join(command)}`")
+    command_str = f"`{' '.join(commands)}`"
 
     # Run step
-    subprocess.call(commands)
+    with st.spinner(f"Running snapshot step... {command_str}"):
+        subprocess.call(args=commands)
+    st.write("Snapshot uploaded!")
