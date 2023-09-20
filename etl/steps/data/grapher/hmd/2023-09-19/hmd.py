@@ -26,11 +26,13 @@ def run(dest_dir: str) -> None:
     tb = tb.reset_index()
 
     ## Only keep 5-year age groups, and 1-year observation periods
-    tb = tb[tb["format"].str.fullmatch(r"5x1")]
-    tb_5 = tb[tb["format"] == "5x1"].copy()
+    tb_5 = tb[tb["format"] == "5x1"]
     ## TODO: Exceptionally add single-year age groups (maybe 0, 10, 15, etc.)
-    tb_1 = tb[tb["format"] == "1x1"].copy()
-    tb_1 = tb_1[tb_1["age"].isin([0, 10, 15, 25, 45, 65, 80])]
+    tb_1 = tb[tb["format"] == "1x1"]
+    ages_single = [0, 10, 15, 25, 45, 65, 80]
+    ages_single = list(map(str, ages_single))
+    tb_1 = tb_1[tb_1["age"].isin(ages_single)]
+    print(tb_1.head())
     ## Combine
     tb = pr.concat([tb_5, tb_1], ignore_index=True)
 
