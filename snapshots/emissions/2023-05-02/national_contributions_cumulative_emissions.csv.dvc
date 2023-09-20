@@ -1,8 +1,8 @@
 meta:
   origin:
-    dataset_title_owid: National contributions to climate change - Cumulative emissions
-    dataset_title_producer: National contributions to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide.
-    dataset_description_producer: >-
+    title_snapshot: National contributions to climate change - Cumulative emissions
+    title: National contributions to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide.
+    description: >-
       A dataset describing the global warming response to national emissions CO2, CH4 and N2O from fossil and land use sources
       during 1851-2021.
 
@@ -28,12 +28,12 @@ meta:
       The data files provide emissions, cumulative emissions and the GMST response by country, gas (CO2, CH4, N2O or 3-GHG
       total) and source (fossil emissions, land use emissions or the total).
     producer: Jones et al.
-    citation_producer: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew, Robbie M., Schwingshackl, Clemens, Gütschow,
+    citation_full: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew, Robbie M., Schwingshackl, Clemens, Gütschow,
       Johannes, Houghton, Richard A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023). National contributions
       to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide [Data set]. In Scientific
       Data (2023.1). Zenodo.
-    dataset_url_main: https://zenodo.org/record/7636699#.ZFCy4exBweZ
-    dataset_url_download: https://zenodo.org/record/7636699/files/EMISSIONS_CUMULATIVE_CO2e100_1851-2021.csv
+    url_main: https://zenodo.org/record/7636699#.ZFCy4exBweZ
+    url_download: https://zenodo.org/record/7636699/files/EMISSIONS_CUMULATIVE_CO2e100_1851-2021.csv
     date_accessed: 2023-05-02
     date_published: 2023-02-13
   license:

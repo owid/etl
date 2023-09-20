@@ -1,15 +1,15 @@
 ---
-name: "walkthrough issue"
-about: For issues that involve `walkthrough` program.
-title: "walkthrough: meaningful title for the issue"
-labels: walkthrough
+name: "🪄 wizard/walkthrough issue"
+about: For issues that involve `wizard` or `walkthrough` tool.
+title: "[wizard or walkthrough]: meaningful title for the issue"
+labels: wizard,walkthrough
 assignees: marigold,lucasrodes
 
 ---
 
 <!--
 INSTRUCTIONS
-Write a meaningful title that describes your issue with walkthrough.
+Write a meaningful title that describes your issue with wizard (or walkthrough).
 -->
 
 ### One-liner

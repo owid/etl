@@ -74,3 +74,37 @@ def examples_to_markdown(
         bad = [f"«`{b}`»" for b in bad]
         text += f"\n{tab}| «`{good}`» | {', '.join(bad)} |"
     return text
+
+
+def faqs_to_markdown(faqs: List[Any], extra_tab: int = 0) -> str:
+    """Render FAQs to markdown from given list in schema."""
+    tab = "\t" * extra_tab
+    texts = []
+    for faq in faqs:
+        text = ""
+        if not isinstance(faq, dict):
+            raise TypeError("Each element in `faqs` must be a dictionary!")
+
+        # Get question
+        if "question" in faq and isinstance(faq["question"], str):
+            # Add main guideline
+            text += f"\n{tab}**_{faq['question']}_**"
+        else:
+            raise TypeError("Check that faqs element has the key 'question' and that it is a string!")
+
+        # Get answer
+        if "answer" in faq and isinstance(faq["question"], str):
+            # Add main guideline
+            text += f"\n\n{tab}{faq['answer']}"
+        else:
+            raise TypeError("Check that faqs element has the key 'answer' and that it is a string!")
+
+        # Get link
+        if "link" in faq and isinstance(faq["question"], str):
+            # Add main guideline
+            text += f"\n\n{tab}[See discussion on Github]({faq['link']})"
+
+        texts.append(text)
+
+    text = "\n\n".join(texts)
+    return text

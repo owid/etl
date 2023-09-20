@@ -11,6 +11,7 @@ Usage:
 
 import datetime
 import os
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from threading import Lock
 from typing import Dict, List, Optional, cast
@@ -39,6 +40,7 @@ log = structlog.get_logger()
 
 source_table_lock = Lock()
 origins_table_lock = Lock()
+variable_commit_lock = Lock()
 
 
 CURRENT_DIR = os.path.dirname(__file__)
@@ -283,21 +285,27 @@ def upsert_table(
             session,
             db_origins,
             faqs=variable_meta.presentation.faqs if variable_meta.presentation else [],
-            tag_names=variable_meta.presentation.topic_tags_links if variable_meta.presentation else [],
+            tag_names=variable_meta.presentation.topic_tags if variable_meta.presentation else [],
         )
         session.add(db_variable)
 
-        # we need to commit changes because we use SQL command in `variable_metadata`. We wouldn't
-        # have to if we used ORM instead
-        session.commit()
+        # We're sometimes getting deadlock from inserts into origins_variables table
+        # I hope this lock will fix it. If we still get deadlocks, we might have to include everything
+        # from `delete_links` below, the downside is that it gets about 30% slower. Another option is
+        # retry on deadlock
+        with variable_commit_lock:
+            # we need to commit changes because we use SQL command in `variable_metadata`. We wouldn't
+            # have to if we used ORM instead
+            session.commit()
 
-        # process and upload data to S3
+        # process data and metadata
         var_data = variable_data(df)
-        upload_gzip_dict(var_data, db_variable.s3_data_path(), r2=True)
-
-        # process and upload metadata to S3
         var_metadata = variable_metadata(session, db_variable_id, df)
-        upload_gzip_dict(var_metadata, db_variable.s3_metadata_path(), r2=True)
+
+        # upload them to R2
+        with ThreadPoolExecutor() as executor:
+            executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path(), r2=True)
+            executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path(), r2=True)
 
         log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
 

@@ -1,11 +1,11 @@
 meta:
   origin:
-    dataset_title_owid: Bullfighting laws
-    dataset_description_owid: This dataset lists countries where bullfighting is banned
+    producer: Various sources
+    title: Bullfighting laws
+    description: This dataset lists countries where bullfighting is banned
       and countries where it is still legal. Note that in some countries bullfighting
       is legal at a national level, although it may be banned in certain regions.
-    producer: Various sources
-    citation_producer: >-
+    citation_full: >-
       Evidence of laws banning bullfighting, and evidence of bullfighting being practiced
       without any ban, has been gathered
       from various sources for different countries.
@@ -122,7 +122,7 @@ meta:
       Although not banned nationally, various municipalities are officially declared
       anti-bullfighting, including the capital,
       Caracas.
-    dataset_url_main: https://www.hsi.org/news-resources/bullfighting/
+    url_main: https://www.hsi.org/news-resources/bullfighting/
     date_accessed: '2023-09-05'
     date_published: '2023-09-05'
   license:

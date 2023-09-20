@@ -28,18 +28,18 @@ def cli(
 
     origin = Origin(
         producer=sm.source_name,
-        citation_producer=sm.source_published_by,
-        dataset_title_owid=sm.name,
-        dataset_url_main=sm.url,
-        dataset_url_download=sm.source_data_url,
-        dataset_description_owid=sm.description,
+        title=sm.name,
+        description=sm.description,
+        citation_full=sm.source_published_by,
+        url_main=sm.url,
+        url_download=sm.source_data_url,
         date_published=sm.publication_date,
         date_accessed=sm.date_accessed,
     )
 
     # replace empty strings by None
-    if getattr(origin, "dataset_description_owid") == "":
-        origin.dataset_description_owid = None
+    if getattr(origin, "description_snapshot") == "":
+        origin.description_snapshot = None
 
     del sm.source_name
     del sm.source_published_by

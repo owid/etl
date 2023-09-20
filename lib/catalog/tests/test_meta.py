@@ -102,8 +102,8 @@ def test_load_license_from_dict():
 
 
 def test_Origin_date_published():
-    assert meta.Origin(dataset_title_owid="a", date_published="2020-01-01").date_published == "2020-01-01"  # type: ignore
-    assert meta.Origin(dataset_title_owid="a", date_published="2020").date_published == "2020"  # type: ignore
-    assert meta.Origin(dataset_title_owid="a", date_published="latest").date_published == "latest"  # type: ignore
+    assert meta.Origin(producer="p", title="a", date_published="2020-01-01").date_published == "2020-01-01"  # type: ignore
+    assert meta.Origin(producer="p", title="a", date_published="2020").date_published == "2020"  # type: ignore
+    assert meta.Origin(producer="p", title="a", date_published="latest").date_published == "latest"  # type: ignore
     with pytest.raises(ValueError):
-        assert meta.Origin(dataset_title_owid="a", date_published="nope")  # type: ignore
+        assert meta.Origin(producer="p", title="a", date_published="nope")  # type: ignore

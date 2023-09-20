@@ -23,7 +23,10 @@
           "type": "string",
           "description": "Toggle linear/logarithmic",
           "default": "linear",
-          "enum": ["linear", "log"]
+          "enum": [
+            "linear",
+            "log"
+          ]
         },
         "max": {
           "type": "number",
@@ -37,7 +40,10 @@
         "facetDomain": {
           "type": "string",
           "description": "Whether the axis domain should be the same across faceted charts (if possible)",
-          "enum": ["independent", "shared"]
+          "enum": [
+            "independent",
+            "shared"
+          ]
         }
       },
       "additionalProperties": false
@@ -50,7 +56,10 @@
           "type": "array",
           "description": "Custom labels for each numeric bin. Only applied when strategy is `manual`.\n`null` falls back to default label.\n",
           "items": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "customCategoryColors": {
@@ -156,7 +165,12 @@
           "type": "string",
           "description": "The strategy for generating the bin boundaries",
           "default": "ckmeans",
-          "enum": ["equalInterval", "quantiles", "ckmeans", "manual"]
+          "enum": [
+            "equalInterval",
+            "quantiles",
+            "ckmeans",
+            "manual"
+          ]
         },
         "legendDescription": {
           "type": "string",
@@ -166,7 +180,10 @@
           "type": "array",
           "description": "Override some or all colors for the numerical color legend.\nColors are CSS colors, usually in the form `#aa9944`\n`null` falls back the color scheme color.\n",
           "items": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "customNumericValues": {
@@ -217,43 +234,114 @@
       "properties": {
         "title": {
           "type": "string",
-          "title": "Title of this ETL dataset",
-          "description": "Title of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one-line description of the dataset (follow the guidelines of the origin's `data_product_title`). NOTE: Dataset titles should be propagated automatically from snapshots. By default, the title of the dataset will be the title of the containing table. But, if there are multiple tables, or if the user wants to manually edit the dataset title, it can be done by editing `dataset.title`.",
-          "requirement_level": "required (often automatic)"
+          "title": "Title of the ETL dataset",
+          "description": "Title of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one-line description of the dataset.",
+          "requirement_level": "required (often automatic)",
+          "guidelines": [
+            [
+              "Must start with a capital letter."
+            ],
+            [
+              "Must not end with a period."
+            ],
+            [
+              "Should identify the dataset (i.e. the collection of tables resulting from one or more original data products)."
+            ],
+            [
+              "Should be used only to override the automatic title (which usually is the title of the containing table). For example, use it when the dataset contains multiple tables."
+            ]
+          ]
         },
         "description": {
           "type": "string",
-          "title": "Description of this ETL dataset",
-          "description": "Description of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the dataset (follow the guidelines of the origin's `description`). NOTE: Dataset descriptions should be propagated automatically from snapshots. By default, the description of the dataset will be the description of the containing table. But, if there are multiple tables, or if the user wants to manually edit the dataset description, it can be done by editing `dataset.description`.",
-          "requirement_level": "recommended (often automatic)"
+          "title": "Description of the ETL dataset",
+          "description": "Description of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the content of the tables.",
+          "requirement_level": "recommended (often automatic)",
+          "guidelines": [
+            [
+              "Must start with a capital letter."
+            ],
+            [
+              "Must end with a period."
+            ],
+            [
+              "Should not mention other metadata fields (e.g. `producer` or `date_published`).",
+              {
+                "type": "exceptions",
+                "value": [
+                  "The other metadata fields are crucial in the description of the data product."
+                ]
+              }
+            ],
+            [
+              "Should describe the dataset (i.e. the collection of tables resulting from one or more original data products)."
+            ],
+            [
+              "Should ideally contain just one or a few paragraphs, that describe its content succinctly."
+            ],
+            [
+              "Should be used only to override the automatic description (which usually is the description of the containing table). For example, use it when the dataset contains multiple tables."
+            ]
+          ]
         },
         "update_period_days": {
           "type": "integer",
           "title": "Number of days between OWID updates",
           "description": "Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`.",
           "guidelines": [
-            ["Must be defined in the garden step."],
-            ["Must be an integer."]
+            [
+              "Must be defined in the garden step."
+            ],
+            [
+              "Must be an integer."
+            ],
+            [
+              "Must specify the update period of OWID's data, not the producer's data (although they may often coincide, e.g. `365`)."
+            ]
           ],
-          "examples": ["7", "30", "90", "365"],
-          "examples_bad": [["2023-01-07"], ["monthly"], ["0.2"], ["1/365"]],
+          "examples": [
+            "7",
+            "30",
+            "90",
+            "365"
+          ],
+          "examples_bad": [
+            [
+              "2023-01-07"
+            ],
+            [
+              "monthly"
+            ],
+            [
+              "0.2"
+            ],
+            [
+              "1/365"
+            ]
+          ],
           "requirement_level": "required"
         },
         "licenses": {
           "type": "array",
           "description": "List of all licenses that have been involved in the processing history of the indicators in this dataset. NOTE: Licenses should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails. In the near future, this field may not even exist, since `licenses` should only exist inside `origins`.",
-          "items": { "$ref": "definitions.json#/license" }
+          "items": {
+            "$ref": "definitions.json#/license"
+          }
         },
         "sources": {
           "type": "array",
           "description": "List of all sources of the indicators in this dataset. NOTE: This is no longer in use, you should use origins.",
-          "items": { "$ref": "definitions.json#/source" }
+          "items": {
+            "$ref": "definitions.json#/source"
+          }
         },
         "origins": {
           "type": "array",
           "description": "List of all origins of the indicators in this dataset. NOTE: Origins should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails.",
           "requirement_level": "required (automatic)",
-          "items": { "$ref": "definitions.json#/origin" }
+          "items": {
+            "$ref": "definitions.json#/origin"
+          }
         }
       }
     },
@@ -269,15 +357,52 @@
         "properties": {
           "title": {
             "type": "string",
-            "title": "Title of this ETL table",
-            "description": "Title of the table (mostly for internal purposes, or for users of our data catalog) which is a few words description of the table (follow the guidelines as origin's `title`). NOTE: Table titles should be propagated automatically from snapshots (from origin's `title`). But, if there are multiple tables, or if the user wants to manually edit the title, it can be done by editing `table.title`.",
-            "requirement_level": "required (often automatic)"
+            "title": "Title of the ETL table",
+            "description": "Title of the table (mostly for internal purposes, or for users of our data catalog) which is a few words description of the table.",
+            "requirement_level": "required (often automatic)",
+            "guidelines": [
+              [
+                "Must start with a capital letter."
+              ],
+              [
+                "Must not end with a period."
+              ],
+              [
+                "Should identify the table."
+              ],
+              [
+                "Should be used only to override the automatic title (which usually is the title of the origin). For example, use it when the table has multiple origins."
+              ]
+            ]
           },
           "description": {
             "type": "string",
             "title": "Description of this ETL table",
-            "description": "Description of the table (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the table (follow the guidelines of origin's `description`). NOTE: Table descriptions should be propagated automatically from snapshots (from origin's `description`). But, if there are multiple tables, or if the user wants to manually edit the description, it can be done by editing `table.description`.",
-            "requirement_level": "recommended (often automatic)"
+            "description": "Description of the table (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the table.",
+            "requirement_level": "recommended (often automatic)",
+            "guidelines": [
+              [
+                "Must start with a capital letter."
+              ],
+              [
+                "Must end with a period."
+              ],
+              [
+                "Should not mention other metadata fields (e.g. `producer` or `date_published`).",
+                {
+                  "type": "exceptions",
+                  "value": [
+                    "The other metadata fields are crucial in the description of the data product."
+                  ]
+                }
+              ],
+              [
+                "Should ideally contain just one or a few paragraphs, that describe its content succinctly."
+              ],
+              [
+                "Should be used only to override the automatic description (which usually is the description of the origin). For example, use it when the table has multiple origins."
+              ]
+            ]
           },
           "variables": {
             "type": "object",
@@ -298,45 +423,94 @@
                     "Share of neutron star mergers that happen in the Milky Way"
                   ],
                   "examples_bad": [
-                    ["Number of neutron stars (NASA)"],
-                    ["Share of neutron star mergers that happen in the Milky Way (2023)"]
+                    [
+                      "Number of neutron stars (NASA)"
+                    ],
+                    [
+                      "Share of neutron star mergers that happen in the Milky Way (2023)"
+                    ]
                   ],
                   "requirement_level": "required",
                   "guidelines": [
-                    ["Must start with a capital letter."],
-                    ["Must not end with a period."],
-                    ["Must be one short sentence (a few words)."],
-                    ["Should not mention other metadata fields like `producer` or `version`."],
-                    ["For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), consider using other metadata fields to improve the public appearance of the title (namely `presentation.title_public` and `grapher_config.title`)."]
+                    [
+                      "Must start with a capital letter."
+                    ],
+                    [
+                      "Must not end with a period."
+                    ],
+                    [
+                      "Must be one short sentence (a few words)."
+                    ],
+                    [
+                      "Should not mention other metadata fields like `producer` or `version`."
+                    ],
+                    [
+                      "For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), consider using other metadata fields to improve the public appearance of the title (namely `presentation.title_public` and `grapher_config.title`)."
+                    ]
                   ],
                   "category": "metadata"
                 },
                 "description_short": {
                   "title": "Indicator's short description",
                   "type": "string",
-                  "description": "One or a few lines that complement the title, so you have a short description of the indicator.",
+                  "description": "One or a few lines that complement the title to have a short description of the indicator.",
                   "requirement_level": "required",
                   "guidelines": [
-                    ["Must start with a capital letter."],
-                    ["Must end with a period."],
-                    ["Must be one short paragraph, suitable to fit in a chart subtitle."],
-                    ["Should not mention any other metadata fields (like information about the processing, or the origins, or the units).", {"type": "exceptions", "value": ["The unit can be mentioned if it is crucial for the description."]}]
+                    [
+                      "Must start with a capital letter."
+                    ],
+                    [
+                      "Must end with a period."
+                    ],
+                    [
+                      "Must be one short paragraph (for example suitable to fit in a chart subtitle)."
+                    ],
+                    [
+                      "Should not mention any other metadata fields (like information about the processing, or the origins, or the units).",
+                      {
+                        "type": "exceptions",
+                        "value": [
+                          "The unit can be mentioned if it is crucial for the description."
+                        ]
+                      }
+                    ]
                   ],
                   "category": "metadata"
                 },
                 "description_key": {
-                  "title": "Indicator's key description points",
+                  "title": "Indicator's key information",
                   "type": "array",
                   "items": {
                     "type": "string"
                   },
-                  "description": "List of key points about the indicator.",
-                  "requirement_level": "recommended (only for curated data pages)",
+                  "description": "List of key pieces of information about the indicator.",
+                  "requirement_level": "recommended (for curated indicators)",
                   "guidelines": [
-                    ["Must be a list of one or more short paragraphs.", {"type": "list", "value": ["Each paragraph must start with a capital letter.", "Each paragraph must end with a period."]}],
-                    ["Should contain all the key information given in other description fields, like `description_short`, `grapher_config.subtitle` or `grapher_config.note`."],
-                    ["Should not contain information about processing (which should be in `description_processing`)."],
-                    ["Should only contain information that is key to the public.", {"type": "list", "value": ["Anything that is too detailed or technical should be left in the code."]}]
+                    [
+                      "Must be a list of one or more short paragraphs.",
+                      {
+                        "type": "list",
+                        "value": [
+                          "Each paragraph must start with a capital letter.",
+                          "Each paragraph must end with a period."
+                        ]
+                      }
+                    ],
+                    [
+                      "Should contain all the key information given in other description fields, like `description_short`, `grapher_config.subtitle` or `grapher_config.note`."
+                    ],
+                    [
+                      "Should not contain information about processing (which should be in `description_processing`)."
+                    ],
+                    [
+                      "Should only contain information that is key to the public.",
+                      {
+                        "type": "list",
+                        "value": [
+                          "Anything that is too detailed or technical should be left in the code."
+                        ]
+                      }
+                    ]
                   ],
                   "category": "metadata"
                 },
@@ -346,11 +520,27 @@
                   "description": "Relevant information about the processing of the indicator done by OWID.",
                   "requirement_level": "required (if applicable)",
                   "guidelines": [
-                    ["Must start with a capital letter."],
-                    ["Must end with a period."],
-                    ["Must be used if important editorial decisions have been taken during data processing."],
-                    ["Must not be used to describe common processing steps like country harmonization."],
-                    ["Should only contain key processing information to the public.", {"type": "list", "value": ["Anything that is too detailed or technical should be left in the code."]}]
+                    [
+                      "Must start with a capital letter."
+                    ],
+                    [
+                      "Must end with a period."
+                    ],
+                    [
+                      "Must be used if important editorial decisions have been taken during data processing."
+                    ],
+                    [
+                      "Must not be used to describe common processing steps like country harmonization."
+                    ],
+                    [
+                      "Should only contain key processing information to the public.",
+                      {
+                        "type": "list",
+                        "value": [
+                          "Anything that is too detailed or technical should be left in the code."
+                        ]
+                      }
+                    ]
                   ],
                   "category": "metadata"
                 },
@@ -360,10 +550,18 @@
                   "description": "Description of the indicator written by the producer, if any was given.",
                   "requirement_level": "recommended (if existing)",
                   "guidelines": [
-                    ["Must start with a capital letter."],
-                    ["Must end with a period."],
-                    ["Should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits."],
-                    ["Should only be given if the producer clearly provides such definitions in a structured way. Avoid spending time searching for a definition given by the producer elsewhere."]
+                    [
+                      "Must start with a capital letter."
+                    ],
+                    [
+                      "Must end with a period."
+                    ],
+                    [
+                      "Should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits."
+                    ],
+                    [
+                      "Should only be given if the producer clearly provides such definitions in a structured way. Avoid spending time searching for a definition given by the producer elsewhere."
+                    ]
                   ],
                   "category": "metadata"
                 },
@@ -371,17 +569,47 @@
                   "title": "Indicator's unit",
                   "type": "string",
                   "description": "Very concise name of the unit we use to measure the indicator values.",
-                  "examples": ["tonnes per hectare", "kilowatts per person"],
-                  "examples_bad": [["tonnes/hectare"], ["kilowatts per capita"]],
+                  "examples": [
+                    "tonnes per hectare",
+                    "kilowatts per person"
+                  ],
+                  "examples_bad": [
+                    [
+                      "tonnes/hectare"
+                    ],
+                    [
+                      "kilowatts per capita"
+                    ]
+                  ],
                   "requirement_level": "required",
                   "guidelines": [
-                    ["Must not start with a capital letter."],
-                    ["Must not end with a period."],
-                    ["Must be empty if the indicator has no units."],
-                    ["Must be in plural."],
-                    ["Must be a metric unit when applicable."],
-                    ["Should not use symbols like “/”.", {"type": "list", "value": ["If it is a derived unit, use “per” to denote a division, e.g. '... per hectare', or '... per person'."]}],
-                    ["Should be '%' for percentages."]
+                    [
+                      "Must not start with a capital letter."
+                    ],
+                    [
+                      "Must not end with a period."
+                    ],
+                    [
+                      "Must be empty if the indicator has no units."
+                    ],
+                    [
+                      "Must be in plural."
+                    ],
+                    [
+                      "Must be a metric unit when applicable."
+                    ],
+                    [
+                      "Should not use symbols like “/”.",
+                      {
+                        "type": "list",
+                        "value": [
+                          "If it is a derived unit, use 'per' to denote a division, e.g. '... per hectare', or '... per person'."
+                        ]
+                      }
+                    ],
+                    [
+                      "Should be '%' for percentages."
+                    ]
                   ],
                   "category": "metadata"
                 },
@@ -389,27 +617,74 @@
                   "title": "Indicator's unit (short version)",
                   "type": "string",
                   "description": "Characters that represent the unit we use to measure the indicator value.",
-                  "examples": ["t/ha", "%", ".../person"],
-                  "examples_bad": [["t / ha"], ["pct"], ["pc"]],
+                  "examples": [
+                    "t/ha",
+                    "%",
+                    "kWh/person"
+                  ],
+                  "examples_bad": [
+                    [
+                      "t / ha"
+                    ],
+                    [
+                      "pct"
+                    ],
+                    [
+                      "pc"
+                    ]
+                  ],
                   "requirement_level": "required",
                   "guidelines": [
-                    ["Must follow the rules of capitalization of the International System of Units, when applicable."],
-                    ["Must not end with a period."],
-                    ["Must be empty if the indicator has no units."],
-                    ["Should not contain spaces."],
-                    ["If, for clarity, we prefer to simplify the units in a chart, e.g. to show `kWh` instead of `kWh/person`, use `display.short_unit` for the simplified units, and keep the correct one in `indicator.short_unit` (and ensure there is no ambiguity in the chart)."]
+                    [
+                      "Must follow the rules of capitalization of the International System of Units, when applicable."
+                    ],
+                    [
+                      "Must not end with a period."
+                    ],
+                    [
+                      "Must be empty if the indicator has no units."
+                    ],
+                    [
+                      "Should not contain spaces."
+                    ],
+                    [
+                      "If, for clarity, we prefer to simplify the units in a chart, e.g. to show `kWh` instead of `kWh/person`, use `display.short_unit` for the simplified units, and keep the correct one in `indicator.short_unit` (and ensure there is no ambiguity in the chart)."
+                    ]
                   ],
                   "category": "metadata"
                 },
                 "processing_level": {
                   "title": "Indicator's processing level",
                   "type": "string",
-                  "enum": ["minor", "major"],
+                  "enum": [
+                    "minor",
+                    "major"
+                  ],
                   "description": "Level of processing that the indicator values have experienced.",
                   "requirement_level": "required (in the future this could be automatic).",
                   "guidelines": [
-                    ["Must be `minor` if the indicator has undergone only minor operations since its origin:", {"type": "list", "value": ["Rename entities (e.g. countries or columns)", "Multiplication by a constant (e.g. unit change)", "Drop missing values."]}],
-                    ["Must be `major` if any other operation is used:", {"type": "list", "value": ["Data aggregates (e.g. sum data for continents or income groups)", "Operations between indicators (e.g. per capita, percentages, annual changes)", "Concatenation of indicators, etc."]}]
+                    [
+                      "Must be `minor` if the indicator has undergone only minor operations since its origin:",
+                      {
+                        "type": "list",
+                        "value": [
+                          "Rename entities (e.g. countries or columns)",
+                          "Multiplication by a constant (e.g. unit change)",
+                          "Drop missing values."
+                        ]
+                      }
+                    ],
+                    [
+                      "Must be `major` if any other operation is used:",
+                      {
+                        "type": "list",
+                        "value": [
+                          "Data aggregates (e.g. sum data for continents or income groups)",
+                          "Operations between indicators (e.g. per capita, percentages, annual changes)",
+                          "Concatenation of indicators, etc."
+                        ]
+                      }
+                    ]
                   ],
                   "category": "metadata"
                 },
@@ -419,30 +694,42 @@
                   "description": "License of the indicator, which depends on the indicator's processing level and the origins' licenses.",
                   "requirement_level": "required (in the future this could be automatic)",
                   "guidelines": [
-                    ["If the indicator's `processing_level` is major, assign `CC BY 4.0`."],
-                    ["If the indicator's `processing_level` is minor, choose the most strict license among the origins' `licenses`."]
+                    [
+                      "If the indicator's `processing_level` is major, assign `CC BY 4.0`."
+                    ],
+                    [
+                      "If the indicator's `processing_level` is minor, choose the most strict license among the origins' `licenses`."
+                    ]
                   ],
                   "category": "metadata"
                 },
                 "sources": {
                   "type": "array",
                   "description": "List of all sources of the indicator. Automatically filled. NOTE: This is no longer in use, you should use origins.",
-                  "items": { "$ref": "definitions.json#/source" }
+                  "items": {
+                    "$ref": "definitions.json#/source"
+                  }
                 },
                 "origins": {
                   "type": "array",
                   "description": "List of all origins of the indicator. Automatically filled.",
-                  "items": { "$ref": "definitions.json#/origin" }
+                  "items": {
+                    "$ref": "definitions.json#/origin"
+                  }
                 },
                 "licenses": {
                   "type": "array",
                   "description": "List of all licenses that have been involved in the processing history of the indicator. Automatically filled.",
-                  "items": { "$ref": "definitions.json#/license" }
+                  "items": {
+                    "$ref": "definitions.json#/license"
+                  }
                 },
-                "display": { "$ref": "definitions.json#/display" },
+                "display": {
+                  "$ref": "definitions.json#/display"
+                },
                 "presentation_license": {
                   "type": "object",
-                  "description": "Custom license for the indicator. This is usally not needed and the value from `license` is used.",
+                  "description": "License to display for the indicator, overriding `license`.",
                   "additionalProperties": false,
                   "properties": {
                     "url": {
@@ -462,8 +749,28 @@
                   "properties": {
                     "title_public": {
                       "type": "string",
-                      "description": "Indicator title to be shown in data pages (follow the guidelines of indicator's `title`). NOTE: This may be needed, for example, when the indicator comes from a big dataset where titles can't easily be curated manually. For those cases, `title_public` will override the indicator's `title`.",
-                      "requirement_level": "optional"
+                      "description": "Indicator title to be shown in data pages, that overrides the indicator's title.",
+                      "requirement_level": "optional",
+                      "guidelines": [
+                        [
+                          "Must start with a capital letter."
+                        ],
+                        [
+                          "Must not end with a period."
+                        ],
+                        [
+                          "Must be one short sentence (a few words)."
+                        ],
+                        [
+                          "Should not mention other metadata fields like `producer` or `version`."
+                        ],
+                        [
+                          "Should help OWID and expert users identify the indicator."
+                        ],
+                        [
+                          "For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), consider using other metadata fields to improve the public appearance of the title (namely `presentation.title_public` and `grapher_config.title`)."
+                        ]
+                      ]
                     },
                     "title_variant": {
                       "type": "string",
@@ -471,81 +778,146 @@
                       "description": "Short disambiguation of the title that references a special feature of the methods or nature of the data.",
                       "requirement_level": "optional",
                       "guidelines": [
-                        ["Must start with a capital letter."],
-                        ["Must not end in a period."],
-                        ["Should be very short."],
-                        ["Should only be used if the indicator's title is ambiguous (e.g. if there are multiple indicators with the same title)."]
+                        [
+                          "Must start with a capital letter."
+                        ],
+                        [
+                          "Must not end in a period."
+                        ],
+                        [
+                          "Should be very short."
+                        ],
+                        [
+                          "Should only be used if the indicator's title is ambiguous (e.g. if there are multiple indicators with the same title)."
+                        ]
                       ],
                       "examples": [
                         "Age-standardized",
                         "Historical data"
                       ],
                       "examples_bad": [
-                        ["The data is age-standardized"],
-                        ["Historical data from 1800 to 2010"]
+                        [
+                          "The data is age-standardized"
+                        ],
+                        [
+                          "Historical data from 1800 to 2010"
+                        ]
                       ]
                     },
                     "attribution": {
                       "type": "string",
                       "title": "Indicator's attribution",
-                      "description": "",
+                      "description": "Citation of the indicator's origins, to override the automatic format `producer1 (year1); producer2 (year2)`.",
                       "guidelines": [
-                        ["Must start with a capital letter."],
-                        ["Must join multiple attributions by a `;`."],
-                        ["Must not end in a period (and must **not** end in `;`)."],
-                        ["Should only be used when the automatic attribution format (of one or multiple origins) needs to be manually edited."]
+                        [
+                          "Must start with a capital letter.",
+                          {
+                            "type": "exceptions",
+                            "value": [
+                              "The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."
+                            ]
+                          }
+                        ],
+                        [
+                          "Must join multiple attributions by a `;`."
+                        ],
+                        [
+                          "Must not end in a period (and must **not** end in `;`)."
+                        ],
+                        [
+                          "Must contain the year of `date_published`, for each origin, in parenthesis."
+                        ],
+                        [
+                          "Should only be used when the automatic format `producer1 (year1); producer2 (year2)` needs to be overridden."
+                        ]
                       ],
-                      "requirement_level": "optional"
+                      "requirement_level": "optional",
+                      "examples": [
+                        "Energy Institute - Statistical Review of World Energy (2023); Ember (2022)"
+                      ],
+                      "examples_bad": [
+                        [
+                          "UN (2023), WHO (2023)"
+                        ]
+                      ]
                     },
-                    "producer_short": {
+                    "attribution_short": {
                       "type": "string",
                       "title": "Indicator's attribution (shorter version)",
                       "description": "Very short citation of the indicator's main producer(s).",
-                      "requirement_level": "recommended (for curated data pages)",
+                      "requirement_level": "recommended (for curated indicators)",
                       "guidelines": [
-                        ["Must start with a capital letter."],
-                        ["Must not end in a period."],
-                        ["Should be very short."],
-                        ["Should be used if the automatic concatenation of origin's `attribution_short` are too long. In those cases, choose the most important `attribution` (e.g. the main producer of the data)."]
+                        [
+                          "Must start with a capital letter.",
+                          {
+                            "type": "exceptions",
+                            "value": [
+                              "The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."
+                            ]
+                          }
+                        ],
+                        [
+                          "Must not end in a period."
+                        ],
+                        [
+                          "Should be very short."
+                        ],
+                        [
+                          "Should be used if the automatic concatenation of origin's `attribution_short` are too long. In those cases, choose the most important `attribution` (e.g. the main producer of the data)."
+                        ]
                       ]
                     },
-                    "topic_tags_links": {
+                    "topic_tags": {
                       "type": "array",
                       "title": "Indicator's topic tags",
                       "description": "List of topics where the indicator is relevant.",
-                      "requirement_level": "recommended (only for curated data pages)",
+                      "requirement_level": "recommended (for curated indicators)",
                       "guidelines": [
-                        ["Must be an existing topic tag, and be spelled correctly (see the list of topic tags in http://datasette-private/owid?sql=SELECT+tags.%60name%60+from+tags+where+isTopic+%3D+1+ORDER+BY+tags.%60name%60%0D%0A)."],
-                        ["The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator)."],
-                        ["Should contain 1, 2, or at most 3 tags."]
+                        [
+                          "Must be an existing topic tag, and be spelled correctly (see the list of topic tags in [datasette](http://datasette-private/owid?sql=SELECT+tags.%60name%60+from+tags+where+isTopic+%3D+1+ORDER+BY+tags.%60name%60%0D%0A) (requires Tailscale)."
+                        ],
+                        [
+                          "The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator)."
+                        ],
+                        [
+                          "Should contain 1, 2, or at most 3 tags."
+                        ]
                       ],
-                      "items": { "type": "string" }
+                      "items": {
+                        "type": "string"
+                      }
                     },
                     "faqs": {
                       "type": "array",
                       "title": "Indicator's FAQs",
                       "description": "List of references to questions in an FAQ google document, relevant to the indicator.",
-                      "requirement_level": "recommended (only for curated data pages)",
+                      "requirement_level": "recommended (for curated indicators)",
                       "guidelines": [
-                        ["Each reference must contain `fragment_id` (question identifier) and `gdoc_id` (document identifier)."]
+                        [
+                          "Each reference must contain `fragment_id` (question identifier) and `gdoc_id` (document identifier)."
+                        ]
                       ],
                       "items": {
                         "type": "object",
                         "properties": {
                           "gdoc_id": {
                             "type": "string",
-                            "examples": ["gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE"]
+                            "examples": [
+                              "gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE"
+                            ]
                           },
                           "fragment_id": {
                             "type": "string",
-                            "examples": ["fragment_id: cherries"]
+                            "examples": [
+                              "fragment_id: cherries"
+                            ]
                           }
                         }
                       }
                     },
                     "grapher_config": {
                       "type": "object",
-                      "description": "Our World In Data grapher configuration. Most of the fields can be left empty and will be filled with reasonable default values.",
+                      "description": "Our World in Data grapher configuration. Most of the fields can be left empty and will be filled with reasonable default values.\n\nFind more details on its attributes [here](https://files.ourworldindata.org/schemas/grapher-schema.003.json).",
                       "properties": {
                         "$schema": {
                           "type": "string",
@@ -570,7 +942,7 @@
                                 "Europe",
                                 "Africa",
                                 "Asia",
-                                "NortAmerica",
+                                "NorthAmerica",
                                 "SouthAmerica",
                                 "Oceania"
                               ],
@@ -593,7 +965,11 @@
                             "toleranceStrategy": {
                               "type": "string",
                               "description": "Tolerance strategy to use. Options include accepting matches that are \"closest\" to the time point in question\n(going forwards and backwards in time), and accepting matches that lie in the past (\"backwards\") or\nthe future (\"forwards\").\n",
-                              "enum": ["closest", "forwards", "backwards"],
+                              "enum": [
+                                "closest",
+                                "forwards",
+                                "backwards"
+                              ],
                               "default": "closest"
                             },
                             "tooltipUseCustomLabels": {
@@ -610,7 +986,9 @@
                                 },
                                 {
                                   "type": "string",
-                                  "enum": ["latest"]
+                                  "enum": [
+                                    "latest"
+                                  ]
                                 }
                               ]
                             },
@@ -632,7 +1010,10 @@
                             },
                             {
                               "type": "string",
-                              "enum": ["latest", "earliest"]
+                              "enum": [
+                                "latest",
+                                "earliest"
+                              ]
                             }
                           ]
                         },
@@ -640,16 +1021,24 @@
                           "type": "string",
                           "description": "Default subtitle to use in charts for the indicator. NOTE: Use this field to override an indicator's `description_short` with information that is more suitable for a chart subtitle.",
                           "guidelines": [
-                            ["Must start with a capital letter."],
-                            ["Must end with a period."],
-                            ["Must be one short paragraph, suitable to fit in a chart subtitle."]
+                            [
+                              "Must start with a capital letter."
+                            ],
+                            [
+                              "Must end with a period."
+                            ],
+                            [
+                              "Must be one short paragraph, suitable to fit in a chart subtitle."
+                            ]
                           ]
                         },
                         "selectedEntityNames": {
                           "type": "array",
                           "description": "List of entities (e.g. harmonized country names) to use by default in charts for the indicator.",
                           "items": {
-                            "type": ["string"]
+                            "type": [
+                              "string"
+                            ]
                           }
                         },
                         "baseColorScheme": {
@@ -664,7 +1053,11 @@
                           "type": "string",
                           "description": "The tab that is shown initially",
                           "default": "chart",
-                          "enum": ["chart", "map", "table"]
+                          "enum": [
+                            "chart",
+                            "map",
+                            "table"
+                          ]
                         },
                         "matchingEntitiesOnly": {
                           "type": "boolean",
@@ -724,13 +1117,21 @@
                           "type": "string",
                           "default": "year",
                           "description": "When a user hovers over a connected series line in a ScatterPlot we show\na label for each point. By default that value will be from the \"year\" column\nbut by changing this option the column used for the x or y axis could be used instead.\n",
-                          "enum": ["x", "y", "year"]
+                          "enum": [
+                            "x",
+                            "y",
+                            "year"
+                          ]
                         },
                         "selectedFacetStrategy": {
                           "type": "string",
                           "default": "none",
                           "description": "The desired facetting strategy (none for no facetting)",
-                          "enum": ["none", "entity", "metric"]
+                          "enum": [
+                            "none",
+                            "entity",
+                            "metric"
+                          ]
                         },
                         "sourceDesc": {
                           "type": "string",
@@ -739,7 +1140,7 @@
                         "isPublished": {
                           "type": "boolean",
                           "default": false,
-                          "description": "Indicates if the chart is published on Our World In Data or still in draft"
+                          "description": "Indicates if the chart is published on Our World in Data or still in draft"
                         },
                         "invertColorScheme": {
                           "type": "boolean",
@@ -768,7 +1169,7 @@
                         },
                         "slug": {
                           "type": "string",
-                          "description": "Slug of the chart on Our World In Data"
+                          "description": "Slug of the chart on Our World in Data"
                         },
                         "internalNotes": {
                           "description": "Internal notes.",
@@ -784,7 +1185,11 @@
                           "type": "string",
                           "description": "Which logo to show on the upper right side",
                           "default": "owid",
-                          "enum": ["owid", "core+owid", "gv+owid"]
+                          "enum": [
+                            "owid",
+                            "core+owid",
+                            "gv+owid"
+                          ]
                         },
                         "entityType": {
                           "type": "string",
@@ -800,11 +1205,21 @@
                           "type": "string",
                           "description": "Default footer note to use in charts for the indicator.",
                           "guidelines": [
-                            ["Must start with a capital letter."],
-                            ["Must end with a period."],
-                            ["Must not include 'Note:' at the beginning (this is added automatically)."],
-                            ["Must be one short paragraph, usually one sentence, suitable to fit in a chart footer note."],
-                            ["Should not mention any other metadata fields."]
+                            [
+                              "Must start with a capital letter."
+                            ],
+                            [
+                              "Must end with a period."
+                            ],
+                            [
+                              "Must not include 'Note:' at the beginning (this is added automatically)."
+                            ],
+                            [
+                              "Must be one short paragraph, usually one sentence, suitable to fit in a chart footer note."
+                            ],
+                            [
+                              "Should not mention any other metadata fields."
+                            ]
                           ]
                         },
                         "dimensions": {
@@ -812,7 +1227,10 @@
                           "description": "List of dimensions and their mapping to variables",
                           "items": {
                             "type": "object",
-                            "required": ["property", "variableId"],
+                            "required": [
+                              "property",
+                              "variableId"
+                            ],
                             "properties": {
                               "targetYear": {
                                 "type": "integer",
@@ -821,7 +1239,13 @@
                               "property": {
                                 "type": "string",
                                 "description": "Which dimension this property maps to",
-                                "enum": ["y", "x", "size", "color", "table"]
+                                "enum": [
+                                  "y",
+                                  "x",
+                                  "size",
+                                  "color",
+                                  "table"
+                                ]
                               },
                               "display": {
                                 "$ref": "definitions.json#/display"
@@ -839,7 +1263,11 @@
                           "type": "string",
                           "description": "Whether the user can change countries, add additional ones or neither",
                           "default": "add-country",
-                          "enum": ["add-country", "change-country", "disabled"]
+                          "enum": [
+                            "add-country",
+                            "change-country",
+                            "disabled"
+                          ]
                         },
                         "compareEndPointsOnly": {
                           "type": "boolean",
@@ -873,7 +1301,24 @@
                         },
                         "title": {
                           "type": "string",
-                          "description": "Default title to use in charts for the indicator (follow guidelines of indicator's `title`)."
+                          "description": "Default title to use in charts for the indicator, overriding the indicator's `title`.",
+                          "guidelines": [
+                            [
+                              "Must start with a capital letter."
+                            ],
+                            [
+                              "Must not end with a period."
+                            ],
+                            [
+                              "Must be one short sentence (a few words)."
+                            ],
+                            [
+                              "Must fit and be an appropriate choice for a chart's public title."
+                            ],
+                            [
+                              "Should not mention other metadata fields like `producer` or `version`."
+                            ]
+                          ]
                         },
                         "type": {
                           "type": "string",
@@ -897,7 +1342,10 @@
                           "description": "Whether the default chart for the indicator should include a map tab."
                         },
                         "stackMode": {
-                          "type": ["string", "null"],
+                          "type": [
+                            "string",
+                            "null"
+                          ],
                           "description": "Stack mode. Only absolute and relative are actively used.",
                           "enum": [
                             "absolute",
@@ -916,7 +1364,10 @@
                             },
                             {
                               "type": "string",
-                              "enum": ["latest", "earliest"]
+                              "enum": [
+                                "latest",
+                                "earliest"
+                              ]
                             }
                           ]
                         },
@@ -995,13 +1446,21 @@
                           "type": "string",
                           "description": "Sort criterium (used by stacked bar charts and marimekko)",
                           "default": "total",
-                          "enum": ["column", "total", "entityName", "custom"]
+                          "enum": [
+                            "column",
+                            "total",
+                            "entityName",
+                            "custom"
+                          ]
                         },
                         "sortOrder": {
                           "type": "string",
                           "description": "Sort order (used by stacked bar charts and marimekko)",
                           "default": "desc",
-                          "enum": ["desc", "asc"]
+                          "enum": [
+                            "desc",
+                            "asc"
+                          ]
                         },
                         "sortColumnSlug": {
                           "description": "Sort column if sortBy is column (used by stacked bar charts and marimekko)",
@@ -1028,7 +1487,11 @@
                           "type": "string",
                           "default": "auto",
                           "description": "The desired strategy for handling entities with missing data",
-                          "enum": ["auto", "hide", "show"]
+                          "enum": [
+                            "auto",
+                            "hide",
+                            "show"
+                          ]
                         },
                         "isExplorable": {
                           "type": "boolean",

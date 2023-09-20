@@ -2,13 +2,13 @@
 
 
 # Learn more about the available fields:
-# http://localhost:8000/architecture/metadata/reference-dataset/
+# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: {{cookiecutter.update_period_days}}
 
 
 # Learn more about the available fields:
-# http://localhost:8000/architecture/metadata/reference-tables/
+# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/tables/
 tables:
   {{cookiecutter.short_name}}:
     variables:
@@ -24,8 +24,8 @@ tables:
       #     title_public:
       #     title_variant:
       #     attribution:
-      #     producer_short:
-      #     topic_tags_links:
+      #     attribution_short:
+      #     topic_tags:
       #     faqs
       #     grapher_config
       #   display:
