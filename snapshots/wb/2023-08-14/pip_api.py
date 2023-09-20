@@ -447,6 +447,8 @@ def generate_percentiles_raw():
         df_country["poverty_line_cents"] = round(df_country["poverty_line"] * 100).astype(int)
         df_region["poverty_line_cents"] = round(df_region["poverty_line"] * 100).astype(int)
 
+        log.info("Checking if all the poverty lines are in the concatenated files")
+
         # Check if all the poverty lines are in the df in country and region df
         assert set(df_country["poverty_line_cents"].unique()) == set(povlines), log.fatal(
             "Not all poverty lines are in the country file!"
@@ -458,6 +460,8 @@ def generate_percentiles_raw():
         # Drop poverty_line_cents column
         df_country = df_country.drop(columns=["poverty_line_cents"])
         df_region = df_region.drop(columns=["poverty_line_cents"])
+
+        log.info("Checking if the set of countries and regions is the same as in PIP")
 
         # I check if the set of countries is the same in the df and in the aux table (list of countries)
         aux_dict = pip_aux_tables(table="countries")
@@ -471,15 +475,15 @@ def generate_percentiles_raw():
             "List of regions is not the same as the one defined in PIP!"
         )
 
+        log.info("Concatenating the raw percentile data for countries and regions")
+
         # Concatenate df_country and df_region
         df = pd.concat([df_country, df_region], ignore_index=True)
 
         end_time = time.time()
         elapsed_time = round(end_time - start_time, 2)
-        print(
-            "Concatenation of raw percentile data for countries and regions completed. Execution time:",
-            elapsed_time,
-            "seconds",
+        log.info(
+            f"Concatenation of raw percentile data for countries and regions completed. Execution time: {elapsed_time} seconds"
         )
 
         return df
@@ -584,7 +588,7 @@ def generate_consolidated_percentiles(df):
 
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
-    print("Done. Execution time:", elapsed_time, "seconds")
+    log.info(f"Percentiles calculated and checked. Execution time: {elapsed_time} seconds")
 
     return df_percentiles
 
@@ -783,7 +787,7 @@ def generate_relative_poverty():
 
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
-    print("Done. Execution time:", elapsed_time, "seconds")
+    log.info(f"Relative poverty indicators calculated. Execution time: {elapsed_time} seconds")
 
     return df
 
@@ -902,7 +906,7 @@ def generate_key_indicators():
 
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
-    print("Done. Execution time:", elapsed_time, "seconds")
+    log.info(f"Key indicators calculated. Execution time: {elapsed_time} seconds")
 
     return df
 
@@ -932,6 +936,8 @@ def median_patch(df):
 
     # Drop thr column
     df = df.drop(columns=["thr"])
+
+    log.info("Medians patched")
 
     return df
 
@@ -1009,6 +1015,8 @@ def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
 
     # Save key indicators file
     df.to_csv(f"{PARENT_DIR}/world_bank_pip.csv", index=False)
+
+    log.info("Relative poverty indicators and decile thresholds added. Key indicators file done :)")
 
     return df
 
