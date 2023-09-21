@@ -1,7 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Table
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -19,6 +20,16 @@ COLUMNS = {
 }
 
 
+def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
+    tb = geo.add_population_to_table(tb, ds_population=ds_population, warn_on_missing_countries=False)
+    tb["n_fish_low_per_capita"] = tb["n_fish_low"] / tb["population"]
+    tb["n_fish_per_capita"] = tb["n_fish"] / tb["population"]
+    tb["n_fish_high_per_capita"] = tb["n_fish_high"] / tb["population"]
+    # Drop population column.
+    tb = tb.drop(columns=["population"])
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -26,6 +37,9 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset and read its main table.
     ds_meadow: Dataset = paths.load_dependency("farmed_finfishes_used_for_food")
     tb = ds_meadow["farmed_finfishes_used_for_food"].reset_index()
+
+    # Load population dataset.
+    ds_population = paths.load_dependency("population")
 
     #
     # Process data.
@@ -43,6 +57,9 @@ def run(dest_dir: str) -> None:
 
     # Add a country column.
     tb["country"] = "World"
+
+    # Add per capita number of farmed fish.
+    tb = add_per_capita_variables(tb=tb, ds_population=ds_population)
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
