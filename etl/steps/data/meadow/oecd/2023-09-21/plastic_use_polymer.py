@@ -18,15 +18,16 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    columns_to_use = ["Plastics applications", "Time", "Value"]
+    columns_to_use = ["Plastics polymer", "Time", "Value"]
     tb = tb[columns_to_use]
-    rename_cols = {"Plastics applications": "plastic_applications", "Time": "year"}
+
+    rename_cols = {"Plastics polymer": "polymer", "Time": "year"}
 
     tb = tb.rename(columns=rename_cols)[rename_cols.values()]
     tb["country"] = "World"
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year", "plastic_applications"], verify_integrity=True).sort_index()
+    tb = tb.underscore().set_index(["country", "year", "polymer"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.

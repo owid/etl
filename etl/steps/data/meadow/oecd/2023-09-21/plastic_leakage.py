@@ -11,22 +11,21 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("plastic_use_application.csv")
+    snap = paths.load_snapshot("plastic_leakage.csv")
 
     # Load data from snapshot.
     tb = snap.read()
     #
     # Process data.
     #
-    columns_to_use = ["Plastics applications", "Time", "Value"]
+    columns_to_use = ["Location", "Variable", "Time", "Value"]
     tb = tb[columns_to_use]
-    rename_cols = {"Plastics applications": "application", "Time": "year"}
 
+    rename_cols = {"Location": "country", "Variable": "leakage_type", "Time": "year"}
     tb = tb.rename(columns=rename_cols)[rename_cols.values()]
-    tb["country"] = "World"
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year", "application"], verify_integrity=True).sort_index()
+    tb = tb.underscore().set_index(["country", "year", "leakage_type"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.

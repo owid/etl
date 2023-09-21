@@ -21,21 +21,19 @@ def run(dest_dir: str) -> None:
     columns_to_use = ["Greenhouse gases", "Plastics lifecycle stage", "Time", "Value"]
     tb = tb[columns_to_use]
     rename_cols = {
-        "Plastics lifecycle stage": "plastic_lifecycle",
+        "Plastics lifecycle stage": "lifecycle_stage",
         "Time": "year",
-        "Greenhouse gases": "greenhouse_gases",
+        "Greenhouse gases": "gas_type",
     }
 
     tb = tb.rename(columns=rename_cols)[rename_cols.values()]
     tb["country"] = "World"
-
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = (
         tb.underscore()
-        .set_index(["country", "year", "plastic_lifecycle", "greenhouse_gases"], verify_integrity=True)
+        .set_index(["country", "year", "lifecycle_stage", "gas_type"], verify_integrity=True)
         .sort_index()
     )
-
     #
     # Save outputs.
     #
