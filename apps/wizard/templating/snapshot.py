@@ -163,7 +163,6 @@ class SnapshotForm(utils.StepForm):
                     "date_accessed": self.date_accessed,
                     "license": license_field,
                 },
-                "license": license_field,
                 "is_public": not self.is_private,
             }
         }

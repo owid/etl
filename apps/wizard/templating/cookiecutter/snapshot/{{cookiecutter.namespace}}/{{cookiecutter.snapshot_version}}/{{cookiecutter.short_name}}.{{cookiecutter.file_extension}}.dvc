@@ -44,12 +44,6 @@ meta:
       url: {{cookiecutter.license_url}}
       {%- endif %}
 
-  # License (same as origin.license, for backwards compatibility)
-  license:
-    name: {{cookiecutter.license_name}}
-    {%- if cookiecutter.license_url %}
-    url: {{cookiecutter.license_url}}
-    {%- endif %}
   {% if cookiecutter.is_private == "True" %}
   is_public: false
   {%- endif -%}
