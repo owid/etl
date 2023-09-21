@@ -7,6 +7,7 @@ steps:
   - data://meadow/wb/2023-07-10/education
   - data://garden/regions/2023-01-01/regions
   - data://garden/wb/2023-04-30/income_groups
+  - data://garden/owid/latest/key_indicators
   data://grapher/wb/2023-07-10/education:
   - data://garden/wb/2023-07-10/education
 

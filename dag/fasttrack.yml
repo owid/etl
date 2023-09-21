@@ -116,3 +116,9 @@ steps:
   - snapshot://fasttrack/latest/democracy_freedom_house.csv
   data://grapher/fasttrack/latest/democracy_lexical_index:
   - snapshot://fasttrack/latest/democracy_lexical_index.csv
+  data://grapher/fasttrack/latest/global_maternal_offspring_loss:
+  - snapshot://fasttrack/latest/global_maternal_offspring_loss.csv
+  data://grapher/fasttrack/latest/under_five_mortality_lmics:
+  - snapshot://fasttrack/latest/under_five_mortality_lmics.csv
+  data://grapher/fasttrack/latest/plastic_waste_meijer_2021:
+  - snapshot://fasttrack/latest/plastic_waste_meijer_2021.csv

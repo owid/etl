@@ -1,4 +1,5 @@
-# Using the interactive walkthrough
+!!! warning "Walkthrough is deprecated. Use [Wizard](wizard.md) instead!"
+
 
 The walkthrough is an interactive web UI for setting up the different ETL steps. It creates the base files to help you
 create the recipe for a dataset.

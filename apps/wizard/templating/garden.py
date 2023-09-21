@@ -25,6 +25,14 @@ st.session_state["step_name"] = "garden"
 APP_STATE = utils.AppState()
 # Config style
 utils.config_style_html()
+# DUMMY defaults
+dummy_values = {
+    "namespace": "dummy",
+    "version": utils.DATE_TODAY,
+    "short_name": "dummy",
+    "meadow_version": utils.DATE_TODAY,
+}
+
 
 #########################################################
 # FUNCTIONS & CLASSES ###################################
@@ -109,7 +117,6 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     variable_meta = {
         "title": "Dummy",
         "description": "This is a dummy indicator with full metadata.",
-        "licenses": [],
         "unit": "Dummy unit",
         "short_unit": "Du",
         "display": {
@@ -135,9 +142,9 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
             },
             "title_public": "The dummy indicator - data page title",
             "title_variant": "historical data",
-            "producer_short": "ACME",
+            "attribution_short": "ACME",
             "attribution": "ACME project",
-            "topic_tags_links": ["Internet"],
+            "topic_tags": ["Internet"],
             "key_info_text": [
                 "First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)",
                 "Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)",
@@ -160,7 +167,7 @@ st.title("Wizard  **:gray[Garden]**")
 
 # SIDEBAR
 with st.sidebar:
-    utils.warning_notion_latest()
+    utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
@@ -179,6 +186,7 @@ with form_widget.form("garden"):
         help="Institution or topic name",
         placeholder="Example: 'emdat', 'health'",
         key="namespace",
+        value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
     )
     # Garden version
     APP_STATE.st_widget(
@@ -187,6 +195,7 @@ with form_widget.form("garden"):
         help="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
         key="version",
         default_last=default_version,
+        value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
     )
     # Garden short name
     APP_STATE.st_widget(
@@ -195,6 +204,7 @@ with form_widget.form("garden"):
         help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
         placeholder="Example: 'cherry_blossom'",
         key="short_name",
+        value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
     )
 
     st.markdown("#### Dataset")
@@ -217,6 +227,7 @@ with form_widget.form("garden"):
         help="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
         key="meadow_version",
         default_last=default_version,
+        value=dummy_values["meadow_version"] if APP_STATE.args.dummy_data else None,
     )
 
     st.markdown("#### Others")
@@ -294,15 +305,25 @@ if submitted:
         notebook_path = DATASET_DIR / "playground.ipynb"
         metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
 
-        if not form.generate_notebook:
+        if (not form.generate_notebook) and (notebook_path.is_file()):
             os.remove(notebook_path)
 
-        if not form.include_metadata_yaml:
+        if (not form.include_metadata_yaml) and (metadata_path.is_file()):
             os.remove(metadata_path)
 
         # Fill with dummy metadata
         if form.namespace == "dummy":
             _fill_dummy_metadata_yaml(metadata_path)
+
+        # Preview generated files
+        st.subheader("Generated files")
+        if form.include_metadata_yaml:
+            utils.preview_file(metadata_path, "yaml")
+        utils.preview_file(step_path, "python")
+        if form.generate_notebook:
+            with st.expander(f"File: `{notebook_path}`", expanded=False):
+                st.markdown("Open the file to see the generated notebook.")
+        utils.preview_dag_additions(dag_content, dag_path)
 
         # Display next steps
         with st.expander("## Next steps", expanded=True):
@@ -354,13 +375,6 @@ if submitted:
         7. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
         """
             )
-
-        # Preview generated files
-        st.subheader("Generated files")
-        if form.include_metadata_yaml:
-            utils.preview_file(metadata_path, "yaml")
-        utils.preview_file(step_path, "python")
-        utils.preview_dag_additions(dag_content, dag_path)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

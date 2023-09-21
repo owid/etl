@@ -1,10 +1,10 @@
 dataset:
   title: Global Carbon Budget (Global Carbon Project, 2023b)
   description: |
-    The Global Carbon Budget dataset is available <a href="https://globalcarbonbudget.org/archive/">here</a>.
+    The Global Carbon Budget dataset is available [here](https://globalcarbonbudget.org/archive/).
 
     Full reference:
-    Friedlingstein, P., O'Sullivan, M., Jones, M. W., Andrew, R. M., Gregor, L., Hauck, J., Le Quéré, C., Luijkx, I. T., Olsen, A., Peters, G. P., Peters, W., Pongratz, J., Schwingshackl, C., Sitch, S., Canadell, J. G., Ciais, P., Jackson, R. B., Alin, S. R., Alkama, R., Arneth, A., Arora, V. K., Bates, N. R., Becker, M., Bellouin, N., Bittig, H. C., Bopp, L., Chevallier, F., Chini, L. P., Cronin, M., Evans, W., Falk, S., Feely, R. A., Gasser, T., Gehlen, M., Gkritzalis, T., Gloege, L., Grassi, G., Gruber, N., Gürses, Ö., Harris, I., Hefner, M., Houghton, R. A., Hurtt, G. C., Iida, Y., Ilyina, T., Jain, A. K., Jersild, A., Kadono, K., Kato, E., Kennedy, D., Klein Goldewijk, K., Knauer, J., Korsbakken, J. I., Landschützer, P., Lefèvre, N., Lindsay, K., Liu, J., Liu, Z., Marland, G., Mayot, N., McGrath, M. J., Metzl, N., Monacci, N. M., Munro, D. R., Nakaoka, S.-I., Niwa, Y., O'Brien, K., Ono, T., Palmer, P. I., Pan, N., Pierrot, D., Pocock, K., Poulter, B., Resplandy, L., Robertson, E., Rödenbeck, C., Rodriguez, C., Rosan, T. M., Schwinger, J., Séférian, R., Shutler, J. D., Skjelvan, I., Steinhoff, T., Sun, Q., Sutton, A. J., Sweeney, C., Takao, S., Tanhua, T., Tans, P. P., Tian, X., Tian, H., Tilbrook, B., Tsujino, H., Tubiello, F., van der Werf, G. R., Walker, A. P., Wanninkhof, R., Whitehead, C., Willstrand Wranne, A., Wright, R., Yuan, W., Yue, C., Yue, X., Zaehle, S., Zeng, J., and Zheng, B.: Global Carbon Budget 2022, Earth Syst. Sci. Data, 14, 4811-4900, <a href="https://doi.org/10.5194/essd-14-4811-2022">https://doi.org/10.5194/essd-14-4811-2022</a>, 2022.
+    Friedlingstein, P., O'Sullivan, M., Jones, M. W., Andrew, R. M., Gregor, L., Hauck, J., Le Quéré, C., Luijkx, I. T., Olsen, A., Peters, G. P., Peters, W., Pongratz, J., Schwingshackl, C., Sitch, S., Canadell, J. G., Ciais, P., Jackson, R. B., Alin, S. R., Alkama, R., Arneth, A., Arora, V. K., Bates, N. R., Becker, M., Bellouin, N., Bittig, H. C., Bopp, L., Chevallier, F., Chini, L. P., Cronin, M., Evans, W., Falk, S., Feely, R. A., Gasser, T., Gehlen, M., Gkritzalis, T., Gloege, L., Grassi, G., Gruber, N., Gürses, Ö., Harris, I., Hefner, M., Houghton, R. A., Hurtt, G. C., Iida, Y., Ilyina, T., Jain, A. K., Jersild, A., Kadono, K., Kato, E., Kennedy, D., Klein Goldewijk, K., Knauer, J., Korsbakken, J. I., Landschützer, P., Lefèvre, N., Lindsay, K., Liu, J., Liu, Z., Marland, G., Mayot, N., McGrath, M. J., Metzl, N., Monacci, N. M., Munro, D. R., Nakaoka, S.-I., Niwa, Y., O'Brien, K., Ono, T., Palmer, P. I., Pan, N., Pierrot, D., Pocock, K., Poulter, B., Resplandy, L., Robertson, E., Rödenbeck, C., Rodriguez, C., Rosan, T. M., Schwinger, J., Séférian, R., Shutler, J. D., Skjelvan, I., Steinhoff, T., Sun, Q., Sutton, A. J., Sweeney, C., Takao, S., Tanhua, T., Tans, P. P., Tian, X., Tian, H., Tilbrook, B., Tsujino, H., Tubiello, F., van der Werf, G. R., Walker, A. P., Wanninkhof, R., Whitehead, C., Willstrand Wranne, A., Wright, R., Yuan, W., Yue, C., Yue, X., Zaehle, S., Zeng, J., and Zheng, B.: Global Carbon Budget 2022, Earth Syst. Sci. Data, 14, 4811-4900, https://doi.org/10.5194/essd-14-4811-2022, 2022.
 
     Variables include each country, region and World Bank income group's share of the global population; production-based (territorial); and consumption-based (trade-adjusted) carbon dioxide emissions.
 
@@ -12,7 +12,7 @@ dataset:
 
     Note that consumption-based emissions are not available for all countries; although those without complete data are a small fraction (3%) of the global total.
 
-    Calculation of each country's share of the global population is calculated using our population dataset, based on <a href="https://ourworldindata.org/population-sources">different sources</a>).
+    Calculation of each country's share of the global population is calculated using our population dataset, based on [different sources](https://ourworldindata.org/population-sources)).
 
     Data on global emissions has been converted by Our World in Data from tonnes of carbon to tonnes of carbon dioxide (CO₂) using a conversion factor of 3.664.
 
@@ -302,7 +302,9 @@ tables:
         title: "GDP"
         unit: "2011 international-$"
         short_unit: "$"
-        description: "Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries."
+        description:  >-
+          Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation)
+          and price differences between countries.
       global_cumulative_emissions_from_cement:
         title: "Global cumulative CO₂ emissions from cement"
         unit: "tonnes"

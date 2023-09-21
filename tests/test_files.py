@@ -31,6 +31,6 @@ b: One-liner
 c:
   nested:
     d:
-    - line
+      - line
 """
     )

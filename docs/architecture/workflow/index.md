@@ -1,5 +1,5 @@
 
-Our World In Data has a whole team dedicated to data management that takes data from publicly available sources, such as the _UN Food and Agriculture Organisation_, and makes it available to our researchers to visualise in the articles that they write.
+Our World in Data has a whole team dedicated to data management that takes data from publicly available sources (e.g. the _UN Food and Agriculture Organisation_), and makes it available to our researchers to analyse and create visualisation for their articles.
 
 ## Five stages
 
@@ -13,7 +13,7 @@ snapshot --> format --> harmonise --> import --> publish
 
 The design of the ETL involves steps that mirror the stages above, which help us to meet several design goals of the project:
 
-1. [Snapshot step](snapshot.md): Take a **snapshot** of the upstream data source and store it on our end.
+1. [Snapshot step](snapshot.md): Take a **snapshot** of the upstream data product and store it on our end.
 - [Meadow step](meadow.md): Bring the data into a **common format**.
 - [Garden step](garden.md): **Harmonise** the names of countries, genders and any other columns we may want to join on. Also do the necessary data processing to make the dataset usable for our needs.
 - [Grapher step](grapher.md): **Import** the data to our internal MySQL database.

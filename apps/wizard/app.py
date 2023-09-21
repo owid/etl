@@ -29,5 +29,7 @@ show_pages(
 
 add_indentation()
 
-if utils.AppState.args.phase != "all":  # type: ignore
+if utils.AppState.args.phase == "all":  # type: ignore
+    switch_page("Snapshot")  # type: ignore
+elif utils.AppState.args.phase != "all":  # type: ignore
     switch_page(utils.AppState.args.phase.title())  # type: ignore

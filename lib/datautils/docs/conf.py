@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath(os.path.join("../owid/")))
 # -- Project information -----------------------------------------------------
 
 project = "owid-datautils"
-copyright = "2022, Our World In Data"
-author = "Our World In Data"
+copyright = "2022, Our World in Data"
+author = "Our World in Data"
 
 # The full version, including alpha/beta/rc tags
 release = "0.5.3"

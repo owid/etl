@@ -1,0 +1,20 @@
+meta:
+  origin:
+    title: Fur banning
+    producer: Fur Free Alliance
+    citation_full: Overview national fur legislation, Fur Free Alliance (2023).
+    url_main: https://www.furfreealliance.com/fur-bans/
+    url_download:
+      https://www.furfreealliance.com/wp-content/uploads/2023/04/Overview-national-fur-legislation-General-Provisions.pdf
+    date_published: '2023-04-01'
+    date_accessed: '2023-09-08'
+    license:
+      name: CC BY 4.0
+  license:
+    name: CC BY 4.0
+  is_public: true
+wdir: ../../../data/snapshots/animal_welfare/2023-09-08
+outs:
+- md5: e326e86b4c1225f688951df82a2f85af
+  size: 178968
+  path: fur_laws.pdf

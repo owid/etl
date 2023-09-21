@@ -1,0 +1,33 @@
+dataset:
+  title: Fossil fuel production (Shift, 2022)
+  description: |
+    Fossil fuel production, produced by Our World in Data based on data from [The Shift Dataportal](https://www.theshiftdataportal.org/energy).
+  sources:
+  - name: Our World in Data based on The Shift Dataportal (2022)
+    published_by: The Shift Dataportal
+    date_accessed: 2022-07-18
+    url: https://www.theshiftdataportal.org/energy
+tables:
+  fossil_fuel_production:
+    variables:
+      coal:
+        title: Coal production
+        short_unit: TWh
+        unit: terawatt-hours
+        description:
+        display:
+          numDecimalPlaces: 0
+      gas:
+        title: Gas production
+        short_unit: TWh
+        unit: terawatt-hours
+        description:
+        display:
+          numDecimalPlaces: 0
+      oil:
+        title: Oil production
+        short_unit: TWh
+        unit: terawatt-hours
+        description:
+        display:
+          numDecimalPlaces: 0
