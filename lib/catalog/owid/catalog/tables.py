@@ -3,12 +3,14 @@
 #
 
 import json
+import types
 from collections import defaultdict
 from os.path import dirname, join, splitext
 from pathlib import Path
 from typing import (
     IO,
     Any,
+    Callable,
     Dict,
     Iterator,
     List,
@@ -848,6 +850,13 @@ class Table(pd.DataFrame):
         return TableGroupBy(super().groupby(*args, **kwargs), self.metadata, self._fields)
 
 
+def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
+    """Create a table with metadata."""
+    tb = Table(df, metadata=metadata.copy())
+    tb._fields = defaultdict(VariableMeta, fields)
+    return tb
+
+
 class TableGroupBy:
     # fixes type hints
     __annotations__ = {}
@@ -857,53 +866,56 @@ class TableGroupBy:
         self.metadata = metadata
         self._fields = fields
 
-    def __getattr__(self, name) -> "VariableGroupBy":
-        self.__annotations__[name] = VariableGroupBy
-        return VariableGroupBy(getattr(self.groupby, name), name, self._fields[name])
+    @overload
+    def __getattr__(self, name: Literal["count", "size", "sum", "mean", "median"]) -> Callable[[], "Table"]:
+        ...
+
+    @overload
+    def __getattr__(self, name: str) -> "VariableGroupBy":
+        ...
+
+    def __getattr__(self, name: str) -> Union[Callable[..., "Table"], "VariableGroupBy"]:
+        # Calling method on the groupby object
+        if isinstance(getattr(self.groupby, name), types.MethodType):
+
+            def func(*args, **kwargs):
+                """Apply function and return variable with proper metadata."""
+                df = getattr(self.groupby, name)(*args, **kwargs)
+                return _create_table(df, self.metadata, self._fields)
+
+            self.__annotations__[name] = Callable[..., "Table"]
+            return func
+        else:
+            self.__annotations__[name] = VariableGroupBy
+            return VariableGroupBy(getattr(self.groupby, name), name, self._fields[name])
+
+    @overload
+    def __getitem__(self, key: str) -> "VariableGroupBy":
+        ...
+
+    @overload
+    def __getitem__(self, key: list) -> "TableGroupBy":
+        ...
 
     def __getitem__(self, key: Union[str, list]) -> Union["VariableGroupBy", "TableGroupBy"]:
         if isinstance(key, list):
             return TableGroupBy(self.groupby[key], self.metadata, self._fields)
         else:
-            return self.__getattr__(key)
+            return self.__getattr__(key)  # type: ignore
 
     def __iter__(self) -> Iterator[Tuple[Any, "Table"]]:
         for name, group in self.groupby:
-            tb = Table(group, metadata=self.metadata.copy())
-            tb._fields = {k: v.copy() for k, v in self._fields.items()}
-            yield name, tb
+            yield name, _create_table(group, self.metadata, self._fields)
 
     def _groupby_operation(self, op, *args, **kwargs):
-        tb = Table(getattr(self.groupby, op)(*args, **kwargs), metadata=self.metadata.copy())
-        tb._fields = {k: v.copy() for k, v in self._fields.items()}
-
-        for k in tb.columns:
-            tb[k].update_log(
-                operation=f"groupby_{op}",
-            )
-
-        return tb
-
-    def sum(self, *args, **kwargs) -> "Table":
-        return self._groupby_operation("sum", *args, **kwargs)
-
-    def size(self, *args, **kwargs) -> pd.Series:
-        """.size returns pandas series"""
-        return self.groupby.size(*args, **kwargs)
+        df = getattr(self.groupby, op)(*args, **kwargs)
+        return _create_table(df, self.metadata, self._fields)
 
     def agg(self, func: Dict[str, Any], *args, **kwargs) -> "Table":
-        assert isinstance(func, dict)
-        tb = Table(self.groupby.agg(func, *args, **kwargs), metadata=self.metadata.copy())
-        tb._fields = {k: v.copy() for k, v in self._fields.items()}
-
-        # add processing log
-        for k, op in func.items():
-            if not isinstance(op, str):
-                op = op.__name__
-            tb[k].update_log(
-                operation=f"groupby_agg - {op}",
-            )
-        return tb
+        if not isinstance(func, dict):
+            raise NotImplementedError()
+        df = self.groupby.agg(func, *args, **kwargs)
+        return _create_table(df, self.metadata, self._fields)
 
 
 class VariableGroupBy:
@@ -912,13 +924,23 @@ class VariableGroupBy:
         self.metadata = metadata
         self.name = name
 
-    def __getattr__(self, funcname):
+    def __getattr__(self, funcname) -> Callable[..., "Table"]:
         def func(*args, **kwargs):
             """Apply function and return variable with proper metadata."""
             out = getattr(self.groupby, funcname)(*args, **kwargs)
-            return variables.Variable(out, name=self.name, metadata=self.metadata)
 
-        return func
+            # this happens when we use e.g. agg([min, max]), propagate metadata from the original then
+            if isinstance(out, Table):
+                out._fields = defaultdict(VariableMeta, {k: self.metadata for k in out.columns})
+                return out
+            elif isinstance(out, variables.Variable):
+                return out
+            elif isinstance(out, pd.Series):
+                return variables.Variable(out, name=self.name, metadata=self.metadata)
+            else:
+                raise NotImplementedError()
+
+        return func  # type: ignore
 
 
 def merge(
@@ -1590,11 +1612,3 @@ def _resolve_collisions(
         else:
             raise NotImplementedError()
     return new_cols
-
-
-def _extract_variables(t: Table, cols: list[str] | str | None) -> list[variables.Variable]:
-    if not cols:
-        return []
-    if isinstance(cols, str):
-        cols = [cols]
-    return [t[col] for col in cols]  # type: ignore

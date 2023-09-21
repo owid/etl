@@ -531,7 +531,7 @@ def _deepcopy_dataclass(dc) -> Any:
         elif isinstance(v, list):
             lis = [_deepcopy_dataclass(x) if is_dataclass(x) else x for x in v]
             # make sure to preserve the type of the list if we subclass it
-            if type(v) != list:
+            if type(v) != list:  # noqa
                 lis = type(v)(lis)
             setattr(dc, k, lis)
         elif isinstance(v, dict):

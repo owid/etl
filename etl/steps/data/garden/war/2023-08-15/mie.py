@@ -242,6 +242,7 @@ def _add_ongoing_metrics(tb: Table) -> Table:
 
     ops = {"micnum": "nunique"}
     ## By region and hostility_level
+    # DELETEME
     tb_ongoing = tb.groupby(["year", "region", "hostility_level"], as_index=False).agg(ops)
     ## region='World' and by hostility_level
     tb_ = tb.groupby(["micnum", "year"], as_index=False).agg({"hostility_level": max})

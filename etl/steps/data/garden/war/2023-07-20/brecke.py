@@ -66,6 +66,7 @@ def run(dest_dir: str) -> None:
 
     # Sanity check
     log.info("war.brecke: sanity checks")
+    # DELETEME
     assert tb.groupby(["name"]).region.nunique().max() == 1, "Wars with same name but different region!"
     assert tb.groupby(["name"]).conflict_type.nunique().max() == 1, "Wars with same name but different conflict_type!"
 

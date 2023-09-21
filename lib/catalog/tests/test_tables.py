@@ -4,12 +4,14 @@
 
 import json
 import tempfile
+from collections import defaultdict
 from os.path import exists, join, splitext
 
 import jsonschema
 import numpy as np
 import pandas as pd
 import pytest
+
 from owid.catalog import tables
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
@@ -961,10 +963,6 @@ def test_groupby_sum(table_1) -> None:
     gt = table_1.groupby("country").a.sum()
     assert gt.m.title == "Title of Table 1 Variable a"
 
-    # x = pd.DataFrame(table_1).groupby("country")["a"]
-
-    # __import__("ipdb").set_trace()
-
     gt = table_1.groupby("country")["a"].sum()
     assert gt.m.title == "Title of Table 1 Variable a"
 
@@ -973,6 +971,20 @@ def test_groupby_sum(table_1) -> None:
     assert gt.b.m.title == "Title of Table 1 Variable b"
 
 
+def test_groupby_agg(table_1) -> None:
+    gt = table_1.groupby("country").a.agg(["min", "max"])
+    assert gt["min"].m.title == "Title of Table 1 Variable a"
+
+    gt = table_1.groupby("country").a.agg("min")
+    assert gt.m.title == "Title of Table 1 Variable a"
+
+
+def test_groupby_count(table_1) -> None:
+    gt = table_1.groupby("country").count()
+    assert gt.a.m.title == "Title of Table 1 Variable a"
+
+
 def test_groupby_iteration(table_1) -> None:
     for _, group in table_1.groupby("country"):
+        assert isinstance(group._fields, defaultdict)
         assert group.a.m.title == "Title of Table 1 Variable a"

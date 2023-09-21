@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
         inplace=True,
     )
     # Add Total Investment
+    # DELETEME
     total_investment = df.groupby("year")["Total Investment"].sum()
     # Create a DataFrame from the total investment series
     total_df = pd.DataFrame(
