@@ -291,7 +291,6 @@ tables:
               in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
               to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
               use.
-            title_snapshot: null
             description_snapshot: This dataset gives global estimates of plastic use, broken down by application type. The
               use of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer
               type across different applications globally, as per Ryberg et al. (2019). Historical values (data from before
@@ -423,7 +422,6 @@ tables:
               in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
               to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
               use.
-            title_snapshot: null
             description_snapshot: This dataset gives global estimates of plastic use, broken down by application type. The
               use of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer
               type across different applications globally, as per Ryberg et al. (2019). Historical values (data from before
