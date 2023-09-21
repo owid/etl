@@ -1,8 +1,5 @@
 meta:
-  namespace: war
-  short_name: ucdp_prio_armed_conflict
   name: Armed Conflict version 23.1 (UCDP/PRIO, 2023)
-  version: 2023-06-22
   publication_year: 2023
   source_name: UCDP/PRIO (2023)
   source_published_by: Davies, Shawn, Therese Pettersson & Magnus Öberg (2023). Organized
@@ -10,7 +7,6 @@ meta:
     Research 60(4)
   url: https://ucdp.uu.se/downloads/index.html#armedconflict
   source_data_url: https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-231-csv.zip
-  file_extension: zip
   license_url:
   license_name: ''
   is_public: true

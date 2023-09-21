@@ -1,8 +1,5 @@
 meta:
-  namespace: war
-  short_name: prio_v31
   name: Battledeaths Dataset (PRIO, 2017)
-  version: 2023-02-02
   publication_year: 2005
   source_name: PRIO v3.1 (2017)
   source_published_by: |-
@@ -11,7 +8,6 @@ meta:
     http://www.prio.no/CSCW/Datasets/Armed-Conflict/Battle-Deaths/
   url: https://www.prio.org/data/1
   source_data_url: https://www.prio.org/download/datasetfile/8/PRIO%20Battle%20Deaths%20Dataset%203.1.xls
-  file_extension: xls
   license_url: https://cdn.cloud.prio.org/files/91648bba-8885-40ce-8a78-fae75c850c55/PRIO%20Battle%20Deaths%20Dataset%2030%20Documentation.pdf?inline=true
   license_name: PRIO terms
   date_accessed: 2023-02-02

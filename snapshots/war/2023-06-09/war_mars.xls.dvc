@@ -1,8 +1,5 @@
 meta:
-  namespace: war
-  short_name: war_mars
   name: Project Mars (Lyall, 2020)
-  version: '2023-06-09'
   publication_year: 2020
 
   publication_date: '2020-10-26'
@@ -11,7 +8,6 @@ meta:
     in Modern War (Princeton, NJ: Princeton University Press, 2020)'
   url: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DUO7IE
   source_data_url: https://dataverse.harvard.edu/api/access/datafile/5857675
-  file_extension: xls
   license_url: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DUO7IE
   license_name: Public Domain
   date_accessed: 2023-06-09

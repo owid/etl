@@ -1,8 +1,5 @@
 meta:
-  namespace: war
-  short_name: war_ucdp
   name: Dyadic Battle-Related Deaths Dataset version 22.1, Dyadic version (UCDP, 2023)
-  version: 2023-03-14
   publication_year: 2022
   publication_date: 2022-06-27
   source_name: UCDP (2023)
@@ -10,7 +7,6 @@ meta:
     violence 1989-2021 and drone warfare. Journal of Peace Research 59(4).
   url: https://ucdp.uu.se/downloads/index.html
   source_data_url: https://ucdp.uu.se/downloads/brd/ucdp-brd-dyadic-221-csv.zip
-  file_extension: zip
   license_url: https://creativecommons.org/licenses/by/4.0/
   license_name: CC BY 4.0
   date_accessed: 2023-03-14

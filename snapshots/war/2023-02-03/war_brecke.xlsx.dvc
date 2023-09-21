@@ -1,8 +1,5 @@
 meta:
-  namespace: war
-  short_name: war_brecke
   name: Conflicts Catalog (Brecke, 1999)
-  version: 2023-02-03
   publication_year: 1958
   publication_date: 1999-10-08
   source_name: Brecke (1999)
@@ -11,7 +8,6 @@ meta:
     Society.
   url: https://brecke.inta.gatech.edu/research/conflict/
   source_data_url: https://brecke.inta.gatech.edu/wp-content/uploads/sites/19/2018/09/Conflict-Catalog-18-vars.xlsx
-  file_extension: xlsx
   license_url:
   license_name:
   date_accessed: 2023-02-03

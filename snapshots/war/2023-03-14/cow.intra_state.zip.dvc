@@ -1,8 +1,5 @@
 meta:
-  namespace: war
-  short_name: war_cow
   name: 'War data: Intra-State Wars v5.1 (COW, 2010)'
-  version: 2023-03-14
   publication_year: 2010
   publication_date: 2010-01-27
   source_name: COW (2010)
@@ -10,7 +7,6 @@ meta:
     War: 1816 – 2007. Washington DC: CQ Press.'
   url: https://correlatesofwar.org/data-sets/cow-war/
   source_data_url: https://correlatesofwar.org/wp-content/uploads/Intra-State-Wars-v5.1.zip
-  file_extension: zip
   license_url: https://correlatesofwar.org/data-sets/
   license_name: Correlates of War terms
   date_accessed: 2023-03-14
