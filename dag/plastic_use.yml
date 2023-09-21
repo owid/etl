@@ -8,17 +8,10 @@ steps:
 
   data://meadow/oecd/2023-09-21/plastic_use_2019:
     - snapshot://oecd/2023-09-21/plastic_use_2019.csv
-  data://garden/oecd/2023-09-21/plastic_use_2019:
-    - data://meadow/oecd/2023-09-21/plastic_use_2019
-  data://grapher/oecd/2023-09-21/plastic_use_2019:
-    - data://garden/oecd/2023-09-21/plastic_use_2019
 
   data://meadow/oecd/2023-09-21/plastic_leakage:
     - snapshot://oecd/2023-09-21/plastic_leakage.csv
-  data://garden/oecd/2023-09-21/plastic_leakage:
-    - data://meadow/oecd/2023-09-21/plastic_leakage
-  data://grapher/oecd/2023-09-21/plastic_leakage:
-    - data://garden/oecd/2023-09-21/plastic_leakage
+
 
   data://meadow/oecd/2023-09-21/plastic_emissions:
     - snapshot://oecd/2023-09-21/plastic_emissions.csv
