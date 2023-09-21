@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 import owid.catalog.processing as pr
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -14,8 +14,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_igme = paths.load_dataset("igme")
-    ds_gapminder_v11 = paths.load_dependency("under_five_mortality", version="2023-09-21")
-    ds_gapminder_v7 = paths.load_dependency("under_five_mortality", version="2023-09-18")
+    ds_gapminder_v11: Dataset = paths.load_dependency("under_five_mortality", version="2023-09-21")
+    ds_gapminder_v7: Dataset = paths.load_dependency("under_five_mortality", version="2023-09-18")
 
     # Read table from meadow dataset.
     tb_igme = ds_igme["igme"].reset_index()
@@ -29,8 +29,11 @@ def run(dest_dir: str) -> None:
     tb_igme = tb_igme[list(columns)].rename(columns=columns, errors="raise")
     tb_igme["source"] = "igme"
 
-    # Load full Gapminder data v11
+    # Load full Gapminder data v11, v11 includes projections, so we need to remove years beyond the last year of IGME data
+
+    max_year = tb_igme["year"].max()
     tb_gap_full = ds_gapminder_v11["under_five_mortality"].reset_index()
+    tb_gap_full = tb_gap_full[tb_gap_full["year"] <= max_year].reset_index(drop=True)
     tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "under_five_mortality"})
     tb_gap_full["source"] = "gapminder"
 
@@ -42,12 +45,9 @@ def run(dest_dir: str) -> None:
     tb_combined_full = combine_datasets(tb_igme, tb_gap_full, "long_run_child_mortality")
     tb_combined_sel = combine_datasets(tb_igme, tb_gap_sel, "long_run_child_mortality_selected")
 
-    # v11 includes projections, so we need to remove years beyond the last year of IGME data
-    max_year = tb_combined_full["year"][tb_combined_full["source"] == "igme"].max()
-    tb_combined_full = tb_combined_full[tb_combined_full["year"] <= max_year].reset_index(drop=True)
-
+    # Calculate and estimate globally the number of children surviving their first five years
     tb_surviving = calculate_share_surviving_first_five_years(tb_combined_full)
-
+    # Combine with full Gapminder dataset
     tb_combined_full = pr.merge(tb_combined_full, tb_surviving, on=["country", "year"], how="left")
 
     # Save outputs.
@@ -100,7 +100,7 @@ def calculate_share_surviving_first_five_years(tb_combined: Table) -> Table:
     """
     # Drop out years prior to 1800 and regions that aren't countries
 
-    tb_world = tb_combined[(tb_combined["country"] == "World") & (tb_combined)].drop(columns=["source"])
+    tb_world = tb_combined[(tb_combined["country"] == "World")].drop(columns=["source"])
 
     # Add global labels and calculate the share of children surviving/dying in their first five years
 
