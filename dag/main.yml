@@ -569,6 +569,25 @@ steps:
     - data://meadow/harvard/2023-09-18/colonial_dates_dataset
   data://grapher/harvard/2023-09-18/colonial_dates_dataset:
     - data://garden/harvard/2023-09-18/colonial_dates_dataset
+  # Gapminder  - Under five mortality v7
+  data://meadow/gapminder/2023-09-18/under_five_mortality:
+    - snapshot://gapminder/2023-09-18/under_five_mortality.xlsx
+  data://garden/gapminder/2023-09-18/under_five_mortality:
+    - data://meadow/gapminder/2023-09-18/under_five_mortality
+
+  #  Gapminder  - Under five mortality v11
+  data://meadow/gapminder/2023-09-21/under_five_mortality:
+    - snapshot://gapminder/2023-09-21/under_five_mortality.xlsx
+  data://garden/gapminder/2023-09-21/under_five_mortality:
+    - data://meadow/gapminder/2023-09-21/under_five_mortality
+
+  # Long-run child mortality, Gapminder + UN IGME
+  data://garden/un/2023-08-29/long_run_child_mortality:
+    - data://garden/un/2023-08-16/igme
+    - data://garden/gapminder/2023-09-18/under_five_mortality
+    - data://garden/gapminder/2023-09-21/under_five_mortality
+  data://grapher/un/2023-09-19/long_run_child_mortality:
+    - data://garden/un/2023-08-29/long_run_child_mortality
 
 include:
   - dag/open_numbers.yml
