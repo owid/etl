@@ -2,7 +2,7 @@
 
 from math import trunc
 
-from owid.catalog import Table, VariableMeta
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -36,14 +36,13 @@ def run(dest_dir: str) -> None:
         index=["country", "year"],
         values=["Observation value", "Lower bound", "Upper bound"],
         columns=["unit_of_measure", "indicator", "sex", "wealth_quintile"],
+        join_column_levels_with="-",
     )
-    tb.columns = [" - ".join(col).strip() for col in tb.columns.values]
-    tb = tb.reset_index()
     # Add some metadata to the variables. Getting the unit from the column name and inferring the number of decimal places from the unit.
     # If it contains " per " we know it is a rate and should have 1 d.p., otherwise it should be an integer.
     for col in tb.columns[2:]:
         unit = col.split("-")[1]
-        tb[col].metadata = VariableMeta(unit=unit)
+        tb[col].metadata.unit = unit.lower().strip()
         if " per " in unit:
             tb[col].metadata.display = {"numDecimalPlaces": 1}
         else:
