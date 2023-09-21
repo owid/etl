@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
 
