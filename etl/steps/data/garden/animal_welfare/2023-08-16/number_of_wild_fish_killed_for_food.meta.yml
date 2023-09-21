@@ -59,6 +59,9 @@ tables:
           numDecimalPlaces: 2
         presentation:
           attribution: *attribution
+          grapher_config:
+            subtitle: This data is calculated based on annual catch figures from 2007 to 2016 in tonnes, and estimated mean weights for fish species. It does not include unrecorded fish capture, such as fish caught illegally and those caught as bycatch and discards.
+            note: Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds.
       n_wild_fish_high_per_capita:
         title: Estimated number of wild-caught fish killed for food per capita (upper bound)
         unit: 'fish per person'
