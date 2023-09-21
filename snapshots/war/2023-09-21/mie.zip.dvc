@@ -9,7 +9,7 @@ meta:
     citation_full: |-
       D. M. Gibler and S. V. Miller, "The Militarized Interstate Events (MIE) Dataset,
       1816-2014." Conflict Management and Peace Science. Forthcoming.
-    description: |2-
+    description: |-
 
       The MIE data includes daily events data that correspond to the Jones, Bremer, and Singer (1997) coding rules, with some additional coding changes as described in the codebook.
 
