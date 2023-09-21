@@ -1,8 +1,5 @@
 meta:
-  namespace: war
-  short_name: war_ucdp
   name: Non-State Conflict Dataset version 23.1 (UCDP, 2023)
-  version: 2023-06-22
   publication_year: 2023
   publication_date:
   source_name: UCDP (2023)
@@ -11,7 +8,6 @@ meta:
     Research 60(4).
   url: https://ucdp.uu.se/downloads/index.html
   source_data_url: https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-231-csv.zip
-  file_extension: zip
   license_url:
   license_name:
   date_accessed: 2023-06-22
