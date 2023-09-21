@@ -6,27 +6,6 @@ steps:
   data://grapher/oecd/2023-09-21/plastic_fate_regions:
     - data://garden/oecd/2023-09-21/plastic_fate_regions
 
-  data://meadow/oecd/2023-09-21/plastic_emissions:
-    - snapshot://oecd/2023-09-21/plastic_emissions.csv
-  data://garden/oecd/2023-09-21/plastic_emissions:
-    - data://meadow/oecd/2023-09-21/plastic_emissions
-  data://grapher/oecd/2023-09-21/plastic_emissions:
-    - data://garden/oecd/2023-09-21/plastic_emissions
-
-  data://meadow/oecd/2023-09-21/plastic_use_application:
-    - snapshot://oecd/2023-09-21/plastic_use_application.csv
-  data://garden/oecd/2023-09-21/plastic_use_application:
-    - data://meadow/oecd/2023-09-21/plastic_use_application
-  data://grapher/oecd/2023-09-21/plastic_use_application:
-    - data://garden/oecd/2023-09-21/plastic_use_application
-
-  data://meadow/oecd/2023-09-21/plastic_use_polymer:
-    - snapshot://oecd/2023-09-21/plastic_use_polymer.csv
-  data://garden/oecd/2023-09-21/plastic_use_polymer:
-    - data://meadow/oecd/2023-09-21/plastic_use_polymer
-  data://grapher/oecd/2023-09-21/plastic_use_polymer:
-    - data://garden/oecd/2023-09-21/plastic_use_polymer
-
   data://meadow/oecd/2023-09-21/plastic_use_2019:
     - snapshot://oecd/2023-09-21/plastic_use_2019.csv
   data://garden/oecd/2023-09-21/plastic_use_2019:
@@ -40,3 +19,25 @@ steps:
     - data://meadow/oecd/2023-09-21/plastic_leakage
   data://grapher/oecd/2023-09-21/plastic_leakage:
     - data://garden/oecd/2023-09-21/plastic_leakage
+
+  data://meadow/oecd/2023-09-21/plastic_emissions:
+    - snapshot://oecd/2023-09-21/plastic_emissions.csv
+  data://garden/oecd/2023-09-21/plastic_emissions:
+    - data://meadow/oecd/2023-09-21/plastic_emissions
+  data://grapher/oecd/2023-09-21/plastic_emissions:
+    -  data://garden/oecd/2023-09-21/plastic_emissions
+
+  data://meadow/oecd/2023-09-21/plastic_use_application:
+    - snapshot://oecd/2023-09-21/plastic_use_application.csv
+  data://garden/oecd/2023-09-21/plastic_use_application:
+    - data://meadow/oecd/2023-09-21/plastic_use_application
+  data://grapher/oecd/2023-09-21/plastic_use_application:
+    -  data://garden/oecd/2023-09-21/plastic_use_application
+
+  data://meadow/oecd/2023-09-21/plastic_use_polymer:
+    - snapshot://oecd/2023-09-21/plastic_use_polymer.csv
+  data://garden/oecd/2023-09-21/plastic_use_polymer:
+    - data://meadow/oecd/2023-09-21/plastic_use_polymer
+  data://grapher/oecd/2023-09-21/plastic_use_polymer:
+    - data://garden/oecd/2023-09-21/plastic_use_polymer
+

@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     tb = tb[columns_to_use]
     rename_cols = {"Location": "country", "Plastic end of life fates": "plastic_fate", "Time": "year"}
 
-    tb = tb.rename(columns=rename_cols)[rename_cols.values()]
+    tb = tb.rename(columns=rename_cols)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["country", "year", "plastic_fate"], verify_integrity=True).sort_index()

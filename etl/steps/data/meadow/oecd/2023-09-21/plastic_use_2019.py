@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
 
     rename_cols = {"Location": "country", "Plastics polymer": "polymer", "Plastics applications": "application"}
 
-    tb = tb.rename(columns=rename_cols)[rename_cols.values()]
+    tb = tb.rename(columns=rename_cols)
     tb["year"] = 2019
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.

@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
         "Greenhouse gases": "gas_type",
     }
 
-    tb = tb.rename(columns=rename_cols)[rename_cols.values()]
+    tb = tb.rename(columns=rename_cols)
     tb["country"] = "World"
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = (

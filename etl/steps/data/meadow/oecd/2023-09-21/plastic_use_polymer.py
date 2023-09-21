@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
 
     rename_cols = {"Plastics polymer": "polymer", "Time": "year"}
 
-    tb = tb.rename(columns=rename_cols)[rename_cols.values()]
+    tb = tb.rename(columns=rename_cols)
     tb["country"] = "World"
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
