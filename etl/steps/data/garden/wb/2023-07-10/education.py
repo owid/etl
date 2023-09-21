@@ -41,7 +41,7 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Datas
         in [
             "HD.HCI.LAYS",
             "HD.HCI.LAYS.FE",
-            "HD.HCI.LAYS.ME",
+            "HD.HCI.LAYS.MA",
             "HD.HCI.HLOS",
             "HD.HCI.HLOS.FE",
             "HD.HCI.HLOS.MA",
