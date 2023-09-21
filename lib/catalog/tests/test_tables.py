@@ -955,3 +955,24 @@ def test_multiply_columns(table_1, sources, origins, licenses):
     assert variable_c.metadata.processing_level == "major"
     assert variable_c.metadata.presentation is None
     assert variable_c.metadata.display == table_1["a"].metadata.display
+
+
+def test_groupby_sum(table_1) -> None:
+    gt = table_1.groupby("country").a.sum()
+    assert gt.m.title == "Title of Table 1 Variable a"
+
+    # x = pd.DataFrame(table_1).groupby("country")["a"]
+
+    # __import__("ipdb").set_trace()
+
+    gt = table_1.groupby("country")["a"].sum()
+    assert gt.m.title == "Title of Table 1 Variable a"
+
+    gt = table_1.groupby("country")[["a", "b"]].sum()
+    assert gt.a.m.title == "Title of Table 1 Variable a"
+    assert gt.b.m.title == "Title of Table 1 Variable b"
+
+
+def test_groupby_iteration(table_1) -> None:
+    for _, group in table_1.groupby("country"):
+        assert group.a.m.title == "Title of Table 1 Variable a"

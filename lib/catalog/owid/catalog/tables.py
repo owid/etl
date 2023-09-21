@@ -10,6 +10,7 @@ from typing import (
     IO,
     Any,
     Dict,
+    Iterator,
     List,
     Literal,
     Optional,
@@ -859,6 +860,18 @@ class TableGroupBy:
     def __getattr__(self, name) -> "VariableGroupBy":
         self.__annotations__[name] = VariableGroupBy
         return VariableGroupBy(getattr(self.groupby, name), name, self._fields[name])
+
+    def __getitem__(self, key: Union[str, list]) -> Union["VariableGroupBy", "TableGroupBy"]:
+        if isinstance(key, list):
+            return TableGroupBy(self.groupby[key], self.metadata, self._fields)
+        else:
+            return self.__getattr__(key)
+
+    def __iter__(self) -> Iterator[Tuple[Any, "Table"]]:
+        for name, group in self.groupby:
+            tb = Table(group, metadata=self.metadata.copy())
+            tb._fields = {k: v.copy() for k, v in self._fields.items()}
+            yield name, tb
 
     def _groupby_operation(self, op, *args, **kwargs):
         tb = Table(getattr(self.groupby, op)(*args, **kwargs), metadata=self.metadata.copy())
