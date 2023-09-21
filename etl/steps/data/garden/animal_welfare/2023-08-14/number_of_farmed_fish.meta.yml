@@ -33,7 +33,7 @@ tables:
         presentation:
           attribution: *attribution
           grapher_config:
-            subtitle: Data does not include lobsters, farmed fish used as bait, and species without estimates of mean weight (which were an additional 17% of reported global fish production).
+            subtitle: This data does not include lobsters, farmed fish used as bait, and species without estimates of mean weight (which were an additional 17% of reported global fish production).
             note: Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds.
       n_farmed_fish_high:
         title: Estimated number of farmed fish (upper bound)
@@ -65,6 +65,9 @@ tables:
           numDecimalPlaces: 2
         presentation:
           attribution: *attribution
+          grapher_config:
+            subtitle: This data does not include lobsters, farmed fish used as bait, and species without estimates of mean weight (which were an additional 17% of reported global fish production).
+            note: Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds.
       n_farmed_fish_high_per_capita:
         title: Estimated number of farmed fish per capita (upper bound)
         unit: 'fish per person'
