@@ -6,7 +6,7 @@ dataset:
   description: |
     Emissions are measured in tonnes of carbon dioxide equivalents (CO₂e), based on 100-year global warming potential factors for non-CO₂ gases.
 
-    Emissions are broken down by sector. Further information on sector definitions is available <a href="https://ourworldindata.org/ghg-emissions-by-sector">here</a>.
+    Emissions are broken down by sector. Further information on sector definitions is available [here](https://ourworldindata.org/ghg-emissions-by-sector).
   sources:
     -
       name: Our World in Data based on Climate Analysis Indicators Tool (CAIT).

@@ -1,17 +1,33 @@
-import xml.etree.ElementTree as ET
+"""Script to create a snapshot of dataset."""
 
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+import click
 import pandas as pd
 import requests
-from structlog import get_logger
+from owid.datautils.io import df_to_file
 
-log = get_logger()
+from etl.snapshot import Snapshot
 
-# change number of years to go back if neccessary (used up to 2000 in 2023)
+# Version for current snapshot dataset.
+SNAPSHOT_VERSION = Path(__file__).parent.name
 
-YEARS = 23
+
+@click.command()
+@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
+def main(upload: bool) -> None:
+    # Create a new snapshot.
+    snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/us_cpi.csv")
+    url = snap.metadata.origin.url_download  # type: ignore
+    df = import_US_cpi_API(url)
+    # Save the resulting dataframe to a single csv file
+    df_to_file(df, file_path=snap.path)
+    # Add the snapshot to DVC
+    snap.dvc_add(upload=upload)
 
 
-def import_US_cpi_API(years_back=YEARS):
+def import_US_cpi_API(url):
     """
     Imports the US Consumer Price Index (CPI) data from the World Bank API.
     https://datahelpdesk.worldbank.org/knowledgebase/articles/898581 - visit here for details
@@ -22,7 +38,6 @@ def import_US_cpi_API(years_back=YEARS):
     """
 
     # API endpoint URL
-    url = f"https://api.worldbank.org/v2/country/us/indicator/FP.CPI.TOTL?mrnev={years_back}"
 
     try:
         # Send a GET request to the API endpoint
@@ -48,16 +63,19 @@ def import_US_cpi_API(years_back=YEARS):
                 # Append the extracted data to the list
                 data.append({"year": date, "fp_cpi_totl": value})
             else:
-                log.info("Year and CPI not found!")
+                print("Year and CPI not found!")
                 return
         # Create a DataFrame from the extracted data
         df = pd.DataFrame(data)
         df["year"] = df["year"].astype(int)
         df["fp_cpi_totl"] = df["fp_cpi_totl"].astype(float)
-
         return df
 
     except requests.exceptions.RequestException as e:
         # Request was not successful
         print(f"Request failed: {str(e)}")
         return None
+
+
+if __name__ == "__main__":
+    main()

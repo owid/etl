@@ -834,7 +834,9 @@ class Variable(SQLModel, table=True):
     descriptionFromProducer: Optional[str] = Field(default=None, sa_column=Column("descriptionFromProducer", LONGTEXT))
     descriptionKey: Optional[List[str]] = Field(default=None, sa_column=Column("descriptionKey", JSON))
     descriptionProcessing: Optional[str] = Field(default=None, sa_column=Column("descriptionProcessing", LONGTEXT))
+    # NOTE: Use of `licenses` is discouraged, they should be captured in origins.
     licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
+    # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
     license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")

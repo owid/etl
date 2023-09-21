@@ -120,3 +120,5 @@ steps:
   - snapshot://fasttrack/latest/global_maternal_offspring_loss.csv
   data://grapher/fasttrack/latest/under_five_mortality_lmics:
   - snapshot://fasttrack/latest/under_five_mortality_lmics.csv
+  data://grapher/fasttrack/latest/plastic_waste_meijer_2021:
+  - snapshot://fasttrack/latest/plastic_waste_meijer_2021.csv
