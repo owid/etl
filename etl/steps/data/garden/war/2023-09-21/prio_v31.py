@@ -16,7 +16,7 @@ Data for incompatibilities in Oceania are included in region Asia (source decisi
 """
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset

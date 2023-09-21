@@ -3,7 +3,6 @@
 import os
 import tempfile
 from pathlib import Path
-from typing import cast
 
 import chardet
 import pandas as pd
@@ -12,7 +11,6 @@ from owid.datautils.io import decompress_file
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Initialize logger.
 log = get_logger()
