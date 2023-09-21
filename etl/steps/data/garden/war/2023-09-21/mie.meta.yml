@@ -17,7 +17,7 @@ tables:
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
         unit: conflicts
-        description: |-
+        description_short: |-
           <% if hostility_level == "all" %>
           The number of all ongoing interstate conflicts in each year.
 
@@ -72,7 +72,7 @@ tables:
       number_new_conflicts:
         title: Number of new conflicts
         unit: conflicts
-        description: |-
+        description_short: |-
           <% if hostility_level == "all" %>
           The number of all new interstate conflicts in each year.
 
@@ -138,7 +138,7 @@ tables:
       number_deaths_ongoing_conflicts_low:
         title: Number of deaths in ongoing conflicts (low estimate)
         unit: deaths
-        description: |-
+        description_short: |-
           The low estimate of the number of deaths in all ongoing interstate conflicts in each year.
 
           An ongoing interstate conflict is a disagreement between states where force is threatened, displayed, or used.
@@ -159,7 +159,7 @@ tables:
       number_deaths_ongoing_conflicts_high:
         title: Number of deaths in ongoing conflicts (high estimate)
         unit: deaths
-        description: |-
+        description_short: |-
           The high estimate of the number of deaths in all ongoing interstate conflicts in each year.
 
           An ongoing interstate conflict is a disagreement between states where force is threatened, displayed, or used.
