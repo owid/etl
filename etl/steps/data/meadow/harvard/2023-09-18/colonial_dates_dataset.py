@@ -29,12 +29,6 @@ def run(dest_dir: str) -> None:
     )
 
     # Process data.
-    # Keep only relevant values for dyads (col=1)
-    tb = tb[tb["col"] == "1"].reset_index(drop=True)
-
-    # Drop col column
-    tb = tb.drop(columns=["col"])
-
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["country", "colonizer"], verify_integrity=True).sort_index()

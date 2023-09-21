@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -21,6 +22,28 @@ def run(dest_dir: str) -> None:
 
     # Capitalize colonizer column and replace Britain by United Kingdom
     tb["colonizer"] = tb["colonizer"].str.capitalize().replace("Britain", "United Kingdom")
+
+    # Create two tables, one for colonized countries and one for colonizers/not colonized countries
+    tb_colonized = tb[tb["col"] == "1"].reset_index(drop=True)
+    tb_rest = tb[tb["col"] == "0"].reset_index(drop=True)
+
+    # Generate a list of the colonizers
+    colonizers_list = tb_rest["colonizer"].unique().tolist()
+
+    # Remove duplicates for tb_rest
+    tb_rest = tb_rest.drop_duplicates(subset=["country"], keep="first").reset_index(drop=True)
+
+    # Assign the value "Not colonized" to colonizer column
+    # tb_rest["colonizer"] = "Not colonized"
+
+    # For countries in colonizers_list, assign the value "Colonizer" to colonizer column
+    tb_rest["colonizer"] = tb_rest["colonizer"].where(~tb_rest["country"].isin(colonizers_list), "Colonizer")
+
+    # For these countries, assign the minimum year of colstart_max as colstart_max and the maximum year of colend_max as colend_max
+    tb_rest["colstart_max"] = tb_colonized["colstart_max"].min()
+    tb_rest["colend_max"] = tb_colonized["colend_max"].max()
+
+    tb = pr.concat([tb_colonized, tb_rest], ignore_index=True)
 
     # Create a year column with one value per row representing the range between colstart_max and colend_max
     # NOTE: I have decided to use last date aggregations, but we could also use mean aggregations
