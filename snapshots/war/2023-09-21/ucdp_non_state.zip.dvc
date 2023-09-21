@@ -8,9 +8,9 @@ meta:
     Research 60(4).
   url: https://ucdp.uu.se/downloads/index.html
   source_data_url: https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-231-csv.zip
-  license_url:
-  license_name:
-  date_accessed: 2023-06-22
+  license_url: https://creativecommons.org/licenses/by/4.0/
+  license_name: CC BY 4.0
+  date_accessed: 2023-09-21
   is_public: true
   description: |
     A conflict-year dataset containing information on communal and organized armed conflict where none of the parties is the government of a state.
