@@ -1,5 +1,6 @@
 """Snapshot phase."""
 import subprocess
+from datetime import datetime as dt
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, cast
 
@@ -88,7 +89,7 @@ class SnapshotForm(utils.StepForm):
     date_published: str
     producer: str
     citation_full: str
-    attribution: str
+    attribution: Optional[str]
     attribution_short: str
     url_main: str
     url_download: str
@@ -102,18 +103,45 @@ class SnapshotForm(utils.StepForm):
         """Construct form."""
         # Change name for certain fields (and remove old ones)
         data["license_url"] = data["origin.license.url"]
+        data["origin_version"] = data["origin.version_producer"]
+        data["dataset_manual_import"] = data["local_import"]
+
+        # Handle custom license
         if "origin.license.name_custom" in data:
             data["license_name"] = data["origin.license.name_custom"]
         else:
             data["license_name"] = data["origin.license.name"]
-        data["origin_version"] = data["origin.version_producer"]
-        data["dataset_manual_import"] = data["local_import"]
-        data = {
-            k: v for k, v in data.items() if k not in ["origin.license.url", "origin.license.name", "origin.version"]
-        }
+
+        # Remove unused fields
+        data = {k: v for k, v in data.items() if k not in ["origin.license.url", "origin.license.name"]}
         # Remove 'origin.' prefix from keys
         data = {k.replace("origin.", ""): v for k, v in data.items()}
+
+        # Init object (includes schema validation)
         super().__init__(**data)
+
+        # Handle custom attribution
+        if not self.errors:
+            if "attribution_custom" in data:
+                self.attribution = str(data["attribution_custom"])
+            else:
+                self.attribution = self.parse_attribution(data)
+
+    def parse_attribution(self: Self, data: Dict[str, str | int]) -> str | None:
+        """Parse the field attribution.
+
+        By default, the field attribution contains the format of the attribution, not the actual attribution. This function
+        renders the actual attribution.
+        """
+        attribution_template = cast(str, data["attribution"])
+        if attribution_template == "{producer} ({year})":
+            return None
+        data_extra = {
+            "year": dt.strptime(str(data["date_published"]), "%Y-%m-%d").year,
+            # "version_producer": data["origin_version"],
+        }
+        attribution = attribution_template.format(**data, **data_extra).replace("  ", " ")
+        return attribution
 
     def validate(self: "SnapshotForm") -> None:
         """Check that fields in form are valid.
@@ -137,6 +165,10 @@ class SnapshotForm(utils.StepForm):
         # License
         if self.license_name == "":
             self.errors["origin.license.name_custom"] = "Please introduce the name of the custom license!"
+
+        # Attribution
+        if self.attribution == "":
+            self.errors["origin.attribution_custom"] = "Please introduce the name of the custom attribute!"
 
     @property
     def metadata(self: Self) -> Dict[str, Any]:
@@ -194,12 +226,16 @@ def create_display_name_init_section(name: str) -> str:
     return display_name
 
 
-def create_display_name_snap_section(props: Dict[str, Any], name: str, property_name: str) -> str:
+def create_display_name_snap_section(
+    props: Dict[str, Any], name: str, property_name: str, title: Optional[str] = None
+) -> str:
     """Create display name for a field."""
     # Get requirement level colored
     req_level = _color_req_level(props["requirement_level"])
     # Create display name
-    display_name = f"`{property_name}.{name}` ┃ {props['title']} ┃ {req_level}"
+    if not title:
+        title = props["title"]
+    display_name = f"`{property_name}.{name}` ┃ {title} ┃ {req_level}"
     return display_name
 
 
@@ -350,16 +386,16 @@ def render_fields_from_schema(
                 else:
                     field = APP_STATE.st_widget(st_widget=st.text_area, **kwargs)
             ## Special case: license name (select box)
-            elif prop_uri == "origin.license.name":
+            elif prop_uri in ["origin.license.name", "origin.attribution"]:
                 # Special one, need to have responsive behaviour inside form (work around)
                 if categories:
                     with containers[props["category"]]:
-                        field = [st.empty(), st.container()]  # type: ignore
+                        field = [prop_uri, st.empty(), st.container()]  # type: ignore
                 elif container:
                     with container:
-                        field = [st.empty(), st.container()]
+                        field = [prop_uri, st.empty(), st.container()]
                 else:
-                    field = [st.empty(), st.container()]
+                    field = [prop_uri, st.empty(), st.container()]
             ## Text input
             else:
                 # default_value = DEFAULT_VALUES.get(prop_uri, "")
@@ -399,7 +435,7 @@ def render_license_field(form: List[Any]) -> List[str]:
     """
     # Assert there is only one element of type list
     assert (
-        len([field for field in form if isinstance(field, list)]) == 1
+        len([field for field in form if isinstance(field, list)]) == 2
     ), "More than one element in the form is of type list!"
 
     # Get relevant values from schema
@@ -437,8 +473,8 @@ def render_license_field(form: List[Any]) -> List[str]:
     CUSTOM_OPTION = "Custom license..."
     # Render and get element depending on selection in selectbox
     for field in form:
-        if isinstance(field, list):
-            with field[0]:
+        if isinstance(field, list) and field[0] == "origin.license.name":
+            with field[1]:
                 license_field = APP_STATE.st_widget(
                     st.selectbox,
                     label=display_name,
@@ -447,7 +483,7 @@ def render_license_field(form: List[Any]) -> List[str]:
                     key=prop_uri,
                     default_last=options[0],
                 )
-            with field[1]:
+            with field[2]:
                 if license_field == CUSTOM_OPTION:
                     license_field = APP_STATE.st_widget(
                         st.text_input,
@@ -462,6 +498,94 @@ def render_license_field(form: List[Any]) -> List[str]:
 
     # Add license field
     form.append(license_field)  # type: ignore
+
+    return form
+
+
+def render_attribution_field(form: List[Any]) -> List[str]:
+    """Render the attribution field within the form.
+
+    We want the attribution field to be a selectbox, but with the option to add a custom license.
+
+    This is a workaround to have repsonsive behaviour within a form.
+
+    Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
+    """
+    # Assert there is only one element of type list
+    assert (
+        len([field for field in form if isinstance(field, list)]) == 2
+    ), "More than one element in the form is of type list!"
+
+    # Get relevant values from schema
+    parent = "origin"
+    name = "attribution"
+    prop_uri = f"{parent}.{name}"
+    props = schema_origin[name]
+    display_name = create_display_name_snap_section(props, name, parent, title="Attribution format")
+
+    # Main decription
+    toc = "[Description](#description) "
+    description_add = """Use this dropdown to select the desired `attribution` format.
+
+The default option should be used in most cases. Alternatively other common format options are available.
+
+Only in rare occasions you will need to define a custom attribution.
+    """
+    help_text = "## Description\n\n" + description_add
+    # Guidelines
+    if props.get("guidelines"):
+        help_text += "\n## Guidelines" + guidelines_to_markdown(guidelines=props["guidelines"])
+        toc += "| [Guidelines](#guidelines) "
+    # Examples (good vs bad)
+    if props.get("examples"):
+        if "examples_bad" in props:
+            help_text += "\n## Examples" + examples_to_markdown(
+                examples=props["examples"], examples_bad=props["examples_bad"], extra_tab=0, do_sign="✅", dont_sign="❌"
+            )
+        else:
+            help_text += "\n## Examples" + examples_to_markdown(
+                examples=props["examples"], examples_bad=[], extra_tab=0, do_sign="✅", dont_sign="❌"
+            )
+        toc += "| [Examples](#examples) "
+    help_text = toc.strip() + "\n\n" + help_text
+
+    # Options
+    DEFAULT_OPTION = "{producer} ({year})"
+    options = [
+        DEFAULT_OPTION,
+        "{producer} - {title} {version_producer} ({year})",
+        # "{title} {version_producer} - {producer} ({year})",
+    ]
+
+    # Default option in select box for custom license
+    CUSTOM_OPTION = "Custom attribution..."
+    # Render and get element depending on selection in selectbox
+    for field in form:
+        if isinstance(field, list) and field[0] == "origin.attribution":
+            with field[1]:
+                attribution_field = APP_STATE.st_widget(
+                    st.selectbox,
+                    label=display_name,
+                    options=["Custom attribution..."] + options,
+                    help=help_text,
+                    key=prop_uri,
+                    default_last=options[0],
+                )
+            with field[2]:
+                if attribution_field == CUSTOM_OPTION:
+                    attribution_field = APP_STATE.st_widget(
+                        st.text_input,
+                        label="↳ *Use custom attribution*",
+                        placeholder="",
+                        help="Enter custom license. Make sure to add the explicit attribution and not its format (as in the dropdown options)!",
+                        key=f"{prop_uri}_custom",
+                    )
+
+    # Remove list from form (former license st.empty tuple)
+    form = [f for f in form if not isinstance(f, list)]
+
+    # Add license field
+    form.append(attribution_field)  # type: ignore
 
     return form
 
@@ -584,6 +708,9 @@ if st.session_state["show_form"]:
         # 3) Submit
         submitted = st.form_submit_button("Submit", type="primary", use_container_width=True, on_click=update_state)
 
+    # 2.1) Create fields for attribution (responsive within form)
+    form = render_attribution_field(form_metadata)
+
     # 2.1) Create fields for License (responsive within form)
     form = render_license_field(form_metadata)
 else:
@@ -653,6 +780,7 @@ if submitted:
         # Update config
         utils.update_wizard_config(form=form)
 
+        # st.write(st.session_state)
     else:
         st.write(form.errors)
         st.error("Form not submitted! Check errors!")
