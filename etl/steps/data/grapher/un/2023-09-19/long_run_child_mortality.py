@@ -17,7 +17,6 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["long_run_child_mortality"]
     tb_sel = ds_garden["long_run_child_mortality_selected"]
     tb_sel = tb_sel.rename(columns={"under_five_mortality": "under_five_mortality_selected"})
-    tb_surv = ds_garden["share_surviving_first_five_years"]
     #
     # Process data.
     #
@@ -27,7 +26,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb, tb_sel, tb_surv], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=[tb, tb_sel], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new grapher dataset.

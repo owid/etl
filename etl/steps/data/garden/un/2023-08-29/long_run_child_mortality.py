@@ -2,7 +2,6 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -15,7 +14,9 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_igme = paths.load_dataset("igme")
-    ds_gapminder = paths.load_dataset("under_five_mortality")
+    ds_gapminder_v11 = paths.load_dependency("under_five_mortality", version="2023-09-21")
+    ds_gapminder_v7 = paths.load_dependency("under_five_mortality", version="2023-09-18")
+
     # Read table from meadow dataset.
     tb_igme = ds_igme["igme"].reset_index()
 
@@ -26,31 +27,36 @@ def run(dest_dir: str) -> None:
         "observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_all_wealth_quintiles": "under_five_mortality",
     }
     tb_igme = tb_igme[list(columns)].rename(columns=columns, errors="raise")
-
     tb_igme["source"] = "igme"
-    # Load full Gapminder data
-    tb_gap = ds_gapminder["under_five_mortality"].reset_index()
-    tb_gap["source"] = "gapminder"
-    #
-    tb_gap_sel = ds_gapminder["under_five_mortality_selected"].reset_index()
+
+    # Load full Gapminder data v11
+    tb_gap_full = ds_gapminder_v11["under_five_mortality"].reset_index()
+    tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "under_five_mortality"})
+    tb_gap_full["source"] = "gapminder"
+
+    # Load Gapminder data v7
+    tb_gap_sel = ds_gapminder_v7["under_five_mortality_selected"].reset_index()
     tb_gap_sel["source"] = "gapminder"
 
     # Combine IGME and Gapminder data
-    tb_combined = combine_datasets(tb_igme, tb_gap, "long_run_child_mortality")
+    tb_combined_full = combine_datasets(tb_igme, tb_gap_full, "long_run_child_mortality")
     tb_combined_sel = combine_datasets(tb_igme, tb_gap_sel, "long_run_child_mortality_selected")
 
-    tb_surviving = calculate_share_surviving_first_five_years(tb_combined)
-    #
+    # v11 includes projections, so we need to remove years beyond the last year of IGME data
+    max_year = tb_combined_full["year"][tb_combined_full["source"] == "igme"].max()
+    tb_combined_full = tb_combined_full[tb_combined_full["year"] <= max_year].reset_index(drop=True)
+
+    tb_surviving = calculate_share_surviving_first_five_years(tb_combined_full)
+
+    tb_combined_full = pr.merge(tb_combined_full, tb_surviving, on=["country", "year"], how="left")
+
     # Save outputs.
-    tb_combined = tb_combined.drop(columns=["source"]).set_index(["country", "year"], verify_integrity=True)
+    tb_combined_full = tb_combined_full.drop(columns=["source"]).set_index(["country", "year"], verify_integrity=True)
     tb_combined_sel = tb_combined_sel.drop(columns=["source"]).set_index(["country", "year"], verify_integrity=True)
-    tb_surviving = tb_surviving.set_index(["country", "year"], verify_integrity=True)
 
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb_combined, tb_combined_sel, tb_surviving], check_variables_metadata=True
-    )
+    ds_garden = create_dataset(dest_dir, tables=[tb_combined_full, tb_combined_sel], check_variables_metadata=True)
     # Save changes in the new garden dataset.
     ds_garden.save()
 
@@ -92,28 +98,15 @@ def calculate_share_surviving_first_five_years(tb_combined: Table) -> Table:
     """
     Calculate and estimate globally the number of children surviving their first five years.
     """
-    # Load population and countries-regions data
-    population = geo._load_population()
-    countries_regions = geo._load_countries_regions()
-    countries = countries_regions[countries_regions["region_type"] == "country"]["name"].tolist()
-
-    # Calculate the population weights of each country: world_pop_share/100
-    population["population_weight"] = population["world_pop_share"] / 100
-
     # Drop out years prior to 1800 and regions that aren't countries
-    tb_combined = tb_combined[(tb_combined["year"] >= 1800) & (tb_combined["country"].isin(countries))]
 
-    # Combine child mortality and population tables
-    tb_pop = pr.merge(tb_combined, population, on=["country", "year"], how="left")
-    # Calculate the weighted under five mortality rate
-    tb_pop["weighted_u5mr"] = tb_pop["under_five_mortality"] * tb_pop["population_weight"]
-    tb_global = tb_pop.groupby(["year"]).agg({"weighted_u5mr": lambda x: x.sum(skipna=True)}).reset_index()
-    # Add metadata
-    tb_global.metadata.short_name = "share_surviving_first_five_years"
+    tb_world = tb_combined[(tb_combined["country"] == "World") & (tb_combined)].drop(columns=["source"])
 
     # Add global labels and calculate the share of children surviving/dying in their first five years
-    tb_global["country"] = "World"
-    tb_global["share_dying_first_five_years"] = tb_global["weighted_u5mr"] / 10
-    tb_global["share_surviving_first_five_years"] = 100 - (tb_global["weighted_u5mr"] / 10)
 
-    return tb_global
+    tb_world["share_dying_first_five_years"] = tb_world["under_five_mortality"] / 10
+    tb_world["share_surviving_first_five_years"] = 100 - (tb_world["under_five_mortality"] / 10)
+
+    tb_world = tb_world.drop(columns=["under_five_mortality"])
+
+    return tb_world

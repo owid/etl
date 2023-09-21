@@ -8,6 +8,12 @@ tables:
         unit: deaths per 1,000 live births
         display:
           numDecimalPlaces: 1
+      share_dying_first_five_years:
+        title: Share dying in first five years
+        unit: "%"
+      share_surviving_first_five_years:
+        title: Share surviving first five years
+        unit: "%"
   long_run_child_mortality_selected:
     variables:
       under_five_mortality:
@@ -15,14 +21,3 @@ tables:
         unit: deaths per 1,000 live births
         display:
           numDecimalPlaces: 1
-  share_surviving_first_five_years:
-    variables:
-      weighted_u5mr:
-        title: Weighted under-five mortality rate
-        unit: deaths per 1,000 live births
-      share_dying_first_five_years:
-        title: Share dying in first five years
-        unit: "%"
-      share_surviving_first_five_years:
-        title: Share surviving first five years
-        unit: "%"
