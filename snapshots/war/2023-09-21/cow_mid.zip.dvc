@@ -22,7 +22,8 @@ meta:
 
     # Files
     url_main: https://correlatesofwar.org/data-sets/mids/
-    url_download: https://correlatesofwar.org/wp-content/uploads/MID-5-Data-and-Supporting-Materials.zip
+    url_download: 
+      https://correlatesofwar.org/wp-content/uploads/MID-5-Data-and-Supporting-Materials.zip
     date_accessed: 2023-09-21
 
     # License
