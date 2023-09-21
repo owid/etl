@@ -43,6 +43,7 @@ def run(dest_dir: str) -> None:
     for col in tb.columns[2:]:
         unit = col.split("-")[1]
         tb[col].metadata.unit = unit.lower().strip()
+        tb[col].metadata.title = col
         if " per " in unit:
             tb[col].metadata.display = {"numDecimalPlaces": 1}
         else:
