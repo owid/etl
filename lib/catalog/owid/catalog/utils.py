@@ -7,6 +7,7 @@ import dynamic_yaml
 import numpy as np
 import pandas as pd
 import pytz
+import yaml
 from unidecode import unidecode
 
 from .tables import Table
@@ -233,7 +234,7 @@ def concat_variables(variables: List[Variable]) -> Table:
     return t
 
 
-def dynamic_yaml_load(path: Union[Path, str], params: dict = {}) -> dict:
+def dynamic_yaml_load(path: Union[Path, str], params: dict = {}, return_dict=False) -> dict:
     with open(path) as istream:
         yd = dynamic_yaml.load(istream)
 
@@ -241,5 +242,8 @@ def dynamic_yaml_load(path: Union[Path, str], params: dict = {}) -> dict:
 
     # additional parameters
     yd["TODAY"] = dt.datetime.now().astimezone(pytz.timezone("Europe/London")).strftime("%-d %B %Y")
+
+    if return_dict:
+        yd = yaml.safe_load(dynamic_yaml.dump(yd))
 
     return yd
