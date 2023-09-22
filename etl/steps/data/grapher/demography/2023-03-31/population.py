@@ -6,7 +6,7 @@ from typing import Any, List
 import numpy as np
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset, grapher_checks
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -179,6 +179,8 @@ def _create_metric_version_from_mask(
     if title_suffix:
         table[metric_new].metadata.title = f"{table[metric_new].metadata.title} {title_suffix}"
     if display_name_suffix:
+        if table[metric_new].metadata.display is None:
+            table[metric_new].metadata.display = {}
         if "name" in table[metric_new].metadata.display:
             display_name = table[metric_new].metadata.display["name"]
         else:
