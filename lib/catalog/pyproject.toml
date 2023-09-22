@@ -40,6 +40,8 @@ dataclasses-json = "0.5.7"
 
 [tool.isort]
 profile = "black"
+# owid is actually first party library, but we need to stay compatible with ETL
+known_third_party = "owid"
 
 [tool.black]
 line-length = 120
