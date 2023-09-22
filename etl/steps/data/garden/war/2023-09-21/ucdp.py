@@ -14,7 +14,7 @@ Notes:
         - UCDP/PRIO: Dataset uses codes (note we changed "Asia" -> "Asia and Oceania")
             1 = Europe (GWNo: 200-399)
             2 = Middle East (GWNo: 630-699)
-            3 = Asia (GWNo: 700-999)
+            3 = Asia (GWNo: 700-999)  [renamed to 'Asia and Oceania']
             4 = Africa (GWNo: 400-626)
             5 = Americas (GWNo: 2-199)
 """

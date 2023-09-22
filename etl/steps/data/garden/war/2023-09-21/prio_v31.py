@@ -17,10 +17,10 @@ ON REGIONS:
     - From UCDP/PRIO, the regions are defined as follows:
         1 = Europe (GWNo: 200-399)
         2 = Middle East (GWNo: 630-699)
-        3 = Asia (GWNo: 700-999)
+        3 = Asia (GWNo: 700-999)  [renamed to 'Asia and Oceania']
         4 = Africa (GWNo: 400-626)
-        5 = Americas (GWNo: 2-199).
-    - Data for incompatibilities in Oceania are included in region Asia (source decision). Therefore, we have changed the region's name from "Asia" to "Asia and Oceania".
+        5 = Americas (GWNo: 2-199)
+    - The source includes data for incompatibilities in Oceania in region Asia. Therefore, we have changed the region's name from "Asia" to "Asia and Oceania".
 """
 import numpy as np
 import pandas as pd
