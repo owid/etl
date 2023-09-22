@@ -6,66 +6,6 @@ dataset:
 
     You can find more information on these sources and how our time series is constructed on this page: https://ourworldindata.org/population-sources
 
-# NOTE: On the next update, it would be better to have origins properly defined for each snapshot. But for now, redefine all origins here following the new metadata guidelines.
-origins_full: &origins-full
-  - producer: Gapminder
-    title: Population
-    citation_full: |
-      Gapminder Population v7 (2022).
-
-      Gapminder's population data is divided into two chunks: One long historical trend for the global population that goes back to 10,000 BC. And the second chunk is country estimates that only reaches back to 1800. For the first chunk, several sources were used. You can learn more at https://docs.google.com/spreadsheets/d/1hkLbEilJbl630IG68q-aQJlUjuTFm9b_12nQMVd1sZM/edit#gid=0. For the second chunk, Gapminder uses UN population data between 1950 to 2100 from the UN Population Division World Population Prospects 2019, and the forecast to the year 2100 uses their medium-fertility variant. For years before 1950, this version uses the data documented in greater detail by Mattias Lindgren in version 3. The main source was Angus Maddison's data, which CLIO Infra Project maintained and improved. Note that when combining version 3 with the new UN data, the trends for a few countries didn't match up in the overlapping year 1950. Minor adjustments were made to the years before and after to smooth out discrepancies between the two sources and avoid spurious jumps in Gapminder's visualisations. Visit https://www.gapminder.org/data/documentation/gd003/ to learn more about the methodology used and the data from back to 10,000 BC.
-    version_producer: v7
-    url_main: http://gapm.io/dpop
-    url_download: https://gapm.io/dl_popv7
-    date_accessed: 2023-03-31
-    date_published: 2022-10-19
-    attribution: "Gapminder - Population v7 (2022)"
-    attribution_short: "Gapminder"
-    license:
-      name: CC BY 4.0
-      url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing
-  - producer: Gapminder
-    title: Systema Globalis
-    citation_full: Gapminder - Systema Globalis (2023).
-    url_main: https://github.com/open-numbers/ddf--gapminder--systema_globalis
-    attribution: "Gapminder - Systema Globalis (2022)"
-    attribution_short: "Gapminder"
-    date_accessed: 2023-03-31
-    date_published: 2023-02-21
-    license:
-      name: CC BY 4.0
-      url: https://github.com/open-numbers/ddf--gapminder--systema_globalis
-  - producer: PBL Netherlands Environmental Assessment Agency
-    title: HYDE
-    description: |
-      HYDE is an internally consistent combination of updated historical population (gridded) estimates and land use for the past 12,000 years. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area.
-    citation_full: |
-      Klein Goldewijk, K., A. Beusen, J.Doelman and E. Stehfest (2017), Anthropogenic land use estimates for the Holocene; HYDE 3.2, Earth System Science Data, 9, 927-953.
-    version_producer: "3.2"
-    url_main: https://www.pbl.nl/en/image/links/hyde
-    url_download: https://public.yoda.uu.nl/geo/UU01/MO2FF3.html
-    attribution: "HYDE (2017)"
-    attribution_short: "HYDE"
-    date_accessed: 2021-10-01
-    date_published: "2017"
-    license:
-      name: CC BY 3.0
-      url: https://public.yoda.uu.nl/geo/UU01/MO2FF3.html
-  - producer: United Nations
-    title: World Population Prospects
-    description: |
-      World Population Prospects 2022 is the 27th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.
-    citation_full: |
-      United Nations, Department of Economic and Social Affairs, Population Division (2022). World Population Prospects 2022, Online Edition.
-    url_main: https://population.un.org/wpp/Download/
-    attribution: "United Nations - World Population Prospects (2022)"
-    attribution_short: "UN WPP"
-    date_accessed: 2022-09-09
-    date_published: 2022-07-11
-    license:
-      name: CC BY 3.0 IGO
-      url: https://population.un.org/wpp/Download/Standard/MostUsed/
-
 origins_combined: &origins-combined
   - producer: Various sources
     title: Population
@@ -133,7 +73,6 @@ tables:
         unit: persons
         display:
           numDecimalPlaces: 0
-        origins: *origins-full
         processing_level: major
       world_pop_share:
         title: Share of world population
@@ -142,7 +81,6 @@ tables:
         description_processing: *description-processing
         unit: "%"
         short_unit: "%"
-        origins: *origins-full
         processing_level: major
       source:
         title: Source
@@ -150,5 +88,4 @@ tables:
           - *population-source-description
         description_processing: *description-processing
         unit: ""
-        origins: *origins-full
         processing_level: major
