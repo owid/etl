@@ -68,12 +68,10 @@ tables:
           grapher_config:
             selectedEntityNames:
               - Asia
-              - Eastern Europe
-              - Latin America
+              - Europe
+              - Americas
               - North Africa and the Middle East
-              - North America
               - Sub-Saharan Africa
-              - Western Europe
       number_deaths_ongoing_conflicts_low:
         title: Number of soldier deaths in ongoing conflicts (low estimate)
         unit: deaths
@@ -86,12 +84,10 @@ tables:
           grapher_config:
             selectedEntityNames:
               - Asia
-              - Eastern Europe
-              - Latin America
+              - Europe
+              - Americas
               - North Africa and the Middle East
-              - North America
               - Sub-Saharan Africa
-              - Western Europe
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
         unit: conflicts
@@ -123,12 +119,10 @@ tables:
           grapher_config:
             selectedEntityNames:
               - Asia
-              - Eastern Europe
-              - Latin America
+              - Europe
+              - Americas
               - North Africa and the Middle East
-              - North America
               - Sub-Saharan Africa
-              - Western Europe
       number_new_conflicts:
         title: Number of new conflicts
         unit: conflicts
@@ -163,9 +157,7 @@ tables:
           grapher_config:
             selectedEntityNames:
               - Asia
-              - Eastern Europe
-              - Latin America
+              - Europe
+              - Americas
               - North Africa and the Middle East
-              - North America
               - Sub-Saharan Africa
-              - Western Europe

@@ -115,7 +115,6 @@ def run(dest_dir: str) -> None:
     log.info("war.mars: replace NaNs with zeroes")
     tb = replace_missing_data_with_zeros(tb)
 
-
     # Dtypes
     log.info("war.mars: set dtypes")
     tb = tb.astype(

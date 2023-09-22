@@ -114,7 +114,7 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
       number_new_disputes:
@@ -180,7 +180,6 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
-              - Oceania

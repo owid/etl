@@ -61,7 +61,7 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
 
@@ -95,7 +95,7 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
       number_new_conflicts:
@@ -132,6 +132,6 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East

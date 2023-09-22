@@ -76,10 +76,9 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
-              - Oceania
       number_new_conflicts:
         title: Number of new conflicts
         unit: conflicts
@@ -142,10 +141,9 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
-              - Oceania
       number_deaths_ongoing_conflicts_low:
         title: Number of deaths in ongoing conflicts (low estimate)
         unit: deaths
@@ -163,10 +161,9 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
-              - Oceania
       number_deaths_ongoing_conflicts_high:
         title: Number of deaths in ongoing conflicts (high estimate)
         unit: deaths
@@ -184,7 +181,6 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
-              - Oceania

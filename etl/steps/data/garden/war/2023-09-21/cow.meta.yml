@@ -18,9 +18,7 @@ dataset:
 
       • Middle East: 630-698
 
-      • Asia: 700-850
-
-      • Oceania: 860-999
+      • Asia and Oceania: 700-999
 
     You can find more information about the data in our article: [To be published]
 
@@ -112,10 +110,9 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Ocania
               - Europe
               - Middle East
-              - Oceania
 
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
@@ -177,10 +174,9 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Ocania
               - Europe
               - Middle East
-              - Oceania
       number_new_conflicts:
         title: Number of new conflicts
         unit: conflicts
@@ -254,7 +250,6 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Ocania
               - Europe
               - Middle East
-              - Oceania
