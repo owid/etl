@@ -9,7 +9,7 @@ In there, open sheet "Data" and check the Source per country and year to find ou
 obtained that data.
 
 """
-from owid.catalog import Dataset, Origin, Table
+from owid.catalog import Dataset, License, Origin, Table
 
 from etl.paths import DATA_DIR
 
@@ -23,9 +23,16 @@ GAPMINDER_ORIGINS = [
     Origin(
         producer="Gapminder",
         title="Systema Globalis",
+        citation_full="Gapminder - Systema Globalis (2023).",
+        url_main="https://github.com/open-numbers/ddf--gapminder--systema_globalis",
         attribution="Gapminder - Systema Globalis (2022)",
         attribution_short="Gapminder",
-        url_main="https://github.com/open-numbers/ddf--gapminder--systema_globalis",
+        date_accessed="2023-03-31",
+        date_published="2023-02-21",  # type: ignore
+        license=License(
+            name="CC BY 4.0",
+            url="https://github.com/open-numbers/ddf--gapminder--systema_globalis",
+        ),
     )
 ]
 
