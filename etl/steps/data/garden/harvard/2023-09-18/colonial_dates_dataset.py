@@ -72,6 +72,12 @@ def run(dest_dir: str) -> None:
         .copy_metadata(tb)
     )
 
+    # Fill years in the range (tb_colonized['year'].min(), YEAR) not present for each country with coloinizer = "Not colonized"
+    tb_colonized = tb_colonized.set_index(["country", "year"]).unstack().stack(dropna=False).reset_index()
+
+    # # Fill NaN values with "Not colonized"
+    # tb_colonized["colonizer"] = tb_colonized["colonizer"].fillna("Not colonized")
+
     # Create an additional summarized colonizer column, replacing the values with " - " with "More than one colonizer"
     # I add the "z." to have this at the last position of the map brackets
     tb_colonized["colonizer_grouped"] = tb_colonized["colonizer"].apply(
@@ -93,7 +99,7 @@ def run(dest_dir: str) -> None:
 
     # Merge both tables
     tb_colonized = pr.merge(
-        tb_colonized2, tb_count, on=["country", "year"], how="left", short_name="colonial_dates_dataset"
+        tb_colonized2, tb_count, on=["country", "year"], how="outer", short_name="colonial_dates_dataset"
     )
 
     # Concatenate tb_colonized and tb_rest
