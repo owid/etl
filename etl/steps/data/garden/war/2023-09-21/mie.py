@@ -9,17 +9,17 @@ estimating the global number of ongoing (or new) conflicts by broken down by hos
     most hostile category at global level.
 
 - Each entry in this dataset describes a conflict (its participants and period). Therefore we need to "explode" it to add observations
-for each year of the conflict.
+for each year, participand of the conflict.
+    - One entry provides deaths for side 1 (ccode1) and side 2 (ccode2).
 
 - The number of deaths is not estimated for each hostile level, but rather only the aggregate is obtained.
 
 
 ON regions:
+    - We use the region of the participants to assign a region to each conflict, and not the region of the conflict itself. We use
+    the country code (ccode) to assign a region to each participant. Same as in COW MID (we used `ccode` from MIDB).
 
-- We use the region of the participants to assign a region to each conflict, and not the region of the conflict itself. We use
-the country code (ccode) to assign a region to each participant. Same as in COW MID (we used `ccode` from MIDB).
-
-- We encode the region using the codes from COW (based on GW).
+    - We encode the region using the codes from COW (based on GW).
 """
 
 import numpy as np
@@ -148,8 +148,9 @@ def add_regions(tb: Table) -> Table:
     tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] < 400), "region"] = "Europe"
     tb.loc[(tb["ccode"] >= 400) & (tb["ccode"] < 627), "region"] = "Africa"
     tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] < 699), "region"] = "Middle East"
-    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 899), "region"] = "Asia"
-    tb.loc[(tb["ccode"] >= 900) & (tb["ccode"] <= 999), "region"] = "Oceania"
+    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 999), "region"] = "Asia and Oceania"
+    # tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 899), "region"] = "Asia"
+    # tb.loc[(tb["ccode"] >= 900) & (tb["ccode"] <= 999), "region"] = "Oceania"
 
     return tb
 
