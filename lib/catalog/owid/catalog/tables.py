@@ -881,7 +881,11 @@ class TableGroupBy:
             def func(*args, **kwargs):
                 """Apply function and return variable with proper metadata."""
                 df = getattr(self.groupby, name)(*args, **kwargs)
-                return _create_table(df, self.metadata, self._fields)
+                if df.ndim == 1:
+                    # output is series, e.g. `size` function
+                    return df
+                else:
+                    return _create_table(df, self.metadata, self._fields)
 
             self.__annotations__[name] = Callable[..., "Table"]
             return func

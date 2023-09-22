@@ -984,6 +984,12 @@ def test_groupby_count(table_1) -> None:
     assert gt.a.m.title == "Title of Table 1 Variable a"
 
 
+def test_groupby_size(table_1) -> None:
+    gt = table_1.groupby("country").size()
+    assert gt.ndim == 1
+    assert isinstance(gt, pd.Series)
+
+
 def test_groupby_iteration(table_1) -> None:
     for _, group in table_1.groupby("country"):
         assert isinstance(group._fields, defaultdict)
