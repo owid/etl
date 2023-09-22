@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
         "battle_related_dyadic",
     }
     for short_name in short_names:
-        snap = cast(Snapshot, paths.load_dependency(f"ucdp.{short_name}.zip"))
+        snap = cast(Snapshot, paths.load_dependency(f"ucdp_{short_name}.zip"))
         log.info(f"war_ucdp: creating table from {snap.path}")
         # Load data from snapshot.
         df = pd.read_csv(snap.path)

@@ -107,7 +107,7 @@ STRICT_AFTER = "2023-06-25"
 
 def enable_bugsnag() -> None:
     BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
-    if BUGSNAG_API_KEY and not DEBUG:
+    if BUGSNAG_API_KEY:
         bugsnag.configure(
             api_key=BUGSNAG_API_KEY,
         )  # type: ignore
