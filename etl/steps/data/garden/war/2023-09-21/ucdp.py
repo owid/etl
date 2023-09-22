@@ -280,6 +280,7 @@ def _sanity_check_conflict_types(tb: Table) -> Table:
     assert (len(transitions) == 1) & (transitions.iloc[0] == TRANSITION_EXPECTED), "Error"
 
     # Check if different regions categorise the conflict differently in the same year
+    # DELETEME
     assert not (
         tb.groupby(["conflict_id", "year"])["type_of_conflict"].nunique() > 1
     ).any(), "Seems like the conflict has multiple types for a single year! Is it categorised differently depending on the region? This case has not been taken into account -- please review the code!"

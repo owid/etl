@@ -153,6 +153,7 @@ def reduce_triplets(tb: Table) -> Table:
     - If duplicated triplets present different regions or conflict types, this will raise an error!
     """
     ## Combine duplicated tripplets ("warcode", "campcode", "ccode")
+    # DELETEME
     tb = tb.groupby(["warcode", "campcode", "ccode"], as_index=False).agg(
         {
             "yrstart": "min",

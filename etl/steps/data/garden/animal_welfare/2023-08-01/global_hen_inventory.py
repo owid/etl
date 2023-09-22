@@ -67,6 +67,7 @@ def fix_typos_in_original_metadata(tb: Table) -> Table:
 def add_individual_sources_to_metadata(tb: Table) -> Table:
     tb = tb.copy()
     # Check that each country has only one source.
+    # DELETEME
     assert (tb.groupby("country").agg({"source": "nunique"})["source"] == 1).all(), "Expected one source per country."
 
     # Gather the data source for each country.

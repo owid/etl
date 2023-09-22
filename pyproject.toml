@@ -120,7 +120,6 @@ line-length = 120
 [tool.isort]
 profile = "black"
 extend_skip = [".ipynb_checkpoints", "apps/walkthrough/meadow_cookiecutter"]
-known_first_party = "owid"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
