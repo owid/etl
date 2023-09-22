@@ -35,8 +35,8 @@ On regions:
     With the mapping done with `REGIONS_RENAME`, we have:
 
     - Americas (1, 2): 2-165
-    - Europe (3, 4): 200-395 (UK-Iceland), 640 (Turkey)
-    - Middle East (5): 630 (Iran), 645-698 (Iraq-Oman)
+    - Europe (3, 4): 200-395 (UK-Iceland)
+    - Middle East (5): 630-698 (Iran-Oman), includes Turkey
     - Africa (6, 7, 8): 402-626 (Cape Verde-South Sudan),
     - Asia and Oceania (9, 10, 11, 12): 700-990 (Afghanistan-Samoa)
 """
