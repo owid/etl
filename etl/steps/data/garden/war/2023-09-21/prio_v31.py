@@ -12,7 +12,15 @@ Also, a conflict (i.e. one specific `id`) can have multiple campaigns. Take `id=
     - Third campaign: 1967 (Bolivia and ELN)
 
 
-Data for incompatibilities in Oceania are included in region Asia (source decision)
+ON REGIONS:
+    - PRIO uses the source encoding from UCDP. In particular, it uses the field `region` from UCDP/PRIO Armed Conflict Dataset.
+    - From UCDP/PRIO, the regions are defined as follows:
+        1 = Europe (GWNo: 200-399)
+        2 = Middle East (GWNo: 630-699)
+        3 = Asia (GWNo: 700-999)
+        4 = Africa (GWNo: 400-626)
+        5 = Americas (GWNo: 2-199).
+    - Data for incompatibilities in Oceania are included in region Asia (source decision). Therefore, we have changed the region's name from "Asia" to "Asia and Oceania".
 """
 import numpy as np
 import pandas as pd
