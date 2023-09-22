@@ -276,7 +276,7 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
 
     # Rename regions
     log.info("war.cow: rename regions")
-    tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
+    tb["region"] = tb["region"].map(REGIONS_RENAME)
     assert tb["region"].isna().sum() == 0, "Unmapped regions!"
 
     # Add yearly observations (scale values)
