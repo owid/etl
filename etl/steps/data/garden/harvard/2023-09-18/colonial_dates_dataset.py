@@ -72,43 +72,38 @@ def run(dest_dir: str) -> None:
         .copy_metadata(tb)
     )
 
-    # Fill years in the range (tb_colonized['year'].min(), YEAR) not present for each country with coloinizer = "Not colonized"
-    tb_colonized = tb_colonized.set_index(["country", "year"]).unstack().stack(dropna=False).reset_index()
+    # Concatenate tb_colonized and tb_rest
+    tb = pr.concat([tb_colonized, tb_rest, tb_count], short_name="colonial_dates_dataset")
 
-    # # Fill NaN values with "Not colonized"
-    # tb_colonized["colonizer"] = tb_colonized["colonizer"].fillna("Not colonized")
+    # Fill years in the range (tb_colonized['year'].min(), YEAR) not present for each country with coloinizer = "Not colonized"
+    tb = tb.set_index(["country", "year"]).unstack().stack(dropna=False).reset_index()
 
     # Create an additional summarized colonizer column, replacing the values with " - " with "More than one colonizer"
     # I add the "z." to have this at the last position of the map brackets
-    tb_colonized["colonizer_grouped"] = tb_colonized["colonizer"].apply(
+    tb["colonizer_grouped"] = tb["colonizer"].apply(
         lambda x: "z. Multiple colonizers" if isinstance(x, str) and " - " in x else x
     )
 
     # Copy table to not lose metadata
-    tb_colonized2 = tb_colonized.copy()
+    tb2 = tb.copy()
 
     # Create last_colonizer column, which is the most recent non-null colonizer for each country and year
-    tb_colonized2["last_colonizer"] = tb_colonized2.groupby(["country"])["colonizer"].fillna(method="ffill")
-    tb_colonized2["last_colonizer_grouped"] = tb_colonized2.groupby(["country"])["colonizer_grouped"].fillna(
-        method="ffill"
-    )
+    tb2["last_colonizer"] = tb2.groupby(["country"])["colonizer"].fillna(method="ffill")
+    tb2["last_colonizer_grouped"] = tb2.groupby(["country"])["colonizer_grouped"].fillna(method="ffill")
 
-    tb_colonized2 = tb_colonized2.copy_metadata(tb)
+    tb2 = tb2.copy_metadata(tb)
     for col in ["last_colonizer", "last_colonizer_grouped"]:
-        tb_colonized2[col].metadata = tb_colonized.colonizer.metadata
+        tb2[col].metadata = tb.colonizer.metadata
 
-    # Merge both tables
-    tb_colonized = pr.merge(
-        tb_colonized2, tb_count, on=["country", "year"], how="outer", short_name="colonial_dates_dataset"
-    )
-
-    # Concatenate tb_colonized and tb_rest
-    tb = pr.concat([tb_colonized, tb_rest], short_name="colonial_dates_dataset")
+    # # Merge both tables
+    # tb = pr.merge(tb2, tb_count, on=["country", "year"], how="outer", short_name="colonial_dates_dataset")
+    tb = tb2.copy()
 
     # For countries in colonizers_list, assign the value "Colonizer" to colonizer, colonizer_grouped, last_colonizer and last_colonizer_group column
     for col in ["colonizer", "colonizer_grouped", "last_colonizer", "last_colonizer_grouped"]:
         tb[f"{col}"] = tb[f"{col}"].where(~tb["country"].isin(colonizers_list), "Colonizer")
         tb[f"{col}"] = tb[f"{col}"].where(tb["country"].isin(colonized_list + colonizers_list), "Not colonized")
+        tb[f"{col}"] = tb[f"{col}"].where(~tb[f"{col}"].isnull(), "Not colonized")
 
     #
     # Process data.
