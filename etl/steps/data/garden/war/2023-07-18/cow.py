@@ -74,7 +74,7 @@ ON REGIONS
 """
 
 import json
-from typing import List, Set, Tuple, cast
+from typing import List, Set, Tuple
 
 import numpy as np
 import pandas as pd
@@ -116,7 +116,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("cow"))
+    ds_meadow = paths.load_dataset("cow")
 
     # Read data (there are four different tables)
     log.info("war.cow: load data")
@@ -700,6 +700,9 @@ def load_cow_table(
     """Read table from dataset."""
     tb = ds[table_name].reset_index()
 
+    # Reset index
+    tb = tb.reset_index()
+
     # Check year start/end (missing?)
     assert (tb[column_start_year] != -9).all(), "There is at least one entry with unknown `column_start_year`"
     assert (tb[column_end_year] != -9).all(), "There is at least one entry with unknown `column_end_year`"
@@ -745,7 +748,6 @@ def load_cow_table(
     for col in columns_deaths:
         tb[col] = tb[col].astype(str).str.replace(",", "").astype("Int64")
     tb["warnum"] = tb["warnum"].astype(float).round(1)
-
     return tb
 
 

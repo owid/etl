@@ -8,7 +8,6 @@ from typing import Any, Dict, Optional
 import pytest
 import yaml
 from dataclasses_json import dataclass_json
-
 from owid.catalog import meta
 
 

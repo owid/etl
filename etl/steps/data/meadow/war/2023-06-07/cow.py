@@ -37,27 +37,31 @@ def run(dest_dir: str) -> None:
 
     tables = []
     # CSVs to tables
-    uri_shortname = {
-        "cow.extra_state.csv": "extra_state",
-        "cow.inter_state.csv": "inter_state",
-        "cow.non_state.csv": "non_state",
+    snapshots = {
+        "cow_extra_state.csv": {
+            "short_name": "extra_state",
+            "index": ["warnum", "ccode1", "ccode2"],
+        },
+        "cow_inter_state.csv": {
+            "short_name": "inter_state",
+            "index": ["warnum", "ccode", "side"],
+        },
+        "cow_non_state.csv": {
+            "short_name": "non_state",
+            "index": ["warnum", "sidea1"],
+        },
     }
-    for snapshot_uri, short_name in uri_shortname.items():
-        snap = cast(Snapshot, paths.load_dependency(snapshot_uri))
+    for snapshot_uri, snapshot_props in snapshots.items():
+        snap = paths.load_snapshot(snapshot_uri)
         encoding = infer_encoding(snap.path)
         log.info(f"cow: creating table from {snap.path}")
         df = pd.read_csv(snap.path, encoding=encoding)
-        tb = Table(df, short_name=short_name, underscore=True)
-        if short_name == "extra_state":
-            tb = tb.set_index(["warnum", "wartype", "ccode1", "ccode2"], verify_integrity=True)
-        elif short_name == "inter_state":
-            tb = tb.set_index(["warnum", "wartype", "ccode", "side"], verify_integrity=True)
-        elif short_name == "non_state":
-            tb = tb.set_index(["warnum", "wartype", "warname"], verify_integrity=True)
+        tb = Table(df, short_name=snapshot_props["short_name"], underscore=True)
+        tb = tb.set_index(snapshot_props["index"], verify_integrity=True)
         tables.append(tb)
     # ZIP to table
     ## Intra-state
-    snap = cast(Snapshot, paths.load_dependency("cow.intra_state.zip"))
+    snap = cast(Snapshot, paths.load_dependency("cow_intra_state.zip"))
     with tempfile.TemporaryDirectory() as tmpdir:
         decompress_file(snap.path, tmpdir)
         path = os.path.join(
@@ -67,10 +71,10 @@ def run(dest_dir: str) -> None:
         log.info(f"cow: creating table from {snap.path}")
         df = pd.read_csv(path, encoding=encoding)
         tb = Table(df, short_name="intra_state", underscore=True)
-        tb = tb.set_index(["warnum", "wartype", "ccodea"], verify_integrity=True)
+        tb = tb.set_index(["warnum"], verify_integrity=True)
         tables.append(tb)
     ## Inter-state (dydadic)
-    snap = cast(Snapshot, paths.load_dependency("cow.inter_state_dyadic.zip"))
+    snap = cast(Snapshot, paths.load_dependency("cow_inter_state_dyadic.zip"))
     with tempfile.TemporaryDirectory() as tmpdir:
         decompress_file(snap.path, tmpdir)
         path = os.path.join(

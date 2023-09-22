@@ -276,11 +276,8 @@ def upsert_table(
         # less than 10ms per variable
         df = add_entity_code_and_name(session, df)
 
-        # delete all previous relationships
-        db_variable.delete_links(session)
-
-        # create links, we need to do it after we commit deleted relationships above
-        db_variable.create_links(
+        # update links, we need to do it after we commit deleted relationships above
+        db_variable.update_links(
             session,
             db_origins,
             faqs=variable_meta.presentation.faqs if variable_meta.presentation else [],

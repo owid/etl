@@ -1,8 +1,5 @@
 meta:
-  namespace: war
-  short_name: war_cow
   name: 'War data: The Directed Dyadic Interstate War Dataset v3.0 (COW, 2019)'
-  version: 2023-03-14
   publication_year: 2019
   source_name: COW (2019)
   source_published_by: >-
@@ -13,7 +10,6 @@ meta:
     (forthcoming)
   url: https://correlatesofwar.org/data-sets/cow-war/
   source_data_url: https://correlatesofwar.org/wp-content/uploads/Dyadic-Interstate-War-Dataset.zip
-  file_extension: zip
   license_url:
   license_name:
   is_public: true
