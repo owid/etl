@@ -72,7 +72,7 @@ def run(dest_dir: str) -> None:
     # Concatenate tb_colonized and tb_rest
     tb = pr.concat([tb_colonized, tb_rest, tb_count], short_name="colonial_dates_dataset")
 
-    # Fill years in the range (tb_colonized['year'].min(), YEAR) not present for each country with coloinizer = "Not colonized"
+    # Fill years in the range (tb_colonized['year'].min(), YEAR) not present for each country
     tb = tb.set_index(["country", "year"]).unstack().stack(dropna=False).reset_index()
 
     # Create an additional summarized colonizer column, replacing the values with " - " with "More than one colonizer"
@@ -98,9 +98,9 @@ def run(dest_dir: str) -> None:
 
     # For countries in colonizers_list, assign the value "Colonizer" to colonizer, colonizer_grouped, last_colonizer and last_colonizer_group column
     for col in ["colonizer", "colonizer_grouped", "last_colonizer", "last_colonizer_grouped"]:
-        tb[f"{col}"] = tb[f"{col}"].where(~tb["country"].isin(colonizers_list), "Colonizer")
-        tb[f"{col}"] = tb[f"{col}"].where(tb["country"].isin(colonized_list + colonizers_list), "Not colonized")
-        tb[f"{col}"] = tb[f"{col}"].where(~tb[f"{col}"].isnull(), "Not colonized")
+        tb[f"{col}"] = tb[f"{col}"].where(~tb["country"].isin(colonizers_list), "zz. Colonizer")
+        tb[f"{col}"] = tb[f"{col}"].where(tb["country"].isin(colonized_list + colonizers_list), "zzz. Not colonized")
+        tb[f"{col}"] = tb[f"{col}"].where(~tb[f"{col}"].isnull(), "zzz. Not colonized")
 
     # For countries in colonizers_list total_colonies, assign 0 when it is null
     tb["total_colonies"] = tb["total_colonies"].where(
