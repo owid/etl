@@ -5,6 +5,7 @@ from typing import Optional, TypeVar, Union, overload
 
 import dynamic_yaml
 import pytz
+import yaml
 from unidecode import unidecode
 
 T = TypeVar("T")
@@ -168,7 +169,16 @@ def validate_underscore(name: Optional[str], object_name: str = "Name") -> None:
         raise NameError(f"{object_name} must be snake_case. Change `{name}` to `{underscore(name, validate=False)}`")
 
 
-def dynamic_yaml_load(path: Union[Path, str], params: dict = {}) -> dict:
+def concat_variables(variables: List[Variable]) -> Table:
+    """Concatenate variables into a single table keeping all metadata."""
+    t = Table(pd.concat(variables, axis=1))
+    for v in variables:
+        if v.name:
+            t._fields[v.name] = v.metadata
+    return t
+
+
+def dynamic_yaml_load(path: Union[Path, str], params: dict = {}, return_dict=False) -> dict:
     with open(path) as istream:
         yd = dynamic_yaml.load(istream)
 
@@ -176,5 +186,8 @@ def dynamic_yaml_load(path: Union[Path, str], params: dict = {}) -> dict:
 
     # additional parameters
     yd["TODAY"] = dt.datetime.now().astimezone(pytz.timezone("Europe/London")).strftime("%-d %B %Y")
+
+    if return_dict:
+        yd = yaml.safe_load(dynamic_yaml.dump(yd))
 
     return yd

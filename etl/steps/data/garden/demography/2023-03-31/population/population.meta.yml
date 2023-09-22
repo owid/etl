@@ -26,28 +26,6 @@ dataset:
   title: Population (various sources, 2023.1)
   description: |
     {definitions.dataset-description}
-  sources: &population-sources
-    - name: Gapminder - Population v7 (2022)
-      published_by: Gapminder - Population v7 (2022)
-      url: https://www.gapminder.org/data/documentation/gd003/
-      date_accessed: 2023-03-31
-    - name: UN (2022)
-      published_by: United Nations - World Population Prospects (2022)
-      url: https://population.un.org/wpp/Download/Standard/Population/
-      date_accessed: 2022-09-10
-    - name: HYDE (2017)
-      published_by: HYDE v3.2 (2017)
-      url: https://public.yoda.uu.nl/geo/UU01/MO2FF3.html
-      date_accessed: 2021-10-08
-      # the following source contains population for former countries
-      # after researching where this comes from, conclusion is that
-      # it comes from Gapminder v3 https://www.gapminder.org/data/documentation/gd003/
-      # and is downloadable via button labeled with text:
-      # "» Download Excel-file with data, including interpolations & detailed meta-data (xlsx)"
-    - name: Gapminder - Systema Globalis (2022)
-      published_by: Gapminder (Systema Globalis)
-      url: https://github.com/open-numbers/ddf--gapminder--systema_globalis
-      date_accessed: 2022-12-12
   licenses:
     - name: CC BY 4.0
       url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing
@@ -73,9 +51,7 @@ tables:
           {definitions.old-description}
         unit: persons
         display:
-          includeInTable: true
           numDecimalPlaces: 0
-        sources: *population-sources
       world_pop_share:
         title: Share of world population
         description_key:
@@ -88,8 +64,6 @@ tables:
         short_unit: "%"
         display:
           name: Share of world population
-          includeInTable: true
-        sources: *population-sources
       source:
         title: Source
         description_key:
