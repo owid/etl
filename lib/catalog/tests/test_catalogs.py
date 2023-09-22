@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Iterable, Iterator, Optional
 
 import pytest  # noqa
-
 from owid.catalog import CHANNEL, LocalCatalog, RemoteCatalog, Table, find
 
 from .test_datasets import create_temp_dataset

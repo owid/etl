@@ -2,7 +2,6 @@ from collections import defaultdict
 
 import pandas as pd
 import pytest
-
 from owid.catalog.meta import (
     DatasetMeta,
     License,
