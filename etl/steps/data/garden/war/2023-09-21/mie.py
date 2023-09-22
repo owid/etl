@@ -18,8 +18,15 @@ for each year, participand of the conflict.
 ON regions:
     - We use the region of the participants to assign a region to each conflict, and not the region of the conflict itself. We use
     the country code (ccode) to assign a region to each participant. Same as in COW MID (we used `ccode` from MIDB).
-
     - We encode the region using the codes from COW (based on GW).
+    - It uses the codes from Correlates of War (https://correlatesofwar.org/data-sets/state-system-membership/, file "states2016.csv"). We encode regions as follows:
+
+        Americas: 2-165
+        Europe: 200-399
+        Africa: 402-626
+        Middle East: 630-698
+        Asia and Oceania: 700-999
+
 """
 
 import numpy as np
