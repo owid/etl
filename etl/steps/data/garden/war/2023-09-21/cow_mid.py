@@ -23,11 +23,19 @@ over their complete lifetime globally".
 
 On regions:
 
-- The information on regions is sourced from MIDB dataset. That's why we use it along with MIDA (our main source of data).
+    - The information on regions is sourced from MIDB dataset. That's why we use it along with MIDA (our main source of data).
 
-- Note that we obtain the information on regions from the participants in the conflict (not the location of the conflict), e.g. `ccode`.
+    - Note that we obtain the information on regions from the participants in the conflict (not the location of the conflict), e.g. `ccode`. This is the same approach as in MIE dataset.
 
-- We encode the region using the codes from COW (based on GW).
+    - We encode the region using the codes from COW (based on GW).
+
+    - It uses the codes from Correlates of War (https://correlatesofwar.org/data-sets/state-system-membership/, file "states2016.csv"). We encode regions as follows:
+
+        Americas: 2-165
+        Europe: 200-399
+        Africa: 402-626
+        Middle East: 630-698
+        Asia and Oceania: 700-999
 """
 
 
@@ -223,7 +231,7 @@ def combine_tables(tb_a: Table, tb_b: Table) -> Table:
     ## Actually fill NaNs
     tb.loc[tb["dispnum"] == 2044, "region"] = "Americas"
     tb.loc[tb["dispnum"] == 2328, "region"] = "Europe"
-    tb.loc[tb["dispnum"] == 4005, "region"] = "Asia"
+    tb.loc[tb["dispnum"] == 4005, "region"] = "Asia and Oceania"
 
     # Check there is no NaN!
     assert tb.notna().all().all(), "NaN in some field!"
@@ -241,8 +249,9 @@ def add_regions(tb: Table) -> Table:
     tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] <= 395), "region"] = "Europe"
     tb.loc[(tb["ccode"] >= 402) & (tb["ccode"] <= 626), "region"] = "Africa"
     tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] <= 698), "region"] = "Middle East"
-    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 850), "region"] = "Asia"
-    tb.loc[(tb["ccode"] >= 860) & (tb["ccode"] <= 999), "region"] = "Oceania"
+    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 999), "region"] = "Asia and Oceania"
+    # tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 850), "region"] = "Asia"
+    # tb.loc[(tb["ccode"] >= 860) & (tb["ccode"] <= 999), "region"] = "Oceania"
 
     # Sanity check: No missing regions
     assert tb["region"].notna().all(), f"Missing regions! {tb.loc[tb['region'].isna(), ['dispnum', 'ccode']]}"
