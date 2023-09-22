@@ -1,6 +1,5 @@
 import pandas as pd
 import pytest
-
 from owid.catalog import Table
 from owid.catalog.utils import underscore, underscore_table
 
