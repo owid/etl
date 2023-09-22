@@ -27,11 +27,11 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 def main(upload: bool) -> None:
     snapshot_paths = [
-        f"war/{SNAPSHOT_VERSION}/cow.non_state.csv",
-        f"war/{SNAPSHOT_VERSION}/cow.intra_state.zip",
-        f"war/{SNAPSHOT_VERSION}/cow.inter_state.csv",
-        f"war/{SNAPSHOT_VERSION}/cow.inter_state_dyadic.zip",
-        f"war/{SNAPSHOT_VERSION}/cow.extra_state.csv",
+        f"war/{SNAPSHOT_VERSION}/cow_non_state.csv",
+        f"war/{SNAPSHOT_VERSION}/cow_intra_state.zip",
+        f"war/{SNAPSHOT_VERSION}/cow_inter_state.csv",
+        f"war/{SNAPSHOT_VERSION}/cow_inter_state_dyadic.zip",
+        f"war/{SNAPSHOT_VERSION}/cow_extra_state.csv",
     ]
     for path in snapshot_paths:
         snap = Snapshot(path)

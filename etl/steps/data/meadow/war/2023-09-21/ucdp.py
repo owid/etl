@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
         },
     }
     for short_name, props in short_names.items():
-        snap = paths.load_snapshot(short_name=f"ucdp.{short_name}.zip")
+        snap = paths.load_snapshot(short_name=f"ucdp_{short_name}.zip")
         log.info(f"war_ucdp: creating table from {snap.path}")
 
         # Load data from snapshot.
