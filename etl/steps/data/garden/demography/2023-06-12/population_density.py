@@ -47,7 +47,7 @@ def run(dest_dir: str) -> None:
 
     # Additional descriptions.
     tb = ds_garden["population_density"]
-    tb.population_density.metadata.description += "\n\n" + tb_population.population.metadata.description
+    tb.population_density.metadata.description += "\n" + tb_population.population.metadata.description
     ds_garden.metadata.description += "\n\n" + ds_population.metadata.description
     ds_garden.add(tb)
 
@@ -60,7 +60,7 @@ def run(dest_dir: str) -> None:
 def make_table(tb_population: Table, tb_land_area: Table) -> Table:
     """Create a table with population density data."""
     # We use land area of countries as they are defined today (latest reported value)
-    log.info("population_density: process land area datafame")
+    log.info("population_density: process land area table")
     column_area = "land_area__00006601__area__005110__hectares"
     tb_land_area = (
         tb_land_area.loc[:, [column_area, "country", "year"]]
@@ -70,8 +70,8 @@ def make_table(tb_population: Table, tb_land_area: Table) -> Table:
         .drop(columns=["year"])
     )
 
-    # Merge dataframes
-    log.info("population_density: merge dataframes")
+    # Merge tables
+    log.info("population_density: merge tables")
     tb = tb_population.merge(tb_land_area, on="country", how="inner")
     # Drop NaN (no data for area)
     tb = tb.dropna(subset=["area"])
