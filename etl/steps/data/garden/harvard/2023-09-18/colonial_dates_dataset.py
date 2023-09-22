@@ -1,13 +1,14 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+YEAR = 2023
 
 
 def run(dest_dir: str) -> None:
@@ -27,68 +28,87 @@ def run(dest_dir: str) -> None:
     tb_colonized = tb[tb["col"] == "1"].reset_index(drop=True)
     tb_rest = tb[tb["col"] == "0"].reset_index(drop=True)
 
-    # Generate a list of the colonizers
-    colonizers_list = tb_rest["colonizer"].unique().tolist()
+    # Get list of colonized countries and another list of colonizers
+    colonized_list = tb_colonized["country"].unique().tolist()
+    colonizers_list = tb_colonized["colonizer"].unique().tolist()
+
+    # Filter tb_rest to only include countries that are not in colonized_list or colonizers_list
+    tb_rest = tb_rest[~tb_rest["country"].isin(colonized_list + colonizers_list)].reset_index(drop=True)
 
     # Remove duplicates for tb_rest
     tb_rest = tb_rest.drop_duplicates(subset=["country"], keep="first").reset_index(drop=True)
 
-    # Assign the value "Not colonized" to colonizer column
-    # tb_rest["colonizer"] = "Not colonized"
-
-    # For countries in colonizers_list, assign the value "Colonizer" to colonizer column
-    tb_rest["colonizer"] = tb_rest["colonizer"].where(~tb_rest["country"].isin(colonizers_list), "Colonizer")
-
     # For these countries, assign the minimum year of colstart_max as colstart_max and the maximum year of colend_max as colend_max
     tb_rest["colstart_max"] = tb_colonized["colstart_max"].min()
-    tb_rest["colend_max"] = tb_colonized["colend_max"].max()
-
-    tb = pr.concat([tb_colonized, tb_rest], ignore_index=True)
+    tb_rest["colend_max"] = YEAR
 
     # Create a year column with one value per row representing the range between colstart_max and colend_max
     # NOTE: I have decided to use last date aggregations, but we could also use mean aggregations
-    tb["year"] = tb.apply(lambda x: list(range(x["colstart_max"], x["colend_max"] + 1)), axis=1)
+    tb_colonized["year"] = tb_colonized.apply(lambda x: list(range(x["colstart_max"], x["colend_max"] + 1)), axis=1)
+    tb_rest["year"] = tb_rest.apply(lambda x: list(range(x["colstart_max"], x["colend_max"] + 1)), axis=1)
 
     # Explode the year column
-    tb = tb.explode("year").reset_index(drop=True)
+    tb_colonized = tb_colonized.explode("year").reset_index(drop=True)
+    tb_rest = tb_rest.explode("year").reset_index(drop=True)
+
+    tb_colonized.to_csv("colonized.csv")
+    tb_rest.to_csv("rest.csv")
 
     # Drop colstart and colend columns
-    tb = tb.drop(columns=["colstart_max", "colend_max", "colstart_mean", "colend_mean"])
+    tb_colonized = tb_colonized.drop(columns=["colstart_max", "colend_max", "colstart_mean", "colend_mean", "col"])
+    tb_rest = tb_rest.drop(columns=["colstart_max", "colend_max", "colstart_mean", "colend_mean", "col"])
 
     # Create another table with the total number of colonies per colonizer and year
-    tb_count = tb.groupby(["colonizer", "year"]).agg({"country": "count"}).reset_index().copy_metadata(tb)
+    tb_count = tb_colonized.groupby(["colonizer", "year"]).agg({"country": "count"}).reset_index().copy_metadata(tb)
 
     # Rename columns
     tb_count = tb_count.rename(columns={"colonizer": "country", "country": "total_colonies"})
 
     # Consolidate results in country and year columns, by merging colonizer column in each row
-    tb = tb.groupby(["country", "year"]).agg({"colonizer": lambda x: " - ".join(x)}).reset_index().copy_metadata(tb)
+    tb_colonized = (
+        tb_colonized.groupby(["country", "year"])
+        .agg({"colonizer": lambda x: " - ".join(x)})
+        .reset_index()
+        .copy_metadata(tb)
+    )
 
     # Create an additional summarized colonizer column, replacing the values with " - " with "More than one colonizer"
     # I add the "z." to have this at the last position of the map brackets
-    tb["colonizer_grouped"] = tb["colonizer"].apply(
+    tb_colonized["colonizer_grouped"] = tb_colonized["colonizer"].apply(
         lambda x: "z. Multiple colonizers" if isinstance(x, str) and " - " in x else x
     )
 
     # Copy table to not lose metadata
-    tb2 = tb.copy()
+    tb_colonized2 = tb_colonized.copy()
 
     # Create last_colonizer column, which is the most recent non-null colonizer for each country and year
-    tb2["last_colonizer"] = tb2.groupby(["country"])["colonizer"].fillna(method="ffill")
-    tb2["last_colonizer_grouped"] = tb2.groupby(["country"])["colonizer_grouped"].fillna(method="ffill")
+    tb_colonized2["last_colonizer"] = tb_colonized2.groupby(["country"])["colonizer"].fillna(method="ffill")
+    tb_colonized2["last_colonizer_grouped"] = tb_colonized2.groupby(["country"])["colonizer_grouped"].fillna(
+        method="ffill"
+    )
 
-    tb2 = tb2.copy_metadata(tb)
+    tb_colonized2 = tb_colonized2.copy_metadata(tb)
     for col in ["last_colonizer", "last_colonizer_grouped"]:
-        tb2[col].metadata = tb.colonizer.metadata
+        tb_colonized2[col].metadata = tb_colonized.colonizer.metadata
 
     # Merge both tables
-    tb = pr.merge(tb2, tb_count, on=["country", "year"], how="left", short_name="colonial_dates_dataset")
+    tb_colonized = pr.merge(
+        tb_colonized2, tb_count, on=["country", "year"], how="left", short_name="colonial_dates_dataset"
+    )
+
+    # Concatenate tb_colonized and tb_rest
+    tb = pr.concat([tb_colonized, tb_rest], short_name="colonial_dates_dataset")
+
+    # For countries in colonizers_list, assign the value "Colonizer" to colonizer, colonizer_grouped, last_colonizer and last_colonizer_group column
+    for col in ["colonizer", "colonizer_grouped", "last_colonizer", "last_colonizer_grouped"]:
+        tb[f"{col}"] = tb[f"{col}"].where(~tb["country"].isin(colonizers_list), "Colonizer")
+        tb[f"{col}"] = tb[f"{col}"].where(tb["country"].isin(colonized_list + colonizers_list), "Not colonized")
 
     #
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.

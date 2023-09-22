@@ -18,9 +18,9 @@ def run(dest_dir: str) -> None:
     tb = snap.read(
         encoding="cp1252",
         dtype={
-            "country": "category",
-            "colonizer": "category",
-            "col": "category",
+            "country": "string",
+            "colonizer": "string",
+            "col": "string",
             "colstart_max": "Int64",
             "colend_max": "Int64",
             "colstart_mean": "Int64",
