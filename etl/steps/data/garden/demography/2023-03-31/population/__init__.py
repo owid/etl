@@ -16,8 +16,7 @@ Four sources are used overall:
 from typing import List
 
 import owid.catalog.processing as pr
-from owid.catalog import Origin, Table
-from owid.catalog.utils import dynamic_yaml_load
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -54,11 +53,6 @@ def run(dest_dir: str) -> None:
     # keep original table with all origins, population table has only one origin
     # defined in YAML file
     tb_original = tb.copy().update_metadata(short_name="population_original")
-
-    # set collapsed origin for population table
-    origin = Origin(**dict(dynamic_yaml_load(paths.metadata_path, return_dict=True)["origin_combined"]))
-    for col in tb.columns:
-        tb[col].metadata.origins = [origin]
 
     # create dataset
     log.info("population: create dataset")

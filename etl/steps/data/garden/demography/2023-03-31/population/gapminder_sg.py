@@ -23,6 +23,8 @@ GAPMINDER_ORIGINS = [
     Origin(
         producer="Gapminder",
         title="Systema Globalis",
+        attribution="Gapminder - Systema Globalis (2022)",
+        attribution_short="Gapminder",
         url_main="https://github.com/open-numbers/ddf--gapminder--systema_globalis",
     )
 ]
