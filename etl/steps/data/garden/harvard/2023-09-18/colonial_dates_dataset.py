@@ -51,9 +51,6 @@ def run(dest_dir: str) -> None:
     tb_colonized = tb_colonized.explode("year").reset_index(drop=True)
     tb_rest = tb_rest.explode("year").reset_index(drop=True)
 
-    tb_colonized.to_csv("colonized.csv")
-    tb_rest.to_csv("rest.csv")
-
     # Drop colstart and colend columns
     tb_colonized = tb_colonized.drop(columns=["colstart_max", "colend_max", "colstart_mean", "colend_mean", "col"])
     tb_rest = tb_rest.drop(columns=["colstart_max", "colend_max", "colstart_mean", "colend_mean", "col"])
@@ -104,6 +101,11 @@ def run(dest_dir: str) -> None:
         tb[f"{col}"] = tb[f"{col}"].where(~tb["country"].isin(colonizers_list), "Colonizer")
         tb[f"{col}"] = tb[f"{col}"].where(tb["country"].isin(colonized_list + colonizers_list), "Not colonized")
         tb[f"{col}"] = tb[f"{col}"].where(~tb[f"{col}"].isnull(), "Not colonized")
+
+    # For countries in colonizers_list total_colonies, assign 0 when it is null
+    tb["total_colonies"] = tb["total_colonies"].where(
+        ~((tb["country"].isin(colonizers_list)) & (tb["total_colonies"].isnull())), 0
+    )
 
     #
     # Process data.
