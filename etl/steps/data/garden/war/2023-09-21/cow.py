@@ -34,8 +34,8 @@ ON REGIONS
                         7 = Asia
                         9 = Oceania
 
-        - Inter-state: Contains several region composites*. We de-aggregate these and distribute deaths uniformly across its regions.
-                        If there are 10 deaths in "Asia & Europe", we assign 5 deaths to Asia and 5 deaths to Europe.
+        - Inter-state: Contains several region composites(*). We de-aggregate these and distribute deaths uniformly across its regions.
+                        E.g., if there are 10 deaths in "Asia & Europe", we assign 5 deaths to Asia and 5 deaths to Europe.
 
                         Originally encoded regions:
 
@@ -69,7 +69,9 @@ ON REGIONS
                         5 = Middle East and North Africa
                         6 = Asia and Oceania.
 
-* A "region composite" is a region such that it is a combination of several regions, e.g. "Europe & Asia".
+    - For consistency with other datasets, we rename "Asia" -> "Asia and Oceania", and "Oceania" -> "Asia and Oceania".
+
+    (*) A "region composite" is a region such that it is a combination of several regions, e.g. "Europe & Asia".
 
 """
 
@@ -95,8 +97,10 @@ REGIONS_RENAME = {
     2: "Europe",
     4: "Africa",
     6: "Middle East",
-    7: "Asia",
-    9: "Oceania",
+    # There are three regions that we map to "Asia and Oceania"
+    7: "Asia and Oceania",  # Originally "Asia"
+    9: "Asia and Oceania",  # Originally "Oceania"
+    17: "Asia and Oceania",  # Originally "Asia & Oceania"
 }
 # Mapping conflicts to regions for some intra-state conflicts
 ## We map intrastate conflicts to only one region. We have region composites (ME & NA, Asia & Oceania) and we need to find the actual region.
@@ -215,7 +219,7 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
     The original data comes in separate tables: extra-, non-, inter- and intra-state.
     """
     # Get relevant columns
-    log.info("war.cow.extra: keep relevant columns")
+    log.info("war.cow: keep relevant columns")
     COLUMNS_RELEVANT = [
         "warnum",
         "year_start",
@@ -270,6 +274,11 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
         ignore_index=True,
     )
 
+    # Rename regions
+    log.info("war.cow: rename regions")
+    tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
+    assert tb["region"].isna().sum() == 0, "Unmapped regions!"
+
     # Add yearly observations (scale values)
     log.info("war.cow: expand observations")
     tb = expand_observations(tb, column_metrics=["number_deaths_ongoing_conflicts"])  # type: ignore
@@ -278,10 +287,6 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
     log.info("war.cow: estimate metrics")
     tb = estimate_metrics(tb)
 
-    # Rename regions
-    log.info("war.cow: rename regions")
-    tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
-    assert tb["region"].isna().sum() == 0, "Unmapped regions!"
     # Add suffix with source name
     msk = tb["region"] != "World"
     tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (COW)"
@@ -541,8 +546,8 @@ def split_regions_composites(tb: Table) -> Table:
         15: [2, 4, 6, 7],
         # Africa, Middle East, Asia & Oceania -> Africa, Middle East, Asia, Oceania
         16: [4, 6, 7, 9],
-        # Asia & Oceania -> Asia, Oceania
-        17: [7, 9],
+        # Asia & Oceania -> Asia, Oceania  # IMPORTANT: this is actually no composite.
+        # 17: [7],
         # Africa & Middle East -> Africa, Middle East
         18: [4, 6],
         # Europe, Africa, Middle East, Asia & Oceania -> Europe, Africa, Middle East, Asia, Oceania
