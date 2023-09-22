@@ -1,0 +1,16 @@
+tables:
+  total_fertility_rate:
+    variables:
+      fertility_rate:
+        title: Babies per woman (total fertility rate)
+        unit: babies per woman
+      children_dying_before_five_per_woman:
+        title: Children that died before five years age per woman
+        unit: under-five deaths per woman
+        display:
+          numDecimalPlaces: 1
+      children_surviving_past_five_per_woman:
+        title: Children that survived past five years age per woman
+        unit: children surviving past five years per woman
+        display:
+          numDecimalPlaces: 1
