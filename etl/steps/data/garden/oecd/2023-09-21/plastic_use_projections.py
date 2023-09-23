@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+import owid.catalog.processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -20,7 +21,14 @@ def run(dest_dir: str) -> None:
     # Convert million to actual number
     tb["value"] = tb["value"] * 1e6
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    total_df = tb.groupby("year")["value"].sum().reset_index()
+
+    total_df["country"] = "World"
+
+    combined_df = pr.merge(total_df, tb, on=["country", "year", "value"], how="outer").copy_metadata(from_table=tb)
+
+    tb = combined_df.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb["cumulative_value"] = tb.groupby("country")["value"].cumsum()
 
     #
     # Save outputs.

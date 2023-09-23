@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -29,9 +28,11 @@ def run(dest_dir: str) -> None:
     total_df = tb.groupby(["year", "leakage_type"])["value"].sum().reset_index()
 
     total_df["country"] = "World"
-    combined_df = pr.merge(total_df, tb, on=["country", "year", "leakage_type", "value"])
-    tb = Table(combined_df, metadata=tb.metadata)
-    tb = tb.underscore().set_index(["country", "year", "leakage_type"], verify_integrity=True).sort_index()
+    combined_df = pr.merge(total_df, tb, on=["country", "year", "leakage_type", "value"], how="outer").copy_metadata(
+        from_table=tb
+    )
+    tb = combined_df.underscore().set_index(["country", "year", "leakage_type"], verify_integrity=True).sort_index()
+
     #
     # Save outputs.
     #
