@@ -15,23 +15,23 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("plastic_fate_regions")
+    ds_meadow = paths.load_dataset("plastic_aquatic_leakage_projections")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["plastic_fate_regions"].reset_index()
+    tb = ds_meadow["plastic_aquatic_leakage_projections"].reset_index()
     # Convert million to actual number
     tb["value"] = tb["value"] * 1e6
     #
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    total_df = tb.groupby(["year", "plastic_fate"])["value"].sum().reset_index()
+
+    total_df = tb.groupby(["year", "water_source"])["value"].sum().reset_index()
 
     total_df["country"] = "World"
-    combined_df = pr.merge(total_df, tb, on=["country", "year", "plastic_fate", "value"])
+    combined_df = pr.merge(total_df, tb, on=["country", "year", "water_source", "value"])
     tb = Table(combined_df, metadata=tb.metadata)
-    tb = tb.underscore().set_index(["country", "year", "plastic_fate"], verify_integrity=True).sort_index()
-
+    tb = tb.underscore().set_index(["country", "year", "water_source"], verify_integrity=True).sort_index()
     #
     # Save outputs.
     #

@@ -8,10 +8,17 @@ steps:
 
   data://meadow/oecd/2023-09-21/plastic_use_2019:
     - snapshot://oecd/2023-09-21/plastic_use_2019.csv
+  data://garden/oecd/2023-09-21/plastic_use_2019:
+    - data://meadow/oecd/2023-09-21/plastic_use_2019
+  data://grapher/oecd/2023-09-21/plastic_use_2019:
+    - data://garden/oecd/2023-09-21/plastic_use_2019
 
-  data://meadow/oecd/2023-09-21/plastic_leakage:
-    - snapshot://oecd/2023-09-21/plastic_leakage.csv
-
+  data://meadow/oecd/2023-09-21/plastic_aquatic_leakage:
+    - snapshot://oecd/2023-09-21/plastic_aquatic_leakage.csv
+  data://garden/oecd/2023-09-21/plastic_aquatic_leakage:
+    - data://meadow/oecd/2023-09-21/plastic_aquatic_leakage
+  data://grapher/oecd/2023-09-21/plastic_aquatic_leakage:
+    - data://garden/oecd/2023-09-21/plastic_aquatic_leakage
 
   data://meadow/oecd/2023-09-21/plastic_emissions:
     - snapshot://oecd/2023-09-21/plastic_emissions.csv
@@ -34,3 +41,34 @@ steps:
   data://grapher/oecd/2023-09-21/plastic_use_polymer:
     - data://garden/oecd/2023-09-21/plastic_use_polymer
 
+
+  data://meadow/oecd/2023-09-21/plastic_use_projections:
+    - snapshot://oecd/2023-09-21/plastic_use_projections.csv
+  data://garden/oecd/2023-09-21/plastic_use_projections:
+    - data://meadow/oecd/2023-09-21/plastic_use_projections
+  data://grapher/oecd/2023-09-21/plastic_use_projections:
+    - data://garden/oecd/2023-09-21/plastic_use_projections
+
+
+  data://meadow/oecd/2023-09-21/plastic_fate_regions_projections:
+    - snapshot://oecd/2023-09-21/plastic_fate_regions_projections.csv
+  data://garden/oecd/2023-09-21/plastic_fate_regions_projections:
+    - data://meadow/oecd/2023-09-21/plastic_fate_regions_projections
+  data://grapher/oecd/2023-09-21/plastic_fate_regions_projections:
+    - data://garden/oecd/2023-09-21/plastic_fate_regions_projections
+
+
+  data://meadow/oecd/2023-09-21/plastic_environment_leakage_projections:
+    - snapshot://oecd/2023-09-21/plastic_environment_leakage_projections.csv
+  data://garden/oecd/2023-09-21/plastic_environment_leakage_projections:
+    - data://meadow/oecd/2023-09-21/plastic_environment_leakage_projections
+  data://grapher/oecd/2023-09-21/plastic_environment_leakage_projections:
+    - data://garden/oecd/2023-09-21/plastic_environment_leakage_projections
+
+
+  data://meadow/oecd/2023-09-21/plastic_aquatic_leakage_projections:
+    - snapshot://oecd/2023-09-21/plastic_aquatic_leakage_projections.csv
+  data://garden/oecd/2023-09-21/plastic_aquatic_leakage_projections:
+    - data://meadow/oecd/2023-09-21/plastic_aquatic_leakage_projections
+  data://grapher/oecd/2023-09-21/plastic_aquatic_leakage_projections:
+    - data://garden/oecd/2023-09-21/plastic_aquatic_leakage_projections

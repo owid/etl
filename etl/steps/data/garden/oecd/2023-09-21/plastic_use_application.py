@@ -14,6 +14,8 @@ def run(dest_dir: str) -> None:
 
     ds_meadow = paths.load_dataset("plastic_use_application")
     tb = ds_meadow["plastic_use_application"].reset_index()
+    # Convert million to actual number
+    tb["value"] = tb["value"] * 1e6
     #
     # Process data.
     #

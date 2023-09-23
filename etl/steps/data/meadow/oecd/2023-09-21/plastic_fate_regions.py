@@ -11,11 +11,11 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
+
     snap = paths.load_snapshot("plastic_fate_regions.csv")
 
     # Load data from snapshot.
     tb = snap.read()
-    #
     # Process data.
     #
     columns_to_use = ["Location", "Plastic end of life fates", "Time", "Value"]

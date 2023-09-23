@@ -11,14 +11,13 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow datasets for global plastic emissions by gas, application type and polymer and read tables.
-
-    ds_meadow = paths.load_dataset("plastic_emissions")
-    tb = ds_meadow["plastic_emissions"].reset_index()
+    ds_meadow = paths.load_dataset("plastic_environment_leakage_projections")
+    tb = ds_meadow["plastic_environment_leakage_projections"]
+    #
+    # Process data.
+    #
     # Convert million to actual number
     tb["value"] = tb["value"] * 1e6
-
-    # Pivot dataframe by gas_type
-    tb = tb.pivot(index=["country", "year", "lifecycle_stage"], columns="gas_type", values="value")
     #
     # Save outputs.
     #

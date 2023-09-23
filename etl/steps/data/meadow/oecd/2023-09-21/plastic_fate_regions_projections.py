@@ -12,24 +12,20 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
 
-    snap = paths.load_snapshot("plastic_use_2019.csv")
+    snap = paths.load_snapshot("plastic_fate_regions_projections.csv")
 
     # Load data from snapshot.
     tb = snap.read()
-
     #
     # Process data.
     #
-    columns_to_use = ["Location", "Plastics polymer", "Plastics applications", "Value"]
+    columns_to_use = ["Location", "Plastics end of life fates", "Time", "Value"]
     tb = tb[columns_to_use]
-
-    rename_cols = {"Location": "country", "Plastics polymer": "polymer", "Plastics applications": "application"}
+    rename_cols = {"Location": "country", "Plastics end of life fates": "plastic_fate", "Time": "year"}
 
     tb = tb.rename(columns=rename_cols)
-    tb["year"] = 2019
-
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year", "polymer", "application"], verify_integrity=True).sort_index()
+    tb = tb.underscore().set_index(["country", "year", "plastic_fate"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.

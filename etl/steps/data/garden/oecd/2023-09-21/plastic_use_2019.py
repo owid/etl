@@ -1,5 +1,4 @@
 """Load a meadow dataset and create a garden dataset."""
-
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -15,22 +14,23 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("plastic_fate_regions")
+    ds_meadow = paths.load_dataset("plastic_use_2019")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["plastic_fate_regions"].reset_index()
+    tb = ds_meadow["plastic_use_2019"].reset_index()
     # Convert million to actual number
     tb["value"] = tb["value"] * 1e6
+
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    total_df = tb.groupby(["year", "plastic_fate"])["value"].sum().reset_index()
+    total_df = tb.groupby(["year", "polymer", "application"])["value"].sum().reset_index()
 
     total_df["country"] = "World"
-    combined_df = pr.merge(total_df, tb, on=["country", "year", "plastic_fate", "value"])
+    combined_df = pr.merge(total_df, tb, on=["country", "year", "polymer", "application", "value"])
     tb = Table(combined_df, metadata=tb.metadata)
-    tb = tb.underscore().set_index(["country", "year", "plastic_fate"], verify_integrity=True).sort_index()
+    tb = tb.underscore().set_index(["country", "year", "polymer", "application"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.

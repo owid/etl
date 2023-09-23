@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -11,17 +12,20 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow datasets for global plastic emissions by gas, application type and polymer and read tables.
-
-    ds_meadow = paths.load_dataset("plastic_emissions")
-    tb = ds_meadow["plastic_emissions"].reset_index()
+    ds_meadow = paths.load_dataset("plastic_use_projections")
+    tb = ds_meadow["plastic_use_projections"].reset_index()
+    #
+    # Process data.
+    #
     # Convert million to actual number
     tb["value"] = tb["value"] * 1e6
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
 
-    # Pivot dataframe by gas_type
-    tb = tb.pivot(index=["country", "year", "lifecycle_stage"], columns="gas_type", values="value")
     #
     # Save outputs.
     #
+
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
