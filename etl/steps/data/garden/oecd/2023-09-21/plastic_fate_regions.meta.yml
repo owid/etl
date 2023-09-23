@@ -1,5 +1,5 @@
 dataset:
-  title: Global Plastics Outlook - Plastics waste by region
+  title: Global Plastics Outlook - Plastics waste by region and end-of-life fate
   description: >-
     This dataset provides estimates of plastics waste for the 15 global regions of the OECD ENV-Linkages model, detailed in
     the Annex of the OECD Global Plastics Outlook.
@@ -16,7 +16,7 @@ dataset:
     Outlook.
   origins:
     - producer: OECD
-      title: Global Plastics Outlook - plastics waste by region
+      title: Global Plastics Outlook - Plastics waste by region and end-of-life fate
       description: >-
         This dataset provides estimates of plastics waste for the 15 global regions of the OECD ENV-Linkages model, detailed
         in the Annex of the OECD Global Plastics Outlook.
@@ -44,10 +44,9 @@ dataset:
       license:
         name: CC BY 4.0
         url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
-  sources: []
 tables:
   plastic_fate_regions:
-    title: Global Plastics Outlook - plastics waste by region
+    title: Global Plastics Outlook - Plastics waste by region and end-of-life fate
     description: >-
       This dataset provides estimates of plastics waste for the 15 global regions of the OECD ENV-Linkages model, detailed
       in the Annex of the OECD Global Plastics Outlook.
@@ -67,7 +66,7 @@ tables:
         title: Plastic waste by fate
         origins:
           - producer: OECD
-            title: Global Plastics Outlook - plastics waste by region
+            title: Global Plastics Outlook - Plastics waste by region and end-of-life fate
             description: >-
               This dataset provides estimates of plastics waste for the 15 global regions of the OECD ENV-Linkages model,
               detailed in the Annex of the OECD Global Plastics Outlook.
