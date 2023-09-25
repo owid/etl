@@ -1,508 +1,93 @@
 tables:
   plastic_use_polymer:
-    title: Global Plastics Outlook - Plastics use by polymer
-    description: >-
-      This dataset provides estimates of plastics use at the global level by polymer.
-
-
-      Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019). An assumption
-      of the split by polymer by application is made that it is homogenous to the global values. Histroical values (pre-2015
-      data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck and Law (2017). Secondary
-      plastics use are derived using recycling rates and recycling loss rates, as described in the GPO annex. The plastics
-      use data is associated with the economic flows in the OECD ENV-Linkages model to estimate changes over time. The total
-      plastics use is equal to the sum of primary and secondary plastics use.
     variables:
       abs__asa__san:
         title: AB, ASA, SAN
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by Polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       bioplastics:
         title: Bioplastics
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       elastomers__tyres:
         title: Elastomers tyres
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       fibres:
         title: Fibres
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       hdpe:
         title: HDPE
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       ldpe__lldpe:
         title: LLDPE, LLDPE
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_8&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_8&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       marine_coatings:
         title: Marine coatings
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       other:
         title: Other
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       pet:
         title: PET
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       pp:
         title: PP
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
-        unit: ''
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       ps:
         title: PS
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       pur:
         title: PUR
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       pvc:
         title: PVC
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       road_marking_coatings:
         title: Road marking coatings
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
       total:
         title: Total
-        origins:
-          - producer: OECD
-            title: Global Plastics Outlook - plastics use by polymer
-            description: >-
-              This dataset provides estimates of plastics use at the global level by polymer.
-
-
-              Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019).
-              An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical
-              values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck
-              and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described
-              in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model
-              to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics
-              use.
-            description_snapshot: This dataset gives global estimates of plastic use, broken down by polymer type. The use
-              of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type
-              across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015)
-              are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is
-              calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are
-              then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic
-              use is the combined amount of primary and secondary plastic use.
-            citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en,     accessed
-              on 21 September 2023
-            url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_10&lang=en
-            date_accessed: '2023-09-21'
-            date_published: '2022-02-09'
-            license:
-              name: CC BY 4.0
-              url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1

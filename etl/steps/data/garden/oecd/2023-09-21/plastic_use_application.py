@@ -20,6 +20,9 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = tb.pivot(index=["country", "year"], columns="application", values="value")
+    # Combine textile and transportation sectors into signle indicators
+    tb["transportation"] = tb["Transportation - other"] + tb["Transportation - tyres"]
+    tb["textile_sector"] = tb["Textile sector - others"] + tb["Textile sector - clothing"]
 
     #
     # Save outputs.

@@ -6,9 +6,13 @@ tables:
         title: Plastic waste - projections
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
 
       cumulative_value:
         title: Cumulative plastic waste - projections
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 1
 
