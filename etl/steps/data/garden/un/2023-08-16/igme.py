@@ -2,6 +2,7 @@
 
 from math import trunc
 
+import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -32,6 +33,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(
         columns={"obs_value": "Observation value", "lower_bound": "Lower bound", "upper_bound": "Upper bound"}
     )
+
     tb = tb.pivot(
         index=["country", "year"],
         values=["Observation value", "Lower bound", "Upper bound"],
@@ -56,6 +58,57 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def calculate_under_fifteen_mortality(tb: Table) -> Table:
+    """
+    Calculate the under fifteen mortality rate from the under five mortality rate and the 5-14 mortality rate.
+    """
+    tb_u5 = (
+        tb[(tb["indicator"] == "Under-five deaths") & (tb["unit_of_measure"] == "Number of deaths")]
+        .drop(columns="indicator")
+        .rename(
+            columns={
+                "Observation value": "under_five_mortality",
+                "Lower bound": "under_five_mortality_lb",
+                "Upper bound": "under_five_mortality_ub",
+            }
+        )
+    )
+    tb_5_14 = (
+        tb[(tb["indicator"] == "Deaths age 5 to 14") & (tb["unit_of_measure"] == "Number of deaths")]
+        .drop(columns="indicator")
+        .rename(
+            columns={
+                "Observation value": "five_to_fourteen_mortality",
+                "Lower bound": "five_to_fourteen_mortality_lb",
+                "Upper bound": "five_to_fourteen_mortality_ub",
+            }
+        )
+    )
+    tb_u15 = pr.merge(tb_u5, tb_5_14)
+    tb_u15["under_fifteen_mortality"] = tb_u15["under_five_mortality"] + tb_u15["five_to_fourteen_mortality"]
+    tb_u15["under_fifteen_mortality_lb"] = tb_u15["under_five_mortality_lb"] + tb_u15["five_to_fourteen_mortality_lb"]
+    tb_u15["under_fifteen_mortality_ub"] = tb_u15["under_five_mortality_ub"] + tb_u15["five_to_fourteen_mortality_ub"]
+
+    tb_u15 = tb_u15.drop(
+        columns=[
+            "under_five_mortality",
+            "under_five_mortality_lb",
+            "under_five_mortality_ub",
+            "five_to_fourteen_mortality",
+            "five_to_fourteen_mortality_lb",
+            "five_to_fourteen_mortality_ub",
+        ]
+    ).rename(
+        columns={
+            "under_fifteen_mortality": "Observation value",
+            "under_fifteen_mortality_lb": "Lower bound",
+            "under_fifteen_mortality_ub": "Upper bound",
+        }
+    )
+    tb_u15["indicator"] = "Under-fifteen deaths"
+    return tb
 
 
 def filter_data(tb: Table) -> Table:
