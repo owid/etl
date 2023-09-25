@@ -974,6 +974,10 @@ def test_groupby_sum(table_1) -> None:
 
 
 def test_groupby_agg(table_1) -> None:
+    gt = table_1.groupby("country")[["a", "b"]].agg("sum")
+    assert gt.values.tolist() == [[3, 6], [3, 9]]
+    assert gt["a"].m.title == "Title of Table 1 Variable a"
+
     gt = table_1.groupby("country").a.agg(["min", "max"])
     assert gt.values.tolist() == [[3, 3], [1, 2]]
     assert gt["min"].m.title == "Title of Table 1 Variable a"
@@ -981,6 +985,9 @@ def test_groupby_agg(table_1) -> None:
     gt = table_1.groupby("country").a.agg("min")
     assert gt.values.tolist() == [3, 1]
     assert gt.m.title == "Title of Table 1 Variable a"
+
+    with pytest.raises(NotImplementedError):
+        table_1.groupby("country")[["a", "b"]].agg(["min", "max"])
 
 
 def test_groupby_count(table_1) -> None:

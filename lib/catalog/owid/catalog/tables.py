@@ -915,10 +915,13 @@ class TableGroupBy:
         df = getattr(self.groupby, op)(*args, **kwargs)
         return _create_table(df, self.metadata, self._fields)
 
-    def agg(self, func: Dict[str, Any], *args, **kwargs) -> "Table":
-        if not isinstance(func, dict):
-            raise NotImplementedError()
+    def agg(self, func: Any, *args, **kwargs) -> "Table":
         df = self.groupby.agg(func, *args, **kwargs)
+
+        # agg returning multiindex is not yet supported
+        if isinstance(df.columns, pd.MultiIndex):
+            raise NotImplementedError()
+
         return _create_table(df, self.metadata, self._fields)
 
 
