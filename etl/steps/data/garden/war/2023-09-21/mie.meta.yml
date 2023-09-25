@@ -7,9 +7,20 @@ dataset:
 
       Deaths of combatants due to fighting are included.
 
-      We use the world regions of the participants to code the conflicts' world region(s).
+      We use the world regions of the participants to code the conflicts' world region(s). The regions are defined based on Gleditsch and Ward codes. Find the complete mapping at
+      https://correlatesofwar.org/wp-content/uploads/states2016.csv:
 
-      You can find more information about the data in our article:
+        • Americas: 2-165
+
+        • Europe: 200-395
+
+        • Africa: 402-626
+
+        • Middle East: 630-698
+
+        • Asia and Oceania: 700-999
+
+      You can find more information about the data in our article: [To be published]
 
 tables:
   mie:
@@ -17,7 +28,7 @@ tables:
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
         unit: conflicts
-        description_short: |-
+        description: |-
           <% if hostility_level == "all" %>
           The number of all ongoing interstate conflicts in each year.
 
@@ -65,14 +76,13 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
-              - Oceania
       number_new_conflicts:
         title: Number of new conflicts
         unit: conflicts
-        description_short: |-
+        description: |-
           <% if hostility_level == "all" %>
           The number of all new interstate conflicts in each year.
 
@@ -131,14 +141,13 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
-              - Oceania
       number_deaths_ongoing_conflicts_low:
         title: Number of deaths in ongoing conflicts (low estimate)
         unit: deaths
-        description_short: |-
+        description: |-
           The low estimate of the number of deaths in all ongoing interstate conflicts in each year.
 
           An ongoing interstate conflict is a disagreement between states where force is threatened, displayed, or used.
@@ -152,14 +161,13 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
-              - Oceania
       number_deaths_ongoing_conflicts_high:
         title: Number of deaths in ongoing conflicts (high estimate)
         unit: deaths
-        description_short: |-
+        description: |-
           The high estimate of the number of deaths in all ongoing interstate conflicts in each year.
 
           An ongoing interstate conflict is a disagreement between states where force is threatened, displayed, or used.
@@ -173,7 +181,6 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
-              - Oceania
