@@ -986,8 +986,19 @@ def test_groupby_agg(table_1) -> None:
     assert gt.values.tolist() == [3, 1]
     assert gt.m.title == "Title of Table 1 Variable a"
 
-    with pytest.raises(NotImplementedError):
-        table_1.groupby("country")[["a", "b"]].agg(["min", "max"])
+    def has_nan(x: pd.Series) -> bool:
+        """Check if there is a NaN in a group."""
+        return x.isna().any()
+
+    gt = table_1.groupby("country")[["a", "b"]].agg(
+        {
+            "a": [has_nan, sum],
+            "b": sum,
+        }
+    )
+    assert gt.columns.tolist() == [("a", "has_nan"), ("a", "sum"), ("b", "sum")]
+    assert gt.values.tolist() == [[False, 3, 6], [False, 3, 9]]
+    assert isinstance(gt.a, Table)
 
 
 def test_groupby_count(table_1) -> None:
