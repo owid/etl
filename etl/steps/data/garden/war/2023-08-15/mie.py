@@ -13,6 +13,13 @@ for each year of the conflict.
 
 - The number of deaths is not estimated for each hostile level, but rather only the aggregate is obtained.
 
+
+ON regions:
+
+- We use the region of the participants to assign a region to each conflict, and not the region of the conflict itself. We use
+the country code (ccode) to assign a region to each participant. Same as in COW MID (we used `ccode` from MIDB).
+
+- We encode the region using the codes from COW (based on GW).
 """
 
 from typing import cast
