@@ -1,0 +1,20 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 1800
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/tables/
+tables:
+  gleditsch:
+    variables:
+      iso:
+        title: ISO country code
+      country:
+        title: Country name
+        description_short: Name of the country. Standardised when possible.
+

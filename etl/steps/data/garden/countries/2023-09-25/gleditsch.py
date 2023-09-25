@@ -12,16 +12,16 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("isd")
+    ds_meadow = paths.load_dataset("gleditsch")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["isd"]
+    tb = ds_meadow["gleditsch"]
 
     #
     # Process data.
     #
     tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, country_col="statename",
+        df=tb, countries_file=paths.country_mapping_path
     )
     # tb = tb.set_index(["country", "year"], verify_integrity=True)
 
