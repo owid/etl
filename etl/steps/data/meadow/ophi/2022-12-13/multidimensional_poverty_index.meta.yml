@@ -6,14 +6,16 @@ dataset:
   description: |
     The global Multidimensional Poverty Index (MPI) is an international measure of acute multidimensional poverty covering over 100 developing countries. It complements traditional monetary poverty measures by capturing the acute deprivations in health, education, and living standards that a person faces simultaneously.
 
-    <h4>How is multidimensional poverty defined?</h4>
+    #### How is multidimensional poverty defined?
+
     Being ‘MPI poor’ means that a person is deprived in a third or more of ten indicators, grouped into three dimensions:
-    <ul>
-        <li><strong>Health</strong> – using two indicators: nutrition, child mortality
-        <li><strong>Education</strong> – using two indicators: years of schooling, school attendance
-        <li><strong>Living standards</strong> – using five indicators: cooking fuel, sanitation, drinking water, electricity, housing, assets.</li>
-    </ul>
-    Households are assessed as being deprived in a given indicator if they do not meet a certain threshold for that indicator. For instance, a household is deprived in the <em>Years of schooling</em> indicator if no household member has completed six years of schooling. A person is considered deprived in the <em>Cooking fuel</em> indicator if they cook using solid fuel, such as dung, agricultural crops, wood, charcoal, or coal. The thresholds for each indicator are published by OPHI in their <a href="https://www.ophi.org.uk/wp-content/uploads/OPHI_MPI_MN_54_2022.pdf">methodological notes</a>.
+
+    * **Health** – using two indicators: nutrition, child mortality
+    * **Education** – using two indicators: years of schooling, school attendance
+    * **Living standards** – using five indicators: cooking fuel, sanitation, drinking water, electricity, housing, assets.
+
+
+    Households are assessed as being deprived in a given indicator if they do not meet a certain threshold for that indicator. For instance, a household is deprived in the *Years of schooling* indicator if no household member has completed six years of schooling. A person is considered deprived in the *Cooking fuel* indicator if they cook using solid fuel, such as dung, agricultural crops, wood, charcoal, or coal. The thresholds for each indicator are published by OPHI in their [methodological notes](https://www.ophi.org.uk/wp-content/uploads/OPHI_MPI_MN_54_2022.pdf).
 
     The individual indicators are not ‘weighted’ equally: When adding up the number of indicators in which a person is deprived, some count for more than others. Health and education indicators are given a weight of 1/6, while the indicators within the living standards dimension are given a weight of 1/18. This means that the three dimensions – health, education and living standards – have an equal weight in the total of one-third each.
 
@@ -21,12 +23,13 @@ dataset:
 
     The global MPI was developed by OPHI with the UN Development Programme (UNDP) for inclusion in UNDP’s flagship Human Development Report in 2010. It has been published annually by OPHI and in the HDRs ever since.
   sources:
-    -
-      name: Alkire, Kanagaratnam and Suppa (2022), The global Multidimensional Poverty Index (MPI) 2022
-      published_by: Alkire, S., Kanagaratnam, U., and Suppa, N. (2022). ‘The global Multidimensional Poverty Index (MPI) 2022 country results and methodological note’, OPHI MPI Methodological Note 52, Oxford Poverty and Human Development Initiative, University of Oxford.
-      publication_year: 2022
-      date_accessed: 2022-10-26
-      url: https://ophi.org.uk/multidimensional-poverty-index/
+  - name: Alkire, Kanagaratnam and Suppa (2022), The global Multidimensional Poverty Index (MPI) 2022
+    published_by: "Alkire, S., Kanagaratnam, U., and Suppa, N. (2022). 'The global Multidimensional Poverty Index (MPI)
+      2022 country results and methodological note', OPHI MPI Methodological Note 52, Oxford Poverty and Human Development
+      Initiative, University of Oxford."
+    publication_year: 2022
+    date_accessed: 2022-10-26
+    url: https://ophi.org.uk/multidimensional-poverty-index/
 tables:
   multidimensional_poverty_index:
     variables:
@@ -73,16 +76,14 @@ tables:
         description: |
           Code of indicator (missing if aggregate measure).
           The options are:
-              <ul>
-                <li><strong>M0</strong> – MPI (adjusted headcount ratio)</li>
-                <li><strong>H</strong> – Headcount ratio (proportion of population which is MPI poor)</li>
-                <li><strong>A</strong> – Intensity (average deprivation among the poor)</li>
-                <li><strong>hd</strong> – Uncensored deprivation rate (proportion of people deprived in indicator)</li>
-                <li><strong>hdk</strong> – Censored deprivation rate (proportion of people being poor and deprived in indicator)</li>
-                <li><strong>actb</strong> – Absolute contribution (Absolute contribution of indicator to MPI)</li>
-                <li><strong>pctb</strong> – Percentage contribution (Relative contribution of indicator to MPI)</li>
-                <li><strong>popsh</strong> – Population share of particular subgroup (if applicable)</li>
-              </ul>
+              * **M0** – MPI (adjusted headcount ratio)
+              * **H** – Headcount ratio (proportion of population which is MPI poor)
+              * **A** – Intensity (average deprivation among the poor)
+              * **hd** – Uncensored deprivation rate (proportion of people deprived in indicator)
+              * **hdk** – Censored deprivation rate (proportion of people being poor and deprived in indicator)
+              * **actb** – Absolute contribution (Absolute contribution of indicator to MPI)
+              * **pctb** – Percentage contribution (Relative contribution of indicator to MPI)
+              * **popsh** – Population share of particular subgroup (if applicable)
       ind_lab:
         title: Indicator (human-readable)
         description: |

@@ -1,0 +1,22 @@
+meta:
+  name: Armed Conflict version 23.1 (UCDP/PRIO, 2023)
+  publication_year: 2023
+  source_name: UCDP/PRIO (2023)
+  source_published_by: Davies, Shawn, Therese Pettersson & Magnus Öberg (2023). Organized
+    violence 1989-2022 and the return of conflicts between states?. Journal of Peace
+    Research 60(4)
+  url: https://ucdp.uu.se/downloads/index.html#armedconflict
+  source_data_url: https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-231-csv.zip
+  license_url:
+  license_name: ''
+  is_public: true
+  description: |
+    A conflict-year dataset with information on armed conflict where at least one party is the government of a state in the time period 1946-2022.
+
+
+    You can find more notes at https://web.archive.org/web/20230624120457/https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-231.pdf
+wdir: ../../../data/snapshots/war/2023-06-22
+outs:
+- md5: eb0e84b14a5380db07fa3ac2ea6dd9a6
+  size: 46573
+  path: ucdp.prio_armed_conflict.zip

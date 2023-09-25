@@ -6,7 +6,7 @@ It has been slightly modified since then.
 """
 import json
 from datetime import date, datetime
-from typing import Annotated, Any, Dict, List, Optional, TypedDict
+from typing import Annotated, Any, Dict, List, Optional, Set, TypedDict
 from urllib.parse import quote
 
 import humps
@@ -40,6 +40,7 @@ from sqlmodel import (
     Relationship,
     Session,
     SQLModel,
+    col,
     create_engine,
     or_,
     select,
@@ -729,6 +730,28 @@ class OriginsVariablesLink(SQLModel, table=True):
     originId: Optional[int] = Field(default=None, foreign_key="origins.id", primary_key=True)
     variableId: Optional[int] = Field(default=None, foreign_key="variables.id", primary_key=True)
 
+    @classmethod
+    def link_with_variable(cls, session: Session, variable_id: int, new_origin_ids: Set[int]) -> None:
+        """Link the given Variable ID with the given Origin IDs."""
+        # Fetch current linked Origins for the given Variable ID
+        existing_links = session.query(cls.originId).filter(cls.variableId == variable_id).all()
+
+        existing_origin_ids = {link.originId for link in existing_links}
+
+        # Find the Origin IDs to delete and the IDs to add
+        to_delete_ids = existing_origin_ids - new_origin_ids
+        to_add_ids = new_origin_ids - existing_origin_ids
+
+        # Delete the obsolete Origin-Variable links
+        if to_delete_ids:
+            session.query(cls).filter(cls.variableId == variable_id, col(cls.originId).in_(to_delete_ids)).delete(
+                synchronize_session="fetch"
+            )
+
+        # Add the new Origin-Variable links
+        if to_add_ids:
+            session.add_all([cls(originId=origin_id, variableId=variable_id) for origin_id in to_add_ids])
+
 
 class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
     __tablename__ = "posts_gdocs_variables_faqs"  # type: ignore
@@ -746,6 +769,31 @@ class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
         default=None, sa_column=Column("fragmentId", String(255), primary_key=True, nullable=False)
     )
 
+    @classmethod
+    def link_with_variable(cls, session: Session, variable_id: int, new_faqs: List[catalog.FaqLink]) -> None:
+        """Link the given Variable ID with Faqs"""
+        # Fetch current linked Faqs for the given Variable ID
+        existing_faqs = session.query(cls).filter(cls.variableId == variable_id).all()
+
+        # Work with tuples instead
+        existing_gdoc_fragment = {(f.gdocId, f.fragmentId) for f in existing_faqs}
+        new_gdoc_fragment = {(f.gdoc_id, f.fragment_id) for f in new_faqs}
+
+        to_delete = existing_gdoc_fragment - new_gdoc_fragment
+        to_add = new_gdoc_fragment - existing_gdoc_fragment
+
+        # Delete the obsolete links
+        for gdoc_id, fragment_id in to_delete:
+            session.query(cls).filter(
+                cls.variableId == variable_id, cls.gdocId == gdoc_id, cls.fragmentId == fragment_id
+            ).delete(synchronize_session="fetch")
+
+        # Add the new links
+        if to_add:
+            session.add_all(
+                [cls(gdocId=gdoc_id, fragmentId=fragment_id, variableId=variable_id) for gdoc_id, fragment_id in to_add]
+            )
+
 
 class TagsVariablesTopicTagsLink(SQLModel, table=True):
     __tablename__ = "tags_variables_topic_tags"  # type: ignore
@@ -757,6 +805,28 @@ class TagsVariablesTopicTagsLink(SQLModel, table=True):
 
     tagId: Optional[str] = Field(default=None, sa_column=Column("tagId", Integer, primary_key=True, nullable=False))
     variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
+
+    @classmethod
+    def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: Set[str]) -> None:
+        """Link the given Variable ID with the given Tag IDs."""
+        # Fetch current linked tags for the given Variable ID
+        existing_links = session.query(cls.tagId).filter(cls.variableId == variable_id).all()
+
+        existing_tag_ids = {link.tagId for link in existing_links}
+
+        # Find the tag IDs to delete and the IDs to add
+        to_delete_ids = existing_tag_ids - new_tag_ids
+        to_add_ids = new_tag_ids - existing_tag_ids
+
+        # Delete the obsolete links
+        if to_delete_ids:
+            session.query(cls).filter(cls.variableId == variable_id, col(cls.tagId).in_(to_delete_ids)).delete(
+                synchronize_session="fetch"
+            )
+
+        # Add the new links
+        if to_add_ids:
+            session.add_all([cls(tagId=tag_id, variableId=variable_id) for tag_id in to_add_ids])
 
 
 class Variable(SQLModel, table=True):
@@ -834,7 +904,9 @@ class Variable(SQLModel, table=True):
     descriptionFromProducer: Optional[str] = Field(default=None, sa_column=Column("descriptionFromProducer", LONGTEXT))
     descriptionKey: Optional[List[str]] = Field(default=None, sa_column=Column("descriptionKey", JSON))
     descriptionProcessing: Optional[str] = Field(default=None, sa_column=Column("descriptionProcessing", LONGTEXT))
+    # NOTE: Use of `licenses` is discouraged, they should be captured in origins.
     licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
+    # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
     license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
@@ -991,15 +1063,7 @@ class Variable(SQLModel, table=True):
             variable = _run(session)
         return variable
 
-    def delete_links(self, session: Session):
-        """
-        Deletes all previous relationships with origins and gdoc posts for this variable.
-        """
-        session.query(OriginsVariablesLink).filter(OriginsVariablesLink.variableId == self.id).delete()
-        session.query(PostsGdocsVariablesFaqsLink).filter(PostsGdocsVariablesFaqsLink.variableId == self.id).delete()
-        session.query(TagsVariablesTopicTagsLink).filter(TagsVariablesTopicTagsLink.variableId == self.id).delete()
-
-    def create_links(
+    def update_links(
         self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
     ):
         """
@@ -1009,26 +1073,23 @@ class Variable(SQLModel, table=True):
 
         # establish relationships between variables and origins
         if db_origins:
-            session.add_all(
-                [OriginsVariablesLink(originId=db_origin.id, variableId=self.id) for db_origin in db_origins]
-            )
+            OriginsVariablesLink.link_with_variable(session, self.id, {origin.id for origin in db_origins})  # type: ignore
+
         # establish relationships between variables and posts
         if faqs:
             required_gdoc_ids = {faq.gdoc_id for faq in faqs}
-            statement = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))  # type: ignore
-            gdoc_posts = session.exec(statement).all()
+            query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))  # type: ignore
+            gdoc_posts = session.exec(query).all()
             existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
             missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
             if missing_gdoc_ids:
                 log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
 
-            session.add_all(
-                [
-                    PostsGdocsVariablesFaqsLink(gdocId=faq.gdoc_id, variableId=self.id, fragmentId=faq.fragment_id)
-                    for faq in faqs
-                    if faq.gdoc_id in existing_gdoc_ids
-                ]
-            )
+            faqs_to_insert = [faq for faq in faqs if faq.gdoc_id in existing_gdoc_ids]
+
+            if faqs_to_insert:
+                PostsGdocsVariablesFaqsLink.link_with_variable(session, self.id, faqs_to_insert)
+
         # establish relationships between variables and tags
         if tag_names:
             # get tags by their name
@@ -1040,7 +1101,9 @@ class Variable(SQLModel, table=True):
                 missing_tags = [tag for tag in tag_names if tag not in found_tags]
                 log.warning("create_links.missing_tags", tags=missing_tags)
 
-            session.add_all([TagsVariablesTopicTagsLink(tagId=tag.id, variableId=self.id) for tag in tags])  # type: ignore
+            tag_ids = {tag.id for tag in tags}
+            if tag_ids:
+                TagsVariablesTopicTagsLink.link_with_variable(session, self.id, tag_ids)  # type: ignore
 
     def s3_data_path(self) -> str:
         """Path to S3 with data in JSON format for Grapher. Typically
