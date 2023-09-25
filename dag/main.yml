@@ -582,6 +582,17 @@ steps:
   data://grapher/un/2023-09-19/long_run_child_mortality:
     - data://garden/un/2023-08-29/long_run_child_mortality
 
+  # Country lists
+  data://meadow/countries/2023-09-25/isd:
+    - snapshot://countries/2023-09-22/isd.xlsx
+  data://garden/countries/2023-09-25/isd:
+    - data://meadow/countries/2023-09-25/isd
+  data://meadow/countries/2023-09-25/gleditsch:
+    - snapshot://countries/2023-09-22/gleditsch_states.dat
+    - snapshot://countries/2023-09-22/gleditsch_microstates.dat
+  data://garden/countries/2023-09-25/gleditsch:
+    - data://meadow/countries/2023-09-25/gleditsch
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
