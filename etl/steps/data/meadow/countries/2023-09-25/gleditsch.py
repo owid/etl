@@ -17,8 +17,12 @@ def run(dest_dir: str) -> None:
     snap_micro = paths.load_snapshot("gleditsch_microstates.dat")
 
     # Load data from snapshot.
-    tb_states = snap_states.read_csv(delimiter="\t", encoding="unicode_escape", names=["id", "iso", "country", "start", "end"], index_col=False)
-    tb_micro = snap_micro.read_csv(delimiter="\t", encoding="unicode_escape", names=["id", "iso", "country", "start", "end"], index_col=False)
+    tb_states = snap_states.read_csv(
+        delimiter="\t", encoding="unicode_escape", names=["id", "iso", "country", "start", "end"], index_col=False
+    )
+    tb_micro = snap_micro.read_csv(
+        delimiter="\t", encoding="unicode_escape", names=["id", "iso", "country", "start", "end"], index_col=False
+    )
 
     #
     # Process data.
@@ -32,7 +36,9 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap_states.metadata)
+    ds_meadow = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap_states.metadata
+    )
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
