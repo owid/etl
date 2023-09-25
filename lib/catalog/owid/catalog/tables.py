@@ -2,15 +2,17 @@
 #  tables.py
 #
 
-import copy
 import json
+import types
 from collections import defaultdict
 from os.path import dirname, join, splitext
 from pathlib import Path
 from typing import (
     IO,
     Any,
+    Callable,
     Dict,
+    Iterator,
     List,
     Literal,
     Optional,
@@ -21,6 +23,7 @@ from typing import (
     overload,
 )
 
+import numpy as np
 import pandas as pd
 import pyarrow
 import pyarrow.parquet as pq
@@ -32,6 +35,7 @@ from pandas.util._decorators import rewrite_axis_style_signature
 
 from . import variables
 from .meta import License, Origin, Source, TableMeta, VariableMeta
+from .utils import underscore
 
 log = structlog.get_logger()
 
@@ -77,7 +81,7 @@ class Table(pd.DataFrame):
         :param metadata: TableMeta to use
         :param short_name: Use empty TableMeta and fill it with `short_name`. This is a shorter version
             of `Table(df, metadata=TableMeta(short_name="my_name"))`
-        :param underscore: Underscore table columns and indexes. See `underscore_table` for help
+        :param underscore: Underscore table columns and indexes. See `underscore` method for help
         :param camel_to_snake: Convert camelCase column names to snake_case.
         :param like: Use metadata from Table given in this argument (including columns). This is a shorter version of
             new_t = Table(df, metadata=old_t.metadata)
@@ -103,15 +107,18 @@ class Table(pd.DataFrame):
 
         # underscore column names
         if underscore:
-            from .utils import underscore_table
-
-            underscore_table(self, inplace=True, camel_to_snake=camel_to_snake)
+            self.underscore(inplace=True, camel_to_snake=camel_to_snake)
 
         # reuse metadata from a different table
         if like is not None:
             copy = self.copy_metadata(like)
             self._fields = copy._fields
             self.metadata = copy.metadata
+
+    @property
+    def m(self) -> TableMeta:
+        """Metadata alias to save typing."""
+        return self.metadata
 
     @property
     def primary_key(self) -> List[str]:
@@ -420,7 +427,7 @@ class Table(pd.DataFrame):
             if inplace:
                 fields[new_col] = self._fields[old_col]
             else:
-                fields[new_col] = copy.deepcopy(self._fields[old_col])
+                fields[new_col] = self._fields[old_col].copy()
 
             # Update processing log.
             if old_col != new_col:
@@ -443,6 +450,14 @@ class Table(pd.DataFrame):
         "Return names of all columns in the dataset, including the index."
         combined: List[str] = filter(None, list(self.index.names) + list(self.columns))  # type: ignore
         return combined
+
+    def get_column_or_index(self, name) -> variables.Variable:
+        if name in self.columns:
+            return self[name]
+        elif name in self.index.names:
+            return variables.Variable(self.index.get_level_values(name), name=name, metadata=self._fields[name])
+        else:
+            raise ValueError(f"'{name}' not found in columns or index")
 
     def update_metadata_from_yaml(
         self, path: Union[Path, str], table_name: str, extra_variables: Literal["raise", "ignore"] = "raise"
@@ -627,10 +642,51 @@ class Table(pd.DataFrame):
             **kwargs,
         )
 
-    def underscore(self, **kwargs) -> "Table":
-        from .utils import underscore_table
+    def underscore(
+        self,
+        collision: Literal["raise", "rename", "ignore"] = "raise",
+        inplace: bool = False,
+        camel_to_snake: bool = False,
+    ) -> "Table":
+        """Convert column and index names to underscore. In extremely rare cases
+        two columns might have the same underscored version. Use `collision` param
+        to control whether to raise an error or append numbered suffix.
 
-        return underscore_table(self, inplace=False, **kwargs)
+        Parameters
+        ----------
+        t : Table
+            Table to underscore.
+        collision : Literal["raise", "rename", "ignore"], optional
+            How to handle collisions, by default "raise".
+        inplace : bool, optional
+            Whether to modify the table in place, by default False.
+        camel_to_snake : bool, optional
+            Whether to convert strings camelCase to snake_case, by default False.
+        """
+        t = self
+        orig_cols = t.columns
+
+        # underscore columns and resolve collisions
+        new_cols = pd.Index([underscore(c, camel_to_snake=camel_to_snake) for c in t.columns])
+        new_cols = _resolve_collisions(orig_cols, new_cols, collision)
+
+        columns_map = {c_old: c_new for c_old, c_new in zip(orig_cols, new_cols)}
+        if inplace:
+            t.rename(columns=columns_map, inplace=True)
+        else:
+            t = t.rename(columns=columns_map)
+
+        t.index.names = [underscore(e, camel_to_snake=camel_to_snake) for e in t.index.names]
+        t.metadata.primary_key = t.primary_key
+        t.metadata.short_name = underscore(t.metadata.short_name, camel_to_snake=camel_to_snake)
+
+        # put original names as titles into metadata by default
+        for c_old, c_new in columns_map.items():
+            # if underscoring didn't change anything, don't add title
+            if t[c_new].metadata.title is None and c_old != c_new:
+                t[c_new].metadata.title = c_old
+
+        return t
 
     def dropna(self, *args, **kwargs) -> "Table":
         tb = super().dropna(*args, **kwargs).copy()
@@ -789,6 +845,106 @@ class Table(pd.DataFrame):
 
     def sort_index(self, *args, **kwargs) -> "Table":
         return super().sort_index(*args, **kwargs)  # type: ignore
+
+    def groupby(self, *args, **kwargs) -> "TableGroupBy":
+        return TableGroupBy(super().groupby(*args, **kwargs), self.metadata, self._fields)
+
+
+def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
+    """Create a table with metadata."""
+    tb = Table(df, metadata=metadata.copy())
+    tb._fields = defaultdict(VariableMeta, fields)
+    return tb
+
+
+class TableGroupBy:
+    # fixes type hints
+    __annotations__ = {}
+
+    def __init__(self, groupby: pd.core.groupby.DataFrameGroupBy, metadata: TableMeta, fields: Dict[str, Any]):
+        self.groupby = groupby
+        self.metadata = metadata
+        self._fields = fields
+
+    @overload
+    def __getattr__(self, name: Literal["count", "size", "sum", "mean", "median"]) -> Callable[[], "Table"]:
+        ...
+
+    @overload
+    def __getattr__(self, name: str) -> "VariableGroupBy":
+        ...
+
+    def __getattr__(self, name: str) -> Union[Callable[..., "Table"], "VariableGroupBy"]:
+        # Calling method on the groupby object
+        if isinstance(getattr(self.groupby, name), types.MethodType):
+
+            def func(*args, **kwargs):
+                """Apply function and return variable with proper metadata."""
+                df = getattr(self.groupby, name)(*args, **kwargs)
+                if df.ndim == 1:
+                    # output is series, e.g. `size` function
+                    return df
+                else:
+                    return _create_table(df, self.metadata, self._fields)
+
+            self.__annotations__[name] = Callable[..., "Table"]
+            return func
+        else:
+            self.__annotations__[name] = VariableGroupBy
+            return VariableGroupBy(getattr(self.groupby, name), name, self._fields[name])
+
+    @overload
+    def __getitem__(self, key: str) -> "VariableGroupBy":
+        ...
+
+    @overload
+    def __getitem__(self, key: list) -> "TableGroupBy":
+        ...
+
+    def __getitem__(self, key: Union[str, list]) -> Union["VariableGroupBy", "TableGroupBy"]:
+        if isinstance(key, list):
+            return TableGroupBy(self.groupby[key], self.metadata, self._fields)
+        else:
+            return self.__getattr__(key)  # type: ignore
+
+    def __iter__(self) -> Iterator[Tuple[Any, "Table"]]:
+        for name, group in self.groupby:
+            yield name, _create_table(group, self.metadata, self._fields)
+
+    def _groupby_operation(self, op, *args, **kwargs):
+        df = getattr(self.groupby, op)(*args, **kwargs)
+        return _create_table(df, self.metadata, self._fields)
+
+    def agg(self, func: Dict[str, Any], *args, **kwargs) -> "Table":
+        if not isinstance(func, dict):
+            raise NotImplementedError()
+        df = self.groupby.agg(func, *args, **kwargs)
+        return _create_table(df, self.metadata, self._fields)
+
+
+class VariableGroupBy:
+    def __init__(self, groupby: pd.core.groupby.SeriesGroupBy, name: str, metadata: VariableMeta):
+        self.groupby = groupby
+        self.metadata = metadata
+        self.name = name
+
+    def __getattr__(self, funcname) -> Callable[..., "Table"]:
+        def func(*args, **kwargs):
+            """Apply function and return variable with proper metadata."""
+            out = getattr(self.groupby, funcname)(*args, **kwargs)
+
+            # this happens when we use e.g. agg([min, max]), propagate metadata from the original then
+            if isinstance(out, Table):
+                out._fields = defaultdict(VariableMeta, {k: self.metadata for k in out.columns})
+                return out
+            elif isinstance(out, variables.Variable):
+                return out
+            elif isinstance(out, pd.Series):
+                return variables.Variable(out, name=self.name, metadata=self.metadata)
+            else:
+                raise NotImplementedError()
+
+        return func  # type: ignore
 
 
 def merge(
@@ -1433,3 +1589,30 @@ def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List
 def _flatten(lst: List[Any]) -> List[str]:
     """Flatten list that contains either strings or lists."""
     return [item for sublist in lst for item in ([sublist] if isinstance(sublist, str) else sublist)]
+
+
+def _resolve_collisions(
+    orig_cols: pd.Index,
+    new_cols: pd.Index,
+    collision: Literal["raise", "rename", "ignore"],
+) -> pd.Index:
+    new_cols = new_cols.copy()
+    vc = new_cols.value_counts()
+
+    colliding_cols = list(vc[vc >= 2].index)
+    for colliding_col in colliding_cols:
+        ixs = np.where(new_cols == colliding_col)[0]
+        if collision == "raise":
+            raise NameError(
+                f"Columns `{orig_cols[ixs[0]]}` and `{orig_cols[ixs[1]]}` are given the same name "
+                f"`{colliding_cols[0]}` after underscoring`"
+            )
+        elif collision == "rename":
+            # give each column numbered suffix
+            for i, ix in enumerate(ixs):
+                new_cols.values[ix] = f"{new_cols[ix]}_{i + 1}"
+        elif collision == "ignore":
+            pass
+        else:
+            raise NotImplementedError()
+    return new_cols
