@@ -169,15 +169,6 @@ def validate_underscore(name: Optional[str], object_name: str = "Name") -> None:
         raise NameError(f"{object_name} must be snake_case. Change `{name}` to `{underscore(name, validate=False)}`")
 
 
-def concat_variables(variables: List[Variable]) -> Table:
-    """Concatenate variables into a single table keeping all metadata."""
-    t = Table(pd.concat(variables, axis=1))
-    for v in variables:
-        if v.name:
-            t._fields[v.name] = v.metadata
-    return t
-
-
 def dynamic_yaml_load(path: Union[Path, str], params: dict = {}, return_dict=False) -> dict:
     with open(path) as istream:
         yd = dynamic_yaml.load(istream)
