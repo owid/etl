@@ -19,6 +19,15 @@ over their complete lifetime globally".
 
 - The "number of ongoing disputes" for a particular hostility level can be understood as "the number of conflicts ongoing in a particular year that will reach this hostility level
 over their complete lifetime globally".
+
+
+On regions:
+
+- The information on regions is sourced from MIDB dataset. That's why we use it along with MIDA (our main source of data).
+
+- Note that we obtain the information on regions from the participants in the conflict (not the location of the conflict), e.g. `ccode`.
+
+- We encode the region using the codes from COW (based on GW).
 """
 
 from typing import cast
@@ -231,10 +240,10 @@ def add_regions(tb: Table) -> Table:
     ## COW uses custom country codes, so we need the following custom mapping.
     tb.loc[(tb["ccode"] >= 1) & (tb["ccode"] <= 165), "region"] = "Americas"
     tb.loc[(tb["ccode"] >= 200) & (tb["ccode"] <= 395), "region"] = "Europe"
-    tb.loc[(tb["ccode"] >= 400) & (tb["ccode"] <= 626), "region"] = "Africa"
+    tb.loc[(tb["ccode"] >= 402) & (tb["ccode"] <= 626), "region"] = "Africa"
     tb.loc[(tb["ccode"] >= 630) & (tb["ccode"] <= 698), "region"] = "Middle East"
-    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 899), "region"] = "Asia"
-    tb.loc[(tb["ccode"] >= 900) & (tb["ccode"] <= 999), "region"] = "Oceania"
+    tb.loc[(tb["ccode"] >= 700) & (tb["ccode"] <= 850), "region"] = "Asia"
+    tb.loc[(tb["ccode"] >= 860) & (tb["ccode"] <= 999), "region"] = "Oceania"
 
     # Sanity check: No missing regions
     assert tb["region"].notna().all(), f"Missing regions! {tb.loc[tb['region'].isna(), ['dispnum', 'ccode']]}"

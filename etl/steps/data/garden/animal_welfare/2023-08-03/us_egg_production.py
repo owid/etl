@@ -17,7 +17,7 @@ def prepare_number_of_eggs(tb: Table) -> Table:
         "n_hens": "number_of_hens",
         "n_eggs": "number_of_eggs",
     }
-    tb = tb[list(columns)].rename(columns=columns, errors="raise")
+    tb = tb.loc[:, list(columns)].rename(columns=columns, errors="raise")
 
     # Add a column for year.
     tb["year"] = tb["month"].str[0:4]
@@ -29,7 +29,7 @@ def prepare_number_of_eggs(tb: Table) -> Table:
     # There should be 4 rows for each month: one row for hatching eggs, and three for table eggs (for "all", "cage-free (non-organic)" and "cage-free (organic)").
     # Therefore, keep only years that have 12 months, and 4 rows for each month (and skip first and last incomplete years).
     # tb = tb[tb.groupby("month", as_index=True)["product"].transform("count") == 4].reset_index(drop=True)
-    tb = tb[tb.groupby("year", as_index=True)["product"].transform("count") == 4 * 12].reset_index(drop=True)
+    tb = tb.loc[tb.groupby("year", as_index=True)["product"].transform("count") == 4 * 12, :].reset_index(drop=True)
 
     # Sanity checks.
     assert tb.groupby(["month"], as_index=False).count()["product"].unique().tolist() == [
