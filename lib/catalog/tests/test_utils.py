@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 from owid.catalog import Table
-from owid.catalog.utils import underscore, underscore_table
+from owid.catalog.utils import underscore
 
 
 def test_underscore():
@@ -105,7 +105,7 @@ def test_underscore_table():
     t["A"].metadata.description = "column A"
     t["b"].metadata.description = "column B"
 
-    tt = underscore_table(t)
+    tt = t.underscore()
     assert list(tt.columns) == ["a", "b"]
     assert tt.index.names == ["i"]
 
@@ -127,10 +127,10 @@ def test_underscore_table_collision():
 
     # raise error by default
     with pytest.raises(NameError):
-        underscore_table(t)
+        t.underscore()
 
     # add suffix
-    tt = underscore_table(t, collision="rename")
+    tt = t.underscore(collision="rename")
     assert list(tt.columns) == ["a__x_1", "b", "a__x_2"]
 
     # make sure we retain metadata

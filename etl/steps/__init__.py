@@ -98,8 +98,8 @@ def filter_to_subgraph(graph: Graph, includes: Iterable[str], downstream: bool =
     included = {s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)}
 
     if only:
-        # Do not search for dependencies, only include explicitly selected nodes
-        return {step: set() for step in included}
+        # Only include explicitly selected nodes
+        return {step: graph[step] & included for step in included}
 
     if downstream:
         # Reverse the graph to find all nodes dependent on included nodes (forward deps)
