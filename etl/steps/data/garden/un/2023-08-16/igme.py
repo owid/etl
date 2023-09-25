@@ -34,6 +34,8 @@ def run(dest_dir: str) -> None:
         columns={"obs_value": "Observation value", "lower_bound": "Lower bound", "upper_bound": "Upper bound"}
     )
 
+    tb = calculate_under_fifteen_mortality(tb)
+
     tb = tb.pivot(
         index=["country", "year"],
         values=["Observation value", "Lower bound", "Upper bound"],
@@ -108,6 +110,8 @@ def calculate_under_fifteen_mortality(tb: Table) -> Table:
         }
     )
     tb_u15["indicator"] = "Under-fifteen deaths"
+
+    tb = pr.concat([tb, tb_u15])
     return tb
 
 
