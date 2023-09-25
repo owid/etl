@@ -2,14 +2,8 @@
 
 """
 import warnings
-from pathlib import Path
-
-import numpy as np
-import owid.catalog.processing as pr
-from owid.catalog import Table, TableMeta
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -64,9 +58,7 @@ def run(dest_dir: str) -> None:
 
     # Set an appropriate index and sort conveniently.
     # NOTE: There are multiple rows for certain country-years. This will be handled in the garden step.
-    tb = (
-        tb.set_index(["country", "year"], verify_integrity=False).sort_index().sort_index(axis=1)
-    )
+    tb = tb.set_index(["country", "year"], verify_integrity=False).sort_index().sort_index(axis=1)
 
     #
     # Save outputs.
