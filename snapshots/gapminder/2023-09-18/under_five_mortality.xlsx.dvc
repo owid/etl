@@ -1,0 +1,36 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Child mortality rate under age five
+    description: |-
+      Estimates of child mortality rate (under five years old) per 1,000 live births.
+      This data has been compiled by Klara Johansson and Mattias Lindgren (Gapminder) from a selection of sources:
+        * Human Mortality Database
+        * Child Mortality Estimates from the UN Inter-agency Group for Child Mortality Estimation.
+        * Gapminder model based on infant mortality ratio (version 2) https://www.gapminder.org/data/documentation/gd002/
+        * Model estimates based on Gapminder's life expectancy data combined with model life tables, with some additional adjustments
+    date_published: 2015-01-01
+    version_producer: v7
+    title_snapshot: Child mortality rate under age five v7
+
+    # Citation
+    producer: Gapminder
+    citation_full: "Compiled and documented by Klara Johansson and Mattias Lindgren from Gapminder from many sources including: Human Mortality Database; UN Inter-agency Group for Child Mortality Estimation; Gapminder models based on life expectancy; Gapminder models based on infant mortality rates."
+    attribution_short: Gapminder
+
+    # Files
+    url_main: https://www.gapminder.org/data/documentation/gd005/
+    url_download: https://www.gapminder.org/documentation/documentation/gapdata005%20v7.xlsx
+    date_accessed: 2023-09-18
+
+    # License
+    license:
+      name: CC BY 4.0
+  # License (same as origin.license, for backwards compatibility)
+  license:
+    name: CC BY 4.0
+wdir: ../../../data/snapshots/gapminder/2023-09-18
+outs:
+  - md5: 6efd02f741de246be79c38567d0db20a
+    size: 1455549
+    path: under_five_mortality.xlsx

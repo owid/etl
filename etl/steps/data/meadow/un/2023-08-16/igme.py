@@ -3,7 +3,6 @@
 import zipfile
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -20,11 +19,11 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     zf = zipfile.ZipFile(snap.path)
-    df = pr.read_csv(zf.open("UN IGME 2022.csv"), low_memory=False, metadata=snap.to_table_metadata())
+    tb = pr.read_csv(zf.open("UN IGME 2022.csv"), low_memory=False, metadata=snap.to_table_metadata())
     # Process data.
     #
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = tb.underscore()
     tb = tb.rename(columns={"geographic_area": "country", "ref_date": "year"})
     tb = tb.set_index(
         ["country", "year", "indicator", "sex", "wealth_quintile", "series_name", "regional_group"],

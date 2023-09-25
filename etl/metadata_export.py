@@ -31,7 +31,7 @@ def cli(
         etl-metadata-export data/garden/ggdc/2020-10-01/ggdc_maddison -o etl/steps/data/garden/ggdc/2020-10-01/ggdc_maddison.meta.yml
     """
     ds = Dataset(path)
-    meta_str = metadata_export(ds)
+    meta_str = metadata_export(ds, prune=True)
     if output:
         os.makedirs(os.path.dirname(output), exist_ok=True)
         with open(output, "w") as f:
@@ -42,7 +42,11 @@ def cli(
 
 def metadata_export(
     ds: Dataset,
+    prune: bool = False,
 ) -> dict:
+    """
+    :param prune: If True, remove origins and licenses that would be propagated from the snapshot.
+    """
     ds_meta = ds.metadata.to_dict()
 
     # transform dataset metadata
@@ -65,7 +69,8 @@ def metadata_export(
     ds_meta.pop("is_public")
     ds_meta.pop("source_checksum", None)
     # move sources at the end
-    ds_meta["sources"] = ds_meta.pop("sources", [])
+    if "sources" in ds_meta:
+        ds_meta["sources"] = ds_meta.pop("sources", [])
 
     # transform tables metadata
     tb_meta = {}
@@ -140,12 +145,23 @@ def metadata_export(
 
     ds_meta, tb_meta = _move_sources_to_dataset(ds_meta, tb_meta)
 
-    final = {
+    # remove metadata that is propagated from the snapshot
+    # TODO: pruning would be ideally True by default, but we still need some backward compatibility
+    if prune:
+        ds_meta.pop("description", None)
+        ds_meta.pop("origins", None)
+        ds_meta.pop("licenses", None)
+
+        for tab in ds:
+            assert tab.metadata.short_name
+            for var_meta in tb_meta[tab.metadata.short_name]["variables"].values():
+                var_meta.pop("origins", None)
+                var_meta.pop("license", None)
+
+    return {
         "dataset": ds_meta,
         "tables": tb_meta,
     }
-
-    return final
 
 
 def _move_sources_to_dataset(ds_meta: Dict[str, Any], tb_meta: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:

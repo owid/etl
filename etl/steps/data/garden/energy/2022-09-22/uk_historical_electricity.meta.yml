@@ -4,33 +4,28 @@ dataset:
   title: UK historical electricity
   short_name: uk_historical_electricity
   description: |
-    All data prior to 1985 (and prior to 1965 in the case of renewables), is sourced from <a href="https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes">the Digest of UK Energy Statistics (DUKES), published by the UK's Department for Business, Energy & Industrial Strategy</a>.
+    All data prior to 1985 (and prior to 1965 in the case of renewables), is sourced from [the Digest of UK Energy Statistics (DUKES), published by the UK's Department for Business, Energy & Industrial Strategy](https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes).
 
-    All other data is sourced from the <a href="https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html">BP's Statistical Review of World Energy</a> and <a href="https://ember-climate.org/insights/research/global-electricity-review-2022/">Ember Global Electricity Review</a>. Where data from BP is available for a given year, we rely on it as the primary source. We then supplement this with data from Ember where data from BP is not available.
+    All other data is sourced from the [BP's Statistical Review of World Energy](https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html) and [Ember Global Electricity Review](https://ember-climate.org/insights/research/global-electricity-review-2022/). Where data from BP is available for a given year, we rely on it as the primary source. We then supplement this with data from Ember where data from BP is not available.
   sources:
-    -
-      name: Digest of UK Energy Statistics
-      published_by: UK's Department for Business, Energy & Industrial Strategy
-      date_accessed: 2022-09-21
-      url: https://www.gov.uk/government/statistical-data-sets/historical-electricity-data
-    -
-      name: BP Statistical Review of World Energy
-      published_by: BP Statistical Review of World Energy
-      date_accessed: 2022-07-08
-      url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
-    -
-      name: Ember's Global Electricity Review
-      published_by: Ember
-      publication_year: 2022
-      date_accessed: 2022-08-01
-      url: https://ember-climate.org/data-catalogue/yearly-electricity-data/
-    -
-      name: Ember's European Electricity Review
-      published_by: Ember
-      publication_year: 2022
-      date_accessed: 2022-08-01
-      url: https://ember-climate.org/insights/research/european-electricity-review-2022/
-
+  - name: Digest of UK Energy Statistics
+    published_by: UK's Department for Business, Energy & Industrial Strategy
+    date_accessed: 2022-09-21
+    url: https://www.gov.uk/government/statistical-data-sets/historical-electricity-data
+  - name: BP Statistical Review of World Energy
+    published_by: BP Statistical Review of World Energy
+    date_accessed: 2022-07-08
+    url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
+  - name: Ember's Global Electricity Review
+    published_by: Ember
+    publication_year: 2022
+    date_accessed: 2022-08-01
+    url: https://ember-climate.org/data-catalogue/yearly-electricity-data/
+  - name: Ember's European Electricity Review
+    published_by: Ember
+    publication_year: 2022
+    date_accessed: 2022-08-01
+    url: https://ember-climate.org/insights/research/european-electricity-review-2022/
 tables:
   uk_historical_electricity:
     variables:

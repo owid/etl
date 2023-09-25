@@ -32,10 +32,7 @@ def repack_frame(
 
     # repack each column into the best dtype we can give it
     df = pd.concat(
-        [
-            repack_series(df[col]) if col not in dtypes else df[col]
-            for col in df.columns
-        ],
+        [repack_series(df[col]) if col not in dtypes else df[col] for col in df.columns],
         axis=1,
     )
 
@@ -135,9 +132,7 @@ def to_category(s: pd.Series) -> pd.Series:
     return s.astype("category")
 
 
-def series_eq(
-    lhs: pd.Series, rhs: pd.Series, cast: Any, rtol: float = 1e-5, atol: float = 1e-8
-) -> bool:
+def series_eq(lhs: pd.Series, rhs: pd.Series, cast: Any, rtol: float = 1e-5, atol: float = 1e-8) -> bool:
     """
     Check that series are equal, but unlike normal floating point checks where
     NaN != NaN, we want missing or null values to be reported as equal to each

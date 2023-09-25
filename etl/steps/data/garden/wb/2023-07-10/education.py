@@ -41,7 +41,7 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Datas
         in [
             "HD.HCI.LAYS",
             "HD.HCI.LAYS.FE",
-            "HD.HCI.LAYS.ME",
+            "HD.HCI.LAYS.MA",
             "HD.HCI.HLOS",
             "HD.HCI.HLOS.FE",
             "HD.HCI.HLOS.MA",
@@ -99,6 +99,11 @@ def run(dest_dir: str) -> None:
     # Adding share of female students in pre-primary school and total funding per student (household + government)
     tb["percentage_of_female_pre_primary_students)"] = (tb["SE.PRE.ENRL.FE"] / tb["SE.PRE.ENRL"]) * 100
     tb["total_funding_per_student_ppp"] = tb["UIS.XUNIT.PPPCONST.1.FSGOV"] + tb["UIS.XUNIT.PPPCONST.1.FSHH"]
+    # Find the maximum value in the 'HD.HCI.HLOS' column
+    max_value = tb["HD.HCI.HLOS"].max()
+
+    # Normalize every value in the 'HD.HCI.HLOS' column by the maximum value (How many years of effective learning do you get for every year of educaiton)
+    tb["normalized_hci"] = tb["HD.HCI.HLOS"] / max_value
 
     # Load additional datasets for region and income group information for regional aggregates
     ds_regions = paths.load_dependency("regions")
@@ -139,6 +144,7 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
         "percentage_of_female_pre_primary_students",
         "percentage_of_female_tertiary_teachers",
         "total_funding_per_student_ppp",
+        "normalized_hci",
     ]
     for column in tqdm(tb.columns, desc="Processing metadata for indicators"):
         if column not in custom_cols:
@@ -248,5 +254,10 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
             tb[column].metadata.display["numDecimalPlaces"] = 1
             tb[column].metadata.unit = "%"
             tb[column].metadata.short_unit = "%"
-
+        elif column == "normalized_hci":
+            tb[column].metadata.title = "Normalised harmonized learning score"
+            tb[column].metadata.display = {}
+            tb[column].metadata.display["numDecimalPlaces"] = 1
+            tb[column].metadata.unit = "score"
+            tb[column].metadata.short_unit = ""
     return tb

@@ -4,7 +4,6 @@
 
 import pandas as pd
 import pytest
-
 from owid.catalog.meta import VariableMeta
 from owid.catalog.variables import (
     License,
