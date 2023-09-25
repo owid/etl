@@ -95,3 +95,5 @@ steps:
     - data://meadow/war/2023-09-21/prio_v31
   data://grapher/war/2023-09-21/prio_v31:
     - data://garden/war/2023-09-21/prio_v31
+  data://meadow/war/2023-09-25/peace_diehl:
+    - snapshot://war/2023-09-25/peace_diehl.csv
