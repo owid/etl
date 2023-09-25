@@ -10,7 +10,7 @@ descriptions:
   equivalization: |-
     Income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
   additional_info: |-
-    The entire population of each country is considered, and also the income definition is the newest from the OECD since 2012. For more information on the methodology, visit the <href="http://www.oecd.org/social/income-distribution-database.htm">OECD Income Distribution Database (IDD)</href>
+    The entire population of each country is considered, and also the income definition is the newest from the OECD since 2012. For more information on the methodology, visit the [OECD Income Distribution Database (IDD)](http://www.oecd.org/social/income-distribution-database.htm).
   covid: |-
     Survey estimates for 2020 are subject to additional uncertainty and are to be treated with extra caution, as in most countries the survey fieldwork was affected by the Coronavirus (COVID-19) pandemic.
 tables:

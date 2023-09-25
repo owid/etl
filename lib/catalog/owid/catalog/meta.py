@@ -10,27 +10,12 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, NewType, Optional, TypeVar, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, Union
 
 import pandas as pd
 from dataclasses_json import dataclass_json
 
-T = TypeVar("T")
-
-
-def pruned_json(cls: T) -> T:
-    orig = cls.to_dict  # type: ignore
-
-    # only keep non-null public variables
-    # make sure to call `to_dict` of nested objects as well
-    cls.to_dict = lambda self, **kwargs: {  # type: ignore
-        k: getattr(self, k).to_dict(**kwargs) if hasattr(getattr(self, k), "to_dict") else v
-        for k, v in orig(self, **kwargs).items()
-        if not k.startswith("_") and v not in [None, [], {}]
-    }
-
-    return cls
-
+from .utils import pruned_json
 
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 
@@ -247,6 +232,7 @@ class VariableMeta:
     # List of bullet points for the description key (can use markdown formatting)
     description_key: List[str] = field(default_factory=list)
     origins: List[Origin] = field(default_factory=list)  # Origins is the new replacement for sources
+    # Use of `licenses` is discouraged, they should be captured in origins.
     licenses: List[License] = field(default_factory=list)
     unit: Optional[str] = None
     short_unit: Optional[str] = None
@@ -543,7 +529,11 @@ def _deepcopy_dataclass(dc) -> Any:
         if is_dataclass(v):
             setattr(dc, k, _deepcopy_dataclass(v))
         elif isinstance(v, list):
-            setattr(dc, k, [_deepcopy_dataclass(x) if is_dataclass(x) else x for x in v])
+            lis = [_deepcopy_dataclass(x) if is_dataclass(x) else x for x in v]
+            # make sure to preserve the type of the list if we subclass it
+            if type(v) != list:  # noqa
+                lis = type(v)(lis)
+            setattr(dc, k, lis)
         elif isinstance(v, dict):
             setattr(dc, k, {x: _deepcopy_dataclass(y) if is_dataclass(y) else y for x, y in v.items()})
         else:

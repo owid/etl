@@ -315,18 +315,25 @@ def _channel_path(channel: CHANNEL, format: FileFormat) -> Path:
     return Path(f"catalog-{channel}.{format}")
 
 
-def read_frame(uri: str) -> pd.DataFrame:
-    if uri.endswith(".feather"):
-        return cast(pd.DataFrame, pd.read_feather(uri))
+def read_frame(uri: str, max_retries: int = 3) -> pd.DataFrame:  # type: ignore
+    retries = 0
+    while retries <= max_retries:
+        try:
+            if uri.endswith(".feather"):
+                return cast(pd.DataFrame, pd.read_feather(uri))
 
-    elif uri.endswith(".parquet"):
-        return cast(pd.DataFrame, pd.read_parquet(uri))
+            elif uri.endswith(".parquet"):
+                return cast(pd.DataFrame, pd.read_parquet(uri))
 
-    elif uri.endswith(".csv"):
-        return pd.read_csv(uri)
+            elif uri.endswith(".csv"):
+                return pd.read_csv(uri)
 
-    else:
-        raise ValueError(f"Unknown format for {uri}")
+            else:
+                raise ValueError(f"Unknown format for {uri}")
+        except IncompleteRead as e:
+            retries += 1
+            if retries > max_retries:
+                raise e
 
 
 if __name__ == "__main__":

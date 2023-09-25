@@ -22,16 +22,20 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Standardise dimension values
-    tb_lt["sex"] = tb_lt["sex"].map({
-        "Males": "male",
-        "Females": "female",
-        "Total": "both",
-    })
-    tb_ex["sex"] = tb_ex["sex"].map({
-        "Male": "male",
-        "Female": "female",
-        "Total": "both",
-    })
+    tb_lt["sex"] = tb_lt["sex"].map(
+        {
+            "Males": "male",
+            "Females": "female",
+            "Total": "both",
+        }
+    )
+    tb_ex["sex"] = tb_ex["sex"].map(
+        {
+            "Male": "male",
+            "Female": "female",
+            "Total": "both",
+        }
+    )
     # Sanity checks
     columns_dim = ["format", "type", "sex", "age"]
     for col in columns_dim:

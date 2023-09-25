@@ -77,16 +77,28 @@ class Variable(pd.Series):
         self,
         data: Any = None,
         index: Any = None,
+        name: Optional[str] = None,
         _fields: Optional[Dict[str, VariableMeta]] = None,
+        metadata: Optional[VariableMeta] = None,
         **kwargs: Any,
     ) -> None:
+        if metadata:
+            assert not _fields, "cannot pass both metadata and _fields"
+            assert name or self.name, "cannot pass metadata without a name"
+            _fields = {(name or self.name): metadata}  # type: ignore
+
         self._fields = _fields or defaultdict(VariableMeta)
 
         # silence warning
         if data is None and not kwargs.get("dtype"):
             kwargs["dtype"] = "object"
 
-        super().__init__(data=data, index=index, **kwargs)
+        super().__init__(data=data, index=index, name=name, **kwargs)
+
+    @property
+    def m(self) -> VariableMeta:
+        """Metadata alias to save typing."""
+        return self.metadata
 
     @property
     def name(self) -> Optional[str]:
@@ -108,7 +120,7 @@ class Variable(pd.Series):
 
     @property
     def checked_name(self) -> str:
-        if not self.name:
+        if self.name is None:
             raise ValueError("variable must be named to have metadata")
 
         return self.name

@@ -1,9 +1,6 @@
 meta:
-  namespace: war
-  short_name: cow_mid
   name: 'Militarized Interstate Disputes v5.0: MID-Level and Incident-Level (COW,
     2020)'
-  version: '2023-06-09'
   publication_year: 1860
   source_name: COW (2020)
   source_published_by: 'Palmer, Glenn, Roseanne W. McManus, Vito D’Orazio, Michael
@@ -12,11 +9,10 @@ meta:
     and Description.” Conflict Management and Peace Science, 39(4): 470-482. DOI:
     https://journals.sagepub.com/doi/full/10.1177/0738894221995743'
   url: https://correlatesofwar.org/data-sets/mids/
-  source_data_url: 
+  source_data_url:
     https://correlatesofwar.org/wp-content/uploads/MID-5-Data-and-Supporting-Materials.zip
-  file_extension: zip
-  license_url:
-  license_name: ''
+  license_url: https://correlatesofwar.org/data-sets/
+  license_name: Correlates of War terms
   date_accessed: 2023-06-09
   is_public: true
   description: |

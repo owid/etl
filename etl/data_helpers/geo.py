@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, TypeVar, Union, cast
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, Variable
 from owid.datautils.common import ExceptionFromDocstring, warn_on_list_of_entities
 from owid.datautils.dataframes import groupby_agg, map_series
 from owid.datautils.io.json import load_json
@@ -432,7 +432,7 @@ def harmonize_countries(
         df_harmonized = df_harmonized[~df_harmonized[country_col].isin(excluded_countries)]
 
     # Harmonize all remaining country names.
-    df_harmonized[country_col] = map_series(
+    country_harmonized = map_series(
         series=df_harmonized[country_col],
         mapping=countries,
         make_unmapped_values_nan=make_missing_countries_nan,
@@ -440,6 +440,14 @@ def harmonize_countries(
         warn_on_unused_mappings=warn_on_unused_countries,
         show_full_warning=show_full_warning,
     )
+
+    # Put back metadata.
+    if isinstance(df_harmonized, Table):
+        country_harmonized = Variable(
+            country_harmonized, name=country_col, metadata=df_harmonized[country_col].metadata
+        )
+
+    df_harmonized[country_col] = country_harmonized
 
     return df_harmonized  # type: ignore
 

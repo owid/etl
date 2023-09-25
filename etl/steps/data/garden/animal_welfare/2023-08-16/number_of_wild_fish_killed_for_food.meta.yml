@@ -26,6 +26,9 @@ tables:
           numDecimalPlaces: 0
         presentation:
           attribution: *attribution
+          grapher_config:
+            subtitle: This data is calculated based on annual catch figures from 2007 to 2016 in tonnes, and estimated mean weights for fish species. It does not include unrecorded fish capture, such as fish caught illegally and those caught as bycatch and discards.
+            note: Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds.
       n_wild_fish_high:
         title: Estimated number of wild-caught fish killed for food (upper bound)
         unit: 'fish'
@@ -34,5 +37,38 @@ tables:
         description_key: *description_key
         display:
           numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution
+      n_wild_fish_low_per_capita:
+        title: Estimated number of wild-caught fish per capita (lower bound)
+        unit: 'fish per person'
+        short_unit: ''
+        description_short: Lower bound estimate of the annual number of fish caught in global fishing per person.
+        description_key: *description_key
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          attribution: *attribution
+      n_wild_fish_per_capita:
+        title: Estimated number of wild-caught fish per capita
+        unit: 'fish per person'
+        short_unit: ''
+        description_short: Midpoint estimate of the annual number of fish caught in global fishing per person.
+        description_key: *description_key
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          attribution: *attribution
+          grapher_config:
+            subtitle: This data is calculated based on annual catch figures from 2007 to 2016 in tonnes, and estimated mean weights for fish species. It does not include unrecorded fish capture, such as fish caught illegally and those caught as bycatch and discards.
+            note: Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds.
+      n_wild_fish_high_per_capita:
+        title: Estimated number of wild-caught fish killed for food per capita (upper bound)
+        unit: 'fish per person'
+        short_unit: ''
+        description_short: Upper bound estimate of the annual number of fish caught in global fishing per person.
+        description_key: *description_key
+        display:
+          numDecimalPlaces: 2
         presentation:
           attribution: *attribution

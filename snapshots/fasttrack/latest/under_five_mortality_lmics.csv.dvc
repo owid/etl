@@ -4,7 +4,7 @@ meta:
     url: https://osf.io/preprints/socarxiv/xvbkj/
     source_data_url: 
       https://docs.google.com/spreadsheets/d/e/2PACX-1vTSjhkmuM72U-5tPH-ZskJYrdf6HHXWl9qm1aHAM7yoMygj0YVGGlxEvRW3_Xw7w4ynF-1lKJQkB-5V/pub?output=csv
-    date_accessed: '2023-09-18'
+    date_accessed: '2023-09-19'
     publication_year: '2023'
     published_by: Google Sheet
   name: 'Greenaway - Under-five mortality exposure in low- and middle-income countries:
@@ -18,6 +18,6 @@ meta:
   license: {}
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 1a1b757710de3800e2e10b585096d464
-  size: 3619
+- md5: 0c480c8bd17bc1bc25091862be75471e
+  size: 3621
   path: under_five_mortality_lmics.csv

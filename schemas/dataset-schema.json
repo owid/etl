@@ -717,13 +717,6 @@
                     "$ref": "definitions.json#/origin"
                   }
                 },
-                "licenses": {
-                  "type": "array",
-                  "description": "List of all licenses that have been involved in the processing history of the indicator. Automatically filled.",
-                  "items": {
-                    "$ref": "definitions.json#/license"
-                  }
-                },
                 "display": {
                   "$ref": "definitions.json#/display"
                 },

@@ -4,12 +4,12 @@ from typing import cast
 
 import numpy as np
 import pandas as pd
-import us_cpi
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
+from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -97,7 +97,10 @@ def run(dest_dir: str) -> None:
     tb.loc[:, _investment_cols] *= 1e6
 
     # Import US CPI data from the API (to adjust investment indicators for inflation)
-    df_wdi_cpi_us = us_cpi.import_US_cpi_API()
+    snap = cast(Snapshot, paths.load_dependency("us_cpi.csv"))
+
+    # Now read the file with pandas
+    df_wdi_cpi_us = pd.read_csv(snap.path)
     if df_wdi_cpi_us is None:
         log.info("Failed to import US CPI data from the API.")
         return

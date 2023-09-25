@@ -2,6 +2,7 @@
 
 from typing import cast
 
+import shared
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
 from tqdm import tqdm
@@ -11,6 +12,59 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+REGIONS = [
+    "North America",
+    "South America",
+    "Europe",
+    "European Union (27)",
+    "Africa",
+    "Asia",
+    "Oceania",
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
+]
+
+
+def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+    tb_with_regions = tb.copy()
+    # Aggregates for adjusted years of schooling and harmonized learning scores
+    aggregations = {
+        column: "mean"
+        for column in tb_with_regions.columns
+        if column
+        in [
+            "HD.HCI.LAYS",
+            "HD.HCI.LAYS.FE",
+            "HD.HCI.LAYS.MA",
+            "HD.HCI.HLOS",
+            "HD.HCI.HLOS.FE",
+            "HD.HCI.HLOS.MA",
+        ]
+    }
+
+    for region in REGIONS:
+        # Find members of current region.
+        members = geo.list_members_of_region(
+            region=region,
+            ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
+        )
+        tb_with_regions = shared.add_region_aggregates_education(
+            df=tb_with_regions,
+            region=region,
+            countries_in_region=members,
+            countries_that_must_have_data=[],
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.5,
+            aggregations=aggregations,
+        )
+    return tb_with_regions
 
 
 def run(dest_dir: str) -> None:
@@ -45,6 +99,17 @@ def run(dest_dir: str) -> None:
     # Adding share of female students in pre-primary school and total funding per student (household + government)
     tb["percentage_of_female_pre_primary_students)"] = (tb["SE.PRE.ENRL.FE"] / tb["SE.PRE.ENRL"]) * 100
     tb["total_funding_per_student_ppp"] = tb["UIS.XUNIT.PPPCONST.1.FSGOV"] + tb["UIS.XUNIT.PPPCONST.1.FSHH"]
+    # Find the maximum value in the 'HD.HCI.HLOS' column
+    max_value = tb["HD.HCI.HLOS"].max()
+
+    # Normalize every value in the 'HD.HCI.HLOS' column by the maximum value (How many years of effective learning do you get for every year of educaiton)
+    tb["normalized_hci"] = tb["HD.HCI.HLOS"] / max_value
+
+    # Load additional datasets for region and income group information for regional aggregates
+    ds_regions = paths.load_dependency("regions")
+    ds_income_groups = paths.load_dependency("income_groups")
+
+    tb = add_data_for_regions(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Set an appropriate index and sort.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
@@ -79,6 +144,7 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
         "percentage_of_female_pre_primary_students",
         "percentage_of_female_tertiary_teachers",
         "total_funding_per_student_ppp",
+        "normalized_hci",
     ]
     for column in tqdm(tb.columns, desc="Processing metadata for indicators"):
         if column not in custom_cols:
@@ -188,5 +254,10 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
             tb[column].metadata.display["numDecimalPlaces"] = 1
             tb[column].metadata.unit = "%"
             tb[column].metadata.short_unit = "%"
-
+        elif column == "normalized_hci":
+            tb[column].metadata.title = "Normalised harmonized learning score"
+            tb[column].metadata.display = {}
+            tb[column].metadata.display["numDecimalPlaces"] = 1
+            tb[column].metadata.unit = "score"
+            tb[column].metadata.short_unit = ""
     return tb
