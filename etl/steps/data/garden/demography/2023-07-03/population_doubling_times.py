@@ -79,7 +79,6 @@ def run(dest_dir: str) -> None:
     # Keep only one row for each population rounded
     # There are multiple rows mapped to the same "population_rounded", but we are only interested in the one that is closest to the rounded value (lowest error)
     tb["population_error"] = (tb["population"] - tb["population_rounded"]).abs()
-    # DELETEME
     tb = tb[tb["population_error"] == tb.groupby("population_rounded")["population_error"].transform("min")]
     tb = tb.drop(columns=["population_error"])
 

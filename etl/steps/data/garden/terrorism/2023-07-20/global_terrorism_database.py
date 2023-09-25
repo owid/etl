@@ -117,7 +117,6 @@ def run(dest_dir: str) -> None:
         tb["country"].dtype.name == "category"
     ), "The 'country' column must be of type 'category for subsequent aggregations to be correct'"
 
-    # DELETEME
     total_df["total_killed"] = tb.groupby(["country", "year"])["nkill"].sum()
     total_df["total_wounded"] = tb.groupby(["country", "year"])["nwound"].sum()
     total_df["total_incident_counts"] = tb.groupby(["country", "year"]).size()

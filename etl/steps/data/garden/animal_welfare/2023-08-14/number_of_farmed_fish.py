@@ -105,7 +105,6 @@ def run(dest_dir: str) -> None:
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Add number of fish for each country and year.
-    # DELETEME
     tb = tb.groupby(["country", "year"], as_index=False).sum()
 
     # Add region aggregates.

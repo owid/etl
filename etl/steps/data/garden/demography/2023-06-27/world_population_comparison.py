@@ -44,7 +44,6 @@ def get_hyde_32() -> Table:
     ds = cast(Dataset, P.load_dependency(namespace="hyde", short_name="baseline"))
     tb = ds["population"].reset_index()
     # Get only World data, add source name
-    # DELETEME
     tb = tb.groupby("year", as_index=False)[["population"]].sum()
     tb.loc[:, "country"] = "HYDE 3.2 (2017)"
 

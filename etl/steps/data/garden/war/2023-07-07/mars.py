@@ -153,7 +153,6 @@ def reduce_triplets(tb: Table) -> Table:
     - If duplicated triplets present different regions or conflict types, this will raise an error!
     """
     ## Combine duplicated tripplets ("warcode", "campcode", "ccode")
-    # DELETEME
     tb = tb.groupby(["warcode", "campcode", "ccode"], as_index=False).agg(
         {
             "yrstart": "min",
@@ -262,7 +261,6 @@ def estimate_metrics(tb: Table) -> Table:
 
 def _create_ongoing_metrics(tb: Table) -> Table:
     # Check that for a given year and conflict, it only has one conflict type
-    # DELETEME
     tb.groupby(["year", "warcode"])["conflict_type"].nunique().max()
 
     # Estimate number of ongoing conflicts

@@ -147,7 +147,6 @@ def _sanity_checks(tb: Table):
     assert set(tb["refmonth"]) == {52}, "Reference month other than '52' detected!"
 
     assert (tb["period"] == tb["refyear"]).all(), "period != refyear!"
-    # DELETEME
     assert (
         tb.groupby(["refyear", "reporterdesc", "cmdcode"]).size().max() == 1
     ), "There should be, at most, one entry per (refyear, reporterdesc, cmdcode) triplet"

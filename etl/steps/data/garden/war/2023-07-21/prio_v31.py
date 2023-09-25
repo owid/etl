@@ -156,7 +156,6 @@ def _add_ongoing_metrics(tb: Table) -> Table:
 
     ops = {"id": "nunique", "bdeadlow": sum_nan, "bdeadbes": sum_nan, "bdeadhig": sum_nan}
     ## By region and type
-    # DELETEME
     tb_ongoing = tb.groupby(["year", "type", "region"], as_index=False).agg(ops)
     ## Type='all'
     tb_ongoing_alltype = tb.groupby(["year", "region"], as_index=False).agg(ops)

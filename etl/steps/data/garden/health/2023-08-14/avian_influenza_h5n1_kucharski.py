@@ -56,7 +56,6 @@ def run(dest_dir: str) -> None:
 
     # Format dataframe
     log.info("avian: format dataframe")
-    # DELETEME
     tb = tb.groupby(["date", "country", "indicator"], as_index=False).size()
     tb = tb.pivot(index=["date", "country"], columns="indicator", values="size").reset_index()
 

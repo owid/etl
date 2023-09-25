@@ -163,7 +163,6 @@ def process_midb_table(tb: Table) -> Table:
     - Add regions
     """
     # Sanity checks
-    # DELETEME
     assert (
         tb.groupby(["dispnum", "ccode", "styear", "endyear"]).size().max() == 1
     ), "Multiple entries for a conflict-country-start_year-end_year"
