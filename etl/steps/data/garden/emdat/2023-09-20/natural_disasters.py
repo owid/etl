@@ -108,26 +108,6 @@ ALL_DISASTERS_TYPE = "all_disasters"
 # and another dictionary that specifies the changes.
 # Note: Countries here should appear as in the raw data (i.e. not harmonized).
 DATA_CORRECTIONS = []
-# Other potential issues, where more people were affected than the entire population of the country:
-# country             |   year | type    |   affected |   homeless |       population |
-# --------------------|-------:|:--------|-----------:|-----------:|-----------------:|
-# Antigua and Barbuda |   1983 | Drought |      75000 |          0 |  65426           |
-# Botswana            |   1981 | Drought |    1037300 |          0 | 982753           |
-# Dominica            |   2017 | Storm   |      71293 |          0 |  70422           |
-# Ghana               |   1980 | Drought |   12500000 |          0 |      1.18653e+07 |
-# Laos                |   1977 | Drought |    3500000 |          0 |      3.12575e+06 |
-# Mauritania          |   1969 | Drought |    1300000 |          0 |      1.08884e+06 |
-# Mauritania          |   1976 | Drought |    1420000 |          0 |      1.34161e+06 |
-# Mauritania          |   1980 | Drought |    1600000 |          0 |      1.5067e+06  |
-# Montserrat          |   1989 | Storm   |          0 |      12000 |  10918           |
-# Saint Lucia         |   2010 | Storm   |     181000 |          0 | 170950           |
-# Samoa               |   1990 | Storm   |     170000 |      25000 | 168202           |
-# Tonga               |   1982 | Storm   |     100000 |      46500 |  96951           |
-# Finally, there are events registered on the same year for both a historical region and one of its
-# successor countries (we are ignoring this issue).
-# 1902: {'Azerbaijan', 'USSR'},
-# 1990: {'Tajikistan', 'USSR'},
-# 1991: {'Georgia', 'USSR'},
 
 
 def prepare_input_data(tb: Table) -> Table:
