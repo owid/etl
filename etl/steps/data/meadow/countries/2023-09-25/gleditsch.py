@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Combine tables
-    tb = pr.concat([tb_states, tb_micro], ignore_index=True)
+    tb = pr.concat([tb_states, tb_micro], ignore_index=True, short_name=paths.short_name)
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["id", "start", "end"], verify_integrity=True).sort_index()
 
