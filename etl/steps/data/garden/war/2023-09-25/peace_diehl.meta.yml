@@ -73,28 +73,3 @@ tables:
         description_processing: *description_processing
         display:
           numDecimalPlaces: 1
-
-      #   description_key: List of key points about the indicator.
-      #   short_unit: au
-      #   description_from_producer: Description of testing variable from producer.
-      #   presentation:
-      #     title_public:
-      #     title_variant:
-      #     attribution:
-      #     attribution_short:
-      #     topic_tags:
-      #     faqs
-      #     grapher_config
-      #   display:
-      #     name: Testing variable
-      #     description:
-      #     isProjection: false
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
-      #     conversionFactor: 1
-      #     tolerance: 0
-      #     yearIsDay: false
-      #     color:
-      #     includeInTable:
-      #     tableDisplay:
-
