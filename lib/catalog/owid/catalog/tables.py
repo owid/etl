@@ -1244,7 +1244,7 @@ def read_csv(
 
 
 def read_fwf(
-    filepath_or_buffer: FilePath | ReadCsvBuffer[bytes] | ReadCsvBuffer[str],
+    filepath_or_buffer: Union[FilePath, ReadCsvBuffer[bytes], ReadCsvBuffer[str]],
     metadata: Optional[TableMeta] = None,
     underscore: bool = False,
     *args,
