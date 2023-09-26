@@ -32,7 +32,6 @@ def run(dest_dir: str) -> None:
     ages_single = [0, 10, 15, 25, 45, 65, 80]
     ages_single = list(map(str, ages_single))
     tb_1 = tb_1[tb_1["age"].isin(ages_single)]
-
     ## Combine
     tb = pr.concat([tb_5, tb_1], ignore_index=True)
 
