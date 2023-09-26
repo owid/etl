@@ -359,6 +359,9 @@ def create_additional_variables(tb: Table, ds_population: Dataset, tb_gdp: Table
     # TODO: Remote this temporary solution once population has origins.
     from owid.catalog import License, Origin
 
+    error = "Remove temporary solution where origins where manually created."
+    assert tb["population"].metadata.origins == [], error
+    tb["population"].metadata.sources = []
     tb["population"].metadata.origins = [
         Origin(
             producer="Various sources",
@@ -378,6 +381,9 @@ def create_additional_variables(tb: Table, ds_population: Dataset, tb_gdp: Table
     # TODO: Remote this temporary solution once WDI has origins.
     from owid.catalog import License, Origin
 
+    error = "Remove temporary solution where origins where manually created."
+    assert tb_gdp["ny_gdp_mktp_cd"].metadata.origins == [], error
+    tb_gdp["ny_gdp_mktp_cd"].metadata.sources = []
     tb_gdp["ny_gdp_mktp_cd"].metadata.origins = [
         Origin(
             title="World Development Indicators",
