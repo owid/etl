@@ -14,8 +14,9 @@ tables:
     variables:
       central_death_rate:
         title: Central death rate
-        description_short: Central death rate between ages x and x+n.
-        unit: deaths per people
+        description_short: |-
+          For a given population or cohort, the central death rate at age x during a given period of 12 months is found by dividing the number of people who died during this period while aged x by the average number who were living in that age group during the period.
+        unit: deaths per capita
       probability_of_death:
         title: Probability of death
         unit: ""
@@ -53,32 +54,3 @@ tables:
         description_short: Total person-years lived in the age interval [x, x + 1) during calendar year t.
         description_from_producer: |-
           Estimates of the population exposed to the risk of death during some agetime interval are based on annual (January 1st) population estimates, with small corrections that reflect the timing of deaths during the interval. Period exposure estimations are based on assumptions of uniformity in the distribution of events except when historical monthly birth data are available.
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     title_public:
-      #     title_variant:
-      #     attribution:
-      #     attribution_short:
-      #     topic_tags:
-      #     faqs
-      #     grapher_config
-      #   display:
-      #     name: Testing variable
-      #     description:
-      #     isProjection: false
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
-      #     conversionFactor: 1
-      #     tolerance: 0
-      #     yearIsDay: false
-      #     color:
-      #     includeInTable:
-      #     tableDisplay:
-
