@@ -173,7 +173,7 @@ class Snapshot:
 
     def read_fwf(self, *args, **kwargs) -> Table:
         """Read a table of fixed-width formatted lines with metadata."""
-        return pr.read_fwf(*args, metadata=self.to_table_metadata(), **kwargs)
+        return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
 
 
 @pruned_json
