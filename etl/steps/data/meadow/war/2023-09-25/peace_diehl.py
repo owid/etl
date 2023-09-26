@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("peace_diehl.csv")
 
     # Load data from snapshot.
-    tb = pr.read_fwf(snap.path, header=None)
+    tb = pr.read_fwf(snap.path, header=None, metadata=snap.to_table_metadata())
     tb = tb[0].str.split(",", expand=True)
     # tb = Table(df, metadata=snap.to_table_metadata(), short_name=paths.short_name)
 
@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
 
     # Uniform peace_scale_level values (e.g. "0.50", "0.5" -> "0.5")
     tb["peace_scale_level"] = tb["peace_scale_level"].astype(float)
-
+    snap.read
     # Sanity check
     assert tb.isna().sum().sum() == 0, "Unexpected NaNs!"
 
