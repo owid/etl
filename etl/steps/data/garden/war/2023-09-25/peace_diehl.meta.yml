@@ -1,0 +1,52 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 1000
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/tables/
+tables:
+  peace_diehl:
+    variables:
+      peace_scale_level:
+        title: Peace scale level
+        unit: ""
+        description_short: "Describes different levels of peace: severe rivalry, lesser rivalry, negative peace, warm peace, and security community respectively."
+        processing_level: minor
+        description_processing: |-
+          The peace scale levels are encoded using float numbers in the range of 0 to 1:
+
+            - 0: severe rivalry
+            - 0.25: lesser rivalry
+            - 0.5: negative peace
+            - 0.75: warm peace
+            - 1: security community
+
+      #   description_key: List of key points about the indicator.
+      #   short_unit: au
+      #   description_from_producer: Description of testing variable from producer.
+      #   presentation:
+      #     title_public:
+      #     title_variant:
+      #     attribution:
+      #     attribution_short:
+      #     topic_tags:
+      #     faqs
+      #     grapher_config
+      #   display:
+      #     name: Testing variable
+      #     description:
+      #     isProjection: false
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0
+      #     conversionFactor: 1
+      #     tolerance: 0
+      #     yearIsDay: false
+      #     color:
+      #     includeInTable:
+      #     tableDisplay:
+
