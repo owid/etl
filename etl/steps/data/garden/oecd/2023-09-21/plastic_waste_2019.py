@@ -18,17 +18,17 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["plastic_use_2019"].reset_index()
     # Convert million to actual number
-    tb["value"] = tb["value"] * 1e6
+    tb["plastic_waste"] = tb["plastic_waste"] * 1e6
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     #
     # Process data.
     #
-    total_df = tb.groupby(["year", "polymer", "application"])["value"].sum().reset_index()
+    total_df = tb.groupby(["year", "polymer", "application"])["plastic_waste"].sum().reset_index()
 
     total_df["country"] = "World"
     combined_df = pr.merge(
-        total_df, tb, on=["country", "year", "polymer", "application", "value"], how="outer"
+        total_df, tb, on=["country", "year", "polymer", "application", "plastic_waste"], how="outer"
     ).copy_metadata(from_table=tb)
     tb = (
         combined_df.underscore()

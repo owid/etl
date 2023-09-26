@@ -23,8 +23,8 @@ def run(dest_dir: str) -> None:
     # Define the growth rate
     growth_rate = 0.05  # 5%
 
-    # Add new rows for 2016-2018
-    for year in range(2016, 2019):  # 2019 is the stop value and is not included
+    # Add new rows for 2016-2019
+    for year in range(2016, 2020):  # 2020 is the stop value and is not included
         last_value = tb.loc[tb.index[-1], "plastic_production"]  # Getting the last value in the 'Value' column
         new_value = last_value * (1 + growth_rate)  # Calculating the value for the new year
         new_row = {"country": "World", "year": year, "plastic_production": new_value}  # Creating a new row

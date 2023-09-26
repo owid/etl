@@ -19,17 +19,19 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Convert million to actual number
-    tb["value"] = tb["value"] * 1e6
+    tb["plastic_use"] = tb["plastic_use"] * 1e6
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Create a global estimate
-    total_df = tb.groupby("year")["value"].sum().reset_index()
+    total_df = tb.groupby("year")["plastic_use"].sum().reset_index()
     total_df["country"] = "World"
     # Merge with the original dataframe
-    combined_df = pr.merge(total_df, tb, on=["country", "year", "value"], how="outer").copy_metadata(from_table=tb)
+    combined_df = pr.merge(total_df, tb, on=["country", "year", "plastic_use"], how="outer").copy_metadata(
+        from_table=tb
+    )
 
     tb = combined_df.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
-    tb["cumulative_value"] = tb.groupby("country")["value"].cumsum()
+    tb["cumulative_plastic_use"] = tb.groupby("country")["plastic_use"].cumsum()
 
     #
     # Save outputs.

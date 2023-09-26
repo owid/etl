@@ -29,4 +29,4 @@ wdir: ../../../data/snapshots/oecd/2023-09-21
 outs:
 - md5: fe9788c98058910e8a1fc6975a343fd8
   size: 134026
-  path: plastic_use_2019.csv
+  path: plastic_waste_2019.csv

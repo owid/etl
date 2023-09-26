@@ -1,9 +1,10 @@
 tables:
   plastic_use_2019:
     variables:
-      value:
+      plastic_waste:
         title: Plastic use
         unit: 'tonnes'
         short_unit: 't'
         display:
+          isProjection: true
           numDecimalPlaces: 0

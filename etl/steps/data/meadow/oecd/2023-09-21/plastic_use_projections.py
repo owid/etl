@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     columns_to_use = ["Location", "Time", "Value"]
     tb = tb[columns_to_use]
 
-    rename_cols = {"Location": "country", "Time": "year"}
+    rename_cols = {"Location": "country", "Time": "year", "Value": "plastic_use"}
 
     tb = tb.rename(columns=rename_cols)
 

@@ -2,19 +2,19 @@
 tables:
   plastic_use_projections:
     variables:
-      value:
+      plastic_use:
         title: Plastic production - projections
         unit: 'tonnes'
         short_unit: 't'
         display:
-          isProjection: false
+          isProjection: true
           numDecimalPlaces: 0
 
-      cumulative_value:
+      cumulative_plastic_use:
         title: Cumulative plastic production - projections
         unit: 'tonnes'
         short_unit: 't'
         display:
-          isProjection: false
+          isProjection: true
           numDecimalPlaces: 0
 
