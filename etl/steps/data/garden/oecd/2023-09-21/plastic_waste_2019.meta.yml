@@ -1,5 +1,5 @@
 tables:
-  plastic_use_2019:
+  plastic_waste_2019:
     variables:
       plastic_waste:
         title: Plastic waste
