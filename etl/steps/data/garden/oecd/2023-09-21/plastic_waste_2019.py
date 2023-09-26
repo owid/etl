@@ -13,10 +13,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("plastic_use_2019")
+    ds_meadow = paths.load_dataset("plastic_waste_2019")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["plastic_use_2019"].reset_index()
+    tb = ds_meadow["plastic_waste_2019"].reset_index()
     # Convert million to actual number
     tb["plastic_waste"] = tb["plastic_waste"] * 1e6
 

@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
 
-    snap = paths.load_snapshot("plastic_use_2019.csv")
+    snap = paths.load_snapshot("plastic_waste_2019.csv")
 
     # Load data from snapshot.
     tb = snap.read()
@@ -23,7 +23,12 @@ def run(dest_dir: str) -> None:
     columns_to_use = ["Location", "Plastics polymer", "Plastics applications", "Value"]
     tb = tb[columns_to_use]
 
-    rename_cols = {"Location": "country", "Plastics polymer": "polymer", "Plastics applications": "application"}
+    rename_cols = {
+        "Location": "country",
+        "Plastics polymer": "polymer",
+        "Plastics applications": "application",
+        "Value": "plastic_waste",
+    }
 
     tb = tb.rename(columns=rename_cols)
     tb["year"] = 2019

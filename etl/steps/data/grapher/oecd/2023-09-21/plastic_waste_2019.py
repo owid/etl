@@ -11,10 +11,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("plastic_use_2019")
+    ds_garden = paths.load_dataset("plastic_waste_2019")
 
     # Read table from garden dataset.
-    tb = ds_garden["plastic_use_2019"]
+    tb = ds_garden["plastic_waste_2019"]
 
     #
     # Process data.
