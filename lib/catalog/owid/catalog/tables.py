@@ -32,6 +32,10 @@ from owid.repack import repack_frame
 from pandas._typing import Scalar
 from pandas.core.series import Series
 from pandas.util._decorators import rewrite_axis_style_signature
+from pandas._typing import (
+    FilePath,
+    ReadCsvBuffer,
+)
 
 from . import variables
 from .meta import License, Origin, Source, TableMeta, VariableMeta
@@ -1244,7 +1248,7 @@ def read_csv(
 
 
 def read_fwf(
-    filepath_or_buffer: Union[str, Path, IO[AnyStr]],
+    filepath_or_buffer: FilePath | ReadCsvBuffer[bytes] | ReadCsvBuffer[str],
     metadata: Optional[TableMeta] = None,
     underscore: bool = False,
     *args,
