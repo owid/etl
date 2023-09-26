@@ -5,12 +5,14 @@ from datetime import datetime as dt
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
+from structlog import get_logger
 
 # from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+log = get_logger()
 
 
 def run(dest_dir: str) -> None:
@@ -21,18 +23,22 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("peace_diehl")
 
     # Read table from meadow dataset.
+    log.info("peace_diehl: Reading table from meadow dataset.")
     tb = ds_meadow["peace_diehl"].reset_index()
 
     #
     # Process data.
     #
     # Set time fields as strings
+    log.info("peace_diehl: Ensure correct types.")
     tb[["time_start", "time_end"]] = tb[["time_start", "time_end"]].astype(str)
 
     # Times (YYYYMMDD) -> Years (YYYY)
+    log.info("peace_diehl: Get year periods.")
     tb = set_years_in_table(tb)
 
     # Expand observations
+    log.info("peace_diehl: Expand observations.")
     tb = expand_observations(tb)
 
     # Harmonize countries
@@ -40,16 +46,20 @@ def run(dest_dir: str) -> None:
     #     df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     # )
 
-    # Set index
-    tb = tb.set_index(["code_1", "code_2", "year"], verify_integrity=True)[["peace_scale_level"]]
-
     # Get aggregate table (counts)
-    # tb_agg = make_aggregate_table(tb)
+    log.info("peace_diehl: Get aggregate table.")
+    tb_agg = make_aggregate_table(tb)
+    tb_agg.metadata.short_name = f"{tb.metadata.short_name}_agg"
+
+    # Set index
+    log.info("peace_diehl: Set indexes.")
+    tb = tb.set_index(["code_1", "code_2", "year"], verify_integrity=True)[["peace_scale_level"]].sort_index()
+    tb_agg = tb_agg.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     # Define list of tables
     tables = [
         tb,
-        # tb_agg,
+        tb_agg,
     ]
 
     #
@@ -117,8 +127,36 @@ def expand_observations(tb: Table) -> Table:
 
 
 def make_aggregate_table(tb: Table) -> Table:
-    """TODO: Aggregate table."""
-    return tb
+    """Aggregate table.
+
+    Obtain the global number of each type of peace scale level relationship per year.
+    """
+    tb_agg = tb.copy()
+    # Map peace scale levels to readable labels
+    tb_agg["peace_scale_level"] = tb_agg["peace_scale_level"].map(
+        {
+            0: "severe_rivalry",
+            0.25: "lesser_rivalry",
+            0.5: "negative_peace",
+            0.75: "positive_peace",
+            1: "security_community",
+        }
+    )
+
+    # Format table
+    tb_agg = tb_agg.groupby(["year", "peace_scale_level"]).size().unstack()
+
+    # Set country to 'World'
+    tb_agg["country"] = "World"
+
+    # Reset index
+    tb_agg = tb_agg.reset_index()
+
+    # Propagate metadata
+    for column in tb_agg.all_columns:
+        tb_agg[column].metadata.origins = tb["peace_scale_level"].metadata.origins
+
+    return tb_agg
 
 
 def time_to_year(t: str, start: bool = False) -> int:
