@@ -69,7 +69,7 @@ def run(dest_dir: str) -> None:
 
 def combine_datasets(tb_wpp: Table, tb_gap: Table, table_name: str, preferred_source: str) -> Table:
     """
-    Combine IGME and Gapminder data.
+    Combine UN WPP and Gapminder data.
     """
     tb_combined = pr.concat([tb_wpp, tb_gap]).sort_values(["country", "year", "source"])
     assert preferred_source in tb_combined["source"].unique()
@@ -81,7 +81,7 @@ def combine_datasets(tb_wpp: Table, tb_gap: Table, table_name: str, preferred_so
 
 def remove_duplicates(tb: Table, preferred_source: str) -> Table:
     """
-    Removing rows where there are overlapping years with a preference for IGME data.
+    Removing rows where there are overlapping years with a preference for a particular source of data.
 
     """
     assert tb["source"].str.contains(preferred_source).any()
