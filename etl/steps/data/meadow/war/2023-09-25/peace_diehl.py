@@ -1,8 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
 import numpy as np
-import pandas as pd
-from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
@@ -19,9 +17,9 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("peace_diehl.csv")
 
     # Load data from snapshot.
-    df = pd.read_fwf(snap.path, header=None)
-    df = df[0].str.split(",", expand=True)
-    tb = Table(df, metadata=snap.to_table_metadata(), short_name=paths.short_name)
+    tb = pr.read_fwf(snap.path, header=None)
+    tb = tb[0].str.split(",", expand=True)
+    # tb = Table(df, metadata=snap.to_table_metadata(), short_name=paths.short_name)
 
     #
     # Process data.
@@ -32,7 +30,7 @@ def run(dest_dir: str) -> None:
     for i in range(1, tb.shape[1], 2):
         tb_ = tb[[0, i, i + 1]].rename(columns={0: "code", i: "years", i + 1: "peace_scale_level"})
         tbs.append(tb_)
-    tb = pr.concat(tbs, ignore_index=True)
+    tb = pr.concat(tbs, ignore_index=True, short_name=paths.short_name)
 
     # Replace: None -> NaN
     tb = tb.replace({None: np.nan, "": np.nan, ".": np.nan})
