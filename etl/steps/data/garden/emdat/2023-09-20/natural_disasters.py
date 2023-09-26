@@ -23,7 +23,7 @@ import datetime
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table, utils
+from owid.catalog import Dataset, Table, utils
 from shared import (
     HISTORIC_TO_CURRENT_REGION,
     REGIONS,
@@ -313,6 +313,7 @@ def get_total_count_of_yearly_impacts(tb: Table) -> Table:
     This function will produce the total count of impacts per country, year and type of disaster.
 
     """
+    # Get the total count of impacts per country, year and type of disaster.
     counts = (
         tb.reset_index()
         .groupby(["country", "year", "type"], observed=True)
@@ -320,7 +321,11 @@ def get_total_count_of_yearly_impacts(tb: Table) -> Table:
         .reset_index()
         .rename(columns={"index": "n_events"})
     )
+    # Copy metadata from any other column into the new column of counts of events.
+    counts["n_events"] = counts["n_events"].copy_metadata(tb["total_dead"])
+    # Get the sum of impacts per country, year and type of disaster.
     tb = tb.groupby(["country", "year", "type"], observed=True).sum(numeric_only=True, min_count=1).reset_index()
+    # Add the column of the number of events.
     tb = tb.merge(counts, on=["country", "year", "type"], how="left")
 
     return tb
@@ -343,8 +348,51 @@ def create_a_new_type_for_all_disasters_combined(tb: Table) -> Table:
     return tb
 
 
-def create_additional_variables(tb: Table, tb_gdp: Table) -> Table:
+def create_additional_variables(tb: Table, ds_population: Dataset, tb_gdp: Table) -> Table:
     """Create additional variables, namely damages per GDP, and impacts per 100,000 people."""
+    # Add population to table.
+    tb = geo.add_population_to_table(
+        tb=tb, ds_population=ds_population, expected_countries_without_population=["North Yemen", "South Yemen"]
+    )
+
+    ####################################################################################################################
+    # TODO: Remote this temporary solution once population has origins.
+    from owid.catalog import License, Origin
+
+    tb["population"].metadata.origins = [
+        Origin(
+            producer="Various sources",
+            attribution="Population based on various sources (2023)",
+            attribution_short="Population",
+            title="Population",
+            citation_full="The long-run data on population is based on various sources, described on this page: https://ourworldindata.org/population-sources",
+            url_main="https://ourworldindata.org/population-sources",
+            date_accessed="2023-03-31",
+            date_published="2023-03-31",
+            description="Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on various sources.",
+            license=License(name="CC BY 4.0"),
+        )
+    ]
+
+    ####################################################################################################################
+    # TODO: Remote this temporary solution once WDI has origins.
+    from owid.catalog import License, Origin
+
+    tb_gdp["ny_gdp_mktp_cd"].metadata.origins = [
+        Origin(
+            title="World Development Indicators",
+            producer="World Bank and OECD",
+            url_main="https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators",
+            url_download="http://databank.worldbank.org/data/download/WDI_csv.zip",
+            date_accessed="2023-05-29",
+            date_published="2023-05-11",
+            citation_full="World Bank national accounts data, and OECD National Accounts data files. Data extracted from the World Bank's World Development Indicators (WDI).",
+            description="The World Development Indicators (WDI) is the primary World Bank collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available, and includes national, regional and global estimates.",
+            license=License(name="CC BY 4.0"),
+        )
+    ]
+    ####################################################################################################################
+
     # Combine natural disasters with GDP data.
     tb = tb.merge(tb_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
     # Prepare cost variables.
@@ -508,8 +556,8 @@ def run(dest_dir: str) -> None:
     tb_meadow = ds_meadow["natural_disasters"].reset_index()
 
     # Load WDI dataset, read its main table and select variable corresponding to GDP (in current US$).
-    ds_gdp = paths.load_dataset("wdi")
-    tb_gdp = ds_gdp["wdi"][["ny_gdp_mktp_cd"]].reset_index()
+    ds_wdi = paths.load_dataset("wdi")
+    tb_gdp = ds_wdi["wdi"][["ny_gdp_mktp_cd"]].reset_index()
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
@@ -555,13 +603,8 @@ def run(dest_dir: str) -> None:
         ds_income_groups=ds_income_groups,
     )
 
-    # Add population and GDP columns.
-    tb = geo.add_population_to_table(
-        tb=tb, ds_population=ds_population, expected_countries_without_population=["North Yemen", "South Yemen"]
-    )
-
     # Add damages per GDP, and rates per 100,000 people.
-    tb = create_additional_variables(tb=tb, tb_gdp=tb_gdp)
+    tb = create_additional_variables(tb=tb, ds_population=ds_population, tb_gdp=tb_gdp)
 
     # Change disaster types to snake, lower case.
     tb["type"] = tb["type"].replace({value: utils.underscore(value) for value in tb["type"].unique()})
