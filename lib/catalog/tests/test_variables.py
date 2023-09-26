@@ -390,7 +390,9 @@ def test_divide_variables_where_only_numerator_has_metadata(variable_1, variable
     assert variable.metadata.display == variable_1.metadata.display
 
 
-def test_divide_variables_where_only_denominator_has_metadata(variable_1, variable_2, sources, origins, licenses) -> None:
+def test_divide_variables_where_only_denominator_has_metadata(
+    variable_1, variable_2, sources, origins, licenses
+) -> None:
     variable_1 = variable_1.copy()
     variable_2 = variable_2.copy()
     # We remove metadata values from the numerator.
