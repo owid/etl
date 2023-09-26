@@ -2,7 +2,7 @@ tables:
   plastic_use_2019:
     variables:
       plastic_waste:
-        title: Plastic use
+        title: Plastic waste
         unit: 'tonnes'
         short_unit: 't'
         display:
