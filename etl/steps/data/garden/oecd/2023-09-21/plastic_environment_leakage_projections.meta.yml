@@ -3,7 +3,7 @@ tables:
     variables:
       value:
         title: Plastic leakage to the envrionment - projections
-        unit: tonnes
-        short_unit: t
+        unit: 'tonnes'
+        short_unit: 't'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0

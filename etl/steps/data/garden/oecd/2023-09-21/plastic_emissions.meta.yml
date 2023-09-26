@@ -6,22 +6,22 @@ tables:
         unit: 'tonnes of CO₂ equivalent'
         short_unit: 't'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
       ch4:
         title: Methane
         unit: 'tonnes of CO₂ equivalent'
         short_unit: 't'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
       co2:
         title: Carbon dioxide
         unit: 'tonnes of CO₂ equivalent'
         short_unit: 't'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
       n2o:
         title: Nitrous oxide
         unit: 'tonnes of CO₂ equivalent'
         short_unit: 't'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0

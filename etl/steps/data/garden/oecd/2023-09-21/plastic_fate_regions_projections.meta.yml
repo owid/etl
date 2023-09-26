@@ -5,5 +5,5 @@ tables:
         unit: 'tonnes'
         short_unit: 't'
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
 

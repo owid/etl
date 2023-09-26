@@ -5,3 +5,5 @@ tables:
         title: Plastic use
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 0
