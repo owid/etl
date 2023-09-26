@@ -25,14 +25,14 @@ steps:
   data://garden/oecd/2023-09-21/plastic_emissions:
     - data://meadow/oecd/2023-09-21/plastic_emissions
   data://grapher/oecd/2023-09-21/plastic_emissions:
-    -  data://garden/oecd/2023-09-21/plastic_emissions
+    - data://garden/oecd/2023-09-21/plastic_emissions
 
   data://meadow/oecd/2023-09-21/plastic_use_application:
     - snapshot://oecd/2023-09-21/plastic_use_application.csv
   data://garden/oecd/2023-09-21/plastic_use_application:
     - data://meadow/oecd/2023-09-21/plastic_use_application
   data://grapher/oecd/2023-09-21/plastic_use_application:
-    -  data://garden/oecd/2023-09-21/plastic_use_application
+    - data://garden/oecd/2023-09-21/plastic_use_application
 
   data://meadow/oecd/2023-09-21/plastic_use_polymer:
     - snapshot://oecd/2023-09-21/plastic_use_polymer.csv
@@ -72,3 +72,9 @@ steps:
     - data://meadow/oecd/2023-09-21/plastic_aquatic_leakage_projections
   data://grapher/oecd/2023-09-21/plastic_aquatic_leakage_projections:
     - data://garden/oecd/2023-09-21/plastic_aquatic_leakage_projections
+  data://meadow/plastic_waste/2023-09-26/geyer_2017:
+    - snapshot://plastic_waste/2023-09-26/geyer_2017.pdf
+  data://garden/plastic_waste/2023-09-26/geyer_2017:
+    - data://meadow/plastic_waste/2023-09-26/geyer_2017
+  data://grapher/plastic_waste/2023-09-26/geyer_2017:
+    - data://garden/plastic_waste/2023-09-26/geyer_2017
