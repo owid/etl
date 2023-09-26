@@ -9,7 +9,6 @@ from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder
-from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
 # Initialize logger.
@@ -41,8 +40,8 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshots.
-    snap_all: Snapshot = paths.load_dependency("xm_karlinsky_kobak.csv")
-    snap_ages: Snapshot = paths.load_dependency("xm_karlinsky_kobak_ages.csv")
+    snap_all = paths.load_snapshot("xm_karlinsky_kobak.csv")
+    snap_ages = paths.load_snapshot("xm_karlinsky_kobak_ages.csv")
 
     # Load data from snapshot.
     df_all = load_dataframe(snap_all.path, column_names=COLUMN_NAMES)
@@ -54,6 +53,9 @@ def run(dest_dir: str) -> None:
     # Create a new table and ensure all columns are snake-case.
     tb_all = Table(df_all, short_name=paths.short_name, underscore=True)
     tb_ages = Table(df_ages, short_name=f"{paths.short_name}_by_age", underscore=True)
+    # Set index
+    tb_all = tb_all.set_index(["country", "year", "time"], verify_integrity=True)
+    tb_ages = tb_ages.set_index(["country", "year", "age", "sex", "time"], verify_integrity=True)
 
     #
     # Save outputs.
