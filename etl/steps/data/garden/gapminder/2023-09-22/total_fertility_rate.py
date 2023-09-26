@@ -34,15 +34,15 @@ def run(dest_dir: str) -> None:
         columns=["variant", "age", "metric", "sex"]
     )
     tb_fertility["source"] = "un_wpp"
-    #
-    # Combine the two fertility datasets with a preference for the UN WPP data when there is a conflict.
-    tb = combine_datasets(tb_wpp=tb_fertility, tb_gap=tb, table_name="fertility_rate", preferred_source="un_wpp")
+
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    # Combine the two fertility datasets with a preference for the UN WPP data when there is a conflict.
+    tb = combine_datasets(tb_wpp=tb_fertility, tb_gap=tb, table_name="fertility_rate", preferred_source="un_wpp")
+    tb = tb.drop(columns=["source"])
     # Merge with child mortality
-
     tbm = tb.merge(tb_cm, on=["country", "year"], how="inner")
     tbm["under_five_mortality"] = tbm["under_five_mortality"] / 1000
     # Calculate the number of children that die before age five, per woman

@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("total_fertility_rate")
 
     # Read table from garden dataset.
-    tb = ds_garden["total_fertility_rate"]
+    tb = ds_garden["fertility_rate"]
 
     #
     # Process data.

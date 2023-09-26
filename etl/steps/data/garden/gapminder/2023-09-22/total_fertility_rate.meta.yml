@@ -1,5 +1,5 @@
 tables:
-  total_fertility_rate:
+  fertility_rate:
     variables:
       fertility_rate:
         title: Babies per woman (total fertility rate)
