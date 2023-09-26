@@ -41,6 +41,9 @@ def run(dest_dir: str) -> None:
     log.info("peace_diehl: Expand observations.")
     tb = expand_observations(tb)
 
+    # Replace NaNs with zeroes
+    tb["peace_scale_level"] = tb["peace_scale_level"].fillna(0)
+
     # Harmonize countries
     # tb = geo.harmonize_countries(
     #     df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
@@ -155,6 +158,9 @@ def make_aggregate_table(tb: Table) -> Table:
     # Propagate metadata
     for column in tb_agg.all_columns:
         tb_agg[column].metadata.origins = tb["peace_scale_level"].metadata.origins
+
+    # Replace NaNs with zeroes
+    tb_agg = tb_agg.fillna(0)
 
     return tb_agg
 

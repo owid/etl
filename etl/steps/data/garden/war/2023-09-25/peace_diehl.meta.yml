@@ -39,30 +39,40 @@ tables:
         unit: countries
         processing_level: minor
         description_processing: *description_processing
+        display:
+          numDecimalPlaces: 1
       lesser_rivalry:
         title: Number of countries with 'lesser rivalry' relationship
         description_short: Number of countries that have a peace scale relationship labeled as 'lesser rivalry'.
         unit: countries
         processing_level: minor
         description_processing: *description_processing
+        display:
+          numDecimalPlaces: 1
       negative_peace:
         title: Number of countries with 'negative peace' relationship
         description_short: Number of countries that have a peace scale relationship labeled as 'negative peace'.
         unit: countries
         processing_level: minor
         description_processing: *description_processing
+        display:
+          numDecimalPlaces: 1
       positive_peace:
         title: Number of countries with 'positive peace' relationship
         description_short: Number of countries that have a peace scale relationship labeled as 'positive peace'.
         unit: countries
         processing_level: minor
         description_processing: *description_processing
+        display:
+          numDecimalPlaces: 1
       security_community:
         title: Number of countries with 'security community' relationship
         description_short: Number of countries that have a peace scale relationship labeled as 'security community'.
         unit: countries
         processing_level: minor
         description_processing: *description_processing
+        display:
+          numDecimalPlaces: 1
 
       #   description_key: List of key points about the indicator.
       #   short_unit: au
