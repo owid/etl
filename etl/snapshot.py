@@ -171,6 +171,10 @@ class Snapshot:
         """Read records into a Table and populate it with metadata."""
         return pr.read_from_records(*args, metadata=self.to_table_metadata(), **kwargs)
 
+    def read_fwf(self, *args, **kwargs) -> Table:
+        """Read a table of fixed-width formatted lines with metadata."""
+        return pr.read_fwf(*args, metadata=self.to_table_metadata(), **kwargs)
+
 
 @pruned_json
 @dataclass_json
