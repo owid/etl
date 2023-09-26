@@ -920,9 +920,9 @@ class TableGroupBy:
 
         # agg returning multiindex is not yet supported
         if isinstance(df.columns, pd.MultiIndex):
-            raise NotImplementedError()
-
-        return _create_table(df, self.metadata, self._fields)
+            return _create_table(df, self.metadata, self._fields)
+        else:
+            return _create_table(df, self.metadata, self._fields)
 
 
 class VariableGroupBy:
