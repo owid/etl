@@ -974,6 +974,10 @@ def test_groupby_sum(table_1) -> None:
 
 
 def test_groupby_agg(table_1) -> None:
+    gt = table_1.groupby("country")[["a", "b"]].agg("sum")
+    assert gt.values.tolist() == [[3, 6], [3, 9]]
+    assert gt["a"].m.title == "Title of Table 1 Variable a"
+
     gt = table_1.groupby("country").a.agg(["min", "max"])
     assert gt.values.tolist() == [[3, 3], [1, 2]]
     assert gt["min"].m.title == "Title of Table 1 Variable a"
@@ -981,6 +985,20 @@ def test_groupby_agg(table_1) -> None:
     gt = table_1.groupby("country").a.agg("min")
     assert gt.values.tolist() == [3, 1]
     assert gt.m.title == "Title of Table 1 Variable a"
+
+    def has_nan(x: pd.Series) -> bool:
+        """Check if there is a NaN in a group."""
+        return x.isna().any()
+
+    gt = table_1.groupby("country")[["a", "b"]].agg(
+        {
+            "a": [has_nan, sum],
+            "b": sum,
+        }
+    )
+    assert gt.columns.tolist() == [("a", "has_nan"), ("a", "sum"), ("b", "sum")]
+    assert gt.values.tolist() == [[False, 3, 6], [False, 3, 9]]
+    assert isinstance(gt.a, Table)
 
 
 def test_groupby_count(table_1) -> None:

@@ -84,7 +84,7 @@ def run(dest_dir: str) -> None:
         log.info(f"cow: creating table from {snap.path}")
         df = pd.read_csv(path, encoding=encoding)
         tb = Table(df, short_name="inter_state_dyadic", underscore=True)
-        tb = tb.set_index(["warnum", "disno", "year", "statea", "stateb"], verify_integrity=True)
+        tb = tb.set_index(["warnum", "year", "statea", "stateb"], verify_integrity=True)
         tables.append(tb)
     #
     # Save outputs.

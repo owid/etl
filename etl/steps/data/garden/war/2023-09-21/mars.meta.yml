@@ -42,9 +42,15 @@ dataset:
 
     Deaths of combatants due to fighting are included.
 
-    We use the world regions as defined by Project Mars: Asia, Eastern Europe, Latin America, North Africa and the Middle East, North America, Sub-Saharan Africa, and Western Europe.
+    We use the world regions as defined by Project Mars. The regions are shown below, along with the codes of the countries in them. Find the complete list of country codes at https://correlatesofwar.org/wp-content/uploads/states2016.csv.
 
-    You can find more information about the data in our article:
+    - Americas: 2-165
+    - Europe: 200-395
+    - Sub-Saharan Africa: 402-420, 433-434, 437-482, 484-517, 540-591
+    - North Africa and the Middle East: 432, 435-436, 483, 520-531, 600-698
+    - Asia and Oceania: 700-990
+
+    You can find more information about the data in our article: [To be published]
 
 tables:
   mars:
@@ -62,12 +68,10 @@ tables:
           grapher_config:
             selectedEntityNames:
               - Asia
-              - Eastern Europe
-              - Latin America
+              - Europe
+              - Americas
               - North Africa and the Middle East
-              - North America
               - Sub-Saharan Africa
-              - Western Europe
       number_deaths_ongoing_conflicts_low:
         title: Number of soldier deaths in ongoing conflicts (low estimate)
         unit: deaths
@@ -80,12 +84,10 @@ tables:
           grapher_config:
             selectedEntityNames:
               - Asia
-              - Eastern Europe
-              - Latin America
+              - Europe
+              - Americas
               - North Africa and the Middle East
-              - North America
               - Sub-Saharan Africa
-              - Western Europe
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
         unit: conflicts
@@ -117,12 +119,10 @@ tables:
           grapher_config:
             selectedEntityNames:
               - Asia
-              - Eastern Europe
-              - Latin America
+              - Europe
+              - Americas
               - North Africa and the Middle East
-              - North America
               - Sub-Saharan Africa
-              - Western Europe
       number_new_conflicts:
         title: Number of new conflicts
         unit: conflicts
@@ -157,9 +157,7 @@ tables:
           grapher_config:
             selectedEntityNames:
               - Asia
-              - Eastern Europe
-              - Latin America
+              - Europe
+              - Americas
               - North Africa and the Middle East
-              - North America
               - Sub-Saharan Africa
-              - Western Europe
