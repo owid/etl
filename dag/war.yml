@@ -101,3 +101,5 @@ steps:
     - snapshot://war/2023-09-25/peace_diehl.csv
   data://garden/war/2023-09-25/peace_diehl:
     - data://meadow/war/2023-09-25/peace_diehl
+  data://grapher/war/2023-09-26/peace_diehl:
+    - data://garden/war/2023-09-25/peace_diehl
