@@ -15,7 +15,7 @@ NOTES:
 
 """
 
-from owid import catalog
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -38,7 +38,7 @@ DISASTER_TYPE_RENAMING = {
 }
 
 
-def create_wide_tables(table: catalog.Table) -> catalog.Table:
+def create_wide_tables(table: Table) -> Table:
     """Convert input table from long to wide format, and adjust column names to adjust to the old names in the files
     used by the explorer.
     """
@@ -46,16 +46,18 @@ def create_wide_tables(table: catalog.Table) -> catalog.Table:
     table = table.reset_index()
     table["type"] = table["type"].replace(DISASTER_TYPE_RENAMING)
 
-    # Create wide dataframes.
-    table_wide = table.pivot(index=["country", "year"], columns="type")
+    # Create wide table.
+    table_wide = table.pivot(index=["country", "year"], columns="type", join_column_levels_with="_")
 
-    # Flatten column indexes and rename columns to match the old names in explorer.
-    table_wide.columns = [
-        f"{column}_{subcolumn}".replace("per_100k_people", "rate_per_100k")
-        .replace("total_dead", "deaths")
-        .replace("total_damages_per_gdp", "total_damages_pct_gdp")
-        for column, subcolumn in table_wide.columns
-    ]
+    # Rename columns to match the old names in explorer.
+    table_wide = table_wide.rename(
+        columns={
+            column: column.replace("per_100k_people", "rate_per_100k")
+            .replace("total_dead", "deaths")
+            .replace("total_damages_per_gdp", "total_damages_pct_gdp")
+            for column in table_wide.columns
+        }
+    )
 
     # Remove unnecessary columns.
     table_wide = table_wide[
@@ -73,6 +75,9 @@ def create_wide_tables(table: catalog.Table) -> catalog.Table:
             ]
         ]
     ]
+
+    # Set an appropriate index and sort conveniently.
+    table_wide = table_wide.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     return table_wide
 
