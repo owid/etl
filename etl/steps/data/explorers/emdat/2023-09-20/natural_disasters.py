@@ -19,10 +19,9 @@ from copy import deepcopy
 
 from owid import catalog
 
-from etl.helpers import PathFinder
-from etl.paths import DATA_DIR
+from etl.helpers import PathFinder, create_dataset
 
-N = PathFinder(__file__)
+paths = PathFinder(__file__)
 
 # Mapping of old to new disaster type names.
 DISASTER_TYPE_RENAMING = {
@@ -77,31 +76,21 @@ def create_wide_tables(table: catalog.Table) -> catalog.Table:
         ]
     ]
 
-    # Adapt table to the format for explorer files.
-    table_wide = table_wide.reset_index()
-
     return table_wide
 
 
 def run(dest_dir: str) -> None:
     # Load the latest dataset from garden.
-    dataset_garden_latest_dir = sorted((DATA_DIR / "garden" / "emdat").glob("*/natural_disasters"))[-1]
-    dataset_garden = catalog.Dataset(dataset_garden_latest_dir)
+    ds_garden = paths.load_dataset("natural_disasters")
 
     # Load tables with yearly and decadal data.
-    table_yearly = dataset_garden["natural_disasters_yearly"]
-    table_decade = dataset_garden["natural_disasters_decadal"]
+    tb_yearly = ds_garden["natural_disasters_yearly"]
+    tb_decadal = ds_garden["natural_disasters_decadal"]
 
     # Create wide tables adapted to the old format in explorers.
-    table_yearly_wide = create_wide_tables(table=table_yearly)
-    table_decade_wide = create_wide_tables(table=table_decade)
+    tb_yearly_wide = create_wide_tables(table=tb_yearly)
+    tb_decadal_wide = create_wide_tables(table=tb_decadal)
 
     # Initialize a new grapher dataset and add dataset metadata.
-    dataset = catalog.Dataset.create_empty(dest_dir)
-    dataset.metadata = deepcopy(dataset_garden.metadata)
-    dataset.metadata.version = N.version
-    dataset.save()
-
-    # Add tables to dataset. Force publication in csv.
-    dataset.add(table_yearly_wide, formats=["csv"])
-    dataset.add(table_decade_wide, formats=["csv"])
+    ds_grapher = create_dataset(dest_dir, tables=[tb_yearly_wide, tb_decadal_wide], default_metadata=ds_garden.metadata, check_variables_metadata=True, formats=["csv"])
+    ds_grapher.save()

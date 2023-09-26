@@ -211,8 +211,8 @@ steps:
   data://grapher/emdat/2023-09-20/natural_disasters_global_by_type:
     - data://garden/emdat/2023-09-20/natural_disasters
   # Natural disasters explorer.
-  # data://explorers/emdat/2023-09-20/natural_disasters:
-  #   - data://garden/emdat/2023-09-20/natural_disasters
+  data://explorers/emdat/2023-09-20/natural_disasters:
+    - data://garden/emdat/2023-09-20/natural_disasters
 
   # Country profiles - overview
   data://garden/country_profile/2022/overview:
