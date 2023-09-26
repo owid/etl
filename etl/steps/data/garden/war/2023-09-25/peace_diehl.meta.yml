@@ -1,4 +1,9 @@
 # NOTE: To learn more about the fields, hover over their names.
+definitions:
+  description_processing: &description_processing |-
+    In the original data, the provider defines a period with constant peace scale level with year, month and day.
+
+    Therefore, in the same year the peace scale level of the relationship between two countries can change. In such cases, we assign a single peace scale level per year, based on the one that was more prominent during that year.
 
 
 # Learn more about the available fields:
@@ -33,26 +38,31 @@ tables:
         description_short: Number of countries that have a peace scale relationship labeled as 'severe rivalry'.
         unit: countries
         processing_level: minor
+        description_processing: *description_processing
       lesser_rivalry:
         title: Number of countries with 'lesser rivalry' relationship
         description_short: Number of countries that have a peace scale relationship labeled as 'lesser rivalry'.
         unit: countries
         processing_level: minor
+        description_processing: *description_processing
       negative_peace:
         title: Number of countries with 'negative peace' relationship
         description_short: Number of countries that have a peace scale relationship labeled as 'negative peace'.
         unit: countries
         processing_level: minor
+        description_processing: *description_processing
       positive_peace:
         title: Number of countries with 'positive peace' relationship
         description_short: Number of countries that have a peace scale relationship labeled as 'positive peace'.
         unit: countries
         processing_level: minor
+        description_processing: *description_processing
       security_community:
         title: Number of countries with 'security community' relationship
         description_short: Number of countries that have a peace scale relationship labeled as 'security community'.
         unit: countries
         processing_level: minor
+        description_processing: *description_processing
 
       #   description_key: List of key points about the indicator.
       #   short_unit: au
