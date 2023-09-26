@@ -7,9 +7,20 @@ dataset:
 
       Deaths of combatants due to fighting are included.
 
-      We use the world regions of the participants to code the conflicts' world region(s).
+      We use the world regions of the participants to code the conflicts' world region(s). The regions are defined based on Gleditsch and Ward codes. Find the complete mapping at
+      https://correlatesofwar.org/wp-content/uploads/states2016.csv:
 
-      You can find more information about the data in our article:
+        • Americas: 2-165
+
+        • Europe: 200-395
+
+        • Africa: 402-626
+
+        • Middle East: 630-698
+
+        • Asia and Oceania: 700-999
+
+      You can find more information about the data in our article: [To be published]
 
 
 definitions:
@@ -103,7 +114,7 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
       number_new_disputes:
@@ -169,7 +180,6 @@ tables:
             selectedEntityNames:
               - Africa
               - Americas
-              - Asia
+              - Asia and Oceania
               - Europe
               - Middle East
-              - Oceania

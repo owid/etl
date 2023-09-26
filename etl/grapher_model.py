@@ -1072,38 +1072,30 @@ class Variable(SQLModel, table=True):
         assert self.id
 
         # establish relationships between variables and origins
-        if db_origins:
-            OriginsVariablesLink.link_with_variable(session, self.id, {origin.id for origin in db_origins})  # type: ignore
+        OriginsVariablesLink.link_with_variable(session, self.id, {origin.id for origin in db_origins})  # type: ignore
 
         # establish relationships between variables and posts
-        if faqs:
-            required_gdoc_ids = {faq.gdoc_id for faq in faqs}
-            query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))  # type: ignore
-            gdoc_posts = session.exec(query).all()
-            existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
-            missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
-            if missing_gdoc_ids:
-                log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
-
-            faqs_to_insert = [faq for faq in faqs if faq.gdoc_id in existing_gdoc_ids]
-
-            if faqs_to_insert:
-                PostsGdocsVariablesFaqsLink.link_with_variable(session, self.id, faqs_to_insert)
+        required_gdoc_ids = {faq.gdoc_id for faq in faqs}
+        query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))  # type: ignore
+        gdoc_posts = session.exec(query).all()
+        existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
+        missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
+        if missing_gdoc_ids:
+            log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
+        PostsGdocsVariablesFaqsLink.link_with_variable(
+            session, self.id, [faq for faq in faqs if faq.gdoc_id in existing_gdoc_ids]
+        )
 
         # establish relationships between variables and tags
-        if tag_names:
-            # get tags by their name
-            tags = session.exec(select(Tag).where(Tag.name.in_(tag_names))).all()  # type: ignore
+        # get tags by their name
+        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names))).all()  # type: ignore
 
-            # raise a warning if some tags were not found
-            if len(tags) != len(tag_names):
-                found_tags = [tag.name for tag in tags]
-                missing_tags = [tag for tag in tag_names if tag not in found_tags]
-                log.warning("create_links.missing_tags", tags=missing_tags)
-
-            tag_ids = {tag.id for tag in tags}
-            if tag_ids:
-                TagsVariablesTopicTagsLink.link_with_variable(session, self.id, tag_ids)  # type: ignore
+        # raise a warning if some tags were not found
+        if len(tags) != len(tag_names):
+            found_tags = [tag.name for tag in tags]
+            missing_tags = [tag for tag in tag_names if tag not in found_tags]
+            log.warning("create_links.missing_tags", tags=missing_tags)
+        TagsVariablesTopicTagsLink.link_with_variable(session, self.id, {tag.id for tag in tags})  # type: ignore
 
     def s3_data_path(self) -> str:
         """Path to S3 with data in JSON format for Grapher. Typically

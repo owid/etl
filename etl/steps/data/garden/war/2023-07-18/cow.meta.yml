@@ -7,9 +7,22 @@ dataset:
 
     Deaths of combatants due to fighting, disease, and starvation are included.
 
-    We align the world regions across the datasets to be Africa, Americas, Asia, Europe, Middle East, and Oceania. This meant we sometimes had to identify the regions manually.
+    We align the world regions across the datasets to be Africa, Americas, Asia, Europe, Middle East, and Oceania. This meant we sometimes had to identify the regions manually. The regions are defined based on Gleditsch and Ward codes. Find the complete mapping at
+    https://correlatesofwar.org/wp-content/uploads/states2016.csv
 
-    You can find more information about the data in our article:
+      • Americas: 2-165
+
+      • Europe: 200-399
+
+      • Africa: 402-626
+
+      • Middle East: 630-698
+
+      • Asia: 700-850
+
+      • Oceania: 860-999
+
+    You can find more information about the data in our article: [To be published]
 
 tables:
   cow:

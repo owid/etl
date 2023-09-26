@@ -257,7 +257,7 @@
         "category": "dataset"
       },
       "version_producer": {
-        "type": "string",
+        "type": ["string", "number"],
         "title": "Version of the data product as given by the producer",
         "description": "Producer's version of the data product.",
         "requirement_level": "recommended (if existing)",
