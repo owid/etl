@@ -9,7 +9,7 @@ dataset:
 origins_combined: &origins-combined
   - producer: Various sources
     title: Population
-    attribution: Various sources - Population (2023)
+    attribution: Population based on various sources (2023)
     attribution_short: Population
     citation_full: |
       The long-run data on population is based on various sources, described on this page: https://ourworldindata.org/population-sources
