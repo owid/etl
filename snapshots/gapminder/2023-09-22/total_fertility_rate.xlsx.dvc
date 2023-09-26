@@ -5,7 +5,8 @@ meta:
     # Data product / Snapshot
     title: Babies per woman (total fertility rate)
     description: |-
-      Sources
+      **Sources:**
+
       — 1800 to 1950 (and in some cases also years after 1950): Gapminder v6 which were compiled and documented by Mattias Lindgren, see previous versions further down on this page.
 
       — 1950 to 2014: In most cases we use the latest UN estimates from World Population Prospects 2017 published in the file with Annually interpolated demographic indicators, called WPP2017_INT_F01_ANNUAL_DEMOGRAPHIC_INDICATORS.xlsx , accessed on September 2, 2017.
@@ -27,11 +28,10 @@ meta:
     # License
     license:
       name: CC BY 4.0
-      url: 
-        https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
+      url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
 
 wdir: ../../../data/snapshots/gapminder/2023-09-22
 outs:
-- md5: 66745048d5fda22a615d0a69a4d07e6a
-  size: 394538
-  path: total_fertility_rate.xlsx
+  - md5: 66745048d5fda22a615d0a69a4d07e6a
+    size: 394538
+    path: total_fertility_rate.xlsx
