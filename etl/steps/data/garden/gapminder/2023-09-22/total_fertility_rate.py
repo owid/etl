@@ -1,5 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -14,11 +17,26 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("total_fertility_rate")
     ds_child_mortality = paths.load_dataset("long_run_child_mortality")
-    # Read table from meadow dataset.
+    ds_fertility = paths.load_dataset("un_wpp")
+    # Read Gapminder table from meadow dataset.
     tb = ds_meadow["total_fertility_rate"].reset_index()
+    tb["source"] = "Gapminder"
+    # Read long run child mortality table from meadow dataset.
     tb_cm = ds_child_mortality["long_run_child_mortality_selected"].reset_index().sort_values(["country", "year"])
-
+    # Reaf UN WPP fertility data from meadow dataset.
+    tb_fertility = ds_fertility["fertility"].reset_index().sort_values(["location", "year"])
+    tb_fertility = tb_fertility[
+        (tb_fertility["variant"] == "estimates")
+        & (tb_fertility["age"] == "all")
+        & (tb_fertility["metric"] == "fertility_rate")
+    ]
+    tb_fertility = tb_fertility.rename(columns={"location": "country", "value": "fertility_rate"}).drop(
+        columns=["variant", "age", "metric", "sex"]
+    )
+    tb_fertility["source"] = "un_wpp"
     #
+    # Combine the two fertility datasets with a preference for the UN WPP data when there is a conflict.
+    tb = combine_datasets(tb_wpp=tb_fertility, tb_gap=tb, table_name="fertility_rate", preferred_source="un_wpp")
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
@@ -47,3 +65,37 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def combine_datasets(tb_wpp: Table, tb_gap: Table, table_name: str, preferred_source: str) -> Table:
+    """
+    Combine IGME and Gapminder data.
+    """
+    tb_combined = pr.concat([tb_wpp, tb_gap]).sort_values(["country", "year", "source"])
+    assert preferred_source in tb_combined["source"].unique()
+    tb_combined.metadata.short_name = table_name
+    tb_combined = remove_duplicates(tb_combined, preferred_source=preferred_source)
+
+    return tb_combined
+
+
+def remove_duplicates(tb: Table, preferred_source: str) -> Table:
+    """
+    Removing rows where there are overlapping years with a preference for IGME data.
+
+    """
+    assert tb["source"].str.contains(preferred_source).any()
+
+    duplicate_rows = tb.duplicated(subset=["country", "year"], keep=False)
+
+    tb_no_duplicates = tb[~duplicate_rows]
+
+    tb_duplicates = tb[duplicate_rows]
+
+    tb_duplicates_removed = tb_duplicates[tb_duplicates["source"] == preferred_source]
+
+    tb = pr.concat([tb_no_duplicates, tb_duplicates_removed])
+
+    assert len(tb[tb.duplicated(subset=["country", "year"], keep=False)]) == 0
+
+    return tb
