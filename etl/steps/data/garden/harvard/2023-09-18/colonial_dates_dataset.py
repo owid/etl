@@ -81,20 +81,23 @@ def run(dest_dir: str) -> None:
         lambda x: "z. Multiple colonizers" if isinstance(x, str) and " - " in x else x
     )
 
-    # Copy table to not lose metadata
-    tb2 = tb.copy()
-
     # Create last_colonizer column, which is the most recent non-null colonizer for each country and year
-    tb2["last_colonizer"] = tb2.groupby(["country"])["colonizer"].fillna(method="ffill")
-    tb2["last_colonizer_grouped"] = tb2.groupby(["country"])["colonizer_grouped"].fillna(method="ffill")
+    tb["last_colonizer"] = tb.groupby(["country"])["colonizer"].fillna(method="ffill")
+    tb["last_colonizer_grouped"] = tb.groupby(["country"])["colonizer_grouped"].fillna(method="ffill")
 
-    tb2 = tb2.copy_metadata(tb)
-    for col in ["last_colonizer", "last_colonizer_grouped"]:
-        tb2[col].metadata = tb.colonizer.metadata
+    # # Copy table to not lose metadata
+    # tb2 = tb.copy()
 
-    # # Merge both tables
-    # tb = pr.merge(tb2, tb_count, on=["country", "year"], how="outer", short_name="colonial_dates_dataset")
-    tb = tb2.copy()
+    # # Create last_colonizer column, which is the most recent non-null colonizer for each country and year
+    # tb2["last_colonizer"] = tb2.groupby(["country"])["colonizer"].fillna(method="ffill")
+    # tb2["last_colonizer_grouped"] = tb2.groupby(["country"])["colonizer_grouped"].fillna(method="ffill")
+
+    # tb2 = tb2.copy_metadata(tb)
+    # for col in ["last_colonizer", "last_colonizer_grouped"]:
+    #     tb2[col].metadata = tb.colonizer.metadata
+
+    # # # Merge both tables
+    # tb = tb2.copy()
 
     # For countries in colonizers_list, assign the value "Colonizer" to colonizer, colonizer_grouped, last_colonizer and last_colonizer_group column
     for col in ["colonizer", "colonizer_grouped", "last_colonizer", "last_colonizer_grouped"]:
