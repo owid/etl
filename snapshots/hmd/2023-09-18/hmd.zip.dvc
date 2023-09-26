@@ -65,7 +65,7 @@ meta:
     date_published: 2023-09-13
 
     # Citation
-    producer: Various sources
+    producer: Human Mortality Database
     citation_full: HMD. Human Mortality Database. Max Planck Institute for Demographic
       Research (Germany), University of California, Berkeley (USA), and French Institute
       for Demographic Studies (France). Available at www.mortality.org.
@@ -80,10 +80,6 @@ meta:
       url: https://www.mortality.org/Data/UserAgreement
       name: CC BY 4.0
 
-  # License (same as origin.license, for backwards compatibility)
-  license:
-    url: https://www.mortality.org/Data/UserAgreement
-    name: CC BY 4.0
 wdir: ../../../data/snapshots/hmd/2023-09-18
 outs:
 - md5: c2b550f5cd962093ea0a80183db4d7e1
