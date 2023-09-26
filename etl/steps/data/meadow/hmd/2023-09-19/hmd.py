@@ -31,6 +31,12 @@ COLUMNS_RENAME = {
     "Tx": "number_person_years_remaining",
     "ex": "life_expectancy",
 }
+# There are some missing values, filled with '.'. Used in `proces_missing_data_lt`
+FRAC_ROWS_MISSING_EXPECTED_LT = 0.01
+COUNTRIES_MISSING_DATA_EXPECTED_LT = 14
+# There are some missing values, filled with '.'. Used in `proces_missing_data_exp`
+FRAC_ROWS_MISSING_EXPECTED_EXP = 0.23
+COUNTRIES_MISSING_DATA_EXPECTED_EXP = 47
 
 
 def run(dest_dir: str) -> None:
@@ -220,21 +226,18 @@ def proces_missing_data_lt(tb: Table) -> Table:
 
     Missing data comes as '.', instead replace these with NaNs.
     """
-    # Expected missing data
-    frac_rows_missing_expected = 0.01
-    countries_missing_data_expected = 14
     # Find missing data
     rows_missing = tb[tb["central_death_rate"] == "."]
     num_rows_missing = len(rows_missing) / len(tb)
     countries_missing_data = rows_missing["country"].unique()
     # Run checks
-    assert num_rows_missing < frac_rows_missing_expected, (
+    assert num_rows_missing < FRAC_ROWS_MISSING_EXPECTED_LT, (
         f"More missing data than expected was found! {round(num_rows_missing*100, 2)} rows missing, but"
-        f" {round(frac_rows_missing_expected*100, 2)}% were expected."
+        f" {round(FRAC_ROWS_MISSING_EXPECTED_LT*100, 2)}% were expected."
     )
-    assert len(countries_missing_data) <= countries_missing_data_expected, (
+    assert len(countries_missing_data) <= COUNTRIES_MISSING_DATA_EXPECTED_LT, (
         f"More missing data than expected was found! Found {len(countries_missing_data)} countries, expected is"
-        f" {countries_missing_data_expected}. Check {countries_missing_data}!"
+        f" {COUNTRIES_MISSING_DATA_EXPECTED_LT}. Check {countries_missing_data}!"
     )
     # Correct
     tb = tb.replace(".", np.nan)
@@ -246,21 +249,18 @@ def proces_missing_data_exp(tb: Table) -> Table:
 
     Missing data comes as '.', instead replace these with NaNs.
     """
-    # Expected missing data
-    frac_rows_missing_expected = 0.23
-    countries_missing_data_expected = 47
     # Find missing data
     rows_missing = tb[tb["exposure"] == "."]
     num_rows_missing = len(rows_missing) / len(tb)
     countries_missing_data = rows_missing["country"].unique()
     # Run checks
-    assert num_rows_missing < frac_rows_missing_expected, (
+    assert num_rows_missing < FRAC_ROWS_MISSING_EXPECTED_EXP, (
         f"More missing data than expected was found! {round(num_rows_missing*100, 2)} rows missing, but"
-        f" {round(frac_rows_missing_expected*100,2)}% were expected."
+        f" {round(FRAC_ROWS_MISSING_EXPECTED_EXP*100,2)}% were expected."
     )
-    assert len(countries_missing_data) <= countries_missing_data_expected, (
+    assert len(countries_missing_data) <= COUNTRIES_MISSING_DATA_EXPECTED_EXP, (
         f"More missing data than expected was found! Found {len(countries_missing_data)} countries, expected is"
-        f" {countries_missing_data_expected}. Check {countries_missing_data}!"
+        f" {COUNTRIES_MISSING_DATA_EXPECTED_EXP}. Check {countries_missing_data}!"
     )
     # Correct
     tb = tb.replace(".", np.nan)
