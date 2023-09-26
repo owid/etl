@@ -29,7 +29,7 @@ import pyarrow
 import pyarrow.parquet as pq
 import structlog
 from owid.repack import repack_frame
-from pandas._typing import FilePath, ReadCsvBuffer, Scalar
+from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
 from pandas.util._decorators import rewrite_axis_style_signature
 
