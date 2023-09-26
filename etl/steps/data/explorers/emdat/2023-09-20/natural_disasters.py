@@ -15,8 +15,6 @@ NOTES:
 
 """
 
-from copy import deepcopy
-
 from owid import catalog
 
 from etl.helpers import PathFinder, create_dataset
@@ -92,5 +90,11 @@ def run(dest_dir: str) -> None:
     tb_decadal_wide = create_wide_tables(table=tb_decadal)
 
     # Initialize a new grapher dataset and add dataset metadata.
-    ds_grapher = create_dataset(dest_dir, tables=[tb_yearly_wide, tb_decadal_wide], default_metadata=ds_garden.metadata, check_variables_metadata=True, formats=["csv"])
+    ds_grapher = create_dataset(
+        dest_dir,
+        tables=[tb_yearly_wide, tb_decadal_wide],
+        default_metadata=ds_garden.metadata,
+        check_variables_metadata=True,
+        formats=["csv"],
+    )
     ds_grapher.save()
