@@ -12,9 +12,9 @@ meta:
   origin:
     producer: PBL Netherlands Environmental Assessment Agency
     title: HYDE
-    description: |
+    description: |-
       HYDE is an internally consistent combination of updated historical population (gridded) estimates and land use for the past 12,000 years. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area.
-    citation_full: |
+    citation_full: |-
       Klein Goldewijk, K., A. Beusen, J.Doelman and E. Stehfest (2017), Anthropogenic land use estimates for the Holocene; HYDE 3.2, Earth System Science Data, 9, 927-953.
     version_producer: "3.2"
     url_main: https://www.pbl.nl/en/image/links/hyde
