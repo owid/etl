@@ -29,8 +29,8 @@ def run(dest_dir: str) -> None:
     ds_meadow: Dataset = paths.load_dependency("xm_karlinsky_kobak")
 
     # Read table from meadow dataset.
-    tb_meadow = ds_meadow["xm_karlinsky_kobak"]
-    tb_meadow_age = ds_meadow["xm_karlinsky_kobak_by_age"]
+    tb_meadow = ds_meadow["xm_karlinsky_kobak"].reset_index()
+    tb_meadow_age = ds_meadow["xm_karlinsky_kobak_by_age"].reset_index()
 
     # Create a dataframe with data from the table.
     df = pd.DataFrame(tb_meadow)
@@ -47,6 +47,10 @@ def run(dest_dir: str) -> None:
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=tb_meadow.metadata.short_name)
     tb_garden_age = Table(df_age, short_name=tb_meadow_age.metadata.short_name)
+
+    # Set index
+    tb_garden = tb_garden.set_index(["entity", "time", "time_unit", "age"], verify_integrity=True)
+    tb_garden_age = tb_garden_age.set_index(["entity", "time", "time_unit", "age"], verify_integrity=True)
 
     #
     # Save outputs.
