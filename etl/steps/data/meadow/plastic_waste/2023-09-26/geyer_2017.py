@@ -41,9 +41,9 @@ def run(dest_dir: str) -> None:
             table = page.extract_table(table_settings)
 
             if i == 7 - 1:  # If it's the first page (7), include headers
-                all_rows.extend(table)
+                all_rows.extend(table)  # type: ignore
             else:  # If it's the subsequent pages, exclude headers
-                all_rows.extend(table[1:])
+                all_rows.extend(table[1:])  # type: ignore
 
     # Convert the table data into a DataFrame
     df = pd.DataFrame(all_rows[3:], columns=all_rows[0])
