@@ -12,7 +12,7 @@ CURRENT_YEAR = int(paths.version.split("-")[0])
 
 # Define available status names (they should coincide with those used in snapshot).
 STATUS_BANNED = "Banned"
-STATUS_BANNED_NOT_EFFECTIVE = "Banned but not yet effective"
+STATUS_BANNED_NOT_EFFECTIVE = "Banned but not yet in effect"
 STATUS_BANNED_PARTIALLY = "Partially banned"
 STATUS_NOT_BANNED = "Not banned"
 STATUS_ALL = {STATUS_BANNED, STATUS_BANNED_NOT_EFFECTIVE, STATUS_BANNED_PARTIALLY, STATUS_NOT_BANNED}
