@@ -57,7 +57,7 @@ def run(dest_dir: str) -> None:
 
     tb = combine_datasets(tb_a=tb, tb_b=tb_youth, table_name="igme_combined", preferred_source="igme (current)")
 
-    tb = calculate_under_fifteen_mortality_totals(tb)
+    tb = calculate_under_fifteen_deaths(tb)
 
     tb = tb.pivot(
         index=["country", "year"],
@@ -65,6 +65,7 @@ def run(dest_dir: str) -> None:
         columns=["unit_of_measure", "indicator", "sex", "wealth_quintile"],
         join_column_levels_with="-",
     )
+    tb = calculate_under_fifteen_mortality_rates(tb)
     # Add some metadata to the variables. Getting the unit from the column name and inferring the number of decimal places from the unit.
     # If it contains " per " we know it is a rate and should have 1 d.p., otherwise it should be an integer.
     for col in tb.columns[2:]:
@@ -83,6 +84,36 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
+    """
+    First of all we must adjust the mortality rates, so that we can combine age groups together.
+
+    For example, if we want to calculate the mortality rate of under-fifteens then we need to combine the under-five mortality rate and the 5-14 year old age group.
+
+    If there are 100 deaths per 1000 under fives, then we need to adjust the denominator of the 5-14 age group to take account of this.
+    """
+    tb["adjusted_5_14_mortality_rate"] = (
+        (
+            1000
+            - tb[
+                "Observation value-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-All wealth quintiles"
+            ]
+        )
+        / 1000
+    ) * tb[
+        "Observation value-Deaths per 1000 children aged 5-Mortality rate age 5 to 14-Both sexes-All wealth quintiles"
+    ]
+
+    tb[
+        "Observation value-Deaths per 1,000 live births-Under-fifteen mortality rate-Both sexes-All wealth quintiles"
+    ] = (
+        tb["Observation value-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-All wealth quintiles"]
+        + tb["adjusted_5_14_mortality_rate"]
+    )
+
+    return tb
 
 
 def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source: str) -> Table:
@@ -123,7 +154,7 @@ def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -
     return tb
 
 
-def calculate_under_fifteen_mortality_totals(tb: Table) -> Table:
+def calculate_under_fifteen_deaths(tb: Table) -> Table:
     """
     Calculate the under fifteen mortality total deaths.
     """
