@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from math import trunc
+from typing import List
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -49,6 +50,7 @@ def run(dest_dir: str) -> None:
         }
     ).drop(columns=["series_name_name"])
     tb_youth = clean_values(tb_youth)
+    tb_youth["wealth_quintile"] = "All wealth quintiles"
     tb_youth["source"] = "igme (2018)"
 
     # Combine datasets with a preference for the current data when there is a conflict.
@@ -90,19 +92,23 @@ def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source
     tb_combined = pr.concat([tb_a, tb_b]).sort_values(["country", "year", "source"])
     assert any(tb_combined["source"] == preferred_source)
     tb_combined.metadata.short_name = table_name
-    tb_combined = remove_duplicates(tb_combined, preferred_source=preferred_source)
+    tb_combined = remove_duplicates(
+        tb_combined,
+        preferred_source=preferred_source,
+        dimensions=["country", "year", "sex", "wealth_quintile", "indicator", "unit_of_measure"],
+    )
 
     return tb_combined
 
 
-def remove_duplicates(tb: Table, preferred_source: str) -> Table:
+def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -> Table:
     """
     Removing rows where there are overlapping years with a preference for IGME data.
 
     """
     assert any(tb["source"] == preferred_source)
 
-    duplicate_rows = tb.duplicated(subset=["country", "year"], keep=False)
+    duplicate_rows = tb.duplicated(subset=dimensions, keep=False)
 
     tb_no_duplicates = tb[~duplicate_rows]
 
@@ -112,7 +118,7 @@ def remove_duplicates(tb: Table, preferred_source: str) -> Table:
 
     tb = pr.concat([tb_no_duplicates, tb_duplicates_removed])
 
-    assert len(tb[tb.duplicated(subset=["country", "year"], keep=False)]) == 0
+    assert len(tb[tb.duplicated(subset=dimensions, keep=False)]) == 0
 
     return tb
 
