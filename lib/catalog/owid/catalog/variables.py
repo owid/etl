@@ -425,14 +425,24 @@ def _get_dict_from_list_if_all_identical(list_of_objects: List[Optional[Dict[str
     return reference_dict if all(d == reference_dict for d in defined_dicts) else None
 
 
-def combine_variables_display(variables: List[Variable]) -> Optional[Dict[str, Any]]:
-    return _get_dict_from_list_if_all_identical(list_of_objects=[variable.metadata.display for variable in variables])
+def combine_variables_display(
+    variables: List[Variable], operation: OPERATION, _field_name="display"
+) -> Optional[Dict[str, Any]]:
+    # Gather displays from all variables that are defined.
+    list_of_displays = [getattr(variable.metadata, _field_name) for variable in variables]
+    if operation == "/" and list_of_displays[0] is None:
+        # When dividing a variable by another, it only makes sense to keep the display values of the first variable.
+        # Therefore, if the first variables doesn't have a display, the resulting variable should have no display.
+        return None
+    else:
+        return _get_dict_from_list_if_all_identical(list_of_objects=list_of_displays)
 
 
-def combine_variables_presentation(variables: List[Variable]) -> Optional[VariablePresentationMeta]:
-    return _get_dict_from_list_if_all_identical(
-        list_of_objects=[variable.metadata.presentation for variable in variables]  # type: ignore
-    )
+def combine_variables_presentation(
+    variables: List[Variable], operation: OPERATION
+) -> Optional[VariablePresentationMeta]:
+    # Apply the same logic as for displays.
+    return combine_variables_display(variables=variables, operation=operation, _field_name="presentation")  # type: ignore
 
 
 def combine_variables_processing_level(variables: List[Variable]) -> Optional[PROCESSING_LEVELS]:
@@ -491,8 +501,8 @@ def combine_variables_metadata(
     metadata.origins = get_unique_origins_from_variables(variables=variables_only)
     metadata.licenses = get_unique_licenses_from_variables(variables=variables_only)
     metadata.processing_log = combine_variables_processing_logs(variables=variables_only)
-    metadata.display = combine_variables_display(variables=variables_only)
-    metadata.presentation = combine_variables_presentation(variables=variables_only)
+    metadata.display = combine_variables_display(variables=variables_only, operation=operation)
+    metadata.presentation = combine_variables_presentation(variables=variables_only, operation=operation)
     metadata.processing_level = combine_variables_processing_level(variables=variables_only)
 
     # List names of variables and scalars (or other objects passed in variables).
