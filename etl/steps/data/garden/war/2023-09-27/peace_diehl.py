@@ -18,7 +18,7 @@ log = get_logger()
 ## To fix this we either go to file `peacedatav31dymon.csv` and check the years there of
 ## check the data itself, in case there are previous or following year periods.
 START_YEAR_FIXES = {
-    "19620086": "19620101",  # dyad code 51365
+    "19620086": "19620806",  # dyad code 51365
 }
 END_YEAR_FIXES = {
     "19699025": "19690925",  # dyad code 435600
