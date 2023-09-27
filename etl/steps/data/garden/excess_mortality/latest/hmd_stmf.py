@@ -35,6 +35,7 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["hmd_stmf"]
+    tb_meadow = tb_meadow.reset_index()
 
     # Create a dataframe with data from the table.
     df = pd.DataFrame(tb_meadow)
@@ -48,6 +49,8 @@ def run(dest_dir: str) -> None:
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=tb_meadow.metadata.short_name)
 
+    # Set index
+    tb_garden = tb_garden.set_index(["entity", "week", "age"], verify_integrity=True)
     #
     # Save outputs.
     #

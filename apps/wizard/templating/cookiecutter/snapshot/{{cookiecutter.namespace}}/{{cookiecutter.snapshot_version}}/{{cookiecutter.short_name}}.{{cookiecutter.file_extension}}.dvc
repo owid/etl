@@ -22,7 +22,8 @@ meta:
 
     # Citation
     producer: {{cookiecutter.producer}}
-    citation_full: {{cookiecutter.citation_full}}
+    citation_full: |-
+      {{cookiecutter.citation_full}}
     {%- if cookiecutter.attribution %}
     attribution: {{cookiecutter.attribution}}
     {%- endif %}

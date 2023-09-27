@@ -4,7 +4,7 @@
 
 import pandas as pd
 import pytest
-from owid.catalog.meta import VariableMeta
+from owid.catalog.meta import VariableMeta, VariablePresentationMeta
 from owid.catalog.variables import (
     License,
     Variable,
@@ -361,3 +361,120 @@ def test_copy() -> None:
     # make sure it doesn't affect original variable
     assert v1.metadata.title == "dog"
     assert v1.metadata.license.name == "dog license"
+
+
+def test_divide_variables_where_only_numerator_has_metadata(variable_1, variable_2, sources, origins, licenses) -> None:
+    variable_1 = variable_1.copy()
+    variable_2 = variable_2.copy()
+    # We remove metadata values from the denominator.
+    variable_2.metadata.title = None
+    variable_2.metadata.description = None
+    variable_2.metadata.unit = None
+    variable_2.metadata.short_unit = None
+
+    # The new variable should have all metadata values from the numerator (for those fields).
+    variable = variable_1 / variable_2
+    assert variable.metadata.title == variable_1.metadata.title
+    assert variable.metadata.description == variable_1.metadata.description
+    assert variable.metadata.unit == variable_1.metadata.unit
+    assert variable.metadata.short_unit == variable_1.metadata.short_unit
+    # Sources, origins and licenses should be propagated as normally.
+    assert variable.metadata.sources == [sources[2], sources[1], sources[3]]
+    assert variable.metadata.origins == [origins[2], origins[1], origins[3]]
+    assert variable.metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    # variable_2 has a major processing level, so the combined variable should have a major processing level.
+    assert variable.metadata.processing_level == "major"
+    # Both variables have different values in presentation, so the combination should have no presentation.
+    assert variable.metadata.presentation is None
+    # Since both variables have identical display, the combination should have the same display.
+    assert variable.metadata.display == variable_1.metadata.display
+
+
+def test_divide_variables_where_only_denominator_has_metadata(
+    variable_1, variable_2, sources, origins, licenses
+) -> None:
+    variable_1 = variable_1.copy()
+    variable_2 = variable_2.copy()
+    # We remove metadata values from the numerator.
+    variable_1.metadata.title = None
+    variable_1.metadata.description = None
+    variable_1.metadata.unit = None
+    variable_1.metadata.short_unit = None
+
+    # The new variable should have no metadata values (for those fields).
+    variable = variable_1 / variable_2
+    assert variable.metadata.title is None
+    assert variable.metadata.description is None
+    assert variable.metadata.unit is None
+    assert variable.metadata.short_unit is None
+    # Sources, origins and licenses should be propagated as normally.
+    assert variable.metadata.sources == [sources[2], sources[1], sources[3]]
+    assert variable.metadata.origins == [origins[2], origins[1], origins[3]]
+    assert variable.metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    # variable_2 has a major processing level, so the combined variable should have a major processing level.
+    assert variable.metadata.processing_level == "major"
+    # Both variables have different values in presentation, so the combination should have no presentation.
+    assert variable.metadata.presentation is None
+    # Since both variables have identical display, the combination should have the same display.
+    assert variable.metadata.display == variable_1.metadata.display
+
+
+def test_display_propagation_on_divisions(variable_1, variable_2) -> None:
+    variable_1 = variable_1.copy()
+    variable_2 = variable_2.copy()
+
+    # If the numerator has no display but the denominator has display, the result should have no display.
+    variable_1.metadata.display = None
+    variable_2.metadata.display = {"numDecimalPlaces": 0}
+    variable = variable_1 / variable_2
+    assert variable.metadata.display is None
+
+    # If the numerator has display but the denominator has no display, the result should have the numerator's display.
+    variable_1.metadata.display = {"numDecimalPlaces": 0}
+    variable_2.metadata.display = None
+    variable = variable_1 / variable_2
+    assert variable.metadata.display == {"numDecimalPlaces": 0}
+
+    # If both numerator and denominator have the same display, the result should have that display.
+    variable_1.metadata.display = {"numDecimalPlaces": 0}
+    variable_2.metadata.display = {"numDecimalPlaces": 0}
+    variable = variable_1 / variable_2
+    assert variable.metadata.display == {"numDecimalPlaces": 0}
+
+    # If numerator and denominator have different displays, the result should have no display.
+    # NOTE: It is not clear if this is the best choice. Alternatively, we could keep the numerator's display.
+    variable_1.metadata.display = {"numDecimalPlaces": 0}
+    variable_2.metadata.display = {"numDecimalPlaces": 1}
+    variable = variable_1 / variable_2
+    assert variable.metadata.display is None
+
+
+def test_presentation_propagation_on_divisions(variable_1, variable_2) -> None:
+    variable_1 = variable_1.copy()
+    variable_2 = variable_2.copy()
+
+    # If the numerator has no presentation but the denominator has presentation, the result should have no presentation.
+    variable_1.metadata.presentation = None
+    variable_2.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
+    variable = variable_1 / variable_2
+    assert variable.metadata.presentation is None
+
+    # If the numerator has presentation but the denominator has no presentation,
+    # the result should have the numerator's presentation.
+    variable_1.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
+    variable_2.metadata.presentation = None
+    variable = variable_1 / variable_2
+    assert variable.metadata.presentation == VariablePresentationMeta("test")  # type: ignore
+
+    # If both numerator and denominator have the same presentation, the result should have that presentation.
+    variable_1.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
+    variable_2.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
+    variable = variable_1 / variable_2
+    assert variable.metadata.presentation == VariablePresentationMeta("test")  # type: ignore
+
+    # If numerator and denominator have different presentations, the result should have no presentation.
+    # NOTE: It is not clear if this is the best choice. Alternatively, we could keep the numerator's presentation.
+    variable_1.metadata.presentation = VariablePresentationMeta("test 1")  # type: ignore
+    variable_2.metadata.presentation = VariablePresentationMeta("test 2")  # type: ignore
+    variable = variable_1 / variable_2
+    assert variable.metadata.presentation is None

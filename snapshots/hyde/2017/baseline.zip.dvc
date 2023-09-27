@@ -1,6 +1,4 @@
 meta:
-  namespace: hyde
-  short_name: baseline
   name: Hyde 3.2 (baseline estimates)
   source_name: PBL Netherlands Environmental Assessment Agency
   publication_year: 2017
@@ -8,10 +6,26 @@ meta:
   source_data_url: https://dataportaal.pbl.nl/downloads/HYDE/HYDE3.2/baseline.zip
   license_url: https://dataportaal.pbl.nl/downloads/HYDE/HYDE3.2/readme_release_HYDE3.2.1.txt
   license_name: CC BY 3.0
-  file_extension: zip
   date_accessed: 2021-10-01
   description: |
     HYDE is an internally consistent combination of updated historical population (gridded) estimates and land use for the past 12,000 years. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area.
+  origin:
+    producer: PBL Netherlands Environmental Assessment Agency
+    title: HYDE
+    description: |-
+      HYDE is an internally consistent combination of updated historical population (gridded) estimates and land use for the past 12,000 years. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area.
+    citation_full: |-
+      Klein Goldewijk, K., A. Beusen, J.Doelman and E. Stehfest (2017), Anthropogenic land use estimates for the Holocene; HYDE 3.2, Earth System Science Data, 9, 927-953.
+    version_producer: "3.2"
+    url_main: https://www.pbl.nl/en/image/links/hyde
+    url_download: https://public.yoda.uu.nl/geo/UU01/MO2FF3.html
+    attribution: "HYDE (2017)"
+    attribution_short: "HYDE"
+    date_accessed: 2021-10-01
+    date_published: "2017"
+    license:
+      name: CC BY 3.0
+      url: https://public.yoda.uu.nl/geo/UU01/MO2FF3.html
 wdir: ../../../data/snapshots/hyde/2017
 outs:
 - md5: acdbbd3908a29fb8ae75f3e081c980ad
