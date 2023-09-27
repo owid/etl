@@ -66,3 +66,11 @@ steps:
   # PRIO v1
   data://meadow/war/2023-06-07/prio_v1:
     - snapshot://war/2023-02-03/prio_v1.zip
+
+  # Diehl
+  data://meadow/war/2023-09-25/peace_diehl:
+    - snapshot://war/2023-09-25/peace_diehl.csv
+  data://garden/war/2023-09-25/peace_diehl:
+    - data://meadow/war/2023-09-25/peace_diehl
+  data://grapher/war/2023-09-26/peace_diehl:
+    - data://garden/war/2023-09-25/peace_diehl

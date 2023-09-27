@@ -29,7 +29,7 @@ import pyarrow
 import pyarrow.parquet as pq
 import structlog
 from owid.repack import repack_frame
-from pandas._typing import Scalar
+from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
 from pandas.util._decorators import rewrite_axis_style_signature
 
@@ -1252,6 +1252,23 @@ def read_csv(
         table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
     else:
         log.warning("Currently, the processing log cannot be updated unless you pass a path to read_csv.")
+
+    return cast(Table, table)
+
+
+def read_fwf(
+    filepath_or_buffer: Union[FilePath, ReadCsvBuffer[bytes], ReadCsvBuffer[str]],
+    metadata: Optional[TableMeta] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_fwf(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    if isinstance(filepath_or_buffer, (str, Path)):
+        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
+    else:
+        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_fwf.")
 
     return cast(Table, table)
 
