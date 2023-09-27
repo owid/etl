@@ -1,0 +1,10 @@
+dataset:
+  title: Public Expenditure on Education OECD - Tanzi & Schuknecht (2000)
+tables:
+  public_expenditure:
+    variables:
+      public_expenditure_on_education__tanzi__and__schuktnecht__2000:
+        title: Public Expenditure on Education (Tanzi & Schuktnecht (2000))
+        description: Public Expenditure on Education (% GDP)
+        unit: percent of GDP
+        short_unit: '%'
