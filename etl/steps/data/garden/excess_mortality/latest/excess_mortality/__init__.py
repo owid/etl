@@ -6,7 +6,7 @@ Both sources are updated weekly.
 This step merges the two datasets into one single dataset, combining metrics from both sources to obtain excess mortality metrics.
 
 """
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -27,9 +27,9 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load dependency datasets.
-    ds_hmd: Dataset = paths.load_dependency("hmd_stmf")
-    ds_wmd: Dataset = paths.load_dependency("wmd")
-    ds_kobak: Dataset = paths.load_dependency("xm_karlinsky_kobak")
+    ds_hmd = paths.load_dataset("hmd_stmf")
+    ds_wmd = paths.load_dataset("wmd")
+    ds_kobak = paths.load_dataset("xm_karlinsky_kobak")
 
     # Build initial dataframe
     df = build_df(ds_hmd, ds_wmd, ds_kobak)
