@@ -1,7 +1,7 @@
 dataset:
-  update_period_days: 365
-
-origins: &origins
+  update_period_days: 90
+  sources: []
+  origins:
   - producer: Global Carbon Project
     title: Global Carbon Budget
     description: |
@@ -48,10 +48,11 @@ tables:
             - Climate Change
             - Energy
           faqs:
-          - fragment_id: emissions-from-aviation-and-shipping
-            gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-          - fragment_id: missing-consumption-based-emissions
-            gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: emissions-from-aviation-and-shipping
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: missing-consumption-based-emissions
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          # NOTE: copied from http://staging-site-mojmir/admin/charts/3488/edit
           grapher_config:
             title: Per capita consumption-based CO₂ emissions
             subtitle: >-
@@ -100,6 +101,3 @@ tables:
             relatedQuestions:
               - url: https://ourworldindata.org/grapher/consumption-co2-per-capita#faqs
                 text: FAQs on this data
-
-        sources: []
-        origins: *origins
