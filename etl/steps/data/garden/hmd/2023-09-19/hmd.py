@@ -70,6 +70,9 @@ def run(dest_dir: str) -> None:
     log.info("hmd: calculating extra variables (ratio and difference in life expectancy for f and m).")
     tb = add_le_diff_and_ratios(tb, columns_primary)
 
+    # Scale central death rates
+    tb["central_death_rate"] = tb["central_death_rate"] * 1000
+
     # Final metadata touches
     tb.metadata.short_name = paths.short_name
     # Set index
