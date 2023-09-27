@@ -107,7 +107,7 @@ def run(dest_dir: str) -> None:
     tb["normalized_hci"] = tb["HD.HCI.HLOS"] / max_value
 
     # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
-    tb = combine_historical_literacy_expenditure(tb)
+    tb, combined_literacy_description, combined_expenditure_description = combine_historical_literacy_expenditure(tb)
 
     # Load additional datasets for region and income group information for regional aggregates
     ds_regions = paths.load_dependency("regions")
@@ -120,7 +120,7 @@ def run(dest_dir: str) -> None:
     tb = Table(tb, short_name=paths.short_name, underscore=True)
 
     # Add metadata by finding the descriptions and sources using the indicator codes.
-    tb = add_metadata(tb, metadata_tb)
+    tb = add_metadata(tb, metadata_tb, combined_literacy_description, combined_expenditure_description)
 
     #
     # Save outputs.
@@ -196,10 +196,16 @@ def combine_historical_literacy_expenditure(tb):
         on=["year", "country"],
         how="outer",
     )
-    return tb
+
+    combined_literacy_description = ds_literacy.metadata.sources[0].description
+    combined_expenditure_description = ds_expenditure.metadata.sources[0].description
+
+    return tb, combined_literacy_description, combined_expenditure_description
 
 
-def add_metadata(tb: Table, metadata_tb: Table) -> None:
+def add_metadata(
+    tb: Table, metadata_tb: Table, combined_literacy_description, combined_expenditure_description
+) -> None:
     """
     Adds metadata by fetching details from the table with descriptions and sources originally retrieved in snapshot using the World Bank API.
 
@@ -337,12 +343,14 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
             tb[column].metadata.short_unit = ""
         elif column == "combined_literacy":
             tb[column].metadata.title = "Historical and more recent literacy estimates"
+            tb[column].metadata.description = "Historical literacy data:\n\n" + combined_literacy_description
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 2
             tb[column].metadata.unit = "%"
             tb[column].metadata.short_unit = "%"
         elif column == "combined_expenditure":
             tb[column].metadata.title = "Historical and more recent expenditure estimates"
+            tb[column].metadata.description = "Historical expenditure data:\n\n" + combined_expenditure_description
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 2
             tb[column].metadata.unit = "%"

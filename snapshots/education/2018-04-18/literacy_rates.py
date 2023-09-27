@@ -1,3 +1,4 @@
+from html.parser import HTMLParser
 from pathlib import Path
 
 import click
@@ -34,6 +35,10 @@ def main(upload: bool) -> None:
     meta.version = SNAPSHOT_VERSION
     meta.short_name = "literacy_rates"
     meta.fill_from_backport_snapshot(snap_config.path)
+    parser = HTMLToMarkdown()
+    parser.feed(meta.source.description)
+    meta.source.description = parser.get_markdown()
+
     meta.save()
 
     # Create a new snapshot.
@@ -48,6 +53,45 @@ def main(upload: bool) -> None:
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)
+
+
+class HTMLToMarkdown(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.md = []
+        self.lasttag = None
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "br":
+            self.md.append("\n")
+        elif tag == "ul":
+            self.md.append("\n")
+        elif tag == "li":
+            self.md.append("- ")
+        elif tag == "a":
+            for attr in attrs:
+                if attr[0] == "href":
+                    self.md.append("[")
+                    self.lasttag = ("a", attr[1])
+        elif tag == "strong" or tag == "b":
+            self.md.append("**")
+
+    def handle_endtag(self, tag):
+        if tag == "a" and self.lasttag and self.lasttag[0] == "a":
+            self.md.append("](" + self.lasttag[1] + ")")
+            self.lasttag = None
+        elif tag == "ul":
+            self.md.append("\n")
+        elif tag == "li":
+            self.md.append("\n")
+        elif tag == "strong" or tag == "b":
+            self.md.append("**")
+
+    def handle_data(self, data):
+        self.md.append(data)
+
+    def get_markdown(self):
+        return "".join(self.md)
 
 
 if __name__ == "__main__":
