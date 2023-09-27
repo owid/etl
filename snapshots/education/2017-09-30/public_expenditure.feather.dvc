@@ -18,6 +18,6 @@ meta:
   description: ''
 wdir: ../../../data/snapshots/education/2017-09-30
 outs:
-- md5: 70215292759c49a6bdb664321f757c15
+- md5: 5ecb8cb6411e3a4f47d5f32a79ef9bdf
   size: 3666
   path: public_expenditure.feather
