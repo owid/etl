@@ -17,11 +17,13 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("igme")
-
+    ds_meadow = paths.load_dependency("igme", version="2023-08-16")
+    # Load vintage dataset which has older data.
+    ds_vintage = paths.load_dependency("igme", version="2023-09-26")
     # Read table from meadow dataset.
     tb = ds_meadow["igme"].reset_index()
-
+    tb_vintage = ds_vintage["igme"].reset_index()
+    tb_youth = tb_vintage[tb_vintage["indicator_name"].isin(["Deaths age 5 to 14", "Mortality rate age 5 to 14"])]
     #
     # Process data.
     #
@@ -33,8 +35,27 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(
         columns={"obs_value": "Observation value", "lower_bound": "Lower bound", "upper_bound": "Upper bound"}
     )
+    tb["source"] = "igme (current)"
 
-    tb = calculate_under_fifteen_mortality(tb)
+    # Process 5-14 mortality data
+    tb_youth = tb_youth.rename(
+        columns={
+            "indicator_name": "indicator",
+            "sex_name": "sex",
+            "unit_measure_name": "unit_of_measure",
+            "obs_value": "Observation value",
+            "lower_bound": "Lower bound",
+            "upper_bound": "Upper bound",
+        }
+    ).drop(columns=["series_name_name"])
+    tb_youth = clean_values(tb_youth)
+    tb_youth["source"] = "igme (2018)"
+
+    # Combine datasets with a preference for the current data when there is a conflict.
+
+    tb = combine_datasets(tb_a=tb, tb_b=tb_youth, table_name="igme_combined", preferred_source="igme (current)")
+
+    tb = calculate_under_fifteen_mortality_totals(tb)
 
     tb = tb.pivot(
         index=["country", "year"],
@@ -62,9 +83,43 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def calculate_under_fifteen_mortality(tb: Table) -> Table:
+def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source: str) -> Table:
     """
-    Calculate the under fifteen mortality rate from the under five mortality rate and the 5-14 mortality rate.
+    Combine two tables with a preference for one source of data.
+    """
+    tb_combined = pr.concat([tb_a, tb_b]).sort_values(["country", "year", "source"])
+    assert any(tb_combined["source"] == preferred_source)
+    tb_combined.metadata.short_name = table_name
+    tb_combined = remove_duplicates(tb_combined, preferred_source=preferred_source)
+
+    return tb_combined
+
+
+def remove_duplicates(tb: Table, preferred_source: str) -> Table:
+    """
+    Removing rows where there are overlapping years with a preference for IGME data.
+
+    """
+    assert any(tb["source"] == preferred_source)
+
+    duplicate_rows = tb.duplicated(subset=["country", "year"], keep=False)
+
+    tb_no_duplicates = tb[~duplicate_rows]
+
+    tb_duplicates = tb[duplicate_rows]
+
+    tb_duplicates_removed = tb_duplicates[tb_duplicates["source"] == preferred_source]
+
+    tb = pr.concat([tb_no_duplicates, tb_duplicates_removed])
+
+    assert len(tb[tb.duplicated(subset=["country", "year"], keep=False)]) == 0
+
+    return tb
+
+
+def calculate_under_fifteen_mortality_totals(tb: Table) -> Table:
+    """
+    Calculate the under fifteen mortality total deaths.
     """
     tb_u5 = (
         tb[(tb["indicator"] == "Under-five deaths") & (tb["unit_of_measure"] == "Number of deaths")]
@@ -154,10 +209,10 @@ def clean_values(tb: Table) -> Table:
         "Second": "Second poorest quintile",
         "Fourth": "Fourth poorest quintile",
     }
-
-    tb["sex"] = tb["sex"].replace(sex_dict)
-
-    tb["wealth_quintile"] = tb["wealth_quintile"].replace(wealth_dict)
+    if "sex" in tb.columns:
+        tb["sex"] = tb["sex"].replace(sex_dict)
+    if "wealth_quintile" in tb.columns:
+        tb["wealth_quintile"] = tb["wealth_quintile"].replace(wealth_dict)
 
     return tb
 
