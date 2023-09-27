@@ -857,7 +857,7 @@ class Table(pd.DataFrame):
         return super().sort_index(*args, **kwargs)  # type: ignore
 
     def groupby(self, *args, **kwargs) -> "TableGroupBy":
-        return TableGroupBy(super().groupby(*args, **kwargs), self.metadata, self._fields)
+        return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
 
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
@@ -944,13 +944,16 @@ class VariableGroupBy:
     def __getattr__(self, funcname) -> Callable[..., "Table"]:
         def func(*args, **kwargs):
             """Apply function and return variable with proper metadata."""
-            out = getattr(self.groupby, funcname)(*args, **kwargs)
+            # out = getattr(self.groupby, funcname)(*args, **kwargs)
+            ff = getattr(self.groupby, funcname)
+            out = ff(*args, **kwargs)
 
             # this happens when we use e.g. agg([min, max]), propagate metadata from the original then
             if isinstance(out, Table):
                 out._fields = defaultdict(VariableMeta, {k: self.metadata for k in out.columns})
                 return out
             elif isinstance(out, variables.Variable):
+                out.metadata = self.metadata.copy()
                 return out
             elif isinstance(out, pd.Series):
                 return variables.Variable(out, name=self.name, metadata=self.metadata)
