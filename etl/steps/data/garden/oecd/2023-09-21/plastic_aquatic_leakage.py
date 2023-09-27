@@ -23,7 +23,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    country_mapping_path = paths.directory / "plastic_pollution.countries.json"
+    tb = geo.harmonize_countries(df=tb, countries_file=country_mapping_path)
 
     total_df = tb.groupby(["year", "leakage_type"])["value"].sum().reset_index()
 

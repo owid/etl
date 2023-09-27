@@ -20,8 +20,8 @@ def run(dest_dir: str) -> None:
     #
     # Convert million to actual number
     tb["plastic_use"] = tb["plastic_use"] * 1e6
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
+    country_mapping_path = paths.directory / "plastic_pollution.countries.json"
+    tb = geo.harmonize_countries(df=tb, countries_file=country_mapping_path)
     # Create a global estimate
     total_df = tb.groupby("year")["plastic_use"].sum().reset_index()
     total_df["country"] = "World"

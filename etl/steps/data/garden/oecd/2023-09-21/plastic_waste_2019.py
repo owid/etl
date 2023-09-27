@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+import numpy as np
 import owid.catalog.processing as pr
 
 from etl.data_helpers import geo
@@ -20,21 +21,26 @@ def run(dest_dir: str) -> None:
     # Convert million to actual number
     tb["plastic_waste"] = tb["plastic_waste"] * 1e6
 
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     #
     # Process data.
     #
+    country_mapping_path = paths.directory / "plastic_pollution.countries.json"
+    tb = geo.harmonize_countries(df=tb, countries_file=country_mapping_path)
     total_df = tb.groupby(["year", "polymer", "application"])["plastic_waste"].sum().reset_index()
 
     total_df["country"] = "World"
     combined_df = pr.merge(
         total_df, tb, on=["country", "year", "polymer", "application", "plastic_waste"], how="outer"
     ).copy_metadata(from_table=tb)
+
+    # Drop rows that only have 0 values to avoid indicators with 0t after pivoting
+    combined_df = combined_df.loc[combined_df["plastic_waste"] != 0]
     tb = (
         combined_df.underscore()
         .set_index(["country", "year", "polymer", "application"], verify_integrity=True)
         .sort_index()
     )
+
     #
     # Save outputs.
     #
