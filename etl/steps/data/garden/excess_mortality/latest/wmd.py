@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     ds_meadow: Dataset = paths.load_dependency("wmd")
 
     # Read table from meadow dataset.
-    tb_meadow = ds_meadow["wmd"]
+    tb_meadow = ds_meadow["wmd"].reset_index()
 
     # Create a dataframe with data from the table.
     df = pd.DataFrame(tb_meadow)
@@ -41,6 +41,10 @@ def run(dest_dir: str) -> None:
 
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=tb_meadow.metadata.short_name)
+    print(tb_garden.head())
+
+    # Set index
+    tb_garden = tb_garden.set_index(["entity", "time", "time_unit", "age"], verify_integrity=True)
 
     #
     # Save outputs.

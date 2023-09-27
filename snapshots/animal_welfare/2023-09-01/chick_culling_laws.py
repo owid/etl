@@ -50,7 +50,7 @@ def main(upload: bool) -> None:
         ),
         (
             "Italy",
-            "Banned but not yet effective",
+            "Banned but not yet in effect",
             2027,
             "Date effective: 2026-12-31. The law prohibits the selective killing of male chicks by December 31st, 2026 and provides exemptions for animal protection purposes only. A decree will later specify the ways in which the law should be implemented. The law does not provide a rule regarding the destruction of non-hatched eggs nor exemptions, other than exemptions for animal health and protection purposes. A decree will likely specify these two aspects.",
             "Article 18, European Delegation Law (22G00136).",
