@@ -37,6 +37,9 @@ COUNTRIES_MISSING_DATA_EXPECTED_LT = 14
 # There are some missing values, filled with '.'. Used in `proces_missing_data_exp`
 FRAC_ROWS_MISSING_EXPECTED_EXP = 0.23
 COUNTRIES_MISSING_DATA_EXPECTED_EXP = 47
+# There are some missing values, filled with '.'. Used in `proces_missing_data_de`
+FRAC_ROWS_MISSING_EXPECTED_DE = 0.001
+COUNTRIES_MISSING_DATA_EXPECTED_DE = 1
 
 
 def run(dest_dir: str) -> None:
@@ -74,6 +77,14 @@ def run(dest_dir: str) -> None:
             path=Path(tmp_dir), folders_names=folders_names, make_tb_from_txt_callable=_make_tb_from_txt_exp
         )
 
+        # Parse Deaths
+        folders_names = [
+            "deaths",
+        ]
+        tb_de = _make_tb(
+            path=Path(tmp_dir), folders_names=folders_names, make_tb_from_txt_callable=_make_tb_from_txt_de
+        )
+
     #
     # Process data.
     #
@@ -85,30 +96,43 @@ def run(dest_dir: str) -> None:
     tb_lt = proces_missing_data_lt(tb_lt)
     ## Dtypes
     tb_lt["Year"] = tb_lt["Year"].astype(str)
-    ## Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    columns_primary = ["format", "type", "country", "year", "sex", "age"]
 
     ## EXPOSURES
     ## Process missing data
     tb_exp = proces_missing_data_exp(tb_exp)
     ## Dtypes
     tb_exp["Year"] = tb_exp["Year"].astype(str)
-    ## Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    columns_primary = ["format", "type", "country", "year", "sex", "age"]
+
+    ## DEATHS
+    ## Process missing data
+    tb_de = proces_missing_data_de(tb_de)
+    # Dtypes
+    tb_de["Year"] = tb_de["Year"].astype(str)
 
     # Add metadata (table + indicators)
+    ## life exp
     tb_lt.metadata = snap.to_table_metadata()
     tb_lt.metadata.short_name = "life_tables"
     for column in tb_lt.columns:
         tb_lt[column].metadata.origins = tb_lt.metadata.dataset.origins
+    ## exposure to risk
     tb_exp.metadata = snap.to_table_metadata()
     tb_exp.metadata.short_name = "exposures"
     for column in tb_exp.all_columns:
         tb_exp[column].metadata.origins = tb_exp.metadata.dataset.origins
+    ## deaths
+    tb_de.metadata = snap.to_table_metadata()
+    tb_de.metadata.short_name = "deaths"
+    for column in tb_de.columns:
+        tb_de[column].metadata.origins = tb_de.metadata.dataset.origins
 
     # Set index
+    ## Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
+    columns_primary = ["format", "type", "country", "year", "sex", "age"]
+    ## Actual index-setting
     tb_lt = tb_lt.underscore().set_index(columns_primary, verify_integrity=True).sort_index()
     tb_exp = tb_exp.underscore().set_index(columns_primary, verify_integrity=True).sort_index()
+    tb_de = tb_de.underscore().set_index(columns_primary, verify_integrity=True).sort_index()
 
     #
     # Save outputs.
@@ -116,7 +140,7 @@ def run(dest_dir: str) -> None:
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(
         dest_dir,
-        tables=[tb_lt, tb_exp],
+        tables=[tb_lt, tb_exp, tb_de],
         check_variables_metadata=True,
         default_metadata=snap.metadata,
     )
@@ -139,10 +163,12 @@ def _make_tb(path: Path, folders_names: List[str], make_tb_from_txt_callable: Ca
         # Iterate over each subfolder, map content in subfolder into a table
         folders = os.listdir(path / folder_name)
         for folder in folders:
-            tb = _make_tb_from_subfolder(
-                path=path / folder_name / folder, make_tb_from_txt_callable=make_tb_from_txt_callable
-            )
-            tbs.append(tb)
+            path_subfolder = path / folder_name / folder
+            if "lexis" in str(path_subfolder):
+                continue
+            if os.path.isdir(path):
+                tb = _make_tb_from_subfolder(path=path_subfolder, make_tb_from_txt_callable=make_tb_from_txt_callable)
+                tbs.append(tb)
         # Concatenate all dataframes
     tb = pr.concat(tbs, ignore_index=True)
     return tb
@@ -227,6 +253,38 @@ def _make_tb_from_txt_exp(txt_path: Path | str) -> Table:
     return tb
 
 
+def _make_tb_from_txt_de(txt_path: Path | str) -> Table:
+    """Load and parse a txt file into a Table."""
+    # Regex to parse TXT file
+    FILE_REGEX = (
+        r"(?P<country>[a-zA-Z\-\s,]+), Deaths \((?P<type>[a-zA-Z]+) (?P<format>\d+x\d+|Lexis triangle)\),\s\tLast modified: "
+        r"(?P<last_modified>\d+ [a-zA-Z]{3} \d+);  Methods Protocol: v\d+ \(\d+\)\n\n(?P<data>(?s:.)*)"
+    )
+    # Read single file
+    with open(txt_path, "r") as f:
+        text = f.read()
+    # Get relevant fields
+    match = re.search(FILE_REGEX, text)
+    if match is not None:
+        groups = match.groupdict()
+    else:
+        raise ValueError(f"No match found in {f}! Please revise that source files' content matches FILE_REGEX.")
+    # Build df
+    tb_str = groups["data"].strip()
+    tb_str = re.sub(r"\n\s+", "\n", tb_str)
+    tb_str = re.sub(r"[^\S\r\n]+", "\t", string=tb_str)
+    tb = pr.read_csv(StringIO(tb_str), sep="\t")
+    # Melt
+    tb = tb.melt(id_vars=["Age", "Year"], var_name="sex", value_name="deaths")
+    # Add dimensions
+    tb = tb.assign(
+        country=groups["country"],
+        type=groups["type"],
+        format=groups["format"],
+    )
+    return tb
+
+
 def proces_missing_data_lt(tb: Table) -> Table:
     """Check and process missing data.
 
@@ -244,6 +302,29 @@ def proces_missing_data_lt(tb: Table) -> Table:
     assert len(countries_missing_data) <= COUNTRIES_MISSING_DATA_EXPECTED_LT, (
         f"More missing data than expected was found! Found {len(countries_missing_data)} countries, expected is"
         f" {COUNTRIES_MISSING_DATA_EXPECTED_LT}. Check {countries_missing_data}!"
+    )
+    # Correct
+    tb = tb.replace(".", np.nan)
+    return tb
+
+
+def proces_missing_data_de(tb: Table) -> Table:
+    """Check and process missing data.
+
+    Missing data comes as '.', instead replace these with NaNs.
+    """
+    # Find missing data
+    rows_missing = tb[tb["deaths"] == "."]
+    num_rows_missing = len(rows_missing) / len(tb)
+    countries_missing_data = rows_missing["country"].unique()
+    # Run checks
+    assert num_rows_missing < FRAC_ROWS_MISSING_EXPECTED_DE, (
+        f"More missing data than expected was found! {round(num_rows_missing*100, 2)} rows missing, but"
+        f" {round(FRAC_ROWS_MISSING_EXPECTED_DE*100,2)}% were expected."
+    )
+    assert len(countries_missing_data) <= COUNTRIES_MISSING_DATA_EXPECTED_DE, (
+        f"More missing data than expected was found! Found {len(countries_missing_data)} countries, expected is"
+        f" {COUNTRIES_MISSING_DATA_EXPECTED_DE}. Check {countries_missing_data}!"
     )
     # Correct
     tb = tb.replace(".", np.nan)
