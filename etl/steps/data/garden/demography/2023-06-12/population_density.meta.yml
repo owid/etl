@@ -1,2 +1,18 @@
-dataset: {}
-tables: {}
+dataset:
+  title: Population density (various sources, 2023.2)
+  description: Population density is obtained by dividing population by land area.
+tables:
+  population_density:
+    variables:
+      population_density:
+        title: Population density
+        description: |
+          Population density estimated by Our World in Data using population estimates from multiple sources
+          and land area estimates by the Food and Agriculture Organization of the United Nations. We obtain it
+          by dividing the population estimates by the land area estimates.
+        unit: people per km²
+      source_population:
+        title: Source (population)
+        description: |
+          Name of the source of the population estimate for a specific data point (country-year). The name includes a short name of the source and a link.
+        unit: ""
