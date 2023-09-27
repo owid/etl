@@ -50,7 +50,7 @@ dataset:
   namespace: demography
   short_name: life_expectancy
   title: Life Expectancy (various sources)
-  description: |
+  description: |-
     This dataset has been created using multiple sources. We use UN WPP for data since 1950 (estimates and medium variant) and a combination of other sources before this year.
 
     For continents, we use UN's definitions for values after 1950 and Riley (2005) definitions for values prior to 1950. Note that Riley reports "Americas", while the UN reports "Northern America" and "Latin America and the Caribbean" separately.
