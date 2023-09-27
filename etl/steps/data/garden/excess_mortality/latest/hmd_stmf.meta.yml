@@ -1,12 +1,6 @@
 tables:
   hmd_stmf:
     variables:
-      entity:
-        description: "Country, nation or region name."
-      week:
-        description: "Week number."
-      age:
-        description: "Age group."
       _2010:
         unit: ""
         description: "The reported number of weekly deaths from all causes for all ages in 2010."

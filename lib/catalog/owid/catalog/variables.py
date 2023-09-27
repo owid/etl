@@ -345,8 +345,18 @@ for k in VariableMeta.__dataclass_fields__:
 
 
 def _get_metadata_value_from_variables_if_all_identical(
-    variables: List[Variable], field: str, warn_if_different: bool = False
+    variables: List[Variable],
+    field: str,
+    warn_if_different: bool = False,
+    operation: Optional[OPERATION] = None,
 ) -> Optional[Any]:
+    if (operation == "/") and (getattr(variables[0].metadata, field) is None):
+        # When dividing a variable by another, it only makes sense to keep the metadata values of the first variable.
+        # For example, if we have energy (without description) and population (with a description), when calculating
+        # energy per capita, the result shouldn't have the description of population. It should have no description.
+        # Therefore, if the first variable has no metadata value, return None.
+        return None
+
     # Get unique values from list, ignoring Nones.
     unique_values = set(
         [getattr(variable.metadata, field) for variable in variables if getattr(variable.metadata, field) is not None]
@@ -359,34 +369,6 @@ def _get_metadata_value_from_variables_if_all_identical(
             log.warning(f"Different values of '{field}' detected among variables: {unique_values}")
 
     return combined_value
-
-
-def combine_variables_unit(variables: List[Variable]) -> Optional[str]:
-    return _get_metadata_value_from_variables_if_all_identical(
-        variables=variables, field="unit", warn_if_different=True
-    )
-
-
-def combine_variables_short_unit(variables: List[Variable]) -> Optional[str]:
-    return _get_metadata_value_from_variables_if_all_identical(
-        variables=variables, field="short_unit", warn_if_different=True
-    )
-
-
-def combine_variables_title(variables: List[Variable]) -> Optional[str]:
-    return _get_metadata_value_from_variables_if_all_identical(variables=variables, field="title")
-
-
-def combine_variables_description(variables: List[Variable]) -> Optional[str]:
-    return _get_metadata_value_from_variables_if_all_identical(variables=variables, field="description")
-
-
-def combine_variables_description_short(variables: List[Variable]) -> Optional[str]:
-    return _get_metadata_value_from_variables_if_all_identical(variables=variables, field="description_short")
-
-
-def combine_variables_description_from_producer(variables: List[Variable]) -> Optional[str]:
-    return _get_metadata_value_from_variables_if_all_identical(variables=variables, field="description_from_producer")
 
 
 def get_unique_sources_from_variables(variables: List[Variable]) -> List[Source]:
@@ -487,12 +469,24 @@ def combine_variables_metadata(
     variables_only = [v for v in variables if hasattr(v, "name") and v.name and hasattr(v, "metadata")]
 
     # Combine each metadata field using the logic of the specified operation.
-    metadata.title = combine_variables_title(variables=variables_only)
-    metadata.description = combine_variables_description(variables=variables_only)
-    metadata.description_short = combine_variables_description_short(variables=variables_only)
-    metadata.description_from_producer = combine_variables_description_from_producer(variables=variables_only)
-    metadata.unit = combine_variables_unit(variables=variables_only)
-    metadata.short_unit = combine_variables_short_unit(variables=variables_only)
+    metadata.title = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="title", operation=operation
+    )
+    metadata.description = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="description", operation=operation
+    )
+    metadata.description_short = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="description_short", operation=operation
+    )
+    metadata.description_from_producer = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="description_from_producer", operation=operation
+    )
+    metadata.unit = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="unit", operation=operation, warn_if_different=True
+    )
+    metadata.short_unit = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="short_unit", operation=operation, warn_if_different=True
+    )
     metadata.sources = get_unique_sources_from_variables(variables=variables_only)
     metadata.origins = get_unique_origins_from_variables(variables=variables_only)
     metadata.licenses = get_unique_licenses_from_variables(variables=variables_only)
