@@ -298,6 +298,13 @@ class Table(pd.DataFrame):
 
         return df
 
+    def update_metadata(self, **kwargs) -> "Table":
+        """Set Table metadata."""
+        for k, v in kwargs.items():
+            assert hasattr(self.metadata, k), f"unknown metadata field {k} in TableMeta"
+            setattr(self.metadata, k, v)
+        return self
+
     @classmethod
     def _add_metadata(cls, df: pd.DataFrame, path: str) -> None:
         """Read metadata from JSON sidecar and add it to the dataframe."""
@@ -763,6 +770,9 @@ class Table(pd.DataFrame):
 
         return variable
 
+    def assign(self, *args, **kwargs) -> "Table":
+        return super().assign(*args, **kwargs)  # type: ignore
+
     def __add__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
         # The following would have a parents only the scalar, not the scalar and the corresponding variable.
@@ -847,7 +857,7 @@ class Table(pd.DataFrame):
         return super().sort_index(*args, **kwargs)  # type: ignore
 
     def groupby(self, *args, **kwargs) -> "TableGroupBy":
-        return TableGroupBy(super().groupby(*args, **kwargs), self.metadata, self._fields)
+        return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
 
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
@@ -934,13 +944,16 @@ class VariableGroupBy:
     def __getattr__(self, funcname) -> Callable[..., "Table"]:
         def func(*args, **kwargs):
             """Apply function and return variable with proper metadata."""
-            out = getattr(self.groupby, funcname)(*args, **kwargs)
+            # out = getattr(self.groupby, funcname)(*args, **kwargs)
+            ff = getattr(self.groupby, funcname)
+            out = ff(*args, **kwargs)
 
             # this happens when we use e.g. agg([min, max]), propagate metadata from the original then
             if isinstance(out, Table):
                 out._fields = defaultdict(VariableMeta, {k: self.metadata for k in out.columns})
                 return out
             elif isinstance(out, variables.Variable):
+                out.metadata = self.metadata.copy()
                 return out
             elif isinstance(out, pd.Series):
                 return variables.Variable(out, name=self.name, metadata=self.metadata)
@@ -1277,6 +1290,7 @@ def read_feather(
 def read_excel(
     io: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
 ) -> Table:
+    assert not isinstance(kwargs.get("sheet_name"), list), "Argument 'sheet_name' must be a string or an integer."
     table = Table(pd.read_excel(io=io, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
     # Note: Maybe we should include the sheet name in parents.
