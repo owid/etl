@@ -77,31 +77,37 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-
     # LIFE TABLES
-    ## Set short_name
-    tb_lt.metadata.short_name = "life_tables"
-    ## Rename columns
     ## While this is not necessary at this step, there are some columns that, when underscored, are mapped to the same name;
     ## e.g. "Lx -> lx" and "lx -> lx". This will cause an error when setting the index.
     tb_lt = tb_lt.rename(columns=COLUMNS_RENAME)
-    ## Process missing data
+    ## Process missing data: discard, replace symbols for NaNs, etc.
     tb_lt = proces_missing_data_lt(tb_lt)
     ## Dtypes
     tb_lt["Year"] = tb_lt["Year"].astype(str)
     ## Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     columns_primary = ["format", "type", "country", "year", "sex", "age"]
-    tb_lt = tb_lt.underscore().set_index(columns_primary, verify_integrity=True).sort_index()
 
     ## EXPOSURES
-    ## Set short_name
-    tb_exp.metadata.short_name = "exposures"
     ## Process missing data
     tb_exp = proces_missing_data_exp(tb_exp)
     ## Dtypes
     tb_exp["Year"] = tb_exp["Year"].astype(str)
     ## Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     columns_primary = ["format", "type", "country", "year", "sex", "age"]
+
+    # Add metadata (table + indicators)
+    tb_lt.metadata = snap.to_table_metadata()
+    tb_lt.metadata.short_name = "life_tables"
+    for column in tb_lt.columns:
+        tb_lt[column].metadata.origins = tb_lt.metadata.dataset.origins
+    tb_exp.metadata = snap.to_table_metadata()
+    tb_exp.metadata.short_name = "exposures"
+    for column in tb_exp.all_columns:
+        tb_exp[column].metadata.origins = tb_exp.metadata.dataset.origins
+
+    # Set index
+    tb_lt = tb_lt.underscore().set_index(columns_primary, verify_integrity=True).sort_index()
     tb_exp = tb_exp.underscore().set_index(columns_primary, verify_integrity=True).sort_index()
 
     #
