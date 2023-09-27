@@ -52,6 +52,7 @@ def run(dest_dir: str) -> None:
     tb_youth = clean_values(tb_youth)
     tb_youth["wealth_quintile"] = "All wealth quintiles"
     tb_youth["source"] = "igme (2018)"
+    tb_youth["indicator"] = tb_youth["indicator"].replace({"Mortality rate age 5 to 14": "Mortality rate age 5-14"})
 
     # Combine datasets with a preference for the current data when there is a conflict.
 
