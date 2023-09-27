@@ -1,5 +1,5 @@
 dataset:
-  update_period_days: 90
+  update_period_days: 365
   sources: []
   origins:
   - producer: Global Carbon Project
@@ -52,7 +52,6 @@ tables:
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
             - fragment_id: missing-consumption-based-emissions
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-          # NOTE: copied from http://staging-site-mojmir/admin/charts/3488/edit
           grapher_config:
             title: Per capita consumption-based CO₂ emissions
             subtitle: >-
