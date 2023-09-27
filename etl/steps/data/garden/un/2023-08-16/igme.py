@@ -103,9 +103,7 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
             ]
         )
         / 1000
-    ) * tb[
-        "Observation value-Deaths per 1000 children aged 5-Mortality rate age 5 to 14-Both sexes-All wealth quintiles"
-    ]
+    ) * tb["Observation value-Deaths per 1000 children aged 5-Mortality rate age 5-14-Both sexes-All wealth quintiles"]
 
     tb[
         "Observation value-Deaths per 1,000 live births-Under-fifteen mortality rate-Both sexes-All wealth quintiles"
