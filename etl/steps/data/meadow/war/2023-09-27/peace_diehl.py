@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
 
     # Uniform peace_scale_level values (e.g. "0.50", "0.5" -> "0.5")
     tb["peace_scale_level"] = tb["peace_scale_level"].astype(float)
-    snap.read
+
     # Sanity check
     assert tb.isna().sum().sum() == 0, "Unexpected NaNs!"
 
@@ -70,7 +70,7 @@ def run(dest_dir: str) -> None:
     assert set(tb["code"].str.len()) == {4, 5, 6}, "Unexpected lengths!"
     ## Standardise dyad codes (6-length codes)
     mask_4 = tb["code"].str.len() == 4
-    tb.loc[mask_4, "code"] = "0" + tb.loc[mask_4, "code"].str[:2] + "0" + tb.loc[mask_4, "code"].str[2:]
+    tb.loc[mask_4, "code"] = "00" + tb.loc[mask_4, "code"]
     mask_5 = tb["code"].str.len() == 5
     tb.loc[mask_5, "code"] = "0" + tb.loc[mask_5, "code"]
     # Final check and split
@@ -96,5 +96,4 @@ def run(dest_dir: str) -> None:
     ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
     # Save changes in the new meadow dataset.
-    ds_meadow.save()
     ds_meadow.save()
