@@ -20,7 +20,7 @@ tables:
       probability_of_death:
         title: Probability of death
         unit: ""
-        description_short: Probability of death between ages x and x+n.
+        description_short: The probability that a person who survived until the start of a given interval will have died by the end of the interval.
       average_survival_length:
         title: Average survival length
         short_unit: years
@@ -47,10 +47,30 @@ tables:
         title: Life expectancy
         short_unit: years
         unit: years
-        description_short: Period life expectancy at exact age x (in years).
+        # description_short: |-
+        #   The number of years that a person of a given age is expected to live. 'Life expectancy at age 0' refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy for people who have already survived to the given age.
+        description: |-
+            <% if type == "period" %>
+            The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
+
+            <% elif type == "cohort" %>
+            The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+            <% endif %>
+
+            'Life expectancy at age 0' refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy for people who have already survived to the given age.
+      life_expectancy_fm_diff:
+        title: Life expectancy difference (f-m)
+        short_unit: years
+        unit: years
+        description_short: Life expectancy difference (females - males) at exact age x (in years).
+      life_expectancy_fm_ratio:
+        title: Life expectancy ratio (f/m)
+        short_unit: years
+        unit: years
+        description_short: Life expectancy ratio (females/males) at exact age x (in years).
       exposure:
         title: Exposure-to-risk
         unit: person-years
-        description_short: Total person-years lived in the age interval [x, x + 1) during calendar year t.
+        description_short: The total number of person-years lived within a given interval.
         description_from_producer: |-
           Estimates of the population exposed to the risk of death during some agetime interval are based on annual (January 1st) population estimates, with small corrections that reflect the timing of deaths during the interval. Period exposure estimations are based on assumptions of uniformity in the distribution of events except when historical monthly birth data are available.
