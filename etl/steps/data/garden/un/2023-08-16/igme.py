@@ -112,7 +112,7 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
         tb["Observation value-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-All wealth quintiles"]
         + tb["adjusted_5_14_mortality_rate"]
     )
-
+    tb = tb.drop(columns="adjusted_5_14_mortality_rate")
     return tb
 
 
