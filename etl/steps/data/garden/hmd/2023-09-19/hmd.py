@@ -24,6 +24,7 @@ def run(dest_dir: str) -> None:
     log.info("hmd: reading table from meadow dataset.")
     tb_lt = ds_meadow["life_tables"].reset_index()
     tb_ex = ds_meadow["exposures"].reset_index()
+    tb_de = ds_meadow["deaths"].reset_index()
 
     #
     # Process data.
@@ -44,14 +45,23 @@ def run(dest_dir: str) -> None:
             "Total": "both",
         }
     )
-    # Sanity checks
+    tb_de["sex"] = tb_de["sex"].map(
+        {
+            "Male": "male",
+            "Female": "female",
+            "Total": "both",
+        }
+    )
+    # Sanity checks (compare each table agains table `life_tables`)
     log.info("hmd: checking dimension values.")
     columns_dim = ["format", "type", "sex", "age"]
     for col in columns_dim:
         not_in_ex = set(tb_lt[col]) - set(tb_ex[col])
         not_in_lt = set(tb_ex[col]) - set(tb_lt[col])
+        not_in_de = set(tb_de[col]) - set(tb_lt[col])
         assert not not_in_lt, f"Found values in column {col} in exposures but not in life tables!"
         assert not not_in_ex, f"Found values in column {col} in life tables but not in exposures!"
+        assert not not_in_de, f"Found values in column {col} in life tables but not in deaths!"
 
     # Harmonise countries
     log.info("hmd: harmonising countries.")
@@ -61,10 +71,15 @@ def run(dest_dir: str) -> None:
     tb_ex = geo.harmonize_countries(
         df=tb_ex, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    # Combine LE + Exposures
-    log.info("hmd: combining life tables and exposures.")
+    tb_de = geo.harmonize_countries(
+        df=tb_de, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
+
+    # Combine LE + Exposures + Deaths
+    log.info("hmd: combining `life tables`, `exposures` and `deaths`.")
     columns_primary = ["format", "type", "country", "year", "sex", "age"]
     tb = tb_lt.merge(tb_ex, on=columns_primary, how="outer")
+    tb = tb.merge(tb_de, on=columns_primary, how="outer")
 
     # Add extra variables: life expectancy f-m, f/m
     log.info("hmd: calculating extra variables (ratio and difference in life expectancy for f and m).")
