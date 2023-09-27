@@ -1,5 +1,4 @@
 """Load a meadow dataset and create a garden dataset."""
-import numpy as np
 import owid.catalog.processing as pr
 
 from etl.data_helpers import geo
