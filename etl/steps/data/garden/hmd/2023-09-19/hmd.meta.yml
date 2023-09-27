@@ -5,6 +5,17 @@
 # http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 365
+  description: |-
+    The Human Mortality Database (HMD) is a collaborative project sponsored by the University of California, Berkeley (in the United States of America) and the Max Planck Institute for Demographic Research (in Germany).
+
+    It provides researchers with comprehensive data on mortality from around 40 countries around the world, which have very high coverage and quality of data at the national level, through vital registration and potentially census data.
+
+    Data is given in terms of period or cohort estimates:
+
+      - **Period data** refers to a snapshot estimated with data at a particular interval. For period life expectancy at birth, this refers to the estimated life expectancy at birth based on a synthetic cohort created using mortality rates across age groups in a given year.
+      - **Cohort data** refers to estimates of a particular birth cohort. For cohort life expectancy at birth, this refers to the average number of years that people in the birth cohort survived. Cohort data may use birth cohorts that are ‘almost extinct’ rather than entirely extinct.
+
+    'Interval' refers to the specific age- and time- period of the estimate. An interval can be a one year period for a single-age group, or it can be wider. For example, the life expectancy of a 40 year old in 2019 corresponds to an interval of 1 single-age group in 1 year. The central death rate of 5–9 year olds in 2020 corresponds to an interval of a 5 year age group in 1 year.
 
 
 # Learn more about the available fields:
