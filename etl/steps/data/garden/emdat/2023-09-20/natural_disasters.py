@@ -356,28 +356,6 @@ def create_additional_variables(tb: Table, ds_population: Dataset, tb_gdp: Table
     )
 
     ####################################################################################################################
-    # TODO: Remote this temporary solution once population has origins.
-    from owid.catalog import License, Origin
-
-    error = "Remove temporary solution where origins where manually created."
-    assert tb["population"].metadata.origins == [], error
-    tb["population"].metadata.sources = []
-    tb["population"].metadata.origins = [
-        Origin(
-            producer="Various sources",
-            attribution="Population based on various sources (2023)",
-            attribution_short="Population",
-            title="Population",
-            citation_full="The long-run data on population is based on various sources, described on this page: https://ourworldindata.org/population-sources",
-            url_main="https://ourworldindata.org/population-sources",
-            date_accessed="2023-03-31",
-            date_published="2023-03-31",
-            description="Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on various sources.",
-            license=License(name="CC BY 4.0"),
-        )
-    ]
-
-    ####################################################################################################################
     # TODO: Remote this temporary solution once WDI has origins.
     from owid.catalog import License, Origin
 
