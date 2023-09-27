@@ -54,7 +54,11 @@ def run(dest_dir: str) -> None:
     # Combine
     columns_primary = ["format", "type", "country", "year", "sex", "age"]
     tb = tb_lt.merge(tb_ex, on=columns_primary, how="outer")
-    # Short name
+
+    # Add extra variables
+
+    
+    # Final metadata touches
     tb.metadata.short_name = paths.short_name
     # Set index
     tb = tb.set_index(columns_primary, verify_integrity=True).sort_index()
