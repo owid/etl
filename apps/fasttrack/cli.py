@@ -17,7 +17,7 @@ import pywebio
 import structlog
 from cryptography.fernet import Fernet
 from git.repo import Repo
-from owid.catalog import Dataset, DatasetMeta, Source, Table, VariableMeta
+from owid.catalog import Dataset, DatasetMeta, Origin, Source, Table, VariableMeta
 from owid.catalog.utils import underscore, validate_underscore
 from owid.datautils import io
 from pydantic import BaseModel
@@ -99,9 +99,11 @@ class FasttrackImport:
     def __init__(
         self,
         dataset: Dataset,
+        origin: Optional[Origin],
         sheets_url: str,
     ):
         self.dataset = dataset
+        self.origin = origin
         self.sheets_url = sheets_url
 
     @property
@@ -149,9 +151,9 @@ class FasttrackImport:
             )
             origin = None
             license = self.meta.licenses[0]
-        elif len(self.meta.origins) == 1:
+        elif self.origin:
             source = None
-            origin = self.meta.origins[0]
+            origin = self.origin
             origin.date_accessed = str(dt.date.today())
 
             # Misuse the version field and url_download fields to store info about the spreadsheet
@@ -241,9 +243,9 @@ def app(dummy_data: bool, commit: bool) -> None:
             contents=[po.put_markdown(f.read())],
         )
 
-    dataset, sheets_url = _load_data_and_meta(dummies)
+    dataset, origin, sheets_url = _load_data_and_meta(dummies)
 
-    fast_import = FasttrackImport(dataset, sheets_url)
+    fast_import = FasttrackImport(dataset, origin, sheets_url)
 
     # diff with existing dataset
     if fast_import.snapshot_exists() and fast_import.metadata_path.exists():
@@ -335,7 +337,7 @@ class FasttrackForm(BaseModel):
         super().__init__(**data)
 
 
-def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[Dataset, str]:
+def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[Dataset, Optional[Origin], str]:
     existing_sheets = [
         {"label": "Choose previously uploaded dataset", "value": "unselected"}
     ] + _load_existing_sheets_from_snapshots()
@@ -409,7 +411,9 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[Dataset, str]:
             csv_df = pd.read_csv(StringIO(form.local_csv["content"].decode()))
 
             data = csv.parse_data_from_csv(csv_df)
-            dataset_meta, variables_meta_dict = csv.parse_metadata_from_csv(form.local_csv["filename"], csv_df.columns)
+            dataset_meta, variables_meta_dict, origin = csv.parse_metadata_from_csv(
+                form.local_csv["filename"], csv_df.columns
+            )
 
             sheets_url = "local_csv"
 
@@ -441,7 +445,7 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[Dataset, str]:
                 po.put_success(
                     f"Data imported (sheet refreshed {_last_updated_before_minutes(google_sheets['dataset_meta'])} minutes ago)"
                 )
-                dataset_meta, variables_meta_dict = sheets.parse_metadata_from_sheets(
+                dataset_meta, variables_meta_dict, origin = sheets.parse_metadata_from_sheets(
                     google_sheets["dataset_meta"],
                     google_sheets["variables_meta"],
                     google_sheets["sources_meta"],
@@ -466,8 +470,7 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[Dataset, str]:
         if form.infer_metadata:
             data, variables_meta_dict = _infer_metadata(data, variables_meta_dict)
             # add unknown source if we have neither sources nor origins
-            # FIXME!!!
-            if not dataset_meta.sources and not dataset_meta.origins:
+            if not dataset_meta.sources and not origin:
                 dataset_meta.sources = [
                     Source(
                         name="Unknown",
@@ -525,7 +528,7 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[Dataset, str]:
     dataset.add(tb)
     dataset.save()
 
-    return dataset, sheets_url
+    return dataset, origin, sheets_url
 
 
 def _dataset_id(ds_meta: DatasetMeta) -> int:
