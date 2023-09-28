@@ -1,4 +1,12 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+Methods used here are taken from https://github.com/jssalvrz/s-ages. Authors of Citation: Alvarez, J.-A., & Vaupel, J. W. (2023). Mortality as a Function of Survival. Demography, 60(1), 327–342. https://doi.org/10.1215/00703370-10429097
+
+
+Dr. Saloni Dattani translated the R scripts into Python: https://github.com/saloni-nd/misc/tree/main/survivorship-ages
+
+Lucas Rodes-Guirao adapted the python code for ETL.
+"""
 
 import numpy as np
 import pandas as pd
