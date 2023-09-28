@@ -10,11 +10,3 @@ tables:
           isProjection: true
           numDecimalPlaces: 0
 
-      cumulative_plastic_use:
-        title: Cumulative plastic production - projections
-        unit: 'tonnes'
-        short_unit: 't'
-        display:
-          isProjection: true
-          numDecimalPlaces: 0
-
