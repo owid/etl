@@ -4,7 +4,7 @@
 
 import pandas as pd
 import pytest
-from owid.catalog.meta import VariableMeta
+from owid.catalog.meta import VariableMeta, VariablePresentationMeta
 from owid.catalog.variables import (
     License,
     Variable,
@@ -417,3 +417,64 @@ def test_divide_variables_where_only_denominator_has_metadata(
     assert variable.metadata.presentation is None
     # Since both variables have identical display, the combination should have the same display.
     assert variable.metadata.display == variable_1.metadata.display
+
+
+def test_display_propagation_on_divisions(variable_1, variable_2) -> None:
+    variable_1 = variable_1.copy()
+    variable_2 = variable_2.copy()
+
+    # If the numerator has no display but the denominator has display, the result should have no display.
+    variable_1.metadata.display = None
+    variable_2.metadata.display = {"numDecimalPlaces": 0}
+    variable = variable_1 / variable_2
+    assert variable.metadata.display is None
+
+    # If the numerator has display but the denominator has no display, the result should have the numerator's display.
+    variable_1.metadata.display = {"numDecimalPlaces": 0}
+    variable_2.metadata.display = None
+    variable = variable_1 / variable_2
+    assert variable.metadata.display == {"numDecimalPlaces": 0}
+
+    # If both numerator and denominator have the same display, the result should have that display.
+    variable_1.metadata.display = {"numDecimalPlaces": 0}
+    variable_2.metadata.display = {"numDecimalPlaces": 0}
+    variable = variable_1 / variable_2
+    assert variable.metadata.display == {"numDecimalPlaces": 0}
+
+    # If numerator and denominator have different displays, the result should have no display.
+    # NOTE: It is not clear if this is the best choice. Alternatively, we could keep the numerator's display.
+    variable_1.metadata.display = {"numDecimalPlaces": 0}
+    variable_2.metadata.display = {"numDecimalPlaces": 1}
+    variable = variable_1 / variable_2
+    assert variable.metadata.display is None
+
+
+def test_presentation_propagation_on_divisions(variable_1, variable_2) -> None:
+    variable_1 = variable_1.copy()
+    variable_2 = variable_2.copy()
+
+    # If the numerator has no presentation but the denominator has presentation, the result should have no presentation.
+    variable_1.metadata.presentation = None
+    variable_2.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
+    variable = variable_1 / variable_2
+    assert variable.metadata.presentation is None
+
+    # If the numerator has presentation but the denominator has no presentation,
+    # the result should have the numerator's presentation.
+    variable_1.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
+    variable_2.metadata.presentation = None
+    variable = variable_1 / variable_2
+    assert variable.metadata.presentation == VariablePresentationMeta("test")  # type: ignore
+
+    # If both numerator and denominator have the same presentation, the result should have that presentation.
+    variable_1.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
+    variable_2.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
+    variable = variable_1 / variable_2
+    assert variable.metadata.presentation == VariablePresentationMeta("test")  # type: ignore
+
+    # If numerator and denominator have different presentations, the result should have no presentation.
+    # NOTE: It is not clear if this is the best choice. Alternatively, we could keep the numerator's presentation.
+    variable_1.metadata.presentation = VariablePresentationMeta("test 1")  # type: ignore
+    variable_2.metadata.presentation = VariablePresentationMeta("test 2")  # type: ignore
+    variable = variable_1 / variable_2
+    assert variable.metadata.presentation is None
