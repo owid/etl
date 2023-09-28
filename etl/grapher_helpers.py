@@ -149,7 +149,8 @@ def _yield_wide_table(
                         "originalShortName": column,
                         "originalName": tab[short_name].metadata.title,
                         "filters": [
-                            {"name": dim_name, "value": sanitize_numpy(dim_value)} for dim_name, dim_value in zip(dim_names, dim_values)
+                            {"name": dim_name, "value": sanitize_numpy(dim_value)}
+                            for dim_name, dim_value in zip(dim_names, dim_values)
                         ],
                     }
                 }
