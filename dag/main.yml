@@ -619,3 +619,4 @@ include:
   - dag/education.yml
   - dag/covid.yml
   - dag/animal_welfare.yml
+  - dag/plastic_use.yml
