@@ -77,3 +77,5 @@ steps:
   # Survivorship ages (HMD-derived)
   data://garden/demography/2023-09-27/survivor_percentiles:
     - data://garden/hmd/2023-09-19/hmd
+  data://grapher/demography/2023-09-27/survivor_percentiles:
+    - data://garden/demography/2023-09-27/survivor_percentiles
