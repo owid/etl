@@ -4,23 +4,25 @@
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/dataset/
 dataset:
-  title: Survivorship percentiles
+  title: Survivorship percentiles (HMD, Alvarez and Vaupel; 2023)
   update_period_days: 365
+
 
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/tables/
 tables:
   survivor_percentiles:
+    title: Survivorship percentiles
+    description: |-
+
     variables:
       age:
         title: Survivorship age
         unit: years
+        processing_level: major
         description_short: |-
-          Period estimate: The age until which a given percentile of the population would survive until, if mortality rates remained constant, using data from a given interval.
-
-          Cohort estimate: The age until which a given percentile of the population survived, among those born in a given interval.
-
+          The age until which the << percentile >>% percentile of the population would survive until, if mortality rates remained constant, using data from a given interval.
         description_processing: |-
           This was calculated with the method published in Alvarez and Vaupel (2023), with code provided by the authors. These estimates were regenerated for data from more recent years in the Human Mortality Database.
 
