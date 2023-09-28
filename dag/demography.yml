@@ -73,3 +73,5 @@ steps:
     - data://meadow/hmd/2023-09-19/hmd
   data://grapher/hmd/2023-09-19/hmd:
     - data://garden/hmd/2023-09-19/hmd
+  data://garden/demography/2023-09-27/gini_le:
+    - data://meadow/demography/2023-09-27/gini_le
