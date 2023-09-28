@@ -149,7 +149,8 @@ def _yield_wide_table(
                         "originalShortName": column,
                         "originalName": tab[short_name].metadata.title,
                         "filters": [
-                            {"name": dim_name, "value": dim_value} for dim_name, dim_value in zip(dim_names, dim_values)
+                            {"name": dim_name, "value": sanitize_numpy(dim_value)}
+                            for dim_name, dim_value in zip(dim_names, dim_values)
                         ],
                     }
                 }
@@ -170,9 +171,16 @@ def _yield_wide_table(
                 tab[short_name].metadata.title = title_with_dims
 
             # expand metadata with Jinja template
-            tab[short_name].metadata.description = _expand_jinja_template(
-                tab[short_name].metadata.description, dim_dict
-            )
+            for k in (
+                "description",
+                "description_short",
+            ):
+                if getattr(tab[short_name].m, k):
+                    setattr(
+                        tab[short_name].m,
+                        k,
+                        _expand_jinja_template(getattr(tab[short_name].m, k), dim_dict),
+                    )
 
             # Keep only entity_id and year in index
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
@@ -592,3 +600,14 @@ class IntRange:
 def contains_inf(s: pd.Series) -> bool:
     """Check if a series contains infinity."""
     return pd.api.types.is_numeric_dtype(s.dtype) and np.isinf(s).any()  # type: ignore
+
+
+def sanitize_numpy(obj: Any) -> Any:
+    """Sanitize numpy types so that we can insert them into MySQL."""
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    return obj
