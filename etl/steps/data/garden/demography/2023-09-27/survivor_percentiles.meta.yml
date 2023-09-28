@@ -22,3 +22,5 @@ tables:
           This was calculated with the method published in Alvarez and Vaupel (2023), with code provided by the authors. These estimates were regenerated for data from more recent years in the Human Mortality Database.
 
           Citation: Alvarez, J.-A., & Vaupel, J. W. (2023). Mortality as a Function of Survival. Demography, 60(1), 327–342. https://doi.org/10.1215/00703370-10429097
+        display:
+          numDecimalPlaces: 1
