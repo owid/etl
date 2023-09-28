@@ -5,7 +5,7 @@ tables:
         title: Population
         unit: people
         display:
-          entityAnnotationsMap: "Western Offshoots (MPD): United States, Canada, Australia and New Zealand"
+          entityAnnotationsMap: "Western offshoots (MPD): United States, Canada, Australia and New Zealand"
       gdp:
         title: GDP
         short_unit: $
@@ -13,7 +13,7 @@ tables:
         description: >-
           Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
         display:
-          entityAnnotationsMap: "Western Offshoots (MPD): United States, Canada, Australia and New Zealand"
+          entityAnnotationsMap: "Western offshoots (MPD): United States, Canada, Australia and New Zealand"
           numDecimalPlaces: 0
 
       gdp_per_capita:
@@ -22,7 +22,7 @@ tables:
         unit: international-$ in 2011 prices
         description:
         display:
-          entityAnnotationsMap: "Western Offshoots (MPD): United States, Canada, Australia and New Zealand"
+          entityAnnotationsMap: "Western offshoots (MPD): United States, Canada, Australia and New Zealand"
           numDecimalPlaces: 0
         presentation:
           grapher_config:
@@ -56,7 +56,7 @@ tables:
                 - World
                 - South and South-East Asia (MPD)
                 - Sub-Saharan Africa (MPD)
-                - Western Offshoots (MPD)
+                - Western offshoots (MPD)
                 - Western Europe (MPD)
                 - Eastern Europe (MPD)
                 - Latin America (MPD)

@@ -46,7 +46,7 @@ def make_table(ds_meadow: Dataset, table_name: str) -> Table:
     log.info(f"Building table {table_name}...")
 
     # Country management
-    tb_garden = ds_meadow[table_name].reset_index(drop=True)
+    tb_garden = ds_meadow[table_name].reset_index()
     tb_garden = clean_countries(tb_garden)
     tb_garden = tb_garden.set_index(["country", "year", "age"], verify_integrity=True)
 

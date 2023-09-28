@@ -29,12 +29,19 @@ import pyarrow
 import pyarrow.parquet as pq
 import structlog
 from owid.repack import repack_frame
-from pandas._typing import Scalar
+from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
 from pandas.util._decorators import rewrite_axis_style_signature
 
 from . import variables
-from .meta import License, Origin, Source, TableMeta, VariableMeta
+from .meta import (
+    SOURCE_EXISTS_OPTIONS,
+    License,
+    Origin,
+    Source,
+    TableMeta,
+    VariableMeta,
+)
 from .utils import underscore
 
 log = structlog.get_logger()
@@ -298,6 +305,13 @@ class Table(pd.DataFrame):
 
         return df
 
+    def update_metadata(self, **kwargs) -> "Table":
+        """Set Table metadata."""
+        for k, v in kwargs.items():
+            assert hasattr(self.metadata, k), f"unknown metadata field {k} in TableMeta"
+            setattr(self.metadata, k, v)
+        return self
+
     @classmethod
     def _add_metadata(cls, df: pd.DataFrame, path: str) -> None:
         """Read metadata from JSON sidecar and add it to the dataframe."""
@@ -460,7 +474,11 @@ class Table(pd.DataFrame):
             raise ValueError(f"'{name}' not found in columns or index")
 
     def update_metadata_from_yaml(
-        self, path: Union[Path, str], table_name: str, extra_variables: Literal["raise", "ignore"] = "raise"
+        self,
+        path: Union[Path, str],
+        table_name: str,
+        extra_variables: Literal["raise", "ignore"] = "raise",
+        if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
     ) -> None:
         """Update metadata of table and variables from a YAML file.
         :param path: Path to YAML file.
@@ -490,6 +508,12 @@ class Table(pd.DataFrame):
                     # create an object out of sources
                     if k == "sources":
                         self[v_short_name].metadata.sources = [Source(**source) for source in v]
+                    elif k == "origins":
+                        if if_origins_exist == "fail" and self[v_short_name].metadata.origins:
+                            raise ValueError(f"Origins already exist for variable {v_short_name}")
+                        if if_origins_exist == "replace":
+                            self[v_short_name].metadata.origins = []
+                        self[v_short_name].metadata.origins += [Origin(**origin) for origin in v]
                     else:
                         setattr(self[v_short_name].metadata, k, v)
 
@@ -763,6 +787,9 @@ class Table(pd.DataFrame):
 
         return variable
 
+    def assign(self, *args, **kwargs) -> "Table":
+        return super().assign(*args, **kwargs)  # type: ignore
+
     def __add__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
         # The following would have a parents only the scalar, not the scalar and the corresponding variable.
@@ -847,7 +874,7 @@ class Table(pd.DataFrame):
         return super().sort_index(*args, **kwargs)  # type: ignore
 
     def groupby(self, *args, **kwargs) -> "TableGroupBy":
-        return TableGroupBy(super().groupby(*args, **kwargs), self.metadata, self._fields)
+        return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
 
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
@@ -934,13 +961,16 @@ class VariableGroupBy:
     def __getattr__(self, funcname) -> Callable[..., "Table"]:
         def func(*args, **kwargs):
             """Apply function and return variable with proper metadata."""
-            out = getattr(self.groupby, funcname)(*args, **kwargs)
+            # out = getattr(self.groupby, funcname)(*args, **kwargs)
+            ff = getattr(self.groupby, funcname)
+            out = ff(*args, **kwargs)
 
             # this happens when we use e.g. agg([min, max]), propagate metadata from the original then
             if isinstance(out, Table):
                 out._fields = defaultdict(VariableMeta, {k: self.metadata for k in out.columns})
                 return out
             elif isinstance(out, variables.Variable):
+                out.metadata = self.metadata.copy()
                 return out
             elif isinstance(out, pd.Series):
                 return variables.Variable(out, name=self.name, metadata=self.metadata)
@@ -1243,6 +1273,23 @@ def read_csv(
     return cast(Table, table)
 
 
+def read_fwf(
+    filepath_or_buffer: Union[FilePath, ReadCsvBuffer[bytes], ReadCsvBuffer[str]],
+    metadata: Optional[TableMeta] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_fwf(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    if isinstance(filepath_or_buffer, (str, Path)):
+        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
+    else:
+        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_fwf.")
+
+    return cast(Table, table)
+
+
 def read_feather(
     filepath: Union[str, Path],
     metadata: Optional[TableMeta] = None,
@@ -1260,6 +1307,7 @@ def read_feather(
 def read_excel(
     io: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
 ) -> Table:
+    assert not isinstance(kwargs.get("sheet_name"), list), "Argument 'sheet_name' must be a string or an integer."
     table = Table(pd.read_excel(io=io, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
     # Note: Maybe we should include the sheet name in parents.

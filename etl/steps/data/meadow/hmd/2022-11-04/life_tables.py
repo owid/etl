@@ -133,6 +133,8 @@ def create_and_add_tables_to_dataset(local_file: str, ds: Dataset, walden_ds: Wa
                 # Create table
                 log.info(f"Creating table for {age}-year age groups and {year}-year intervals...")
                 table = make_table(tmp_dir, age, year, walden_ds)
+                # set index
+                table = table.set_index(["country", "year", "age"], verify_integrity=True)
                 # add table to a dataset
                 log.info("Adding table to dataset...")
                 ds.add(table)
