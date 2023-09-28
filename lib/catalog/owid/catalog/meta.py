@@ -12,6 +12,7 @@ from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Literal, NewType, Optional, Union
 
+import mistune
 import pandas as pd
 from dataclasses_json import dataclass_json
 
@@ -496,7 +497,7 @@ def to_html(record: Any) -> Optional[str]:
         return '<ul style="text-align: left; margin-top: 0em; margin-bottom: 0em">{}</ul>'.format("".join(rows))
 
     else:
-        return str(record)
+        return mistune.html(str(record))  # type: ignore
 
 
 def is_year_or_date(s: str) -> bool:
