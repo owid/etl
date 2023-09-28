@@ -56,8 +56,8 @@ def run(dest_dir: str) -> None:
     # Sort
     tb = tb.sort_values(["year", "age"])
 
-    # Debugging
-    tb = tb[tb.country == "Denmark"]
+    # Debugging (pick just one country to speed up calculations)
+    # tb = tb[tb.country == "Denmark"]
 
     # Actual calculation
     log.info("survivor_percentiles: calculate surviorship ages (can take some minutes)...")
