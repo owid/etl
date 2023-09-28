@@ -74,6 +74,7 @@ nav:
     - Maintenance:
       - Maintenance: "dev/index.md"
       - Documentation: "dev/docs.md"
+      - Catalog: "dev/update-catalog.md"
 
 theme:
   # logo: assets/logo.png
