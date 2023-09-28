@@ -1,14 +1,14 @@
 import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
-from owid import catalog
+from owid.catalog import Dataset, Table, Variable
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.paths import DATA_DIR
 
 CURRENT_DIR = Path(__file__).parent
 
@@ -169,242 +169,19 @@ EXPECTED_COUNTRIES_WITHOUT_POPULATION = list(
 # We accept them either because they happened close to the transition, or to avoid needing to introduce new
 # countries for which we do not have data (like the Russian Empire).
 ACCEPTED_OVERLAPS = {
-    1902: {"USSR", "Azerbaijan"},
-    1990: {"Tajikistan", "USSR"},
+    1911: {"Kazakhstan", "USSR"},
     1991: {"Georgia", "USSR"},
 }
 
 
-def get_countries_in_region(
-    region: str, region_modifications: Optional[Dict[str, Dict[str, List[str]]]] = None
-) -> List[str]:
-    """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
-
-    Parameters
-    ----------
-    region : str
-        Region name (e.g. "Africa", or "Europe (excl. EU-27)").
-    region_modifications : dict or None
-        If None (or an empty dictionary), the region should be in OWID's countries-regions dataset.
-        If not None, it should be a dictionary with any (or all) of the following keys:
-        - "regions_included": List of regions whose countries will be included.
-        - "regions_excluded": List of regions whose countries will be excluded.
-        - "countries_included": List of additional individual countries to be included.
-        - "countries_excluded": List of additional individual countries to be excluded.
-        NOTE: All regions and countries defined in this dictionary should be in OWID's countries-regions dataset.
-
-    Returns
-    -------
-    countries : list
-        List of countries in the specified region.
-
-    """
-    if region_modifications is None:
-        region_modifications = {}
-
-    # Check that the fields in the regions_modifications dictionary are well defined.
-    expected_fields = ["regions_included", "regions_excluded", "countries_included", "countries_excluded"]
-    assert all([field in expected_fields for field in region_modifications])
-
-    # Get lists of regions whose countries will be included and excluded.
-    regions_included = region_modifications.get("regions_included", [region])
-    regions_excluded = region_modifications.get("regions_excluded", [])
-    # Get lists of additional individual countries to include and exclude.
-    countries_included = region_modifications.get("countries_included", [])
-    countries_excluded = region_modifications.get("countries_excluded", [])
-
-    # List countries from the list of regions included.
-    countries_set = set(
-        sum([geo.list_countries_in_region(region_included) for region_included in regions_included], [])
-    )
-
-    # Remove all countries from the list of regions excluded.
-    countries_set -= set(
-        sum([geo.list_countries_in_region(region_excluded) for region_excluded in regions_excluded], [])
-    )
-
-    # Add the list of individual countries to be included.
-    countries_set |= set(countries_included)
-
-    # Remove the list of individual countries to be excluded.
-    countries_set -= set(countries_excluded)
-
-    # Convert set of countries into a sorted list.
-    countries = sorted(countries_set)
-
-    return countries
-
-
-def load_population(regions: Optional[Dict[Any, Any]] = None) -> pd.DataFrame:
-    """Load OWID population dataset, and add historical regions to it.
-
-    Returns
-    -------
-    population : pd.DataFrame
-        Population dataset.
-
-    """
-    # Load population dataset.
-    population = catalog.Dataset(DATA_DIR / "garden/owid/latest/key_indicators/")["population"].reset_index()[
-        ["country", "year", "population"]
-    ]
-
-    # Add data for historical regions (if not in population) by adding the population of its current successors.
-    countries_with_population = population["country"].unique()
-
-    # Consider additional regions (e.g. historical regions).
-    if regions is None:
-        regions = {}
-    missing_countries = [country for country in regions if country not in countries_with_population]
-    for country in missing_countries:
-        members = regions[country]["regions_included"]
-        _population = (
-            population[population["country"].isin(members)]
-            .groupby("year")
-            .agg({"population": "sum", "country": "nunique"})
-            .reset_index()
-        )
-        # Select only years for which we have data for all member countries.
-        _population = _population[_population["country"] == len(members)].reset_index(drop=True)
-        _population["country"] = country
-        population = pd.concat([population, _population], ignore_index=True).reset_index(drop=True)
-
-    error = "Duplicate country-years found in population. Check if historical regions changed."
-    assert population[population.duplicated(subset=["country", "year"])].empty, error
-
-    return cast(pd.DataFrame, population)
-
-
-def load_income_groups() -> pd.DataFrame:
-    """Load dataset of income groups and add historical regions to it.
-
-    Returns
-    -------
-    income_groups : pd.DataFrame
-        Income groups data.
-
-    """
-    # Load the WorldBank dataset for income grups.
-    income_groups = catalog.Dataset(DATA_DIR / "garden/wb/2021-07-01/wb_income")["wb_income_group"].reset_index()
-
-    # Add historical regions to income groups.
-    for historic_region in HISTORIC_TO_CURRENT_REGION:
-        historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region]["income_group"]
-        if historic_region not in income_groups["country"]:
-            historic_region_df = pd.DataFrame(
-                {
-                    "country": [historic_region],
-                    "income_group": [historic_region_income_group],
-                }
-            )
-            income_groups = pd.concat([income_groups, historic_region_df], ignore_index=True)
-
-    return cast(pd.DataFrame, income_groups)
-
-
-def add_population(
-    df: pd.DataFrame,
-    country_col: str = "country",
-    year_col: str = "year",
-    population_col: str = "population",
-    interpolate_missing_population: bool = False,
-    warn_on_missing_countries: bool = True,
-    show_full_warning: bool = True,
-    regions: Optional[Dict[Any, Any]] = None,
-    expected_countries_without_population: List[str] = [],
-) -> pd.DataFrame:
-    """Add a column of OWID population to the countries in the data, including population of historical regions.
-
-    This function has been adapted from datautils.geo, because population currently does not include historic regions.
-    We include them in this function.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Data without a column for population (after harmonizing elements, items and country names).
-    country_col : str
-        Name of country column in data.
-    year_col : str
-        Name of year column in data.
-    population_col : str
-        Name for new population column in data.
-    interpolate_missing_population : bool
-        True to linearly interpolate population on years that are presented in df, but for which we do not have
-        population data; otherwise False to keep missing population data as nans.
-        For example, if interpolate_missing_population is True and df has data for all years between 1900 and 1910,
-        but population is only given for 1900 and 1910, population will be linearly interpolated between those years.
-    warn_on_missing_countries : bool
-        True to warn if population is not found for any of the countries in the data.
-    show_full_warning : bool
-        True to show affected countries if the previous warning is raised.
-    regions : dict
-        Definitions of regions whose population also needs to be included.
-    expected_countries_without_population : list
-        Countries that are expected to not have population (that should be ignored if warnings are activated).
-
-    Returns
-    -------
-    df_with_population : pd.DataFrame
-        Data after adding a column for population for all countries in the data.
-
-    """
-
-    # Load population dataset.
-    population = load_population(regions=regions).rename(
-        columns={
-            "country": country_col,
-            "year": year_col,
-            "population": population_col,
-        }
-    )[[country_col, year_col, population_col]]
-
-    # Check if there is any missing country.
-    missing_countries = set(df[country_col]) - set(population[country_col])
-    if len(missing_countries) > 0:
-        if warn_on_missing_countries:
-            geo.warn_on_list_of_entities(
-                list_of_entities=missing_countries,
-                warning_message=(
-                    f"{len(missing_countries)} countries not found in population"
-                    " dataset. They will remain in the dataset, but have nan"
-                    " population."
-                ),
-                show_list=show_full_warning,
-            )
-
-    if interpolate_missing_population:
-        # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
-        # Optionally fill missing years linearly.
-        countries_in_data = df[country_col].unique()
-        years_in_data = df[year_col].unique()
-
-        population = population.set_index([country_col, year_col]).reindex(
-            pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, year_col])
-        )
-
-        population = population.groupby(country_col).transform(
-            lambda x: x.interpolate(method="linear", limit_direction="both")
-        )
-
-        error = "Countries without population data differs from list of expected countries without population data."
-        assert set(population[population[population_col].isnull()].reset_index()[country_col]) == set(
-            expected_countries_without_population
-        ), error
-
-    # Add population to original dataframe.
-    df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
-
-    return df_with_population
-
-
 def detect_overlapping_regions(
-    df, index_columns, region_and_members, country_col="country", year_col="year", ignore_zeros=True
+    tb, index_columns, region_and_members, country_col="country", year_col="year", ignore_zeros=True
 ):
     """Detect years on which the data for two regions overlap, e.g. a historical region and one of its successors.
 
     Parameters
     ----------
-    df : _type_
+    tb : _type_
         Data (with a dummy index).
     index_columns : _type_
         Names of index columns.
@@ -425,9 +202,9 @@ def detect_overlapping_regions(
 
     """
     # Sum over all columns to get the total sum of each column for each country-year.
-    df_total = (
-        df.groupby([country_col, year_col])
-        .agg({column: "sum" for column in df.columns if column not in index_columns})
+    tb_total = (
+        tb.groupby([country_col, year_col])
+        .agg({column: "sum" for column in tb.columns if column not in index_columns})
         .reset_index()
     )
     # Create a list of values that will be ignored in overlaps (usually zero or nothing).
@@ -436,9 +213,9 @@ def detect_overlapping_regions(
     else:
         overlapping_values_to_ignore = []
     # List all variables in data (ignoring index columns).
-    variables = [column for column in df.columns if column not in index_columns]
+    variables = [column for column in tb.columns if column not in index_columns]
     # List all country names found in data.
-    countries_in_data = df[country_col].unique().tolist()
+    countries_in_data = tb[country_col].unique().tolist()
     # List all regions found in data.
     regions = [country for country in list(region_and_members) if country in countries_in_data]
     # Initialize a dictionary that will store all overlaps found.
@@ -449,13 +226,13 @@ def detect_overlapping_regions(
         for member in members:
             # Select data for current region.
             region_values = (
-                df_total[df_total[country_col] == region]
+                tb_total[tb_total[country_col] == region]
                 .replace(overlapping_values_to_ignore, np.nan)
                 .dropna(subset=variables, how="all")
             )
             # Select data for current member.
             member_values = (
-                df_total[df_total[country_col] == member]
+                tb_total[tb_total[country_col] == member]
                 .replace(overlapping_values_to_ignore, np.nan)
                 .dropna(subset=variables, how="all")
             )
@@ -473,19 +250,28 @@ def detect_overlapping_regions(
 
 
 def add_region_aggregates(
-    data: pd.DataFrame,
+    data: Table,
+    regions_to_add: Dict[Any, Any],
     index_columns: List[str],
+    ds_regions: Dataset,
+    ds_income_groups: Dataset,
     country_column: str = "country",
     aggregates: Optional[Dict[str, str]] = None,
-) -> pd.DataFrame:
+) -> Table:
     """Add region aggregates for all regions (which may include continents and income groups).
 
     Parameters
     ----------
-    data : pd.DataFrame
+    data : Table
         Data.
+    regions_to_add: list
+        Regions to add.
     index_columns : list
         Name of index columns.
+    ds_regions : Dataset
+        Regions dataset.
+    ds_income_groups : Dataset
+        Income groups dataset.
     country_column : str
         Name of country column.
     year_column : str
@@ -495,14 +281,14 @@ def add_region_aggregates(
 
     Returns
     -------
-    data : pd.DataFrame
+    data : Table
         Data after adding aggregate regions.
 
     """
     data = data.copy()
 
     all_overlaps = detect_overlapping_regions(
-        df=data, region_and_members=HISTORIC_TO_CURRENT_REGION, index_columns=index_columns
+        tb=data, region_and_members=HISTORIC_TO_CURRENT_REGION, index_columns=index_columns
     )
 
     # Check whether all accepted overlaps are found in the data, and that there are no new unknown overlaps.
@@ -513,20 +299,22 @@ def add_region_aggregates(
         # If aggregations are not specified, assume all variables are to be aggregated, by summing.
         aggregates = {column: "sum" for column in data.columns if column not in index_columns}
 
-    for region in REGIONS:
+    for region in regions_to_add:
         # List of countries in region.
-        countries_in_region = get_countries_in_region(region=region, region_modifications=REGIONS[region])
+        countries_in_region = geo.list_members_of_region(
+            region=region, ds_regions=ds_regions, ds_income_groups=ds_income_groups
+        )
         # Select rows of data for member countries.
         data_region = data[data[country_column].isin(countries_in_region)]
 
         # Add region aggregates.
         region_df = (
             data_region.groupby([column for column in index_columns if column != country_column])
-            .sum(numeric_only=True)
+            .agg(aggregates)
             .reset_index()
             .assign(**{country_column: region})
         )
-        data = pd.concat([data, region_df], ignore_index=True)  # type: ignore
+        data = pr.concat([data, region_df], ignore_index=True)
 
     return data
 
@@ -555,36 +343,36 @@ def get_last_day_of_month(year: int, month: int):
     return last_day
 
 
-def correct_data_points(df: pd.DataFrame, corrections: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]) -> pd.DataFrame:
-    """Make individual corrections to data points in a dataframe.
+def correct_data_points(tb: Table, corrections: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]) -> Table:
+    """Make individual corrections to data points in a table.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    tb : Table
         Data to be corrected.
     corrections : List[Tuple[Dict[Any, Any], Dict[Any, Any]]]
         Corrections.
 
     Returns
     -------
-    corrected_df : pd.DataFrame
+    tb_corrected : Table
         Corrected data.
 
     """
-    corrected_df = df.copy()
+    tb_corrected = tb.copy()
 
     for correction in corrections:
         wrong_row, corrected_row = correction
 
-        # Select the row in the dataframe where the wrong data point is.
+        # Select the row in the table where the wrong data point is.
         # The 'fillna(False)' is added because otherwise rows that do not fulfil the selection will create ambiguity.
-        selection = corrected_df.loc[(corrected_df[list(wrong_row)] == pd.Series(wrong_row)).fillna(False).all(axis=1)]
+        selection = tb_corrected.loc[(tb_corrected[list(wrong_row)] == Variable(wrong_row)).fillna(False).all(axis=1)]
         # Sanity check.
         error = "Either raw data has been corrected, or dictionary selecting wrong row is ambiguous."
         assert len(selection) == 1, error
 
         # Replace wrong fields by the corrected ones.
         # Note: Changes to categorical fields will not work.
-        corrected_df.loc[selection.index, list(corrected_row)] = list(corrected_row.values())
+        tb_corrected.loc[selection.index, list(corrected_row)] = list(corrected_row.values())
 
-    return corrected_df
+    return tb_corrected
