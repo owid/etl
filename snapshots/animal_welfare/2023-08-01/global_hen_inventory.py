@@ -16,6 +16,9 @@ To download the data:
 
 Then execute this script with the argument --path-to-file followed by the path to the downloaded file.
 
+NOTE: The data source for Malta and Mexico were misplaced in the original dataset. The correct sources needed to be
+swapped (the data was not affected, though). We confirmed this issue with the author and manually fixed the sources.
+
 """
 
 from pathlib import Path

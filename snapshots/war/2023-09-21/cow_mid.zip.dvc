@@ -1,0 +1,38 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Militarized Interstate Disputes
+    date_published: 2020-11-09
+    version_producer: v5.0
+    description: |-
+      Version 5 of the Militarized Interstate Dispute (MID) data collection compiled by the Correlates of War Project provides information about conflicts in which one or more states threaten, display, or use force against one or more other states between 1816 and 2014. By definition, “Militarized interstate disputes are united historical cases of conflict in which the threat, display or use of military force short of war by one member state is explicitly directed towards the government, official representatives, official forces, property, or territory of another state. Disputes are composed of incidents that range in intensity from threats to use force to actual combat short of war” (Jones et al. 1996: 163).
+
+      This dataset includes MIDA, MIDB, MIDI, and MIDIP.
+
+      - MIDA: Data on MIDs from 1816-2014, at the dispute level. Contains one record per militarized dispute.
+      - MIDB: Data on MIDs from 1816-2014, at the participant level. Contains one record per militarized dispute participant.
+      - MIDI: Data on incidents within MIDs from 1993-2014, at the incident level. Contains one record per militarized incident.
+      - MIDIP: Data on incidents within MIDs from 1993-2014, at the incident-participant level. Contains one record per participant in each incident.
+
+    # Citation
+    producer: Correlates of War
+    citation_full: |-
+      Palmer, Glenn, Roseanne W. McManus, Vito D’Orazio, Michael R. Kenwick, Mikaela Karstens, Chase Bloch, Nick Dietrich, Kayla Kahn, Kellan Ritter, Michael J. Soules. 2020. “The MID5 Dataset, 2011-2014: Procedures, Coding Rules, and Description.” Conflict Management and Peace Science, 39(4): 470-482. DOI: https://journals.sagepub.com/doi/full/10.1177/0738894221995743
+    attribution_short: COW
+
+    # Files
+    url_main: https://correlatesofwar.org/data-sets/mids/
+    url_download: 
+      https://correlatesofwar.org/wp-content/uploads/MID-5-Data-and-Supporting-Materials.zip
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: Correlates of War terms
+      url: https://correlatesofwar.org/data-sets/
+
+wdir: ../../../data/snapshots/war/2023-09-21
+outs:
+- md5: baa334bbbaf9b213c9efe3a27dc20fbd
+  size: 3202698
+  path: cow_mid.zip

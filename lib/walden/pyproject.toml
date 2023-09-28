@@ -2,7 +2,7 @@
 name = "walden"
 version = "0.1.0"
 description = ""
-authors = ["Our World In Data <tech@ourworldindata.org>"]
+authors = ["Our World in Data <tech@ourworldindata.org>"]
 packages = [{ include = "owid" }]
 
 [tool.poetry.dependencies]

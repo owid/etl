@@ -56,8 +56,19 @@ def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Data
     return tb
 
 
+def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
+    tb = geo.add_population_to_table(tb, ds_population=ds_population, warn_on_missing_countries=False)
+    tb["n_wild_fish_low_per_capita"] = tb["n_wild_fish_low"] / tb["population"]
+    tb["n_wild_fish_per_capita"] = tb["n_wild_fish"] / tb["population"]
+    tb["n_wild_fish_high_per_capita"] = tb["n_wild_fish_high"] / tb["population"]
+    # Drop population column.
+    tb = tb.drop(columns=["population"])
+    return tb
+
+
 def run_sanity_checks_on_outputs(tb: Table) -> None:
-    # Check that the total agrees with the sum of aggregates from each continent.
+    # Check that the total agrees with the sum of aggregates from each continent, for non per capita columns.
+    tb = tb[[column for column in tb.columns if "per_capita" not in column]].copy()
     world = tb[tb["country"] == "World"].reset_index(drop=True).drop(columns=["country"])
     test = (
         tb[tb["country"].isin(["Africa", "North America", "South America", "Asia", "Europe", "Oceania"])]
@@ -81,6 +92,9 @@ def run(dest_dir: str) -> None:
     # Load income groups dataset.
     ds_income_groups = paths.load_dependency("income_groups")
 
+    # Load population dataset.
+    ds_population = paths.load_dependency("population")
+
     #
     # Process data.
     #
@@ -102,6 +116,9 @@ def run(dest_dir: str) -> None:
 
     # Add midpoint number of wild fish.
     tb["n_wild_fish"] = (tb["n_wild_fish_low"] + tb["n_wild_fish_high"]) / 2
+
+    # Add per capita number of farmed fish.
+    tb = add_per_capita_variables(tb=tb, ds_population=ds_population)
 
     # Run sanity checks on outputs.
     run_sanity_checks_on_outputs(tb=tb)

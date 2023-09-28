@@ -4,10 +4,11 @@
 
 import hashlib
 import os
+import time
 from collections import OrderedDict
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, List, Optional, Set, TextIO, Union
+from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
 
 import black
 import yaml
@@ -93,7 +94,8 @@ def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoint
 
 
 class _MyDumper(Dumper):
-    pass
+    def increase_indent(self, flow=False, indentless=False):
+        return super(_MyDumper, self).increase_indent(flow, False)
 
 
 def _str_presenter(dumper: Any, data: Any) -> Any:
@@ -179,3 +181,31 @@ def apply_black_formatter_to_files(file_paths: List[Union[str, Path]]) -> None:
     # Apply black formatter to generated step files.
     for file_path in file_paths:
         black.format_file_in_place(src=file_path, fast=True, mode=black_mode, write_back=black.WriteBack.YES)  # type: ignore
+
+
+def _mtime_mapping(path: Path) -> Dict[Path, float]:
+    return {f: f.stat().st_mtime for f in path.rglob("*") if f.is_file() and "__pycache__" not in f.parts}
+
+
+def watch_folder(path: Path) -> Generator[Path, None, None]:
+    """Watch folder and yield on any changes."""
+    last_seen = _mtime_mapping(path)
+
+    while True:
+        time.sleep(1)
+
+        current_files = _mtime_mapping(path)
+
+        # Check for modifications
+        for f, mtime in current_files.items():
+            # new file
+            if f not in last_seen:
+                yield f
+                break
+            # updated file
+            else:
+                if last_seen[f] != mtime:
+                    yield f
+                    break
+
+        last_seen = current_files

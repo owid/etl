@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 import mkdocs_gen_files
 
-from etl.docs import examples_to_markdown, guidelines_to_markdown
+from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
 from etl.helpers import read_json_schema
 from etl.paths import SCHEMAS_DIR
 
@@ -17,6 +17,7 @@ TEMPLATE_PROPERTY = """
 
 {guidelines}
 {examples}
+{faqs}
 
 ---
 
@@ -35,7 +36,10 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
     # Prepare requirement_level
     requirement_level = ""
     if "requirement_level" in prop:
-        requirement_level = f" | {prop['requirement_level']}"
+        if "required" in prop['requirement_level']:
+            requirement_level = f" | {{=={prop['requirement_level']}==}}"
+        else:
+            requirement_level = f" | {prop['requirement_level']}"
     # Prepare guidelines
     guidelines = ""
     if "guidelines" in prop and prop.get("guidelines"):
@@ -47,6 +51,13 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
     if "examples" in prop and prop.get("examples"):
         examples = f"""=== ":material-note-edit: Examples"
         {examples_to_markdown(prop['examples'], prop['examples_bad'], extra_tab=1)}
+    """
+
+    # Prepare FAQs
+    faqs = ""
+    if "faqs" in prop and prop.get("examples"):
+        faqs = f"""=== ":material-chat-question: FAQs"
+        {faqs_to_markdown(prop['faqs'], extra_tab=1)}
     """
 
     # Bake documentation for property
@@ -66,6 +77,7 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
         "requirement_level": requirement_level,
         "guidelines": guidelines,
         "examples": examples,
+        "faqs": faqs,
     })
     return prop_docs
 
@@ -87,7 +99,8 @@ def render_props_recursive(prop: Dict[str, Any], prop_name: str, level: int, tex
             props_children = prop["properties"]
         else:
             return text
-        for prop_name_child, prop_child in props_children.items():
+        props_children_sorted = dict(sorted(props_children.items()))
+        for prop_name_child, prop_child in props_children_sorted.items():
             text += render_props_recursive(prop_child, prop_name=f"{prop_name}.{prop_name_child}", level=level + 1, text="")
     else:
         text += render_prop_doc(prop, prop_name=prop_name, level=level)
@@ -122,17 +135,17 @@ def render_table() -> str:
 
 
 # Origin reference
-with mkdocs_gen_files.open("architecture/metadata/reference-origin.md", "w") as f:
+with mkdocs_gen_files.open("architecture/metadata/reference/origin.md", "w") as f:
     text_origin = render_origin()
     print(text_origin, file=f)
 
 # Dataset reference
-with mkdocs_gen_files.open("architecture/metadata/reference-dataset.md", "w") as f:
+with mkdocs_gen_files.open("architecture/metadata/reference/dataset.md", "w") as f:
     text_dataset = render_dataset()
     print(text_dataset, file=f)
 
 # Tables reference
-with mkdocs_gen_files.open("architecture/metadata/reference-tables.md", "w") as f:
+with mkdocs_gen_files.open("architecture/metadata/reference/tables.md", "w") as f:
     text_tables = render_table()
     print(text_tables, file=f)
 

@@ -14,6 +14,7 @@ nav:
     - Tutorials: "tutorials/index.md"
     - Adding data:
       - Adding data: "tutorials/adding-data/index.md"
+      - Wizard: "tutorials/adding-data/wizard.md"
       - Walkthrough: "tutorials/adding-data/walkthrough.md"
       - Manually add: "tutorials/adding-data/manual.md"
       - Fast-track: "tutorials/adding-data/fast-track.md"
@@ -23,11 +24,10 @@ nav:
       - Using chatGPT: "tutorials/charts/chatgpt.md"
     - Harmonize country names: "tutorials/harmonize-countries.md"
     - Metadata in data pages: "tutorials/metadata-play.md"
-    - Backporting Grapher datasets to ETL: "tutorials/backport.md"
-    - Importing a private dataset to ETL: "tutorials/private-import.md"
+    - Backport a dataset to ETL: "tutorials/backport.md"
+    - Import a private dataset to ETL: "tutorials/private-import.md"
   - Architecture:
       - Architecture: architecture/index.md
-      - Our journey: "architecture/our-journey.md"
       - Design principles:
         - Computational graph:
           - Computational graph: "architecture/design/compute-graph/index.md"
@@ -36,12 +36,12 @@ nav:
         - Features and constraints: "architecture/design/features-constraints.md"
         - The DAG: "architecture/design/dag.md"
         - The URI: "architecture/design/uri.md"
-      - ETL steps:
-        - ETL steps: "architecture/workflow/index.md"
-        - Snapshot: "architecture/workflow/snapshot.md"
-        - Meadow: "architecture/workflow/meadow.md"
-        - Garden: "architecture/workflow/garden.md"
-        - Grapher: "architecture/workflow/grapher.md"
+      - Workflow:
+        - Workflow: "architecture/workflow/index.md"
+        - Snapshot step: "architecture/workflow/snapshot.md"
+        - Meadow step: "architecture/workflow/meadow.md"
+        - Garden step: "architecture/workflow/garden.md"
+        - Grapher step: "architecture/workflow/grapher.md"
         - Special steps:
           # - Special steps: "architecture/workflow/other-steps/index.md"
           - Explorers: "architecture/workflow/other-steps/explorers.md"
@@ -52,13 +52,16 @@ nav:
           - Private steps: "architecture/workflow/other-steps/private.md"
       - Metadata:
         - Metadata: "architecture/metadata/index.md"
-        - Workflow with metadata: "architecture/metadata/workflow.md"
+        # - Workflow with metadata: "architecture/metadata/workflow.md"
+        # - Reference:
         - Reference:
-          - origin reference: "architecture/metadata/reference-origin.md"
-          - dataset reference: "architecture/metadata/reference-dataset.md"
-          - tables reference: "architecture/metadata/reference-tables.md"
+          - Reference: "architecture/metadata/reference/index.md"
+          - Origin: "architecture/metadata/reference/origin.md"
+          - Dataset: "architecture/metadata/reference/dataset.md"
+          - Tables: "architecture/metadata/reference/tables.md"
         - Propagation of metadata: "architecture/metadata/propagation.md"
         - Using metadata: "architecture/metadata/using.md"
+      - Our journey: "architecture/our-journey.md"
   - API and catalog:
     - API: "api/index.md"
     - Python: "api/python.ipynb"
@@ -71,6 +74,7 @@ nav:
     - Maintenance:
       - Maintenance: "dev/index.md"
       - Documentation: "dev/docs.md"
+      - Catalog: "dev/update-catalog.md"
 
 theme:
   # logo: assets/logo.png
@@ -118,7 +122,6 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
   - md_in_html
-  - pymdownx.superfences
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid

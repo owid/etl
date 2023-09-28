@@ -25,6 +25,13 @@ st.session_state["step_name"] = "garden"
 APP_STATE = utils.AppState()
 # Config style
 utils.config_style_html()
+# DUMMY defaults
+dummy_values = {
+    "namespace": "dummy",
+    "version": utils.DATE_TODAY,
+    "short_name": "dummy",
+    "meadow_version": utils.DATE_TODAY,
+}
 
 
 #########################################################
@@ -110,7 +117,6 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     variable_meta = {
         "title": "Dummy",
         "description": "This is a dummy indicator with full metadata.",
-        "licenses": [],
         "unit": "Dummy unit",
         "short_unit": "Du",
         "display": {
@@ -161,7 +167,7 @@ st.title("Wizard  **:gray[Garden]**")
 
 # SIDEBAR
 with st.sidebar:
-    utils.warning_notion_latest()
+    utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
@@ -180,6 +186,7 @@ with form_widget.form("garden"):
         help="Institution or topic name",
         placeholder="Example: 'emdat', 'health'",
         key="namespace",
+        value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
     )
     # Garden version
     APP_STATE.st_widget(
@@ -188,6 +195,7 @@ with form_widget.form("garden"):
         help="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
         key="version",
         default_last=default_version,
+        value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
     )
     # Garden short name
     APP_STATE.st_widget(
@@ -196,6 +204,7 @@ with form_widget.form("garden"):
         help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
         placeholder="Example: 'cherry_blossom'",
         key="short_name",
+        value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
     )
 
     st.markdown("#### Dataset")
@@ -218,6 +227,7 @@ with form_widget.form("garden"):
         help="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
         key="meadow_version",
         default_last=default_version,
+        value=dummy_values["meadow_version"] if APP_STATE.args.dummy_data else None,
     )
 
     st.markdown("#### Others")
@@ -305,6 +315,16 @@ if submitted:
         if form.namespace == "dummy":
             _fill_dummy_metadata_yaml(metadata_path)
 
+        # Preview generated files
+        st.subheader("Generated files")
+        if form.include_metadata_yaml:
+            utils.preview_file(metadata_path, "yaml")
+        utils.preview_file(step_path, "python")
+        if form.generate_notebook:
+            with st.expander(f"File: `{notebook_path}`", expanded=False):
+                st.markdown("Open the file to see the generated notebook.")
+        utils.preview_dag_additions(dag_content, dag_path)
+
         # Display next steps
         with st.expander("## Next steps", expanded=True):
             st.markdown(
@@ -325,25 +345,11 @@ if submitted:
 
         2. (Optional) Generated notebook `{notebook_path.relative_to(BASE_DIR)}` can be used to examine the dataset output interactively.
 
-        3. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
+        3. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
 
-            ```
-            poetry run etl-metadata-export data/garden/{form.namespace}/{form.version}/{form.short_name} -o etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.meta.yml
-            ```
+        4. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
 
-            then manual edit it and rerun the step again with
-
-            ```
-            poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
-            ```
-
-            Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
-
-        4. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
-
-        5. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
-
-        6. (Optional) Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
+        5. (Optional) Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
 
             ```python
             from owid.catalog import find_one
@@ -352,16 +358,9 @@ if submitted:
             print(tab.head())
             ```
 
-        7. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
+        6. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
         """
             )
-
-        # Preview generated files
-        st.subheader("Generated files")
-        if form.include_metadata_yaml:
-            utils.preview_file(metadata_path, "yaml")
-        utils.preview_file(step_path, "python")
-        utils.preview_dag_additions(dag_content, dag_path)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

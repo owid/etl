@@ -6,14 +6,14 @@ dataset:
 
     You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/nuclear_weapons
   licenses:
-  - {}
+    - {}
   sources:
-  - name: Suh (2023)
-    url: https://kyungwon-suh.github.io/datasets/
-    date_accessed: '2023-05-08'
-    publication_year: '2023'
-    published_by: 'Kyungwon, Suh. 2023. Nuclear balance and the initiation of nuclear crises: Does superiority matter? Journal
-      of Peace Research 60(2): 337–351.'
+    - name: Suh (2023)
+      url: https://kyungwon-suh.github.io/datasets/
+      date_accessed: '2023-05-08'
+      publication_year: '2023'
+      published_by: 'Kyungwon, Suh. 2023. Nuclear balance and the initiation of nuclear crises: Does superiority matter? Journal
+        of Peace Research 60(2): 337–351.'
 tables:
   monadic_strategic_nuclear_forces:
     variables:
@@ -48,6 +48,9 @@ tables:
         title: nuclwarh_firststr_area
         description: >-
           The area destroyable by strategic nuclear warheads deliverable in first strike.
+
+
+          Destruction of unprotected structures, such as buildings and factories.
 
 
           Strategic nuclear warheads designed for use away from the battlefield, such as against military bases, arms industries,

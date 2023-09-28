@@ -77,16 +77,28 @@ class Variable(pd.Series):
         self,
         data: Any = None,
         index: Any = None,
+        name: Optional[str] = None,
         _fields: Optional[Dict[str, VariableMeta]] = None,
+        metadata: Optional[VariableMeta] = None,
         **kwargs: Any,
     ) -> None:
+        if metadata:
+            assert not _fields, "cannot pass both metadata and _fields"
+            assert name or self.name, "cannot pass metadata without a name"
+            _fields = {(name or self.name): metadata}  # type: ignore
+
         self._fields = _fields or defaultdict(VariableMeta)
 
         # silence warning
         if data is None and not kwargs.get("dtype"):
             kwargs["dtype"] = "object"
 
-        super().__init__(data=data, index=index, **kwargs)
+        super().__init__(data=data, index=index, name=name, **kwargs)
+
+    @property
+    def m(self) -> VariableMeta:
+        """Metadata alias to save typing."""
+        return self.metadata
 
     @property
     def name(self) -> Optional[str]:
@@ -108,7 +120,7 @@ class Variable(pd.Series):
 
     @property
     def checked_name(self) -> str:
-        if not self.name:
+        if self.name is None:
             raise ValueError("variable must be named to have metadata")
 
         return self.name
@@ -333,8 +345,18 @@ for k in VariableMeta.__dataclass_fields__:
 
 
 def _get_metadata_value_from_variables_if_all_identical(
-    variables: List[Variable], field: str, warn_if_different: bool = False
+    variables: List[Variable],
+    field: str,
+    warn_if_different: bool = False,
+    operation: Optional[OPERATION] = None,
 ) -> Optional[Any]:
+    if (operation == "/") and (getattr(variables[0].metadata, field) is None):
+        # When dividing a variable by another, it only makes sense to keep the metadata values of the first variable.
+        # For example, if we have energy (without description) and population (with a description), when calculating
+        # energy per capita, the result shouldn't have the description of population. It should have no description.
+        # Therefore, if the first variable has no metadata value, return None.
+        return None
+
     # Get unique values from list, ignoring Nones.
     unique_values = set(
         [getattr(variable.metadata, field) for variable in variables if getattr(variable.metadata, field) is not None]
@@ -347,34 +369,6 @@ def _get_metadata_value_from_variables_if_all_identical(
             log.warning(f"Different values of '{field}' detected among variables: {unique_values}")
 
     return combined_value
-
-
-def combine_variables_unit(variables: List[Variable]) -> Optional[str]:
-    return _get_metadata_value_from_variables_if_all_identical(
-        variables=variables, field="unit", warn_if_different=True
-    )
-
-
-def combine_variables_short_unit(variables: List[Variable]) -> Optional[str]:
-    return _get_metadata_value_from_variables_if_all_identical(
-        variables=variables, field="short_unit", warn_if_different=True
-    )
-
-
-def combine_variables_title(variables: List[Variable]) -> Optional[str]:
-    return _get_metadata_value_from_variables_if_all_identical(variables=variables, field="title")
-
-
-def combine_variables_description(variables: List[Variable]) -> Optional[str]:
-    return _get_metadata_value_from_variables_if_all_identical(variables=variables, field="description")
-
-
-def combine_variables_description_short(variables: List[Variable]) -> Optional[str]:
-    return _get_metadata_value_from_variables_if_all_identical(variables=variables, field="description_short")
-
-
-def combine_variables_description_from_producer(variables: List[Variable]) -> Optional[str]:
-    return _get_metadata_value_from_variables_if_all_identical(variables=variables, field="description_from_producer")
 
 
 def get_unique_sources_from_variables(variables: List[Variable]) -> List[Source]:
@@ -431,14 +425,24 @@ def _get_dict_from_list_if_all_identical(list_of_objects: List[Optional[Dict[str
     return reference_dict if all(d == reference_dict for d in defined_dicts) else None
 
 
-def combine_variables_display(variables: List[Variable]) -> Optional[Dict[str, Any]]:
-    return _get_dict_from_list_if_all_identical(list_of_objects=[variable.metadata.display for variable in variables])
+def combine_variables_display(
+    variables: List[Variable], operation: OPERATION, _field_name="display"
+) -> Optional[Dict[str, Any]]:
+    # Gather displays from all variables that are defined.
+    list_of_displays = [getattr(variable.metadata, _field_name) for variable in variables]
+    if operation == "/" and list_of_displays[0] is None:
+        # When dividing a variable by another, it only makes sense to keep the display values of the first variable.
+        # Therefore, if the first variables doesn't have a display, the resulting variable should have no display.
+        return None
+    else:
+        return _get_dict_from_list_if_all_identical(list_of_objects=list_of_displays)
 
 
-def combine_variables_presentation(variables: List[Variable]) -> Optional[VariablePresentationMeta]:
-    return _get_dict_from_list_if_all_identical(
-        list_of_objects=[variable.metadata.presentation for variable in variables]  # type: ignore
-    )
+def combine_variables_presentation(
+    variables: List[Variable], operation: OPERATION
+) -> Optional[VariablePresentationMeta]:
+    # Apply the same logic as for displays.
+    return combine_variables_display(variables=variables, operation=operation, _field_name="presentation")  # type: ignore
 
 
 def combine_variables_processing_level(variables: List[Variable]) -> Optional[PROCESSING_LEVELS]:
@@ -475,18 +479,30 @@ def combine_variables_metadata(
     variables_only = [v for v in variables if hasattr(v, "name") and v.name and hasattr(v, "metadata")]
 
     # Combine each metadata field using the logic of the specified operation.
-    metadata.title = combine_variables_title(variables=variables_only)
-    metadata.description = combine_variables_description(variables=variables_only)
-    metadata.description_short = combine_variables_description_short(variables=variables_only)
-    metadata.description_from_producer = combine_variables_description_from_producer(variables=variables_only)
-    metadata.unit = combine_variables_unit(variables=variables_only)
-    metadata.short_unit = combine_variables_short_unit(variables=variables_only)
+    metadata.title = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="title", operation=operation
+    )
+    metadata.description = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="description", operation=operation
+    )
+    metadata.description_short = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="description_short", operation=operation
+    )
+    metadata.description_from_producer = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="description_from_producer", operation=operation
+    )
+    metadata.unit = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="unit", operation=operation, warn_if_different=True
+    )
+    metadata.short_unit = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="short_unit", operation=operation, warn_if_different=True
+    )
     metadata.sources = get_unique_sources_from_variables(variables=variables_only)
     metadata.origins = get_unique_origins_from_variables(variables=variables_only)
     metadata.licenses = get_unique_licenses_from_variables(variables=variables_only)
     metadata.processing_log = combine_variables_processing_logs(variables=variables_only)
-    metadata.display = combine_variables_display(variables=variables_only)
-    metadata.presentation = combine_variables_presentation(variables=variables_only)
+    metadata.display = combine_variables_display(variables=variables_only, operation=operation)
+    metadata.presentation = combine_variables_presentation(variables=variables_only, operation=operation)
     metadata.processing_level = combine_variables_processing_level(variables=variables_only)
 
     # List names of variables and scalars (or other objects passed in variables).

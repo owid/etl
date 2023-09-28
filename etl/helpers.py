@@ -19,6 +19,7 @@ import yaml
 from owid import catalog
 from owid.catalog import CHANNEL, DatasetMeta, Table
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
+from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 from owid.catalog.tables import (
     combine_tables_description,
     combine_tables_title,
@@ -105,6 +106,7 @@ def create_dataset(
     formats: List[FileFormat] = DEFAULT_FORMATS,
     check_variables_metadata: bool = False,
     run_grapher_checks: bool = True,
+    if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -121,6 +123,7 @@ def create_dataset(
     :param camel_to_snake: Whether to convert camel case to snake case for the table name.
     :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
     :param run_grapher_checks: Run grapher checks on the dataset, only applies to grapher channel.
+    :param if_origins_exist: What to do if origins already exist in the dataset metadata.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -187,7 +190,7 @@ def create_dataset(
     else:
         N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
     if N.metadata_path.exists():
-        ds.update_metadata(N.metadata_path)
+        ds.update_metadata(N.metadata_path, if_origins_exist=if_origins_exist)
 
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():
@@ -971,7 +974,8 @@ def print_tables_metadata_template(tables: List[Table]):
 
 @contextmanager
 def isolated_env(
-    working_dir: Path, keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas"
+    working_dir: Path,
+    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy",
 ) -> Generator[None, None, None]:
     """Add given directory to pythonpath, run code in context, and
     then remove from pythonpath and unimport modules imported in context.

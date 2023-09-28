@@ -90,6 +90,10 @@ IPDB_ENABLED = False
 # number of workers for grapher inserts
 GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 
+# only upsert indicators matching this filter, this is useful for fast development
+# of data pages for a single indicator
+GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
+
 # forbid any individual step from consuming more than this much memory
 # (only enforced on Linux)
 MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
@@ -103,7 +107,7 @@ STRICT_AFTER = "2023-06-25"
 
 def enable_bugsnag() -> None:
     BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
-    if BUGSNAG_API_KEY and not DEBUG:
+    if BUGSNAG_API_KEY:
         bugsnag.configure(
             api_key=BUGSNAG_API_KEY,
         )  # type: ignore

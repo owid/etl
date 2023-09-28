@@ -10,27 +10,12 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, NewType, Optional, TypeVar, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, Union
 
 import pandas as pd
 from dataclasses_json import dataclass_json
 
-T = TypeVar("T")
-
-
-def pruned_json(cls: T) -> T:
-    orig = cls.to_dict  # type: ignore
-
-    # only keep non-null public variables
-    # make sure to call `to_dict` of nested objects as well
-    cls.to_dict = lambda self, **kwargs: {  # type: ignore
-        k: getattr(self, k).to_dict(**kwargs) if hasattr(getattr(self, k), "to_dict") else v
-        for k, v in orig(self, **kwargs).items()
-        if not k.startswith("_") and v not in [None, [], {}]
-    }
-
-    return cls
-
+from .utils import pruned_json
 
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 
@@ -247,6 +232,7 @@ class VariableMeta:
     # List of bullet points for the description key (can use markdown formatting)
     description_key: List[str] = field(default_factory=list)
     origins: List[Origin] = field(default_factory=list)  # Origins is the new replacement for sources
+    # Use of `licenses` is discouraged, they should be captured in origins.
     licenses: List[License] = field(default_factory=list)
     unit: Optional[str] = None
     short_unit: Optional[str] = None
@@ -386,36 +372,65 @@ class DatasetMeta:
             params["YEAR"] = pd.to_datetime(self.version).year
         return params
 
-    def update_from_yaml(self, path: Union[Path, str], if_source_exists: SOURCE_EXISTS_OPTIONS = "fail") -> None:
+    def update_from_yaml(
+        self,
+        path: Union[Path, str],
+        if_source_exists: SOURCE_EXISTS_OPTIONS = "fail",
+        if_origins_exist: SOURCE_EXISTS_OPTIONS = "fail",
+    ) -> None:
         """The main reason for wanting to do this is to manually override what goes into Grapher before an export."""
         from owid.catalog import utils
 
         annot = utils.dynamic_yaml_load(path, self._params_yaml())
 
-        dataset_sources = annot.get("dataset", {}).get("sources", []) or []
+        # None is treated differently from [] - if given empty list, we clear sources
+        dataset_sources = annot.get("dataset", {}).get("sources")
+        if dataset_sources is not None:
+            # update sources of dataset, if there are no sources in the new dataset, don't update existing ones
+            if if_source_exists == "replace":
+                self.sources = []
 
-        # update sources of dataset, if there are no sources in the new dataset, don't update existing ones
-        if if_source_exists == "replace" and dataset_sources:
-            self.sources = []
+            new_sources = []
+            for source_annot in dataset_sources:
+                # if there's an existing source, update it
+                ds_sources = [s for s in self.sources if s.name == source_annot["name"]]
+                if ds_sources:
+                    ds_sources[0].update(**source_annot)
+                # there is already a source in a dataset, raise an error
+                elif self.sources and if_source_exists == "fail":
+                    raise ValueError(
+                        f"Source {self.sources[0].name} would be overwritten by source {source_annot['name']}"
+                    )
+                # otherwise append it
+                else:
+                    new_sources.append(Source(**source_annot))
 
-        new_sources = []
-        for source_annot in dataset_sources:
-            # if there's an existing source, update it
-            ds_sources = [s for s in self.sources if s.name == source_annot["name"]]
-            if ds_sources:
-                ds_sources[0].update(**source_annot)
-            # there is already a source in a dataset, raise an error
-            elif self.sources and if_source_exists == "fail":
-                raise ValueError(f"Source {self.sources[0].name} would be overwritten by source {source_annot['name']}")
-            # otherwise append it
-            else:
-                new_sources.append(Source(**source_annot))
+            self.sources.extend(new_sources)
 
-        self.sources.extend(new_sources)
+        # None is treated differently from [] - if given empty list, we clear origins
+        dataset_origins = annot.get("dataset", {}).get("origins")
+
+        # update origins of dataset, if there are no origins in the new dataset, don't update existing ones
+        if dataset_origins is not None:
+            if if_origins_exist == "replace":
+                self.origins = []
+
+            new_origins = []
+            for origin_annot in dataset_origins:
+                # there is already a origin in a dataset, raise an error
+                if self.origins and if_origins_exist == "fail":
+                    raise ValueError(
+                        f"Origin {self.origins[0].title} would be overwritten by origin {origin_annot['title']}"
+                    )
+                # otherwise append it
+                else:
+                    new_origins.append(Origin(**origin_annot))
+
+            self.origins.extend(new_origins)
 
         # update dataset
         for k, v in annot.get("dataset", {}).items():
-            if k != "sources":
+            if k not in ("sources", "origins"):
                 setattr(self, k, v)
 
     @property
@@ -543,7 +558,11 @@ def _deepcopy_dataclass(dc) -> Any:
         if is_dataclass(v):
             setattr(dc, k, _deepcopy_dataclass(v))
         elif isinstance(v, list):
-            setattr(dc, k, [_deepcopy_dataclass(x) if is_dataclass(x) else x for x in v])
+            lis = [_deepcopy_dataclass(x) if is_dataclass(x) else x for x in v]
+            # make sure to preserve the type of the list if we subclass it
+            if type(v) != list:  # noqa
+                lis = type(v)(lis)
+            setattr(dc, k, lis)
         elif isinstance(v, dict):
             setattr(dc, k, {x: _deepcopy_dataclass(y) if is_dataclass(y) else y for x, y in v.items()})
         else:
