@@ -80,6 +80,9 @@ def create_wide_tables(table: catalog.Table) -> catalog.Table:
     # Adapt table to the format for explorer files.
     table_wide = table_wide.reset_index()
 
+    # Set an appropriate index and sort conveniently.
+    table_wide = table_wide.set_index(["country", "year"], verify_integrity=True).sort_index()
+
     return table_wide
 
 
