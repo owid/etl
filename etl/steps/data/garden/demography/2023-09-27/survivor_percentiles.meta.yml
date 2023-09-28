@@ -13,9 +13,6 @@ dataset:
 # http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/tables/
 tables:
   survivor_percentiles:
-    title: Survivorship percentiles
-    description: |-
-
     variables:
       age:
         title: Survivorship age
