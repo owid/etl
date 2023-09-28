@@ -183,7 +183,12 @@ class Dataset:
             table.metadata.dataset = self.metadata
             table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
-    def update_metadata(self, metadata_path: Path, if_source_exists: SOURCE_EXISTS_OPTIONS = "replace") -> None:
+    def update_metadata(
+        self,
+        metadata_path: Path,
+        if_source_exists: SOURCE_EXISTS_OPTIONS = "replace",
+        if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+    ) -> None:
         """
         Load YAML file with metadata from given path and update metadata of dataset and its tables.
 
@@ -193,14 +198,20 @@ class Dataset:
             - "replace" (default): replace existing source with new one
             - "append": append new source to existing ones
             - "fail": raise an exception if source already exists
+        :param if_origins_exist: What to do if origin already exists in metadata. Possible values:
+            - "replace" (default): replace existing origin with new one
+            - "append": append new origin to existing ones
+            - "fail": raise an exception if origin already exists
         """
-        self.metadata.update_from_yaml(metadata_path, if_source_exists=if_source_exists)
+        self.metadata.update_from_yaml(
+            metadata_path, if_source_exists=if_source_exists, if_origins_exist=if_origins_exist
+        )
 
         with open(metadata_path) as istream:
             metadata = yaml.safe_load(istream)
             for table_name in metadata.get("tables", {}).keys():
                 table = self[table_name]
-                table.update_metadata_from_yaml(metadata_path, table_name)
+                table.update_metadata_from_yaml(metadata_path, table_name, if_origins_exist=if_origins_exist)
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
     def index(self, catalog_path: Path = Path("/")) -> pd.DataFrame:

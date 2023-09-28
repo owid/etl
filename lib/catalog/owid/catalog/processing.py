@@ -12,6 +12,7 @@ from .tables import (
     read_feather,
     read_from_dict,
     read_from_records,
+    read_fwf,
     read_json,
 )
 
@@ -27,4 +28,5 @@ __all__ = [
     "read_from_dict",
     "read_from_records",
     "read_json",
+    "read_fwf",
 ]

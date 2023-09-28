@@ -215,6 +215,11 @@ t = Table.read_csv('/tmp/my_table.csv')
 ## Changelog
 
 - `dev`
+- `v0.3.6`
+  - Fixed tons of bugs
+  - `processing.py` module with pandas-like functions that propagate metadata
+  - Support for Dynamic YAML files
+  - Support for R2 alongside S3
 - `v0.3.5`
   - Remove `catalog.frames`; use `owid-repack` package instead
   - Relax dependency constraints

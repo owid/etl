@@ -229,7 +229,7 @@ def list_countries_in_region_that_must_have_data(
 
 
 def add_region_aggregates(
-    df: pd.DataFrame,
+    df: TableOrDataFrame,
     region: str,
     countries_in_region: Optional[List[str]] = None,
     countries_that_must_have_data: Optional[List[str]] = None,
@@ -240,7 +240,7 @@ def add_region_aggregates(
     aggregations: Optional[Dict[str, Any]] = None,
     keep_original_region_with_suffix: Optional[str] = None,
     population: Optional[pd.DataFrame] = None,
-) -> pd.DataFrame:
+) -> TableOrDataFrame:
     """Add data for regions (e.g. income groups or continents) to a dataset.
 
     If data for a region already exists in the dataset, it will be replaced.
@@ -359,7 +359,11 @@ def add_region_aggregates(
     # Sort conveniently.
     df_updated = df_updated.sort_values([country_col, year_col]).reset_index(drop=True)
 
-    return df_updated
+    # If the original was Table, copy metadata
+    if isinstance(df, Table):
+        return Table(df_updated).copy_metadata(df)
+    else:
+        return df_updated  # type: ignore
 
 
 def harmonize_countries(
@@ -606,11 +610,6 @@ def add_population_to_table(
     tb_with_population[population_col] = tb_with_population[population_col].copy_metadata(
         ds_population["population"]["population"]
     )
-
-    ####################################################################################################################
-    # NOTE: Currently, column "population" in table "population" does not have licenses. Manually add them.
-    tb_with_population[population_col].metadata.licenses = ds_population.metadata.licenses
-    ####################################################################################################################
 
     return tb_with_population
 
