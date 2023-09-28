@@ -15,14 +15,11 @@ NOTES:
 
 """
 
-from copy import deepcopy
+from owid.catalog import Table
 
-from owid import catalog
+from etl.helpers import PathFinder, create_dataset
 
-from etl.helpers import PathFinder
-from etl.paths import DATA_DIR
-
-N = PathFinder(__file__)
+paths = PathFinder(__file__)
 
 # Mapping of old to new disaster type names.
 DISASTER_TYPE_RENAMING = {
@@ -41,7 +38,7 @@ DISASTER_TYPE_RENAMING = {
 }
 
 
-def create_wide_tables(table: catalog.Table) -> catalog.Table:
+def create_wide_tables(table: Table) -> Table:
     """Convert input table from long to wide format, and adjust column names to adjust to the old names in the files
     used by the explorer.
     """
@@ -49,16 +46,18 @@ def create_wide_tables(table: catalog.Table) -> catalog.Table:
     table = table.reset_index()
     table["type"] = table["type"].replace(DISASTER_TYPE_RENAMING)
 
-    # Create wide dataframes.
-    table_wide = table.pivot(index=["country", "year"], columns="type")
+    # Create wide table.
+    table_wide = table.pivot(index=["country", "year"], columns="type", join_column_levels_with="_")
 
-    # Flatten column indexes and rename columns to match the old names in explorer.
-    table_wide.columns = [
-        f"{column}_{subcolumn}".replace("per_100k_people", "rate_per_100k")
-        .replace("total_dead", "deaths")
-        .replace("total_damages_per_gdp", "total_damages_pct_gdp")
-        for column, subcolumn in table_wide.columns
-    ]
+    # Rename columns to match the old names in explorer.
+    table_wide = table_wide.rename(
+        columns={
+            column: column.replace("per_100k_people", "rate_per_100k")
+            .replace("total_dead", "deaths")
+            .replace("total_damages_per_gdp", "total_damages_pct_gdp")
+            for column in table_wide.columns
+        }
+    )
 
     # Remove unnecessary columns.
     table_wide = table_wide[
@@ -77,9 +76,6 @@ def create_wide_tables(table: catalog.Table) -> catalog.Table:
         ]
     ]
 
-    # Adapt table to the format for explorer files.
-    table_wide = table_wide.reset_index()
-
     # Set an appropriate index and sort conveniently.
     table_wide = table_wide.set_index(["country", "year"], verify_integrity=True).sort_index()
 
@@ -88,23 +84,22 @@ def create_wide_tables(table: catalog.Table) -> catalog.Table:
 
 def run(dest_dir: str) -> None:
     # Load the latest dataset from garden.
-    dataset_garden_latest_dir = sorted((DATA_DIR / "garden" / "emdat").glob("*/natural_disasters"))[-1]
-    dataset_garden = catalog.Dataset(dataset_garden_latest_dir)
+    ds_garden = paths.load_dataset("natural_disasters")
 
     # Load tables with yearly and decadal data.
-    table_yearly = dataset_garden["natural_disasters_yearly"]
-    table_decade = dataset_garden["natural_disasters_decadal"]
+    tb_yearly = ds_garden["natural_disasters_yearly"]
+    tb_decadal = ds_garden["natural_disasters_decadal"]
 
     # Create wide tables adapted to the old format in explorers.
-    table_yearly_wide = create_wide_tables(table=table_yearly)
-    table_decade_wide = create_wide_tables(table=table_decade)
+    tb_yearly_wide = create_wide_tables(table=tb_yearly)
+    tb_decadal_wide = create_wide_tables(table=tb_decadal)
 
     # Initialize a new grapher dataset and add dataset metadata.
-    dataset = catalog.Dataset.create_empty(dest_dir)
-    dataset.metadata = deepcopy(dataset_garden.metadata)
-    dataset.metadata.version = N.version
-    dataset.save()
-
-    # Add tables to dataset. Force publication in csv.
-    dataset.add(table_yearly_wide, formats=["csv"])
-    dataset.add(table_decade_wide, formats=["csv"])
+    ds_grapher = create_dataset(
+        dest_dir,
+        tables=[tb_yearly_wide, tb_decadal_wide],
+        default_metadata=ds_garden.metadata,
+        check_variables_metadata=True,
+        formats=["csv"],
+    )
+    ds_grapher.save()
