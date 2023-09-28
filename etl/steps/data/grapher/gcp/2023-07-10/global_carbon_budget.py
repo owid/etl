@@ -32,12 +32,20 @@ def run(dest_dir: str) -> None:
     years = np.arange(tb_garden.reset_index()["year"].min(), tb_garden.reset_index()["year"].max() + 1, dtype=int)
     tb_garden = tb_garden.reindex(pd.MultiIndex.from_product([countries, years], names=["country", "year"]))
 
+    # Remove sources from all indicators
+    for col in tb_garden.columns:
+        tb_garden[col].m.sources = []
+
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata, check_variables_metadata=True
+        dest_dir,
+        tables=[tb_garden],
+        default_metadata=ds_garden.metadata,
+        check_variables_metadata=True,
+        if_origins_exist="append",
     )
 
     # Sanity checks.

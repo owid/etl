@@ -34,7 +34,14 @@ from pandas.core.series import Series
 from pandas.util._decorators import rewrite_axis_style_signature
 
 from . import variables
-from .meta import License, Origin, Source, TableMeta, VariableMeta
+from .meta import (
+    SOURCE_EXISTS_OPTIONS,
+    License,
+    Origin,
+    Source,
+    TableMeta,
+    VariableMeta,
+)
 from .utils import underscore
 
 log = structlog.get_logger()
@@ -467,7 +474,11 @@ class Table(pd.DataFrame):
             raise ValueError(f"'{name}' not found in columns or index")
 
     def update_metadata_from_yaml(
-        self, path: Union[Path, str], table_name: str, extra_variables: Literal["raise", "ignore"] = "raise"
+        self,
+        path: Union[Path, str],
+        table_name: str,
+        extra_variables: Literal["raise", "ignore"] = "raise",
+        if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
     ) -> None:
         """Update metadata of table and variables from a YAML file.
         :param path: Path to YAML file.
@@ -497,6 +508,12 @@ class Table(pd.DataFrame):
                     # create an object out of sources
                     if k == "sources":
                         self[v_short_name].metadata.sources = [Source(**source) for source in v]
+                    elif k == "origins":
+                        if if_origins_exist == "fail" and self[v_short_name].metadata.origins:
+                            raise ValueError(f"Origins already exist for variable {v_short_name}")
+                        if if_origins_exist == "replace":
+                            self[v_short_name].metadata.origins = []
+                        self[v_short_name].metadata.origins += [Origin(**origin) for origin in v]
                     else:
                         setattr(self[v_short_name].metadata, k, v)
 
