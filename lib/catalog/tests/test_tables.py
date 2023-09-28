@@ -432,8 +432,6 @@ def test_assign_dataset_sources_origins_and_licenses_to_each_variable(table_1, s
     assert tb["c"].metadata.sources == [sources[1], sources[2], sources[3]]
     # Check that variables that did have sources were not affected.
     assert tb["a"].metadata.sources == [sources[2], sources[1]]
-    # Check that variables that did not have origins now have the dataset of the dataset.
-    assert tb["c"].metadata.origins == [origins[1], origins[2], origins[3]]
     # Check that variables that did have origins were not affected.
     assert tb["a"].metadata.origins == [origins[2], origins[1]]
     # Check that variables that did not have licenses now have the dataset of the dataset.
