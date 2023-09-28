@@ -250,14 +250,10 @@ def add_metadata(
             tb.rename(columns={column: new_column_name}, inplace=True)
             description_string = " ".join(
                 [
-                    description + "." "World Bank variable id: " + indicator_to_find + ".",
+                    description + "\n\n" "World Bank variable id: " + indicator_to_find + "",
                     source,
                 ]
             )
-
-            # Replace any occurrences of '..' with '.'
-            description_string = description_string.replace("..", ".")
-            description_string = description_string.replace(".W", ". W")
 
             tb[new_column_name].metadata.description = description_string
             tb[new_column_name].metadata.title = name
@@ -343,14 +339,30 @@ def add_metadata(
             tb[column].metadata.short_unit = ""
         elif column == "combined_literacy":
             tb[column].metadata.title = "Historical and more recent literacy estimates"
-            tb[column].metadata.description = "Historical literacy data:\n\n" + combined_literacy_description
+            tb[column].metadata.description = (
+                "**Historical literacy data:**\n\n"
+                + combined_literacy_description
+                + "\n\n"
+                + "**Recent estimates:**\n\n"
+                + "Percentage of the population between age 25 and age 64 who can, with understanding, read and write a short, simple statement on their everyday life. Generally, ‘literacy’ also encompasses ‘numeracy’, the ability to make simple arithmetic calculations. This indicator is calculated by dividing the number of literates aged 25-64 years by the corresponding age group population and multiplying the result by 100."
+                + "\n\n"
+                + "World Bank variable id: UIS.LR.AG25T64. UNESCO Institute for Statistics"
+            )
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 2
             tb[column].metadata.unit = "%"
             tb[column].metadata.short_unit = "%"
         elif column == "combined_expenditure":
             tb[column].metadata.title = "Historical and more recent expenditure estimates"
-            tb[column].metadata.description = "Historical expenditure data:\n\n" + combined_expenditure_description
+            tb[column].metadata.description = (
+                "**Historical expenditure data:**\n\n"
+                + combined_expenditure_description
+                + "\n\n"
+                + "**Recent estimates:**\n\n"
+                + "General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments."
+                + "\n\n"
+                + "World Bank variable id: SE.XPD.TOTL.GD.ZS. UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022."
+            )
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 2
             tb[column].metadata.unit = "%"
