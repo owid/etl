@@ -76,6 +76,7 @@ tables:
               colorScale:
                 baseColorScheme: Reds
                 binningStrategy: manual
+                # TODO: these intervals are not well chosen according to our map bracket guidelines
                 customNumericValues:
                   - 1
                   - 2.5
