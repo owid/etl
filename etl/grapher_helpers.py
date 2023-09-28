@@ -171,9 +171,16 @@ def _yield_wide_table(
                 tab[short_name].metadata.title = title_with_dims
 
             # expand metadata with Jinja template
-            tab[short_name].metadata.description = _expand_jinja_template(
-                tab[short_name].metadata.description, dim_dict
-            )
+            for k in (
+                "description",
+                "description_short",
+            ):
+                if getattr(tab[short_name].m, k):
+                    setattr(
+                        tab[short_name].m,
+                        k,
+                        _expand_jinja_template(getattr(tab[short_name].m, k), dim_dict),
+                    )
 
             # Keep only entity_id and year in index
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
