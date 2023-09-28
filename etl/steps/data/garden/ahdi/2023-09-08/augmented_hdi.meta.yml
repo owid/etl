@@ -11,7 +11,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |
-          The Augmented Human Development Index (AHDI) measures human wellbeing with a multidimensional index composed of four different dimensions: healthy life, knowledge, freedom, and wellbeing dimensions other than education and health.
+          The AHDI seeks to give a historical perspective on human development, in four dimensions: healthy life, knowledge, a decent standard of living, and civil and political freedom.
         description_from_producer: |
           Human wellbeing is widely viewed as a multidimensional phenomenon, in which income is only one facet. Human development, originally defined as a process of enlarging people’s choices, namely, enjoying a healthy life, acquiring knowledge and achieving a decent standard of living, provides a multidimensional measure of wellbeing.
 
@@ -30,18 +30,17 @@ tables:
 
           If we denote the non-linearly transformed values of life expectancy and education as LEB and EDU, LD to represent those of liberal democracy, and the adjusted per capita income as UNY, the historical index of human development can be expressed as,
 
-          AHDI = (LEB * EDU * LD * UNY)^1/4^
+          AHDI = (LEB * EDU * LD * UNY)^(1/4)
         processing_level: minor
         description_key:
           - "{tables.augmented_hdi.variables.ahdi.description_short}"
-          - "Each of these dimensions are measured as sub-indices:"
+          - "Each of these dimensions are measured as normalized sub-indices, in a scale from 0 to 1:"
           - Life expectancy is the proxy for healthy life, where 1 represents 85 or more years and 0 represents 20 or less years.
           - Years of schooling is the proxy for access to knowledge, where 1 represents 15 or more years of education and 0 represents 0 years of education.
-          - Liberal democracy is the proxy for freedom, it ranges from 0 to 1, where higher values represents more democracy.
-          - Adjusted (log) GDP per capita is the proxy for wellbeing dimensions different from education and health, bounded between 47,000 and 100 international-$ at 1990 prices.
+          - (log) GDP per capita is the proxy for a decent standard of living, bounded between 47,000 and 100 international-$ at 1990 prices.
+          - "[Varieties of Democracy's Liberal democracy index](https://ourworldindata.org/vdem-electoral-democracy-data) is the proxy for civil and political freedom, higher values represents more democracy."
           - The AHDI is then estimated as the geometric of these indices, or
-            AHDI = (LEB * EDU * LD * UNY)^1/4^
-            Where LEB is life expectancy, EDU is years of schooling, LD is liberal democracy and UNY is adjusted GDP per capita.
+            AHDI = (Health index * Education index * Income index * Freedom index)^(1/4)
         display:
           name: AHDI
           entityAnnotationsMap: "{common.entity_annotations}"
@@ -53,7 +52,7 @@ tables:
             title: Augmented Human Development Index
             subtitle: >-
               The Augmented Human Development Index (AHDI) is a summary measure of
-              average achievement in four key dimensions of human development: a long and
+              historical achievement in four key dimensions of human development: a long and
               healthy life, being knowledgeable, being free and having a decent standard of living.
             hasMapTab: true
             tab: map
@@ -82,10 +81,10 @@ tables:
               - India
               - China
               - Brazil
-              - Cape Verde
+              - Nigeria
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
-          topic_tags_links:
+          topic_tags:
             - Human Development Index (HDI)
             - Life Expectancy
             - Global Education
@@ -97,18 +96,9 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |
-          The Augmented Human Development Index (AHDI) (excluding the income dimension) measures human wellbeing with a multidimensional index composed of three different dimensions: healthy life, knowledge and freedom. The main difference with the AHDI is that this indicator excludes the income-based wellbeing component.
+          The AHDI seeks to give a historical perspective on human development, in four dimensions: healthy life, knowledge, and civil and political freedom. This indicator excludes the income-based wellbeing component.
         description_from_producer: ""
         processing_level: minor
-        description_key:
-          - "{tables.augmented_hdi.variables.ahdi_excluding_income.description_short}"
-          - "Each of these dimensions are measured as sub-indices:"
-          - Life expectancy is the proxy for healthy life, where 1 represents 85 or more years and 0 represents 20 or less years.
-          - Years of schooling is the proxy for access to knowledge, where 1 represents 15 or more years of education and 0 represents 0 years of education.
-          - Liberal democracy is the proxy for freedom, it ranges from 0 to 1, where higher values represents more democracy.
-          - The AHDI is then estimated as the geometric of these indices, or
-            AHDI = (LEB * EDU * LD)^1/3^
-            Where LEB is life expectancy, EDU is years of schooling and LD is liberal democracy.
         display:
           name: AHDI excluding income
           entityAnnotationsMap: "{common.entity_annotations}"
@@ -120,7 +110,7 @@ tables:
             title: Augmented Human Development Index (excluding income)
             subtitle: >-
               The Augmented Human Development Index (AHDI) is a summary measure of
-              average achievement in three key dimensions of human development: a long and
+              historical achievement in three key dimensions of human development: a long and
               healthy life, being knowledgeable, and being free. This version of the indicator excludes national income estimations.
             hasMapTab: true
             tab: map
@@ -149,22 +139,15 @@ tables:
               - India
               - China
               - Brazil
-              - Cape Verde
+              - Nigeria
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
-
-          topic_tags_links:
-            - Human Development Index (HDI)
-            - Life Expectancy
-            - Global Education
-            - Democracy
-            - Economic Growth
 
       life_expectancy:
         title: Life expectancy
         unit: "years"
         short_unit: "years"
         description_short: |
-          Life expectancy is the average number of years a newborn would live if age-specific mortality rates in the current year were to stay the same throughout its life.
+          Average number of years a newborn would live if age-specific mortality rates in the current year were to stay the same throughout its life.
         description_from_producer: |
           Life expectancy is defined as the average number of years of life which would remain for males and females reaching the ages specified if they continued to be subjected to the same mortality experienced in the year(s) to which these life expectancies refer.
         processing_level: minor
@@ -179,7 +162,7 @@ tables:
         unit: "years"
         short_unit: "years"
         description_short: |
-          The average number of years of total schooling (primary, secondary, and tertiary) for the population aged 15 and over.
+          Average number of years of total schooling (primary, secondary, and tertiary) for the population aged 15 and over.
         description_from_producer: |
           Education attainment is measured by the average years of total schooling (primary, secondary, and tertiary) for the population aged 15 and over.
         processing_level: minor
@@ -193,7 +176,7 @@ tables:
         title: Liberal Democracy Index
         unit: ""
         short_unit: ""
-        description_short: "The Liberal Democracy Index combines two other indices: electoral democracy index, which incorporates measures of freedom of association, expression, suffrage and clean elections; and the liberal democracy index, which includes measures of equality before the law and individual liberty, judicial constraints on the executive, and legislative constraints on the executive."
+        description_short: "Combines two other indices: electoral democracy index, which incorporates measures of freedom of association, expression, suffrage and clean elections; and the liberal democracy index, which includes measures of equality before the law and individual liberty, judicial constraints on the executive, and legislative constraints on the executive."
         description_from_producer: |
           The *Liberal Democracy Index* combines the electoral democracy index and the liberal component index. The former incorporates indices of freedom of association, expression, suffrage, and clean elections. The latter includes indices of equality before the law and individual liberty, judicial constraints on the executive, and legislative constraints on the executive.
 
@@ -222,7 +205,7 @@ tables:
         display:
           name: GDP per capita
           entityAnnotationsMap: "{common.entity_annotations}"
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           conversionFactor: 1
 
       life_expectancy_index:
