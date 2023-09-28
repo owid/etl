@@ -3,6 +3,7 @@ dataset:
   sources: []
 
 all:
+  sources: []
   origins:
     - producer: Global Carbon Project
       title: Global Carbon Budget

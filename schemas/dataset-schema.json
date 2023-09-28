@@ -334,14 +334,6 @@
           "items": {
             "$ref": "definitions.json#/source"
           }
-        },
-        "origins": {
-          "type": "array",
-          "description": "List of all origins of the indicators in this dataset. NOTE: Origins should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails.",
-          "requirement_level": "required (automatic)",
-          "items": {
-            "$ref": "definitions.json#/origin"
-          }
         }
       }
     },
@@ -712,7 +704,7 @@
                 },
                 "origins": {
                   "type": "array",
-                  "description": "List of all origins of the indicator. Automatically filled.",
+                  "description": "List of all origins of the indicator. Automatically filled. NOTE: Origins should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails.",
                   "items": {
                     "$ref": "definitions.json#/origin"
                   }

@@ -28,7 +28,6 @@ import pandas as pd
 import pyarrow
 import pyarrow.parquet as pq
 import structlog
-from owid.catalog.utils import dynamic_yaml_to_dict
 from owid.repack import repack_frame
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
@@ -529,15 +528,34 @@ class Table(pd.DataFrame):
             if k != "variables":
                 setattr(self.metadata, k, v)
 
-        # parse `all` section and append origins to all indicators
+        # parse `all` section
+        # append origins to all indicators
         all_origins = [
-            Origin(**dynamic_yaml_to_dict(origin_dict)) for origin_dict in annot.get("all", {}).get("origins", [])
+            Origin(**origin_dict) for origin_dict in annot.get("all", {}).get("origins", [])
         ]
         if all_origins:
             for var_name in self.columns:
                 self[var_name].metadata.origins += [
                     origin for origin in all_origins if origin not in self[var_name].metadata.origins
                 ]
+
+        # append sources to all indicators
+        if "sources" in annot.get("all", {}):
+            # setting [] explicitly means you want to remove them all
+            if list(annot["all"]["sources"]) == []:
+                for var_name in self.columns:
+                    self[var_name].metadata.sources = []
+            # otherwise append them if there are any
+            else:
+                all_sources = [
+                    Source(**source_dict)
+                    for source_dict in annot.get("all", {}).get("sources", [])
+                ]
+                if all_sources:
+                    for var_name in self.columns:
+                        self[var_name].metadata.sources += [
+                            source for source in all_sources if source not in self[var_name].metadata.sources
+                        ]
 
     def prune_metadata(self) -> "Table":
         """Prune metadata for columns that are not in the table. This can happen after slicing

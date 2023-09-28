@@ -466,6 +466,7 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[Dataset, str]:
         if form.infer_metadata:
             data, variables_meta_dict = _infer_metadata(data, variables_meta_dict)
             # add unknown source if we have neither sources nor origins
+            # FIXME!!!
             if not dataset_meta.sources and not dataset_meta.origins:
                 dataset_meta.sources = [
                     Source(
