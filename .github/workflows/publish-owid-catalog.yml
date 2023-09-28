@@ -1,9 +1,10 @@
 name: Publish owid-catalog
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Publish owid-catalog to PyPI'
 
 jobs:
   publish:
