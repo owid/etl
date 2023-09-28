@@ -1502,6 +1502,16 @@
           }
         }
       }
+    },
+    "all": {
+      "description": "Metadata fields appended to all indicators",
+      "origins": {
+        "type": "array",
+        "description": "Origins appended to all indicators.",
+        "items": {
+          "$ref": "definitions.json#/origin"
+        }
+      }
     }
   }
 }

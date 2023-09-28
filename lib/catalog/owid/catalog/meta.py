@@ -318,8 +318,7 @@ class DatasetMeta:
     short_name: Optional[str] = None
     title: Optional[str] = None
     description: Optional[str] = None
-    origins: List[Origin] = field(default_factory=list)
-    # sources is deprecated, use origins instead
+    # sources is deprecated, use origins on indicator level instead
     sources: List[Source] = field(default_factory=list)
     licenses: List[License] = field(default_factory=list)
     is_public: bool = True
@@ -376,7 +375,6 @@ class DatasetMeta:
         self,
         path: Union[Path, str],
         if_source_exists: SOURCE_EXISTS_OPTIONS = "fail",
-        if_origins_exist: SOURCE_EXISTS_OPTIONS = "fail",
     ) -> None:
         """The main reason for wanting to do this is to manually override what goes into Grapher before an export."""
         from owid.catalog import utils
@@ -407,30 +405,9 @@ class DatasetMeta:
 
             self.sources.extend(new_sources)
 
-        # None is treated differently from [] - if given empty list, we clear origins
-        dataset_origins = annot.get("dataset", {}).get("origins")
-
-        # update origins of dataset, if there are no origins in the new dataset, don't update existing ones
-        if dataset_origins is not None:
-            if if_origins_exist == "replace":
-                self.origins = []
-
-            new_origins = []
-            for origin_annot in dataset_origins:
-                # there is already a origin in a dataset, raise an error
-                if self.origins and if_origins_exist == "fail":
-                    raise ValueError(
-                        f"Origin {self.origins[0].title} would be overwritten by origin {origin_annot['title']}"
-                    )
-                # otherwise append it
-                else:
-                    new_origins.append(Origin(**origin_annot))
-
-            self.origins.extend(new_origins)
-
         # update dataset
         for k, v in annot.get("dataset", {}).items():
-            if k not in ("sources", "origins"):
+            if k not in ("sources",):
                 setattr(self, k, v)
 
     @property
