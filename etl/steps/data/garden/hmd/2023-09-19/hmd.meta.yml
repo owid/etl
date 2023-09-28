@@ -60,7 +60,7 @@ tables:
         unit: years
         # description_short: |-
         #   The number of years that a person of a given age is expected to live. 'Life expectancy at age 0' refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy for people who have already survived to the given age.
-        description: |-
+        description_short: |-
             <% if type == "period" %>
             The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
 
