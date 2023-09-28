@@ -12,8 +12,7 @@ meta:
     date_published: 2022-02-09
     # Citation
     producer: OECD
-    citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_WASTE_7&lang=en,     accessed
-      on 21 September 2023
+    citation_full: OECD (2022), Global Plastics Outlook, https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_WASTE_7&lang=en, accessed on 21 September 2023
 
     # Files
     url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_WASTE_7&lang=en
@@ -22,8 +21,7 @@ meta:
     # License
     license:
       name: CC BY 4.0
-      url: 
-        https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
+      url: https://www.oecd.org/termsandconditions
 
 wdir: ../../../data/snapshots/oecd/2023-09-21
 outs:

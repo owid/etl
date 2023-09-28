@@ -6,5 +6,4 @@ tables:
         unit: 'tonnes'
         short_unit: 't'
         display:
-          isProjection: true
           numDecimalPlaces: 0

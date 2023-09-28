@@ -23,8 +23,7 @@ meta:
     # License
     license:
       name: CC BY 4.0
-      url: 
-        https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
+      url: https://www.oecd.org/termsandconditions
 wdir: ../../../data/snapshots/oecd/2023-09-21
 outs:
 - md5: e86b116ac8c6b7ddaf98ef10338fab13

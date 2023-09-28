@@ -9,7 +9,7 @@ tables:
         display:
           numDecimalPlaces: 0
       consumer__and__institutional_products:
-        title: Consumer and institutuional products
+        title: Consumer and institutional products
         unit: 'tonnes'
         short_unit: 't'
         display:
