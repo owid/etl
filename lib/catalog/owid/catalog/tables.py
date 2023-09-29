@@ -1472,35 +1472,6 @@ def _add_processing_log_entry_to_each_variable(
     return table
 
 
-def assign_dataset_sources_origins_and_licenses_to_each_variable(table: Table) -> Table:
-    # Get sources, origins and licenses from the table dataset.
-    sources = []
-    origins = []
-    licenses = []
-    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
-        sources = table.metadata.dataset.sources  # type: ignore
-    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "origins"):
-        origins = table.metadata.dataset.origins  # type: ignore
-    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
-        licenses = table.metadata.dataset.licenses  # type: ignore
-
-    if len(sources) == len(licenses) == len(origins) == 0:
-        # There are no default sources/origins/licenses to assign to each variable.
-        return table
-
-    # If a variable does not have sources/origins/licenses defined, assign the ones from the dataset.
-    # Do this for all columns, including index columns.
-    for column in list(table.all_columns):
-        if len(table._fields[column].sources) == 0:
-            table._fields[column].sources = sources
-        if len(table._fields[column].origins) == 0:
-            table._fields[column].origins = origins
-        if len(table._fields[column].licenses) == 0:
-            table._fields[column].licenses = licenses
-
-    return table
-
-
 def copy_metadata(from_table: Table, to_table: Table, deep=False) -> Table:
     """Copy metadata from a different table to self."""
     tab = Table(pd.DataFrame.copy(to_table, deep=deep), metadata=from_table.metadata.copy())
