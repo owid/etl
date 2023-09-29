@@ -122,3 +122,5 @@ steps:
   - snapshot://fasttrack/latest/under_five_mortality_lmics.csv
   data://grapher/fasttrack/latest/plastic_waste_meijer_2021:
   - snapshot://fasttrack/latest/plastic_waste_meijer_2021.csv
+  data://grapher/fasttrack/2023-09-29/un_space_objects:
+  - snapshot://fasttrack/2023-09-29/un_space_objects.csv
