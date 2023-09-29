@@ -2,6 +2,7 @@
 
 import pandas as pd
 import pdfplumber
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
