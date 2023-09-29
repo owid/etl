@@ -48,7 +48,7 @@ def run(dest_dir: str) -> None:
     tb = tb.sort_values(["country", "year", "sex", "age"])
 
     # Estimates
-    tb = tb.groupby(["country", "year", "sex"], as_index=False).apply(log_gini_from_mx)
+    tb = tb.groupby(["country", "year", "sex"], as_index=False).apply(gini_from_mx)
 
     # Rename columns
     log.info("gini_le: rename columns")
@@ -88,7 +88,7 @@ def AKm02a0(m0: float, is_male: bool = True) -> NDArray[Any]:
         return np.where(m0 < 0.01724, 0.14903 - 2.05527 * m0, np.where(m0 < 0.06891, 0.04667 + 3.88089 * m0, 0.31411))
 
 
-def log_gini_from_mx(tb_group: Table) -> Variable:
+def gini_from_mx(tb_group: Table) -> Variable:
     """Get Gini coefficient from central death rate."""
     mx = tb_group["central_death_rate"].values
     is_male = tb_group.name[2] == "male"
