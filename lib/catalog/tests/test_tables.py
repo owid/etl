@@ -1007,6 +1007,13 @@ def test_groupby_count(table_1) -> None:
     assert gt.a.m.title == "Title of Table 1 Variable a"
 
 
+def test_groupby_transform(table_1) -> None:
+    # column named `count` should work
+    gt = table_1.rename(columns={"a": "count"}).groupby("country")["count"].transform("sum")
+    assert gt.values.tolist() == [3, 3, 3]
+    assert gt.m.title == "Title of Table 1 Variable a"
+
+
 def test_groupby_size(table_1) -> None:
     gt = table_1.groupby("country").size()
     assert gt.values.tolist() == [1, 2]

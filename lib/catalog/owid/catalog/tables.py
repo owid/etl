@@ -932,7 +932,8 @@ class TableGroupBy:
         if isinstance(key, list):
             return TableGroupBy(self.groupby[key], self.metadata, self._fields)
         else:
-            return self.__getattr__(key)  # type: ignore
+            self.__annotations__[key] = VariableGroupBy
+            return VariableGroupBy(self.groupby[key], key, self._fields[key])
 
     def __iter__(self) -> Iterator[Tuple[Any, "Table"]]:
         for name, group in self.groupby:
