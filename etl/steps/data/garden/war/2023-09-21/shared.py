@@ -6,6 +6,7 @@ from typing_extensions import Self
 
 class Normaliser:
     """Normalise indicators."""
+
     country_column: str
 
     def code_to_region(self: Self) -> None:
@@ -13,8 +14,8 @@ class Normaliser:
         raise NotImplementedError("Subclasses must implement this method")
 
     @classmethod
-    def get_num_countries_per_year(cls: Type[Self], tb: Table) -> Table:
-        """Get number of countries (and country-pairs) per region per year.
+    def add_num_countries_per_year(cls: Type[Self], tb: Table) -> Table:
+        """Get number of countries (and country-pairs) per region per year and add it to the table.
 
         `tb` is expected to be the table cow_ssm_system from the cow_ssm dataset.
         """
@@ -22,8 +23,7 @@ class Normaliser:
 
         # Get number of countries per region per year
         tb = (
-            tb
-            .groupby(["region", "year"], as_index=False)
+            tb.groupby(["region", "year"], as_index=False)
             .agg({cls.country_column: "nunique"})
             .rename(columns={cls.country_column: "num_countries"})
         )
@@ -33,7 +33,7 @@ class Normaliser:
         return tb
 
     @classmethod
-    def add_country_normalised_indicators_cow(cls: Type[Self], tb: Table, tb_codes: Table, columns_to_scale: List[str]) -> Table:
+    def add_indicators(cls: Type[Self], tb: Table, tb_codes: Table, columns_to_scale: List[str]) -> Table:
         """Scale columns `columns_to_scale` based on the number of countries (and country-pairs) in each region and year.
 
         For each indicator listed in `columns_to_scale`, two new columns are added to the table:
@@ -41,18 +41,24 @@ class Normaliser:
         - `{indicator}_per_country_pair`: the indicator value divided by the number of country-pairs in the region and year.
         """
         # From raw cow_ssm_system table get number of countryes (and country-pairs) per region per year
-        tb_codes = cls.get_num_countries_per_year(tb_codes)
+        tb_codes = cls.add_num_countries_per_year(tb_codes)
         # Merge with main table
         tb = tb.merge(tb_codes, on=["year", "region"], how="left")
 
+        # Add normalised indicators
         for col in columns_to_scale:
             tb[f"{col}_per_country"] = tb[col] / tb["num_countries"]
             tb[f"{col}_per_country_pair"] = tb[col] / tb["num_country_pairs"]
+
+        # Drop intermediate columns
+        tb = tb.drop(columns=["num_countries", "num_country_pairs"])
+
         return tb
 
 
 class COWNormaliser(Normaliser):
     """Normalise COW data based on the number of countries (and country-pairs) in each region and year."""
+
     country_column: str = "statenme"
 
     @classmethod

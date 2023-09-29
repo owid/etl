@@ -33,6 +33,7 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
+from shared import COWNormaliser
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -60,6 +61,9 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["mie"].reset_index()
+    # Read table from COW codes
+    ds_cow_ssm = paths.load_dataset("cow_ssm")
+    tb_codes = ds_cow_ssm["cow_ssm_system"].reset_index()
 
     #
     # Process data.
@@ -112,12 +116,19 @@ def run(dest_dir: str) -> None:
     log.info("war.mie: rename hostility_level")
     tb["hostility_level"] = tb["hostility_level"].map(HOSTILITY_LEVEL_MAP | {"all": "all"})
     assert tb["hostility_level"].isna().sum() == 0, "Unmapped regions!"
-    # Add suffix with source name
-    msk = tb["region"] != "World"
-    tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (COW)"
 
     log.info("war.cow_mid: replace NaNs with zeros where applicable")
     tb = replace_missing_data_with_zeros(tb)
+
+    # Add normalised indicators
+    log.info("war.mie: add normalised indicators")
+    tb = COWNormaliser.add_indicators(
+        tb, tb_codes, columns_to_scale=["number_ongoing_conflicts", "number_new_conflicts"]
+    )
+
+    # Add suffix with source name
+    msk = tb["region"] != "World"
+    tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (COW)"
 
     # set index
     log.info("war.mie: set index")
