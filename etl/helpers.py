@@ -195,8 +195,8 @@ def create_dataset(
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():
             assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
-    else:
-        log.warning(f" Metadata is not being updated from any YAML. No metadata file {N.metadata_path} was found!")
+    elif ds.metadata.channel == "garden":
+        log.warning(f"Metadata is not being updated from any YAML. No metadata file {N.metadata_path} was found!")
     # run grapher checks
     if ds.metadata.channel == "grapher" and run_grapher_checks:
         grapher_checks(ds)
