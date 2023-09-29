@@ -23,17 +23,19 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("war_brecke.xlsx")
 
     # Load data from snapshot.
-    df = snap.read_excel()
+    tb = snap.read_excel(underscore=True)
 
     #
     # Process data.
     #
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
-
     tb["id"] = np.arange(1, len(tb) + 1)
+    tb["id"] = tb["id"].copy_metadata(tb["totalfatalities"])
+
     # Set index
     tb = tb.set_index(["id"], verify_integrity=True)
+
+    # Update shortname
+    tb.m.short_name = paths.short_name
 
     #
     # Save outputs.
