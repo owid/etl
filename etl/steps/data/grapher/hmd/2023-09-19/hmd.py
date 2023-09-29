@@ -19,7 +19,16 @@ INDICATORS_RELEVANT = [
     "probability_of_death",
 ]
 # Single-age groups to preserve
-AGES_SINGLE = [0, 10, 15, 25, 45, 65, 80]
+AGES_SINGLE = [
+    0,
+    10,
+    15,
+    25,
+    45,
+    65,
+    80,
+]
+AGES_SINGLE = list(map(str, AGES_SINGLE))
 
 
 def run(dest_dir: str) -> None:
@@ -75,7 +84,6 @@ def keep_only_relevant_dimensions(tb: Table) -> Table:
 
     # Keep 1-year age groups + 1-year observation periods, for specific age groups.
     tb_1 = tb[tb["format"] == "1x1"]
-    ages_single = list(map(str, AGES_SINGLE))
     tb_1 = tb_1[tb_1["age"].isin(AGES_SINGLE)]
 
     ## Combine
