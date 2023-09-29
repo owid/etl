@@ -22,6 +22,7 @@ Notes:
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -408,7 +409,7 @@ def _get_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world["region"] = "World"
 
     # Combine
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_world], ignore_index=True).sort_values(  # type: ignore
+    tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_world], ignore_index=True).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
     return tb_ongoing
@@ -436,7 +437,7 @@ def _get_new_metrics(tb: Table) -> Table:
     tb_new_world["region"] = "World"
 
     # Combine
-    tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pr.concat([tb_new, tb_new_world], ignore_index=True).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
 
@@ -529,7 +530,7 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
     ].fillna(0)
 
     # Add to main table
-    tb = pd.concat([tb[-mask], tb_extra])
+    tb = pr.concat([tb[-mask], tb_extra])
     return tb
 
 
@@ -584,7 +585,7 @@ def _prio_add_metrics(tb: Table) -> Table:
     tb_ongoing_world.columns = cols_idx + ["number_ongoing_conflicts"]
     tb_ongoing_world["region"] = "World"
     # Combine regions & world
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_world], ignore_index=True)
+    tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_world], ignore_index=True)
     # Keep only until 1989
     tb_ongoing = tb_ongoing[tb_ongoing["year"] < 1989]
 
@@ -602,7 +603,7 @@ def _prio_add_metrics(tb: Table) -> Table:
     tb_new_world.columns = cols_idx + ["number_new_conflicts"]
     tb_new_world["region"] = "World"
     # Combine regions & world
-    tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True)
+    tb_new = pr.concat([tb_new, tb_new_world], ignore_index=True)
     # Keep only until 1989 (inc)
     tb_new = tb_new[tb_new["year_start"] <= 1989]
     # Rename column
@@ -638,7 +639,7 @@ def add_conflict_all(tb: Table) -> Table:
 
     # Only append values after 1989 (before that we don't have 'one-sided' or 'non-state' counts)
     tb_all = tb_all[tb_all["year"] >= 1989]
-    tb = pd.concat([tb, tb_all], ignore_index=True)
+    tb = pr.concat([tb, tb_all], ignore_index=True)
 
     # Set `number_new_conflicts` to NaN for 1989
     tb.loc[(tb["year"] == 1989) & (tb["conflict_type"] == "all"), "number_new_conflicts"] = np.nan
@@ -653,7 +654,7 @@ def add_conflict_all_intrastate(tb: Table) -> Table:
     ].copy()
     tb_intra = tb_intra.groupby(["year", "region"], as_index=False).sum(numeric_only=True, min_count=1)
     tb_intra["conflict_type"] = "intrastate"
-    tb = pd.concat([tb, tb_intra], ignore_index=True)
+    tb = pr.concat([tb, tb_intra], ignore_index=True)
     return tb
 
 

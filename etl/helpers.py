@@ -24,7 +24,6 @@ from owid.catalog.tables import (
     combine_tables_description,
     combine_tables_title,
     get_unique_licenses_from_tables,
-    get_unique_origins_from_tables,
     get_unique_sources_from_tables,
 )
 from owid.datautils.common import ExceptionFromDocstring
@@ -93,8 +92,9 @@ def grapher_checks(ds: catalog.Dataset) -> None:
             if col in ("year", "country"):
                 continue
             catalog.utils.validate_underscore(col)
-            assert tab[col].metadata.unit is not None, f"Column {col} must have a unit."
-            assert tab[col].metadata.title is not None, f"Column {col} must have a title."
+            assert tab[col].metadata.unit is not None, f"Column `{col}` must have a unit."
+            assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
+            assert tab[col].m.origins or tab[col].m.sources, f"Column `{col}` must have either sources or origins"
 
 
 def create_dataset(
@@ -140,9 +140,7 @@ def create_dataset(
         licenses = get_unique_licenses_from_tables(tables=tables)
         if any(["origins" in table[column].metadata.to_dict() for table in tables for column in table.columns]):
             # If any of the variables contains "origins" this means that it is a recently created dataset.
-            # Gather origins from all variables in all tables.
-            origins = get_unique_origins_from_tables(tables=tables)
-            default_metadata = DatasetMeta(licenses=licenses, origins=origins, title=title, description=description)
+            default_metadata = DatasetMeta(licenses=licenses, title=title, description=description)
         else:
             # None of the variables includes "origins", which means it is an old dataset, with "sources".
             sources = get_unique_sources_from_tables(tables=tables)

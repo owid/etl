@@ -416,17 +416,6 @@ def _adapt_dataset_metadata_for_grapher(
         Adapted dataset metadata, ready to be inserted into grapher.
 
     """
-    # Add origins to sources to stay backward compatible.
-    if metadata.origins:
-        # NOTE: we disabled source <-> origin conversion
-        # metadata.sources = _add_origins_to_sources(metadata.sources, metadata.origins)
-        pass
-    else:
-        warnings.warn(
-            "Dataset has sources instead of origins. This is deprecated and will be removed in the future. "
-            "Please use origins instead."
-        )
-
     # Combine metadata sources into one.
     if metadata.sources:
         metadata.sources = [combine_metadata_sources(metadata.sources)]
@@ -494,29 +483,11 @@ def _adapt_table_for_grapher(
 
     table = table.set_index(["entity_id", "year"] + dim_names)
 
-    # Append dataset origins to all variables
-    # TODO: In the future, all variables should have their origins and dataset origins will be union of their origins.
-    table = _add_dataset_origins_to_variables(table)
-
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).
     table = _ensure_source_per_variable(table)
 
     return cast(catalog.Table, table)
-
-
-def _add_dataset_origins_to_variables(table: catalog.Table) -> catalog.Table:
-    assert table.metadata.dataset
-    if not table.metadata.dataset.origins:
-        return table
-
-    for col in table.columns:
-        variable_meta = table[col].metadata
-        for origin in table.metadata.dataset.origins:
-            if origin not in variable_meta.origins:
-                variable_meta.origins.append(origin)
-
-    return table
 
 
 def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:

@@ -42,7 +42,7 @@ tables:
           - The AHDI is then estimated as the geometric of these indices, or
             AHDI = (Health index * Education index * Income index * Freedom index)^(1/4)
         display:
-          name: AHDI
+          name: Augmented Human Development Index (AHDI)
           entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 2
           conversionFactor: 1
