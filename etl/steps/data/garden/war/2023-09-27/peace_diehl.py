@@ -161,7 +161,7 @@ def make_aggregate_table(tb: Table) -> Table:
             0: "severe_rivalry",
             0.25: "lesser_rivalry",
             0.5: "negative_peace",
-            0.75: "positive_peace",
+            0.75: "warm_peace",
             1: "security_community",
         }
     )

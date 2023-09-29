@@ -78,13 +78,13 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      positive_peace:
-        title: Number of country-pairs with 'positive peace' relationship
+      warm_peace:
+        title: Number of country-pairs with 'warm peace' relationship
         description_short: |-
-          Positive peace between two countries is when these have resolved their main issues and violence between them is unthinkable. They have firm diplomatic and societal relations, and coordinate some of their policies.
+          Warm peace peace between two countries is when these have resolved their main issues and violence between them is unthinkable. They have firm diplomatic and societal relations, and coordinate some of their policies.
         description_processing: *description_processing
         description_key:
-          - Prominent examples of positive peace relationships include Argentina and Brazil since 1986, and Malaysia and Indonesia since 1967.
+          - Prominent examples of warm peace relationships include Argentina and Brazil since 1986, and Malaysia and Indonesia since 1967.
         unit: country-pairs
         processing_level: minor
         display:
