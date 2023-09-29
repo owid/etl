@@ -87,6 +87,7 @@ def run(dest_dir: str) -> None:
 
     # Scale central death rates
     tb["central_death_rate"] = tb["central_death_rate"] * 1000
+    tb["probability_of_death"] = tb["probability_of_death"] * 100
 
     # Final metadata touches
     tb.metadata.short_name = paths.short_name

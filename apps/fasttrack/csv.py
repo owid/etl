@@ -1,7 +1,7 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
-from owid.catalog import DatasetMeta, VariableMeta
+from owid.catalog import DatasetMeta, Origin, VariableMeta
 from owid.catalog.utils import underscore
 
 from .sheets import parse_data_from_sheets
@@ -17,7 +17,9 @@ def parse_data_from_csv(csv_df: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def parse_metadata_from_csv(filename: str, columns: List[str]) -> Tuple[DatasetMeta, Dict[str, VariableMeta]]:
+def parse_metadata_from_csv(
+    filename: str, columns: List[str]
+) -> Tuple[DatasetMeta, Dict[str, VariableMeta], Optional[Origin]]:
     filename = filename.replace(".csv", "")
     title = f"DRAFT {filename}"
     dataset_dict: dict[str, Any] = {
@@ -51,4 +53,4 @@ def parse_metadata_from_csv(filename: str, columns: List[str]) -> Tuple[DatasetM
         }
     ]
 
-    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}
+    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, None
