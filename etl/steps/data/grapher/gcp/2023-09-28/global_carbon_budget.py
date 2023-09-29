@@ -6,7 +6,6 @@ Some auxiliary variables will be added (where nans are filled with zeros, to avo
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
 
@@ -19,7 +18,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset and read its main table.
-    ds_garden: Dataset = paths.load_dependency("global_carbon_budget")
+    ds_garden = paths.load_dataset("global_carbon_budget")
     tb_garden = ds_garden["global_carbon_budget"]
 
     #

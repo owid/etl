@@ -8,7 +8,6 @@ It harmonizes and further processes meadow data, and uses the following auxiliar
 - WorldBank's Income groups, to generate aggregates for different income groups.
 
 """
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
@@ -896,7 +895,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset and read all its tables.
-    ds_meadow: Dataset = paths.load_dependency("global_carbon_budget")
+    ds_meadow = paths.load_dataset("global_carbon_budget")
     tb_co2 = ds_meadow["global_carbon_budget_fossil_co2_emissions"].reset_index()
     tb_historical = ds_meadow["global_carbon_budget_historical_budget"].reset_index()
     tb_consumption = ds_meadow["global_carbon_budget_consumption_emissions"].reset_index()
@@ -904,20 +903,20 @@ def run(dest_dir: str) -> None:
     tb_land_use = ds_meadow["global_carbon_budget_land_use_change"].reset_index()
 
     # Load primary energy consumption dataset and read its main table.
-    ds_energy: Dataset = paths.load_dependency("primary_energy_consumption")
+    ds_energy = paths.load_dataset("primary_energy_consumption")
     tb_energy = ds_energy["primary_energy_consumption"].reset_index()
 
     # Load GDP dataset.
-    ds_gdp: Dataset = paths.load_dependency("ggdc_maddison")
+    ds_gdp = paths.load_dataset("ggdc_maddison")
 
     # Load population dataset.
-    ds_population: Dataset = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
 
     # Load regions dataset.
-    ds_regions: Dataset = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
 
     # Load income groups dataset.
-    ds_income_groups: Dataset = paths.load_dependency("income_groups")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     #
     # Process data.
@@ -925,6 +924,8 @@ def run(dest_dir: str) -> None:
     # Prepare fossil CO2 emissions data.
     tb_co2 = prepare_fossil_co2_emissions(tb_co2=tb_co2)
 
+    tb_co2["country"].metadata
+    tb_co2["country"] = tb_co2["country"]
     # Prepare consumption-based emission data.
     tb_consumption = prepare_consumption_emissions(tb_consumption=tb_consumption)
 
