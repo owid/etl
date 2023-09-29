@@ -906,6 +906,40 @@ def run(dest_dir: str) -> None:
     ds_energy = paths.load_dataset("primary_energy_consumption")
     tb_energy = ds_energy["primary_energy_consumption"].reset_index()
 
+    ####################################################################################################################
+    # TODO: Remove this temporary solution once primary energy consumption dataset has origins.
+    error = "Remove temporary solution now that primary energy consumption has origins."
+    assert not tb_energy["primary_energy_consumption__twh"].metadata.origins, error
+    from owid.catalog import License, Origin
+
+    tb_energy["primary_energy_consumption__twh"].metadata.origins = [
+        Origin(
+            producer="Energy Institute",
+            title="Statistical Review of World Energy",
+            attribution="Energy Institute - Statistical Review of World Energy (2023)",
+            url_main="https://www.energyinst.org/statistical-review/",
+            url_download="https://www.energyinst.org/__data/assets/file/0007/1055761/Consolidated-Dataset-Panel-format-CSV.csv",
+            date_published="2023-06-26",
+            date_accessed="2023-06-27",
+            description="The Energy Institute Statistical Review of World Energy analyses data on world energy markets from the prior year. Previously produced by BP, the Review has been providing timely, comprehensive and objective data to the energy community since 1952.",
+            license=License(
+                name="©Energy Institute 2023",
+                url="https://www.energyinst.org/__data/assets/file/0007/1055761/Consolidated-Dataset-Panel-format-CSV.csv",
+            ),
+        ),
+        Origin(
+            producer="U.S. Energy Information Administration",
+            title="International Energy Data",
+            url_main="https://www.eia.gov/opendata/bulkfiles.php",
+            url_download="https://api.eia.gov/bulk/INTL.zip",
+            date_published="2023-06-27",
+            date_accessed="2023-07-10",
+            license=License(name="Public domain", url="https://www.eia.gov/about/copyrights_reuse.php"),
+        ),
+    ]
+
+    ####################################################################################################################
+
     # Load GDP dataset.
     ds_gdp = paths.load_dataset("ggdc_maddison")
 
@@ -924,8 +958,6 @@ def run(dest_dir: str) -> None:
     # Prepare fossil CO2 emissions data.
     tb_co2 = prepare_fossil_co2_emissions(tb_co2=tb_co2)
 
-    tb_co2["country"].metadata
-    tb_co2["country"] = tb_co2["country"]
     # Prepare consumption-based emission data.
     tb_consumption = prepare_consumption_emissions(tb_consumption=tb_consumption)
 
