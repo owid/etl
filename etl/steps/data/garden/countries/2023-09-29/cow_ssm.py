@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
     ## tb_system
     length_first = tb_system.shape[0]
     tb_system = tb_system.merge(tb_codes, on="stateabb")
-    assert tb_system.shape[0] == length_first, "Some `state_name` values are missing after merge (tb_system!"
+    assert tb_system.shape[0] == length_first, "Some `state_name` values are missing after merge (tb_system)!"
     ## tb_majors
     length_first = tb_majors.shape[0]
     tb_majors = tb_majors.merge(tb_codes, on="stateabb")

@@ -17,41 +17,41 @@ tables:
         description_from_producer: |-
           A three-letter abbreviation given by the COW dataset. For new cases, a COW ID was created.
       statename:
-        title: State Name
+        title: State name
         description_from_producer: |-
           The name used for the state in the ISD dataset.
       othername:
-        title: Other Name
+        title: Other state name
         description_from_producer: |-
-          Other names by which the state is known
+          Other names by which the state is known.
       isd_category:
-        title: ISD Category
+        title: ISD category
         description_from_producer: |-
           Category 1 states have same start and end years as ISD V1. Category 2 states were in ISD V1 but have changed start and/or end years. Category 3 states are new states that were not in ISD V1.
       region:
-        title: Region
+        title: COW Region
         description_from_producer: |-
           The COW index number for the geographic region in which the state is located.
       start_am:
-        title: Start-Am
+        title: Start (ambiguity)
         description_from_producer: |-
           Was there ambiguity in the coding of the start?
       estart:
-        title: EStart
+        title: Had early start
         description_from_producer: |-
           What year did the state start if earlier than 1816?
       estart_am:
-        title: EStart-Am
+        title: Had early start (ambiguity)
         description_from_producer: |-
           Was there ambiguity regarding the early start?
       declare:
-        title:
+        title: Declaration of independence
         description_from_producer: |-
           Is there evidence of a declaration of independence? (0=no, 1=yes). It can be a pronouncement or a document. By listing “1” for this variable you are directing the future researcher to a case where something occurred.
 
           May produce false negatives. For example, a “1” indicated that evidence was found for the variable “Border.” A “0” indicates that no evidence was found, NOT that borders did not exist in this case.
       decdate:
-        title: DecDate
+        title: Date of the declaration of independence
         description_from_producer: |-
           Date of the declaration of independence (provide year and date if possible).
 
@@ -61,23 +61,23 @@ tables:
         description_from_producer: |-
           List the population for the start year or as close as possible to it.
       popdate:
-        title: PopDate
+        title: Population estimate date
         description_from_producer: |-
           Year population was counted.
       popam:
-        title: POP-Am
+        title: Population estimate (ambiguity)
         description_from_producer: |-
           Ambiguity surrounding the population estimate?
       populationhigh:
-        title: Population-High
+        title: Population high estimate
         description_from_producer: |-
           Upper end of population estimates.
       populationlow:
-        title: Population-Low
+        title: Population low estimate
         description_from_producer: |-
           Lower end of population estimates.
       starttype:
-        title: Start Type-Am
+        title: State creation type
         description_from_producer: |-
           How was the state created?
 
@@ -88,19 +88,19 @@ tables:
           5. Decolonization = state born from decolonization
           6. Other (please provide information in case narrative)
       starttype_am:
-        title:
+        title: State creation type (ambiguity)
         description_from_producer: |-
           Was there ambiguity on the start type?
       startsettle:
-        title: Start Settle
+        title: State creation settlmenet
         description_from_producer: |-
           Was there a treaty or formal settlement attending the birth of the state?
       end_am:
-        title: End-Am
+        title: Ending year
         description_from_producer: |-
           Was there ambiguity on the end date?
       endtype:
-        title: End Type
+        title: State end type
         description_from_producer: |-
           How did the state end?
 
@@ -111,31 +111,31 @@ tables:
           5. Partition = State death via partition by outside powers.
           6. . Other (please provide information in case narrative).
       endtype_am:
-        title: End Type-Am
+        title: State end type (ambiguity)
         description_from_producer: |-
           Was there ambiguity on the end type?
       endsettle:
-        title: End Settle
+        title: State end settlement
         description_from_producer: |-
           Was there a treaty or formal settlement attending the death of the state?
       sovereignty_am:
-        title: Sovereignty-Am
+        title: State sovereignty (ambiguity)
         description_from_producer: |-
           Was there ambiguity regarding the criterion that the sovereignty of the state is either uncontested or acknowledged by the relevant international actors. 0 = no; 1 = indicated ambiguity / uncertainty.
       eurodip:
-        title: Euro-Dip
+        title: Had diplomatic relationships with European power
         description_from_producer: |-
           Is there evidence that the state had diplomatic relations with a European power? If so, provide information (and citations) in the case narrative.
 
           May produce false negatives. For example, a “1” indicated that evidence was found for the variable “Border.” A “0” indicates that no evidence was found, NOT that borders did not exist in this case.
       borders:
-        title: Borders
+        title: Had borders
         description_from_producer: |-
           Is there evidence that the state had clearly defined borders separating it from other states or sources of authority?
 
           May produce false negatives. For example, a “1” indicated that evidence was found for the variable “Border.” A “0” indicates that no evidence was found, NOT that borders did not exist in this case.
       borders_am:
-        title: Borders-Am
+        title: Had borders (ambiguity)
         description_from_producer: |-
           Was there ambiguity on the issue of borders?
       latitude:
@@ -147,18 +147,18 @@ tables:
         description_from_producer: |-
           Longitude coordinates (Geolocation)
       viostart:
-        title: VioStart
+        title: State born violently
         description_from_producer: |-
           Was the state born violently? Violence here is defined as the killing of civilians and combatants.
       viostart_am:
-        title: VioStart-Am
+        title: State born violently (ambiguity)
         description_from_producer: |-
           Is their ambiguity about the starting violence?
       vioend:
-        title: VioEnd
+        title: State died violently
         description_from_producer: |-
           Did the state die violently? Violence here is defined as the killing of civilians and combatants.
       vioend_am:
-        title: VioEnd-Am
+        title: State died violently (ambiguity)
         description_from_producer: |-
           Is their ambiguity about the ending violence?
