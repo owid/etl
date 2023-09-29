@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
     tb = tb.groupby(columns_grouping).apply(lambda group: obtain_survivorship_ages(group)).reset_index()
 
     # Unpivot
-    log.info("survivor_percentiles: unpivot.")
+    log.info("survivor_percentiles: unpivot")
     tb = tb.melt(
         id_vars=["country", "sex", "year"],
         value_vars=["s1", "s10", "s20", "s30", "s40", "s50", "s60", "s70", "s80", "s90", "s99"],
@@ -81,7 +81,9 @@ def run(dest_dir: str) -> None:
         value_name="age",
     )
     tb = tb.dropna(subset=["percentile"])
-    tb["percentile"] = tb["percentile"].str.replace("s", "")
+    log.info("survivor_percentiles: rename percentiles (remove 's' and reverse order))")
+    tb["percentile"] = tb["percentile"].str.replace("s", "").astype(int)
+    tb["percentile"] = 100 - tb["percentile"]
 
     # Dtypes
     log.info("survivor_percentiles: final dtypes settings.")
