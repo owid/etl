@@ -915,6 +915,14 @@ class Table(pd.DataFrame):
             if not self[column].metadata.origins:
                 raise ValueError(f"Variable `{column}` has no origins.")
 
+    def rename_index_names(self, renames: Dict[str, str]) -> "Table":
+        """Rename index."""
+        column_idx = list(self.index.names)
+        column_idx_new = [renames.get(col, col) for col in column_idx]
+        tb = self.reset_index().rename(columns={"region": "country"})
+        tb = tb.set_index(column_idx_new)
+        return tb
+
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
     """Create a table with metadata."""
