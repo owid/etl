@@ -35,6 +35,9 @@ def run(dest_dir: str) -> None:
     log.info("gini_le: set year dtype to int")
     tb["year"] = tb["year"].astype("Int64")
 
+    # Get origins
+    origins = tb["life_expectancy"].m.origins
+
     # Get rate for central_death_rate, as it is given per 1,000 people.
     log.info("gini_le: get rate for central_death_rate, as it is given per 1,000 people.")
     tb["central_death_rate"] = tb["central_death_rate"] / 1000
@@ -63,7 +66,7 @@ def run(dest_dir: str) -> None:
     tb.metadata.short_name = paths.short_name
     # Propagate origins metadata (unsure why this has not been propagated?)
     for col in tb.columns:
-        tb[col].metadata.origins = ds_meadow.metadata.origins
+        tb[col].metadata.origins = origins
 
     #
     # Save outputs.
