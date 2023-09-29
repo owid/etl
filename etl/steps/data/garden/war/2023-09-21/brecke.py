@@ -49,6 +49,8 @@ from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
+from .shared import expand_observations
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 # Logger
@@ -120,7 +122,12 @@ def run(dest_dir: str) -> None:
 
     # Expand observations
     log.info("war.brecke: expand observations")
-    tb = expand_observations(tb)
+    tb = expand_observations(
+        tb,
+        col_year_start="startyear",
+        col_year_end="endyear",
+        col_deahts="totalfatalities",
+    )
 
     # Estimate metrics
     log.info("war.brecke: estimate metrics")
@@ -232,35 +239,6 @@ def add_lower_bound_deaths(tb: Table) -> Table:
     """
     mask = tb["totalfatalities"].isna()
     tb.loc[mask, "totalfatalities"] = 32 * (tb.loc[mask, "endyear"] - tb.loc[mask, "startyear"] + 1)
-    return tb
-
-
-def expand_observations(tb: Table) -> Table:
-    """Expand to have a row per (year, conflict).
-
-    Parameters
-    ----------
-    tb : Table
-        Original table, where each row is a conflict with its start and end year.
-
-    Returns
-    -------
-    Table
-        Here, each conflict has as many rows as years of activity. Its deaths have been uniformly distributed among the years of activity.
-    """
-    # For that we scale the number of deaths proportional to the duration of the conflict.
-    tb["totalfatalities"] = (tb["totalfatalities"] / (tb["endyear"] - tb["startyear"] + 1)).copy_metadata(
-        tb["totalfatalities"]
-    )
-
-    # Add missing years for each triplet ("warcode", "campcode", "ccode")
-    YEAR_MIN = tb["startyear"].min()
-    YEAR_MAX = tb["endyear"].max()
-    tb_all_years = Table(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
-    tb = tb.merge(tb_all_years, how="cross")
-    # Filter only entries that actually existed
-    tb = tb[(tb["year"] >= tb["startyear"]) & (tb["year"] <= tb["endyear"])]
-
     return tb
 
 
