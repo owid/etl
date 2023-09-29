@@ -18,7 +18,6 @@ from owid.catalog.tables import (
     SCHEMA,
     Table,
     get_unique_licenses_from_tables,
-    get_unique_origins_from_tables,
     get_unique_sources_from_tables,
 )
 from owid.catalog.variables import PROCESSING_LOG, Variable
@@ -847,15 +846,6 @@ def test_get_unique_sources_from_tables(table_1, sources):
         sources[2],
         sources[1],
         sources[3],
-    ]
-
-
-def test_get_unique_origins_from_tables(table_1, origins):
-    unique_origins = get_unique_origins_from_tables([table_1, table_1])
-    assert unique_origins == [
-        origins[2],
-        origins[1],
-        origins[3],
     ]
 
 
