@@ -114,17 +114,17 @@ def run(dest_dir: str) -> None:
     tb_lt.metadata = snap.to_table_metadata()
     tb_lt.metadata.short_name = "life_tables"
     for column in tb_lt.columns:
-        tb_lt[column].metadata.origins = tb_lt.metadata.dataset.origins
+        tb_lt[column].metadata.origins = [snap.metadata.origin]
     ## exposure to risk
     tb_exp.metadata = snap.to_table_metadata()
     tb_exp.metadata.short_name = "exposures"
     for column in tb_exp.all_columns:
-        tb_exp[column].metadata.origins = tb_exp.metadata.dataset.origins
+        tb_exp[column].metadata.origins = [snap.metadata.origin]
     ## deaths
     tb_de.metadata = snap.to_table_metadata()
     tb_de.metadata.short_name = "deaths"
     for column in tb_de.columns:
-        tb_de[column].metadata.origins = tb_de.metadata.dataset.origins
+        tb_de[column].metadata.origins = [snap.metadata.origin]
 
     # Set index
     ## Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
