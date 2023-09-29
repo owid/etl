@@ -432,32 +432,39 @@ class Table(pd.DataFrame):
         old_cols = self.all_columns
         new_table = super().rename(*args, **kwargs)
 
+        # __setattr__ on columns has already done its job of renaming
         if inplace:
             new_table = self
-
-        # construct new _fields attribute
-        fields = {}
-        for old_col, new_col in zip(old_cols, new_table.all_columns):
-            if inplace:
-                fields[new_col] = self._fields[old_col]
-            else:
+        else:
+            # construct new _fields attribute
+            fields = {}
+            for old_col, new_col in zip(old_cols, new_table.all_columns):
                 fields[new_col] = self._fields[old_col].copy()
 
-            # Update processing log.
-            if old_col != new_col:
-                fields[new_col].processing_log = variables.add_entry_to_processing_log(
-                    processing_log=fields[new_col].processing_log,
-                    variable_name=new_col,
-                    parents=[old_col],
-                    operation="rename",
-                )
-
-        new_table._fields = defaultdict(VariableMeta, fields)
+            new_table._fields = defaultdict(VariableMeta, fields)
 
         if inplace:
             return None
         else:
             return cast(Table, new_table)
+
+    def __setattr__(self, name: str, value) -> None:
+        # setting columns must rename them
+        if name == "columns":
+            for old_col, new_col in zip(self.columns, value):
+                if old_col in self._fields:
+                    self._fields[new_col] = self._fields.pop(old_col)
+
+                # Update processing log.
+                if old_col != new_col:
+                    self._fields[new_col].processing_log = variables.add_entry_to_processing_log(
+                        processing_log=self._fields[new_col].processing_log,
+                        variable_name=new_col,
+                        parents=[old_col],
+                        operation="rename",
+                    )
+
+        super().__setattr__(name, value)
 
     @property
     def all_columns(self) -> List[str]:
@@ -899,6 +906,14 @@ class Table(pd.DataFrame):
 
     def groupby(self, *args, **kwargs) -> "TableGroupBy":
         return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
+
+    def check_metadata(self) -> None:
+        """Check that all variables in the table have origins."""
+        for column in self.columns:
+            if column in ("year", "country"):
+                continue
+            if not self[column].metadata.origins:
+                raise ValueError(f"Variable `{column}` has no origins.")
 
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
@@ -1585,24 +1600,6 @@ def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
 
     # Get unique array of tuples of source fields (respecting the order).
     return pd.unique(sources).tolist()
-
-
-def get_unique_origins_from_tables(tables: List[Table]) -> List[Origin]:
-    # First, ensure only "origins" (and not "sources") are used in the variables.
-    if any(
-        [
-            ("sources" in table[column].metadata.to_dict()) and (len(table[column].metadata.sources) > 0)
-            for table in tables
-            for column in table.columns
-        ]
-    ):
-        log.warning("Origins and sources mixed in tables. The resulting dataset may not include all origins.")
-
-    # Make a list of all origins of all variables in all tables.
-    origins = sum([table._fields[column].origins for table in tables for column in list(table.all_columns)], [])
-
-    # Get unique array of tuples of source fields (respecting the order).
-    return pd.unique(origins).tolist()
 
 
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:

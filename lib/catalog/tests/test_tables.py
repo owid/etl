@@ -18,7 +18,6 @@ from owid.catalog.tables import (
     SCHEMA,
     Table,
     get_unique_licenses_from_tables,
-    get_unique_origins_from_tables,
     get_unique_sources_from_tables,
 )
 from owid.catalog.variables import PROCESSING_LOG, Variable
@@ -282,6 +281,8 @@ def test_rename_columns() -> None:
     new_t = t.rename(columns={"gdp": "new_gdp"})
     assert new_t.new_gdp.metadata.title == "GDP"
     assert new_t.columns == ["new_gdp"]
+
+    new_t.new_gdp.metadata.title = "New GDP"
 
     # old table hasn't changed
     assert t.gdp.metadata.title == "GDP"
@@ -848,15 +849,6 @@ def test_get_unique_sources_from_tables(table_1, sources):
     ]
 
 
-def test_get_unique_origins_from_tables(table_1, origins):
-    unique_origins = get_unique_origins_from_tables([table_1, table_1])
-    assert unique_origins == [
-        origins[2],
-        origins[1],
-        origins[3],
-    ]
-
-
 def test_get_unique_license_from_tables(table_1, licenses):
     unique_licenses = get_unique_licenses_from_tables([table_1, table_1])
     assert unique_licenses == [
@@ -1013,3 +1005,8 @@ def test_groupby_iteration(table_1) -> None:
     for _, group in table_1.groupby("country"):
         assert isinstance(group._fields, defaultdict)
         assert group.a.m.title == "Title of Table 1 Variable a"
+
+
+def test_set_columns(table_1) -> None:
+    table_1.columns = ["country", "year", "new_a", "new_b"]
+    assert table_1.new_a.m.title == "Title of Table 1 Variable a"

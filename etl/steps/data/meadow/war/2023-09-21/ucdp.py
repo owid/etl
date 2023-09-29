@@ -55,6 +55,10 @@ def run(dest_dir: str) -> None:
         tb = Table(df, short_name=short_name, underscore=True, camel_to_snake=True)
         # Set index
         tb = tb.set_index(props["index"], verify_integrity=True)
+        # Set origin for all indicators
+        assert snap.m.origin
+        for col in tb.columns:
+            tb[col].m.origins = [snap.m.origin]
         # Add table to list of tables.
         tables.append(tb)
 
