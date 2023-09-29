@@ -49,6 +49,7 @@ steps:
     - snapshot://war/2023-09-21/mie.zip
   data://garden/war/2023-09-21/mie:
     - data://meadow/war/2023-09-21/mie
+    - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/war/2023-09-21/mie:
     - data://garden/war/2023-09-21/mie
 
