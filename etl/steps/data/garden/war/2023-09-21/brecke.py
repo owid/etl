@@ -249,7 +249,9 @@ def expand_observations(tb: Table) -> Table:
         Here, each conflict has as many rows as years of activity. Its deaths have been uniformly distributed among the years of activity.
     """
     # For that we scale the number of deaths proportional to the duration of the conflict.
-    tb["totalfatalities"] = (tb["totalfatalities"] / (tb["endyear"] - tb["startyear"] + 1)).copy_metadata(tb["totalfatalities"])
+    tb["totalfatalities"] = (tb["totalfatalities"] / (tb["endyear"] - tb["startyear"] + 1)).copy_metadata(
+        tb["totalfatalities"]
+    )
 
     # Add missing years for each triplet ("warcode", "campcode", "ccode")
     YEAR_MIN = tb["startyear"].min()
@@ -333,7 +335,9 @@ def _add_ongoing_metrics(tb: Table) -> Table:
         }
     )
 
-    tb_ongoing["number_ongoing_conflicts"] = tb_ongoing["number_ongoing_conflicts"].copy_metadata(tb_ongoing["number_deaths_ongoing_conflicts"])
+    tb_ongoing["number_ongoing_conflicts"] = tb_ongoing["number_ongoing_conflicts"].copy_metadata(
+        tb_ongoing["number_deaths_ongoing_conflicts"]
+    )
     return tb_ongoing
 
 
