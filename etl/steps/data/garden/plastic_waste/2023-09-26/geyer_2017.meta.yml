@@ -2,10 +2,10 @@ tables:
   geyer_2017:
     variables:
       plastic_production:
-        title: Annual plastic production between 1950 and 2018
+        title: Annual plastic production between 1950 and 2019
         unit: tonnes
         short_unit: t
-        description_short: Estimates between 1950 and 2015 are from Greyer et al. (2017). Data for 2016-2019 was estimated using a 5% annual growth rate in line with Geyer's estimates.
+        description_short: Estimates between 1950 and 2015 are from Greyer et al. (2017). Data for 2016-2018 as estimated using a 5% annual growth rate in line with Geyer's estimates. Data for 2019 is from the OECD Global Plastics Outlook (2022).
         description_from_producer: >-
             Total annual plastic production is global annual pure polymer (resin) production data from 1950 to 2015, published by the Plastics Europe Market Research Group, and global annual fiber production data from 1970 to 2015 published by The Fiber Year and Tecnon OrbiChem.
         processing_level: minor
@@ -13,10 +13,10 @@ tables:
           isProjection: false
           numDecimalPlaces: 0
       cumulative_production:
-        title: Cumulative plastic production between 1950 and 2018
+        title: Cumulative plastic production between 1950 and 2019
         unit: tonnes
         short_unit: t
-        description_short: Estimates between 1950 and 2015 are from Greyer et al. (2017). Data for 2016-2019 was estimated using a 5% annual growth rate in line with Geyer's estimates.
+        description_short: Estimates between 1950 and 2015 are from Greyer et al. (2017). Data for 2016-2018 as estimated using a 5% annual growth rate in line with Geyer's estimates.  Data for 2019 is from the OECD Global Plastics Outlook (2022).
         description_from_producer: >-
             Total annual plastic production is global annual pure polymer (resin) production data from 1950 to 2015, published by the Plastics Europe Market Research Group, and global annual fiber production data from 1970 to 2015 published by The Fiber Year and Tecnon OrbiChem.
         processing_level: minor
