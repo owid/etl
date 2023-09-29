@@ -1,7 +1,54 @@
-from typing import List, Type
+from typing import List, Optional, Type
 
+import pandas as pd
 from owid.catalog import Table
 from typing_extensions import Self
+
+
+def expand_observations(tb: Table, col_year_start: str, col_year_end: str, col_deahts: Optional[str] = None) -> Table:
+    """Expand to have a row per (year, conflict).
+
+    Example
+    -------
+
+        Input:
+
+        | dispnum | year_start | year_end |
+        |---------|------------|----------|
+        | 1       | 1990       | 1993     |
+
+        Output:
+
+        |  year | warcode |
+        |-------|---------|
+        |  1990 |    1    |
+        |  1991 |    1    |
+        |  1992 |    1    |
+        |  1993 |    1    |
+
+    Parameters
+    ----------
+    tb : Table
+        Original table, where each row is a conflict with its start and end year.
+
+    Returns
+    -------
+    Table
+        Here, each conflict has as many rows as years of activity. Its deaths have been uniformly distributed among the years of activity.
+    """
+    # For that we scale the number of deaths proportional to the duration of the conflict.
+    if col_deahts:
+        tb[col_deahts] = (tb[col_deahts] / (tb[col_year_end] - tb[col_year_start] + 1)).copy_metadata(tb[col_deahts])
+
+    # Add missing years for each triplet ("warcode", "campcode", "ccode")
+    YEAR_MIN = tb[col_year_start].min()
+    YEAR_MAX = tb[col_year_end].max()
+    tb_all_years = Table(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
+    tb = tb.merge(tb_all_years, how="cross")
+    # Filter only entries that actually existed
+    tb = tb[(tb["year"] >= tb[col_year_start]) & (tb["year"] <= tb[col_year_end])]
+
+    return tb
 
 
 class Normaliser:
