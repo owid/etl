@@ -76,17 +76,14 @@ def calculate_percentage(df, column, valid_responses_dict):
     # Group by country and year
     grouped = df_filtered.groupby(["country", "year"])
 
-    # HOTFIX: rename `count` to `countt` until we fix groupby.transform
     # Count valid responses
-    counts = grouped[column].value_counts().reset_index(name="countt")
+    counts = grouped[column].value_counts().reset_index(name="count")
 
     # Calculate total counts for each country and year
-    total_counts = counts.groupby(["country", "year"])["countt"].transform("sum")
+    total_counts = counts.groupby(["country", "year"])["count"].transform("sum")
 
     # Calculate percentage
-    counts["percentage"] = (counts["countt"] / total_counts) * 100
-
-    counts = counts.rename(columns={"countt": "count"})
+    counts["percentage"] = (counts["count"] / total_counts) * 100
 
     # Map response codes to labels
     counts[column] = counts[column].map(valid_responses_dict)

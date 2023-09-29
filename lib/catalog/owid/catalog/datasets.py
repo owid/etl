@@ -203,9 +203,7 @@ class Dataset:
             - "append": append new origin to existing ones
             - "fail": raise an exception if origin already exists
         """
-        self.metadata.update_from_yaml(
-            metadata_path, if_source_exists=if_source_exists, if_origins_exist=if_origins_exist
-        )
+        self.metadata.update_from_yaml(metadata_path, if_source_exists=if_source_exists)
 
         with open(metadata_path) as istream:
             metadata = yaml.safe_load(istream)

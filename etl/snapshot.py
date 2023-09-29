@@ -64,6 +64,11 @@ class Snapshot:
         self.metadata = SnapshotMeta.load_from_yaml(self.metadata_path)
 
     @property
+    def m(self) -> "SnapshotMeta":
+        """Metadata alias to save typing."""
+        return self.metadata
+
+    @property
     def path(self) -> Path:
         """Path to materialized file."""
         return paths.DATA_DIR / "snapshots" / self.uri
@@ -153,27 +158,29 @@ class Snapshot:
 
     def read_csv(self, *args, **kwargs) -> Table:
         """Read CSV file into a Table and populate it with metadata."""
-        return pr.read_csv(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+        return pr.read_csv(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
     def read_feather(self, *args, **kwargs) -> Table:
         """Read feather file into a Table and populate it with metadata."""
-        return pr.read_feather(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+        return pr.read_feather(
+            self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
+        )
 
     def read_excel(self, *args, **kwargs) -> Table:
         """Read excel file into a Table and populate it with metadata."""
-        return pr.read_excel(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+        return pr.read_excel(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
     def read_json(self, *args, **kwargs) -> Table:
         """Read JSON file into a Table and populate it with metadata."""
-        return pr.read_json(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+        return pr.read_json(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
     def read_from_records(self, *args, **kwargs) -> Table:
         """Read records into a Table and populate it with metadata."""
-        return pr.read_from_records(*args, metadata=self.to_table_metadata(), **kwargs)
+        return pr.read_from_records(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
     def read_fwf(self, *args, **kwargs) -> Table:
         """Read a table of fixed-width formatted lines with metadata."""
-        return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), **kwargs)
+        return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
 
 @pruned_json
@@ -344,7 +351,6 @@ class SnapshotMeta:
                             "short_name": self.short_name,
                             "title": self.origin.title,  # type: ignore
                             "description": self.origin.description,  # type: ignore
-                            "origins": [self.origin] if self.origin else [],
                             "licenses": [self.license] if self.license else [],
                             "is_public": self.is_public,
                             "version": self.version,
