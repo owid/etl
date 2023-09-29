@@ -912,6 +912,7 @@ def run(dest_dir: str) -> None:
     assert not tb_energy["primary_energy_consumption__twh"].metadata.origins, error
     from owid.catalog import License, Origin
 
+    tb_energy["primary_energy_consumption__twh"].metadata.sources = []
     tb_energy["primary_energy_consumption__twh"].metadata.origins = [
         Origin(
             producer="Energy Institute",
