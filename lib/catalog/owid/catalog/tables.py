@@ -174,8 +174,10 @@ class Table(pd.DataFrame):
             raise ValueError(f"could not detect a suitable format to read from: {path}")
 
         # Add processing log to the metadata of each variable in the table.
-        # TODO: For some reason, the snapshot loading entry gets repeated.
         table = update_processing_logs_when_loading_or_creating_table(table=table)
+
+        if cls.DEBUG:
+            table.check_metadata()
 
         return table
 
