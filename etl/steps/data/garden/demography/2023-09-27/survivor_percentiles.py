@@ -41,6 +41,9 @@ def run(dest_dir: str) -> None:
     log.info("survivor_percentiles: keep relevant columns, drop NaNs, reset index.")
     tb = tb[["deaths", "exposure"]].dropna().reset_index()
 
+    # Get origins
+    origins = tb["deaths"].m.origins
+
     # Keep format="1x1", and sex="both"
     log.info("survivor_percentiles: Use period and 1x1 data.")
     tb = tb[(tb["type"] == "period") & (tb["format"] == "1x1")]
@@ -103,7 +106,7 @@ def run(dest_dir: str) -> None:
     tb.metadata.short_name = paths.short_name
     # Propagate origins metadata (unsure why this has not been propagated?)
     for col in tb.columns:
-        tb[col].metadata.origins = ds_meadow.metadata.origins
+        tb[col].metadata.origins = origins
 
     #
     # Save outputs.
