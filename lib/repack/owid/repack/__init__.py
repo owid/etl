@@ -140,16 +140,14 @@ def series_eq(lhs: pd.Series, rhs: pd.Series, cast: Any, rtol: float = 1e-5, ato
     """
     # NOTE: this could be speeded up with numpy methods or smarter comparison,
     # but it's not bottleneck at the moment
-    if len(lhs) != len(rhs) or (lhs.isnull() != rhs.isnull()).any():
+    if len(lhs) != len(rhs):
         return False
 
     # improve performance by calling native astype method
     if cast == float:
         func = lambda s: s.astype(float)  # noqa: E731
     else:
+        # NOTE: this would be extremely slow in practice
         func = lambda s: s.apply(cast)  # noqa: E731
 
-    lhs_values = func(lhs.dropna())  # type: ignore
-    rhs_values = func(lhs.dropna())  # type: ignore
-
-    return np.allclose(lhs_values, rhs_values, rtol=rtol, atol=atol)
+    return np.allclose(func(lhs), func(rhs), rtol=rtol, atol=atol, equal_nan=True)

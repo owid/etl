@@ -1169,7 +1169,7 @@ class Origin(SQLModel, table=True):
     urlMain: Optional[str] = None
     urlDownload: Optional[str] = None
     dateAccessed: Optional[date] = None
-    datePublished: Optional[date] = None
+    datePublished: Optional[str] = None
     license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
 
     variables: list["Variable"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)

@@ -1,11 +1,23 @@
-"""Load a garden dataset and create a grapher dataset."""
+"""There is some work to filter only those indicators and dimensions that are relevant for the grapher.
+
+That is, we may just want a subset of the indicators, or just fewer dimensions (e.g. we don't want 10-year age groups, but 5-years are enough)
+"""
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+# Relevant indicators
+INDICATORS_RELEVANT = [
+    "central_death_rate",
+    "life_expectancy",
+    "life_expectancy_fm_diff",
+    "life_expectancy_fm_ratio",
+    "probability_of_death",
+]
 
 
 def run(dest_dir: str) -> None:
@@ -26,15 +38,7 @@ def run(dest_dir: str) -> None:
     tb = tb.reset_index()
 
     ## Only keep 5-year age groups, and 1-year observation periods
-    tb_5 = tb[tb["format"] == "5x1"]
-    ## TODO: Exceptionally add single-year age groups (maybe 0, 10, 15, etc.)
-    tb_1 = tb[tb["format"] == "1x1"]
-    ages_single = [0, 10, 15, 25, 45, 65, 80]
-    ages_single = list(map(str, ages_single))
-    tb_1 = tb_1[tb_1["age"].isin(ages_single)]
-    print(tb_1.head())
-    ## Combine
-    tb = pr.concat([tb_5, tb_1], ignore_index=True)
+    tb = keep_only_relevant_dimensions(tb)
 
     ## Set dtype of year to int
     tb["year"] = tb["year"].astype("Int64")
@@ -43,7 +47,7 @@ def run(dest_dir: str) -> None:
     tb = tb.set_index(column_index, verify_integrity=True).sort_index()
 
     ## Only keep subset of columns
-    tb = tb[["central_death_rate", "life_expectancy", "probability_of_death"]]
+    tb = tb[INDICATORS_RELEVANT]
 
     #
     # Save outputs.
@@ -55,3 +59,25 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
+
+
+def keep_only_relevant_dimensions(tb: Table) -> Table:
+    """Keep only relevant dimensions.
+
+    - We only preserve 5-year age groups, and specific 1-year age groups.
+    - We only preserve 1-year observation periods.
+
+    """
+    # Keep 5-year age groups + 1-year observation periods
+    tb_5 = tb[tb["format"] == "5x1"]
+
+    # Keep 1-year age groups + 1-year observation periods, for specific age groups.
+    tb_1 = tb[tb["format"] == "1x1"]
+    ages_single = [0, 10, 15, 45]
+    ages_single = list(map(str, ages_single))
+    tb_1 = tb_1[tb_1["age"].isin(ages_single)]
+
+    ## Combine
+    tb = pr.concat([tb_5, tb_1], ignore_index=True)
+
+    return tb

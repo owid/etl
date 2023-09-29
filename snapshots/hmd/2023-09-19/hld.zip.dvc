@@ -29,10 +29,6 @@ meta:
       url: https://www.lifetable.de/Data/CitationGuidelines
       name: CC BY 4.0
 
-  # License (same as origin.license, for backwards compatibility)
-  license:
-    url: https://www.lifetable.de/Data/CitationGuidelines
-    name: CC BY 4.0
 wdir: ../../../data/snapshots/hmd/2023-09-19
 outs:
 - md5: edcd1b272c1e8a678e7e82bf622bcf1a

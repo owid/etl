@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       reason:
-        description: 'Publish owid-catalog to PyPI'
+        description: 'Publish owid-catalog to PyPI. Make sure you have bumped the version.'
 
 jobs:
   publish:

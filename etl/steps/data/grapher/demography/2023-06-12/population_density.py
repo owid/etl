@@ -18,6 +18,8 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb_garden = ds_garden["population_density"]
 
+    tb_garden.source_population.m.origins = tb_garden.population_density.m.origins
+
     #
     # Process data.
     #
