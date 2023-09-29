@@ -28,10 +28,12 @@ def run(dest_dir: str) -> None:
     tb = tb.astype({"othername": str, "decdate": str, "latitude": str, "longitude": str})
 
     # Replace -9 -> NaN
-    tb = tb.replace({
-        -9: np.nan,
-        "-9": np.nan,
-    })
+    tb = tb.replace(
+        {
+            -9: np.nan,
+            "-9": np.nan,
+        }
+    )
 
     # Remove -9 from categorical columns
     columns_cat = tb.dtypes[tb.dtypes.isin(["category", "object"])].index
