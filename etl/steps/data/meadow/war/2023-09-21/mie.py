@@ -3,8 +3,7 @@
 import os
 import tempfile
 
-import pandas as pd
-from owid.catalog import Table
+import owid.catalog.processing as pr
 from owid.datautils.io import decompress_file
 
 from etl.helpers import PathFinder, create_dataset
@@ -24,13 +23,13 @@ def run(dest_dir: str) -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         decompress_file(snap.path, tmpdir)
         path = os.path.join(tmpdir, "mie-1.0.csv")  # other file: "INTRA-STATE_State_participants v5.1 CSV.csv"
-        df = pd.read_csv(path)
+        # df = pd.read_csv(path)
+        tb = pr.read_csv(path, metadata=snap.to_table_metadata(), origin=snap.m.origin, underscore=True)
 
     #
     # Process data.
     #
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
     tb = tb.set_index(["micnum", "eventnum"], verify_integrity=True)
 
     #
