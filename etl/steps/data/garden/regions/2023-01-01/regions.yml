@@ -470,6 +470,7 @@
   is_historical: True
   aliases:
     - "Germany, East"
+    - "German Democratic Republic"
   end_year: 1990
   successors:
     - "DEU"
@@ -1602,6 +1603,7 @@
   is_historical: True
   aliases:
     - "Germany, West"
+    - "German Federal Republic"
   end_year: 1990
   successors:
     - "DEU"
