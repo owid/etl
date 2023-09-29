@@ -8,3 +8,9 @@ tables:
         display:
           isProjection: true
           numDecimalPlaces: 0
+      share:
+        title: Share of plastic leakage accumulated - projections
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
