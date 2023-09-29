@@ -283,7 +283,7 @@ def test_rename_columns() -> None:
     assert new_t.new_gdp.metadata.title == "GDP"
     assert new_t.columns == ["new_gdp"]
 
-    new_t.new_gdp.metadata.title = 'New GDP'
+    new_t.new_gdp.metadata.title = "New GDP"
 
     # old table hasn't changed
     assert t.gdp.metadata.title == "GDP"
