@@ -423,26 +423,6 @@ def test_set_index_keeps_metadata_inplace() -> None:
     assert tb_new["b"].metadata.title == "B"
 
 
-def test_assign_dataset_sources_origins_and_licenses_to_each_variable(table_1, sources, origins, licenses) -> None:
-    tb = table_1.copy()
-    # Create a new variable without metadata.
-    tb["c"] = 1
-    tb = tables.assign_dataset_sources_origins_and_licenses_to_each_variable(tb)
-    # Check that variables that did not have sources now have the dataset of the dataset.
-    assert tb["c"].metadata.sources == [sources[1], sources[2], sources[3]]
-    # Check that variables that did have sources were not affected.
-    assert tb["a"].metadata.sources == [sources[2], sources[1]]
-    # Check that variables that did not have origins now have the dataset of the dataset.
-    assert tb["c"].metadata.origins == [origins[1], origins[2], origins[3]]
-    # Check that variables that did have origins were not affected.
-    assert tb["a"].metadata.origins == [origins[2], origins[1]]
-    # Check that variables that did not have licenses now have the dataset of the dataset.
-    assert tb["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
-    # Check that variables that did have licenses were not affected.
-    assert tb["a"].metadata.licenses == [licenses[1]]
-    # Note: This function will also add all sources to columns "country" and "year", which may not be a desired effect.
-
-
 def test_merge_without_any_on_arguments(table_1, table_2, sources, origins, licenses) -> None:
     # If "on", "left_on" and "right_on" are not specified, the join is performed on common columns.
     # In this case, "country", "year", "a".

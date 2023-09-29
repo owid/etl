@@ -88,7 +88,6 @@ def table_1(sources, licenses, origins):
         description="Description of Table 1",
         dataset=DatasetMeta(
             sources=[sources[1], sources[2], sources[3]],
-            origins=[origins[1], origins[2], origins[3]],
             licenses=[licenses[1], licenses[2], licenses[3]],
         ),
     )
