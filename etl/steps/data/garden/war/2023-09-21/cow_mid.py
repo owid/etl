@@ -47,6 +47,8 @@ from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
+from .shared import expand_observations
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 # Log
@@ -125,7 +127,7 @@ def run(dest_dir: str) -> None:
 
     # Add short_name to table
     log.info("war.cow_mid: add shortname to table")
-    tb = Table(tb, short_name=paths.short_name)
+    tb.m.short_name = paths.short_name
 
     #
     # Save outputs.
@@ -162,7 +164,11 @@ def process_mida_table(tb: Table) -> Table:
     tb = tb[COLUMNS_RELEVANT]
 
     # Add observation for each year
-    tb = expand_observations(tb)
+    tb = expand_observations(
+        tb,
+        col_year_start="styear",
+        col_year_end="endyear",
+    )
 
     # Drop columns
     tb = tb.drop(columns=["styear", "endyear"])
@@ -201,7 +207,11 @@ def process_midb_table(tb: Table) -> Table:
     tb = tb.drop_duplicates()
 
     # Add observation for each year
-    tb = expand_observations(tb)
+    tb = expand_observations(
+        tb,
+        col_year_start="styear",
+        col_year_end="endyear",
+    )
 
     # Drop columns
     tb = tb.drop(columns=["styear", "endyear"])
@@ -255,49 +265,6 @@ def add_regions(tb: Table) -> Table:
 
     # Sanity check: No missing regions
     assert tb["region"].notna().all(), f"Missing regions! {tb.loc[tb['region'].isna(), ['dispnum', 'ccode']]}"
-    return tb
-
-
-def expand_observations(tb: Table) -> Table:
-    """Expand to have a row per (year, dispute).
-
-    Example
-
-        Input:
-
-        | dispnum | year_start | year_end |
-        |---------|------------|----------|
-        | 1       | 1990       | 1993     |
-
-        Output:
-
-        |  year | warcode |
-        |-------|---------|
-        |  1990 |    1    |
-        |  1991 |    1    |
-        |  1992 |    1    |
-        |  1993 |    1    |
-
-    Parameters
-    ----------
-    tb : Table
-        Original table, where each row is a dispute with its start and end year.
-
-    Returns
-    -------
-    Table
-        Here, each dispute has as many rows as years of activity. Its deaths have been uniformly distributed among the years of activity.
-    """
-    # Add missing years for each triplet ("warcode", "campcode", "ccode")
-    YEAR_MIN = tb["styear"].min()
-    YEAR_MAX = tb["endyear"].max()
-    tb_all_years = pd.DataFrame(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
-    df = pd.DataFrame(tb)  # to prevent error "AttributeError: 'DataFrame' object has no attribute 'all_columns'"
-    df = df.merge(tb_all_years, how="cross")  # type: ignore
-    tb = Table(df, metadata=tb.metadata)
-    # Filter only entries that actually existed
-    tb = tb[(tb["year"] >= tb["styear"]) & (tb["year"] <= tb["endyear"])]
-
     return tb
 
 

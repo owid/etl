@@ -3,6 +3,7 @@
 import os
 import tempfile
 
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 from owid.datautils.io import decompress_file
@@ -48,8 +49,13 @@ def run(dest_dir: str) -> None:
     with tempfile.TemporaryDirectory() as tmp_dir:
         decompress_file(snap.path, tmp_dir)
         for filename, file_props in files.items():
-            df = pd.read_csv(os.path.join(tmp_dir, filename))
-            tb = Table(df, short_name=file_props["short_name"], underscore=True)
+            tb = pr.read_csv(
+                os.path.join(tmp_dir, filename),
+                metadata=snap.to_table_metadata(),
+                origin=snap.metadata.origin,
+                underscore=True,
+            )
+            tb.m.short_name = file_props["short_name"]
             tb = tb.set_index(file_props["index"], verify_integrity=True)
             tables.append(tb)
 
