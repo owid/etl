@@ -2,10 +2,17 @@ tables:
   plastic_fate_regions_projections:
    variables:
       value:
-        title: Plastic waste - projection
+        title: Plastic waste by fate - projection
         unit: 'tonnes'
         short_unit: 't'
         display:
           isProjection: true
           numDecimalPlaces: 0
+
+      share:
+        title: Share of plastic waste by fate - projections
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
 

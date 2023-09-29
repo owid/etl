@@ -19,6 +19,12 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    tb = tb.reset_index()
+
+    # Replace scenario type to be the country column for visualisation purposes
+    tb = tb.drop("country", axis=1)
+    tb = tb.rename(columns={"scenario_type": "country"})
+    tb = tb.set_index(["year", "country", "plastic_type"])
 
     #
     # Save outputs.
