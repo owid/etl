@@ -196,7 +196,7 @@ def parse_metadata_from_sheets(
     variables_meta_df: pd.DataFrame,
     sources_meta_df: pd.DataFrame,
     origins_meta_df: pd.DataFrame,
-) -> Tuple[DatasetMeta, Dict[str, VariableMeta]]:
+) -> Tuple[DatasetMeta, Dict[str, VariableMeta], Optional[Origin]]:
     source = _parse_sources(sources_meta_df)
     origin = _parse_origins(origins_meta_df)
     dataset_meta = _parse_dataset(dataset_meta_df)
@@ -208,10 +208,8 @@ def parse_metadata_from_sheets(
     # put all sources and origins to dataset level
     if source:
         dataset_meta.sources = [source]
-    if origin:
-        dataset_meta.origins = [origin]
 
-    return dataset_meta, variables_meta_dict
+    return dataset_meta, variables_meta_dict, origin
 
 
 def _prune_empty(d: Dict[str, Any]) -> Dict[str, Any]:

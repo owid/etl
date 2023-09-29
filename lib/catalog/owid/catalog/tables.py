@@ -432,32 +432,39 @@ class Table(pd.DataFrame):
         old_cols = self.all_columns
         new_table = super().rename(*args, **kwargs)
 
+        # __setattr__ on columns has already done its job of renaming
         if inplace:
             new_table = self
-
-        # construct new _fields attribute
-        fields = {}
-        for old_col, new_col in zip(old_cols, new_table.all_columns):
-            if inplace:
-                fields[new_col] = self._fields[old_col]
-            else:
+        else:
+            # construct new _fields attribute
+            fields = {}
+            for old_col, new_col in zip(old_cols, new_table.all_columns):
                 fields[new_col] = self._fields[old_col].copy()
 
-            # Update processing log.
-            if old_col != new_col:
-                fields[new_col].processing_log = variables.add_entry_to_processing_log(
-                    processing_log=fields[new_col].processing_log,
-                    variable_name=new_col,
-                    parents=[old_col],
-                    operation="rename",
-                )
-
-        new_table._fields = defaultdict(VariableMeta, fields)
+            new_table._fields = defaultdict(VariableMeta, fields)
 
         if inplace:
             return None
         else:
             return cast(Table, new_table)
+
+    def __setattr__(self, name: str, value) -> None:
+        # setting columns must rename them
+        if name == "columns":
+            for old_col, new_col in zip(self.columns, value):
+                if old_col in self._fields:
+                    self._fields[new_col] = self._fields.pop(old_col)
+
+                # Update processing log.
+                if old_col != new_col:
+                    self._fields[new_col].processing_log = variables.add_entry_to_processing_log(
+                        processing_log=self._fields[new_col].processing_log,
+                        variable_name=new_col,
+                        parents=[old_col],
+                        operation="rename",
+                    )
+
+        super().__setattr__(name, value)
 
     @property
     def all_columns(self) -> List[str]:
@@ -527,6 +534,30 @@ class Table(pd.DataFrame):
         for k, v in t_annot.items():
             if k != "variables":
                 setattr(self.metadata, k, v)
+
+        # parse `all` section
+        # append origins to all indicators
+        all_origins = [Origin(**origin_dict) for origin_dict in annot.get("all", {}).get("origins", [])]
+        if all_origins:
+            for var_name in self.columns:
+                self[var_name].metadata.origins += [
+                    origin for origin in all_origins if origin not in self[var_name].metadata.origins
+                ]
+
+        # append sources to all indicators
+        if "sources" in annot.get("all", {}):
+            # setting [] explicitly means you want to remove them all
+            if list(annot["all"]["sources"]) == []:
+                for var_name in self.columns:
+                    self[var_name].metadata.sources = []
+            # otherwise append them if there are any
+            else:
+                all_sources = [Source(**source_dict) for source_dict in annot.get("all", {}).get("sources", [])]
+                if all_sources:
+                    for var_name in self.columns:
+                        self[var_name].metadata.sources += [
+                            source for source in all_sources if source not in self[var_name].metadata.sources
+                        ]
 
     def prune_metadata(self) -> "Table":
         """Prune metadata for columns that are not in the table. This can happen after slicing
@@ -876,6 +907,14 @@ class Table(pd.DataFrame):
     def groupby(self, *args, **kwargs) -> "TableGroupBy":
         return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
 
+    def check_metadata(self) -> None:
+        """Check that all variables in the table have origins."""
+        for column in self.columns:
+            if column in ("year", "country"):
+                continue
+            if not self[column].metadata.origins:
+                raise ValueError(f"Variable `{column}` has no origins.")
+
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
     """Create a table with metadata."""
@@ -932,7 +971,8 @@ class TableGroupBy:
         if isinstance(key, list):
             return TableGroupBy(self.groupby[key], self.metadata, self._fields)
         else:
-            return self.__getattr__(key)  # type: ignore
+            self.__annotations__[key] = VariableGroupBy
+            return VariableGroupBy(self.groupby[key], key, self._fields[key])
 
     def __iter__(self) -> Iterator[Tuple[Any, "Table"]]:
         for name, group in self.groupby:
@@ -1242,12 +1282,14 @@ def pivot(
     return table
 
 
-def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[TableMeta]) -> Table:
+def _add_table_and_variables_metadata_to_table(
+    table: Table, metadata: Optional[TableMeta], origin: Optional[Origin]
+) -> Table:
     if metadata is not None:
         table.metadata = metadata
         for column in list(table.all_columns):
-            if "origins" in metadata.dataset.to_dict():  # type: ignore
-                table._fields[column].origins = metadata.dataset.origins  # type: ignore
+            if origin:
+                table._fields[column].origins = [origin]
             else:
                 table._fields[column].sources = metadata.dataset.sources  # type: ignore
             table._fields[column].licenses = metadata.dataset.licenses  # type: ignore
@@ -1259,12 +1301,13 @@ def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[
 def read_csv(
     filepath_or_buffer: Union[str, Path, IO[AnyStr]],
     metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
     underscore: bool = False,
     *args,
     **kwargs,
 ) -> Table:
     table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     if isinstance(filepath_or_buffer, (str, Path)):
         table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
     else:
@@ -1276,12 +1319,13 @@ def read_csv(
 def read_fwf(
     filepath_or_buffer: Union[FilePath, ReadCsvBuffer[bytes], ReadCsvBuffer[str]],
     metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
     underscore: bool = False,
     *args,
     **kwargs,
 ) -> Table:
     table = Table(pd.read_fwf(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     if isinstance(filepath_or_buffer, (str, Path)):
         table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
     else:
@@ -1293,32 +1337,45 @@ def read_fwf(
 def read_feather(
     filepath: Union[str, Path],
     metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
     underscore: bool = False,
     *args,
     **kwargs,
 ) -> Table:
     table = Table(pd.read_feather(filepath, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     table = update_log(table=table, operation="load", parents=[filepath])
 
     return cast(Table, table)
 
 
 def read_excel(
-    io: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
+    io: Union[str, Path],
+    *args,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    **kwargs,
 ) -> Table:
     assert not isinstance(kwargs.get("sheet_name"), list), "Argument 'sheet_name' must be a string or an integer."
     table = Table(pd.read_excel(io=io, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     # Note: Maybe we should include the sheet name in parents.
     table = update_log(table=table, operation="load", parents=[io], inplace=False)
 
     return cast(Table, table)
 
 
-def read_from_records(data: Any, *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs):
+def read_from_records(
+    data: Any,
+    *args,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    **kwargs,
+):
     table = Table(pd.DataFrame.from_records(data=data, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     # NOTE: Parents could be passed as arguments, or extracted from metadata.
     table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
 
@@ -1326,10 +1383,15 @@ def read_from_records(data: Any, *args, metadata: Optional[TableMeta] = None, un
 
 
 def read_from_dict(
-    data: Dict[Any, Any], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
+    data: Dict[Any, Any],
+    *args,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    **kwargs,
 ) -> Table:
     table = Table(pd.DataFrame.from_dict(data=data, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     # NOTE: Parents could be passed as arguments, or extracted from metadata.
     table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
 
@@ -1339,12 +1401,13 @@ def read_from_dict(
 def read_json(
     path_or_buf: Union[str, Path, IO[AnyStr]],
     metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
     underscore: bool = False,
     *args,
     **kwargs,
 ) -> Table:
     table = Table(pd.read_json(path_or_buf=path_or_buf, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     if isinstance(path_or_buf, (str, Path)):
         table = update_log(table=table, operation="load", parents=[path_or_buf])
     else:
@@ -1359,6 +1422,7 @@ class ExcelFile(pd.ExcelFile):
         sheet_name: Union[str, int] = 0,
         *args,
         metadata: Optional[TableMeta] = None,
+        origin: Optional[Origin] = None,
         underscore: bool = False,
         **kwargs,
     ):
@@ -1366,7 +1430,7 @@ class ExcelFile(pd.ExcelFile):
         df = super().parse(sheet_name=sheet_name, *args, **kwargs)  # type: ignore
         table = Table(df, underscore=underscore, short_name=str(sheet_name))
         if metadata is not None:
-            table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+            table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
         # Note: Maybe we should include the sheet name in parents.
         table = update_log(table=table, operation="load", parents=[self.io], inplace=False)
 
@@ -1419,35 +1483,6 @@ def _add_processing_log_entry_to_each_variable(
             table._fields[column].processing_log = variables.add_entry_to_processing_log(
                 processing_log=table._fields[column].processing_log, **log_new_entry
             )
-
-    return table
-
-
-def assign_dataset_sources_origins_and_licenses_to_each_variable(table: Table) -> Table:
-    # Get sources, origins and licenses from the table dataset.
-    sources = []
-    origins = []
-    licenses = []
-    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
-        sources = table.metadata.dataset.sources  # type: ignore
-    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "origins"):
-        origins = table.metadata.dataset.origins  # type: ignore
-    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
-        licenses = table.metadata.dataset.licenses  # type: ignore
-
-    if len(sources) == len(licenses) == len(origins) == 0:
-        # There are no default sources/origins/licenses to assign to each variable.
-        return table
-
-    # If a variable does not have sources/origins/licenses defined, assign the ones from the dataset.
-    # Do this for all columns, including index columns.
-    for column in list(table.all_columns):
-        if len(table._fields[column].sources) == 0:
-            table._fields[column].sources = sources
-        if len(table._fields[column].origins) == 0:
-            table._fields[column].origins = origins
-        if len(table._fields[column].licenses) == 0:
-            table._fields[column].licenses = licenses
 
     return table
 
@@ -1565,24 +1600,6 @@ def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
 
     # Get unique array of tuples of source fields (respecting the order).
     return pd.unique(sources).tolist()
-
-
-def get_unique_origins_from_tables(tables: List[Table]) -> List[Origin]:
-    # First, ensure only "origins" (and not "sources") are used in the variables.
-    if any(
-        [
-            ("sources" in table[column].metadata.to_dict()) and (len(table[column].metadata.sources) > 0)
-            for table in tables
-            for column in table.columns
-        ]
-    ):
-        log.warning("Origins and sources mixed in tables. The resulting dataset may not include all origins.")
-
-    # Make a list of all origins of all variables in all tables.
-    origins = sum([table._fields[column].origins for table in tables for column in list(table.all_columns)], [])
-
-    # Get unique array of tuples of source fields (respecting the order).
-    return pd.unique(origins).tolist()
 
 
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:

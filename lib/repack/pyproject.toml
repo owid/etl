@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "owid-repack"
-version = "0.1.2"
+version = "0.1.3"
 description = "Pack Pandas data frames into smaller, more memory-efficient data types."
 authors = ["Our World in Data <tech@ourworldindata.org>"]
 license = "MIT"
@@ -23,6 +23,8 @@ isort = ">=5.11.4"
 
 [tool.isort]
 profile = "black"
+# owid is actually first party library, but we need to stay compatible with ETL
+known_third_party = "owid"
 
 [tool.black]
 line-length = 120
