@@ -7,7 +7,7 @@ definitions:
 
 
 # Learn more about the available fields:
-# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/dataset/
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   title: Peace data (Diehl et al., 2023)
   update_period_days: 1000
@@ -22,7 +22,7 @@ dataset:
 
 
 # Learn more about the available fields:
-# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/tables/
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
   peace_diehl:
     variables:
