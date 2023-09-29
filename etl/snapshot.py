@@ -64,6 +64,11 @@ class Snapshot:
         self.metadata = SnapshotMeta.load_from_yaml(self.metadata_path)
 
     @property
+    def m(self) -> "SnapshotMeta":
+        """Metadata alias to save typing."""
+        return self.metadata
+
+    @property
     def path(self) -> Path:
         """Path to materialized file."""
         return paths.DATA_DIR / "snapshots" / self.uri

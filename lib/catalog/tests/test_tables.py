@@ -283,6 +283,8 @@ def test_rename_columns() -> None:
     assert new_t.new_gdp.metadata.title == "GDP"
     assert new_t.columns == ["new_gdp"]
 
+    new_t.new_gdp.metadata.title = "New GDP"
+
     # old table hasn't changed
     assert t.gdp.metadata.title == "GDP"
 
@@ -1013,3 +1015,8 @@ def test_groupby_iteration(table_1) -> None:
     for _, group in table_1.groupby("country"):
         assert isinstance(group._fields, defaultdict)
         assert group.a.m.title == "Title of Table 1 Variable a"
+
+
+def test_set_columns(table_1) -> None:
+    table_1.columns = ["country", "year", "new_a", "new_b"]
+    assert table_1.new_a.m.title == "Title of Table 1 Variable a"
