@@ -2,7 +2,7 @@
 
 import pandas as pd
 import pdfplumber
-from owid.catalog import Table
+from owid.catalog import Origin, Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -50,6 +50,7 @@ def run(dest_dir: str) -> None:
     df["country"] = "World"
     df = df.rename(columns={"Year Global": "year", "Prod": "plastic_production"})
     tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb["plastic_production"].metadata.origins = [snap.metadata.origin]
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()

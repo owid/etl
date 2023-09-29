@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
 
     # Define the growth rate
     growth_rate = 0.05  # 5%
-
+    print(tb["plastic_production"].metadata.origins)
     # Add new rows for 2016-2018
     for year in range(2016, 2019):  # 2019 is the stop value and is not included
         last_value = tb.loc[tb.index[-1], "plastic_production"]  # Getting the last value in the 'Value' column
@@ -41,7 +41,7 @@ def run(dest_dir: str) -> None:
     total_prod = total_plastic_use_2019[["year", "country", "total"]][total_plastic_use_2019["year"] == 2019]
     total_prod = total_prod.rename(columns={"total": "plastic_production"})
 
-    combined_df = pr.merge(total_prod, tb, on=["country", "year", "plastic_production"], how="outer").copy_metadata(
+    combined_df = pr.merge(tb, total_prod, on=["country", "year", "plastic_production"], how="outer").copy_metadata(
         from_table=tb
     )
 
