@@ -2,7 +2,6 @@
 
 import pandas as pd
 import pdfplumber
-from owid.catalog import Origin, Table
 
 from etl.helpers import PathFinder, create_dataset
 
