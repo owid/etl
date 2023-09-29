@@ -182,6 +182,7 @@ class Tag(SQLModel, table=True):
     isBulkImport: int = Field(sa_column=Column("isBulkImport", TINYINT(1), nullable=False, server_default=text("'0'")))
     parentId: Optional[int] = Field(default=None, sa_column=Column("parentId", Integer))
     specialType: Optional[str] = Field(default=None, sa_column=Column("specialType", String(255, "utf8mb4_0900_as_cs")))
+    isTopic: int = Field(sa_column=Column("isTopic", TINYINT(1), nullable=False, server_default=text("'0'")))
 
     post: List["Posts"] = Relationship(back_populates="tag")
     tags: Optional["Tag"] = Relationship(back_populates="tags_reverse")
@@ -1088,7 +1089,7 @@ class Variable(SQLModel, table=True):
 
         # establish relationships between variables and tags
         # get tags by their name
-        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names))).all()  # type: ignore
+        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names), Tag.isTopic == 1)).all()  # type: ignore
 
         # raise a warning if some tags were not found
         if len(tags) != len(tag_names):
@@ -1168,7 +1169,7 @@ class Origin(SQLModel, table=True):
     urlMain: Optional[str] = None
     urlDownload: Optional[str] = None
     dateAccessed: Optional[date] = None
-    datePublished: Optional[date] = None
+    datePublished: Optional[str] = None
     license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
 
     variables: list["Variable"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)

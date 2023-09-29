@@ -1,0 +1,1326 @@
+tables:
+  igme_combined:
+    variables:
+      ? observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_infant_mortality_rate_female_all_wealth_quintiles
+      : title: Observation value-Deaths per 1,000 live births-Infant mortality rate-Female-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_infant_mortality_rate_male_all_wealth_quintiles
+      : title: Observation value-Deaths per 1,000 live births-Infant mortality rate-Male-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_infant_mortality_rate_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1,000 live births-Infant mortality rate-Both sexes-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_female_all_wealth_quintiles
+      : title: Observation value-Deaths per 1,000 live births-Under-five mortality rate-Female-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_male_all_wealth_quintiles
+      : title: Observation value-Deaths per 1,000 live births-Under-five mortality rate-Male-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_1_child_mortality_rate_age_1_4_female_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 1-Child Mortality rate age 1-4-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 1
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_1_child_mortality_rate_age_1_4_male_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 1-Child Mortality rate age 1-4-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 1
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_1_child_mortality_rate_age_1_4_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 1-Child Mortality rate age 1-4-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 1
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_number_of_deaths_infant_deaths_female_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Infant deaths-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_infant_deaths_male_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Infant deaths-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_infant_deaths_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Infant deaths-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_under_five_deaths_female_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Under-five deaths-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_under_five_deaths_male_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Under-five deaths-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_under_five_deaths_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Under-five deaths-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_child_deaths_age_1_to_4_female_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Child deaths age 1 to 4-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_child_deaths_age_1_to_4_male_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Child deaths age 1 to 4-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_child_deaths_age_1_to_4_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Child deaths age 1 to 4-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_5_to_14_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 5 to 14-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_deaths_per_1000_children_aged_5_mortality_rate_age_5_14_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 5-Mortality rate age 5-14-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_neonatal_mortality_rate_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1,000 live births-Neonatal mortality rate-Both sexes-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_mortality_rate_1_59_months_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1,000 live births-Mortality rate 1-59 months-Both sexes-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_number_of_deaths_neonatal_deaths_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Neonatal deaths-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_1_59_months_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths 1-59 months-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_poorest_quintile
+      : title: Observation value-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Poorest quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_second_poorest_quintile
+      : title: Observation value-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Second poorest quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_middle_wealth_quintile
+      : title: Observation value-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Middle wealth quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_fourth_poorest_quintile
+      : title: Observation value-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Fourth poorest quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_richest_quintile
+      : title: Observation value-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Richest quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_10_mortality_rate_age_10_14_female_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 10-Mortality rate age 10-14-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_10_mortality_rate_age_10_14_male_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 10-Mortality rate age 10-14-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_10_mortality_rate_age_10_14_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 10-Mortality rate age 10-14-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_10_mortality_rate_age_10_19_female_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 10-Mortality rate age 10-19-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_10_mortality_rate_age_10_19_male_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 10-Mortality rate age 10-19-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_10_mortality_rate_age_10_19_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 10-Mortality rate age 10-19-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_15_mortality_rate_age_15_19_female_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 15-Mortality rate age 15-19-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_15_mortality_rate_age_15_19_male_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 15-Mortality rate age 15-19-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_15_mortality_rate_age_15_19_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 15-Mortality rate age 15-19-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_15_mortality_rate_age_15_24_female_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 15-Mortality rate age 15-24-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_15_mortality_rate_age_15_24_male_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 15-Mortality rate age 15-24-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_15_mortality_rate_age_15_24_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 15-Mortality rate age 15-24-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_20_mortality_rate_age_20_24_female_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 20-Mortality rate age 20-24-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 20
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_20_mortality_rate_age_20_24_male_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 20-Mortality rate age 20-24-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 20
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_20_mortality_rate_age_20_24_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 20-Mortality rate age 20-24-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 20
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_5_mortality_rate_age_5_14_female_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 5-Mortality rate age 5-14-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_5_mortality_rate_age_5_14_male_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 5-Mortality rate age 5-14-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_5_mortality_rate_age_5_24_female_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 5-Mortality rate age 5-24-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_5_mortality_rate_age_5_24_male_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 5-Mortality rate age 5-24-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_5_mortality_rate_age_5_24_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 5-Mortality rate age 5-24-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_5_mortality_rate_age_5_9_female_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 5-Mortality rate age 5-9-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_5_mortality_rate_age_5_9_male_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 5-Mortality rate age 5-9-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1000_children_aged_5_mortality_rate_age_5_9_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1000 children aged 5-Mortality rate age 5-9-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_number_of_deaths_under_five_deaths_both_sexes_poorest_quintile
+      : title: Observation value-Number of deaths-Under-five deaths-Both sexes-Poorest quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_under_five_deaths_both_sexes_second_poorest_quintile
+      : title: Observation value-Number of deaths-Under-five deaths-Both sexes-Second poorest quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_under_five_deaths_both_sexes_middle_wealth_quintile
+      : title: Observation value-Number of deaths-Under-five deaths-Both sexes-Middle wealth quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_under_five_deaths_both_sexes_fourth_poorest_quintile
+      : title: Observation value-Number of deaths-Under-five deaths-Both sexes-Fourth poorest quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_under_five_deaths_both_sexes_richest_quintile
+      : title: Observation value-Number of deaths-Under-five deaths-Both sexes-Richest quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_10_to_14_female_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 10 to 14-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_10_to_14_male_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 10 to 14-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_10_to_14_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 10 to 14-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_10_to_19_female_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 10 to 19-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_10_to_19_male_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 10 to 19-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_10_to_19_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 10 to 19-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_15_to_19_female_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 15 to 19-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_15_to_19_male_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 15 to 19-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_15_to_19_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 15 to 19-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_15_to_24_female_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 15 to 24-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_15_to_24_male_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 15 to 24-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_15_to_24_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 15 to 24-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_20_to_24_female_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 20 to 24-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_20_to_24_male_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 20 to 24-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_20_to_24_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 20 to 24-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_5_to_14_female_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 5 to 14-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_5_to_14_male_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 5 to 14-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_5_to_24_female_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 5 to 24-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_5_to_24_male_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 5 to 24-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_5_to_24_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 5 to 24-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_5_to_9_female_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 5 to 9-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_5_to_9_male_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 5 to 9-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_deaths_age_5_to_9_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Deaths age 5 to 9-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_stillbirths_stillbirths_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of stillbirths-Stillbirths-Both sexes-All wealth quintiles
+        unit: number of stillbirths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_stillbirths_per_1_000_total_births_stillbirth_rate_both_sexes_all_wealth_quintiles
+      : title: Observation value-Stillbirths per 1,000 total births-Stillbirth rate-Both sexes-All wealth quintiles
+        unit: stillbirths per 1,000 total births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_progress_towards_sdg_in_neonatal_mortality_rate_both_sexes_all_wealth_quintiles
+      : title:
+          Observation value-Deaths per 1,000 live births-Progress towards SDG in neonatal mortality rate-Both sexes-All
+          wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_deaths_per_1_000_live_births_progress_towards_sdg_in_under_five_mortality_rate_both_sexes_all_wealth_quintiles
+      : title:
+          Observation value-Deaths per 1,000 live births-Progress towards SDG in under-five mortality rate-Both sexes-All
+          wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? observation_value_number_of_deaths_under_fifteen_deaths_female_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Under-fifteen deaths-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_under_fifteen_deaths_male_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Under-fifteen deaths-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_number_of_deaths_under_fifteen_deaths_both_sexes_all_wealth_quintiles
+      : title: Observation value-Number of deaths-Under-fifteen deaths-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_infant_mortality_rate_female_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1,000 live births-Infant mortality rate-Female-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_infant_mortality_rate_male_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1,000 live births-Infant mortality rate-Male-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_infant_mortality_rate_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1,000 live births-Infant mortality rate-Both sexes-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_under_five_mortality_rate_female_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1,000 live births-Under-five mortality rate-Female-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_under_five_mortality_rate_male_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1,000 live births-Under-five mortality rate-Male-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_1_child_mortality_rate_age_1_4_female_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 1-Child Mortality rate age 1-4-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 1
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_1_child_mortality_rate_age_1_4_male_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 1-Child Mortality rate age 1-4-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 1
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_1_child_mortality_rate_age_1_4_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 1-Child Mortality rate age 1-4-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 1
+        display:
+          numDecimalPlaces: 1
+      lower_bound_number_of_deaths_infant_deaths_female_all_wealth_quintiles:
+        title: Lower bound-Number of deaths-Infant deaths-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      lower_bound_number_of_deaths_infant_deaths_male_all_wealth_quintiles:
+        title: Lower bound-Number of deaths-Infant deaths-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_infant_deaths_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Infant deaths-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_under_five_deaths_female_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Under-five deaths-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      lower_bound_number_of_deaths_under_five_deaths_male_all_wealth_quintiles:
+        title: Lower bound-Number of deaths-Under-five deaths-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_under_five_deaths_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Under-five deaths-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_child_deaths_age_1_to_4_female_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Child deaths age 1 to 4-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_child_deaths_age_1_to_4_male_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Child deaths age 1 to 4-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_child_deaths_age_1_to_4_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Child deaths age 1 to 4-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_5_to_14_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 5 to 14-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_14_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 5-Mortality rate age 5-14-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_neonatal_mortality_rate_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1,000 live births-Neonatal mortality rate-Both sexes-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_mortality_rate_1_59_months_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1,000 live births-Mortality rate 1-59 months-Both sexes-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_number_of_deaths_neonatal_deaths_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Neonatal deaths-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_1_59_months_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths 1-59 months-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_poorest_quintile
+      : title: Lower bound-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Poorest quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_second_poorest_quintile
+      : title: Lower bound-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Second poorest quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_middle_wealth_quintile
+      : title: Lower bound-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Middle wealth quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_fourth_poorest_quintile
+      : title: Lower bound-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Fourth poorest quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_richest_quintile
+      : title: Lower bound-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Richest quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_10_mortality_rate_age_10_14_female_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 10-Mortality rate age 10-14-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_10_mortality_rate_age_10_14_male_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 10-Mortality rate age 10-14-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_10_mortality_rate_age_10_14_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 10-Mortality rate age 10-14-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_10_mortality_rate_age_10_19_female_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 10-Mortality rate age 10-19-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_10_mortality_rate_age_10_19_male_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 10-Mortality rate age 10-19-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_10_mortality_rate_age_10_19_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 10-Mortality rate age 10-19-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_15_mortality_rate_age_15_19_female_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 15-Mortality rate age 15-19-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_15_mortality_rate_age_15_19_male_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 15-Mortality rate age 15-19-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_15_mortality_rate_age_15_19_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 15-Mortality rate age 15-19-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_15_mortality_rate_age_15_24_female_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 15-Mortality rate age 15-24-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_15_mortality_rate_age_15_24_male_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 15-Mortality rate age 15-24-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_15_mortality_rate_age_15_24_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 15-Mortality rate age 15-24-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_20_mortality_rate_age_20_24_female_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 20-Mortality rate age 20-24-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 20
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_20_mortality_rate_age_20_24_male_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 20-Mortality rate age 20-24-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 20
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_20_mortality_rate_age_20_24_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 20-Mortality rate age 20-24-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 20
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_14_female_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 5-Mortality rate age 5-14-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_14_male_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 5-Mortality rate age 5-14-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_24_female_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 5-Mortality rate age 5-24-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_24_male_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 5-Mortality rate age 5-24-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_24_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 5-Mortality rate age 5-24-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_9_female_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 5-Mortality rate age 5-9-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_9_male_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 5-Mortality rate age 5-9-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_9_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Deaths per 1000 children aged 5-Mortality rate age 5-9-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_number_of_deaths_under_five_deaths_both_sexes_poorest_quintile
+      : title: Lower bound-Number of deaths-Under-five deaths-Both sexes-Poorest quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_under_five_deaths_both_sexes_second_poorest_quintile
+      : title: Lower bound-Number of deaths-Under-five deaths-Both sexes-Second poorest quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_under_five_deaths_both_sexes_middle_wealth_quintile
+      : title: Lower bound-Number of deaths-Under-five deaths-Both sexes-Middle wealth quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_under_five_deaths_both_sexes_fourth_poorest_quintile
+      : title: Lower bound-Number of deaths-Under-five deaths-Both sexes-Fourth poorest quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_under_five_deaths_both_sexes_richest_quintile
+      : title: Lower bound-Number of deaths-Under-five deaths-Both sexes-Richest quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_10_to_14_female_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 10 to 14-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_10_to_14_male_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 10 to 14-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_10_to_14_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 10 to 14-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_10_to_19_female_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 10 to 19-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_10_to_19_male_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 10 to 19-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_10_to_19_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 10 to 19-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_15_to_19_female_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 15 to 19-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_15_to_19_male_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 15 to 19-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_15_to_19_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 15 to 19-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_15_to_24_female_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 15 to 24-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_15_to_24_male_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 15 to 24-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_15_to_24_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 15 to 24-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_20_to_24_female_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 20 to 24-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_20_to_24_male_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 20 to 24-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_20_to_24_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 20 to 24-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_5_to_14_female_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 5 to 14-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      lower_bound_number_of_deaths_deaths_age_5_to_14_male_all_wealth_quintiles:
+        title: Lower bound-Number of deaths-Deaths age 5 to 14-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_5_to_24_female_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 5 to 24-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      lower_bound_number_of_deaths_deaths_age_5_to_24_male_all_wealth_quintiles:
+        title: Lower bound-Number of deaths-Deaths age 5 to 24-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_5_to_24_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 5 to 24-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_5_to_9_female_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 5 to 9-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      lower_bound_number_of_deaths_deaths_age_5_to_9_male_all_wealth_quintiles:
+        title: Lower bound-Number of deaths-Deaths age 5 to 9-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_deaths_age_5_to_9_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Deaths age 5 to 9-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_stillbirths_stillbirths_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of stillbirths-Stillbirths-Both sexes-All wealth quintiles
+        unit: number of stillbirths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_stillbirths_per_1_000_total_births_stillbirth_rate_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Stillbirths per 1,000 total births-Stillbirth rate-Both sexes-All wealth quintiles
+        unit: stillbirths per 1,000 total births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_progress_towards_sdg_in_neonatal_mortality_rate_both_sexes_all_wealth_quintiles
+      : title:
+          Lower bound-Deaths per 1,000 live births-Progress towards SDG in neonatal mortality rate-Both sexes-All wealth
+          quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_deaths_per_1_000_live_births_progress_towards_sdg_in_under_five_mortality_rate_both_sexes_all_wealth_quintiles
+      : title:
+          Lower bound-Deaths per 1,000 live births-Progress towards SDG in under-five mortality rate-Both sexes-All wealth
+          quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? lower_bound_number_of_deaths_under_fifteen_deaths_female_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Under-fifteen deaths-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_under_fifteen_deaths_male_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Under-fifteen deaths-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? lower_bound_number_of_deaths_under_fifteen_deaths_both_sexes_all_wealth_quintiles
+      : title: Lower bound-Number of deaths-Under-fifteen deaths-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_infant_mortality_rate_female_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1,000 live births-Infant mortality rate-Female-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_infant_mortality_rate_male_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1,000 live births-Infant mortality rate-Male-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_infant_mortality_rate_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1,000 live births-Infant mortality rate-Both sexes-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_under_five_mortality_rate_female_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1,000 live births-Under-five mortality rate-Female-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_under_five_mortality_rate_male_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1,000 live births-Under-five mortality rate-Male-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_1_child_mortality_rate_age_1_4_female_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 1-Child Mortality rate age 1-4-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 1
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_1_child_mortality_rate_age_1_4_male_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 1-Child Mortality rate age 1-4-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 1
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_1_child_mortality_rate_age_1_4_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 1-Child Mortality rate age 1-4-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 1
+        display:
+          numDecimalPlaces: 1
+      upper_bound_number_of_deaths_infant_deaths_female_all_wealth_quintiles:
+        title: Upper bound-Number of deaths-Infant deaths-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      upper_bound_number_of_deaths_infant_deaths_male_all_wealth_quintiles:
+        title: Upper bound-Number of deaths-Infant deaths-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_infant_deaths_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Infant deaths-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_under_five_deaths_female_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Under-five deaths-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      upper_bound_number_of_deaths_under_five_deaths_male_all_wealth_quintiles:
+        title: Upper bound-Number of deaths-Under-five deaths-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_under_five_deaths_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Under-five deaths-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_child_deaths_age_1_to_4_female_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Child deaths age 1 to 4-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_child_deaths_age_1_to_4_male_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Child deaths age 1 to 4-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_child_deaths_age_1_to_4_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Child deaths age 1 to 4-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_5_to_14_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 5 to 14-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_14_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 5-Mortality rate age 5-14-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_neonatal_mortality_rate_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1,000 live births-Neonatal mortality rate-Both sexes-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_mortality_rate_1_59_months_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1,000 live births-Mortality rate 1-59 months-Both sexes-All wealth quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_number_of_deaths_neonatal_deaths_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Neonatal deaths-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_1_59_months_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths 1-59 months-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_poorest_quintile
+      : title: Upper bound-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Poorest quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_second_poorest_quintile
+      : title: Upper bound-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Second poorest quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_middle_wealth_quintile
+      : title: Upper bound-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Middle wealth quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_fourth_poorest_quintile
+      : title: Upper bound-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Fourth poorest quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_richest_quintile
+      : title: Upper bound-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-Richest quintile
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_10_mortality_rate_age_10_14_female_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 10-Mortality rate age 10-14-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_10_mortality_rate_age_10_14_male_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 10-Mortality rate age 10-14-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_10_mortality_rate_age_10_14_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 10-Mortality rate age 10-14-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_10_mortality_rate_age_10_19_female_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 10-Mortality rate age 10-19-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_10_mortality_rate_age_10_19_male_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 10-Mortality rate age 10-19-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_10_mortality_rate_age_10_19_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 10-Mortality rate age 10-19-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 10
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_15_mortality_rate_age_15_19_female_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 15-Mortality rate age 15-19-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_15_mortality_rate_age_15_19_male_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 15-Mortality rate age 15-19-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_15_mortality_rate_age_15_19_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 15-Mortality rate age 15-19-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_15_mortality_rate_age_15_24_female_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 15-Mortality rate age 15-24-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_15_mortality_rate_age_15_24_male_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 15-Mortality rate age 15-24-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_15_mortality_rate_age_15_24_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 15-Mortality rate age 15-24-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 15
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_20_mortality_rate_age_20_24_female_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 20-Mortality rate age 20-24-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 20
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_20_mortality_rate_age_20_24_male_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 20-Mortality rate age 20-24-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 20
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_20_mortality_rate_age_20_24_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 20-Mortality rate age 20-24-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 20
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_14_female_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 5-Mortality rate age 5-14-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_14_male_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 5-Mortality rate age 5-14-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_24_female_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 5-Mortality rate age 5-24-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_24_male_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 5-Mortality rate age 5-24-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_24_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 5-Mortality rate age 5-24-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_9_female_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 5-Mortality rate age 5-9-Female-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_9_male_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 5-Mortality rate age 5-9-Male-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1000_children_aged_5_mortality_rate_age_5_9_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Deaths per 1000 children aged 5-Mortality rate age 5-9-Both sexes-All wealth quintiles
+        unit: deaths per 1000 children aged 5
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_number_of_deaths_under_five_deaths_both_sexes_poorest_quintile
+      : title: Upper bound-Number of deaths-Under-five deaths-Both sexes-Poorest quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_under_five_deaths_both_sexes_second_poorest_quintile
+      : title: Upper bound-Number of deaths-Under-five deaths-Both sexes-Second poorest quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_under_five_deaths_both_sexes_middle_wealth_quintile
+      : title: Upper bound-Number of deaths-Under-five deaths-Both sexes-Middle wealth quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_under_five_deaths_both_sexes_fourth_poorest_quintile
+      : title: Upper bound-Number of deaths-Under-five deaths-Both sexes-Fourth poorest quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_under_five_deaths_both_sexes_richest_quintile
+      : title: Upper bound-Number of deaths-Under-five deaths-Both sexes-Richest quintile
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_10_to_14_female_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 10 to 14-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_10_to_14_male_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 10 to 14-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_10_to_14_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 10 to 14-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_10_to_19_female_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 10 to 19-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_10_to_19_male_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 10 to 19-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_10_to_19_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 10 to 19-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_15_to_19_female_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 15 to 19-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_15_to_19_male_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 15 to 19-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_15_to_19_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 15 to 19-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_15_to_24_female_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 15 to 24-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_15_to_24_male_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 15 to 24-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_15_to_24_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 15 to 24-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_20_to_24_female_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 20 to 24-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_20_to_24_male_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 20 to 24-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_20_to_24_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 20 to 24-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_5_to_14_female_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 5 to 14-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      upper_bound_number_of_deaths_deaths_age_5_to_14_male_all_wealth_quintiles:
+        title: Upper bound-Number of deaths-Deaths age 5 to 14-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_5_to_24_female_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 5 to 24-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      upper_bound_number_of_deaths_deaths_age_5_to_24_male_all_wealth_quintiles:
+        title: Upper bound-Number of deaths-Deaths age 5 to 24-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_5_to_24_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 5 to 24-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_5_to_9_female_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 5 to 9-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      upper_bound_number_of_deaths_deaths_age_5_to_9_male_all_wealth_quintiles:
+        title: Upper bound-Number of deaths-Deaths age 5 to 9-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_deaths_age_5_to_9_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Deaths age 5 to 9-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_stillbirths_stillbirths_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of stillbirths-Stillbirths-Both sexes-All wealth quintiles
+        unit: number of stillbirths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_stillbirths_per_1_000_total_births_stillbirth_rate_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Stillbirths per 1,000 total births-Stillbirth rate-Both sexes-All wealth quintiles
+        unit: stillbirths per 1,000 total births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_progress_towards_sdg_in_neonatal_mortality_rate_both_sexes_all_wealth_quintiles
+      : title:
+          Upper bound-Deaths per 1,000 live births-Progress towards SDG in neonatal mortality rate-Both sexes-All wealth
+          quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_deaths_per_1_000_live_births_progress_towards_sdg_in_under_five_mortality_rate_both_sexes_all_wealth_quintiles
+      : title:
+          Upper bound-Deaths per 1,000 live births-Progress towards SDG in under-five mortality rate-Both sexes-All wealth
+          quintiles
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1
+      ? upper_bound_number_of_deaths_under_fifteen_deaths_female_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Under-fifteen deaths-Female-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_under_fifteen_deaths_male_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Under-fifteen deaths-Male-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? upper_bound_number_of_deaths_under_fifteen_deaths_both_sexes_all_wealth_quintiles
+      : title: Upper bound-Number of deaths-Under-fifteen deaths-Both sexes-All wealth quintiles
+        unit: number of deaths
+        display:
+          numDecimalPlaces: 0
+      ? observation_value_deaths_per_1_000_live_births_under_fifteen_mortality_rate_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1,000 live births-Under-fifteen mortality rate-Both sexes-All wealth quintiles
+        description_short: Under-fifteen mortality rate, calculated from the under-five mortality rate and the infant mortality rate.
+        unit: deaths per 1,000 live births
+        display:
+          numDecimalPlaces: 1

@@ -1,0 +1,10 @@
+tables:
+  plastic_aquatic_leakage_projections:
+    variables:
+      value:
+        title: Plastic leakage accumulated - projections
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          isProjection: true
+          numDecimalPlaces: 0

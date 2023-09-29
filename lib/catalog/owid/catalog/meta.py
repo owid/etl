@@ -12,6 +12,7 @@ from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Literal, NewType, Optional, Union
 
+import mistune
 import pandas as pd
 from dataclasses_json import dataclass_json
 
@@ -318,8 +319,7 @@ class DatasetMeta:
     short_name: Optional[str] = None
     title: Optional[str] = None
     description: Optional[str] = None
-    origins: List[Origin] = field(default_factory=list)
-    # sources is deprecated, use origins instead
+    # sources is deprecated, use origins on indicator level instead
     sources: List[Source] = field(default_factory=list)
     licenses: List[License] = field(default_factory=list)
     is_public: bool = True
@@ -372,36 +372,43 @@ class DatasetMeta:
             params["YEAR"] = pd.to_datetime(self.version).year
         return params
 
-    def update_from_yaml(self, path: Union[Path, str], if_source_exists: SOURCE_EXISTS_OPTIONS = "fail") -> None:
+    def update_from_yaml(
+        self,
+        path: Union[Path, str],
+        if_source_exists: SOURCE_EXISTS_OPTIONS = "fail",
+    ) -> None:
         """The main reason for wanting to do this is to manually override what goes into Grapher before an export."""
         from owid.catalog import utils
 
         annot = utils.dynamic_yaml_load(path, self._params_yaml())
 
-        dataset_sources = annot.get("dataset", {}).get("sources", []) or []
+        # None is treated differently from [] - if given empty list, we clear sources
+        dataset_sources = annot.get("dataset", {}).get("sources")
+        if dataset_sources is not None:
+            # update sources of dataset, if there are no sources in the new dataset, don't update existing ones
+            if if_source_exists == "replace":
+                self.sources = []
 
-        # update sources of dataset, if there are no sources in the new dataset, don't update existing ones
-        if if_source_exists == "replace" and dataset_sources:
-            self.sources = []
+            new_sources = []
+            for source_annot in dataset_sources:
+                # if there's an existing source, update it
+                ds_sources = [s for s in self.sources if s.name == source_annot["name"]]
+                if ds_sources:
+                    ds_sources[0].update(**source_annot)
+                # there is already a source in a dataset, raise an error
+                elif self.sources and if_source_exists == "fail":
+                    raise ValueError(
+                        f"Source {self.sources[0].name} would be overwritten by source {source_annot['name']}"
+                    )
+                # otherwise append it
+                else:
+                    new_sources.append(Source(**source_annot))
 
-        new_sources = []
-        for source_annot in dataset_sources:
-            # if there's an existing source, update it
-            ds_sources = [s for s in self.sources if s.name == source_annot["name"]]
-            if ds_sources:
-                ds_sources[0].update(**source_annot)
-            # there is already a source in a dataset, raise an error
-            elif self.sources and if_source_exists == "fail":
-                raise ValueError(f"Source {self.sources[0].name} would be overwritten by source {source_annot['name']}")
-            # otherwise append it
-            else:
-                new_sources.append(Source(**source_annot))
-
-        self.sources.extend(new_sources)
+            self.sources.extend(new_sources)
 
         # update dataset
         for k, v in annot.get("dataset", {}).items():
-            if k != "sources":
+            if k not in ("sources",):
                 setattr(self, k, v)
 
     @property
@@ -490,7 +497,7 @@ def to_html(record: Any) -> Optional[str]:
         return '<ul style="text-align: left; margin-top: 0em; margin-bottom: 0em">{}</ul>'.format("".join(rows))
 
     else:
-        return str(record)
+        return mistune.html(str(record))  # type: ignore
 
 
 def is_year_or_date(s: str) -> bool:

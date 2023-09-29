@@ -29,12 +29,19 @@ import pyarrow
 import pyarrow.parquet as pq
 import structlog
 from owid.repack import repack_frame
-from pandas._typing import Scalar
+from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
 from pandas.util._decorators import rewrite_axis_style_signature
 
 from . import variables
-from .meta import License, Origin, Source, TableMeta, VariableMeta
+from .meta import (
+    SOURCE_EXISTS_OPTIONS,
+    License,
+    Origin,
+    Source,
+    TableMeta,
+    VariableMeta,
+)
 from .utils import underscore
 
 log = structlog.get_logger()
@@ -467,7 +474,11 @@ class Table(pd.DataFrame):
             raise ValueError(f"'{name}' not found in columns or index")
 
     def update_metadata_from_yaml(
-        self, path: Union[Path, str], table_name: str, extra_variables: Literal["raise", "ignore"] = "raise"
+        self,
+        path: Union[Path, str],
+        table_name: str,
+        extra_variables: Literal["raise", "ignore"] = "raise",
+        if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
     ) -> None:
         """Update metadata of table and variables from a YAML file.
         :param path: Path to YAML file.
@@ -497,6 +508,12 @@ class Table(pd.DataFrame):
                     # create an object out of sources
                     if k == "sources":
                         self[v_short_name].metadata.sources = [Source(**source) for source in v]
+                    elif k == "origins":
+                        if if_origins_exist == "fail" and self[v_short_name].metadata.origins:
+                            raise ValueError(f"Origins already exist for variable {v_short_name}")
+                        if if_origins_exist == "replace":
+                            self[v_short_name].metadata.origins = []
+                        self[v_short_name].metadata.origins += [Origin(**origin) for origin in v]
                     else:
                         setattr(self[v_short_name].metadata, k, v)
 
@@ -510,6 +527,30 @@ class Table(pd.DataFrame):
         for k, v in t_annot.items():
             if k != "variables":
                 setattr(self.metadata, k, v)
+
+        # parse `all` section
+        # append origins to all indicators
+        all_origins = [Origin(**origin_dict) for origin_dict in annot.get("all", {}).get("origins", [])]
+        if all_origins:
+            for var_name in self.columns:
+                self[var_name].metadata.origins += [
+                    origin for origin in all_origins if origin not in self[var_name].metadata.origins
+                ]
+
+        # append sources to all indicators
+        if "sources" in annot.get("all", {}):
+            # setting [] explicitly means you want to remove them all
+            if list(annot["all"]["sources"]) == []:
+                for var_name in self.columns:
+                    self[var_name].metadata.sources = []
+            # otherwise append them if there are any
+            else:
+                all_sources = [Source(**source_dict) for source_dict in annot.get("all", {}).get("sources", [])]
+                if all_sources:
+                    for var_name in self.columns:
+                        self[var_name].metadata.sources += [
+                            source for source in all_sources if source not in self[var_name].metadata.sources
+                        ]
 
     def prune_metadata(self) -> "Table":
         """Prune metadata for columns that are not in the table. This can happen after slicing
@@ -915,7 +956,8 @@ class TableGroupBy:
         if isinstance(key, list):
             return TableGroupBy(self.groupby[key], self.metadata, self._fields)
         else:
-            return self.__getattr__(key)  # type: ignore
+            self.__annotations__[key] = VariableGroupBy
+            return VariableGroupBy(self.groupby[key], key, self._fields[key])
 
     def __iter__(self) -> Iterator[Tuple[Any, "Table"]]:
         for name, group in self.groupby:
@@ -1225,12 +1267,14 @@ def pivot(
     return table
 
 
-def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[TableMeta]) -> Table:
+def _add_table_and_variables_metadata_to_table(
+    table: Table, metadata: Optional[TableMeta], origin: Optional[Origin]
+) -> Table:
     if metadata is not None:
         table.metadata = metadata
         for column in list(table.all_columns):
-            if "origins" in metadata.dataset.to_dict():  # type: ignore
-                table._fields[column].origins = metadata.dataset.origins  # type: ignore
+            if origin:
+                table._fields[column].origins = [origin]
             else:
                 table._fields[column].sources = metadata.dataset.sources  # type: ignore
             table._fields[column].licenses = metadata.dataset.licenses  # type: ignore
@@ -1242,12 +1286,13 @@ def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[
 def read_csv(
     filepath_or_buffer: Union[str, Path, IO[AnyStr]],
     metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
     underscore: bool = False,
     *args,
     **kwargs,
 ) -> Table:
     table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     if isinstance(filepath_or_buffer, (str, Path)):
         table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
     else:
@@ -1256,35 +1301,66 @@ def read_csv(
     return cast(Table, table)
 
 
+def read_fwf(
+    filepath_or_buffer: Union[FilePath, ReadCsvBuffer[bytes], ReadCsvBuffer[str]],
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_fwf(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    if isinstance(filepath_or_buffer, (str, Path)):
+        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
+    else:
+        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_fwf.")
+
+    return cast(Table, table)
+
+
 def read_feather(
     filepath: Union[str, Path],
     metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
     underscore: bool = False,
     *args,
     **kwargs,
 ) -> Table:
     table = Table(pd.read_feather(filepath, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     table = update_log(table=table, operation="load", parents=[filepath])
 
     return cast(Table, table)
 
 
 def read_excel(
-    io: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
+    io: Union[str, Path],
+    *args,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    **kwargs,
 ) -> Table:
     assert not isinstance(kwargs.get("sheet_name"), list), "Argument 'sheet_name' must be a string or an integer."
     table = Table(pd.read_excel(io=io, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     # Note: Maybe we should include the sheet name in parents.
     table = update_log(table=table, operation="load", parents=[io], inplace=False)
 
     return cast(Table, table)
 
 
-def read_from_records(data: Any, *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs):
+def read_from_records(
+    data: Any,
+    *args,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    **kwargs,
+):
     table = Table(pd.DataFrame.from_records(data=data, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     # NOTE: Parents could be passed as arguments, or extracted from metadata.
     table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
 
@@ -1292,10 +1368,15 @@ def read_from_records(data: Any, *args, metadata: Optional[TableMeta] = None, un
 
 
 def read_from_dict(
-    data: Dict[Any, Any], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
+    data: Dict[Any, Any],
+    *args,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    **kwargs,
 ) -> Table:
     table = Table(pd.DataFrame.from_dict(data=data, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     # NOTE: Parents could be passed as arguments, or extracted from metadata.
     table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
 
@@ -1305,12 +1386,13 @@ def read_from_dict(
 def read_json(
     path_or_buf: Union[str, Path, IO[AnyStr]],
     metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
     underscore: bool = False,
     *args,
     **kwargs,
 ) -> Table:
     table = Table(pd.read_json(path_or_buf=path_or_buf, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     if isinstance(path_or_buf, (str, Path)):
         table = update_log(table=table, operation="load", parents=[path_or_buf])
     else:
@@ -1325,6 +1407,7 @@ class ExcelFile(pd.ExcelFile):
         sheet_name: Union[str, int] = 0,
         *args,
         metadata: Optional[TableMeta] = None,
+        origin: Optional[Origin] = None,
         underscore: bool = False,
         **kwargs,
     ):
@@ -1332,7 +1415,7 @@ class ExcelFile(pd.ExcelFile):
         df = super().parse(sheet_name=sheet_name, *args, **kwargs)  # type: ignore
         table = Table(df, underscore=underscore, short_name=str(sheet_name))
         if metadata is not None:
-            table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+            table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
         # Note: Maybe we should include the sheet name in parents.
         table = update_log(table=table, operation="load", parents=[self.io], inplace=False)
 
@@ -1385,35 +1468,6 @@ def _add_processing_log_entry_to_each_variable(
             table._fields[column].processing_log = variables.add_entry_to_processing_log(
                 processing_log=table._fields[column].processing_log, **log_new_entry
             )
-
-    return table
-
-
-def assign_dataset_sources_origins_and_licenses_to_each_variable(table: Table) -> Table:
-    # Get sources, origins and licenses from the table dataset.
-    sources = []
-    origins = []
-    licenses = []
-    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
-        sources = table.metadata.dataset.sources  # type: ignore
-    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "origins"):
-        origins = table.metadata.dataset.origins  # type: ignore
-    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
-        licenses = table.metadata.dataset.licenses  # type: ignore
-
-    if len(sources) == len(licenses) == len(origins) == 0:
-        # There are no default sources/origins/licenses to assign to each variable.
-        return table
-
-    # If a variable does not have sources/origins/licenses defined, assign the ones from the dataset.
-    # Do this for all columns, including index columns.
-    for column in list(table.all_columns):
-        if len(table._fields[column].sources) == 0:
-            table._fields[column].sources = sources
-        if len(table._fields[column].origins) == 0:
-            table._fields[column].origins = origins
-        if len(table._fields[column].licenses) == 0:
-            table._fields[column].licenses = licenses
 
     return table
 

@@ -1,0 +1,9 @@
+tables:
+  plastic_fate_regions:
+    variables:
+      value:
+        title: Plastic waste by fate
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
