@@ -1,5 +1,6 @@
 from typing import List, Optional, Type
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Table
 from typing_extensions import Self
@@ -56,6 +57,51 @@ def expand_observations(
     return tb
 
 
+def add_indicators_conflict_rate(tb: Table, tb_regions: Table, columns_to_scale: List[str]) -> Table:
+    """Scale columns `columns_to_scale` based on the number of countries (and country-pairs) in each region and year.
+
+    For each indicator listed in `columns_to_scale`, two new columns are added to the table:
+    - `{indicator}_per_country`: the indicator value divided by the number of countries in the region and year.
+    - `{indicator}_per_country_pair`: the indicator value divided by the number of country-pairs in the region and year.
+
+    tb: Main table
+    tb_regions: Table with three columns: "year", "region", "num_countries". Gives the number of countries per region per year.
+    columns_to_scale: List with the names of the columns that need scaling. E.g. number_ongiong_conflicts -> number_ongiong_conflicts_per_country
+
+    NOTE: Only tested for COW-based state lists (COW, MIE).
+    """
+    # Sanity check 1: columns as expected in tb_regions
+    assert set(tb_regions.columns) == {
+        "year",
+        "region",
+        "number_countries",
+    }, f"Invalid columns in tb_regions {tb_regions.columns}"
+    # Sanity check 2: regions equivalent in both tables
+    regions_main = set(tb["region"])
+    regions_aux = set(tb_regions["region"])
+    assert regions_main == regions_aux, f"Regions in main table and tb_regions differ: {regions_main} vs {regions_aux}"
+
+    # Ensure full precision
+    tb_regions["number_countries"] = tb_regions["number_countries"].astype(float)
+
+    # Get number of country-pairs
+    tb_regions["number_country_pairs"] = (
+        tb_regions["number_countries"] * (tb_regions["number_countries"] - 1) / 2
+    ).astype(int)
+    # Add number of countries and number of country pairs to main table
+    tb = tb.merge(tb_regions, on=["year", "region"], how="left")
+
+    # Add normalised indicators
+    for col in columns_to_scale:
+        tb[f"{col}_per_country"] = (tb[col] / tb["number_countries"]).replace([np.inf, -np.inf], np.nan)
+        tb[f"{col}_per_country_pair"] = (tb[col] / tb["number_country_pairs"]).replace([np.inf, -np.inf], np.nan)
+
+    # Drop intermediate columns
+    tb = tb.drop(columns=["number_countries", "number_country_pairs"])
+
+    return tb
+
+
 class Normaliser:
     """Normalise indicators."""
 
@@ -71,14 +117,6 @@ class Normaliser:
 
         `tb` is expected to be the table cow_ssm_system from the cow_ssm dataset.
         """
-        tb["region"] = tb["ccode"].apply(cls.code_to_region)
-
-        # Get number of countries per region per year
-        tb = (
-            tb.groupby(["region", "year"], as_index=False)
-            .agg({cls.country_column: "nunique"})
-            .rename(columns={cls.country_column: "num_countries"})
-        )
         # Get number of country-pairs per region per year
         tb["num_country_pairs"] = (tb["num_countries"] * (tb["num_countries"] - 1) / 2).astype(int)
 

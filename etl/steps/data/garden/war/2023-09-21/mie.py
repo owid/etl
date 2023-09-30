@@ -33,11 +33,10 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
+from shared import add_indicators_conflict_rate, expand_observations
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-
-from .shared import expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -63,8 +62,8 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["mie"].reset_index()
     # Read table from COW codes
-    # ds_cow_ssm = paths.load_dataset("cow_ssm")
-    # tb_codes = ds_cow_ssm["cow_ssm_system"].reset_index()
+    ds_cow_ssm = paths.load_dataset("cow_ssm")
+    tb_regions = ds_cow_ssm["cow_ssm_regions"].reset_index()
 
     #
     # Process data.
@@ -129,9 +128,7 @@ def run(dest_dir: str) -> None:
 
     # Add normalised indicators
     log.info("war.mie: add normalised indicators")
-    # tb = COWNormaliser.add_indicators(
-    #     tb, tb_codes, columns_to_scale=["number_ongoing_conflicts", "number_new_conflicts"]
-    # )
+    tb = add_indicators_conflict_rate(tb, tb_regions, ["number_ongoing_conflicts", "number_new_conflicts"])
 
     # Add suffix with source name
     msk = tb["region"] != "World"
