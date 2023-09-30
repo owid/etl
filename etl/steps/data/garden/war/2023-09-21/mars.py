@@ -41,11 +41,14 @@ On regions:
 """
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+
+from .shared import expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -104,7 +107,12 @@ def run(dest_dir: str) -> None:
     tb = reduce_triplets(tb)
 
     log.info("war.mars: add all observation years")
-    tb = expand_observations(tb)
+    tb = expand_observations(
+        tb,
+        col_year_start="yrstart",
+        col_year_end="yrend",
+        col_deaths=["kialow", "kiahigh"],
+    )
 
     log.info("war.mars: aggregate numbers at warcode level")
     tb = aggregate_wars(tb)
@@ -130,10 +138,6 @@ def run(dest_dir: str) -> None:
     # Set index
     log.info("war.mars: set index")
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True).sort_index()
-
-    # Add short_name to table
-    log.info("war.mars: add shortname to table")
-    tb = Table(tb, short_name=paths.short_name)
 
     #
     # Save outputs.
@@ -202,47 +206,6 @@ def reduce_triplets(tb: Table) -> Table:
         }
     )
     assert tb.isna().sum().sum() == 0, "Unexpected NaNs were found!"
-
-    return tb
-
-
-def expand_observations(tb: Table) -> Table:
-    """Add entries to each triplet for all its years of activity.
-
-    - By default, a triplet only appears in a row, with the total number of fatalities and the year of start and end.
-    - This function expands these single entries in order to obtain a row per triplet + year of occurence.
-    - Deaths per year are estimated assuming uniform distribution.
-
-    Example
-
-        Input:
-
-        | warcode | campcode | ccode | year_start | year_end | deaths |
-        |---------|----------|-------|------------|----------|--------|
-        | 1       | 1        | 1     | 1990       | 1993     | 12     |
-
-        Output:
-
-        |  year | warcode | campcode | ccode | deaths |
-        |-------|---------|----------|-------|--------|
-        |  1990 |    1    |    1     | 1     |   3    |
-        |  1991 |    1    |    1     | 1     |   3    |
-        |  1992 |    1    |    1     | 1     |   3    |
-        |  1993 |    1    |    1     | 1     |   3    |
-
-    """
-    # Add an entry of the triplet ("warcode", "campcode", "ccode") per year
-    # For that we scale the number of deaths proportional to the duration of the conflict.
-    tb[["kialow", "kiahigh"]] = tb[["kialow", "kiahigh"]].div(tb["yrend"] - tb["yrstart"] + 1, "index").round()
-
-    ## Add missing years for each triplet ("warcode", "campcode", "ccode")
-    YEAR_MIN = tb["yrstart"].min()
-    YEAR_MAX = tb["yrend"].max()
-    tb_all_years = pd.DataFrame(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
-    tb = pd.DataFrame(tb)  # to prevent error "AttributeError: 'DataFrame' object has no attribute 'all_columns'"
-    tb = tb.merge(tb_all_years, how="cross")
-    ## Filter only entries that actually existed
-    tb = tb[(tb["year"] >= tb["yrstart"]) & (tb["year"] <= tb["yrend"])]
 
     return tb
 
@@ -317,7 +280,7 @@ def _create_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world_all_conf["conflict_type"] = "all"
 
     ## Combine
-    tb_ongoing = pd.concat(
+    tb_ongoing = pr.concat(
         [
             tb_ongoing_regions,
             tb_ongoing_world,
@@ -347,7 +310,7 @@ def _create_metrics_new(tb: Table) -> Table:
     tb_new_world_all_conf["conflict_type"] = "all"
     tb_new_world_all_conf["region"] = "World"
     ## Combine
-    tb_new = pd.concat(
+    tb_new = pr.concat(
         [tb_new_regions, tb_new_regions_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True
     )
     tb_new = tb_new.rename(columns={"yrstart": "year"})  # type: ignore

@@ -23,17 +23,13 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("war_mars.xls")
 
     # Read excel
-    dfs = pd.read_excel(snap.path, sheet_name=None)
-    # Load dataframe
-    if "ProjectMarsV1.1" not in dfs.keys():
-        raise ValueError("Sheet 'ProjectMarsV1.1' not found.")
-    df = dfs["ProjectMarsV1.1"]
+    tb = snap.read(sheet_name="ProjectMarsV1.1")
 
     #
     # Process data.
     #
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    # Change short_name (war_mars -> mars)
+    tb.m.short_name = paths.short_name
     # Ensure correct dtypes
     for col in ["startdate", "enddate"]:
         tb[col] = pd.to_datetime(tb[col])
