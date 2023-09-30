@@ -33,10 +33,11 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
-from shared import COWNormaliser
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+
+from .shared import expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -106,7 +107,13 @@ def run(dest_dir: str) -> None:
     )
 
     log.info("war.mie: expand observations")
-    tb = expand_observations(tb)
+    # tb = expand_observations(tb)
+    tb = expand_observations(
+        tb,
+        col_year_start="styear",
+        col_year_end="endyear",
+        col_deaths=["fatalmax", "fatalmin"]
+    )
 
     # estimate metrics
     log.info("war.mie: estimate metrics")
@@ -122,9 +129,9 @@ def run(dest_dir: str) -> None:
 
     # Add normalised indicators
     log.info("war.mie: add normalised indicators")
-    tb = COWNormaliser.add_indicators(
-        tb, tb_codes, columns_to_scale=["number_ongoing_conflicts", "number_new_conflicts"]
-    )
+    # tb = COWNormaliser.add_indicators(
+    #     tb, tb_codes, columns_to_scale=["number_ongoing_conflicts", "number_new_conflicts"]
+    # )
 
     # Add suffix with source name
     msk = tb["region"] != "World"
@@ -133,10 +140,6 @@ def run(dest_dir: str) -> None:
     # set index
     log.info("war.mie: set index")
     tb = tb.set_index(["year", "region", "hostility_level"], verify_integrity=True)
-
-    # Add short_name to table
-    log.info("war.mie: add shortname to table")
-    tb = Table(tb, short_name=paths.short_name)
 
     #
     # Save outputs.
@@ -192,36 +195,6 @@ def reshape_table(tb: Table) -> Table:
         tbs.append(tb_)
 
     tb = pr.concat(tbs, ignore_index=True)
-
-    return tb
-
-
-def expand_observations(tb: Table) -> Table:
-    """Expand to have a row per (year, conflict).
-
-    Parameters
-    ----------
-    tb : Table
-        Original table, where each row is a conflict with its start and end year.
-
-    Returns
-    -------
-    Table
-        Here, each conflict has as many rows as years of activity. Its deaths have been uniformly distributed among the years of activity.
-    """
-    # For that we scale the number of deaths proportional to the duration of the conflict.
-    tb[["fatalmax"]] = tb[["fatalmax"]].div(tb["endyear"] - tb["styear"] + 1, "index").round()
-    tb[["fatalmin"]] = tb[["fatalmin"]].div(tb["endyear"] - tb["styear"] + 1, "index").round()
-
-    # Add missing years for each triplet ("warcode", "campcode", "ccode")
-    YEAR_MIN = tb["styear"].min()
-    YEAR_MAX = tb["endyear"].max()
-    tb_all_years = pd.DataFrame(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
-    df = pd.DataFrame(tb)  # to prevent error "AttributeError: 'DataFrame' object has no attribute 'all_columns'"
-    df = df.merge(tb_all_years, how="cross")  # type: ignore
-    tb = Table(df, metadata=tb.metadata)
-    # Filter only entries that actually existed
-    tb = tb[(tb["year"] >= tb["styear"]) & (tb["year"] <= tb["endyear"])]
 
     return tb
 
@@ -325,7 +298,7 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new_world_alltypes["hostility_level"] = "all"
 
     # Combine
-    tb_new = pd.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pr.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True).sort_values(  # type: ignore
         by=["styear", "region", "hostility_level"]
     )
 
