@@ -63,8 +63,8 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["mie"].reset_index()
     # Read table from COW codes
-    ds_cow_ssm = paths.load_dataset("cow_ssm")
-    tb_codes = ds_cow_ssm["cow_ssm_system"].reset_index()
+    # ds_cow_ssm = paths.load_dataset("cow_ssm")
+    # tb_codes = ds_cow_ssm["cow_ssm_system"].reset_index()
 
     #
     # Process data.
@@ -112,7 +112,7 @@ def run(dest_dir: str) -> None:
         tb,
         col_year_start="styear",
         col_year_end="endyear",
-        cols_scale=["fatalmax", "fatalmin"]
+        cols_scale=["fatalmax", "fatalmin"],
     )
 
     # estimate metrics

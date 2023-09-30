@@ -5,8 +5,7 @@ import tempfile
 from pathlib import Path
 
 import chardet
-import pandas as pd
-from owid.catalog import Table
+import owid.catalog.processing as pr
 from owid.datautils.io import decompress_file
 from structlog import get_logger
 
@@ -33,57 +32,42 @@ def run(dest_dir: str) -> None:
     # Load inputs & create tables
     #
 
+    # List of tables
     tables = []
+
     # CSVs to tables
-    snapshots = {
-        "cow_extra_state.csv": {
-            "short_name": "extra_state",
-            "index": ["warnum", "ccode1", "ccode2"],
-        },
-        "cow_inter_state.csv": {
-            "short_name": "inter_state",
-            "index": ["warnum", "ccode", "side"],
-        },
-        "cow_non_state.csv": {
-            "short_name": "non_state",
-            "index": ["warnum", "sidea1"],
-        },
-    }
-    for snapshot_uri, snapshot_props in snapshots.items():
+    snapshots = [
+        ("cow_extra_state.csv", ["warnum", "ccode1", "ccode2"]),
+        ("cow_inter_state.csv", ["warnum", "ccode", "side"]),
+        ("cow_non_state.csv", ["warnum", "sidea1"]),
+    ]
+    for snapshot_uri, snapshot_index in snapshots:
         snap = paths.load_snapshot(snapshot_uri)
         encoding = infer_encoding(snap.path)
         log.info(f"cow: creating table from {snap.path}")
-        df = pd.read_csv(snap.path, encoding=encoding)
-        tb = Table(df, short_name=snapshot_props["short_name"], underscore=True)
-        tb = tb.set_index(snapshot_props["index"], verify_integrity=True)
+        tb = snap.read(encoding=encoding, underscore=True)
+        # tb = Table(df, short_name=snapshot_props["short_name"], underscore=True)
+        tb = tb.set_index(snapshot_index, verify_integrity=True)
         tables.append(tb)
+
     # ZIP to table
-    ## Intra-state
-    snap = paths.load_snapshot("cow_intra_state.zip")
-    with tempfile.TemporaryDirectory() as tmpdir:
-        decompress_file(snap.path, tmpdir)
-        path = os.path.join(
-            tmpdir, "INTRA-STATE WARS v5.1 CSV.csv"
-        )  # other file: "INTRA-STATE_State_participants v5.1 CSV.csv"
-        encoding = infer_encoding(path)
-        log.info(f"cow: creating table from {snap.path}")
-        df = pd.read_csv(path, encoding=encoding)
-        tb = Table(df, short_name="intra_state", underscore=True)
-        tb = tb.set_index(["warnum"], verify_integrity=True)
-        tables.append(tb)
-    ## Inter-state (dydadic)
-    snap = paths.load_snapshot("cow_inter_state_dyadic.zip")
-    with tempfile.TemporaryDirectory() as tmpdir:
-        decompress_file(snap.path, tmpdir)
-        path = os.path.join(
-            tmpdir, "directed_dyadic_war.csv"
-        )  # other file: "INTRA-STATE_State_participants v5.1 CSV.csv"
-        encoding = infer_encoding(path)
-        log.info(f"cow: creating table from {snap.path}")
-        df = pd.read_csv(path, encoding=encoding)
-        tb = Table(df, short_name="inter_state_dyadic", underscore=True)
-        tb = tb.set_index(["warnum", "disno", "year", "statea", "stateb"], verify_integrity=True)
-        tables.append(tb)
+    snapshots = [
+        ("cow_intra_state.zip", "INTRA-STATE WARS v5.1 CSV.csv", ["warnum"]),
+        ("cow_inter_state_dyadic.zip", "directed_dyadic_war.csv", ["warnum", "disno", "year", "statea", "stateb"]),
+    ]
+    for uri, fname, index in snapshots:
+        snap = paths.load_snapshot(uri)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            decompress_file(snap.path, tmpdir)
+            path = os.path.join(tmpdir, fname)  # other file: "INTRA-STATE_State_participants v5.1 CSV.csv"
+            encoding = infer_encoding(path)
+            log.info(f"cow: creating table from {snap.path}")
+            tb = pr.read_csv(
+                path, encoding=encoding, metadata=snap.to_table_metadata(), origin=snap.m.origin, underscore=True
+            )
+            tb = tb.set_index(index, verify_integrity=True)
+            tables.append(tb)
+
     #
     # Save outputs.
     #

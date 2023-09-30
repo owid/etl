@@ -291,7 +291,7 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
         tb,
         col_year_start="year_start",
         col_year_end="year_end",
-        cols_scale=["number_deaths_ongoing_conflicts"]
+        cols_scale=["number_deaths_ongoing_conflicts"],
     )
     # Estimate metrics (do the aggregations)
     log.info("war.cow: estimate metrics")
@@ -389,12 +389,8 @@ def aggregate_rows_by_periods_extra(tb: Table) -> Table:
     """
     # Get summation (assuming NaN=0) and flag stating if a NaN is found
     index = ["warnum", "conflict_type", "region", "year_start", "year_end"]
-    tb_nan = tb.groupby(index, as_index=False).agg(
-        {"battle_deaths": has_nan, "nonstate_deaths": has_nan}
-    )
-    tb_sum = tb.groupby(index, as_index=False).agg(
-        {"battle_deaths": sum, "nonstate_deaths": sum}
-    )
+    tb_nan = tb.groupby(index, as_index=False).agg({"battle_deaths": has_nan, "nonstate_deaths": has_nan})
+    tb_sum = tb.groupby(index, as_index=False).agg({"battle_deaths": sum, "nonstate_deaths": sum})
     tb = tb_nan.merge(tb_sum, on=index, suffixes=("_has_nan", "_sum"))
 
     # Obtain deaths threshold according to dataset description
@@ -520,12 +516,8 @@ def aggregate_rows_by_periods_inter(tb: Table) -> Table:
     """
     # Get summation (NaN if any NaN, and assuming NaN=0)
     index = ["warnum", "conflict_type", "region", "year_start", "year_end"]
-    tb_nan = tb.groupby(index, as_index=False).agg(
-        {"number_deaths_ongoing_conflicts": has_nan}
-    )
-    tb_sum = tb.groupby(index, as_index=False).agg(
-        {"number_deaths_ongoing_conflicts": sum}
-    )
+    tb_nan = tb.groupby(index, as_index=False).agg({"number_deaths_ongoing_conflicts": has_nan})
+    tb_sum = tb.groupby(index, as_index=False).agg({"number_deaths_ongoing_conflicts": sum})
     tb = tb_nan.merge(tb_sum, on=index, suffixes=("_has_nan", "_sum"))
 
     # Obtain deaths threshold according to dataset description

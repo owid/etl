@@ -5,7 +5,9 @@ from owid.catalog import Table
 from typing_extensions import Self
 
 
-def expand_observations(tb: Table, col_year_start: str, col_year_end: str, cols_scale: Optional[List[str]] = None, rounding: bool = True) -> Table:
+def expand_observations(
+    tb: Table, col_year_start: str, col_year_end: str, cols_scale: Optional[List[str]] = None, rounding: bool = True
+) -> Table:
     """Expand to have a row per (year, conflict).
 
     Example
