@@ -4,8 +4,6 @@ import os
 import tempfile
 
 import owid.catalog.processing as pr
-import pandas as pd
-from owid.catalog import Table
 from owid.datautils.io import decompress_file
 from structlog import get_logger
 
