@@ -23,15 +23,13 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("prio_v31.xls")
 
     # Load data from snapshot.
-    df = pd.read_excel(snap.path)
+    tb = snap.read()
 
     #
     # Process data.
     #
-    df = assign_dtypes(df)
+    tb = assign_dtypes(tb)
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
-
     tb = tb.set_index(["id", "year"], verify_integrity=True)
     #
     # Save outputs.
