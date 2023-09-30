@@ -33,10 +33,11 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
-from shared import add_indicators_conflict_rate, expand_observations
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+
+from .shared import add_indicators_conflict_rate, expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
