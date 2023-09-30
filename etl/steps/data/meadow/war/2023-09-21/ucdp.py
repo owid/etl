@@ -47,18 +47,13 @@ def run(dest_dir: str) -> None:
 
         # Load data from snapshot.
         if short_name == "geo":
-            df = pd.read_csv(snap.path, dtype={"gwnoa": "str"})
+            tb = snap.read_csv(dtype={"gwnoa": "str"})
         else:
-            df = pd.read_csv(snap.path)
+            tb = snap.read_csv()
 
-        # Create a new table and ensure all columns are snake-case.
-        tb = Table(df, short_name=short_name, underscore=True, camel_to_snake=True)
         # Set index
         tb = tb.set_index(props["index"], verify_integrity=True)
-        # Set origin for all indicators
-        assert snap.m.origin
-        for col in tb.columns:
-            tb[col].m.origins = [snap.m.origin]
+
         # Add table to list of tables.
         tables.append(tb)
 

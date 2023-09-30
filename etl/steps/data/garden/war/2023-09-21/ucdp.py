@@ -71,9 +71,9 @@ def run(dest_dir: str) -> None:
     _sanity_checks(ds_meadow)
 
     # Load relevant tables
-    tb_geo = ds_meadow["geo"].reset_index()
-    tb_conflict = ds_meadow["battle_related_conflict"].reset_index()
-    tb_prio = ds_meadow["prio_armed_conflict"].reset_index()
+    tb_geo = ds_meadow["ucdp_geo"].reset_index()
+    tb_conflict = ds_meadow["ucdp_battle_related_conflict"].reset_index()
+    tb_prio = ds_meadow["ucdp_prio_armed_conflict"].reset_index()
 
     # Keep only active conflicts
     log.info("war.ucdp: keep active conflicts")
@@ -146,10 +146,10 @@ def run(dest_dir: str) -> None:
 
 def _sanity_checks(ds: Dataset) -> None:
     """Check that the tables in the dataset are as expected."""
-    tb_geo = ds["geo"].reset_index()
-    tb_conflict = ds["battle_related_conflict"].reset_index()
-    tb_nonstate = ds["non_state"].reset_index()
-    tb_onesided = ds["one_sided"].reset_index()
+    tb_geo = ds["ucdp_geo"].reset_index()
+    tb_conflict = ds["ucdp_battle_related_conflict"].reset_index()
+    tb_nonstate = ds["ucdp_non_state"].reset_index()
+    tb_onesided = ds["ucdp_one_sided"].reset_index()
 
     # Battle-related conflict #
     # Check IDs
