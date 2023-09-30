@@ -149,7 +149,7 @@ class Snapshot:
             return self.read_csv(*args, **kwargs)
         elif self.metadata.file_extension == "feather":
             return self.read_feather(*args, **kwargs)
-        elif self.metadata.file_extension == "xlsx":
+        elif self.metadata.file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
             return self.read_excel(*args, **kwargs)
         elif self.metadata.file_extension == "json":
             return self.read_json(*args, **kwargs)
