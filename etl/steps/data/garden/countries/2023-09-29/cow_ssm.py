@@ -77,6 +77,7 @@ def run(dest_dir: str) -> None:
 
 
 def create_table_countries_in_region(tb_system: Table):
+    """Create table with number of countries per region per year."""
     # Create new table
     tb_regions = tb_system.copy()
     tb_regions["region"] = tb_regions["ccode"].apply(code_to_region)
@@ -87,6 +88,15 @@ def create_table_countries_in_region(tb_system: Table):
         .agg({"statenme": "nunique"})
         .rename(columns={"statenme": "number_countries"})
     )
+
+    # Get numbers for World
+    tb_regions_world = tb_regions.groupby(["year"], as_index=False).agg({"number_countries": "sum"})
+    tb_regions_world["region"] = "World"
+
+    # Combine
+    tb_regions = pr.concat([tb_regions, tb_regions_world], ignore_index=True)
+
+    # Add short name
     tb_regions.m.short_name = "cow_ssm_regions"
 
     # Check latest year is as expected, drop year column
