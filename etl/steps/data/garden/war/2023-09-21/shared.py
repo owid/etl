@@ -5,7 +5,7 @@ from owid.catalog import Table
 from typing_extensions import Self
 
 
-def expand_observations(tb: Table, col_year_start: str, col_year_end: str, col_deahts: Optional[str] = None) -> Table:
+def expand_observations(tb: Table, col_year_start: str, col_year_end: str, col_deaths: Optional[List[str]] = None, rounding: bool = True) -> Table:
     """Expand to have a row per (year, conflict).
 
     Example
@@ -37,8 +37,11 @@ def expand_observations(tb: Table, col_year_start: str, col_year_end: str, col_d
         Here, each conflict has as many rows as years of activity. Its deaths have been uniformly distributed among the years of activity.
     """
     # For that we scale the number of deaths proportional to the duration of the conflict.
-    if col_deahts:
-        tb[col_deahts] = (tb[col_deahts] / (tb[col_year_end] - tb[col_year_start] + 1)).copy_metadata(tb[col_deahts])
+    if col_deaths:
+        for col in col_deaths:
+            tb[col] = (tb[col] / (tb[col_year_end] - tb[col_year_start] + 1)).copy_metadata(tb[col])
+            if rounding:
+                tb[col] = tb[col].round()
 
     # Add missing years for each triplet ("warcode", "campcode", "ccode")
     YEAR_MIN = tb[col_year_start].min()
