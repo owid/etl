@@ -111,7 +111,7 @@ def run(dest_dir: str) -> None:
         tb,
         col_year_start="yrstart",
         col_year_end="yrend",
-        col_deaths=["kialow", "kiahigh"],
+        cols_scale=["kialow", "kiahigh"],
     )
 
     log.info("war.mars: aggregate numbers at warcode level")

@@ -126,7 +126,7 @@ def run(dest_dir: str) -> None:
         tb,
         col_year_start="startyear",
         col_year_end="endyear",
-        col_deaths=["totalfatalities"],
+        cols_scale=["totalfatalities"],
     )
 
     # Estimate metrics

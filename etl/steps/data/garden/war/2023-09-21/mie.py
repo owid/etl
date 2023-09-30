@@ -112,7 +112,7 @@ def run(dest_dir: str) -> None:
         tb,
         col_year_start="styear",
         col_year_end="endyear",
-        col_deaths=["fatalmax", "fatalmin"]
+        cols_scale=["fatalmax", "fatalmin"]
     )
 
     # estimate metrics
