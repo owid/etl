@@ -21,7 +21,7 @@ tables:
         unit: countries
         processing_level: minor
         description_processing: |-
-          We assign each sovereign state to a region based on the mapping:
+          We assign each sovereign state to a region based on the mapping (using ISD/COW codes):
 
             - Americas: 2-199
             - Europe: 200-399, 2558, 3375

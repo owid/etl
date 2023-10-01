@@ -20,7 +20,7 @@ tables:
         unit: countries
         processing_level: minor
         description_processing: |-
-          We use the list of independent states and microstates from Gleditsch and Ward. We assign each country to a region based on the mapping:
+          We use the list of independent states and microstates from Gleditsch and Ward. We assign each country to a region based on the mapping (using GW codes):
 
             - Americas: 2-199
             - Europe: 200-399
