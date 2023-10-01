@@ -21,10 +21,10 @@ definitions:
       <%- elif hostility_level == "War" -%>
       The number of interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year
       <%- endif -%>
-    description_processing: &description_processing_ongoing |-
-      We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
-
-      The hostility level for a conflict overall is the highest level across all world regions.
+    description_key: &description_key_ongoing
+      - *interstate_conflict
+      - We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+      - The hostility level for a conflict overall is the highest level across all world regions.
 
   number_new_conflicts:
     description_short: |-
@@ -39,16 +39,15 @@ definitions:
       <%- elif hostility_level == "War" -%>
       The number of new interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year
       <%- endif -%>
-    description_processing: &description_processing_new |-
-      We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
-
-      We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
-
-      The hostility level for a conflict overall is the highest level across all world regions.
+    description_key: &description_key_new
+      - *interstate_conflict
+      - We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
+      - We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
+      - The hostility level for a conflict overall is the highest level across all world regions.
 
   number_deaths:
-    description_processing: &description_processing_deaths |-
-      Deaths of combatants due to fighting are included.
+    description_key: &description_key_deaths
+      - Deaths of combatants due to fighting are included.
 
 dataset:
   title: History of war (Gibler and Miller, 2020)
@@ -85,9 +84,7 @@ tables:
         unit: conflicts
         description_short: |-
           {definitions.number_ongoing_conflicts.description_short}.
-        description_key:
-          - *interstate_conflict
-        description_processing: *description_processing_ongoing
+        description_key: *description_key_ongoing
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -100,9 +97,7 @@ tables:
         unit: conflicts per country
         description_short: |-
           {definitions.number_ongoing_conflicts.description_short}, divided by the number of countries in the region.
-        description_key:
-          - *interstate_conflict
-        description_processing: *description_processing_ongoing
+        description_key: *description_key_ongoing
         processing_level: major
         display:
           numDecimalPlaces: 3
@@ -115,9 +110,7 @@ tables:
         unit: conflicts per country-pair
         description_short: |-
           {definitions.number_ongoing_conflicts.description_short}, divided by the number of country-pairs in the region.
-        description_key:
-          - *interstate_conflict
-        description_processing: *description_processing_ongoing
+        description_key: *description_key_ongoing
         processing_level: major
         display:
           numDecimalPlaces: 5
@@ -133,9 +126,7 @@ tables:
         unit: conflicts
         description_short: |-
           {definitions.number_new_conflicts.description_short}.
-        description_key:
-          - *interstate_conflict
-        description_processing: *description_processing_new
+        description_key: *description_key_new
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -148,9 +139,7 @@ tables:
         unit: conflicts per country
         description_short: |-
           {definitions.number_new_conflicts.description_short}, divided by the number of countries in the region.
-        description_key:
-          - *interstate_conflict
-        description_processing: *description_processing_new
+        description_key: *description_key_new
         processing_level: major
         display:
           numDecimalPlaces: 3
@@ -163,9 +152,7 @@ tables:
         unit: conflicts per country-pair
         description_short: |-
             {definitions.number_new_conflicts.description_short}, divided by the number of country-pairs in the region.
-        description_key:
-          - *interstate_conflict
-        description_processing: *description_processing_new
+        description_key: *description_key_new
         processing_level: major
         display:
           numDecimalPlaces: 5
@@ -181,9 +168,7 @@ tables:
         unit: deaths
         description_short: |-
           The low estimate of the number of deaths in all ongoing interstate conflicts in each year.
-        description_key:
-          - *interstate_conflict
-        description_processing: *description_processing_deaths
+        description_key: *description_key_deaths
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -196,9 +181,7 @@ tables:
         unit: deaths
         description_short: |-
           The high estimate of the number of deaths in all ongoing interstate conflicts in each year.
-        description_key:
-          - *interstate_conflict
-        description_processing: *description_processing_deaths
+        description_key: *description_key_deaths
         processing_level: major
         display:
           numDecimalPlaces: 0
