@@ -4,7 +4,7 @@
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/dataset/
 dataset:
-  title: Countries in regions (COW)
+  title: States in regions (COW)
   update_period_days: 1800
 
 
@@ -12,16 +12,16 @@ dataset:
 # http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/tables/
 tables:
   cow_ssm_regions:
-    title: Countries in regions (COW)
+    title: States in regions (COW)
     variables:
       number_countries:
-        title: Number of countries in a region
+        title: Number of states in a region
         description_short: |-
-          Number of countries listed in the state membership list for a given region.
+          Number of states listed in the state system membership list for a given region.
         unit: countries
         processing_level: minor
         description_processing: |-
-          We use the state system membership from Correlates of War. We assign each country to a region based on their COW codes:
+          We use the state system membership from Correlates of War. We assign each country to a region based on the mapping (using COW codes):
 
             - Americas: 2-165
             - Europe: 200-399
