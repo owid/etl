@@ -4,7 +4,7 @@
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/dataset/
 dataset:
-  title: Countries in regions (ISD)
+  title: States in regions (ISD)
   update_period_days: 1400
 
 
@@ -12,26 +12,22 @@ dataset:
 # http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/tables/
 tables:
   isd_regions:
-    title: Countries in regions (ISD)
+    title: States in regions (ISD)
     variables:
       number_countries:
-        title: Number of countries in a region
+        title: Number of states in a region
         description_short: |-
-          Number of countries listed in the list of states and microstates in each region.
+          Number of sovereign states in each region.
         unit: countries
         processing_level: minor
         description_processing: |-
-          We assign each country to a region based on their codes:
+          We assign each sovereign state to a region based on the mapping:
 
             - Americas: 2-199
             - Europe: 200-399, 2558, 3375
             - Africa: 400-626, 4044-6257
             - Middle East: 630-699, 6821-6845
             - Asia and Oceania: 700-999, 7003-9210
-
-          Additionally, we provide regions:
-            - Sub-Saharan Africa: X
-            - North Africa and Middle East: Y
 
         display:
           numDecimalPlaces: 0
