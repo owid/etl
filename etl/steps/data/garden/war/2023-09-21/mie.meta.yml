@@ -8,6 +8,7 @@ definitions:
       - Middle East
     interstate_conflict: &interstate_conflict |-
       An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
+
   number_ongoing_conflicts:
     description_short: |-
       <%- if hostility_level == "all" -%>
