@@ -64,11 +64,13 @@ def add_indicators_conflict_rate(tb: Table, tb_regions: Table, columns_to_scale:
     - `{indicator}_per_country`: the indicator value divided by the number of countries in the region and year.
     - `{indicator}_per_country_pair`: the indicator value divided by the number of country-pairs in the region and year.
 
+    TODO: add metadata to derived columns? can't do atm bc metadata of the original columns is added after creating the dataset.
+
     tb: Main table
     tb_regions: Table with three columns: "year", "region", "num_countries". Gives the number of countries per region per year.
     columns_to_scale: List with the names of the columns that need scaling. E.g. number_ongiong_conflicts -> number_ongiong_conflicts_per_country
 
-    NOTE: Only tested for COW-based state lists (COW, MIE).
+    NOTE: Only tested for COW-based state lists (MIE).
     """
     # Sanity check 1: columns as expected in tb_regions
     assert set(tb_regions.columns) == {
@@ -92,9 +94,13 @@ def add_indicators_conflict_rate(tb: Table, tb_regions: Table, columns_to_scale:
     tb = tb.merge(tb_regions, on=["year", "region"], how="left")
 
     # Add normalised indicators
-    for col in columns_to_scale:
-        tb[f"{col}_per_country"] = (tb[col] / tb["number_countries"]).replace([np.inf, -np.inf], np.nan)
-        tb[f"{col}_per_country_pair"] = (tb[col] / tb["number_country_pairs"]).replace([np.inf, -np.inf], np.nan)
+    for column_name in columns_to_scale:
+        # Add per country indicator
+        column_name_new = f"{column_name}_per_country"
+        tb[column_name_new] = (tb[column_name] / tb["number_countries"]).replace([np.inf, -np.inf], np.nan)
+        # Add per country-pair indicator
+        column_name_new = f"{column_name}_per_country_pair"
+        tb[column_name_new] = (tb[column_name] / tb["number_country_pairs"]).replace([np.inf, -np.inf], np.nan)
 
     # Drop intermediate columns
     tb = tb.drop(columns=["number_countries", "number_country_pairs"])
