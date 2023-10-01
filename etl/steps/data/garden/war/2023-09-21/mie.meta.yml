@@ -1,3 +1,55 @@
+definitions:
+  all:
+    selectedEntityNames: &selected_entities
+      - Africa
+      - Americas
+      - Asia and Oceania
+      - Europe
+      - Middle East
+    interstate_conflict: &interstate_conflict |-
+      An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
+  number_ongoing_conflicts:
+    description_short: |-
+      <%- if hostility_level == "all" -%>
+      The number of all ongoing interstate conflicts in each year
+      <%- elif hostility_level == "Threat to use force" -%>
+      The number of interstate conflicts where at most the use of force is threatened in each year
+      <%- elif hostility_level == "Display of force" -%>
+      The number of interstate conflicts where at most force is displayed in each year
+      <%- elif hostility_level == "Use of force" -%>
+      The number of interstate conflicts where force is used, but causes fewer than 1,000 combatant deaths due to fighting, in each year
+      <%- elif hostility_level == "War" -%>
+      The number of interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year
+      <%- endif -%>
+    description_processing: &description_processing_ongoing |-
+      We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+
+      The hostility level for a conflict overall is the highest level across all world regions.
+
+  number_new_conflicts:
+    description_short: |-
+      <%- if hostility_level == "all" -%>
+      The number of all new interstate conflicts in each year
+      <%- elif hostility_level == "Threat to use force" -%>
+      The number of new interstate conflicts where at most the use of force is threatened in each year
+      <%- elif hostility_level == "Display of force" -%>
+      The number of new interstate conflicts where at most force is displayed in each year
+      <%- elif hostility_level == "Use of force" -%>
+      The number of new interstate conflicts where force is used, but causes fewer at least 1,000 combatant deaths due to fighting, in each year
+      <%- elif hostility_level == "War" -%>
+      The number of new interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year
+      <%- endif -%>
+    description_processing: &description_processing_new |-
+      We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
+
+      We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
+
+      The hostility level for a conflict overall is the highest level across all world regions.
+
+  number_deaths:
+    description_processing: &description_processing_deaths |-
+      Deaths of combatants due to fighting are included.
+
 dataset:
   title: History of war (Gibler and Miller, 2020)
   description: |-
@@ -32,90 +84,46 @@ tables:
         title: Number of ongoing conflicts
         unit: conflicts
         description_short: |-
-          <% if hostility_level == "all" %>
-          The number of all ongoing interstate conflicts in each year.
-          <% elif hostility_level == "Threat to use force" %>
-          The number of interstate conflicts where at most the use of force is threatened in each year.
-          <% elif hostility_level == "Display of force" %>
-          The number of interstate conflicts where at most force is displayed in each year.
-          <% elif hostility_level == "Use of force" %>
-          The number of interstate conflicts where force is used, but causes fewer than 1,000 combatant deaths due to fighting, in each year.
-          <% elif hostility_level == "War" %>
-          The number of interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year.
-          <% endif %>
+          {definitions.number_ongoing_conflicts.description_short}.
         description_key:
-          - An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
-        description_processing: |-
-          We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
-
-          The hostility level for a conflict overall is the highest level across all world regions.
+          - *interstate_conflict
+        description_processing: *description_processing_ongoing
         processing_level: major
         display:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            selectedEntityNames:
-              - Africa
-              - Americas
-              - Asia and Oceania
-              - Europe
-              - Middle East
+            selectedEntityNames: *selected_entities
 
       number_ongoing_conflicts_per_country:
         title: Number of ongoing conflicts per country
         unit: conflicts per country
         description_short: |-
-          <%- if hostility_level == "all" -%>
-          The number of all ongoing interstate conflicts in each year
-          <%- elif hostility_level == "Threat to use force" -%>
-          The number of interstate conflicts where at most the use of force is threatened in each year
-          <%- elif hostility_level == "Display of force" -%>
-          The number of interstate conflicts where at most force is displayed in each year
-          <%- elif hostility_level == "Use of force" -%>
-          The number of interstate conflicts where force is used, but causes fewer than 1,000 combatant deaths due to fighting, in each year
-          <%- elif hostility_level == "War" -%>
-          The number of interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year
-          <%- endif -%>
-          , divided by the number of countries in the region.
+          {definitions.number_ongoing_conflicts.description_short}, divided by the number of countries in the region.
+        description_key:
+          - *interstate_conflict
+        description_processing: *description_processing_ongoing
         processing_level: major
         display:
           numDecimalPlaces: 3
         presentation:
           grapher_config:
-            selectedEntityNames:
-              - Africa
-              - Americas
-              - Asia and Oceania
-              - Europe
-              - Middle East
+            selectedEntityNames: *selected_entities
 
       number_ongoing_conflicts_per_country_pair:
         title: Number of ongoing conflicts per country-pair
         unit: conflicts per country-pair
         description_short: |-
-          <%- if hostility_level == "all" -%>
-          The number of all ongoing interstate conflicts in each year
-          <%- elif hostility_level == "Threat to use force" -%>
-          The number of interstate conflicts where at most the use of force is threatened in each year
-          <%- elif hostility_level == "Display of force" -%>
-          The number of interstate conflicts where at most force is displayed in each year
-          <%- elif hostility_level == "Use of force" -%>
-          The number of interstate conflicts where force is used, but causes fewer than 1,000 combatant deaths due to fighting, in each year
-          <%- elif hostility_level == "War" -%>
-          The number of interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year
-          <%- endif -%>
-          , divided by the number of country-pairs in the region.
+          {definitions.number_ongoing_conflicts.description_short}, divided by the number of country-pairs in the region.
+        description_key:
+          - *interstate_conflict
+        description_processing: *description_processing_ongoing
         processing_level: major
         display:
           numDecimalPlaces: 5
         presentation:
           grapher_config:
-            selectedEntityNames:
-              - Africa
-              - Americas
-              - Asia and Oceania
-              - Europe
-              - Middle East
+            selectedEntityNames: *selected_entities
 
       #################
       # New conflicts #
@@ -124,92 +132,46 @@ tables:
         title: Number of new conflicts
         unit: conflicts
         description_short: |-
-          <% if hostility_level == "all" %>
-          The number of all new interstate conflicts in each year.
-          <% elif hostility_level == "Threat to use force" %>
-          The number of new interstate conflicts where at most the use of force is threatened in each year.
-          <% elif hostility_level == "Display of force" %>
-          The number of new interstate conflicts where at most force is displayed in each year.
-          <% elif hostility_level == "Use of force" %>
-          The number of new interstate conflicts where force is used, but causes fewer at least 1,000 combatant deaths due to fighting, in each year.
-          <% elif hostility_level == "War" %>
-          The number of new interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year.
-          <% endif %>
+          {definitions.number_new_conflicts.description_short}.
         description_key:
-          - A new interstate conflict is a disagreement between states where force is threatened, displayed, or used for the first time.
-        description_processing: |-
-          We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
-
-          We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
-
-          The hostility level for a conflict overall is the highest level across all world regions.
+          - *interstate_conflict
+        description_processing: *description_processing_new
         processing_level: major
         display:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            selectedEntityNames:
-              - Africa
-              - Americas
-              - Asia and Oceania
-              - Europe
-              - Middle East
+            selectedEntityNames: *selected_entities
 
       number_new_conflicts_per_country:
         title: Number of new conflicts per country
         unit: conflicts per country
         description_short: |-
-          <%- if hostility_level == "all" -%>
-          The number of all new interstate conflicts in each year
-          <%- elif hostility_level == "Threat to use force" -%>
-          The number of new interstate conflicts where at most the use of force is threatened in each year
-          <%- elif hostility_level == "Display of force" -%>
-          The number of new interstate conflicts where at most force is displayed in each year
-          <%- elif hostility_level == "Use of force" -%>
-          The number of new interstate conflicts where force is used, but causes fewer at least 1,000 combatant deaths due to fighting, in each year
-          <%- elif hostility_level == "War" -%>
-          The number of new interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year
-          <%- endif -%>
-          , divided by the number of countries in the region.
+          {definitions.number_new_conflicts.description_short}, divided by the number of countries in the region.
+        description_key:
+          - *interstate_conflict
+        description_processing: *description_processing_new
         processing_level: major
         display:
           numDecimalPlaces: 3
         presentation:
           grapher_config:
-            selectedEntityNames:
-              - Africa
-              - Americas
-              - Asia and Oceania
-              - Europe
-              - Middle East
+            selectedEntityNames: *selected_entities
 
       number_new_conflicts_per_country_pair:
         title: Number of new conflicts per country-pair
         unit: conflicts per country-pair
         description_short: |-
-          <%- if hostility_level == "all" -%>
-          The number of all new interstate conflicts in each year
-          <%- elif hostility_level == "Threat to use force" -%>
-          The number of new interstate conflicts where at most the use of force is threatened in each year
-          <%- elif hostility_level == "Display of force" -%>
-          The number of new interstate conflicts where at most force is displayed in each year
-          <%- elif hostility_level == "Use of force" -%>
-          The number of new interstate conflicts where force is used, but causes fewer at least 1,000 combatant deaths due to fighting, in each year
-          <%- elif hostility_level == "War" -%>
-          The number of new interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year
-          <%- endif -%>
-          , divided by the number of country-pairs in the region.
+            {definitions.number_new_conflicts.description_short}, divided by the number of country-pairs in the region.
+        description_key:
+          - *interstate_conflict
+        description_processing: *description_processing_new
         processing_level: major
         display:
           numDecimalPlaces: 5
         presentation:
           grapher_config:
-            selectedEntityNames:
-              - Africa
-              - Americas
-              - Asia and Oceania
-              - Europe
-              - Middle East
+            selectedEntityNames: *selected_entities
 
       ###############################
       # Deaths in ongoing conflicts #
@@ -220,20 +182,14 @@ tables:
         description_short: |-
           The low estimate of the number of deaths in all ongoing interstate conflicts in each year.
         description_key:
-          - An ongoing interstate conflict is a disagreement between states where force is threatened, displayed, or used.
-        description_processing: |-
-          Deaths of combatants due to fighting are included.
+          - *interstate_conflict
+        description_processing: *description_processing_deaths
         processing_level: major
         display:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            selectedEntityNames:
-              - Africa
-              - Americas
-              - Asia and Oceania
-              - Europe
-              - Middle East
+            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_high:
         title: Number of deaths in ongoing conflicts (high estimate)
@@ -241,17 +197,11 @@ tables:
         description_short: |-
           The high estimate of the number of deaths in all ongoing interstate conflicts in each year.
         description_key:
-          - An ongoing interstate conflict is a disagreement between states where force is threatened, displayed, or used.
-        description_processing: |-
-          Deaths of combatants due to fighting are included.
+          - *interstate_conflict
+        description_processing: *description_processing_deaths
         processing_level: major
         display:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            selectedEntityNames:
-              - Africa
-              - Americas
-              - Asia and Oceania
-              - Europe
-              - Middle East
+            selectedEntityNames: *selected_entities

@@ -59,9 +59,9 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("mie")
-
     # Read table from meadow dataset.
     tb = ds_meadow["mie"].reset_index()
+
     # Read table from COW codes
     ds_cow_ssm = paths.load_dataset("cow_ssm")
     tb_regions = ds_cow_ssm["cow_ssm_regions"].reset_index()
