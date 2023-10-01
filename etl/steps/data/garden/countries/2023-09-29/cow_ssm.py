@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 # Only for table tb_regions:
 # The current list of members goes until 2016, we artificially extend it until 2023, preserving the last value
 EXPECTED_LAST_YEAR = 2016
-LAST_YEAR = 2023  # Update to extend it further in time
+LAST_YEAR = 2022  # Update to extend it further in time
 
 
 def run(dest_dir: str) -> None:
@@ -61,8 +61,6 @@ def run(dest_dir: str) -> None:
         tb_majors.set_index(["ccode", "styear", "stmonth", "stday", "endyear", "endmonth", "endday"]).sort_index(),
         tb_regions.set_index(["region", "year"], verify_integrity=True).sort_index(),
     ]
-
-    # tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
     # Save outputs.
