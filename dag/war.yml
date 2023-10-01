@@ -70,6 +70,7 @@ steps:
     - snapshot://war/2023-09-21/cow_non_state.csv
   data://garden/war/2023-09-21/cow:
     - data://meadow/war/2023-09-21/cow
+    - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/war/2023-09-21/cow:
     - data://garden/war/2023-09-21/cow
 

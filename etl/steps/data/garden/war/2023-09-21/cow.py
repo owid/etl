@@ -87,7 +87,7 @@ from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
-from .shared import expand_observations
+from .shared import add_indicators_conflict_rate, expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -129,6 +129,10 @@ def run(dest_dir: str) -> None:
     log.info("war.cow: load data")
     tb_extra, tb_nonstate, tb_inter, tb_intra = load_tables(ds_meadow)
 
+    # Read table from COW codes
+    ds_cow_ssm = paths.load_dataset("cow_ssm")
+    tb_regions = ds_cow_ssm["cow_ssm_regions"].reset_index()
+
     # Check that there are no overlapping warnums between tables
     log.info("war.cow: check overlapping warnum in tables")
     _check_overlapping_warnum(tb_extra, tb_nonstate, tb_inter, tb_intra)
@@ -147,6 +151,7 @@ def run(dest_dir: str) -> None:
         tb_nonstate=tb_nonstate,
         tb_inter=tb_inter,
         tb_intra=tb_intra,
+        tb_regions=tb_regions,
     )
 
     # Set new short_name
@@ -219,7 +224,7 @@ def load_tables(ds: Dataset) -> Tuple[Table, Table, Table, Table]:
     return tb_extra, tb_nonstate, tb_inter, tb_intra
 
 
-def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intra: Table) -> Table:
+def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intra: Table, tb_regions: Table) -> Table:
     """Combine the tables from all four different conflict types.
 
     The original data comes in separate tables: extra-, non-, inter- and intra-state.
@@ -297,6 +302,13 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
     log.info("war.cow: estimate metrics")
     tb = estimate_metrics(tb)
 
+    # Replace missing values with zeroes
+    log.info("war.cow: replace missing values with zeroes")
+    tb = replace_missing_data_with_zeros(tb)
+
+    log.info("war.cow: map fatality codes to names")
+    tb = add_indicators_conflict_rate(tb, tb_regions, ["number_ongoing_conflicts", "number_new_conflicts"])
+
     # Add suffix with source name
     msk = tb["region"] != "World"
     tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (COW)"
@@ -306,10 +318,6 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
     assert (
         not tb["number_deaths_ongoing_conflicts"].isna().any()
     ), "Some NaNs found in `number_deaths_ongoing_conflicts`!"
-
-    # Replace missing values with zeroes
-    log.info("war.cow: replace missing values with zeroes")
-    tb = replace_missing_data_with_zeros(tb)
 
     # Set index
     log.info("war.cow: set index")
