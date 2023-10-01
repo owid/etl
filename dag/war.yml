@@ -78,6 +78,7 @@ steps:
     - snapshot://war/2023-09-21/cow_mid.zip
   data://garden/war/2023-09-21/cow_mid:
     - data://meadow/war/2023-09-21/cow_mid
+    - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/war/2023-09-21/cow_mid:
     - data://garden/war/2023-09-21/cow_mid
 

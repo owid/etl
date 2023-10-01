@@ -47,7 +47,7 @@ from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
-from .shared import expand_observations
+from .shared import add_indicators_conflict_rate, expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -80,10 +80,13 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("cow_mid")
-
     # Read table from meadow dataset.
     tb_a = ds_meadow["mida"].reset_index()
     tb_b = ds_meadow["midb"].reset_index()
+
+    # Read table from COW codes
+    ds_cow_ssm = paths.load_dataset("cow_ssm")
+    tb_regions = ds_cow_ssm["cow_ssm_regions"].reset_index()
 
     #
     # Process data.
@@ -114,12 +117,16 @@ def run(dest_dir: str) -> None:
     tb["hostility"] = tb["hostility"].map(HOSTILITY_LEVEL_MAP | {"all": "all"})
     assert tb["hostility"].notna().all(), "Unmapped hostility codes!"
 
+    log.info("war.cow_mid: replace NaNs with zeros where applicable")
+    tb = replace_missing_data_with_zeros(tb)
+
+    # Add normalised indicators
+    log.info("war.mie: add normalised indicators")
+    tb = add_indicators_conflict_rate(tb, tb_regions, ["number_ongoing_disputes", "number_new_disputes"])
+
     # Add suffix with source name
     msk = tb["region"] != "World"
     tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (COW)"
-
-    log.info("war.cow_mid: replace NaNs with zeros where applicable")
-    tb = replace_missing_data_with_zeros(tb)
 
     # Set index
     log.info("war.cow_mid: set index")
