@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
         with z.open("peacedata3.1/peacedata3.1.csv") as f:
 
             # read the dataset
-            tb = pr.read_fwf(f, header=None, names=["data"], metadata=snap.to_table_metadata())
+            tb = pr.read_fwf(f, header=None, names=["data"], metadata=snap.to_table_metadata(), origin=snap.m.origin)
 
     meta_origins = tb["data"].metadata.origins
 

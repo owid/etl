@@ -31,7 +31,6 @@ def run(dest_dir: str) -> None:
     )
 
     tb = combined_df.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
-
     #
     # Save outputs.
     #
