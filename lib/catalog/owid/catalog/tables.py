@@ -1614,24 +1614,6 @@ def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
     return pd.unique(sources).tolist()
 
 
-def get_unique_origins_from_tables(tables: List[Table]) -> List[Origin]:
-    # First, ensure only "origins" (and not "sources") are used in the variables.
-    if any(
-        [
-            ("sources" in table[column].metadata.to_dict()) and (len(table[column].metadata.sources) > 0)
-            for table in tables
-            for column in table.columns
-        ]
-    ):
-        log.warning("Origins and sources mixed in tables. The resulting dataset may not include all origins.")
-
-    # Make a list of all origins of all variables in all tables.
-    origins = sum([table._fields[column].origins for table in tables for column in list(table.all_columns)], [])
-
-    # Get unique array of tuples of source fields (respecting the order).
-    return pd.unique(origins).tolist()
-
-
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     # Make a list of all licenses of all variables in all tables.
     licenses = sum([table._fields[column].licenses for table in tables for column in list(table.all_columns)], [])
