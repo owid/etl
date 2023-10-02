@@ -120,9 +120,8 @@ def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source
     """
     Combine two tables with a preference for one source of data.
     """
-    tb_combined = pr.concat([tb_a, tb_b]).sort_values(["country", "year", "source"])
-    assert any(tb_combined["source"] == preferred_source)
-    tb_combined.metadata.short_name = table_name
+    tb_combined = pr.concat([tb_a, tb_b]).sort_values(["country", "year", "source"], short_name=table_name)
+    assert any(tb_combined["source"] == preferred_source), "Preferred source not in table!"
     tb_combined = remove_duplicates(
         tb_combined,
         preferred_source=preferred_source,
@@ -149,7 +148,7 @@ def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -
 
     tb = pr.concat([tb_no_duplicates, tb_duplicates_removed])
 
-    assert len(tb[tb.duplicated(subset=dimensions, keep=False)]) == 0
+    assert len(tb[tb.duplicated(subset=dimensions, keep=False)]) == 0, "Duplicates still in table!"
 
     return tb
 
@@ -181,9 +180,11 @@ def calculate_under_fifteen_deaths(tb: Table) -> Table:
         )
     )
     tb_u15 = pr.merge(tb_u5, tb_5_14)
-    tb_u15["under_fifteen_mortality"] = tb_u15["under_five_mortality"] + tb_u15["five_to_fourteen_mortality"]
-    tb_u15["under_fifteen_mortality_lb"] = tb_u15["under_five_mortality_lb"] + tb_u15["five_to_fourteen_mortality_lb"]
-    tb_u15["under_fifteen_mortality_ub"] = tb_u15["under_five_mortality_ub"] + tb_u15["five_to_fourteen_mortality_ub"]
+
+    for suffix in ["", "_lb", "_ub"]:
+        tb_u15[f"under_fifteen_mortality{suffix}"] = (
+            tb_u15[f"under_five_mortality{suffix}"] + tb_u15[f"five_to_fourteen_mortality{suffix}"]
+        )
 
     tb_u15 = tb_u15.drop(
         columns=[
