@@ -122,6 +122,11 @@ def create_table_countries_in_region(tb: Table) -> Table:
         .agg({"cownum": "nunique"})
         .rename(columns={"cownum": "number_countries"})
     )
+
+    # The code below is commented (and not deleted) in case we wanted to use it in the future
+    # It tries to add other regions to the table (possible overlapping with the existing ones)
+    # The code should be checked again, as it might be outdated and not work
+    #
     # Same as before, but with an alternate region set. Basically, instead of (Africa, Middle East) -> (Sub-Saharan Africa, North Africa & Middle East)
     # tb["region_alt"] = tb["cownum"].apply(code_to_region_alt)
     # tb_regions_alt = (
@@ -168,7 +173,10 @@ def code_to_region(cow_code: int) -> str:
 
 
 def code_to_region_alt(cow_code: int) -> str:
-    """Convert code to region name."""
+    """Convert code to (alternative) region name.
+
+    Adds regions that might overlap with the existing ones.
+    """
     match cow_code:
         case c if (630 <= c <= 698) or (6821 <= c <= 6845):
             return "North Africa and the Middle East"

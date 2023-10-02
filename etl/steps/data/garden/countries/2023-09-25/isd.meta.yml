@@ -23,11 +23,11 @@ tables:
         description_processing: |-
           We assign each sovereign state to a region based on the mapping (using ISD/COW codes):
 
-            - Americas: 2-199
-            - Europe: 200-399, 2558, 3375
+            - Americas: 2-165
+            - Europe: 200-395, 2558, 3375
             - Africa: 400-626, 4044-6257
-            - Middle East: 630-699, 6821-6845
-            - Asia and Oceania: 700-999, 7003-9210
+            - Middle East: 630-698, 6821-6845
+            - Asia and Oceania: 700-990, 7003-9210
 
         display:
           numDecimalPlaces: 0
@@ -113,7 +113,7 @@ tables:
         description_from_producer: |-
           Was there ambiguity on the start type?
       startsettle:
-        title: State creation settlmenet
+        title: State creation settlement
         description_from_producer: |-
           Was there a treaty or formal settlement attending the birth of the state?
       end_am:
