@@ -357,6 +357,9 @@ class PathFinder:
         if is_private is None:
             self.is_private = False
 
+        # Default logger
+        self.log = structlog.get_logger("something", step=f"{self.namespace}/{self.channel}/{self.version}/{self.short_name}")
+
     @property
     def channel(self) -> str:
         return self.f.parent.parent.parent.name
