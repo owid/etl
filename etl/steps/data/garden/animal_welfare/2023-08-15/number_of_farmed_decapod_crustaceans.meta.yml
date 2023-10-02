@@ -20,7 +20,7 @@ tables:
         presentation:
           attribution: *attribution
           grapher_config:
-            subtitle: Decapod crustaceans are animals such as shrimps, crabs, lobsters, prawns, and crayfish.
+            subtitle: &subtitle Decapod crustaceans are animals such as shrimps, crabs, lobsters, prawns, and crayfish. Data for 2016 and 2017 does not include species without an estimated mean weight (that would increase the numbers by at most 5%).
             note: Upper and lower-bound estimates are shown due to large uncertainties. The map shows midpoint values.
       n_farmed_decapod_crustaceans:
         title: Estimated number of farmed decapod crustaceans
@@ -36,7 +36,7 @@ tables:
         presentation:
           attribution: *attribution
           grapher_config:
-            subtitle: Decapod crustaceans are animals such as shrimps, crabs, lobsters, prawns, and crayfish.
+            subtitle: *subtitle
             note: Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds.
       n_farmed_decapod_crustaceans_high:
         title: Estimated number of farmed decapod crustaceans (upper bound)
@@ -65,7 +65,7 @@ tables:
         presentation:
           attribution: *attribution
           grapher_config:
-            subtitle: Decapod crustaceans are animals such as shrimps, crabs, lobsters, prawns, and crayfish.
+            subtitle: *subtitle
             note: Upper and lower-bound estimates are shown due to large uncertainties. The map shows midpoint values.
       n_farmed_decapod_crustaceans_per_capita:
         title: Estimated number of farmed decapod crustaceans per capita
@@ -81,7 +81,7 @@ tables:
         presentation:
           attribution: *attribution
           grapher_config:
-            subtitle: Decapod crustaceans are animals such as shrimps, crabs, lobsters, prawns, and crayfish.
+            subtitle: *subtitle
             note: Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds.
       n_farmed_decapod_crustaceans_high_per_capita:
         title: Estimated number of farmed decapod crustaceans per capita (upper bound)

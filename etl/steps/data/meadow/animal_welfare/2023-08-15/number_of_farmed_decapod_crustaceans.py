@@ -60,7 +60,10 @@ def run(dest_dir: str) -> None:
     for year in [2015, 2016, 2017]:
         snap_i: Snapshot = paths.load_dependency(f"number_of_farmed_decapod_crustaceans_{year}.xlsx")
         tb_i = pr.read_excel(
-            snap_i.path, skiprows=find_number_of_lines_to_skip(snap_i.path), metadata=snap_i.to_table_metadata(), origin=snap_i.metadata.origin
+            snap_i.path,
+            skiprows=find_number_of_lines_to_skip(snap_i.path),
+            metadata=snap_i.to_table_metadata(),
+            origin=snap_i.metadata.origin,
         )
         # Process yearly data.
         tb_i = process_yearly_data(tb_i=tb_i, year=year)

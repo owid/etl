@@ -32,6 +32,45 @@ REGIONS_TO_ADD = [
 ]
 
 
+def run_sanity_checks_on_inputs(tb: Table) -> None:
+    # NOTE: 2015 data includes the number of decapods with and without an estimated mean weight (EMW), but 2016 and 2017
+    # data includes only the number of decapods with an EMW.
+    # Therefore, for consistency, we could:
+    # (A) Show only numbers with an EMW for all years. But that would remove data for many countries.
+    # (B) Show only 2015 data.
+    # (C) Show all data, but add a footnote saying that 2016 and 2017 include only decapods for which there is an EMW.
+    # I think (C) is the better option. Therefore, ensure that only 2015 data has number when there is no EMW.
+
+    for year in [2015, 2016, 2017]:
+        # Calculate the lower and upper bounds of the number of decapods for which there is an EMW.
+        lower_emw = tb[(tb["country"] != "Totals") & (tb["year"] == year) & (tb["estimated_mean_weight__lower"] > 0)][
+            "estimated_numbers__millions__lower"
+        ].sum()
+        upper_emw = tb[(tb["country"] != "Totals") & (tb["year"] == year) & (tb["estimated_mean_weight__upper"] > 0)][
+            "estimated_numbers__millions__upper"
+        ].sum()
+        # Calculate the lower and upper bounds of the number of decapods with or without an EMW.
+        lower = tb[(tb["country"] != "Totals") & (tb["year"] == year)]["estimated_numbers__millions__lower"].sum()
+        upper = tb[(tb["country"] != "Totals") & (tb["year"] == year)]["estimated_numbers__millions__upper"].sum()
+
+        # Check that the lower and upper bounds of "Totals" is equal to the sum of rows with or without EMW.
+        assert round(lower, -1) == round(
+            tb[(tb["country"] == "Totals") & (tb["year"] == year)]["estimated_numbers__millions__lower"].item(), -1
+        )
+        assert round(upper, -1) == round(
+            tb[(tb["country"] == "Totals") & (tb["year"] == year)]["estimated_numbers__millions__upper"].item(), -1
+        )
+
+        if year == 2015:
+            # Check that the number of decapods with EMW is smaller by just a few percent.
+            assert lower_emw * 1.02 < lower
+            assert upper_emw * 1.02 < upper
+        elif year in [2016, 2017]:
+            # For 2016 and 2017, check that with and without EMW are the same.
+            assert round(lower_emw, -1) == round(lower, -1)
+            assert round(upper_emw, -1) == round(upper, -1)
+
+
 def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     tb = tb.copy()
     for region in REGIONS_TO_ADD:
@@ -98,6 +137,9 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Run sanity checks on inputs.
+    run_sanity_checks_on_inputs(tb=tb)
+
     # Select and rename columns.
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
@@ -105,7 +147,7 @@ def run(dest_dir: str) -> None:
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Add number of fish for each country and year.
-    tb = tb.groupby(["country", "year"], as_index=False).sum()
+    tb = tb.groupby(["country", "year"], as_index=False).sum(min_count=1)
 
     # Add region aggregates.
     tb = add_region_aggregates(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups).copy_metadata(tb)
