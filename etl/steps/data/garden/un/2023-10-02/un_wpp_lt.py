@@ -40,6 +40,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("un_wpp_lt")
 
     # Read table from meadow dataset.
+    paths.log.info("load tables, concatenate.")
     tb = pr.concat(
         [
             ds_meadow["un_wpp_lt_all"].reset_index(),
@@ -60,11 +61,13 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns=COLUMNS_RENAME)
 
     # Scale central death rates
+    paths.log.info("scale indicators to make them more.")
     tb["central_death_rate"] = tb["central_death_rate"] * 1000
     tb["probability_of_death"] = tb["probability_of_death"] * 100
     tb["probability_of_survival"] = tb["probability_of_survival"] * 100
 
     # Harmonize country names.
+    paths.log.info("harmonise country names.")
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, country_col="location")
     tb = tb.set_index(COLUMNS_INDEX, verify_integrity=True)[COLUMNS_INDICATORS]
 
