@@ -1,4 +1,8 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+This is an old file we had in the Google Drive archive. It can be here: https://docs.google.com/spreadsheets/d/1kv28AOLywNcmfm9e2qreeGlkKHuy9grMwVlATHgoUPY/edit#gid=1723389681
+
+"""
 
 from pathlib import Path
 
