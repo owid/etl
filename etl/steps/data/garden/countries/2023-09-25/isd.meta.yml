@@ -2,13 +2,13 @@
 
 
 # Learn more about the available fields:
-# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/dataset/
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 1400
 
 
 # Learn more about the available fields:
-# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/tables/
+# http://docs.owid.io/projects/etl/en/architecture/metadata/reference/tables/
 tables:
   isd:
     variables:
