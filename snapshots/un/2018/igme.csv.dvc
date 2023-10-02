@@ -25,7 +25,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://www.unicef.org/legal#copyright
-wdir: ../../../data/snapshots/un/2023-09-26
+wdir: ../../../data/snapshots/un/2018
 outs:
 - md5: 16fc4f6a083467848e58093d85636eed
   size: 62755821
