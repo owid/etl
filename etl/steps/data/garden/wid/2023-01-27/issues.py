@@ -90,7 +90,6 @@ share_vars = list(df.filter(like="share"))
 
 # For each share variable
 for sh in share_vars:
-
     # Filter values below 0 and over 100
     df_review = df[(df[sh] > 100) | (df[sh] < 0)]
 
@@ -110,13 +109,11 @@ for sh in share_vars:
 # CHECK UNUSUAL SHARE, AVG, THR VALUES
 
 for m in metric:
-
     # Get all the variables
     metric_vars = list(df.filter(like=m))
 
     # For each of the metric variables
     for mv in metric_vars:
-
         # Filter values below 0 and over 100
         df_review = df[df[mv] < 0]
 
@@ -141,7 +138,6 @@ check_vars = []
 for v in vars:
     for m in metric:
         for i in range(len(deciles)):
-
             if i <= 8:
                 col1 = f"{deciles[i]}_{m}_{v}"
                 col2 = f"{deciles[i+1]}_{m}_{v}"

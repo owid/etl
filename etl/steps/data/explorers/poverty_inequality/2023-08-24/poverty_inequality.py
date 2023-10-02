@@ -17,6 +17,7 @@ paths = PathFinder(__file__)
 # Get path of PIP csv file
 PIP_PATH = "https://raw.githubusercontent.com/owid/notebooks/main/BetterDataDocs/JoeHasell/PIP/data/ppp_2017/final/OWID_internal_upload/explorer_database/inc_or_cons/poverty_inc_or_cons.csv"
 
+
 # Function to load and clean PIP data (will dissapear when PIP steps are created)
 def add_pip_data(PIP_PATH: str):
     # Load PIP data
@@ -101,7 +102,6 @@ def create_pip_inequality_table(tb_pip: pd.DataFrame) -> pd.DataFrame:
 
 
 def run(dest_dir: str) -> None:
-
     # Load WID explorer step
     ds_wid: Dataset = paths.load_dependency("world_inequality_database")
     tb_wid = ds_wid["world_inequality_database"].reset_index()

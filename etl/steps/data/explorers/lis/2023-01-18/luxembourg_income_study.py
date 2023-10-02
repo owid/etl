@@ -12,7 +12,6 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-
     # Load garden dataset.
     ds_garden: Dataset = paths.load_dependency("luxembourg_income_study")
 

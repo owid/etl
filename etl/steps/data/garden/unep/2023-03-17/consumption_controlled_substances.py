@@ -194,7 +194,8 @@ def add_consumption_rel_1986(df: pd.DataFrame) -> pd.DataFrame:
 def remove_last_year_for_regions(df: pd.DataFrame) -> pd.DataFrame:
     """Remove datapoint for latest available year in regions.
 
-    Data for latest year for regions is usually an underestimate, because just a subset of countries have reported data."""
+    Data for latest year for regions is usually an underestimate, because just a subset of countries have reported data.
+    """
     REGIONS = [
         "Africa",
         "Asia",

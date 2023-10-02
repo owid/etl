@@ -45,7 +45,6 @@ def run(dest_dir: str) -> None:
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-
     df = df[
         (df["Dimension"].isin(["Total", "by mechanisms"]))
         & (

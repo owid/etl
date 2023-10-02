@@ -18,6 +18,7 @@ from apps.wizard.utils import CURRENT_DIR, PHASES
 # ref: @kajarenc from https://github.com/streamlit/streamlit/issues/6620#issuecomment-1564735996
 logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.ERROR)
 
+
 # NOTE: Any new arguments here need to be in sync with the arguments defined in
 # wizard.utils.APP_STATE.args property method
 @click.command(cls=RichCommand)
