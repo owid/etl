@@ -47,14 +47,16 @@ def fix_typos_in_original_metadata(tb: Table) -> Table:
     tb_fixed.loc[uruguay_mask, "available_at"] = uruguay_url
     tb_fixed.loc[uruguay_mask, "source"] = tb_fixed.loc[uruguay_mask, "source"].item().split(expected_text)[0]
 
-    # TODO: Malta has no link, and the source seems to be wrong.
-
     # Fix some typos in the metadata, and ensure sources end in a period.
     tb_fixed["source"] = (
         tb_fixed["source"]
         .str.replace("husbndry", "husbandry")
         .replace("(Ministry of Agriculture). '", "(Ministry of Agriculture)'")
         .replace("Regulation (EC) 617/2008)", "Regulation (EC) 617/2008")
+        .replace(
+            "IEC Annual Review 2019.",
+            "International Egg Commission (IEC) Annual Review 2019 (data no longer public and only available to IEC members).",
+        )
     )
     tb_fixed["source"] = [source if source.endswith(".") else source + "." for source in tb_fixed["source"]]
 
