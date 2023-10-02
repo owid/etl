@@ -10,9 +10,9 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 # Only for table tb_regions:
-# The current list of members goes until 2016, we artificially extend it until 2023, preserving the last value
+# The current list of members goes until 2016, we artificially extend it until 2022, preserving the last value
 EXPECTED_LAST_YEAR = 2016
-LAST_YEAR = 2022  # Update to extend it further in time
+LAST_YEAR = 2022  # Update to extend it further in time (until year with last 31 December)
 
 
 def run(dest_dir: str) -> None:
