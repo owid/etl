@@ -65,6 +65,9 @@ class Table(pd.DataFrame):
     # propagate all these fields on every slice or copy
     _metadata = ["metadata", "_fields"]
 
+    # Set to True to help debugging metadata issues.
+    DEBUG = False
+
     # slicing and copying creates tables
     @property
     def _constructor(self) -> type:
@@ -171,8 +174,10 @@ class Table(pd.DataFrame):
             raise ValueError(f"could not detect a suitable format to read from: {path}")
 
         # Add processing log to the metadata of each variable in the table.
-        # TODO: For some reason, the snapshot loading entry gets repeated.
         table = update_processing_logs_when_loading_or_creating_table(table=table)
+
+        if cls.DEBUG:
+            table.check_metadata()
 
         return table
 
@@ -412,6 +417,9 @@ class Table(pd.DataFrame):
             else:
                 self._fields[key] = VariableMeta()
 
+        if self.DEBUG:
+            self.check_metadata()
+
     def equals_table(self, table: "Table") -> bool:
         return (
             isinstance(table, Table)
@@ -645,13 +653,13 @@ class Table(pd.DataFrame):
 
     def _repr_html_(self):
         html = super()._repr_html_()
-        return """
-             <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
+        if self.DEBUG:
+            self.check_metadata()
+        return f"""
+             <h2 style="margin-bottom: 0em"><pre>{self.metadata.short_name}</pre></h2>
              <p style="font-variant: small-caps; font-size: 1.5em; font-family: sans-serif; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">table</p>
-             {}
-        """.format(
-            self.metadata.short_name, html
-        )
+             {html}
+        """
 
     def merge(self, right, *args, **kwargs) -> "Table":
         return merge(left=self, right=right, *args, **kwargs)
@@ -907,13 +915,17 @@ class Table(pd.DataFrame):
     def groupby(self, *args, **kwargs) -> "TableGroupBy":
         return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
 
-    def check_metadata(self) -> None:
+    def check_metadata(self, ignore_columns: Optional[List[str]] = None) -> None:
         """Check that all variables in the table have origins."""
-        for column in self.columns:
-            if column in ("year", "country"):
-                continue
+        if ignore_columns is None:
+            if self.primary_key:
+                ignore_columns = self.primary_key
+            else:
+                ignore_columns = ["year", "country"]
+
+        for column in [column for column in self.columns if column not in ignore_columns]:
             if not self[column].metadata.origins:
-                raise ValueError(f"Variable `{column}` has no origins.")
+                log.warning(f"Variable {column} has no origins.")
 
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
