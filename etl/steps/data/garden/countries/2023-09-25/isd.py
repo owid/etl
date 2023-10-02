@@ -138,10 +138,7 @@ def create_table_countries_in_region(tb: Table) -> Table:
     tb_world["region"] = "World"
 
     # Combine
-    tb_regions = pr.concat([tb_regions, tb_world], ignore_index=True)
-
-    # Add short name
-    tb_regions.metadata.short_name = f"{tb_regions.m.short_name}_regions"
+    tb_regions = pr.concat([tb_regions, tb_world], ignore_index=True, short_name="isd_regions")
 
     # Finish by adding missing last years
     tb_regions = add_latest_years_with_constat_num_countries(
