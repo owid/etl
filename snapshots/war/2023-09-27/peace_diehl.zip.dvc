@@ -1,5 +1,5 @@
 # Learn more at:
-# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/origin/
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
 meta:
   origin:
     # Data product / Snapshot
@@ -15,7 +15,7 @@ meta:
       Paul F Diehl & Gary Goertz & Yahve Gallegos, 2021. "Peace data: Concept, measurement, patterns, and research agenda," Conflict Management and Peace Science, Peace Science Society (International), vol. 38(5), pages 605-624, September.
 
     # Files
-    url_main: 
+    url_main:
       https://drive.google.com/drive/folders/1HKZ6FQmK09VJ5mzzEzIwkOawf7tb6Z63?usp=sharing
     date_accessed: 2023-09-27
 

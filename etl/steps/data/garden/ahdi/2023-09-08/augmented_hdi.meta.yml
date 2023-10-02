@@ -44,7 +44,7 @@ tables:
         display:
           name: Augmented Human Development Index (AHDI)
           entityAnnotationsMap: "{common.entity_annotations}"
-          numDecimalPlaces: 2
+          numDecimalPlaces: 3
           conversionFactor: 1
         presentation:
           grapher_config:
@@ -74,6 +74,7 @@ tables:
                   - 0.7
                   - 0.8
                   - 0.9
+                  - 0.1
             selectedEntityNames:
               - United Kingdom
               - United States
@@ -102,7 +103,7 @@ tables:
         display:
           name: AHDI excluding income
           entityAnnotationsMap: "{common.entity_annotations}"
-          numDecimalPlaces: 2
+          numDecimalPlaces: 3
           conversionFactor: 1
         presentation:
           grapher_config:
@@ -154,7 +155,7 @@ tables:
         display:
           name: Life expectancy
           entityAnnotationsMap: "{common.entity_annotations}"
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
           conversionFactor: 1
 
       years_of_schooling:
@@ -169,7 +170,7 @@ tables:
         display:
           name: Years of schooling
           entityAnnotationsMap: "{common.entity_annotations}"
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
           conversionFactor: 1
 
       liberal_democracy_index:
@@ -191,7 +192,7 @@ tables:
         display:
           name: Liberal Democracy Index
           entityAnnotationsMap: "{common.entity_annotations}"
-          numDecimalPlaces: 2
+          numDecimalPlaces: 3
           conversionFactor: 1
 
       gdp_per_capita:
@@ -228,7 +229,7 @@ tables:
         display:
           name: Life expectancy indecx
           entityAnnotationsMap: "{common.entity_annotations}"
-          numDecimalPlaces: 2
+          numDecimalPlaces: 3
           conversionFactor: 1
 
       schooling_index:
@@ -250,7 +251,7 @@ tables:
         display:
           name: Schooling index
           entityAnnotationsMap: "{common.entity_annotations}"
-          numDecimalPlaces: 2
+          numDecimalPlaces: 3
           conversionFactor: 1
 
       adjusted_income_index:
@@ -273,5 +274,5 @@ tables:
         display:
           name: Adjusted income index
           entityAnnotationsMap: "{common.entity_annotations}"
-          numDecimalPlaces: 2
+          numDecimalPlaces: 3
           conversionFactor: 1
