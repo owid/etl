@@ -990,18 +990,15 @@ class TableGroupBy:
         for name, group in self.groupby:
             yield name, _create_table(group, self.metadata, self._fields)
 
-    def _groupby_operation(self, op, *args, **kwargs):
-        df = getattr(self.groupby, op)(*args, **kwargs)
-        return _create_table(df, self.metadata, self._fields)
-
-    def agg(self, func: Any, *args, **kwargs) -> "Table":
+    def agg(self, func: Optional[Any] = None, *args, **kwargs) -> "Table":
         df = self.groupby.agg(func, *args, **kwargs)
+        tb = _create_table(df, self.metadata, self._fields)
 
-        # agg returning multiindex is not yet supported
-        if isinstance(df.columns, pd.MultiIndex):
-            return _create_table(df, self.metadata, self._fields)
-        else:
-            return _create_table(df, self.metadata, self._fields)
+        # kwargs rename fields
+        for new_col, (col, _) in kwargs.items():
+            tb._fields[new_col] = self._fields[col]
+
+        return tb
 
 
 class VariableGroupBy:
