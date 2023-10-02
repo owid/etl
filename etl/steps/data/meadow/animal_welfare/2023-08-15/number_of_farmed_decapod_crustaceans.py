@@ -38,9 +38,9 @@ def process_yearly_data(tb_i: Table, year: int) -> Table:
             # There is a typo in a column of the 2015 file.
             "Numberws (upper) millions": "Estimated numbers (millions) upper",
             # It is unclear whether the following mapping is correct, but we will not use these columns anyway.
-            "mean weight (lower)": "Weighted estimated mean weight (lower) (same as L except for some Rainbow trout)",
+            "mean weight (lower)": "Weighted estimated mean weight (lower)",
             # There is a typo in a column of the 2015 file.
-            "mean weight (upprr)": "Weighted estimated mean weight (upper) (same as L except for some Rainbow trout)",
+            "mean weight (upprr)": "Weighted estimated mean weight (upper)",
         },
         errors="ignore",
     )
@@ -60,7 +60,7 @@ def run(dest_dir: str) -> None:
     for year in [2015, 2016, 2017]:
         snap_i: Snapshot = paths.load_dependency(f"number_of_farmed_decapod_crustaceans_{year}.xlsx")
         tb_i = pr.read_excel(
-            snap_i.path, skiprows=find_number_of_lines_to_skip(snap_i.path), metadata=snap_i.to_table_metadata()
+            snap_i.path, skiprows=find_number_of_lines_to_skip(snap_i.path), metadata=snap_i.to_table_metadata(), origin=snap_i.metadata.origin
         )
         # Process yearly data.
         tb_i = process_yearly_data(tb_i=tb_i, year=year)
