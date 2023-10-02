@@ -1,14 +1,14 @@
 # NOTE: To learn more about the fields, hover over their names.
 
 # Learn more about the available fields:
-# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/dataset/
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   title: States in regions (Gleditsch)
   update_period_days: 1800
 
 
 # Learn more about the available fields:
-# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/tables/
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
   gleditsch_regions:
     title: States in regions (Gleditsch)
