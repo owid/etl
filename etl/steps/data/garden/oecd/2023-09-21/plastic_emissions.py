@@ -16,6 +16,8 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["plastic_emissions"].reset_index()
     # Convert million to actual number
     tb["value"] = tb["value"] * 1e6
+    # Replace specific strings in the 'lifecycle_stage' column
+    tb["lifecycle_stage"] = tb["lifecycle_stage"].replace({"Production & Conversion": "Production and conversion"})
 
     # Pivot dataframe by gas_type
     tb = tb.pivot(index=["country", "year", "lifecycle_stage"], columns="gas_type", values="value")

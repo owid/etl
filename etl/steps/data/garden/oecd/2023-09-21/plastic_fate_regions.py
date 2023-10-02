@@ -43,8 +43,15 @@ def run(dest_dir: str) -> None:
     # Optionally, drop the 'Global Value' column if it's not needed
     df_with_share = df_with_share.drop(columns=["global_value", "country_y"])
     df_with_share.rename(columns={"country_x": "country"}, inplace=True)
+    tb = df_with_share.pivot(index=["country", "year"], columns="plastic_fate", values=["value", "share"])
 
-    tb = df_with_share.underscore().set_index(["country", "year", "plastic_fate"], verify_integrity=True).sort_index()
+    tb.columns = [f"{col[0]}_{col[1]}" if col[0] not in ["year", "country"] else col[0] for col in tb.columns]
+    for column in tb.columns:
+        if "value" in column:
+            tb[f"{column}_share"] = (tb[column] / tb["value_Total"]) * 100
+
+    tb = tb.underscore().sort_index()
+    tb = tb.drop(["share_total", "value_total_share"], axis=1)  # Remove the total from total column
 
     #
     # Save outputs.
