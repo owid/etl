@@ -120,7 +120,7 @@ def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source
     """
     Combine two tables with a preference for one source of data.
     """
-    tb_combined = pr.concat([tb_a, tb_b]).sort_values(["country", "year", "source"], short_name=table_name)
+    tb_combined = pr.concat([tb_a, tb_b], short_name=table_name).sort_values(["country", "year", "source"])
     assert any(tb_combined["source"] == preferred_source), "Preferred source not in table!"
     tb_combined = remove_duplicates(
         tb_combined,
