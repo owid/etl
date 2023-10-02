@@ -65,9 +65,7 @@ def run(dest_dir: str) -> None:
     tb["probability_of_survival"] = tb["probability_of_survival"] * 100
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, country_col="location"
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, country_col="location")
     tb = tb.set_index(COLUMNS_INDEX, verify_integrity=True)[COLUMNS_INDICATORS]
 
     #
