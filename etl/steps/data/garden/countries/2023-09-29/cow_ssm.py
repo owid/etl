@@ -92,10 +92,7 @@ def create_table_countries_in_region(tb_system: Table):
     tb_regions_world["region"] = "World"
 
     # Combine
-    tb_regions = pr.concat([tb_regions, tb_regions_world], ignore_index=True)
-
-    # Add short name
-    tb_regions.m.short_name = "cow_ssm_regions"
+    tb_regions = pr.concat([tb_regions, tb_regions_world], ignore_index=True, short_name="cow_ssm_regions")
 
     # Check latest year is as expected, drop year column
     tb_last = tb_regions.sort_values("year").drop_duplicates(subset=["region"], keep="last")
