@@ -22,7 +22,6 @@ LOCAL_FILE = "WHOMortalityDatabase_Deaths_sex_age_a_country_area_year-Violence_2
     help="Upload dataset to Snapshot",
 )
 def main(upload: bool) -> None:
-
     # Read in the raw data from local file
     raw = pd.read_csv(LOCAL_FILE, skiprows=6, index_col=False)
 
