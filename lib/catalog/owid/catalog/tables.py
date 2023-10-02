@@ -65,6 +65,9 @@ class Table(pd.DataFrame):
     # propagate all these fields on every slice or copy
     _metadata = ["metadata", "_fields"]
 
+    # Set to True to help debugging metadata issues.
+    DEBUG = False
+
     # slicing and copying creates tables
     @property
     def _constructor(self) -> type:
@@ -171,8 +174,10 @@ class Table(pd.DataFrame):
             raise ValueError(f"could not detect a suitable format to read from: {path}")
 
         # Add processing log to the metadata of each variable in the table.
-        # TODO: For some reason, the snapshot loading entry gets repeated.
         table = update_processing_logs_when_loading_or_creating_table(table=table)
+
+        if cls.DEBUG:
+            table.check_metadata()
 
         return table
 
@@ -412,6 +417,9 @@ class Table(pd.DataFrame):
             else:
                 self._fields[key] = VariableMeta()
 
+        if self.DEBUG:
+            self.check_metadata()
+
     def equals_table(self, table: "Table") -> bool:
         return (
             isinstance(table, Table)
@@ -432,32 +440,39 @@ class Table(pd.DataFrame):
         old_cols = self.all_columns
         new_table = super().rename(*args, **kwargs)
 
+        # __setattr__ on columns has already done its job of renaming
         if inplace:
             new_table = self
-
-        # construct new _fields attribute
-        fields = {}
-        for old_col, new_col in zip(old_cols, new_table.all_columns):
-            if inplace:
-                fields[new_col] = self._fields[old_col]
-            else:
+        else:
+            # construct new _fields attribute
+            fields = {}
+            for old_col, new_col in zip(old_cols, new_table.all_columns):
                 fields[new_col] = self._fields[old_col].copy()
 
-            # Update processing log.
-            if old_col != new_col:
-                fields[new_col].processing_log = variables.add_entry_to_processing_log(
-                    processing_log=fields[new_col].processing_log,
-                    variable_name=new_col,
-                    parents=[old_col],
-                    operation="rename",
-                )
-
-        new_table._fields = defaultdict(VariableMeta, fields)
+            new_table._fields = defaultdict(VariableMeta, fields)
 
         if inplace:
             return None
         else:
             return cast(Table, new_table)
+
+    def __setattr__(self, name: str, value) -> None:
+        # setting columns must rename them
+        if name == "columns":
+            for old_col, new_col in zip(self.columns, value):
+                if old_col in self._fields:
+                    self._fields[new_col] = self._fields.pop(old_col)
+
+                # Update processing log.
+                if old_col != new_col:
+                    self._fields[new_col].processing_log = variables.add_entry_to_processing_log(
+                        processing_log=self._fields[new_col].processing_log,
+                        variable_name=new_col,
+                        parents=[old_col],
+                        operation="rename",
+                    )
+
+        super().__setattr__(name, value)
 
     @property
     def all_columns(self) -> List[str]:
@@ -638,13 +653,13 @@ class Table(pd.DataFrame):
 
     def _repr_html_(self):
         html = super()._repr_html_()
-        return """
-             <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
+        if self.DEBUG:
+            self.check_metadata()
+        return f"""
+             <h2 style="margin-bottom: 0em"><pre>{self.metadata.short_name}</pre></h2>
              <p style="font-variant: small-caps; font-size: 1.5em; font-family: sans-serif; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">table</p>
-             {}
-        """.format(
-            self.metadata.short_name, html
-        )
+             {html}
+        """
 
     def merge(self, right, *args, **kwargs) -> "Table":
         return merge(left=self, right=right, *args, **kwargs)
@@ -900,6 +915,18 @@ class Table(pd.DataFrame):
     def groupby(self, *args, **kwargs) -> "TableGroupBy":
         return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
 
+    def check_metadata(self, ignore_columns: Optional[List[str]] = None) -> None:
+        """Check that all variables in the table have origins."""
+        if ignore_columns is None:
+            if self.primary_key:
+                ignore_columns = self.primary_key
+            else:
+                ignore_columns = ["year", "country"]
+
+        for column in [column for column in self.columns if column not in ignore_columns]:
+            if not self[column].metadata.origins:
+                log.warning(f"Variable {column} has no origins.")
+
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
     """Create a table with metadata."""
@@ -963,18 +990,15 @@ class TableGroupBy:
         for name, group in self.groupby:
             yield name, _create_table(group, self.metadata, self._fields)
 
-    def _groupby_operation(self, op, *args, **kwargs):
-        df = getattr(self.groupby, op)(*args, **kwargs)
-        return _create_table(df, self.metadata, self._fields)
-
-    def agg(self, func: Any, *args, **kwargs) -> "Table":
+    def agg(self, func: Optional[Any] = None, *args, **kwargs) -> "Table":
         df = self.groupby.agg(func, *args, **kwargs)
+        tb = _create_table(df, self.metadata, self._fields)
 
-        # agg returning multiindex is not yet supported
-        if isinstance(df.columns, pd.MultiIndex):
-            return _create_table(df, self.metadata, self._fields)
-        else:
-            return _create_table(df, self.metadata, self._fields)
+        # kwargs rename fields
+        for new_col, (col, _) in kwargs.items():
+            tb._fields[new_col] = self._fields[col]
+
+        return tb
 
 
 class VariableGroupBy:
@@ -1585,24 +1609,6 @@ def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
 
     # Get unique array of tuples of source fields (respecting the order).
     return pd.unique(sources).tolist()
-
-
-def get_unique_origins_from_tables(tables: List[Table]) -> List[Origin]:
-    # First, ensure only "origins" (and not "sources") are used in the variables.
-    if any(
-        [
-            ("sources" in table[column].metadata.to_dict()) and (len(table[column].metadata.sources) > 0)
-            for table in tables
-            for column in table.columns
-        ]
-    ):
-        log.warning("Origins and sources mixed in tables. The resulting dataset may not include all origins.")
-
-    # Make a list of all origins of all variables in all tables.
-    origins = sum([table._fields[column].origins for table in tables for column in list(table.all_columns)], [])
-
-    # Get unique array of tuples of source fields (respecting the order).
-    return pd.unique(origins).tolist()
 
 
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:

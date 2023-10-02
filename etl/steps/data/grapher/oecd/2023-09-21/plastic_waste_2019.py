@@ -19,6 +19,12 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    tb = tb.reset_index()
+    # Replace application type to be the country column for visualisation purposes
+    tb = tb.rename(columns={"country": "entity"})
+
+    tb = tb.rename(columns={"application": "country"})
+    tb = tb.set_index(["country", "year", "entity"])
 
     #
     # Save outputs.

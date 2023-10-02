@@ -330,9 +330,8 @@ class Variable(pd.Series):
     def copy(self, deep: bool = True) -> "Variable":
         new_var = super().copy(deep=deep)
         if deep:
-            new_var._fields = defaultdict(
-                VariableMeta, {k: var_meta.copy(deep=deep) for k, var_meta in self._fields.items()}
-            )
+            field_names = [n for n in self.index.names + [self.name] if n is not None]
+            new_var._fields = defaultdict(VariableMeta, {k: self._fields[k].copy(deep=deep) for k in field_names})
         return new_var
 
 

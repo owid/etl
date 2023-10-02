@@ -29,10 +29,23 @@ def run(dest_dir: str) -> None:
     total_df = tb.groupby(["year", "leakage_type"])["value"].sum().reset_index()
 
     total_df["country"] = "World"
+
     combined_df = pr.merge(total_df, tb, on=["country", "year", "leakage_type", "value"], how="outer").copy_metadata(
         from_table=tb
     )
-    tb = combined_df.underscore().set_index(["country", "year", "leakage_type"], verify_integrity=True).sort_index()
+    total_df = total_df.rename(columns={"value": "global_value"})
+
+    # Merge the global totals back to the original DataFrame
+    df_with_share = pr.merge(combined_df, total_df, on=["year", "leakage_type"], how="left")
+
+    # Calculate the share from global total
+    df_with_share["share"] = (df_with_share["value"] / df_with_share["global_value"]) * 100
+
+    # Optionally, drop the 'Global Value' column if it's not needed
+    df_with_share = df_with_share.drop(columns=["global_value", "country_y"])
+    df_with_share.rename(columns={"country_x": "country"}, inplace=True)
+
+    tb = df_with_share.underscore().set_index(["country", "year", "leakage_type"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
