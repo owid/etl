@@ -343,7 +343,7 @@ tables:
           numDecimalPlaces: 0
       # 2. Inequality-adjusted Human Development Index
       ineq_edu:
-        title: Inequality in eduation
+        title: Inequality in education
         short_unit: "%"
         unit: "%"
         description: |
