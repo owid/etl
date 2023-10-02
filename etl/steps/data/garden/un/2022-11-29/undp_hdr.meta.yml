@@ -28,7 +28,7 @@ tables:
     variables:
       # Life expectancy
       le:
-        title: Life Expectancy at Birth
+        title: Life expectancy at birth
         short_unit: "years"
         unit: "years"
         description: |
@@ -38,7 +38,7 @@ tables:
         display:
           numDecimalPlaces: 1
       le_f:
-        title: Life Expectancy at Birth, female
+        title: Life expectancy at birth, female
         short_unit: "years"
         unit: "years"
         description: |
@@ -48,7 +48,7 @@ tables:
         display:
           numDecimalPlaces: 1
       le_m:
-        title: Life Expectancy at Birth, male
+        title: Life expectancy at birth, male
         short_unit: "years"
         unit: "years"
         description: |
@@ -59,7 +59,7 @@ tables:
           numDecimalPlaces: 1
       # Schooling years (expected)
       eys:
-        title: Expected Years of Schooling
+        title: Expected years of schooling
         short_unit: "years"
         unit: "years"
         description: |
@@ -72,7 +72,7 @@ tables:
         display:
           numDecimalPlaces: 1
       eys_f:
-        title: Expected Years of Schooling, female
+        title: Expected years of schooling, female
         short_unit: "years"
         unit: "years"
         description: |
@@ -85,7 +85,7 @@ tables:
         display:
           numDecimalPlaces: 1
       eys_m:
-        title: Expected Years of Schooling, male
+        title: Expected years of schooling, male
         short_unit: "years"
         unit: "years"
         description: |
@@ -99,7 +99,7 @@ tables:
           numDecimalPlaces: 1
       # Schooling (mean)
       mys:
-        title: Mean Years of Schooling
+        title: Mean years of schooling
         short_unit: "years"
         unit: "years"
         description: |
@@ -111,7 +111,7 @@ tables:
         display:
           numDecimalPlaces: 1
       mys_f:
-        title: Mean Years of Schooling, female
+        title: Mean years of schooling, female
         short_unit: "years"
         unit: "years"
         description: |
@@ -123,7 +123,7 @@ tables:
         display:
           numDecimalPlaces: 1
       mys_m:
-        title: Mean Years of Schooling, male
+        title: Mean years of schooling, male
         short_unit: "years"
         unit: "years"
         description: |
@@ -136,7 +136,7 @@ tables:
           numDecimalPlaces: 1
       # GNI PPP
       gni_pc_f:
-        title: Gross National Income Per Capita, female
+        title: Gross national income per capita, female
         short_unit: $
         unit: international-$ in 2017 prices
         description: |
@@ -152,7 +152,7 @@ tables:
         display:
           numDecimalPlaces: 0
       gni_pc_m:
-        title: Gross National Income Per Capita, male
+        title: Gross national income per capita, male
         short_unit: $
         unit: international-$ in 2017 prices
         description: |
@@ -167,7 +167,7 @@ tables:
         display:
           numDecimalPlaces: 0
       gnipc:
-        title: Gross National Income Per Capita
+        title: Gross national income per capita
         short_unit: $
         unit: international-$ in 2017 prices
         description: |
@@ -181,7 +181,7 @@ tables:
           numDecimalPlaces: 0
       # Maternal mortality rate
       mmr:
-        title: Maternal Mortality Ratio
+        title: Maternal mortality ratio
         unit: "deaths per 100,000 live births"
         description: |
           The maternal mortality ratio (MMR) is defined as the number of maternal deaths during a given time period per 100,000 live births during the same time period. It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of death in a single pregnancy or a single live birth. Maternal deaths: The annual number of female deaths from any cause related to or aggravated by pregnancy or its management (excluding accidental or incidental causes) during pregnancy and childbirth or within 42 days of termination of pregnancy, irrespective of the duration and site of the pregnancy, expressed per 100,000 live births, for a specified time period.
@@ -195,7 +195,7 @@ tables:
           numDecimalPlaces: 0
       # Adolescent birth rate
       abr:
-        title: Adolescent Birth Rate
+        title: Adolescent birth rate
         unit: "births per 1,000 women ages 15-19"
         description: |
           The annual number of births to women aged 15-19 years per 1,000 women in that age group. It is also referred to as the age-specific fertility rate for women aged 15-19.
@@ -335,7 +335,7 @@ tables:
         display:
           numDecimalPlaces: 3
       hdi_rank:
-        title: HDI Rank
+        title: HDI rank
         unit: ""
         description: |
           Country's global rank based on its Human Development Index (HDI) value.
