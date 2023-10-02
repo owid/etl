@@ -47,6 +47,10 @@ def run(dest_dir: str) -> None:
         )
         # Rename columns
         tb = tb.rename(columns=COLUMNS_RENAME)
+        # Filter only relevant location types
+        tb = tb[
+            tb["LocTypeName"].isin(["Geographic region", "Income group", "Country/Area", "World", "Development group"])
+        ]
         # Set index
         tb = tb.set_index(["Location", "Time", "Sex", "AgeGrp", "LocTypeName"], verify_integrity=True).sort_index()
         # Add to tables list
