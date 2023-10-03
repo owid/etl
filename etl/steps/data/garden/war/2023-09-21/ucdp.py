@@ -3,8 +3,7 @@
 
 Notes:
     - Conflict types for state-based violence is sourced from UCDP/PRIO dataset. non-state and one-sided violence is sourced from GED dataset.
-    - There can be some mismatches with latest official reported data (UCDP's live dashboard). This is because UCDP uses latest data for their
-    dashboard, which might not be available yet as bulk download.
+    - There can be some mismatches with latest official reported data (UCDP's live dashboard). This is because UCDP uses latest data for their dashboard, which might not be available yet as bulk download.
     - Regions:
         - Uses `region` column for both GED and UCDP/PRIO datasets.
         - Incompatibilities in Oceania are encoded in "Asia". We therefore have changed the region name to "Asia and Oceania".
