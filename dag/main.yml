@@ -593,11 +593,15 @@ steps:
     - snapshot://countries/2023-09-22/isd.xlsx
   data://garden/countries/2023-09-25/isd:
     - data://meadow/countries/2023-09-25/isd
+  data://grapher/countries/2023-10-01/isd:
+    - data://garden/countries/2023-09-25/isd
   data://meadow/countries/2023-09-25/gleditsch:
     - snapshot://countries/2023-09-22/gleditsch_states.dat
     - snapshot://countries/2023-09-22/gleditsch_microstates.dat
   data://garden/countries/2023-09-25/gleditsch:
     - data://meadow/countries/2023-09-25/gleditsch
+  data://grapher/countries/2023-10-01/gleditsch:
+    - data://garden/countries/2023-09-25/gleditsch
   data://meadow/countries/2023-09-29/cow_ssm:
     - snapshot://countries/2023-09-22/cow_ssm_majors.csv
     - snapshot://countries/2023-09-22/cow_ssm_states.csv
