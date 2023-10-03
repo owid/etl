@@ -3,8 +3,7 @@
 import os
 import tempfile
 
-import pandas as pd
-from owid.catalog import Table
+import owid.catalog.processing as pr
 from owid.datautils.io import decompress_file
 from structlog import get_logger
 
@@ -48,8 +47,13 @@ def run(dest_dir: str) -> None:
     with tempfile.TemporaryDirectory() as tmp_dir:
         decompress_file(snap.path, tmp_dir)
         for filename, file_props in files.items():
-            df = pd.read_csv(os.path.join(tmp_dir, filename))
-            tb = Table(df, short_name=file_props["short_name"], underscore=True)
+            tb = pr.read_csv(
+                os.path.join(tmp_dir, filename),
+                metadata=snap.to_table_metadata(),
+                origin=snap.metadata.origin,
+                underscore=True,
+            )
+            tb.m.short_name = file_props["short_name"]
             tb = tb.set_index(file_props["index"], verify_integrity=True)
             tables.append(tb)
 
@@ -57,7 +61,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=tables, default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=tables, default_metadata=snap.metadata, check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
