@@ -344,28 +344,28 @@ tables:
       # 2. Inequality-adjusted Human Development Index
       ineq_edu:
         title: Inequality in education
-        short_unit: "%"
-        unit: "%"
+        short_unit: ""
+        unit: ""
         description: |
           Inequality in education. This metric is needed to estimate the Inequality-adjusted Human Development Index.
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
       ineq_inc:
         title: Inequality in income
-        short_unit: "%"
-        unit: "%"
+        short_unit: ""
+        unit: ""
         description: |
           Inequality in income. This metric is needed to estimate the Inequality-adjusted Human Development Index.
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
       ineq_le:
         title: Inequality in life expectancy
-        short_unit: "%"
-        unit: "%"
+        short_unit: ""
+        unit: ""
         description: |
           Inequality in life expectancy. This metric is needed to estimate the Inequality-adjusted Human Development Index.
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
       coef_ineq:
         title: Coefficient of human inequality
         unit: ""
@@ -376,7 +376,7 @@ tables:
 
           When all inequalities in dimensions are of a similar magnitude, the coefficient of human inequality and the loss in HDI value differ negligibly. When inequalities differ in magnitude, the loss in HDI value tends to be higher than the coefficient of human inequality.
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
       ihdi:
         title: Inequality-adjusted Human Development Index
         unit: ""
