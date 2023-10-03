@@ -1016,7 +1016,7 @@ def test_groupby_iteration(table_1) -> None:
 def test_groupby_observed_default(table_1) -> None:
     table_1 = table_1.astype({"a": "category"}).query("a != 3")
     gt = table_1.groupby("a").min()
-    assert len(gt) == 2
+    assert len(gt) == 3
 
 
 def test_set_columns(table_1) -> None:

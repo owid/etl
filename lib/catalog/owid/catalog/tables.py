@@ -912,9 +912,15 @@ class Table(pd.DataFrame):
     def sort_index(self, *args, **kwargs) -> "Table":
         return super().sort_index(*args, **kwargs)  # type: ignore
 
-    def groupby(self, *args, observed=True, **kwargs) -> "TableGroupBy":
-        """Groupby that preserves metadata. Uses `observed` by default to avoid
-        fix behavior with categoricals."""
+    def groupby(self, *args, observed=False, **kwargs) -> "TableGroupBy":
+        """Groupby that preserves metadata."""
+        by_list = [args[0]] if isinstance(args[0], str) else args[0]
+        for by in by_list:
+            if self.dtypes[by] == "category":
+                log.warning(
+                    f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour."
+                )
+
         return TableGroupBy(
             pd.DataFrame.groupby(self.copy(deep=False), *args, observed=observed, **kwargs), self.metadata, self._fields
         )
