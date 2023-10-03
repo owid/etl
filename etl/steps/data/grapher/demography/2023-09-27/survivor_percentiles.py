@@ -11,22 +11,16 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("mie")
+    ds_garden = paths.load_dataset("survivor_percentiles")
 
     # Read table from garden dataset.
-    tb = ds_garden["mie"]
+    tb = ds_garden["survivor_percentiles"]
+
+    tb["age"] = tb["age"].astype("float64").round(1)
 
     #
     # Process data.
     #
-    # Rename index column `region` to `country`.
-    tb = tb.reset_index().rename(columns={"region": "country"})
-
-    # Remove suffixes in region names
-    tb["country"] = tb["country"].str.replace(r" \(.+\)", "", regex=True)
-
-    # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["year", "country", "hostility_level"]).sort_index()
 
     #
     # Save outputs.
@@ -35,9 +29,6 @@ def run(dest_dir: str) -> None:
     ds_grapher = create_dataset(
         dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
-
-    # Remove source description so that it doesn't get appended to the dataset description.
-    # ds_grapher.metadata.sources[0].description = ""
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

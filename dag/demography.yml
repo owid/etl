@@ -74,6 +74,12 @@ steps:
   data://grapher/hmd/2023-09-19/hmd:
     - data://garden/hmd/2023-09-19/hmd
 
+  # Survivorship ages (HMD-derived)
+  data://garden/demography/2023-09-27/survivor_percentiles:
+    - data://garden/hmd/2023-09-19/hmd
+  data://grapher/demography/2023-09-27/survivor_percentiles:
+    - data://garden/demography/2023-09-27/survivor_percentiles
+
   # UN WPP Life Tables
   data://meadow/un/2023-10-02/un_wpp_lt:
     - snapshot://un/2023-10-02/un_wpp_lt_all.zip

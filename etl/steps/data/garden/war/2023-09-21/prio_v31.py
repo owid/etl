@@ -23,6 +23,7 @@ ON REGIONS:
     - The source includes data for incompatibilities in Oceania in region Asia. Therefore, we have changed the region's name from "Asia" to "Asia and Oceania".
 """
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
@@ -103,14 +104,13 @@ def run(dest_dir: str) -> None:
     log.info("war.prio_v31: set index")
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True)
 
-    log.info("war.prio_v31: add shortname to table")
-    tb = Table(tb, short_name=paths.short_name)
-
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -183,7 +183,7 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world_intratype["type"] = "intrastate"
 
     ## Combine
-    tb_ongoing = pd.concat(
+    tb_ongoing = pr.concat(
         [
             tb_ongoing,
             tb_ongoing_alltype,
@@ -230,14 +230,14 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new_intratype = tb_new_regions_intra_.groupby(["year", "region"], as_index=False)["id"].sum()
     tb_new_intratype["type"] = "intrastate"
 
-    tb_new = pd.concat([tb_new_regions, tb_new_alltype, tb_new_intratype], ignore_index=True)
+    tb_new = pr.concat([tb_new_regions, tb_new_alltype, tb_new_intratype], ignore_index=True)
 
     # Estimate metric for new region='World'
     tb_new_world = tb_new.groupby(["year", "type"], as_index=False)["id"].sum()
     tb_new_world["region"] = "World"
 
     # Combine
-    tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True)
+    tb_new = pr.concat([tb_new, tb_new_world], ignore_index=True)
 
     # Rename
     tb_new = tb_new.rename(columns={"id": "number_new_conflicts"})  # type: ignore
