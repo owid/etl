@@ -73,16 +73,17 @@ tables:
                   - 0.6
                   - 0.7
                   - 0.8
-                  - 0.9
                   - 0.1
             selectedEntityNames:
-              - United Kingdom
-              - United States
-              - South Korea
-              - India
-              - China
-              - Brazil
-              - Nigeria
+            - East Asia (AHDI)
+            - South Asia (AHDI)
+            - Middle East (AHDI)
+            - North Africa (AHDI)
+            - Latin America (AHDI)
+            - Sub Saharan Africa (AHDI)
+            - Western offshoots (AHDI)
+            - Western Europe (AHDI)
+            - Eastern Europe (AHDI)
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
           topic_tags:

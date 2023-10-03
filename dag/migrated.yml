@@ -8,3 +8,11 @@ steps:
   - data://garden/biodiversity/2022/living_planet_index
   data://garden/biodiversity/2022/living_planet_index:
   - snapshot://biodiversity/2022/living_planet_index.feather
+  data://grapher/education/2018-04-18/literacy_rates:
+  - data://garden/education/2018-04-18/literacy_rates
+  data://garden/education/2018-04-18/literacy_rates:
+  - snapshot://education/2018-04-18/literacy_rates.feather
+  data://grapher/education/2017-09-30/public_expenditure:
+  - data://garden/education/2017-09-30/public_expenditure
+  data://garden/education/2017-09-30/public_expenditure:
+  - snapshot://education/2017-09-30/public_expenditure.feather

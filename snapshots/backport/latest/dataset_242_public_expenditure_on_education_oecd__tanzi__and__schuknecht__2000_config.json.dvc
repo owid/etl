@@ -2,14 +2,14 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/242
-    date_accessed: 2023-08-10 09:20:13.101737
+    date_accessed: 2023-09-27 06:57:19.235380
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_242_public_expenditure_on_education_oecd__tanzi__and__schuknecht__2000
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 36dcbbdd1d0d8ac0fd1f752bd4b32f0f
-  size: 2527
+- md5: e853482c2a60ce875e7c12ed9813a0fa
+  size: 2540
   path: 
     dataset_242_public_expenditure_on_education_oecd__tanzi__and__schuknecht__2000_config.json

@@ -29,7 +29,41 @@ REGIONS_TO_ADD = [
     "Upper-middle-income countries",
     "Lower-middle-income countries",
     "High-income countries",
+    "World",
 ]
+
+
+def run_sanity_checks_on_inputs(tb: Table) -> None:
+    for year in [2015, 2016, 2017]:
+        # Calculate the lower and upper bounds of the number of fish with or without an EMW.
+        lower = tb[(tb["country"] != "Totals") & (tb["year"] == year)]["estimated_numbers__millions__lower"].sum()
+        upper = tb[(tb["country"] != "Totals") & (tb["year"] == year)]["estimated_numbers__millions__upper"].sum()
+
+        # Calculate the lower and upper bounds of the number of fish for which there is an EMW.
+        lower_emw = tb[(tb["country"] != "Totals") & (tb["year"] == year) & (tb["estimated_mean_weight__lower"] > 0)][
+            "estimated_numbers__millions__lower"
+        ].sum()
+        upper_emw = tb[(tb["country"] != "Totals") & (tb["year"] == year) & (tb["estimated_mean_weight__upper"] > 0)][
+            "estimated_numbers__millions__upper"
+        ].sum()
+
+        # Check that the lower and upper bounds of "Totals" is equal to the sum of rows with or without EMW.
+        assert round(lower, -1) == round(
+            tb[(tb["country"] == "Totals") & (tb["year"] == year)]["estimated_numbers__millions__lower"].item(), -1
+        )
+        assert round(upper, -1) == round(
+            tb[(tb["country"] == "Totals") & (tb["year"] == year)]["estimated_numbers__millions__upper"].item(), -1
+        )
+
+        if year == 2015:
+            # The estimated number of farmed fish for 2015 includes species with and without an EMW.
+            # Check that the number of fish with EMW is smaller by around 20%.
+            assert lower_emw * 1.2 < lower
+            assert upper_emw * 1.2 < upper
+        elif year in [2016, 2017]:
+            # The estimated number of farmed fish for 2016 and 2017 includes only species with an EMW.
+            assert round(lower_emw, -1) == round(lower, -1)
+            assert round(upper_emw, -1) == round(upper, -1)
 
 
 def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
@@ -98,14 +132,22 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Select and rename columns.
-    tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+    # Run sanity checks on inputs.
+    run_sanity_checks_on_inputs(tb=tb)
 
     # Harmonize country names.
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    # The number of fish for 2015 includes species with and without an EMW, however 2016 and 2017 includes only fish
+    # with an EMW. This means that 2015 includes a 17% of additional production. For consistency, include in 2015 only
+    # species with an EMW.
+    tb = tb[tb["estimated_mean_weight__lower"] > 0].reset_index(drop=True)
+
+    # Select and rename columns.
+    tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+
     # Add number of fish for each country and year.
-    tb = tb.groupby(["country", "year"], as_index=False).sum()
+    tb = tb.groupby(["country", "year"], as_index=False, observed=True).sum(min_count=1)
 
     # Add region aggregates.
     tb = add_region_aggregates(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups).copy_metadata(tb)
