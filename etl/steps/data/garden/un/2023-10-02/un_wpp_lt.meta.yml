@@ -30,7 +30,7 @@ tables:
         description_processing: |-
           The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
       probability_of_survival:
-        title: Probability of death
+        title: Probability of survival
         unit: "%"
         description_short: The probability that a person who survived until the start of a given interval will have died by the end of the interval.
         processing_level: minor
@@ -53,11 +53,11 @@ tables:
       number_person_years_lived:
         title: Number of person-years lived
         unit: person-years
-        description_short: Survival ratio corresponding to proportion of the life table population in age group (x, x+n) who are alive n year later.
-      survivorship_ratio:
-        title: Number of person-years lived
-        unit: person-years
         description_short: Number of person-years lived between ages x and x+n.
+      survivorship_ratio:
+        title: Survivorship ratio
+        unit: ""
+        description_short: Survival ratio (nSx) corresponding to proportion of the life table population in age group (x, x+n) who are alive n year later
       number_person_years_remaining:
         title: Number of person-years remaining
         unit: person-years
