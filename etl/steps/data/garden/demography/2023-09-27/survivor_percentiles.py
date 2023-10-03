@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Table
 from scipy.integrate import cumtrapz
-from scipy.interpolate import UnivariateSpline
+from scipy.interpolate import InterpolatedUnivariateSpline
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -129,8 +129,10 @@ def obtain_survivorship_ages(tb_group: Table, start_age: int = 0, end_age: int =
     """
     # Step 1: Apply splines, get Mx for each (country, year, sex, age)
     ## Define splines
-    spline_deaths = UnivariateSpline(tb_group["age"], tb_group["deaths"], s=0, k=3)
-    spline_exposures = UnivariateSpline(tb_group["age"], tb_group["exposure"], s=0, k=3)
+    ### We could use CubicSpline (k=3 order), but it provides slightly different results hence, for precaution, we sticked to InterpolatedUnivariateSpline.
+    ### This is equivalent to R function interpSpline
+    spline_deaths = InterpolatedUnivariateSpline(tb_group["age"], tb_group["deaths"], k=3)
+    spline_exposures = InterpolatedUnivariateSpline(tb_group["age"], tb_group["exposure"], k=3)
 
     ## Define age range (with step 0.01)
     age_range = np.arange(start_age, end_age, 0.01)
