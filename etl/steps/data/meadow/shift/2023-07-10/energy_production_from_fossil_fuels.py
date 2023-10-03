@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("energy_production_from_fossil_fuels.csv")
 
     # Load data from snapshot.
-    tb = snap.read_csv(snap.path, underscore=True)
+    tb = snap.read_csv(underscore=True)
 
     #
     # Process data.
