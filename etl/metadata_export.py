@@ -137,7 +137,7 @@ def metadata_export(
             # fix sources
             for source in variable.get("sources", []):
                 if "date_accessed" in source:
-                    source["date_accessed"] = pd.to_datetime(source["date_accessed"]).date()
+                    source["date_accessed"] = pd.to_datetime(source["date_accessed"], dayfirst=True).date()
 
             t["variables"][col] = variable
 

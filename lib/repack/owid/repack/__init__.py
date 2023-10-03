@@ -48,7 +48,7 @@ def repack_frame(
 
     for col in df.columns:
         if df[col].dtype == "object":
-            raise ValueError(f"column {col} is still object")
+            raise ValueError(f"Column {col} is still object. Consider converting it to str.")
 
     # set the primary key back again
     if primary_key:
