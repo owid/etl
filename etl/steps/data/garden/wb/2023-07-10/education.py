@@ -2,6 +2,7 @@
 
 from typing import cast
 
+import pandas as pd
 import shared
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
@@ -105,6 +106,9 @@ def run(dest_dir: str) -> None:
     # Normalize every value in the 'HD.HCI.HLOS' column by the maximum value (How many years of effective learning do you get for every year of educaiton)
     tb["normalized_hci"] = tb["HD.HCI.HLOS"] / max_value
 
+    # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
+    tb, combined_literacy_description, combined_expenditure_description = combine_historical_literacy_expenditure(tb)
+
     # Load additional datasets for region and income group information for regional aggregates
     ds_regions = paths.load_dependency("regions")
     ds_income_groups = paths.load_dependency("income_groups")
@@ -116,7 +120,7 @@ def run(dest_dir: str) -> None:
     tb = Table(tb, short_name=paths.short_name, underscore=True)
 
     # Add metadata by finding the descriptions and sources using the indicator codes.
-    tb = add_metadata(tb, metadata_tb)
+    tb = add_metadata(tb, metadata_tb, combined_literacy_description, combined_expenditure_description)
 
     #
     # Save outputs.
@@ -128,7 +132,80 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_metadata(tb: Table, metadata_tb: Table) -> None:
+def combine_historical_literacy_expenditure(tb):
+    """
+    Combines historical and recent literacy and expenditure data into a single DataFrame.
+
+    This function loads historical literacy and expenditure data, merges them with the recent data in
+    the input DataFrame 'tb' based on 'year' and 'country' columns. It then creates two new columns:
+    'combined_literacy' and 'combined_expenditure', which hold the respective values, preferring recent
+    data when available.
+    """
+    # Load historical literacy and and expenditure data
+    ds_literacy = cast(Dataset, paths.load_dependency("literacy_rates"))
+    tb_literacy = ds_literacy["literacy_rates"]
+
+    ds_expenditure = cast(Dataset, paths.load_dependency("public_expenditure"))
+    tb_expenditure = ds_expenditure["public_expenditure"]
+
+    historic_literacy = (
+        tb_literacy[["literacy_rates__world_bank__cia_world_factbook__and_other_sources"]].reset_index().copy()
+    )
+    historic_expenditure = (
+        tb_expenditure[["public_expenditure_on_education__tanzi__and__schuktnecht__2000"]].reset_index().copy()
+    )
+    recent_literacy = tb[["year", "country", "SE.ADT.LITR.ZS"]].copy()  # Literacy
+    recent_expenditure = tb[["year", "country", "SE.XPD.TOTL.GD.ZS"]].copy()  # Public expenditure
+
+    # Merge the DataFrames based on 'year' and 'country'
+    combined_df = pd.merge(
+        historic_literacy,
+        recent_literacy,
+        on=["year", "country"],
+        how="outer",
+        suffixes=("_historic_lit", "_recent_lit"),
+    )
+    combined_df = pd.merge(combined_df, historic_expenditure, on=["year", "country"], how="outer")
+    combined_df = pd.merge(
+        combined_df, recent_expenditure, on=["year", "country"], how="outer", suffixes=("_historic_exp", "_recent_exp")
+    )
+
+    # Define the functions to decide which value to keep
+    def decide_literacy(row):
+        return (
+            row["SE.ADT.LITR.ZS"]
+            if pd.notna(row["SE.ADT.LITR.ZS"])
+            else row["literacy_rates__world_bank__cia_world_factbook__and_other_sources"]
+        )
+
+    def decide_expenditure(row):
+        return (
+            row["SE.XPD.TOTL.GD.ZS"]
+            if pd.notna(row["SE.XPD.TOTL.GD.ZS"])
+            else row["public_expenditure_on_education__tanzi__and__schuktnecht__2000"]
+        )
+
+    # Apply the functions and create new columns
+    combined_df["combined_literacy"] = combined_df.apply(decide_literacy, axis=1)
+    combined_df["combined_expenditure"] = combined_df.apply(decide_expenditure, axis=1)
+
+    # Now, merge the combined_df back into the original tb DataFrame based on 'year' and 'country'
+    tb = pd.merge(
+        tb,
+        combined_df[["year", "country", "combined_literacy", "combined_expenditure"]],
+        on=["year", "country"],
+        how="outer",
+    )
+
+    combined_literacy_description = ds_literacy.metadata.sources[0].description
+    combined_expenditure_description = ds_expenditure.metadata.sources[0].description
+
+    return tb, combined_literacy_description, combined_expenditure_description
+
+
+def add_metadata(
+    tb: Table, metadata_tb: Table, combined_literacy_description, combined_expenditure_description
+) -> None:
     """
     Adds metadata by fetching details from the table with descriptions and sources originally retrieved in snapshot using the World Bank API.
 
@@ -139,13 +216,16 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
     Returns:
         Table: The table with updated metadata.
     """
-    # Loop through the DataFrame columns
+    # List of columns that were calculated in the etl for which metadata won't be available
     custom_cols = [
         "percentage_of_female_pre_primary_students",
         "percentage_of_female_tertiary_teachers",
         "total_funding_per_student_ppp",
         "normalized_hci",
+        "combined_literacy",
+        "combined_expenditure",
     ]
+    # Loop through the DataFrame columns
     for column in tqdm(tb.columns, desc="Processing metadata for indicators"):
         if column not in custom_cols:
             # Extract the title from the default metadata to find the corresponding World Bank indicator
@@ -170,14 +250,10 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
             tb.rename(columns={column: new_column_name}, inplace=True)
             description_string = " ".join(
                 [
-                    description + "." "World Bank variable id: " + indicator_to_find + ".",
+                    description + "\n\n" "World Bank variable id: " + indicator_to_find + "",
                     source,
                 ]
             )
-
-            # Replace any occurrences of '..' with '.'
-            description_string = description_string.replace("..", ".")
-            description_string = description_string.replace(".W", ". W")
 
             tb[new_column_name].metadata.description = description_string
             tb[new_column_name].metadata.title = name
@@ -239,6 +315,7 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
             else:
                 # Default metadata update when no other conditions are met.
                 update_metadata(tb, new_column_name, 0, " ", " ")
+        # Now, update metadata for custom indicators
         elif column == "total_funding_per_student_ppp":
             tb[column].metadata.title = "Total funding per student (in PPP)"
             tb[column].metadata.display = {}
@@ -260,4 +337,34 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
             tb[column].metadata.display["numDecimalPlaces"] = 1
             tb[column].metadata.unit = "score"
             tb[column].metadata.short_unit = ""
+        elif column == "combined_literacy":
+            tb[column].metadata.title = "Historical and more recent literacy estimates"
+            tb[column].metadata.description = (
+                "**Historical literacy data:**\n\n"
+                + combined_literacy_description
+                + "\n\n"
+                + "**Recent estimates:**\n\n"
+                + "Percentage of the population between age 25 and age 64 who can, with understanding, read and write a short, simple statement on their everyday life. Generally, ‘literacy’ also encompasses ‘numeracy’, the ability to make simple arithmetic calculations. This indicator is calculated by dividing the number of literates aged 25-64 years by the corresponding age group population and multiplying the result by 100."
+                + "\n\n"
+                + "World Bank variable id: UIS.LR.AG25T64. UNESCO Institute for Statistics"
+            )
+            tb[column].metadata.display = {}
+            tb[column].metadata.display["numDecimalPlaces"] = 2
+            tb[column].metadata.unit = "%"
+            tb[column].metadata.short_unit = "%"
+        elif column == "combined_expenditure":
+            tb[column].metadata.title = "Historical and more recent expenditure estimates"
+            tb[column].metadata.description = (
+                "**Historical expenditure data:**\n\n"
+                + combined_expenditure_description
+                + "\n\n"
+                + "**Recent estimates:**\n\n"
+                + "General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments."
+                + "\n\n"
+                + "World Bank variable id: SE.XPD.TOTL.GD.ZS. UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022."
+            )
+            tb[column].metadata.display = {}
+            tb[column].metadata.display["numDecimalPlaces"] = 2
+            tb[column].metadata.unit = "%"
+            tb[column].metadata.short_unit = "%"
     return tb
