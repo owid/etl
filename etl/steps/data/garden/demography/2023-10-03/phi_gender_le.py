@@ -12,10 +12,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("phi_gender_le")
+    ds_meadow = paths.load_dataset("life_tables")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["phi_gender_le"].reset_index()
+    tb = ds_meadow["life_tables"].reset_index()
 
     #
     # Process data.

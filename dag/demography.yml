@@ -92,3 +92,5 @@ steps:
   # Phi-gender life expectancy inequality
   data://garden/demography/2023-10-03/phi_gender_le:
     - data://garden/demography/2023-10-03/life_tables
+  # data://grapher/demography/2023-10-03/phi_gender_le:
+  #   - data://garden/demography/2023-10-03/phi_gender_le
