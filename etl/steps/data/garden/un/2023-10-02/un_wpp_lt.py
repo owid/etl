@@ -53,12 +53,16 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Sanity check
     assert (tb["agegrpspan"].isin([1, -1])).all() and (
         tb.loc[tb["agegrpspan"] == -1, "agegrpstart"] == 100
     ).all(), "Age group span should always be of 1, except for 100+ (-1)"
 
     # Rename columns, select columns
     tb = tb.rename(columns=COLUMNS_RENAME)
+
+    # Change 100 -> 100+
+    tb.loc[tb["age"] == 100, "age"] = "100+"
 
     # Scale central death rates
     paths.log.info("scale indicators to make them more.")
@@ -71,12 +75,15 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, country_col="location")
 
     # Harmonize sex sex
-    tb["sex"] = tb["sex"].map({
-        "Total": "both",
-        "Male": "male",
-        "Female": "female"
-    })
+    tb["sex"] = tb["sex"].map({"Total": "both", "Male": "male", "Female": "female"})
     assert tb["sex"].notna().all(), "NaNs detected after mapping sex values!"
+
+    # DTypes
+    tb = tb.astype(
+        {
+            "age": str,
+        }
+    )
 
     # Set index
     tb = tb.set_index(COLUMNS_INDEX, verify_integrity=True)[COLUMNS_INDICATORS]
