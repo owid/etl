@@ -83,6 +83,7 @@ definitions:
         <% endif %>
       - We count a war as new in a region even if the war started at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
       - |-
+        <% if conflict_type == "all" %>
         We only count a war as new when the war overall started that year, not if it restarted.
         <% elif conflict_type == "intra-state (internationalized)" %>
         We also only count an internationalized intrastate war as new when the war overall started that year, not if it became internationalized.
