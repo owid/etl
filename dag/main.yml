@@ -110,16 +110,6 @@ steps:
   data://grapher/un/2022-07-11/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
 
-  # UN SDG - archive
-  data://meadow/un/2023-01-24/un_sdg:
-    - snapshot://un/2023-01-24/un_sdg.feather
-  data://garden/un/2023-01-24/un_sdg:
-    - data://meadow/un/2023-01-24/un_sdg
-    - snapshot://un/2023-01-24/un_sdg_unit.csv
-    - snapshot://un/2023-01-24/un_sdg_dimension.json
-  data://grapher/un/2023-01-24/un_sdg:
-    - data://garden/un/2023-01-24/un_sdg
-
   # UN SDG - current
   data://meadow/un/2023-08-16/un_sdg:
     - snapshot://un/2023-08-16/un_sdg.feather
@@ -559,6 +549,7 @@ steps:
     - snapshot://un/2023-08-16/igme.zip
   data://garden/un/2023-08-16/igme:
     - data://meadow/un/2023-08-16/igme
+    - data://garden/un/2018/igme
   data://grapher/un/2023-08-16/igme:
     - data://garden/un/2023-08-16/igme
 
@@ -591,6 +582,31 @@ steps:
   data://grapher/un/2023-09-19/long_run_child_mortality:
     - data://garden/un/2023-08-29/long_run_child_mortality
 
+  # Older vintage UN IGME (with longer time-series)
+  data://meadow/un/2018/igme:
+    - snapshot://un/2018/igme.csv
+  data://garden/un/2018/igme:
+    - data://meadow/un/2018/igme
+
+  # Country lists
+  data://meadow/countries/2023-09-25/isd:
+    - snapshot://countries/2023-09-22/isd.xlsx
+  data://garden/countries/2023-09-25/isd:
+    - data://meadow/countries/2023-09-25/isd
+  data://meadow/countries/2023-09-25/gleditsch:
+    - snapshot://countries/2023-09-22/gleditsch_states.dat
+    - snapshot://countries/2023-09-22/gleditsch_microstates.dat
+  data://garden/countries/2023-09-25/gleditsch:
+    - data://meadow/countries/2023-09-25/gleditsch
+  data://meadow/countries/2023-09-29/cow_ssm:
+    - snapshot://countries/2023-09-22/cow_ssm_majors.csv
+    - snapshot://countries/2023-09-22/cow_ssm_states.csv
+    - snapshot://countries/2023-09-22/cow_ssm_system.csv
+  data://garden/countries/2023-09-29/cow_ssm:
+    - data://meadow/countries/2023-09-29/cow_ssm
+  data://grapher/countries/2023-09-29/cow_ssm:
+    - data://garden/countries/2023-09-29/cow_ssm
+
   # Fertility rate, Gapminder
   data://meadow/gapminder/2023-09-22/total_fertility_rate:
     - snapshot://gapminder/2023-09-22/total_fertility_rate.xlsx
@@ -603,6 +619,16 @@ steps:
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
+
+  # UN SDG - archive
+  data://meadow/un/2023-01-24/un_sdg:
+    - snapshot://un/2023-01-24/un_sdg.feather
+  data://garden/un/2023-01-24/un_sdg:
+    - data://meadow/un/2023-01-24/un_sdg
+    - snapshot://un/2023-01-24/un_sdg_unit.csv
+    - snapshot://un/2023-01-24/un_sdg_dimension.json
+  data://grapher/un/2023-01-24/un_sdg:
+    - data://garden/un/2023-01-24/un_sdg
 
   ######################################################################################################################
 

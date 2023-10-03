@@ -32,7 +32,9 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+    )
 
     # Remove source description so that it doesn't get appended to the dataset description.
     # ds_grapher.metadata.sources[0].description = ""

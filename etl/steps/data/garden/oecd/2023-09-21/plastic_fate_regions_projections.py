@@ -31,7 +31,26 @@ def run(dest_dir: str) -> None:
     combined_df = pr.merge(total_df, tb, on=["country", "year", "plastic_fate", "value"], how="outer").copy_metadata(
         from_table=tb
     )
-    tb = combined_df.underscore().set_index(["country", "year", "plastic_fate"], verify_integrity=True).sort_index()
+    total_df = total_df.rename(columns={"value": "global_value"})
+
+    # Merge the global totals back to the original DataFrame
+    df_with_share = pr.merge(combined_df, total_df, on=["year", "plastic_fate"], how="left")
+
+    # Calculate the share from global total
+    df_with_share["share"] = (df_with_share["value"] / df_with_share["global_value"]) * 100
+
+    # Optionally, drop the 'Global Value' column if it's not needed
+    df_with_share = df_with_share.drop(columns=["global_value", "country_y"])
+    df_with_share.rename(columns={"country_x": "country"}, inplace=True)
+    tb = df_with_share.pivot(index=["country", "year"], columns="plastic_fate", values=["value", "share"])
+
+    tb.columns = [f"{col[0]}_{col[1]}" if col[0] not in ["year", "country"] else col[0] for col in tb.columns]
+    for column in tb.columns:
+        if "value" in column:
+            tb[f"{column}_share"] = (tb[column] / tb["value_Total"]) * 100
+
+    tb = tb.underscore().sort_index()
+    tb = tb.drop(["share_total", "value_total_share"], axis=1)  # Remove the total from total column
 
     #
     # Save outputs.

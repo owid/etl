@@ -94,7 +94,9 @@ def grapher_checks(ds: catalog.Dataset) -> None:
             catalog.utils.validate_underscore(col)
             assert tab[col].metadata.unit is not None, f"Column `{col}` must have a unit."
             assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
-            assert tab[col].m.origins or tab[col].m.sources, f"Column `{col}` must have either sources or origins"
+            assert (
+                tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
+            ), f"Column `{col}` must have either sources or origins"
 
 
 def create_dataset(
@@ -193,7 +195,6 @@ def create_dataset(
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():
             assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
-
     # run grapher checks
     if ds.metadata.channel == "grapher" and run_grapher_checks:
         grapher_checks(ds)

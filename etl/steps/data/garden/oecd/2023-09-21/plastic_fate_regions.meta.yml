@@ -1,9 +1,99 @@
 tables:
   plastic_fate_regions:
     variables:
-      value:
-        title: Plastic waste by fate
+      value_incinerated:
+        title: Incinerated
         unit: 'tonnes'
         short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      value_landfilled:
+        title: Landfilled
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      value_littered:
+        title: Littered
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      value_mismanaged:
+        title: Mismanaged
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      value_recycled:
+        title: Recycled
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      value_total:
+        title: Total waste
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      share_incinerated:
+        title: Share of waste incinerated from global total
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      share_landfilled:
+        title: Share of waste landfilled from global total
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      share_littered:
+        title: Share of waste littered from global total
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      share_mismanaged:
+        title: Share of waste mismanaged from global total
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      share_recycled:
+        title: Share of waste recycled from global total
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      value_incinerated_share:
+        title: Share of waste incinerated from total regional waste
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      value_landfilled_share:
+        title: Share of waste landfilled from total regional waste
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      value_littered_share:
+        title: Share of waste littered from total regional waste
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      value_mismanaged_share:
+        title: Share of waste mismanaged from total regional waste
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      value_recycled_share:
+        title: Share of waste recycled from total regional waste
+        unit: '%'
+        short_unit: '%'
         display:
           numDecimalPlaces: 0

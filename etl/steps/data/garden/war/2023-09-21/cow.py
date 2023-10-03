@@ -79,12 +79,15 @@ import json
 from typing import List, Set, Tuple
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
 from pandas.api.types import is_integer_dtype  # type: ignore
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+
+from .shared import add_indicators_conflict_rate, expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -126,6 +129,10 @@ def run(dest_dir: str) -> None:
     log.info("war.cow: load data")
     tb_extra, tb_nonstate, tb_inter, tb_intra = load_tables(ds_meadow)
 
+    # Read table from COW codes
+    ds_cow_ssm = paths.load_dataset("cow_ssm")
+    tb_regions = ds_cow_ssm["cow_ssm_regions"].reset_index()
+
     # Check that there are no overlapping warnums between tables
     log.info("war.cow: check overlapping warnum in tables")
     _check_overlapping_warnum(tb_extra, tb_nonstate, tb_inter, tb_intra)
@@ -144,13 +151,19 @@ def run(dest_dir: str) -> None:
         tb_nonstate=tb_nonstate,
         tb_inter=tb_inter,
         tb_intra=tb_intra,
+        tb_regions=tb_regions,
     )
+
+    # Set new short_name
+    tb.m.short_name = "cow"
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -165,7 +178,7 @@ def load_tables(ds: Dataset) -> Tuple[Table, Table, Table, Table]:
     log.info("war.cow.extra: read data")
     tb_extra = load_cow_table(
         ds=ds,
-        table_name="extra_state",
+        table_name="cow_extra_state",
         column_start_year="startyear1",
         column_end_year="endyear1",
         column_location="wherefought",
@@ -177,7 +190,7 @@ def load_tables(ds: Dataset) -> Tuple[Table, Table, Table, Table]:
     log.info("war.cow.non: read data")
     tb_nonstate = load_cow_table(
         ds=ds,
-        table_name="non_state",
+        table_name="cow_non_state",
         column_start_year="startyear",
         column_end_year="endyear",
         column_location="wherefought",
@@ -189,7 +202,7 @@ def load_tables(ds: Dataset) -> Tuple[Table, Table, Table, Table]:
     log.info("war.cow.inter: read data")
     tb_inter = load_cow_table(
         ds=ds,
-        table_name="inter_state",
+        table_name="cow_inter_state",
         column_start_year="startyear1",
         column_end_year="endyear1",
         column_location="wherefought",
@@ -202,7 +215,7 @@ def load_tables(ds: Dataset) -> Tuple[Table, Table, Table, Table]:
     log.info("war.cow.intra: read data")
     tb_intra = load_cow_table(
         ds=ds,
-        table_name="intra_state",
+        table_name="cow_intra_state",
         column_start_year="startyr1",
         column_end_year="endyr1",
         column_location="v5regionnum",
@@ -213,7 +226,7 @@ def load_tables(ds: Dataset) -> Tuple[Table, Table, Table, Table]:
     return tb_extra, tb_nonstate, tb_inter, tb_intra
 
 
-def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intra: Table) -> Table:
+def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intra: Table, tb_regions: Table) -> Table:
     """Combine the tables from all four different conflict types.
 
     The original data comes in separate tables: extra-, non-, inter- and intra-state.
@@ -264,7 +277,7 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
 
     # Concatenate
     log.info("war.cow: concatenate tables")
-    tb = pd.concat(
+    tb = pr.concat(
         [
             tb_extra,
             tb_nonstate,
@@ -281,11 +294,22 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
 
     # Add yearly observations (scale values)
     log.info("war.cow: expand observations")
-    tb = expand_observations(tb, column_metrics=["number_deaths_ongoing_conflicts"])  # type: ignore
-
+    tb = expand_observations(
+        tb,
+        col_year_start="year_start",
+        col_year_end="year_end",
+        cols_scale=["number_deaths_ongoing_conflicts"],
+    )
     # Estimate metrics (do the aggregations)
     log.info("war.cow: estimate metrics")
     tb = estimate_metrics(tb)
+
+    # Replace missing values with zeroes
+    log.info("war.cow: replace missing values with zeroes")
+    tb = replace_missing_data_with_zeros(tb)
+
+    log.info("war.cow: map fatality codes to names")
+    tb = add_indicators_conflict_rate(tb, tb_regions, ["number_ongoing_conflicts", "number_new_conflicts"])
 
     # Add suffix with source name
     msk = tb["region"] != "World"
@@ -297,16 +321,9 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
         not tb["number_deaths_ongoing_conflicts"].isna().any()
     ), "Some NaNs found in `number_deaths_ongoing_conflicts`!"
 
-    # Replace missing values with zeroes
-    log.info("war.cow: replace missing values with zeroes")
-    tb = replace_missing_data_with_zeros(tb)
-
     # Set index
     log.info("war.cow: set index")
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True)
-
-    # Create table
-    tb = Table(tb, short_name="cow")
 
     return tb
 
@@ -381,10 +398,10 @@ def aggregate_rows_by_periods_extra(tb: Table) -> Table:
             it is replaced by the lower bound (e.g. 2,000 for 2 years, etc.)
     """
     # Get summation (assuming NaN=0) and flag stating if a NaN is found
-    tb = tb.groupby(["warnum", "conflict_type", "region", "year_start", "year_end"], as_index=False).agg(
-        {"battle_deaths": [has_nan, sum], "nonstate_deaths": [has_nan, sum]}
-    )
-    tb.columns = [f"{col1}_{col2}" if col2 != "" else col1 for col1, col2 in tb.columns]
+    index = ["warnum", "conflict_type", "region", "year_start", "year_end"]
+    tb_nan = tb.groupby(index, as_index=False).agg({"battle_deaths": has_nan, "nonstate_deaths": has_nan})
+    tb_sum = tb.groupby(index, as_index=False).agg({"battle_deaths": sum, "nonstate_deaths": sum})
+    tb = tb_nan.merge(tb_sum, on=index, suffixes=("_has_nan", "_sum"))
 
     # Obtain deaths threshold according to dataset description
     tb["deaths_threshold"] = 1000 * (tb["year_end"] - tb["year_start"] + 1)
@@ -508,10 +525,11 @@ def aggregate_rows_by_periods_inter(tb: Table) -> Table:
             it is replaced by the lower bound (e.g. 2,000 for 2 years, etc.)
     """
     # Get summation (NaN if any NaN, and assuming NaN=0)
-    tb = tb.groupby(["warnum", "conflict_type", "region", "year_start", "year_end"], as_index=False).agg(
-        {"number_deaths_ongoing_conflicts": [has_nan, sum]}
-    )
-    tb.columns = [f"{col1}_{col2}" if col2 != "" else col1 for col1, col2 in tb.columns]
+    index = ["warnum", "conflict_type", "region", "year_start", "year_end"]
+    tb_nan = tb.groupby(index, as_index=False).agg({"number_deaths_ongoing_conflicts": has_nan})
+    tb_sum = tb.groupby(index, as_index=False).agg({"number_deaths_ongoing_conflicts": sum})
+    tb = tb_nan.merge(tb_sum, on=index, suffixes=("_has_nan", "_sum"))
+
     # Obtain deaths threshold according to dataset description
     tb["deaths_threshold"] = 1000 * (tb["year_end"] - tb["year_start"] + 1)
 
@@ -756,23 +774,6 @@ def load_cow_table(
     return tb
 
 
-def expand_observations(tb: Table, column_metrics: List[int]) -> Table:
-    """Add year per observation."""
-    # Expand to all observation years
-    # Add years
-    YEAR_MIN = tb["year_start"].min()
-    YEAR_MAX = tb["year_end"].max()
-    tb_all_years = pd.DataFrame(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
-    tb = tb_all_years.merge(tb, how="cross")  # type: ignore
-    ## Filter only entries that actually existed
-    tb = tb[(tb["year"] >= tb["year_start"]) & (tb["year"] <= tb["year_end"])]
-
-    # Scale number of deaths
-    tb[column_metrics] = tb[column_metrics].div(tb["year_end"] - tb["year_start"] + 1, "index").round()
-
-    return tb
-
-
 def estimate_metrics(tb: Table) -> Table:
     """Remix table to have the desired metrics.
 
@@ -844,7 +845,7 @@ def _get_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world_intra["conflict_type"] = "intra-state"
 
     ## Combine all
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_alltypes, tb_ongoing_world, tb_ongoing_world_alltypes, tb_ongoing_intra, tb_ongoing_world_intra], ignore_index=True).sort_values(  # type: ignore
+    tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_alltypes, tb_ongoing_world, tb_ongoing_world_alltypes, tb_ongoing_intra, tb_ongoing_world_intra], ignore_index=True).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
 
@@ -897,7 +898,7 @@ def _get_new_metrics(tb: Table) -> Table:
     tb_new_world_intra["conflict_type"] = "intra-state"
 
     ## Combine
-    tb_new = pd.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes, tb_new_intra, tb_new_world_intra], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pr.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes, tb_new_intra, tb_new_world_intra], ignore_index=True).sort_values(  # type: ignore
         by=["year_start", "region", "conflict_type"]
     )
 

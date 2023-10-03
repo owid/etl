@@ -3,7 +3,7 @@ tables:
   plastic_use_projections:
     variables:
       plastic_use:
-        title: Plastic production - projections
+        title: Plastic use - projections
         unit: 'tonnes'
         short_unit: 't'
         display:
