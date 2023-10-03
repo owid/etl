@@ -81,3 +81,8 @@ steps:
     - snapshot://un/2023-10-02/un_wpp_lt_m.zip
   data://garden/un/2023-10-02/un_wpp_lt:
     - data://meadow/un/2023-10-02/un_wpp_lt
+
+  # UN WPP + HMD Life Tables
+  data://garden/demography/2023-10-03/life_tables:
+    - data://garden/hmd/2023-09-19/hmd
+    - data://garden/un/2023-10-02/un_wpp_lt
