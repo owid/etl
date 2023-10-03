@@ -182,6 +182,10 @@ class Snapshot:
         """Read a table of fixed-width formatted lines with metadata."""
         return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
+    def ExcelFile(self, *args, **kwargs) -> pr.ExcelFile:
+        """Return an Excel file object ready for parsing."""
+        return pr.ExcelFile(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
 
 @pruned_json
 @dataclass_json
