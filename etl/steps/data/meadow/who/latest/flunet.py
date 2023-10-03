@@ -32,6 +32,12 @@ def run(dest_dir: str) -> None:
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
     tb = tb.rename(columns={"country_area_territory": "country"})
+
+    # Convert messy columns to string.
+    for col in ("aother_subtype_details",):
+        ix = tb[col].notnull()
+        tb.loc[ix, col] = tb.loc[ix, col].astype("str")
+
     #
     # Save outputs.
     #

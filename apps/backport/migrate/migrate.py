@@ -5,6 +5,7 @@ from typing import Optional, cast
 import click
 import structlog
 from owid.catalog.utils import underscore
+from rich import print
 from sqlalchemy.engine import Engine
 
 from apps.backport.backport import PotentialBackport
@@ -124,9 +125,14 @@ def migrate(
     # add steps to DAG
     _add_to_migrated_dag(namespace, version, short_name)
 
-    print(f"Execute snapshot with `python snapshots/{namespace}/{version}/{short_name}.py`")
-    print(f"Import dataset with `etl {namespace}/{version}/{short_name} --grapher`")
-    print("Run chart revisions with `ENV=.env.prod.write walkthrough charts`")
+    # Print instructions
+    print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
+    print(
+        f"[green]1.[/green] Execute snapshot with [bold]`python snapshots/{namespace}/{version}/{short_name}.py`[/bold]"
+    )
+    print(f"[green]2.[/green] Import dataset with [bold]`etl {namespace}/{version}/{short_name} --grapher`[/bold]")
+    print("[green]3.[/green] Run chart revisions with [bold]`ENV=.env.prod.write walkthrough charts`[/bold]")
+    print("[green]4.[/green] [bold]Delete[/bold] or archive the old dataset")
 
 
 def _add_to_migrated_dag(namespace: str, version: str, short_name: str):
