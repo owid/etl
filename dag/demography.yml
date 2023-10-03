@@ -74,6 +74,18 @@ steps:
   data://grapher/hmd/2023-09-19/hmd:
     - data://garden/hmd/2023-09-19/hmd
 
+  # Survivorship ages (HMD-derived)
+  data://garden/demography/2023-09-27/survivor_percentiles:
+    - data://garden/hmd/2023-09-19/hmd
+  data://grapher/demography/2023-09-27/survivor_percentiles:
+    - data://garden/demography/2023-09-27/survivor_percentiles
+
+  # Phi-gender life expectancy inequality
+  data://garden/demography/2023-10-03/phi_gender_le:
+    - data://garden/demography/2023-10-03/life_tables
+  # data://grapher/demography/2023-10-03/phi_gender_le:
+  #   - data://garden/demography/2023-10-03/phi_gender_le
+
   # UN WPP Life Tables
   data://meadow/un/2023-10-02/un_wpp_lt:
     - snapshot://un/2023-10-02/un_wpp_lt_all.zip
@@ -88,9 +100,3 @@ steps:
     - data://garden/un/2023-10-02/un_wpp_lt
   data://grapher/demography/2023-10-03/life_tables:
     - data://garden/demography/2023-10-03/life_tables
-
-  # Phi-gender life expectancy inequality
-  data://garden/demography/2023-10-03/phi_gender_le:
-    - data://garden/demography/2023-10-03/life_tables
-  # data://grapher/demography/2023-10-03/phi_gender_le:
-  #   - data://garden/demography/2023-10-03/phi_gender_le

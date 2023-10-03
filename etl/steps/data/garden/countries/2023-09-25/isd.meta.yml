@@ -4,12 +4,33 @@
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
+  title: States in regions (ISD)
   update_period_days: 1400
 
 
 # Learn more about the available fields:
-# http://docs.owid.io/projects/etl/en/architecture/metadata/reference/tables/
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
+  isd_regions:
+    title: States in regions (ISD)
+    variables:
+      number_countries:
+        title: Number of states in a region
+        description_short: |-
+          Number of sovereign states in each region.
+        unit: countries
+        processing_level: minor
+        description_processing: |-
+          We assign each sovereign state to a region based on the mapping (using ISD/COW codes):
+
+            - Americas: 2-165
+            - Europe: 200-395, 2558, 3375
+            - Africa: 400-626, 4044-6257
+            - Middle East: 630-698, 6821-6845
+            - Asia and Oceania: 700-990, 7003-9210
+
+        display:
+          numDecimalPlaces: 0
   isd:
     variables:
       cowid:
@@ -92,7 +113,7 @@ tables:
         description_from_producer: |-
           Was there ambiguity on the start type?
       startsettle:
-        title: State creation settlmenet
+        title: State creation settlement
         description_from_producer: |-
           Was there a treaty or formal settlement attending the birth of the state?
       end_am:

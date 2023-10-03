@@ -1,7 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
 import pandas as pd
-from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -23,21 +22,19 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("prio_v31.xls")
 
     # Load data from snapshot.
-    df = pd.read_excel(snap.path)
+    tb = snap.read()
 
     #
     # Process data.
     #
-    df = assign_dtypes(df)
+    tb = assign_dtypes(tb)
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
-
     tb = tb.set_index(["id", "year"], verify_integrity=True)
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata, check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
