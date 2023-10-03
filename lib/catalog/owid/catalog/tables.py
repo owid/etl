@@ -931,7 +931,7 @@ class Table(pd.DataFrame):
         """Rename index."""
         column_idx = list(self.index.names)
         column_idx_new = [renames.get(col, col) for col in column_idx]
-        tb = self.reset_index().rename(columns={"region": "country"})
+        tb = self.reset_index().rename(columns=renames)
         tb = tb.set_index(column_idx_new)
         return tb
 
