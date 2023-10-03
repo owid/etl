@@ -23,7 +23,6 @@ def run(dest_dir: str) -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         decompress_file(snap.path, tmpdir)
         path = os.path.join(tmpdir, "mie-1.0.csv")  # other file: "INTRA-STATE_State_participants v5.1 CSV.csv"
-        # df = pd.read_csv(path)
         tb = pr.read_csv(path, metadata=snap.to_table_metadata(), origin=snap.m.origin, underscore=True)
 
     #
