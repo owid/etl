@@ -1013,6 +1013,12 @@ def test_groupby_iteration(table_1) -> None:
         assert group.a.m.title == "Title of Table 1 Variable a"
 
 
+def test_groupby_observed_default(table_1) -> None:
+    table_1 = table_1.astype({"a": "category"}).query("a != 3")
+    gt = table_1.groupby("a").min()
+    assert len(gt) == 2
+
+
 def test_set_columns(table_1) -> None:
     table_1.columns = ["country", "year", "new_a", "new_b"]
     assert table_1.new_a.m.title == "Title of Table 1 Variable a"
