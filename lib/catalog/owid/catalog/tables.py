@@ -1426,7 +1426,6 @@ def read_json(
 
 
 class ExcelFile(pd.ExcelFile):
-
     def __init__(self, *args, metadata: Optional[TableMeta] = None, origin: Optional[Origin] = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.metadata = metadata
