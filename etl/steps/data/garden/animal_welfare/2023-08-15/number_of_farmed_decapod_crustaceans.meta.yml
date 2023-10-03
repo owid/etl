@@ -20,7 +20,7 @@ tables:
         presentation:
           attribution: *attribution
           grapher_config:
-            subtitle: &subtitle Decapod crustaceans are animals such as shrimps, crabs, lobsters, prawns, and crayfish. 2016 and 2017 data does not include species without an estimated mean weight (which were an additional 6% of reported global production).
+            subtitle: &subtitle Decapod crustaceans are animals such as shrimps, crabs, lobsters, prawns, and crayfish. This data does not include species without an estimated mean weight (which were an additional 6% of reported global production).
             note: Upper and lower-bound estimates are shown due to large uncertainties. The map shows midpoint values.
       n_farmed_decapod_crustaceans:
         title: Estimated number of farmed decapod crustaceans
