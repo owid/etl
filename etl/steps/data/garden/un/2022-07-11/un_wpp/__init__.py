@@ -22,7 +22,7 @@ YEAR_SPLIT = 2022
 
 log = structlog.get_logger()
 
-metric_categories = {
+METRIC_CATEGORIES = {
     "migration": [
         "net_migration",
         "net_migration_rate",
@@ -60,7 +60,7 @@ def merge_dfs(dfs: List[Table]) -> Table:
     # Fix variant name
     df.loc[df.year < YEAR_SPLIT, "variant"] = "estimates"
     # Index
-    df = df.set_index(["location", "year", "metric", "sex", "age", "variant"])
+    df = df.set_index(["location", "year", "metric", "sex", "age", "variant"], verify_integrity=True)
     df = df.dropna(subset=["value"])
     # df = df.sort_index()
     return df
@@ -111,7 +111,7 @@ def run(dest_dir: str) -> None:
     )
     # generate sub-datasets
     tables = []
-    for category, metrics in metric_categories.items():
+    for category, metrics in METRIC_CATEGORIES.items():
         log.info(f"Generating table for category {category}...")
         tables.append(
             df.query(f"metric in {metrics}")
@@ -122,6 +122,8 @@ def run(dest_dir: str) -> None:
             )
         )
     # add dataset with single-year age group population
+    cols_index = ["location", "year", "metric", "sex", "age", "variant"]
+    df_population_granular = df_population_granular.set_index(cols_index, verify_integrity=True)
     tables.append(
         df_population_granular.update_metadata(
             short_name="population_granular",
