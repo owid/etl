@@ -912,8 +912,19 @@ class Table(pd.DataFrame):
     def sort_index(self, *args, **kwargs) -> "Table":
         return super().sort_index(*args, **kwargs)  # type: ignore
 
-    def groupby(self, *args, **kwargs) -> "TableGroupBy":
-        return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
+    def groupby(self, *args, observed=False, **kwargs) -> "TableGroupBy":
+        """Groupby that preserves metadata."""
+        by_list = [args[0]] if isinstance(args[0], str) else args[0]
+        for by in by_list:
+            by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
+            if by_type == "category":
+                log.warning(
+                    f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour."
+                )
+
+        return TableGroupBy(
+            pd.DataFrame.groupby(self.copy(deep=False), *args, observed=observed, **kwargs), self.metadata, self._fields
+        )
 
     def check_metadata(self, ignore_columns: Optional[List[str]] = None) -> None:
         """Check that all variables in the table have origins."""
