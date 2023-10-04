@@ -8,7 +8,8 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-YEAR = 2023
+# Define most recent year to extend the range of years of the dataset.
+LATEST_YEAR = 2022
 
 
 def run(dest_dir: str) -> None:
@@ -40,7 +41,7 @@ def run(dest_dir: str) -> None:
 
     # For these countries, assign the minimum year of colstart_max as colstart_max and the maximum year of colend_max as colend_max
     tb_rest["colstart_max"] = tb_colonized["colstart_max"].min()
-    tb_rest["colend_max"] = YEAR
+    tb_rest["colend_max"] = LATEST_YEAR
 
     # Create a year column with one value per row representing the range between colstart_max and colend_max
     # NOTE: I have decided to use last date aggregations, but we could also use mean aggregations
@@ -51,7 +52,7 @@ def run(dest_dir: str) -> None:
     tb_colonized = tb_colonized.explode("year").reset_index(drop=True)
     tb_rest = tb_rest.explode("year").reset_index(drop=True)
 
-    # Drop colstart and colend columns
+    # Drop colstart, colend and col columns
     tb_colonized = tb_colonized.drop(columns=["colstart_max", "colend_max", "colstart_mean", "colend_mean", "col"])
     tb_rest = tb_rest.drop(columns=["colstart_max", "colend_max", "colstart_mean", "colend_mean", "col"])
 
@@ -72,7 +73,7 @@ def run(dest_dir: str) -> None:
     # Concatenate tb_colonized and tb_rest
     tb = pr.concat([tb_colonized, tb_rest, tb_count], short_name="colonial_dates_dataset")
 
-    # Fill years in the range (tb_colonized['year'].min(), YEAR) not present for each country
+    # Fill years in the range (tb_colonized['year'].min(), LATEST_YEAR) not present for each country
     tb = tb.set_index(["country", "year"]).unstack().stack(dropna=False).reset_index()
 
     # Create an additional summarized colonizer column, replacing the values with " - " with "More than one colonizer"

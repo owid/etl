@@ -7,6 +7,8 @@ meta:
       the new dataset reflects the accumulated knowledge in the discipline and relieves
       researchers from making hard to justify choices between different historical
       datasets.
+
+      The dataset only considers the colonial status of countries that are independent today.
     producer: Bastian Becker
     citation_full: 'Becker, Bastian (2019), Introducing COLDAT: The Colonial Dates
       Dataset, SOCIUM/SFB1342 Working Paper Series, 02/2019. url: https://www.socium.uni-bremen.de/f/51ebd445c4.pdf'
@@ -17,9 +19,6 @@ meta:
     license:
       name: CC0
       url: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/T9SDEW
-  license:
-    name: CC0
-    url: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/T9SDEW
   is_public: true
 wdir: ../../../data/snapshots/harvard/2023-09-18
 outs:
