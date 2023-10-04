@@ -1,0 +1,80 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+  description: |-
+    Abridged life tables up to age 100 by sex and both sexes combined providing a set of values showing the mortality experience of a hypothetical group of infants born at the same time and subject throughout their lifetime to the specific mortality rates of a given year (period life tables), from 1950 to 2021.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  un_wpp_lt:
+    variables:
+      central_death_rate:
+        title: Central death rate
+        description_short: |-
+          For a given population or cohort, the central death rate at age x during a given period of 12 months is found by dividing the number of people who died during this period while aged x by the average number who were living in that age group during the period.
+        unit: deaths per 1,000 people
+        processing_level: minor
+        description_processing: |-
+          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
+      probability_of_death:
+        title: Probability of death
+        unit: "%"
+        description_short: The probability that a person who survived until the start of a given interval will have survived by the end of the interval.
+        processing_level: minor
+        description_processing: |-
+          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
+      probability_of_survival:
+        title: Probability of survival
+        unit: "%"
+        description_short: The probability that a person who survived until the start of a given interval will have died by the end of the interval.
+        processing_level: minor
+        description_processing: |-
+          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
+      average_survival_length:
+        title: Average survival length
+        short_unit: years
+        unit: years
+        description_short: Average length of survival between ages x and x+n for persons dying in the interval.
+      number_survivors:
+        title: Number of survivors
+        unit: survivors
+        description_short: Number of survivors at exact age x, assuming survivors at 0 years old is 100,000.
+      number_deaths:
+        title: Number of deaths
+        short_unit: deaths
+        unit: deaths
+        description_short: Number of deaths between ages x and x+n.
+      number_person_years_lived:
+        title: Number of person-years lived
+        unit: person-years
+        description_short: Number of person-years lived between ages x and x+n.
+      survivorship_ratio:
+        title: Survivorship ratio
+        unit: ""
+        description_short: Survival ratio (nSx) corresponding to proportion of the life table population in age group (x, x+n) who are alive n year later
+      number_person_years_remaining:
+        title: Number of person-years remaining
+        unit: person-years
+        description_short: Number of person-years remaining after exact age x.
+      life_expectancy:
+        title: Life expectancy
+        short_unit: years
+        unit: years
+        # description_short: |-
+        #   The number of years that a person of a given age is expected to live. 'Life expectancy at age 0' refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy for people who have already survived to the given age.
+        description_short: |-
+            <% if type == "period" %>
+            The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
+
+            <% elif type == "cohort" %>
+            The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+            <% endif %>
+
+            'Life expectancy at age 0' refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy for people who have already survived to the given age.
+

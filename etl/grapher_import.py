@@ -165,6 +165,7 @@ def _add_or_update_source(
 
 def _add_or_update_origins(session: Session, origins: list[catalog.Origin]) -> list[gm.Origin]:
     out = []
+    assert len(origins) == len(set(origins)), "origins must be unique"
     for origin in origins:
         out.append(gm.Origin.from_origin(origin).upsert(session))
     return out

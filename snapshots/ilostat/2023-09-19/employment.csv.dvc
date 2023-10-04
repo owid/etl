@@ -1,5 +1,5 @@
 # Learn more at:
-# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/origin/
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
 meta:
   origin:
     # Data product / Snapshot
@@ -17,7 +17,7 @@ meta:
 
     # Files
     url_main: https://ilostat.ilo.org/data/
-    url_download: 
+    url_download:
       https://www.ilo.org/shinyapps/bulkexplorer45/session/122788c35f3169da500a18da4cf708a8/download/download?w=
 
     date_accessed: 2023-09-19

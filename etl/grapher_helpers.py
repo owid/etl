@@ -174,6 +174,8 @@ def _yield_wide_table(
             for k in (
                 "description",
                 "description_short",
+                "description_from_producer",
+                "description_processing",
             ):
                 if getattr(tab[short_name].m, k):
                     setattr(
@@ -181,6 +183,9 @@ def _yield_wide_table(
                         k,
                         _expand_jinja_template(getattr(tab[short_name].m, k), dim_dict),
                     )
+
+            for i, desc_key in enumerate(tab[short_name].m.description_key or []):
+                tab[short_name].m.description_key[i] = _expand_jinja_template(desc_key, dim_dict)
 
             # Keep only entity_id and year in index
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
@@ -198,13 +203,9 @@ def _expand_jinja_template(text: str, dim_dict: Dict[str, str]) -> str:
 
     try:
         return jinja_env.from_string(text).render(dim_dict)
-    except jinja2.exceptions.TemplateSyntaxError:
-        log.warning(
-            "yield_wide_table.jinja_syntax_error",
-            dims=dim_dict,
-            description="\n" + text,
-        )
-        raise
+    except jinja2.exceptions.TemplateSyntaxError as e:
+        new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
+        raise e.__class__(new_message, e.lineno, e.name, e.filename) from e
 
 
 def _title_column_and_dimensions(title: str, dims: List[str], dim_names: List[str]) -> str:

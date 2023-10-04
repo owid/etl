@@ -2,14 +2,14 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/2762
-    date_accessed: 2023-08-10 09:08:47.743199
+    date_accessed: 2023-09-27 06:30:31.518935
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Cross-country literacy rates - World Bank, CIA World Factbook, and other sources
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 251182c48c885464c85860b237c3823a
-  size: 26106
+- md5: f7127eb7fa156116408e550b70212a0f
+  size: 31722
   path: 
     dataset_2762_cross_country_literacy_rates__world_bank__cia_world_factbook__and_other_sources_values.feather

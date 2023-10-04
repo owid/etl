@@ -42,11 +42,14 @@ On regions:
 """
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+
+from .shared import expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -119,7 +122,12 @@ def run(dest_dir: str) -> None:
 
     # Expand observations
     log.info("war.brecke: expand observations")
-    tb = expand_observations(tb)
+    tb = expand_observations(
+        tb,
+        col_year_start="startyear",
+        col_year_end="endyear",
+        cols_scale=["totalfatalities"],
+    )
 
     # Estimate metrics
     log.info("war.brecke: estimate metrics")
@@ -139,15 +147,13 @@ def run(dest_dir: str) -> None:
     log.info("war.brecke: set index")
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True)
 
-    # Add short_name to table
-    log.info("war.brecke: add shortname to table")
-    tb = Table(tb, short_name=paths.short_name)
-
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -238,34 +244,6 @@ def add_lower_bound_deaths(tb: Table) -> Table:
     return tb
 
 
-def expand_observations(tb: Table) -> Table:
-    """Expand to have a row per (year, conflict).
-
-    Parameters
-    ----------
-    tb : Table
-        Original table, where each row is a conflict with its start and end year.
-
-    Returns
-    -------
-    Table
-        Here, each conflict has as many rows as years of activity. Its deaths have been uniformly distributed among the years of activity.
-    """
-    # For that we scale the number of deaths proportional to the duration of the conflict.
-    tb[["totalfatalities"]] = tb[["totalfatalities"]].div(tb["endyear"] - tb["startyear"] + 1, "index").round()
-
-    # Add missing years for each triplet ("warcode", "campcode", "ccode")
-    YEAR_MIN = tb["startyear"].min()
-    YEAR_MAX = tb["endyear"].max()
-    tb_all_years = pd.DataFrame(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
-    tb = pd.DataFrame(tb)  # to prevent error "AttributeError: 'DataFrame' object has no attribute 'all_columns'"
-    tb = tb.merge(tb_all_years, how="cross")
-    # Filter only entries that actually existed
-    tb = tb[(tb["year"] >= tb["startyear"]) & (tb["year"] <= tb["endyear"])]
-
-    return tb
-
-
 def estimate_metrics(tb: Table) -> Table:
     """Remix table to have the desired metrics.
 
@@ -325,7 +303,7 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world_all_conf["conflict_type"] = "all"
 
     ## Add region=World
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_all_conf, tb_ongoing_world, tb_ongoing_world_all_conf], ignore_index=True).sort_values(  # type: ignore
+    tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_all_conf, tb_ongoing_world, tb_ongoing_world_all_conf], ignore_index=True).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
 
@@ -337,6 +315,9 @@ def _add_ongoing_metrics(tb: Table) -> Table:
         }
     )
 
+    tb_ongoing["number_ongoing_conflicts"] = tb_ongoing["number_ongoing_conflicts"].copy_metadata(
+        tb_ongoing["number_deaths_ongoing_conflicts"]
+    )
     return tb_ongoing
 
 
@@ -360,7 +341,7 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new_world_all_conf["conflict_type"] = "all"
 
     ## Combine
-    tb_new = pd.concat([tb_new, tb_new_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pr.concat([tb_new, tb_new_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True).sort_values(  # type: ignore
         by=["startyear", "region", "conflict_type"]
     )
 
@@ -372,6 +353,7 @@ def _add_new_metrics(tb: Table) -> Table:
         }
     )
 
+    tb_new["number_new_conflicts"] = tb_new["number_new_conflicts"].copy_metadata(tb["totalfatalities"])
     return tb_new
 
 

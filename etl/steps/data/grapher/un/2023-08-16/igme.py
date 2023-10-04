@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     ds_garden = cast(Dataset, paths.load_dependency("igme"))
 
     # Read table from garden dataset.
-    tb = ds_garden["igme"]
+    tb = ds_garden["igme_combined"]
 
     #
     # Process data.
