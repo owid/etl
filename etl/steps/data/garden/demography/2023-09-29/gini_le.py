@@ -83,7 +83,9 @@ def run(dest_dir: str) -> None:
 def AKm02a0(m0: float, is_male: bool = True) -> NDArray[Any]:
     """Get estimates.
 
-    Different procedure for male or female.
+    Calculate the average number of years lived in the first year of life (ax for age 0), and is calculated based on the mortality rate during the first year of life (m0).
+
+    There is a slight different procedure for male or female.
 
     More details: https://www.rdocumentation.org/packages/MortHump/versions/0.2/topics/AKm02a0
     """
@@ -116,20 +118,31 @@ def gini_from_mx(tb_group: Table) -> Variable:
 
     # Estimate D
     OPENAGE = i_openage - 1
-    RADIX = 1
+    ## Calculates the probability of dying in each age interval
     qx = mx / (1 + (1 - ax) * mx)  # type: ignore
     qx[i_openage - 1] = 1 if not np.isnan(qx[i_openage - 1]) else np.nan
+    ## Probability of surviving in each age interval
     px = 1 - qx
     px[np.isnan(px)] = 0
+    ## number of survivors at the start of each interval
+    RADIX = 1  # starting value
     lx = np.concatenate(([RADIX], RADIX * np.cumprod(px[:OPENAGE])))
+    ## number of people who die in each interval
     dx = lx * qx
+    ## number of person years lived in each interval
+    ## [number of initial survivors in that interval] -  (1 - [number of years lived during that interval]) * [number who die in the interval]
     Lx = lx - (1 - ax) * dx
     Lx[i_openage - 1] = lx[i_openage - 1] * ax[i_openage - 1]
+    ## total number of life years from a given age to the end of the cohort
     Tx = np.concatenate((np.cumsum(Lx[:OPENAGE][::-1])[::-1], [0])) + Lx[i_openage - 1]
+    ## life expectancy
     ex = Tx / lx
+    ## matrix with the number of deaths for each age-pair combination
     D = np.outer(dx, dx)
 
     # Estimate Gini
+    ## total inequality in lifespans: sum of the product of the matrix D by the age difference, np.sum(D * X_)
+    ## divided by the life expectancy at birth x2 (helps to normalise it to a number between 0 and 1)
     G = np.sum(D * X_) / (2 * ex[0])
 
     var = Variable({"life_expectancy_gini": G})
