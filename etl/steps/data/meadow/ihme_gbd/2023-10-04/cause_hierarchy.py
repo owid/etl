@@ -6,21 +6,19 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Retrieve snapshot.
-    snap = paths.load_snapshot("cause_hierarchy.xlsx")
+def run(
+    dest_dir: str,
+) -> None:
+    # Load snapshot.
+    snap = paths.load_snapshot("cause_hierarchy.csv")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="GBD_2019_Cause_Hierarchy_1130_2")
-
+    tb = snap.read()
     #
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.underscore()
 
     #
     # Save outputs.
