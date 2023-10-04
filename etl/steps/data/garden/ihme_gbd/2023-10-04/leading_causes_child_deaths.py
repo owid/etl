@@ -26,20 +26,29 @@ def run(dest_dir: str) -> None:
     level_3_causes = tb_hierarchy[tb_hierarchy["level"] == 3]["cause_name_underscore"].to_list()
     level_3_causes = list(map(lambda item: underscore(item), level_3_causes))
 
+    level_4_causes = tb_hierarchy[tb_hierarchy["level"] == 4]["cause_name_underscore"].to_list()
+    level_4_causes = list(map(lambda item: underscore(item), level_4_causes))
+
     tb_level_2 = create_hierarchy_table(tb_cause, level_2_causes, short_name="leading_cause_level_2")
     tb_level_3 = create_hierarchy_table(tb_cause, level_3_causes, short_name="leading_cause_level_3")
+    tb_level_4 = create_hierarchy_table(tb_cause, level_4_causes, short_name="leading_cause_level_4")
 
     tb_level_2 = clean_disease_names(tb=tb_level_2, tb_hierarchy=tb_hierarchy)
     tb_level_3 = clean_disease_names(tb=tb_level_3, tb_hierarchy=tb_hierarchy)
+    tb_level_4 = clean_disease_names(tb=tb_level_4, tb_hierarchy=tb_hierarchy)
 
     tb_level_2 = tb_level_2.set_index(["country", "year"], verify_integrity=True)
     tb_level_3 = tb_level_3.set_index(["country", "year"], verify_integrity=True)
+    tb_level_4 = tb_level_4.set_index(["country", "year"], verify_integrity=True)
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb_level_2, tb_level_3], check_variables_metadata=True, default_metadata=tb_cause.metadata
+        dest_dir,
+        tables=[tb_level_2, tb_level_3, tb_level_4],
+        check_variables_metadata=True,
+        default_metadata=tb_cause.metadata,
     )
 
     # Save changes in the new garden dataset.
@@ -84,5 +93,6 @@ def clean_disease_names(tb: Table, tb_hierarchy: Table) -> Table:
     disease_col = disease_col[0]
     tb = tb.merge(tb_hierarchy, how="left", left_on=disease_col, right_on="cause_name_underscore")
     tb = tb.drop(columns=["cause_name_underscore", disease_col])
+    tb = tb.rename(columns={"cause_name": disease_col})
 
     return tb
