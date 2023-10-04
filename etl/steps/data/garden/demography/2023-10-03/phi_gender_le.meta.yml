@@ -14,8 +14,8 @@ tables:
     variables:
       phi:
         title: Outsurvival statistic
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: |-
           The probability that an individual from the male population will outlive an individual from the female population.
         description_processing: |-
@@ -24,32 +24,8 @@ tables:
           Bergeron-Boucher, M.-P., Alvarez, J.-A., Kashnitsky, I., & Zarulli, V. (2022). Probability of males to outlive females: An international comparison from 1751 to 2020. BMJ Open, 12(8), e059964. https://doi.org/10.1136/bmjopen-2021-059964
 
           Code available at: https://github.com/CPop-SDU/outsurvival-in-perspective
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     title_public:
-      #     title_variant:
-      #     attribution:
-      #     attribution_short:
-      #     topic_tags:
-      #     faqs
-      #     grapher_config
-      #   display:
-      #     name: Testing variable
-      #     description:
-      #     isProjection: false
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
-      #     conversionFactor: 1
-      #     tolerance: 0
-      #     yearIsDay: false
-      #     color:
-      #     includeInTable:
-      #     tableDisplay:
-
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            hasMapTab: true

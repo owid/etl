@@ -81,6 +81,11 @@ def make_table_phi(tb: Table) -> Table:
     tb = tb.pivot(
         index=["location", "year", "age"], columns="sex", values=["number_survivors", "number_deaths"]
     ).reset_index()
+
+    # Shift one up (note the subindex in the equation 'x-n', in our case n=1 (age group width))
+    column = ("number_survivors", "male")
+    tb[column] = tb.groupby(["location", "year"])[[column]].shift(-1).squeeze()
+
     # Estimate phi_i (i.e. Eq 2 for a specific age group, without the summation)
     tb["phi"] = (
         tb["number_deaths"]["female"] * tb["number_survivors"]["male"]
@@ -88,6 +93,9 @@ def make_table_phi(tb: Table) -> Table:
     )
     # Apply the summation from Eq 2
     tb = tb.groupby(["location", "year"], as_index=False, observed=True)[[("phi", "")]].sum()
+
+    # Scale
+    tb["phi"] = (tb["phi"] * 100).round(2)
 
     # Fix column names (remove multiindex)
     tb.columns = [col[0] for col in tb.columns]
