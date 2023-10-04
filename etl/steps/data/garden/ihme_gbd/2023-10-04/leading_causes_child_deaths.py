@@ -81,6 +81,7 @@ def clean_disease_names(tb: Table, tb_hierarchy: Table) -> Table:
 
     tb_hierarchy = tb_hierarchy[["cause_name", "cause_name_underscore"]]
     disease_col = [item for item in tb.columns if "disease_" in item]
+    disease_col = disease_col[0]
     tb = tb.merge(tb_hierarchy, how="left", left_on=disease_col, right_on="cause_name_underscore")
     tb = tb.drop(columns=["cause_name_underscore", disease_col])
 
