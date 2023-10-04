@@ -60,7 +60,7 @@ def run(dest_dir: str) -> None:
 
 def create_hierarchy_table(age_group: str, tb_cause: Table, level_causes: List[str], short_name: str) -> Table:
     u5_causes = [item for item in tb_cause.table_names if age_group in item]
-    assert u5_causes.shape[0] > 0, f"No causes found for {age_group}, check spelling"
+    assert len(u5_causes) > 0, f"No causes found for {age_group}, check spelling"
 
     tb_out = Table()
     for cause in u5_causes:
