@@ -14,8 +14,10 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("leading_causes_child_deaths")
 
     # Read table from garden dataset.
+    tb_level_1 = ds_garden["leading_cause_level_1"]
     tb_level_2 = ds_garden["leading_cause_level_2"]
     tb_level_3 = ds_garden["leading_cause_level_3"]
+    tb_level_4 = ds_garden["leading_cause_level_4"]
 
     #
     # Process data.
@@ -26,7 +28,10 @@ def run(dest_dir: str) -> None:
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb_level_2, tb_level_3], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir,
+        tables=[tb_level_1, tb_level_2, tb_level_3, tb_level_4],
+        check_variables_metadata=True,
+        default_metadata=ds_garden.metadata,
     )
 
     # Save changes in the new grapher dataset.
