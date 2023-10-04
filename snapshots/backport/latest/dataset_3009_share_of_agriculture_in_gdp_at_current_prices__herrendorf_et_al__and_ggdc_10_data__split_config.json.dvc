@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/3009
-    date_accessed: 2023-08-10 09:22:08.962632
+    date_accessed: 2023-10-04 08:05:24.629426
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for 
@@ -11,7 +11,7 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 964b49331c2991263158ddc2c0beb0c0
-  size: 8009
+- md5: d786fa82233a8d574c15cd4cbd000f15
+  size: 8038
   path: 
     dataset_3009_share_of_agriculture_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data__split_config.json

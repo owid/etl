@@ -16,3 +16,7 @@ steps:
   - data://garden/education/2017-09-30/public_expenditure
   data://garden/education/2017-09-30/public_expenditure:
   - snapshot://education/2017-09-30/public_expenditure.feather
+  data://grapher/agriculture/2023-10-04/share_of_agriculture_in_gdp:
+  - data://garden/agriculture/2023-10-04/share_of_agriculture_in_gdp
+  data://garden/agriculture/2023-10-04/share_of_agriculture_in_gdp:
+  - snapshot://agriculture/2023-10-04/share_of_agriculture_in_gdp.feather
