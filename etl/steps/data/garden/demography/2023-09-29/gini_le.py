@@ -1,4 +1,4 @@
-"""Estimate the gini index on """
+"""Estimate the gini index on life expectency"""
 
 from typing import Any, cast
 
@@ -81,9 +81,11 @@ def run(dest_dir: str) -> None:
 
 
 def AKm02a0(m0: float, is_male: bool = True) -> NDArray[Any]:
-    """Get esimtates.
+    """Get estimates.
 
     Different procedure for male or female.
+
+    More details: https://www.rdocumentation.org/packages/MortHump/versions/0.2/topics/AKm02a0
     """
     if is_male:
         return np.where(m0 < 0.0230, 0.14929 - 1.99545 * m0, np.where(m0 < 0.08307, 0.02832 + 3.26201 * m0, 0.29915))
@@ -92,18 +94,31 @@ def AKm02a0(m0: float, is_male: bool = True) -> NDArray[Any]:
 
 
 def gini_from_mx(tb_group: Table) -> Variable:
-    """Get Gini coefficient from central death rate."""
+    """Get Gini coefficient from central death rate.
+
+    This code is adapted from the original R code: https://github.com/jmaburto/Dynamics_Code/tree/V1.0/R%20code
+    """
+    # Get values from input
     mx = tb_group["central_death_rate"].values
     is_male = tb_group.name[2] == "male"
-    m0 = cast(float, mx[0])
+
+    # Estimate i_openage, ax
     i_openage = len(mx)
-    OPENAGE = i_openage - 1
-    RADIX = 1
+    m0 = cast(float, mx[0])
     ax = np.full_like(mx, 0.5)
     ax[0] = AKm02a0(m0=m0, is_male=is_male)
+    ax[i_openage - 1] = 1 / mx[i_openage - 1]  # type: ignore
+
+    # Estimate X_
+    age = np.arange(i_openage) + ax
+    e = np.ones_like(age)
+    X_ = np.abs(np.outer(e, age) - np.outer(age, e))
+
+    # Estimate D
+    OPENAGE = i_openage - 1
+    RADIX = 1
     qx = mx / (1 + (1 - ax) * mx)  # type: ignore
     qx[i_openage - 1] = 1 if not np.isnan(qx[i_openage - 1]) else np.nan
-    ax[i_openage - 1] = 1 / mx[i_openage - 1]  # type: ignore
     px = 1 - qx
     px[np.isnan(px)] = 0
     lx = np.concatenate(([RADIX], RADIX * np.cumprod(px[:OPENAGE])))
@@ -112,10 +127,9 @@ def gini_from_mx(tb_group: Table) -> Variable:
     Lx[i_openage - 1] = lx[i_openage - 1] * ax[i_openage - 1]
     Tx = np.concatenate((np.cumsum(Lx[:OPENAGE][::-1])[::-1], [0])) + Lx[i_openage - 1]
     ex = Tx / lx
-    age = np.arange(i_openage) + ax
-    e = np.ones_like(age)
     D = np.outer(dx, dx)
-    X_ = np.abs(np.outer(e, age) - np.outer(age, e))
+
+    # Estimate Gini
     G = np.sum(D * X_) / (2 * ex[0])
 
     var = Variable({"life_expectancy_gini": G})
