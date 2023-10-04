@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -22,6 +23,29 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["colonial_dates_dataset"].reset_index()
 
+    #
+    # Process data.
+    #
+    tb = process_data(tb)
+
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+
+def process_data(tb: Table) -> Table:
+    """Process data and create new columns."""
+
     # Capitalize colonizer column and replace Britain by United Kingdom
     tb["colonizer"] = tb["colonizer"].str.capitalize().replace("Britain", "United Kingdom")
 
@@ -38,6 +62,9 @@ def run(dest_dir: str) -> None:
 
     # Remove duplicates for tb_rest
     tb_rest = tb_rest.drop_duplicates(subset=["country"], keep="first").reset_index(drop=True)
+
+    # Drop colonizer column from tb_rest
+    tb_rest = tb_rest.drop(columns=["colonizer"])
 
     # For these countries, assign the minimum year of colstart_max as colstart_max and the maximum year of colend_max as colend_max
     tb_rest["colstart_max"] = tb_colonized["colstart_max"].min()
@@ -82,6 +109,9 @@ def run(dest_dir: str) -> None:
         lambda x: "z. Multiple colonizers" if isinstance(x, str) and " - " in x else x
     )
 
+    # Create years_colonized: counts for each year the number of years a country has been colonized (e.g. there has been a non null colonizer)
+    tb["years_colonized"] = tb.groupby(["country"])["colonizer"].transform(lambda x: x.notnull().cumsum())
+
     # Create last_colonizer column, which is the most recent non-null colonizer for each country and year
     tb["last_colonizer"] = tb.groupby(["country"])["colonizer"].fillna(method="ffill")
     tb["last_colonizer_grouped"] = tb.groupby(["country"])["colonizer_grouped"].fillna(method="ffill")
@@ -97,19 +127,4 @@ def run(dest_dir: str) -> None:
         ~((tb["country"].isin(colonizers_list)) & (tb["total_colonies"].isnull())), 0
     )
 
-    #
-    # Process data.
-    #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
-
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
-
-    # Save changes in the new garden dataset.
-    ds_garden.save()
+    return tb

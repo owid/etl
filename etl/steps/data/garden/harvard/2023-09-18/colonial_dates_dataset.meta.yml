@@ -30,6 +30,21 @@ tables:
           entityAnnotationsMap: ""
           numDecimalPlaces: 0
           conversionFactor: 1
+
+      years_colonized:
+        title: Years the country has been colonized
+        unit: "years"
+        short_unit: "years"
+        description_short: |
+          Number of years the country has been colonized by the European colonial power(s) in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Years colonized
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
       last_colonizer:
         title: Last European colonial power
         unit: ""
