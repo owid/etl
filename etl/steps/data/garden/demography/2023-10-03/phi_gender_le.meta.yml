@@ -13,11 +13,11 @@ tables:
   phi_gender_le:
     variables:
       phi:
-        title: Outsurvival statistic
+        title: Outsurvival statistic at birth
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The probability that an individual from the male population will outlive an individual from the female population.
+          The probability that a male will outsurvive a female if both are randomly selected from the population at birth.
         description_processing: |-
           This indicator is estimated using the Equation 2 from:
 
