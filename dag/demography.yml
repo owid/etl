@@ -85,3 +85,16 @@ steps:
     - data://garden/hmd/2023-09-19/hmd
   data://grapher/demography/2023-09-27/survivor_percentiles:
     - data://garden/demography/2023-09-27/survivor_percentiles
+
+  # UN WPP Life Tables
+  data://meadow/un/2023-10-02/un_wpp_lt:
+    - snapshot://un/2023-10-02/un_wpp_lt_all.zip
+    - snapshot://un/2023-10-02/un_wpp_lt_f.zip
+    - snapshot://un/2023-10-02/un_wpp_lt_m.zip
+  data://garden/un/2023-10-02/un_wpp_lt:
+    - data://meadow/un/2023-10-02/un_wpp_lt
+
+  # UN WPP + HMD Life Tables
+  data://garden/demography/2023-10-03/life_tables:
+    - data://garden/hmd/2023-09-19/hmd
+    - data://garden/un/2023-10-02/un_wpp_lt

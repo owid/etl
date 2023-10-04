@@ -1,0 +1,39 @@
+meta:
+  source:
+    name: Our World In Data based on Herrendorf et al. (2014) and GGDC-10 (2015)
+    description: >-
+      For Belgium, Spain, France, Japan, South Korea, the Netherlands, Sweden, the
+      UK, and the USA, observations in this dataset
+      correspond to the data published by Herrendorf, Rogerson, and Valentinyi (2014),
+      except in some cases where we have
+      updated observation using new releases of the same underlying data sources.
+      The most important update corresponds to
+      the 2015 release of the Groningen Growth and Development Centre’s (GGDC) 10-sector
+      database. However, some other country-specific
+      updates were also considered (e.g. US data published by the Bureau of Economic
+      Analysis). In [the attached documentation](https://drive.google.com/file/d/1JMXH6IYOtR_Cs0gASRVT1VQRxBIZn-11/view?usp=sharing)
+      we describe sources and updates, country by country.
+
+
+      For the rest of the countries, data comes directly from the 2015 release of
+      the GGDC 10-sector database. The only change
+      we applied to the GGDC 10-sector database was dropping observations for GDP
+      shares in Peru 1950-1985 (these are reported
+      as negative in the original).
+    url: Data from Herrendorf et al. (2014) is available from https://drive.google.com/file/d/1Oq02EqNF5AqJDw5FmDRLg5yUHQ5basKR/view
+      . The GGDC 10-Sector Database is available from http://www.rug.nl/ggdc/productivity/10-sector/
+      Links to other data used to update the Herrendorf et al. (2014) series is available
+      in our attached documentation
+    date_accessed: 2017-03-08
+    published_by: 'Our World in Data (Nicolas Lippolis) based on: (i) Berthold Herrendorf,
+      Richard Rogerson and Akos Valentinyi (2014) – “Growth and Structural Transformation”
+      Handbook of Economic Growth Vol. 2B, (ii) 2015 release of the Groningen Growth
+      and Development Centre’s (GGDC) 10-sector database'
+  name: Share of agriculture in GDP at current prices (Herrendorf et al. and GGDC-10
+    data) (split)
+  description: ''
+wdir: ../../../data/snapshots/agriculture/2023-10-04
+outs:
+- md5: 3ce82b23325e8851d45df17a4727792b
+  size: 74522
+  path: share_of_agriculture_in_gdp.feather

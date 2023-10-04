@@ -1219,6 +1219,12 @@ class Origin(SQLModel, table=True):
         )  # type: ignore
 
     def upsert(self, session: Session) -> "Origin":
+        """
+        # NOTE: this would be an ideal solution if we only stored unique rows in
+        # origins table, but there are weird race conditions and we cannot have
+        # index on all columns because it would be too long.
+        # Storing duplicate origins is not a big deal though
+
         origin = session.exec(self._upsert_select).one_or_none()
         if origin is None:
             # create new origin
@@ -1231,6 +1237,19 @@ class Origin(SQLModel, table=True):
 
         # select added object to get its id
         return session.exec(self._upsert_select).one()
+        """
+
+        origins = session.exec(self._upsert_select).all()
+        if not origins:
+            # create new origin
+            origin = self
+            session.add(origin)
+        else:
+            # we match on all fields, so there's nothing to update
+            # just pick any origin
+            origin = origins[0]
+
+        return origin
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
