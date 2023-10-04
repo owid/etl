@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl//architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: List of independent states
+    description: |-
+      We examine the criteria for membership in the international system as applied in the widely employed system membership list maintained by the Correlates of War Project. Some problems with existing classifications are illustrated and some analytical and empirical consequences of these problems are detailed. Using updated criteria and information, we develop a revised and updated list of the composition of the international system of nation state actors in world politics from the Congress of Vienna to the present.
+    date_published: 2007-01-22
+    version_producer: '3.2'
+    title_snapshot: List of independent states - Microstates
+
+    # Citation
+    producer: Gleditsch and Ward
+    citation_full: |-
+      Gleditsch, Kristian S. & Michael D. Ward. 1999. "Interstate System Membership: A Revised List of the Independent States since 1816." International Interactions 25: 393-413.
+
+    # Files
+    url_main: http://ksgleditsch.com/data-4.html
+    url_download: http://ksgleditsch.com/data/microstatessystem.dat
+    date_accessed: 2023-09-22
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+
+wdir: ../../../data/snapshots/countries/2023-09-22
+outs:
+- md5: b9ef1b421b1afbf2004abfe5050774fe
+  size: 1015
+  path: gleditsch_microstates.dat

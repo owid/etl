@@ -149,7 +149,8 @@ def _yield_wide_table(
                         "originalShortName": column,
                         "originalName": tab[short_name].metadata.title,
                         "filters": [
-                            {"name": dim_name, "value": dim_value} for dim_name, dim_value in zip(dim_names, dim_values)
+                            {"name": dim_name, "value": sanitize_numpy(dim_value)}
+                            for dim_name, dim_value in zip(dim_names, dim_values)
                         ],
                     }
                 }
@@ -170,9 +171,21 @@ def _yield_wide_table(
                 tab[short_name].metadata.title = title_with_dims
 
             # expand metadata with Jinja template
-            tab[short_name].metadata.description = _expand_jinja_template(
-                tab[short_name].metadata.description, dim_dict
-            )
+            for k in (
+                "description",
+                "description_short",
+                "description_from_producer",
+                "description_processing",
+            ):
+                if getattr(tab[short_name].m, k):
+                    setattr(
+                        tab[short_name].m,
+                        k,
+                        _expand_jinja_template(getattr(tab[short_name].m, k), dim_dict),
+                    )
+
+            for i, desc_key in enumerate(tab[short_name].m.description_key or []):
+                tab[short_name].m.description_key[i] = _expand_jinja_template(desc_key, dim_dict)
 
             # Keep only entity_id and year in index
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
@@ -190,13 +203,9 @@ def _expand_jinja_template(text: str, dim_dict: Dict[str, str]) -> str:
 
     try:
         return jinja_env.from_string(text).render(dim_dict)
-    except jinja2.exceptions.TemplateSyntaxError:
-        log.warning(
-            "yield_wide_table.jinja_syntax_error",
-            dims=dim_dict,
-            description="\n" + text,
-        )
-        raise
+    except jinja2.exceptions.TemplateSyntaxError as e:
+        new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
+        raise e.__class__(new_message, e.lineno, e.name, e.filename) from e
 
 
 def _title_column_and_dimensions(title: str, dims: List[str], dim_names: List[str]) -> str:
@@ -408,17 +417,6 @@ def _adapt_dataset_metadata_for_grapher(
         Adapted dataset metadata, ready to be inserted into grapher.
 
     """
-    # Add origins to sources to stay backward compatible.
-    if metadata.origins:
-        # NOTE: we disabled source <-> origin conversion
-        # metadata.sources = _add_origins_to_sources(metadata.sources, metadata.origins)
-        pass
-    else:
-        warnings.warn(
-            "Dataset has sources instead of origins. This is deprecated and will be removed in the future. "
-            "Please use origins instead."
-        )
-
     # Combine metadata sources into one.
     if metadata.sources:
         metadata.sources = [combine_metadata_sources(metadata.sources)]
@@ -486,24 +484,11 @@ def _adapt_table_for_grapher(
 
     table = table.set_index(["entity_id", "year"] + dim_names)
 
-    # Add dataset origins to variables if they don't have an origin.
-    # TODO: In the future, all variables should have their origins and dataset origins will be union of their origins.
-    table = _add_dataset_origins_to_variables(table)
-
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).
     table = _ensure_source_per_variable(table)
 
     return cast(catalog.Table, table)
-
-
-def _add_dataset_origins_to_variables(table: catalog.Table) -> catalog.Table:
-    assert table.metadata.dataset
-    for col in table.columns:
-        variable_meta = table[col].metadata
-        if not variable_meta.origins:
-            variable_meta.origins = table.metadata.dataset.origins
-    return table
 
 
 def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
@@ -587,3 +572,14 @@ class IntRange:
 def contains_inf(s: pd.Series) -> bool:
     """Check if a series contains infinity."""
     return pd.api.types.is_numeric_dtype(s.dtype) and np.isinf(s).any()  # type: ignore
+
+
+def sanitize_numpy(obj: Any) -> Any:
+    """Sanitize numpy types so that we can insert them into MySQL."""
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    return obj

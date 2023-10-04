@@ -110,16 +110,6 @@ steps:
   data://grapher/un/2022-07-11/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
 
-  # UN SDG - archive
-  data://meadow/un/2023-01-24/un_sdg:
-    - snapshot://un/2023-01-24/un_sdg.feather
-  data://garden/un/2023-01-24/un_sdg:
-    - data://meadow/un/2023-01-24/un_sdg
-    - snapshot://un/2023-01-24/un_sdg_unit.csv
-    - snapshot://un/2023-01-24/un_sdg_dimension.json
-  data://grapher/un/2023-01-24/un_sdg:
-    - data://garden/un/2023-01-24/un_sdg
-
   # UN SDG - current
   data://meadow/un/2023-08-16/un_sdg:
     - snapshot://un/2023-08-16/un_sdg.feather
@@ -193,26 +183,26 @@ steps:
     - data://garden/un/2022-11-29/undp_hdr
 
   #
-  # EM-DAT Natural disasters (2022).
+  # EM-DAT Natural disasters (2023).
   #
-  data://meadow/emdat/2022-11-24/natural_disasters:
-    - snapshot://emdat/2022-11-24/natural_disasters.xlsx
+  data://meadow/emdat/2023-09-20/natural_disasters:
+    - snapshot://emdat/2023-09-20/natural_disasters.xlsx
   # The following dataset has a table for yearly data and another for decadal data.
-  data://garden/emdat/2022-11-24/natural_disasters:
-    - data://meadow/emdat/2022-11-24/natural_disasters
-    - data://garden/owid/latest/key_indicators
-    - data://garden/wb/2021-07-01/wb_income
+  data://garden/emdat/2023-09-20/natural_disasters:
+    - data://meadow/emdat/2023-09-20/natural_disasters
+    - data://garden/demography/2023-03-31/population
+    - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
-    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/worldbank_wdi/2023-05-29/wdi
   # The following dataset has all (yearly and decadal) variables together.
-  data://grapher/emdat/2022-11-24/natural_disasters:
-    - data://garden/emdat/2022-11-24/natural_disasters
+  data://grapher/emdat/2023-09-20/natural_disasters:
+    - data://garden/emdat/2023-09-20/natural_disasters
   # The following dataset has only global data, and entity corresponds to the type of disaster.
-  data://grapher/emdat/2022-11-24/natural_disasters_global_by_type:
-    - data://garden/emdat/2022-11-24/natural_disasters
+  data://grapher/emdat/2023-09-20/natural_disasters_global_by_type:
+    - data://garden/emdat/2023-09-20/natural_disasters
   # Natural disasters explorer.
-  data://explorers/emdat/2022-12-07/natural_disasters:
-    - data://garden/emdat/2022-11-24/natural_disasters
+  data://explorers/emdat/2023-09-20/natural_disasters:
+    - data://garden/emdat/2023-09-20/natural_disasters
 
   # Country profiles - overview
   data://garden/country_profile/2022/overview:
@@ -559,6 +549,7 @@ steps:
     - snapshot://un/2023-08-16/igme.zip
   data://garden/un/2023-08-16/igme:
     - data://meadow/un/2023-08-16/igme
+    - data://garden/un/2018/igme
   data://grapher/un/2023-08-16/igme:
     - data://garden/un/2023-08-16/igme
 
@@ -569,6 +560,16 @@ steps:
     - data://meadow/harvard/2023-09-18/colonial_dates_dataset
   data://grapher/harvard/2023-09-18/colonial_dates_dataset:
     - data://garden/harvard/2023-09-18/colonial_dates_dataset
+    
+  # Augmented Human Development Index
+  data://meadow/ahdi/2023-09-08/augmented_hdi:
+    - snapshot://ahdi/2023-09-08/augmented_hdi.xlsx
+    - snapshot://ahdi/2023-09-08/augmented_hdi_region.xlsx
+  data://garden/ahdi/2023-09-08/augmented_hdi:
+    - data://meadow/ahdi/2023-09-08/augmented_hdi
+  data://grapher/ahdi/2023-09-08/augmented_hdi:
+    - data://garden/ahdi/2023-09-08/augmented_hdi
+
   # Gapminder  - Under five mortality v7
   data://meadow/gapminder/2023-09-18/under_five_mortality:
     - snapshot://gapminder/2023-09-18/under_five_mortality.xlsx
@@ -588,6 +589,60 @@ steps:
     - data://garden/gapminder/2023-09-21/under_five_mortality
   data://grapher/un/2023-09-19/long_run_child_mortality:
     - data://garden/un/2023-08-29/long_run_child_mortality
+
+  # Older vintage UN IGME (with longer time-series)
+  data://meadow/un/2018/igme:
+    - snapshot://un/2018/igme.csv
+  data://garden/un/2018/igme:
+    - data://meadow/un/2018/igme
+
+  # Country lists
+  data://meadow/countries/2023-09-25/isd:
+    - snapshot://countries/2023-09-22/isd.xlsx
+  data://garden/countries/2023-09-25/isd:
+    - data://meadow/countries/2023-09-25/isd
+  data://grapher/countries/2023-10-01/isd:
+    - data://garden/countries/2023-09-25/isd
+  data://meadow/countries/2023-09-25/gleditsch:
+    - snapshot://countries/2023-09-22/gleditsch_states.dat
+    - snapshot://countries/2023-09-22/gleditsch_microstates.dat
+  data://garden/countries/2023-09-25/gleditsch:
+    - data://meadow/countries/2023-09-25/gleditsch
+  data://grapher/countries/2023-10-01/gleditsch:
+    - data://garden/countries/2023-09-25/gleditsch
+  data://meadow/countries/2023-09-29/cow_ssm:
+    - snapshot://countries/2023-09-22/cow_ssm_majors.csv
+    - snapshot://countries/2023-09-22/cow_ssm_states.csv
+    - snapshot://countries/2023-09-22/cow_ssm_system.csv
+  data://garden/countries/2023-09-29/cow_ssm:
+    - data://meadow/countries/2023-09-29/cow_ssm
+  data://grapher/countries/2023-09-29/cow_ssm:
+    - data://garden/countries/2023-09-29/cow_ssm
+
+  # Fertility rate, Gapminder
+  data://meadow/gapminder/2023-09-22/total_fertility_rate:
+    - snapshot://gapminder/2023-09-22/total_fertility_rate.xlsx
+  data://garden/gapminder/2023-09-22/total_fertility_rate:
+    - data://meadow/gapminder/2023-09-22/total_fertility_rate
+    - data://garden/un/2023-08-29/long_run_child_mortality
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/gapminder/2023-09-22/total_fertility_rate:
+    - data://garden/gapminder/2023-09-22/total_fertility_rate
+
+  ######################################################################################################################
+  # Older versions to be archived once they are not used by any other steps.
+
+  # UN SDG - archive
+  data://meadow/un/2023-01-24/un_sdg:
+    - snapshot://un/2023-01-24/un_sdg.feather
+  data://garden/un/2023-01-24/un_sdg:
+    - data://meadow/un/2023-01-24/un_sdg
+    - snapshot://un/2023-01-24/un_sdg_unit.csv
+    - snapshot://un/2023-01-24/un_sdg_dimension.json
+  data://grapher/un/2023-01-24/un_sdg:
+    - data://garden/un/2023-01-24/un_sdg
+
+  ######################################################################################################################
 
 include:
   - dag/open_numbers.yml
@@ -611,3 +666,4 @@ include:
   - dag/education.yml
   - dag/covid.yml
   - dag/animal_welfare.yml
+  - dag/plastic_use.yml

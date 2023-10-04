@@ -1,0 +1,48 @@
+meta:
+  origin:
+    title: Augmented Human Development Index (AHDI) - Country data
+    description: |-
+      The economic historian Leandro Prados de la Escosura has calculated the AHDI over the last 150 years. He refers to it as the Augmented Human Development Index.
+
+      ## Dimensions of Augmented Human Development
+
+      In order to provide a synthetic measure of augmented human development, its different dimensions are expressed in index form,
+
+        - life expectancy at birth as a proxy for a healthy life,
+        - years of schooling as a proxy for access to knowledge,
+        - liberal democracy as a proxy for freedom,
+        - and discounted GDP per head as a surrogate for wellbeing dimensions other than education and health.
+
+      Life expectancy is defined as the average number of years of life which would remain for males and females reaching the ages specified if they continued to be subjected to the same mortality experienced in the year(s) to which these life expectancies refer.
+
+      Education attainment is measured by the average years of total schooling (primary, secondary, and tertiary) for the population aged 15 and over.
+
+      The Liberal Democracy Index combines the electoral democracy index and the liberal component index. The former incorporates indices of freedom of association, expression, suffrage, and clean elections. The latter includes indices of equality before the law and individual liberty, judicial constraints on the executive, and legislative constraints on the executive.
+
+      GDP per head is expressed in 1990 dollars adjusted for its purchasing power adjusted, that it, for the difference in price level across countries (the so-called Geary-Khamis [G-K] 1990 $).
+
+      ## Time and Spatial Coverage
+
+      Over the entire time span, 1870-2020, 115 countries are considered, and its number rises up to 121, 146, 161, and 162 countries for the samples starting in 1913, 1950, 1980, and 1990, respectively. These samples represent above 90 per cent of the world population (and practically 100 per cent after 1950).
+
+      ## Alert: measuring changes in the index
+
+      By how much did human development improve over the long run? Given the way in which the index has been computed, the conventional logarithmic rate of variation (as in the case of GDP per head) can be used.
+    producer: Leandro Prados de la Escosura
+    citation_full: Prados de la Escosura, L. (2021), Augmented Human Development
+      in the Age of Globalisation, Economic History Review.
+    url_main:
+      https://frdelpino.es/investigacion/en/category/01_social-sciences/02_world-economy/03_human-development-world-economy/
+    url_download:
+      https://frdelpino.es/investigacion/wp-content/uploads/2023/02/AHDI_countries_1870-2020.xlsx
+    date_published: 2021
+    date_accessed: 2023-09-08
+  license:
+    url:
+      https://frdelpino.es/investigacion/en/category/01_social-sciences/02_world-economy/03_human-development-world-economy/
+    name: Creative Commons BY 4.0
+wdir: ../../../data/snapshots/ahdi/2023-09-08
+outs:
+- md5: d187329001384e104e019a3e08d533c6
+  size: 478574
+  path: augmented_hdi.xlsx

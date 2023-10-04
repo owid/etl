@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Plastics Outlook - Plastics use by region - projections
+    description: |-
+      This dataset provides estimates of plastics use disaggregated by region for the baseline scenario.
+
+      The plastics use data is associated with the economic flows in the OECD ENV-Linkages model to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics use.
+    date_published: 2022-05-05
+    description_snapshot: |-
+      This dataset offers projections between 2019 and 2060 of plastic use across 15 global regions separated by end-of-life fate.
+    # Citation
+    producer: OECD
+    citation_full: OECD (2022), Global Plastics Outlook, https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_V2_1&lang=en, accessed on 21 September 2023
+
+    # Files
+    url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_V2_1&lang=en
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.oecd.org/termsandconditions
+
+wdir: ../../../data/snapshots/oecd/2023-09-21
+outs:
+- md5: 1a0a6dbc0d30cd997f3de9e908562f31
+  size: 29072
+  path: plastic_use_projections.csv

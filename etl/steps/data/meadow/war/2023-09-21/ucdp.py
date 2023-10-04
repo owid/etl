@@ -1,7 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-import pandas as pd
-from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -47,14 +45,13 @@ def run(dest_dir: str) -> None:
 
         # Load data from snapshot.
         if short_name == "geo":
-            df = pd.read_csv(snap.path, dtype={"gwnoa": "str"})
+            tb = snap.read_csv(dtype={"gwnoa": "str"})
         else:
-            df = pd.read_csv(snap.path)
+            tb = snap.read_csv()
 
-        # Create a new table and ensure all columns are snake-case.
-        tb = Table(df, short_name=short_name, underscore=True, camel_to_snake=True)
         # Set index
         tb = tb.set_index(props["index"], verify_integrity=True)
+
         # Add table to list of tables.
         tables.append(tb)
 
@@ -62,7 +59,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=tables, default_metadata=snap.metadata)  # type: ignore
+    ds_meadow = create_dataset(dest_dir, tables=tables, default_metadata=snap.metadata, check_variables_metadata=True)  # type: ignore
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

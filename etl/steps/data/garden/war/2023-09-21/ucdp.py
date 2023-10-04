@@ -3,9 +3,9 @@
 
 Notes:
     - Conflict types for state-based violence is sourced from UCDP/PRIO dataset. non-state and one-sided violence is sourced from GED dataset.
-    - There can be some mismatches with latest official reported data (UCDP's live dashboard). This is because UCDP uses latest data for their
-    dashboard, which might not be available yet as bulk download.
+    - There can be some mismatches with latest official reported data (UCDP's live dashboard). This is because UCDP uses latest data for their dashboard, which might not be available yet as bulk download.
     - Regions:
+        - Uses `region` column for both GED and UCDP/PRIO datasets.
         - Incompatibilities in Oceania are encoded in "Asia". We therefore have changed the region name to "Asia and Oceania".
         - GED: Dataset uses names (not codes!)
             - You can learn more about the countries included in each region from section "Appendix 5 Main sources consulted during the 2022 update" in page 40,
@@ -22,6 +22,7 @@ Notes:
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -70,9 +71,9 @@ def run(dest_dir: str) -> None:
     _sanity_checks(ds_meadow)
 
     # Load relevant tables
-    tb_geo = ds_meadow["geo"].reset_index()
-    tb_conflict = ds_meadow["battle_related_conflict"].reset_index()
-    tb_prio = ds_meadow["prio_armed_conflict"].reset_index()
+    tb_geo = ds_meadow["ucdp_geo"].reset_index()
+    tb_conflict = ds_meadow["ucdp_battle_related_conflict"].reset_index()
+    tb_prio = ds_meadow["ucdp_prio_armed_conflict"].reset_index()
 
     # Keep only active conflicts
     log.info("war.ucdp: keep active conflicts")
@@ -135,7 +136,9 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -145,10 +148,10 @@ def run(dest_dir: str) -> None:
 
 def _sanity_checks(ds: Dataset) -> None:
     """Check that the tables in the dataset are as expected."""
-    tb_geo = ds["geo"].reset_index()
-    tb_conflict = ds["battle_related_conflict"].reset_index()
-    tb_nonstate = ds["non_state"].reset_index()
-    tb_onesided = ds["one_sided"].reset_index()
+    tb_geo = ds["ucdp_geo"].reset_index()
+    tb_conflict = ds["ucdp_battle_related_conflict"].reset_index()
+    tb_nonstate = ds["ucdp_non_state"].reset_index()
+    tb_onesided = ds["ucdp_one_sided"].reset_index()
 
     # Battle-related conflict #
     # Check IDs
@@ -408,7 +411,7 @@ def _get_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world["region"] = "World"
 
     # Combine
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_world], ignore_index=True).sort_values(  # type: ignore
+    tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_world], ignore_index=True).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
     return tb_ongoing
@@ -436,7 +439,7 @@ def _get_new_metrics(tb: Table) -> Table:
     tb_new_world["region"] = "World"
 
     # Combine
-    tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pr.concat([tb_new, tb_new_world], ignore_index=True).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
 
@@ -529,7 +532,7 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
     ].fillna(0)
 
     # Add to main table
-    tb = pd.concat([tb[-mask], tb_extra])
+    tb = pr.concat([tb[-mask], tb_extra])
     return tb
 
 
@@ -584,7 +587,7 @@ def _prio_add_metrics(tb: Table) -> Table:
     tb_ongoing_world.columns = cols_idx + ["number_ongoing_conflicts"]
     tb_ongoing_world["region"] = "World"
     # Combine regions & world
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_world], ignore_index=True)
+    tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_world], ignore_index=True)
     # Keep only until 1989
     tb_ongoing = tb_ongoing[tb_ongoing["year"] < 1989]
 
@@ -602,7 +605,7 @@ def _prio_add_metrics(tb: Table) -> Table:
     tb_new_world.columns = cols_idx + ["number_new_conflicts"]
     tb_new_world["region"] = "World"
     # Combine regions & world
-    tb_new = pd.concat([tb_new, tb_new_world], ignore_index=True)
+    tb_new = pr.concat([tb_new, tb_new_world], ignore_index=True)
     # Keep only until 1989 (inc)
     tb_new = tb_new[tb_new["year_start"] <= 1989]
     # Rename column
@@ -638,7 +641,7 @@ def add_conflict_all(tb: Table) -> Table:
 
     # Only append values after 1989 (before that we don't have 'one-sided' or 'non-state' counts)
     tb_all = tb_all[tb_all["year"] >= 1989]
-    tb = pd.concat([tb, tb_all], ignore_index=True)
+    tb = pr.concat([tb, tb_all], ignore_index=True)
 
     # Set `number_new_conflicts` to NaN for 1989
     tb.loc[(tb["year"] == 1989) & (tb["conflict_type"] == "all"), "number_new_conflicts"] = np.nan
@@ -653,7 +656,7 @@ def add_conflict_all_intrastate(tb: Table) -> Table:
     ].copy()
     tb_intra = tb_intra.groupby(["year", "region"], as_index=False).sum(numeric_only=True, min_count=1)
     tb_intra["conflict_type"] = "intrastate"
-    tb = pd.concat([tb, tb_intra], ignore_index=True)
+    tb = pr.concat([tb, tb_intra], ignore_index=True)
     return tb
 
 

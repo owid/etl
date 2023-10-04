@@ -37,6 +37,8 @@ from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
+from .shared import add_indicators_conflict_rate, expand_observations
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 # Logger
@@ -57,9 +59,12 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("mie")
-
     # Read table from meadow dataset.
     tb = ds_meadow["mie"].reset_index()
+
+    # Read table from COW codes
+    ds_cow_ssm = paths.load_dataset("cow_ssm")
+    tb_regions = ds_cow_ssm["cow_ssm_regions"].reset_index()
 
     #
     # Process data.
@@ -102,7 +107,13 @@ def run(dest_dir: str) -> None:
     )
 
     log.info("war.mie: expand observations")
-    tb = expand_observations(tb)
+    # tb = expand_observations(tb)
+    tb = expand_observations(
+        tb,
+        col_year_start="styear",
+        col_year_end="endyear",
+        cols_scale=["fatalmax", "fatalmin"],
+    )
 
     # estimate metrics
     log.info("war.mie: estimate metrics")
@@ -112,26 +123,29 @@ def run(dest_dir: str) -> None:
     log.info("war.mie: rename hostility_level")
     tb["hostility_level"] = tb["hostility_level"].map(HOSTILITY_LEVEL_MAP | {"all": "all"})
     assert tb["hostility_level"].isna().sum() == 0, "Unmapped regions!"
-    # Add suffix with source name
-    msk = tb["region"] != "World"
-    tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (COW)"
 
     log.info("war.cow_mid: replace NaNs with zeros where applicable")
     tb = replace_missing_data_with_zeros(tb)
+
+    # Add normalised indicators
+    log.info("war.mie: add normalised indicators")
+    tb = add_indicators_conflict_rate(tb, tb_regions, ["number_ongoing_conflicts", "number_new_conflicts"])
+
+    # Add suffix with source name
+    msk = tb["region"] != "World"
+    tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (COW)"
 
     # set index
     log.info("war.mie: set index")
     tb = tb.set_index(["year", "region", "hostility_level"], verify_integrity=True)
 
-    # Add short_name to table
-    log.info("war.mie: add shortname to table")
-    tb = Table(tb, short_name=paths.short_name)
-
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -181,36 +195,6 @@ def reshape_table(tb: Table) -> Table:
         tbs.append(tb_)
 
     tb = pr.concat(tbs, ignore_index=True)
-
-    return tb
-
-
-def expand_observations(tb: Table) -> Table:
-    """Expand to have a row per (year, conflict).
-
-    Parameters
-    ----------
-    tb : Table
-        Original table, where each row is a conflict with its start and end year.
-
-    Returns
-    -------
-    Table
-        Here, each conflict has as many rows as years of activity. Its deaths have been uniformly distributed among the years of activity.
-    """
-    # For that we scale the number of deaths proportional to the duration of the conflict.
-    tb[["fatalmax"]] = tb[["fatalmax"]].div(tb["endyear"] - tb["styear"] + 1, "index").round()
-    tb[["fatalmin"]] = tb[["fatalmin"]].div(tb["endyear"] - tb["styear"] + 1, "index").round()
-
-    # Add missing years for each triplet ("warcode", "campcode", "ccode")
-    YEAR_MIN = tb["styear"].min()
-    YEAR_MAX = tb["endyear"].max()
-    tb_all_years = pd.DataFrame(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
-    df = pd.DataFrame(tb)  # to prevent error "AttributeError: 'DataFrame' object has no attribute 'all_columns'"
-    df = df.merge(tb_all_years, how="cross")  # type: ignore
-    tb = Table(df, metadata=tb.metadata)
-    # Filter only entries that actually existed
-    tb = tb[(tb["year"] >= tb["styear"]) & (tb["year"] <= tb["endyear"])]
 
     return tb
 
@@ -314,7 +298,7 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new_world_alltypes["hostility_level"] = "all"
 
     # Combine
-    tb_new = pd.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pr.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes], ignore_index=True).sort_values(  # type: ignore
         by=["styear", "region", "hostility_level"]
     )
 

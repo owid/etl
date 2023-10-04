@@ -49,6 +49,7 @@ steps:
     - snapshot://war/2023-09-21/mie.zip
   data://garden/war/2023-09-21/mie:
     - data://meadow/war/2023-09-21/mie
+    - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/war/2023-09-21/mie:
     - data://garden/war/2023-09-21/mie
 
@@ -69,6 +70,7 @@ steps:
     - snapshot://war/2023-09-21/cow_non_state.csv
   data://garden/war/2023-09-21/cow:
     - data://meadow/war/2023-09-21/cow
+    - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/war/2023-09-21/cow:
     - data://garden/war/2023-09-21/cow
 
@@ -77,6 +79,7 @@ steps:
     - snapshot://war/2023-09-21/cow_mid.zip
   data://garden/war/2023-09-21/cow_mid:
     - data://meadow/war/2023-09-21/cow_mid
+    - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/war/2023-09-21/cow_mid:
     - data://garden/war/2023-09-21/cow_mid
 
@@ -95,3 +98,11 @@ steps:
     - data://meadow/war/2023-09-21/prio_v31
   data://grapher/war/2023-09-21/prio_v31:
     - data://garden/war/2023-09-21/prio_v31
+
+  # Peace data (Diehl)
+  data://meadow/war/2023-09-27/peace_diehl:
+    - snapshot://war/2023-09-27/peace_diehl.zip
+  data://garden/war/2023-09-27/peace_diehl:
+    - data://meadow/war/2023-09-27/peace_diehl
+  data://grapher/war/2023-09-27/peace_diehl:
+    - data://garden/war/2023-09-27/peace_diehl

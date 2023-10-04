@@ -18,7 +18,6 @@ from owid.catalog.tables import (
     SCHEMA,
     Table,
     get_unique_licenses_from_tables,
-    get_unique_origins_from_tables,
     get_unique_sources_from_tables,
 )
 from owid.catalog.variables import PROCESSING_LOG, Variable
@@ -283,6 +282,8 @@ def test_rename_columns() -> None:
     assert new_t.new_gdp.metadata.title == "GDP"
     assert new_t.columns == ["new_gdp"]
 
+    new_t.new_gdp.metadata.title = "New GDP"
+
     # old table hasn't changed
     assert t.gdp.metadata.title == "GDP"
 
@@ -421,26 +422,6 @@ def test_set_index_keeps_metadata_inplace() -> None:
     # metadata should be preserved
     assert tb_new["a"].metadata.title == "A"
     assert tb_new["b"].metadata.title == "B"
-
-
-def test_assign_dataset_sources_origins_and_licenses_to_each_variable(table_1, sources, origins, licenses) -> None:
-    tb = table_1.copy()
-    # Create a new variable without metadata.
-    tb["c"] = 1
-    tb = tables.assign_dataset_sources_origins_and_licenses_to_each_variable(tb)
-    # Check that variables that did not have sources now have the dataset of the dataset.
-    assert tb["c"].metadata.sources == [sources[1], sources[2], sources[3]]
-    # Check that variables that did have sources were not affected.
-    assert tb["a"].metadata.sources == [sources[2], sources[1]]
-    # Check that variables that did not have origins now have the dataset of the dataset.
-    assert tb["c"].metadata.origins == [origins[1], origins[2], origins[3]]
-    # Check that variables that did have origins were not affected.
-    assert tb["a"].metadata.origins == [origins[2], origins[1]]
-    # Check that variables that did not have licenses now have the dataset of the dataset.
-    assert tb["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
-    # Check that variables that did have licenses were not affected.
-    assert tb["a"].metadata.licenses == [licenses[1]]
-    # Note: This function will also add all sources to columns "country" and "year", which may not be a desired effect.
 
 
 def test_merge_without_any_on_arguments(table_1, table_2, sources, origins, licenses) -> None:
@@ -868,15 +849,6 @@ def test_get_unique_sources_from_tables(table_1, sources):
     ]
 
 
-def test_get_unique_origins_from_tables(table_1, origins):
-    unique_origins = get_unique_origins_from_tables([table_1, table_1])
-    assert unique_origins == [
-        origins[2],
-        origins[1],
-        origins[3],
-    ]
-
-
 def test_get_unique_license_from_tables(table_1, licenses):
     unique_licenses = get_unique_licenses_from_tables([table_1, table_1])
     assert unique_licenses == [
@@ -1000,11 +972,24 @@ def test_groupby_agg(table_1) -> None:
     assert gt.values.tolist() == [[False, 3, 6], [False, 3, 9]]
     assert isinstance(gt.a, Table)
 
+    gt = table_1.groupby("country").agg(
+        min_a=("a", "min"),
+    )
+    assert gt.min_a.values.tolist() == [3, 1]
+    assert gt.min_a.m.title == "Title of Table 1 Variable a"
+
 
 def test_groupby_count(table_1) -> None:
     gt = table_1.groupby("country").count()
     assert gt.values.tolist() == [[1, 1, 1], [2, 2, 2]]
     assert gt.a.m.title == "Title of Table 1 Variable a"
+
+
+def test_groupby_transform(table_1) -> None:
+    # column named `count` should work
+    gt = table_1.rename(columns={"a": "count"}).groupby("country")["count"].transform("sum")
+    assert gt.values.tolist() == [3, 3, 3]
+    assert gt.m.title == "Title of Table 1 Variable a"
 
 
 def test_groupby_size(table_1) -> None:
@@ -1026,3 +1011,14 @@ def test_groupby_iteration(table_1) -> None:
     for _, group in table_1.groupby("country"):
         assert isinstance(group._fields, defaultdict)
         assert group.a.m.title == "Title of Table 1 Variable a"
+
+
+def test_groupby_observed_default(table_1) -> None:
+    table_1 = table_1.astype({"a": "category"}).query("a != 3")
+    gt = table_1.groupby("a").min()
+    assert len(gt) == 3
+
+
+def test_set_columns(table_1) -> None:
+    table_1.columns = ["country", "year", "new_a", "new_b"]
+    assert table_1.new_a.m.title == "Title of Table 1 Variable a"

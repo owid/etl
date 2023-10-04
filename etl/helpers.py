@@ -19,11 +19,11 @@ import yaml
 from owid import catalog
 from owid.catalog import CHANNEL, DatasetMeta, Table
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
+from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 from owid.catalog.tables import (
     combine_tables_description,
     combine_tables_title,
     get_unique_licenses_from_tables,
-    get_unique_origins_from_tables,
     get_unique_sources_from_tables,
 )
 from owid.datautils.common import ExceptionFromDocstring
@@ -92,8 +92,11 @@ def grapher_checks(ds: catalog.Dataset) -> None:
             if col in ("year", "country"):
                 continue
             catalog.utils.validate_underscore(col)
-            assert tab[col].metadata.unit is not None, f"Column {col} must have a unit."
-            assert tab[col].metadata.title is not None, f"Column {col} must have a title."
+            assert tab[col].metadata.unit is not None, f"Column `{col}` must have a unit."
+            assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
+            assert (
+                tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
+            ), f"Column `{col}` must have either sources or origins"
 
 
 def create_dataset(
@@ -105,6 +108,7 @@ def create_dataset(
     formats: List[FileFormat] = DEFAULT_FORMATS,
     check_variables_metadata: bool = False,
     run_grapher_checks: bool = True,
+    if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -121,6 +125,7 @@ def create_dataset(
     :param camel_to_snake: Whether to convert camel case to snake case for the table name.
     :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
     :param run_grapher_checks: Run grapher checks on the dataset, only applies to grapher channel.
+    :param if_origins_exist: What to do if origins already exist in the dataset metadata.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -137,9 +142,7 @@ def create_dataset(
         licenses = get_unique_licenses_from_tables(tables=tables)
         if any(["origins" in table[column].metadata.to_dict() for table in tables for column in table.columns]):
             # If any of the variables contains "origins" this means that it is a recently created dataset.
-            # Gather origins from all variables in all tables.
-            origins = get_unique_origins_from_tables(tables=tables)
-            default_metadata = DatasetMeta(licenses=licenses, origins=origins, title=title, description=description)
+            default_metadata = DatasetMeta(licenses=licenses, title=title, description=description)
         else:
             # None of the variables includes "origins", which means it is an old dataset, with "sources".
             sources = get_unique_sources_from_tables(tables=tables)
@@ -187,12 +190,11 @@ def create_dataset(
     else:
         N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
     if N.metadata_path.exists():
-        ds.update_metadata(N.metadata_path)
+        ds.update_metadata(N.metadata_path, if_origins_exist=if_origins_exist)
 
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():
             assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
-
     # run grapher checks
     if ds.metadata.channel == "grapher" and run_grapher_checks:
         grapher_checks(ds)
@@ -353,6 +355,9 @@ class PathFinder:
         # Then, if the step is not found in the dag, but it's found as private, is_private will be set to True.
         if is_private is None:
             self.is_private = False
+
+        # Default logger
+        self.log = structlog.get_logger(step=f"{self.namespace}/{self.channel}/{self.version}/{self.short_name}")
 
     @property
     def channel(self) -> str:

@@ -182,6 +182,7 @@ class Tag(SQLModel, table=True):
     isBulkImport: int = Field(sa_column=Column("isBulkImport", TINYINT(1), nullable=False, server_default=text("'0'")))
     parentId: Optional[int] = Field(default=None, sa_column=Column("parentId", Integer))
     specialType: Optional[str] = Field(default=None, sa_column=Column("specialType", String(255, "utf8mb4_0900_as_cs")))
+    isTopic: int = Field(sa_column=Column("isTopic", TINYINT(1), nullable=False, server_default=text("'0'")))
 
     post: List["Posts"] = Relationship(back_populates="tag")
     tags: Optional["Tag"] = Relationship(back_populates="tags_reverse")
@@ -1088,7 +1089,7 @@ class Variable(SQLModel, table=True):
 
         # establish relationships between variables and tags
         # get tags by their name
-        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names))).all()  # type: ignore
+        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names), Tag.isTopic == 1)).all()  # type: ignore
 
         # raise a warning if some tags were not found
         if len(tags) != len(tag_names):
@@ -1168,7 +1169,7 @@ class Origin(SQLModel, table=True):
     urlMain: Optional[str] = None
     urlDownload: Optional[str] = None
     dateAccessed: Optional[date] = None
-    datePublished: Optional[date] = None
+    datePublished: Optional[str] = None
     license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
 
     variables: list["Variable"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
@@ -1218,6 +1219,12 @@ class Origin(SQLModel, table=True):
         )  # type: ignore
 
     def upsert(self, session: Session) -> "Origin":
+        """
+        # NOTE: this would be an ideal solution if we only stored unique rows in
+        # origins table, but there are weird race conditions and we cannot have
+        # index on all columns because it would be too long.
+        # Storing duplicate origins is not a big deal though
+
         origin = session.exec(self._upsert_select).one_or_none()
         if origin is None:
             # create new origin
@@ -1230,6 +1237,19 @@ class Origin(SQLModel, table=True):
 
         # select added object to get its id
         return session.exec(self._upsert_select).one()
+        """
+
+        origins = session.exec(self._upsert_select).all()
+        if not origins:
+            # create new origin
+            origin = self
+            session.add(origin)
+        else:
+            # we match on all fields, so there's nothing to update
+            # just pick any origin
+            origin = origins[0]
+
+        return origin
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:

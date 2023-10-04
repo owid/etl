@@ -282,9 +282,25 @@ def _variable_metadata(
         variableMetadata[col] = variableMetadata[col].strftime(time_format)  # type: ignore
 
     # add origins
-    variableMetadata["origins"] = [_omit_nullable_values(d) for d in db_origins_df.to_dict(orient="records")]  # type: ignore
+    variableMetadata["origins"] = _move_population_origin_to_end(
+        [_omit_nullable_values(d) for d in db_origins_df.to_dict(orient="records")]
+    )
 
     return variableMetadata
+
+
+def _move_population_origin_to_end(origins: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Move population origin to the end of the list of origins. This way it gets displayed last on data page."""
+    new_origins = []
+    pop_origin = None
+    for origin in origins:
+        if origin.get("title") == "Population" and origin.get("producer") == "Various sources":
+            pop_origin = origin
+        else:
+            new_origins.append(origin)
+    if pop_origin:
+        new_origins.append(pop_origin)
+    return new_origins
 
 
 def variable_metadata(session: Session, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
