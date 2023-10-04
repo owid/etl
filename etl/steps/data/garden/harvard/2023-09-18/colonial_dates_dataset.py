@@ -127,4 +127,9 @@ def process_data(tb: Table) -> Table:
         ~((tb["country"].isin(colonizers_list)) & (tb["total_colonies"].isnull())), 0
     )
 
+    # Add rows for the country "World" with the total number of colonies per year
+    tb_count_world = tb.groupby(["year"]).agg({"total_colonies": "sum"}).reset_index()
+    tb_count_world["country"] = "World"
+    tb = pr.concat([tb, tb_count_world], short_name="colonial_dates_dataset")
+
     return tb
