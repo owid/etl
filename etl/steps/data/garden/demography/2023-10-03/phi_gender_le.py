@@ -87,7 +87,7 @@ def make_table_phi(tb: Table) -> Table:
         + tb["number_deaths"]["female"] * tb["number_deaths"]["male"] / 2
     )
     # Apply the summation from Eq 2
-    tb = tb.groupby(["location", "year"], as_index=False)[[("phi", "")]].sum()
+    tb = tb.groupby(["location", "year"], as_index=False, observed=True)[[("phi", "")]].sum()
 
     # Fix column names (remove multiindex)
     tb.columns = [col[0] for col in tb.columns]
