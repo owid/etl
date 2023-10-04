@@ -62,10 +62,10 @@ FORMER_COUNTRIES = {
         "name": "Serbia and Montenegro",
         "end": 2006,
     },
-    "ussr": {
-        "name": "USSR",
-        "end": 1991,
-    },
+    # "ussr": {
+    #     "name": "USSR",
+    #     "end": 1991,
+    # },
     "yem_north": {
         "name": "Yemen Arab Republic",
         "end": 1990,
