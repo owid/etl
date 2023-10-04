@@ -916,7 +916,8 @@ class Table(pd.DataFrame):
         """Groupby that preserves metadata."""
         by_list = [args[0]] if isinstance(args[0], str) else args[0]
         for by in by_list:
-            if self.dtypes[by] == "category":
+            by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
+            if by_type == "category":
                 log.warning(
                     f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour."
                 )
