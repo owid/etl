@@ -60,6 +60,7 @@ nav:
           - Dataset: "architecture/metadata/reference/dataset.md"
           - Tables: "architecture/metadata/reference/tables.md"
         - Propagation of metadata: "architecture/metadata/propagation.md"
+        - Structing YAML metadata file: "architecture/metadata/structuring-yaml.md"
         - Using metadata: "architecture/metadata/using.md"
       - Our journey: "architecture/our-journey.md"
   - API and catalog:
