@@ -19,18 +19,19 @@ import ast
 from typing import List
 
 import owid.catalog.processing as pr
-from gapminder import load_gapminder
-from gapminder_sg import (
-    load_gapminder_sys_glob_complement,
-    load_gapminder_sys_glob_former,
-)
-from hyde import load_hyde
 from owid.catalog import Table
 from structlog import get_logger
-from unwpp import load_unwpp
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
+
+from .gapminder import load_gapminder
+from .gapminder_sg import (
+    load_gapminder_sys_glob_complement,
+    load_gapminder_sys_glob_former,
+)
+from .hyde import load_hyde
+from .unwpp import load_unwpp
 
 log = get_logger()
 
@@ -47,9 +48,7 @@ SOURCES_NAMES = {
 }
 # Former countries
 ## These countries are added by aggregating their successors' values, and using regions.
-FORMER_COUNTRIES_CODES = {
-    "OWID_USS"
-}
+FORMER_COUNTRIES_CODES = {"OWID_USS"}
 
 
 def run(dest_dir: str) -> None:
@@ -247,7 +246,9 @@ def add_historical_regions(df: Table, tb_regions: Table) -> Table:
         former_country_name = tb_regions.loc[ccode, "name"]
         end_year = tb_regions.loc[ccode, "end_year"]
         # Sanity check
-        assert former_country_name not in set(tb["country"]), f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
+        assert former_country_name not in set(
+            tb["country"]
+        ), f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
         # Get list of country successors (equivalent of former state nowadays) and end year (dissolution of former state)
         ccodes_successors = ast.literal_eval(tb_regions.loc[ccode, "successors"])
         successor_names = tb_regions.loc[ccodes_successors, "name"].tolist()
@@ -258,15 +259,14 @@ def add_historical_regions(df: Table, tb_regions: Table) -> Table:
         year_filter = year_filter[year_filter].index.tolist()
         tb_ = tb_[tb_["year"].isin(year_filter)]
         # Perform operations
-        tb_.groupby("year", as_index=False).agg({
-            "population": sum,
-            "world_pop_share": sum,
-            "source": lambda x: "; ".join(sorted(set(x)))
-        })
+        tb_ = tb_.groupby("year", as_index=False).agg(
+            {"population": sum, "source": lambda x: "; ".join(sorted(set(x)))}
+        )
         tb_["country"] = former_country_name
         # Add to main table
         tb = pr.concat([tb, tb_], ignore_index=True)
     return tb
+
 
 def fix_anomalies(df: Table) -> Table:
     """Make sure that all rows make sense.
