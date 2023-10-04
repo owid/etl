@@ -2,7 +2,7 @@ meta:
   namespace: artificial_intelligence
   short_name: epoch
   name: Parameter, Compute and Data Trends in Machine Learning (Epoch, 2023)
-  version: '2023-06-21'
+  version: '2023-10-04'
   publication_year: 2023
   publication_date:
   source_name: Epoch (2023)
@@ -15,7 +15,7 @@ meta:
   file_extension: csv
   license_url:
   license_name: Public domain
-  date_accessed: 2023-09-18
+  date_accessed: 2023-10-04
   is_public: true
   description: |
     We update this chart with the latest available data from our source every month.
@@ -32,9 +32,8 @@ meta:
         — Deployed in a notable context
 
         The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models.'"
-
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-21
 outs:
-- md5: f19e7454da0c55ce2b5e0dd01b1d5617
-  size: 530905
+- md5: 2cf3fdf19759c9b9012e47599365d2e3
+  size: 602718
   path: epoch.csv
