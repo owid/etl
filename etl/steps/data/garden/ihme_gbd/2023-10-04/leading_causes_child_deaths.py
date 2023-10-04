@@ -83,7 +83,7 @@ def create_hierarchy_table(age_group: str, tb_cause: Table, level_causes: List[s
     # Find the cause of death with the highest number of deaths in each country-year
     leading_causes_idx = long_tb.groupby(["country", "year"], observed=True)[f"deaths_{short_name}"].idxmax()
     leading_causes_tb = long_tb.loc[leading_causes_idx]
-
+    leading_causes_tb = leading_causes_tb.drop(columns=[f"deaths_{short_name}"])
     leading_causes_tb.metadata.short_name = short_name
 
     return leading_causes_tb
