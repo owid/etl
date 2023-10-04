@@ -44,10 +44,16 @@ def run(dest_dir: str) -> None:
 
     # 110+ -> 110
     log.info("gini_le: replace 110+ -> 100, 110+ -> 110, set Dtypes.")
-    tb["age"] = tb["age"].replace({
-        "110+": "110",
-        "100+": "100",
-    }).astype("Int64")
+    tb["age"] = (
+        tb["age"]
+        .replace(
+            {
+                "110+": "110",
+                "100+": "100",
+            }
+        )
+        .astype("Int64")
+    )
 
     # Sort rows
     log.info("gini_le: sort rows (needed for correct estimation)")
