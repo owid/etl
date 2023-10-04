@@ -1,21 +1,33 @@
 !!! warning "This tutorial might be partial or incomplete. Please check with the team if you have questions."
 
-Before the existance of the ETL, datasets were directly uploaded to our Grapher admin site. Sometimes, we want to use these datasets in ETL. However, they are not available by default as they were never imported via the ETL. To make them available in ETL we use _backport_.
+Before ETL came along, datasets were uploaded directly to our Grapher admin site. If you want to leverage these datasets in the ETL, they won't be available out of the box, since they weren't initially imported via ETL. You have two main options to bring them into ETL:
+
+1. Migrate them into the ETL pipeline.
+2. Move them to Fast-Track.
+
+Choose Fast-Track if the dataset requires author edits. Otherwise, it's more straightforward to migrate to ETL.
 
 
-The first step is getting them to Snapshot using:
+## How to Migrate to ETL
+
+Automatically generate ETL steps for a specific dataset (xxx) with the following command:
 
 ```
-bulk_backport
+ENV=.env.prod backport-migrate --dataset-id xxx --namespace your_namespace --version your_version --short-name your_short_name
 ```
 
-(specify `--limit` to make it process only a subset of datasets). It goes through all public datasets with at least one indicator used in a chart and uploads them to Walden catalog (or skip them if they're already there and have the same checksum). If you set `--skip-upload` flag, it will only persist the datasets locally. **You need S3 credentials to upload them to Snapshot.**
+After running this, follow the terminal prompts.
 
-Backported snapshot (and walden) datasets can be processed with ETL using
+
+## How to Migrate to Fast-Track
+
+To move a dataset to Fast-Track, generate a Google spreadsheet using:
 
 ```
-etl --backport
+ENV=.env.prod backport-fasttrack --dataset-id xxx --short-name your_short_name
 ```
 
-(or `etl backport --backport`). This will transform original datasets from long format to wide format, optimize their data types, convert metadata and add them to the catalog. Then you can run `publish` to publish the datasets as usual.
+Once generated, open the Fast-Track spreadsheet and follow the provided instructions.
 
+
+!!! warning "Using automatically backported datasets via `backport://backport/owid/latest/dataset_xxx_...` is discouraged."
