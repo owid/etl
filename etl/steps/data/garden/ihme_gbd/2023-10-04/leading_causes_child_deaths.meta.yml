@@ -1,4 +1,14 @@
 tables:
+  leading_cause_level_1:
+    title: Leading causes of death in under-fives, based on IHME GBD cause level 1. There are 7 broad categories in level 2.
+    variables:
+      deaths_leading_cause_level_1:
+        title: Deaths from leading cause of death in under-fives (level 1)
+        description_short: The number of deaths from the leading cause of death in under-fives
+        unit: deaths
+      disease_leading_cause_level_1:
+        title: The leading cause of death in under-fives (level 1)
+        unit: ""
   leading_cause_level_2:
     title: Leading causes of death in under-fives, based on IHME GBD cause level 2. There are 22 broad categories in level 2.
     variables:

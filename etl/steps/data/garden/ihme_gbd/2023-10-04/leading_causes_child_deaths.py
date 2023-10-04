@@ -20,33 +20,27 @@ def run(dest_dir: str) -> None:
     # Select out the level 2 and level 3 causes separately, level 2 are broader than level 3
     tb_hierarchy["cause_name_underscore"] = tb_hierarchy["cause_name"].apply(underscore)
 
-    level_2_causes = tb_hierarchy[tb_hierarchy["level"] == 2]["cause_name_underscore"].to_list()
-    level_2_causes = list(map(lambda item: underscore(item), level_2_causes))
+    levels = [1, 2, 3, 4]
 
-    level_3_causes = tb_hierarchy[tb_hierarchy["level"] == 3]["cause_name_underscore"].to_list()
-    level_3_causes = list(map(lambda item: underscore(item), level_3_causes))
+    tb_out = []
+    for level in levels:
+        level_causes = tb_hierarchy[tb_hierarchy["level"] == level]["cause_name_underscore"].to_list()
+        level_causes = list(map(lambda item: underscore(item), level_causes))
+        tb_level = create_hierarchy_table(tb_cause, level_causes, short_name=f"leading_cause_level_{level}")
+        tb_level = clean_disease_names(tb=tb_level, tb_hierarchy=tb_hierarchy)
+        tb_level = tb_level.set_index(["country", "year"], verify_integrity=True)
+        tb_out.append(tb_level)
 
-    level_4_causes = tb_hierarchy[tb_hierarchy["level"] == 4]["cause_name_underscore"].to_list()
-    level_4_causes = list(map(lambda item: underscore(item), level_4_causes))
-
-    tb_level_2 = create_hierarchy_table(tb_cause, level_2_causes, short_name="leading_cause_level_2")
-    tb_level_3 = create_hierarchy_table(tb_cause, level_3_causes, short_name="leading_cause_level_3")
-    tb_level_4 = create_hierarchy_table(tb_cause, level_4_causes, short_name="leading_cause_level_4")
-
-    tb_level_2 = clean_disease_names(tb=tb_level_2, tb_hierarchy=tb_hierarchy)
-    tb_level_3 = clean_disease_names(tb=tb_level_3, tb_hierarchy=tb_hierarchy)
-    tb_level_4 = clean_disease_names(tb=tb_level_4, tb_hierarchy=tb_hierarchy)
-
-    tb_level_2 = tb_level_2.set_index(["country", "year"], verify_integrity=True)
-    tb_level_3 = tb_level_3.set_index(["country", "year"], verify_integrity=True)
-    tb_level_4 = tb_level_4.set_index(["country", "year"], verify_integrity=True)
-    #
+    tb_level_1 = tb_out[0]
+    tb_level_2 = tb_out[1]
+    tb_level_3 = tb_out[2]
+    tb_level_4 = tb_out[3]
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb_level_2, tb_level_3, tb_level_4],
+        tables=[tb_level_1, tb_level_2, tb_level_3, tb_level_4],
         check_variables_metadata=True,
         default_metadata=tb_cause.metadata,
     )
