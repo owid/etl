@@ -1,16 +1,17 @@
+
 dataset:
-  title: Global Plastics Outlook - Plastics waste in 2019 by region and application
+  title: Global Plastics Outlook - Plastics waste in 2019 by region and polymer
 tables:
   plastic_waste_2019:
     variables:
       plastic_waste:
-        title: Plastic waste by application in 2019
+        title: Plastic waste by polymer in 2019
         unit: 'tonnes'
         short_unit: 't'
         display:
           numDecimalPlaces: 0
       share:
-        title: Share of plastic waste by application in 2019
+        title: Share of plastic waste by polymer in 2019
         unit: '%'
         short_unit: '%'
         display:

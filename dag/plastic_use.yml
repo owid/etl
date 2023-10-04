@@ -13,6 +13,11 @@ steps:
   data://grapher/oecd/2023-09-21/plastic_waste_2019:
     - data://garden/oecd/2023-09-21/plastic_waste_2019
 
+  data://garden/oecd/2023-09-21/plastic_waste_2019_by_polymer:
+    - data://meadow/oecd/2023-09-21/plastic_waste_2019
+  data://grapher/oecd/2023-09-21/plastic_waste_2019_by_polymer:
+    - data://garden/oecd/2023-09-21/plastic_waste_2019_by_polymer
+
   data://meadow/oecd/2023-09-21/plastic_aquatic_leakage:
     - snapshot://oecd/2023-09-21/plastic_aquatic_leakage.csv
   data://garden/oecd/2023-09-21/plastic_aquatic_leakage:
