@@ -149,7 +149,7 @@ class Snapshot:
             return self.read_csv(*args, **kwargs)
         elif self.metadata.file_extension == "feather":
             return self.read_feather(*args, **kwargs)
-        elif self.metadata.file_extension == "xlsx":
+        elif self.metadata.file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
             return self.read_excel(*args, **kwargs)
         elif self.metadata.file_extension == "json":
             return self.read_json(*args, **kwargs)
@@ -334,7 +334,9 @@ class SnapshotMeta:
             description=s["description"].get("additionalInfo"),
             url=s["description"].get("link"),
             published_by=s["description"].get("dataPublishedBy"),
-            date_accessed=pd.to_datetime(s["description"].get("retrievedDate") or dt.date.today()).date(),
+            date_accessed=pd.to_datetime(
+                s["description"].get("retrievedDate") or dt.date.today(), dayfirst=True
+            ).date(),
         )
 
     def to_table_metadata(self):

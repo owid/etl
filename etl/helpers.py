@@ -195,7 +195,6 @@ def create_dataset(
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():
             assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
-
     # run grapher checks
     if ds.metadata.channel == "grapher" and run_grapher_checks:
         grapher_checks(ds)
@@ -356,6 +355,9 @@ class PathFinder:
         # Then, if the step is not found in the dag, but it's found as private, is_private will be set to True.
         if is_private is None:
             self.is_private = False
+
+        # Default logger
+        self.log = structlog.get_logger(step=f"{self.namespace}/{self.channel}/{self.version}/{self.short_name}")
 
     @property
     def channel(self) -> str:

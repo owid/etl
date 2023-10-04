@@ -972,6 +972,12 @@ def test_groupby_agg(table_1) -> None:
     assert gt.values.tolist() == [[False, 3, 6], [False, 3, 9]]
     assert isinstance(gt.a, Table)
 
+    gt = table_1.groupby("country").agg(
+        min_a=("a", "min"),
+    )
+    assert gt.min_a.values.tolist() == [3, 1]
+    assert gt.min_a.m.title == "Title of Table 1 Variable a"
+
 
 def test_groupby_count(table_1) -> None:
     gt = table_1.groupby("country").count()
@@ -1005,6 +1011,12 @@ def test_groupby_iteration(table_1) -> None:
     for _, group in table_1.groupby("country"):
         assert isinstance(group._fields, defaultdict)
         assert group.a.m.title == "Title of Table 1 Variable a"
+
+
+def test_groupby_observed_default(table_1) -> None:
+    table_1 = table_1.astype({"a": "category"}).query("a != 3")
+    gt = table_1.groupby("a").min()
+    assert len(gt) == 3
 
 
 def test_set_columns(table_1) -> None:
