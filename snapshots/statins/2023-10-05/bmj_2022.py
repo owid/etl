@@ -38,22 +38,21 @@ def main(upload: bool) -> None:
     }
 
     # Attempt to fetch data from the source URL.
-    response = None
     if snap.metadata.origin is not None:
         response = requests.get(snap.metadata.origin.url_download, headers=headers)
 
-    # Proceed only if the request was successful (HTTP Status Code 200).
-    if response.status_code == 200:
-        # Extracting tables from the PDF response.
-        df_statins = extract_statin_use_table(response)
-        df_econ_health = extract_economic_health_indicators(response)
+        # Proceed only if the request was successful (HTTP Status Code 200).
+        if response.status_code == 200:
+            # Extracting tables from the PDF response.
+            df_statins = extract_statin_use_table(response)
+            df_econ_health = extract_economic_health_indicators(response)
 
-        # Merging extracted tables based on the 'country' column.
-        df = pd.merge(df_statins, df_econ_health, on="country")
+            # Merging extracted tables based on the 'country' column.
+            df = pd.merge(df_statins, df_econ_health, on="country")
 
-        # Saving the merged dataframe to a file and updating the DVC.
-        df_to_file(df, file_path=snap.path)
-        snap.dvc_add(upload=upload)
+            # Saving the merged dataframe to a file and updating the DVC.
+            df_to_file(df, file_path=snap.path)
+            snap.dvc_add(upload=upload)
 
 
 def extract_statin_use_table(response):
