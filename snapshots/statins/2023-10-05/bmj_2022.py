@@ -101,27 +101,27 @@ def extract_statin_use_table(response):
 
             # Extract the table from the page using the predefined settings.
             table = page.extract_table(table_settings)
+            if table is not None:
+                # Discard header or irrelevant rows and extract the data rows.
+                rows = table[10:]
 
-            # Discard header or irrelevant rows and extract the data rows.
-            rows = table[10:]
+                # Apply specific cleaning and processing logic based on the page number (original formatting is different depending on the page).
+                if i == (page_start - 1):
+                    # Clean and merge cell data for the first page.
+                    cleaned_rows = [merge_and_clean(row) for row in rows]
 
-            # Apply specific cleaning and processing logic based on the page number (original formatting is different depending on the page).
-            if i == (page_start - 1):
-                # Clean and merge cell data for the first page.
-                cleaned_rows = [merge_and_clean(row) for row in rows]
+                    # Retain only the relevant columns containing country name and statin utilization rates.
+                    only_rates = [row[:3] for row in cleaned_rows]
 
-                # Retain only the relevant columns containing country name and statin utilization rates.
-                only_rates = [row[:3] for row in cleaned_rows]
-
-                # Append the cleaned data to the master list.
-                all_rows.extend(only_rates)
-            else:
-                # Clean data for subsequent pages without merging cells.
-                cleaned_rows = [
-                    [item.replace("·", ".") if isinstance(item, str) else item for item in row] for row in rows
-                ]
-                only_rates = [row[:3] for row in cleaned_rows]
-                all_rows.extend(only_rates)
+                    # Append the cleaned data to the master list.
+                    all_rows.extend(only_rates)
+                else:
+                    # Clean data for subsequent pages without merging cells.
+                    cleaned_rows = [
+                        [item.replace("·", ".") if isinstance(item, str) else item for item in row] for row in rows
+                    ]
+                    only_rates = [row[:3] for row in cleaned_rows]
+                    all_rows.extend(only_rates)
 
     # Discard the last 8 rows from the extracted data, as they might be footnotes or unrelated content.
     rows_to_save = all_rows[:-8]
@@ -181,26 +181,28 @@ def extract_economic_health_indicators(response):
 
             # Extract the table from the page using the predefined settings.
             table = page.extract_table(table_settings)
+            if table is not None:
+                # Discard header or irrelevant rows and extract the data rows.
+                rows = table[11:]
+                # Replace non-standard decimal point notation in numbers with a standard period.
+                cleaned_rows = [
+                    [item.replace("·", ".") if isinstance(item, str) else item for item in row] for row in rows
+                ]
+                # Apply specific cleaning and processing logic based on the page number (original formatting is different depending on the page).
+                if i == (page_start - 1):
+                    # Specify the columns of interest for the first page.
+                    index_columns = [0, 9, 12, 13]
+                    columns_of_interest = [[row[i] for i in index_columns] for row in cleaned_rows]
 
-            # Discard header or irrelevant rows and extract the data rows.
-            rows = table[11:]
-            # Replace non-standard decimal point notation in numbers with a standard period.
-            cleaned_rows = [[item.replace("·", ".") if isinstance(item, str) else item for item in row] for row in rows]
-            # Apply specific cleaning and processing logic based on the page number (original formatting is different depending on the page).
-            if i == (page_start - 1):
-                # Specify the columns of interest for the first page.
-                index_columns = [0, 9, 12, 13]
-                columns_of_interest = [[row[i] for i in index_columns] for row in cleaned_rows]
+                    # Append the cleaned data to the master list.
+                    all_rows.extend(columns_of_interest)
+                else:
+                    # Specify the columns of interest for the second page.
+                    index_columns = [0, 5, 8, 9]
+                    columns_of_interest = [[row[i] for i in index_columns] for row in cleaned_rows]
 
-                # Append the cleaned data to the master list.
-                all_rows.extend(columns_of_interest)
-            else:
-                # Specify the columns of interest for the second page.
-                index_columns = [0, 5, 8, 9]
-                columns_of_interest = [[row[i] for i in index_columns] for row in cleaned_rows]
-
-                # Append the cleaned data to the master list.
-                all_rows.extend(columns_of_interest)
+                    # Append the cleaned data to the master list.
+                    all_rows.extend(columns_of_interest)
 
     # Discard the last 11 rows from the extracted data, which might be footnotes or unrelated content.
     rows_to_save = all_rows[:-11]
