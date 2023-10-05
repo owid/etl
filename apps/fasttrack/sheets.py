@@ -163,6 +163,8 @@ def _parse_dataset(dataset_meta_df: pd.DataFrame) -> DatasetMeta:
 
 
 def _parse_variables(variables_meta_df: pd.DataFrame) -> Dict[str, VariableMeta]:
+    variables_meta_df = variables_meta_df.dropna(subset=["short_name"])
+
     variables_list = [_prune_empty(v) for v in variables_meta_df.to_dict(orient="records")]  # type: ignore
 
     # default variable values
