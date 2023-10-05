@@ -1,6 +1,6 @@
 ## Creating YAML Files
 
-Metadata YAML files are typically stored within a garden step as `my_dataset.meta.yml`. The conventional structure is as follows:
+Metadata YAML files are typically stored within a garden step as `my_dataset.meta.yml`. Their content is applied **at the very end** of any ETL step. Therefore, YAML files have "the final word" on the metadata of any step. The conventional structure is as follows:
 
 ```yaml
 dataset:
@@ -21,39 +21,44 @@ poetry run etl-metadata-export data/garden/my_namespace/my_version/my_dataset -o
 
 ## Handling Multi-line Strings and Whitespace
 
-Multi-line strings are often sources of confusion. YAML supports two primary styles for writing them:
+Multi-line strings are often sources of confusion. [YAML multiline](https://yaml-multiline.info/) supports two primary styles for writing them:
 
-```yaml
-my_var_1:
-  description: |-
-    The first line
-    and the second
+* **Literal style** (denoted with the `|` block style indicator): Line breaks in the YAML file are treated as line breaks.
 
-    Third line after line break
-```
+  NOTE: This implies that lines of text in the YAML file can become very long; to be able to read them on a text editor without needing to scroll left and right, use "Word wrap" (in VSCode on Mac, shortcut option+z).
+  ```yaml
+  my_var_1:
+    description_short: |-
+      The first line
+      and the second
 
-```yaml
-my_var_1:
-  description: >-
-    Just a
-    single line
+      Third line after line break
+  ```
+* **Folded style**  (denoted with the `>` block style indicator): Line breaks in the YAML file are treated like spaces; to create a line break, you need a double line break in the YAML file.
 
-    Second line
+  NOTE: This avoids having lines of text that are too long in the YAML file. However, if you want to rephrase a paragraph, you may need to manually rearrange the line breaks afterwards.
+  ```yaml
+  my_var_1:
+    description_short: >-
+      Just a
+      single line
+
+      Second line
 
 
-    Third line after line break
-```
+      Third line after line break
+  ```
 
-It's up to you whether you want to fit the entire text on the single line and use `>-` or use `|-` and break the lines.
+It's up to you which option to use.
 
-Using `-` after `|` or `>` removes whitespaces at the beginning and end of the string. This is almost always what you want.
+Note that, using the "strip" chomping indicator, denoted with `-`, after `|` or `>` removes whitespaces at the beginning and end of the string. **This is almost always what you want.**
 
 
 ## Anchors & aliases
 
-[Anchors and aliases](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/) are a native YAML functionality and they can be used to reduce repetition.
+[Anchors (&) and aliases (*)](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/) are a native YAML functionality and they can be used to reduce repetition.
 
-Typically we define a special section called `definitions:` at the very top of the file and then we use aliases to refer to these definitions.
+You can define anchors anywhere on the YAML file, but typically we define a special section called `definitions` at the very top of the file, and then use aliases to refer to these definitions.
 
 An example that reuses `attribution` and `description_key`
 
@@ -78,7 +83,7 @@ tables:
           - *description_key_common
           - *third_line
 ```
-
+Note that the case of `description_key` is a bit special: You can use anchor/aliases for both the entire list of bullet points, and also individual points. We have implemented some logic so that the result is always a list of bullet points.
 
 ## Common fields for all indicators
 
@@ -113,7 +118,6 @@ tables:
             - Internet
 ```
 
-
 ## Dynamic YAML
 
 Anchors and aliases have limitations. One of the main ones is that you cannot use it for in-line text. That's why we've added support for [dynamic-yaml](https://github.com/childsish/dynamic-yaml) which lets you write YAML files likes this:
@@ -127,7 +131,7 @@ tables:
   my_table:
     variables:
       my_var_1:
-        description: |-
+        description_short: |-
           This is a description.
           { additional_info }
 ```
@@ -157,12 +161,12 @@ tables:
   ucdp:
     variables:
       number_deaths_ongoing_conflicts_high:
-        description: |-
+        description_processing: |-
           <% set estimate = "high" %>
 
           {definitions.conflict_type_estimate}
       number_deaths_ongoing_conflicts_low:
-        description: |-
+        description_processing: |-
           <% set estimate = "low" %>
 
           {definitions.conflict_type_estimate}
