@@ -553,6 +553,14 @@ steps:
   data://grapher/un/2023-08-16/igme:
     - data://garden/un/2023-08-16/igme
 
+  # Colonial Dates Dataset (COLDAT)
+  data://meadow/harvard/2023-09-18/colonial_dates_dataset:
+    - snapshot://harvard/2023-09-18/colonial_dates_dataset.csv
+  data://garden/harvard/2023-09-18/colonial_dates_dataset:
+    - data://meadow/harvard/2023-09-18/colonial_dates_dataset
+  data://grapher/harvard/2023-09-18/colonial_dates_dataset:
+    - data://garden/harvard/2023-09-18/colonial_dates_dataset
+    
   # Augmented Human Development Index
   data://meadow/ahdi/2023-09-08/augmented_hdi:
     - snapshot://ahdi/2023-09-08/augmented_hdi.xlsx
