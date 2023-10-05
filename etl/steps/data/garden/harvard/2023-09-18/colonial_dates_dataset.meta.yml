@@ -22,7 +22,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |
-          Name of European colonial power that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers"
+          Name of European colonial power that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
         description_from_producer: ""
         processing_level: major
         display:
@@ -63,7 +63,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |
-          Name of the last European colonial power that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers"
+          Name of the last European colonial power that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
         description_from_producer: ""
         processing_level: major
         display:
