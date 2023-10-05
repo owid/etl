@@ -74,6 +74,7 @@ tables:
         f.write(yaml_text)
 
     t = Table({"a": [1, 2, 3], "b": [1, 2, 3]})
+    t.a.metadata.description_short = "Will be overwritten"
     t.a.metadata.sources = [Source()]
 
     ym.update_metadata_from_yaml(t, path, "test")

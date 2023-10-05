@@ -33,38 +33,40 @@ def update_metadata_from_yaml(
     if extra_variables == "raise":
         _validate_variables(t_annot, tb)
 
+    common_dict = annot.get("definitions", {}).get("common", {})
+
     # update variables
     for v_short_name in tb.columns:
         # get YAML metadata or empty dict
-        v_annot = t_annot.get("variables", {}).get(v_short_name, {})
+        variable_dict = t_annot.get("variables", {}).get(v_short_name, {})
 
-        # merge with common definitions
-        v_annot = _merge_variable_metadata(
-            v_annot, annot.get("definitions", {}).get("common", {}), if_origins_exist="append"
+        # firstly merge with variable defined fields that overwrites metadata
+        meta_dict = _merge_variable_metadata(
+            tb[v_short_name].m.to_dict(), variable_dict, if_origins_exist, overwrite=True
         )
 
-        if not v_annot:
-            continue
+        # secondly merge with common definitions that don't overwrite
+        meta_dict = _merge_variable_metadata(meta_dict, common_dict, if_origins_exist="append", overwrite=False)
 
         # we allow `- *descriptions` which needs to be flattened
-        if "description_key" in v_annot:
-            v_annot["description_key"] = _flatten(v_annot["description_key"])
+        if "description_key" in meta_dict:
+            meta_dict["description_key"] = _flatten(meta_dict["description_key"])
 
-        v_meta_dict = _merge_variable_metadata(tb[v_short_name].m.to_dict(), v_annot, if_origins_exist)
-        tb[v_short_name].metadata = VariableMeta.from_dict(v_meta_dict)
+        # convert to objects
+        tb[v_short_name].metadata = VariableMeta.from_dict(meta_dict)
 
     # update table attributes
     tb_meta_dict = _merge_table_metadata(tb.m.to_dict(), t_annot)
     tb.metadata = TableMeta.from_dict(tb_meta_dict)
 
 
-def _merge_variable_metadata(md: dict, new: dict, if_origins_exist: SOURCE_EXISTS_OPTIONS) -> dict:
+def _merge_variable_metadata(md: dict, new: dict, if_origins_exist: SOURCE_EXISTS_OPTIONS, overwrite: bool) -> dict:
     """Merge VariableMeta in a dictionary with another dictionary. It modifies the original object."""
     for k, v in new.items():
         # special cases
         if k in ("presentation", "grapher_config"):
             # merge fields
-            md[k] = _merge_variable_metadata(md.get(k, {}), v, if_origins_exist)
+            md[k] = _merge_variable_metadata(md.get(k, {}), v, if_origins_exist, overwrite)
         # origins have their special flag to decide what to do
         elif k == "origins":
             if if_origins_exist == "fail" and md["origins"]:
@@ -79,9 +81,11 @@ def _merge_variable_metadata(md: dict, new: dict, if_origins_exist: SOURCE_EXIST
         # append list (could be origins, sources or others)
         elif isinstance(v, list):
             md[k] = md.get(k, []) + v
-        # key is already defined in metadata, don't overwrite
+        # key is already defined in metadata
         elif k in md:
-            pass
+            # should we overwrite it?
+            if overwrite:
+                md[k] = v
         # otherwise just define it
         else:
             md[k] = v
