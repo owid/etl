@@ -38,7 +38,9 @@ def main(upload: bool) -> None:
     }
 
     # Attempt to fetch data from the source URL.
-    response = requests.get(snap.metadata.origin.url_download, headers=headers)
+    response = None
+    if snap.metadata.origin is not None:
+        response = requests.get(snap.metadata.origin.url_download, headers=headers)
 
     # Proceed only if the request was successful (HTTP Status Code 200).
     if response.status_code == 200:
