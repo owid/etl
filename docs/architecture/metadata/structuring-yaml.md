@@ -1,6 +1,6 @@
-## Creating YAML files
+## Creating YAML Files
 
-Metadata YAML files are most commonly saved in a garden step with name `my_dataset.meta.yml`. The typical structure looks like this:
+Metadata YAML files are typically stored within a garden step as `my_dataset.meta.yml`. The conventional structure is as follows:
 
 ```yaml
 dataset:
@@ -13,15 +13,15 @@ tables:
         title: ...
 ```
 
-If you already have a garden dataset, you can generate the file automatically with pre-filled variables names with
+To generate a metadata YAML file with pre-populated variable names for an existing garden dataset, execute:
 
 ```
 poetry run etl-metadata-export data/garden/my_namespace/my_version/my_dataset -o etl/steps/data/garden/my_namespace/my_version/my_dataset.meta.yml
 ```
 
-## Multi-line strings and whitespaces
+## Handling Multi-line Strings and Whitespace
 
-Multi-line strings are a common source of confusion. There are two ways to write them:
+Multi-line strings are often sources of confusion. YAML supports two primary styles for writing them:
 
 ```yaml
 my_var_1:
@@ -134,8 +134,7 @@ tables:
 
 There are also special variables like `{ TODAY }` that can be used for automatically updated datasets.
 
-
-## Jinja templates
+## Using Jinja Templates for Advanced Cases
 
 Even more complex metadata can be generated with [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/). This is especially useful for datasets in a long format, because Jinja lets you dynamically generate text (titles, descriptions, ...) based on dimension names.
 
@@ -169,4 +168,4 @@ tables:
           {definitions.conflict_type_estimate}
 ```
 
-Line breaks and trailing whitespaces can be tricky when using templates. Despite using good defaults, you might end up experimenting a lot to get the desired result.
+Be cautious with line breaks and trailing whitespace when utilizing templates. Despite using good defaults, you might end up experimenting a lot to get the desired result.
