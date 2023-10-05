@@ -14,11 +14,9 @@ for each year of the dispute.
 
 - Due to missing data in the number of deaths, we are not estimating this metric. Instead, we are using the "fatality" level to group by the different conflicts.
 
-- The "number of ongoing disputes" for a particular fatality level can be understood as "the number of conflicts ongoing in a particular year that will have between X1-X2 fatalities
-over their complete lifetime globally".
+- The "number of ongoing disputes" for a particular fatality level can be understood as "the number of conflicts ongoing in a particular year that will have between X1-X2 fatalities over their complete lifetime globally".
 
-- The "number of ongoing disputes" for a particular hostility level can be understood as "the number of conflicts ongoing in a particular year that will reach this hostility level
-over their complete lifetime globally".
+- The "number of ongoing disputes" for a particular hostility level can be understood as "the number of conflicts ongoing in a particular year that will reach this hostility level over their complete lifetime globally".
 
 
 On regions:
@@ -293,10 +291,12 @@ def estimate_metrics(tb: Table) -> Table:
     Table
         Table with a row per year, and the corresponding metrics of interest.
     """
-    # Estimate metrics broken down by fatality
-    tb_fatality = _estimate_metrics_fatality(tb.copy())
     # Estimate metrics broken down by hostility
+    ## estimate `number_ongoing_disputes` and `number_new_disputes`
     tb_hostility = _estimate_metrics_hostility(tb.copy())
+    # Estimate metrics broken down by fatality
+    ## only estimate `number_ongoing_disputes`
+    tb_fatality = _estimate_metrics_fatality(tb.copy())
 
     # Combine
     tb = pr.concat([tb_fatality, tb_hostility], ignore_index=False)
@@ -331,10 +331,10 @@ def _estimate_metrics_fatality(tb: Table) -> Table:
     tb = tb.rename(columns={"dispnum": "number_ongoing_disputes"})
 
     # Add fatality="all"
-    ops = {"number_ongoing_disputes": "sum"}
-    tb_all = tb.groupby(["year", "region"], as_index=False).agg(ops)
-    tb_all["fatality"] = "all"
-    tb = pr.concat([tb, tb_all], ignore_index=False)
+    # ops = {"number_ongoing_disputes": "sum"}
+    # tb_all = tb.groupby(["year", "region"], as_index=False).agg(ops)
+    # tb_all["fatality"] = "all"
+    # tb = pr.concat([tb, tb_all], ignore_index=False)
 
     # Add hostility level
     tb["hostility"] = "all"
@@ -367,14 +367,24 @@ def _estimate_metrics_hostility_ongoing(tb: Table) -> Table:
     # Operations to apply
     ops = {"dispnum": "nunique"}
 
-    # By regions
+    ## By regions and hostility level
     tb_regions = tb.groupby(["year", "hostlev", "region"], as_index=False).agg(ops)
-    # World
+
+    ## region='World' and by hostility_level
     tb_world = tb.groupby(["year", "hostlev"], as_index=False).agg(ops)
     tb_world["region"] = "World"
 
+    # hostility = "all"
+    tb_allhost = tb.groupby(["year", "region"], as_index=False).agg(ops)
+    tb_allhost["hostlev"] = "all"
+
+    # hostility = "all" & region = 'World'
+    tb_world_allhost = tb.groupby(["year"], as_index=False).agg(ops)
+    tb_world_allhost["region"] = "World"
+    tb_world_allhost["hostlev"] = "all"
+
     # Combine
-    tb = pr.concat([tb_regions, tb_world], ignore_index=False)
+    tb = pr.concat([tb_regions, tb_world, tb_allhost, tb_world_allhost], ignore_index=False)
 
     # Rename indicator column
     tb = tb.rename(
@@ -391,21 +401,30 @@ def _estimate_metrics_hostility_new(tb: Table) -> Table:
     assert (
         tb.groupby(["dispnum"])["hostlev"].nunique().max() == 1
     ), "The same conflict appears with multiple hostlev levels!"
-
-    # Drop 'duplicates'
-    tb = tb.sort_values("year").drop_duplicates(subset=["dispnum", "region"], keep="first")
-
     # Operations to apply
     ops = {"dispnum": "nunique"}
 
     # By regions
+    ## Drop 'duplicates'
+    tb = tb.sort_values("year").drop_duplicates(subset=["dispnum", "region"], keep="first")
     tb_regions = tb.groupby(["year", "hostlev", "region"], as_index=False).agg(ops)
+    ## By region and hostility level
+    tb_allhost = tb.groupby(["year", "region"], as_index=False).agg(ops)
+    tb_allhost["hostlev"] = "all"
+
     # World
+    ## Drop 'duplicates'
+    tb = tb.sort_values("year").drop_duplicates(subset=["dispnum"], keep="first")
+    ## World and by region
     tb_world = tb.groupby(["year", "hostlev"], as_index=False).agg(ops)
     tb_world["region"] = "World"
+    # hostility = "all" & region = 'World'
+    tb_world_allhost = tb.groupby(["year"], as_index=False).agg(ops)
+    tb_world_allhost["region"] = "World"
+    tb_world_allhost["hostlev"] = "all"
 
     # Combine
-    tb = pr.concat([tb_regions, tb_world], ignore_index=False)
+    tb = pr.concat([tb_regions, tb_allhost, tb_world, tb_world_allhost], ignore_index=False)
 
     # Rename indicator column
     tb = tb.rename(
