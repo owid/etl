@@ -1,6 +1,9 @@
 dataset:
   update_period_days: 365
 
+common:
+  years: Years have been expanded to show the full range of years in the dataset, from 1462 to 2022. The original dataset only includes years where a country was colonized.
+
 tables:
   colonial_dates_dataset:
     variables:
@@ -10,6 +13,10 @@ tables:
         short_unit: ""
         description_short: |
           Name of European colonial power(s) that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_processing: |
+          The indicator has been processed to identify the European colonial powers as "Colonizers", the countries not colonized as "Not colonized" and the countries colonized for multiple colonizers in the same year as the name of the colonizers separated by "-".
+
+          {common.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -17,12 +24,17 @@ tables:
           entityAnnotationsMap: ""
           numDecimalPlaces: 0
           conversionFactor: 1
+
       colonizer_grouped:
         title: European colonial power (grouped)
         unit: ""
         short_unit: ""
         description_short: |
           Name of European colonial power that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
+        description_processing: |
+          The indicator has been processed to identify the European colonial powers as "Colonizers", the countries not colonized as "Not colonized" and the countries colonized for multiple colonizers in the same year as "Multiple colonizers".
+
+          {common.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -37,6 +49,10 @@ tables:
         short_unit: "years"
         description_short: |
           Number of years the country has been colonized by the European colonial power(s) in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_processing: |
+          This is a cummulative sum of the years the country has been colonized, across the entire time series. Colonizers or countries not colonized show a value of 0.
+
+          {common.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -51,6 +67,10 @@ tables:
         short_unit: ""
         description_short: |
           Name of the last European colonial power(s) that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_processing: |
+          The indicator is constructed by filling years with no colonizers with the last colonizer in the time series for each country. Colonizers are identified as such, countries not colonized as "Not colonized" and countries colonized for multiple colonizers in the same year as the name of the colonizers separated by "-".
+
+          {common.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -58,12 +78,17 @@ tables:
           entityAnnotationsMap: ""
           numDecimalPlaces: 0
           conversionFactor: 1
+
       last_colonizer_grouped:
         title: Last European colonial power (grouped)
         unit: ""
         short_unit: ""
         description_short: |
           Name of the last European colonial power that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
+        description_processing: |
+          The indicator is constructed by filling years with no colonizers with the last colonizer (grouped) in the time series for each country. Colonizers are identified as such, countries not colonized as "Not colonized" and countries colonized for multiple colonizers in the same year as "Multiple colonizers".
+
+          {common.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -95,6 +120,10 @@ tables:
         short_unit: ""
         description_short: |
           Total number of colonies per year colonized by the European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states.
+        description_processing: |
+          This is the cumulative sum of years the country has been colonized by any European colonial power, across the entire time series. Colonizers or countries not colonized show a value of 0.
+
+          {common.years}
         description_from_producer: ""
         processing_level: major
         display:
