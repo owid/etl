@@ -84,20 +84,21 @@ tables:
 
 !!! warning "In progress."
 
-To avoid repetition for all indicators, you can use a special section called `common:`. This section is then merged with sections of all indicators. Using this saves you from repeating the same aliases in indicators.
+To avoid repetition for all indicators, you can use a special section called `common:` under `definitions:`. This section is then merged with sections of all indicators. Using this saves you from repeating the same aliases in indicators.
 
 ```yaml
-common:
-  description_key:
-    - First line.
-    - Second line.
-  presentation:
-    grapher_config:
-      selectedEntityNames:
-        - Germany
-        - Italy
-      topic_tags:
-        - Energy
+definitions:
+  common:
+    description_key:
+      - First line.
+      - Second line.
+    presentation:
+      grapher_config:
+        selectedEntityNames:
+          - Germany
+          - Italy
+        topic_tags:
+          - Energy
 
 tables:
   my_table:
