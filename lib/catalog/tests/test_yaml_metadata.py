@@ -79,29 +79,23 @@ tables:
 
     ym.update_metadata_from_yaml(t, path, "test")
 
-    assert t.a.m.sources == []
-    assert t.b.m.sources == []
-    assert len(t.a.m.origins) == 2
-    assert len(t.b.m.origins) == 1
-    assert t.a.m.description_key == ["C", "D"]
-    assert t.b.m.description_key == ["D"]
-    assert t.a.m.description_processing == ["A", "B"]
-    assert t.b.m.description_processing == ["A", "B"]
-    assert t.a.m.description_short == "A desc short"
-    assert t.b.m.description_short == "Default desc short"
-    assert t.a.m.display["numDecimalPlaces"] == 1
-    assert t.b.m.display["numDecimalPlaces"] == 0
+    assert t.a.m.to_dict() == {
+        "description_short": "A desc short",
+        "description_key": ["C", "D"],
+        "origins": [{"producer": "Origin2", "title": "Title2"}, {"producer": "Origin1", "title": "Title1"}],
+        "display": {"numDecimalPlaces": 1},
+        "presentation": {
+            "grapher_config": {"subtitle": "A subtitle", "selectedEntityNames": ["France"]},
+            "attribution": "A presentation attribution",
+        },
+        "description_processing": ["A", "B"],
+    }
 
-    # display is completely overwritten, not merged
-    assert "conversionFactor" not in t.a.m.display
-    assert t.b.m.display["conversionFactor"] == 2
-
-    # merging presentation
-    assert t.a.m.presentation.attribution == "A presentation attribution"
-    assert t.b.m.presentation.attribution is None
-
-    # merging grapher_config
-    assert t.a.m.presentation.grapher_config["selectedEntityNames"] == ["France"]
-    assert t.b.m.presentation.grapher_config["selectedEntityNames"] == ["France"]
-    assert t.a.m.presentation.grapher_config["subtitle"] == "A subtitle"
-    assert "subtitle" not in t.b.m.presentation.grapher_config
+    assert t.b.m.to_dict() == {
+        "description_short": "Default desc short",
+        "description_key": ["D"],
+        "origins": [{"producer": "Origin1", "title": "Title1"}],
+        "display": {"conversionFactor": 2, "numDecimalPlaces": 0},
+        "presentation": {"grapher_config": {"selectedEntityNames": ["France"]}},
+        "description_processing": ["A", "B"],
+    }
