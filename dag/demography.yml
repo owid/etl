@@ -98,3 +98,5 @@ steps:
   data://garden/demography/2023-10-03/life_tables:
     - data://garden/hmd/2023-09-19/hmd
     - data://garden/un/2023-10-02/un_wpp_lt
+  data://grapher/demography/2023-10-04/life_tables:
+    - data://garden/demography/2023-10-03/life_tables
