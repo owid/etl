@@ -1,0 +1,104 @@
+dataset:
+  update_period_days: 365
+
+tables:
+  colonial_dates_dataset:
+    variables:
+      colonizer:
+        title: European colonial power
+        unit: ""
+        short_unit: ""
+        description_short: |
+          Name of European colonial power(s) that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Colonizer
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+      colonizer_grouped:
+        title: European colonial power (grouped)
+        unit: ""
+        short_unit: ""
+        description_short: |
+          Name of European colonial power that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Colonizer
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      years_colonized:
+        title: Years the country has been colonized
+        unit: "years"
+        short_unit: "years"
+        description_short: |
+          Number of years the country has been colonized by the European colonial power(s) in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Years colonized
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      last_colonizer:
+        title: Last European colonial power
+        unit: ""
+        short_unit: ""
+        description_short: |
+          Name of the last European colonial power(s) that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Last colonizer
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+      last_colonizer_grouped:
+        title: Last European colonial power (grouped)
+        unit: ""
+        short_unit: ""
+        description_short: |
+          Name of the last European colonial power that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Last colonizer
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            hasChartTab: false
+            hasMapTab: true
+            tab: map
+            map:
+              time: latest
+              hideTimeline: true
+              colorScale:
+                baseColorScheme: Paired
+                colorSchemeInvert: true
+                customCategoryLabels:
+                  z. Multiple colonizers: Multiple colonizers
+                  United Kingdom: United Kingdom
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
+      total_colonies:
+        title: Number of colonies
+        unit: "countries"
+        short_unit: ""
+        description_short: |
+          Total number of colonies per year colonized by the European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states.
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Number of colonies
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
