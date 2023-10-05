@@ -9,7 +9,7 @@ Some notes:
         - UN contains data on many more countries, but only since 1950.
         - HMD contains data on fewer countries, but since 1676!
         - We therefore use UN since 1950 for all countries, and HMD prior to that. We use the same source for all countries in each time period to ensure comparability across countries.
-    - Age grous:
+    - Age groups:
         - HMD contains single-age groups from 0 to 109 and 110+ (equivalent to >=110). It also contains data on wider age groups, but we discard these.
         - UN contains single-age groups from 0 to 99 and 100+ (equivalent to >=100)
 """
@@ -109,9 +109,9 @@ def combine_tables(tb_hmd: Table, tb_un: Table) -> Table:
     ## Ensure year is int
     tb_hmd["year"] = tb_hmd["year"].astype(str).astype("Int64")
     ## Sanity check years
-    assert tb_hmd["year"].max() == 2022, "UN data should end in 2022"
-    assert tb_hmd["year"].min() == 1676, "UN data should start in 1676"
-    ## Keep only period data prior to 1950 (UN data starts in 1950)
+    assert tb_hmd["year"].max() == 2022, "HMD data should end in 2022"
+    assert tb_hmd["year"].min() == 1676, "HMD data should start in 1676"
+    ## Keep only period HMD data prior to 1950 (UN data starts in 1950)
     tb_hmd = tb_hmd[((tb_hmd["year"] < 1950) & (tb_hmd["type"] == "period")) | (tb_hmd["type"] == "cohort")]
     ## Column renames
     tb_hmd = tb_hmd.rename(
@@ -156,6 +156,8 @@ def add_le_diff_and_ratios(tb: Table, columns_primary: List[str]) -> Table:
     tb_le["sex"] = "both"
     ## optional cast
     tb_le = cast(Table, tb_le)
+    ## Remove unit
+    tb_le["life_expectancy_fm_ratio"].metadata.unit = ""
 
     ## Add table to main table
     tb = tb.merge(tb_le, on=columns_primary, how="left")
