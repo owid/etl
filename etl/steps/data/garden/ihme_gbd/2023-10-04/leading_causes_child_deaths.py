@@ -20,9 +20,9 @@ def run(dest_dir: str) -> None:
 
     # Underschore the hierachy cause names to match tb_cause
     tb_hierarchy["cause_name_underscore"] = tb_hierarchy["cause_name"].apply(underscore)
-
+    tb_hierarchy = add_owid_hierarchy(tb_hierarchy)
     # We'll iterate through each level of the hierachy to find the leading cause of death in under-fives in each country-year
-    levels = [1, 2, 3, 4]
+    levels = [1, 2, 3, 4, "owid_all_ages", "owid_under_5"]
     age_groups = ["under_5", "all_ages"]
 
     tb_out = []
@@ -102,3 +102,88 @@ def clean_disease_names(tb: Table, tb_hierarchy: Table) -> Table:
     tb = tb.rename(columns={"cause_name": disease_col})
 
     return tb
+
+
+def add_owid_hierarchy(tb_hierarchy: Table) -> Table:
+    """
+    At OWID we use a mixture of level 2 and 3 GBD causes of death, to limit the number of causes shown on a chart.
+    These are the causes of death we show in our causes of death charts e.g. https://ourworldindata.org/grapher/causes-of-death-in-children-under-5
+    """
+
+    all_ages = [
+        "Cardiovascular diseases",
+        "Neoplasms",
+        "Chronic respiratory diseases",
+        "Digestive diseases",
+        "Lower respiratory infections",
+        "Neonatal disorders",
+        "Alzheimer's disease and other dementias",
+        "Diabetes mellitus",
+        "Diarrheal diseases",
+        "Cirrhosis and other chronic liver diseases",
+        "Meningitis",
+        "Parkinson's disease",
+        "Nutritional deficiencies",
+        "Malaria",
+        "Drowning",
+        "Interpersonal violence",
+        "Maternal disorders",
+        "HIV/AIDS",
+        "Drug use disorders",
+        "Tuberculosis",
+        "Alcohol use disorders",
+        "Self-harm",
+        "Exposure to forces of nature",
+        "Environmental heat and cold exposure",
+        "Conflict and terrorism",
+        "Chronic kidney disease",
+        "Poisonings",
+        "Protein-energy malnutrition",
+        "Road injury",
+        "Fire, heat, and hot substances",
+        "Acute hepatitis",
+    ]
+
+    under_five = [
+        "Lower respiratory infections",
+        "Invasive Non-typhoidal Salmonella (iNTS)",
+        "Interpersonal violence",
+        "Nutritional deficiencies",
+        "Acute hepatitis",
+        "Neoplasms",
+        "Measles",
+        "Digestive diseases",
+        "Cirrhosis and other chronic liver diseases",
+        "Chronic kidney disease",
+        "Cardiovascular diseases",
+        "Congenital birth defects",
+        "Neonatal preterm birth",
+        "Environmental heat and cold exposure",
+        "Neonatal sepsis and other neonatal infections",
+        "Exposure to forces of nature",
+        "Diabetes mellitus",
+        "Neonatal encephalopathy due to birth asphyxia and trauma",
+        "Meningitis",
+        "Other neonatal disorders",
+        "Whooping cough",
+        "Diarrheal diseases",
+        "Fire, heat, and hot substances",
+        "Road injuries",
+        "Tuberculosis",
+        "HIV/AIDS",
+        "Drowning",
+        "Malaria" "Syphilis",
+    ]
+    msk_all_ages = tb_hierarchy["cause_name"].isin(all_ages)
+    tb_hierarchy_all_ages = tb_hierarchy[msk_all_ages]
+    tb_hierarchy_all_ages = tb_hierarchy_all_ages.copy()
+    tb_hierarchy_all_ages.loc["level"] = "owid_all_ages"
+
+    msk_under_five = tb_hierarchy["cause_name"].isin(under_five)
+    tb_hierarchy_under_five = tb_hierarchy[msk_under_five]
+    tb_hierarchy_under_five = tb_hierarchy_under_five.copy()
+    tb_hierarchy_under_five.loc["level"] = "owid_under_5"
+
+    tb_hierarchy = pr.concat([tb_hierarchy_all_ages, tb_hierarchy_under_five, tb_hierarchy])
+
+    return tb_hierarchy
