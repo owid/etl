@@ -540,11 +540,6 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, measured as a percentage of production-based emissions of CO₂. Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter."
-      pct_traded_emissions_including_land_use_change:
-        title: "Traded emissions including land-use change (%)"
-        unit: "%"
-        short_unit: "%"
-        description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, including land-use change, measured as a percentage of production-based emissions of CO₂, including land-use change. Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter."
       population:
         title: "Population"
         unit: "persons"
@@ -564,21 +559,6 @@ tables:
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, measured in tonnes. Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter."
-      traded_emissions_including_land_use_change:
-        title: "Traded emissions including land-use change"
-        unit: "tonnes"
-        short_unit: "t"
-        description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, including land-use change, measured in tonnes. Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter."
-      traded_emissions_including_land_use_change_per_capita:
-        title: "Traded emissions including land-use change per capita"
-        unit: "tonnes per person"
-        short_unit: "t/person"
-        display:
-          shortUnit: t
-        description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, including land-use change, measured in tonnes per person. Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter."
-        description_key:
-          - *per_capita_description_key
-          - *international_aviation_description_key
       traded_emissions_per_capita:
         title: "Annual CO₂ emissions embedded in trade (per capita)"
         unit: "tonnes per person"
