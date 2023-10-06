@@ -923,7 +923,7 @@ class Table(pd.DataFrame):
                     by_type = by.dtype
                 else:
                     by_type = "unknown"
-                if by_type == "category":
+                if isinstance(by_type, str) and by_type == "category":
                     log.warning(
                         f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour."
                     )
