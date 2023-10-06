@@ -15,23 +15,23 @@ Four sources are used overall:
         Provides data on former countries, and complements other sources with data on missing years for some countries.
         More on this dataset please refer to module gapminder_sg.
 """
-import ast
+
+import json
 from typing import List
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
-from structlog import get_logger
-
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
-
-from .gapminder import load_gapminder
-from .gapminder_sg import (
+from gapminder import load_gapminder
+from gapminder_sg import (
     load_gapminder_sys_glob_complement,
     load_gapminder_sys_glob_former,
 )
-from .hyde import load_hyde
-from .unwpp import load_unwpp
+from hyde import load_hyde
+from owid.catalog import Table
+from structlog import get_logger
+from unwpp import load_unwpp
+
+from etl.data_helpers import geo
+from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
 
@@ -250,7 +250,7 @@ def add_historical_regions(df: Table, tb_regions: Table) -> Table:
             tb["country"]
         ), f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
         # Get list of country successors (equivalent of former state nowadays) and end year (dissolution of former state)
-        ccodes_successors = ast.literal_eval(tb_regions.loc[ccode, "successors"])
+        ccodes_successors = json.loads(tb_regions.loc[ccode, "successors"])
         successor_names = tb_regions.loc[ccodes_successors, "name"].tolist()
         # Filter table accordingly
         tb_ = tb[(tb["year"] <= end_year) & (tb["country"].isin(successor_names))]
@@ -259,7 +259,7 @@ def add_historical_regions(df: Table, tb_regions: Table) -> Table:
         year_filter = year_filter[year_filter].index.tolist()
         tb_ = tb_[tb_["year"].isin(year_filter)]
         # Perform operations
-        tb_ = tb_.groupby("year", as_index=False).agg(
+        tb_ = tb_.groupby("year", as_index=False, observed=True).agg(
             {"population": sum, "source": lambda x: "; ".join(sorted(set(x)))}
         )
         tb_["country"] = former_country_name
