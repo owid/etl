@@ -2,16 +2,17 @@
 #  tables.py
 #
 
-import copy
-import dataclasses
 import json
+import types
 from collections import defaultdict
 from os.path import dirname, join, splitext
 from pathlib import Path
 from typing import (
     IO,
     Any,
+    Callable,
     Dict,
+    Iterator,
     List,
     Literal,
     Optional,
@@ -22,17 +23,26 @@ from typing import (
     overload,
 )
 
+import numpy as np
 import pandas as pd
 import pyarrow
 import pyarrow.parquet as pq
 import structlog
 from owid.repack import repack_frame
-from pandas._typing import Scalar
+from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
 from pandas.util._decorators import rewrite_axis_style_signature
 
 from . import variables
-from .meta import License, Origin, Source, TableMeta, VariableMeta
+from .meta import (
+    SOURCE_EXISTS_OPTIONS,
+    License,
+    Origin,
+    Source,
+    TableMeta,
+    VariableMeta,
+)
+from .utils import underscore
 
 log = structlog.get_logger()
 
@@ -54,6 +64,9 @@ class Table(pd.DataFrame):
 
     # propagate all these fields on every slice or copy
     _metadata = ["metadata", "_fields"]
+
+    # Set to True to help debugging metadata issues.
+    DEBUG = False
 
     # slicing and copying creates tables
     @property
@@ -78,7 +91,7 @@ class Table(pd.DataFrame):
         :param metadata: TableMeta to use
         :param short_name: Use empty TableMeta and fill it with `short_name`. This is a shorter version
             of `Table(df, metadata=TableMeta(short_name="my_name"))`
-        :param underscore: Underscore table columns and indexes. See `underscore_table` for help
+        :param underscore: Underscore table columns and indexes. See `underscore` method for help
         :param camel_to_snake: Convert camelCase column names to snake_case.
         :param like: Use metadata from Table given in this argument (including columns). This is a shorter version of
             new_t = Table(df, metadata=old_t.metadata)
@@ -104,13 +117,18 @@ class Table(pd.DataFrame):
 
         # underscore column names
         if underscore:
-            from .utils import underscore_table
-
-            underscore_table(self, inplace=True, camel_to_snake=camel_to_snake)
+            self.underscore(inplace=True, camel_to_snake=camel_to_snake)
 
         # reuse metadata from a different table
         if like is not None:
-            self.copy_metadata_from(like)
+            copy = self.copy_metadata(like)
+            self._fields = copy._fields
+            self.metadata = copy.metadata
+
+    @property
+    def m(self) -> TableMeta:
+        """Metadata alias to save typing."""
+        return self.metadata
 
     @property
     def primary_key(self) -> List[str]:
@@ -155,13 +173,11 @@ class Table(pd.DataFrame):
         else:
             raise ValueError(f"could not detect a suitable format to read from: {path}")
 
-        # If each variable does not have sources, load them from the dataset.
-        # TODO: I think this is not a good idea, consider removing.
-        # table = assign_dataset_sources_and_licenses_to_each_variable(table=table)
-
         # Add processing log to the metadata of each variable in the table.
-        # TODO: For some reason, the snapshot loading entry gets repeated.
         table = update_processing_logs_when_loading_or_creating_table(table=table)
+
+        if cls.DEBUG:
+            table.check_metadata()
 
         return table
 
@@ -294,6 +310,13 @@ class Table(pd.DataFrame):
 
         return df
 
+    def update_metadata(self, **kwargs) -> "Table":
+        """Set Table metadata."""
+        for k, v in kwargs.items():
+            assert hasattr(self.metadata, k), f"unknown metadata field {k} in TableMeta"
+            setattr(self.metadata, k, v)
+        return self
+
     @classmethod
     def _add_metadata(cls, df: pd.DataFrame, path: str) -> None:
         """Read metadata from JSON sidecar and add it to the dataframe."""
@@ -394,6 +417,9 @@ class Table(pd.DataFrame):
             else:
                 self._fields[key] = VariableMeta()
 
+        if self.DEBUG:
+            self.check_metadata()
+
     def equals_table(self, table: "Table") -> bool:
         return (
             isinstance(table, Table)
@@ -414,32 +440,39 @@ class Table(pd.DataFrame):
         old_cols = self.all_columns
         new_table = super().rename(*args, **kwargs)
 
+        # __setattr__ on columns has already done its job of renaming
         if inplace:
             new_table = self
+        else:
+            # construct new _fields attribute
+            fields = {}
+            for old_col, new_col in zip(old_cols, new_table.all_columns):
+                fields[new_col] = self._fields[old_col].copy()
 
-        # construct new _fields attribute
-        fields = {}
-        for old_col, new_col in zip(old_cols, new_table.all_columns):
-            if inplace:
-                fields[new_col] = self._fields[old_col]
-            else:
-                fields[new_col] = copy.deepcopy(self._fields[old_col])
-
-            # Update processing log.
-            if old_col != new_col:
-                fields[new_col].processing_log = variables.add_entry_to_processing_log(
-                    processing_log=fields[new_col].processing_log,
-                    variable_name=new_col,
-                    parents=[old_col],
-                    operation="rename",
-                )
-
-        new_table._fields = defaultdict(VariableMeta, fields)
+            new_table._fields = defaultdict(VariableMeta, fields)
 
         if inplace:
             return None
         else:
             return cast(Table, new_table)
+
+    def __setattr__(self, name: str, value) -> None:
+        # setting columns must rename them
+        if name == "columns":
+            for old_col, new_col in zip(self.columns, value):
+                if old_col in self._fields:
+                    self._fields[new_col] = self._fields.pop(old_col)
+
+                # Update processing log.
+                if old_col != new_col:
+                    self._fields[new_col].processing_log = variables.add_entry_to_processing_log(
+                        processing_log=self._fields[new_col].processing_log,
+                        variable_name=new_col,
+                        parents=[old_col],
+                        operation="rename",
+                    )
+
+        super().__setattr__(name, value)
 
     @property
     def all_columns(self) -> List[str]:
@@ -447,8 +480,20 @@ class Table(pd.DataFrame):
         combined: List[str] = filter(None, list(self.index.names) + list(self.columns))  # type: ignore
         return combined
 
+    def get_column_or_index(self, name) -> variables.Variable:
+        if name in self.columns:
+            return self[name]
+        elif name in self.index.names:
+            return variables.Variable(self.index.get_level_values(name), name=name, metadata=self._fields[name])
+        else:
+            raise ValueError(f"'{name}' not found in columns or index")
+
     def update_metadata_from_yaml(
-        self, path: Union[Path, str], table_name: str, extra_variables: Literal["raise", "ignore"] = "raise"
+        self,
+        path: Union[Path, str],
+        table_name: str,
+        extra_variables: Literal["raise", "ignore"] = "raise",
+        if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
     ) -> None:
         """Update metadata of table and variables from a YAML file.
         :param path: Path to YAML file.
@@ -478,54 +523,64 @@ class Table(pd.DataFrame):
                     # create an object out of sources
                     if k == "sources":
                         self[v_short_name].metadata.sources = [Source(**source) for source in v]
+                    elif k == "origins":
+                        if if_origins_exist == "fail" and self[v_short_name].metadata.origins:
+                            raise ValueError(f"Origins already exist for variable {v_short_name}")
+                        if if_origins_exist == "replace":
+                            self[v_short_name].metadata.origins = []
+                        self[v_short_name].metadata.origins += [Origin(**origin) for origin in v]
                     else:
                         setattr(self[v_short_name].metadata, k, v)
+
+                    # we allow `- *descriptions` which needs to be flattened
+                    if k == "description_key":
+                        self[v_short_name].metadata.description_key = _flatten(
+                            self[v_short_name].metadata.description_key
+                        )
 
         # update table attributes
         for k, v in t_annot.items():
             if k != "variables":
                 setattr(self.metadata, k, v)
 
+        # parse `all` section
+        # append origins to all indicators
+        all_origins = [Origin(**origin_dict) for origin_dict in annot.get("all", {}).get("origins", [])]
+        if all_origins:
+            for var_name in self.columns:
+                self[var_name].metadata.origins += [
+                    origin for origin in all_origins if origin not in self[var_name].metadata.origins
+                ]
+
+        # append sources to all indicators
+        if "sources" in annot.get("all", {}):
+            # setting [] explicitly means you want to remove them all
+            if list(annot["all"]["sources"]) == []:
+                for var_name in self.columns:
+                    self[var_name].metadata.sources = []
+            # otherwise append them if there are any
+            else:
+                all_sources = [Source(**source_dict) for source_dict in annot.get("all", {}).get("sources", [])]
+                if all_sources:
+                    for var_name in self.columns:
+                        self[var_name].metadata.sources += [
+                            source for source in all_sources if source not in self[var_name].metadata.sources
+                        ]
+
     def prune_metadata(self) -> "Table":
         """Prune metadata for columns that are not in the table. This can happen after slicing
         the table by columns."""
-        self._fields = {col: self._fields[col] for col in self.all_columns}
+        self._fields = defaultdict(VariableMeta, {col: self._fields[col] for col in self.all_columns})
         return self
 
     def copy(self, deep: bool = True) -> "Table":
         """Copy table together with all its metadata."""
         tab = super().copy(deep=deep)
-        tab.copy_metadata_from(self)
-        return tab
+        return tab.copy_metadata(self)
 
-    def copy_metadata_from(self, table: "Table", errors: Literal["raise", "ignore", "warn"] = "raise") -> None:
+    def copy_metadata(self, from_table: "Table", deep: bool = False) -> "Table":
         """Copy metadata from a different table to self."""
-        self.metadata = dataclasses.replace(table.metadata)
-
-        extra_columns = set(table.columns) - set(self.columns)
-        missing_columns = set(self.columns) - set(table.columns)
-        common_columns = set(self.columns) & set(table.columns)
-
-        if errors == "raise":
-            if extra_columns:
-                raise ValueError(f"Extra columns in table: {extra_columns}")
-            if missing_columns:
-                raise ValueError(f"Missing columns in table: {missing_columns}")
-        elif errors == "warn":
-            if extra_columns:
-                log.warning(f"Extra columns in table: {extra_columns}")
-            if missing_columns:
-                log.warning(f"Missing columns in table: {missing_columns}")
-
-        new_fields = defaultdict(VariableMeta)
-        for k in common_columns:
-            # copy if we have metadata in the other table
-            if k in table._fields:
-                new_fields[k] = table._fields[k].copy()
-            # otherwise keep current metadata (if it exists)
-            elif k in self._fields:
-                new_fields[k] = self._fields[k]
-        self._fields = new_fields
+        return copy_metadata(to_table=self, from_table=from_table, deep=deep)
 
     @overload
     def set_index(
@@ -588,7 +643,7 @@ class Table(pd.DataFrame):
         """Fix type signature of join."""
         t = super().join(other, *args, **kwargs)
 
-        t.copy_metadata_from(self, errors="ignore")
+        t = t.copy_metadata(self)
 
         # copy variables metadata from other table
         if isinstance(other, Table):
@@ -598,13 +653,13 @@ class Table(pd.DataFrame):
 
     def _repr_html_(self):
         html = super()._repr_html_()
-        return """
-             <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
+        if self.DEBUG:
+            self.check_metadata()
+        return f"""
+             <h2 style="margin-bottom: 0em"><pre>{self.metadata.short_name}</pre></h2>
              <p style="font-variant: small-caps; font-size: 1.5em; font-family: sans-serif; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">table</p>
-             {}
-        """.format(
-            self.metadata.short_name, html
-        )
+             {html}
+        """
 
     def merge(self, right, *args, **kwargs) -> "Table":
         return merge(left=self, right=right, *args, **kwargs)
@@ -650,10 +705,51 @@ class Table(pd.DataFrame):
             **kwargs,
         )
 
-    def underscore(self, **kwargs) -> "Table":
-        from .utils import underscore_table
+    def underscore(
+        self,
+        collision: Literal["raise", "rename", "ignore"] = "raise",
+        inplace: bool = False,
+        camel_to_snake: bool = False,
+    ) -> "Table":
+        """Convert column and index names to underscore. In extremely rare cases
+        two columns might have the same underscored version. Use `collision` param
+        to control whether to raise an error or append numbered suffix.
 
-        return underscore_table(self, inplace=False, **kwargs)
+        Parameters
+        ----------
+        t : Table
+            Table to underscore.
+        collision : Literal["raise", "rename", "ignore"], optional
+            How to handle collisions, by default "raise".
+        inplace : bool, optional
+            Whether to modify the table in place, by default False.
+        camel_to_snake : bool, optional
+            Whether to convert strings camelCase to snake_case, by default False.
+        """
+        t = self
+        orig_cols = t.columns
+
+        # underscore columns and resolve collisions
+        new_cols = pd.Index([underscore(c, camel_to_snake=camel_to_snake) for c in t.columns])
+        new_cols = _resolve_collisions(orig_cols, new_cols, collision)
+
+        columns_map = {c_old: c_new for c_old, c_new in zip(orig_cols, new_cols)}
+        if inplace:
+            t.rename(columns=columns_map, inplace=True)
+        else:
+            t = t.rename(columns=columns_map)
+
+        t.index.names = [underscore(e, camel_to_snake=camel_to_snake) for e in t.index.names]
+        t.metadata.primary_key = t.primary_key
+        t.metadata.short_name = underscore(t.metadata.short_name, camel_to_snake=camel_to_snake)
+
+        # put original names as titles into metadata by default
+        for c_old, c_new in columns_map.items():
+            # if underscoring didn't change anything, don't add title
+            if t[c_new].metadata.title is None and c_old != c_new:
+                t[c_new].metadata.title = c_old
+
+        return t
 
     def dropna(self, *args, **kwargs) -> "Table":
         tb = super().dropna(*args, **kwargs).copy()
@@ -666,13 +762,6 @@ class Table(pd.DataFrame):
             )
 
         return cast("Table", tb)
-
-    def copy_metadata(
-        self, from_table: "Table", include_missing_variables: bool = False, inplace: bool = False
-    ) -> Optional["Table"]:
-        return copy_metadata(
-            to_table=self, from_table=from_table, include_missing_variables=include_missing_variables, inplace=inplace
-        )
 
     def update_log(
         self,
@@ -688,7 +777,7 @@ class Table(pd.DataFrame):
             parents=parents,
             variable_names=variable_names,
             comment=comment,
-            inplace=inplace,
+            inplace=inplace,  # type: ignore
         )
 
     def amend_log(
@@ -736,6 +825,9 @@ class Table(pd.DataFrame):
         )
 
         return variable
+
+    def assign(self, *args, **kwargs) -> "Table":
+        return super().assign(*args, **kwargs)  # type: ignore
 
     def __add__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
@@ -816,6 +908,150 @@ class Table(pd.DataFrame):
 
     def __ipow__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         return self.__pow__(other)
+
+    def sort_index(self, *args, **kwargs) -> "Table":
+        return super().sort_index(*args, **kwargs)  # type: ignore
+
+    def groupby(self, *args, observed=False, **kwargs) -> "TableGroupBy":
+        """Groupby that preserves metadata."""
+        by_list = [args[0]] if isinstance(args[0], str) else args[0]
+        if observed is False:
+            for by in by_list:
+                if isinstance(by, str):
+                    by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
+                elif isinstance(by, pd.Series):
+                    by_type = by.dtype
+                else:
+                    by_type = "unknown"
+                if isinstance(by_type, str) and by_type == "category":
+                    log.warning(
+                        f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour."
+                    )
+
+        return TableGroupBy(
+            pd.DataFrame.groupby(self.copy(deep=False), *args, observed=observed, **kwargs), self.metadata, self._fields
+        )
+
+    def check_metadata(self, ignore_columns: Optional[List[str]] = None) -> None:
+        """Check that all variables in the table have origins."""
+        if ignore_columns is None:
+            if self.primary_key:
+                ignore_columns = self.primary_key
+            else:
+                ignore_columns = ["year", "country"]
+
+        for column in [column for column in self.columns if column not in ignore_columns]:
+            if not self[column].metadata.origins:
+                log.warning(f"Variable {column} has no origins.")
+
+    def rename_index_names(self, renames: Dict[str, str]) -> "Table":
+        """Rename index."""
+        column_idx = list(self.index.names)
+        column_idx_new = [renames.get(col, col) for col in column_idx]
+        tb = self.reset_index().rename(columns=renames)
+        tb = tb.set_index(column_idx_new)
+        return tb
+
+
+def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
+    """Create a table with metadata."""
+    tb = Table(df, metadata=metadata.copy())
+    tb._fields = defaultdict(VariableMeta, fields)
+    return tb
+
+
+class TableGroupBy:
+    # fixes type hints
+    __annotations__ = {}
+
+    def __init__(self, groupby: pd.core.groupby.DataFrameGroupBy, metadata: TableMeta, fields: Dict[str, Any]):
+        self.groupby = groupby
+        self.metadata = metadata
+        self._fields = fields
+
+    @overload
+    def __getattr__(self, name: Literal["count", "size", "sum", "mean", "median"]) -> Callable[[], "Table"]:
+        ...
+
+    @overload
+    def __getattr__(self, name: str) -> "VariableGroupBy":
+        ...
+
+    def __getattr__(self, name: str) -> Union[Callable[..., "Table"], "VariableGroupBy"]:
+        # Calling method on the groupby object
+        if isinstance(getattr(self.groupby, name), types.MethodType):
+
+            def func(*args, **kwargs):
+                """Apply function and return variable with proper metadata."""
+                df = getattr(self.groupby, name)(*args, **kwargs)
+                if df.ndim == 1:
+                    # output is series, e.g. `size` function
+                    return df
+                else:
+                    return _create_table(df, self.metadata, self._fields)
+
+            self.__annotations__[name] = Callable[..., "Table"]
+            return func
+        else:
+            self.__annotations__[name] = VariableGroupBy
+            return VariableGroupBy(getattr(self.groupby, name), name, self._fields[name])
+
+    @overload
+    def __getitem__(self, key: str) -> "VariableGroupBy":
+        ...
+
+    @overload
+    def __getitem__(self, key: list) -> "TableGroupBy":
+        ...
+
+    def __getitem__(self, key: Union[str, list]) -> Union["VariableGroupBy", "TableGroupBy"]:
+        if isinstance(key, list):
+            return TableGroupBy(self.groupby[key], self.metadata, self._fields)
+        else:
+            self.__annotations__[key] = VariableGroupBy
+            return VariableGroupBy(self.groupby[key], key, self._fields[key])
+
+    def __iter__(self) -> Iterator[Tuple[Any, "Table"]]:
+        for name, group in self.groupby:
+            yield name, _create_table(group, self.metadata, self._fields)
+
+    def agg(self, func: Optional[Any] = None, *args, **kwargs) -> "Table":
+        df = self.groupby.agg(func, *args, **kwargs)
+        tb = _create_table(df, self.metadata, self._fields)
+
+        # kwargs rename fields
+        for new_col, (col, _) in kwargs.items():
+            tb._fields[new_col] = self._fields[col]
+
+        return tb
+
+
+class VariableGroupBy:
+    def __init__(self, groupby: pd.core.groupby.SeriesGroupBy, name: str, metadata: VariableMeta):
+        self.groupby = groupby
+        self.metadata = metadata
+        self.name = name
+
+    def __getattr__(self, funcname) -> Callable[..., "Table"]:
+        def func(*args, **kwargs):
+            """Apply function and return variable with proper metadata."""
+            # out = getattr(self.groupby, funcname)(*args, **kwargs)
+            ff = getattr(self.groupby, funcname)
+            out = ff(*args, **kwargs)
+
+            # this happens when we use e.g. agg([min, max]), propagate metadata from the original then
+            if isinstance(out, Table):
+                out._fields = defaultdict(VariableMeta, {k: self.metadata for k in out.columns})
+                return out
+            elif isinstance(out, variables.Variable):
+                out.metadata = self.metadata.copy()
+                return out
+            elif isinstance(out, pd.Series):
+                return variables.Variable(out, name=self.name, metadata=self.metadata)
+            else:
+                raise NotImplementedError()
+
+        return func  # type: ignore
 
 
 def merge(
@@ -1080,12 +1316,14 @@ def pivot(
     return table
 
 
-def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[TableMeta]) -> Table:
+def _add_table_and_variables_metadata_to_table(
+    table: Table, metadata: Optional[TableMeta], origin: Optional[Origin]
+) -> Table:
     if metadata is not None:
         table.metadata = metadata
         for column in list(table.all_columns):
-            if "origins" in metadata.dataset.to_dict():  # type: ignore
-                table._fields[column].origins = metadata.dataset.origins  # type: ignore
+            if origin:
+                table._fields[column].origins = [origin]
             else:
                 table._fields[column].sources = metadata.dataset.sources  # type: ignore
             table._fields[column].licenses = metadata.dataset.licenses  # type: ignore
@@ -1097,12 +1335,13 @@ def _add_table_and_variables_metadata_to_table(table: Table, metadata: Optional[
 def read_csv(
     filepath_or_buffer: Union[str, Path, IO[AnyStr]],
     metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
     underscore: bool = False,
     *args,
     **kwargs,
 ) -> Table:
     table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     if isinstance(filepath_or_buffer, (str, Path)):
         table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
     else:
@@ -1111,24 +1350,104 @@ def read_csv(
     return cast(Table, table)
 
 
-def read_excel(
-    io: Union[str, Path], *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs
+def read_fwf(
+    filepath_or_buffer: Union[FilePath, ReadCsvBuffer[bytes], ReadCsvBuffer[str]],
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
 ) -> Table:
+    table = Table(pd.read_fwf(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    if isinstance(filepath_or_buffer, (str, Path)):
+        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
+    else:
+        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_fwf.")
+
+    return cast(Table, table)
+
+
+def read_feather(
+    filepath: Union[str, Path],
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_feather(filepath, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    table = update_log(table=table, operation="load", parents=[filepath])
+
+    return cast(Table, table)
+
+
+def read_excel(
+    io: Union[str, Path],
+    *args,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    **kwargs,
+) -> Table:
+    assert not isinstance(kwargs.get("sheet_name"), list), "Argument 'sheet_name' must be a string or an integer."
     table = Table(pd.read_excel(io=io, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     # Note: Maybe we should include the sheet name in parents.
     table = update_log(table=table, operation="load", parents=[io], inplace=False)
 
     return cast(Table, table)
 
 
-def read_from_records(data: Any, *args, metadata: Optional[TableMeta] = None, underscore: bool = False, **kwargs):
+def read_from_records(
+    data: Any,
+    *args,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    **kwargs,
+):
     table = Table(pd.DataFrame.from_records(data=data, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
-    # Note: Parents could be passed as arguments, or extracted from metadata.
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    # NOTE: Parents could be passed as arguments, or extracted from metadata.
     table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
 
     return table
+
+
+def read_from_dict(
+    data: Dict[Any, Any],
+    *args,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    **kwargs,
+) -> Table:
+    table = Table(pd.DataFrame.from_dict(data=data, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    # NOTE: Parents could be passed as arguments, or extracted from metadata.
+    table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
+
+    return table
+
+
+def read_json(
+    path_or_buf: Union[str, Path, IO[AnyStr]],
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_json(path_or_buf=path_or_buf, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    if isinstance(path_or_buf, (str, Path)):
+        table = update_log(table=table, operation="load", parents=[path_or_buf])
+    else:
+        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_json.")
+
+    return cast(Table, table)
 
 
 class ExcelFile(pd.ExcelFile):
@@ -1137,6 +1456,7 @@ class ExcelFile(pd.ExcelFile):
         sheet_name: Union[str, int] = 0,
         *args,
         metadata: Optional[TableMeta] = None,
+        origin: Optional[Origin] = None,
         underscore: bool = False,
         **kwargs,
     ):
@@ -1144,7 +1464,7 @@ class ExcelFile(pd.ExcelFile):
         df = super().parse(sheet_name=sheet_name, *args, **kwargs)  # type: ignore
         table = Table(df, underscore=underscore, short_name=str(sheet_name))
         if metadata is not None:
-            table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata)
+            table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
         # Note: Maybe we should include the sheet name in parents.
         table = update_log(table=table, operation="load", parents=[self.io], inplace=False)
 
@@ -1201,66 +1521,23 @@ def _add_processing_log_entry_to_each_variable(
     return table
 
 
-def assign_dataset_sources_and_licenses_to_each_variable(table: Table) -> Table:
-    # Get sources and licenses from the table dataset.
-    sources = []
-    licenses = []
-    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
-        sources = table.metadata.dataset.sources  # type: ignore
-    if hasattr(table.metadata, "dataset") and hasattr(table.metadata.dataset, "sources"):
-        licenses = table.metadata.dataset.licenses  # type: ignore
+def copy_metadata(from_table: Table, to_table: Table, deep=False) -> Table:
+    """Copy metadata from a different table to self."""
+    tab = Table(pd.DataFrame.copy(to_table, deep=deep), metadata=from_table.metadata.copy())
 
-    if len(sources) == len(licenses) == 0:
-        # There are no default sources/licenses to assign to each variable.
-        return table
+    common_columns = set(to_table.all_columns) & set(from_table.all_columns)
 
-    # If a variable does not have sources/licenses defined, assign the ones from the dataset.
-    # Do this for all columns, including index columns.
-    for column in list(table.all_columns):
-        if len(table._fields[column].sources) == 0:
-            table._fields[column].sources = sources
-        if len(table._fields[column].licenses) == 0:
-            table._fields[column].licenses = licenses
+    new_fields = defaultdict(VariableMeta)
+    for k in common_columns:
+        # copy if we have metadata in the other table
+        if k in from_table._fields:
+            new_fields[k] = from_table._fields[k].copy()
+        # otherwise keep current metadata (if it exists)
+        elif k in to_table._fields:
+            new_fields[k] = to_table._fields[k]
 
-    return table
-
-
-@overload
-def copy_metadata(
-    from_table: Table, to_table: Table, include_missing_variables: bool = False, inplace: bool = False
-) -> Table:
-    ...
-
-
-@overload
-def copy_metadata(
-    from_table: Table, to_table: Table, include_missing_variables: bool = False, inplace: bool = True
-) -> None:
-    ...
-
-
-def copy_metadata(
-    from_table: Table, to_table: Table, include_missing_variables: bool = False, inplace: bool = False
-) -> Optional[Table]:
-    if not inplace:
-        to_table = to_table.copy()
-
-    # Copy the table metadata.
-    to_table.metadata = copy.deepcopy(from_table.metadata)
-
-    if include_missing_variables:
-        # Copy metadata from all variables (in case you may need them later).
-        to_table._fields = copy.deepcopy(from_table._fields)
-    else:
-        # Find variables in the destination table that had metadata in the reference table.
-        existing_variables = set(to_table.all_columns) & set(from_table._fields.keys())
-        # Copy the metadata of those variables from the reference table to the destination table.
-        to_table._fields = copy.deepcopy(
-            defaultdict(VariableMeta, {variable: from_table._fields[variable] for variable in existing_variables})
-        )
-
-    if not inplace:
-        return to_table
+    tab._fields = new_fields
+    return tab
 
 
 @overload
@@ -1270,7 +1547,7 @@ def update_log(
     parents: Optional[List[Any]] = None,
     variable_names: Optional[List[str]] = None,
     comment: Optional[str] = None,
-    inplace: bool = True,
+    inplace: Literal[True] = True,
 ) -> None:
     ...
 
@@ -1282,7 +1559,7 @@ def update_log(
     parents: Optional[List[Any]] = None,
     variable_names: Optional[List[str]] = None,
     comment: Optional[str] = None,
-    inplace: bool = False,
+    inplace: Literal[False] = False,
 ) -> Table:
     ...
 
@@ -1359,29 +1636,6 @@ def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
     return pd.unique(sources).tolist()
 
 
-def get_unique_origins_from_tables(tables: List[Table]) -> List[Origin]:
-    # First, ensure only "origins" (and not "sources") are used in the variables.
-    if any(
-        [
-            ("sources" in table[column].metadata.to_dict()) and (len(table[column].metadata.sources) > 0)
-            for table in tables
-            for column in table.columns
-        ]
-    ):
-        log.warning("Origins and sources mixed in tables. The resulting dataset may not include all origins.")
-
-    # Make a list of all origins of all variables in all tables.
-    origins = sum([table._fields[column].origins for table in tables for column in list(table.all_columns)], [])
-
-    # Get unique array of tuples of origin fields (respecting the order).
-    unique_origins_array = pd.unique([tuple(origin.to_dict().items()) for origin in origins])
-
-    # Make a list of unique origins.
-    unique_origins = [Origin.from_dict(dict(origin)) for origin in unique_origins_array]  # type: ignore
-
-    return unique_origins
-
-
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     # Make a list of all licenses of all variables in all tables.
     licenses = sum([table._fields[column].licenses for table in tables for column in list(table.all_columns)], [])
@@ -1390,28 +1644,30 @@ def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     return pd.unique(licenses).tolist()
 
 
-def _combine_tables_titles_and_descriptions(tables: List[Table], title_or_description: str) -> Optional[str]:
-    # Keep the title only if all tables have exactly the same title.
-    # Otherwise we assume that the table has a different meaning, and its title should be manually handled.
-    title_or_description_combined = None
-    titles_or_descriptions = pd.unique([getattr(table.metadata, title_or_description) for table in tables])
-    if len(titles_or_descriptions) == 1:
-        title_or_description_combined = titles_or_descriptions[0]
+def _get_metadata_value_from_tables_if_all_identical(tables: List[Table], field: str) -> Optional[Any]:
+    # Get unique values from list, ignoring Nones.
+    unique_values = set(
+        [getattr(table.metadata, field) for table in tables if getattr(table.metadata, field) is not None]
+    )
+    if len(unique_values) == 1:
+        combined_value = unique_values.pop()
+    else:
+        combined_value = None
 
-    return title_or_description_combined
-
-
-def combine_tables_titles(tables: List[Table]) -> Optional[str]:
-    return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="title")
+    return combined_value
 
 
-def combine_tables_descriptions(tables: List[Table]) -> Optional[str]:
-    return _combine_tables_titles_and_descriptions(tables=tables, title_or_description="description")
+def combine_tables_title(tables: List[Table]) -> Optional[str]:
+    return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="title")
+
+
+def combine_tables_description(tables: List[Table]) -> Optional[str]:
+    return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="description")
 
 
 def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = None) -> TableMeta:
-    title = combine_tables_titles(tables=tables)
-    description = combine_tables_descriptions(tables=tables)
+    title = combine_tables_title(tables=tables)
+    description = combine_tables_description(tables=tables)
     if short_name is None:
         # If a short name is not specified, take it from the first table.
         short_name = tables[0].metadata.short_name
@@ -1422,7 +1678,7 @@ def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = Non
 
 def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List[str]] = None) -> None:
     if fields is None:
-        fields = ["origins", "licenses"]
+        fields = ["origins"]
 
     for table in tables:
         table_name = table.metadata.short_name
@@ -1430,3 +1686,35 @@ def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List
             for field in fields:
                 if not getattr(table[column].metadata, field):
                     log.warning(f"Table {table_name}, column {column} has no {field}.")
+
+
+def _flatten(lst: List[Any]) -> List[str]:
+    """Flatten list that contains either strings or lists."""
+    return [item for sublist in lst for item in ([sublist] if isinstance(sublist, str) else sublist)]
+
+
+def _resolve_collisions(
+    orig_cols: pd.Index,
+    new_cols: pd.Index,
+    collision: Literal["raise", "rename", "ignore"],
+) -> pd.Index:
+    new_cols = new_cols.copy()
+    vc = new_cols.value_counts()
+
+    colliding_cols = list(vc[vc >= 2].index)
+    for colliding_col in colliding_cols:
+        ixs = np.where(new_cols == colliding_col)[0]
+        if collision == "raise":
+            raise NameError(
+                f"Columns `{orig_cols[ixs[0]]}` and `{orig_cols[ixs[1]]}` are given the same name "
+                f"`{colliding_cols[0]}` after underscoring`"
+            )
+        elif collision == "rename":
+            # give each column numbered suffix
+            for i, ix in enumerate(ixs):
+                new_cols.values[ix] = f"{new_cols[ix]}_{i + 1}"
+        elif collision == "ignore":
+            pass
+        else:
+            raise NotImplementedError()
+    return new_cols

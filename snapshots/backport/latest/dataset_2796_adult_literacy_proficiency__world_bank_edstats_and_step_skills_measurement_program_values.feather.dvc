@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2796
+    date_accessed: 2023-08-16 07:56:48.816407
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Adult literacy proficiency - World Bank EdStats and STEP Skills Measurement
+    Program
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3fc336600012d47fc17071b569f2a4d2
+  size: 7546
+  path: 
+    dataset_2796_adult_literacy_proficiency__world_bank_edstats_and_step_skills_measurement_program_values.feather

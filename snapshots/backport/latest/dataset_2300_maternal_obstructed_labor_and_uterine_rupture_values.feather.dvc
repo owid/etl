@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2300
+    date_accessed: 2023-08-14 05:46:39.355451
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Maternal obstructed labor and uterine rupture
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 49832ec5574bcc0e1ae3cb95139e5ded
+  size: 1544490
+  path: dataset_2300_maternal_obstructed_labor_and_uterine_rupture_values.feather

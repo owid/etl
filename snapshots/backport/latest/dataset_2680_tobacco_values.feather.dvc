@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2680
+    date_accessed: 2023-08-11 07:35:49.257062
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Tobacco
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4967d186ef58aff607986170e8f9c5a4
+  size: 29882
+  path: dataset_2680_tobacco_values.feather

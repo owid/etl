@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2063
+    date_accessed: 2023-08-16 09:25:11.794745
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of births attended by skilled health personnel
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bdad104d2545b070f952302fd922dccc
+  size: 22874
+  path: 
+    dataset_2063_proportion_of_births_attended_by_skilled_health_personnel_values.feather

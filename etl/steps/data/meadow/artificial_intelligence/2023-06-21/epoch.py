@@ -2,6 +2,7 @@
 
 from typing import cast
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
@@ -41,12 +42,12 @@ def run(dest_dir: str) -> None:
         "Training compute (FLOP)",
         "Training dataset size (datapoints)",
         "Training time (hours)",
-        "Inclusion criteria",
+        "Notability criteria",
     ]
 
     df = df[cols]
-    # df.replace("#REF!", np.nan, inplace=True)
-    # df.replace("", np.nan, inplace=True)
+    df.replace("#REF!", np.nan, inplace=True)
+    df.replace("", np.nan, inplace=True)
 
     df["Training compute (FLOP)"] = df["Training compute (FLOP)"].astype(float)
 

@@ -1,0 +1,43 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: {{cookiecutter.update_period_days}}
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  {{cookiecutter.short_name}}:
+    variables:
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description_short: Short description of testing variable.
+      #   description_key: List of key points about the indicator.
+      #   description_from_producer: Description of testing variable from producer.
+      #   processing_level: minor
+      #   presentation:
+      #     title_public:
+      #     title_variant:
+      #     attribution:
+      #     attribution_short:
+      #     topic_tags:
+      #     faqs
+      #     grapher_config
+      #   display:
+      #     name: Testing variable
+      #     description:
+      #     isProjection: false
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0
+      #     conversionFactor: 1
+      #     tolerance: 0
+      #     yearIsDay: false
+      #     color:
+      #     includeInTable:
+      #     tableDisplay:
+

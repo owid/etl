@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2117
+    date_accessed: 2023-08-16 10:41:04.356541
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2117_diabetes__urogenital__blood__and_endocrine_diseases
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b4b50a1925de6b6d0a9e13df842f7bec
+  size: 34009
+  path: dataset_2117_diabetes__urogenital__blood__and_endocrine_diseases_config.json

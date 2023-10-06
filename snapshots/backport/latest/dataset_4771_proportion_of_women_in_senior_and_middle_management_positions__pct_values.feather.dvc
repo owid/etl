@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4771
+    date_accessed: 2023-08-16 09:39:06.284755
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of women in senior and middle management positions (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a633c5f13fb8eb5468681ef5762f398a
+  size: 12754
+  path: 
+    dataset_4771_proportion_of_women_in_senior_and_middle_management_positions__pct_values.feather

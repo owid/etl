@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4517
+    date_accessed: 2023-08-14 05:53:27.529935
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Countries with sustainable consumption and production (SCP) national action
+    plans or SCP mainstreamed as a priority or target into national policies (1 =
+    YES; 0 = NO)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2f8351dbeeb5c29126e3e504762b93d2
+  size: 8506
+  path: 
+    dataset_4517_countries_with_sustainable_consumption_and_production__scp__national_action_plans_or_scp_mainstreamed_as_a_priority_or_target_into_national_policies__1__yes__0__no_values.feather

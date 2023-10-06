@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4783
+    date_accessed: 2023-08-16 10:05:27.291851
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of groundwater bodies with good ambient water quality (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0031c0d944df35ce9a203c59de772ed1
+  size: 7074
+  path: 
+    dataset_4783_proportion_of_groundwater_bodies_with_good_ambient_water_quality__pct_values.feather

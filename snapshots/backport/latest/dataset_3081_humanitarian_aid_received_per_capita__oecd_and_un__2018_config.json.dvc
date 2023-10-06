@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3081
+    date_accessed: 2023-08-14 05:50:47.185020
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3081_humanitarian_aid_received_per_capita__oecd_and_un__2018
+    (archived)
+  description: For OECD Report - do not delete.
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: daa54720a911ff11cdbe4d65d1af0225
+  size: 3733
+  path: dataset_3081_humanitarian_aid_received_per_capita__oecd_and_un__2018_config.json

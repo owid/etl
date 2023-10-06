@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4688
+    date_accessed: 2023-08-11 07:42:24.401099
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Neonatal mortality rate (deaths per 1,000 live births)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5189597155a790ae5968b8af36d6a83c
+  size: 28234
+  path: 
+    dataset_4688_neonatal_mortality_rate__deaths_per_1_000_live_births_values.feather

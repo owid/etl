@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/885
+    date_accessed: 2023-08-11 07:53:06.339922
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank EdStats - Economic Policy & Debt: National accounts: Atlas GNI
+    & GNI per capita'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b2bd3a92ae9cab88eb013494072d0197
+  size: 49170
+  path: 
+    dataset_885_world_bank_edstats__economic_policy__and__debt__national_accounts__atlas_gni__and__gni_per_capita_values.feather

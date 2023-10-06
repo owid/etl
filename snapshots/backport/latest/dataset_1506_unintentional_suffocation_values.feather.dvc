@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1506
+    date_accessed: 2023-08-10 14:51:12.358599
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Unintentional suffocation
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6141b6160d2525f2a224134455d9bf06
+  size: 1915962
+  path: dataset_1506_unintentional_suffocation_values.feather

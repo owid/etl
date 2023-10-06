@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2196
+    date_accessed: 2023-08-14 15:29:09.699204
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2196_migraine (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c3d23891ef5dd642d4a9fcae0ae7ad2f
+  size: 32200
+  path: dataset_2196_migraine_config.json

@@ -96,6 +96,8 @@ steps:
   # AI corporate investment
   data://garden/artificial_intelligence/2023-06-14/ai_corporate_investment:
     - snapshot://artificial_intelligence/2023-06-14/ai_corporate_investment.csv
+    - snapshot://wb/2023-09-19/us_cpi.csv
+
   data://grapher/artificial_intelligence/2023-06-14/ai_corporate_investment:
     - data://garden/artificial_intelligence/2023-06-14/ai_corporate_investment
 
@@ -103,6 +105,8 @@ steps:
   data://garden/artificial_intelligence/2023-06-14/ai_private_investment:
     - snapshot://artificial_intelligence/2023-06-14/ai_private_investment.csv
     - snapshot://artificial_intelligence/2023-06-14/ai_private_investment_total.csv
+    - snapshot://wb/2023-09-19/us_cpi.csv
+
   data://grapher/artificial_intelligence/2023-06-14/ai_private_investment:
     - data://garden/artificial_intelligence/2023-06-14/ai_private_investment
 
@@ -144,7 +148,7 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/ai_gender_representation:
     - data://garden/artificial_intelligence/2023-06-14/ai_gender_representation
 
-# AI PhDs
+  # AI PhDs
   data://garden/artificial_intelligence/2023-06-14/ai_phds:
     - snapshot://artificial_intelligence/2023-06-14/ai_phds.csv
   data://grapher/artificial_intelligence/2023-06-14/ai_phds:
@@ -206,10 +210,15 @@ steps:
   data://grapher/artificial_intelligence/2023-07-07/semiconductors_cset:
   - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset
 
+
  # CSET data on articles, patents and investment
   data://meadow/artificial_intelligence/2023-07-25/cset:
   - snapshot://artificial_intelligence/2023-07-25/cset.csv
   data://garden/artificial_intelligence/2023-07-25/cset:
   - data://meadow/artificial_intelligence/2023-07-25/cset
+  - data://garden/demography/2023-03-31/population
+  - data://garden/regions/2023-01-01/regions
+  - snapshot://wb/2023-09-19/us_cpi.csv
+
   data://grapher/artificial_intelligence/2023-07-25/cset:
   - data://garden/artificial_intelligence/2023-07-25/cset

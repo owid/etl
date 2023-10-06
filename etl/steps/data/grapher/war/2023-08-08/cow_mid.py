@@ -1,10 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from typing import cast
-
-from owid.catalog import Dataset
-
-from etl.helpers import PathFinder, create_dataset, grapher_checks
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -15,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("cow_mid"))
+    ds_garden = paths.load_dataset("cow_mid")
 
     # Read table from garden dataset.
     tb = ds_garden["cow_mid"]
@@ -30,7 +26,7 @@ def run(dest_dir: str) -> None:
     tb["country"] = tb["country"].str.replace(r" \(.+\)", "", regex=True)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["year", "country", "hostility_level"])
+    tb = tb.set_index(["year", "country", "fatality", "hostility"]).sort_index()
 
     #
     # Save outputs.
@@ -38,10 +34,8 @@ def run(dest_dir: str) -> None:
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
 
-    #
-    # Checks.
-    #
-    grapher_checks(ds_grapher)
+    # Remove source description so that it doesn't get appended to the dataset description.
+    ds_grapher.metadata.sources[0].description = ""
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

@@ -1,12 +1,11 @@
 meta:
   origin:
     producer: Yasuyuki Aono
-    dataset_title_owid: Peak Cherry Tree Blossom at Kyoto City
-    dataset_title_producer: Historical Series of Phenological data for Cherry Tree Flowering at Kyoto City (and March Mean Temperature Reconstructions)
-    dataset_url_main: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
+    title: Historical Series of Phenological data for Cherry Tree Flowering at Kyoto City (and March Mean Temperature Reconstructions)
+    url_main: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
     attribution: Multiple sources compiled by Aono
     attribution_short: Yasuyuki Aono
-    citation_producer: |-
+    citation_full: |-
       Yasuyuki Aono compiled this data based on multiple sources:
       - Taguchi,T. (1939) Climatic change in historical time in Japan J. Mar. Meteorol. Soc. 19 217–27
 

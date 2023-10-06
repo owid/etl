@@ -3,7 +3,7 @@
 [![Build status](https://badge.buildkite.com/a2012d475d9eed5ae6d85b9362acc07aa5cab265a810d9a37b.svg)](https://buildkite.com/our-world-in-data/walden-unit-tests)
 
 
-_A prototype catalog of all upstream datasets used to build Our World In Data._
+_A prototype catalog of all upstream datasets used to build Our World in Data._
 
 ## Goals
 

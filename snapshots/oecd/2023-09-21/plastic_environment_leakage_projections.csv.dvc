@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Plastics Outlook - Plastic leakage to the environment - projections
+    description: |-
+      This dataset provides estimates of plastics leakages to the environment at a global level per source.
+
+
+      Plastic leakages estimates from mismanaged waste and litter correspond to the average of the estimates caclulated using the methodology adapted from (Ryberg et al., 2019) and (Cottom, Cook and Velis, 2020) that were applied on OECD ENV-Linkages model outputs.Plastics leakages from all other sources correspond to the estimates caclulated using the methodology adapted from (Ryberg et al., 2019).
+    date_published: 2022-05-05
+
+    # Citation
+    producer: OECD
+    citation_full: OECD (2022), Global Plastics Outlook ,https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_LEAKAGE_V2_3&lang=en,      accessed
+      on 21 September 2023
+
+    # Files
+    url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_LEAKAGE_V2_3&lang=en
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.oecd.org/termsandconditions
+wdir: ../../../data/snapshots/oecd/2023-09-21
+outs:
+- md5: e86b116ac8c6b7ddaf98ef10338fab13
+  size: 34953
+  path: plastic_environment_leakage_projections.csv

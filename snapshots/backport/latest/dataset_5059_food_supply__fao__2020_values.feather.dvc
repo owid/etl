@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5059
+    date_accessed: 2023-08-16 07:30:31.402417
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Food supply (FAO, 2020)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e3dfa20cdc70d5ac27368c555e206eec
+  size: 758090
+  path: dataset_5059_food_supply__fao__2020_values.feather

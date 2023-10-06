@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2130
+    date_accessed: 2023-08-11 07:59:46.187856
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other skin and subcutaneous diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0ece778e4e1ee4d974b8feb13fd019d3
+  size: 2116410
+  path: dataset_2130_other_skin_and_subcutaneous_diseases_values.feather

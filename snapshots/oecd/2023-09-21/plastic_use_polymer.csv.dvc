@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Plastics Outlook - Plastics use by polymer
+    description: |-
+      This dataset provides estimates of plastics use at the global level by polymer.
+
+      Primary plastics use is estimated using regional consumption by application data from Ryberg et al. (2019). An assumption of the split by polymer by application is made that it is homogenous to the global values. Histroical values (pre-2015 data) is extrapolated from 2015 data using the global evolution contained in Geyer, Jambeck and Law (2017). Secondary plastics use are derived using recycling rates and recycling loss rates, as described in the GPO annex. The plastics use data is associated with the economic flows in the OECD ENV-Linkages model to estimate changes over time. The total plastics use is equal to the sum of primary and secondary plastics use.
+    date_published: 2022-02-09
+    description_snapshot: |-
+      This dataset gives global estimates of plastic use, broken down by polymer type. The use of primary plastics is estimated from regional consumption data, assuming a consistent split by polymer type across different applications globally, as per Ryberg et al. (2019). Historical values (data from before 2015) are extrapolated using the evolution model in Geyer, Jambeck and Law (2017). The use of secondary plastics is calculated using recycling and recycling loss rates, as detailed in the GPO annex. These plastic use data are then related to economic flows in the OECD ENV-Linkages model to track changes over time. The total plastic use is the combined amount of primary and secondary plastic use.
+    # Citation
+    producer: OECD
+    citation_full: OECD (2022), Global Plastics Outlook, https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_8&lang=en, accessed on 21 September 2023
+
+    # Files
+    url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_USE_8&lang=en
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.oecd.org/termsandconditions
+wdir: ../../../data/snapshots/oecd/2023-09-21
+outs:
+- md5: eab53b86d7bc1ff5df01d45a8aa82859
+  size: 20537
+  path: plastic_use_polymer.csv

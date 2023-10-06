@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2085
+    date_accessed: 2023-08-16 08:21:48.107313
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2085_h_influenzae_type_b_meningitis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ba8b6c08a18278ed3a83d4c5fdf1f1de
+  size: 33124
+  path: dataset_2085_h_influenzae_type_b_meningitis_config.json

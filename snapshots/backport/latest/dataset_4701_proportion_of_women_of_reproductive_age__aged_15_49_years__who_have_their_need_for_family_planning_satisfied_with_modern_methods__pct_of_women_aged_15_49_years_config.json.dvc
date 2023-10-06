@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4701
+    date_accessed: 2023-08-16 08:39:31.769206
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4701_proportion_of_women_of_reproductive_age__aged_15_49_years__who_have_their_need_for_family_planning_satisfied_with_modern_methods__pct_of_women_aged_15_49_years
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a6de5cb9da707a6dbb2285dca63f9597
+  size: 19906
+  path: 
+    dataset_4701_proportion_of_women_of_reproductive_age__aged_15_49_years__who_have_their_need_for_family_planning_satisfied_with_modern_methods__pct_of_women_aged_15_49_years_config.json

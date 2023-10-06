@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3082
+    date_accessed: 2023-08-16 08:36:37.162623
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Under-aided countries (OECD, 2018)
+  description: For OECD report - do not delete.
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 62b035c23629a5229d99391531542037
+  size: 7130
+  path: dataset_3082_under_aided_countries__oecd__2018_values.feather

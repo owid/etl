@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2221
+    date_accessed: 2023-08-10 14:42:16.325192
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Maternal disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: af62a045fef0262a2dffcfe7cba96226
+  size: 1386578
+  path: dataset_2221_maternal_disorders_values.feather

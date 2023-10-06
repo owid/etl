@@ -1,0 +1,90 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+  description: |-
+    The Human Mortality Database (HMD) is a collaborative project sponsored by the University of California, Berkeley (in the United States of America) and the Max Planck Institute for Demographic Research (in Germany).
+
+    It provides researchers with comprehensive data on mortality from around 40 countries around the world, which have very high coverage and quality of data at the national level, through vital registration and potentially census data.
+
+    Data is given in terms of period or cohort estimates:
+
+      - **Period data** refers to a snapshot estimated with data at a particular interval. For period life expectancy at birth, this refers to the estimated life expectancy at birth based on a synthetic cohort created using mortality rates across age groups in a given year.
+      - **Cohort data** refers to estimates of a particular birth cohort. For cohort life expectancy at birth, this refers to the average number of years that people in the birth cohort survived. Cohort data may use birth cohorts that are ‘almost extinct’ rather than entirely extinct.
+
+    'Interval' refers to the specific age- and time- period of the estimate. An interval can be a one year period for a single-age group, or it can be wider. For example, the life expectancy of a 40 year old in 2019 corresponds to an interval of 1 single-age group in 1 year. The central death rate of 5–9 year olds in 2020 corresponds to an interval of a 5 year age group in 1 year.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  hmd:
+    variables:
+      central_death_rate:
+        title: Central death rate
+        description_short: |-
+          For a given population or cohort, the central death rate at a given age during a given period of 12 months is found by dividing the number of people who died during this period while aged x by the average number who were living in that age group during the period.
+        unit: deaths per 1,000 people
+        processing_level: minor
+        description_processing: |-
+          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
+      probability_of_death:
+        title: Probability of death
+        unit: "%"
+        description_short: The probability that a person who survived until the start of a given interval will have died by the end of the interval.
+        processing_level: minor
+        description_processing: |-
+          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
+      average_survival_length:
+        title: Average survival length
+        short_unit: years
+        unit: years
+        description_short: Average length of survival between ages x and x+n for persons dying in the interval.
+      number_survivors:
+        title: Number of survivors
+        unit: survivors
+        description_short: Number of survivors at a given age, assuming survivors at 0 years old is 100,000.
+      number_deaths:
+        title: Number of deaths
+        short_unit: deaths
+        unit: deaths
+        description_short: Number of deaths between ages x and x+n.
+      number_person_years_lived:
+        title: Number of person-years lived
+        unit: person-years
+        description_short: Number of person-years lived between ages x and x+n.
+      number_person_years_remaining:
+        title: Number of person-years remaining
+        unit: person-years
+        description_short: Number of person-years remaining after a given age.
+      life_expectancy:
+        title: Life expectancy
+        short_unit: years
+        unit: years
+        description_short: |-
+            <% if type == "period" %>
+            The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
+
+            <% elif type == "cohort" %>
+            The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+            <% endif %>
+
+            'Life expectancy at age 0' refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy for people who have already survived to the given age.
+      life_expectancy_fm_diff:
+        title: Life expectancy difference (f-m)
+        short_unit: years
+        unit: years
+        description_short: Life expectancy difference (females - males) at a given age.
+      life_expectancy_fm_ratio:
+        title: Life expectancy ratio (f/m)
+        unit: ""
+        description_short: Life expectancy ratio (females/males) at a given age.
+      exposure:
+        title: Exposure-to-risk
+        unit: person-years
+        description_short: The total number of person-years lived within a given interval.
+        description_from_producer: |-
+          Estimates of the population exposed to the risk of death during some agetime interval are based on annual (January 1st) population estimates, with small corrections that reflect the timing of deaths during the interval. Period exposure estimations are based on assumptions of uniformity in the distribution of events except when historical monthly birth data are available.

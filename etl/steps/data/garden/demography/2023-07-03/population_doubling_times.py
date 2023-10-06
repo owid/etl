@@ -9,10 +9,9 @@ NOTE 2: In the future, we might want to have other countries and regions in this
 
 """
 
-from typing import cast
-
+import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -29,10 +28,10 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     log.info("population_doubling_times: load data")
-    ds_meadow = cast(Dataset, paths.load_dependency("population"))
+    ds_meadow = paths.load_dataset("population")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["population"]
+    tb = ds_meadow["population_original"]
     tb.metadata.short_name = "population_doubling_times"
 
     #
@@ -53,10 +52,8 @@ def run(dest_dir: str) -> None:
 
     # Estimate number of years passed since population was half
     def _get_year_half_population(population: int, tb: Table):
-        tb_ = tb.loc[(tb["population"] <= population)]
-        idx = (tb_["population"] - population / 2).abs().argmin()
-        year = tb_.iloc[idx]["year"]
-        return year
+        idx = np.argmin(np.abs(tb.population.values - population / 2))
+        return tb.year.values[idx]
 
     log.info("population_doubling_times: estimate years since half population")
     year_with_half_population = tb["population"].apply(lambda x: _get_year_half_population(x, tb))

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Google Sheet
+    url: https://zerotracker.net/
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSYTMEGxV7wubu5FLg67llhoi5TBGZXA6IMJxZOA7xmhgKiR_CS7-11Y8_RsUXKKi-wJTg8okG_mwlG/pub?output=csv
+    date_accessed: '2023-08-21'
+    publication_year: .nan
+    published_by: Google Sheet
+  name: Net Zero Targets (Net Zero Tracker)
+  description: ''
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 39916c2f8ceadc7b7dd76dd8fedb8067
+  size: 5728
+  path: net_zero_tracker.csv

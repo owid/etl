@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2035
+    date_accessed: 2023-08-14 05:45:14.417218
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2035_proportion_of_urban_population_living_in_slums__informal_settlements_or_inadequate_housing
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: acf0db2828341e153604f341dc28721e
+  size: 5127
+  path: 
+    dataset_2035_proportion_of_urban_population_living_in_slums__informal_settlements_or_inadequate_housing_config.json

@@ -2,7 +2,7 @@ from unittest import mock
 
 import numpy as np
 import pandas as pd
-from owid.catalog import DatasetMeta, Origin, Source, Table, TableMeta, VariableMeta
+from owid.catalog import DatasetMeta, Source, Table, TableMeta, VariableMeta
 
 from etl import grapher_helpers as gh
 
@@ -188,12 +188,3 @@ def test_adapt_table_for_grapher_multiindex():
         out_table = gh._adapt_table_for_grapher(table)
         assert out_table.index.names == ["entity_id", "year", "sex"]
         assert out_table.columns.tolist() == ["deaths"]
-
-
-def test_add_dataset_origins_to_variables():
-    table = _sample_table()
-    assert table.deaths.metadata.origins == []
-    origins = [Origin(dataset_title_owid="A")]
-    table.metadata.dataset = DatasetMeta(origins=origins)
-    table = gh._add_dataset_origins_to_variables(table)
-    assert table.deaths.metadata.origins == origins

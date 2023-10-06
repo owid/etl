@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2657
+    date_accessed: 2023-08-10 15:08:00.454035
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Social Protection and Well-being - Social Expenditure - Aggregated data
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5b078d57788412238651f2a4d5b5158c
+  size: 55114
+  path: 
+    dataset_2657_social_protection_and_well_being__social_expenditure__aggregated_data_values.feather

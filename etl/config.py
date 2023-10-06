@@ -20,7 +20,9 @@ ENV_FILE = env.get("ENV", BASE_DIR / ".env")
 
 load_dotenv(ENV_FILE)
 
-DEBUG = env.get("DEBUG") == "True"
+# When DEBUG is on
+# - run steps in the same process (speeding up ETL)
+DEBUG = env.get("DEBUG") in ("True", "true", "1")
 
 # publishing to OWID's public data catalog
 S3_BUCKET = "owid-catalog"
@@ -43,6 +45,9 @@ DB_HOST = env.get("DB_HOST", "localhost")
 DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")
 DB_PASS = env.get("DB_PASS", "")
+
+# metaplay config
+METAPLAY_PORT = int(env.get("METAPLAY_PORT", "8051"))
 
 
 def get_username():
@@ -85,6 +90,10 @@ IPDB_ENABLED = False
 # number of workers for grapher inserts
 GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 
+# only upsert indicators matching this filter, this is useful for fast development
+# of data pages for a single indicator
+GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
+
 # forbid any individual step from consuming more than this much memory
 # (only enforced on Linux)
 MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
@@ -98,7 +107,7 @@ STRICT_AFTER = "2023-06-25"
 
 def enable_bugsnag() -> None:
     BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
-    if BUGSNAG_API_KEY and not DEBUG:
+    if BUGSNAG_API_KEY:
         bugsnag.configure(
             api_key=BUGSNAG_API_KEY,
         )  # type: ignore

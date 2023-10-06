@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1765
+    date_accessed: 2023-08-16 08:50:57.948346
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1765_diet_low_in_whole_grains (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9d76a0125e5961dabf99ea3e20404f1e
+  size: 22024
+  path: dataset_1765_diet_low_in_whole_grains_config.json

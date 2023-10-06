@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1466
+    date_accessed: 2023-08-16 09:53:02.302737
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Tuberculosis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 09f56b111ac1c7a904d86fda29c05903
+  size: 2012042
+  path: dataset_1466_tuberculosis_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1452
+    date_accessed: 2023-08-10 15:06:14.090603
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1452_viral_skin_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5c65b2c1995bae5023adc757db23d6ad
+  size: 16607
+  path: dataset_1452_viral_skin_diseases_config.json

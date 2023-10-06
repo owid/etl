@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/868
+    date_accessed: 2023-08-16 08:24:00.559213
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Clio-Infra - National Accounts
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 97961d2e9c00b863ddc4ec64f1fc9abd
+  size: 84658
+  path: dataset_868_clio_infra__national_accounts_values.feather

@@ -1,0 +1,45 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Under-five Mortality
+    description: |-
+      This file contains data on child mortality rates compiled by Gapminder, based on multiple sources:
+                                                                                                                                                                                                                                    — 1800 to 1950: Gapminder v7  ( In some cases this is also used for years after 1950, see below.) This was compiled and documented by Mattias Lindgren from many sources, but mainly based on www.mortality.org and the series of books called International Historical Statistics  by Brian R Mitchell, which often have historic estimates of Infant mortality rate which were converted to Child mortality through regression. See detailed documentation of v7 below.
+
+      — 1950 to 2018: UNIGME, is a data collaboration project between UNICEF, WHO, UN Population Division and the World Bank. They  released new estimates of child mortality for countries and a global estimate on September 19, 2019, which is available at www.childmortality.org. In this dataset 70% of all countries have estimates between 1970 and 2016, while roughly half the countries also reach back to 1950.
+
+      — 1950 to 2100: UN WPP, World Population Prospects 2019  provides annual data for Child mortality rate for all countries in the annually interpolated demographic indicators, called WPP2019_INT_F01_ANNUAL_DEMOGRAPHIC_INDICATORS.xlsx
+                                                                                                                                                                                                                                                               In general, We connected our historic estimates from Gapminder v7 to the earliest available year with data in UNIGME or if it didn’t have data, we used UN POP from 1950 and on, until UNIGME had data. Depending on data availability, different countries are moving between sources at different points in the period 1930-1980.After 2018, we have extended the UN IGME series with the UN POP numbers. But we haven't extended it with the  UN POP actual numbers but  instead, we extended it with the UN POP expected change.
+                                                                                                                                                                                                                                                                                           The data is part of Gapminder effort to build a fact-based worldview by showing the big picture of global development. When we find multiple data sources that haven't been combined we combine them into one consistent timeseries. This often results in large data uncertainty, as the underlaying data-sources use different methodologies etc. But we still dare to combine data that hasn't been combined, as we find it extremely important to visualize the big picture, which people otherwise tend to get absolutely wrong. Before using our data for any other purpose though, please read the documentation to make sure you are aware of our levels of doubts in the data.
+    date_published: 2020-01-30
+    version_producer: v11
+    title_snapshot:
+
+    # Citation
+    producer: Gapminder based on UN IGME & UN WPP
+    citation_full: Under-five Mortality Dataset v11, Gapminder (2020)
+    attribution_short: Gapminder
+
+    # Files
+    url_main:
+      https://docs.google.com/spreadsheets/d/1Av7eps_zEK73-AdbFYEmtTrwFKlfruBYXdrnXAOFVpM/edit#gid=501532268
+    url_download:
+      https://docs.google.com/spreadsheets/d/1Av7eps_zEK73-AdbFYEmtTrwFKlfruBYXdrnXAOFVpM/export?format=xlsx
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      url:
+        https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
+      name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
+  license:
+    url:
+      https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
+    name: CC BY 4.0
+wdir: ../../../data/snapshots/gapminder/2023-09-21
+outs:
+- md5: 8d8068bb4ee54de840510f47b34c281f
+  size: 1522912
+  path: under_five_mortality.xlsx

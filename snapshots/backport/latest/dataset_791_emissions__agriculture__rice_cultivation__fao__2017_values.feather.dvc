@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/791
+    date_accessed: 2023-08-16 08:35:24.006085
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Agriculture: Rice Cultivation - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 59300de18d4037f4289a94940931e534
+  size: 156258
+  path: dataset_791_emissions__agriculture__rice_cultivation__fao__2017_values.feather

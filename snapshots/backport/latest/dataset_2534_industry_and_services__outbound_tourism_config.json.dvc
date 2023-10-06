@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2534
+    date_accessed: 2023-08-14 15:16:53.359952
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2534_industry_and_services__outbound_tourism
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0f25402f835ca1adcc19634148d40b51
+  size: 38449
+  path: dataset_2534_industry_and_services__outbound_tourism_config.json

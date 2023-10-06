@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2263
+    date_accessed: 2023-08-16 07:54:39.963130
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2263_klinefelter_syndrome (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0c7c1fe6a14c85381822e703bd81f0da
+  size: 32755
+  path: dataset_2263_klinefelter_syndrome_config.json

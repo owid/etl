@@ -2,14 +2,14 @@ steps:
   # Health
   data://garden/owid/latest/covid:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
-  # Death completion (Karlinsky,2021)
-  data://meadow/health/2022-12-28/deaths_karlinsky:
-    - snapshot://health/2022-12-28/deaths_karlinsky.csv
-  data://garden/health/2022-12-28/deaths_karlinsky:
-    - data://meadow/health/2022-12-28/deaths_karlinsky
-    - data://garden/owid/latest/key_indicators
-  data://grapher/health/2022-12-28/deaths_karlinsky:
-    - data://garden/health/2022-12-28/deaths_karlinsky
+  # Death completion (Karlinsky,2023)
+  data://meadow/health/2023-08-16/deaths_karlinsky:
+  - snapshot://health/2023-08-16/deaths_karlinsky.csv
+  data://garden/health/2023-08-16/deaths_karlinsky:
+  - data://meadow/health/2023-08-16/deaths_karlinsky
+  - data://garden/demography/2023-03-31/population
+  data://grapher/health/2023-08-16/deaths_karlinsky:
+  - data://garden/health/2023-08-16/deaths_karlinsky
 
   # WHO Vaccination data
   data://meadow/who/2022-07-17/who_vaccination:
@@ -255,15 +255,27 @@ steps:
 # UNAIDS
   data://meadow/health/2023-08-09/unaids:
   - snapshot://health/2023-08-09/unaids.csv
+  data://meadow/health/2023-08-11/unaids_hiv_children:
+  - snapshot://health/2023-08-11/unaids_hiv_children.xlsx
+  data://meadow/health/2023-08-22/unaids_deaths_averted_art:
+  - snapshot://health/2023-08-22/unaids_deaths_averted_art.xlsx
+  data://meadow/health/2023-08-22/unaids_gap_art:
+  - snapshot://health/2023-08-22/unaids_gap_art.xlsx
+  data://meadow/health/2023-08-22/unaids_condom_msm:
+  - snapshot://health/2023-08-22/unaids_condom_msm.xlsx
+
   data://garden/health/2023-08-09/unaids:
   - data://meadow/health/2023-08-09/unaids
   - data://meadow/health/2023-08-11/unaids_hiv_children
+  - data://meadow/health/2023-08-22/unaids_condom_msm
+  - data://meadow/health/2023-08-22/unaids_gap_art
+  - data://meadow/health/2023-08-22/unaids_deaths_averted_art
   - data://garden/demography/2023-03-31/population
+
   data://grapher/health/2023-08-09/unaids:
   - data://garden/health/2023-08-09/unaids
 
-  data://meadow/health/2023-08-11/unaids_hiv_children:
-  - snapshot://health/2023-08-11/unaids_hiv_children.xlsx
+
 
 # OECD Road accidents
   data://meadow/oecd/2023-08-11/road_accidents:
@@ -273,3 +285,23 @@ steps:
   - data://garden/oecd/2018-03-11/road_deaths_and_injuries
   data://grapher/oecd/2023-08-11/road_accidents:
   - data://garden/oecd/2023-08-11/road_accidents
+
+# WHO Avian Influenza H5N1
+
+  data://meadow/who/2023-08-14/avian_influenza_ah5n1:
+  - snapshot://who/2023-08-14/avian_influenza_ah5n1.csv
+  data://garden/who/2023-08-14/avian_influenza_ah5n1:
+  - data://meadow/who/2023-08-14/avian_influenza_ah5n1
+  - data://garden/regions/2023-01-01/regions
+  data://grapher/who/2023-08-14/avian_influenza_ah5n1:
+  - data://garden/who/2023-08-14/avian_influenza_ah5n1
+
+
+# Kucharski
+  data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski:
+  - snapshot://health/2023-08-14/avian_influenza_h5n1_kucharski.xlsx
+  data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski:
+  - data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski
+  - data://garden/regions/2023-01-01/regions
+  data://grapher/health/2023-08-14/avian_influenza_h5n1_kucharski:
+  - data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski

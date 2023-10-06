@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4649
+    date_accessed: 2023-08-16 08:00:14.890474
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4649_net_official_development_assistance__oda__to_small_island_states__sids__as_a_percentage_of_oecd_dac_donors_gni__by_donor_countries__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2bbc926c393cbcdc013ad9fb81f8fc76
+  size: 6817
+  path: 
+    dataset_4649_net_official_development_assistance__oda__to_small_island_states__sids__as_a_percentage_of_oecd_dac_donors_gni__by_donor_countries__pct_config.json

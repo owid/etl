@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1830
+    date_accessed: 2023-08-16 08:01:46.725877
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1830_occupational_ergonomic_factors (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9b826d6069ee83bd139aa7eb5a61e436
+  size: 11850
+  path: dataset_1830_occupational_ergonomic_factors_config.json

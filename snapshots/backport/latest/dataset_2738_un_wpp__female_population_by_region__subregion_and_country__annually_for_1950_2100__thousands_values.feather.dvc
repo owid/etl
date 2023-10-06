@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2738
+    date_accessed: 2023-08-14 16:09:05.058004
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: UN WPP - Female population by region, subregion and country, annually for
+    1950-2100 (thousands)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 90d0e7d722c70c8b7183d6299464b349
+  size: 1284242
+  path: 
+    dataset_2738_un_wpp__female_population_by_region__subregion_and_country__annually_for_1950_2100__thousands_values.feather

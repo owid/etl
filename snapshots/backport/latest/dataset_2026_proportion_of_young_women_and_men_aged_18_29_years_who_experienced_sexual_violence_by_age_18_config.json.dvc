@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2026
+    date_accessed: 2023-08-14 14:33:04.487065
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2026_proportion_of_young_women_and_men_aged_18_29_years_who_experienced_sexual_violence_by_age_18
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 05c9f3884edcf50ef4b7d85517fd45ec
+  size: 3539
+  path: 
+    dataset_2026_proportion_of_young_women_and_men_aged_18_29_years_who_experienced_sexual_violence_by_age_18_config.json

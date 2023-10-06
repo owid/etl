@@ -4,9 +4,9 @@ from copy import deepcopy
 from typing import Any, List
 
 import numpy as np
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset, grapher_checks
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -23,10 +23,13 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden: Dataset = paths.load_dependency("population")
+    ds_garden = paths.load_dataset("population")
 
     # Read table from garden dataset.
-    tb_garden = ds_garden["population"]
+    tb_garden = ds_garden["population_original"].update_metadata(short_name="population")
+
+    # Set origins on `source`
+    tb_garden.source.m.origins = tb_garden.population.m.origins
 
     #
     # Process data.
@@ -37,11 +40,6 @@ def run(dest_dir: str) -> None:
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata)
-
-    #
-    # Checks.
-    #
-    grapher_checks(ds_grapher)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
@@ -184,8 +182,12 @@ def _create_metric_version_from_mask(
     if title_suffix:
         table[metric_new].metadata.title = f"{table[metric_new].metadata.title} {title_suffix}"
     if display_name_suffix:
-        table[metric_new].metadata.display[
-            "name"
-        ] = f"{table[metric_new].metadata.display['name']} {display_name_suffix}"
+        if table[metric_new].metadata.display is None:
+            table[metric_new].metadata.display = {}
+        if "name" in table[metric_new].metadata.display:
+            display_name = table[metric_new].metadata.display["name"]
+        else:
+            display_name = table[metric_new].metadata.title
+        table[metric_new].metadata.display["name"] = f"{display_name} {display_name_suffix}"
     table[metric_new].metadata.description = description
     return table.astype({metric_new: dtype})

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4768
+    date_accessed: 2023-08-11 07:53:10.162215
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4768_number_of_seats_held_by_women_in_national_parliaments__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c400d67d731d799651636aa7f65d39dd
+  size: 1827
+  path: 
+    dataset_4768_number_of_seats_held_by_women_in_national_parliaments__number_config.json

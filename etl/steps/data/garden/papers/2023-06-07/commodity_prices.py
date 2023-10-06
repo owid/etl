@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     #
     # Load data from snapshot.
     #
-    snap = paths.load_snapshot_dependency()
+    snap = paths.load_snapshot()
     df = pd.read_excel(snap.path, skiprows=1).rename(columns={"(1900=100)": "year"})
     df["country"] = "World"
     df = df.set_index(["country", "year"])

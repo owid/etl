@@ -5,7 +5,7 @@ from urllib.error import URLError
 
 import pandas as pd
 
-from backport.datasync.data_metadata import variable_data_df_from_s3
+from apps.backport.datasync.data_metadata import variable_data_df_from_s3
 from etl.db import get_engine
 
 # Set to True when running experiments locally and want to avoid downloading data from S3.

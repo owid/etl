@@ -5,9 +5,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 
+import jinja2
 import numpy as np
 import pandas as pd
 import structlog
+from jinja2 import Environment
 from owid import catalog
 from owid.catalog.utils import underscore
 
@@ -16,16 +18,19 @@ from etl.db_utils import DBUtils
 
 log = structlog.get_logger()
 
-
-INT_TYPES = (
-    "int",
-    "uint16",
-    "Int16",
-    "uint32",
-    "Int32",
-    "uint64",
-    "Int64",
+jinja_env = Environment(
+    block_start_string="<%",
+    block_end_string="%>",
+    variable_start_string="<<",
+    variable_end_string=">>",
+    comment_start_string="<#",
+    comment_end_string="#>",
+    trim_blocks=True,
+    lstrip_blocks=True,
 )
+
+# this might work too pd.api.types.is_integer_dtype(col)
+INT_TYPES = tuple({f"{n}{b}" for n in ("int", "Int", "uint", "UInt") for b in ("8", "16", "32", "64")})
 
 
 def as_table(df: pd.DataFrame, table: catalog.Table) -> catalog.Table:
@@ -107,8 +112,8 @@ def _yield_wide_table(
         # a situation when there's only year and entity_id in index with no additional dimensions
         grouped = [([], table)]
 
-    for dims, table_to_yield in grouped:
-        dims = [dims] if isinstance(dims, str) else dims
+    for dim_values, table_to_yield in grouped:
+        dim_values = [dim_values] if isinstance(dim_values, str) else dim_values
 
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
@@ -116,7 +121,7 @@ def _yield_wide_table(
             # If all values are null, skip variable
             if table_to_yield[column].isnull().all():
                 if warn_null_variables:
-                    log.warning("yield_wide_table.null_variable", column=column, dims=dims)
+                    log.warning("yield_wide_table.null_variable", column=column, dims=dim_values)
                 continue
 
             # Safety check to see if the metadata is still intact
@@ -126,40 +131,81 @@ def _yield_wide_table(
 
             # Select only one column and dimensions for performance
             tab = table_to_yield[[column]].copy()
-            tab.metadata = copy.deepcopy(tab.metadata)
 
             # Drop NA values
             tab = tab.dropna() if na_action == "drop" else tab
 
             # Create underscored name of a new column from the combination of column and dimensions
-            short_name = _underscore_column_and_dimensions(column, dims, dim_names)
+            short_name = _underscore_column_and_dimensions(column, dim_values, dim_names)
 
             # set new metadata with dimensions
             tab.metadata.short_name = short_name
             tab = tab.rename(columns={column: short_name})
 
             # add info about dimensions to metadata
-            if dims:
+            if dim_values:
                 tab[short_name].metadata.additional_info = {
                     "dimensions": {
                         "originalShortName": column,
                         "originalName": tab[short_name].metadata.title,
                         "filters": [
-                            {"name": dim_name, "value": dim_value} for dim_name, dim_value in zip(dim_names, dims)
+                            {"name": dim_name, "value": sanitize_numpy(dim_value)}
+                            for dim_name, dim_value in zip(dim_names, dim_values)
                         ],
                     }
                 }
 
+            dim_dict = dict(zip(dim_names, dim_values))
+
             # Add dimensions to title (which will be used as variable name in grapher)
-            title_with_dims: Optional[str]
             if tab[short_name].metadata.title:
-                title_with_dims = _title_column_and_dimensions(tab[short_name].metadata.title, dims, dim_titles)
+                # We use template as a title
+                if _uses_jinja(tab[short_name].metadata.title):
+                    title_with_dims = _expand_jinja_template(tab[short_name].metadata.title, dim_dict)
+                # Otherwise use default
+                else:
+                    title_with_dims = _title_column_and_dimensions(
+                        tab[short_name].metadata.title, dim_values, dim_titles
+                    )
+
                 tab[short_name].metadata.title = title_with_dims
-            else:
-                title_with_dims = None
+
+            # expand metadata with Jinja template
+            for k in (
+                "description",
+                "description_short",
+                "description_from_producer",
+                "description_processing",
+            ):
+                if getattr(tab[short_name].m, k):
+                    setattr(
+                        tab[short_name].m,
+                        k,
+                        _expand_jinja_template(getattr(tab[short_name].m, k), dim_dict),
+                    )
+
+            for i, desc_key in enumerate(tab[short_name].m.description_key or []):
+                tab[short_name].m.description_key[i] = _expand_jinja_template(desc_key, dim_dict)
 
             # Keep only entity_id and year in index
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
+
+
+def _uses_jinja(text: Optional[str]):
+    if not text:
+        return False
+    return "<%" in text or "<<" in text
+
+
+def _expand_jinja_template(text: str, dim_dict: Dict[str, str]) -> str:
+    if not _uses_jinja(text) or not dim_dict:
+        return text
+
+    try:
+        return jinja_env.from_string(text).render(dim_dict)
+    except jinja2.exceptions.TemplateSyntaxError as e:
+        new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
+        raise e.__class__(new_message, e.lineno, e.name, e.filename) from e
 
 
 def _title_column_and_dimensions(title: str, dims: List[str], dim_names: List[str]) -> str:
@@ -371,17 +417,6 @@ def _adapt_dataset_metadata_for_grapher(
         Adapted dataset metadata, ready to be inserted into grapher.
 
     """
-    # Add origins to sources to stay backward compatible.
-    if metadata.origins:
-        # NOTE: we disabled source <-> origin conversion
-        # metadata.sources = _add_origins_to_sources(metadata.sources, metadata.origins)
-        pass
-    else:
-        warnings.warn(
-            "Dataset has sources instead of origins. This is deprecated and will be removed in the future. "
-            "Please use origins instead."
-        )
-
     # Combine metadata sources into one.
     if metadata.sources:
         metadata.sources = [combine_metadata_sources(metadata.sources)]
@@ -449,24 +484,11 @@ def _adapt_table_for_grapher(
 
     table = table.set_index(["entity_id", "year"] + dim_names)
 
-    # Add dataset origins to variables if they don't have an origin.
-    # TODO: In the future, all variables should have their origins and dataset origins will be union of their origins.
-    table = _add_dataset_origins_to_variables(table)
-
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).
     table = _ensure_source_per_variable(table)
 
     return cast(catalog.Table, table)
-
-
-def _add_dataset_origins_to_variables(table: catalog.Table) -> catalog.Table:
-    assert table.metadata.dataset
-    for col in table.columns:
-        variable_meta = table[col].metadata
-        if not variable_meta.origins:
-            variable_meta.origins = table.metadata.dataset.origins
-    return table
 
 
 def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
@@ -550,3 +572,14 @@ class IntRange:
 def contains_inf(s: pd.Series) -> bool:
     """Check if a series contains infinity."""
     return pd.api.types.is_numeric_dtype(s.dtype) and np.isinf(s).any()  # type: ignore
+
+
+def sanitize_numpy(obj: Any) -> Any:
+    """Sanitize numpy types so that we can insert them into MySQL."""
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    return obj

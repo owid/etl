@@ -1,14 +1,58 @@
+definitions:
+  number_deaths_ongoing_conflicts: |-
+    <% if conflict_type == "all" %>
+    The << estimate >> estimate of the number of deaths in all ongoing conventional wars in each year.
+
+    An ongoing conventional war is a conflict between combatants with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
+
+    Deaths of combatants due to fighting are included.
+
+    If a war lasted more than one year, we distributed its deaths evenly across years. If a war was ongoing in more than one world region, we distributed its deaths evenly across regions.
+    <% elif conflict_type == "others (non-civil)" %>
+    The << estimate >> estimate of the number of deaths in ongoing conventional interstate wars in each year.
+
+    An ongoing conventional interstate war is a conflict between combatants that are part of different political authorities, that involves differentiated militaries and clear frontlines, and that causes at least 500 deaths over its duration.
+
+    We identify conventional interstate wars as those wars that are not coded civil wars by Project Mars.
+
+    For the two wars that had campaigns within it that were a civil war and an interstate war, we coded them as interstate wars.
+
+    Deaths of combatants due to fighting are included.
+
+    If a war lasted more than one year, we distributed its deaths evenly across years. If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
+    <% elif conflict_type == "civil war" %>
+    The << estimate >> estimate of the number of deaths in ongoing conventional civil wars in each year.
+
+    An ongoing conventional civil war is a conflict between combatants that were previously part of the same political authority, where now at least one seeks control or secession, that involves differentiated militaries and clear frontlines, and that causes at least 500 deaths over its duration.
+
+    For the two wars that had campaigns within it that were a civil war and an interstate war, we coded them as interstate wars.
+
+    Deaths of combatants due to fighting are included.
+
+    If a war lasted more than one year, we distributed its deaths evenly across years.
+    <% endif %>
+
+
 dataset:
   title: History of war (Project Mars, 2020)
-  description: >-
-    This dataset contains information on armed conflicts, both internal and external, in the period of 1800 and 2011.
+  description: |-
+    This dataset provides information on conventional wars, using data from Jason Lyall's Project Mars.
 
+    The project provides information on the number of ongoing and new wars, the number of ongoing and new war types, as well as the number of deaths in ongoing wars and war types.
 
-    It has been constructed using the Project Mars dataset by Lyall, Jason.
+    Deaths of combatants due to fighting are included.
 
+    We use the world regions as defined by Project Mars. The regions are shown below, along with the codes of the countries in them. Find the complete list of country codes at https://correlatesofwar.org/wp-content/uploads/states2016.csv.
 
-    More details about Project Mars:
+    - Asia and Oceania: 700-990
+    - Eastern Europe: 200-280, 305, 325-338, 375-395
+    - Latin America: 31-165
+    - North Africa and the Middle East: 432, 435-436, 483, 520-531, 600-698
+    - North America: 2-20
+    - Sub-Saharan Africa: 402-420, 433-434, 437-482, 484-517, 540-591
+    - Western Europe: 290-300, 310-317, 339-373,
 
+    You can find more information about the data in our article: [To be published]
 
 tables:
   mars:
@@ -17,50 +61,113 @@ tables:
       number_deaths_ongoing_conflicts_high:
         title: Number of soldier deaths in ongoing conflicts (high estimate)
         unit: deaths
-        description: >-
-          The number of soldiers killed in a year over the course of wars. Excluded from this total are missing soldiers as well as those who
-          died from illness and/or disease. This is the high estimate of those who were killed.
+        description: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths_ongoing_conflicts}
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Asia
+              - Eastern Europe
+              - Latin America
+              - North Africa and the Middle East
+              - North America
+              - Sub-Saharan Africa
+              - Western Europe
       number_deaths_ongoing_conflicts_low:
         title: Number of soldier deaths in ongoing conflicts (low estimate)
         unit: deaths
-        description: >-
-          The number of soldiers killed in a year over the course of wars. Excluded from this total are missing soldiers as well as those who
-          died from illness and/or disease. This is the low estimate of those who were killed.
+        description: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths_ongoing_conflicts}
         display:
           numDecimalPlaces: 0
-
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Asia
+              - Eastern Europe
+              - Latin America
+              - North Africa and the Middle East
+              - North America
+              - Sub-Saharan Africa
+              - Western Europe
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
         unit: conflicts
-        description: >-
-          Number of ongoing conflicts in a given year.
+        description: |-
+          <% if conflict_type == "all" %>
+          The number of ongoing conventional wars in each year.
 
-          We count a war as ongoing in a region even if the conflict is also ongoing in other regions.
-          The sum across all regions can therefore be higher than the total number of ongoing wars.
+          An ongoing conventional war is a conflict between combatants with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
+          <% elif conflict_type == "others (non-civil)" %>
+          The number of ongoing conventional interstate wars in each year.
 
+          An ongoing conventional interstate war is a conflict between combatants that are part of different political authorities, that involves differentiated militaries and clear frontlines, and that causes at least 500 deaths over its duration.
 
-          For the wars that had campaigns within it that were a civil war and a non-civil war, we coded them as non-civil wars.
+          We identify conventional interstate wars as those wars that are not coded civil wars by Project Mars.
 
+          For the two wars that had campaigns within it that were a civil war and an interstate war, we coded them as interstate wars.
+          <% elif conflict_type == "civil war" %>
+          The number of ongoing conventional civil wars in each year.
+
+          An ongoing conventional civil war is a conflict between combatants that were previously part of the same political authority, where now at least one seeks control or secession, that involves differentiated militaries and clear frontlines, and that causes at least 500 deaths over its duration.
+
+          For the two wars that had campaigns within it that were a civil war and an interstate war, we coded them as interstate wars.
+          <% endif %>
+
+          We count a war as ongoing in a region even if the war is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing wars.
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Asia
+              - Eastern Europe
+              - Latin America
+              - North Africa and the Middle East
+              - North America
+              - Sub-Saharan Africa
+              - Western Europe
       number_new_conflicts:
         title: Number of new conflicts
         unit: conflicts
-        description: >-
-          Number of new conflicts in a given year.
+        description: |-
+          <% if conflict_type == "all" %>
+          The number of new conventional wars in each year.
 
+          A conventional war is a conflict between combatants with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration. We consider it new in its start year.
 
-          • New conflicts for the 'World': We only count a war as new when the war overall started that year, not if it restarted
-          or a new campaign within it begins.
+          We only count a war as new when the war overall started that year, not if it restarted or a new campaign within it begins.
+          <% elif conflict_type == "others (non-civil)" %>
+          The number of new conventional interstate wars in each year.
 
-          • New conflicts for all regions (except 'World'): We count a war as new in a region even if the war overall started
-          earlier in another region. The sum across all regions can therefore be higher than the total number of new wars.
+          A conventional interstate war is a conflict between combatants that are part of different political authorities, that involves differentiated militaries and clear frontlines, and that causes at least 500 deaths over its duration. We consider it new in its start year.
 
-          • New conflicts by type: We only count a civil war as new when the war overall started that year, not if it became a civil war.
-          We only count a non-civil war as new when the war overall started that year, not if a civil war became internationalized.
+          We identify conventional interstate wars as those wars that are not coded civil wars by Project Mars.
 
+          We only count an interstate war as new when the war overall started that year, not if a civil war became internationalized.
+          <% elif conflict_type == "civil war" %>
+          The number of ongoing conventional civil wars in each year.
+
+          A conventional civil war is a conflict between combatants that were previously part of the same political authority, where now at least one seeks control or secession, that involves differentiated militaries and clear frontlines, and that causes at least 500 deaths over its duration. We consider it new in its start year.
+
+          We only count a civil war as new when the war overall started that year, not if it became a civil war.
+          <% endif %>
+
+          We count a war as new in a region even if the war started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
 
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Asia
+              - Eastern Europe
+              - Latin America
+              - North Africa and the Middle East
+              - North America
+              - Sub-Saharan Africa
+              - Western Europe

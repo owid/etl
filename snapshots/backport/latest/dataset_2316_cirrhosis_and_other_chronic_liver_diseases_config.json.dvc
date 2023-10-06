@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2316
+    date_accessed: 2023-08-14 16:01:32.468577
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2316_cirrhosis_and_other_chronic_liver_diseases
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0714d2e71d59fe90ba73bd582bc0f6a0
+  size: 33628
+  path: dataset_2316_cirrhosis_and_other_chronic_liver_diseases_config.json

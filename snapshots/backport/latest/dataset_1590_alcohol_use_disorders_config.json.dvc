@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1590
+    date_accessed: 2023-08-14 14:51:15.608472
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1590_alcohol_use_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2acb035d5b0925535e514e3664b08715
+  size: 27040
+  path: dataset_1590_alcohol_use_disorders_config.json

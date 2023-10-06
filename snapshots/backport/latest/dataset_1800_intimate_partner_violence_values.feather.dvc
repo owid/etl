@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1800
+    date_accessed: 2023-08-14 15:49:03.423817
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Intimate partner violence
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 17dc817953a6d887048f7a7ee0c9acad
+  size: 961146
+  path: dataset_1800_intimate_partner_violence_values.feather

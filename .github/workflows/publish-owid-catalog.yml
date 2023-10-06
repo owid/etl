@@ -1,0 +1,30 @@
+name: Publish owid-catalog
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Publish owid-catalog to PyPI. Make sure you have bumped the version.'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Poetry
+      run: curl -sSL https://install.python-poetry.org | python3 -
+
+    - name: Publish
+      env:
+        POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+      run: |
+        cd lib/catalog &&
+        poetry publish --build -u ourworldindata

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4641
+    date_accessed: 2023-08-11 07:56:09.884928
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Countries that have conducted at least one population and housing census in
+    the last 10 years (1 = YES; 0 = NO)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b2830464f7d4df6320816bb775d33e0a
+  size: 13762
+  path: 
+    dataset_4641_countries_that_have_conducted_at_least_one_population_and_housing_census_in_the_last_10_years__1__yes__0__no_values.feather

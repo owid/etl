@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/279
+    date_accessed: 2023-08-16 09:33:34.718853
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Literate world population (OurWorldInData based on OECD and UNESCO)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 03cf4a8da0477f3bb9b54ece2d784850
+  size: 13794
+  path: 
+    dataset_279_literate_world_population__ourworldindata_based_on_oecd_and_unesco_values.feather

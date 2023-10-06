@@ -10,27 +10,13 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, NewType, Optional, TypeVar, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, Union
 
+import mistune
 import pandas as pd
 from dataclasses_json import dataclass_json
 
-T = TypeVar("T")
-
-
-def pruned_json(cls: T) -> T:
-    orig = cls.to_dict  # type: ignore
-
-    # only keep non-null public variables
-    # make sure to call `to_dict` of nested objects as well
-    cls.to_dict = lambda self, **kwargs: {  # type: ignore
-        k: getattr(self, k).to_dict(**kwargs) if hasattr(getattr(self, k), "to_dict") else v
-        for k, v in orig(self, **kwargs).items()
-        if not k.startswith("_") and v not in [None, [], {}]
-    }
-
-    return cls
-
+from .utils import pruned_json
 
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 
@@ -106,28 +92,32 @@ class Source:
 @dataclass_json
 @dataclass
 class Origin:
-    # Dataset title written by OWID (without a year)
-    dataset_title_owid: str
-    # Dataset title written by producer (without a year)
-    dataset_title_producer: Optional[str] = None
-    # Our description of the dataset
-    dataset_description_owid: Optional[str] = None
-    # The description for this dataset used by the producer
-    dataset_description_producer: Optional[str] = None
-    # The name of the institution (without a year) or the main authors of the paper
-    producer: Optional[str] = None
-    # The full citation that the producer asks for
-    citation_producer: Optional[str] = None
+    # Producer name
+    # Name of the institution or the author(s) that produced the data product.
+    producer: str
+    # Title of the original data product
+    title: str
+    # Description of the data product
+    description: Optional[str] = None
+    # Title of the snapshot
+    # Subset of data that we extract from the data product. Only fill if it does not coincide with the title of the data product.
+    title_snapshot: Optional[str] = None
+    # Description of the snapshot
+    # Subset of data that we extract from the data product). Only when the data product and the snapshot do not coincide, the description_snapshot
+    # will contain additional information to the description of the data product.
+    description_snapshot: Optional[str] = None
+    # The full citation
+    citation_full: Optional[str] = None
     # These will be often empty and then producer is used instead, but for the (relatively common) cases
     # where the data product is more famous than the authors we would use this (e.g. VDEM instead of the first authors)
     attribution: Optional[str] = None
     attribution_short: Optional[str] = None
     # This is also often empty but if not then it will be part of the short citation (e.g. for VDEM)
-    version: Optional[str] = None
+    version_producer: Optional[str] = None
     # The authorative URL of the dataset
-    dataset_url_main: Optional[str] = None
+    url_main: Optional[str] = None
     # Direct URL to download the dataset
-    dataset_url_download: Optional[str] = None
+    url_download: Optional[str] = None
     # Date when the dataset was accessed
     date_accessed: Optional[str] = None
     # Publication date or, if the exact date is not known, publication year
@@ -141,8 +131,8 @@ class Origin:
 
     def __post_init__(self):
         if self.date_published:
-            # convert date to string
-            if isinstance(self.date_published, dt.date):
+            # convert date or int to string
+            if isinstance(self.date_published, (dt.date, int)):
                 self.date_published = YearDateLatest(str(self.date_published))
 
             if self.date_published != "latest" and not is_year_or_date(self.date_published):
@@ -163,7 +153,13 @@ class Origin:
 
 # Minor is for cases where we only harmonized the countries or similar
 # Major is for cases where we do more, like create new aggregations, combine multiple indicators, etc.
-OWID_PROCESSING_LEVELS = Literal["minor", "major"]
+PROCESSING_LEVELS = Literal["minor", "major"]
+
+# Hierarchy of processing levels.
+PROCESSING_LEVELS_ORDER = {
+    "minor": 1,
+    "major": 2,
+}
 
 
 @pruned_json
@@ -188,21 +184,16 @@ class VariablePresentationMeta:
     # Shown next to title to differentiate similar indicators e.g. "future projections" or "historical values"
     title_variant: Optional[str] = None
     # Shown next to title to differentiate similar indicators e.g. "WHO" or "IHME"
-    producer_short: Optional[str] = None
+    attribution_short: Optional[str] = None
     # A short text to use to credit the source e.g. at the bottom of charts. Autofilled from the list of origins (see below). Semicolon separated if there are multiple.
     attribution: Optional[str] = None
     # List of topic tags
-    topic_tags_links: List[str] = field(default_factory=list)
+    topic_tags: List[str] = field(default_factory=list)
 
     # Fields that are more work to add but of high value
 
     # List of google doc ids + fragment id
     faqs: List[FaqLink] = field(default_factory=list)
-    # List of bullet points for the key info text (can use markdown formatting)
-    key_info_text: List[str] = field(default_factory=list)
-
-    # A short summary of what was done to process this indicator
-    processing_info: Optional[str] = None
 
     def __hash__(self):
         """Hash that uniquely identifies VariablePresentationMeta."""
@@ -233,12 +224,16 @@ class VariableMeta:
     """
 
     title: Optional[str] = None
+    # This shouldn't be used for data pages, use `description_short`, `description_key` or `description_processing` instead
     description: Optional[str] = None
-    # A 1-2 sentence description - used internally or as fallback for key_info_text
+    # A 1-2 sentence description - used internally or as fallback for description_key
     description_short: Optional[str] = None
     # How did the origin describe this variable?
     description_from_producer: Optional[str] = None
+    # List of bullet points for the description key (can use markdown formatting)
+    description_key: List[str] = field(default_factory=list)
     origins: List[Origin] = field(default_factory=list)  # Origins is the new replacement for sources
+    # Use of `licenses` is discouraged, they should be captured in origins.
     licenses: List[License] = field(default_factory=list)
     unit: Optional[str] = None
     short_unit: Optional[str] = None
@@ -247,11 +242,14 @@ class VariableMeta:
     additional_info: Optional[Dict[str, Any]] = None  # Only used for internal bookkeeping
 
     # How much processing did we do to this data?
-    processing_level: Optional[OWID_PROCESSING_LEVELS] = None
+    processing_level: Optional[PROCESSING_LEVELS] = None
     # List of processing steps, in the future autogenerated
     processing_log: List[Dict[str, Any]] = field(default_factory=list)
 
     presentation: Optional[VariablePresentationMeta] = None
+
+    # A short summary of what was done to process this indicator
+    description_processing: Optional[str] = None
 
     # This one is the license that we give the data. Normally it will be empty and then it will
     # be our usual license (CC-BY) but in cases where special restriction apply this is where
@@ -321,8 +319,7 @@ class DatasetMeta:
     short_name: Optional[str] = None
     title: Optional[str] = None
     description: Optional[str] = None
-    origins: List[Origin] = field(default_factory=list)
-    # sources is deprecated, use origins instead
+    # sources is deprecated, use origins on indicator level instead
     sources: List[Source] = field(default_factory=list)
     licenses: List[License] = field(default_factory=list)
     is_public: bool = True
@@ -375,36 +372,43 @@ class DatasetMeta:
             params["YEAR"] = pd.to_datetime(self.version).year
         return params
 
-    def update_from_yaml(self, path: Union[Path, str], if_source_exists: SOURCE_EXISTS_OPTIONS = "fail") -> None:
+    def update_from_yaml(
+        self,
+        path: Union[Path, str],
+        if_source_exists: SOURCE_EXISTS_OPTIONS = "fail",
+    ) -> None:
         """The main reason for wanting to do this is to manually override what goes into Grapher before an export."""
         from owid.catalog import utils
 
         annot = utils.dynamic_yaml_load(path, self._params_yaml())
 
-        dataset_sources = annot.get("dataset", {}).get("sources", []) or []
+        # None is treated differently from [] - if given empty list, we clear sources
+        dataset_sources = annot.get("dataset", {}).get("sources")
+        if dataset_sources is not None:
+            # update sources of dataset, if there are no sources in the new dataset, don't update existing ones
+            if if_source_exists == "replace":
+                self.sources = []
 
-        # update sources of dataset, if there are no sources in the new dataset, don't update existing ones
-        if if_source_exists == "replace" and dataset_sources:
-            self.sources = []
+            new_sources = []
+            for source_annot in dataset_sources:
+                # if there's an existing source, update it
+                ds_sources = [s for s in self.sources if s.name == source_annot["name"]]
+                if ds_sources:
+                    ds_sources[0].update(**source_annot)
+                # there is already a source in a dataset, raise an error
+                elif self.sources and if_source_exists == "fail":
+                    raise ValueError(
+                        f"Source {self.sources[0].name} would be overwritten by source {source_annot['name']}"
+                    )
+                # otherwise append it
+                else:
+                    new_sources.append(Source(**source_annot))
 
-        new_sources = []
-        for source_annot in dataset_sources:
-            # if there's an existing source, update it
-            ds_sources = [s for s in self.sources if s.name == source_annot["name"]]
-            if ds_sources:
-                ds_sources[0].update(**source_annot)
-            # there is already a source in a dataset, raise an error
-            elif self.sources and if_source_exists == "fail":
-                raise ValueError(f"Source {self.sources[0].name} would be overwritten by source {source_annot['name']}")
-            # otherwise append it
-            else:
-                new_sources.append(Source(**source_annot))
-
-        self.sources.extend(new_sources)
+            self.sources.extend(new_sources)
 
         # update dataset
         for k, v in annot.get("dataset", {}).items():
-            if k != "sources":
+            if k not in ("sources",):
                 setattr(self, k, v)
 
     @property
@@ -460,6 +464,13 @@ class TableMeta:
             short_name, to_html(record)
         )
 
+    def copy(self, deep=True) -> "TableMeta":
+        """Return a copy of the TableMeta object."""
+        if not deep:
+            return dataclasses.replace(self)
+        else:
+            return _deepcopy_dataclass(self)
+
 
 def to_html(record: Any) -> Optional[str]:
     if isinstance(record, dict):
@@ -486,7 +497,7 @@ def to_html(record: Any) -> Optional[str]:
         return '<ul style="text-align: left; margin-top: 0em; margin-bottom: 0em">{}</ul>'.format("".join(rows))
 
     else:
-        return str(record)
+        return mistune.html(str(record))  # type: ignore
 
 
 def is_year_or_date(s: str) -> bool:
@@ -525,7 +536,11 @@ def _deepcopy_dataclass(dc) -> Any:
         if is_dataclass(v):
             setattr(dc, k, _deepcopy_dataclass(v))
         elif isinstance(v, list):
-            setattr(dc, k, [_deepcopy_dataclass(x) if is_dataclass(x) else x for x in v])
+            lis = [_deepcopy_dataclass(x) if is_dataclass(x) else x for x in v]
+            # make sure to preserve the type of the list if we subclass it
+            if type(v) != list:  # noqa
+                lis = type(v)(lis)
+            setattr(dc, k, lis)
         elif isinstance(v, dict):
             setattr(dc, k, {x: _deepcopy_dataclass(y) if is_dataclass(y) else y for x, y in v.items()})
         else:

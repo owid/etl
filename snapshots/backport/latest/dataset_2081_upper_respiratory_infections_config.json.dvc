@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2081
+    date_accessed: 2023-08-14 05:37:52.601257
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2081_upper_respiratory_infections (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 542a46ba66a179907a2635871ba37d44
+  size: 33040
+  path: dataset_2081_upper_respiratory_infections_config.json

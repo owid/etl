@@ -1,42 +1,67 @@
 dataset:
+  title: Monadic Strategic Nuclear Forces Dataset – Suh
+  description: >-
+    This dataset provides information on the strategic nuclear forces by the nuclear powers, using monadic data from Suh (2022)
+
+
+    You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/nuclear_weapons
+  licenses:
+    - {}
   sources:
-  - name: Suh (2023)
-    published_by: 'Kyungwon, Suh. 2023. Nuclear balance and the initiation of nuclear crises: Does superiority matter? Journal
-      of Peace Research 60(2): 337–351.'
-    publication_year: 2023
-    date_accessed: 2023-05-08
-    url: https://kyungwon-suh.github.io/datasets/
+    - name: Suh (2023)
+      url: https://kyungwon-suh.github.io/datasets/
+      date_accessed: '2023-05-08'
+      publication_year: '2023'
+      published_by: 'Kyungwon, Suh. 2023. Nuclear balance and the initiation of nuclear crises: Does superiority matter? Journal
+        of Peace Research 60(2): 337–351.'
 tables:
   monadic_strategic_nuclear_forces:
     variables:
       nuclear_warheads_stockpile:
         title: nuclear_warheads_stockpile
-        unit: ''
         description: The number of stockpiled nuclear warheads.
+        unit: ''
       nuclear_warheads_firststrike:
         title: nuclear_warheads_firststrike
-        unit: ''
         description: >-
           The number of strategic nuclear warheads deliverable in first strike.
 
 
           Warheads designed for use away from the battlefield, such as against military bases, arms industries, or infrastructure
           and that could be carried by ballistic missiles, bombers, and submarines in one strike.
+        unit: ''
       nuclwarh_firststr_yield:
         title: nuclwarh_firststr_yield
-        unit: ''
         description: >-
-          The number of strategic nuclear warheads deliverable in first strike weighted by yield.
+          The number of megatons of strategic nuclear warheads deliverable in first strike.
 
 
           Strategic nuclear warheads designed for use away from the battlefield, such as against military bases, arms industries,
           or infrastructure and that could be carried by ballistic missiles, bombers, and submarines in one strike.
-      nuclwarh_firststr_yield_accur:
-        title: nuclwarh_firststr_yield_accur
-        unit: ''
+
+
+          Equivalent megatons, meaning that small warheads (equal or less than one megaton) are weighted more because they
+          are relatively more destructive than large ones.
+        unit: equivalent megatons
+        short_unit: Mt
+      nuclwarh_firststr_area:
+        title: nuclwarh_firststr_area
         description: >-
-          The number of strategic nuclear warheads deliverable in first strike weighted by yield and accuracy.
+          The area destroyable by strategic nuclear warheads deliverable in first strike.
+
+
+          Destruction of unprotected structures, such as buildings and factories.
 
 
           Strategic nuclear warheads designed for use away from the battlefield, such as against military bases, arms industries,
           or infrastructure and that could be carried by ballistic missiles, bombers, and submarines in one strike.
+
+
+          Destroyable area in square kilometers, calculated by multiplying the equivalent megatonnage and the approximate
+          area destroyed by one megaton (20 square miles), and then converting it into square kilometers.
+
+
+          Approximate area destroyed by one megaton based on: Richelson, Jeffrey. 1980. Evaluating the Strategic Balance.
+          American Journal of Political Science 24(4): 782.
+        unit: square kilometers
+        short_unit: km²

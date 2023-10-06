@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2132
+    date_accessed: 2023-08-14 05:50:33.562188
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Glaucoma
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 696a693af59065775172b4ac3a10394d
+  size: 760650
+  path: dataset_2132_glaucoma_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2359
+    date_accessed: 2023-08-16 10:40:52.773000
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other sexually transmitted diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 004d2e3ce47896ee695e88e3fbbf31de
+  size: 777146
+  path: dataset_2359_other_sexually_transmitted_diseases_values.feather

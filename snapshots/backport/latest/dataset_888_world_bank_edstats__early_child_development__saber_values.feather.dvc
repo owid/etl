@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/888
+    date_accessed: 2023-08-16 10:23:54.206257
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - Early Child Development (SABER)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 83d36a07f290c2811f09ee59cebdf26e
+  size: 8466
+  path: dataset_888_world_bank_edstats__early_child_development__saber_values.feather

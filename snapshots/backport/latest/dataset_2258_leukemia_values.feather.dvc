@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2258
+    date_accessed: 2023-08-16 09:42:11.980259
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Leukemia
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 09a133c0a3fc8d3c8fad92b5313464d6
+  size: 2116386
+  path: dataset_2258_leukemia_values.feather

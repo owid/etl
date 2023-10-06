@@ -22,41 +22,14 @@ COLUMNS = {
     "organic": "share_of_hens_free_range_organic",
     "total_layers": "number_of_laying_hens",
     "unknown": "share_of_hens_in_unknown_housing",
-    # The following columns will be used to extract sources and urls and add them to the source metadata description.
+    # The following columns were initially used to extract sources and urls, and to then add them to the source
+    # metadata. However, in the end, there were too many fixes, and we manually corrected them in the snapshot metadata.
     # Afterwards, they will be removed.
-    "available_at": "available_at",
-    "source": "source",
+    # "available_at": "available_at",
+    # "source": "source",
     # "click_placements" : "click_placements",
     # "number_of_records": "number_of_records",
 }
-
-
-def add_individual_sources_to_metadata(tb: Table) -> Table:
-    tb = tb.copy()
-    # Check that each country has only one source.
-    assert (tb.groupby("country").agg({"source": "nunique"})["source"] == 1).all(), "Expected one source per country."
-    # Gather the data source for each country.
-    original_sources = (
-        "- "
-        + tb["country"].astype(str)
-        + ": "
-        + tb["source"].astype(str)
-        + " Available at "
-        + tb["available_at"].astype(str)
-    )
-    # Check that each variable has only one source.
-    assert all(
-        [len(tb[column].metadata.sources) == 1 for column in tb.columns if column not in ["country", "year"]]
-    ), "Expected only one source. Something has changed."
-    # Take the source from any of those variables.
-    source = tb[tb.columns[-1]].metadata.sources[0]
-    # Add the full list of original sources to the variable source.
-    source.published_by = source.published_by + "\n" + "\n".join(original_sources)
-    # Replace the source of each variable with the new one that has the full list of original sources.
-    for column in tb.columns:
-        tb[column].metadata.sources = [source]
-
-    return tb
 
 
 def clean_values(tb: Table) -> Table:
@@ -104,13 +77,6 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names.
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
-    # The sources and URLs of the data for each country are given as separate columns.
-    # Gather them and add them to the source description of each variable.
-    tb = add_individual_sources_to_metadata(tb=tb)
-
-    # Drop unnecessary columns.
-    tb = tb.drop(columns=["available_at", "source"])
 
     # Clean data (remove spurious "%" in the data).
     tb = clean_values(tb=tb)

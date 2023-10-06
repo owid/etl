@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2068
+    date_accessed: 2023-08-16 08:35:54.928957
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Direct economic loss in relation to global GDP, damage to critical infrastructure
+    and number of disruptions to basic services, attributed to disasters
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f4868c2d7d277edbd6d7ad6e5babca29
+  size: 18730
+  path: 
+    dataset_2068_direct_economic_loss_in_relation_to_global_gdp__damage_to_critical_infrastructure_and_number_of_disruptions_to_basic_services__attributed_to_disasters_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1569
+    date_accessed: 2023-08-14 15:58:59.010598
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other non-communicable diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e80951b860433745c57909637996ebe4
+  size: 2012058
+  path: dataset_1569_other_non_communicable_diseases_values.feather

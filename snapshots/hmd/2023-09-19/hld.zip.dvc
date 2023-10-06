@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Human Life-Table Database
+    description: |-
+      The Human Life-Table Database (HLD) is a collection of population life tables for a multitude of countries covering many years. Most of the HLD life tables are for national populations, which national statistical offices have officially published. Some HLD life tables refer to specific regional or ethnic sub-populations within countries. Some of the HLD life tables are non-official life tables produced by researchers. The HLD documents the evolution of human mortality by providing a quantitative life-table description of mortality patterns. The database also supplies information on calculation techniques and ways of publishing mortality data used in different countries at different times. The HLD is part of the [Human Mortality Database (HMD)](http://www.mortality.org/) project.
+
+      The HMD is a joint project of the Department of Demography at the University of California at Berkeley, USA and the Max Planck Institute for Demographic Research (MPIDR) in Rostock, Germany. The HLD was designed to supplement the HMD and provide free and user-friendly access to mortality data, which, for various reasons, cannot be included in the HMD. The HMD, the primary database of the project, provides high-quality continuous data series based on official and detailed population statistics comparable across countries and time. It contains detailed data on deaths, populations, death rates by age, year of birth, and calendar year, complete life tables, and the original raw data from which the output data are derived. The HMD is by design limited to developed countries or areas with reliable population estimates and good quality vital statistics. All data series in the HMD are continuously updated regularly. The HLD, by contrast, has no strong data quality requirements and includes a wider variety of life tables, some of which might be less reliable than those published in the HMD.
+
+      The HLD provides life tables assembled from different sources: statistical and scientific publications, official reports, data collections compiled by individual researchers, etc. Most tables are for national populations, but many cover regional or ethnic sub-populations within countries. The HLD is a collection of mortality data produced by different organizations or individual researchers using different methods; thus, we cannot guarantee comparability of data across time or populations. Moreover, in some cases, we provide several alternative life tables for the same population and year. Therefore, HLD users are advised to consider carefully which sections of the published HLD data are more appropriate for their research. We conduct only some basic checks (to exclude or correct obviously wrong data) and recalculate life table functions to provide data in a standardized and consistent format. Unlike the HMD, the HLD includes only period life tables.
+    date_published: 2023-02-15
+
+    # Citation
+    producer: Various sources
+    citation_full: HLD. Human Life-Table Database. Max Planck Institute for Demographic
+      Research (Germany), University of California, Berkeley (USA), and French Institute
+      for Demographic Studies (France). Available at http://www.lifetable.de.
+    attribution_short: HLD
+
+    # Files
+    url_main: https://www.lifetable.de/
+    url_download: https://www.lifetable.de/File/GetDocument/data/hld.zip
+    date_accessed: 2023-09-19
+
+    # License
+    license:
+      url: https://www.lifetable.de/Data/CitationGuidelines
+      name: CC BY 4.0
+
+wdir: ../../../data/snapshots/hmd/2023-09-19
+outs:
+- md5: edcd1b272c1e8a678e7e82bf622bcf1a
+  size: 46242186
+  path: hld.zip

@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4510
+    date_accessed: 2023-08-16 07:24:52.202635
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4510_number_of_disruptions_to_other_basic_services_attributed_to_disasters__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f49fe042aa3ea51b169f2595d1c1f3cc
+  size: 10967
+  path: 
+    dataset_4510_number_of_disruptions_to_other_basic_services_attributed_to_disasters__number_config.json

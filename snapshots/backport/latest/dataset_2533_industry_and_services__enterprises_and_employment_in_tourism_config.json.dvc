@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2533
+    date_accessed: 2023-08-14 15:17:46.745878
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2533_industry_and_services__enterprises_and_employment_in_tourism
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 87cf2e2c7a45a67cda7c2e6d4d93e8f2
+  size: 33977
+  path: 
+    dataset_2533_industry_and_services__enterprises_and_employment_in_tourism_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2533
+    date_accessed: 2023-08-14 15:18:00.339677
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Industry and Services - Enterprises and employment in tourism
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8ed4e2e0d88298e2327344f9bf3e0c31
+  size: 49898
+  path: 
+    dataset_2533_industry_and_services__enterprises_and_employment_in_tourism_values.feather

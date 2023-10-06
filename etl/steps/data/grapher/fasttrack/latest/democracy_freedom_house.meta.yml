@@ -1,0 +1,171 @@
+dataset:
+  title: Democracy - Freedom House (2023)
+  description: >-
+    This dataset provides information on political regimes, using data from Freedom House's Freedom in the World (2023).
+
+
+    You can read a description of the data in this post: https://ourworldindata.org/democracies-measurement
+
+
+    You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/democracy
+  licenses:
+  - {}
+  sources:
+  - name: Freedom House (2023)
+    url: https://freedomhouse.org/report/freedom-world
+    date_accessed: '2023-09-05'
+    published_by: Freedom House (2023). Freedom in the World.
+tables:
+  democracy_freedom_house:
+    variables:
+      regime_fh:
+        title: regime_fh
+        description: >-
+          The variable identifies the political regime of a country using the classification by Freedom House's Freedom in
+          the World. It distinguishes between free countries (score 2), partly free countries (score 1), and not free countries
+          (score 0).
+
+
+          It matches Freedom House's variable scorest.
+
+
+          Free countries are understood as countries in which citizens have many political rights (free and fair elections,
+          political pluralism and participation, functioning government) and civil liberties (freedoms of expression and association,
+          rule of law, personal autonomy).
+
+
+          Partly free country are countries in which citizens have some political rights and civil liberties.
+
+
+          Not free country are countries in which citizens have few political rights and civil liberties.
+        unit: ''
+        display:
+          name: Political regime
+      polrights_fh:
+        title: Political rights
+        description: >-
+          The variable identifies the extent of free and fair elections, political pluralism and participation, and a functioning
+          government, based on Freedom House's Freedom in the World.
+
+
+          It matches Freedom House's variable scorepr.
+
+
+          Lower ratings indicate more rights.
+        unit: ''
+      civlibs_fh:
+        title: Civil liberties
+        description: >-
+          The variable identifies the extent of freedom of expression and association, the rule of law, and personal autonomy,
+          based on Freedom House's Freedom in the World.
+
+
+          It matches Freedom House's variable scorecl.
+
+
+          Lower ratings indicate more liberties.
+        unit: ''
+      electdem_fh:
+        title: Political regime
+        description: >-
+          The variable identifies the political regime of a country using the second classification by Freedom House's Freedom
+          in the World. It identifies whether a country is an electoral democracy (score 1) or not (score 0).
+
+
+          Electoral democracies are understood as political systems in which citizens have the right to choose chief executive
+          and legislature in broadly free and fair elections and have substantial other political rights and civil liberties.
+        unit: ''
+      electprocess_fh:
+        title: Democratic electoral institutions
+        description: >-
+          The variable identifies the extent to which the chief executive and legislature are chosen in free and fair elections
+          under universal suffrage, based on Freedom House's Freedom in the World.
+
+
+          Higher scores indicate a freer electoral process.
+        unit: ''
+      polrights_score_fh:
+        title: polrights_score_fh
+        description: >-
+          The variable identifies the fine-grained extent of free and fair elections, political pluralism and participation,
+          and a functioning government, based on Freedom House's Freedom in the World.
+
+
+          Higher scores indicate more rights.
+        unit: ''
+        display:
+          name: Political rights
+      civlibs_score_fh:
+        title: civlibs_score_fh
+        description: >-
+          The variable identifies the fine-grained extent of freedom of expression and association, the rule of law, and personal
+          autonomy, based on Freedom House's Freedom in the World.
+
+
+          Higher scores indicate more liberties.
+        unit: ''
+        display:
+          name: Civil liberties
+      country_fh:
+        title: country_fh
+        description: The variable identifies whether Freedom House consider the entity a country or territory.
+        unit: ''
+      number_notfree_fh:
+        title: number_notfree_fh
+        description: The variable identifies the number of not-free countries based on Freedom House's Freedom in the World.
+        unit: ''
+      number_partlyfree_fh:
+        title: number_partlyfree_fh
+        description: The variable identifies the number of partly-free countries based on Freedom House's Freedom in the World.
+        unit: ''
+      number_free_fh:
+        title: number_free_fh
+        description: The variable identifies the number of free countries based on Freedom House's Freedom in the World.
+        unit: ''
+      number_nonelectdem_fh:
+        title: number_nonelectdem_fh
+        description: The variable identifies the number of non-democracies based on Freedom House's Freedom in the World.
+        unit: ''
+      number_electdem_fh:
+        title: number_electdem_fh
+        description: The variable identifies the number of electoral democracies based on Freedom House's Freedom in the World.
+        unit: ''
+      pop_notfree_fh:
+        title: pop_notfree_fh
+        description: The variable identifies the number of people living in not free countries, based on Freedom House's Freedom
+          in the World.
+        unit: ''
+      pop_partlyfree_fh:
+        title: pop_partlyfree_fh
+        description: The variable identifies the number of people living in partly free countries, based on Freedom House's
+          Freedom in the World.
+        unit: ''
+      pop_free_fh:
+        title: pop_free_fh
+        description: The variable identifies the number of people living in free countries, based on Freedom House's Freedom
+          in the World.
+        unit: ''
+      pop_missreg_fh:
+        title: pop_missreg_fh
+        description: The variable identifies the number of people living in countries without regime data, based on Freedom
+          House's Freedom in the World.
+        unit: ''
+      pop_nonelectdem_fh:
+        title: pop_nonelectdem_fh
+        description: The variable identifies the number of people living in non-democracies, based on Freedom House's Freedom
+          in the World.
+        unit: ''
+      pop_electdem_fh:
+        title: pop_electdem_fh
+        description: The variable identifies the number of people living in electoral democracies, based on Freedom House's
+          Freedom in the World.
+        unit: ''
+      pop_missdem_fh:
+        title: pop_missdem_fh
+        description: The variable identifies the number of people living in countries without democracy data, based on Freedom
+          House's Freedom in the World.
+        unit: ''
+      region:
+        title: region
+        description: The variable identifies the region a country or territory is in.
+        unit: ''

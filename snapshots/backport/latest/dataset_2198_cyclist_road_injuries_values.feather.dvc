@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2198
+    date_accessed: 2023-08-14 15:53:13.467202
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Cyclist road injuries
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ad3a980aac6bf052feaa04bc6788d35c
+  size: 2116394
+  path: dataset_2198_cyclist_road_injuries_values.feather

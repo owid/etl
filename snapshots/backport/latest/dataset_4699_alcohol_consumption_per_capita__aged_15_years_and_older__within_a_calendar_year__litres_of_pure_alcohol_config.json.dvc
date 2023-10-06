@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4699
+    date_accessed: 2023-08-16 07:19:44.016752
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4699_alcohol_consumption_per_capita__aged_15_years_and_older__within_a_calendar_year__litres_of_pure_alcohol
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b2dc59965fec59da6f5f76914adf9d83
+  size: 13446
+  path: 
+    dataset_4699_alcohol_consumption_per_capita__aged_15_years_and_older__within_a_calendar_year__litres_of_pure_alcohol_config.json

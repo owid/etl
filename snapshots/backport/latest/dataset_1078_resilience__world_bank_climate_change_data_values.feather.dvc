@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1078
+    date_accessed: 2023-08-16 08:13:40.126641
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Resilience - World Bank Climate Change Data
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5126748edc1cec884f12d10b9b19e7c1
+  size: 184250
+  path: dataset_1078_resilience__world_bank_climate_change_data_values.feather

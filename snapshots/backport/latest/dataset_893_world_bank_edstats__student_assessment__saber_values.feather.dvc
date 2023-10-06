@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/893
+    date_accessed: 2023-08-16 09:42:19.342064
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - Student Assessment (SABER)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c54af2a8240f6d4729ef6c78d22bc113
+  size: 8938
+  path: dataset_893_world_bank_edstats__student_assessment__saber_values.feather

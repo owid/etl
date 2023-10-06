@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/826
+    date_accessed: 2023-08-16 09:37:38.063884
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_826_agri_environmental_indicators__land_cover__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8dd48ff41b1ce722bcb7bfa6ee775b98
+  size: 30882
+  path: dataset_826_agri_environmental_indicators__land_cover__fao__2017_config.json

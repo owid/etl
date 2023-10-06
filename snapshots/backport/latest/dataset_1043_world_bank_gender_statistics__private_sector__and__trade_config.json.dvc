@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1043
+    date_accessed: 2023-08-11 07:58:29.358504
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1043_world_bank_gender_statistics__private_sector__and__trade
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7256e18034a79285d918e1b565d9453b
+  size: 43718
+  path: 
+    dataset_1043_world_bank_gender_statistics__private_sector__and__trade_config.json

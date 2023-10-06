@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4639
+    date_accessed: 2023-08-16 08:16:08.846964
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Countries with birth registration data that are at least 90 percent complete
+    (1 = YES; 0 = NO)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b31b82e547a79356d061b9a9e5e89656
+  size: 14210
+  path: 
+    dataset_4639_countries_with_birth_registration_data_that_are_at_least_90_percent_complete__1__yes__0__no_values.feather

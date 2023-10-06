@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2541
+    date_accessed: 2023-08-10 14:43:16.766545
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Public Sector, Taxation and Market Regulation - Table I.5. Average personal
+    income tax and social security contribution rates on gross labour income
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ba3ae4b77b21d8c1e49f66bdea6885d5
+  size: 93386
+  path: 
+    dataset_2541_public_sector__taxation_and_market_regulation__table_i_5__average_personal_income_tax_and_social_security_contribution_rates_on_gross_labour_income_values.feather

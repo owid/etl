@@ -1,19 +1,15 @@
 meta:
-  name: COVID-19 Cases and deaths - WHO
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5883
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-17 12:55:49.201393
+    date_accessed: 2023-08-16 10:51:30.403970
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: COVID-19 Cases and deaths - WHO
+  description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3deffa689c8692237ef516e2536459bc
-  size: 22643826
+- md5: d0376479c251bc58d8887afa48ac6784
+  size: 22842746
   path: dataset_5883_covid_19_cases_and_deaths__who_values.feather

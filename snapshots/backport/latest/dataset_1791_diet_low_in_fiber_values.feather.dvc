@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1791
+    date_accessed: 2023-08-14 15:23:32.906524
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diet low in fiber
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2d2cd9d1429ce206165e1ab4cc31f34d
+  size: 961138
+  path: dataset_1791_diet_low_in_fiber_values.feather

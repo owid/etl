@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1758
+    date_accessed: 2023-08-14 05:35:13.606601
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Benign prostatic hyperplasia
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 68f38e5a519ab4f452713d2d650bd806
+  size: 702834
+  path: dataset_1758_benign_prostatic_hyperplasia_values.feather

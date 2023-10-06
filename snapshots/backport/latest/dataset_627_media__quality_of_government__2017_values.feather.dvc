@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/627
+    date_accessed: 2023-08-16 09:59:58.332393
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Media - Quality of Government (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 65b47c4bc0a9986d6f45de89a1c1e1da
+  size: 128458
+  path: dataset_627_media__quality_of_government__2017_values.feather

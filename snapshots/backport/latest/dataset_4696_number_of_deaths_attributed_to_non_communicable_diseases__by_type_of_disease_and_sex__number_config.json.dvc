@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4696
+    date_accessed: 2023-08-10 15:07:16.568428
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4696_number_of_deaths_attributed_to_non_communicable_diseases__by_type_of_disease_and_sex__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ddfc238a07e7c3eb8d95b130a8ff38b2
+  size: 20344
+  path: 
+    dataset_4696_number_of_deaths_attributed_to_non_communicable_diseases__by_type_of_disease_and_sex__number_config.json

@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Plastics Outlook - Greenhouse gas emissions from primary plastics
+    description: |-
+      Greenhouse gases emissions are aggregated using 100-year global warming potential (GWP) from AR2 (IPCC, 1995)
+
+      Emission coefficiens by stage and polymer or end-of-life fate are extrapolated from 2015 data using indexes. These indexes are built on scope-2 emissions intensity of primary and secondary plastics production (incl. upstream sectors) from the OECD ENV-Linkages model.
+    date_published: 2022-02-09
+    description_snapshot: |-
+      Greenhouse gas emissions are combined using a measurement called the 100-year Global Warming Potential (GWP), which comes from a 1995 report by the international climate science group, IPCC. Emissions are estimated at different stages, for different types of plastics, and when they are thrown away, based on data from 2015. These estimates are calculated using specific measures that consider the emissions created during the making of primary and secondary plastics, including those from related industries. These measures are taken from a model by the Organisation for Economic Co-operation and Development (OECD), ensuring a detailed and thorough analysis of emissions related to plastic production.
+    # Citation
+    producer: OECD
+    citation_full: OECD (2022), Global Plastics Outlook , https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_GHG_2&lang=en#,     accessed
+      on 21 September 2023
+
+    # Files
+    url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_GHG_2&lang=en#
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.oecd.org/termsandconditions
+wdir: ../../../data/snapshots/oecd/2023-09-21
+outs:
+- md5: b405dcd5163b1df4012a245e264fa8bb
+  size: 4335
+  path: plastic_emissions.csv

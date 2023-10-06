@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/556
+    date_accessed: 2023-08-14 05:42:35.888850
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_556_world_development_indicators__infrastructure
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 06ea8b80152fce619237b03e81f51719
+  size: 145159
+  path: dataset_556_world_development_indicators__infrastructure_config.json

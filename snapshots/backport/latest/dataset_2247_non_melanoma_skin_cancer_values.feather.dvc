@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2247
+    date_accessed: 2023-08-16 08:48:36.560996
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Non-melanoma skin cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8bdda66b838c6ef4f3d83e7afface507
+  size: 1265642
+  path: dataset_2247_non_melanoma_skin_cancer_values.feather

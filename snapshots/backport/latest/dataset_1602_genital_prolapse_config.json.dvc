@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/1602
-    date_accessed: 2023-08-08 07:38:02.879353
+    date_accessed: 2023-08-16 08:30:11.968441
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Grapher metadata for dataset_1602_genital_prolapse
+  name: Grapher metadata for dataset_1602_genital_prolapse (archived)
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: abc70cbe7930a45a0865d61664e86822
-  size: 31847
+- md5: 4c8fcfb012633df9b6327dee8099ed72
+  size: 26727
   path: dataset_1602_genital_prolapse_config.json

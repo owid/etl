@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4742
+    date_accessed: 2023-08-16 10:03:55.415880
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Low to high socio-economic parity status index for achievement in reading,
+    by education level (ratio)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2e918abb564526cb34e11800a1498499
+  size: 14474
+  path: 
+    dataset_4742_low_to_high_socio_economic_parity_status_index_for_achievement_in_reading__by_education_level__ratio_values.feather
