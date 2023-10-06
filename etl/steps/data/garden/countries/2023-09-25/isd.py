@@ -139,9 +139,19 @@ def create_table_countries_in_region(tb: Table) -> Table:
 
     # Sanity check
     cols = ["year", "number_countries"]
-    sum_1 = tb_regions.loc[tb_regions["region"].isin(["Middle East", "Africa"]), cols].groupby("year")["number_countries"].sum()
-    sum_2 = tb_regions.loc[tb_regions["region"].isin(["North Africa and the Middle East", "Sub-Saharan Africa"]), cols].groupby("year")["number_countries"].sum()
-    assert (sum_1 == sum_2).all(), f"The following equation should hold: ME + AFR = NAME + SSA, but {sum_1[sum_1 != sum_2]}"
+    sum_1 = (
+        tb_regions.loc[tb_regions["region"].isin(["Middle East", "Africa"]), cols]
+        .groupby("year")["number_countries"]
+        .sum()
+    )
+    sum_2 = (
+        tb_regions.loc[tb_regions["region"].isin(["North Africa and the Middle East", "Sub-Saharan Africa"]), cols]
+        .groupby("year")["number_countries"]
+        .sum()
+    )
+    assert (
+        sum_1 == sum_2
+    ).all(), f"The following equation should hold: ME + AFR = NAME + SSA, but {sum_1[sum_1 != sum_2]}"
 
     # Get numbers for World
     tb_world = (
