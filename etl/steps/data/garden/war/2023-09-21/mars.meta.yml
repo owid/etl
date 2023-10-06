@@ -26,11 +26,11 @@ definitions:
   number_deaths:
     description_short: |-
       <%- if conflict_type == "all" -%>
-      The << estimate >> estimate of the number of deaths in all ongoing conventional wars in each year.
+      The << estimate >> estimate of the number of deaths in all ongoing conventional wars in each year
       <%- elif conflict_type == "others (non-civil)" -%>
-      The << estimate >> estimate of the number of deaths in ongoing conventional interstate wars in each year.
+      The << estimate >> estimate of the number of deaths in ongoing conventional interstate wars in each year
       <%- elif conflict_type == "civil war" -%>
-      The << estimate >> estimate of the number of deaths in ongoing conventional civil wars in each year.
+      The << estimate >> estimate of the number of deaths in ongoing conventional civil wars in each year
       <%- endif -%>
     description_key: &description_key_deaths
       - {definitions.all.conflict_type_ongoing}
