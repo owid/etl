@@ -553,7 +553,7 @@ def extract_global_emissions(tb_co2: Table, tb_historical: Table, ds_population:
     return global_emissions
 
 
-def harmonize_country_names(df: Table) -> Table:
+def harmonize_country_names(tb: Table) -> Table:
     """Harmonize country names, and fix known issues with certain regions.
 
     Parameters
@@ -569,8 +569,8 @@ def harmonize_country_names(df: Table) -> Table:
 
     """
     # Harmonize country names.
-    df = geo.harmonize_countries(
-        df=df,
+    tb = geo.harmonize_countries(
+        df=tb,
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
         warn_on_missing_countries=True,
@@ -584,14 +584,69 @@ def harmonize_country_names(df: Table) -> Table:
     # therefore there are rows with different data for the same country-year.
     # However, "Pacific Islands (Palau)" have data until 1991, and "Palau" has data from 1992 onwards.
     # After removing empty rows, there should be no overlap.
-    columns_that_must_have_data = df.drop(columns=["country", "year"]).columns
-    check = df.dropna(subset=columns_that_must_have_data, how="all").reset_index(drop=True)
+    columns_that_must_have_data = tb.drop(columns=["country", "year"]).columns
+    tb = tb.dropna(subset=columns_that_must_have_data, how="all").reset_index(drop=True)
     error = "After harmonizing country names, there is more than one data point for the same country-year."
-    assert check[check.duplicated(subset=["country", "year"])].empty, error
+    assert tb[tb.duplicated(subset=["country", "year"])].empty, error
 
-    df = df.dropna(subset="country").reset_index(drop=True)
+    return tb
 
-    return df
+
+def fix_consumption_emissions_for_africa(tb_co2_with_regions: Table) -> Table:
+    # The calculated consumption emissions for Africa differ significantly from those in the GCP dataset.
+    # GCP's estimate is significantly larger. The reason may be that many African countries do not have data on
+    # consumption emissions, so the aggregate may be underestimated. Maybe GCP has a different way to estimate Africa's
+    # consumption emissions.
+    # We therefore replace our values for Africa (calculated by summing consumption emissions from African countries)
+    # with those from GCP.
+    # At the end of the day, the reason why we keep ours and GCP's version of continents is that our definitions may
+    # differ. But it is unlikely that their definition of the African continent is different from ours.
+
+    # First, check that the discrepancy exists in the current data.
+    tb = tb_co2_with_regions.copy()
+    consumption_emissions_africa = tb[(tb["country"] == "Africa") & (tb["year"] == 2020)][
+        "consumption_emissions"
+    ].item()
+    consumption_emissions_africa_gcp = tb[(tb["country"] == "Africa (GCP)") & (tb["year"] == 2020)][
+        "consumption_emissions"
+    ].item()
+    error = (
+        "Discrepancy in consumption emissions between aggregated Africa and Africa (GCP) no longer exists. "
+        "Remove temporary fix"
+    )
+    assert (
+        consumption_emissions_africa_gcp - consumption_emissions_africa
+    ) / consumption_emissions_africa_gcp > 0.24, error
+
+    # Replace consumption emissions for "Africa" by those by "Africa (GCP)".
+    consumption_emissions = tb[tb["country"] != "Africa"][["country", "year", "consumption_emissions"]].reset_index(
+        drop=True
+    )
+    consumption_emissions_for_africa = (
+        consumption_emissions[consumption_emissions["country"] == "Africa (GCP)"]
+        .reset_index(drop=True)
+        .replace({"Africa (GCP)": "Africa"})
+    )
+    consumption_emissions = pr.concat([consumption_emissions, consumption_emissions_for_africa], ignore_index=True)
+    # Replace consumption emissions in main table by the fixed one.
+    tb = tb.drop(columns="consumption_emissions").merge(consumption_emissions, on=["country", "year"], how="outer")
+
+    # Sanity checks.
+    # All columns except consumption_emissions should be identical to the original.
+    error = "Mismatch before and after fixing consumption emissions for Africa."
+    for col in tb.drop(columns=["consumption_emissions"]).columns:
+        assert (
+            tb[col].dropna().reset_index(drop=True) == tb_co2_with_regions[col].dropna().reset_index(drop=True)
+        ).all()
+    # Consumption emissions should be identical to the original except for Africa.
+    assert (
+        tb[tb["country"] != "Africa"]["consumption_emissions"].dropna().reset_index(drop=True)
+        == tb_co2_with_regions[tb_co2_with_regions["country"] != "Africa"]["consumption_emissions"]
+        .dropna()
+        .reset_index(drop=True)
+    ).all()
+
+    return tb
 
 
 def combine_data_and_add_variables(
@@ -640,7 +695,7 @@ def combine_data_and_add_variables(
     """
     tb_co2_with_regions = tb_co2.copy()
 
-    # Add region aggregates that were included in the national emissions file, but not in the Fossil CO2 emissions dataset.
+    # Add region aggregates that were included in the national emissions file, but not in the Fossil CO2 emissions file.
     gcp_aggregates = sorted(set(tb_production["country"]) - set(tb_co2_with_regions["country"]))
     tb_co2_with_regions = pr.concat(
         [
@@ -650,6 +705,7 @@ def combine_data_and_add_variables(
             .astype({"year": int}),
         ],
         ignore_index=True,
+        short_name=paths.short_name,
     ).reset_index(drop=True)
 
     # Add consumption emissions to main table (keep only the countries of the main table).
@@ -696,9 +752,6 @@ def combine_data_and_add_variables(
         tb_co2_with_regions["emissions_total"] + tb_co2_with_regions["emissions_from_land_use_change"]
     )
 
-    # Create a copy of the current table, to be able to copy its metadata after adding region aggregates.
-    _tb_co2_with_regions = tb_co2_with_regions.copy()
-
     # Add region aggregates.
     # Aggregate not only emissions data, but also population, gdp and primary energy.
     # This way we ensure that custom regions (e.g. "North America (excl. USA)") will have all required data.
@@ -727,8 +780,8 @@ def combine_data_and_add_variables(
             aggregations=aggregations,
         )
 
-    # NOTE: The previous operation does not preserve metadata. Copy metadata of original table.
-    tb_co2_with_regions = tb_co2_with_regions.copy_metadata(from_table=_tb_co2_with_regions)
+    # Fix consumption emissions for Africa.
+    tb_co2_with_regions = fix_consumption_emissions_for_africa(tb_co2_with_regions=tb_co2_with_regions)
 
     # Add global emissions and global cumulative emissions columns to main table.
     tb_co2_with_regions = pr.merge(
@@ -760,10 +813,7 @@ def combine_data_and_add_variables(
         # But nans will not be propagated in the sum.
         # This means that countries with some (not all) nans will have the cumulative sum of the informed emissions
         # (treating nans as zeros), but will have nan on those rows that were not informed.
-        # NOTE: Currently, this operation doesn't propagate metadata properly. This has to be done manually.
-        tb_co2_with_regions[f"cumulative_{column}"] = (
-            tb_co2_with_regions.groupby(["country"])[column].cumsum().copy_metadata(tb_co2_with_regions[column])
-        )
+        tb_co2_with_regions[f"cumulative_{column}"] = tb_co2_with_regions.groupby(["country"])[column].cumsum()
 
         # Add share of global emissions.
         tb_co2_with_regions[f"{column}_as_share_of_global"] = (
@@ -836,16 +886,14 @@ def combine_data_and_add_variables(
     )
 
     # Add annual percentage growth of total emissions.
-    # NOTE: Currently, this operation doesn't propagate metadata properly. This has to be done manually.
     tb_co2_with_regions["pct_growth_emissions_total"] = (
         tb_co2_with_regions.groupby("country")["emissions_total"].pct_change() * 100
-    ).copy_metadata(tb_co2_with_regions["emissions_total"])
+    )
 
     # Add annual percentage growth of total emissions (including land-use change).
-    # NOTE: Currently, this operation doesn't propagate metadata properly. This has to be done manually.
     tb_co2_with_regions["pct_growth_emissions_total_including_land_use_change"] = (
         tb_co2_with_regions.groupby("country")["emissions_total_including_land_use_change"].pct_change() * 100
-    ).copy_metadata(tb_co2_with_regions["emissions_total_including_land_use_change"])
+    )
 
     # Add annual absolute growth of total emissions.
     tb_co2_with_regions["growth_emissions_total"] = tb_co2_with_regions.groupby("country")["emissions_total"].diff()
@@ -986,10 +1034,10 @@ def run(dest_dir: str) -> None:
     )
 
     # Harmonize country names.
-    tb_co2 = harmonize_country_names(df=tb_co2)
-    tb_consumption = harmonize_country_names(df=tb_consumption)
-    tb_production = harmonize_country_names(df=tb_production)
-    tb_land_use = harmonize_country_names(df=tb_land_use)
+    tb_co2 = harmonize_country_names(tb=tb_co2)
+    tb_consumption = harmonize_country_names(tb=tb_consumption)
+    tb_production = harmonize_country_names(tb=tb_production)
+    tb_land_use = harmonize_country_names(tb=tb_land_use)
 
     # Add new variables to main table (consumption-based emissions, emission intensity, per-capita emissions, etc.).
     tb_combined = combine_data_and_add_variables(
