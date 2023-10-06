@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -40,11 +40,23 @@ def run(dest_dir: str) -> None:
                 short_name=f"leading_cause_level_{level}_in_{age_group}",
             )
             # Make the disease names more readable
-            tb_level = clean_disease_names(tb=tb_level, tb_hierarchy=tb_hierarchy)
+            tb_level = clean_disease_names(tb=tb_level, tb_hierarchy=tb_hierarchy, level=level)
             tb_level = tb_level.set_index(["country", "year"], verify_integrity=True)
             tb_out.append(tb_level)
+
+    # Removing the tables where we the age group doesn't match the hierarchy
+    tb_out = [
+        tb
+        for tb in tb_out
+        if tb.metadata.short_name
+        not in [
+            "leading_cause_level_owid_under_5_in_all_ages",
+            "leading_cause_level_owid_all_ages_in_under_5",
+        ]
+    ]
+
     # Save outputs.
-    #
+
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
@@ -88,16 +100,16 @@ def create_hierarchy_table(age_group: str, tb_cause: Table, level_causes: List[s
     return leading_causes_tb
 
 
-def clean_disease_names(tb: Table, tb_hierarchy: Table) -> Table:
+def clean_disease_names(tb: Table, tb_hierarchy: Table, level: Any) -> Table:
     """
     Making the underscored disease names more readable using the original hierarchy table
 
     """
 
-    tb_hierarchy = tb_hierarchy[["cause_name", "cause_name_underscore"]]
+    tb_hierarchy = tb_hierarchy[tb_hierarchy["level"] == level][["cause_name", "cause_name_underscore"]]
     disease_col = [item for item in tb.columns if "disease_" in item]
     disease_col = disease_col[0]
-    tb = tb.merge(tb_hierarchy, how="left", left_on=disease_col, right_on="cause_name_underscore")
+    tb = tb.merge(tb_hierarchy, how="inner", left_on=disease_col, right_on="cause_name_underscore")
     tb = tb.drop(columns=["cause_name_underscore", disease_col])
     tb = tb.rename(columns={"cause_name": disease_col})
 
@@ -177,13 +189,15 @@ def add_owid_hierarchy(tb_hierarchy: Table) -> Table:
     msk_all_ages = tb_hierarchy["cause_name"].isin(all_ages)
     tb_hierarchy_all_ages = tb_hierarchy[msk_all_ages]
     tb_hierarchy_all_ages = tb_hierarchy_all_ages.copy()
-    tb_hierarchy_all_ages.loc["level"] = "owid_all_ages"
+    tb_hierarchy_all_ages["level"] = "owid_all_ages"
 
     msk_under_five = tb_hierarchy["cause_name"].isin(under_five)
     tb_hierarchy_under_five = tb_hierarchy[msk_under_five]
     tb_hierarchy_under_five = tb_hierarchy_under_five.copy()
-    tb_hierarchy_under_five.loc["level"] = "owid_under_5"
+    tb_hierarchy_under_five["level"] = "owid_under_5"
 
-    tb_hierarchy = pr.concat([tb_hierarchy_all_ages, tb_hierarchy_under_five, tb_hierarchy])
+    tb_hierarchy = pr.concat(
+        [tb_hierarchy_all_ages, tb_hierarchy_under_five, tb_hierarchy], ignore_index=True
+    ).drop_duplicates()
 
     return tb_hierarchy

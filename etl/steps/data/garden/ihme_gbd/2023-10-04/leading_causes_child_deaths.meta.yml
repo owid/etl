@@ -36,14 +36,26 @@ tables:
         title: The leading cause of death in under-fives (level 3)
         unit: ""
   leading_cause_level_4_in_all_ages:
-    title: Leading causes of death in all ages, based on IHME GBD cause level 4. There are 165 categories in level 3.
+    title: Leading causes of death in all ages, based on IHME GBD cause level 4. There are 165 categories in level 4.
     variables:
       disease_leading_cause_level_4_in_all_ages:
         title: The leading cause of death in all ages (level 4)
         unit: ""
   leading_cause_level_4_in_under_5:
-    title: Leading causes of death in under-fives, based on IHME GBD cause level 4. There are 165 categories in level 3.
+    title: Leading causes of death in under-fives, based on IHME GBD cause level 4. There are 165 categories in level 4.
     variables:
       disease_leading_cause_level_4_in_under_5:
         title: The leading cause of death in under-fives (level 4)
+        unit: ""
+  leading_cause_level_owid_all_ages_in_all_ages:
+    title: Leading causes of death in all ages, based on OWIDs mix of IHME GBD hierarchies.
+    variables:
+      disease_leading_cause_level_owid_all_ages_in_all_ages:
+        title: The leading cause of death in all ages (OWID mix)
+        unit: ""
+  leading_cause_level_owid_under_5_in_under_5:
+    title: Leading causes of death in under-fives, based on OWIDs mix of IHME GBD hierarchies.
+    variables:
+      disease_leading_cause_level_owid_under_5_in_under_5:
+        title: The leading cause of death in under-fives (OWID mix)
         unit: ""
