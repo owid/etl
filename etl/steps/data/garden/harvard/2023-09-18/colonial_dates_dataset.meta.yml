@@ -150,7 +150,7 @@ tables:
         description_from_producer: ""
         processing_level: major
         display:
-          name: Number of colonies
+          name: Number of colonies by region
           entityAnnotationsMap: ""
           numDecimalPlaces: 0
           conversionFactor: 1
