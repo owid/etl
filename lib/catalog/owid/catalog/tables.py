@@ -917,7 +917,12 @@ class Table(pd.DataFrame):
         by_list = [args[0]] if isinstance(args[0], str) else args[0]
         if observed is False:
             for by in by_list:
-                by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
+                if isinstance(by, str):
+                    by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
+                elif isinstance(by, pd.Series):
+                    by_type = by.dtype
+                else:
+                    by_type = "unknown"
                 if by_type == "category":
                     log.warning(
                         f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour."
