@@ -1,5 +1,5 @@
 from owid.catalog import yaml_metadata as ym
-from owid.catalog.meta import Source
+from owid.catalog.meta import Origin, Source
 from owid.catalog.tables import Table
 
 
@@ -37,9 +37,7 @@ definitions:
     origins:
       - producer: Origin1
         title: Title1
-    description_processing:
-      - A
-      - B
+    description_processing: Processed
     description_key:
       - D
     description_short: Default desc short
@@ -76,6 +74,7 @@ tables:
     t = Table({"a": [1, 2, 3], "b": [1, 2, 3]})
     t.a.metadata.description_short = "Will be overwritten"
     t.a.metadata.sources = [Source()]
+    t.b.metadata.origins = [Origin(producer="Producer", title="Title")]
 
     ym.update_metadata_from_yaml(t, path, "test")
 
@@ -88,14 +87,14 @@ tables:
             "grapher_config": {"subtitle": "A subtitle", "selectedEntityNames": ["France"]},
             "attribution": "A presentation attribution",
         },
-        "description_processing": ["A", "B"],
+        "description_processing": "Processed",
     }
 
     assert t.b.m.to_dict() == {
         "description_short": "Default desc short",
         "description_key": ["D"],
-        "origins": [{"producer": "Origin1", "title": "Title1"}],
+        "origins": [{"producer": "Producer", "title": "Title"}, {"producer": "Origin1", "title": "Title1"}],
         "display": {"conversionFactor": 2, "numDecimalPlaces": 0},
         "presentation": {"grapher_config": {"selectedEntityNames": ["France"]}},
-        "description_processing": ["A", "B"],
+        "description_processing": "Processed",
     }
