@@ -9,17 +9,17 @@ definitions:
   number_ongoing_conflicts:
     description_short: |-
       <% if conflict_type == "all" %>
-      The number of all ongoing state-based conflicts in each year. This includes interstate, intrastate, and extrasystemic conflicts.
+      The number of all ongoing state-based conflicts in each year. This includes interstate, intrastate, and extrasystemic conflicts
       <% elif conflict_type == "interstate" %>
-      The number of ongoing interstate conflicts in each year.
+      The number of ongoing interstate conflicts in each year
       <% elif conflict_type == "intrastate" %>
-      The number of ongoing intrastate conflicts in each year.
+      The number of ongoing intrastate conflicts in each year
       <% elif conflict_type == "intrastate (internationalized)" %>
-      The number of ongoing internationalized intrastate conflicts in each year.
+      The number of ongoing internationalized intrastate conflicts in each year
       <% elif conflict_type == "intrastate (non-internationalized)" %>
-      The number of ongoing non-internationalized intrastate conflicts in each year.
+      The number of ongoing non-internationalized intrastate conflicts in each year
       <% elif conflict_type == "extrasystemic" %>
-      The number of ongoing extrasystemic conflicts in each year.
+      The number of ongoing extrasystemic conflicts in each year
       <% endif %>
     description_key: &description_key_ongoing
       - |-
@@ -40,17 +40,17 @@ definitions:
   number_new_conflicts:
     description_short: |-
       <% if conflict_type == "all" %>
-      The number of all new state-based conflicts in each year. This includes interstate, intrastate, and extrasystemic conflicts.
+      The number of all new state-based conflicts in each year. This includes interstate, intrastate, and extrasystemic conflicts
       <% elif conflict_type == "interstate" %>
-      The number of new interstate conflicts in each year.
+      The number of new interstate conflicts in each year
       <% elif conflict_type == "intrastate" %>
-      The number of new intrastate conflicts in each year.
+      The number of new intrastate conflicts in each year
       <% elif conflict_type == "intrastate (internationalized)" %>
-      The number of new internationalized intrastate conflicts in each year.
+      The number of new internationalized intrastate conflicts in each year
       <% elif conflict_type == "intrastate (non-internationalized)" %>
-      The number of new non-internationalized intrastate conflicts in each year.
+      The number of new non-internationalized intrastate conflicts in each year
       <% elif conflict_type == "extrasystemic" %>
-      The number of new extrasystemic conflicts in each year.
+      The number of new extrasystemic conflicts in each year
       <% endif %>
     description_key: &description_key_new
       - |-
@@ -190,6 +190,7 @@ tables:
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities
+
       number_ongoing_conflicts_per_country:
         title: Number of ongoing conflicts per country
         unit: conflicts per country
