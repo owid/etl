@@ -506,7 +506,8 @@ class DataStep(Step):
         """
         from etl.helpers import isolated_env
 
-        module_dir = self._search_path.parent
+        # path can be either in a module with __init__.py or a single .py file
+        module_dir = self._search_path if self._search_path.is_dir() else self._search_path.parent
 
         with isolated_env(module_dir):
             step_module = import_module(self._search_path.relative_to(paths.BASE_DIR).as_posix().replace("/", "."))

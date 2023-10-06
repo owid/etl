@@ -192,9 +192,9 @@ def test_infer_variable_type():
 
 
 def test_convert_strings_to_numeric():
-    r = _convert_strings_to_numeric(["-2", "1", "2.1", "UK", "9.8e+09"])
-    assert r == [-2, 1, 2.1, "UK", 9800000000]
-    assert [type(x) for x in r] == [int, int, float, str, int]
+    r = _convert_strings_to_numeric(["-2", "1", "2.1", "UK", "9.8e+09", "nan"])
+    assert r == [-2, 1, 2.1, "UK", 9800000000, "nan"]
+    assert [type(x) for x in r] == [int, int, float, str, int, str]
 
     with pytest.raises(AssertionError):
         r = _convert_strings_to_numeric([None, "UK"])  # type: ignore
