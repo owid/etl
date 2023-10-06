@@ -29,6 +29,10 @@ def run(dest_dir: str) -> None:
     tb = process_data(tb)
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Create regional aggregations for total_colonies
+    tb = regional_aggregations(tb)
+
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
@@ -127,9 +131,49 @@ def process_data(tb: Table) -> Table:
         ~((tb["country"].isin(colonizers_list)) & (tb["total_colonies"].isnull())), 0
     )
 
-    # Add rows for the country "World" with the total number of colonies per year
-    tb_count_world = tb.groupby(["year"]).agg({"total_colonies": "sum"}).reset_index()
-    tb_count_world["country"] = "World"
-    tb = pr.concat([tb, tb_count_world], short_name="colonial_dates_dataset")
+    return tb
+
+
+def regional_aggregations(tb: Table) -> Table:
+    """Create regional aggregations for total_colonies."""
+    # Copy table
+    tb_regions = tb.copy()
+
+    # Define non-colonies identifiers for `colonizer`
+    non_colonies = ["zz. Colonizer", "zzz. Not colonized"]
+
+    # Define colony, which is 1 if countries are not in non_colonies
+    tb_regions["colony"] = tb_regions["colonizer"].apply(lambda x: 0 if x in non_colonies else 1)
+
+    # Define regions to aggregate
+    regions = [
+        "Europe",
+        "Asia",
+        "North America",
+        "South America",
+        "Africa",
+        "Oceania",
+        "High-income countries",
+        "Low-income countries",
+        "Lower-middle-income countries",
+        "Upper-middle-income countries",
+        "European Union (27)",
+        "World",
+    ]
+
+    # Add regional aggregates, by summing up the variables in `aggregations`
+    for region in regions:
+        tb_regions = geo.add_region_aggregates(
+            tb_regions, region=region, aggregations={"colony": "sum"}, countries_that_must_have_data=[]
+        )
+
+    # Drop total_colonies column and rename colony column to total_colonies
+    tb_regions = tb_regions.drop(columns=["total_colonies"]).rename(columns={"colony": "total_colonies"})
+
+    # Select only regions in tb_regions
+    tb_regions = tb_regions[tb_regions["country"].isin(regions)].reset_index(drop=True)
+
+    # Concatenate tb and tb_regions
+    tb = pr.concat([tb, tb_regions], short_name="colonial_dates_dataset")
 
     return tb
