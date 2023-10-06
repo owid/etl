@@ -31,9 +31,8 @@ meta:
     # License
     license:
       name: CC BY 4.0
-
 wdir: ../../../data/snapshots/statins/2023-10-05
 outs:
-- md5: 42f408ceee3d9fb1f32b92aae71a1665
-  size: 2676
+- md5: 8fc170b9c94a55f2230372e7a2973579
+  size: 2681
   path: bmj_2022.csv

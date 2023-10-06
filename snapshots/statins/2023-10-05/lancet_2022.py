@@ -92,7 +92,7 @@ def extract_statin_use_table(response):
             table = page.extract_table(table_settings)
             if table is not None:
                 # Append the cleaned data to the master list (exclude headers)
-                all_rows.extend(table[2:])
+                all_rows.extend(table[4:])
 
     # Convert the cleaned and processed data into a Pandas DataFrame.
     df = pd.DataFrame(all_rows, columns=["country", "statin_use_secondary", "statin_use_primary"])

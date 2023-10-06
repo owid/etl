@@ -213,7 +213,7 @@ def extract_economic_health_indicators(response):
         columns=[
             "country",
             "health_expenditure_per_capita_2018",
-            "statins_essential_medicine",
+            "statins_essential_medicine_2017",
             "ihd_mortality_rate_2019",
         ],
     )

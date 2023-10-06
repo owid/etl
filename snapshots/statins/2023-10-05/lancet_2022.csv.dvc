@@ -38,6 +38,6 @@ meta:
 
 wdir: ../../../data/snapshots/statins/2023-10-05
 outs:
-- md5: f3600359a5c061911abaedda9b327515
-  size: 1698
+- md5: a9bae94a60b04dea8b889d16f23c0ca9
+  size: 1632
   path: lancet_2022.csv
