@@ -131,6 +131,11 @@ def process_data(tb: Table) -> Table:
         ~((tb["country"].isin(colonizers_list)) & (tb["total_colonies"].isnull())), 0
     )
 
+    # Add rows for the country "World" with the total number of colonies per year
+    tb_count_world = tb.groupby(["year"]).agg({"total_colonies": "sum"}).reset_index()
+    tb_count_world["country"] = "World"
+    tb = pr.concat([tb, tb_count_world], short_name="colonial_dates_dataset")
+
     return tb
 
 
@@ -167,13 +172,20 @@ def regional_aggregations(tb: Table) -> Table:
             tb_regions, region=region, aggregations={"colony": "sum"}, countries_that_must_have_data=[]
         )
 
-    # Drop total_colonies column and rename colony column to total_colonies
-    tb_regions = tb_regions.drop(columns=["total_colonies"]).rename(columns={"colony": "total_colonies"})
+    # Rename colony column to total_colonies
+    tb_regions = tb_regions.rename(columns={"colony": "total_colonies_by_region"})
 
-    # Select only regions in tb_regions
-    tb_regions = tb_regions[tb_regions["country"].isin(regions)].reset_index(drop=True)
+    # Select only regions in tb_regions and "World" tb_world
+    tb_world = tb_regions[tb_regions["country"] == "World"].reset_index(drop=True)
+    tb_regions = tb_regions[(tb_regions["country"].isin(regions)) & (tb_regions["country"] != "World")].reset_index(
+        drop=True
+    )
 
-    # Concatenate tb and tb_regions
+    # Concatenate and merge
+    tb = pr.merge(tb, tb_world[["country", "year", "total_colonies_by_region"]], on=["country", "year"], how="left")
     tb = pr.concat([tb, tb_regions], short_name="colonial_dates_dataset")
+
+    # Make total_colonies_by_region integer
+    tb["total_colonies_by_region"] = tb["total_colonies_by_region"].astype("Int64")
 
     return tb

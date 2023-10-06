@@ -2,7 +2,10 @@ dataset:
   update_period_days: 365
 
 common:
-  years: Years have been expanded to show the full range of years in the dataset, from 1462 to 2022. The original dataset only includes years where a country was colonized.
+  years: |
+    Years are defined from last date aggregations available in the Colonial Dates Dataset. This means that when sources differ, years of colonization are defined from the last date between them. This is different from mean date aggregations (also available), which averages the dates of colonization across the original sources.
+
+    Years have been expanded to show the full range of years in the dataset, from 1462 to 2022. The original dataset only includes the years where a country was colonized.
 
 tables:
   colonial_dates_dataset:
@@ -50,7 +53,7 @@ tables:
         description_short: |
           Number of years the country has been colonized by the European colonial power(s) in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
         description_processing: |
-          This is a cummulative sum of the years the country has been colonized, across the entire time series. Colonizers or countries not colonized show a value of 0.
+          This is a cumulative sum of the years the country has been colonized, across the entire time series. Colonizers or countries not colonized show a value of 0.
 
           {common.years}
         description_from_producer: ""
@@ -119,9 +122,29 @@ tables:
         unit: "countries"
         short_unit: ""
         description_short: |
-          Total number of colonies per year colonized by the European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states.
+          Total number of colonies per year colonized by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states.
         description_processing: |
-          This is the cumulative sum of years the country has been colonized by any European colonial power, across the entire time series. Colonizers or countries not colonized show a value of 0.
+          This is the count of countries each European colonial power colonized each year. Colonized countries or countries not colonized show a null value.
+
+          A total for each year is estimated with the country (entity) "World".
+
+          {common.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Number of colonies
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      total_colonies_by_region:
+        title: Number of colonies by region
+        unit: "countries"
+        short_unit: ""
+        description_short: |
+          Total number of colonies per year colonized in each region by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states.
+        description_processing: |
+          This is is an aggregation of the number of countries each European colonial power colonized each year, by OWID geographic region or World Bank income groups.
 
           {common.years}
         description_from_producer: ""
