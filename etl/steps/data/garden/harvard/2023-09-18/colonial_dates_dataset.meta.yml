@@ -122,7 +122,7 @@ tables:
         unit: "countries"
         short_unit: ""
         description_short: |
-          Total number of colonies per year colonized by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states.
+          Total number of colonies per year colonized by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
         description_processing: |
           This is the count of countries each European colonial power colonized each year. Colonized countries or countries not colonized show a null value.
 
@@ -142,7 +142,7 @@ tables:
         unit: "countries"
         short_unit: ""
         description_short: |
-          Total number of colonies per year colonized in each region by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states.
+          Total number of colonies per year colonized in each region by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
         description_processing: |
           This is is an aggregation of the number of countries each European colonial power colonized each year, by OWID geographic region or World Bank income groups.
 
