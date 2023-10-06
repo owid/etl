@@ -80,11 +80,11 @@ tables:
 
     assert t.a.m.to_dict() == {
         "description_short": "A desc short",
-        "description_key": ["C", "D"],
-        "origins": [{"producer": "Origin2", "title": "Title2"}, {"producer": "Origin1", "title": "Title1"}],
+        "description_key": ["C"],
+        "origins": [{"producer": "Origin2", "title": "Title2"}],
         "display": {"numDecimalPlaces": 1},
         "presentation": {
-            "grapher_config": {"subtitle": "A subtitle", "selectedEntityNames": ["France"]},
+            "grapher_config": {"selectedEntityNames": ["France"], "subtitle": "A subtitle"},
             "attribution": "A presentation attribution",
         },
         "description_processing": "Processed",
@@ -93,7 +93,7 @@ tables:
     assert t.b.m.to_dict() == {
         "description_short": "Default desc short",
         "description_key": ["D"],
-        "origins": [{"producer": "Producer", "title": "Title"}, {"producer": "Origin1", "title": "Title1"}],
+        "origins": [{"producer": "Origin1", "title": "Title1"}],
         "display": {"conversionFactor": 2, "numDecimalPlaces": 0},
         "presentation": {"grapher_config": {"selectedEntityNames": ["France"]}},
         "description_processing": "Processed",

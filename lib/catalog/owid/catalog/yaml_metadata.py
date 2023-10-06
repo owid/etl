@@ -16,6 +16,16 @@ def update_metadata_from_yaml(
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
 ) -> None:
     """Update metadata of table and variables from a YAML file.
+
+    The logic is as follows:
+
+    - Whatever you write in the definitions.common section of the yaml file always replaces
+      the metadata that was on the table already.
+    - Whatever you write in the tables section of the yaml file always replaces what was
+      written in the definitions.common section of the yaml file.
+
+    See more details [here](https://github.com/owid/etl/pull/1737#issuecomment-1750245399)
+
     :param path: Path to YAML file.
     :param table_name: Name of table, also updates this in the metadata.
     """
@@ -37,16 +47,16 @@ def update_metadata_from_yaml(
 
     # update variables
     for v_short_name in tb.columns:
-        # get YAML metadata or empty dict
+        meta_dict = tb[v_short_name].m.to_dict()
+
+        # first overwrite table metadata with definitions.common
+        meta_dict = _merge_variable_metadata(meta_dict, common_dict, if_origins_exist=if_origins_exist, overwrite=True)
+
+        # then overwrite with table specific metadata
         variable_dict = t_annot.get("variables", {}).get(v_short_name, {})
-
-        # firstly merge with variable defined fields that overwrites metadata
         meta_dict = _merge_variable_metadata(
-            tb[v_short_name].m.to_dict(), variable_dict, if_origins_exist, overwrite=True
+            meta_dict, variable_dict, if_origins_exist=if_origins_exist, overwrite=True
         )
-
-        # secondly merge with common definitions that don't overwrite
-        meta_dict = _merge_variable_metadata(meta_dict, common_dict, if_origins_exist="append", overwrite=False)
 
         # we allow `- *descriptions` which needs to be flattened
         if "description_key" in meta_dict:
@@ -62,6 +72,7 @@ def update_metadata_from_yaml(
 
 def _merge_variable_metadata(md: dict, new: dict, if_origins_exist: SOURCE_EXISTS_OPTIONS, overwrite: bool) -> dict:
     """Merge VariableMeta in a dictionary with another dictionary. It modifies the original object."""
+    # NOTE: when this gets stable, consider removing flags `if_origins_exist` and `overwrite` if they are not used
     for k, v in new.items():
         # special cases
         if k in ("presentation", "grapher_config"):
@@ -78,9 +89,12 @@ def _merge_variable_metadata(md: dict, new: dict, if_origins_exist: SOURCE_EXIST
         # explicitly passing empty list means we want to overwrite
         elif v == []:
             md[k] = []
-        # append list (could be origins, sources or others)
+        # append or overwrite list (could be origins, sources or others)
         elif isinstance(v, list):
-            md[k] = md.get(k, []) + v
+            if overwrite:
+                md[k] = v
+            else:
+                md[k] = md.get(k, []) + v
         # key is already defined in metadata
         elif k in md:
             # should we overwrite it?
