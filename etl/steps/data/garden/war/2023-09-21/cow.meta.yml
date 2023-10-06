@@ -8,21 +8,21 @@ definitions:
       - Middle East
   number_ongoing_conflicts:
     description_short: |-
-      <% if conflict_type == "all" %>
-      The number of all ongoing wars in each year. This includes interstate, intrastate, extrastate, and non-state wars.
-      <% elif conflict_type == "inter-state" %>
-      The number of ongoing interstate wars in each year.
-      <% elif conflict_type == "intra-state" %>
-      The number of ongoing intrastate wars in each year.
-      <% elif conflict_type == "intra-state (internationalized)" %>
-      The number of ongoing internationalized intrastate wars in each year.
-      <% elif conflict_type == "intra-state (non-internationalized)" %>
-      The number of ongoing non-internationalized intrastate wars in each year.
-      <% elif conflict_type == "extra-state" %>
-      The number of ongoing extrastate wars in each year.
-      <% elif conflict_type == "non-state" %>
-      The number of ongoing non-state wars in each year.
-      <% endif %>
+      <%- if conflict_type == "all" %>
+      The number of all ongoing wars in each year. This includes interstate, intrastate, extrastate, and non-state wars
+      <%- elif conflict_type == "inter-state" -%>
+      The number of ongoing interstate wars in each year
+      <%- elif conflict_type == "intra-state" -%>
+      The number of ongoing intrastate wars in each year
+      <%- elif conflict_type == "intra-state (internationalized)" -%>
+      The number of ongoing internationalized intrastate wars in each year
+      <%- elif conflict_type == "intra-state (non-internationalized)" -%>
+      The number of ongoing non-internationalized intrastate wars in each year
+      <%- elif conflict_type == "extra-state" -%>
+      The number of ongoing extrastate wars in each year
+      <%- elif conflict_type == "non-state" -%>
+      The number of ongoing non-state wars in each year
+      <%- endif -%>
     description_key: &description_key_ongoing
       - |-
         <% if conflict_type == "all" %>
@@ -49,21 +49,21 @@ definitions:
         <% endif %>
   number_new_conflicts:
     description_short: |-
-      <% if conflict_type == "all" %>
+      <% if conflict_type == "all" -%>
       The number of new wars in each year. This includes interstate, intrastate, extrastate, and non-state wars
-      <% elif conflict_type == "inter-state" %>
+      <% elif conflict_type == "inter-state" -%>
       The number of new interstate wars in each year
-      <% elif conflict_type == "intra-state" %>
+      <% elif conflict_type == "intra-state" -%>
       The number of new intrastate wars in each year
-      <% elif conflict_type == "intra-state (internationalized)" %>
+      <% elif conflict_type == "intra-state (internationalized)" -%>
       The number of new internationalized intrastate wars in each year
-      <% elif conflict_type == "intra-state (non-internationalized)" %>
+      <% elif conflict_type == "intra-state (non-internationalized)" -%>
       The number of new non-internationalized intrastate wars in each year
-      <% elif conflict_type == "extra-state" %>
+      <% elif conflict_type == "extra-state" -%>
       The number of new extrastate wars in each year
-      <% elif conflict_type == "non-state" %>
+      <% elif conflict_type == "non-state" -%>
       The number of new non-state wars in each year
-      <% endif %>
+      <% endif -%>
     description_key: &description_key_new
       - |-
         <% if conflict_type == "all" %>
@@ -98,21 +98,21 @@ definitions:
         <% endif %>
   number_deaths:
     description_short: |-
-      <% if conflict_type == "all" %>
+      <%- if conflict_type == "all" -%>
       The estimated number of deaths in all ongoing wars in each year. This includes interstate, intrastate, extrastate, and non-state wars
-      <% elif conflict_type == "inter-state" %>
+      <%- elif conflict_type == "inter-state" -%>
       The estimated number of deaths in ongoing interstate wars in each year
-      <% elif conflict_type == "intra-state" %>
+      <%- elif conflict_type == "intra-state" -%>
       The estimated number of deaths in ongoing intrastate wars in each year
-      <% elif conflict_type == "intra-state (internationalized)" %>
+      <%- elif conflict_type == "intra-state (internationalized)" -%>
       The estimated number of deaths in ongoing internationalized intrastate wars in each year
-      <% elif conflict_type == "intra-state (non-internationalized)" %>
+      <%- elif conflict_type == "intra-state (non-internationalized)" -%>
       The estimated number of deaths in ongoing non-internationalized intrastate wars in each year
-      <% elif conflict_type == "extra-state" %>
+      <%- elif conflict_type == "extra-state" -%>
       The estimated number of deaths in ongoing extrastate wars in each year
-      <% elif conflict_type == "non-state" %>
+      <%- elif conflict_type == "non-state" -%>
       The estimated number of deaths in ongoing non-state wars in each year
-      <% endif %>
+      <%- endif -%>
     description_key: &description_key_deaths
       - |-
         <% if conflict_type == "all" %>
