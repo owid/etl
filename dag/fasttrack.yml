@@ -124,3 +124,5 @@ steps:
   - snapshot://fasttrack/latest/plastic_waste_meijer_2021.csv
   data://grapher/fasttrack/2023-09-29/un_space_objects:
   - snapshot://fasttrack/2023-09-29/un_space_objects.csv
+  data://grapher/fasttrack/2023-10-05/great_pacific_garbage_lebreton:
+  - snapshot://fasttrack/2023-10-05/great_pacific_garbage_lebreton.csv

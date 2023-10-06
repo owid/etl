@@ -9,10 +9,12 @@ Some notes:
         - UN contains data on many more countries, but only since 1950.
         - HMD contains data on fewer countries, but since 1676!
         - We therefore use UN since 1950 for all countries, and HMD prior to that. We use the same source for all countries in each time period to ensure comparability across countries.
-    - Age grous:
-        - HMD contains single-age groups from 0 to 109 and 110+ (equivalent to >=110)
+    - Age groups:
+        - HMD contains single-age groups from 0 to 109 and 110+ (equivalent to >=110). It also contains data on wider age groups, but we discard these.
         - UN contains single-age groups from 0 to 99 and 100+ (equivalent to >=100)
 """
+
+from typing import List, cast
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -33,6 +35,8 @@ COLUMNS_INDICATORS = [
     "number_person_years_remaining",
     "life_expectancy",
     "average_survival_length",
+    "life_expectancy_fm_diff",
+    "life_expectancy_fm_ratio",
 ]
 COLUMNS_INDEX = [
     "type",
@@ -59,6 +63,13 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Set type='period' for UN data
+    tb_un["type"] = "period"
+
+    # Add life expectancy differences and ratios
+    paths.log.info("calculating extra variables (ratio and difference in life expectancy for f and m).")
+    tb_un = add_le_diff_and_ratios(tb_un, COLUMNS_INDEX)
+
     # Combine HMD + UN
     paths.log.info("concatenate tables")
     tb = combine_tables(tb_hmd, tb_un)
@@ -98,9 +109,9 @@ def combine_tables(tb_hmd: Table, tb_un: Table) -> Table:
     ## Ensure year is int
     tb_hmd["year"] = tb_hmd["year"].astype(str).astype("Int64")
     ## Sanity check years
-    assert tb_hmd["year"].max() == 2022, "UN data should end in 2022"
-    assert tb_hmd["year"].min() == 1676, "UN data should start in 1676"
-    ## Keep only period data prior to 1950 (UN data starts in 1950)
+    assert tb_hmd["year"].max() == 2022, "HMD data should end in 2022"
+    assert tb_hmd["year"].min() == 1676, "HMD data should start in 1676"
+    ## Keep only period HMD data prior to 1950 (UN data starts in 1950)
     tb_hmd = tb_hmd[((tb_hmd["year"] < 1950) & (tb_hmd["type"] == "period")) | (tb_hmd["type"] == "cohort")]
     ## Column renames
     tb_hmd = tb_hmd.rename(
@@ -108,13 +119,11 @@ def combine_tables(tb_hmd: Table, tb_un: Table) -> Table:
             "country": "location",
         }
     )
-    ## Filter relevant columns
+    ## Filter relevant columns (UN has two columns that HMD doesn't: 'probability_of_survival', 'survivorship_ratio')
     columns_indicators_hmd = [col for col in tb_hmd.columns if col in COLUMNS_INDICATORS]
     tb_hmd = tb_hmd[COLUMNS_INDEX + columns_indicators_hmd]
 
     # UN
-    ## Set type='period' for UN data
-    tb_un["type"] = "period"
     ## Sanity check years
     assert tb_un["year"].max() == 2021, "UN data should end in 2021"
     assert tb_un["year"].min() == 1950, "UN data should start in 1950"
@@ -127,5 +136,30 @@ def combine_tables(tb_hmd: Table, tb_un: Table) -> Table:
 
     # Remove all-NaN rows
     tb = tb.dropna(subset=COLUMNS_INDICATORS, how="all")
+
+    return tb
+
+
+def add_le_diff_and_ratios(tb: Table, columns_primary: List[str]) -> Table:
+    """Add metrics on life expectancy ratios and differences between females and males."""
+    ## Get relevant metric, split into f and m tables
+    metric = "life_expectancy"
+    tb_le = tb[columns_primary + [metric]].dropna(subset=[metric])
+    tb_le_m = tb_le[tb_le["sex"] == "male"].drop(columns=["sex"])
+    tb_le_f = tb_le[tb_le["sex"] == "female"].drop(columns=["sex"])
+    ## Merge f and m tables
+    tb_le = tb_le_f.merge(tb_le_m, on=list(set(columns_primary) - {"sex"}), suffixes=("_f", "_m"))
+    ## Calculate extra variables
+    tb_le["life_expectancy_fm_diff"] = tb_le["life_expectancy_f"] - tb_le["life_expectancy_m"]
+    tb_le["life_expectancy_fm_ratio"] = tb_le["life_expectancy_f"] / tb_le["life_expectancy_m"]
+    ## Set sex dimension to none
+    tb_le["sex"] = "both"
+    ## optional cast
+    tb_le = cast(Table, tb_le)
+    ## Remove unit
+    tb_le["life_expectancy_fm_ratio"].metadata.unit = ""
+
+    ## Add table to main table
+    tb = tb.merge(tb_le, on=columns_primary, how="left")
 
     return tb
