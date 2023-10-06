@@ -49,7 +49,7 @@ from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
-from .shared import expand_observations
+from .shared import add_indicators_conflict_rate, expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -57,18 +57,18 @@ paths = PathFinder(__file__)
 log = get_logger()
 # Region mapping
 REGIONS_RENAME = {
-    1: "Americas (Brecke)",  # "North America, Central America, and the Caribbean (Brecke)",
-    2: "Americas (Brecke)",  # "South America (Brecke)",
-    3: "Europe (Brecke)",  # "Western Europe (Brecke)",
-    4: "Europe (Brecke)",  # "Eastern Europe (Brecke)",
-    5: "Middle East (Brecke)",
-    6: "Africa (Brecke)",  # "North Africa (Brecke)",
-    7: "Africa (Brecke)",  # "West & Central Africa (Brecke)",
-    8: "Africa (Brecke)",  # "East & South Africa (Brecke)",
-    9: "Asia and Oceania (Brecke)",  # "Central Asia (Brecke)",
-    10: "Asia and Oceania (Brecke)",  # "South Asia (Brecke)",
-    11: "Asia and Oceania (Brecke)",  # "Southeast Asia (Brecke)",
-    12: "Asia and Oceania (Brecke)",  # "East Asia (Brecke)",
+    1: "Americas",  # "North America, Central America, and the Caribbean",
+    2: "Americas",  # "South America",
+    3: "Europe",  # "Western Europe",
+    4: "Europe",  # "Eastern Europe",
+    5: "Middle East",
+    6: "Africa",  # "North Africa",
+    7: "Africa",  # "West & Central Africa",
+    8: "Africa",  # "East & South Africa",
+    9: "Asia and Oceania",  # "Central Asia",
+    10: "Asia and Oceania",  # "South Asia",
+    11: "Asia and Oceania",  # "Southeast Asia",
+    12: "Asia and Oceania",  # "East Asia",
     -9: -9,  # Unknown
 }
 
@@ -80,9 +80,12 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     log.info("war.brecke: start")
     ds_meadow = paths.load_dataset("brecke")
-
     # Read table from meadow dataset.
     tb = ds_meadow["brecke"]
+
+    # Read table from COW codes
+    ds_isd = paths.load_dataset("isd")
+    tb_regions = ds_isd["isd_regions"].reset_index()
 
     #
     # Process data.
@@ -142,6 +145,15 @@ def run(dest_dir: str) -> None:
     log.info("war.brecke: distributing metrics for region -9")
     tb = distribute_metrics_m9(tb)
     assert (tb["region"] != -9).all(), "-9 region still detected!"
+
+    # Add conflict rates
+    log.info("war.cow: map fatality codes to names")
+    tb_regions = tb_regions[~tb_regions["region"].isin(["Sub-Saharan Africa", "North Africa and the Middle East"])]
+    tb = add_indicators_conflict_rate(tb, tb_regions, ["number_ongoing_conflicts", "number_new_conflicts"])
+
+    # Add suffix with source name
+    msk = tb["region"] != "World"
+    tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (Brecke)"
 
     # Set index
     log.info("war.brecke: set index")
