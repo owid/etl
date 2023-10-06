@@ -579,15 +579,21 @@ def harmonize_country_names(tb: Table) -> Table:
         warn_on_unknown_excluded_countries=False,
     )
 
+    return tb
+
+
+def fix_duplicated_palau_data(tb_co2: Table) -> Table:
+    tb = tb_co2.copy()
     # Check that there is only one data point for each country-year.
     # In the fossil CO2 emissions data, after harmonization, "Pacific Islands (Palau)" is mapped to "Palau", and
     # therefore there are rows with different data for the same country-year.
     # However, "Pacific Islands (Palau)" have data until 1991, and "Palau" has data from 1992 onwards.
-    # After removing empty rows, there should be no overlap.
-    columns_that_must_have_data = tb.drop(columns=["country", "year"]).columns
-    tb = tb.dropna(subset=columns_that_must_have_data, how="all").reset_index(drop=True)
-    error = "After harmonizing country names, there is more than one data point for the same country-year."
-    assert tb[tb.duplicated(subset=["country", "year"])].empty, error
+    # Check that duplicate rows are still there.
+    error = "Expected 'Palau' data to be duplicated. Remove temporary fix."
+    assert tb[tb.duplicated(subset=["country", "year"])]["country"].unique().tolist() == ["Palau"], error
+    # Remove duplicate rows.
+    tb = tb.drop_duplicates(subset=["country", "year"]).reset_index(drop=True)
+    # NOTE: Do not drop empty rows yet, as they will be needed to have a complete population series.
 
     return tb
 
@@ -868,17 +874,19 @@ def combine_data_and_add_variables(
     )
 
     # Add variable of emissions embedded in trade, including land-use change emissions.
-    tb_co2_with_regions["traded_emissions_including_land_use_change"] = (
-        tb_co2_with_regions["consumption_emissions"] - tb_co2_with_regions["emissions_total_including_land_use_change"]
-    )
-    tb_co2_with_regions["pct_traded_emissions_including_land_use_change"] = (
-        100
-        * tb_co2_with_regions["traded_emissions_including_land_use_change"]
-        / tb_co2_with_regions["emissions_total_including_land_use_change"]
-    )
-    tb_co2_with_regions["traded_emissions_including_land_use_change_per_capita"] = (
-        tb_co2_with_regions["traded_emissions_including_land_use_change"] / tb_co2_with_regions["population"]
-    )
+    # NOTE: The following variables would be a little misleading, since consumption emissions do not include land-use
+    # change emissions, but total emissions do.
+    # tb_co2_with_regions["traded_emissions_including_land_use_change"] = (
+    #     tb_co2_with_regions["consumption_emissions"] - tb_co2_with_regions["emissions_total_including_land_use_change"]
+    # )
+    # tb_co2_with_regions["pct_traded_emissions_including_land_use_change"] = (
+    #     100
+    #     * tb_co2_with_regions["traded_emissions_including_land_use_change"]
+    #     / tb_co2_with_regions["emissions_total_including_land_use_change"]
+    # )
+    # tb_co2_with_regions["traded_emissions_including_land_use_change_per_capita"] = (
+    #     tb_co2_with_regions["traded_emissions_including_land_use_change"] / tb_co2_with_regions["population"]
+    # )
 
     # Remove temporary columns.
     tb_co2_with_regions = tb_co2_with_regions.drop(
@@ -1038,6 +1046,9 @@ def run(dest_dir: str) -> None:
     tb_consumption = harmonize_country_names(tb=tb_consumption)
     tb_production = harmonize_country_names(tb=tb_production)
     tb_land_use = harmonize_country_names(tb=tb_land_use)
+
+    # Fix duplicated rows for Palau.
+    tb_co2 = fix_duplicated_palau_data(tb_co2=tb_co2)
 
     # Add new variables to main table (consumption-based emissions, emission intensity, per-capita emissions, etc.).
     tb_combined = combine_data_and_add_variables(
