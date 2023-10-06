@@ -113,6 +113,17 @@ def clean_disease_names(tb: Table, tb_hierarchy: Table, level: Any) -> Table:
     tb = tb.drop(columns=["cause_name_underscore", disease_col])
     tb = tb.rename(columns={"cause_name": disease_col})
 
+    # Add more succinct disease names
+
+    disease_dict = {
+        "Neonatal encephalopathy due to birth asphyxia and trauma": "Asphyxia and trauma",
+        "Neonatal preterm birth": "Preterm birth",
+        "Exposure to forces of nature": "Natural diasasters",
+        "Neoplasms": "Cancer",
+    }
+
+    tb[disease_col] = tb[disease_col].replace(disease_dict)
+
     return tb
 
 
