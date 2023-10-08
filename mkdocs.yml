@@ -61,7 +61,7 @@ nav:
           - Tables: "architecture/metadata/reference/tables.md"
         - Propagation of metadata: "architecture/metadata/propagation.md"
         - Structuring YAML file: "architecture/metadata/structuring-yaml.md"
-        - Workflow: "architecture/metadata/workflow.md"
+        - Data Pages Workflow: "architecture/metadata/data_pages_workflow.md"
         - Using metadata: "architecture/metadata/using.md"
       - Our journey: "architecture/our-journey.md"
   - API and catalog:

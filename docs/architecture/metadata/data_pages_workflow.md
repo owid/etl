@@ -1,3 +1,5 @@
+# Data Pages Workflow
+
 ## Live Reloading of a Data Page
 
 When modifying a YAML file for a Data page, executing the `etl ... --grapher` command to visualize updates can be inefficient. The following steps outline a streamlined approach for rapid development and testing.
@@ -21,11 +23,11 @@ For illustration, the step `grapher/gcp/2023-07-10/global_carbon_budget` is cons
 ```bash
 ENV=.env.myname GRAPHER_FILTER=consumption_emissions_per_capita etl grapher/gcp/2023-07-10/global_carbon_budget --grapher --watch --only
 ```
-!!! note 
+!!! note
     Working on your local grapher instead of a remote grapher will also reduce upload times. One option is to work on local grapher to begin with, and move to your staging server at a later point to be able to share the result with other colleagues.
 
 ### Usage
 After initiating the above command, changes made to the YAML file can be reviewed by refreshing the [staging Data page](http://staging-site-mojmir/admin/datapage-preview/738081). The updates should be reflected promptly.
 
 !!! info
-    Note: If editing the YAML file in the **garden channel** and the step execution time is long, refresh latency will be dependent on the step's runtime. In such cases, consider developing the YAML file in the **grapher channel** before moving it into the garden channel (if the table and indicator names are identical).
+    If editing the YAML file in the **garden channel** and the step execution time is long, refresh latency will be dependent on the step's runtime. In such cases, consider developing the YAML file in the **grapher channel** before moving it into the garden channel (if the table and indicator names are identical).
