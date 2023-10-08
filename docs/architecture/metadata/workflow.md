@@ -21,7 +21,8 @@ For illustration, the step `grapher/gcp/2023-07-10/global_carbon_budget` is cons
 ```bash
 ENV=.env.myname GRAPHER_FILTER=consumption_emissions_per_capita etl grapher/gcp/2023-07-10/global_carbon_budget --grapher --watch --only
 ```
-NOTE: Working on your local grapher instead of a remote grapher will also reduce upload times. One option is to work on local grapher to begin with, and move to your staging server at a later point to be able to share the result with other colleagues.
+!!! note 
+    Working on your local grapher instead of a remote grapher will also reduce upload times. One option is to work on local grapher to begin with, and move to your staging server at a later point to be able to share the result with other colleagues.
 
 ### Usage
 After initiating the above command, changes made to the YAML file can be reviewed by refreshing the [staging Data page](http://staging-site-mojmir/admin/datapage-preview/738081). The updates should be reflected promptly.
