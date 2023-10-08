@@ -68,7 +68,7 @@ my_var_1:
 
 You can define anchors anywhere on the YAML file, but typically we define a special section called `definitions` at the very top of the file, and then use aliases to refer to these definitions.
 
-An example that reuses `attribution` and `description_key`
+An example that reuses `attribution` and `description_key`:
 
 ```yaml
 definitions:
