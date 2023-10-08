@@ -117,6 +117,7 @@ theme:
 
 markdown_extensions:
   - pymdownx.critic
+  - pymdownx.keys
   - admonition
   - abbr
   - attr_list

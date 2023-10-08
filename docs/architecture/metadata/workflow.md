@@ -6,10 +6,10 @@ When modifying a YAML file for a Data page, executing the `etl ... --grapher` co
 For illustration, the step `grapher/gcp/2023-07-10/global_carbon_budget` is considered. The corresponding YAML file, `global_carbon_budget.meta.yml`, is assumed to be edited within the grapher channel and previewed on a [staging Data page](http://staging-site-mojmir/admin/datapage-preview/738081).
 
 ### Initial Configuration
-- Add `DEBUG=1` to your `.env.myname` file and any other `.env.*` files in use to expedite ETL operations.
+- Add `DEBUG=1` to your `.env.myname` file and any other `.env.*` files in use to expedite ETL operations. `DEBUG=1` runs all steps in a single process and removes 2s overhead from running each step.
 
 ### File Monitoring
-- Execute the ETL command with the `--watch` flag. This monitors the YAML file for changes and automatically re-executes the corresponding step.
+- Execute the ETL command with the `--watch` flag. This monitors the YAML file for changes and automatically re-executes the corresponding step. This might not be as useful for long-running steps.
 
 ### Data Filtering
 - If the dataset contains numerous indicators, consider using `GRAPHER_FILTER=consumption_emissions_per_capita` to filter the data to only relevant variables. This is optional for smaller datasets.

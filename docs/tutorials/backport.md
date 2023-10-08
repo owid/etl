@@ -5,15 +5,16 @@ Before ETL came along, datasets were uploaded directly to our Grapher admin site
 1. Migrate them into the ETL pipeline.
 2. Move them to Fast-Track.
 
-Choose Fast-Track if the dataset requires author edits. Otherwise, it's more straightforward to migrate to ETL.
+
+Fast-Track is recommended for users who prefer working on Google sheets rather than the ETL environment. However, it's not as flexible as ETL, and it's not recommended for datasets that require frequent updates.
 
 
 ## How to Migrate to ETL
 
-Automatically generate ETL steps for a specific dataset (xxx) with the following command:
+Automatically generate ETL steps for a specific dataset with the following command. Choose the appropriate namespace, version and short name for the migrated dataset.
 
 ```
-ENV=.env.prod backport-migrate --dataset-id xxx --namespace your_namespace --version your_version --short-name your_short_name
+ENV=.env.prod etl-backport-migrate --dataset-id your_dataset_id --namespace your_namespace --version your_version --short-name your_short_name
 ```
 
 After running this, follow the terminal prompts.

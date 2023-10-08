@@ -89,7 +89,7 @@ Note that the case of `description_key` is a bit special: You can use anchor/ali
 
 !!! warning "In progress."
 
-To avoid repetition for all indicators, you can use a special section called `common:` under `definitions:`. This section is then merged with sections of all indicators. Using this saves you from repeating the same aliases in indicators.
+To avoid repetition for all indicators, you can use a special section called `common:` under `definitions:`. This section sets the default metadata for indicator if there's no specific metadata defined in `tables:`. Using this saves you from repeating the same aliases in indicators. Note that it doesn't merge metadata, but overwrites. If you look for merge, check out `<<:` override operator.
 
 ```yaml
 definitions:
@@ -109,13 +109,16 @@ tables:
   my_table:
     variables:
       my_var_1:
-        # Final description will be First, Second, Third line
+        # Description will be Third line
         description_key:
           - Third line.
         presentation:
-          # Final tags will be Internet, Energy
+          # Tag will be Internet
           topic_tags:
             - Internet
+      my_var_2:
+        # Description will be First line, Second line
+        # Tag will be Energy
 ```
 
 ## Dynamic YAML
