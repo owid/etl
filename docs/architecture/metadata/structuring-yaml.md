@@ -151,7 +151,7 @@ There are also special variables like `{ TODAY }` that can be used for automatic
 
 ## Using Jinja Templates for Advanced Cases
 
-Even more complex metadata can be generated with [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/). This is especially useful for datasets in a long format, because Jinja lets you dynamically generate text (titles, descriptions, ...) based on dimension names.
+Even more complex metadata can be generated with [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/). This is especially useful for datasets in a long format and multiple dimensions, because Jinja lets you dynamically generate text (titles, descriptions, ...) based on the dimension names.
 
 We use tags `<% if ... %>` and `<< var >>` instead of default `{% if ... %}` and `{{ var }}`.
 
