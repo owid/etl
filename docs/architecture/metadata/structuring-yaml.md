@@ -21,37 +21,45 @@ poetry run etl-metadata-export data/garden/my_namespace/my_version/my_dataset -o
 
 ## Handling Multi-line Strings and Whitespace
 
-Multi-line strings are often sources of confusion. [YAML multiline](https://yaml-multiline.info/) supports two primary styles for writing them:
+Multi-line strings are often sources of confusion. [YAML multiline](https://yaml-multiline.info/) supports two primary styles for writing them (literal and folded style), and it's up to you which option to use.
 
-* **Literal style** (denoted with the `|` block style indicator): Line breaks in the YAML file are treated as line breaks.
-
-  NOTE: This implies that lines of text in the YAML file can become very long; to be able to read them on a text editor without needing to scroll left and right, use "Word wrap" (in VSCode on Mac, shortcut option+z).
-  ```yaml
-  my_var_1:
-    description_short: |-
-      The first line
-      and the second
-
-      Third line after line break
-  ```
-* **Folded style**  (denoted with the `>` block style indicator): Line breaks in the YAML file are treated like spaces; to create a line break, you need a double line break in the YAML file.
-
-  NOTE: This avoids having lines of text that are too long in the YAML file. However, if you want to rephrase a paragraph, you may need to manually rearrange the line breaks afterwards.
-  ```yaml
-  my_var_1:
-    description_short: >-
-      Just a
-      single line
-
-      Second line
+In addition, using the "strip" chomping indicator, denoted with `-`, after `|` or `>` removes whitespaces at the beginning and end of the string. **This is almost always what you want.**
 
 
-      Third line after line break
-  ```
+### Literal style `|`
+It is denoted with the `|` block style indicator. Line breaks in the YAML file are treated as line breaks.
 
-It's up to you which option to use.
+```yaml
+my_var_1:
+  description_short: |-
+    The first line
+    and the second
 
-Note that, using the "strip" chomping indicator, denoted with `-`, after `|` or `>` removes whitespaces at the beginning and end of the string. **This is almost always what you want.**
+    Third line after line break
+```
+
+
+!!! note "Note"
+    This implies that lines of text in the YAML file can become very long; to be able to read them on a text editor without needing to scroll left and right, use "Word wrap" (or ++option+z++ in VS Code on Mac).
+
+### Folded style `>`
+It is denoted with the `>` block style indicator. Line breaks in the YAML file are treated like spaces; to create a line break, you need a double line break in the YAML file.
+
+```yaml
+my_var_1:
+  description_short: >-
+    Just a
+    single line
+
+    Second line
+
+
+    Third line after line break
+```
+
+!!! note "Note"
+    This avoids having lines of text that are too long in the YAML file. However, if you want to rephrase a paragraph, you may need to manually rearrange the line breaks afterwards.
+
 
 
 ## Anchors & aliases
