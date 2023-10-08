@@ -153,11 +153,12 @@ There are also special variables like `{ TODAY }` that can be used for automatic
 
 Even more complex metadata can be generated with [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/). This is especially useful for datasets in a long format and multiple dimensions, because Jinja lets you dynamically generate text (titles, descriptions, ...) based on the dimension names.
 
-We use tags `<% if ... %>` and `<< var >>` instead of default `{% if ... %}` and `{{ var }}`.
+!!! note
+    We use a slightly flavoured Jinja, where we use `<% if ... %>` and `<< var >>` instead of the defaults `{% if ... %}` and `{{ var }}`.
 
-Dimension values are available through variables with the same name.
 
-Here is a more complex example with dimension `conflict_type`:
+Find below a more complex example with dimension `conflict_type`. In this example, we use Jinja combined with dynamic YAML. Note that the dimension values are available through variables with the same name.
+
 
 ```yaml
 definitions:
