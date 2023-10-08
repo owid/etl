@@ -117,12 +117,12 @@ steps:
   data://grapher/fasttrack/latest/democracy_lexical_index:
     - snapshot://fasttrack/latest/democracy_lexical_index.csv
   data://grapher/fasttrack/latest/global_maternal_offspring_loss:
-  - snapshot://fasttrack/latest/global_maternal_offspring_loss.csv
+    - snapshot://fasttrack/latest/global_maternal_offspring_loss.csv
   data://grapher/fasttrack/latest/under_five_mortality_lmics:
-  - snapshot://fasttrack/latest/under_five_mortality_lmics.csv
+    - snapshot://fasttrack/latest/under_five_mortality_lmics.csv
   data://grapher/fasttrack/latest/plastic_waste_meijer_2021:
-  - snapshot://fasttrack/latest/plastic_waste_meijer_2021.csv
+    - snapshot://fasttrack/latest/plastic_waste_meijer_2021.csv
   data://grapher/fasttrack/2023-09-29/un_space_objects:
-  - snapshot://fasttrack/2023-09-29/un_space_objects.csv
+    - snapshot://fasttrack/2023-09-29/un_space_objects.csv
   data://grapher/fasttrack/2023-10-05/great_pacific_garbage_lebreton:
-  - snapshot://fasttrack/2023-10-05/great_pacific_garbage_lebreton.csv
+    - snapshot://fasttrack/2023-10-05/great_pacific_garbage_lebreton.csv
