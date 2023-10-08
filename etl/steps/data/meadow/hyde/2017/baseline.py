@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
         # Population table
         country_path = Path(temp_dir) / "baseline" / "txt" / "popc_c.txt"
         population = (
-            pr.read_csv(country_path, sep=" ", metadata=snap.to_table_metadata())
+            pr.read_csv(country_path, sep=" ", metadata=snap.to_table_metadata(), origin=snap.m.origin)
             .rename({"region": "country_code"}, axis=1)
             .melt(id_vars="country_code", var_name="year", value_name="population")
         )

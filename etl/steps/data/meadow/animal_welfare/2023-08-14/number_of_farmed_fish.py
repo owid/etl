@@ -6,7 +6,6 @@ import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -56,10 +55,8 @@ def run(dest_dir: str) -> None:
     # Retrieve and process snapshots.
     tb = Table(short_name=paths.short_name)
     for year in [2015, 2016, 2017]:
-        snap_i: Snapshot = paths.load_dependency(f"number_of_farmed_fish_{year}.xlsx")
-        tb_i = pr.read_excel(
-            snap_i.path, skiprows=find_number_of_lines_to_skip(snap_i.path), metadata=snap_i.to_table_metadata()
-        )
+        snap_i = paths.load_snapshot(f"number_of_farmed_fish_{year}.xlsx")
+        tb_i = snap_i.read_excel(skiprows=find_number_of_lines_to_skip(snap_i.path))
         # Process yearly data.
         tb_i = process_yearly_data(tb_i=tb_i, year=year)
         # Combine all tables.
