@@ -471,10 +471,23 @@
                 },
                 "description_key": {
                   "title": "Indicator's key information",
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ],
                   "description": "List of key pieces of information about the indicator.",
                   "requirement_level": "recommended (for curated indicators)",
                   "guidelines": [
