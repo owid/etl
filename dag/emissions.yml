@@ -100,6 +100,8 @@ steps:
   #
   # Decoupling of GDP and CO2 (2023).
   #
+  # The data from the following step will be used in a static chart.
+  # TODO: Add reference here when it's live.
   data://garden/emissions/2023-10-06/gdp_and_co2_decoupling:
     - data://garden/gcp/2023-09-28/global_carbon_budget
     - data://garden/worldbank_wdi/2022-05-26/wdi
