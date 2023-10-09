@@ -106,3 +106,10 @@ steps:
     - data://garden/un/2023-10-02/un_wpp_lt
   data://grapher/demography/2023-10-04/life_tables:
     - data://garden/demography/2023-10-03/life_tables
+
+  # OMM: Life Expectancy
+  data://garden/demography/2023-10-09/life_expectancy:
+    - data://garden/demography/2023-10-03/life_tables
+    - data://garden/papers/2022-11-03/zijdeman_et_al_2015
+    - data://garden/papers/2023-02-03/riley_2005
+    - data://garden/un/2022-07-11/un_wpp
