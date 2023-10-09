@@ -227,6 +227,17 @@
     }
   },
   "properties": {
+    "definitions": {
+      "type": "object",
+      "description": "Definitions with anchors that are reused in other parts of the metadata",
+      "additionalProperties": true,
+      "properties": {
+        "common": {
+          "description": "Metadata that will be merged with all indicators. Does not overwrite existing metadata.",
+          "$ref": "#/properties/tables/additionalProperties/properties/variables/additionalProperties"
+        }
+      }
+    },
     "dataset": {
       "type": "object",
       "description": "An ETL dataset is a collection of tables. The dataset metadata fields are the attributes of the `DatasetMeta` object in ETL.",
@@ -1505,16 +1516,6 @@
               }
             }
           }
-        }
-      }
-    },
-    "all": {
-      "description": "Metadata fields appended to all indicators",
-      "origins": {
-        "type": "array",
-        "description": "Origins appended to all indicators.",
-        "items": {
-          "$ref": "definitions.json#/origin"
         }
       }
     }
