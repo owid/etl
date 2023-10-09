@@ -60,6 +60,13 @@ def run(dest_dir: str) -> None:
     # Select and rename the required variables from WDI.
     tb_wdi = tb_wdi[list(COLUMNS_WDI)].rename(columns=COLUMNS_WDI, errors="raise")
 
+    ####################################################################################################################
+    # TODO: Remote this temporary solution once WDI has origins.
+    from etl.data_helpers.misc import add_origins_to_wdi
+
+    tb_wdi = add_origins_to_wdi(tb_wdi=tb_wdi)
+    ####################################################################################################################
+
     # Combine both tables.
     tb = tb_gcb.merge(tb_wdi, on=["country", "year"], how="outer", short_name=paths.short_name)
 
@@ -69,15 +76,8 @@ def run(dest_dir: str) -> None:
     # Remove empty rows.
     tb = tb.dropna(subset=data_columns, how="all").reset_index(drop=True)
 
-    # TODO: Decide a start year, and add percent changes (at least in consumption-based emissions and per capita gdp).
-    # The final table will be indexed by country and (start) year, going from 1990 to 2019.
-    # TODO: Add assertions about final year and start year.
-
     # Select years between START_YEAR and END_YEAR.
     tb = tb[(tb["year"] >= START_YEAR) & (tb["year"] <= END_YEAR)].reset_index(drop=True)
-
-    # Ensure table is properly sorted by country and year.
-    tb = tb.sort_values(by=["country", "year"]).reset_index(drop=True)
 
     # Select data for all countries at the final year.
     tb_final = tb[tb["year"] == END_YEAR].reset_index(drop=True)
@@ -87,7 +87,10 @@ def run(dest_dir: str) -> None:
 
     # Add percent changes.
     for column in data_columns:
-        tb[f"{column}_pct_change"] = (tb[f"{column}_final_year"] - tb[column]) / tb[column] * 100
+        tb[f"{column}_change"] = (tb[f"{column}_final_year"] - tb[column]) / tb[column] * 100
+
+    # Remove unnecessary columns.
+    tb = tb.drop(columns=[f"{column}_final_year" for column in data_columns])
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
