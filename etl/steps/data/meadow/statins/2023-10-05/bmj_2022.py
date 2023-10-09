@@ -35,7 +35,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Extracting year and renaming columns
-    melted_statin_utilization["year"] = melted_statin_utilization["indicator"].str.extract("(\d+)")  # Extracting year
+    melted_statin_utilization["year"] = melted_statin_utilization["indicator"].str.extract(r"(\d+)")
     melted_statin_utilization["indicator"] = "Statin use"
     melted_statin_utilization["value"] = melted_statin_utilization["value"].astype(float)
 
@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
     health_exp_tb["year"] = 2018
     health_exp_tb["indicator"] = "Health expenditure per capita in 2018 "
     health_exp_tb = health_exp_tb.rename(columns={"health_expenditure_per_capita_2018": "value"})
-    health_exp_tb["value"] = health_exp_tb["value"].replace("[\$,e]", "", regex=True).astype(float)
+    health_exp_tb["value"] = health_exp_tb["value"].replace(r"[\$,e]", "", regex=True).astype(float)
 
     ihd_mort_tb = tb[["country", "ihd_mortality_rate_2019"]]
     ihd_mort_tb["year"] = 2019

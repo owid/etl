@@ -14,8 +14,8 @@ tables:
 
       statin_use:
         title: Statin use
-        unit: "%"
-        short_unit: "%"
+        unit: "per 1000 population ≥ 40 years old"
+        short_unit: ""
         description_short: Based on purchases made by stores and hospitals in 52 countries and, in special cases like the UK, using data about the volume given to patients.
         display:
           numDecimalPlaces: 1
