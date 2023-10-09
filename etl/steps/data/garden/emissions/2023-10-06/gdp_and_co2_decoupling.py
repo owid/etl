@@ -11,9 +11,8 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# First and final years to consider.
-# Percentage changes will start from START_YEAR, START_YEAR + 1, ..., END_Year - 1, and end in END_YEAR.
-START_YEAR = 1990
+# First and final years whose (per capita) GDP and emissions will be compared.
+START_YEAR = 2010
 END_YEAR = 2020
 
 # Columns to select from WDI, and how to rename them.
@@ -21,7 +20,7 @@ COLUMNS_WDI = {
     "country": "country",
     "year": "year",
     # GDP, PPP (constant 2017 international $)
-    "ny_gdp_mktp_pp_kd": "gdp",
+    # "ny_gdp_mktp_pp_kd": "gdp",
     # GDP per capita, PPP (constant 2017 international $)
     "ny_gdp_pcap_pp_kd": "gdp_per_capita",
 }
@@ -30,9 +29,9 @@ COLUMNS_WDI = {
 COLUMNS_GCB = {
     "country": "country",
     "year": "year",
-    "emissions_total": "production_emissions",
-    "emissions_total_per_capita": "production_emissions_per_capita",
-    "consumption_emissions": "consumption_emissions",
+    # "emissions_total": "production_emissions",
+    # "emissions_total_per_capita": "production_emissions_per_capita",
+    # "consumption_emissions": "consumption_emissions",
     "consumption_emissions_per_capita": "consumption_emissions_per_capita",
     # 'emissions_total_including_land_use_change': "",
     # 'emissions_total_including_land_use_change_per_capita': "",
@@ -77,23 +76,29 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(subset=data_columns, how="all").reset_index(drop=True)
 
     # Select years between START_YEAR and END_YEAR.
-    tb = tb[(tb["year"] >= START_YEAR) & (tb["year"] <= END_YEAR)].reset_index(drop=True)
+    # tb = tb[(tb["year"] >= START_YEAR) & (tb["year"] <= END_YEAR)].reset_index(drop=True)
+    tb_start = tb[(tb["year"] == START_YEAR)].reset_index(drop=True)
 
     # Select data for all countries at the final year.
-    tb_final = tb[tb["year"] == END_YEAR].reset_index(drop=True)
+    tb_end = tb[tb["year"] == END_YEAR].reset_index(drop=True)
 
     # Add columns for data on the final year to the main table.
-    tb = tb.merge(tb_final, on="country", how="left", suffixes=("", "_final_year"))
+    tb = tb_start.merge(tb_end, on="country", how="left", suffixes=("_start_year", "_final_year"))
 
     # Add percent changes.
     for column in data_columns:
-        tb[f"{column}_change"] = (tb[f"{column}_final_year"] - tb[column]) / tb[column] * 100
+        tb[f"{column}_change"] = (
+            (tb[f"{column}_final_year"] - tb[f"{column}_start_year"]) / tb[f"{column}_start_year"] * 100
+        )
 
     # Remove unnecessary columns.
-    tb = tb.drop(columns=[f"{column}_final_year" for column in data_columns])
+    tb = tb.drop(columns=[column for column in tb.columns if "year" in column])
+
+    # Drop rows that miss any of the main columns.
+    tb = tb.dropna(how="any").reset_index(drop=True)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.set_index(["country"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
@@ -101,3 +106,29 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset.
     ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()
+
+
+# To quickly inspect the decoupling of GDP per capita vs consumption-based emissions per capita, use this function.
+# def plot_decoupling(tb, countries=None):
+#     import plotly.express as px
+#     import owid.catalog.processing as pr
+#     from tqdm.auto import tqdm
+#     column = "gdp_per_capita_change"
+#     emissions_column = "consumption_emissions_per_capita_change"
+#     _tb = tb.reset_index().astype({"country": str})[["country", column, emissions_column]]
+#     _tb["year"] = START_YEAR
+#     if countries is None:
+#         countries = sorted(set(_tb["country"]))
+#     for country in tqdm(countries):
+#         tb_old = _tb[_tb["country"] == country].reset_index(drop=True)
+#         if (tb_old[emissions_column].isna().all()) or (tb_old[column].isna().all()):
+#             continue
+#         title = tb_old[column].metadata.title or column
+#         tb_new = tb_old.copy()
+#         tb_new["year"] = END_YEAR
+#         tb_old[column] = 0
+#         tb_old[emissions_column] = 0
+#         tb_plot = pr.concat([tb_old, tb_new], ignore_index=True)
+#         tb_plot = tb_plot.melt(id_vars=["country", "year"], var_name="Indicator")
+#         plot = px.line(tb_plot, x="year", y="value", color="Indicator", title=f"{country} - {title}")
+#         plot.show()
