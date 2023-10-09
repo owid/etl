@@ -11,6 +11,11 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# First and final years to consider.
+# Percentage changes will start from START_YEAR, START_YEAR + 1, ..., END_Year - 1, and end in END_YEAR.
+START_YEAR = 1990
+END_YEAR = 2020
+
 # Columns to select from WDI, and how to rename them.
 COLUMNS_WDI = {
     "country": "country",
@@ -58,12 +63,34 @@ def run(dest_dir: str) -> None:
     # Combine both tables.
     tb = tb_gcb.merge(tb_wdi, on=["country", "year"], how="outer", short_name=paths.short_name)
 
+    # Define list of non-index columns.
+    data_columns = [column for column in tb.columns if column not in ["country", "year"]]
+
     # Remove empty rows.
-    tb = tb.dropna(
-        subset=[column for column in tb.columns if column not in ["country", "year"]], how="all"
-    ).reset_index(drop=True)
+    tb = tb.dropna(subset=data_columns, how="all").reset_index(drop=True)
 
     # TODO: Decide a start year, and add percent changes (at least in consumption-based emissions and per capita gdp).
+    # The final table will be indexed by country and (start) year, going from 1990 to 2019.
+    # TODO: Add assertions about final year and start year.
+
+    # Select years between START_YEAR and END_YEAR.
+    tb = tb[(tb["year"] >= START_YEAR) & (tb["year"] <= END_YEAR)].reset_index(drop=True)
+
+    # Ensure table is properly sorted by country and year.
+    tb = tb.sort_values(by=["country", "year"]).reset_index(drop=True)
+
+    # Select data for all countries at the final year.
+    tb_final = tb[tb["year"] == END_YEAR].reset_index(drop=True)
+
+    # Add columns for data on the final year to the main table.
+    tb = tb.merge(tb_final, on="country", how="left", suffixes=("", "_final_year"))
+
+    # Add percent changes.
+    for column in data_columns:
+        tb[f"{column}_pct_change"] = (tb[f"{column}_final_year"] - tb[column]) / tb[column] * 100
+
+    # Set an appropriate index and sort conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
