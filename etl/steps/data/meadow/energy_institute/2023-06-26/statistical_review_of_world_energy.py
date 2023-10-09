@@ -17,23 +17,21 @@ from the main excel file.
 
 import copy
 import re
-from typing import cast
 
 import owid.catalog.processing as pr
-from owid.catalog import License, Source, Table, TableMeta, VariableMeta
+from owid.catalog import License, Source, Table, VariableMeta
 from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def parse_coal_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
+def parse_coal_reserves(data: pr.ExcelFile) -> Table:
     sheet_name = "Coal - Reserves"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=1, metadata=metadata)
+    tb = data.parse(sheet_name, skiprows=1)
 
     # The year of the data is written in the header of the sheet.
     # Extract it using a regular expression.
@@ -92,10 +90,10 @@ def parse_coal_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
     return tb
 
 
-def parse_oil_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
+def parse_oil_reserves(data: pr.ExcelFile) -> Table:
     sheet_name = "Oil - Proved reserves history"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=2, metadata=metadata)
+    tb = data.parse(sheet_name, skiprows=2)
 
     # Check that units are the expected ones.
     assert (
@@ -152,10 +150,10 @@ def parse_oil_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
     return tb
 
 
-def parse_gas_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
+def parse_gas_reserves(data: pr.ExcelFile) -> Table:
     sheet_name = "Gas - Proved reserves history "
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=2, metadata=metadata)
+    tb = data.parse(sheet_name, skiprows=2)
 
     # Check that units are the expected ones.
     assert tb.columns[0] == "Trillion cubic metres", f"Units (or sheet format) may have changed in sheet {sheet_name}"
@@ -208,10 +206,10 @@ def parse_gas_reserves(data: pr.ExcelFile, metadata: TableMeta) -> Table:
     return tb
 
 
-def parse_oil_spot_crude_prices(data: pr.ExcelFile, metadata: TableMeta):
+def parse_oil_spot_crude_prices(data: pr.ExcelFile):
     sheet_name = "Oil - Spot crude prices"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=0, metadata=metadata, na_values=["-"])
+    tb = data.parse(sheet_name, skiprows=0, na_values=["-"])
 
     # Re-create the original column names, assuming the zeroth column is for years.
     tb.columns = ["year"] + [
@@ -242,10 +240,10 @@ def parse_oil_spot_crude_prices(data: pr.ExcelFile, metadata: TableMeta):
     return tb
 
 
-def parse_oil_crude_prices(data: pr.ExcelFile, metadata: TableMeta):
+def parse_oil_crude_prices(data: pr.ExcelFile):
     sheet_name = "Oil crude prices since 1861"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=3, metadata=metadata, na_values=["-"])
+    tb = data.parse(sheet_name, skiprows=3, na_values=["-"])
 
     # Rename columns.
     tb.columns = ["year"] + ["Oil crude prices - " + column for column in tb.columns[1:]]
@@ -267,10 +265,10 @@ def parse_oil_crude_prices(data: pr.ExcelFile, metadata: TableMeta):
     return tb
 
 
-def parse_gas_prices(data: pr.ExcelFile, metadata: TableMeta) -> Table:
+def parse_gas_prices(data: pr.ExcelFile) -> Table:
     sheet_name = "Gas Prices "
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=1, metadata=metadata, na_values="-")
+    tb = data.parse(sheet_name, skiprows=1, na_values="-")
 
     # Re-create the original column names, assuming the zeroth column is for countries.
     tb.iloc[0] = tb.iloc[0].ffill()
@@ -301,10 +299,10 @@ def parse_gas_prices(data: pr.ExcelFile, metadata: TableMeta) -> Table:
     return tb
 
 
-def parse_coal_prices(data: pr.ExcelFile, metadata: TableMeta) -> Table:
+def parse_coal_prices(data: pr.ExcelFile) -> Table:
     sheet_name = "Coal Prices"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=1, metadata=metadata, na_values=["-"])
+    tb = data.parse(sheet_name, skiprows=1, na_values=["-"])
 
     # Remove spurious columns.
     tb = tb.drop(columns=[column for column in tb.columns if column.startswith("Unnamed:") or len(column.strip()) == 0])
@@ -359,10 +357,10 @@ def create_table_of_fossil_fuel_prices(
     return tb_prices
 
 
-def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, metadata: TableMeta) -> Table:
+def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, source: Source, license: License) -> Table:
     sheet_name = "Approximate conversion factors"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=1, metadata=metadata, na_values=["-"])
+    tb = data.parse(sheet_name, skiprows=1, na_values=["-"])
 
     # In the "Approximate conversion factors" sheet, there is a table, called
     # "Thermal equivalent efficiency factors used to convert non-fossil electricity to primary energy."
@@ -417,8 +415,8 @@ def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, metadata: TableMeta)
     efficiency["efficiency_factor"].metadata = VariableMeta(
         title="Thermal equivalent efficiency factors",
         description="Thermal equivalent efficiency factors used to convert non-fossil electricity to primary energy.",
-        sources=metadata.dataset.sources,
-        licenses=metadata.dataset.licenses,
+        sources=[source],
+        licenses=[license],
     )
 
     return efficiency
@@ -429,42 +427,40 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshots.
-    snap = cast(Snapshot, paths.load_dependency("statistical_review_of_world_energy.csv"))
-    snap_additional = cast(Snapshot, paths.load_dependency("statistical_review_of_world_energy.xlsx"))
+    snap = paths.load_snapshot("statistical_review_of_world_energy.csv")
+    snap_additional = paths.load_snapshot("statistical_review_of_world_energy.xlsx")
 
     # Most data comes from the wide-format csv file, and some additional variables from the excel file.
-    tb = pr.read_csv(snap.path, metadata=snap.to_table_metadata(), underscore=True)
-    data_additional = pr.ExcelFile(snap_additional.path)
+    tb = snap.read_csv(underscore=True)
+    data_additional = snap_additional.ExcelFile()
 
     #
     # Process data.
     #
     # Parse coal reserves sheet.
-    tb_coal_reserves = parse_coal_reserves(data=data_additional, metadata=snap_additional.to_table_metadata())
+    tb_coal_reserves = parse_coal_reserves(data=data_additional)
 
     # Parse gas reserves sheeet.
-    tb_gas_reserves = parse_gas_reserves(data=data_additional, metadata=snap_additional.to_table_metadata())
+    tb_gas_reserves = parse_gas_reserves(data=data_additional)
 
     # Parse oil reserves sheeet.
-    tb_oil_reserves = parse_oil_reserves(data=data_additional, metadata=snap_additional.to_table_metadata())
+    tb_oil_reserves = parse_oil_reserves(data=data_additional)
 
     # Parse oil spot crude prices.
-    tb_oil_spot_crude_prices = parse_oil_spot_crude_prices(
-        data=data_additional, metadata=snap_additional.to_table_metadata()
-    )
+    tb_oil_spot_crude_prices = parse_oil_spot_crude_prices(data=data_additional)
 
     # Parse oil crude prices.
-    tb_oil_crude_prices = parse_oil_crude_prices(data=data_additional, metadata=snap_additional.to_table_metadata())
+    tb_oil_crude_prices = parse_oil_crude_prices(data=data_additional)
 
     # Parse gas prices.
-    tb_gas_prices = parse_gas_prices(data=data_additional, metadata=snap_additional.to_table_metadata())
+    tb_gas_prices = parse_gas_prices(data=data_additional)
 
     # Parse coal prices.
-    tb_coal_prices = parse_coal_prices(data=data_additional, metadata=snap_additional.to_table_metadata())
+    tb_coal_prices = parse_coal_prices(data=data_additional)
 
     # Parse thermal equivalent efficiency factors.
     tb_efficiency_factors = parse_thermal_equivalent_efficiency(
-        data=data_additional, metadata=snap_additional.to_table_metadata()
+        data=data_additional, source=snap_additional.m.source, license=snap_additional.m.license
     )
 
     # Combine main table and coal, gas, and oil reserves.
