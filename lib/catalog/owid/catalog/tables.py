@@ -923,7 +923,7 @@ class Table(pd.DataFrame):
                     by_type = by.dtype
                 else:
                     by_type = "unknown"
-                if by_type == "category":
+                if isinstance(by_type, str) and by_type == "category":
                     log.warning(
                         f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour."
                     )
@@ -1451,6 +1451,11 @@ def read_json(
 
 
 class ExcelFile(pd.ExcelFile):
+    def __init__(self, *args, metadata: Optional[TableMeta] = None, origin: Optional[Origin] = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.metadata = metadata
+        self.origin = origin
+
     def parse(
         self,
         sheet_name: Union[str, int] = 0,
@@ -1460,6 +1465,9 @@ class ExcelFile(pd.ExcelFile):
         underscore: bool = False,
         **kwargs,
     ):
+        metadata = metadata or self.metadata
+        origin = origin or self.origin
+
         # Note: Maybe we should include the sheet name in parents.
         df = super().parse(sheet_name=sheet_name, *args, **kwargs)  # type: ignore
         table = Table(df, underscore=underscore, short_name=str(sheet_name))

@@ -1,9 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-import owid.catalog.processing as pr
-
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -23,10 +20,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("uk_egg_statistics.ods")
+    snap = paths.load_snapshot("uk_egg_statistics.ods")
 
     # Load data from snapshot.
-    tb = pr.read_excel(snap.path, sheet_name="Packers_Annual", skiprows=2, metadata=snap.to_table_metadata())
+    tb = snap.read_excel(sheet_name="Packers_Annual", skiprows=2)
 
     #
     # Process data.

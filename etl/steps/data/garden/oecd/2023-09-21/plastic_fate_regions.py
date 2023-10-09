@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import numpy as np
 import owid.catalog.processing as pr
 
 from etl.data_helpers import geo
@@ -53,9 +52,6 @@ def run(dest_dir: str) -> None:
 
     tb = tb.underscore().sort_index()
     tb = tb.drop(["share_total", "value_total_share"], axis=1)  # Remove the total from total column
-
-    # hotfix problems with <1%, remove this when we fix grapher
-    tb.loc[tb["value_incinerated_share"] < 0.5, "value_incinerated_share"] = np.nan
 
     #
     # Save outputs.

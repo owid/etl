@@ -1,10 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
-from pathlib import Path
-
 import numpy as np
-import owid.catalog.processing as pr
-from owid.catalog import Table, TableMeta
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
@@ -13,13 +10,11 @@ from etl.snapshot import Snapshot
 paths = PathFinder(__file__)
 
 
-def read_data(file_name: Path, metadata: TableMeta) -> Table:
-    temp = pr.read_excel(file_name, header=None)
+def read_data(snap: Snapshot) -> Table:
+    temp = snap.read_excel(header=None)
     line_number_start = [i for i, line in enumerate(temp[temp.columns[0]]) if str(line).strip().lower() == "country"][0]
     line_number_end = [i for i, line in enumerate(temp[temp.columns[0]]) if str(line).strip().lower() == "total"][0]
-    tb = pr.read_excel(
-        file_name, skiprows=line_number_start, nrows=line_number_end - line_number_start, metadata=metadata
-    )
+    tb = snap.read_excel(skiprows=line_number_start, nrows=line_number_end - line_number_start)
 
     return tb
 
@@ -51,8 +46,8 @@ def run(dest_dir: str) -> None:
     # Load and process inputs.
     #
     # Load snapshot.
-    snap: Snapshot = paths.load_dependency("number_of_wild_fish_killed_for_food.xlsx")
-    tb = read_data(file_name=snap.path, metadata=snap.to_table_metadata())
+    snap = paths.load_snapshot("number_of_wild_fish_killed_for_food.xlsx")
+    tb = read_data(snap=snap)
 
     #
     # Process data.
