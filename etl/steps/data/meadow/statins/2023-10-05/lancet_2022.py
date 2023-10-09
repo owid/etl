@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     tb["statin_use_secondary"] = tb["statin_use_secondary"].str.split("(").str[0].str.strip().astype(float)
     tb["statin_use_primary"] = tb["statin_use_primary"].str.split("(").str[0].str.strip().astype(float)
     # Drop rows that contain only NaN values and row with Grenadines (actually belongs to St. Vincent and the Grenadines, row above)
-    tb = tb[tb["country"] != " Grenadines"]
+    tb = tb[tb["country"] != "Grenadines"]
     tb = tb.dropna(how="all")
     tb["year"] = 2019
 
