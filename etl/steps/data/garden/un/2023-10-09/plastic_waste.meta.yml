@@ -1,0 +1,118 @@
+# NOTE: To learn more about the fields, hover over their names.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  plastic_waste:
+    variables:
+      import_total_mot:
+        title: Imports of plastic waste via all modes of transport
+        unit: kilograms
+        short_unit: kg
+      export_total_mot:
+        title: Exports of plastic waste via all modes of transport
+        unit: kilograms
+        short_unit: kg
+      import_air:
+        title: Imports of plastic waste via air
+        unit: kilograms
+        short_unit: kg
+      import_sea:
+        title: Imports of plastic waste via sea
+        unit: kilograms
+        short_unit: kg
+      import_railway:
+        title: Imports of plastic waste via railway
+        unit: kilograms
+        short_unit: kg
+      import_road:
+        title: Imports of plastic waste via road
+        unit: kilograms
+        short_unit: kg
+      export_air:
+        title: Exports of plastic waste via air
+        unit: kilograms
+        short_unit: kg
+      export_sea:
+        title: Exports of plastic waste via sea
+        unit: kilograms
+        short_unit: kg
+      export_road:
+        title: Exports of plastic waste via roads
+        unit: kilograms
+        short_unit: kg
+      import_other_mot:
+        title: Imports of plastic waste via other modes of tranport
+        unit: kilograms
+        short_unit: kg
+      import_postal_consignments__mail_or_courier_shipment:
+        title: Imports of plastic waste via postal or courier services
+        unit: kilograms
+        short_unit: kg
+      export_other_mot:
+        title: Exports of plastic waste via other modes of transport
+        unit: kilograms
+        short_unit: kg
+      import_inland_waterway:
+        title: Imports of plastic waste via inland waterways
+        unit: kilograms
+        short_unit: kg
+      export_inland_waterway:
+        title: Exports of plastic waste via inland waterways
+        unit: kilograms
+        short_unit: kg
+      export_railway:
+        title: Exports of plastic waste via railway
+        unit: kilograms
+        short_unit: kg
+      export_postal_consignments__mail_or_courier_shipment:
+        title: Exports of plastic waste via postal or courier services
+        unit: kilograms
+        short_unit: kg
+      import_pipelines__cables__postal_and_others:
+        title: Imports of plastic waste via pipelines, cables, and other methods
+        unit: kilograms
+        short_unit: kg
+      export_water__not_else_classified:
+        title: Unspecified waterborne exports of plastic waste
+        unit: kilograms
+        short_unit: kg
+      export_self_propelled_goods:
+        title: Exports of self-propelled plastic waste
+        unit: kilograms
+        short_unit: kg
+      import_land:
+        title: Land-based imports of plastic waste
+        unit: kilograms
+        short_unit: kg
+      export_land:
+        title: Land-based exports of plastic waste
+        unit: kilograms
+        short_unit: kg
+      export_pipelines_and_cables:
+        title: Exports of plastic waste via pipelines and cables
+        unit: kilograms
+        short_unit: kg
+      import_pipelines_and_cables:
+        title: imports of plastic waste via pipelines and cables
+        unit: kilograms
+        short_unit: kg
+      import_water:
+        title: Waterborne imports of plastic waste
+        unit: kilograms
+        short_unit: kg
+      import_self_propelled_goods:
+        title: Imports of self-propelled plastic waste goods
+        unit: kilograms
+        short_unit: kg
+      export_water:
+        title: Waterborne exports of plastic waste
+        unit: kilograms
+        short_unit: kg
+      import_land__not_else_classified:
+        title: Unspecified land-based imports of plastic waste
+        unit: kilograms
+        short_unit: kg
+      export_land__not_else_classified:
+        title: Unspecified land-based exports of plastic waste
+        unit: kilograms
+        short_unit: kg
