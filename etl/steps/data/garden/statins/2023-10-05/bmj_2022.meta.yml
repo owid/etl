@@ -1,0 +1,21 @@
+# NOTE: To learn more about the fields, hover over their names.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  bmj_2022:
+    variables:
+      essential_medicine_list:
+        title: Statin inclusion on essential medicine list
+        unit: arbitrary units
+        short_unit: au
+        description_short: Denotes whether statins were included in national Essential Medicines Lists (EMLs).
+        display:
+          numDecimalPlaces: 0
+
+      statin_use:
+        title: Statin use
+        unit: "%"
+        short_unit: "%"
+        description_short: Based on purchases made by stores and hospitals in 52 countries and, in special cases like the UK, using data about the volume given to patients.
+        display:
+          numDecimalPlaces: 1
