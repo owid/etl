@@ -6,7 +6,6 @@ Some auxiliary variables will be added (where nans are filled with zeros, to avo
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
 
@@ -19,7 +18,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset and read its main table.
-    ds_garden: Dataset = paths.load_dependency("global_carbon_budget")
+    ds_garden = paths.load_dataset("global_carbon_budget")
     tb_garden = ds_garden["global_carbon_budget"]
 
     #
@@ -32,10 +31,6 @@ def run(dest_dir: str) -> None:
     years = np.arange(tb_garden.reset_index()["year"].min(), tb_garden.reset_index()["year"].max() + 1, dtype=int)
     tb_garden = tb_garden.reindex(pd.MultiIndex.from_product([countries, years], names=["country", "year"]))
 
-    # Remove sources from all indicators
-    for col in tb_garden.columns:
-        tb_garden[col].m.sources = []
-
     #
     # Save outputs.
     #
@@ -45,7 +40,6 @@ def run(dest_dir: str) -> None:
         tables=[tb_garden],
         default_metadata=ds_garden.metadata,
         check_variables_metadata=True,
-        if_origins_exist="append",
     )
 
     # Sanity checks.

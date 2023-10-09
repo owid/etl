@@ -10,12 +10,10 @@ It combines the following snapshots:
 
 """
 
-import owid.catalog.processing as pr
 from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Initialize logger.
 log = get_logger()
@@ -117,7 +115,7 @@ def prepare_land_use_emissions(tb_land_use: Table) -> Table:
     assert set(tb_land_use["country"]) == set(quality_flag["country"]), error
 
     # Add quality factor as an additional column.
-    tb_land_use = pr.merge(tb_land_use, quality_flag, how="left", on="country")
+    tb_land_use = tb_land_use.merge(quality_flag, how="left", on="country")
 
     # Copy metadata from another existing variable to the new quality flag.
     tb_land_use["quality_flag"] = tb_land_use["quality_flag"].copy_metadata(tb_land_use["emissions"])
@@ -181,33 +179,25 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshots.
-    snap_fossil_co2: Snapshot = paths.load_dependency("global_carbon_budget_fossil_co2_emissions.csv")
-    snap_global: Snapshot = paths.load_dependency("global_carbon_budget_global_emissions.xlsx")
-    snap_national: Snapshot = paths.load_dependency("global_carbon_budget_national_emissions.xlsx")
-    snap_land_use: Snapshot = paths.load_dependency("global_carbon_budget_land_use_change_emissions.xlsx")
+    snap_fossil_co2 = paths.load_snapshot("global_carbon_budget_fossil_co2_emissions.csv")
+    snap_global = paths.load_snapshot("global_carbon_budget_global_emissions.xlsx")
+    snap_national = paths.load_snapshot("global_carbon_budget_national_emissions.xlsx")
+    snap_land_use = paths.load_snapshot("global_carbon_budget_land_use_change_emissions.xlsx")
 
     # Load data from fossil CO2 emissions.
-    tb_fossil_co2 = pr.read_csv(snap_fossil_co2.path, metadata=snap_fossil_co2.to_table_metadata())
+    tb_fossil_co2 = snap_fossil_co2.read()
 
     # Load historical budget from the global emissions file.
-    tb_historical = pr.read_excel(
-        snap_global.path, sheet_name="Historical Budget", skiprows=15, metadata=snap_global.to_table_metadata()
-    )
+    tb_historical = snap_global.read(sheet_name="Historical Budget", skiprows=15)
 
     # Load land-use emissions.
-    tb_land_use = pr.read_excel(
-        snap_land_use.path, sheet_name="BLUE", skiprows=7, metadata=snap_land_use.to_table_metadata()
-    )
+    tb_land_use = snap_land_use.read(sheet_name="BLUE", skiprows=7)
 
     # Load production-based national emissions.
-    tb_production = pr.read_excel(
-        snap_national.path, sheet_name="Territorial Emissions", skiprows=11, metadata=snap_national.to_table_metadata()
-    )
+    tb_production = snap_national.read(sheet_name="Territorial Emissions", skiprows=11)
 
     # Load consumption-based national emissions.
-    tb_consumption = pr.read_excel(
-        snap_national.path, sheet_name="Consumption Emissions", skiprows=8, metadata=snap_national.to_table_metadata()
-    )
+    tb_consumption = snap_national.read(sheet_name="Consumption Emissions", skiprows=8)
 
     #
     # Process data.
