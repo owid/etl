@@ -15,7 +15,6 @@ nav:
     - Adding data:
       - Adding data: "tutorials/adding-data/index.md"
       - Wizard: "tutorials/adding-data/wizard.md"
-      - Walkthrough: "tutorials/adding-data/walkthrough.md"
       - Manually add: "tutorials/adding-data/manual.md"
       - Fast-track: "tutorials/adding-data/fast-track.md"
     - Updating charts:
@@ -60,6 +59,8 @@ nav:
           - Dataset: "architecture/metadata/reference/dataset.md"
           - Tables: "architecture/metadata/reference/tables.md"
         - Propagation of metadata: "architecture/metadata/propagation.md"
+        - Structuring YAML file: "architecture/metadata/structuring-yaml.md"
+        - Data Pages Workflow: "architecture/metadata/data_pages_workflow.md"
         - Using metadata: "architecture/metadata/using.md"
       - Our journey: "architecture/our-journey.md"
   - API and catalog:
@@ -115,6 +116,7 @@ theme:
 
 markdown_extensions:
   - pymdownx.critic
+  - pymdownx.keys
   - admonition
   - abbr
   - attr_list

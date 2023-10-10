@@ -1,4 +1,4 @@
-Here's a summary of this walkthrough, you don't have to manually execute anything, all of it will be done automatically after submitting a form below
+Here's a summary of this wizard, you don't have to manually execute anything, all of it will be done automatically after submitting a form below
 
 1. **Create a new `garden` step** (e.g. `etl/etl/steps/data/garden/example_institution/YYYY-MM-DD/example_dataset.py`). The step must contain a `run(dest_dir)` function that loads data from the last `meadow` step, processes the data and creates a dataset with one or more tables and the necessary metadata.
 

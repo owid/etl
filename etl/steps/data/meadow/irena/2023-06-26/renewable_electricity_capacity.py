@@ -1,10 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
-from pathlib import Path
-from typing import cast
-
 import owid.catalog.processing as pr
-from owid.catalog import Table, TableMeta
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
@@ -13,7 +10,7 @@ from etl.snapshot import Snapshot
 paths = PathFinder(__file__)
 
 
-def extract_capacity_from_sheet(excel_object: pr.ExcelFile, sheet_name: str, metadata: TableMeta) -> Table:
+def extract_capacity_from_sheet(excel_object: pr.ExcelFile, sheet_name: str) -> Table:
     # The name of the energy source is given in the very first cell.
     # To get that, I load the file, skipping all rows from the bottom.
     # The first column is the content of the first cell.
@@ -24,7 +21,7 @@ def extract_capacity_from_sheet(excel_object: pr.ExcelFile, sheet_name: str, met
     assert all([not character.isdigit() for character in technology])
 
     # The format of this dataset is inconvenient and requires some adjustment that may not work on the next update.
-    tb = excel_object.parse(sheet_name=sheet_name, skiprows=4, metadata=metadata)  # type: ignore
+    tb = excel_object.parse(sheet_name=sheet_name, skiprows=4)  # type: ignore
 
     # There are two tables put together: One for capacity and one for production.
     # Keep only columns for capacity that start with a year.
@@ -54,15 +51,15 @@ def extract_capacity_from_sheet(excel_object: pr.ExcelFile, sheet_name: str, met
     return tb
 
 
-def extract_capacity_from_all_sheets(data_file: Path, metadata: TableMeta) -> Table:
+def extract_capacity_from_all_sheets(snap: Snapshot) -> Table:
     # Select sheets that contain data (their names are numbers).
-    excel_object = pr.ExcelFile(data_file)
+    excel_object = snap.ExcelFile()
     sheet_names = [sheet for sheet in excel_object.sheet_names if sheet.strip().isdigit()]
 
     # Extract data sheet by sheet.
-    all_data = Table(metadata=metadata)
+    all_data = Table(metadata=snap.to_table_metadata())
     for sheet_name in sheet_names:
-        data = extract_capacity_from_sheet(excel_object=excel_object, sheet_name=sheet_name, metadata=metadata)
+        data = extract_capacity_from_sheet(excel_object=excel_object, sheet_name=sheet_name)
         all_data = pr.concat([all_data, data], ignore_index=True)
 
     # Set a short name to the new table.
@@ -90,10 +87,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("renewable_electricity_capacity_and_generation.xlsm"))
+    snap = paths.load_snapshot("renewable_electricity_capacity_and_generation.xlsm")
 
     # Load and prepare data from snapshot.
-    tb = extract_capacity_from_all_sheets(data_file=snap.path, metadata=snap.to_table_metadata())
+    tb = extract_capacity_from_all_sheets(snap=snap)
 
     #
     # Save outputs.

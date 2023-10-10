@@ -23,7 +23,7 @@ meta:
     # Citation
     producer: {{cookiecutter.producer}}
     citation_full: |-
-      {{cookiecutter.citation_full}}
+      {{cookiecutter.citation_full.replace("\n", "\n      ")}}
     {%- if cookiecutter.attribution %}
     attribution: {{cookiecutter.attribution}}
     {%- endif %}

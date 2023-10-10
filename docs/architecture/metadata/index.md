@@ -13,7 +13,7 @@ In our [data model](../design/common-format.md) there are various data objects (
 
 
 
-The metadata is ingested into ETL in the form of YAML files, which live next to the scripts. Metadata can be ingested at any ETL step to tweak, change and add new metadata. However, the most standard places to have metadata defined are in Snapshot and in Garden.
+The metadata is ingested into ETL in the form of [YAML files](./structuring-yaml.md), which live next to the scripts. Metadata can be ingested at any ETL step to tweak, change and add new metadata. However, the most standard places to have metadata defined are in Snapshot and in Garden.
 
 
 ## Snapshot
