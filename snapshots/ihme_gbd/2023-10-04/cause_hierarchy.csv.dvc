@@ -13,8 +13,8 @@ meta:
     producer: Institute for Health Metrics and Evaluation
     citation_full: |-
       Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2019 (GBD 2019) Cause, REI, and Location Hierarchies. Seattle, United States of America: Institute for Health Metrics and Evaluation (IHME), 2020.
-    attribution: IHME, Global Burden of Disease Study
-    attribution_short: IHME, GBD
+    attribution: IHME - Global Burden of Disease Study (2019)
+    attribution_short: IHME - GBD
 
     # Files
     url_main: https://ghdx.healthdata.org/record/ihme-data/gbd-2019-cause-rei-and-location-hierarchies

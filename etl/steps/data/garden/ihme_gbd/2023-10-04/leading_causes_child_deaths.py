@@ -14,14 +14,14 @@ log = get_logger()
 
 def run(dest_dir: str) -> None:
     # Load in the cause of death data and hierarchy of causes data
-    tb_cause = paths.load_dataset("gbd_cause")
-    tb_hierarchy = paths.load_dataset("cause_hierarchy")
-    tb_hierarchy = tb_hierarchy["cause_hierarchy"]
+    ds_cause = paths.load_dataset("gbd_cause")
+    ds_hierarchy = paths.load_dataset("cause_hierarchy")
+    tb_hierarchy = ds_hierarchy["cause_hierarchy"].reset_index()
 
-    # Underschore the hierachy cause names to match tb_cause
+    # Underscore the hierarchy cause names to match tb_cause
     tb_hierarchy["cause_name_underscore"] = tb_hierarchy["cause_name"].apply(underscore)
     tb_hierarchy = add_owid_hierarchy(tb_hierarchy)
-    # We'll iterate through each level of the hierachy to find the leading cause of death in under-fives in each country-year
+    # We'll iterate through each level of the hierarchy to find the leading cause of death in under-fives in each country-year
     levels = [1, 2, 3, 4, "owid_all_ages", "owid_under_5"]
     age_groups = ["under_5", "all_ages"]
 
@@ -35,7 +35,7 @@ def run(dest_dir: str) -> None:
             # Create table with leading cause of death at this level for each country-year
             tb_level = create_hierarchy_table(
                 age_group=age_group,
-                tb_cause=tb_cause,
+                tb_cause=ds_cause,
                 level_causes=level_causes,
                 short_name=f"leading_cause_level_{level}_in_{age_group}",
             )
@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
             tb_level = tb_level.set_index(["country", "year"], verify_integrity=True)
             tb_out.append(tb_level)
 
-    # Removing the tables where we the age group doesn't match the hierarchy
+    # Removing the tables where the age group doesn't match the hierarchy
     tb_out = [
         tb
         for tb in tb_out
@@ -62,7 +62,7 @@ def run(dest_dir: str) -> None:
         dest_dir,
         tables=tb_out,
         check_variables_metadata=True,
-        default_metadata=tb_cause.metadata,
+        default_metadata=ds_cause.metadata,
     )
 
     # Save changes in the new garden dataset.
@@ -84,7 +84,7 @@ def create_hierarchy_table(age_group: str, tb_cause: Table, level_causes: List[s
             if death_col in tb.columns:
                 cols = ["country", "year", death_col]
                 tb = tb[cols]
-                tb = tb.rename(columns={death_col: cause_name})
+                tb = tb.rename(columns={death_col: cause_name}, errors="raise")
                 tb_out = pr.concat([tb_out, tb])
 
     # Melt the table from wide to long to make it easier to groupby
@@ -118,7 +118,7 @@ def clean_disease_names(tb: Table, tb_hierarchy: Table, level: Any) -> Table:
     disease_dict = {
         "Neonatal encephalopathy due to birth asphyxia and trauma": "Asphyxia and trauma",
         "Neonatal preterm birth": "Preterm birth",
-        "Exposure to forces of nature": "Natural diasasters",
+        "Exposure to forces of nature": "Natural disasters",
         "Neoplasms": "Cancer",
     }
 

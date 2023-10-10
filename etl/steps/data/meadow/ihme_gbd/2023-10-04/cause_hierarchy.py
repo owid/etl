@@ -13,14 +13,8 @@ def run(
     snap = paths.load_snapshot("cause_hierarchy.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
-    #
-    # Process data.
-    #
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore()
-
-    #
+    tb = snap.read(underscore=True)
+    tb = tb.set_index(["cause_name"], verify_integrity=True)
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
