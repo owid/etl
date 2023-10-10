@@ -15,7 +15,7 @@ def init_app():
         page_icon="🧑‍🍳",
         initial_sidebar_state="collapsed",
         menu_items={
-            "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=walkthrough&projects=&template=walkthrough-issue---.md&title=walkthrough%3A+meaningful+title+for+the+issue",
+            "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
             "About": """
     After the new dataset has been correctly upserted into the database, we need to update the affected charts. This step helps with that. These are the steps (this is all automated):
 

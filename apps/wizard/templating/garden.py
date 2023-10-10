@@ -108,7 +108,7 @@ def _check_dataset_in_meadow(form: GardenForm) -> None:
 def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     """Fill dummy metadata yaml file with some dummy values.
 
-    Only useful when `--dummy-data` is used. We need this to avoid errors in `walkthrough grapher --dummy-data`.
+    Only useful when `--dummy-data` is used. We need this to avoid errors in `etl-wizard grapher --dummy-data`.
     """
     with open(metadata_path, "r") as f:
         doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
