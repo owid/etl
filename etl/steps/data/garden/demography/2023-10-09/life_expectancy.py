@@ -10,6 +10,22 @@ paths = PathFinder(__file__)
 # Year of last estimate
 YEAR_ESTIMATE_LAST = 2021
 
+# Region mapping
+# We will be using continent names without (Entity) suffix. This way charts show continuity between lines from different datasets (e.g. riley and UN)
+REGION_MAPPING = {
+    "Africa (Riley 2005)": "Africa",
+    "Americas (Riley 2005)": "Americas",
+    "Asia (Riley 2005)": "Asia",
+    "Europe (Riley 2005)": "Europe",
+    "Oceania (Riley 2005)": "Oceania",
+    "Africa (UN)": "Africa",
+    "Northern America (UN)": "Northern America",
+    "Latin America and the Caribbean (UN)": "Latin America and the Caribbean",
+    "Asia (UN)": "Asia",
+    "Europe (UN)": "Europe",
+    "Oceania (UN)": "Oceania",
+}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -17,8 +33,8 @@ def run(dest_dir: str) -> None:
     #
     # Load datasets
     ## Life tables
-    ds_meadow = paths.load_dataset("life_tables")
-    tb_lt = ds_meadow["life_tables"].reset_index()
+    ds_lt = paths.load_dataset("life_tables")
+    tb_lt = ds_lt["life_tables"].reset_index()
     ## zijdeman_et_al_2015
     ds_zi = paths.load_dataset("zijdeman_et_al_2015")
     tb_zi = ds_zi["zijdeman_et_al_2015"].reset_index()
@@ -38,7 +54,14 @@ def run(dest_dir: str) -> None:
     tb_ri = process_ri(tb_ri)
 
     tb = combine_tables(tb_lt, tb_un, tb_zi, tb_ri)
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+
+    ## Check values
+    _check_column_values(tb, "sex", {"all", "male", "female"})
+    _check_column_values(tb, "age", {0, 15, 65, 80})
+    _check_column_values(tb, "type", {"period", "cohort"})
+
+    ## Set index
+    tb = tb.set_index(["location", "year", "type", "sex", "age"], verify_integrity=True)
 
     #
     # Save outputs.
@@ -148,6 +171,9 @@ def process_zi(tb: Table) -> Table:
     # Dtypes
     tb = tb.astype({"location": str})
 
+    # Resulution
+    tb["life_expectancy"] = tb["life_expectancy"].astype("float64").round(3)
+
     # Sanity check
     assert tb["year"].max() == 2012, f"Last year was {tb['year'].max()}, but should be 2012"
 
@@ -163,7 +189,7 @@ def process_ri(tb: Table) -> Table:
     ## dimension values: metric=life_expectancy, variant=medium, year >= YEAR_ESTIMATE_LAST
     ## columns: location, year, value, sex, age
     tb = tb.loc[
-        (tb["year"] <= YEAR_ESTIMATE_LAST),
+        (tb["year"] < 1950),
     ]
 
     # Rename column names
@@ -174,10 +200,20 @@ def process_ri(tb: Table) -> Table:
     tb["sex"] = "all"
     tb["age"] = 0
 
+    # Resolution
+    tb["life_expectancy"] = tb["life_expectancy"].astype("float64").round(1)
+
     return tb
 
 
 def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Table:
+    """Combine all LE tables.
+
+    - Only HMD (within LT) contains cohort data.
+    - LE broken down by sex and age is available from LT and UN_WPP.
+    - LT already contains UN_WPP data, but without projections. That's why we also use UN WPP's
+    - RIL and ZIJ contain figures for all sexes and at birth. Only period.
+    """
     tb = pr.concat([tb_lt, tb_un], ignore_index=True)
 
     # Separate LE at birth from at different ages
@@ -186,14 +222,15 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
 
     # Extend tb_0
     ## Zijdeman: complement country data
-    tb_0 = tb_0.merge(tb_zi, how="outer", on=["location", "year", "type", "sex", "age"], suffixes=["", "_zij"])
-    tb_0 = tb_0["life_expectancy"].fillna(tb_0["life_expectancy_zij"])
+    tb_0 = tb_0.merge(tb_zi, how="outer", on=["location", "year", "type", "sex", "age"], suffixes=("", "_zij"))
+    tb_0["life_expectancy"] = tb_0["life_expectancy"].fillna(tb_0["life_expectancy_zij"])
+    tb_0 = tb_0.drop(columns=["life_expectancy_zij"])
     ## Riley: complement with continent data
     tb_0 = pr.concat([tb_0, tb_ri], ignore_index=True)
 
     # Combine tb_0 with tb
-    tb = tb.merge(tb_0, on=["location", "year", "type", "sex", "age"], how="left")
-    return tb_lt
+    tb = tb.merge(tb_0, on=["location", "year", "type", "sex", "age"], how="outer", suffixes=("", "_0"))
+    return tb
 
 
 def _check_column_values(tb: Table, column: str, expected_values: set) -> None:
