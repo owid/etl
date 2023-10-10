@@ -110,7 +110,7 @@ def _merge_table_metadata(meta: dict, new: dict) -> dict:
     """Merge TableMeta in a dictionary with another dictionary. It modifies the original object."""
     for k, v in new.items():
         if k != "variables":
-            setattr(meta, k, v)
+            meta[k] = v
     return meta
 
 

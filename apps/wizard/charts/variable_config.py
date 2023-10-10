@@ -1,4 +1,4 @@
-"""Concerns the second stage of walkthrough charts, when the variable mapping is constructed."""
+"""Concerns the second stage of wizard charts, when the variable mapping is constructed."""
 import uuid
 from typing import Any, Dict, List, Literal
 
