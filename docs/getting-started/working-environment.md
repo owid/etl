@@ -195,7 +195,7 @@ This will list all the folders and directories in the project. Find a brief expl
 | `etl/`       | This is home to our ETL library. This is where all the recipes to generate our datasets live. |
 | `snapshots/`       | This is the entry point to ETL. This folder contains metadata and code to get external data and import it to our pipeline. |
 | `dag/`    | Contains the dataset dependencies. That is, if `dataset A` needs `dataset B` to be up to date, this should be listed here. |
-| `apps/`    | Apps built around and for ETL management. Some include `walkthrough`, `backport`, `fasttrack`, etc. |
+| `apps/`    | Apps built around and for ETL management. Some include `wizard`, `backport`, `fasttrack`, etc. |
 | `data/`    | When you run the recipe code for a dataset, the dataset will be created under this directory. Note that not all the content from this directory is added to git. |
 | `schemas/`    | Metadata schemas for ETL datasets. |
 | `scripts/`    | Various scripts. |
