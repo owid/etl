@@ -114,9 +114,15 @@ def run(dest_dir: str) -> None:
     # Add per capita metrics
     paths.log.info("add per capita")
     tb = add_per_capita_variables(tb)
+
     # Add net exports
+    paths.log.info("add net exports")
     tb["net_export"] = tb["Export_TOTAL MOT"] - tb["Import_TOTAL MOT"]
     tb["net_export"].metadata.origins = tb["Import_TOTAL MOT"].metadata.origins
+
+    # Add share from total for total exports, imports, total exports by air and total imports by air
+    paths.log.info("add share from total exports and imports")
+    tb = add_share_from_total(tb)
 
     # Set index
     tb = tb.underscore().set_index(["year", "country"], verify_integrity=True).sort_index()
@@ -194,3 +200,54 @@ def add_per_capita_variables(tb: Table) -> Table:
     tb_with_per_capita = tb_with_per_capita.drop(columns=["population"])
 
     return tb_with_per_capita
+
+
+def add_share_from_total(tb: Table) -> Table:
+    """
+    Calculate the share of imports and exports for each country relative to
+    the world total and add these as new columns to the input dataframe.
+
+    The function performs the following steps:
+    - Extracts world totals for each year for the columns 'Import_TOTAL MOT' and 'Export_TOTAL MOT'.
+    - Merges the world totals with the main dataframe on the 'year' column.
+    - Calculates the import and export share for each country as a percentage of the world total.
+    - Drops the columns used for intermediate calculations.
+
+    Parameters
+    ----------
+    tb : pandas.DataFrame
+        The input data frame, which must contain at least the following columns:
+        - 'country': The name of the country.
+        - 'year': The year of the data.
+        - 'Import_TOTAL MOT': The total import value for the country in the given year.
+        - 'Export_TOTAL MOT': The total export value for the country in the given year.
+
+    Returns
+    -------
+    merged_df : pandas.DataFrame
+        A dataframe with the same columns as `tb`, plus two additional columns:
+        - 'import_share': The share of the country's imports relative to the world total, expressed as a percentage.
+        - 'export_share': The share of the country's exports relative to the world total, expressed as a percentage.
+
+    """
+
+    # Extract the World totals for each year
+    world_totals = tb[tb["country"] == "World"][
+        ["year", "Import_TOTAL MOT", "Export_TOTAL MOT", "Import_Air", "Export_Air"]
+    ]
+
+    # Merge these totals with the main dataframe on the year column
+    merged_df = pr.merge(tb, world_totals, on="year", suffixes=("", "_World"))
+
+    # Calculate the shares for each country
+    merged_df["import_share"] = (merged_df["Import_TOTAL MOT"] / merged_df["Import_TOTAL MOT_World"]) * 100
+    merged_df["export_share"] = (merged_df["Export_TOTAL MOT"] / merged_df["Export_TOTAL MOT_World"]) * 100
+    merged_df["import_share_air"] = (merged_df["Import_Air"] / merged_df["Import_Air_World"]) * 100
+    merged_df["export_share_air"] = (merged_df["Export_Air"] / merged_df["Export_Air_World"]) * 100
+
+    # Drop the intermediate columns used for calculations
+    merged_df = merged_df.drop(
+        columns=["Import_TOTAL MOT_World", "Export_TOTAL MOT_World", "Import_Air_World", "Export_Air_World"]
+    )
+
+    return merged_df
