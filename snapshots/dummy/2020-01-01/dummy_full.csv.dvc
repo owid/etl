@@ -10,7 +10,7 @@ meta:
     attribution_short: '[origin.attribution_short]'
     version_producer: '[origin.version_producer]'
     url_main: '[origin.url_main]'
-    url_download: https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv
+    url_download: https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv
     date_published: 2000-01-01
     date_accessed: 2020-01-01
   license:

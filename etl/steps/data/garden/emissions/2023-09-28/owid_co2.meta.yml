@@ -1,0 +1,9 @@
+dataset:
+  title: OWID CO2 dataset (2023b)
+  description: |
+    OWID CO2 dataset.
+
+    This dataset will be loaded by [the co2-data repository](https://github.com/owid/co2-data), to create a csv file of the dataset that can be downloaded in one click.
+
+# Dataset sources will be created in the step by combining all component datasets' sources.
+# Also, table metadata will be built from the tables' original metadata.

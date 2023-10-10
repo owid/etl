@@ -558,9 +558,11 @@ steps:
     - snapshot://harvard/2023-09-18/colonial_dates_dataset.csv
   data://garden/harvard/2023-09-18/colonial_dates_dataset:
     - data://meadow/harvard/2023-09-18/colonial_dates_dataset
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
   data://grapher/harvard/2023-09-18/colonial_dates_dataset:
     - data://garden/harvard/2023-09-18/colonial_dates_dataset
-    
+
   # Augmented Human Development Index
   data://meadow/ahdi/2023-09-08/augmented_hdi:
     - snapshot://ahdi/2023-09-08/augmented_hdi.xlsx
@@ -648,7 +650,7 @@ include:
   - dag/open_numbers.yml
   - dag/faostat.yml
   - dag/energy.yml
-  - dag/walkthrough.yml
+  - dag/wizard.yml
   - dag/examples.yml
   - dag/emissions.yml
   - dag/papers.yml

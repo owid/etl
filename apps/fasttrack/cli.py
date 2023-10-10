@@ -29,7 +29,7 @@ from rich import print
 from rich.console import Console
 from sqlmodel import Session
 
-from apps.walkthrough import utils as walkthrough_utils
+from apps.wizard import utils as wizard_utils
 from etl import config
 from etl import grapher_model as gm
 from etl.command import main as etl_main
@@ -47,7 +47,7 @@ from etl.paths import (
 )
 from etl.snapshot import Snapshot, SnapshotMeta
 
-from . import csv, sheets
+from . import csv, pywebio_utils, sheets
 
 config.enable_bugsnag()
 
@@ -226,19 +226,19 @@ def app(dummy_data: bool, commit: bool) -> None:
     po.put_warning("This tool is still in beta. Please report any issues to @Mojmir")
 
     with open(CURRENT_DIR / "instructions_sheets.md", "r") as f:
-        walkthrough_utils.put_widget(
+        pywebio_utils.put_widget(
             title=po.put_html("<b>Instructions for importing Google Sheet</b>"),
             contents=[po.put_markdown(f.read())],
         )
 
     with open(CURRENT_DIR / "instructions_csv.md", "r") as f:
-        walkthrough_utils.put_widget(
+        pywebio_utils.put_widget(
             title=po.put_html("<b>Instructions for importing Local CSV</b>"),
             contents=[po.put_markdown(f.read())],
         )
 
     with open(CURRENT_DIR / "instructions_large_csv.md", "r") as f:
-        walkthrough_utils.put_widget(
+        pywebio_utils.put_widget(
             title=po.put_html("<b>Instructions for importing large CSV file</b>"),
             contents=[po.put_markdown(f.read())],
         )
@@ -264,7 +264,7 @@ def app(dummy_data: bool, commit: bool) -> None:
     dag_content = _add_to_dag(dataset.metadata)
 
     # create step and metadata file
-    walkthrough_utils.generate_step_to_channel(CURRENT_DIR / "grapher_cookiecutter/", fast_import.meta.to_dict())
+    wizard_utils.generate_step_to_channel(CURRENT_DIR / "grapher_cookiecutter/", fast_import.meta.to_dict())
     fast_import.save_metadata()
 
     po.put_markdown(
@@ -312,10 +312,10 @@ def app(dummy_data: bool, commit: bool) -> None:
 ## Generated files
         """
     )
-    walkthrough_utils.preview_file(fast_import.metadata_path, language="yaml")
-    walkthrough_utils.preview_file(fast_import.step_path, language="python")
-    walkthrough_utils.preview_file(snapshot_path, language="yaml")
-    walkthrough_utils.preview_dag(dag_content, dag_name="dag/fasttrack.yml")
+    pywebio_utils.preview_file(fast_import.metadata_path, language="yaml")
+    pywebio_utils.preview_file(fast_import.step_path, language="python")
+    pywebio_utils.preview_file(snapshot_path, language="yaml")
+    pywebio_utils.preview_dag(dag_content, dag_name="dag/fasttrack.yml")
 
 
 class Options(Enum):
@@ -703,11 +703,11 @@ def _add_to_dag(ds_meta: DatasetMeta) -> str:
         to_remove = public_data_step
         to_add = {private_data_step: [f"snapshot-private://{snapshot_uri}.csv"]}
 
-    walkthrough_utils.remove_from_dag(
+    wizard_utils.remove_from_dag(
         to_remove,
         DAG_FASTTRACK_PATH,
     )
-    return walkthrough_utils.add_to_dag(
+    return wizard_utils.add_to_dag(
         to_add,
         DAG_FASTTRACK_PATH,
     )

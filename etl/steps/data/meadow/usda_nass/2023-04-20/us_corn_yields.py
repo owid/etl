@@ -1,10 +1,8 @@
 """Load a snapshot and create a meadow dataset."""
 
-from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Initialize logger.
 log = get_logger()
@@ -26,10 +24,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("us_corn_yields.csv")
+    snap = paths.load_snapshot("us_corn_yields.csv")
 
     # Load data from snapshot.
-    tb = pr.read_csv(snap.path, metadata=snap.to_table_metadata())
+    tb = snap.read_csv()
 
     #
     # Process data.

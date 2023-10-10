@@ -31,13 +31,13 @@ steps:
   #
   # GCP - Global Carbon Budget (2023-07-10).
   #
-  data://meadow/gcp/2023-07-10/global_carbon_budget:
-    - snapshot://gcp/2023-04-28/global_carbon_budget_fossil_co2_emissions.csv
-    - snapshot://gcp/2023-04-28/global_carbon_budget_global_emissions.xlsx
-    - snapshot://gcp/2023-04-28/global_carbon_budget_national_emissions.xlsx
-    - snapshot://gcp/2023-04-28/global_carbon_budget_land_use_change_emissions.xlsx
-  data://garden/gcp/2023-07-10/global_carbon_budget:
-    - data://meadow/gcp/2023-07-10/global_carbon_budget
+  data://meadow/gcp/2023-09-28/global_carbon_budget:
+    - snapshot://gcp/2023-09-28/global_carbon_budget_fossil_co2_emissions.csv
+    - snapshot://gcp/2023-09-28/global_carbon_budget_global_emissions.xlsx
+    - snapshot://gcp/2023-09-28/global_carbon_budget_national_emissions.xlsx
+    - snapshot://gcp/2023-09-28/global_carbon_budget_land_use_change_emissions.xlsx
+  data://garden/gcp/2023-09-28/global_carbon_budget:
+    - data://meadow/gcp/2023-09-28/global_carbon_budget
     # Loaded to calculate emissions per unit energy.
     - data://garden/energy/2023-07-10/primary_energy_consumption
     # Loaded to calculate emissions per GDP.
@@ -47,8 +47,8 @@ steps:
     # Loaded to create region aggregates (including income groups).
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
-  data://grapher/gcp/2023-07-10/global_carbon_budget:
-    - data://garden/gcp/2023-07-10/global_carbon_budget
+  data://grapher/gcp/2023-09-28/global_carbon_budget:
+    - data://garden/gcp/2023-09-28/global_carbon_budget
   #
   # Emissions - CO2 dataset (2023).
   #
@@ -84,7 +84,7 @@ steps:
   data://grapher/rff/2022-10-11/emissions_weighted_carbon_price:
     - data://garden/rff/2022-10-11/emissions_weighted_carbon_price
   #
-  # Jones et al. (2023) - National contributions to climate change (2023-05-02)
+  # Jones et al. (2023) - National contributions to climate change (2023-05-02).
   #
   data://meadow/emissions/2023-05-02/national_contributions:
     - snapshot://emissions/2023-05-02/national_contributions_annual_emissions.csv
@@ -97,7 +97,36 @@ steps:
     - data://garden/demography/2022-12-08/population
   data://grapher/emissions/2023-05-02/national_contributions:
     - data://garden/emissions/2023-05-02/national_contributions
+  #
+  # Decoupling of GDP and CO2 (2023).
+  #
+  # The data from the following step will be used in a static chart.
+  # TODO: Add reference here when it's live.
+  data://garden/emissions/2023-10-06/gdp_and_co2_decoupling:
+    - data://garden/gcp/2023-09-28/global_carbon_budget
+    - data://garden/worldbank_wdi/2022-05-26/wdi
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
-  
+  #
+  # GCP - Global Carbon Budget (2023-07-10).
+  #
+  data://meadow/gcp/2023-07-10/global_carbon_budget:
+    - snapshot://gcp/2023-04-28/global_carbon_budget_fossil_co2_emissions.csv
+    - snapshot://gcp/2023-04-28/global_carbon_budget_global_emissions.xlsx
+    - snapshot://gcp/2023-04-28/global_carbon_budget_national_emissions.xlsx
+    - snapshot://gcp/2023-04-28/global_carbon_budget_land_use_change_emissions.xlsx
+  data://garden/gcp/2023-07-10/global_carbon_budget:
+    - data://meadow/gcp/2023-07-10/global_carbon_budget
+    # Loaded to calculate emissions per unit energy.
+    - data://garden/energy/2023-07-10/primary_energy_consumption
+    # Loaded to calculate emissions per GDP.
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    # Loaded to create per-capita variables.
+    - data://garden/demography/2023-03-31/population
+    # Loaded to create region aggregates (including income groups).
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/gcp/2023-07-10/global_carbon_budget:
+    - data://garden/gcp/2023-07-10/global_carbon_budget
+
   ######################################################################################################################
