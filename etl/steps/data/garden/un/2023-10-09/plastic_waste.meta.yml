@@ -171,3 +171,24 @@ tables:
         unit: kilograms
         short_unit: kg
         description_short: Data representing plastic waste exported via land, where specific details may be unavailable or varied.
+
+      import_total_mot_per_capita:
+        title: Per capita imports of plastic waste via all modes of transport
+        unit: kilograms
+        short_unit: kg
+        processing_level: minor
+        description_short: Plastic waste imports encompassing all transport methods per capita. These are calculated by dividing by each country's population
+
+      export_total_mot_per_capita:
+        title: Per capita exports of plastic waste via all modes of transport
+        unit: kilograms
+        short_unit: kg
+        processing_level: minor
+        description_short: Plastic waste exports encompassing all transport methods per capita. These are calculated by dividing by each country's population
+
+      net_export:
+        title: Per capita net exports of plastic waste via all modes of transport
+        unit: kilograms
+        short_unit: kg
+        processing_level: minor
+        description_short: Plastic waste net exports encompassing all transport methods per capita. Net exports are is calculated as exports minus imports. These are calculated by dividing by each country's population

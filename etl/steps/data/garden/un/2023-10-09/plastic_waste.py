@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -113,6 +111,13 @@ def run(dest_dir: str) -> None:
     tb.loc[(tb["country"] == "Germany") & (tb["year"] <= YEAR_GERMANY), "country"] = "West Germany"
     tb.loc[(tb["country"] == "Sudan") & (tb["year"] <= YEAR_SUDAN), "country"] = "Sudan (former)"
 
+    # Add per capita metrics
+    paths.log.info("add per capita")
+    tb = add_per_capita_variables(tb)
+    # Add net exports
+    tb["net_export"] = tb["Import_TOTAL MOT"] - tb["Export_TOTAL MOT"]
+    tb["net_export"].metadata.origins = tb["Import_TOTAL MOT"].metadata.origins
+
     # Set index
     tb = tb.underscore().set_index(["year", "country"], verify_integrity=True).sort_index()
 
@@ -149,3 +154,43 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Datas
         )
 
     return tb_with_regions
+
+
+def add_per_capita_variables(tb: Table) -> Table:
+    """
+    Add per-capita variables for total exports and imports of plastic waste.
+
+    Parameters
+    ----------
+    tb : Table
+        Primary data.
+    ds_population : Dataset
+        Population dataset.
+    Returns
+    -------
+    tb : Table
+        Data after adding per-capita variables.
+    """
+    tb_with_per_capita = tb.copy()
+
+    ds_population = paths.load_dependency("population")
+    # Estimate per-capita variables.
+    ## Add population variable
+    tb_with_per_capita = geo.add_population_to_dataframe(
+        tb_with_per_capita,
+        ds_population,
+        expected_countries_without_population=[],
+    )
+    ## Calculate per capita indicators
+    for col in tb_with_per_capita.columns:
+        if col not in ["year", "country", "population"]:
+            tb_with_per_capita[col].metadata.origins = tb[col].metadata.origins
+        if col in ["Import_TOTAL MOT", "Export_TOTAL MOT"]:
+            tb_with_per_capita[f"{col}_per_capita"] = tb_with_per_capita[col] / tb_with_per_capita["population"]
+            # Add origins to per capital variable
+            tb_with_per_capita[f"{col}_per_capita"].metadata.origins = tb[col].metadata.origins
+
+    # Drop unnecessary column.
+    tb_with_per_capita = tb_with_per_capita.drop(columns=["population"])
+
+    return tb_with_per_capita
