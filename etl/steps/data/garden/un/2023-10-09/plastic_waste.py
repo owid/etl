@@ -115,7 +115,7 @@ def run(dest_dir: str) -> None:
     paths.log.info("add per capita")
     tb = add_per_capita_variables(tb)
     # Add net exports
-    tb["net_export"] = tb["Import_TOTAL MOT"] - tb["Export_TOTAL MOT"]
+    tb["net_export"] = tb["Export_TOTAL MOT"] - tb["Import_TOTAL MOT"]
     tb["net_export"].metadata.origins = tb["Import_TOTAL MOT"].metadata.origins
 
     # Set index
