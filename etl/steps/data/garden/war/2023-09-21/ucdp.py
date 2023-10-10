@@ -27,6 +27,8 @@ from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
+from .shared import add_indicators_conflict_rate
+
 log = get_logger()
 
 # Get paths and naming conventions for current step.
@@ -63,6 +65,10 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("ucdp")
+
+    # Read table from COW codes
+    ds_cow_ssm = paths.load_dataset("gleditsch")
+    tb_regions = ds_cow_ssm["gleditsch_regions"].reset_index()
 
     #
     # Process data.
@@ -121,6 +127,9 @@ def run(dest_dir: str) -> None:
 
     # Force types
     # tb = tb.astype({"conflict_type": "category", "region": "category"})
+
+    # Add conflict rates
+    tb = add_indicators_conflict_rate(tb, tb_regions, ["number_ongoing_conflicts", "number_new_conflicts"])
 
     # Adapt region names
     tb = adapt_region_names(tb)
