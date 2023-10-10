@@ -806,4 +806,6 @@ if st.session_state["run_step"]:
     # Run step
     with st.spinner(f"Running snapshot step... {command_str}"):
         subprocess.call(args=commands)
-    st.write("Snapshot should be uploaded! However, please check in the terminal in case there was an error message raised there.")
+    st.write(
+        "Snapshot should be uploaded! However, please check in the terminal in case there was an error message raised there."
+    )
