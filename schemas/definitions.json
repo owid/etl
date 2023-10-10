@@ -239,8 +239,7 @@
         "description": "Exact day (or year, if exact day is unknown) when the producer's data (in its current version) was published.",
         "examples": [
           "2023-09-07",
-          "2023",
-          "latest"
+          "2023"
         ],
         "examples_bad": [],
         "requirement_level": "required",
@@ -252,7 +251,7 @@
             "Must be the date when the current version of the dataset was published (not when the dataset was first released)."
           ]
         ],
-        "pattern": "(^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$)|(^\\d{4}$)|(^latest$)",
+        "pattern": "(^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$)|(^\\d{4}$)",
         "errorMessage": "`date_published` must have format YYYY-MM-DD, YYYY or 'latest'",
         "category": "dataset"
       },
