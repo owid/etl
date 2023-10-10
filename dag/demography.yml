@@ -107,6 +107,15 @@ steps:
   data://grapher/demography/2023-10-04/life_tables:
     - data://garden/demography/2023-10-03/life_tables
 
+  # Zijdeman et al
+  data://meadow/demography/2023-10-10/zijdeman_et_al_2015:
+    - snapshot://demography/2023-10-10/zijdeman_et_al_2015.xlsx
+  data://garden/demography/2023-10-10/zijdeman_et_al_2015:
+    - data://meadow/demography/2023-10-10/zijdeman_et_al_2015
+
+  # Riley
+
+  
   # OMM: Life Expectancy
   data://garden/demography/2023-10-09/life_expectancy:
     - data://garden/demography/2023-10-03/life_tables
