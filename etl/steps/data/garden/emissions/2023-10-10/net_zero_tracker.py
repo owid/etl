@@ -40,6 +40,13 @@ def run(dest_dir: str) -> None:
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    # Add a column that simply indicates whether the country has a net zero target.
+    # NOTE: All countries in the table have set a net zero target. Those that have not are not in the table (and will
+    # show in charts as missing data).
+    tb["has_net_zero_target"] = "Net-zero achieved or pledged"
+    # Copy metadata from another variable.
+    tb["has_net_zero_target"] = tb["has_net_zero_target"].copy_metadata(tb["net_zero_status"])
+
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 

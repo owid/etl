@@ -10,15 +10,9 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load garden dataset.
+    # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("net_zero_tracker")
-
-    # Read table from garden dataset.
     tb = ds_garden["net_zero_tracker"]
-
-    #
-    # Process data.
-    #
 
     #
     # Save outputs.
