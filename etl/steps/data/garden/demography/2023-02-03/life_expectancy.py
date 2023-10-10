@@ -387,6 +387,41 @@ def add_americas(frame: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def add_population_americas_from_wpp(df: pd.DataFrame):
+    """Add population values for LATAM and Northern America.
+
+    Data is sourced from UN WPP, hence only available since 1950.
+    """
+    pop = load_america_population_from_unwpp()
+    df = df.merge(pop, on=["country", "year"])
+    return df
+
+
+def load_america_population_from_unwpp():
+    """Load population data from UN WPP for Northern America and Latin America and the Caribbean.
+
+    We use this dataset instead of the long-run because we want the entities as defined by the UN.
+    """
+    # load population from WPP
+    locations = ["Latin America and the Caribbean (UN)", "Northern America (UN)"]
+    ds = Dataset(GARDEN_POPULATION_WPP)
+    df = ds["population"].reset_index()
+    df = df.loc[
+        (df["location"].isin(locations))
+        & (df["metric"] == "population")
+        & (df["sex"] == "all")
+        & (df["age"] == "all")
+        & (df["variant"].isin(["estimates", "medium"])),
+        ["location", "year", "value"],
+    ]
+    assert len(set(df["location"])) == 2, f"Check that all of {locations} are in df"
+    df["location"] = df["location"].replace(REGION_MAPPING)
+
+    # rename columns
+    df = df.rename(columns={"location": "country", "value": "population"})
+    return df
+
+
 def add_region_aggregates(frame: pd.DataFrame) -> pd.DataFrame:
     """Add life expectancy for continents.
 
@@ -439,41 +474,6 @@ def add_region_aggregates(frame: pd.DataFrame) -> pd.DataFrame:
 
     # concatenate
     df = pd.concat([frame, df]).sort_values(["country", "year"], ignore_index=True).drop(columns="population")
-    return df
-
-
-def add_population_americas_from_wpp(df: pd.DataFrame):
-    """Add population values for LATAM and Northern America.
-
-    Data is sourced from UN WPP, hence only available since 1950.
-    """
-    pop = load_america_population_from_unwpp()
-    df = df.merge(pop, on=["country", "year"])
-    return df
-
-
-def load_america_population_from_unwpp():
-    """Load population data from UN WPP for Northern America and Latin America and the Caribbean.
-
-    We use this dataset instead of the long-run because we want the entities as defined by the UN.
-    """
-    # load population from WPP
-    locations = ["Latin America and the Caribbean (UN)", "Northern America (UN)"]
-    ds = Dataset(GARDEN_POPULATION_WPP)
-    df = ds["population"].reset_index()
-    df = df.loc[
-        (df["location"].isin(locations))
-        & (df["metric"] == "population")
-        & (df["sex"] == "all")
-        & (df["age"] == "all")
-        & (df["variant"].isin(["estimates", "medium"])),
-        ["location", "year", "value"],
-    ]
-    assert len(set(df["location"])) == 2, f"Check that all of {locations} are in df"
-    df["location"] = df["location"].replace(REGION_MAPPING)
-
-    # rename columns
-    df = df.rename(columns={"location": "country", "value": "population"})
     return df
 
 
