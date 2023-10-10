@@ -33,11 +33,11 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dependency("plastic_waste")
+    ds_meadow = paths.load_dataset("plastic_waste")
 
     # Load regions dataset.
-    ds_regions = paths.load_dependency("regions")
-    ds_income_groups = paths.load_dependency("income_groups")
+    ds_regions = paths.load_dataset("regions")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     # Read table from meadow dataset.
     tb = ds_meadow["plastic_waste"].reset_index()
@@ -173,7 +173,7 @@ def add_per_capita_variables(tb: Table) -> Table:
     """
     tb_with_per_capita = tb.copy()
 
-    ds_population = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
     # Estimate per-capita variables.
     ## Add population variable
     tb_with_per_capita = geo.add_population_to_dataframe(
