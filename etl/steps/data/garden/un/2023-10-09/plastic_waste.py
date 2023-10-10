@@ -232,9 +232,7 @@ def add_share_from_total(tb: Table) -> Table:
     """
 
     # Extract the World totals for each year
-    world_totals = tb[tb["country"] == "World"][
-        ["year", "Import_TOTAL MOT", "Export_TOTAL MOT", "Import_Air", "Export_Air"]
-    ]
+    world_totals = tb[tb["country"] == "World"][["year", "Import_TOTAL MOT", "Export_TOTAL MOT"]]
 
     # Merge these totals with the main dataframe on the year column
     merged_df = pr.merge(tb, world_totals, on="year", suffixes=("", "_World"))
@@ -242,12 +240,7 @@ def add_share_from_total(tb: Table) -> Table:
     # Calculate the shares for each country
     merged_df["import_share"] = (merged_df["Import_TOTAL MOT"] / merged_df["Import_TOTAL MOT_World"]) * 100
     merged_df["export_share"] = (merged_df["Export_TOTAL MOT"] / merged_df["Export_TOTAL MOT_World"]) * 100
-    merged_df["import_share_air"] = (merged_df["Import_Air"] / merged_df["Import_Air_World"]) * 100
-    merged_df["export_share_air"] = (merged_df["Export_Air"] / merged_df["Export_Air_World"]) * 100
-
     # Drop the intermediate columns used for calculations
-    merged_df = merged_df.drop(
-        columns=["Import_TOTAL MOT_World", "Export_TOTAL MOT_World", "Import_Air_World", "Export_Air_World"]
-    )
+    merged_df = merged_df.drop(columns=["Import_TOTAL MOT_World", "Export_TOTAL MOT_World"])
 
     return merged_df
