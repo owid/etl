@@ -9,7 +9,7 @@ definitions:
         - Declaration / pledge
         - Proposed / in discussion"
       - The inclusion criteria for net-zero commitments may vary from country to country. For example, the inclusion of international aviation emissions, or the acceptance of carbon offsets.
-    description_from_producer: "More detail about each indicator is available in the Tracker Codebook: https://docs.google.com/document/d/13bGE8FCOeF5QweoOvyMPZi3XbZrGLEPL2aM04LuZQcc/edit?usp=sharing "
+    description_from_producer: "More detail about each indicator is available in [the Tracker Codebook](https://docs.google.com/document/d/13bGE8FCOeF5QweoOvyMPZi3XbZrGLEPL2aM04LuZQcc/edit?usp=sharing)."
     unit: ""
     short_unit: ""
 
@@ -22,8 +22,6 @@ tables:
       net_zero_status:
         title: Status of net-zero carbon emissions targets
         description_short: ""
-        description_from_producer: |-
-          More detail about each indicator is available in the Tracker Codebook: https://docs.google.com/document/d/13bGE8FCOeF5QweoOvyMPZi3XbZrGLEPL2aM04LuZQcc/edit?usp=sharing 
         processing_level: minor
       has_net_zero_target:
         title: Countries that have set a net-zero emissions target

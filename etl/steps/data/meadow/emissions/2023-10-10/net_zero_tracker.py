@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
 
     # Set an appropriate index and sort conveniently.
     # NOTE: There are multiple rows for the same country-year (this will be handled in the garden step).
-    tb = tb.set_index(["country", "end_target_year"], verify_integrity=False).sort_index()
+    tb = tb.set_index(["id_code"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
