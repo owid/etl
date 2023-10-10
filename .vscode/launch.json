@@ -1,19 +1,21 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
             "name": "Python: bulk_packport",
             "type": "python",
             "request": "launch",
-            "program": "/home/daniel/.local/bin/poetry",
-            "args": ["run", "bulk_backport", "--dry-run"],
+            "program": "debug.sh",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "python": "/usr/bin/python",
-
+            "python": "/home/lucas/repos/etl/.venv/bin/python"
+        },
+        {
+            "name": "Python: File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "justMyCode": true
         }
     ]
 }
