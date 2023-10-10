@@ -187,7 +187,7 @@ tables:
         description_short: Plastic waste exports encompassing all transport methods per capita. These are calculated by dividing by each country's population
 
       net_export:
-        title: Per capita net exports of plastic waste via all modes of transport
+        title: Net exports of plastic waste via all modes of transport
         unit: kilograms
         short_unit: kg
         processing_level: minor
