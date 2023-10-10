@@ -1,0 +1,22 @@
+dataset:
+  update_period_days: 365
+
+tables:
+  net_zero_tracker:
+    variables:
+      net_zero_status:
+        title: Status of net-zero carbon emissions targets
+        unit: ""
+        short_unit: ""
+        description_short: ""
+        description_key:
+          - "The net zero status of a country can be one of the following:
+            - Achieved (externally validated)
+            - Achieved (self-declared)
+            - In law
+            - In policy document
+            - Declaration / pledge
+            - Proposed / in discussion"
+          - The inclusion criteria for net-zero commitments may vary from country to country. For example, the inclusion of international aviation emissions, or the acceptance of carbon offsets.
+        description_from_producer: "More detail about each indicator is available in the Tracker Codebook: https://docs.google.com/document/d/13bGE8FCOeF5QweoOvyMPZi3XbZrGLEPL2aM04LuZQcc/edit?usp=sharing "
+        processing_level: minor
