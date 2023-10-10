@@ -12,6 +12,14 @@ dataset:
 tables:
   life_expectancy:
     variables:
+      life_expectancy:
+        title: Life expectancy
+        unit: years
+        short_unit: years
+      life_expectancy_0:
+        title: Life expectancy at birth
+        unit: years
+        short_unit: years
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units

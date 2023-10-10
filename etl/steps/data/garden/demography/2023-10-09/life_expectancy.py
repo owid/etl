@@ -33,29 +33,36 @@ def run(dest_dir: str) -> None:
     #
     # Load datasets
     ## Life tables
+    paths.log.info("reading dataset `life_tables`")
     ds_lt = paths.load_dataset("life_tables")
     tb_lt = ds_lt["life_tables"].reset_index()
     ## zijdeman_et_al_2015
+    paths.log.info("reading dataset `zijdeman_et_al_2015`")
     ds_zi = paths.load_dataset("zijdeman_et_al_2015")
     tb_zi = ds_zi["zijdeman_et_al_2015"].reset_index()
     ## Riley
+    paths.log.info("reading dataset `riley_2005`")
     ds_ri = paths.load_dataset("riley_2005")
     tb_ri = ds_ri["riley_2005"].reset_index()
     ## WPP
+    paths.log.info("reading dataset `un_wpp`")
     ds_un = paths.load_dataset("un_wpp")
     tb_un = ds_un["un_wpp"].reset_index()
 
     #
     # Process data.
     #
+    paths.log.info("processing data")
     tb_lt = process_lt(tb_lt)
     tb_un = process_un(tb_un)
     tb_zi = process_zi(tb_zi)
     tb_ri = process_ri(tb_ri)
 
+    paths.log.info("combining tables")
     tb = combine_tables(tb_lt, tb_un, tb_zi, tb_ri)
 
     ## Check values
+    paths.log.info("final checks")
     _check_column_values(tb, "sex", {"all", "male", "female"})
     _check_column_values(tb, "age", {0, 15, 65, 80})
     _check_column_values(tb, "type", {"period", "cohort"})
@@ -68,7 +75,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_lt.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -214,7 +221,7 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
     - LT already contains UN_WPP data, but without projections. That's why we also use UN WPP's
     - RIL and ZIJ contain figures for all sexes and at birth. Only period.
     """
-    tb = pr.concat([tb_lt, tb_un], ignore_index=True)
+    tb = pr.concat([tb_lt, tb_un], ignore_index=True, short_name="life_expectancy")
 
     # Separate LE at birth from at different ages
     tb = tb[tb["age"] != 0]

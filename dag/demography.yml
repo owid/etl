@@ -114,3 +114,5 @@ steps:
     - data://garden/demography/2023-10-10/zijdeman_et_al_2015
     - data://garden/demography/2023-10-10/riley_2005
     - data://garden/un/2022-07-11/un_wpp
+  data://grapher/demography/2023-10-10/life_expectancy:
+    - data://garden/demography/2023-10-09/life_expectancy
