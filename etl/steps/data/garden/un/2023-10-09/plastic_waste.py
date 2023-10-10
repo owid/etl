@@ -35,10 +35,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("plastic_waste"))
+    ds_meadow = paths.load_dependency("plastic_waste")
 
     # Load regions dataset.
-    ds_regions: Dataset = paths.load_dependency("regions")
+    ds_regions = paths.load_dependency("regions")
     ds_income_groups = paths.load_dependency("income_groups")
 
     # Read table from meadow dataset.
@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     #
 
     # Keep relevant columns
-    log.info("un.comtrade.plastic: keep relevant columns")
+    paths.log.info("keep relevant columns")
 
     #  Extract relevatn columns
     #    - Year ("RefYear")
@@ -62,7 +62,7 @@ def run(dest_dir: str) -> None:
     tb = tb[COLUMNS_RELEVANT]
 
     # Rename year and country column fields
-    log.info("un.comtrade.plastic: rename columns")
+    paths.log.info("rename columns")
     tb = tb.rename(
         columns={
             "refyear": "year",
@@ -84,7 +84,7 @@ def run(dest_dir: str) -> None:
     # Rename hiearachical columns after pivoting
     tb.columns = [f"{col[0]}_{col[1]}" if col[0] not in ["year", "country"] else col[0] for col in tb.columns]
     # Check that there is no intersection between former and current countries
-    log.info("un.comtrade: handle former countries West Germany and Sudan (former)")
+    paths.log.info("un.comtrade: handle former countries West Germany and Sudan (former)")
     assert (
         tb[tb["country"].str.contains("Germany")].groupby("year").size().max() == 1
     ), "There are some years with data for both Germany and West Germany"
@@ -98,18 +98,18 @@ def run(dest_dir: str) -> None:
     YEAR_SUDAN = tb.loc[tb["country"] == "Sudan (...2011)", "year"].max()
 
     # Harmonize country names
-    log.info("un.comtrade: harmonize country names")
+    paths.log.info("harmonize country names")
     tb: Table = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
     tb["country"] = tb["country"].astype(str)
 
     # Add regions
-    log.info("un.comtrade.plastic: add regions and income groups")
+    paths.log.info("add regions and income groups")
     tb = add_data_for_regions(tb, ds_regions, ds_income_groups)
 
     # Correct former country names
-    log.info("un.comtrade: finish handling former countries West Germany and Sudan (former)")
+    paths.log.info("finish handling former countries West Germany and Sudan (former)")
     tb.loc[(tb["country"] == "Germany") & (tb["year"] <= YEAR_GERMANY), "country"] = "West Germany"
     tb.loc[(tb["country"] == "Sudan") & (tb["year"] <= YEAR_SUDAN), "country"] = "Sudan (former)"
 

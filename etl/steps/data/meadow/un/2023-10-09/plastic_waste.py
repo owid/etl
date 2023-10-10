@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     tbs = [snap.read_csv(encoding="latin-1") for snap in snaps]
-    tb = pr.concat(tbs, ignore_index=True)
+    tb = pr.concat(tbs, ignore_index=True, short_name=paths.short_name)
 
     #   Check that there is, at most, one entry per combination of:
     #    - Year ("RefYear")
@@ -35,8 +35,6 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = tb.set_index(["RefYear", "FlowDesc", "ReporterDesc", "PartnerDesc", "MotDesc"], verify_integrity=True)
-    # Set table's short_name
-    tb.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
