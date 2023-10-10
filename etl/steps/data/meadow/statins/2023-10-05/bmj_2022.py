@@ -31,26 +31,27 @@ def run(dest_dir: str) -> None:
         var_name="indicator",
         value_name="value",
     )
+    # Note: The 2019 data includes estimates of statin utilization from October 2019 to March 2020, while the 2020 data pertains to assessments conducted from April 2020 to October 2020.
     melted_statin_utilization["year"] = melted_statin_utilization["indicator"].str.extract(r"(\d+)")
     melted_statin_utilization["indicator"] = "Statin use"
     melted_statin_utilization["value"] = melted_statin_utilization["value"].astype(float)
 
     # Processing 'health_expenditure_per_capita_2018' and renaming columns
-    health_exp_tb = tb[["country", "health_expenditure_per_capita_2018"]]
+    health_exp_tb = tb[["country", "health_expenditure_per_capita_2018"]].copy()
     health_exp_tb["year"] = 2018
     health_exp_tb["indicator"] = "Health expenditure per capita in 2018"
     health_exp_tb = health_exp_tb.rename(columns={"health_expenditure_per_capita_2018": "value"})
     health_exp_tb["value"] = health_exp_tb["value"].replace(r"[\$,e]", "", regex=True).astype(float)
 
     # Processing 'ihd_mortality_rate_2019' and renaming columns
-    ihd_mort_tb = tb[["country", "ihd_mortality_rate_2019"]]
+    ihd_mort_tb = tb[["country", "ihd_mortality_rate_2019"]].copy()
     ihd_mort_tb["year"] = 2019
     ihd_mort_tb["indicator"] = "IHD mortality rate in 2019"
     ihd_mort_tb = ihd_mort_tb.rename(columns={"ihd_mortality_rate_2019": "value"})
     ihd_mort_tb["value"] = ihd_mort_tb["value"].astype(float)
 
     # Processing 'statins_essential_medicine_2017' and renaming columns
-    essential_med_tb = tb[["country", "statins_essential_medicine_2017"]]
+    essential_med_tb = tb[["country", "statins_essential_medicine_2017"]].copy()
     essential_med_tb["year"] = 2017
     essential_med_tb["indicator"] = "Essential medicine list"
     essential_med_tb = essential_med_tb.rename(columns={"statins_essential_medicine_2017": "value"})
