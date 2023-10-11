@@ -26,6 +26,12 @@ REGION_MAPPING = {
     "Oceania (UN)": "Oceania",
 }
 
+# TODO:
+
+#     - Add Americas
+#         - Need population data for each age-sex group. Use: geo.population.add_population
+#     - Improve metadata
+#     - Chart revision tool
 
 def run(dest_dir: str) -> None:
     #
@@ -60,6 +66,9 @@ def run(dest_dir: str) -> None:
 
     paths.log.info("combining tables")
     tb = combine_tables(tb_lt, tb_un, tb_zi, tb_ri)
+
+    # Rename regions
+    tb["location"] = tb["location"].replace(REGION_MAPPING)
 
     ## Check values
     paths.log.info("final checks")
@@ -224,8 +233,8 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
     tb = pr.concat([tb_lt, tb_un], ignore_index=True, short_name="life_expectancy")
 
     # Separate LE at birth from at different ages
-    tb = tb[tb["age"] != 0]
     tb_0 = tb[tb["age"] == 0]
+    tb = tb[tb["age"] != 0]
 
     # Extend tb_0
     ## Zijdeman: complement country data

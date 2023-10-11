@@ -4,6 +4,7 @@
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
+  title: Life Expetancy
   update_period_days: 365
 
 
@@ -16,10 +17,14 @@ tables:
         title: Life expectancy
         unit: years
         short_unit: years
+        display:
+          numDecimalPlaces: 1
       life_expectancy_0:
         title: Life expectancy at birth
         unit: years
         short_unit: years
+        display:
+          numDecimalPlaces: 1
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units
