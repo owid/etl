@@ -3,13 +3,6 @@ dataset:
   update_period_days: 365
 
 definitions:
-  # TODO: Apply the following description processing to all indicators (even if not all processing info is relevant for all indicators).
-  description_processing: &description_processing |
-      - Data on global emissions has been converted from tonnes of carbon to tonnes of carbon dioxide (CO₂) using a conversion factor of 3.664.
-      - Emissions from the Kuwaiti oil fires in 1991 have been included as part of Kuwait's emissions for that year.
-      - Country's share of the global population is calculated using our population dataset, based on [different sources](https://ourworldindata.org/population-sources).
-      - Each country's share of global CO₂ emissions from flaring has been calculated using global CO₂ emissions from flaring provided in the Global Carbon Budget dataset.
-  # TODO: Apply the following description key on international aviation to all indicators.
   international_aviation_description_key: &international_aviation_description_key
     - Emissions from international aviation and shipping are not included in any country or region's emissions. They are only included in the global total emissions.
   consumption_emissions_description_key: &consumption_emissions_description_key
@@ -20,6 +13,15 @@ definitions:
     - This data measures carbon dioxide (CO₂) emissions from fossil fuels and industry and does not include emissions from land use change, deforestation, soils, or vegetation.
   per_capita_description_key: &per_capita_description_key
     - Per capita emissions represent the emissions of an average person in a country or region - they are total emissions divided by population.
+  # Common fields to be used in all indicators (unless overridden for specific indicators below).
+  common:
+    description_processing: &description_processing |
+        - Data on global emissions has been converted from tonnes of carbon to tonnes of carbon dioxide (CO₂) using a conversion factor of 3.664.
+        - Emissions from the Kuwaiti oil fires in 1991 have been included as part of Kuwait's emissions for that year.
+        - Country's share of the global population is calculated using our population dataset, based on [different sources](https://ourworldindata.org/population-sources).
+        - Each country's share of global CO₂ emissions from flaring has been calculated using global CO₂ emissions from flaring provided in the Global Carbon Budget dataset.
+    description_key:
+      - *international_aviation_description_key
 
 tables:
   global_carbon_budget:
