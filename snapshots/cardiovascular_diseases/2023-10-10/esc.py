@@ -120,12 +120,11 @@ def main(upload: bool) -> None:
                         country = columns[0].get_text(strip=True)
                         year = columns[2].get_text(strip=True)
                         number = columns[3].get_text(strip=True).split(" ")[0]  # Considering only the numeric part
-
                         data.append([country, year, number])
-            # Create a DataFrame
-            df = pd.DataFrame(data, columns=["country", "year", "value"])
-            df["indicator"] = title
-            dfs.append(df)
+                # Create a DataFrame
+                df = pd.DataFrame(data, columns=["country", "year", "value"])
+                df["indicator"] = title
+                dfs.append(df)
     all_dfs = pd.concat(dfs, ignore_index=True)
 
     df_to_file(all_dfs, file_path=snap.path)

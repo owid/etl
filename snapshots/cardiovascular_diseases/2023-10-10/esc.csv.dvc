@@ -17,7 +17,6 @@ meta:
     # Files
     url_main: 
       https://eatlas.escardio.org/Atlas/ESC-Atlas-of-Cardiology/Cardiovascular-healthcare-delivery/Cardiological-specialists/chr_card_1m_r-cardiologists-total-per-million-people
-    url_download:
     date_accessed: 2023-10-10
 
     # License
