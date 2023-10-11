@@ -73,7 +73,6 @@ def run(dest_dir: str) -> None:
     paths.log.info("final checks")
     _check_column_values(tb, "sex", {"all", "male", "female"})
     _check_column_values(tb, "age", {0, 15, 65, 80})
-    # _check_column_values(tb, "type", {"period", "cohort"})
 
     ## Set index
     tb = tb.set_index(["country", "year", "sex", "age"], verify_integrity=True)
@@ -171,9 +170,6 @@ def process_un(tb: Table) -> Table:
             "value": "life_expectancy",
         }
     )
-
-    # Assign type
-    # tb["type"] = "period"
 
     # Check column values
     ## sex

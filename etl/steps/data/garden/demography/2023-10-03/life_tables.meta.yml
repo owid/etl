@@ -61,7 +61,6 @@ tables:
         description_short: |-
           <% if type == "period" %>
           The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
-
           <% elif type == "cohort" %>
           The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
           <% endif %>

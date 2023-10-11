@@ -16,5 +16,6 @@ tables:
         title: Life expectancy (at birth)
         unit: years
         short_unit: years
+        processing_level: minor
         description_short: Period life expectancy at birth.
 

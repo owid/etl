@@ -10,7 +10,7 @@ definitions:
       - World
     standard: &sel_entities
       - Africa
-      - North America
+      - Northern America
       - Latin America and the Caribbean
       - Asia
       - Europe
@@ -26,9 +26,9 @@ definitions:
       {definitions.life_expectancy_0.description_short}
       <% else %>
       <% if (sex == 'female') %>
-      The total number of years a person is expected to live, among people who have already reached << age >> years of age.
+      The total number of years a person is expected to live, among females who have already reached << age >> years of age.
       <% elif (sex == 'male') %>
-      The total number of years a person is expected to live, among people who have already reached << age >> years of age.
+      The total number of years a person is expected to live, among males who have already reached << age >> years of age.
       <% elif (sex == 'all') %>
       The total number of years a person is expected to live, among people who have already reached << age >> years of age.
       <% endif %>
