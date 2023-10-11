@@ -545,8 +545,8 @@ steps:
     - data://garden/terrorism/2023-07-20/global_terrorism_database
 
   # European Society for Cardiology datasets
-  data://meadow/cardiology/2023-10-10/cardiologists:
-    - snapshot://cardiology/2023-10-10/cardiologists.csv
+  data://meadow/cardiology/2023-10-10/esc:
+    - snapshot://cardiology/2023-10-10/esc.csv
 
   # UN IGME Child Mortality
   data://meadow/un/2023-08-16/igme:
