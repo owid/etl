@@ -1,10 +1,48 @@
 # NOTE: To learn more about the fields, hover over their names.
-
+definitions:
+  selected_entities:
+    with_americas: &sel_entities_americas
+      - Africa
+      - Americas
+      - Asia
+      - Europe
+      - Oceania
+      - World
+    standard: &sel_entities
+      - Africa
+      - North America
+      - Latin America and the Caribbean
+      - Asia
+      - Europe
+      - Oceania
+      - World
+  title_base: Period life expectancy
+  life_expectancy_0:
+    description_short: |-
+      The total number of years a newborn is expected to live.
+  common:
+    description_short: |-
+      <% if (age === 0) %>
+      {definitions.life_expectancy_0.description_short}
+      <% else %>
+      <% if (sex === 'female') %>
+      The total number of years a person is expected to live, among people who have already reached << age >> years of age.
+      <% elif (sex === 'male') %>
+      The total number of years a person is expected to live, among people who have already reached << age >> years of age.
+      <% elif (sex === 'all') %>
+      The total number of years a person is expected to live, among people who have already reached << age >> years of age.
+      <% endif %>
+      <% endif %>
+    description_key:
+      - Period life expectancy assumes that current mortality trends will continue for the rest of a subject's life.
+    presentation:
+      topic_tags:
+        - Life Expectancy
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
-  title: Life Expectancy
+  title: Life Expectancy (period)
   update_period_days: 365
 
 
@@ -17,28 +55,21 @@ tables:
     variables:
 
       life_expectancy:
-        title: Life expectancy
+        title: |-
+          {definitions.title_base}
         unit: years
         short_unit: years
         processing_level: minor
         display:
           numDecimalPlaces: 1
         presentation:
-          topic_tags:
-            - Life Expectancy
           grapher_config:
             hasMapTab: true
-            selectedEntityNames:
-              - Africa
-              - Asia
-              - Europe
-              - Latin America and the Caribbean
-              - North america
-              - Oceania
-              - World
+            selectedEntityNames: *sel_entities
 
       life_expectancy_0:
-        title: Life expectancy at birth
+        title: |-
+          {definitions.title_base} at birth
         unit: years
         short_unit: years
         processing_level: minor
@@ -48,18 +79,10 @@ tables:
         presentation:
           title_public: Life expectancy at birth
           title_variant: Historical data, period life expectancy
-          topic_tags:
-            - Life Expectancy
           grapher_config:
             title: Life expectancy at birth
             hasMapTab: true
-            selectedEntityNames:
-              - Africa
-              - Americas
-              - Asia
-              - Europe
-              - Oceania
-              - World
+            selectedEntityNames: *sel_entities_americas
           attribution: |-
             UN WPP (2022); HMD (2023); Zijdeman et al. (2015); Riley (2005)
 
@@ -68,8 +91,9 @@ tables:
   life_expectancy_with_proj:
     variables:
 
-      life_expectancy:
-        title: Life expectancy (with projections)
+      life_expectancy_with_proj:
+        title: |-
+          {definitions.title_base} (with projections)
         unit: years
         short_unit: years
         processing_level: minor
@@ -77,21 +101,13 @@ tables:
           numDecimalPlaces: 1
         presentation:
           title_variant: With UN Projections
-          topic_tags:
-            - Life Expectancy
           grapher_config:
             hasMapTab: true
-            selectedEntityNames:
-              - Africa
-              - Asia
-              - Europe
-              - Latin America and the Caribbean
-              - North america
-              - Oceania
-              - World
+            selectedEntityNames: *sel_entities
 
-      life_expectancy_0:
-        title: Life expectancy at birth (with projections)
+      life_expectancy_0_with_proj:
+        title: |-
+          {definitions.title_base} at birth (with projections)
         unit: years
         short_unit: years
         processing_level: minor
@@ -101,18 +117,10 @@ tables:
         presentation:
           title_public: Life expectancy at birth
           title_variant: With UN projections, period life expectancy
-          topic_tags:
-            - Life Expectancy
           grapher_config:
             title: Life expectancy at birth
             hasMapTab: true
-            selectedEntityNames:
-              - Africa
-              - Americas
-              - Asia
-              - Europe
-              - Oceania
-              - World
+            selectedEntityNames: *sel_entities_americas
           attribution: |-
             UN WPP (2022); HMD (2023); Zijdeman et al. (2015); Riley (2005)
 
@@ -121,8 +129,9 @@ tables:
   life_expectancy_only_proj:
     variables:
 
-      life_expectancy:
-        title: Life expectancy (only projections)
+      life_expectancy_only_proj:
+        title: |-
+          {definitions.title_base} (only projections)
         unit: years
         short_unit: years
         processing_level: minor
@@ -130,21 +139,13 @@ tables:
           numDecimalPlaces: 1
         presentation:
           title_variant: UN Projections
-          topic_tags:
-            - Life Expectancy
           grapher_config:
             hasMapTab: true
-            selectedEntityNames:
-              - Africa
-              - Asia
-              - Europe
-              - Latin America and the Caribbean
-              - North america
-              - Oceania
-              - World
+            selectedEntityNames: *sel_entities
 
-      life_expectancy_0:
-        title: Life expectancy at birth (only projections)
+      life_expectancy_0_only_proj:
+        title: |-
+          {definitions.title_base} at birth (only projections)
         unit: years
         short_unit: years
         processing_level: minor
@@ -154,15 +155,7 @@ tables:
         presentation:
           title_public: Life expectancy at birth
           title_variant: UN Projections, period life expectancy
-          topic_tags:
-            - Life Expectancy
           grapher_config:
             title: Life expectancy at birth
             hasMapTab: true
-            selectedEntityNames:
-              - Africa
-              - Americas
-              - Asia
-              - Europe
-              - Oceania
-              - World
+            selectedEntityNames: *sel_entities_americas

@@ -72,10 +72,10 @@ def run(dest_dir: str) -> None:
     paths.log.info("final checks")
     _check_column_values(tb, "sex", {"all", "male", "female"})
     _check_column_values(tb, "age", {0, 15, 65, 80})
-    _check_column_values(tb, "type", {"period", "cohort"})
+    # _check_column_values(tb, "type", {"period", "cohort"})
 
     ## Set index
-    tb = tb.set_index(["location", "year", "type", "sex", "age"], verify_integrity=True)
+    tb = tb.set_index(["location", "year", "sex", "age"], verify_integrity=True)
 
     ## Create tables (main, only projections, with projections)
     tb_main = tb[tb.index.get_level_values("year") <= YEAR_ESTIMATE_LAST].copy()
@@ -83,9 +83,16 @@ def run(dest_dir: str) -> None:
 
     tb_only_proj = tb[tb.index.get_level_values("year") > YEAR_ESTIMATE_LAST].copy()
     tb_only_proj.m.short_name = paths.short_name + "_only_proj"
+    tb_only_proj.columns = [f"{col}_only_proj" for col in tb_only_proj.columns]
+    # Table only with projections should only contain UN as origin
+    origins = tb_main["life_expectancy"].m.origins
+    origins_un = [origin for origin in origins if origin.producer == "United Nations"]
+    for col in tb_only_proj.columns:
+        tb_only_proj[col].origins = origins_un
 
     tb_with_proj = tb
     tb_with_proj.m.short_name = paths.short_name + "_with_proj"
+    tb_with_proj.columns = [f"{col}_with_proj" for col in tb_with_proj.columns]
 
     tables = [
         tb_main,
@@ -106,10 +113,11 @@ def run(dest_dir: str) -> None:
 def process_lt(tb: Table) -> Table:
     """Process LT data and output it in the desired format.
 
-    Desired format is with columns location, year, type, sex, age | life_expectancy.
+    Desired format is with columns location, year, sex, age | life_expectancy.
     """
     tb = tb.loc[
-        (tb["age"].isin(["0", "15", "65", "80"])), ["location", "year", "type", "sex", "age", "life_expectancy"]
+        (tb["age"].isin(["0", "15", "65", "80"])) & (tb["type"] == "period"),
+        ["location", "year", "sex", "age", "life_expectancy"],
     ]
 
     # Assign dtype
@@ -131,13 +139,14 @@ def process_lt(tb: Table) -> Table:
     _check_column_values(tb, "sex", {"all", "female", "male"})
     ## age
     _check_column_values(tb, "age", {0, 15, 65, 80})
+
     return tb
 
 
 def process_un(tb: Table) -> Table:
     """Process UN WPP data and output it in the desired format.
 
-    Desired format is with columns location, year, type, sex, age | life_expectancy.
+    Desired format is with columns location, year, sex, age | life_expectancy.
     """
     # Sanity check
     assert (
@@ -163,7 +172,7 @@ def process_un(tb: Table) -> Table:
     )
 
     # Assign type
-    tb["type"] = "period"
+    # tb["type"] = "period"
 
     # Check column values
     ## sex
@@ -182,7 +191,7 @@ def process_un(tb: Table) -> Table:
 def process_zi(tb: Table) -> Table:
     """Process Zijdeman data and output it in the desired format.
 
-    Desired format is with columns location, year, type, sex, age | life_expectancy.
+    Desired format is with columns location, year, sex, age | life_expectancy.
     """
     # Filter
     ## dimension values: metric=life_expectancy, variant=medium, year >= YEAR_ESTIMATE_LAST
@@ -197,7 +206,7 @@ def process_zi(tb: Table) -> Table:
     )
 
     # Add columns
-    tb["type"] = "period"
+    # tb["type"] = "period"
     tb["age"] = 0
     tb["sex"] = "all"
 
@@ -216,7 +225,7 @@ def process_zi(tb: Table) -> Table:
 def process_ri(tb: Table) -> Table:
     """Process Riley data and output it in the desired format.
 
-    Desired format is with columns location, year, type, sex, age | life_expectancy.
+    Desired format is with columns location, year, sex, age | life_expectancy.
     """
     # Filter
     ## dimension values: metric=life_expectancy, variant=medium, year >= YEAR_ESTIMATE_LAST
@@ -229,7 +238,7 @@ def process_ri(tb: Table) -> Table:
     tb = tb.rename(columns={"entity": "location"})
 
     # Add columns
-    tb["type"] = "period"
+    # tb["type"] = "period"
     tb["sex"] = "all"
     tb["age"] = 0
 
@@ -250,20 +259,20 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
     tb = pr.concat([tb_lt, tb_un], ignore_index=True, short_name="life_expectancy")
 
     # Separate LE at birth from at different ages
-    mask = (tb["age"] == 0) & (tb["type"] == "period") & (tb["sex"] == "all")
+    mask = (tb["age"] == 0) & (tb["sex"] == "all")
     tb_0 = tb[mask]
     tb = tb[~mask]
 
     # Extend tb_0 (onlu for period)
     ## Zijdeman: complement country data
-    tb_0 = tb_0.merge(tb_zi, how="outer", on=["location", "year", "type", "sex", "age"], suffixes=("", "_zij"))
+    tb_0 = tb_0.merge(tb_zi, how="outer", on=["location", "year", "sex", "age"], suffixes=("", "_zij"))
     tb_0["life_expectancy"] = tb_0["life_expectancy"].fillna(tb_0["life_expectancy_zij"])
     tb_0 = tb_0.drop(columns=["life_expectancy_zij"])
     ## Riley: complement with continent data
     tb_0 = pr.concat([tb_0, tb_ri], ignore_index=True)
 
     # Combine tb_0 with tb
-    tb = tb.merge(tb_0, on=["location", "year", "type", "sex", "age"], how="outer", suffixes=("", "_0"))
+    tb = tb.merge(tb_0, on=["location", "year", "sex", "age"], how="outer", suffixes=("", "_0"))
     return tb
 
 
@@ -278,7 +287,6 @@ def add_americas(tb: Table, ds_population: Dataset) -> Table:
 
     Only performs this estimation for:
 
-        type = period
         sex = all
         age = 0
 
@@ -287,7 +295,7 @@ def add_americas(tb: Table, ds_population: Dataset) -> Table:
     # filter only member countries of the region
     AMERICAS_MEMBERS = ["Northern America", "Latin America and the Caribbean"]
     tb_am = tb.loc[
-        (tb["location"].isin(AMERICAS_MEMBERS)) & (tb["type"] == "period") & (tb["sex"] == "all") & (tb["age"] == 0),
+        (tb["location"].isin(AMERICAS_MEMBERS)) & (tb["sex"] == "all") & (tb["age"] == 0),
     ].copy()
 
     # sanity check
@@ -315,7 +323,6 @@ def add_americas(tb: Table, ds_population: Dataset) -> Table:
     # assign region name
     tb_am = tb_am.assign(
         location="Americas",
-        type="period",
         sex="all",
         age=0,
     )
