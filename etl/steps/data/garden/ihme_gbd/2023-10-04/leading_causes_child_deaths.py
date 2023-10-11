@@ -78,7 +78,7 @@ def create_hierarchy_table(age_group: str, ds_cause: Dataset, level_causes: List
     for cause in level_causes:
         cause_table_name = cause + f"__both_sexes__{age_group}"
         tb = ds_cause[cause_table_name].reset_index()
-        assert tb.shape()[0] > 0, f"Table {cause_table_name} is empty"
+        assert tb.shape[0] > 0, f"Table {cause_table_name} is empty"
         death_col = f"deaths_that_are_from_{cause}__in_both_sexes_aged_{age_group}"
         if death_col in tb.columns:
             cols = ["country", "year", death_col]
