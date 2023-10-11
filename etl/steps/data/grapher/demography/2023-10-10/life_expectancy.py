@@ -14,19 +14,22 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("life_expectancy")
 
     # Read table from garden dataset.
-    tb = ds_garden["life_expectancy"]
-
+    tables = [
+        ds_garden["life_expectancy"],
+        ds_garden["life_expectancy_with_proj"],
+        ds_garden["life_expectancy_only_proj"],
+    ]
     #
     # Process data.
     #
-    tb = tb.rename_index_names({"location": "country"})
+    tables = [tb.rename_index_names({"location": "country"}) for tb in tables]
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new grapher dataset.

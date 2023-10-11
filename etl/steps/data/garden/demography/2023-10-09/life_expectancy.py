@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -9,6 +9,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 # Year of last estimate
 YEAR_ESTIMATE_LAST = 2021
+YEAR_WPP_START = 1950
 
 # Region mapping
 # We will be using continent names without (Entity) suffix. This way charts show continuity between lines from different datasets (e.g. riley and UN)
@@ -26,12 +27,6 @@ REGION_MAPPING = {
     "Oceania (UN)": "Oceania",
 }
 
-# TODO:
-
-#     - Add Americas
-#         - Need population data for each age-sex group. Use: geo.population.add_population
-#     - Improve metadata
-#     - Chart revision tool
 
 def run(dest_dir: str) -> None:
     #
@@ -70,6 +65,9 @@ def run(dest_dir: str) -> None:
     # Rename regions
     tb["location"] = tb["location"].replace(REGION_MAPPING)
 
+    # Add Americas
+    tb = add_americas(tb, ds_un)
+
     ## Check values
     paths.log.info("final checks")
     _check_column_values(tb, "sex", {"all", "male", "female"})
@@ -79,13 +77,29 @@ def run(dest_dir: str) -> None:
     ## Set index
     tb = tb.set_index(["location", "year", "type", "sex", "age"], verify_integrity=True)
 
+    ## Create tables (main, only projections, with projections)
+    tb_main = tb[tb.index.get_level_values("year") <= YEAR_ESTIMATE_LAST].copy()
+    tb_main.m.short_name = paths.short_name
+
+    tb_only_proj = tb[tb.index.get_level_values("year") > YEAR_ESTIMATE_LAST].copy()
+    tb_only_proj.m.short_name = paths.short_name + "_only_proj"
+
+    tb_with_proj = tb
+    tb_with_proj.m.short_name = paths.short_name + "_with_proj"
+
+    tables = [
+        tb_main,
+        tb_only_proj,
+        tb_with_proj,
+    ]
+
+    for x in tables:
+        print(x.m.short_name)
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_lt.metadata
-    )
+    ds_garden = create_dataset(dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_lt.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -127,6 +141,11 @@ def process_un(tb: Table) -> Table:
 
     Desired format is with columns location, year, type, sex, age | life_expectancy.
     """
+    # Sanity check
+    assert (
+        tb["year"].min() == YEAR_WPP_START
+    ), f"Year of first estimate is different than {YEAR_WPP_START}, it is {tb['year'].min()}"
+
     # Filter
     ## dimension values: metric=life_expectancy, variant=medium, year >= YEAR_ESTIMATE_LAST
     ## columns: location, year, value, sex, age
@@ -253,3 +272,92 @@ def _check_column_values(tb: Table, column: str, expected_values: set) -> None:
     """Check that a column has only expected values."""
     unexpected_values = set(tb[column]) - expected_values
     assert not unexpected_values, f"Unexpected values found in column {column}: {unexpected_values}"
+
+
+def add_americas(tb: Table, ds_population: Dataset) -> Table:
+    """Estimate value for the Americas using North America and LATAM/Caribbean.
+
+    Only performs this estimation for:
+
+        type = period
+        sex = all
+        age = 0
+
+    It estimates it by doing the population-weighted average of life expectancies.
+    """
+    # filter only member countries of the region
+    AMERICAS_MEMBERS = ["Northern America", "Latin America and the Caribbean"]
+    tb_am = tb.loc[
+        (tb["location"].isin(AMERICAS_MEMBERS)) & (tb["type"] == "period") & (tb["sex"] == "all") & (tb["age"] == 0),
+    ].copy()
+
+    # sanity check
+    assert (
+        tb_am.groupby(["location", "year"]).size().max() == 1
+    ), "There is more than one entry for a (country, year) tuple!"
+
+    # add population for LATAM and Northern America (from WPP, hence since 1950)
+    assert tb_am["year"].min() == YEAR_WPP_START
+    tb_am = add_population_americas_from_wpp(tb_am, ds_population)
+
+    # sanity check: ensure there are NO missing values. This way, we can safely do the groupby
+    assert (tb_am[["life_expectancy_0", "population"]].isna().sum() == 0).all()
+
+    # estimate values for regions
+    # y(location) = weight(location) * metric(location)
+    tb_am["life_expectancy_0"] *= tb_am["population"]
+
+    # z(region) = sum{ y(location) } for location in region
+    tb_am = tb_am.groupby("year", as_index=False)[["life_expectancy_0", "population"]].sum()
+
+    # z(region) /  sum{ population(location) } for location in region
+    tb_am["life_expectancy_0"] /= tb_am["population"]
+
+    # assign region name
+    tb_am = tb_am.assign(
+        location="Americas",
+        type="period",
+        sex="all",
+        age=0,
+    )
+
+    # drop unused column
+    tb_am = tb_am.drop(columns="population")
+
+    # concatenate
+    tb = pr.concat([tb, tb_am], ignore_index=True)
+    return tb
+
+
+def add_population_americas_from_wpp(tb: Table, ds_population: Dataset) -> Table:
+    """Add population values for LATAM and Northern America.
+
+    Data is sourced from UN WPP, hence only available since 1950.
+    """
+    pop = load_america_population_from_unwpp(ds_population)
+    tb = tb.merge(pop, on=["location", "year"])
+    return tb
+
+
+def load_america_population_from_unwpp(ds_population: Dataset) -> Table:
+    """Load population data from UN WPP for Northern America and Latin America and the Caribbean.
+
+    We use this dataset instead of the long-run because we want the entities as defined by the UN.
+    """
+    # load population from WPP
+    locations = ["Latin America and the Caribbean (UN)", "Northern America (UN)"]
+    tb = ds_population["population"].reset_index()
+    tb = tb.loc[
+        (tb["location"].isin(locations))
+        & (tb["metric"] == "population")
+        & (tb["sex"] == "all")
+        & (tb["age"] == "all")
+        & (tb["variant"].isin(["estimates", "medium"])),
+        ["location", "year", "value"],
+    ]
+    assert len(set(tb["location"])) == 2, f"Check that all of {locations} are in df"
+    tb["location"] = tb["location"].replace(REGION_MAPPING)
+
+    # rename columns
+    tb = tb.rename(columns={"value": "population"})
+    return tb
