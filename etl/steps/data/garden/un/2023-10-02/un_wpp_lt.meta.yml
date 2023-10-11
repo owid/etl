@@ -1,4 +1,18 @@
 # NOTE: To learn more about the fields, hover over their names.
+definitions:
+  life_expectancy:
+    description_short: |-
+      <% if type == "period" %>
+      Period life expectancy is the average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
+      <% elif type == "cohort" %>
+      Cohort life expectancy is the average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+      <% endif %>
+    point_1: |-
+      <% if type == "period" %>
+      This is based on a synthetic cohort created using mortality rates across age groups in a given year.
+      <% elif type == "cohort" %>
+      Rather than waiting for the entire cohort to have died before calculating the cohort life expectancy, researchers may use data from birth cohorts that are 'almost extinct'.
+      <% endif %>
 
 
 # Learn more about the available fields:
@@ -17,7 +31,9 @@ tables:
       central_death_rate:
         title: Central death rate
         description_short: |-
-          For a given population or cohort, the number of people who died during a 12-month period while at a given age divided by the average number who were living in that age group during this period.
+          The annual death rate per 1,000 people in a given age group.
+        description_key:
+          - For a given population or cohort, the central death rate during a given interval of 12 months is calculated using the number of people in that age group who died during the period, divided by the average number of people alive at that age at the start of the interval.
         unit: deaths per 1,000 people
         processing_level: minor
         description_processing: |-
