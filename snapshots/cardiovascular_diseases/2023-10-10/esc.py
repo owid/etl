@@ -113,7 +113,7 @@ def main(upload: bool) -> None:
             # Extract data
             data = []
             if table is not None:
-                rows = table.find_all("tr")
+                rows = table.find_all("tr")  # type: ignore
                 for row in rows[1:]:  # Skip the header row
                     columns = row.find_all("td")
                     if len(columns) > 1:
