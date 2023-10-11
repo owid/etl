@@ -110,18 +110,18 @@ def main(upload: bool) -> None:
 
             # Find the table
             table = soup.find("table", {"class": "active", "id": "datatable_dataTest"})
+            if table is not None:
+                # Extract data
+                data = []
+                rows = table.find_all("tr")
+                for row in rows[1:]:  # Skip the header row
+                    columns = row.find_all("td")
+                    if len(columns) > 1:
+                        country = columns[0].get_text(strip=True)
+                        year = columns[2].get_text(strip=True)
+                        number = columns[3].get_text(strip=True).split(" ")[0]  # Considering only the numeric part
 
-            # Extract data
-            data = []
-            rows = table.find_all("tr")
-            for row in rows[1:]:  # Skip the header row
-                columns = row.find_all("td")
-                if len(columns) > 1:
-                    country = columns[0].get_text(strip=True)
-                    year = columns[2].get_text(strip=True)
-                    number = columns[3].get_text(strip=True).split(" ")[0]  # Considering only the numeric part
-
-                    data.append([country, year, number])
+                        data.append([country, year, number])
             # Create a DataFrame
             df = pd.DataFrame(data, columns=["country", "year", "value"])
             df["indicator"] = title
