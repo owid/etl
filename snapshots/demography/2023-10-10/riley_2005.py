@@ -7,6 +7,7 @@ Steps to reproduce:
     3. Transcribe it into a CSV file.
     4. To transcribe it, basically copy-paste values and years.
         - When the years are ranges, use the middle year.
+        - Output generated file is attached in this folder (`riley_2005.csv`)
 """
 
 from pathlib import Path

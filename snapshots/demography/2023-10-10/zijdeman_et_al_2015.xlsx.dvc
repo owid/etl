@@ -20,7 +20,7 @@ meta:
         - [http://www.abs.gov.au/ausstats/abs@.nsf/web+pages/statistics?opendocument#from-banner=LN](Australian Bureau of Statistics).
         - Kannisto, V., Nieminen, M. & Turpeinen, O. (1999). Finnish Life Tables since 1751, Demographic Research, 1(1), DOI: 10.4054/DemRes.1999.1.1
 
-        For specifics concerning (selections of) the sources, see the R-file below, with which the dataset was created.
+        For specifics concerning (selections of) the sources, see the R code available in the working paper [here](https://clio-infra.eu/Indicators/LifeExpectancyatBirthTotal.html).
     date_published: 2014-07-26
     version_producer: 2
 
