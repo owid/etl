@@ -162,7 +162,7 @@ def get_life_expectancy() -> pd.DataFrame:
     df_life_expectancy = ds_life_expectancy["life_expectancy"].reset_index()
     cols = ["country", "year", "life_expectancy_0"]
     new_cols = ["country", "year", "life_expectancy_at_birth"]
-    df_life_expectancy = df_life_expectancy[cols]
+    df_life_expectancy = df_life_expectancy[cols].dropna()
     df_life_expectancy.columns = new_cols
     df_life_expectancy["year"] = df_life_expectancy["year"].astype("int64")
     return df_life_expectancy

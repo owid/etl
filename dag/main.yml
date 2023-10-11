@@ -210,7 +210,7 @@ steps:
     - backport://backport/owid/latest/dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018
     - backport://backport/owid/latest/dataset_2710_child_mortality_rates__selected_gapminder__v10__2017
     - backport://backport/owid/latest/dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources
-    # - data://garden/demography/2023-02-03/life_expectancy
+    - data://garden/demography/2023-10-09/life_expectancy
     - data://garden/owid/latest/key_indicators
     - data://garden/regions/2023-01-01/regions
     - data://garden/gcp/2023-07-10/global_carbon_budget
