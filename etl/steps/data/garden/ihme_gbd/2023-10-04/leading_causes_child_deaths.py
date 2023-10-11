@@ -1,7 +1,7 @@
 from typing import Any, List
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
 from structlog import get_logger
 
@@ -35,7 +35,7 @@ def run(dest_dir: str) -> None:
             # Create table with leading cause of death at this level for each country-year
             tb_level = create_hierarchy_table(
                 age_group=age_group,
-                tb_cause=ds_cause,
+                ds_cause=ds_cause,
                 level_causes=level_causes,
                 short_name=f"leading_cause_level_{level}_in_{age_group}",
             )
@@ -69,29 +69,31 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def create_hierarchy_table(age_group: str, tb_cause: Table, level_causes: List[str], short_name: str) -> Table:
-    causes = [item for item in tb_cause.table_names if age_group in item]
-    assert len(causes) > 0, f"No causes found for {age_group}, check spelling"
+def create_hierarchy_table(age_group: str, ds_cause: Dataset, level_causes: List[str], short_name: str) -> Table:
+    """
+    For each level_cause find the relevent table in ds_cause and create a table with the leading cause of death in each country-year
 
-    tb_out = Table()
-    for cause in causes:
-        tb = tb_cause[cause].reset_index()
-        # Get cause name from table name
-        cause_name = cause.split("__")[0]
-        if cause_name in level_causes:
-            # Get deaths column from cause name
-            death_col = f"deaths_that_are_from_{cause_name}__in_both_sexes_aged_{age_group}"
-            if death_col in tb.columns:
-                cols = ["country", "year", death_col]
-                tb = tb[cols]
-                tb = tb.rename(columns={death_col: cause_name}, errors="raise")
-                tb_out = pr.concat([tb_out, tb])
+    """
+    tb_out = []
+    for cause in level_causes:
+        cause_table_name = cause + f"__both_sexes__{age_group}"
+        tb = ds_cause[cause_table_name].reset_index()
+        assert tb.shape[0] > 0, f"Table {cause_table_name} is empty"
+        death_col = f"deaths_that_are_from_{cause}__in_both_sexes_aged_{age_group}"
+        if death_col in tb.columns:
+            cols = ["country", "year", death_col]
+            tb = tb[cols]
+            tb = tb.rename(columns={death_col: cause}, errors="raise")
+            tb_out.append(tb)
 
+    tb_out = pr.concat(tb_out, ignore_index=True)
     # Melt the table from wide to long to make it easier to groupby
     long_tb = pr.melt(
         tb_out, id_vars=["country", "year"], var_name=f"disease_{short_name}", value_name=f"deaths_{short_name}"
     )
+    long_tb = long_tb.dropna(how="any")
     # Find the cause of death with the highest number of deaths in each country-year
+    long_tb[f"disease_{short_name}"] = long_tb[f"disease_{short_name}"].astype(str)
     leading_causes_idx = long_tb.groupby(["country", "year"], observed=True)[f"deaths_{short_name}"].idxmax()
     leading_causes_tb = long_tb.loc[leading_causes_idx]
     leading_causes_tb = leading_causes_tb.drop(columns=[f"deaths_{short_name}"])
