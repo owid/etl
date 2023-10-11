@@ -130,3 +130,9 @@ steps:
     - data://garden/gcp/2023-07-10/global_carbon_budget
 
   ######################################################################################################################
+  data://meadow/emissions/2023-10-10/net_zero_tracker:
+    - snapshot://emissions/2023-10-10/net_zero_tracker.xlsx
+  data://garden/emissions/2023-10-10/net_zero_tracker:
+    - data://meadow/emissions/2023-10-10/net_zero_tracker
+  data://grapher/emissions/2023-10-10/net_zero_tracker:
+    - data://garden/emissions/2023-10-10/net_zero_tracker
