@@ -856,8 +856,8 @@ class Table(pd.DataFrame):
 
     def groupby(self, *args, observed=False, **kwargs) -> "TableGroupBy":
         """Groupby that preserves metadata."""
-        by_list = [args[0]] if isinstance(args[0], str) else args[0]
-        if observed is False:
+        if observed is False and args:
+            by_list = [args[0]] if isinstance(args[0], str) else args[0]
             for by in by_list:
                 if isinstance(by, str):
                     by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
