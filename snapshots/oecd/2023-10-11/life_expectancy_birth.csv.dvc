@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Life expectancy at birth
+    description: |-
+      Life expectancy at birth is defined as how long, on average, a newborn can expect to live, if current death rates do not change. However, the actual age-specific death rate of any particular birth cohort cannot be known in advance. If rates are falling, actual life spans will be higher than life expectancy calculated using current death rates. Life expectancy at birth is one of the most frequently used health status indicators. Gains in life expectancy at birth can be attributed to a number of factors, including rising living standards, improved lifestyle and better education, as well as greater access to quality health services. This indicator is presented as a total and per gender and is measured in years.
+    date_published: 2023
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2023), Life expectancy at birth (indicator). doi: 10.1787/27e0fc9d-en (Accessed on 12 October 2023)
+
+    # Files
+    url_main: https://data.oecd.org/healthstat/life-expectancy-at-birth.htm
+    url_download: 
+      https://stats.oecd.org/sdmx-json/data/DP_LIVE/.LIFEEXP.../OECD?contentType=csv&detail=code&separator=comma&csv-lang=en
+    date_accessed: 2023-10-11
+
+    # License
+    license:
+      name: OECD terms
+      url: https://www.oecd.org/termsandconditions/
+
+wdir: ../../../data/snapshots/oecd/2023-10-11
+outs:
+- md5: f28e5fbe6538efe3e1d01a8859808808
+  size: 381472
+  path: life_expectancy_birth.csv
