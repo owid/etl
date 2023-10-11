@@ -1,4 +1,12 @@
-"""Script to create a snapshot of dataset."""
+"""The file is found in the data site from OECD:
+
+https://data.oecd.org/healthstat/life-expectancy-at-birth.htm
+
+In order to find the direct link to download the CSV:
+
+    - Monitor the network traffic from the web developer inspect tools.
+    - Click on download -> Full indicator data (.csv)
+    - In the network traffic tab you will observe an API request with the direct CSV download link. This is the link used in url_download in the yaml file."""
 
 from pathlib import Path
 
