@@ -22,7 +22,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tables = [tb.rename_index_names({"location": "country"}) for tb in tables]
 
     #
     # Save outputs.

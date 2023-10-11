@@ -62,8 +62,9 @@ def run(dest_dir: str) -> None:
     paths.log.info("combining tables")
     tb = combine_tables(tb_lt, tb_un, tb_zi, tb_ri)
 
-    # Rename regions
-    tb["location"] = tb["location"].replace(REGION_MAPPING)
+    # Rename regions, and use column 'country' instead of 'location'
+    tb["country"] = tb["location"].replace(REGION_MAPPING)
+    tb = tb.drop(columns=["location"])
 
     # Add Americas
     tb = add_americas(tb, ds_un)
@@ -75,7 +76,7 @@ def run(dest_dir: str) -> None:
     # _check_column_values(tb, "type", {"period", "cohort"})
 
     ## Set index
-    tb = tb.set_index(["location", "year", "sex", "age"], verify_integrity=True)
+    tb = tb.set_index(["country", "year", "sex", "age"], verify_integrity=True)
 
     ## Create tables (main, only projections, with projections)
     tb_main = tb[tb.index.get_level_values("year") <= YEAR_ESTIMATE_LAST].copy()
@@ -295,12 +296,12 @@ def add_americas(tb: Table, ds_population: Dataset) -> Table:
     # filter only member countries of the region
     AMERICAS_MEMBERS = ["Northern America", "Latin America and the Caribbean"]
     tb_am = tb.loc[
-        (tb["location"].isin(AMERICAS_MEMBERS)) & (tb["sex"] == "all") & (tb["age"] == 0),
+        (tb["country"].isin(AMERICAS_MEMBERS)) & (tb["sex"] == "all") & (tb["age"] == 0),
     ].copy()
 
     # sanity check
     assert (
-        tb_am.groupby(["location", "year"]).size().max() == 1
+        tb_am.groupby(["country", "year"]).size().max() == 1
     ), "There is more than one entry for a (country, year) tuple!"
 
     # add population for LATAM and Northern America (from WPP, hence since 1950)
@@ -322,7 +323,7 @@ def add_americas(tb: Table, ds_population: Dataset) -> Table:
 
     # assign region name
     tb_am = tb_am.assign(
-        location="Americas",
+        country="Americas",
         sex="all",
         age=0,
     )
@@ -341,7 +342,7 @@ def add_population_americas_from_wpp(tb: Table, ds_population: Dataset) -> Table
     Data is sourced from UN WPP, hence only available since 1950.
     """
     pop = load_america_population_from_unwpp(ds_population)
-    tb = tb.merge(pop, on=["location", "year"])
+    tb = tb.merge(pop, on=["country", "year"])
     return tb
 
 
@@ -362,7 +363,7 @@ def load_america_population_from_unwpp(ds_population: Dataset) -> Table:
         ["location", "year", "value"],
     ]
     assert len(set(tb["location"])) == 2, f"Check that all of {locations} are in df"
-    tb["location"] = tb["location"].replace(REGION_MAPPING)
+    tb["country"] = tb["location"].replace(REGION_MAPPING).drop(columns="location")
 
     # rename columns
     tb = tb.rename(columns={"value": "population"})
