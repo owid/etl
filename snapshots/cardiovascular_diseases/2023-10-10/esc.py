@@ -110,9 +110,9 @@ def main(upload: bool) -> None:
 
             # Find the table
             table = soup.find("table", {"class": "active", "id": "datatable_dataTest"})
+            # Extract data
+            data = []
             if table is not None:
-                # Extract data
-                data = []
                 rows = table.find_all("tr")
                 for row in rows[1:]:  # Skip the header row
                     columns = row.find_all("td")
