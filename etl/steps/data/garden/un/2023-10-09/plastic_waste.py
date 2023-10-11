@@ -111,14 +111,16 @@ def run(dest_dir: str) -> None:
     tb.loc[(tb["country"] == "Germany") & (tb["year"] <= YEAR_GERMANY), "country"] = "West Germany"
     tb.loc[(tb["country"] == "Sudan") & (tb["year"] <= YEAR_SUDAN), "country"] = "Sudan (former)"
 
-    # Add per capita metrics
-    paths.log.info("add per capita")
-    tb = add_per_capita_variables(tb)
+    tb = tb[tb["country"] != "West Germany"]
 
     # Add net exports
     paths.log.info("add net exports")
     tb["net_export"] = tb["Export_TOTAL MOT"] - tb["Import_TOTAL MOT"]
     tb["net_export"].metadata.origins = tb["Import_TOTAL MOT"].metadata.origins
+
+    # Add per capita metrics
+    paths.log.info("add per capita")
+    tb = add_per_capita_variables(tb)
 
     # Add share from total for total exports, imports, total exports by air and total imports by air
     paths.log.info("add share from total exports and imports")
@@ -191,7 +193,7 @@ def add_per_capita_variables(tb: Table) -> Table:
     for col in tb_with_per_capita.columns:
         if col not in ["year", "country", "population"]:
             tb_with_per_capita[col].metadata.origins = tb[col].metadata.origins
-        if col in ["Import_TOTAL MOT", "Export_TOTAL MOT"]:
+        if col in ["Import_TOTAL MOT", "Export_TOTAL MOT", "net_export"]:
             tb_with_per_capita[f"{col}_per_capita"] = tb_with_per_capita[col] / tb_with_per_capita["population"]
             # Add origins to per capital variable
             tb_with_per_capita[f"{col}_per_capita"].metadata.origins = tb[col].metadata.origins

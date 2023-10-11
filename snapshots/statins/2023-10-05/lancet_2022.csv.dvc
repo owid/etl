@@ -20,14 +20,14 @@ meta:
       Outcomes Measured: The primary outcomes were the proportions of individuals self-reporting use of statins for primary and secondary prevention of CVD. The eligibility criteria for statin therapy were established based on either a history of diagnosed diabetes/a 10-year CVD risk of at least 20% (for primary prevention) or a history of self-reported CVD (for secondary prevention).
 
     # Citation
-    producer: Marcus et al. (2022)
+    producer: Marcus et al.
     citation_full: |-
       Marcus ME, Manne-Goehler J, Theilmann M, Farzadfar F, Moghaddam SS, Keykhaei M, Hajebi A, Tschida S, Lemp JM, Aryal KK, Dunn M, Houehanou C, Bahendeka S, Rohloff P, Atun R, Bärnighausen TW, Geldsetzer P, Ramirez-Zea M, Chopra V, Heisler M, Davies JI, Huffman MD, Vollmer S, Flood D. Use of statins for the prevention of cardiovascular disease in 41 low-income and middle-income countries: a cross-sectional study of nationally representative, individual-level data. Lancet Glob Health. 2022 Mar;10(3):e369-e379. doi: 10.1016/S2214-109X(21)00551-9. PMID: 35180420; PMCID: PMC8896912.
 
     # Files
-    url_main: 
+    url_main:
       https://www.thelancet.com/journals/langlo/article/PIIS2214-109X(21)00551-9/fulltext#sec1
-    url_download: 
+    url_download:
       https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8896912/bin/NIHMS1783023-supplement-Appendix.pdf
 
     date_accessed: 2023-10-05
