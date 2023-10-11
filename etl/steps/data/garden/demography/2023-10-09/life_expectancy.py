@@ -93,8 +93,6 @@ def run(dest_dir: str) -> None:
         tb_with_proj,
     ]
 
-    for x in tables:
-        print(x.m.short_name)
     #
     # Save outputs.
     #
@@ -252,10 +250,11 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
     tb = pr.concat([tb_lt, tb_un], ignore_index=True, short_name="life_expectancy")
 
     # Separate LE at birth from at different ages
-    tb_0 = tb[tb["age"] == 0]
-    tb = tb[tb["age"] != 0]
+    mask = (tb["age"] == 0) & (tb["type"] == "period") & (tb["sex"] == "all")
+    tb_0 = tb[mask]
+    tb = tb[~mask]
 
-    # Extend tb_0
+    # Extend tb_0 (onlu for period)
     ## Zijdeman: complement country data
     tb_0 = tb_0.merge(tb_zi, how="outer", on=["location", "year", "type", "sex", "age"], suffixes=("", "_zij"))
     tb_0["life_expectancy"] = tb_0["life_expectancy"].fillna(tb_0["life_expectancy_zij"])
