@@ -12,7 +12,7 @@ meta:
     # Citation
     producer: European Society of Cardiology
     citation_full: |-
-      Downloaded from the ESC Atlas of Cardiology website eatlas.escardio.org. Accessed on: 2023-10-10. Cardiologists (total) (per million people).
+      Downloaded from the ESC Atlas of Cardiology website eatlas.escardio.org. Accessed on: 2023-10-10.
 
     # Files
     url_main: 
@@ -24,9 +24,8 @@ meta:
     license:
       name: ©producer year
       url: https://eatlas.escardio.org/About/terms-conditions
-
-wdir: ../../../data/snapshots/cardiology/2023-10-10
+wdir: ../../../data/snapshots/cardiovascular_diseases/2023-10-10
 outs:
-- md5: c6a9c18679e67aae5fa76ca8a293406d
-  size: 183252
+- md5: 1ad2a2d1bd36f28ccb049a2bf473a492
+  size: 181521
   path: esc.csv

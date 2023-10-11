@@ -97,7 +97,7 @@ def main(upload: bool) -> None:
         }
     """
     # Create a new snapshot.
-    snap = Snapshot(f"cardiology/{SNAPSHOT_VERSION}/esc.csv")
+    snap = Snapshot(f"cardiovascular_diseases/{SNAPSHOT_VERSION}/esc.csv")
     # Attempt to fetch data from the source URL.
     dfs = []
     for title, url_download in tqdm(HTML_DICTIONARY.items(), desc="Fetching data from the ESC website"):
@@ -123,7 +123,8 @@ def main(upload: bool) -> None:
 
                     data.append([country, year, number])
             # Create a DataFrame
-            df = pd.DataFrame(data, columns=["country", "year", title])
+            df = pd.DataFrame(data, columns=["country", "year", "value"])
+            df["indicator"] = title
             dfs.append(df)
     all_dfs = pd.concat(dfs, ignore_index=True)
 
