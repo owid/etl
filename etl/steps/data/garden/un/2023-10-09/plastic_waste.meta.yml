@@ -191,7 +191,7 @@ tables:
         unit: kilograms
         short_unit: kg
         processing_level: minor
-        description_short: Plastic waste net exports encompassing all transport methods per capita. Net exports are calculated as exports minus imports. These are calculated by dividing by each country's population.
+        description_short: Plastic waste net exports encompassing all transport methods. Net exports are calculated as exports minus imports.
 
       import_share:
         title: Share of plastic waste imports via all modes of transport
@@ -206,3 +206,9 @@ tables:
         short_unit: '%'
         processing_level: minor
         description_short: Share of plastic waste exports encompassing all transport methods from total global. These are calculated by determining the proportion of plastic waste exports from the total plastic waste exports worldwide.
+      net_export_per_capita:
+        title: Per capita net exports of plastic waste via all modes of transport
+        unit: kilograms
+        short_unit: kg
+        processing_level: minor
+        description_short: Plastic waste net exports encompassing all transport methods per capita. Net exports are calculated as exports minus imports. These are calculated by dividing by each country's population.

@@ -10,7 +10,7 @@ tables:
         title: Statin use for secondary prevention amongst elibible individuals
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of eligible individuals self-reporting use of statins for the secondary preventation of cardiovascular disease
+        description_short: Proportion of eligible individuals self-reporting use of statins for the secondary prevention of cardiovascular disease
         description_from_producer: Eligibility for statin therapy for secondary prevention was defined among individuals with a history of self-reported cardiovascular disease.
         processing_level: minor
         display:
@@ -19,7 +19,7 @@ tables:
         title: Statin use for primary prevention amongst elibible individuals
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of eligible individuals self-reporting use of statins for the primary preventation of cardiovascular disease
+        description_short: Proportion of eligible individuals self-reporting use of statins for the primary prevention of cardiovascular disease
         description_from_producer: Eligibility for statin therapy for primary prevention was defined among individuals with a history of diagnosed diabetes or a 10-year cardiovascular disease risk of at least 20%.
         processing_level: minor
         display:
