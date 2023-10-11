@@ -676,7 +676,7 @@ with st.sidebar:
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
-        st.markdown("3. **Only supports `origin`**. To work with `source` instead, use `walkthrough`.")
+        st.markdown("3. **Only supports `origin`**. `source` is not supported anymore.")
 
 # FORM
 if st.session_state["show_form"]:
@@ -730,7 +730,7 @@ if submitted:
         # Create files
         utils.generate_step(
             cookiecutter_path=utils.COOKIE_SNAPSHOT,
-            data=dict(**form.dict(), channel="snapshots", walkthrough_origins=utils.WALKTHROUGH_ORIGINS),
+            data=dict(**form.dict(), channel="snapshots"),
             target_dir=SNAPSHOTS_DIR,
         )
         ingest_path = SNAPSHOTS_DIR / form.namespace / form.snapshot_version / (form.short_name + ".py")
@@ -806,4 +806,6 @@ if st.session_state["run_step"]:
     # Run step
     with st.spinner(f"Running snapshot step... {command_str}"):
         subprocess.call(args=commands)
-    st.write("Snapshot uploaded!")
+    st.write(
+        "Snapshot should be uploaded! However, please check in the terminal in case there was an error message raised there."
+    )

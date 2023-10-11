@@ -7,7 +7,6 @@ import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -97,10 +96,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("international_energy_data.zip"))
+    snap = paths.load_snapshot("international_energy_data.zip")
 
     # Load raw data from snapshot.
-    data_raw = pd.read_json(snap.path, lines=True)
+    data_raw = snap.read_json(lines=True)
 
     #
     # Process data.

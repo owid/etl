@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from owid.catalog import Table
+from owid.catalog import Origin, Table, VariableMeta, VariablePresentationMeta
 from owid.catalog.utils import underscore
 
 
@@ -137,3 +137,14 @@ def test_underscore_table_collision():
     assert tt["a__x_1"].metadata.description == "desc1"
     assert tt["b"].metadata.description == "desc2"
     assert tt["a__x_2"].metadata.description == "desc3"
+
+
+def test_pruned_json():
+    meta = VariableMeta(
+        origins=[Origin(title="Title", producer="Producer")],
+        presentation=VariablePresentationMeta(title_public="Title public"),
+    )
+    assert meta.to_dict() == {
+        "origins": [{"producer": "Producer", "title": "Title"}],
+        "presentation": {"title_public": "Title public"},
+    }

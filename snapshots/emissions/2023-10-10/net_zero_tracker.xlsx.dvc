@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Net Zero Tracker
+    description: |-
+      The Net Zero Tracker aims to increase transparency and accountability of net zero targets pledged by nations, states and regions, cities and companies. It collects data on targets set and on many factors that indicate the integrity of those targets — essentially, how serious the entity setting the target is about meaningfully cutting its net emissions to zero.
+    date_published: 2023-10-10
+
+    # Citation
+    producer: Net Zero Tracker
+    citation_full: |-
+      Net Zero Tracker. Energy and Climate Intelligence Unit, Data-Driven EnviroLab, NewClimate Institute, Oxford Net Zero. 2023.
+      John Lang, Camilla Hyslop, Zhi Yi Yeo, Richard Black, Peter Chalkley, Thomas Hale, Frederic Hans, Nick Hay, Niklas Höhne, Angel Hsu, Takeshi Kuramochi, Silke Mooldijk, Steve Smith.
+    attribution: Energy and Climate Intelligence Unit, Data-Driven EnviroLab, NewClimate
+      Institute, Oxford Net Zero - Net Zero Tracker (2023)
+    attribution_short: Net Zero Tracker
+
+    # Files
+    url_main: https://zerotracker.net/
+    url_download: https://download.zerotracker.net/csv/snapshot_2023-10-10_08-10-57.xlsx
+    date_accessed: 2023-10-10
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://zerotracker.net/about
+wdir: ../../../data/snapshots/emissions/2023-10-10
+outs:
+- md5: 4b34d50be9fec86c4af2de48aec4540e
+  size: 1860068
+  path: net_zero_tracker.xlsx

@@ -11,16 +11,26 @@ from unidecode import unidecode
 T = TypeVar("T")
 
 
+def prune_dict(d: dict) -> dict:
+    """Remove all keys starting with underscore and all empty values from a dictionary."""
+    out = {}
+    for k, v in d.items():
+        if not k.startswith("_") and v not in [None, [], {}]:
+            if isinstance(v, dict):
+                out[k] = prune_dict(v)
+            elif isinstance(v, list):
+                out[k] = [prune_dict(x) if isinstance(x, dict) else x for x in v if x not in [None, [], {}]]
+            else:
+                out[k] = v
+    return out
+
+
 def pruned_json(cls: T) -> T:
     orig = cls.to_dict  # type: ignore
 
     # only keep non-null public variables
-    # make sure to call `to_dict` of nested objects as well
-    cls.to_dict = lambda self, **kwargs: {  # type: ignore
-        k: getattr(self, k).to_dict(**kwargs) if hasattr(getattr(self, k), "to_dict") else v
-        for k, v in orig(self, **kwargs).items()
-        if not k.startswith("_") and v not in [None, [], {}]
-    }
+    # calling original to_dict returns dictionaries, not objects
+    cls.to_dict = lambda self, **kwargs: prune_dict(orig(self, **kwargs))  # type: ignore
 
     return cls
 

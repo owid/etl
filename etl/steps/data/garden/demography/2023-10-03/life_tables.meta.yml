@@ -20,7 +20,7 @@ tables:
       central_death_rate:
         title: Central death rate
         description_short: |-
-          For a given population or cohort, the central death rate at age x during a given period of 12 months is found by dividing the number of people who died during this period while aged x by the average number who were living in that age group during the period.
+          The number of people who died during a 12-month period while at a given age by the average number who were living in that age group during this period.
         unit: deaths per 1,000 people
         processing_level: minor
         description_processing: |-
@@ -40,20 +40,20 @@ tables:
       number_survivors:
         title: Number of survivors
         unit: survivors
-        description_short: Number of survivors at exact age x, assuming survivors at 0 years old is 100,000.
+        description_short: Number of survivors at a given age, assuming survivors at 0 years old is 100,000.
       number_deaths:
         title: Number of deaths
         short_unit: deaths
         unit: deaths
-        description_short: Number of deaths between ages x and x+n.
+        description_short: Number of deaths between during a given age.
       number_person_years_lived:
         title: Number of person-years lived
         unit: person-years
-        description_short: Number of person-years lived between ages x and x+n.
+        description_short: Number of person-years lived between a given ages and a year after.
       number_person_years_remaining:
         title: Number of person-years remaining
         unit: person-years
-        description_short: Number of person-years remaining after exact age x.
+        description_short: Number of person-years remaining after a given age.
       life_expectancy:
         title: Life expectancy
         short_unit: years
@@ -65,6 +65,14 @@ tables:
           <% elif type == "cohort" %>
           The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
           <% endif %>
-
-          'Life expectancy at age 0' refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy for people who have already survived to the given age.
-
+        description_key:
+          - Life expectancy at age 0 refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy people who have already survived to the given age.
+      life_expectancy_fm_diff:
+        title: Life expectancy difference (f-m)
+        short_unit: years
+        unit: years
+        description_short: Life expectancy difference (females - males) at a given age.
+      life_expectancy_fm_ratio:
+        title: Life expectancy ratio (f/m)
+        unit: ""
+        description_short: Life expectancy ratio (females/males) at a given age.

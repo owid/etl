@@ -97,7 +97,7 @@ include:
   # - dag/archive/open_numbers.yml
   - dag/archive/faostat.yml
   - dag/archive/energy.yml
-  # - dag/archive/walkthrough.yml
+  # - dag/archive/wizard.yml
   # - dag/archive/examples.yml
   - dag/archive/emissions.yml
   - dag/archive/papers.yml

@@ -96,31 +96,6 @@ def test_saving_empty_table_fails():
         t.to_feather("/tmp/example.feather")
 
 
-def test_update_metadata_from_yaml(tmp_path):
-    yaml_text = """
-description_key_common: &description_key_common
-- &text_1 Text 1
-- &text_2 Text 2
-
-tables:
-  test:
-    variables:
-      a:
-        description_key:
-          - *description_key_common
-          - *text_2
-          - Text 3
-""".strip()
-
-    path = tmp_path / "test.yaml"
-    with open(path, "w") as f:
-        f.write(yaml_text)
-
-    t = Table({"a": [1, 2, 3]})
-    t.update_metadata_from_yaml(path, "test")
-    assert t.a.metadata.description_key == ["Text 1", "Text 2", "Text 2", "Text 3"]
-
-
 # The parametrize decorator runs this test multiple times with different formats
 @pytest.mark.parametrize("format", ["csv", "feather", "parquet"])
 def test_round_trip_no_metadata(format: FileFormat) -> None:
@@ -1017,6 +992,13 @@ def test_groupby_observed_default(table_1) -> None:
     table_1 = table_1.astype({"a": "category"}).query("a != 3")
     gt = table_1.groupby("a").min()
     assert len(gt) == 3
+
+
+def test_groupby_levels(table_1) -> None:
+    table_1 = table_1.set_index(["country", "year"])
+    gt = table_1.groupby(level=[0, 1]).last()
+    assert gt.values.tolist() == [[3, 6], [1, 4], [2, 5]]
+    assert gt.a.m.title == "Title of Table 1 Variable a"
 
 
 def test_set_columns(table_1) -> None:

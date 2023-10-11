@@ -124,7 +124,7 @@ tables:
         description_key: *description_key_ongoing
         processing_level: major
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 3
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities
@@ -137,7 +137,7 @@ tables:
         description_key: *description_key_ongoing
         processing_level: major
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 5
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities
@@ -166,7 +166,7 @@ tables:
         description_key: *description_key_new
         processing_level: major
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 3
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities
@@ -179,7 +179,7 @@ tables:
         description_key: *description_key_new
         processing_level: major
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 5
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities
