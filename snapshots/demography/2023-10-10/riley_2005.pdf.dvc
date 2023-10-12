@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Estimates of Regional and Global Life Expectancy, 1800-2001
+    description: |-
+      Historians and demographers have gone through considerable trouble to reconstruct life expectancy in the past in individual countries.
+
+      This overview collects information from a large body of that work and links estimates for historical populations to those provided by the United Nations, the World Bank, and other sources for 1950–2001. The result shows regional and global life expectancy at birth for selected years from 1800 to 2001. The bibliography of more than 700 sources is published separately on the web.
+    date_published: 2005-10-21
+
+    # Citation
+    producer: James C. Riley
+    citation_full: |-
+      Riley, J.C. (2005), Estimates of Regional and Global Life Expectancy, 1800–2001. Population and Development Review, 31: 537-543. https://doi.org/10.1111/j.1728-4457.2005.00083.x
+
+    # Files
+    url_main: https://doi.org/10.1111/j.1728-4457.2005.00083.x
+    url_download: 
+      https://u.demog.berkeley.edu/~jrw/Biblio/Eprints/%20P-S/riley.2005_estimates.global.e0.pdf
+    date_accessed: 2023-10-10
+
+    # License
+    license:
+      name: JSTOR terms
+      url: https://about.jstor.org/terms/
+
+wdir: ../../../data/snapshots/demography/2023-10-10
+outs:
+- md5: f72f60c74142ec25af1c6e069c25c728
+  size: 1107
+  path: riley_2005.pdf
