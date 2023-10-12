@@ -1039,6 +1039,7 @@ class Variable(SQLModel, table=True):
             descriptionShort=metadata.description_short,
             descriptionFromProducer=metadata.description_from_producer,
             descriptionKey=metadata.description_key,
+            descriptionProcessing=metadata.description_processing,
             licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
             license=metadata.license.to_dict() if metadata.license else None,
             **presentation_dict,
