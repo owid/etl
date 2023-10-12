@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table, TableMeta
+from owid.catalog import Origin, Table, TableMeta
 from pandas.api.types import CategoricalDtype
 from structlog import get_logger
 
@@ -23,17 +23,17 @@ def extract_data(snap: Snapshot, output_dir: str) -> None:
     z.extractall(output_dir)
 
 
-def load_data(tmp_dir: str, metadata: TableMeta) -> Tuple[Table, ...]:
+def load_data(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Tuple[Table, ...]:
     return (
-        _load_population(tmp_dir, metadata),
-        _load_fertility(tmp_dir, metadata),
-        _load_demographics(tmp_dir, metadata),
-        _load_dependency_ratio(tmp_dir, metadata),
-        _load_deaths(tmp_dir, metadata),
+        _load_population(tmp_dir, metadata, origin),
+        _load_fertility(tmp_dir, metadata, origin),
+        _load_demographics(tmp_dir, metadata, origin),
+        _load_dependency_ratio(tmp_dir, metadata, origin),
+        _load_deaths(tmp_dir, metadata, origin),
     )
 
 
-def _load_population(tmp_dir: str, metadata: TableMeta) -> Table:
+def _load_population(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table:
     """Load population dataset (CSV)"""
     log.info("un_wpp._load_population")
     filenames = list(filter(lambda x: "PopulationBySingleAgeSex" in x, sorted(os.listdir(tmp_dir))))
@@ -60,12 +60,15 @@ def _load_population(tmp_dir: str, metadata: TableMeta) -> Table:
         "PopTotal": "float",
     }
     return pr.concat(
-        [pr.read_csv(os.path.join(tmp_dir, filename), dtype=dtype, metadata=metadata) for filename in filenames],
+        [
+            pr.read_csv(os.path.join(tmp_dir, filename), dtype=dtype, metadata=metadata, origin=origin)
+            for filename in filenames
+        ],
         ignore_index=True,
     )
 
 
-def _load_fertility(tmp_dir: str, metadata: TableMeta) -> Table:
+def _load_fertility(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table:
     log.info("un_wpp._load_fertility")
     """Load fertility dataset (CSV)"""
     (filename,) = [f for f in filter(lambda x: "Fertility" in x, sorted(os.listdir(tmp_dir))) if "notes" not in f]
@@ -91,10 +94,10 @@ def _load_fertility(tmp_dir: str, metadata: TableMeta) -> Table:
         "PASFR": "float",
         "Births": "float",
     }
-    return pr.read_csv(os.path.join(tmp_dir, filename), dtype=dtype, metadata=metadata)
+    return pr.read_csv(os.path.join(tmp_dir, filename), dtype=dtype, metadata=metadata, origin=origin)
 
 
-def _load_demographics(tmp_dir: str, metadata: TableMeta) -> Table:
+def _load_demographics(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table:
     """Load demographics dataset (CSV)"""
     log.info("un_wpp._load_demographics")
     filenames = [f for f in filter(lambda x: "Demographic" in x, sorted(os.listdir(tmp_dir))) if "notes" not in f]
@@ -132,30 +135,33 @@ def _load_demographics(tmp_dir: str, metadata: TableMeta) -> Table:
         "Time": "uint16",
     }
     return pr.concat(
-        [pr.read_csv(os.path.join(tmp_dir, filename), dtype=dtype, metadata=metadata) for filename in filenames],
+        [
+            pr.read_csv(os.path.join(tmp_dir, filename), dtype=dtype, metadata=metadata, origin=origin)
+            for filename in filenames
+        ],
         ignore_index=True,
     )
 
 
-def _load_deaths(tmp_dir: str, metadata: TableMeta) -> Table:
+def _load_deaths(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table:
     """Load deaths dataset (XLSX)"""
     log.info("un_wpp._load_deaths")
     filenames = list(filter(lambda x: "DEATHS" in x, sorted(os.listdir(tmp_dir))))
     # Load
-    dfs = [_read_xlsx_file(tmp_dir, filename, metadata=metadata) for filename in filenames]
+    dfs = [_read_xlsx_file(tmp_dir, filename, metadata=metadata, origin=origin) for filename in filenames]
     return pr.concat(dfs, ignore_index=True)
 
 
-def _load_dependency_ratio(tmp_dir: str, metadata: TableMeta) -> Table:
+def _load_dependency_ratio(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table:
     """Load dependency ratio dataset (XLSX)"""
     log.info("un_wpp._load_dependency_ratio")
     filenames = list(filter(lambda x: "DEPENDENCY_RATIOS" in x, sorted(os.listdir(tmp_dir))))
     # Load
-    dfs = [_read_xlsx_file(tmp_dir, filename, metadata=metadata) for filename in filenames]
+    dfs = [_read_xlsx_file(tmp_dir, filename, metadata=metadata, origin=origin) for filename in filenames]
     return pr.concat(dfs, ignore_index=True)
 
 
-def _read_xlsx_file(tmp_dir: str, filename: str, metadata: TableMeta) -> Table:
+def _read_xlsx_file(tmp_dir: str, filename: str, metadata: TableMeta, origin: Origin) -> Table:
     dtype_base = {
         "Index": "category",
         "Variant": "category",
@@ -178,6 +184,7 @@ def _read_xlsx_file(tmp_dir: str, filename: str, metadata: TableMeta) -> Table:
                 skiprows=16,
                 sheet_name=sheet_name,
                 metadata=metadata,
+                origin=origin,
             )
         )
 
@@ -379,6 +386,7 @@ def run(dest_dir: str) -> None:
     with tempfile.TemporaryDirectory() as tmp_dir:
         log.info("un_wpp.extract_data")
         extract_data(snap, tmp_dir)
+        assert snap.metadata.origin
         log.info("un_wpp.load_data")
         (
             df_population,
@@ -386,7 +394,7 @@ def run(dest_dir: str) -> None:
             df_demographics,
             df_depratio,
             df_deaths,
-        ) = load_data(tmp_dir, metadata=snap.to_table_metadata())
+        ) = load_data(tmp_dir, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)
     # Process
     log.info("un_wpp.process")
     df_population, df_fertility, df_demographics, df_depratio, df_deaths = process(
