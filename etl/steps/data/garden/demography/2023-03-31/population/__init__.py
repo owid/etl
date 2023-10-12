@@ -7,28 +7,31 @@ Four sources are used overall:
 - After 1950:
     - UN WPP (2022)
 - Before 1950:
-    - Gapminder (v7): This is prioritised over HYDE.
+    - Gapminder (v7): This is prioritised over HYDE. Gapminder v7 relies on multiple sources:
+        - CLIO/Maddison: https://clio-infra.eu/Indicators/TotalPopulation.html
+        - Gapminder (v3): https://www.gapminder.org/data/documentation/gd003/
     - HYDE (v3.2)
     - Gapminder (Systema Globalis):
         Provides data on former countries, and complements other sources with data on missing years for some countries.
         More on this dataset please refer to module gapminder_sg.
 """
+
+import json
 from typing import List
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
-from structlog import get_logger
-
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
-
-from .gapminder import load_gapminder
-from .gapminder_sg import (
+from gapminder import load_gapminder
+from gapminder_sg import (
     load_gapminder_sys_glob_complement,
     load_gapminder_sys_glob_former,
 )
-from .hyde import load_hyde
-from .unwpp import load_unwpp
+from hyde import load_hyde
+from owid.catalog import Table
+from structlog import get_logger
+from unwpp import load_unwpp
+
+from etl.data_helpers import geo
+from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
 
@@ -43,12 +46,19 @@ SOURCES_NAMES = {
     "gapminder_sg": "Gapminder - Systema Globalis (2023) (https://github.com/open-numbers/ddf--gapminder--systema_globalis)",
     "hyde": "HYDE v3.2 (2017) (https://dataportaal.pbl.nl/downloads/HYDE/)",
 }
+# Former countries
+## These countries are added by aggregating their successors' values, and using regions.
+FORMER_COUNTRIES_CODES = {"OWID_USS"}
 
 
 def run(dest_dir: str) -> None:
     log.info("population.start")
 
-    tb = make_table()
+    # Load regions table
+    ds_regions = paths.load_dataset("regions")
+    tb_regions = ds_regions["regions"]
+
+    tb = make_table(tb_regions)
 
     # keep original table with all origins, population table has only one origin
     # defined in YAML file
@@ -64,13 +74,13 @@ def run(dest_dir: str) -> None:
     log.info("population.end")
 
 
-def make_table() -> Table:
+def make_table(tb_regions: Table) -> Table:
     tb = (
         load_data()
         .pipe(select_source)
         .pipe(add_regions)
         .pipe(add_world)
-        .pipe(add_historical_regions)
+        .pipe(add_historical_regions, tb_regions)
         .pipe(fix_anomalies)
         .pipe(set_dtypes)
         .pipe(add_world_population_share)
@@ -212,20 +222,50 @@ def add_world(df: Table) -> Table:
     return df
 
 
-def add_historical_regions(df: Table) -> Table:
+def add_historical_regions(df: Table, tb_regions: Table) -> Table:
     """Add historical regions.
 
-    Systema Globalis from Gapminder contains historical regions. We add them to the data. These include
-    Yugoslavia, USSR, etc.
+    Historical regions are added using different techniques:
 
-    Note that this is added after regions and world regions have been obtained, to avoid double counting.
+    1. Systema Globalis from Gapminder contains historical regions. We add them to the data. These include
+    Yugoslavia, USSR, etc. Note that this is added after regions and world regions have been obtained, to avoid double counting.
+    2. Add historical regions by grouping and summing current countries.
     """
+
+    # 1. Add from Systema Globalis
     log.info("population: loading data (Gapminder Systema Globalis)")
     gapminder_sg = load_gapminder_sys_glob_former()
     # map source name
     gapminder_sg["source"] = SOURCES_NAMES["gapminder_sg"]
+    # Add to main table
+    tb = pr.concat([df, gapminder_sg], ignore_index=True)
 
-    return pr.concat([df, gapminder_sg], ignore_index=True)
+    # 2. Add historical regions by grouping and summing current countries.
+    for ccode in FORMER_COUNTRIES_CODES:
+        # Get former country name and end year (dissolution)
+        former_country_name = tb_regions.loc[ccode, "name"]
+        end_year = tb_regions.loc[ccode, "end_year"]
+        # Sanity check
+        assert former_country_name not in set(
+            tb["country"]
+        ), f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
+        # Get list of country successors (equivalent of former state nowadays) and end year (dissolution of former state)
+        ccodes_successors = json.loads(tb_regions.loc[ccode, "successors"])
+        successor_names = tb_regions.loc[ccodes_successors, "name"].tolist()
+        # Filter table accordingly
+        tb_ = tb[(tb["year"] <= end_year) & (tb["country"].isin(successor_names))]
+        # Filter rows (only preserve years where all countries have data)
+        year_filter = tb_.groupby("year")["country"].nunique() == len(successor_names)
+        year_filter = year_filter[year_filter].index.tolist()
+        tb_ = tb_[tb_["year"].isin(year_filter)]
+        # Perform operations
+        tb_ = tb_.groupby("year", as_index=False, observed=True).agg(
+            {"population": sum, "source": lambda x: "; ".join(sorted(set(x)))}
+        )
+        tb_["country"] = former_country_name
+        # Add to main table
+        tb = pr.concat([tb, tb_], ignore_index=True)
+    return tb
 
 
 def fix_anomalies(df: Table) -> Table:

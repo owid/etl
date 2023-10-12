@@ -59,7 +59,7 @@ def add_population(
     """
     # Load granular population dataset
     ds = Dataset(DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp")
-    pop = ds["population_granular"]
+    pop = ds["population_granular"].reset_index()
     # Keep only variant='medium'
     pop = pop[pop["variant"] == "medium"].drop(columns=["variant"])
     # Keep only metric='population'
