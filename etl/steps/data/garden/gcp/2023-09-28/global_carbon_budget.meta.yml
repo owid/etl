@@ -5,6 +5,8 @@ dataset:
 definitions:
   production_emissions_description_key: &production_emissions_description_key
     - This data is based on territorial emissions, which do not account for emissions embedded in traded goods.
+  traded_emissions_description_key: &traded_emissions_description_key
+    - Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter.
   international_aviation_description_key: &international_aviation_description_key
     - Emissions from international aviation and shipping are not included in any country or region's emissions. They are only included in the global total emissions.
   consumption_emissions_description_key: &consumption_emissions_description_key
@@ -554,7 +556,10 @@ tables:
         title: "Share of annual CO₂ emissions embedded in trade"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, measured as a percentage of emissions of CO₂. Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter."
+        description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, measured as a percentage of emissions of CO₂."
+        description_key:
+          - *traded_emissions_description_key
+          - *international_aviation_description_key
       population:
         title: "Population"
         unit: "persons"
@@ -573,15 +578,18 @@ tables:
         title: "Annual CO₂ emissions embedded in trade"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, measured in tonnes. Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter."
+        description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, measured in tonnes."
+        description_key:
+          - *traded_emissions_description_key
+          - *international_aviation_description_key
       traded_emissions_per_capita:
         title: "Annual CO₂ emissions embedded in trade (per capita)"
         unit: "tonnes per person"
         short_unit: "t/person"
         display:
           shortUnit: t
-        description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, measured in tonnes per person. Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter."
+        description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, measured in tonnes per person."
         description_key:
           - *per_capita_description_key
-          - *production_emissions_description_key
+          - *traded_emissions_description_key
           - *international_aviation_description_key
