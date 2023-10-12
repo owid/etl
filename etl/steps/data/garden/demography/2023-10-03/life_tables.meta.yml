@@ -1,5 +1,21 @@
 # NOTE: To learn more about the fields, hover over their names.
-
+definitions:
+  global:
+    life_expectancy:
+      description_short: |-
+        <% if type == "period" %>
+        The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
+        <% elif type == "cohort" %>
+        The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+        <% endif %>
+      point_1: |-
+        <% if type == "period" %>
+        This is based on a synthetic cohort created using mortality rates across age groups in a given year.
+        <% elif type == "cohort" %>
+        Rather than waiting for the entire cohort to have died before calculating the cohort life expectancy, researchers may use data from birth cohorts that are 'almost extinct'.
+        <% endif %>
+    data_used: |-
+      Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -20,18 +36,23 @@ tables:
       central_death_rate:
         title: Central death rate
         description_short: |-
-          The number of people who died during a 12-month period while at a given age by the average number who were living in that age group during this period.
+          The annual death rate per 1,000 people in a given age group.
+        description_key:
+          - For a given population or cohort, the central death rate during a given interval of 12 months is calculated using the number of people in that age group who died during the period, divided by the average number of people alive at that age at the start of the interval.
+          - |-
+            {definitions.global.data_used}
         unit: deaths per 1,000 people
         processing_level: minor
         description_processing: |-
-          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
+          The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
       probability_of_death:
         title: Probability of death
         unit: "%"
-        description_short: The probability that a person who survived until the start of a given interval will have died by the end of the interval.
+        description_short: |-
+          The probability that a person who survived until the start of a given age interval will have died by the end of this interval.
         processing_level: minor
         description_processing: |-
-          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
+          The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
       average_survival_length:
         title: Average survival length
         short_unit: years
@@ -54,24 +75,56 @@ tables:
         title: Number of person-years remaining
         unit: person-years
         description_short: Number of person-years remaining after a given age.
+
       life_expectancy:
         title: Life expectancy
         short_unit: years
         unit: years
         description_short: |-
-          <% if type == "period" %>
-          The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
-          <% elif type == "cohort" %>
-          The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
-          <% endif %>
+          {definitions.global.life_expectancy.description_short}
         description_key:
-          - Life expectancy at age 0 refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy people who have already survived to the given age.
+          - |-
+            <% if age == 0 %>
+            Life expectancy at age 0 refers to life expectancy at birth.
+            <% else %>
+            It refers to the remaining life expectancy for people who have already survived to the given age.
+            <% endif %>
+          - |-
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.data_used}
       life_expectancy_fm_diff:
         title: Life expectancy difference (f-m)
         short_unit: years
         unit: years
-        description_short: Life expectancy difference (females - males) at a given age.
+        description_short: |-
+          <% if type == "cohort" %>
+          The difference in cohort life expectancy (females - males) at a given age.
+          <% if type == "period" %>
+          The difference in period life expectancy (females - males) at a given age.
+          <% endif %>
+        description_key:
+          - Higher values indicate longer life expectancy among females than males.
+          - |-
+            {definitions.global.life_expectancy.description_short}
+          - |-
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.data_used}
       life_expectancy_fm_ratio:
         title: Life expectancy ratio (f/m)
         unit: ""
-        description_short: Life expectancy ratio (females/males) at a given age.
+        description_short: |-
+          <% if type == "cohort" %>
+          The ratio of cohort life expectancy (females/males) at a given age.
+          <% if type == "period" %>
+          The ratio of period life expectancy (females/males) at a given age.
+          <% endif %>
+        description_key:
+          - Higher values indicate longer life expectancy among females than males.
+          - |-
+            {definitions.global.life_expectancy.description_short}
+          - |-
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.data_used}
