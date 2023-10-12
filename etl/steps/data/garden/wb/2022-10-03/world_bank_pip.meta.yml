@@ -1,0 +1,701 @@
+dataset:
+  title: World Bank Poverty and Inequality Platform (PIP)
+tables:
+  world_bank_pip:
+    variables:
+      dollar1__share_of_population_above_poverty_line:
+        title: $1 - share of population above poverty line
+        description: '% of population living in households with an income or expenditure per person above $1 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar1__total_number_of_people_above_poverty_line:
+        title: $1 - total number of people above poverty line
+        description: Number of people living in households with an income or expenditure per person above $1 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar1__total_number_of_people_below_poverty_line:
+        title: $1 - total number of people below poverty line
+        description: Number of people living in households with an income or expenditure per person below $1 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar1_a_day__poverty_gap_index:
+        title: $1 a day - poverty gap index
+        description: >-
+          The poverty gap index calculated at a poverty line of $1 a day.
+
+
+          The poverty gap index is a measure that reflects both the depth and prevalence of poverty. It is defined as the
+          mean shortfall of the total population from the poverty line counting the non-poor as having zero shortfall and
+          expressed as a percentage of the poverty line.
+
+
+          It is worth unpacking that definition a little. For those below the poverty line, the shortfall corresponds to the
+          amount of money required in order to reach the poverty line. For those at or above the poverty line, the shortfall
+          is counted as zero. The average shortfall is then calculated across the total population – both poor and non-poor
+          – and then expressed as a share of the poverty line.
+
+
+          Unlike the more commonly-used metric of the headcount ratio, the poverty gap index is thus sensitive not only to
+          whether a person’s income falls below the poverty line or not, but also by how much – i.e. to the depth of poverty
+          they experience.
+        unit: '%'
+        short_unit: '%'
+      dollar1_a_day__share_of_population_below_poverty_line:
+        title: $1 a day - share of population below poverty line
+        description: '% of population living in households with an income or expenditure per person below $1 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar1_a_day__total_shortfall:
+        title: $1 a day - total shortfall
+        description: >-
+          The total shortfall from a poverty line of $1 a day.
+
+
+          This is the amount of money that would be theoretically needed to lift the income or expenditure of all people in
+          poverty up to the poverty line. However this is not a measure of the actual cost of eliminating poverty, since it
+          does not take into account the costs involved in making the necessary transfers nor any changes in behaviour they
+          would bring about.
+        unit: international-$ at 2017 prices
+        short_unit: $
+      dollar1_dollar2_15__share_of_population_between_poverty_lines:
+        title: $1-$2.15 - share of population between poverty lines
+        description: '% of population living in households with an income or expenditure per person between $1 and $2.15 a
+          day'
+        unit: '%'
+        short_unit: '%'
+      dollar1_dollar2_15__total_number_of_people_between_poverty_lines:
+        title: $1-$2.15 - total number of people between poverty lines
+        description: Number of people living in households with an income or expenditure per person between $1 and $2.15 a
+          day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar10__share_of_population_above_poverty_line:
+        title: $10 - share of population above poverty line
+        description: '% of population living in households with an income or expenditure per person above $10 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar10__total_number_of_people_above_poverty_line:
+        title: $10 - total number of people above poverty line
+        description: Number of people living in households with an income or expenditure per person above $10 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar10__total_number_of_people_below_poverty_line:
+        title: $10 - total number of people below poverty line
+        description: Number of people living in households with an income or expenditure per person below $10 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar10_a_day__poverty_gap_index:
+        title: $10 a day - poverty gap index
+        description: >-
+          The poverty gap index calculated at a poverty line of $10 a day.
+
+
+          The poverty gap index is a measure that reflects both the depth and prevalence of poverty. It is defined as the
+          mean shortfall of the total population from the poverty line counting the non-poor as having zero shortfall and
+          expressed as a percentage of the poverty line.
+
+
+          It is worth unpacking that definition a little. For those below the poverty line, the shortfall corresponds to the
+          amount of money required in order to reach the poverty line. For those at or above the poverty line, the shortfall
+          is counted as zero. The average shortfall is then calculated across the total population – both poor and non-poor
+          – and then expressed as a share of the poverty line.
+
+
+          Unlike the more commonly-used metric of the headcount ratio, the poverty gap index is thus sensitive not only to
+          whether a person’s income falls below the poverty line or not, but also by how much – i.e. to the depth of poverty
+          they experience.
+        unit: '%'
+        short_unit: '%'
+      dollar10_a_day__share_of_population_below_poverty_line:
+        title: $10 a day - share of population below poverty line
+        description: '% of population living in households with an income or expenditure per person below $10 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar10_a_day__total_shortfall:
+        title: $10 a day - total shortfall
+        description: >-
+          The total shortfall from a poverty line of $10 a day.
+
+
+          This is the amount of money that would be theoretically needed to lift the income or expenditure of all people in
+          poverty up to the poverty line. However this is not a measure of the actual cost of eliminating poverty, since it
+          does not take into account the costs involved in making the necessary transfers nor any changes in behaviour they
+          would bring about.
+        unit: international-$ at 2017 prices
+        short_unit: $
+      dollar10_dollar20__share_of_population_between_poverty_lines:
+        title: $10-$20 - share of population between poverty lines
+        description: '% of population living in households with an income or expenditure per person between $10 and $20 a
+          day'
+        unit: '%'
+        short_unit: '%'
+      dollar10_dollar20__total_number_of_people_between_poverty_lines:
+        title: $10-$20 - total number of people between poverty lines
+        description: Number of people living in households with an income or expenditure per person between $10 and $20 a
+          day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar10_dollar30__share_of_population_between_poverty_lines:
+        title: $10-$30 - share of population between poverty lines
+        description: '% of population living in households with an income or expenditure per person between $10 and $30 a
+          day'
+        unit: ''
+      dollar10_dollar30__total_number_of_people_between_poverty_lines:
+        title: $10-$30 - total number of people between poverty lines
+        description: Number of people living in households with an income or expenditure per person between $10 and $30 a
+          day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar2_15__share_of_population_above_poverty_line:
+        title: $2.15 - share of population above poverty line
+        description: '% of population living in households with an income or expenditure per person above $2.15 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar2_15__total_number_of_people_above_poverty_line:
+        title: $2.15 - total number of people above poverty line
+        description: Number of people living in households with an income or expenditure per person above $2.15 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar2_15__total_number_of_people_below_poverty_line:
+        title: $2.15 - total number of people below poverty line
+        description: Number of people living in households with an income or expenditure per person below $2.15 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar2_15_a_day__poverty_gap_index:
+        title: $2.15 a day - poverty gap index
+        description: >-
+          The poverty gap index calculated at a poverty line of $2.15 a day.
+
+
+          The poverty gap index is a measure that reflects both the depth and prevalence of poverty. It is defined as the
+          mean shortfall of the total population from the poverty line counting the non-poor as having zero shortfall and
+          expressed as a percentage of the poverty line.
+
+
+          It is worth unpacking that definition a little. For those below the poverty line, the shortfall corresponds to the
+          amount of money required in order to reach the poverty line. For those at or above the poverty line, the shortfall
+          is counted as zero. The average shortfall is then calculated across the total population – both poor and non-poor
+          – and then expressed as a share of the poverty line.
+
+
+          Unlike the more commonly-used metric of the headcount ratio, the poverty gap index is thus sensitive not only to
+          whether a person’s income falls below the poverty line or not, but also by how much – i.e. to the depth of poverty
+          they experience.
+        unit: '%'
+        short_unit: '%'
+      dollar2_15_a_day__share_of_population_below_poverty_line:
+        title: $2.15 a day - share of population below poverty line
+        description: '% of population living in households with an income or expenditure per person below $2.15 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar2_15_a_day__total_shortfall:
+        title: $2.15 a day - total shortfall
+        description: >-
+          The total shortfall from a poverty line of $2.15 a day.
+
+
+          This is the amount of money that would be theoretically needed to lift the income or expenditure of all people in
+          poverty up to the poverty line. However this is not a measure of the actual cost of eliminating poverty, since it
+          does not take into account the costs involved in making the necessary transfers nor any changes in behaviour they
+          would bring about.
+
+
+          We calculate the total annual shortfall from the poverty line ('poverty gap') from estimates of the poverty gap
+          index produced by the World Bank using the following formula: Total annual poverty gap = Poverty gap index x total
+          population (including both poor and non-poor) x $2.15 x 365.
+        unit: international-$ at 2017 prices
+        short_unit: $
+      dollar2_15_dollar10__share_of_population_between_poverty_lines:
+        title: $2.15-$10 - share of population between poverty lines
+        description: '% of population living in households with an income or expenditure per person between $2.15 and $10
+          a day'
+        unit: ''
+      dollar2_15_dollar10__total_number_of_people_between_poverty_lines:
+        title: $2.15-$10 - total number of people between poverty lines
+        description: Number of people living in households with an income or expenditure per person between $2.15 and $10
+          a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar2_15_dollar3_65__share_of_population_between_poverty_lines:
+        title: $2.15-$3.65 - share of population between poverty lines
+        description: '% of population living in households with an income or expenditure per person between $2.15 and $3.65
+          a day'
+        unit: '%'
+        short_unit: '%'
+      dollar2_15_dollar3_65__total_number_of_people_between_poverty_lines:
+        title: $2.15-$3.65 - total number of people between poverty lines
+        description: Number of people living in households with an income or expenditure per person between $2.15 and $3.65
+          a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar20__share_of_population_above_poverty_line:
+        title: $20 - share of population above poverty line
+        description: '% of population living in households with an income or expenditure per person above $20 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar20__total_number_of_people_above_poverty_line:
+        title: $20 - total number of people above poverty line
+        description: Number of people living in households with an income or expenditure per person above $20 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar20__total_number_of_people_below_poverty_line:
+        title: $20 - total number of people below poverty line
+        description: Number of people living in households with an income or expenditure per person below $20 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar20_a_day__poverty_gap_index:
+        title: $20 a day - poverty gap index
+        description: >-
+          The poverty gap index calculated at a poverty line of $20 a day.
+
+
+          The poverty gap index is a measure that reflects both the depth and prevalence of poverty. It is defined as the
+          mean shortfall of the total population from the poverty line counting the non-poor as having zero shortfall and
+          expressed as a percentage of the poverty line.
+
+
+          It is worth unpacking that definition a little. For those below the poverty line, the shortfall corresponds to the
+          amount of money required in order to reach the poverty line. For those at or above the poverty line, the shortfall
+          is counted as zero. The average shortfall is then calculated across the total population – both poor and non-poor
+          – and then expressed as a share of the poverty line.
+
+
+          Unlike the more commonly-used metric of the headcount ratio, the poverty gap index is thus sensitive not only to
+          whether a person’s income falls below the poverty line or not, but also by how much – i.e. to the depth of poverty
+          they experience.
+        unit: '%'
+        short_unit: '%'
+      dollar20_a_day__share_of_population_below_poverty_line:
+        title: $20 a day - share of population below poverty line
+        description: '% of population living in households with an income or expenditure per person below $20 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar20_a_day__total_shortfall:
+        title: $20 a day - total shortfall
+        description: >-
+          The total shortfall from a poverty line of $20 a day.
+
+
+          This is the amount of money that would be theoretically needed to lift the income or expenditure of all people in
+          poverty up to the poverty line. However this is not a measure of the actual cost of eliminating poverty, since it
+          does not take into account the costs involved in making the necessary transfers nor any changes in behaviour they
+          would bring about.
+        unit: international-$ at 2017 prices
+        short_unit: $
+      dollar20_dollar30__share_of_population_between_poverty_lines:
+        title: $20-$30 - share of population between poverty lines
+        description: '% of population living in households with an income or expenditure per person between $20 and $30 a
+          day'
+        unit: '%'
+        short_unit: '%'
+      dollar20_dollar30__total_number_of_people_between_poverty_lines:
+        title: $20-$30 - total number of people between poverty lines
+        description: Number of people living in households with an income or expenditure per person between $20 and $30 a
+          day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar24_35__share_of_population_above_poverty_line:
+        title: $24.35 - share of population above poverty line
+        unit: ''
+      dollar24_35__total_number_of_people_above_poverty_line:
+        title: $24.35 - total number of people above poverty line
+        unit: ''
+      dollar24_35__total_number_of_people_below_poverty_line:
+        title: $24.35 - total number of people below poverty line
+        unit: ''
+      dollar24_35_a_day__poverty_gap_index:
+        title: $24.35 a day - poverty gap index
+        unit: ''
+      dollar24_35_a_day__share_of_population_below_poverty_line:
+        title: $24.35 a day - share of population below poverty line
+        unit: ''
+      dollar24_35_a_day__total_shortfall:
+        title: $24.35 a day - total shortfall
+        unit: ''
+      dollar3_65__share_of_population_above_poverty_line:
+        title: $3.65 - share of population above poverty line
+        description: '% of population living in households with an income or expenditure per person above $3.65 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar3_65__total_number_of_people_above_poverty_line:
+        title: $3.65 - total number of people above poverty line
+        description: Number of people living in households with an income or expenditure per person above $3.65 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar3_65__total_number_of_people_below_poverty_line:
+        title: $3.65 - total number of people below poverty line
+        description: Number of people living in households with an income or expenditure per person below $3.65 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar3_65_a_day__poverty_gap_index:
+        title: $3.65 a day - poverty gap index
+        description: >-
+          The poverty gap index calculated at a poverty line of $3.65 a day.
+
+
+          The poverty gap index is a measure that reflects both the depth and prevalence of poverty. It is defined as the
+          mean shortfall of the total population from the poverty line counting the non-poor as having zero shortfall and
+          expressed as a percentage of the poverty line.
+
+
+          It is worth unpacking that definition a little. For those below the poverty line, the shortfall corresponds to the
+          amount of money required in order to reach the poverty line. For those at or above the poverty line, the shortfall
+          is counted as zero. The average shortfall is then calculated across the total population – both poor and non-poor
+          – and then expressed as a share of the poverty line.
+
+
+          Unlike the more commonly-used metric of the headcount ratio, the poverty gap index is thus sensitive not only to
+          whether a person’s income falls below the poverty line or not, but also by how much – i.e. to the depth of poverty
+          they experience.
+        unit: '%'
+        short_unit: '%'
+      dollar3_65_a_day__share_of_population_below_poverty_line:
+        title: $3.65 a day - share of population below poverty line
+        description: '% of population living in households with an income or expenditure per person below $3.65 a day'
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+        short_unit: '%'
+      dollar3_65_a_day__total_shortfall:
+        title: $3.65 a day - total shortfall
+        description: >-
+          The total shortfall from a poverty line of $3.65 a day.
+
+
+          This is the amount of money that would be theoretically needed to lift the income or expenditure of all people in
+          poverty up to the poverty line. However this is not a measure of the actual cost of eliminating poverty, since it
+          does not take into account the costs involved in making the necessary transfers nor any changes in behaviour they
+          would bring about.
+        unit: international-$ at 2017 prices
+        short_unit: $
+      dollar3_65_dollar6_85__share_of_population_between_poverty_lines:
+        title: $3.65-$6.85 - share of population between poverty lines
+        description: '% of population living in households with an income or expenditure per person between $3.65 and $6.85
+          a day'
+        unit: '%'
+        short_unit: '%'
+      dollar3_65_dollar6_85__total_number_of_people_between_poverty_lines:
+        title: $3.65-$6.85 - total number of people between poverty lines
+        description: Number of people living in households with an income or expenditure per person between $3.65 and $6.85
+          a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar30__share_of_population_above_poverty_line:
+        title: $30 - share of population above poverty line
+        description: '% of population living in households with an income or expenditure per person above $30 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar30__total_number_of_people_above_poverty_line:
+        title: $30 - total number of people above poverty line
+        description: Number of people living in households with an income or expenditure per person above $30 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar30__total_number_of_people_below_poverty_line:
+        title: $30 - total number of people below poverty line
+        description: Number of people living in households with an income or expenditure per person below $30 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar30_a_day__poverty_gap_index:
+        title: $30 a day - poverty gap index
+        description: >-
+          The poverty gap index calculated at a poverty line of $30 a day.
+
+
+          The poverty gap index is a measure that reflects both the depth and prevalence of poverty. It is defined as the
+          mean shortfall of the total population from the poverty line counting the non-poor as having zero shortfall and
+          expressed as a percentage of the poverty line.
+
+
+          It is worth unpacking that definition a little. For those below the poverty line, the shortfall corresponds to the
+          amount of money required in order to reach the poverty line. For those at or above the poverty line, the shortfall
+          is counted as zero. The average shortfall is then calculated across the total population – both poor and non-poor
+          – and then expressed as a share of the poverty line.
+
+
+          Unlike the more commonly-used metric of the headcount ratio, the poverty gap index is thus sensitive not only to
+          whether a person’s income falls below the poverty line or not, but also by how much – i.e. to the depth of poverty
+          they experience.
+        unit: '%'
+        short_unit: '%'
+      dollar30_a_day__share_of_population_below_poverty_line:
+        title: $30 a day - share of population below poverty line
+        description: '% of population living in households with an income or expenditure per person below $30 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar30_a_day__total_shortfall:
+        title: $30 a day - total shortfall
+        description: >-
+          The total shortfall from a poverty line of $30 a day.
+
+
+          This is the amount of money that would be theoretically needed to lift the income or expenditure of all people in
+          poverty up to the poverty line. However this is not a measure of the actual cost of eliminating poverty, since it
+          does not take into account the costs involved in making the necessary transfers nor any changes in behaviour they
+          would bring about.
+        unit: international-$ at 2017 prices
+        short_unit: $
+      dollar30_dollar40__share_of_population_between_poverty_lines:
+        title: $30-$40 - share of population between poverty lines
+        description: '% of population living in households with an income or expenditure per person between $30 and $40 a
+          day'
+        unit: '%'
+        short_unit: '%'
+      dollar30_dollar40__total_number_of_people_between_poverty_lines:
+        title: $30-$40 - total number of people between poverty lines
+        description: Number of people living in households with an income or expenditure per person between $30 and $40 a
+          day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar40__share_of_population_above_poverty_line:
+        title: $40 - share of population above poverty line
+        description: '% of population living in households with an income or expenditure per person above $40 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar40__total_number_of_people_above_poverty_line:
+        title: $40 - total number of people above poverty line
+        description: Number of people living in households with an income or expenditure per person above $40 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar40__total_number_of_people_below_poverty_line:
+        title: $40 - total number of people below poverty line
+        description: Number of people living in households with an income or expenditure per person below $40 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar40_a_day__poverty_gap_index:
+        title: $40 a day - poverty gap index
+        description: >-
+          The poverty gap index calculated at a poverty line of $30 a day.
+
+
+          The poverty gap index is a measure that reflects both the depth and prevalence of poverty. It is defined as the
+          mean shortfall of the total population from the poverty line counting the non-poor as having zero shortfall and
+          expressed as a percentage of the poverty line.
+
+
+          It is worth unpacking that definition a little. For those below the poverty line, the shortfall corresponds to the
+          amount of money required in order to reach the poverty line. For those at or above the poverty line, the shortfall
+          is counted as zero. The average shortfall is then calculated across the total population – both poor and non-poor
+          – and then expressed as a share of the poverty line.
+
+
+          Unlike the more commonly-used metric of the headcount ratio, the poverty gap index is thus sensitive not only to
+          whether a person’s income falls below the poverty line or not, but also by how much – i.e. to the depth of poverty
+          they experience.
+        unit: '%'
+        short_unit: '%'
+      dollar40_a_day__share_of_population_below_poverty_line:
+        title: $40 a day - share of population below poverty line
+        description: '% of population living in households with an income or expenditure per person below $40 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar40_a_day__total_shortfall:
+        title: $40 a day - total shortfall
+        description: >-
+          The total shortfall from a poverty line of $40 a day.
+
+
+          This is the amount of money that would be theoretically needed to lift the income or expenditure of all people in
+          poverty up to the poverty line. However this is not a measure of the actual cost of eliminating poverty, since it
+          does not take into account the costs involved in making the necessary transfers nor any changes in behaviour they
+          would bring about.
+        unit: international-$ at 2017 prices
+        short_unit: $
+      dollar6_85__share_of_population_above_poverty_line:
+        title: $6.85 - share of population above poverty line
+        description: '% of population living in households with an income or expenditure per person above $6.85 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar6_85__total_number_of_people_above_poverty_line:
+        title: $6.85 - total number of people above poverty line
+        description: Number of people living in households with an income or expenditure per person above $6.85 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar6_85__total_number_of_people_below_poverty_line:
+        title: $6.85 - total number of people below poverty line
+        description: Number of people living in households with an income or expenditure per person below $6.85 a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      dollar6_85_a_day__poverty_gap_index:
+        title: $6.85 a day - poverty gap index
+        description: >-
+          The poverty gap index calculated at a poverty line of $6.85 a day.
+
+
+          The poverty gap index is a measure that reflects both the depth and prevalence of poverty. It is defined as the
+          mean shortfall of the total population from the poverty line counting the non-poor as having zero shortfall and
+          expressed as a percentage of the poverty line.
+
+
+          It is worth unpacking that definition a little. For those below the poverty line, the shortfall corresponds to the
+          amount of money required in order to reach the poverty line. For those at or above the poverty line, the shortfall
+          is counted as zero. The average shortfall is then calculated across the total population – both poor and non-poor
+          – and then expressed as a share of the poverty line.
+
+
+          Unlike the more commonly-used metric of the headcount ratio, the poverty gap index is thus sensitive not only to
+          whether a person’s income falls below the poverty line or not, but also by how much – i.e. to the depth of poverty
+          they experience.
+        unit: '%'
+        short_unit: '%'
+      dollar6_85_a_day__share_of_population_below_poverty_line:
+        title: $6.85 a day - share of population below poverty line
+        description: '% of population living in households with an income or expenditure per person below $6.85 a day'
+        unit: '%'
+        short_unit: '%'
+      dollar6_85_a_day__total_shortfall:
+        title: $6.85 a day - total shortfall
+        description: >-
+          The total shortfall from a poverty line of $6.85 a day.
+
+
+          This is the amount of money that would be theoretically needed to lift the income or expenditure of all people in
+          poverty up to the poverty line. However this is not a measure of the actual cost of eliminating poverty, since it
+          does not take into account the costs involved in making the necessary transfers nor any changes in behaviour they
+          would bring about.
+        unit: international-$ at 2017 prices
+        short_unit: $
+      dollar6_85_dollar10__share_of_population_between_poverty_lines:
+        title: $6.85-$10 - share of population between poverty lines
+        description: '% of population living in households with an income or expenditure per person between $6.85 and $10
+          a day'
+        unit: '%'
+        short_unit: '%'
+      dollar6_85_dollar10__total_number_of_people_between_poverty_lines:
+        title: $6.85-$10 - total number of people between poverty lines
+        description: Number of people living in households with an income or expenditure per person between $6.85 and $10
+          a day
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      _40pct_of_median__share_of_population_below_poverty_line:
+        title: 40% of median - share of population below poverty line
+        description: '% of population living in households with an income or expenditure per person below 40% of the median'
+        unit: '%'
+        short_unit: '%'
+      _40pct_of_median__total_number_of_people_below_poverty_line:
+        title: 40% of median - total number of people below poverty line
+        description: Number of people living in households with an income or expenditure per person below 40% of the median
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      _50pct_of_median__share_of_population_below_poverty_line:
+        title: 50% of median - share of population below poverty line
+        description: '% of population living in households with an income or expenditure per person below 50% of the median'
+        unit: '%'
+        short_unit: '%'
+      _50pct_of_median__total_number_of_people_below_poverty_line:
+        title: 50% of median - total number of people below poverty line
+        description: Number of people living in households with an income or expenditure per person below 50% of the median
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      _60pct_of_median__share_of_population_below_poverty_line:
+        title: 60% of median - share of population below poverty line
+        description: '% of population living in households with an income or expenditure per person below 60% of the median'
+        unit: '%'
+        short_unit: '%'
+      _60pct_of_median__total_number_of_people_below_poverty_line:
+        title: 60% of median - total number of people below poverty line
+        description: Number of people living in households with an income or expenditure per person below 60% of the median
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      gini_coefficient:
+        title: Gini coefficient
+        description: The Gini coefficient measures inequality on a scale between 0 and 1, where higher values indicate greater
+          inequality.
+        unit: ''
+        display:
+          numDecimalPlaces: 2
+      mean_income_or_expenditure_per_day:
+        title: Mean income or expenditure per day
+        description: The mean level of income or expenditure per day.
+        unit: international-$ at 2017 prices
+        short_unit: $
+      median_income_or_expenditure_per_day:
+        title: Median income or expenditure per day
+        description: The level of income or expenditure per day below which half of the population live.
+        unit: international-$ at 2017 prices
+        short_unit: $
+      p10:
+        title: P10
+        description: The level of income or expenditure per day below which 10% of the population falls.
+        unit: international-$ at 2017 prices
+        short_unit: $
+      p90:
+        title: P90
+        description: The level of income or expenditure per day below which 90% of the population falls.
+        unit: international-$ at 2017 prices
+        short_unit: $
+      share_of_the_2nd_quintile_in_total_income_or_expenditure:
+        title: Share of the 2nd quintile in total income or expenditure
+        description: The income or expenditure of the 2nd quintile (fifth of the population) as a share of total income or
+          expenditure.
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+        short_unit: '%'
+      share_of_the_3rd_quintile_in_total_income_or_expenditure:
+        title: Share of the 3rd quintile in total income or expenditure
+        description: The income or expenditure of the 3rd quintile (fifth of the population) as a share of total income or
+          expenditure.
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+        short_unit: '%'
+      share_of_the_4th_quintile_in_total_income_or_expenditure:
+        title: Share of the 4th quintile in total income or expenditure
+        description: The income or expenditure of the 4th quintile (fifth of the population) as a share of total income or
+          expenditure.
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+        short_unit: '%'
+      share_of_the_poorest_quintile_in_total_income_or_expenditure:
+        title: Share of the poorest quintile in total income or expenditure
+        description: The income or expenditure of the poorest quintile (fifth of the population) as a share of total income
+          or expenditure.
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+        short_unit: '%'
+      share_of_the_richest_decile_in_total_income_or_expenditure:
+        title: Share of the richest decile in total income or expenditure
+        description: The income or expenditure of the richest decile (tenth of the population) as a share of total income
+          or expenditure.
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+        short_unit: '%'
+      share_of_the_richest_quintile_in_total_income_or_expenditure:
+        title: Share of the richest quintile in total income or expenditure
+        description: The income or expenditure of the richest quintile (fifth of the population) as a share of total income
+          or expenditure.
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+        short_unit: '%'
