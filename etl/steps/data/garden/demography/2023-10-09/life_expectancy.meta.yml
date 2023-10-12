@@ -106,7 +106,8 @@ tables:
           name: Life expectancy at birth
         presentation:
           title_public: Life expectancy at birth
-          title_variant: With UN projections, period life expectancy
+          attribution_short: UN WPP
+          title_variant: With projections, period life expectancy
           grapher_config:
             title: Life expectancy at birth
             selectedEntityNames: *sel_entities_americas
@@ -136,7 +137,8 @@ tables:
           name: Life expectancy at birth
         presentation:
           title_public: Life expectancy at birth
-          title_variant: UN Projections, period life expectancy
+          attribution_short: UN WPP
+          title_variant: Projections, period life expectancy
           grapher_config:
             title: Life expectancy at birth
             selectedEntityNames: *sel_entities_americas
