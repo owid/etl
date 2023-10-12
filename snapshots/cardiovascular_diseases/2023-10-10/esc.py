@@ -40,7 +40,8 @@ def main(upload: bool) -> None:
     snap = Snapshot(f"cardiovascular_diseases/{SNAPSHOT_VERSION}/esc.csv")
     # Attempt to fetch data from the source URL.
     dfs = []
-    for title, url_download in tqdm(HTML_DICTIONARY.items(), desc="Fetching data from the ESC website"):
+
+    for title, url_download in tqdm(HTML_DICTIONARY.items(), desc="Fetching data from the ESC website"):  # type: ignore
         response = requests.get(url_download)
 
         # Check if the request was successful (Status Code: 200)
