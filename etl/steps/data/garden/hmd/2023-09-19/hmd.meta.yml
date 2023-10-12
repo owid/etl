@@ -3,9 +3,9 @@ definitions:
   life_expectancy:
     description_short: |-
       <% if type == "period" %>
-      Period life expectancy is the average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
+      The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
       <% elif type == "cohort" %>
-      Cohort life expectancy is the average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+      The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
       <% endif %>
     point_1: |-
       <% if type == "period" %>

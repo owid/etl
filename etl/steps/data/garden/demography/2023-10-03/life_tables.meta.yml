@@ -1,19 +1,21 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
-  life_expectancy:
-    description_short: |-
-      <% if type == "period" %>
-      The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
-      <% elif type == "cohort" %>
-      The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
-      <% endif %>
-    point_1: |-
-      <% if type == "period" %>
-      This is based on a synthetic cohort created using mortality rates across age groups in a given year.
-      <% elif type == "cohort" %>
-      Rather than waiting for the entire cohort to have died before calculating the cohort life expectancy, researchers may use data from birth cohorts that are 'almost extinct'.
-      <% endif %>
-
+  global:
+    life_expectancy:
+      description_short: |-
+        <% if type == "period" %>
+        The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
+        <% elif type == "cohort" %>
+        The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+        <% endif %>
+      point_1: |-
+        <% if type == "period" %>
+        This is based on a synthetic cohort created using mortality rates across age groups in a given year.
+        <% elif type == "cohort" %>
+        Rather than waiting for the entire cohort to have died before calculating the cohort life expectancy, researchers may use data from birth cohorts that are 'almost extinct'.
+        <% endif %>
+    data_used: |-
+      Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -37,6 +39,8 @@ tables:
           The annual death rate per 1,000 people in a given age group.
         description_key:
           - For a given population or cohort, the central death rate during a given interval of 12 months is calculated using the number of people in that age group who died during the period, divided by the average number of people alive at that age at the start of the interval.
+          - |-
+            {definitions.global.data_used}
         unit: deaths per 1,000 people
         processing_level: minor
         description_processing: |-
@@ -77,17 +81,18 @@ tables:
         short_unit: years
         unit: years
         description_short: |-
-          {definitions.life_expectancy.description_short}
+          {definitions.global.life_expectancy.description_short}
         description_key:
           - |-
-            <% if type == "period" %>
+            <% if age == 0 %>
             Life expectancy at age 0 refers to life expectancy at birth.
             <% else %>
             It refers to the remaining life expectancy for people who have already survived to the given age.
             <% endif %>
           - |-
-            {definitions.life_expectancy.point_1}
-
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.data_used}
       life_expectancy_fm_diff:
         title: Life expectancy difference (f-m)
         short_unit: years
@@ -101,9 +106,11 @@ tables:
         description_key:
           - Higher values indicate longer life expectancy among females than males.
           - |-
-            {definitions.life_expectancy.description_short}
+            {definitions.global.life_expectancy.description_short}
           - |-
-            {definitions.life_expectancy.point_1}
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.data_used}
       life_expectancy_fm_ratio:
         title: Life expectancy ratio (f/m)
         unit: ""
@@ -116,6 +123,8 @@ tables:
         description_key:
           - Higher values indicate longer life expectancy among females than males.
           - |-
-            {definitions.life_expectancy.description_short}
+            {definitions.global.life_expectancy.description_short}
           - |-
-            {definitions.life_expectancy.point_1}
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.data_used}
