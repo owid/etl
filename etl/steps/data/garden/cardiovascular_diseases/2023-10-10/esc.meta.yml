@@ -112,7 +112,7 @@ tables:
 
         cardiologists__females__percent_of_cardiologists__total:
           title: Female cardiologists as a percentage of total cardiologists
-          unit: 'percent'
+          unit: '%'
           short_unit: '%'
           description_short: The percentage of female cardiologists out of the total number of cardiologists.
           processing_level: minor
@@ -428,7 +428,7 @@ tables:
 
         percent_of_percutaneous_coronary_interventions__pci__performed_by_trans_radial_access:
           title: Percentage of percutaneous coronary interventions (PCI) performed by transradial access
-          unit: 'percent'
+          unit: '%'
           short_unit: '%'
           description_short: The percentage of percutaneous coronary interventions (PCI) performed using transradial access.
           processing_level: minor
