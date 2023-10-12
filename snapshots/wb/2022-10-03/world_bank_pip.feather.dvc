@@ -12,7 +12,7 @@ meta:
       Version 20220909_2017_01_02_PROD
 
 
-      You can read more information about PIP data and methodology in <a href="https://github.com/owid/poverty-data">GitHub</a>.
+      You can read more information about PIP data and methodology in [GitHub](https://github.com/owid/poverty-data).
     url: https://pip.worldbank.org/
     date_accessed: 2022-10-03
     published_by: World Bank Poverty and Inequality Platform
