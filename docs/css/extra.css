@@ -25,6 +25,23 @@
     padding: 0.5rem;
 }
 
+
+.md-grid {
+    max-width: 95%;
+}
+
+.md-sidebar--secondary {
+    min-width: 30%;
+  }
+
+/* .md-content {
+    max-width: 50%;
+}
+
+.md-sidebar {
+    max-width: 100%;
+} */
+
 /* .md-typeset h1 {
     font-size: 3em;
 }

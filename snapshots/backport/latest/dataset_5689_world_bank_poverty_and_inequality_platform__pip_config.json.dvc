@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/5689
-    date_accessed: 2023-08-10 07:47:01.704188
+    date_accessed: 2023-10-12 08:53:23.632892
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5689_world_bank_poverty_and_inequality_platform__pip
   description: Version 20220909_2017_01_02_PROD
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 42832ded72567577fade7816c08f1ef7
-  size: 91230
+- md5: 36af408b935426c53f29686da48acf37
+  size: 92387
   path: dataset_5689_world_bank_poverty_and_inequality_platform__pip_config.json

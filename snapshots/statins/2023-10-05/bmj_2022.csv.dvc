@@ -1,0 +1,38 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global, regional and national trends in statin utilisation in high-income
+      and low/middle-income countries, 2015-2020.
+    date_published: 2022-09-22
+    title_snapshot: Global, regional and national trends in statin utilisation  (Guadamuz
+      , Shooshtari and Qato, 2022)
+    description_snapshot: |-
+      This dataset and study focus on investigating the global utilization of statins, which are essential medicines for cardiovascular disease (CVD) prevention, and exploring the disparities and trends in their use across various income groups, regions, and countries from 2015 to 2020.
+
+      Key Points:
+      - Data Source: Pharmaceutical sales data.
+      - Countries Included: 41 HICs and 50 LMICs.
+      - Population aged 40 years and above.
+      - Primary and Secondary Outcome Measures: Statin utilization, measured using defined daily doses (DDDs) per 1000 population ≥40 years per day (TPD).
+
+    # Citation
+    producer: Guadamuz , Shooshtari and Qato
+    citation_full: |-
+      Guadamuz JS, Shooshtari A, Qato DM. Global, regional and national trends in statin utilisation in high-income and low/middle-income countries, 2015-2020.
+
+    # Files
+    url_main: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9462115/
+    url_download: 
+      https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9462115/bin/bmjopen-2022-061350supp001.pdf
+    date_accessed: 2023-10-05
+
+    # License
+    license:
+      name: CC BY 4.0
+wdir: ../../../data/snapshots/statins/2023-10-05
+outs:
+- md5: 8fc170b9c94a55f2230372e7a2973579
+  size: 2681
+  path: bmj_2022.csv

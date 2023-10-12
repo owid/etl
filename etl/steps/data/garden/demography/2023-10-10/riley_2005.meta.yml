@@ -1,0 +1,21 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  riley_2005:
+    variables:
+      life_expectancy:
+        title: Life expectancy (at birth)
+        unit: years
+        short_unit: years
+        processing_level: minor
+        description_short: Period life expectancy at birth.
+

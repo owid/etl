@@ -644,10 +644,16 @@ class SnapshotStep(Step):
         return f"snapshot://{self.path}"
 
     def run(self) -> None:
+        from dvc.exceptions import CheckoutError
         from dvc.repo import Repo
 
         with _unignore_backports(Path(self._path)):
-            Repo(paths.BASE_DIR).pull(self._path, remote="public-read", force=True)
+            try:
+                Repo(paths.BASE_DIR).pull(self._path, remote="public-read", force=True)
+            except CheckoutError as e:
+                raise Exception(
+                    "File not found in DVC. Have you run the snapshot script? Make sure you're not using `is_public: false`."
+                ) from e
 
     def is_dirty(self) -> bool:
         # check if the snapshot has been added to DVC
@@ -690,10 +696,16 @@ class SnapshotStepPrivate(SnapshotStep):
         return f"snapshot-private://{self.path}"
 
     def run(self) -> None:
+        from dvc.exceptions import CheckoutError
         from dvc.repo import Repo
 
         with _unignore_backports(Path(self._path)):
-            Repo(paths.BASE_DIR).pull(self._path, remote="private", force=True)
+            try:
+                Repo(paths.BASE_DIR).pull(self._path, remote="private", force=True)
+            except CheckoutError as e:
+                raise Exception(
+                    "File not found in DVC. Have you run the snapshot script with `is_public: false`?"
+                ) from e
 
 
 class GrapherStep(Step):

@@ -9,25 +9,24 @@ meta:
 
       The dataset is compatible with the UCDP/PRIO Armed Conflict Dataset for the period 1946–2008.
 
-      A longer time series (1900-1997) compatible with the Correlates of War database (http://www.correlatesofwar.org/data-sets) was included in the first version (v1) of the Battle Deaths Dataset, available from the downloads section (https://www.prio.org/utility/DownloadFile.ashx?id=7&type=datasetfile).
+      A longer time series (1900-1997) compatible with the [Correlates of War database](http://www.correlatesofwar.org/data-sets) was included in the first version (v1) of the Battle Deaths Dataset, available from the downloads section.
 
       For academic exchanges on the PRIO data, see the following articles and rebuttals:
 
 
-      - Lacina & Gleditsch (2005) 'Monitoring trends in global combat: A new dataset of battle deaths' (https://www.semanticscholar.org/paper/Monitoring-Trends-in-Global-Combat%3A-A-New-Dataset-Lacina-Gleditsch/0c4ff27fff986bc30112ac59ad6afbd7b719ad17?p2df).
-      - Obermeier et al. (2008) 'Fifty years of violent war deaths from Vietnam to Bosnia'
-      (https://www.jstor.org/stable/20510162)
-      - Spagat et al. (2009) 'Estimating war deaths: An arena of contestation' (https://www.jstor.org/stable/20684623?seq=1#page_scan_tab_contents).
-      - Gohdes & Price (2012) 'First things first: Assessing data quality before model
-      quality' (https://www.jstor.org/stable/24545604?seq=1#page_scan_tab_contents).
-      - Lacina & Gleditsch (2012) 'The waning of war is real: A response to Gohdes and
-      Price' (https://www.jstor.org/stable/24545604?seq=1#page_scan_tab_contents)
+      - [Lacina & Gleditsch (2005) 'Monitoring trends in global combat: A new dataset of battle deaths'](https://www.semanticscholar.org/paper/Monitoring-Trends-in-Global-Combat%3A-A-New-Dataset-Lacina-Gleditsch/0c4ff27fff986bc30112ac59ad6afbd7b719ad17?p2df).
+      - [Obermeier et al. (2008) 'Fifty years of violent war deaths from Vietnam to Bosnia'](https://www.jstor.org/stable/20510162)
+      - [Spagat et al. (2009) 'Estimating war deaths: An arena of contestation'](https://www.jstor.org/stable/20684623?seq=1#page_scan_tab_contents).
+      - [Gohdes & Price (2012) 'First things first: Assessing data quality before model
+      quality'](https://www.jstor.org/stable/24545604?seq=1#page_scan_tab_contents).
+      - [Lacina & Gleditsch (2012) 'The waning of war is real: A response to Gohdes and
+      Price'](https://www.jstor.org/stable/24545604?seq=1#page_scan_tab_contents)
 
 
       There are no plans to update the PRIO battle deaths dataset beyond 2008. The Uppsala
       Conflict Data Program (UCDP) maintains a similar dataset from 1989, which is updated
       annually. For this dataset in different formats,
-      as well as a codebook, go to the UCDP Battle-Related Deaths Dataset (https://ucdp.uu.se/downloads/).
+      as well as a codebook, go to the [UCDP Battle-Related Deaths Dataset](https://ucdp.uu.se/downloads/).
 
       While the definitions are very similar, the coding practices may differ somewhat,
       and we generally recommend users of the two datasets to point out that these are
@@ -41,14 +40,14 @@ meta:
 
     # Files
     url_main: https://www.prio.org/data/1
-    url_download: 
+    url_download:
       https://cdn.cloud.prio.org/files/d21ef702-a546-45a8-b3c9-5b520dcc1239/PRIO%20Battle%20Deaths%20Dataset%2031.xls?inline=true
     date_accessed: 2023-09-21
 
     # License
     license:
       name: PRIO terms
-      url: 
+      url:
         https://cdn.cloud.prio.org/files/91648bba-8885-40ce-8a78-fae75c850c55/PRIO%20Battle%20Deaths%20Dataset%2030%20Documentation.pdf?inline=true
 
 wdir: ../../../data/snapshots/war/2023-09-21

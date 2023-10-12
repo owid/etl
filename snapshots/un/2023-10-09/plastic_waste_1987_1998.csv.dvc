@@ -1,0 +1,47 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: 'Comtrade Database'
+    description: |-
+      The United Nations Comtrade database aggregates detailed global annual and monthly trade statistics by product and trading partner for use by governments, academia, research institutes, and enterprises. Data compiled by the United Nations Statistics.
+
+      Division covers approximately 200 countries and represents more than 99% of the world's merchandise trade. Information can be extracted in a variety of formats, including API developer tools for integration into enterprise applications and workflows.
+
+      Subscribers receive access to additional functionality to improve efficiency and specificity.
+
+
+      The conversion factors used in Comtrade are domestic currency per US Dollar (period average) from IMF.
+
+
+      Contact subscriptions@un.org for information and licensing.
+    date_published: '2023'
+    title_snapshot: 'Comtrade Database: Plastic Waste Trade, 1987-1998'
+    description_snapshot: |-
+        Subset of Comtrade database only concerning indicators related to plastic waste.
+
+        The data is sourced from the commodity category '3915 – Waste, parings and scrap, of plastics' from the UN's Comtrade Database.
+
+        This snapshot only includes data from 1987 until 1998.
+
+    # Citation
+    producer: United Nations Comtrade Database
+    citation_full: |-
+      United Nations Comtrade Database (2023)
+    attribution_short: UN Comtrade
+
+    # Files
+    url_main: https://comtradeplus.un.org/
+    date_accessed: 2023-10-09
+
+    # License
+    license:
+      name: ©producer year
+      url: https://comtrade.un.org/licenseagreement.html
+
+wdir: ../../../data/snapshots/un/2023-10-09
+outs:
+- md5: 133f171f9ea495903b05aeedee023f43
+  size: 5603174
+  path: plastic_waste_1987_1998.csv

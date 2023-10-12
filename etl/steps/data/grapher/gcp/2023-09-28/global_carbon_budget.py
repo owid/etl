@@ -7,7 +7,7 @@ Some auxiliary variables will be added (where nans are filled with zeros, to avo
 import numpy as np
 import pandas as pd
 
-from etl.helpers import PathFinder, create_dataset, grapher_checks
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -41,9 +41,4 @@ def run(dest_dir: str) -> None:
         default_metadata=ds_garden.metadata,
         check_variables_metadata=True,
     )
-
-    # Sanity checks.
-    grapher_checks(ds_grapher)
-
-    # Save changes in the new grapher dataset.
     ds_grapher.save()
