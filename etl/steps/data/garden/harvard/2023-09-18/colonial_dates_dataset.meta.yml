@@ -15,7 +15,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |
-          Name of European colonial power(s) that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+          Name of European colonial power(s) that colonized from overseas each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
         description_processing: |
           The indicator has been processed to identify the European colonial powers as "Colonizers", the countries not colonized as "Not colonized" and the countries colonized for multiple colonizers in the same year as the name of the colonizers separated by "-".
 
@@ -33,7 +33,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |
-          Name of European colonial power that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
+          Name of European colonial power that colonized from overseas each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
         description_processing: |
           The indicator has been processed to identify the European colonial powers as "Colonizers", the countries not colonized as "Not colonized" and the countries colonized for multiple colonizers in the same year as "Multiple colonizers".
 
@@ -51,7 +51,7 @@ tables:
         unit: "years"
         short_unit: "years"
         description_short: |
-          Number of years the country has been colonized by the European colonial power(s) in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+          Number of years the country has been colonized from overseas by the European colonial power(s) in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
         description_processing: |
           This is a cumulative sum of the years the country has been colonized, across the entire time series. Colonizers or countries not colonized show a value of 0.
 
@@ -69,7 +69,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |
-          Name of the last European colonial power(s) that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+          Name of the last European colonial power(s) that colonized from overseas each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
         description_processing: |
           The indicator is constructed by filling years with no colonizers with the last colonizer in the time series for each country. Colonizers are identified as such, countries not colonized as "Not colonized" and countries colonized for multiple colonizers in the same year as the name of the colonizers separated by "-".
 
@@ -87,7 +87,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |
-          Name of the last European colonial power that colonized each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
+          Name of the last European colonial power that colonized from overseas each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
         description_processing: |
           The indicator is constructed by filling years with no colonizers with the last colonizer (grouped) in the time series for each country. Colonizers are identified as such, countries not colonized as "Not colonized" and countries colonized for multiple colonizers in the same year as "Multiple colonizers".
 
@@ -122,7 +122,7 @@ tables:
         unit: "countries"
         short_unit: ""
         description_short: |
-          Total number of colonies per year colonized by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+          Total number of overseas colonies per year colonized by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
         description_processing: |
           This is the count of countries each European colonial power colonized each year. Colonized countries or countries not colonized show a null value.
 
@@ -142,7 +142,7 @@ tables:
         unit: "countries"
         short_unit: ""
         description_short: |
-          Total number of colonies per year colonized in each region by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+          Total number of overseas colonies per year colonized in each region by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
         description_processing: |
           This is is an aggregation of the number of countries each European colonial power colonized each year, by OWID geographic region or World Bank income groups.
 
