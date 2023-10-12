@@ -25,7 +25,7 @@ definitions:
         - Country's share of the global population is calculated using our population dataset, based on [different sources](https://ourworldindata.org/population-sources).
         - Each country's share of global CO₂ emissions from flaring has been calculated using global CO₂ emissions from flaring provided in the Global Carbon Budget dataset.
     description_key:
-      # NOTE: The description key are re-defined for each indicator on consumption-based emissions.
+      # NOTE: The description key points are re-defined for each indicator on consumption-based emissions and traded emissions, as well as on per-capita indicators.
       - *production_emissions_description_key
       - *international_aviation_description_key
 
@@ -412,12 +412,12 @@ tables:
         title: "Annual CO₂ emissions including land-use change per GDP"
         unit: "kilograms per international-$"
         short_unit: "kg/$"
-        description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per dollar of GDP (2011 international-$). Emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per dollar of GDP (2011 international-$)."
       emissions_total_including_land_use_change_per_unit_energy:
         title: "Annual CO₂ emissions including land-use change per unit energy"
         unit: "kilograms per kilowatt-hour"
         short_unit: "kg/kWh"
-        description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per kilowatt-hour of primary energy consumption. Emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per kilowatt-hour of primary energy consumption."
       emissions_total_per_capita:
         title: "Annual CO₂ emissions (per capita)"
         unit: "tonnes per person"
@@ -433,12 +433,12 @@ tables:
         title: "Annual CO₂ emissions per GDP (kg per international-$)"
         unit: "kilograms per international-$"
         short_unit: "kg/$"
-        description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per dollar of GDP (2011 international-$). Emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per dollar of GDP (2011 international-$)."
       emissions_total_per_unit_energy:
         title: "Annual CO₂ emissions per unit energy (kg per kilowatt-hour)"
         unit: "kilograms per kilowatt-hour"
         short_unit: "kg/kWh"
-        description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per kilowatt-hour of primary energy consumption. Emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per kilowatt-hour of primary energy consumption."
       gdp:
         title: "GDP"
         unit: "2011 international-$"
@@ -541,7 +541,9 @@ tables:
         title: "Land-use change quality flag"
         unit: ""
         short_unit: ""
-        description_short: "Carbon dioxide emissions from land use change vary significantly in their degree of certainty. The quality flag is 1 if the different estimates of land-use change emissions considered by the Global Carbon Project have a reasonable agreement. Otherwise the quality flag is 0. The flag is also set to zero if not all estimates have data for a given country. For a more detailed definition, see the original paper."
+        description_short: "The quality flag is 1 if the different estimates of land-use change emissions considered by the Global Carbon Project have a reasonable agreement. Otherwise the quality flag is 0. The flag is also set to zero if not all estimates have data for a given country."
+        description_key:
+          - Carbon dioxide emissions from land use change vary significantly in their degree of certainty.
       pct_growth_emissions_total:
         title: "Annual CO₂ emissions growth (%)"
         unit: "%"
