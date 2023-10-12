@@ -3,6 +3,8 @@ dataset:
   update_period_days: 365
 
 definitions:
+  production_emissions_description_key: &production_emissions_description_key
+    - This data is based on territorial emissions, which do not account for emissions embedded in traded goods.
   international_aviation_description_key: &international_aviation_description_key
     - Emissions from international aviation and shipping are not included in any country or region's emissions. They are only included in the global total emissions.
   consumption_emissions_description_key: &consumption_emissions_description_key
@@ -21,6 +23,8 @@ definitions:
         - Country's share of the global population is calculated using our population dataset, based on [different sources](https://ourworldindata.org/population-sources).
         - Each country's share of global CO₂ emissions from flaring has been calculated using global CO₂ emissions from flaring provided in the Global Carbon Budget dataset.
     description_key:
+      # NOTE: The description key are re-defined for each indicator on consumption-based emissions.
+      - *production_emissions_description_key
       - *international_aviation_description_key
 
 tables:
@@ -130,7 +134,7 @@ tables:
         title: "Share of global cumulative CO₂ consumption-based emissions"
         unit: "%"
         short_unit: "%"
-        description_short: "Cumulative consumption-based emissions of carbon dioxide (CO₂) since the first year of available data, measured as a percentage of global cumulative consumption-based emissions of CO₂ since the first year of available data."
+        description_short: "Cumulative consumption-based emissions of carbon dioxide (CO₂) since the first year of available data, measured as a percentage of global cumulative consumption-based emissions."
         description_key:
           - *consumption_emissions_description_key
           - *international_aviation_description_key
@@ -138,292 +142,301 @@ tables:
         title: "Cumulative CO₂ emissions from cement"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from cement since the first year of available data, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from cement since the first year of available data, measured in tonnes."
       cumulative_emissions_from_cement_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from cement"
         unit: "%"
         short_unit: "%"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from cement since the first year of available data, measured as a percentage of global cumulative production-based emissions of CO₂ from cement since the first year of available data. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from cement since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from cement."
       cumulative_emissions_from_coal:
         title: "Cumulative CO₂ emissions from coal"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from coal since the first year of available data, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from coal since the first year of available data, measured in tonnes."
       cumulative_emissions_from_coal_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from coal"
         unit: "%"
         short_unit: "%"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from coal since the first year of available data, measured as a percentage of global cumulative production-based emissions of CO₂ from coal since the first year of available data. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from coal since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from coal."
       cumulative_emissions_from_flaring:
         title: "Cumulative CO₂ emissions from flaring"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from flaring since the first year of available data, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from flaring since the first year of available data, measured in tonnes."
       cumulative_emissions_from_flaring_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from flaring"
         unit: "%"
         short_unit: "%"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from flaring since the first year of available data, measured as a percentage of global cumulative production-based emissions of CO₂ from flaring since the first year of available data. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from flaring since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from flaring."
       cumulative_emissions_from_gas:
         title: "Cumulative CO₂ emissions from gas"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from gas since the first year of available data, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from gas since the first year of available data, measured in tonnes."
       cumulative_emissions_from_gas_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from gas"
         unit: "%"
         short_unit: "%"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from gas since the first year of available data, measured as a percentage of global cumulative production-based emissions of CO₂ from gas since the first year of available data. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from gas since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from gas."
       cumulative_emissions_from_land_use_change:
         title: "Cumulative CO₂ emissions from land-use change"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from land-use change since the first year of available data, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from land-use change since the first year of available data, measured in tonnes."
       cumulative_emissions_from_land_use_change_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from land-use change"
         unit: "%"
         short_unit: "%"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from land-use change since the first year of available data, measured as a percentage of global cumulative production-based emissions of CO₂ from land-use chang since the first year of available data. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from land-use change since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from land-use change."
       cumulative_emissions_from_oil:
         title: "Cumulative CO₂ emissions from oil"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from oil since the first year of available data, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from oil since the first year of available data, measured in tonnes."
       cumulative_emissions_from_oil_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from oil"
         unit: "%"
         short_unit: "%"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from oil since the first year of available data, measured as a percentage of global cumulative production-based emissions of CO₂ from oil since the first year of available data. This is based on territorial emissions, which do not account for emissions embedded in traded goods. Global oil emissions include all country emissions as well as emissions from international aviation and shipping."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from oil since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from oil."
       cumulative_emissions_from_other_industry:
         title: "Cumulative CO₂ emissions from other industry"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from other industry sources since the first year of available data, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from other industry sources since the first year of available data, measured in tonnes."
       cumulative_emissions_from_other_industry_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from other industry"
         unit: "%"
         short_unit: "%"
-        description_short: "Cumulative production-based emissions of carbon dioxide (CO₂) from other industry sources since the first year of available data, measured as a percentage of global cumulative production-based emissions of CO₂ from other industry sources since the first year of available data. This is based on territorial emissions, which do not account for emissions embedded in traded goods. Global emissions from other industry sources include all country emissions."
+        description_short: "Cumulative emissions of carbon dioxide (CO₂) from other industry sources since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from other industry sources."
       cumulative_emissions_total:
         title: "Cumulative CO₂ emissions"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Total cumulative production-based emissions of carbon dioxide (CO₂), excluding land-use change, since the first year of available data, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Total cumulative emissions of carbon dioxide (CO₂), excluding land-use change, since the first year of available data, measured in tonnes."
       cumulative_emissions_total_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions"
         unit: "%"
         short_unit: "%"
-        description_short: "Total cumulative production-based emissions of carbon dioxide (CO₂), excluding land-use change, since the first year of available data, measured as a percentage of global total cumulative production-based emissions of CO₂ since the first year of available data. This is based on territorial emissions, which do not account for emissions embedded in traded goods. Global emissions include all country emissions as well as emissions from international aviation and shipping."
+        description_short: "Total cumulative emissions of carbon dioxide (CO₂), excluding land-use change, since the first year of available data, measured as a percentage of global total cumulative emissions of CO₂."
       cumulative_emissions_total_including_land_use_change:
         title: "Cumulative CO₂ emissions including land-use change"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Total cumulative production-based emissions of carbon dioxide (CO₂), including land-use change, since the first year of available data, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Total cumulative emissions of carbon dioxide (CO₂), including land-use change, since the first year of available data, measured in tonnes."
       cumulative_emissions_total_including_land_use_change_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions including land-use change"
         unit: "%"
         short_unit: "%"
-        description_short: "Total cumulative production-based emissions of carbon dioxide (CO₂), including land-use change, since the first year of available data, measured as a percentage of global total cumulative production-based emissions of CO₂ (including land-use change) since the first year of available data. This is based on territorial emissions, which do not account for emissions embedded in traded goods. Global emissions include all country emissions as well as emissions from international aviation and shipping."
+        description_short: "Total cumulative emissions of carbon dioxide (CO₂), including land-use change, since the first year of available data, measured as a percentage of global total cumulative emissions of CO₂ (including land-use change)."
       emissions_from_cement:
         title: "Annual CO₂ emissions from cement"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from cement, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from cement, measured in tonnes."
       emissions_from_cement_as_share_of_global:
         title: "Share of global annual CO₂ emissions from cement"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from cement, measured as a percentage of global production-based emissions of CO₂ from cement in the same year. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from cement, measured as a percentage of global emissions of CO₂ from cement in the same year."
       emissions_from_cement_per_capita:
         title: "Annual CO₂ emissions from cement (per capita)"
         unit: "tonnes per person"
         short_unit: "t/person"
         display:
           shortUnit: t
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from cement, measured in tonnes per person. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from cement, measured in tonnes per person."
         description_key:
           - *per_capita_description_key
+          - *production_emissions_description_key
           - *international_aviation_description_key
       emissions_from_coal:
         title: "Annual CO₂ emissions from coal"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from coal, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from coal, measured in tonnes."
       emissions_from_coal_as_share_of_global:
         title: "Share of global annual CO₂ emissions from coal"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from coal, measured as a percentage of global production-based emissions of CO₂ from coal in the same year. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from coal, measured as a percentage of global emissions of CO₂ from coal in the same year."
       emissions_from_coal_per_capita:
         title: "Annual CO₂ emissions from coal (per capita)"
         unit: "tonnes per person"
         short_unit: "t/person"
         display:
           shortUnit: t
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from coal, measured in tonnes per person. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from coal, measured in tonnes per person."
         description_key:
           - *per_capita_description_key
+          - *production_emissions_description_key
           - *international_aviation_description_key
       emissions_from_flaring:
         title: "Annual CO₂ emissions from flaring"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from flaring, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from flaring, measured in tonnes."
       emissions_from_flaring_as_share_of_global:
         title: "Share of global annual CO₂ emissions from flaring"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from flaring, measured as a percentage of global production-based emissions of CO₂ from flaring in the same year. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from flaring, measured as a percentage of global emissions of CO₂ from flaring in the same year."
       emissions_from_flaring_per_capita:
         title: "Annual CO₂ emissions from flaring (per capita)"
         unit: "tonnes per person"
         short_unit: "t/person"
         display:
           shortUnit: t
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from flaring, measured in tonnes per person. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from flaring, measured in tonnes per person."
         description_key:
           - *per_capita_description_key
+          - *production_emissions_description_key
           - *international_aviation_description_key
       emissions_from_gas:
         title: "Annual CO₂ emissions from gas"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from gas, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from gas, measured in tonnes."
       emissions_from_gas_as_share_of_global:
         title: "Share of global annual CO₂ emissions from gas"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from gas, measured as a percentage of global production-based emissions of CO₂ from gas in the same year. This is based on territorial emissions, which do not account for emissions embedded in traded goods. Global gas emissions include all country emissions as well as emissions from international aviation and shipping."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from gas, measured as a percentage of global emissions of CO₂ from gas in the same year."
       emissions_from_gas_per_capita:
         title: "Annual CO₂ emissions from gas (per capita)"
         unit: "tonnes per person"
         short_unit: "t/person"
         display:
           shortUnit: t
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from gas, measured in tonnes per person. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from gas, measured in tonnes per person."
         description_key:
           - *per_capita_description_key
+          - *production_emissions_description_key
           - *international_aviation_description_key
       emissions_from_land_use_change:
         title: "Annual CO₂ emissions from land-use change"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from land-use change, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from land-use change, measured in tonnes."
       emissions_from_land_use_change_as_share_of_global:
         title: "Share of global annual CO₂ emissions from land-use change"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from land-use change, measured as a percentage of global production-based emissions of CO₂ from land-use change in the same year. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from land-use change, measured as a percentage of global emissions of CO₂ from land-use change in the same year."
       emissions_from_land_use_change_per_capita:
         title: "Annual CO₂ emissions from land-use change per capita"
         unit: "tonnes per person"
         short_unit: "t/person"
         display:
           shortUnit: t
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from land-use change, measured in tonnes per person. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from land-use change, measured in tonnes per person."
         description_key:
           - *per_capita_description_key
+          - *production_emissions_description_key
           - *international_aviation_description_key
       emissions_from_oil:
         title: "Annual CO₂ emissions from oil"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from oil, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from oil, measured in tonnes."
       emissions_from_oil_as_share_of_global:
         title: "Share of global annual CO₂ emissions from oil"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from oil, measured as a percentage of global production-based emissions of CO₂ from oil in the same year. This is based on territorial emissions, which do not account for emissions embedded in traded goods. Global oil emissions include all country emissions as well as emissions from international aviation and shipping."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from oil, measured as a percentage of global emissions of CO₂ from oil in the same year."
       emissions_from_oil_per_capita:
         title: "Annual CO₂ emissions from oil (per capita)"
         unit: "tonnes per person"
         short_unit: "t/person"
         display:
           shortUnit: t
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from oil, measured in tonnes per person. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from oil, measured in tonnes per person."
         description_key:
           - *per_capita_description_key
+          - *production_emissions_description_key
           - *international_aviation_description_key
       emissions_from_other_industry:
         title: "Annual CO₂ emissions from other industry"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from other industry sources, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from other industry sources, measured in tonnes."
       emissions_from_other_industry_as_share_of_global:
         title: "Share of global annual CO₂ emissions from other industry"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from other industry sources, measured as a percentage of global production-based emissions of CO₂ from other industry sources in the same year. This is based on territorial emissions, which do not account for emissions embedded in traded goods. Global emissions form other industry sources include all country emissions."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from other industry sources, measured as a percentage of global emissions of CO₂ from other industry sources in the same year."
       emissions_from_other_industry_per_capita:
         title: "Annual CO₂ emissions from other industry (per capita)"
         unit: "tonnes per person"
         short_unit: "t/person"
         display:
           shortUnit: t
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂) from other industry sources, measured in tonnes per person. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂) from other industry sources, measured in tonnes per person."
         description_key:
           - *per_capita_description_key
+          - *production_emissions_description_key
           - *international_aviation_description_key
       emissions_total:
         title: "Annual CO₂ emissions"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Annual total production-based emissions of carbon dioxide (CO₂), excluding land-use change, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in tonnes."
       emissions_total_as_share_of_global:
         title: "Share of global annual CO₂ emissions"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual total production-based emissions of carbon dioxide (CO₂), excluding land-use change, measured as a percentage of global production-based emissions of CO₂ in the same year. This is based on territorial emissions, which do not account for emissions embedded in traded goods. Global emissions include all country emissions as well as emissions from international aviation and shipping."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured as a percentage of global emissions of CO₂ in the same year."
       emissions_total_including_land_use_change:
         title: "Annual CO₂ emissions including land-use change"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Annual total production-based emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes."
       emissions_total_including_land_use_change_as_share_of_global:
         title: "Share of global annual CO₂ emissions including land-use change"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual total production-based emissions of carbon dioxide (CO₂), including land-use change, measured as a percentage of global total production-based emissions of CO₂ in the same year. This is based on territorial emissions, which do not account for emissions embedded in traded goods. Global emissions include all country emissions as well as emissions from international aviation and shipping."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured as a percentage of global total emissions of CO₂ in the same year."
       emissions_total_including_land_use_change_per_capita:
         title: "Annual CO₂ emissions including land-use change per capita"
         unit: "tonnes per person"
         short_unit: "t/person"
         display:
           shortUnit: t
-        description_short: "Annual production-based emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes per person. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes per person."
         description_key:
           - *per_capita_description_key
+          - *production_emissions_description_key
           - *international_aviation_description_key
       emissions_total_including_land_use_change_per_gdp:
         title: "Annual CO₂ emissions including land-use change per GDP"
         unit: "kilograms per international-$"
         short_unit: "kg/$"
-        description_short: "Annual total production-based emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per dollar of GDP (2011 international-$). Production-based emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per dollar of GDP (2011 international-$). Emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
       emissions_total_including_land_use_change_per_unit_energy:
         title: "Annual CO₂ emissions including land-use change per unit energy"
         unit: "kilograms per kilowatt-hour"
         short_unit: "kg/kWh"
-        description_short: "Annual total production-based emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per kilowatt-hour of primary energy consumption. Production-based emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per kilowatt-hour of primary energy consumption. Emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
       emissions_total_per_capita:
         title: "Annual CO₂ emissions (per capita)"
         unit: "tonnes per person"
         short_unit: "t/person"
         display:
           shortUnit: t
-        description_short: "Annual total production-based emissions of carbon dioxide (CO₂), excluding land-use change, measured in tonnes per person. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in tonnes per person."
         description_key:
           - *per_capita_description_key
+          - *production_emissions_description_key
           - *international_aviation_description_key
       emissions_total_per_gdp:
         title: "Annual CO₂ emissions per GDP (kg per international-$)"
         unit: "kilograms per international-$"
         short_unit: "kg/$"
-        description_short: "Annual total production-based emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per dollar of GDP (2011 international-$). Production-based emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per dollar of GDP (2011 international-$). Emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
       emissions_total_per_unit_energy:
         title: "Annual CO₂ emissions per unit energy (kg per kilowatt-hour)"
         unit: "kilograms per kilowatt-hour"
         short_unit: "kg/kWh"
-        description_short: "Annual total production-based emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per kilowatt-hour of primary energy consumption. Production-based emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per kilowatt-hour of primary energy consumption. Emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
       gdp:
         title: "GDP"
         unit: "2011 international-$"
@@ -516,12 +529,12 @@ tables:
         title: "Annual CO₂ emissions growth (abs)"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Annual growth in total production-based emissions of carbon dioxide (CO₂), excluding land-use change, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual growth in total emissions of carbon dioxide (CO₂), excluding land-use change, measured in tonnes."
       growth_emissions_total_including_land_use_change:
         title: "Growth rate of emissions including land-use change"
         unit: "tonnes"
         short_unit: "t"
-        description_short: "Annual growth in total production-based emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual growth in total emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes."
       land_use_change_quality_flag:
         title: "Land-use change quality flag"
         unit: ""
@@ -531,17 +544,17 @@ tables:
         title: "Annual CO₂ emissions growth (%)"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual percentage growth in total production-based emissions of carbon dioxide (CO₂), excluding land-use change. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual percentage growth in total emissions of carbon dioxide (CO₂), excluding land-use change."
       pct_growth_emissions_total_including_land_use_change:
         title: "Growth rate of emissions including land-use change (%)"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual percentage growth in total production-based emissions of carbon dioxide (CO₂), including land-use change. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
+        description_short: "Annual percentage growth in total emissions of carbon dioxide (CO₂), including land-use change."
       pct_traded_emissions:
         title: "Share of annual CO₂ emissions embedded in trade"
         unit: "%"
         short_unit: "%"
-        description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, measured as a percentage of production-based emissions of CO₂. Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter."
+        description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, measured as a percentage of emissions of CO₂. Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter."
       population:
         title: "Population"
         unit: "persons"
@@ -570,4 +583,5 @@ tables:
         description_short: "Annual net carbon dioxide (CO₂) emissions embedded in trade, measured in tonnes per person. Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter."
         description_key:
           - *per_capita_description_key
+          - *production_emissions_description_key
           - *international_aviation_description_key
