@@ -146,4 +146,4 @@ After adapting and processing the origin's data, we have a curated dataset. This
 
 The metadata in Garden consists mainly of two objects: `dataset` and `tables`. The metadata comes as a YAML file next to the processing scripts.
 
-!!! info "Learn more in our [dataset reference](../metadata/reference/dataset.md) and [tables reference](../metadata/reference/tables.md)."
+!!! info "Learn more in our [dataset reference](../metadata/reference/dataset.md), [tables reference](../metadata/reference/tables.md) and  [indicator reference](../metadata/reference/indicator.md)."
