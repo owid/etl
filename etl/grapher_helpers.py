@@ -171,7 +171,7 @@ def _yield_wide_table(
                 tab[short_name].metadata.title = title_with_dims
 
             # traverse metadata and expand Jinja
-            tab[short_name].metadata = _expand_jinja_object(tab[short_name].metadata, dim_dict)
+            tab[short_name].metadata = _expand_jinja(tab[short_name].metadata, dim_dict)
 
             # Keep only entity_id and year in index
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
@@ -194,7 +194,7 @@ def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> str:
         raise e.__class__(new_message, e.lineno, e.name, e.filename) from e
 
 
-def _expand_jinja_object(obj: Any, dim_dict: Dict[str, str]) -> Any:
+def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
     """Expand Jinja in all metadata fields."""
     if obj is None:
         return None
@@ -202,12 +202,12 @@ def _expand_jinja_object(obj: Any, dim_dict: Dict[str, str]) -> Any:
         return _expand_jinja_text(obj, dim_dict)
     elif is_dataclass(obj):
         for k, v in obj.__dict__.items():
-            setattr(obj, k, _expand_jinja_object(v, dim_dict))
+            setattr(obj, k, _expand_jinja(v, dim_dict))
         return obj
     elif isinstance(obj, list):
-        return [_expand_jinja_object(v, dim_dict) for v in obj]
+        return [_expand_jinja(v, dim_dict) for v in obj]
     elif isinstance(obj, dict):
-        return {k: _expand_jinja_object(v, dim_dict) for k, v in obj.items()}
+        return {k: _expand_jinja(v, dim_dict) for k, v in obj.items()}
     else:
         return obj
 
