@@ -1,4 +1,12 @@
 tables:
+  igme:
+    variables:
+      ? observation_value_number_of_deaths_post_neonatal_deaths_both_sexes_all_wealth_quintiles
+      : title: Post-neonatal deaths
+        description_short: The estimated number of deaths of children aged between 28 days and one year.
+        description_processing: This indicator is calculated by Our World in Data by substracting the neonatal (< 28 days) deaths from the under-one deaths.
+        display:
+          numDecimalPlaces: 1
   igme_under_fifteen_mortality_rate:
     variables:
       ? observation_value_deaths_per_1_000_live_births_under_fifteen_mortality_rate_both_sexes_all_wealth_quintiles
