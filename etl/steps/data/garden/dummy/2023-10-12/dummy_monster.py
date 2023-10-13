@@ -1,6 +1,11 @@
-"""Create a dummy dataset with indicators that have very different metadata situations."""
+"""Create a dummy dataset with indicators that have very different metadata situations.
 
-from owid.catalog import Origin, Source, Table
+NOTE: To play around with this dataset, you don't need to edit this file. Instead, simply edit the adjacent yaml file.
+
+"""
+
+import yaml
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -12,23 +17,14 @@ def run(dest_dir: str) -> None:
     # Create a dummy data table.
     tb = Table({"country": ["France", "Portugal", "Portugal"], "year": [2022, 2022, 2023]}, short_name=paths.short_name)
 
-    # Create an origin with almost no metadata.
-    origin_with_no_metadata = Origin(
-        title="Origin with almost no metadata", producer="Producer with almost no metadata"
-    )
+    # Read the list of indicators defined in the adjacent yaml file.
+    with open(paths.metadata_path) as istream:
+        metadata = yaml.safe_load(istream)
+    indicators = list(metadata["tables"]["dummy_monster"]["variables"])
 
-    # Create an empty source.
-    source_empty = Source()
-
-    # Indicator has no metadata.
-    indicator = "origin_no_metadata"
-    tb[indicator] = [1, 2, 3]
-    tb[indicator].metadata.origins = [origin_with_no_metadata]
-
-    # Indicator that has only an empty source.
-    indicator = "only_source_empty"
-    tb[indicator] = [1, 2, 3]
-    tb[indicator].metadata.sources = [source_empty]
+    # Add some dummy data to each indicator.
+    for indicator in indicators:
+        tb[indicator] = [1, 2, 3]
 
     # Set an appropriate index.
     tb = tb.set_index(["country", "year"], verify_integrity=True)
