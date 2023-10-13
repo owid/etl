@@ -1,7 +1,7 @@
 import copy
 import warnings
 from copy import deepcopy
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 
@@ -161,7 +161,7 @@ def _yield_wide_table(
             if tab[short_name].metadata.title:
                 # We use template as a title
                 if _uses_jinja(tab[short_name].metadata.title):
-                    title_with_dims = _expand_jinja_template(tab[short_name].metadata.title, dim_dict)
+                    title_with_dims = _expand_jinja_text(tab[short_name].metadata.title, dim_dict)
                 # Otherwise use default
                 else:
                     title_with_dims = _title_column_and_dimensions(
@@ -170,22 +170,8 @@ def _yield_wide_table(
 
                 tab[short_name].metadata.title = title_with_dims
 
-            # expand metadata with Jinja template
-            for k in (
-                "description",
-                "description_short",
-                "description_from_producer",
-                "description_processing",
-            ):
-                if getattr(tab[short_name].m, k):
-                    setattr(
-                        tab[short_name].m,
-                        k,
-                        _expand_jinja_template(getattr(tab[short_name].m, k), dim_dict),
-                    )
-
-            for i, desc_key in enumerate(tab[short_name].m.description_key or []):
-                tab[short_name].m.description_key[i] = _expand_jinja_template(desc_key, dim_dict)
+            # traverse metadata and expand Jinja
+            tab[short_name].metadata = _expand_jinja_object(tab[short_name].metadata, dim_dict)
 
             # Keep only entity_id and year in index
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
@@ -197,7 +183,7 @@ def _uses_jinja(text: Optional[str]):
     return "<%" in text or "<<" in text
 
 
-def _expand_jinja_template(text: str, dim_dict: Dict[str, str]) -> str:
+def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> str:
     if not _uses_jinja(text) or not dim_dict:
         return text
 
@@ -206,6 +192,24 @@ def _expand_jinja_template(text: str, dim_dict: Dict[str, str]) -> str:
     except jinja2.exceptions.TemplateSyntaxError as e:
         new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
         raise e.__class__(new_message, e.lineno, e.name, e.filename) from e
+
+
+def _expand_jinja_object(obj: Any, dim_dict: Dict[str, str]) -> Any:
+    """Expand Jinja in all metadata fields."""
+    if obj is None:
+        return None
+    elif isinstance(obj, str):
+        return _expand_jinja_text(obj, dim_dict)
+    elif is_dataclass(obj):
+        for k, v in obj.__dict__.items():
+            setattr(obj, k, _expand_jinja_object(v, dim_dict))
+        return obj
+    elif isinstance(obj, list):
+        return [_expand_jinja_object(v, dim_dict) for v in obj]
+    elif isinstance(obj, dict):
+        return {k: _expand_jinja_object(v, dim_dict) for k, v in obj.items()}
+    else:
+        return obj
 
 
 def _title_column_and_dimensions(title: str, dims: List[str], dim_names: List[str]) -> str:

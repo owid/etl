@@ -30,6 +30,7 @@ tables:
       number_deaths_ongoing_conflicts:
         title: Number of battle-related deaths in ongoing conflicts
         unit: deaths
+        # DELETEME
         description: |-
           <% if conflict_type == "all" %>
           The estimated number of deaths in all ongoing wars in each year. This includes interstate, intrastate, extrastate, and non-state wars.
