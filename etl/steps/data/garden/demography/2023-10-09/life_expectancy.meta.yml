@@ -1,29 +1,42 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
-  selected_entities:
-    with_americas: &sel_entities_americas
-      - Africa
-      - Americas
-      - Asia
-      - Europe
-      - Oceania
-      - World
-    standard: &sel_entities
-      - Africa
-      - Northern America
-      - Latin America and the Caribbean
-      - Asia
-      - Europe
-      - Oceania
-      - World
-  title_base: Period life expectancy
-  life_expectancy_0:
-    description_short: |-
-      The total number of years a newborn is expected to live.
+  global:
+    selected_entities:
+      with_americas: &sel_entities_americas
+        - Africa
+        - Americas
+        - Asia
+        - Europe
+        - Oceania
+        - World
+      standard: &sel_entities
+        - Africa
+        - Northern America
+        - Latin America and the Caribbean
+        - Asia
+        - Europe
+        - Oceania
+        - World
+    title_base: Life expectancy (period)
+    title_public: Life expectancy
+    title_public_0: Life expectancy at birth
+    data_used: |-
+      <% if (age == 0) and (sex == 'all') %>
+      Prior to 1950, we use HMD (2023) data combined with Zijdeman (2015). From 1950 onwards, we use UN WPP (2022) data. For old regional data, we use Riley (2005) estimates.
+      <% else %>
+      Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data.
+      <% endif %>
+
   common:
     description_short: |-
       <% if (age == 0) %>
-      {definitions.life_expectancy_0.description_short}
+      <% if (sex == 'female') %>
+      The total number of years a newborn is expected to live (among females).
+      <% elif (sex == 'male') %>
+      The total number of years a newborn is expected to live (among males).
+      <% elif (sex == 'all') %>
+      The total number of years a newborn is expected to live.
+      <% endif %>
       <% else %>
       <% if (sex == 'female') %>
       The total number of years a person is expected to live, among females who have already reached << age >> years of age.
@@ -34,12 +47,16 @@ definitions:
       <% endif %>
       <% endif %>
     description_key:
-      - Period life expectancy assumes that current mortality trends will continue for the rest of a subject's life.
+      - &period_lt_def Period life expectancy assumes that current mortality trends will continue for the rest of a subject's life.
+      - |-
+        {definitions.global.data_used}
     presentation:
       topic_tags:
         - Life Expectancy
       grapher_config:
         hasMapTab: true
+    display:
+      numDecimalPlaces: 1
     unit: years
     short_unit: years
     processing_level: minor
@@ -61,24 +78,27 @@ tables:
 
       life_expectancy:
         title: |-
-          {definitions.title_base}
-        display:
-          numDecimalPlaces: 1
+          {definitions.global.title_base}
         presentation:
+          title_variant: &title_variant_hist Historical data, period life tables
+          attribution_short: &attr_hist Various sources
           grapher_config:
             selectedEntityNames: *sel_entities
 
       life_expectancy_0:
         title: |-
-          {definitions.title_base} at birth
+          {definitions.global.title_base} at birth
         display:
-          numDecimalPlaces: 1
-          name: Life expectancy at birth
+          name: |-
+            {definitions.global.title_public_0}
         presentation:
-          title_public: Life expectancy at birth
-          title_variant: Historical data, period life expectancy
+          title_public: |-
+            {definitions.global.title_public_0}
+          attribution_short: *attr_hist
+          title_variant: *title_variant_hist
           grapher_config:
-            title: Life expectancy at birth
+            title: |-
+              {definitions.global.title_public_0}
             selectedEntityNames: *sel_entities_americas
           attribution: |-
             UN WPP (2022); HMD (2023); Zijdeman et al. (2015); Riley (2005)
@@ -90,26 +110,27 @@ tables:
 
       life_expectancy_with_proj:
         title: |-
-          {definitions.title_base} (with projections)
-        display:
-          numDecimalPlaces: 1
+          {definitions.global.title_base} (with projections)
         presentation:
-          title_variant: With UN Projections
+          title_variant: &title_variant_w_proj With UN medium Projections, period life tables
+          attribution_short: &attr_w_proj Various sources
           grapher_config:
             selectedEntityNames: *sel_entities
 
       life_expectancy_0_with_proj:
         title: |-
-          {definitions.title_base} at birth (with projections)
+          {definitions.global.title_base} at birth (with projections)
         display:
-          numDecimalPlaces: 1
-          name: Life expectancy at birth
+          name: |-
+            {definitions.global.title_public_0}
         presentation:
-          title_public: Life expectancy at birth
-          attribution_short: UN WPP
-          title_variant: With projections, period life expectancy
+          title_public: |-
+            {definitions.global.title_public_0}
+          attribution_short: *attr_w_proj
+          title_variant: *title_variant_w_proj
           grapher_config:
-            title: Life expectancy at birth
+            title: |-
+              {definitions.global.title_public_0}
             selectedEntityNames: *sel_entities_americas
           attribution: |-
             UN WPP (2022); HMD (2023); Zijdeman et al. (2015); Riley (2005)
@@ -121,24 +142,29 @@ tables:
 
       life_expectancy_only_proj:
         title: |-
-          {definitions.title_base} (only projections)
-        display:
-          numDecimalPlaces: 1
+          {definitions.global.title_base} (only projections)
+        description_key:
+          - *period_lt_def
         presentation:
-          title_variant: UN Projections
+          attribution_short: &attr_o_proj UN WPP
+          title_variant: &title_variant_o_proj Medium projection, period life tables
           grapher_config:
             selectedEntityNames: *sel_entities
 
       life_expectancy_0_only_proj:
         title: |-
-          {definitions.title_base} at birth (only projections)
+          {definitions.global.title_base} at birth (only projections)
+        description_key:
+          - *period_lt_def
         display:
-          numDecimalPlaces: 1
-          name: Life expectancy at birth
+          name: |-
+            {definitions.global.title_public_0}
         presentation:
-          title_public: Life expectancy at birth
-          attribution_short: UN WPP
-          title_variant: Projections, period life expectancy
+          title_public: |-
+            {definitions.global.title_public_0}
+          attribution_short: *attr_o_proj
+          title_variant: *title_variant_o_proj
           grapher_config:
-            title: Life expectancy at birth
+            title: |-
+              {definitions.global.title_public_0}
             selectedEntityNames: *sel_entities_americas

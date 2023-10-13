@@ -124,6 +124,7 @@ def run(dest_dir: str) -> None:
 
     tb = Table(df_merged_wb, short_name=paths.short_name, underscore=True)
     tb.set_index(["country", "year"], inplace=True)
+
     #
     # Save outputs
     #

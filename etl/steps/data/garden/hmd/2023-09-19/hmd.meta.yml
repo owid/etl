@@ -1,4 +1,18 @@
 # NOTE: To learn more about the fields, hover over their names.
+definitions:
+  life_expectancy:
+    description_short: |-
+      <% if type == "period" %>
+      The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
+      <% elif type == "cohort" %>
+      The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+      <% endif %>
+    point_1: |-
+      <% if type == "period" %>
+      This is based on a synthetic cohort created using mortality rates across age groups in a given year.
+      <% elif type == "cohort" %>
+      Rather than waiting for the entire cohort to have died before calculating the cohort life expectancy, researchers may use data from birth cohorts that are 'almost extinct'.
+      <% endif %>
 
 
 # Learn more about the available fields:
@@ -26,18 +40,21 @@ tables:
       central_death_rate:
         title: Central death rate
         description_short: |-
-          For a given population or cohort, the central death rate at a given age during a given period of 12 months is found by dividing the number of people who died during this period while aged x by the average number who were living in that age group during the period.
+          The annual death rate per 1,000 people in a given age group.
+        description_key:
+          - For a given population or cohort, the central death rate during a given interval of 12 months is calculated using the number of people in that age group who died during the period, divided by the average number of people alive at that age at the start of the interval.
         unit: deaths per 1,000 people
         processing_level: minor
         description_processing: |-
-          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
+          The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
       probability_of_death:
         title: Probability of death
         unit: "%"
-        description_short: The probability that a person who survived until the start of a given interval will have died by the end of the interval.
+        description_short: |-
+          The probability that a person who survived until the start of a given age interval will have died by the end of this interval.
         processing_level: minor
         description_processing: |-
-          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
+          The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
       average_survival_length:
         title: Average survival length
         short_unit: years
@@ -65,26 +82,55 @@ tables:
         short_unit: years
         unit: years
         description_short: |-
+          {definitions.life_expectancy.description_short}
+        description_key:
+          - |-
             <% if type == "period" %>
-            The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
-
-            <% elif type == "cohort" %>
-            The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+            Life expectancy at age 0 refers to life expectancy at birth.
+            <% else %>
+            It refers to the remaining life expectancy for people who have already survived to the given age.
             <% endif %>
+          - |-
+            {definitions.life_expectancy.description_short}
+          - |-
+            {definitions.life_expectancy.point_1}
 
-            'Life expectancy at age 0' refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy for people who have already survived to the given age.
       life_expectancy_fm_diff:
         title: Life expectancy difference (f-m)
         short_unit: years
         unit: years
-        description_short: Life expectancy difference (females - males) at a given age.
+        description_short: |-
+          <% if type == "cohort" %>
+          The difference in cohort life expectancy (females - males) at a given age.
+          <% elif type == "period" %>
+          The difference in period life expectancy (females - males) at a given age.
+          <% endif %>
+        description_key:
+          - Higher values indicate longer life expectancy among females than males.
+          - |-
+            {definitions.life_expectancy.description_short}
+          - |-
+            {definitions.life_expectancy.point_1}
       life_expectancy_fm_ratio:
         title: Life expectancy ratio (f/m)
         unit: ""
-        description_short: Life expectancy ratio (females/males) at a given age.
+        description_short: |-
+          <% if type == "cohort" %>
+          The ratio of cohort life expectancy (females/males) at a given age.
+          <% elif type == "period" %>
+          The ratio of period life expectancy (females/males) at a given age.
+          <% endif %>
+        description_key:
+          - Higher values indicate longer life expectancy among females than males.
+          - |-
+            {definitions.life_expectancy.description_short}
+          - |-
+            {definitions.life_expectancy.point_1}
       exposure:
         title: Exposure-to-risk
         unit: person-years
         description_short: The total number of person-years lived within a given interval.
+        description_key:
+          - It is equivalent to the average number of people living in that age group during the period.
         description_from_producer: |-
-          Estimates of the population exposed to the risk of death during some agetime interval are based on annual (January 1st) population estimates, with small corrections that reflect the timing of deaths during the interval. Period exposure estimations are based on assumptions of uniformity in the distribution of events except when historical monthly birth data are available.
+          Estimates of the population exposed to the risk of death during some age-time interval are based on annual (January 1st) population estimates, with small corrections that reflect the timing of deaths during the interval. Period exposure estimations are based on assumptions of uniformity in the distribution of events except when historical monthly birth data are available.

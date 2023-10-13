@@ -780,7 +780,9 @@ class GrapherStep(Step):
             for table in dataset:
                 # if GRAPHER_FILTER is set, only upsert matching columns
                 if config.GRAPHER_FILTER:
-                    table = table.loc[:, table.filter(regex=config.GRAPHER_FILTER).columns]
+                    cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
+                    cols += [c for c in table.columns if c in {"year", "country"} and c not in cols]
+                    table = table.loc[:, cols]
 
                 catalog_path = f"{self.path}/{table.metadata.short_name}"
 

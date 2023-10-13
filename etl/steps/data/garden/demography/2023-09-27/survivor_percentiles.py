@@ -3,7 +3,9 @@
 Methods used here are taken from https://github.com/jssalvrz/s-ages. Authors of Citation: Alvarez, J.-A., & Vaupel, J. W. (2023). Mortality as a Function of Survival. Demography, 60(1), 327–342. https://doi.org/10.1215/00703370-10429097
 
 
-Dr. Saloni Dattani translated the R scripts into Python: https://github.com/saloni-nd/misc/tree/main/survivorship-ages
+Dr. Saloni Dattani translated the R scripts into Python:
+    - Original: https://github.com/jssalvrz/s-ages
+    - Translated: https://github.com/saloni-nd/misc/tree/main/survivorship-ages
 
 Lucas Rodes-Guirao adapted the python code for ETL.
 """
@@ -13,21 +15,18 @@ import pandas as pd
 from owid.catalog import Table
 from scipy.integrate import cumtrapz
 from scipy.interpolate import InterpolatedUnivariateSpline
-from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-# Logger
-log = get_logger()
 
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    log.info("survivor_percentiles: load data.")
+    paths.log.info("survivor_percentiles: load data.")
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("hmd")
 
@@ -38,20 +37,20 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Keep relevant columns, drop NaNs and reset index
-    log.info("survivor_percentiles: keep relevant columns, drop NaNs, reset index.")
+    paths.log.info("survivor_percentiles: keep relevant columns, drop NaNs, reset index.")
     tb = tb[["deaths", "exposure"]].dropna().reset_index()
 
     # Get origins
     origins = tb["deaths"].m.origins
 
     # Keep format="1x1", and sex="both"
-    log.info("survivor_percentiles: Use period and 1x1 data.")
+    paths.log.info("survivor_percentiles: Use period and 1x1 data.")
     tb = tb[(tb["type"] == "period") & (tb["format"] == "1x1")]
     # Drop unused columns
     tb = tb.drop(columns=["format", "type"])
 
     # 110+ -> 110
-    log.info("survivor_percentiles: replace 110+ -> 100, set Dtypes.")
+    paths.log.info("survivor_percentiles: replace 110+ -> 100, set Dtypes.")
     tb["age"] = tb["age"].replace({"110+": "110"})
 
     # Dtypes
@@ -71,12 +70,12 @@ def run(dest_dir: str) -> None:
     # tb = tb[tb.country == "Denmark"]
 
     # Actual calculation
-    log.info("survivor_percentiles: calculate surviorship ages (can take some minutes)...")
+    paths.log.info("survivor_percentiles: calculate surviorship ages (can take some minutes)...")
     columns_grouping = ["country", "sex", "year"]
     tb = tb.groupby(columns_grouping).apply(lambda group: obtain_survivorship_ages(group)).reset_index()
 
     # Unpivot
-    log.info("survivor_percentiles: unpivot")
+    paths.log.info("survivor_percentiles: unpivot")
     tb = tb.melt(
         id_vars=["country", "sex", "year"],
         value_vars=["s1", "s10", "s20", "s30", "s40", "s50", "s60", "s70", "s80", "s90", "s99"],
@@ -84,12 +83,12 @@ def run(dest_dir: str) -> None:
         value_name="age",
     )
     tb = tb.dropna(subset=["percentile"])
-    log.info("survivor_percentiles: rename percentiles (remove 's' and reverse order))")
+    paths.log.info("survivor_percentiles: rename percentiles (remove 's' and reverse order))")
     tb["percentile"] = tb["percentile"].str.replace("s", "").astype(int)
     tb["percentile"] = 100 - tb["percentile"]
 
     # Dtypes
-    log.info("survivor_percentiles: final dtypes settings.")
+    paths.log.info("survivor_percentiles: final dtypes settings.")
     tb = tb.astype(
         {
             "year": int,
@@ -98,11 +97,11 @@ def run(dest_dir: str) -> None:
     )
 
     # Set index
-    log.info("survivor_percentiles: set index.")
+    paths.log.info("survivor_percentiles: set index.")
     tb = tb.set_index(["country", "year", "sex", "percentile"], verify_integrity=True)
 
     # Update metadata
-    log.info("survivor_percentiles: metadata.")
+    paths.log.info("survivor_percentiles: metadata.")
     tb.metadata.short_name = paths.short_name
     # Propagate origins metadata (unsure why this has not been propagated?)
     for col in tb.columns:
