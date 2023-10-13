@@ -513,7 +513,13 @@
                       }
                     ],
                     [
-                      "Should contain all the key information given in other description fields, like `description_short`, `grapher_config.subtitle` or `grapher_config.note`."
+                      "Must not contain `description_short` (although there might be some overlap of information)."
+                    ],
+                    [
+                      "Should contain all the key information about the indicator (except that already given in `description_short`)."
+                    ],
+                    [
+                      "Should include the key information given in other fields like `grapher_config.subtitle` (if different from `description_short`) and `grapher_config.note`."
                     ],
                     [
                       "Should not contain information about processing (which should be in `description_processing`)."
