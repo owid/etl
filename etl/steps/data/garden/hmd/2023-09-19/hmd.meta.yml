@@ -117,7 +117,7 @@ tables:
         description_short: |-
           <% if type == "cohort" %>
           The ratio of cohort life expectancy (females/males) at a given age.
-          <% if type == "period" %>
+          <% elif type == "period" %>
           The ratio of period life expectancy (females/males) at a given age.
           <% endif %>
         description_key:
