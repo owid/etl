@@ -62,6 +62,8 @@ def run(dest_dir: str) -> None:
 
     # Pivot the table so that the variables are in columns.
     tb = pivot_table_and_format(tb)
+    # Calculate post neonatal deaths
+    tb = add_post_neonatal_deaths(tb)
     tb_com = pivot_table_and_format(tb_com)
 
     tb_com = calculate_under_fifteen_mortality_rates(tb_com)
@@ -78,6 +80,18 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_post_neonatal_deaths(tb: Table) -> Table:
+    """
+    Calculate the deaths for the post-neonatal age-group, 28 days - 1 year
+    """
+    tb["Observation value-Number of deaths-Post-neonatal deaths-Both sexes-All wealth quintiles"] = (
+        tb["Observation value-Number of deaths-Infant deaths-Both sexes-All wealth quintiles"]
+        - tb["Observation value-Number of deaths-Neonatal deaths-Both sexes-All wealth quintiles"]
+    )
+
+    return tb
 
 
 def add_metadata_and_set_index(tb: Table) -> Table:
