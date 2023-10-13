@@ -2,7 +2,6 @@
 definitions:
   global:
     life_expectancy:
-      # DELETEME
       description_short: |-
         <% if type == "period" %>
         The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.

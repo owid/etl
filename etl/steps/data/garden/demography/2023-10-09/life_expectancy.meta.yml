@@ -20,7 +20,6 @@ definitions:
     title_base: Life expectancy (period)
     title_public: Life expectancy
     title_public_0: Life expectancy at birth
-    # DELETEME
     data_used: |-
       <% if (age == 0) and (sex == 'all') %>
       Prior to 1950, we use HMD (2023) data combined with Zijdeman (2015). From 1950 onwards, we use UN WPP (2022) data. For old regional data, we use Riley (2005) estimates.

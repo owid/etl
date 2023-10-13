@@ -16,7 +16,6 @@ tables:
         unit: years
         short_unit: years
         processing_level: minor
-        # DELETEME
         description_short: |-
           <% if (sex == 'female') %>
           The total number of years a newborn is expected to live (among females).
