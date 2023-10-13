@@ -300,7 +300,7 @@ def generate_percentiles_raw():
     between_100_and_150_dollars = list(range(10000, 15000, 10))
     between_150_and_175_dollars = list(range(15000, 17500, 10))
     between_175_and_250_dollars = list(range(17500, 25000, 20))
-    betweeb_250_and_500_dollars = list(range(25000, 50000, 50))
+    between_250_and_500_dollars = list(range(25000, 50000, 50))
 
     # povlines is all these lists together
     povlines = (
@@ -314,7 +314,7 @@ def generate_percentiles_raw():
         + between_100_and_150_dollars
         + between_150_and_175_dollars
         + between_175_and_250_dollars
-        + betweeb_250_and_500_dollars
+        + between_250_and_500_dollars
     )
 
     def get_percentiles_data(povline, versions, ppp_version):
