@@ -100,7 +100,7 @@ tables:
         description_short: |-
           <% if type == "cohort" %>
           The difference in cohort life expectancy (females - males) at a given age.
-          <% if type == "period" %>
+          <% elif type == "period" %>
           The difference in period life expectancy (females - males) at a given age.
           <% endif %>
         description_key:
