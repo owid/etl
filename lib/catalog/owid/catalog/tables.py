@@ -192,9 +192,11 @@ class Table(pd.DataFrame):
             raise ValueError(f'filename must end in ".csv": {path}')
 
         df = pd.DataFrame(self)
-        # if the dataframe uses the default index then we don't want to store it (would be a column of row numbers)
-        save_index = self.primary_key != []
-        df.to_csv(path, index=save_index, **kwargs)
+        if "index" not in kwargs:
+            # if the dataframe uses the default index then we don't want to store it (would be a column of row numbers)
+            # NOTE: By default pandas does store the index, and users often explicitly add "index=False".
+            kwargs["index"] = self.primary_key != []
+        df.to_csv(path, **kwargs)
 
         metadata_filename = splitext(path)[0] + ".meta.json"
         self._save_metadata(metadata_filename)
