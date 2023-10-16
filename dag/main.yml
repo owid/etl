@@ -610,6 +610,7 @@ steps:
     - snapshot://countries/2023-09-22/gleditsch_microstates.dat
   data://garden/countries/2023-09-25/gleditsch:
     - data://meadow/countries/2023-09-25/gleditsch
+    - data://garden/demography/2023-03-31/population
   data://grapher/countries/2023-10-01/gleditsch:
     - data://garden/countries/2023-09-25/gleditsch
   data://meadow/countries/2023-09-29/cow_ssm:

@@ -3,7 +3,7 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from shared import (
-    add_latest_years_with_constat_num_countries,
+    add_latest_years_with_constant_num_countries,
     init_table_countries_in_region,
 )
 from structlog import get_logger
@@ -163,7 +163,7 @@ def create_table_countries_in_region(tb: Table) -> Table:
     tb_regions = pr.concat([tb_regions, tb_world], ignore_index=True, short_name="isd_regions")
 
     # Finish by adding missing last years
-    tb_regions = add_latest_years_with_constat_num_countries(
+    tb_regions = add_latest_years_with_constant_num_countries(
         tb_regions,
         column_year="year",
         expected_last_year=EXPECTED_LAST_YEAR,

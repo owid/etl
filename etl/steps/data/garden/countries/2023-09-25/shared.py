@@ -43,7 +43,7 @@ def init_table_countries_in_region(
     return tb_regions
 
 
-def add_latest_years_with_constat_num_countries(tb_regions: Table, column_year: str, expected_last_year: int) -> Table:
+def add_latest_years_with_constant_num_countries(tb_regions: Table, column_year: str, expected_last_year: int) -> Table:
     """Extend data until LAST_YEAR with constant number of countries.
 
     Data stops at expected_last_year, extend it until LAST_YEAR with constant number of countries.

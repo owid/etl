@@ -1,15 +1,14 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
+from shared import (
+    add_latest_years_with_constant_num_countries,
+    init_table_countries_in_region,
+)
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-
-from .shared import (
-    add_latest_years_with_constat_num_countries,
-    init_table_countries_in_region,
-)
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -22,11 +21,12 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load gleditsch table
     ds_meadow = paths.load_dataset("gleditsch")
-
-    # Read table from meadow dataset.
     tb = ds_meadow["gleditsch"].reset_index()
+    # Load population table
+    ds_pop = paths.load_dataset("population")
+    tb_pop = ds_pop["population"]
 
     #
     # Process data.
@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Create new table
-    tb_regions = create_table_countries_in_region(tb)
+    tb_regions = create_table_countries_in_region(tb, ds_pop)
 
     # Add to table list
     tables = [
@@ -54,7 +54,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def create_table_countries_in_region(tb: Table) -> Table:
+def create_table_countries_in_region(tb: Table, ds_pop: Dataset) -> Table:
     """Create table with number of countries in each region per year."""
     tb = init_table_countries_in_region(
         tb,
@@ -79,12 +79,15 @@ def create_table_countries_in_region(tb: Table) -> Table:
     tb_regions = pr.concat([tb_regions, tb_world], ignore_index=True, short_name="gleditsch_regions")
 
     # Finish by adding missing last years
-    tb_regions = add_latest_years_with_constat_num_countries(
+    tb_regions = add_latest_years_with_constant_num_countries(
         tb_regions,
         column_year="year",
         expected_last_year=EXPECTED_LAST_YEAR,
     )
 
+    # Get only latest values
+    tb_last = tb[tb["year"] == tb["year"].max()]
+    tb_last = geo.add_population_to_table(tb_last, ds_pop)
     return tb_regions
 
 
