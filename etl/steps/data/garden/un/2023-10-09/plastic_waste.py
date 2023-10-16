@@ -129,6 +129,10 @@ def run(dest_dir: str) -> None:
     # Set index
     tb = tb.underscore().set_index(["year", "country"], verify_integrity=True).sort_index()
 
+    # Convert columns that are not per capita/ share of to tonnes
+    for col in tb.columns:
+        if "per_capita" not in col and "share" not in col:
+            tb[col] = tb[col] / 1000
     # Set table's short_name
     tb.metadata.short_name = paths.short_name
 
