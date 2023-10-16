@@ -10,14 +10,14 @@ definitions:
         description: |-
           The World Development Indicators (WDI) is the World Bank’s primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
 
-          \[Text from World Bank data catalog\]
+          \[Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)\]
         citation_full: TBD
         url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
         url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
         date_accessed: '2023-05-29'
         date_published: '2023-05-11'
         license:
-          name: Creative Commons Attribution 4.0
+          name: CC BY 4.0
           url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
       # - producer: World Bank
       #   title: World Development Indicators - World Bank (2023.05.11)
@@ -45,23 +45,27 @@ tables:
         title: Share of children who are stunted
         unit: '% of children under 5'
         short_unit: '%'
-        description_short: The share of children younger than five years old whose growth is stunted. Stunting is when a child is significantly shorter than the average for their age. Stunted growth is a consequence of poor nutrition and/or repeated infection.
+        description_short: |-
+          The share of children younger than five years old whose growth is stunted.
         # description: Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two
         #   standard deviations below the median for the international reference population ages 0-59 months. For children up
         #   to two years old height is measured by recumbent length. For older children height is measured by stature while
         #   standing. The data are based on the WHO's new child growth standards released in 2006.
         description_key:
-          - The share of children younger than five years old whose growth is stunted. Stunting is when a child is significantly shorter than the average for their age. Stunted growth is a consequence of poor nutrition and/or repeated infection.
+          - Stunting is when a child is significantly shorter than the average for their age.
+          - Stunted growth is a consequence of poor nutrition and/or repeated infection.
         description_from_producer: |-
           Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two standard deviations below the median for the international reference population ages 0-59 months. For children up to two years old height is measured by recumbent length. For older children height is measured by stature while standing. The data are based on the WHO's new child growth standards released in 2006.
 
+
           \[Text from World Bank World Development Indicators [metadata glossary](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SH.STA.STNT.ZS)\]
         presentation:
-          title_variant: UNICEF/WHO
+          title_public: Share of children who are stunted
+          # title_variant: UNICEF/WHO
           attribution: UNICEF, World Health Organization and World Bank
-          attribution_short: the World Bank
+          attribution_short: UNICEF/WHO (via World Bank)
           topic_tags:
-            - Hunger & Undernourishment
+            - Hunger and Undernourishment
             - Micronutrient Deficiency
           faqs:
             - fragment_id: stunting-definition
