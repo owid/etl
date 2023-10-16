@@ -14,9 +14,7 @@ GDP are included.
 from typing import List
 
 import numpy as np
-import pandas as pd
-from owid import catalog
-from owid.datautils import dataframes
+from owid.catalog import Dataset, Source, Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -145,8 +143,8 @@ UNITS = {"tonnes": {"conversion": TONNES_TO_MILLION_TONNES, "new_unit": "million
 
 
 def unique_sources_from_datasets(
-    datasets: List[catalog.Dataset],
-) -> List[catalog.meta.Source]:
+    datasets: List[Dataset],
+) -> List[Source]:
     """Gather unique sources from datasets.
 
     Note: To check if a source is already listed, only the name of the source is considered (not the description or any
@@ -164,7 +162,7 @@ def unique_sources_from_datasets(
 
     """
     # Initialise list that will gather all unique metadata sources from the tables.
-    known_sources: List[catalog.meta.Source] = []
+    known_sources: List[Source] = []
     for ds in datasets:
         # Get list of sources of the dataset of current table.
         table_sources = ds.metadata.sources
@@ -178,17 +176,17 @@ def unique_sources_from_datasets(
     return known_sources
 
 
-def convert_units(table: catalog.Table) -> catalog.Table:
+def convert_units(table: Table) -> Table:
     """Convert units of table.
 
     Parameters
     ----------
-    table : catalog.Table
+    table : Table
         Data with its original units.
 
     Returns
     -------
-    catalog.Table
+    Table
         Data after converting units of specific columns.
 
     """
@@ -198,7 +196,7 @@ def convert_units(table: catalog.Table) -> catalog.Table:
         unit = table[column].metadata.unit
         short_unit = table[column].metadata.short_unit
         title = table[column].metadata.title
-        description = table[column].metadata.description
+        description = table[column].metadata.description or table[column].metadata.description_short
         if unit in list(UNITS):
             table[column] *= UNITS[unit]["conversion"]
             table[column].metadata.unit = unit
@@ -210,72 +208,56 @@ def convert_units(table: catalog.Table) -> catalog.Table:
 
 
 def combine_tables(
-    tb_gcp: catalog.Table,
-    tb_jones: catalog.Table,
-    tb_cait_ghg: catalog.Table,
-    tb_cait_ch4: catalog.Table,
-    tb_cait_n2o: catalog.Table,
-    tb_energy: catalog.Table,
-    tb_gdp: catalog.Table,
-    tb_population: catalog.Table,
-    tb_regions: catalog.Table,
-) -> catalog.Table:
+    tb_gcp: Table,
+    tb_jones: Table,
+    tb_cait_ghg: Table,
+    tb_cait_ch4: Table,
+    tb_cait_n2o: Table,
+    tb_energy: Table,
+    tb_gdp: Table,
+    tb_population: Table,
+    tb_regions: Table,
+) -> Table:
     """Combine tables.
 
     Parameters
     ----------
-    tb_gcp : catalog.Table
+    tb_gcp : Table
         Global Carbon Budget table (from Global Carbon Project).
-    tb_jones : catalog.Table
+    tb_jones : Table
         National contributions to climate change (from Jones et al. (2023)).
-    tb_cait_ghg : catalog.Table
+    tb_cait_ghg : Table
         Greenhouse gas emissions table (from CAIT).
-    tb_cait_ch4 : catalog.Table
+    tb_cait_ch4 : Table
         CH4 emissions table (from CAIT).
-    tb_cait_n2o : catalog.Table
+    tb_cait_n2o : Table
         N2O emissions table (from CAIT).
-    tb_energy : catalog.Table
+    tb_energy : Table
         Primary energy consumption table (from BP & EIA).
-    tb_gdp : catalog.Table
+    tb_gdp : Table
         Maddison GDP table (from GGDC).
-    tb_population : catalog.Table
+    tb_population : Table
         OWID population table (from various sources).
-    tb_regions : catalog.Table
+    tb_regions : Table
         OWID regions table.
 
     Returns
     -------
-    combined : catalog.Table
+    combined : Table
         Combined table with metadata and variables metadata.
 
     """
-    # Gather all variables' metadata from all tables.
-    tables = [tb_gcp, tb_jones, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population, tb_regions]
-    variables_metadata = {}
-    for table in tables:
-        for variable in table.columns:
-            # If variable does not have sources metadata, take them from the dataset metadata.
-            if len(table[variable].metadata.sources) == 0:
-                if table.metadata.dataset is None:
-                    table[variable].metadata.sources = []
-                else:
-                    table[variable].metadata.sources = table.metadata.dataset.sources
-            variables_metadata[variable] = table[variable].metadata
-
     # Combine main tables (with an outer join, to gather all entities from all tables).
-    tables = [tb_gcp, tb_jones, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o]
-    combined = dataframes.multi_merge(dfs=tables, on=["country", "year"], how="outer")
+    combined = tb_gcp.copy()
+    for table in [tb_jones, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o]:
+        combined = combined.merge(table, on=["country", "year"], how="outer", short_name=paths.short_name)
 
     # Add secondary tables (with a left join, to keep only entities for which we have emissions data).
-    tables = [combined, tb_energy, tb_gdp, tb_population]
-    combined = dataframes.multi_merge(dfs=tables, on=["country", "year"], how="left")
+    for table in [tb_energy, tb_gdp, tb_population]:
+        combined = combined.merge(table, on=["country", "year"], how="left")
 
     # Countries-regions dataset does not have a year column, so it has to be merged on country.
-    combined = pd.merge(combined, tb_regions, on="country", how="left")
-
-    # Assign variables metadata back to combined dataframe.
-    for variable in variables_metadata:
-        combined[variable].metadata = variables_metadata[variable]
+    combined = combined.merge(tb_regions, on="country", how="left")
 
     # Check that there were no repetition in column names.
     error = "Repeated columns in combined data."
@@ -284,23 +266,20 @@ def combine_tables(
     # Adjust units.
     combined = convert_units(combined)
 
-    # Adjust metadata.
-    combined.metadata.short_name = "owid_co2"
-
     return combined
 
 
-def prepare_outputs(combined: catalog.Table) -> catalog.Table:
+def prepare_outputs(combined: Table) -> Table:
     """Clean and prepare output table.
 
     Parameters
     ----------
-    combined : catalog.Table
+    combined : Table
         Combined table.
 
     Returns
     -------
-    combined: catalog.Table
+    combined: Table
         Cleaned combined table.
 
     """
@@ -325,25 +304,25 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load the global carbon budget dataset from the Global Carbon Project (GCP).
-    ds_gcp: catalog.Dataset = paths.load_dependency("global_carbon_budget")
+    ds_gcp = paths.load_dataset("global_carbon_budget")
 
     # Load the Jones et al. (2023) dataset on national contributions to climate change.
-    ds_jones: catalog.Dataset = paths.load_dependency("national_contributions")
+    ds_jones = paths.load_dataset("national_contributions")
 
     # Load the greenhouse gas emissions by sector dataset by CAIT.
-    ds_cait: catalog.Dataset = paths.load_dependency("ghg_emissions_by_sector")
+    ds_cait = paths.load_dataset("ghg_emissions_by_sector")
 
     # Load the GDP dataset by GGDC Maddison.
-    ds_gdp: catalog.Dataset = paths.load_dependency("ggdc_maddison")
+    ds_gdp = paths.load_dataset("ggdc_maddison")
 
     # Load primary energy consumption dataset (by different sources in our 'energy' namespace).
-    ds_energy: catalog.Dataset = paths.load_dependency("primary_energy_consumption")
+    ds_energy = paths.load_dataset("primary_energy_consumption")
 
     # Load population dataset.
-    ds_population: catalog.Dataset = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
 
     # Load countries-regions dataset (required to get ISO codes).
-    ds_regions: catalog.Dataset = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
 
     # Gather all required tables from all datasets.
     tb_gcp = ds_gcp["global_carbon_budget"]
@@ -356,19 +335,42 @@ def run(dest_dir: str) -> None:
     tb_population = ds_population["population"]
     tb_regions = ds_regions["regions"]
 
+    ####################################################################################################################
+    # TODO: Remove this temporary solution once all indicators of all tables of all dataset have metadata.
+    def propagate_sources_to_all_indicators(table: Table, ds: Dataset) -> Table:
+        table = table.copy()
+        for column in table.columns:
+            error = f"Column {column} of table {table.metadata.short_name} already has sources or origins. Remove temporary solution for this table."
+            assert (len(table[column].metadata.sources) == 0) and (len(table[column].metadata.origins) == 0), error
+            # if (len(table[column].metadata.sources) == 0) and (len(table[column].metadata.origins) == 0):
+            table[column].metadata.sources = ds.metadata.sources
+
+        return table
+
+    tb_jones = propagate_sources_to_all_indicators(table=tb_jones, ds=ds_jones)
+    tb_cait_ghg = propagate_sources_to_all_indicators(table=tb_cait_ghg, ds=ds_cait)
+    tb_cait_ch4 = propagate_sources_to_all_indicators(table=tb_cait_ch4, ds=ds_cait)
+    tb_cait_n2o = propagate_sources_to_all_indicators(table=tb_cait_n2o, ds=ds_cait)
+    tb_regions = propagate_sources_to_all_indicators(table=tb_regions, ds=ds_regions)
+    ####################################################################################################################
+
     #
     # Process data.
     #
     # Choose required columns and rename them.
-    tb_gcp = tb_gcp.reset_index()[list(GCP_COLUMNS)].rename(columns=GCP_COLUMNS)
-    tb_jones = tb_jones.reset_index()[list(JONES_COLUMNS)].rename(columns=JONES_COLUMNS)
-    tb_cait_ghg = tb_cait_ghg.reset_index()[list(CAIT_GHG_COLUMNS)].rename(columns=CAIT_GHG_COLUMNS)
-    tb_cait_ch4 = tb_cait_ch4.reset_index()[list(CAIT_CH4_COLUMNS)].rename(columns=CAIT_CH4_COLUMNS)
-    tb_cait_n2o = tb_cait_n2o.reset_index()[list(CAIT_N2O_COLUMNS)].rename(columns=CAIT_N2O_COLUMNS)
-    tb_energy = tb_energy.reset_index()[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS)
-    tb_gdp = tb_gdp.reset_index()[list(GDP_COLUMNS)].rename(columns=GDP_COLUMNS)
-    tb_population = tb_population.reset_index()[list(POPULATION_COLUMNS)].rename(columns=POPULATION_COLUMNS)
-    tb_regions = tb_regions.reset_index()[list(REGIONS_COLUMNS)].rename(columns=REGIONS_COLUMNS)
+    tb_gcp = tb_gcp.reset_index()[list(GCP_COLUMNS)].rename(columns=GCP_COLUMNS, errors="raise")
+    tb_jones = tb_jones.reset_index()[list(JONES_COLUMNS)].rename(columns=JONES_COLUMNS, errors="raise")
+    tb_cait_ghg = tb_cait_ghg.reset_index()[list(CAIT_GHG_COLUMNS)].rename(columns=CAIT_GHG_COLUMNS, errors="raise")
+    tb_cait_ch4 = tb_cait_ch4.reset_index()[list(CAIT_CH4_COLUMNS)].rename(columns=CAIT_CH4_COLUMNS, errors="raise")
+    tb_cait_n2o = tb_cait_n2o.reset_index()[list(CAIT_N2O_COLUMNS)].rename(columns=CAIT_N2O_COLUMNS, errors="raise")
+    tb_energy = tb_energy.reset_index()[list(PRIMARY_ENERGY_COLUMNS)].rename(
+        columns=PRIMARY_ENERGY_COLUMNS, errors="raise"
+    )
+    tb_gdp = tb_gdp.reset_index()[list(GDP_COLUMNS)].rename(columns=GDP_COLUMNS, errors="raise")
+    tb_population = tb_population.reset_index()[list(POPULATION_COLUMNS)].rename(
+        columns=POPULATION_COLUMNS, errors="raise"
+    )
+    tb_regions = tb_regions.reset_index()[list(REGIONS_COLUMNS)].rename(columns=REGIONS_COLUMNS, errors="raise")
 
     # Combine tables.
     combined = combine_tables(
@@ -389,27 +391,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    ds_garden = create_dataset(dest_dir, tables=[combined])
-
-    # Gather metadata sources from all tables' original dataset sources.
-    datasets = [
-        ds_gcp,
-        ds_jones,
-        ds_cait,
-        ds_gdp,
-        ds_energy,
-        ds_regions,
-    ]
-    sources = unique_sources_from_datasets(datasets=datasets)
-
-    # OWID population dataset does not have sources metadata.
-    sources.append(
-        catalog.meta.Source(
-            name="Our World in Data based on different sources (https://ourworldindata.org/population-sources)."
-        )
-    )
-
-    ds_garden.metadata.sources = sources
-
-    # Create dataset.
+    # TODO: Change check_variables_metadata to True once all indicators have origins (for now, they have a mixture of
+    # origins and sources).
+    ds_garden = create_dataset(dest_dir, tables=[combined], check_variables_metadata=False)
     ds_garden.save()
