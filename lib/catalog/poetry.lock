@@ -355,13 +355,13 @@ toml = ["tomli"]
 
 [[package]]
 name = "dataclasses-json"
-version = "0.5.7"
+version = "0.5.8"
 description = "Easily serialize dataclasses to and from JSON"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "dataclasses-json-0.5.7.tar.gz", hash = "sha256:c2c11bc8214fbf709ffc369d11446ff6945254a7f09128154a7620613d8fda90"},
-    {file = "dataclasses_json-0.5.7-py3-none-any.whl", hash = "sha256:bc285b5f892094c3a53d558858a88553dd6a61a11ab1a8128a0e554385dcc5dd"},
+    {file = "dataclasses-json-0.5.8.tar.gz", hash = "sha256:6572ac08ad9340abcb74fd8c4c8e9752db2a182a402c8e871d0a8aa119e3804e"},
+    {file = "dataclasses_json-0.5.8-py3-none-any.whl", hash = "sha256:65b167c15fdf9bde27569c09ac18dd39bf1cc5b7998525024cb4678d2653946c"},
 ]
 
 [package.dependencies]
@@ -370,7 +370,7 @@ marshmallow-enum = ">=1.5.1,<2.0.0"
 typing-inspect = ">=0.4.0"
 
 [package.extras]
-dev = ["flake8", "hypothesis", "ipython", "mypy (>=0.710)", "portray", "pytest (>=6.2.3)", "simplejson", "types-dataclasses"]
+dev = ["flake8", "hypothesis", "ipython", "mypy (>=0.710)", "portray", "pytest (>=7.2.0)", "simplejson", "types-dataclasses"]
 
 [[package]]
 name = "decorator"
@@ -1543,4 +1543,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1"
-content-hash = "faf0857395efc44c70a1f6e473b16ee337ef67ee64a373add6fb875957fff663"
+content-hash = "d02fda7c502fe8e8529a1cde6cdbf7903a6a875f23330f22aace65e396e32bdd"
