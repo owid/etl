@@ -2,7 +2,14 @@ from unittest import mock
 
 import numpy as np
 import pandas as pd
-from owid.catalog import DatasetMeta, Source, Table, TableMeta, VariableMeta
+from owid.catalog import (
+    DatasetMeta,
+    Source,
+    Table,
+    TableMeta,
+    VariableMeta,
+    VariablePresentationMeta,
+)
 
 from etl import grapher_helpers as gh
 
@@ -188,3 +195,21 @@ def test_adapt_table_for_grapher_multiindex():
         out_table = gh._adapt_table_for_grapher(table)
         assert out_table.index.names == ["entity_id", "year", "sex"]
         assert out_table.columns.tolist() == ["deaths"]
+
+
+def test_expand_jinja():
+    m = VariableMeta(
+        title="Title << foo >>",
+        description_key=[
+            '<% if foo == "bar" %>This is bar<% else %>This is not bar<% endif %>',
+        ],
+        presentation=VariablePresentationMeta(
+            title_variant="Variant << foo >>",
+        ),
+    )
+    out = gh._expand_jinja(m, dim_dict={"foo": "bar"})
+    assert out.to_dict() == {
+        "title": "Title bar",
+        "description_key": ["This is bar"],
+        "presentation": {"title_variant": "Variant bar"},
+    }
