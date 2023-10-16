@@ -4577,7 +4577,7 @@ files = [
 
 [[package]]
 name = "owid-catalog"
-version = "0.3.7"
+version = "0.3.8"
 description = "Core data types used by OWID for managing data."
 optional = false
 python-versions = ">=3.8.1"
