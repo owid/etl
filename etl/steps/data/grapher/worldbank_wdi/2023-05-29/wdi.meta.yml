@@ -1,0 +1,136 @@
+dataset:
+  update_period_days: 365
+  sources: []
+definitions:
+  common:
+    sources: []
+    origins:
+      - producer: World Bank World Development Indicators
+        title: UNICEF, World Health Organization and World Bank
+        description: |-
+          The World Development Indicators (WDI) is the World Bank’s primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
+
+          \[Text from World Bank data catalog\]
+        citation_full: TBD
+        url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+        url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
+        date_accessed: '2023-05-29'
+        date_published: '2023-05-11'
+        license:
+          name: Creative Commons Attribution 4.0
+          url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+      # - producer: World Bank
+      #   title: World Development Indicators - World Bank (2023.05.11)
+      #   description: >-
+      #     The World Development Indicators (WDI) is the primary World Bank collection of development indicators, compiled
+      #     from officially-recognized international sources. It presents the most current and accurate global development data
+      #     available, and includes national, regional and global estimates.
+
+
+      #     The World Development Indicators (WDI) is the primary World Bank collection of development indicators, compiled
+      #     from officially-recognized international sources. It presents the most current and accurate global development data
+      #     available, and includes national, regional and global estimates.
+      #   url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+      #   url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
+      #   date_accessed: '2023-05-29'
+      #   date_published: '2023-05-11'
+      #   license:
+      #     name: Creative Commons Attribution 4.0
+      #     url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+tables:
+  wdi:
+    variables:
+      sh_sta_stnt_zs:
+        # title: Prevalence of stunting, height for age (% of children under 5)
+        title: Share of children who are stunted
+        unit: '% of children under 5'
+        short_unit: '%'
+        description_short: The share of children younger than five years old whose growth is stunted. Stunting is when a child is significantly shorter than the average for their age. Stunted growth is a consequence of poor nutrition and/or repeated infection.
+        # description: Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two
+        #   standard deviations below the median for the international reference population ages 0-59 months. For children up
+        #   to two years old height is measured by recumbent length. For older children height is measured by stature while
+        #   standing. The data are based on the WHO's new child growth standards released in 2006.
+        description_key:
+          - The share of children younger than five years old whose growth is stunted. Stunting is when a child is significantly shorter than the average for their age. Stunted growth is a consequence of poor nutrition and/or repeated infection.
+        description_from_producer: |-
+          Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two standard deviations below the median for the international reference population ages 0-59 months. For children up to two years old height is measured by recumbent length. For older children height is measured by stature while standing. The data are based on the WHO's new child growth standards released in 2006.
+
+          \[Text from World Bank World Development Indicators [metadata glossary](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SH.STA.STNT.ZS)\]
+        presentation:
+          title_variant: UNICEF/WHO
+          attribution: UNICEF, World Health Organization and World Bank
+          attribution_short: the World Bank
+          topic_tags:
+            - Hunger & Undernourishment
+            - Micronutrient Deficiency
+          faqs:
+            - fragment_id: stunting-definition
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: stunting-measurement
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: stunting-causes
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            slug: share-of-children-younger-than-5-who-suffer-from-stunting
+            title: 'Malnutrition: Share of children who are stunted'
+            subtitle: >-
+              The share of children younger than five years old that are defined as stunted.
+              [Stunting](#dod:stunting) is when a child is significantly shorter than the
+              average for their age. It is a consequence of poor nutrition and/or repeated
+              infection.
+            sourceDesc: UNICEF, World Health Organization and World Bank
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hasMapTab: true
+            tab: map
+            variantName: United Nations
+            originUrl: https://ourworldindata.org/hunger-and-undernourishment
+            yAxis:
+              min: 0
+              max: 0
+            map:
+              columnSlug: '735978'
+              timeTolerance: 5
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericMinValue: 0
+                customNumericValues:
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericColors:
+                  - null
+                  - null
+                legendDescription: Prevalence of stunting (% of children under 5)
+            selectedEntityNames:
+              - China
+              - Colombia
+              - Kenya
+              - Peru
+              - Bangladesh
+              - United States
+            relatedQuestions:
+              - url: >-
+                  https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
+                text: FAQs on this data
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
