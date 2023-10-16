@@ -148,6 +148,7 @@ def _load_faqs(session: Session, variable_id: int) -> List[Dict[str, Any]]:
         fragmentId
     FROM posts_gdocs_variables_faqs
     WHERE variableId = :variable_id
+    ORDER BY displayOrder
     """
 
     # Using the session to execute raw SQL
