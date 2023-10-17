@@ -31,9 +31,10 @@ tables:
       central_death_rate:
         title: Central death rate
         description_short: |-
-          The annual death rate per 1,000 people in a given age group.
+          For a given population or cohort, the central death rate during a given 12 month interval is calculated as the number of deaths during the period, divided by the number of person-years lived during that interval.
         description_key:
-          - For a given population or cohort, the central death rate during a given interval of 12 months is calculated using the number of people in that age group who died during the period, divided by the average number of people alive at that age at the start of the interval.
+          - |-
+            Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years. This makes the value very slightly different from the 'probability of death' during the interval, because the 'probability of death' metric uses a different denominator: the number of people alive at that age at the start of the interval.
         unit: deaths per 1,000 people
         processing_level: minor
         description_processing: |-
@@ -42,7 +43,10 @@ tables:
         title: Probability of death
         unit: "%"
         description_short: |-
-          The probability that a person who survived until the start of a given age interval will have died by the end of this interval.
+          The probability of dying in a given interval, among people who survived to the start of that interval.
+        description_key:
+          - |-
+            For example, the probability of death for a 50 year old in a given year is found by: dividing the number of deaths in 50 year olds that year, by the number of people alive at the age of 50 at the start of the year.
         processing_level: minor
         description_processing: |-
           The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
