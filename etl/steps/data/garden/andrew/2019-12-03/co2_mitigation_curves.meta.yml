@@ -1,8 +1,8 @@
 dataset:
   sources:
     -
-      name: Robbie Andrews, based on the Global Carbon Project
-      published_by: Robbie Andrews
+      name: Robbie Andrew, based on the Global Carbon Project
+      published_by: Robbie Andrew
       date_accessed: 2022-09-28
       url: https://folk.universitetetioslo.no/roberan/t/global_mitigation_curves.shtml
       description: Data comes from historical emissions to 2017 from CDIAC/Global Carbon Project, projection to 2018 from Global Carbon Project (Le Quéré et al. 2018)
