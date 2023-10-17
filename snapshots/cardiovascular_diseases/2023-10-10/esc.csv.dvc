@@ -25,6 +25,6 @@ meta:
       url: https://eatlas.escardio.org/About/terms-conditions
 wdir: ../../../data/snapshots/cardiovascular_diseases/2023-10-10
 outs:
-- md5: 1ad2a2d1bd36f28ccb049a2bf473a492
-  size: 181521
+- md5: 53fcaf669fc650c2bf4385bb05502772
+  size: 182246
   path: esc.csv
