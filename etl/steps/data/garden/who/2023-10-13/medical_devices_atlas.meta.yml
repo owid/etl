@@ -20,7 +20,7 @@ tables:
         description_short: Total number of computed tomography units per million population.
         processing_level: minor
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
 
       total_density_per_million_population__gamma_camera_or_nuclear_medicine:
         title: Total density per million population, gamma camera or nuclear medicine
@@ -29,7 +29,7 @@ tables:
         description_short: Total number of gamma camera or nuclear medicine units per million population.
         processing_level: minor
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
 
       total_density_per_million_population__magnetic_resonance_imaging:
         title:  Total density per million population, magnetic resonance imaging
@@ -38,7 +38,7 @@ tables:
         description_short: Total number of magnetic resonance imaging units per million population.
         processing_level: minor
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
 
       total_density_per_million_population__positron_emission_tomography:
         title:  Total density per million population, positron emission tomography
@@ -47,4 +47,4 @@ tables:
         description_short: Total number of positron emission tomography units per million population.
         processing_level: minor
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
