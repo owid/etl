@@ -29,3 +29,20 @@ tables:
             - Asia and Oceania: 700-999
         display:
           numDecimalPlaces: 0
+
+      population:
+        title: Population in region
+        description_short: |-
+          Population in the region, using borders from 2022.
+        unit: countries
+        processing_level: minor
+        description_processing: |-
+          We use the list of independent states and microstates from Gleditsch and Ward. We assign each country to a region based on the mapping (using GW codes):
+
+            - Americas: 2-199
+            - Europe: 200-399
+            - Africa: 400-626
+            - Middle East: 630-699
+            - Asia and Oceania: 700-999
+        display:
+          numDecimalPlaces: 0

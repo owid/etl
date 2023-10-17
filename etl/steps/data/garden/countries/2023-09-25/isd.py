@@ -4,6 +4,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Table
 from shared import (
     add_latest_years_with_constant_num_countries,
+    add_population_to_table,
     init_table_countries_in_region,
 )
 from structlog import get_logger
@@ -26,6 +27,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("isd")
+    # Load population table
+    ds_pop = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["isd"].reset_index()
@@ -44,9 +47,18 @@ def run(dest_dir: str) -> None:
     log.info("isd: fixing data")
     tb = fix_data(tb)
 
+    # Format table
+    tb = format_table(tb)
+
     # Create new table
     log.info("isd: creating table with countries in region")
     tb_regions = create_table_countries_in_region(tb=tb)
+
+    # Population table
+    tb_pop = add_population_to_table(tb, ds_pop)
+
+    # Combine tables
+    tb_regions = tb_regions.merge(tb_pop, how="left", on=["region", "year"])
 
     # Add to tables list
     tables = [
@@ -103,8 +115,13 @@ def fix_data(tb: Table) -> Table:
     return tb
 
 
-def create_table_countries_in_region(tb: Table) -> Table:
-    """Create table with number of countries in each region per year."""
+def format_table(tb: Table) -> Table:
+    """Format table.
+
+    - Create years
+    - Expand observations
+    - Map countries to regions
+    """
     tb = init_table_countries_in_region(
         tb,
         date_format="%d-%m-%Y",
@@ -114,8 +131,14 @@ def create_table_countries_in_region(tb: Table) -> Table:
         column_country="statename",
     )
 
-    # Get region name, then obtain number of countries per region per year
+    # Get region name
     tb["region"] = tb["cownum"].apply(code_to_region)
+
+    return tb
+
+
+def create_table_countries_in_region(tb: Table) -> Table:
+    """Create table with number of countries in each region per year."""
     # Get number of countries per region per year
     tb_regions = (
         tb.groupby(["region", "year"], as_index=False)

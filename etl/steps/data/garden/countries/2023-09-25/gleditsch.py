@@ -4,6 +4,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from shared import (
     add_latest_years_with_constant_num_countries,
+    add_population_to_table,
     init_table_countries_in_region,
 )
 
@@ -26,15 +27,26 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["gleditsch"].reset_index()
     # Load population table
     ds_pop = paths.load_dataset("population")
-    tb_pop = ds_pop["population"]
 
     #
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    # Minor fix
+    tb.loc[tb["country"] == "German Federal Republic", "end"] = "02:10:1990"
+
+    # Format table
+    tb_formatted = format_table(tb)
+
     # Create new table
-    tb_regions = create_table_countries_in_region(tb, ds_pop)
+    tb_regions = create_table_countries_in_region(tb_formatted, ds_pop)
+
+    # Population table
+    tb_pop = add_population_to_table(tb_formatted, ds_pop)
+
+    # Combine tables
+    tb_regions = tb_regions.merge(tb_pop, how="left", on=["region", "year"])
 
     # Add to table list
     tables = [
@@ -54,8 +66,13 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def create_table_countries_in_region(tb: Table, ds_pop: Dataset) -> Table:
-    """Create table with number of countries in each region per year."""
+def format_table(tb: Table) -> Table:
+    """Format table.
+
+    - Create years
+    - Expand observations
+    - Map countries to regions
+    """
     tb = init_table_countries_in_region(
         tb,
         date_format="%d:%m:%Y",
@@ -66,6 +83,12 @@ def create_table_countries_in_region(tb: Table, ds_pop: Dataset) -> Table:
 
     # Get region name
     tb["region"] = tb["id"].apply(code_to_region)
+
+    return tb
+
+
+def create_table_countries_in_region(tb: Table, ds_pop: Dataset) -> Table:
+    """Create table with number of countries in each region per year."""
     # Get number of countries per region per year
     tb_regions = (
         tb.groupby(["region", "year"], as_index=False).agg({"id": "nunique"}).rename(columns={"id": "number_countries"})
@@ -84,10 +107,6 @@ def create_table_countries_in_region(tb: Table, ds_pop: Dataset) -> Table:
         column_year="year",
         expected_last_year=EXPECTED_LAST_YEAR,
     )
-
-    # Get only latest values
-    tb_last = tb[tb["year"] == tb["year"].max()]
-    tb_last = geo.add_population_to_table(tb_last, ds_pop)
     return tb_regions
 
 
