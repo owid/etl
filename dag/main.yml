@@ -603,6 +603,7 @@ steps:
     - snapshot://countries/2023-09-22/isd.xlsx
   data://garden/countries/2023-09-25/isd:
     - data://meadow/countries/2023-09-25/isd
+    - data://garden/demography/2023-03-31/population
   data://grapher/countries/2023-10-01/isd:
     - data://garden/countries/2023-09-25/isd
   data://meadow/countries/2023-09-25/gleditsch:
@@ -619,6 +620,7 @@ steps:
     - snapshot://countries/2023-09-22/cow_ssm_system.csv
   data://garden/countries/2023-09-29/cow_ssm:
     - data://meadow/countries/2023-09-29/cow_ssm
+    - data://garden/demography/2023-03-31/population
   data://grapher/countries/2023-09-29/cow_ssm:
     - data://garden/countries/2023-09-29/cow_ssm
 

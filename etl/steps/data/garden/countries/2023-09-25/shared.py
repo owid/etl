@@ -95,7 +95,9 @@ def _get_end_year(date_str: str, date_format: str) -> int:
     return date.year
 
 
-def add_population_to_table(tb: Table, ds_pop: Dataset) -> Table:
+def add_population_to_table(
+    tb: Table, ds_pop: Dataset, country_col: str = "country", region_alt: bool = False
+) -> Table:
     """Bla.
 
     1. Get list of countries from latest available year. That is, we only have one row per country.
@@ -113,7 +115,7 @@ def add_population_to_table(tb: Table, ds_pop: Dataset) -> Table:
     tb_pop = tb_last.merge(tb_all_years, how="cross")
 
     # Add population
-    tb_pop = geo.add_population_to_table(tb_pop, ds_pop)
+    tb_pop = geo.add_population_to_table(tb_pop, ds_pop, country_col=country_col)
 
     # Estimate population by region
     tb_pop_regions = tb_pop.groupby(["year", "region"], as_index=False)[["population"]].sum()
@@ -122,7 +124,13 @@ def add_population_to_table(tb: Table, ds_pop: Dataset) -> Table:
     tb_pop_world = tb_pop.groupby(["year"], as_index=False)[["population"]].sum()
     tb_pop_world["region"] = "World"
 
-    # Combine
-    tb_pop = pr.concat([tb_pop_regions, tb_pop_world], ignore_index=True)
-
+    if region_alt:
+        # Estimate population by region
+        tb_pop_regions_alt = tb_pop.groupby(["year", "region_alt"], as_index=False)[["population"]].sum()
+        tb_pop_regions_alt = tb_pop_regions_alt.rename(columns={"region_alt": "region"})
+        tb_pop_regions_alt = tb_pop_regions_alt[tb_pop_regions_alt["region"] != "Rest"]
+        # Combine
+        tb_pop = pr.concat([tb_pop_regions, tb_pop_regions_alt, tb_pop_world], ignore_index=True)
+    else:
+        tb_pop = pr.concat([tb_pop_regions, tb_pop_world], ignore_index=True)
     return tb_pop

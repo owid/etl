@@ -48,14 +48,14 @@ def run(dest_dir: str) -> None:
     tb = fix_data(tb)
 
     # Format table
-    tb = format_table(tb)
+    tb_formatted = format_table(tb)
 
     # Create new table
     log.info("isd: creating table with countries in region")
-    tb_regions = create_table_countries_in_region(tb=tb)
+    tb_regions = create_table_countries_in_region(tb=tb_formatted)
 
     # Population table
-    tb_pop = add_population_to_table(tb, ds_pop)
+    tb_pop = add_population_to_table(tb_formatted, ds_pop, country_col="statename", region_alt=True)
 
     # Combine tables
     tb_regions = tb_regions.merge(tb_pop, how="left", on=["region", "year"])

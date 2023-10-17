@@ -137,7 +137,7 @@ def code_to_region(cow_code: int) -> str:
             raise ValueError(f"Invalid COW code: {cow_code}")
 
 
-def add_population_to_table(tb: Table, ds_pop: Dataset) -> Table:
+def add_population_to_table(tb: Table, ds_pop: Dataset, country_col: str = "country") -> Table:
     """Add population.
 
     1. Get list of countries from latest available year. That is, we only have one row per country.
@@ -157,7 +157,7 @@ def add_population_to_table(tb: Table, ds_pop: Dataset) -> Table:
     tb_pop = tb_last.merge(tb_all_years, how="cross")
 
     # Add population
-    tb_pop = geo.add_population_to_table(tb_pop, ds_pop)
+    tb_pop = geo.add_population_to_table(tb_pop, ds_pop, country_col="statenme")
 
     # Estimate population by region
     tb_pop_regions = tb_pop.groupby(["year", "region"], as_index=False)[["population"]].sum()
