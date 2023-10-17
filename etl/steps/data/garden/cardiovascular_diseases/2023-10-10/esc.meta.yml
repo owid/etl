@@ -481,7 +481,7 @@ tables:
             numDecimalPlaces: 2
 
         percutaneous_coronary_interventions__pci__performed_with_adjunctive_intracoronary_imaging_techniques__per_million_people:
-          title: Percutaneous coronary interventions (PCI) performed with adjunctive intracoronary Imaging Techniques per million people
+          title: Percutaneous coronary interventions (PCI) performed with adjunctive intracoronary imaging techniques per million people
           unit: 'per million people'
           short_unit: ''
           description_short: The number of percutaneous coronary interventions (PCI) performed with adjunctive intracoronary imaging techniques per million people.
@@ -508,7 +508,7 @@ tables:
             numDecimalPlaces: 2
 
         percutaneous_coronary_interventions__pci__with_rotational_or_orbital_atherectomy__per_million_people:
-          title: Percutaneous coronary interventions (PCI) with rotational or orbital Atherectomy per million people
+          title: Percutaneous coronary interventions (PCI) with rotational or orbital atherectomy per million people
           unit: 'per million people'
           short_unit: ''
           description_short: The number of percutaneous coronary interventions (PCI) performed using rotational or orbital atherectomy per million people.
