@@ -60,7 +60,7 @@ def main(upload: bool) -> None:
                     if len(columns) > 1:
                         country = columns[0].get_text(strip=True)
                         year = columns[2].get_text(strip=True)
-                        number = columns[3].get_text(strip=True).split(" ")[0]  # Considering only the numeric part
+                        number = columns[3].get_text(strip=True).replace(" ", "")
                         data.append([country, year, number])
                 # Create a DataFrame
                 df = pd.DataFrame(data, columns=["country", "year", "value"])
