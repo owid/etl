@@ -21,6 +21,6 @@ tables:
         title: Share of mothers who have lost a child
         description: The estimated share of mothers who have lost a child under 5 years old. The denominator refers to women
           of childbearing age who have given birth to a living child, but whose child(ren) may no longer be alive. Estimates
-          were made for the decade (1960s, 1970s, 1980s) and are listed with the middle year (e.g. 1965).
+          were made for the decade (1960s, 1970s, 1980s) and are listed with the first year (e.g. 1960).
         unit: '%'
         short_unit: '%'

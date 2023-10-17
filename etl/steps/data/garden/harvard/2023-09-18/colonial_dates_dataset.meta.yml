@@ -146,6 +146,8 @@ tables:
         description_processing: |
           This is is an aggregation of the number of countries each European colonial power colonized each year, by OWID geographic region or World Bank income groups.
 
+          We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
+
           {common.years}
         description_from_producer: ""
         processing_level: major
