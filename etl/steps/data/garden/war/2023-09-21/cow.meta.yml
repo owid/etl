@@ -188,6 +188,18 @@ tables:
           grapher_config:
             selectedEntityNames: *selected_entities
 
+      number_deaths_ongoing_conflicts_per_capita:
+        title: Number of battle-related deaths in ongoing conflicts (per capita)
+        unit: deaths per 100,000 people
+        description_short: |-
+          {definitions.number_deaths.description_short}, per capita.
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames: *selected_entities
+
       ####################
       # Ongoing disputes #
       ####################
