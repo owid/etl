@@ -4,8 +4,8 @@ We currently have many fields related to an indicator's title, so you might be w
 
 * **`indicator.title`**: This field must always be given.
 
-    - **Small datasets**: it can be the publicly displayed title of the indicator in all places.
-    - **Big datasets**:
+    - Small datasets: it can be the publicly displayed title of the indicator in all places.
+    - Big datasets:
         - These may have dimensions, and their indicators can include text fragments to communicate these breakdowns (e.g.  "Indicator name - Gender: male - Age: 10-19").
         - In such cases, `indicator.title` is mostly useful for internal searches, and a human-readable `display.name` should be given.
 
