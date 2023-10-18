@@ -51,7 +51,9 @@ def _guideline_to_markdown(text: str, tab: str, guideline):
 
         # Element in guideliens is more than 2 items long
         if len(guideline) > 2:
-            raise ValueError(f"Each element in `guidelines` must have at most 2 elements! Found {len(guideline)} instead in '{guideline}'!")
+            raise ValueError(
+                f"Each element in `guidelines` must have at most 2 elements! Found {len(guideline)} instead in '{guideline}'!"
+            )
 
     return text
 
