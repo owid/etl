@@ -10,13 +10,7 @@ meta:
 
       Temperature anomalies are based on the HadCRUT5 near-surface temperature dataset
       as published by the Met Office Hadley
-      Centre. Temperature anomalies are given in degrees celsius relative to the average
-      temperature over the period 1961-1990.
-
-
-      These are available for the Northern Hemisphere and the Southern Hemisphere.
-      The global mean has been calculated by
-      averaging anomalies for northern and southern hemispheres.
+      Centre.
     title_snapshot: HadCRUT5 - Southern hemisphere near surface temperature
     citation_full: 'Morice, C.P., J.J. Kennedy, N.A. Rayner, J.P. Winn, E. Hogan,
       R.E. Killick, R.J.H. Dunn, T.J. Osborn, P.D. Jones and I.R. Simpson (in press)

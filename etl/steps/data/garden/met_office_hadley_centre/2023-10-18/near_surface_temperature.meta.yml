@@ -1,6 +1,12 @@
+definitions:
+  common:
+    description_key:
+      - Temperature anomalies are given in degrees Celsius relative to the average temperature over the period 1961-1990.
+      - Temperature anomalies are available for the Northern Hemisphere and the Southern Hemisphere.
+      - The global mean is calculated by averaging anomalies for northern and southern hemispheres.
+
 dataset:
-  title: Near-surface temperature anomaly (Met Office Hadley Centre, 2023)
-  description: ""
+  update_period_days: 90
 
 tables:
   near_surface_temperature:
@@ -9,15 +15,11 @@ tables:
         title: Global average temperature anomaly relative to 1961-1990
         short_unit: °C
         unit: degrees Celsius
-        description: |
-          Annual average temperature anomaly (relative to 1961-90).
-
-          The global mean has been calculated by averaging anomalies for northern and southern hemispheres.
       upper_limit:
-        title: Upper bound (95% confidence interval) of the annual temperature anomaly
+        title: Upper bound of the annual temperature anomaly (95% confidence interval)
         short_unit: °C
         unit: degrees Celsius
       lower_limit:
-        title: Lower bound (95% confidence interval) of the annual temperature anomaly
+        title: Lower bound of the annual temperature anomaly (95% confidence interval)
         short_unit: °C
         unit: degrees Celsius
