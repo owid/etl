@@ -744,7 +744,10 @@
       },
       "conversionFactor": {
         "type": "number",
-        "description": "Conversion factor to apply to indicator values. NOTE: We should avoid using this, and instead convert data and units (and possibly other metadata fields where the units are mentioned) consistently in the ETL grapher step."
+        "description": "Conversion factor to apply to indicator values.",
+        "guidelines": [
+          "**Note:** We should avoid using this, and instead convert data and units (and possibly other metadata fields where the units are mentioned) consistently in the ETL grapher step."
+        ]
       },
       "unit": {
         "type": "string",
