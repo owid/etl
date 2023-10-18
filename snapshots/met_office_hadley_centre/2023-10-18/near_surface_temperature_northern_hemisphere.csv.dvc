@@ -1,0 +1,27 @@
+meta:
+  namespace: met_office_hadley_centre
+  short_name: near_surface_temperature_northern_hemisphere
+  name: HadCRUT5 near surface temperature - Northern hemisphere
+  source_name: Met Office Hadley Centre
+  source_published_by: |
+    Morice, C.P., J.J. Kennedy, N.A. Rayner, J.P. Winn, E. Hogan, R.E. Killick, R.J.H. Dunn, T.J. Osborn, P.D. Jones and I.R. Simpson (in press) An updated assessment of near-surface temperature change from 1850: the HadCRUT5 dataset. Journal of Geophysical Research (Atmospheres) doi:10.1029/2019JD032361 (supporting information).
+  publication_year: 2022
+  publication_date:
+  url: https://www.metoffice.gov.uk/hadobs/hadcrut5/
+  source_data_url: https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.northern_hemisphere.annual.csv
+  file_extension: csv
+  license_url: https://www.metoffice.gov.uk/hadobs/hadcrut5/terms_and_conditions.html
+  license_name: Open Government License v3
+  date_accessed: 2023-01-17
+  is_public: true
+  description: |
+    The HadCRUT5 near surface temperature data set is produced by blending data from the CRUTEM5 surface air temperature dataset and the HadSST4 sea-surface temperature dataset.
+
+    Temperature anomalies are based on the HadCRUT5 near-surface temperature dataset as published by the Met Office Hadley Centre. Temperature anomalies are given in degrees celsius relative to the average temperature over the period 1961-1990.
+
+    These are available for the Northern Hemisphere and the Southern Hemisphere. The global mean has been calculated by averaging anomalies for northern and southern hemispheres.
+wdir: ../../../data/snapshots/met_office_hadley_centre/2023-01-17
+outs:
+- md5: 633a7e29c17cf96a669c5561da9172eb
+  size: 6892
+  path: near_surface_temperature_northern_hemisphere.csv
