@@ -34,39 +34,44 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("peace_diehl")
 
     # Read table from meadow dataset.
-    log.info("peace_diehl: Reading table from meadow dataset.")
+    paths.log.info("Reading table from meadow dataset.")
     tb = ds_meadow["peace_diehl"].reset_index()
 
     #
     # Process data.
     #
     # Set time fields as strings
-    log.info("peace_diehl: Ensure correct types.")
+    paths.log.info("ensure correct types.")
     tb[["time_start", "time_end"]] = tb[["time_start", "time_end"]].astype(str)
 
     # Times (YYYYMMDD) -> Years (YYYY)
-    log.info("peace_diehl: Get year periods.")
+    paths.log.info("get year periods.")
     tb = set_years_in_table(tb)
 
     # Expand observations
-    log.info("peace_diehl: Expand observations.")
+    paths.log.info("expand observations.")
     tb = expand_observations(tb)
 
     # Replace NaNs with zeroes
     tb["peace_scale_level"] = tb["peace_scale_level"].fillna(0)
 
-    # Harmonize countries
-    # tb = geo.harmonize_countries(
-    #     df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    # )
+    # Add region of the relationship
+    tb["region_1"] = tb["code_1"].apply(code_to_region)
+    tb["region_2"] = tb["code_2"].apply(code_to_region)
+    assert tb["region_1"].notna().all(), "Some regions are NaN"
+    assert tb["region_2"].notna().all(), "Some regions are NaN"
+    mask = tb["region_1"] == tb["region_2"]
+    tb.loc[mask, "country"] = tb.loc[mask, "region_1"]
+    tb.loc[~mask, "country"] = "Inter-continental"
+    tb = tb.drop(columns=["region_1", "region_2"])
 
     # Get aggregate table (counts)
-    log.info("peace_diehl: Get aggregate table.")
+    log.info("get aggregate table")
     tb_agg = make_aggregate_table(tb)
     tb_agg.metadata.short_name = f"{tb.metadata.short_name}_agg"
 
     # Set index
-    log.info("peace_diehl: Set indexes.")
+    paths.log.info("set indexes")
     tb = tb.set_index(["code_1", "code_2", "year"], verify_integrity=True)[["peace_scale_level"]].sort_index()
     tb_agg = tb_agg.set_index(["country", "year"], verify_integrity=True).sort_index()
 
@@ -166,14 +171,21 @@ def make_aggregate_table(tb: Table) -> Table:
         }
     )
 
-    # Format table
-    tb_agg = tb_agg.groupby(["year", "peace_scale_level"]).size().unstack()
+    # World
+    ## Format table
+    tb_agg_world = tb_agg.groupby(["year", "peace_scale_level"]).size().unstack()
+    ## Set country to 'World'
+    tb_agg_world["country"] = "World"
+    # Reset index
+    tb_agg_world = tb_agg_world.reset_index()
 
-    # Set country to 'World'
-    tb_agg["country"] = "World"
-
+    # Regions
+    ## Format table
+    tb_agg = tb_agg.groupby(["year", "country", "peace_scale_level"]).size().unstack()
     # Reset index
     tb_agg = tb_agg.reset_index()
+
+    tb_agg = pr.concat([tb_agg, tb_agg_world], ignore_index=True)
 
     # Propagate metadata
     for column in tb_agg.all_columns:
@@ -226,3 +238,20 @@ def time_to_year(t: str, start: bool = False) -> int:
         if (date.month == 12) & (date.day == 31):
             return year + 1
         return year
+
+
+def code_to_region(cow_code: int) -> str:
+    """Convert code to region name."""
+    match cow_code:
+        case c if 2 <= c <= 165:
+            return "Americas"
+        case c if 200 <= c <= 399:
+            return "Europe"
+        case c if 402 <= c <= 626:
+            return "Africa"
+        case c if 630 <= c <= 698:
+            return "Middle East"
+        case c if 700 <= c <= 999:
+            return "Asia and Oceania"
+        case _:
+            raise ValueError(f"Invalid COW code: {cow_code}")
