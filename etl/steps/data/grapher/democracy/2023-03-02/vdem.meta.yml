@@ -5,7 +5,8 @@ definitions:
   common:
     sources: []
     origins:
-      - producer: V-Dem (v13)
+      - producer: V-Dem
+        version_producer: "v13"
         title: Democracy and Human rights - OWID based on Varieties of Democracy (v13) and Regimes of the World
         description: |-
           The Varieties of Democracy (V-Dem) project publishes data and research on democracy and human rights.
@@ -51,37 +52,23 @@ tables:
         display:
           name: Electoral democracy
         description_short: >-
-          Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures
-          to which extent political leaders are elected under comprehensive voting
+          It captures to which extent political leaders are elected under comprehensive voting
           rights in free and fair elections, and freedoms of association and expression
           are guaranteed. It ranges from 0 to 1 (most democratic).
-        # description_short: >-
-        #   The variable denotes the best estimate of the extent to which political leaders are elected under comprehensive
-        #   suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
-
-
-        #   It is based on the V-Dem variable v2x_polyarchy, and we expand it to cover more years for some countries.
-
-
-        #   The index reaches from 0 to 1 (most democratic).
         description_key:
-          - The Electoral Democracy Index scores each country on a spectrum, with some countries being more democratic than others. It ranges from 0 to 1 (most democratic).
-          - It captures the extent to which political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed.
           - The index is mostly based on evaluations by around 3,500 experts, which are primarily academics and members of the media and civil society, and often are nationals or residents of the country. They therefore know the country’s political system well and can evaluate aspects that are difficult to observe.
-          - Our World in Data expands the coverage of the original data to include more years when current countries were still non-sovereign territories. We use the index score of the historical entity that they were part of, whenever available.
+          - We expand the coverage of the original data to include more years when current countries were still non-sovereign territories. We use the index score of the historical entity that they were part of, whenever available.
         # NOTE: this doesn't render correctly at the moment
         description_from_producer: |-
-          The index (<code>v2x_polyarchy</code>) is formed by taking the average of, on the one hand, the weighted average of the indices measuring freedom of association thick (<code>v2x_frassoc_thick</code>), clean elections (<code>v2xel_frefair</code>), freedom of expression (<code>v2x_freexp_altinf</code>), elected officials (<code>v2x_elecoff), and suffrage (<code>v2x_suffr</code>) and, on the other, the five-way multiplicative interaction between those indices. This is half way between a straight average and strict multiplication, meaning the average of the two. It is thus a compromise between the two most well known aggregation formulas in the literature, both allowing partial "compensation" in one sub-component for lack of polyarchy in the others, but also punishing countries not strong in one sub-component according to the "weakest link" argument. The aggregation is done at the level of Dahl’s subcomponents with the one exception of the non-electoral component. The index is aggregated using this formula:
+          The index (`v2x_polyarchy`) is formed by taking the average of, on the one hand, the weighted average of the indices measuring freedom of association thick (`v2x_frassoc_thick`), clean elections (`v2xel_frefair`), freedom of expression (`v2x_freexp_altinf`), elected officials (`v2x_elecoff`), and suffrage (`v2x_suffr`) and, on the other, the five-way multiplicative interaction between those indices. This is half way between a straight average and strict multiplication, meaning the average of the two. It is thus a compromise between the two most well known aggregation formulas in the literature, both allowing partial "compensation" in one sub-component for lack of polyarchy in the others, but also punishing countries not strong in one sub-component according to the "weakest link" argument. The aggregation is done at the level of Dahl’s subcomponents with the one exception of the non-electoral component. The index is aggregated using this formula:
 
-          <code>v2x_polyarchy = .5 ∗ MPI + .5 ∗ API</code>
+          `v2x_polyarchy = .5 ∗ MPI + .5 ∗ API`
 
-          <code>= .5 ∗ (v2x_elecoff ∗ v2xel_frefair ∗ v2x_frassoc_thick∗ v2x_suffr ∗ v2x_freexp_altinf) + .5 ∗ ((1/8) ∗ v2x_elecoff + (1/4) ∗ v2xel_frefair + (1/4) ∗ v2x_frassoc_thick + (1/8) ∗ v2x_suffr + (1/4) ∗ v2x_freexp_altinf)</code>
+          `= .5 ∗ (v2x_elecoff ∗ v2xel_frefair ∗ v2x_frassoc_thick∗ v2x_suffr ∗ v2x_freexp_altinf) + .5 ∗ ((1/8) ∗ v2x_elecoff + (1/4) ∗ v2xel_frefair + (1/4) ∗ v2x_frassoc_thick + (1/8) ∗ v2x_suffr + (1/4) ∗ v2x_freexp_altinf)`
 
           \[Text from [V-Dem Codebook v13](https://www.v-dem.net/documents/24/codebook_v13.pdf)\]
         description_processing: |-
           We ingested the original data from the [V-Dem project website](https://v-dem.net/data/the-v-dem-dataset/) and processed it with Stata.
-
-          We standardized the names of countries and regions by using the _[Our World in Data](https://ourworldindata.org/world-region-map-definitions)_ [standard entity names](https://ourworldindata.org/world-region-map-definitions).
 
           We expanded the years and countries covered by V-Dem. To include more of the period when current countries were still non-sovereign territories, we identified the historical entity they were a part of and used that regime’s data whenever available.
 
@@ -92,7 +79,7 @@ tables:
           All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
         presentation:
           title_variant: V-Dem
-          attribution_short: V-Dem
+          # attribution_short: V-Dem
           topic_tags:
             - Democracy
           faqs:
@@ -140,17 +127,6 @@ tables:
                   - 0.8
                   - 0.9
                   - 1
-                customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
             selectedEntityNames:
               - Argentina
               - Australia
