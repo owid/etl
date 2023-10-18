@@ -3,6 +3,10 @@
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+definitions:
+  common:
+    processing_level: minor
+
 dataset:
   update_period_days: 365
 
@@ -18,7 +22,6 @@ tables:
         unit: units per million population
         short_unit: ""
         description_short: Total number of computed tomography units per million population.
-        processing_level: minor
         display:
           numDecimalPlaces: 1
 
@@ -27,7 +30,6 @@ tables:
         unit: units per million population
         short_unit: ""
         description_short: Total number of gamma camera or nuclear medicine units per million population.
-        processing_level: minor
         display:
           numDecimalPlaces: 1
 
@@ -36,7 +38,6 @@ tables:
         unit: units per million population
         short_unit: ""
         description_short: Total number of magnetic resonance imaging units per million population.
-        processing_level: minor
         display:
           numDecimalPlaces: 1
 
@@ -45,6 +46,5 @@ tables:
         unit: units per million population
         short_unit: ""
         description_short: Total number of positron emission tomography units per million population.
-        processing_level: minor
         display:
           numDecimalPlaces: 1
