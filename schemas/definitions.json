@@ -341,9 +341,9 @@
             {
               "type": "list",
               "value": [
-                "One author: `Williams`.",
-                "Two authors: `Williams and Jones`.",
-                "Three or more authors: `Williams et al.`."
+                ["One author: `Williams`."],
+                ["Two authors: `Williams and Jones`."],
+                ["Three or more authors: `Williams et al.`."]
               ]
             }
           ],
@@ -584,7 +584,12 @@
               "type": "exceptions",
               "value": [
                 "The name of the origin is well known and includes other metadata fields.",
-                "The producer's data product has a well-known name, and the snapshot is a specific slice of the data product. If so, use the format 'Data product - Specific slice'. NOTE: This means that the title of the snapshot may contain the title of the data product."
+                [
+                  "The producer's data product has a well-known name, and the snapshot is a specific slice of the data product. If so, use the format 'Data product - Specific slice'.",
+                  {
+                    "type": "list",
+                    "value": ["**Note:** This means that the title of the snapshot may contain the title of the data product."]}
+                ]
               ]
             }
           ],
