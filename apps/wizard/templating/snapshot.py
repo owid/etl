@@ -1,5 +1,6 @@
 """Snapshot phase."""
 import subprocess
+import traceback
 from datetime import datetime as dt
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, cast
@@ -805,7 +806,11 @@ if st.session_state["run_step"]:
 
     # Run step
     with st.spinner(f"Running snapshot step... {command_str}"):
-        subprocess.call(args=commands)
-    st.write(
-        "Snapshot should be uploaded! However, please check in the terminal in case there was an error message raised there."
-    )
+        try:
+            output = subprocess.check_output(args=commands)
+        except Exception as e:
+            st.write("The snapshot was NOT uploaded! Please check the terminal for the complete error message.")
+            tb_str = "".join(traceback.format_exception(e))
+            st.error(tb_str)
+        else:
+            st.write("Snapshot should be uploaded!")
