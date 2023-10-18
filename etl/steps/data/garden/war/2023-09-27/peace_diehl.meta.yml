@@ -109,3 +109,15 @@ tables:
         processing_level: minor
         display:
           numDecimalPlaces: 0
+
+      no_relation:
+        title: Number of country-pairs with no relationship
+        description_short: |-
+          There is no official relationship between these two countries.
+        description_key:
+          - |-
+            {definitions.global.region_numbers}
+        unit: country-pairs
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0

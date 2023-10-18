@@ -31,11 +31,13 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("peace_diehl")
-
-    # Read table from meadow dataset.
     paths.log.info("Reading table from meadow dataset.")
+    ds_meadow = paths.load_dataset("peace_diehl")
+    # Read table from meadow dataset.
     tb = ds_meadow["peace_diehl"].reset_index()
+    # Load COW state system
+    ds_cow_ssm = paths.load_dataset("cow_ssm")
+    tb_regions = ds_cow_ssm["cow_ssm_regions"].reset_index()
 
     #
     # Process data.
@@ -56,18 +58,17 @@ def run(dest_dir: str) -> None:
     tb["peace_scale_level"] = tb["peace_scale_level"].fillna(0)
 
     # Add region of the relationship
-    tb["region_1"] = tb["code_1"].apply(code_to_region)
-    tb["region_2"] = tb["code_2"].apply(code_to_region)
-    assert tb["region_1"].notna().all(), "Some regions are NaN"
-    assert tb["region_2"].notna().all(), "Some regions are NaN"
-    mask = tb["region_1"] == tb["region_2"]
-    tb.loc[mask, "country"] = tb.loc[mask, "region_1"]
-    tb.loc[~mask, "country"] = "Inter-continental"
-    tb = tb.drop(columns=["region_1", "region_2"])
+    tb = add_region(tb)
 
     # Get aggregate table (counts)
-    log.info("get aggregate table")
+    paths.log.info("get aggregate table")
     tb_agg = make_aggregate_table(tb)
+
+    # Add 'no relationship'
+    paths.log.info("adding indicator 'no relationship'")
+    tb_agg = add_no_relationship(tb_agg, tb_regions)
+
+    # Add short_name
     tb_agg.metadata.short_name = f"{tb.metadata.short_name}_agg"
 
     # Set index
@@ -255,3 +256,63 @@ def code_to_region(cow_code: int) -> str:
             return "Asia and Oceania"
         case _:
             raise ValueError(f"Invalid COW code: {cow_code}")
+
+
+def add_region(tb: Table) -> Table:
+    """Add region of the relationship.
+
+    If both countries belong to region A, then the region of the relationship is A. Otherwise, the region is 'Inter-continental'.
+    """
+    tb["region_1"] = tb["code_1"].apply(code_to_region)
+    tb["region_2"] = tb["code_2"].apply(code_to_region)
+    assert tb["region_1"].notna().all(), "Some regions are NaN"
+    assert tb["region_2"].notna().all(), "Some regions are NaN"
+    mask = tb["region_1"] == tb["region_2"]
+    tb.loc[mask, "country"] = tb.loc[mask, "region_1"]
+    tb.loc[~mask, "country"] = "Inter-continental"
+    tb = tb.drop(columns=["region_1", "region_2"])
+    return tb
+
+
+def add_no_relationship(tb: Table, tb_regions: Table) -> Table:
+    """Add new column with number of country-pairs with no relationship."""
+    # Column types
+    columns_index = ["country", "year"]
+    columns_indicators = [col for col in tb.columns if col not in columns_index]
+    column_new = "no_relation"
+    ## Load region numbers, add number of country-pairs in inter-continental
+    tb_regions["number_countries"] = tb_regions["number_countries"].astype(float)
+    tb_regions["number_country_pairs"] = (
+        tb_regions["number_countries"] * (tb_regions["number_countries"] - 1) / 2
+    ).astype(int)
+    tb_no_rel = tb_regions.groupby("year", as_index=False).apply(_get_intercontinental_pairs)
+    tb_no_rel = Table(tb_no_rel).rename(columns={None: "number_country_pairs"})
+    tb_no_rel["region"] = "Inter-continental"
+    tb_regions = pr.concat([tb_regions, tb_no_rel]).rename(columns={"region": "country"})
+    ## Merge with main table
+    tb = tb.merge(tb_regions, on=["year", "country"])
+    ## Estimate no-relationship
+    tb[column_new] = tb["number_country_pairs"] - tb[columns_indicators].sum(axis=1)
+
+    ## Remove unused columns
+    tb = tb[columns_index + columns_indicators + [column_new]]
+    return tb
+
+
+def _get_intercontinental_pairs(tb_group: Table):
+    # expected_regions = {
+    #     "Africa",
+    #     "Americas",
+    #     "Asia and Oceania",
+    #     "Europe",
+    #     "Middle East",
+    #     "World",
+    # }
+    mask = tb_group["region"] == "World"
+    value = tb_group.loc[mask, "number_country_pairs"] - tb_group.loc[~mask, "number_country_pairs"].sum()
+    return value.item()
+    # if set(tb_group["region"]) == expected_regions:
+    #     mask = tb_group["region"] == "World"
+    #     value = (tb_group.loc[mask, "number_country_pairs"] - tb_group.loc[~mask, "number_country_pairs"].sum())
+    #     return value.item()
+    # return np.nan

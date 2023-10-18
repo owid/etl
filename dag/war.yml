@@ -108,5 +108,6 @@ steps:
     - snapshot://war/2023-09-27/peace_diehl.zip
   data://garden/war/2023-09-27/peace_diehl:
     - data://meadow/war/2023-09-27/peace_diehl
+    - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/war/2023-09-27/peace_diehl:
     - data://garden/war/2023-09-27/peace_diehl
