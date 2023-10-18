@@ -7,6 +7,14 @@ definitions:
     description_processing: |-
       The peace scale level of a relationship for a given year reports the level as of the 31st of December of that year.
 
+      Regions are defined based on their COW (Correlates of War) codes:
+
+      • Americas: 2-165
+      • Europe: 200-399
+      • Africa: 402-626
+      • Middle East: 630-698
+      • Asia and Oceania: 700-999
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
