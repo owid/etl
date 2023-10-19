@@ -239,7 +239,7 @@ tables:
       #####################
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
-        unit: deaths
+        unit: conflicts
         description_short: |-
           {definitions.number_ongoing_conflicts.description_short}.
         description_key: *description_key_ongoing
@@ -278,7 +278,7 @@ tables:
       #################
       number_new_conflicts:
         title: Number of new conflicts
-        unit: deaths
+        unit: conflicts
         description_short: |-
           {definitions.number_new_conflicts.description_short}
         description_key: *description_key_new
