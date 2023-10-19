@@ -1289,7 +1289,8 @@ def read_csv(
     if isinstance(filepath_or_buffer, (str, Path)):
         table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
     else:
-        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_csv.")
+        # NOTE: Currently, the processing log cannot be updated unless you pass a path to read_csv.
+        table = update_log(table=table, operation="load", parents=["unknown"])
 
     return cast(Table, table)
 
