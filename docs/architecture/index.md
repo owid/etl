@@ -18,7 +18,7 @@ The best data on global issues comes from **the hard work of _data providers_**,
 
 As a data republisher, we therefore need a methodology to process, version, and maintain several datasets all the way from the original source's publication wite to our platform. And it needs to be scalable.
 <!--
-We've had [our own journey](our-journey.md) in the search for this methodology for some time, which has now converged into what we know as the ETL. In this section we describe [its design prinicples](design), our [workflow](workflow/index.md).
+We've had [our own journey](our-journey.md) in the search for this methodology for some time, which has now converged into what we know as the ETL. In this section we describe [its design principles](design), our [workflow](workflow/index.md).
 Learn more about our architecture in the following sections: -->
 
 *[ETL]: Extract Transform Load
