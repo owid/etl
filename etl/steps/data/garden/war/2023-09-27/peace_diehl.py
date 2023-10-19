@@ -41,6 +41,15 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Fix codes
+    codes_to_fix = {
+        "936": "946",
+        "937": "947",
+    }
+    columns_codes = ["code_1", "code_2"]
+    for col in columns_codes:
+        tb[col] = tb[col].replace(codes_to_fix)
+
     # Set time fields as strings
     paths.log.info("ensure correct types.")
     tb[["time_start", "time_end"]] = tb[["time_start", "time_end"]].astype(str)
