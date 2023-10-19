@@ -164,10 +164,6 @@ steps:
     - data://garden/aviation_safety_network/2023-04-18/aviation_statistics
 
   # HMD
-  data://meadow/hmd/2022-11-04/life_tables:
-    - walden://hmd/2022-11-04/life_tables
-  data://garden/hmd/2022-11-04/life_tables:
-    - data://meadow/hmd/2022-11-04/life_tables
   data://meadow/hmd/2022-12-07/life_tables:
     - snapshot://hmd/2022-12-07/hmd.zip
   data://garden/hmd/2022-12-07/life_tables:
@@ -251,7 +247,7 @@ steps:
     - data://garden/ggdc/2022-11-28/penn_world_table
 
   #
-  # Met Office Hadley Centre - Near surface temperature anomaly.
+  # Met Office Hadley Centre - Near surface temperature anomaly (2023-10-18).
   #
   data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature:
     - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_global.csv
@@ -643,18 +639,6 @@ steps:
     - snapshot://un/2023-01-24/un_sdg_dimension.json
   data://grapher/un/2023-01-24/un_sdg:
     - data://garden/un/2023-01-24/un_sdg
-
-  #
-  # Met Office Hadley Centre - Near surface temperature anomaly.
-  #
-  data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_global.csv
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_northern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_southern_hemisphere.csv
-  data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature
-  data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
 
   ######################################################################################################################
 
