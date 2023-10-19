@@ -87,7 +87,7 @@ from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
-from .shared import add_indicators_conflict_rate, expand_observations
+from .shared import add_indicators_extra, expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -309,7 +309,12 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
     tb = replace_missing_data_with_zeros(tb)
 
     log.info("war.cow: map fatality codes to names")
-    tb = add_indicators_conflict_rate(tb, tb_regions, ["number_ongoing_conflicts", "number_new_conflicts"])
+    tb = add_indicators_extra(
+        tb,
+        tb_regions,
+        columns_conflict_rate=["number_ongoing_conflicts", "number_new_conflicts"],
+        columns_conflict_mortality=["number_deaths_ongoing_conflicts"],
+    )
 
     # Add suffix with source name
     msk = tb["region"] != "World"
