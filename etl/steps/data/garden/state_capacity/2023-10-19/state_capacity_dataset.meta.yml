@@ -12,6 +12,676 @@ dataset:
 tables:
   state_capacity_dataset:
     variables:
+      capacity:
+        title: State capacity estimate
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      capacity_sd:
+        title: Standard deviation of state capacity estimate
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state capacity standard deviation.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state capacity standard deviation from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Capacity Standard Deviation
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      admeffic:
+        title: Administrative efficiency
+        unit: ""
+        short_unit: ""
+        description_short: "Based on the expert assesments by Adelman and Morris (1967). It captures efficiency of public administration by combining measures of permanence and training of administrators, corruption and inefficiencies, and instability of policy. It ranges from 0 to 8 (most efficient)"
+        description_key:
+        - "Encompasses three categories of the efficiency of public administration: \"the degree of permanence and training of administrators\", \"the extent to which corruption, ineffciency and incompetence seriously hamper government functioning\" and \"the extent to which instability of policy at higher levels of administration promotes inefficiency\"."
+        description_from_producer: >|
+          As part of a study on the social and political sources of economic growth in developing countries,
+          Adelman and Morris (1967) produced a measure of “degree of administrative efficiency” for 69
+          countries. The measure encompasses three categories of the efficiency of public administration:
+          “the degree of permanence and training of administrators,” the “extent to which corruption, inefficiency and incompetence seriously hamper government functioning,” and the “extent to which
+          instability of policy at higher levels of administration promotes inefficiency”.
+
+
+          To make these assessments, Adelman and Morris interviewed regional and country experts,
+          compiled information from country studies, and checked their findings against those of other analysts. The period of observation was 1957-1962, overlapping our period of analysis for the years
+          1960-1962.
+
+
+          The ratings reflect a letter grade system akin to those of student in school, including minuses
+          and plusses:
+          -A grade of A signifies that the country has a reasonably efficient public administration with
+          “well-trained civil services” and low levels of corruption.
+          -A grade of B signifies that the country has “considerable bureaucratic inefficiency but . . .
+          a permanent body of administrators” (p. 78). Corruption and policy instability were present
+          but did not significantly interfere with government functioning.
+          -A grade of C signifies “extreme bureaucratic inefficiency and/or widespread corruption and/or
+          serious instability of policy at higher administrative levels”.
+
+
+          Once accounting for pluses and minuses, this measurement strategy produces a nine-point scale
+          (0 to 8).
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: Administrative Efficiency
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      bureau_qual:
+        title: Bureaucratic quality (PRS)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of bureaucratic quality.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of bureaucratic quality from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: Bureaucratic Quality
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      law_order:
+        title: Law and order (PRS)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of law and order.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of law and order from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: Law and Order
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      censusfreq:
+        title: Census frequency
+        unit: ""
+        short_unit: ""
+        description_short: Frequency with which a census is conducted.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of census frequency from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: Census Frequency
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      v2clrspct:
+        title: Rigourous and Impartial Public Administration (V-Dem)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of civilian clearance rate.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of civilian clearance rate from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: Civilian Clearance Rate
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      v2stfisccap:
+        title: Fiscal capacity (V-Dem)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      v2terr:
+        title: v2svstterr transformed by invnormal(v2scstterr/100)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      infcap:
+        title: Information capacity filled (Brambor et al. 2020)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of infrastructure capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of infrastructure capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: Infrastructure Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      irai_qbfm:
+        title: Quality of Budgetary and Financial Management (CPIA)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      irai_qpa:
+        title: Quality of Public Administration (CPIA)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      irai_erm:
+        title: Efficiency of Revenue Mobilization (CPIA)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      milexpercap:
+        title: (log) Military expenditures per capita (SIPRI/COW)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      milpercap:
+        title: (log) Military personnel per 1,000 people (SIPRI/COW)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      policecap:
+        title: (log) Police Officers per 1,000 people (UN)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      statehist50s:
+        title: State Anriquity Index (50 year discounting)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      bti_mo:
+        title: Monopoly of Force (Bertlesmann TI)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      weberian:
+        title: index of Weberiannes (Rauch and Evans 2000)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      wbstat:
+        title: Statistical Capacity (World Bank)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      tax_inc_tax:
+        title: Taxes on income, profits and capital gains (% of taxes)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      tax_trade_tax:
+        title: Taxes on international trade (% of taxes)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
+      taxrev_gdp:
+        title: Tax revenue (% GDP)
+        unit: ""
+        short_unit: ""
+        description_short: Short description of state fiscal capacity.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of state fiscal capacity from producer.
+        processing_level: minor
+        presentation:
+          title_public:
+          title_variant:
+          attribution:
+          attribution_short:
+          topic_tags:
+          faqs
+          grapher_config
+        display:
+          name: State Fiscal Capacity
+          description:
+          isProjection: false
+          entityAnnotationsMap: Test annotation
+          numDecimalPlaces: 0
+          conversionFactor: 1
+          tolerance: 0
+          yearIsDay: false
+          color:
+          includeInTable:
+          tableDisplay:
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units

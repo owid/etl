@@ -19,6 +19,11 @@ def run(dest_dir: str) -> None:
 
     #
     # Process data.
+
+    # Drop columns
+    drop_list = ["cntrynum", "iso3", "iso2", "ccode", "scode", "vdem", "wbregion", "sample_polity"]
+    tb = tb.drop(columns=drop_list)
+
     #
     tb = geo.harmonize_countries(
         df=tb,
