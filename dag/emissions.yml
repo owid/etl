@@ -61,28 +61,23 @@ steps:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/regions/2023-01-01/regions
   #
-  # RFF - World Carbon Pricing (2022-10-11).
+  # RFF - World Carbon Pricing (2022-09-14).
   #
-  data://meadow/rff/2022-10-11/world_carbon_pricing:
-    - walden://rff/2022-10-11/world_carbon_pricing
-    - walden://rff/2022-10-11/ipcc_codes
-  data://meadow/rff/2022-10-11/world_carbon_pricing__subnational:
-    - walden://rff/2022-10-11/world_carbon_pricing__subnational
-    - walden://rff/2022-10-11/ipcc_codes
-  data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__economy:
-    - walden://rff/2022-10-11/emissions_weighted_carbon_price__economy
-  data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__coverage:
-    - walden://rff/2022-10-11/emissions_weighted_carbon_price__coverage
-  data://garden/rff/2022-10-11/world_carbon_pricing:
-    - data://meadow/rff/2022-10-11/world_carbon_pricing
-    - data://meadow/rff/2022-10-11/world_carbon_pricing__subnational
-  data://garden/rff/2022-10-11/emissions_weighted_carbon_price:
-    - data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__economy
-    - data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__coverage
-  data://grapher/rff/2022-10-11/world_carbon_pricing_any_sector:
-    - data://garden/rff/2022-10-11/world_carbon_pricing
-  data://grapher/rff/2022-10-11/emissions_weighted_carbon_price:
-    - data://garden/rff/2022-10-11/emissions_weighted_carbon_price
+  data://meadow/rff/2023-10-19/world_carbon_pricing:
+    - snapshot://rff/2023-10-19/world_carbon_pricing.zip
+  # data://garden/rff/2023-10-19/world_carbon_pricing:
+  #   - data://meadow/rff/2023-10-19/world_carbon_pricing
+  # data://grapher/rff/2023-10-19/world_carbon_pricing:
+  #   - data://garden/rff/2023-10-19/world_carbon_pricing
+  #
+  # RFF - Emissions-weighted Carbon Price (2022-09-14).
+  #
+  # data://meadow/rff/2023-10-19/emissions_weighted_carbon_price:
+  #   - snapshot://rff/2023-10-19/emissions_weighted_carbon_price.zip
+  # data://garden/rff/2023-10-19/emissions_weighted_carbon_price:
+  #   - data://meadow/rff/2023-10-19/emissions_weighted_carbon_price
+  # data://grapher/rff/2023-10-19/emissions_weighted_carbon_price:
+  #   - data://garden/rff/2023-10-19/emissions_weighted_carbon_price
   #
   # Jones et al. (2023) - National contributions to climate change (2023-05-02).
   #
@@ -114,3 +109,26 @@ steps:
     - data://meadow/emissions/2023-10-10/net_zero_tracker
   data://grapher/emissions/2023-10-10/net_zero_tracker:
     - data://garden/emissions/2023-10-10/net_zero_tracker
+  #
+  # RFF - World Carbon Pricing (2022-10-11).
+  #
+  data://meadow/rff/2022-10-11/world_carbon_pricing:
+    - walden://rff/2022-10-11/world_carbon_pricing
+    - walden://rff/2022-10-11/ipcc_codes
+  data://meadow/rff/2022-10-11/world_carbon_pricing__subnational:
+    - walden://rff/2022-10-11/world_carbon_pricing__subnational
+    - walden://rff/2022-10-11/ipcc_codes
+  data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__economy:
+    - walden://rff/2022-10-11/emissions_weighted_carbon_price__economy
+  data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__coverage:
+    - walden://rff/2022-10-11/emissions_weighted_carbon_price__coverage
+  data://garden/rff/2022-10-11/world_carbon_pricing:
+    - data://meadow/rff/2022-10-11/world_carbon_pricing
+    - data://meadow/rff/2022-10-11/world_carbon_pricing__subnational
+  data://garden/rff/2022-10-11/emissions_weighted_carbon_price:
+    - data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__economy
+    - data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__coverage
+  data://grapher/rff/2022-10-11/world_carbon_pricing_any_sector:
+    - data://garden/rff/2022-10-11/world_carbon_pricing
+  data://grapher/rff/2022-10-11/emissions_weighted_carbon_price:
+    - data://garden/rff/2022-10-11/emissions_weighted_carbon_price
