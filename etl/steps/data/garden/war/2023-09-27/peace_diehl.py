@@ -4,7 +4,7 @@ from datetime import datetime as dt
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 # from etl.data_helpers import geo
@@ -37,7 +37,6 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["peace_diehl"].reset_index()
     # Load COW state system
     ds_cow_ssm = paths.load_dataset("cow_ssm")
-    tb_regions = ds_cow_ssm["cow_ssm_regions"].reset_index()
 
     #
     # Process data.
@@ -56,6 +55,9 @@ def run(dest_dir: str) -> None:
 
     # Replace NaNs with zeroes
     tb["peace_scale_level"] = tb["peace_scale_level"].fillna(0)
+
+    # Region table
+    tb_regions = build_tb_regions(tb, ds_cow_ssm)
 
     # Add region of the relationship
     tb = add_region(tb)
@@ -239,6 +241,39 @@ def time_to_year(t: str, start: bool = False) -> int:
         if (date.month == 12) & (date.day == 31):
             return year + 1
         return year
+
+
+def build_tb_regions(tb: Table, ds_cow_ssm: Dataset) -> Table:
+    """Build table with number of countries per region per year (using Diehl's data).
+
+    We only consider countries listed in the dataset. Hence if a country existed but did not have any relationship, it is not counted. We sanity-checked this, and only country with code 260 was missing! This is West Germany. Instead, Diehl uses 255, which stands for Germany. I.e. they consider Germany to exist back then (not as West Germany but as modern Germany already).
+    """
+    tb_1 = tb[["code_1", "year"]].drop_duplicates().rename(columns={"code_1": "code"})
+    tb_2 = tb[["code_2", "year"]].drop_duplicates().rename(columns={"code_2": "code"})
+    tb_regions = pr.concat([tb_1, tb_2])
+    tb_regions["region"] = tb_regions["code"].apply(code_to_region)
+    tb_regions_regions = tb_regions.groupby(["region", "year"], as_index=False)[["code"]].nunique()
+    tb_regions_world = tb_regions.groupby(["year"], as_index=False)[["code"]].nunique()
+    tb_regions_world["region"] = "World"
+    tb_regions = pr.concat([tb_regions_regions, tb_regions_world]).rename(columns={"code": "number_countries"})
+
+    # COW table
+    tb_regions_cow = ds_cow_ssm["cow_ssm_system"].reset_index()
+    tb_regions_cow = tb_regions_cow[tb_regions_cow["year"] >= 1900]
+
+    missing_codes = set(tb_regions_cow["ccode"]) - (set(tb["code_2"]) | set(tb["code_1"]))
+    assert missing_codes == {
+        260
+    }, "Country codes missing in Diehl, when comparing with COW. Only code expected to miss is 260."
+
+    # Sanity check
+    assert (
+        tb_regions["year"].max() == tb["year"].max()
+    ), "Maximum year does not match between DIEHL and DIEHL-based country in region table."
+    assert (
+        tb_regions["year"].min() == tb["year"].min()
+    ), "Minimum year does not match between DIEHL and DIEHL-based country in region table."
+    return tb_regions
 
 
 def code_to_region(cow_code: int) -> str:
