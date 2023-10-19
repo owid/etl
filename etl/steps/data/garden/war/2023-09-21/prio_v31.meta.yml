@@ -187,7 +187,7 @@ tables:
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities
@@ -200,7 +200,7 @@ tables:
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities

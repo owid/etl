@@ -98,7 +98,7 @@ def _get_end_year(date_str: str, date_format: str) -> int:
 def add_population_to_table(
     tb: Table, ds_pop: Dataset, country_col: str = "country", region_alt: bool = False
 ) -> Table:
-    """Bla.
+    """Add population to table.
 
     1. Get list of countries from latest available year. That is, we only have one row per country.
     2. Duplicate these entries for each year from first available to latest available year. As if they existed.
