@@ -20,30 +20,7 @@ definitions:
         url_main: http://v-dem.net/vdemds.html
         date_accessed: '2023-03-02'
         date_published: '2023-03-02'
-      # - producer: OWID based on V-Dem (v13) and Lührmann et al. (2018)
-      #   title: Democracy and Human rights - OWID based on Varieties of Democracy (v13) and Regimes of the World
-      #   description: >-
-      #     This dataset provides information on democracy and human rights, using data from the Varieties of Democracy project
-      #     (v12), and the Regimes of the World classification by Lührmann et al. (2018).
 
-
-      #     We expand the countries and years covered, and refine the coding of the Regimes of the World classification. You
-      #     can read a detailed description of the data in these posts:
-
-      #     https://ourworldindata.org/regimes-of-the-world-data
-
-      #     https://ourworldindata.org/vdem-electoral-democracy-data
-
-      #     https://ourworldindata.org/vdem-human-rights-data
-
-
-      #     You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/democracy
-
-
-      #     Data comes from the Varieties of Democracy project (v13), sometimes using Lührmann et al's (2018) Regimes of the
-      #     World classification, and own expansions and refinements.
-      #   citation_full: Our World in Data, Bastian Herre
-      #   url_main: http://v-dem.net/vdemds.html
 tables:
   vdem:
     variables:
@@ -58,7 +35,6 @@ tables:
         description_key:
           - The index is mostly based on evaluations by around 3,500 experts, which are primarily academics and members of the media and civil society, and often are nationals or residents of the country. They therefore know the country’s political system well and can evaluate aspects that are difficult to observe.
           - We expand the coverage of the original data to include more years when current countries were still non-sovereign territories. We use the index score of the historical entity that they were part of, whenever available.
-        # NOTE: this doesn't render correctly at the moment
         description_from_producer: |-
           The index (`v2x_polyarchy`) is formed by taking the average of, on the one hand, the weighted average of the indices measuring freedom of association thick (`v2x_frassoc_thick`), clean elections (`v2xel_frefair`), freedom of expression (`v2x_freexp_altinf`), elected officials (`v2x_elecoff`), and suffrage (`v2x_suffr`) and, on the other, the five-way multiplicative interaction between those indices. This is half way between a straight average and strict multiplication, meaning the average of the two. It is thus a compromise between the two most well known aggregation formulas in the literature, both allowing partial "compensation" in one sub-component for lack of polyarchy in the others, but also punishing countries not strong in one sub-component according to the "weakest link" argument. The aggregation is done at the level of Dahl’s subcomponents with the one exception of the non-electoral component. The index is aggregated using this formula:
 
@@ -79,7 +55,7 @@ tables:
           All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
         presentation:
           title_variant: V-Dem
-          # attribution_short: V-Dem
+          attribution_short: V-Dem
           topic_tags:
             - Democracy
           faqs:
