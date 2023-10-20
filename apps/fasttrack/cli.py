@@ -135,14 +135,12 @@ class FasttrackImport:
         # since sheets url is accessible with link, we have to encrypt it when storing in metadata
         sheets_url = _encrypt(self.sheets_url) if not self.meta.is_public else self.sheets_url
 
-        source_name = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
-
         if len(self.meta.sources) == 1:
             dataset_source = self.meta.sources[0]
             source = Source(
                 url=dataset_source.url,
-                name=source_name,
-                published_by=source_name,
+                name=dataset_source.name,
+                published_by=dataset_source.published_by,
                 source_data_url=sheets_url,
                 date_accessed=str(dt.date.today()),
                 publication_year=dataset_source.publication_year
@@ -185,7 +183,10 @@ class FasttrackImport:
 
     def dataset_yaml(self) -> str:
         """Generate dataset YAML file."""
-        return yaml_dump(metadata_export(self.dataset))  # type: ignore
+        yml = metadata_export(self.dataset)
+        # source is already in the snapshot and is propagated
+        yml["dataset"].pop("sources")
+        return yaml_dump(yml)  # type: ignore
 
     def save_metadata(self) -> None:
         with open(self.metadata_path, "w") as f:
