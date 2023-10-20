@@ -15,6 +15,8 @@ definitions:
       • Middle East: 630-698
       • Asia and Oceania: 700-999
 
+      Fixes: The source used country codes 936 and 937 instead of 946 (Kiribati) and 947 (Tuvalu), respectively.
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -125,6 +127,7 @@ tables:
         description_key:
           - |-
             {definitions.global.region_numbers}
+          - We estimate the number of country-pairs with no relationship by subtracting the number of country-pairs with a relationship from the total number of country-pairs in the world. To estimate the total number of country-pairs in the world for a given year, we consider countries that appear in the dataset with a certain relationship.
         unit: country-pairs
         processing_level: minor
         display:
