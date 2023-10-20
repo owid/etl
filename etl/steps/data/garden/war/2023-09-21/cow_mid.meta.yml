@@ -131,7 +131,7 @@ tables:
 
       number_ongoing_disputes_per_country_pair:
         title: Number of ongoing disputes per country-pair
-        unit: disputes per country
+        unit: disputes per country-pair
         description_short: |-
           {definitions.number_ongoing_disputes.description_short}, divided by the number of country-pairs in the region.
         description_key: *description_key_ongoing
