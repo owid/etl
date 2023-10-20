@@ -17,7 +17,8 @@ tables:
         unit: ""
         short_unit: ""
         description_short: "Measures state capacity by combining 21 different indicators related to three key dimensions: extractive capacity, coercive capacity, and administrative capacity. Higher values indicate greater state capacity."
-        description_from_producer: Description of state capacity from producer.
+        # NOTE: Include a producer description if available
+        # description_from_producer: Description of state capacity from producer.
         processing_level: minor
         display:
           name: State capacity
@@ -31,7 +32,7 @@ tables:
           name: State capacity standard deviation
           numDecimalPlaces: 1
       admeffic:
-        title: Administrative efficiency (Adelman and Morris)
+        title: Administrative efficiency
         unit: ""
         short_unit: ""
         description_short: "Based on the expert assessments by Adelman and Morris (1967). It captures efficiency of public administration by combining measures of permanence and training of administrators, corruption and inefficiencies, and instability of policy. It ranges from 0 to 8 (most efficient)"
@@ -53,7 +54,7 @@ tables:
           - A grade of A signifies that the country has a reasonably efficient public administration with
           “well-trained civil services” and low levels of corruption.
           - A grade of B signifies that the country has “considerable bureaucratic inefficiency but . . .
-          a permanent body of administrators” (p. 78). Corruption and policy instability were present
+          a permanent body of administrators”. Corruption and policy instability were present
           but did not significantly interfere with government functioning.
           - A grade of C signifies “extreme bureaucratic inefficiency and/or widespread corruption and/or
           serious instability of policy at higher administrative levels”.
@@ -66,7 +67,7 @@ tables:
           name: Administrative efficiency
           numDecimalPlaces: 1
       bureau_qual:
-        title: Bureaucratic quality (PRS)
+        title: Bureaucratic quality
         unit: ""
         short_unit: ""
         description_short: Measures the institutional strength and quality of the bureaucracy. It ranges from 0 to 4 (greater bureaucratic quality).
@@ -82,7 +83,7 @@ tables:
           name: Bureaucratic quality
           numDecimalPlaces: 1
       law_order:
-        title: Law and order (PRS)
+        title: Law and order
         unit: ""
         short_unit: ""
         description_short: Measures the strength and impartiality of the legal system and the popular observance of the law. It ranges from 0 to 6 (greater law and order).
@@ -113,7 +114,7 @@ tables:
           name: Census frequency
           numDecimalPlaces: 1
       v2clrspct:
-        title: Rigourous and Impartial Public Administration (V-Dem)
+        title: Rigourous and Impartial Public Administration
         unit: ""
         short_unit: ""
         description_short: Based on the expert assessments by V-Dem. It captures the extent to which public officials are expected to follow the law and are not biased in their administration of the law. It ranges from 0 to 4 (more rigorous and impartial public administration).
@@ -138,7 +139,7 @@ tables:
           name: Rigourous and Impartial Public Administration
           numDecimalPlaces: 1
       v2stfisccap:
-        title: Fiscal capacity (V-Dem)
+        title: Fiscal capacity
         unit: ""
         short_unit: ""
         description_short: Based on the expert assessments by V-Dem. It captures the capacity of the state to fund itself through taxes that are of greater administrative complexity. It ranges from 0 to 4 (greater fiscal capacity).
@@ -161,7 +162,7 @@ tables:
           name: Fiscal capacity
           numDecimalPlaces: 1
       v2terr:
-        title: State Authority over Territory (V-Dem)
+        title: State Authority over Territory
         unit: ""
         short_unit: ""
         description_short: Based on the expert assessments by V-Dem. It captures the extent to which the state has effective control over its territory.
@@ -180,7 +181,7 @@ tables:
           name: State Authority over Territory
           numDecimalPlaces: 1
       infcap:
-        title: Information capacity filled (Brambor et al. 2020)
+        title: Information capacity filled
         unit: ""
         short_unit: ""
         description_short: Measures the ability of the state to collect and process information. It ranges from 0 to 1 (greater information capacity).
@@ -204,7 +205,7 @@ tables:
           name: Information capacity filled
           numDecimalPlaces: 1
       irai_qbfm:
-        title: Quality of Budgetary and Financial Management (CPIA)
+        title: Quality of Budgetary and Financial Management
         unit: ""
         short_unit: ""
         description_short: It ranges from 0 to 6 (greater quality of budgetary and financial management).
@@ -226,7 +227,7 @@ tables:
           name: Quality of Budgetary and Financial Management
           numDecimalPlaces: 1
       irai_qpa:
-        title: Quality of Public Administration (CPIA)
+        title: Quality of Public Administration
         unit: ""
         short_unit: ""
         description_short: Measures the extent to which civilian central government staff are structured to design and implement government policy and deliver services effectively. It ranges from 0 to 4 (greater quality of public administration).
@@ -248,7 +249,7 @@ tables:
           name: Quality of Public Administration
           numDecimalPlaces: 1
       irai_erm:
-        title: Efficiency of Revenue Mobilization (CPIA)
+        title: Efficiency of Revenue Mobilization
         unit: ""
         short_unit: ""
         description_short: Measures the extent to which the tax system and tax administration are efficient. It ranges from 0 to 4 (greater efficiency of revenue mobilization).
@@ -263,13 +264,13 @@ tables:
           income taxes applied to a broad base, rather than from taxes on international trade.
 
 
-          For further details, see World Bank (2017) p. 39. Coverage is 2005-2015.
+          Coverage is 2005-2015.
         processing_level: minor
         display:
           name: Efficiency of Revenue Mobilization
           numDecimalPlaces: 1
       milexpercap:
-        title: (log) Military expenditures per capita (SIPRI/COW)
+        title: Military expenditures per capita, in logarithmic scale
         unit: ""
         short_unit: ""
         description_short: Measures the amount of money spent on the military per capita. It is logged to reduce the skewness of the distribution.
@@ -280,10 +281,10 @@ tables:
           from the United Nations World Population Prospects (2019).
         processing_level: minor
         display:
-          name: (log) Military expenditures per capita
+          name: Military expenditures per capita
           numDecimalPlaces: 1
       milpercap:
-        title: (log) Military personnel per 1,000 people (SIPRI/COW)
+        title: Military personnel per 1,000 people, in logarithmic scale
         unit: ""
         short_unit: ""
         description_short: Measures the number of military personnel per 1,000 people. It is logged to reduce the skewness of the distribution.
@@ -295,10 +296,10 @@ tables:
           (2019).
         processing_level: minor
         display:
-          name: (log) Military personnel per 1,000 people
+          name: Military personnel per 1,000 people
           numDecimalPlaces: 1
       policecap:
-        title: (log) Police Officers per 1,000 people (UN)
+        title: Police Officers per 1,000 people, in logarithmic scale
         unit: ""
         short_unit: ""
         description_short: Measures the number of police officers per 1,000 people. It is logged to reduce the skewness of the distribution.
@@ -308,15 +309,15 @@ tables:
           the years 1973-2015 for a varying number of countries each year.
         processing_level: minor
         display:
-          name: (log) Police Officers per 1,000 people
+          name: Police Officers per 1,000 people
           numDecimalPlaces: 1
       statehist50s:
-        title: State Antiquity Index (50 year discounting)
+        title: State Antiquity Index
         unit: ""
         short_unit: ""
         description_short: Measures the antiquity and sovereignty of the state. It ranges from 0 to 1, with higher values indicating greater antiquity and sovereignty.
         description_from_producer: >-
-          In the original, this index codes three items for contemporary countries, based on 1950 borders,
+          In the original data, this index codes three items for contemporary countries, based on 1950 borders,
           for each 50-year period starting in the year 0 C.E.:
           - whether the territory of the present-day country contained a state at that period in time
           - whether this state was sovereign or under the control of an outside entity
@@ -332,7 +333,7 @@ tables:
           name: State Antiquity Index
           numDecimalPlaces: 1
       bti_mo:
-        title: Monopoly of Force (Bertlesmann TI)
+        title: Monopoly of Force
         unit: ""
         short_unit: ""
         description_short: Measures the extent to which the state has a monopoly on the use of force. It ranges from 0 to 10 (greater monopoly of force).
@@ -350,7 +351,7 @@ tables:
           name: Monopoly of Force
           numDecimalPlaces: 1
       weberian:
-        title: Index of Weberianness (Rauch and Evans 2000)
+        title: Index of Weberianness
         unit: ""
         short_unit: ""
         description_short: Measures the degree to which state agencies involved with economic policy exhibit Weberian characteristics. It ranges from 0 to 1 (greater Weberian characteristics).
@@ -368,7 +369,7 @@ tables:
           name: Index of Weberiannes
           numDecimalPlaces: 1
       wbstat:
-        title: Statistical Capacity (World Bank)
+        title: Statistical Capacity
         unit: ""
         short_unit: ""
         description_short: Measures the capacity of a country to collect and process statistical data. It ranges from 0 to 1 (greater statistical capacity).
@@ -393,7 +394,7 @@ tables:
           name: Statistical Capacity
           numDecimalPlaces: 1
       tax_inc_tax:
-        title: Taxes on income, profits and capital gains (% of taxes)
+        title: Taxes on income, profits and capital gains (as a share of total tax revenue)
         unit: "%"
         short_unit: "%"
         description_short: Measures the percentage of total tax revenue that comes from taxes on income, profits, and capital gains.
@@ -407,10 +408,10 @@ tables:
           for 168 countries, with broad coverage beginning in the early 1970s.
         processing_level: minor
         display:
-          name: Taxes on income (% of taxes)
+          name: Taxes on income (% of total revenue)
           numDecimalPlaces: 1
       tax_trade_tax:
-        title: Taxes on international trade (% of taxes)
+        title: Taxes on international trade (as a share of total tax revenue)
         unit: "%"
         short_unit: "%"
         description_short: Measures the percentage of total tax revenue that comes from taxes on international trade.
@@ -424,13 +425,12 @@ tables:
           countries, with broad coverage beginning in the early 1970s.
         processing_level: minor
         display:
-          name: Taxes on international trade (% of taxes)
+          name: Taxes on international trade (% of total revenue)
           numDecimalPlaces: 1
       taxrev_gdp:
-        title: Tax revenue (% GDP)
+        title: Tax revenue (as a share of GDP)
         unit: "%"
         short_unit: "%"
-        description_short: Measures tax revenue as a percentage of GDP.
         description_from_producer: >-
           For this measure, we start with the Government Revenue Dataset from the International Centre
           for Tax and Development (ICTD). We then expand coverage of these data considerably through a
