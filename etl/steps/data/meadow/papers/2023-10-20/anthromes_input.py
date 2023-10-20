@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["regn_nm"], verify_integrity=True).sort_index()
+    tb = tb.underscore().set_index(["id", "regn_nm"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
