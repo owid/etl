@@ -285,7 +285,9 @@ def run(dest_dir: str) -> None:
     tb_any_sector.metadata.short_name = "world_carbon_pricing_any_sector"
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year", "ipcc_code", "product"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = (
+        tb.set_index(["country", "year", "ipcc_code", "product"], verify_integrity=True).sort_index().sort_index(axis=1)
+    )
     tb_any_sector = tb_any_sector.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     #

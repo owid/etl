@@ -1,7 +1,7 @@
 dataset:
-  short_name: emissions_weighted_carbon_price
+  update_period_days: 365
   title: Emissions-weighted carbon price
-  description: |
+  description: |-
     The World Carbon Pricing Database covers national and subnational economic mechanisms relating to carbon emissions from 1990 onwards. It was developed from several key sources: most notably, policy documents from countries and regions themselves. Secondly, from other sources such as the International Carbon Action Partnership.
 
     The dataset primarily focuses on economic instruments targeting carbon dioxide (CO2) emissions. In some cases these instruments also cover other greenhouse gases. However, any pricing mechanisms that target non-CO2 gases (such as methane or nitrous oxide) specifically, are not included.
@@ -11,18 +11,11 @@ dataset:
     For each country, researchers calculate an emissions-weighted carbon price for the economy. To do this, they rely on two metrics:
 
     - Carbon prices applied at the sectoral level (e.g. electricity, or road transport)
-    - Each sector’s contribution to a country’s CO2 emissions (e.g. what percentage of a country’s emissions come from electricity, or road transport)
-    They then weight each sector’s carbon price by the relevant sector’s contribution to CO2 emissions, and aggregate these figures to get an economy-wide weighted carbon price.
+    - Each sector's contribution to a country's CO2 emissions (e.g. what percentage of a country's emissions come from electricity, or road transport)
+    They then weight each sector's carbon price by the relevant sector's contribution to CO2 emissions, and aggregate these figures to get an economy-wide weighted carbon price.
 
     A full technical note on this methodology is provided by the authors [here](https://www.rff.org/publications/working-papers/emissions-weighted-carbon-price-sources-and-methods/).
-  sources:
-  - name: Dolphin, Pollitt and Newbery (2020). Emissions-weighted Carbon Price.
-    published_by: >-
-      Dolphin, G., Pollitt, M. and Newbery, D. 2020. The political economy of carbon pricing: a panel analysis.
-      Oxford Economic Papers 72(2): 472-500.
-    publication_year: 2022
-    publication_date: 2022-01-18
-    url: https://github.com/g-dolphin/ECP
+
 tables:
   emissions_weighted_carbon_price:
     title: Emissions-weighted carbon price

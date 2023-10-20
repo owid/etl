@@ -16,6 +16,13 @@ DATA_PATH_ECONOMY = "ECP-master/_dataset/ecp/ecp_economy/ecp_CO2.csv"
 DATA_PATH_COVERAGE = "ECP-master/_dataset/coverage/tot_coverage_jurisdiction_CO2.csv"
 
 
+def run_sanity_checks(tb):
+    error = "There should be one row per jurisdiction-year."
+    assert tb[tb.duplicated(subset=["jurisdiction", "year"])].empty, error
+    error = "There should not be any row that only has nan data."
+    assert tb[tb.drop(columns=["jurisdiction", "year"]).isnull().all(axis=1)].empty, error
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
@@ -41,11 +48,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Sanity checks.
-    for tb in [tb_economy, tb_coverage]:
-        error = "There should be one row per jurisdiction-year."
-        assert tb[tb.duplicated(subset=["jurisdiction", "year"])].empty, error
-        error = "There should not be any row that only has nan data."
-        assert tb[tb.drop(columns=["jurisdiction", "year"]).isnull().all(axis=1)].empty, error
+    run_sanity_checks(tb=tb_economy)
+    run_sanity_checks(tb=tb_coverage)
 
     # Set an appropriate index and sort conveniently.
     index_columns = ["jurisdiction", "year"]

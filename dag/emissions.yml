@@ -76,10 +76,10 @@ steps:
   #
   data://meadow/rff/2023-10-19/emissions_weighted_carbon_price:
     - snapshot://rff/2023-10-19/emissions_weighted_carbon_price.zip
-  # data://garden/rff/2023-10-19/emissions_weighted_carbon_price:
-  #   - data://meadow/rff/2023-10-19/emissions_weighted_carbon_price
-  # data://grapher/rff/2023-10-19/emissions_weighted_carbon_price:
-  #   - data://garden/rff/2023-10-19/emissions_weighted_carbon_price
+  data://garden/rff/2023-10-19/emissions_weighted_carbon_price:
+    - data://meadow/rff/2023-10-19/emissions_weighted_carbon_price
+  data://grapher/rff/2023-10-19/emissions_weighted_carbon_price:
+    - data://garden/rff/2023-10-19/emissions_weighted_carbon_price
   #
   # Jones et al. (2023) - National contributions to climate change (2023-05-02).
   #
