@@ -1,3 +1,0 @@
-country,year,cntrynum,iso3,iso2,ccode,scode,vdem,wbregion,sample_polity,capacity,capacity_sd,admeffic,bureau_qual,law_order,censusfreq,v2clrspct,v2stfisccap,v2terr,infcap,irai_qbfm,irai_qpa,irai_erm,milexpercap,milpercap,policecap,statehist50s,bti_mo,weberian,wbstat,tax_inc_tax,tax_trade_tax,taxrev_gdp
-Yugoslavia,1991,190.0,YUG,,345,YUG,198.0,Europe & Central Asia (all income levels),1.0,0.3469,0.5134217,,,,1.09375,,,,,,,,5.01377,2.1087565,,0.8536194,,,,,,
-"Yugoslavia, Fed. Rep.",1991,191.0,YGS,,347,YGS,198.0,Europe & Central Asia (all income levels),1.0,0.03797,0.4812582,,,,,0.179,0.365,1.5220362,0.49206495,,,,,,,0.7999545,,,,,,
