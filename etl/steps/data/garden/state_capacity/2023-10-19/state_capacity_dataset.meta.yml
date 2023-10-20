@@ -34,7 +34,7 @@ tables:
         title: Administrative efficiency (Adelman and Morris)
         unit: ""
         short_unit: ""
-        description_short: "Based on the expert assesments by Adelman and Morris (1967). It captures efficiency of public administration by combining measures of permanence and training of administrators, corruption and inefficiencies, and instability of policy. It ranges from 0 to 8 (most efficient)"
+        description_short: "Based on the expert assessments by Adelman and Morris (1967). It captures efficiency of public administration by combining measures of permanence and training of administrators, corruption and inefficiencies, and instability of policy. It ranges from 0 to 8 (most efficient)"
         description_from_producer: >-
           As part of a study on the social and political sources of economic growth in developing countries,
           Adelman and Morris (1967) produced a measure of “degree of administrative efficiency” for 69
@@ -116,7 +116,7 @@ tables:
         title: Rigourous and Impartial Public Administration (V-Dem)
         unit: ""
         short_unit: ""
-        description_short: Based on the expert assesments by V-Dem. It captures the extent to which public officials are expected to follow the law and are not biased in their administration of the law. It ranges from 0 to 4 (more rigourous and impartial public administration).
+        description_short: Based on the expert assessments by V-Dem. It captures the extent to which public officials are expected to follow the law and are not biased in their administration of the law. It ranges from 0 to 4 (more rigorous and impartial public administration).
         description_from_producer: >-
           This is the `v2clrspct` variable from version 9 of the Varieties of Democracy project (Coppedge et al.
           2019). The measure comes from a Bayesian item response theory measurement model using expert
@@ -141,7 +141,7 @@ tables:
         title: Fiscal capacity (V-Dem)
         unit: ""
         short_unit: ""
-        description_short: Based on the expert assesments by V-Dem. It captures the capacity of the state to fund itself through taxes that are of greater administrative complexity. It ranges from 0 to 4 (greater fiscal capacity).
+        description_short: Based on the expert assessments by V-Dem. It captures the capacity of the state to fund itself through taxes that are of greater administrative complexity. It ranges from 0 to 4 (greater fiscal capacity).
         description_from_producer: >-
           This is the state fiscal capacity (`v2stfisccap`) variable from version 9 of the Varieties of Democracy
           project (Coppedge et al. 2019). The measure is a Bayesian item response theory measurement
@@ -164,7 +164,7 @@ tables:
         title: State Authority over Territory (V-Dem)
         unit: ""
         short_unit: ""
-        description_short: Based on the expert assesments by V-Dem. It captures the extent to which the state has effective control over its territory.
+        description_short: Based on the expert assessments by V-Dem. It captures the extent to which the state has effective control over its territory.
         description_from_producer: >-
           For this indicator, we start with the `v2svstterr` measure of state authority over territory from V-Dem.
           This is a measure in which country experts are asked to estimate the percentage of the territory
