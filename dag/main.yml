@@ -630,6 +630,14 @@ steps:
   data://grapher/gapminder/2023-09-22/total_fertility_rate:
     - data://garden/gapminder/2023-09-22/total_fertility_rate
 
+  # State Capacity Dataset
+  data://meadow/state_capacity/2023-10-19/state_capacity_dataset:
+    - snapshot://state_capacity/2023-10-19/state_capacity_dataset.dta
+  data://garden/state_capacity/2023-10-19/state_capacity_dataset:
+    - data://meadow/state_capacity/2023-10-19/state_capacity_dataset
+  data://grapher/state_capacity/2023-10-19/state_capacity_dataset:
+    - data://garden/state_capacity/2023-10-19/state_capacity_dataset
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
@@ -644,11 +652,6 @@ steps:
     - data://garden/un/2023-01-24/un_sdg
 
   ######################################################################################################################
-
-  data://meadow/state_capacity/2023-10-19/state_capacity_dataset:
-    - snapshot://state_capacity/2023-10-19/state_capacity_dataset.dta
-  data://garden/state_capacity/2023-10-19/state_capacity_dataset:
-    - data://meadow/state_capacity/2023-10-19/state_capacity_dataset
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

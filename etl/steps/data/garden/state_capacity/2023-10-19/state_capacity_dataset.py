@@ -24,6 +24,10 @@ def run(dest_dir: str) -> None:
     drop_list = ["cntrynum", "iso3", "iso2", "ccode", "scode", "vdem", "wbregion", "sample_polity"]
     tb = tb.drop(columns=drop_list)
 
+    # Convert tax indicators to percentages.
+    tax_vars = ["tax_inc_tax", "tax_trade_tax", "taxrev_gdp"]
+    tb[tax_vars] *= 100
+
     #
     tb = geo.harmonize_countries(
         df=tb,
