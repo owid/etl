@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -16,6 +18,14 @@ def run(dest_dir: str) -> None:
     ds_meadow_input = paths.load_dataset("anthromes_input")
     # Read table from meadow dataset.
     tb = ds_meadow["anthromes"].reset_index()
+    tb_input = ds_meadow_input["anthromes_input"].reset_index().drop(columns=["pot_veg", "pot_vll"])
+
+    # Merge the two tables
+
+    tb_long = pr.melt(tb, id_vars="id", var_name="name", value_name="value")
+
+    tb = tb_long.merge(tb_input, on="id", how="left")
+    # Add categories to the value column and figure out how to sum the area values
 
     #
     # Process data.
