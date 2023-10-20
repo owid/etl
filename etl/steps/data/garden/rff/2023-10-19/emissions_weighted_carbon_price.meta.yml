@@ -2,6 +2,7 @@ definitions:
   description_short_dollars: &description_short_dollars |-
     This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries.
   common:
+    processing_level: minor
     description_key:
       - This data primarily focuses on economic instruments targeting carbon dioxide (CO₂) emissions.
       - In some cases these instruments also cover other greenhouse gases. However, any pricing mechanisms that specifically target non-CO₂ gases (such as methane or nitrous oxide) are not included.

@@ -16,6 +16,7 @@ tables:
         title: Covered by emissions trading system
         unit: ""
         description_short: A binary value indicating whether the sector(-fuel) is covered by at least one emissions trading system.
+        processing_level: minor
       ets_price:
         title: ETS price
         unit: Current local currency unit per ton of CO₂ equivalent
@@ -23,13 +24,16 @@ tables:
         description_short: Price of an emissions allowance in current local currency unit per ton of CO₂ equivalent.
         display:
           numDecimalPlaces: 2
+        processing_level: minor
       sector_name:
         title: IPCC sector name.
         unit: ""
+        processing_level: minor
       tax:
         title: Covered by tax instrument
         unit: ""
         description_short: A binary value indicating whether the sector(-fuel) is covered by at least one tax instrument.
+        processing_level: minor
       tax_rate_gross:
         title: Gross tax rate
         unit: Current local currency unit per ton of CO₂ equivalent
@@ -37,6 +41,7 @@ tables:
         description_short: Tax rate in current local currency unit (LCU) per ton of CO₂ equivalent
         display:
           numDecimalPlaces: 2
+        processing_level: minor
       tax_rate_net:
         title: Net tax rate
         unit: Current local currency unit per ton of CO₂ equivalent
@@ -44,6 +49,7 @@ tables:
         description_short: Net tax rate (accounting for exemption) in current LCU per ton of CO₂ equivalent.
         display:
           numDecimalPlaces: 2
+        processing_level: minor
   world_carbon_pricing_any_sector:
     title: World carbon pricing for any sector
     variables:
@@ -51,7 +57,9 @@ tables:
         title: Covered by emissions trading system in at least one sector
         unit: ""
         description_short: This data indicates whether at least one sector(-fuel) is covered by at least one emissions trading system at the national level, or only at the sub-national level, or whether no sector is covered.
+        processing_level: major
       tax:
         title: Covered by tax instrument in at least one sector
         unit: ""
         description_short: This data indicates whether at least one sector(-fuel) is covered by at least one carbon tax at the national level, or only at the sub-national level, or whether no sector is covered.
+        processing_level: major
