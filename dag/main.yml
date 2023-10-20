@@ -645,6 +645,10 @@ steps:
 
   ######################################################################################################################
 
+  data://meadow/papers/2023-10-20/anthromes_input:
+    - snapshot://papers/2023-10-20/anthromes_input.zip
+  data://meadow/papers/2023-10-20/anthromes:
+    - snapshot://papers/2023-10-20/anthromes.csv
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
