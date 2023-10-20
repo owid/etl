@@ -6,6 +6,8 @@ meta:
     title: World Carbon Pricing Database
     description: |-
       This dataset contains information on carbon pricing mechanisms (carbon taxes or cap-and-trade) introduced around the world since 1990. To date, it is the most comprehensive attempt at providing a consistent-across-jurisdiction description of carbon pricing mechanisms in terms of their sectoral (and fuel) coverage as well as the associated price signal.
+
+      It covers national and sub-national economic mechanisms relating to carbon emissions, and was developed from several key sources: Most notably, policy documents from countries and regions themselves. Secondly, from other sources such as the International Carbon Action Partnership.
     date_published: 2023-10-04
 
     # Citation
@@ -18,7 +20,7 @@ meta:
 
     # Files
     url_main: https://github.com/g-dolphin/WorldCarbonPricingDatabase/
-    url_download: 
+    url_download:
       https://github.com/g-dolphin/WorldCarbonPricingDatabase/archive/refs/heads/master.zip
     date_accessed: 2023-10-19
 

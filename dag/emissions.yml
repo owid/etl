@@ -65,15 +65,17 @@ steps:
   #
   data://meadow/rff/2023-10-19/world_carbon_pricing:
     - snapshot://rff/2023-10-19/world_carbon_pricing.zip
-  # data://garden/rff/2023-10-19/world_carbon_pricing:
-  #   - data://meadow/rff/2023-10-19/world_carbon_pricing
-  # data://grapher/rff/2023-10-19/world_carbon_pricing:
-  #   - data://garden/rff/2023-10-19/world_carbon_pricing
+    # The following snapshot is just used to get the IPCC codes.
+    - snapshot://rff/2023-10-19/emissions_weighted_carbon_price.zip
+  data://garden/rff/2023-10-19/world_carbon_pricing:
+    - data://meadow/rff/2023-10-19/world_carbon_pricing
+  data://grapher/rff/2023-10-19/world_carbon_pricing:
+    - data://garden/rff/2023-10-19/world_carbon_pricing
   #
   # RFF - Emissions-weighted Carbon Price (2022-09-14).
   #
-  # data://meadow/rff/2023-10-19/emissions_weighted_carbon_price:
-  #   - snapshot://rff/2023-10-19/emissions_weighted_carbon_price.zip
+  data://meadow/rff/2023-10-19/emissions_weighted_carbon_price:
+    - snapshot://rff/2023-10-19/emissions_weighted_carbon_price.zip
   # data://garden/rff/2023-10-19/emissions_weighted_carbon_price:
   #   - data://meadow/rff/2023-10-19/emissions_weighted_carbon_price
   # data://grapher/rff/2023-10-19/emissions_weighted_carbon_price:
