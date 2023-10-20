@@ -33,6 +33,7 @@ dataset:
 tables:
   life_tables:
     variables:
+
       central_death_rate:
         title: Central death rate
         description_short: |-
@@ -46,6 +47,19 @@ tables:
         processing_level: minor
         description_processing: |-
           The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
+        display:
+          name: |-
+            Central death rate at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'both') >>, << type >>
+        presentation:
+          title_public: Central death rate at << age if age != '0' else 'birth'>>
+          title_variant: << sex + 's, ' if sex != 'both' >><< type + ' tables'>>, historical data
+          grapher_config:
+            selectedEntityNames:
+              - Italy
+              - England and Wales
+              - France
+              - Sweden
+
       probability_of_death:
         title: Probability of death
         unit: "%"
@@ -57,24 +71,29 @@ tables:
         processing_level: minor
         description_processing: |-
           The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
+
       average_survival_length:
         title: Average survival length
         short_unit: years
         unit: years
         description_short: Average length of survival between ages x and x+n for persons dying in the interval.
+
       number_survivors:
         title: Number of survivors
         unit: survivors
         description_short: Number of survivors at a given age, assuming survivors at 0 years old is 100,000.
+
       number_deaths:
         title: Number of deaths
         short_unit: deaths
         unit: deaths
         description_short: Number of deaths between during a given age.
+
       number_person_years_lived:
         title: Number of person-years lived
         unit: person-years
         description_short: Number of person-years lived between a given ages and a year after.
+
       number_person_years_remaining:
         title: Number of person-years remaining
         unit: person-years
@@ -97,6 +116,7 @@ tables:
             {definitions.global.life_expectancy.point_1}
           - |-
             {definitions.global.data_used}
+
       life_expectancy_fm_diff:
         title: Life expectancy difference (f-m)
         short_unit: years
@@ -115,6 +135,7 @@ tables:
             {definitions.global.life_expectancy.point_1}
           - |-
             {definitions.global.data_used}
+
       life_expectancy_fm_ratio:
         title: Life expectancy ratio (f/m)
         unit: ""
