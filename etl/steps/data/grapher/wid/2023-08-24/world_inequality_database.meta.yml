@@ -75,4 +75,3 @@ tables:
               - China
               - France
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
-

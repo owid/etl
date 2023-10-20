@@ -45,7 +45,7 @@ tables:
           - "{definitions.income_consumption_pc}"
           - "{definitions.non_market_income}"
         description_processing: |-
-          {common.processing_notes}
+          {definitions.processing_notes}
         presentation:
           title_public: Share of population living in extreme poverty
           topic_tags:
@@ -120,7 +120,7 @@ tables:
         description_processing: |-
           Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country and year, calculate a relative poverty line – in this case 60% of the median – and then run a specific query on the PIP API to return the share of population below that line.
 
-          {common.processing_notes}
+          {definitions.processing_notes}
         presentation:
           title_public: Share of population below 60% of median income or consumption
           topic_tags:
@@ -174,7 +174,7 @@ tables:
           - "{definitions.income_consumption_pc}"
           - "{definitions.non_market_income}"
         description_processing: |-
-          {common.processing_notes}
+          {definitions.processing_notes}
         presentation:
           title_public: Gini Coefficient
           topic_tags:
