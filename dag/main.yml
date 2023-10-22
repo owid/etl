@@ -643,8 +643,6 @@ steps:
   data://grapher/un/2023-01-24/un_sdg:
     - data://garden/un/2023-01-24/un_sdg
 
-  ######################################################################################################################
-
   data://meadow/papers/2023-10-20/anthromes_input:
     - snapshot://papers/2023-10-20/anthromes_input.zip
   data://meadow/papers/2023-10-20/anthromes:
@@ -652,6 +650,8 @@ steps:
   data://garden/papers/2023-10-20/anthromes:
     - data://meadow/papers/2023-10-20/anthromes
     - data://meadow/papers/2023-10-20/anthromes_input
+  ######################################################################################################################
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
