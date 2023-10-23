@@ -385,10 +385,22 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
             {"variable_ids": variable_ids_to_delete},
         )
 
-        # delete relationships to origins
+        # delete relationships
         db.cursor.execute(
             """
             DELETE FROM origins_variables WHERE variableId IN %(variable_ids)s
+        """,
+            {"variable_ids": variable_ids_to_delete},
+        )
+        db.cursor.execute(
+            """
+            DELETE FROM tags_variables_topic_tags WHERE variableId IN %(variable_ids)s
+        """,
+            {"variable_ids": variable_ids_to_delete},
+        )
+        db.cursor.execute(
+            """
+            DELETE FROM posts_gdocs_variables_faqs WHERE variableId IN %(variable_ids)s
         """,
             {"variable_ids": variable_ids_to_delete},
         )

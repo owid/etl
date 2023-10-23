@@ -155,7 +155,7 @@ class FasttrackImport:
             origin.date_accessed = str(dt.date.today())
 
             # Misuse the version field and url_download fields to store info about the spreadsheet
-            origin.version_producer = source_name
+            origin.version_producer = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
             origin.url_download = sheets_url
             license = self.meta.licenses[0]
         else:
