@@ -46,6 +46,16 @@ tables:
         processing_level: minor
         description_processing: |-
           The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
+      central_death_rate_fm_ratio:
+        title: Central death rate (f/m)
+        unit: ""
+        description_short: |-
+          <% if type == "cohort" %>
+          The ratio of cohort central death rate (females/males) at a given age.
+          <% elif type == "period" %>
+          The ratio of period central death rate (females/males) at a given age.
+          <% endif %>
+
       probability_of_death:
         title: Probability of death
         unit: "%"
