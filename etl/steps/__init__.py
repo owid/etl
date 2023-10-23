@@ -41,6 +41,8 @@ DAG = Dict[str, Any]
 
 dvc_lock = Lock()
 
+DVC_REPO_CACHE = files.RuntimeCache()
+
 
 def compile_steps(
     dag: DAG,
@@ -645,11 +647,10 @@ class SnapshotStep(Step):
 
     def run(self) -> None:
         from dvc.exceptions import CheckoutError
-        from dvc.repo import Repo
 
         with _unignore_backports(Path(self._path)):
             try:
-                Repo(paths.BASE_DIR).pull(self._path, remote="public-read", force=True)
+                _cached_dvc_repo(self._dvc_path).pull(self._path, remote="public-read", force=True)
             except CheckoutError as e:
                 raise Exception(
                     "File not found in DVC. Have you run the snapshot script? Make sure you're not using `is_public: false`."
@@ -658,14 +659,13 @@ class SnapshotStep(Step):
     def is_dirty(self) -> bool:
         # check if the snapshot has been added to DVC
         from dvc.dvcfile import load_file
-        from dvc.repo import Repo
 
         with open(self._dvc_path) as istream:
             if "outs:\n" not in istream.read():
                 raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
 
         with _unignore_backports(Path(self._dvc_path)), dvc_lock:
-            repo = Repo(paths.BASE_DIR)
+            repo = _cached_dvc_repo(self._dvc_path)
             dvc_file = load_file(repo, self._dvc_path)
             with repo.lock:
                 # DVC returns empty dictionary if file is up to date
@@ -987,6 +987,22 @@ def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
+
+
+def _cached_dvc_repo(dvc_path: str) -> Any:
+    """Return DVC repo and cache it. Backported steps do not use cached repository."""
+    if "backport" in dvc_path:
+        from dvc.repo import Repo
+
+        return Repo(paths.BASE_DIR)
+
+    key = str(paths.BASE_DIR)
+    cache = DVC_REPO_CACHE
+    if key not in cache:
+        from dvc.repo import Repo
+
+        cache.add(key, Repo(paths.BASE_DIR))
+    return cache[key]
 
 
 def _uses_old_schema(e: KeyError) -> bool:
