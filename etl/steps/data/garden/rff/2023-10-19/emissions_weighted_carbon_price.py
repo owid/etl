@@ -2,6 +2,8 @@
 
 """
 
+from typing import Set
+
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -125,7 +127,7 @@ def run_sanity_checks_on_inputs(tb_economy: Table, tb_coverage: Table) -> None:
             log.warning("The last year in the data may be incomplete. Define LAST_INFORMED_YEAR.")
 
 
-def run_sanity_checks_on_outputs(tb_combined: Table) -> None:
+def run_sanity_checks_on_outputs(tb_combined: Table, expected_countries_dropping_taxes: Set) -> None:
     """Sanity checks on the output table.
 
     Parameters
@@ -138,6 +140,26 @@ def run_sanity_checks_on_outputs(tb_combined: Table) -> None:
     assert tb_combined.columns[tb_combined.isna().all()].empty, error
     error = "Country named 'World' should be included in the countries file."
     assert "World" in set(tb_combined["country"]), error
+
+    # Warn if any country suddenly drops its carbon prices to zero, which may be spurious.
+    countries_to_inspect_for_any_carbon_mechanism = []
+    for column in tb_combined.drop(columns=["country", "year"]).columns:
+        countries_without_taxes_now = set(
+            tb_combined[(tb_combined["year"] == tb_combined["year"].max()) & (tb_combined[column] == 0)]["country"]
+        )
+        countries_that_had_taxes = set(
+            tb_combined[(tb_combined["year"] == (tb_combined["year"].max() - 1)) & (tb_combined[column] > 0)]["country"]
+        )
+        countries_to_inspect = countries_without_taxes_now & countries_that_had_taxes
+        if len(countries_without_taxes_now & countries_that_had_taxes - expected_countries_dropping_taxes) > 0:
+            log.warning(
+                f"Some countries unexpectedly dropped '{column}' to zero in the last year, inspect them: "
+                f"{countries_to_inspect}"
+            )
+        countries_to_inspect_for_any_carbon_mechanism += list(countries_to_inspect)
+    # Check if the list of countries to inspect has changed.
+    if set(countries_to_inspect_for_any_carbon_mechanism) != expected_countries_dropping_taxes:
+        log.warning("The list of countries that dropped their carbon prices to zero in the last year has changed. ")
 
 
 def run(dest_dir: str) -> None:
@@ -185,7 +207,13 @@ def run(dest_dir: str) -> None:
         tb_combined = tb_combined[tb_combined["year"] <= LAST_INFORMED_YEAR].reset_index(drop=True)
 
     # Sanity checks.
-    run_sanity_checks_on_outputs(tb_combined)
+    ####################################################################################################################
+    # Some countries suddenly dropped their carbon mechanisms to zero.
+    # I will ask the data producer if any of these drops may be spurious.
+    expected_countries_dropping_taxes = {"Kazakhstan", "Denmark", "Norway", "Iceland"}
+    # expected_countries_dropping_taxes = set()
+    ####################################################################################################################
+    run_sanity_checks_on_outputs(tb_combined, expected_countries_dropping_taxes=expected_countries_dropping_taxes)
 
     # Set an appropriate index and sort conveniently.
     tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
