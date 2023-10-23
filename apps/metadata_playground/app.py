@@ -37,7 +37,7 @@ with open(PATH_METADATA_GARDEN, "r") as f:
 METADATA_GARDEN_DISPLAY = METADATA_GARDEN_BASE
 
 # Catalog path
-CATALOG_PATH = f"grapher/dummy/2020-01-01/{DUMMY}/{DUMMY}"
+CATALOG_PATH = f"grapher/dummy/2020-01-01/{DUMMY}/{DUMMY}#dummy_variable"
 
 
 # Functions
