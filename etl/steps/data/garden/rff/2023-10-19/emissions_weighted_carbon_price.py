@@ -2,26 +2,24 @@
 
 """
 
-import pandas as pd
-from owid.catalog import Dataset, Table
-from owid.catalog.utils import underscore_table
-from shared import LAST_INFORMED_YEAR, MEADOW_VERSION, VERSION
+from typing import Set
+
+from owid.catalog import Table
+from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.paths import DATA_DIR, STEP_DIR
+from etl.helpers import PathFinder, create_dataset
 
-# Details on garden dataset to be exported.
-DATASET_NAME = "emissions_weighted_carbon_price"
-TABLE_NAME = DATASET_NAME
-# Path to country names file.
-# NOTE: This countries file contains as many countries as the file for world_cabon_pricing, plus "World".
-#  Here we ignore all regions inside countries.
-COUNTRIES_PATH = STEP_DIR / f"data/garden/rff/{VERSION}/{DATASET_NAME}.countries.json"
-# Path to metadata file.
-METADATA_PATH = STEP_DIR / f"data/garden/rff/{VERSION}/{DATASET_NAME}.meta.yml"
-# Details on meadow datasets to be imported.
-MEADOW_PATH_ECONOMY = DATA_DIR / f"meadow/rff/{MEADOW_VERSION}/emissions_weighted_carbon_price__economy"
-MEADOW_PATH_COVERAGE = DATA_DIR / f"meadow/rff/{MEADOW_VERSION}/emissions_weighted_carbon_price__coverage"
+# Initialize logger.
+log = get_logger()
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
+# It may happen that the data for the most recent year is incomplete.
+# If so, define the following to be last year fully informed.
+# LAST_INFORMED_YEAR = 2021
+LAST_INFORMED_YEAR = None
 
 # Columns to keep from raw dataset and how to rename them.
 COLUMNS = {
@@ -29,22 +27,22 @@ COLUMNS = {
     "year": "year",
     # Emissions-weighted average price on emissions covered by either a carbon tax or an ETS.
     # Weights: share of jurisdiction total CO2 emissions.
-    "ecp_all_jurco2_kusd": "price_with_tax_or_ets_weighted_by_share_of_co2",
+    "ecp_all_jurco2_usd_k": "price_with_tax_or_ets_weighted_by_share_of_co2",
     # Emissions-weighted average price on emissions covered by either a carbon tax or an ETS.
     # Weights: share of jurisdiction total GHG emissions.
-    "ecp_all_jurghg_kusd": "price_with_tax_or_ets_weighted_by_share_of_ghg",
+    "ecp_all_jurghg_usd_k": "price_with_tax_or_ets_weighted_by_share_of_ghg",
     # Emissions-weighted average price on emissions covered by an ETS.
     # Weights: share of jurisdiction total CO2 emissions.
-    "ecp_ets_jurco2_kusd": "price_with_ets_weighted_by_share_of_co2",
+    "ecp_ets_jurco2_usd_k": "price_with_ets_weighted_by_share_of_co2",
     # Emissions-weighted average price on emissions covered by an ETS.
     # Weights: share of jurisdiction total GHG emissions.
-    "ecp_ets_jurghg_kusd": "price_with_ets_weighted_by_share_of_ghg",
+    "ecp_ets_jurghg_usd_k": "price_with_ets_weighted_by_share_of_ghg",
     # Emissions-weighted average price on emissions covered by a carbon tax.
     # Weights: share of jurisdiction total CO2 emissions.
-    "ecp_tax_jurco2_kusd": "price_with_tax_weighted_by_share_of_co2",
+    "ecp_tax_jurco2_usd_k": "price_with_tax_weighted_by_share_of_co2",
     # Emissions-weighted average price on emissions covered by a carbon tax.
     # Weights: share of jurisdiction total GHG emissions.
-    "ecp_tax_jurghg_kusd": "price_with_tax_weighted_by_share_of_ghg",
+    "ecp_tax_jurghg_usd_k": "price_with_tax_weighted_by_share_of_ghg",
     # CO2 emissions covered by either a carbon tax or an ETS as a share of jurisdiction total CO2 emissions.
     "cov_all_co2_jurco2": "co2_with_tax_or_ets_as_share_of_co2",
     # CO2 emissions covered by either a carbon tax or an ETS as a share of jurisdiction total GHG emissions.
@@ -72,22 +70,22 @@ COLUMNS = {
     # # Other variables that are only relevant when considering sub-country regions (that we ignore for now):
     # # Emissions-weighted average price on emissions covered by either a carbon tax or an ETS.
     # # Weights: share of national jurisdiction total CO2 emissions.
-    # 'ecp_all_supraco2_kusd': 'price_with_tax_or_ets_weighted_by_share_of_country_co2',
+    # 'ecp_all_supraco2_usd_k': 'price_with_tax_or_ets_weighted_by_share_of_country_co2',
     # # Emissions-weighted average price on emissions covered by either a carbon tax or an ETS.
     # # Weights: share of national jurisdiction total GHG emissions.
-    # 'ecp_all_supraghg_kusd': 'price_with_tax_or_ets_weighted_by_share_of_country_ghg',
+    # 'ecp_all_supraghg_usd_k': 'price_with_tax_or_ets_weighted_by_share_of_country_ghg',
     # # Emissions-weighted average price on emissions covered by an ETS.
     # # Weights: share of national jurisdiction total CO2 emissions.
-    # 'ecp_ets_supraco2_kusd': 'price_with_ets_weighted_by_share_of_country_co2',
+    # 'ecp_ets_supraco2_usd_k': 'price_with_ets_weighted_by_share_of_country_co2',
     # # Emissions-weighted average price on emissions covered by an ETS.
     # # Weights: share of national jurisdiction total GHG emissions.
-    # 'ecp_ets_supraghg_kusd': 'price_with_ets_weighted_by_share_of_country_ghg',
+    # 'ecp_ets_supraghg_usd_k': 'price_with_ets_weighted_by_share_of_country_ghg',
     # # Emissions-weighted average price on emissions covered by a carbon tax.
     # # Weights: share of national jurisdiction total CO2 emissions.
-    # 'ecp_tax_supraco2_kusd': 'price_with_tax_weighted_by_share_of_country_co2',
+    # 'ecp_tax_supraco2_usd_k': 'price_with_tax_weighted_by_share_of_country_co2',
     # # Emissions-weighted average price on emissions covered by a carbon tax.
     # # Weights: share of national jurisdiction total GHG emissions.
-    # 'ecp_tax_supraghg_kusd': 'price_with_tax_weighted_by_share_of_country_ghg',
+    # 'ecp_tax_supraghg_usd_k': 'price_with_tax_weighted_by_share_of_country_ghg',
     # # CO2 emissions covered by either carbon taxes or an ETS as a share of national jurisdiction CO2 emissions.
     # 'cov_all_co2_supraco2': 'co2_with_tax_or_ets_as_share_of_country_co2',
     # # CO2 emissions covered by either carbon taxes or an ETS as a share of national jurisdiction GHG emissions.
@@ -103,96 +101,128 @@ COLUMNS = {
 }
 
 
-def sanity_checks(df_economy: pd.DataFrame, df_coverage: pd.DataFrame) -> None:
+def run_sanity_checks_on_inputs(tb_economy: Table, tb_coverage: Table) -> None:
     """Sanity checks on the raw data from meadow.
 
     Parameters
     ----------
-    df_economy : pd.DataFrame
+    tb_economy : Table
         Raw data from meadow on prices.
-    df_coverage : pd.DataFrame
+    tb_coverage : Table
         Raw data from meadow on coverage.
 
     """
-    error = "Both dataframes were expected to have the same jurisdictions (although this may not be necessary)."
-    assert set(df_economy["jurisdiction"]) == set(df_coverage["jurisdiction"]), error
+    error = "Both tables were expected to have the same jurisdictions (although this may not be necessary)."
+    assert set(tb_economy["jurisdiction"]) == set(tb_coverage["jurisdiction"]), error
     error = "Coverage should have the same (or less) years than economy (current year may be missing in coverage)."
-    assert set(df_coverage["year"]) <= set(df_economy["year"]), error
+    assert set(tb_coverage["year"]) <= set(tb_economy["year"]), error
+
+    # If the last year in the data is the current year, or if the data for the last year is missing, raise a warning.
+    for tb in [tb_economy, tb_coverage]:
+        column = tb.columns[2]
+        if (
+            tb["year"].max() == int(paths.version.split("-")[0])
+            or tb[["year", column]].groupby(["year"], observed=True).sum(min_count=1)[column].isnull().iloc[-1]
+        ):
+            log.warning("The last year in the data may be incomplete. Define LAST_INFORMED_YEAR.")
+
+
+def run_sanity_checks_on_outputs(tb_combined: Table, expected_countries_dropping_taxes: Set) -> None:
+    """Sanity checks on the output table.
+
+    Parameters
+    ----------
+    tb_combined : Table
+        Output table
+
+    """
+    error = "There should be no columns with only nans."
+    assert tb_combined.columns[tb_combined.isna().all()].empty, error
+    error = "Country named 'World' should be included in the countries file."
+    assert "World" in set(tb_combined["country"]), error
+
+    # Warn if any country suddenly drops its carbon prices to zero, which may be spurious.
+    countries_to_inspect_for_any_carbon_mechanism = []
+    for column in tb_combined.drop(columns=["country", "year"]).columns:
+        countries_without_taxes_now = set(
+            tb_combined[(tb_combined["year"] == tb_combined["year"].max()) & (tb_combined[column] == 0)]["country"]
+        )
+        countries_that_had_taxes = set(
+            tb_combined[(tb_combined["year"] == (tb_combined["year"].max() - 1)) & (tb_combined[column] > 0)]["country"]
+        )
+        countries_to_inspect = countries_without_taxes_now & countries_that_had_taxes
+        if len(countries_without_taxes_now & countries_that_had_taxes - expected_countries_dropping_taxes) > 0:
+            log.warning(
+                f"Some countries unexpectedly dropped '{column}' to zero in the last year, inspect them: "
+                f"{countries_to_inspect}"
+            )
+        countries_to_inspect_for_any_carbon_mechanism += list(countries_to_inspect)
+    # Check if the list of countries to inspect has changed.
+    if set(countries_to_inspect_for_any_carbon_mechanism) != expected_countries_dropping_taxes:
+        log.warning("The list of countries that dropped their carbon prices to zero in the last year has changed. ")
 
 
 def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Read datasets from meadow.
-    ds_economy = Dataset(MEADOW_PATH_ECONOMY)
-    ds_coverage = Dataset(MEADOW_PATH_COVERAGE)
-    # Get tables from datasets.
-    tb_economy = ds_economy[ds_economy.table_names[0]]
-    tb_coverage = ds_coverage[ds_coverage.table_names[0]]
-    # Create dataframes from tables.
-    df_economy = pd.DataFrame(tb_economy).reset_index()
-    df_coverage = pd.DataFrame(tb_coverage).reset_index()
+    # Load dataset from meadow and read its main tables.
+    ds_meadow = paths.load_dataset("emissions_weighted_carbon_price")
+    tb_economy = ds_meadow["emissions_weighted_carbon_price_economy"].reset_index()
+    tb_coverage = ds_meadow["emissions_weighted_carbon_price_coverage"].reset_index()
 
     #
     # Process data.
     #
     # Sanity checks on raw data.
-    sanity_checks(df_economy=df_economy, df_coverage=df_coverage)
+    run_sanity_checks_on_inputs(tb_economy=tb_economy, tb_coverage=tb_coverage)
 
     # Convert all values in coverage to percentages (instead of fractions).
-    df_coverage.loc[:, [column for column in df_coverage.columns if column not in ["jurisdiction", "year"]]] *= 100
+    tb_coverage.loc[:, [column for column in tb_coverage.columns if column not in ["jurisdiction", "year"]]] *= 100
 
-    # Combine both dataframes.
-    df_combined = pd.merge(df_economy, df_coverage, how="outer", on=["jurisdiction", "year"])
+    # Combine both tables.
+    tb_combined = tb_economy.merge(tb_coverage, how="outer", on=["jurisdiction", "year"], short_name=paths.short_name)
 
     # Select and rename columns.
-    df_combined = df_combined[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+    tb_combined = tb_combined[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     # Harmonize country names.
-    # Notes:
-    #  * Here it would be better to have a list of excluded countries, but this is not yet implemented
-    #  in harmonize_countries. For example, if a new country is included, it will be ignored here
-    #  (while instead it should raise a warning).
-    df_combined = geo.harmonize_countries(
-        df=df_combined,
-        countries_file=str(COUNTRIES_PATH),
-        warn_on_unused_countries=False,
-        warn_on_missing_countries=False,
-        make_missing_countries_nan=True,
+    # NOTE: In the file of excluded countries we add all sub-national regions. This way, if an actual country is added
+    # or removed, we will be warned. But, if many sub-national regions are added and including them in the excluded
+    # countries file becomes a problem, we can remove that file and impose below make_missing_countries_nan=True, and
+    # drop nans.
+    tb_combined = geo.harmonize_countries(
+        df=tb_combined,
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
+        warn_on_unused_countries=True,
+        warn_on_missing_countries=True,
     )
 
     # Remove sub-regions within a country.
-    df_combined = df_combined.dropna(subset=["country"]).reset_index(drop=True)
+    tb_combined = tb_combined.dropna(subset=["country"]).reset_index(drop=True)
 
-    # Given that the most recent data is incomplete, keep only data points prior to (or at) a certain year
-    # (given by global variables LAST_INFORMED_YEAR).
-    df_combined = df_combined[df_combined["year"] <= LAST_INFORMED_YEAR].reset_index(drop=True)
+    if LAST_INFORMED_YEAR is not None:
+        # Keep only data points prior to (or at) a certain year.
+        tb_combined = tb_combined[tb_combined["year"] <= LAST_INFORMED_YEAR].reset_index(drop=True)
 
     # Sanity checks.
-    error = "There should be no columns with only nans."
-    assert df_combined.columns[df_combined.isna().all()].empty, error
-    error = f"Country named 'World' should be included in the countries file {COUNTRIES_PATH.name}."
-    assert "World" in set(df_combined["country"]), error
+    ####################################################################################################################
+    # Some countries suddenly dropped their carbon mechanisms to zero.
+    # I will ask the data producer if any of these drops may be spurious.
+    expected_countries_dropping_taxes = {"Kazakhstan", "Denmark", "Norway", "Iceland"}
+    # expected_countries_dropping_taxes = set()
+    ####################################################################################################################
+    run_sanity_checks_on_outputs(tb_combined, expected_countries_dropping_taxes=expected_countries_dropping_taxes)
 
     # Set an appropriate index and sort conveniently.
-    df_combined = df_combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-
-    # Create main table.
-    tb_garden = underscore_table(Table(df_combined))
+    tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = Dataset.create_empty(dest_dir)
-    # Fetch metadata from any of the meadow steps (if any).
-    ds_garden.metadata = ds_economy.metadata
-    # Update dataset metadata using metadata yaml file.
-    ds_garden.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
-    # Update main table metadata using metadata yaml file.
-    tb_garden.update_metadata_from_yaml(METADATA_PATH, TABLE_NAME)
-    # Add tables to dataset.
-    ds_garden.add(tb_garden)
-    # Save dataset.
+    ds_garden = create_dataset(
+        dest_dir=dest_dir, tables=[tb_combined], default_metadata=ds_meadow.metadata, check_variables_metadata=True
+    )
     ds_garden.save()
