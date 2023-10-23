@@ -16,6 +16,7 @@ Some notes:
 
 from typing import List, cast
 
+import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -161,6 +162,9 @@ def add_le_diff_and_ratios(tb: Table, columns_primary: List[str]) -> Table:
         if "ratio" in operations:
             tb_metric[f"{metric}_fm_ratio"] = tb_metric[f"{metric}_f"] / tb_metric[f"{metric}_m"]
         tb_metric = tb_metric.drop(columns=[f"{metric}_f", f"{metric}_m"])
+        # remove infinties
+        tb_metric[f"{metric}_fm_ratio"] = tb_metric[f"{metric}_fm_ratio"].replace([np.inf, -np.inf], np.nan)
+        tb_metric[f"{metric}_fm_diff"] = tb_metric[f"{metric}_fm_ratio"].replace([np.inf, -np.inf], np.nan)
         ## Set sex dimension to none
         tb_metric["sex"] = "both"
         ## optional cast

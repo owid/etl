@@ -47,7 +47,7 @@ tables:
         description_processing: |-
           The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
       central_death_rate_fm_ratio:
-        title: Central death rate (f/m)
+        title: Central death rate ratio (f/m)
         unit: ""
         description_short: |-
           <% if type == "cohort" %>
