@@ -26,12 +26,15 @@ In an ideal world, we could define all previous fields for all indicators, but i
 
 !!! info "Title hierarchy"
 
+    !!! warning "This is under development and might change soon, please check regularly for updates."
+
     In general, the hierarchy is: `presentation.title_public > presentation.grapher_config.title > display.name > indicator.title`
 
     The following places on our (internal/public) website will be populated using this hierarchy:
 
     - **Admin**: `indicator.title`
     - **Charts**:
-        - **'Learn more about this data'** and **Table view** (and possibly other public places): `display.name > indicator.title`
+        - **Table view**: `display.name > indicator.title`
         - **Chart title**: `presentation.grapher_config.title > display.name > indicator.title`
+        - **Learn more about this data**: (and possibly other public places): `presentation.title_public > indicator.title`
     - **Data page title**: `presentation.title_public > presentation.grapher_config.title > indicator.title`
