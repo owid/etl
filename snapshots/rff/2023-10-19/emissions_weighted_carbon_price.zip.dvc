@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: Emissions-weighted Carbon Price
     description: |-
-      The Emissions-weighted Carbon Price (ECP) is an economy-wide average price on CO2 emissions. It is calculated from sector-fuel level data, which is aggregated back to the economy level using the share of each sector-fuel CO2 emissions in total GHG emissions as weights. The full methodology is described in the Resources for the Future Working Paper 22-6 [Emissions-weighted carbon price: Sources and Methods](https://www.rff.org/publications/working-papers/emissions-weighted-carbon-price-sources-and-methods/).
+      The Emissions-weighted Carbon Price (ECP) is an economy-wide average price on CO₂ emissions. It is calculated from sector-fuel level data, which is aggregated back to the economy level using the share of each sector-fuel CO₂ emissions in total GHG emissions as weights. The full methodology is described in the Resources for the Future Working Paper 22-6 [Emissions-weighted carbon price: Sources and Methods](https://www.rff.org/publications/working-papers/emissions-weighted-carbon-price-sources-and-methods/).
     date_published: 2023-10-09
 
     # Citation
