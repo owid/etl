@@ -111,8 +111,8 @@ def add_le_diff_and_ratios(tb: Table, columns_primary: List[str]) -> Table:
     """Add metrics on life expectancy ratios and differences between females and males."""
     ## Get relevant metric, split into f and m tables
     metrics = {
-        "life_expectancy": ["ratio", "diff"],
-        "central_death_rate": ["ratio"],
+        "life_expectancy": ["ratio_fm", "diff_fm"],
+        "central_death_rate": ["ratio_mf"],
     }
     for metric, operations in metrics.items():
         tb_metric = tb[columns_primary + [metric]].dropna(subset=[metric])
@@ -122,14 +122,20 @@ def add_le_diff_and_ratios(tb: Table, columns_primary: List[str]) -> Table:
         ## Merge f and m tables
         tb_metric = tb_metric_f.merge(tb_metric_m, on=list(set(columns_primary) - {"sex"}), suffixes=("_f", "_m"))
         ## Calculate extra variables
-        if "diff" in operations:
+        if "diff_fm" in operations:
             tb_metric[f"{metric}_fm_diff"] = tb_metric[f"{metric}_f"] - tb_metric[f"{metric}_m"]
-        if "ratio" in operations:
+            tb_metric[f"{metric}_fm_diff"] = tb_metric[f"{metric}_fm_diff"].replace([np.inf, -np.inf], np.nan)
+        if "diff_mf" in operations:
+            tb_metric[f"{metric}_mf_diff"] = tb_metric[f"{metric}_m"] - tb_metric[f"{metric}_f"]
+            tb_metric[f"{metric}_mf_diff"] = tb_metric[f"{metric}_mf_diff"].replace([np.inf, -np.inf], np.nan)
+        if "ratio_fm" in operations:
             tb_metric[f"{metric}_fm_ratio"] = tb_metric[f"{metric}_f"] / tb_metric[f"{metric}_m"]
+            tb_metric[f"{metric}_fm_ratio"] = tb_metric[f"{metric}_fm_ratio"].replace([np.inf, -np.inf], np.nan)
+        if "ratio_mf" in operations:
+            tb_metric[f"{metric}_mf_ratio"] = tb_metric[f"{metric}_m"] / tb_metric[f"{metric}_f"]
+            tb_metric[f"{metric}_mf_ratio"] = tb_metric[f"{metric}_mf_ratio"].replace([np.inf, -np.inf], np.nan)
+        # drop individual sex columns
         tb_metric = tb_metric.drop(columns=[f"{metric}_f", f"{metric}_m"])
-        # remove infinties
-        tb_metric[f"{metric}_fm_ratio"] = tb_metric[f"{metric}_fm_ratio"].replace([np.inf, -np.inf], np.nan)
-        tb_metric[f"{metric}_fm_diff"] = tb_metric[f"{metric}_fm_ratio"].replace([np.inf, -np.inf], np.nan)
         ## Set sex dimension to none
         tb_metric["sex"] = "both"
         ## optional cast
