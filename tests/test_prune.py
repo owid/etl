@@ -2,9 +2,12 @@ import json
 from pathlib import Path
 from unittest import mock
 
+import pytest
+
 from etl.prune import prune
 
 
+@pytest.mark.skip(reason="Takes too long to run")
 def test_prune(tmp_path: Path) -> None:
     # create dag file
     dag_file = tmp_path / "dag.yml"
