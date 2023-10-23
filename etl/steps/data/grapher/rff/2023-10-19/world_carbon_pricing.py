@@ -10,8 +10,8 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load garden dataset and read the table on carbon pricing on any sector.
-    ds_garden = paths.load_dataset("emissions_weighted_carbon_price")
-    tb_garden = ds_garden["emissions_weighted_carbon_price"]
+    ds_garden = paths.load_dataset("world_carbon_pricing")
+    tb_garden = ds_garden["world_carbon_pricing_any_sector"]
 
     #
     # Save outputs.
