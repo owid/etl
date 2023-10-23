@@ -13,22 +13,29 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("hmd")
+    ds_meadow = paths.load_dataset("life_tables")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["hmd"]
+    tb = ds_meadow["life_tables"]
 
     #
     # Process data.
     #
     # Filter relevant dimensions
-    tb = tb.loc[("1x1", "period", slice(None), slice(None), slice(None), "0"), ["life_expectancy"]].reset_index()
+    tb = tb.loc[("period", slice(None), slice(None), slice(None), "0"), ["life_expectancy"]].reset_index()
 
     # Keep relevant columns and rows
-    tb = tb.drop(columns=["format", "type", "age"]).dropna()
+    tb = tb.drop(columns=["type", "age"]).dropna()
 
     # Dtypes
     tb["year"] = tb["year"].astype(str).astype(int)
+
+    # Rename column
+    tb = tb.rename(columns={"location": "country"})
+
+    # Only preserve countries coming from HDM
+    countries_hmd = set(tb.loc[tb["year"] < 1950, "country"])
+    tb = tb[tb["country"].isin(countries_hmd)]
 
     # Get max for each year
     tb = tb.loc[tb.groupby(["year", "sex"], observed=True)["life_expectancy"].idxmax()]
