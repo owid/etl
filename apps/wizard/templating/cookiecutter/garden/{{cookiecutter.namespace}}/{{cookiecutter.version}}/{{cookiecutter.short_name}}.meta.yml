@@ -1,4 +1,13 @@
 # NOTE: To learn more about the fields, hover over their names.
+{%- if cookiecutter.topic_tags %}
+definitions:
+  commons:
+    presentation:
+      topic_tags:
+{%- filter indent(width=8) %}
+{{cookiecutter.topic_tags}}
+{%- endfilter -%}
+{%- endif %}
 
 
 # Learn more about the available fields:
