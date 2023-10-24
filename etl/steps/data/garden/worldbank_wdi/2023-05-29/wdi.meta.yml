@@ -1954,7 +1954,6 @@ tables:
           tolerance: 5
         origins:  # Going forward this will usually come from snapshots in this form but you could also set it here
         - producer: World Bank
-          # UNICEF, World Health Organization and World Bank
           title: World Development Indicators
           description: >-
             The World Development Indicators (WDI) is the primary
@@ -1964,7 +1963,7 @@ tables:
             data available, and includes national, regional and
             global estimates.
 
-            \[Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)\]
+            [Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)]
           attribution: International Telecommunication Union (via World Bank) # This is an override that we would want to do for many indicators in the WDI especially
           attribution_short: World Bank
           citation_full: ""
@@ -1985,33 +1984,28 @@ tables:
           title_public: Share of the population using the Internet
           # title_variant: WDI
           title_variant: International Telecommunication Union
-          attribution_short: the World Bank
           # attribution: # defaults to origin[*].producer so does not have to be set here
           topic_tags:
-          - Technological Progress
+          - Technological Change
           - Internet
-          - Loneliness and Social Connections
+          - Loneliness & Social Connections
           faqs: []
           grapher_config:
-            slug: share-of-individuals-using-the-internet
             title: Share of the population using the Internet
             subtitle: 'Share of the population who [used the Internet](#dod:internetuser) in the last three months.'
+            timelineMinTime: 1990
             sourceDesc: International Telecommunication Union (via World Bank)
             originUrl: https://ourworldindata.org/internet
             hideAnnotationFieldsInTitle:
               time: true
               entity: true
               changeInPrefix: true
-            minTime: 1960
-            maxTime: 2020
-            timelineMinTime: 1990
             hasMapTab: true
             yAxis:
               min: 0
               max: 100
             map:
               timeTolerance: 5
-              columnSlug: '735493'
               colorScale:
                   baseColorScheme: Blues
                   colorSchemeInvert: false
