@@ -45,11 +45,10 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
+from shared import add_indicators_extra, expand_observations
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-
-from .shared import add_indicators_conflict_rate, expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -147,9 +146,14 @@ def run(dest_dir: str) -> None:
     assert (tb["region"] != -9).all(), "-9 region still detected!"
 
     # Add conflict rates
-    log.info("war.cow: map fatality codes to names")
+    paths.log.info("add conflict rate and conflict mortality indicators")
     tb_regions = tb_regions[~tb_regions["region"].isin(["Sub-Saharan Africa", "North Africa and the Middle East"])]
-    tb = add_indicators_conflict_rate(tb, tb_regions, ["number_ongoing_conflicts", "number_new_conflicts"])
+    tb = add_indicators_extra(
+        tb,
+        tb_regions,
+        columns_conflict_rate=["number_ongoing_conflicts", "number_new_conflicts"],
+        columns_conflict_mortality=["number_deaths_ongoing_conflicts"],
+    )
 
     # Add suffix with source name
     msk = tb["region"] != "World"

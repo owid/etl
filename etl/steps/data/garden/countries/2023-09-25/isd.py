@@ -3,7 +3,8 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from shared import (
-    add_latest_years_with_constat_num_countries,
+    add_latest_years_with_constant_num_countries,
+    add_population_to_table,
     init_table_countries_in_region,
 )
 from structlog import get_logger
@@ -26,6 +27,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("isd")
+    # Load population table
+    ds_pop = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["isd"].reset_index()
@@ -44,9 +47,18 @@ def run(dest_dir: str) -> None:
     log.info("isd: fixing data")
     tb = fix_data(tb)
 
+    # Format table
+    tb_formatted = format_table(tb)
+
     # Create new table
     log.info("isd: creating table with countries in region")
-    tb_regions = create_table_countries_in_region(tb=tb)
+    tb_regions = create_table_countries_in_region(tb=tb_formatted)
+
+    # Population table
+    tb_pop = add_population_to_table(tb_formatted, ds_pop, country_col="statename", region_alt=True)
+
+    # Combine tables
+    tb_regions = tb_regions.merge(tb_pop, how="left", on=["region", "year"])
 
     # Add to tables list
     tables = [
@@ -103,8 +115,13 @@ def fix_data(tb: Table) -> Table:
     return tb
 
 
-def create_table_countries_in_region(tb: Table) -> Table:
-    """Create table with number of countries in each region per year."""
+def format_table(tb: Table) -> Table:
+    """Format table.
+
+    - Create years
+    - Expand observations
+    - Map countries to regions
+    """
     tb = init_table_countries_in_region(
         tb,
         date_format="%d-%m-%Y",
@@ -114,8 +131,14 @@ def create_table_countries_in_region(tb: Table) -> Table:
         column_country="statename",
     )
 
-    # Get region name, then obtain number of countries per region per year
+    # Get region name
     tb["region"] = tb["cownum"].apply(code_to_region)
+
+    return tb
+
+
+def create_table_countries_in_region(tb: Table) -> Table:
+    """Create table with number of countries in each region per year."""
     # Get number of countries per region per year
     tb_regions = (
         tb.groupby(["region", "year"], as_index=False)
@@ -163,7 +186,7 @@ def create_table_countries_in_region(tb: Table) -> Table:
     tb_regions = pr.concat([tb_regions, tb_world], ignore_index=True, short_name="isd_regions")
 
     # Finish by adding missing last years
-    tb_regions = add_latest_years_with_constat_num_countries(
+    tb_regions = add_latest_years_with_constant_num_countries(
         tb_regions,
         column_year="year",
         expected_last_year=EXPECTED_LAST_YEAR,

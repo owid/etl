@@ -410,6 +410,8 @@ tables:
         description: |
           The Gender Development Index (GDI) measures gender inequalities in achievement in three basic dimensions of human development: health, measured by female and male life expectancy at birth; education, measured by female and male expected years of schooling for children and female and male mean years of schooling for adults ages 25 years and older; and command over economic resources, measured by female and male estimated earned income.
 
+          Values below 1 indicate higher human development for men than women, while values above 1 indicate the opposite. Values close to 1 therefore indicate higher gender equality.
+
           For more details read the technical note at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
         display:
           numDecimalPlaces: 3
