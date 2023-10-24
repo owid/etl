@@ -53,6 +53,10 @@ def run(dest_dir: str) -> None:
     tb = tb.underscore().sort_index()
     tb = tb.drop(["share_total", "value_total_share"], axis=1)  # Remove the total from total column
 
+    # Create a category that combines littered and mismanaged
+    tb["littered_mismanaged_combined"] = tb["value_littered"] + tb["value_mismanaged"]
+    tb["littered_mismanaged_combined_share"] = tb["value_littered_share"] + tb["value_mismanaged_share"]
+
     #
     # Save outputs.
     #

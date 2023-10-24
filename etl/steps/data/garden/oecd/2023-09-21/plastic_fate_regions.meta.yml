@@ -125,3 +125,15 @@ tables:
         short_unit: '%'
         display:
           numDecimalPlaces: 0
+      littered_mismanaged_combined:
+        title: Littered and mismanaged
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      littered_mismanaged_combined_share:
+        title: Share of littered and mismanaged from total regional waste
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
