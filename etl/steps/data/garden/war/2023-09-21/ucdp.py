@@ -23,11 +23,10 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
+from shared import add_indicators_extra
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-
-from .shared import add_indicators_extra
 
 log = get_logger()
 
