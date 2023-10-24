@@ -10,9 +10,6 @@ meta:
     date_accessed: '2023-10-24'
     license:
       name: CC BY 4.0
-  license:
-    name: CC BY 4.0
-  is_public: true
 wdir: ../../../data/snapshots/animal_welfare/2023-10-24
 outs:
 - md5: bb6e0f8b9a05a8d7c446be2f1d6f9613
