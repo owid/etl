@@ -1,5 +1,5 @@
 dataset:
-  update_period_days: 365
+  update_period_days: 730
   sources: []
 definitions:
   common:
@@ -12,7 +12,7 @@ definitions:
 
           This dataset contains time-series of population abundance data for vertebrate species spanning years between 1970 and 2021. This is the public version of the database as confidential records that cannot be shared have been removed. The open-source code used to calculate the Living Planet Index using this data set can be found here: [https://github.com/Zoological-Society-of-London/rlpi](https://github.com/Zoological-Society-of-London/rlpi).
 
-          \[Text from [Living PIanet Index website](https://www.livingplanetindex.org/data_portal)\]
+          \[Text from [Living Planet Index website](https://www.livingplanetindex.org/data_portal)\]
         citation_full:
           World Wildlife Fund (WWF) and Zoological Society of London (2022). Living Planet Report 2022 – Building
           a nature-positive society. Almond, R.E.A., Grooten, M., Juffe Bignoli, D. & Petersen, T. (Eds). WWF, Gland, Switzerland.
@@ -29,9 +29,7 @@ definitions:
       #     weight than groups with fewer species. Using a method developed by ZSL and WWF, these species population trends are
       #     aggregated to produce indices of the state of biodiversity.
 
-
       #     The index value is measured relative to species' populations in 1970 (i.e. 1970 = 1).
-
 
       #     To calculate an LPI, a generalised additive modelling framework is used to determine the underlying trend in each population
       #     time-series. Average rates of change are then calculated and aggregated to the species level. For the global LPI, the
@@ -64,13 +62,15 @@ tables:
           - The Living Planet Index aggregates observations on changes in population size, and similar metrics, across tens of thousands of animal populations.
           - Its 2022 report included figures across 30,000 wildlife populations. This captures everything from frogs to elephant species, rhinos to owls, from every continent on Earth.
         description_from_producer: |-
-          The Living Planet Index (LPI) tracks changes in the relative abundance of wild species populations over time. The global Index is constructed by calculating an average trend for tens of thousands of terrestrial, freshwater and marine vertebrate populations from across the globe.
+          _The Living Planet Index (LPI) tracks changes in the relative abundance of wild species populations over time. The global Index is constructed by calculating an average trend for tens of thousands of terrestrial, freshwater and marine vertebrate populations from across the globe._
 
-          \[Text from [Living Planet Report 2022](https://wwfint.awsassets.panda.org/downloads/embargo_13_10_2022_lpr_2022_full_report_single_page_1.pdf)\]
 
-          The data used in constructing the LPI are time-series of either population size, density (population size per unit area), abundance (number of individuals per sample) or a proxy of abundance (for example, the number of nests recorded may be used instead of a direct population count).
+          [Text from [Living Planet Report 2022](https://wwfint.awsassets.panda.org/downloads/embargo_13_10_2022_lpr_2022_full_report_single_page_1.pdf)]
 
-          \[Text from [Living Planet Index website](https://www.livingplanetindex.org/about_index)\]
+
+          _The data used in constructing the LPI are time-series of either population size, density (population size per unit area), abundance (number of individuals per sample) or a proxy of abundance (for example, the number of nests recorded may be used instead of a direct population count)._
+
+          [Text from [Living Planet Index website](https://www.livingplanetindex.org/about_index)]
         presentation:
           title_variant: Zoological Society of London
           attribution_short: WWF and Zoological Society of London
@@ -111,15 +111,15 @@ tables:
               min: 0
               max: 0
             map:
-              columnSlug: '8524'
+              columnSlug: "8524"
               time: 1980
               timeTolerance: 1
               colorScale:
                 baseColorScheme: BuGn
                 binningStrategy: equalInterval
-                legendDescription: ''
+                legendDescription: ""
             selectedEntityNames:
               - World
             selectedEntityColors:
-              World: '#adadad'
+              World: "#adadad"
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
