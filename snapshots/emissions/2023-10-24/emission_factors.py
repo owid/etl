@@ -1,8 +1,8 @@
 """Script to create a snapshot of dataset.
 
 To create a snapshot of the dataset, follow these steps:
-* Go to https://www.ipcc-nggip.iges.or.jp/EFDB/
-* Click on the button "Export to XLS".
+* Go to https://www.ipcc-nggip.iges.or.jp/EFDB/find_ef.php
+* Search for "Export to XLS" in the page, and click on that button.
 * Run this snapshot using the flag "--path-to-file" followed by the path to the downloaded file.
 
 """
