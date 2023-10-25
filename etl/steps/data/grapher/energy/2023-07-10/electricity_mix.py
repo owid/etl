@@ -27,6 +27,14 @@ def run(dest_dir: str) -> None:
     # NOTE: Chart [Electricity production by source](https://ourworldindata.org/grapher/electricity-prod-source-stacked)
     # has a timeline starting in 1990 (instead of 1985) because the data is incomplete for many countries between 1985
     # and 1990. If EI data changes in the future and is more complete in that range, remove the timeline restriction.
+    # The issue happens, for example, to Denmark.
+    # However, this issue happens also in other countries at a later date, for example, Algeria in 2000.
+    # The best would be to fix these issues in the data (possibly create new variables filling certain nans to zero, and
+    # removing data if not all relevant fuels are informed).
+    # For now, check that the issue is still present (and hence cutting at 1990 is a good temporary solution).
+    error = "Data availability has changed. Edit temporary solution in grapher step."
+    assert tb.loc["Denmark"].loc[1989][["coal_generation__twh"]].isnull().item(), error
+    assert tb.loc["Denmark"].loc[1990][["coal_generation__twh"]].notnull().item(), error
 
     #
     # Save outputs.

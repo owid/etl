@@ -1,197 +1,200 @@
 steps:
-  data://open_numbers/open_numbers/latest/bp__energy:
-    - github://open-numbers/ddf--bp--energy
-  data://open_numbers/open_numbers/latest/cait__historical_emissions:
-    - github://open-numbers/ddf--cait--historical_emissions
-  data://open_numbers/open_numbers/latest/cdiac__co2:
-    - github://open-numbers/ddf--cdiac--co2
-  data://open_numbers/open_numbers/latest/clio_infra__indicators:
-    - github://open-numbers/ddf--clio_infra--indicators
-  data://open_numbers/open_numbers/latest/cred__em_dat:
-    - github://open-numbers/ddf--cred--em_dat
-  data://open_numbers/open_numbers/latest/ecdc__covid_19_geographic_distribution:
-    - github://open-numbers/ddf--ecdc--covid_19_geographic_distribution
-  data://open_numbers/open_numbers/latest/energy_flows_usa:
-    - github://open-numbers/ddf--energy_flows_usa
-  data://open_numbers/open_numbers/latest/gapminder__atlas_of_economic_complexity:
-    - github://open-numbers/ddf--gapminder--atlas_of_economic_complexity
-  data://open_numbers/open_numbers/latest/gapminder__bp_energy:
-    - github://open-numbers/ddf--gapminder--bp_energy
-  data://open_numbers/open_numbers/latest/gapminder__child_mortality:
-    - github://open-numbers/ddf--gapminder--child_mortality
-  data://open_numbers/open_numbers/latest/gapminder__co2_emission:
-    - github://open-numbers/ddf--gapminder--co2_emission
-  data://open_numbers/open_numbers/latest/gapminder__dont_panic_poverty:
-    - github://open-numbers/ddf--gapminder--dont_panic_poverty
-  data://open_numbers/open_numbers/latest/gapminder__fao_fra:
-    - github://open-numbers/ddf--gapminder--fao_fra
-  data://open_numbers/open_numbers/latest/gapminder__fasttrack:
-    - github://open-numbers/ddf--gapminder--fasttrack
-  data://open_numbers/open_numbers/latest/gapminder__fertility_rate:
-    - github://open-numbers/ddf--gapminder--fertility_rate
-  data://open_numbers/open_numbers/latest/gapminder__gapminder_world:
-    - github://open-numbers/ddf--gapminder--gapminder_world
-  data://open_numbers/open_numbers/latest/gapminder__gbd_indicators:
-    - github://open-numbers/ddf--gapminder--gbd_indicators
-  data://open_numbers/open_numbers/latest/gapminder__gdp_per_capita_cppp:
-    - github://open-numbers/ddf--gapminder--gdp_per_capita_cppp
-  data://open_numbers/open_numbers/latest/gapminder__geo_entity_domain:
-    - github://open-numbers/ddf--gapminder--geo_entity_domain
-  data://open_numbers/open_numbers/latest/gapminder__gini:
-    - github://open-numbers/ddf--gapminder--gini
-  data://open_numbers/open_numbers/latest/gapminder__hist_gdppc:
-    - github://open-numbers/ddf--gapminder--hist_gdppc
-  data://open_numbers/open_numbers/latest/gapminder__hist_hiv:
-    - github://open-numbers/ddf--gapminder--hist_hiv
-  data://open_numbers/open_numbers/latest/gapminder__hist_imr:
-    - github://open-numbers/ddf--gapminder--hist_imr
-  data://open_numbers/open_numbers/latest/gapminder__hist_lex:
-    - github://open-numbers/ddf--gapminder--hist_lex
-  data://open_numbers/open_numbers/latest/gapminder__hist_marriage_age:
-    - github://open-numbers/ddf--gapminder--hist_marriage_age
-  data://open_numbers/open_numbers/latest/gapminder__hist_maternal_mort:
-    - github://open-numbers/ddf--gapminder--hist_maternal_mort
-  data://open_numbers/open_numbers/latest/gapminder__hist_u5mr:
-    - github://open-numbers/ddf--gapminder--hist_u5mr
-  data://open_numbers/open_numbers/latest/gapminder__ihme_edu_attainment:
-    - github://open-numbers/ddf--gapminder--ihme_edu_attainment
-  data://open_numbers/open_numbers/latest/gapminder__ihme_lex:
-    - github://open-numbers/ddf--gapminder--ihme_lex
-  data://open_numbers/open_numbers/latest/gapminder__ilostat:
-    - github://open-numbers/ddf--gapminder--ilostat
-  data://open_numbers/open_numbers/latest/gapminder__legal_slavery:
-    - github://open-numbers/ddf--gapminder--legal_slavery
-  data://open_numbers/open_numbers/latest/gapminder__life_expectancy:
-    - github://open-numbers/ddf--gapminder--life_expectancy
-  data://open_numbers/open_numbers/latest/gapminder__life_expectancy_historic:
-    - github://open-numbers/ddf--gapminder--life_expectancy_historic
-  data://open_numbers/open_numbers/latest/gapminder__misconception_surveys:
-    - github://open-numbers/ddf--gapminder--misconception_surveys
-  data://open_numbers/open_numbers/latest/gapminder__ontology:
-    - github://open-numbers/ddf--gapminder--ontology
-  data://open_numbers/open_numbers/latest/gapminder__population:
-    - github://open-numbers/ddf--gapminder--population
-  data://open_numbers/open_numbers/latest/gapminder__population_by_income_group:
-    - github://open-numbers/ddf--gapminder--population_by_income_group
-  data://open_numbers/open_numbers/latest/gapminder__population_historic:
-    - github://open-numbers/ddf--gapminder--population_historic
-  data://open_numbers/open_numbers/latest/gapminder__static_assets:
-    - github://open-numbers/ddf--gapminder--static_assets
-  data://open_numbers/open_numbers/latest/gapminder__suicide_homicide_traffic_death_rates:
-    - github://open-numbers/ddf--gapminder--suicide_homicide_traffic_death_rates
+  # Open numbers datasets we use in other ETL steps
   data://open_numbers/open_numbers/latest/gapminder__systema_globalis:
     - github://open-numbers/ddf--gapminder--systema_globalis
-  data://open_numbers/open_numbers/latest/gapminder__unfao_faostat:
-    - github://open-numbers/ddf--gapminder--unfao_faostat
-  data://open_numbers/open_numbers/latest/gapminder__unpop_wpp:
-    - github://open-numbers/ddf--gapminder--unpop_wpp
-  data://open_numbers/open_numbers/latest/gapminder__wpp_annual_indicators:
-    - github://open-numbers/ddf--gapminder--wpp_annual_indicators
-  data://open_numbers/open_numbers/latest/gdl__area_db:
-    - github://open-numbers/ddf--gdl--area_db
-  data://open_numbers/open_numbers/latest/global_carbon_project__global_carbon_budget:
-    - github://open-numbers/ddf--global_carbon_project--global_carbon_budget
-  data://open_numbers/open_numbers/latest/harvard__country_complexity_rankings:
-    - github://open-numbers/ddf--harvard--country_complexity_rankings
-  data://open_numbers/open_numbers/latest/iarc__ci5:
-    - github://open-numbers/ddf--iarc--ci5
-  data://open_numbers/open_numbers/latest/igme__cme:
-    - github://open-numbers/ddf--igme--cme
-  data://open_numbers/open_numbers/latest/ihme__death_cause_compact:
-    - github://open-numbers/ddf--ihme--death_cause_compact
-  data://open_numbers/open_numbers/latest/ihme__edu_attainment:
-    - github://open-numbers/ddf--ihme--edu_attainment
-  data://open_numbers/open_numbers/latest/ihme__global_burden_disease_cancer_incidence:
-    - github://open-numbers/ddf--ihme--global_burden_disease_cancer_incidence
-  data://open_numbers/open_numbers/latest/ihme__global_burden_disease_dalys_by_risk:
-    - github://open-numbers/ddf--ihme--global_burden_disease_dalys_by_risk
-  data://open_numbers/open_numbers/latest/ihme__global_burden_disease_death_number:
-    - github://open-numbers/ddf--ihme--global_burden_disease_death_number
-  data://open_numbers/open_numbers/latest/ihme__global_burden_disease_death_rate:
-    - github://open-numbers/ddf--ihme--global_burden_disease_death_rate
-  data://open_numbers/open_numbers/latest/ihme__global_burden_disease_deaths_by_risk:
-    - github://open-numbers/ddf--ihme--global_burden_disease_deaths_by_risk
-  data://open_numbers/open_numbers/latest/ihme__global_burden_disease_disability_life_lost:
-    - github://open-numbers/ddf--ihme--global_burden_disease_disability_life_lost
-  data://open_numbers/open_numbers/latest/ihme__global_burden_disease_etiology:
-    - github://open-numbers/ddf--ihme--global_burden_disease_etiology
-  data://open_numbers/open_numbers/latest/ihme__global_burden_disease_impairment:
-    - github://open-numbers/ddf--ihme--global_burden_disease_impairment
-  data://open_numbers/open_numbers/latest/ihme__global_burden_disease_maternal_mortality:
-    - github://open-numbers/ddf--ihme--global_burden_disease_maternal_mortality
-  data://open_numbers/open_numbers/latest/ihme__global_burden_disease_ylds_by_risk:
-    - github://open-numbers/ddf--ihme--global_burden_disease_ylds_by_risk
-  data://open_numbers/open_numbers/latest/ihme__global_burden_disease_ylls_by_risk:
-    - github://open-numbers/ddf--ihme--global_burden_disease_ylls_by_risk
-  data://open_numbers/open_numbers/latest/ihme__lex:
-    - github://open-numbers/ddf--ihme--lex
-  data://open_numbers/open_numbers/latest/ilo__ilostat:
-    - github://open-numbers/ddf--ilo--ilostat
-  data://open_numbers/open_numbers/latest/imf__weo:
-    - github://open-numbers/ddf--imf--weo
-  data://open_numbers/open_numbers/latest/imperial__metabolic:
-    - github://open-numbers/ddf--imperial--metabolic
-  data://open_numbers/open_numbers/latest/mit__economic_complexity_rankings:
-    - github://open-numbers/ddf--mit--economic_complexity_rankings
-  data://open_numbers/open_numbers/latest/oecd__dac:
-    - github://open-numbers/ddf--oecd--dac
-  data://open_numbers/open_numbers/latest/open_numbers:
-    - github://open-numbers/ddf--open_numbers
-  data://open_numbers/open_numbers/latest/open_numbers__covid_19_geographic_distribution:
-    - github://open-numbers/ddf--open_numbers--covid_19_geographic_distribution
-  data://open_numbers/open_numbers/latest/open_numbers__covid_government_response:
-    - github://open-numbers/ddf--open_numbers--covid_government_response
   data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators:
     - github://open-numbers/ddf--open_numbers--world_development_indicators
-  data://open_numbers/open_numbers/latest/open_numbers__yearly_data_as_daily:
-    - github://open-numbers/ddf--open_numbers--yearly_data_as_daily
-  data://open_numbers/open_numbers/latest/oxford__covid_government_response:
-    - github://open-numbers/ddf--oxford--covid_government_response
-  data://open_numbers/open_numbers/latest/pwt__penn_world_table:
-    - github://open-numbers/ddf--pwt--penn_world_table
-  data://open_numbers/open_numbers/latest/sodertorn__stockholm_lan_basomrade:
-    - github://open-numbers/ddf--sodertorn--stockholm_lan_basomrade
-  data://open_numbers/open_numbers/latest/sodertornsmodellen:
-    - github://open-numbers/ddf--sodertornsmodellen
-  data://open_numbers/open_numbers/latest/transparency_international__corruption_perception_index:
-    - github://open-numbers/ddf--transparency_international--corruption_perception_index
-  data://open_numbers/open_numbers/latest/uis__stats:
-    - github://open-numbers/ddf--uis--stats
-  data://open_numbers/open_numbers/latest/unaids__aidsinfo:
-    - github://open-numbers/ddf--unaids--aidsinfo
-  data://open_numbers/open_numbers/latest/undp__hdi:
-    - github://open-numbers/ddf--undp--hdi
-  data://open_numbers/open_numbers/latest/unfao__aquastat:
-    - github://open-numbers/ddf--unfao--aquastat
-  data://open_numbers/open_numbers/latest/unfao__faostat:
-    - github://open-numbers/ddf--unfao--faostat
-  data://open_numbers/open_numbers/latest/unfao__fra:
-    - github://open-numbers/ddf--unfao--fra
-  data://open_numbers/open_numbers/latest/unhcr__population_statistics:
-    - github://open-numbers/ddf--unhcr--population_statistics
-  data://open_numbers/open_numbers/latest/unicef__immunization:
-    - github://open-numbers/ddf--unicef--immunization
-  data://open_numbers/open_numbers/latest/unpop__family_planning_indicators:
-    - github://open-numbers/ddf--unpop--family_planning_indicators
-  data://open_numbers/open_numbers/latest/unpop__international_migrant_stock:
-    - github://open-numbers/ddf--unpop--international_migrant_stock
-  data://open_numbers/open_numbers/latest/unpop__world_population_prospects:
-    - github://open-numbers/ddf--unpop--world_population_prospects
-  data://open_numbers/open_numbers/latest/unstats__sdg_indicators:
-    - github://open-numbers/ddf--unstats--sdg_indicators
-  data://open_numbers/open_numbers/latest/wb__edu:
-    - github://open-numbers/ddf--wb--edu
-  data://open_numbers/open_numbers/latest/who__child_causes_of_death:
-    - github://open-numbers/ddf--who--child_causes_of_death
-  data://open_numbers/open_numbers/latest/who__gho:
-    - github://open-numbers/ddf--who--gho
-  data://open_numbers/open_numbers/latest/who__global_health_expenditure:
-    - github://open-numbers/ddf--who--global_health_expenditure
-  data://open_numbers/open_numbers/latest/who__tb_burden_estimates:
-    - github://open-numbers/ddf--who--tb_burden_estimates
-  data://open_numbers/open_numbers/latest/who__violence_injury_prevention:
-    - github://open-numbers/ddf--who--violence_injury_prevention
-  data://open_numbers/open_numbers/latest/world_bank__world_development_indicators:
-    - github://open-numbers/ddf--world_bank--world_development_indicators
-  data://open_numbers/open_numbers/latest/worldbank__povcalnet:
-    - github://open-numbers/ddf--worldbank--povcalnet
+
+  # Datasets we don't use anywhere. Feel free to uncomment them if you need them.
+  # data://open_numbers/open_numbers/latest/bp__energy:
+  #   - github://open-numbers/ddf--bp--energy
+  # data://open_numbers/open_numbers/latest/cait__historical_emissions:
+  #   - github://open-numbers/ddf--cait--historical_emissions
+  # data://open_numbers/open_numbers/latest/cdiac__co2:
+  #   - github://open-numbers/ddf--cdiac--co2
+  # data://open_numbers/open_numbers/latest/clio_infra__indicators:
+  #   - github://open-numbers/ddf--clio_infra--indicators
+  # data://open_numbers/open_numbers/latest/cred__em_dat:
+  #   - github://open-numbers/ddf--cred--em_dat
+  # data://open_numbers/open_numbers/latest/ecdc__covid_19_geographic_distribution:
+  #   - github://open-numbers/ddf--ecdc--covid_19_geographic_distribution
+  # data://open_numbers/open_numbers/latest/energy_flows_usa:
+  #   - github://open-numbers/ddf--energy_flows_usa
+  # data://open_numbers/open_numbers/latest/gapminder__atlas_of_economic_complexity:
+  #   - github://open-numbers/ddf--gapminder--atlas_of_economic_complexity
+  # data://open_numbers/open_numbers/latest/gapminder__bp_energy:
+  #   - github://open-numbers/ddf--gapminder--bp_energy
+  # data://open_numbers/open_numbers/latest/gapminder__child_mortality:
+  #   - github://open-numbers/ddf--gapminder--child_mortality
+  # data://open_numbers/open_numbers/latest/gapminder__co2_emission:
+  #   - github://open-numbers/ddf--gapminder--co2_emission
+  # data://open_numbers/open_numbers/latest/gapminder__dont_panic_poverty:
+  #   - github://open-numbers/ddf--gapminder--dont_panic_poverty
+  # data://open_numbers/open_numbers/latest/gapminder__fao_fra:
+  #   - github://open-numbers/ddf--gapminder--fao_fra
+  # data://open_numbers/open_numbers/latest/gapminder__fasttrack:
+  #   - github://open-numbers/ddf--gapminder--fasttrack
+  # data://open_numbers/open_numbers/latest/gapminder__fertility_rate:
+  #   - github://open-numbers/ddf--gapminder--fertility_rate
+  # data://open_numbers/open_numbers/latest/gapminder__gapminder_world:
+  #   - github://open-numbers/ddf--gapminder--gapminder_world
+  # data://open_numbers/open_numbers/latest/gapminder__gbd_indicators:
+  #   - github://open-numbers/ddf--gapminder--gbd_indicators
+  # data://open_numbers/open_numbers/latest/gapminder__gdp_per_capita_cppp:
+  #   - github://open-numbers/ddf--gapminder--gdp_per_capita_cppp
+  # data://open_numbers/open_numbers/latest/gapminder__geo_entity_domain:
+  #   - github://open-numbers/ddf--gapminder--geo_entity_domain
+  # data://open_numbers/open_numbers/latest/gapminder__gini:
+  #   - github://open-numbers/ddf--gapminder--gini
+  # data://open_numbers/open_numbers/latest/gapminder__hist_gdppc:
+  #   - github://open-numbers/ddf--gapminder--hist_gdppc
+  # data://open_numbers/open_numbers/latest/gapminder__hist_hiv:
+  #   - github://open-numbers/ddf--gapminder--hist_hiv
+  # data://open_numbers/open_numbers/latest/gapminder__hist_imr:
+  #   - github://open-numbers/ddf--gapminder--hist_imr
+  # data://open_numbers/open_numbers/latest/gapminder__hist_lex:
+  #   - github://open-numbers/ddf--gapminder--hist_lex
+  # data://open_numbers/open_numbers/latest/gapminder__hist_marriage_age:
+  #   - github://open-numbers/ddf--gapminder--hist_marriage_age
+  # data://open_numbers/open_numbers/latest/gapminder__hist_maternal_mort:
+  #   - github://open-numbers/ddf--gapminder--hist_maternal_mort
+  # data://open_numbers/open_numbers/latest/gapminder__hist_u5mr:
+  #   - github://open-numbers/ddf--gapminder--hist_u5mr
+  # data://open_numbers/open_numbers/latest/gapminder__ihme_edu_attainment:
+  #   - github://open-numbers/ddf--gapminder--ihme_edu_attainment
+  # data://open_numbers/open_numbers/latest/gapminder__ihme_lex:
+  #   - github://open-numbers/ddf--gapminder--ihme_lex
+  # data://open_numbers/open_numbers/latest/gapminder__ilostat:
+  #   - github://open-numbers/ddf--gapminder--ilostat
+  # data://open_numbers/open_numbers/latest/gapminder__legal_slavery:
+  #   - github://open-numbers/ddf--gapminder--legal_slavery
+  # data://open_numbers/open_numbers/latest/gapminder__life_expectancy:
+  #   - github://open-numbers/ddf--gapminder--life_expectancy
+  # data://open_numbers/open_numbers/latest/gapminder__life_expectancy_historic:
+  #   - github://open-numbers/ddf--gapminder--life_expectancy_historic
+  # data://open_numbers/open_numbers/latest/gapminder__misconception_surveys:
+  #   - github://open-numbers/ddf--gapminder--misconception_surveys
+  # data://open_numbers/open_numbers/latest/gapminder__ontology:
+  #   - github://open-numbers/ddf--gapminder--ontology
+  # data://open_numbers/open_numbers/latest/gapminder__population:
+  #   - github://open-numbers/ddf--gapminder--population
+  # data://open_numbers/open_numbers/latest/gapminder__population_by_income_group:
+  #   - github://open-numbers/ddf--gapminder--population_by_income_group
+  # data://open_numbers/open_numbers/latest/gapminder__population_historic:
+  #   - github://open-numbers/ddf--gapminder--population_historic
+  # data://open_numbers/open_numbers/latest/gapminder__static_assets:
+  #   - github://open-numbers/ddf--gapminder--static_assets
+  # data://open_numbers/open_numbers/latest/gapminder__suicide_homicide_traffic_death_rates:
+  #   - github://open-numbers/ddf--gapminder--suicide_homicide_traffic_death_rates
+  # data://open_numbers/open_numbers/latest/gapminder__unfao_faostat:
+  #   - github://open-numbers/ddf--gapminder--unfao_faostat
+  # data://open_numbers/open_numbers/latest/gapminder__unpop_wpp:
+  #   - github://open-numbers/ddf--gapminder--unpop_wpp
+  # data://open_numbers/open_numbers/latest/gapminder__wpp_annual_indicators:
+  #   - github://open-numbers/ddf--gapminder--wpp_annual_indicators
+  # data://open_numbers/open_numbers/latest/gdl__area_db:
+  #   - github://open-numbers/ddf--gdl--area_db
+  # data://open_numbers/open_numbers/latest/global_carbon_project__global_carbon_budget:
+  #   - github://open-numbers/ddf--global_carbon_project--global_carbon_budget
+  # data://open_numbers/open_numbers/latest/harvard__country_complexity_rankings:
+  #   - github://open-numbers/ddf--harvard--country_complexity_rankings
+  # data://open_numbers/open_numbers/latest/iarc__ci5:
+  #   - github://open-numbers/ddf--iarc--ci5
+  # data://open_numbers/open_numbers/latest/igme__cme:
+  #   - github://open-numbers/ddf--igme--cme
+  # data://open_numbers/open_numbers/latest/ihme__death_cause_compact:
+  #   - github://open-numbers/ddf--ihme--death_cause_compact
+  # data://open_numbers/open_numbers/latest/ihme__edu_attainment:
+  #   - github://open-numbers/ddf--ihme--edu_attainment
+  # data://open_numbers/open_numbers/latest/ihme__global_burden_disease_cancer_incidence:
+  #   - github://open-numbers/ddf--ihme--global_burden_disease_cancer_incidence
+  # data://open_numbers/open_numbers/latest/ihme__global_burden_disease_dalys_by_risk:
+  #   - github://open-numbers/ddf--ihme--global_burden_disease_dalys_by_risk
+  # data://open_numbers/open_numbers/latest/ihme__global_burden_disease_death_number:
+  #   - github://open-numbers/ddf--ihme--global_burden_disease_death_number
+  # data://open_numbers/open_numbers/latest/ihme__global_burden_disease_death_rate:
+  #   - github://open-numbers/ddf--ihme--global_burden_disease_death_rate
+  # data://open_numbers/open_numbers/latest/ihme__global_burden_disease_deaths_by_risk:
+  #   - github://open-numbers/ddf--ihme--global_burden_disease_deaths_by_risk
+  # data://open_numbers/open_numbers/latest/ihme__global_burden_disease_disability_life_lost:
+  #   - github://open-numbers/ddf--ihme--global_burden_disease_disability_life_lost
+  # data://open_numbers/open_numbers/latest/ihme__global_burden_disease_etiology:
+  #   - github://open-numbers/ddf--ihme--global_burden_disease_etiology
+  # data://open_numbers/open_numbers/latest/ihme__global_burden_disease_impairment:
+  #   - github://open-numbers/ddf--ihme--global_burden_disease_impairment
+  # data://open_numbers/open_numbers/latest/ihme__global_burden_disease_maternal_mortality:
+  #   - github://open-numbers/ddf--ihme--global_burden_disease_maternal_mortality
+  # data://open_numbers/open_numbers/latest/ihme__global_burden_disease_ylds_by_risk:
+  #   - github://open-numbers/ddf--ihme--global_burden_disease_ylds_by_risk
+  # data://open_numbers/open_numbers/latest/ihme__global_burden_disease_ylls_by_risk:
+  #   - github://open-numbers/ddf--ihme--global_burden_disease_ylls_by_risk
+  # data://open_numbers/open_numbers/latest/ihme__lex:
+  #   - github://open-numbers/ddf--ihme--lex
+  # data://open_numbers/open_numbers/latest/ilo__ilostat:
+  #   - github://open-numbers/ddf--ilo--ilostat
+  # data://open_numbers/open_numbers/latest/imf__weo:
+  #   - github://open-numbers/ddf--imf--weo
+  # data://open_numbers/open_numbers/latest/imperial__metabolic:
+  #   - github://open-numbers/ddf--imperial--metabolic
+  # data://open_numbers/open_numbers/latest/mit__economic_complexity_rankings:
+  #   - github://open-numbers/ddf--mit--economic_complexity_rankings
+  # data://open_numbers/open_numbers/latest/oecd__dac:
+  #   - github://open-numbers/ddf--oecd--dac
+  # data://open_numbers/open_numbers/latest/open_numbers:
+  #   - github://open-numbers/ddf--open_numbers
+  # data://open_numbers/open_numbers/latest/open_numbers__covid_19_geographic_distribution:
+  #   - github://open-numbers/ddf--open_numbers--covid_19_geographic_distribution
+  # data://open_numbers/open_numbers/latest/open_numbers__covid_government_response:
+  #   - github://open-numbers/ddf--open_numbers--covid_government_response
+  # data://open_numbers/open_numbers/latest/open_numbers__yearly_data_as_daily:
+  #   - github://open-numbers/ddf--open_numbers--yearly_data_as_daily
+  # data://open_numbers/open_numbers/latest/oxford__covid_government_response:
+  #   - github://open-numbers/ddf--oxford--covid_government_response
+  # data://open_numbers/open_numbers/latest/pwt__penn_world_table:
+  #   - github://open-numbers/ddf--pwt--penn_world_table
+  # data://open_numbers/open_numbers/latest/sodertorn__stockholm_lan_basomrade:
+  #   - github://open-numbers/ddf--sodertorn--stockholm_lan_basomrade
+  # data://open_numbers/open_numbers/latest/sodertornsmodellen:
+  #   - github://open-numbers/ddf--sodertornsmodellen
+  # data://open_numbers/open_numbers/latest/transparency_international__corruption_perception_index:
+  #   - github://open-numbers/ddf--transparency_international--corruption_perception_index
+  # data://open_numbers/open_numbers/latest/uis__stats:
+  #   - github://open-numbers/ddf--uis--stats
+  # data://open_numbers/open_numbers/latest/unaids__aidsinfo:
+  #   - github://open-numbers/ddf--unaids--aidsinfo
+  # data://open_numbers/open_numbers/latest/undp__hdi:
+  #   - github://open-numbers/ddf--undp--hdi
+  # data://open_numbers/open_numbers/latest/unfao__aquastat:
+  #   - github://open-numbers/ddf--unfao--aquastat
+  # data://open_numbers/open_numbers/latest/unfao__faostat:
+  #   - github://open-numbers/ddf--unfao--faostat
+  # data://open_numbers/open_numbers/latest/unfao__fra:
+  #   - github://open-numbers/ddf--unfao--fra
+  # data://open_numbers/open_numbers/latest/unhcr__population_statistics:
+  #   - github://open-numbers/ddf--unhcr--population_statistics
+  # data://open_numbers/open_numbers/latest/unicef__immunization:
+  #   - github://open-numbers/ddf--unicef--immunization
+  # data://open_numbers/open_numbers/latest/unpop__family_planning_indicators:
+  #   - github://open-numbers/ddf--unpop--family_planning_indicators
+  # data://open_numbers/open_numbers/latest/unpop__international_migrant_stock:
+  #   - github://open-numbers/ddf--unpop--international_migrant_stock
+  # data://open_numbers/open_numbers/latest/unpop__world_population_prospects:
+  #   - github://open-numbers/ddf--unpop--world_population_prospects
+  # data://open_numbers/open_numbers/latest/unstats__sdg_indicators:
+  #   - github://open-numbers/ddf--unstats--sdg_indicators
+  # data://open_numbers/open_numbers/latest/wb__edu:
+  #   - github://open-numbers/ddf--wb--edu
+  # data://open_numbers/open_numbers/latest/who__child_causes_of_death:
+  #   - github://open-numbers/ddf--who--child_causes_of_death
+  # data://open_numbers/open_numbers/latest/who__gho:
+  #   - github://open-numbers/ddf--who--gho
+  # data://open_numbers/open_numbers/latest/who__global_health_expenditure:
+  #   - github://open-numbers/ddf--who--global_health_expenditure
+  # data://open_numbers/open_numbers/latest/who__tb_burden_estimates:
+  #   - github://open-numbers/ddf--who--tb_burden_estimates
+  # data://open_numbers/open_numbers/latest/who__violence_injury_prevention:
+  #   - github://open-numbers/ddf--who--violence_injury_prevention
+  # data://open_numbers/open_numbers/latest/world_bank__world_development_indicators:
+  #   - github://open-numbers/ddf--world_bank--world_development_indicators
+  # data://open_numbers/open_numbers/latest/worldbank__povcalnet:
+  #   - github://open-numbers/ddf--worldbank--povcalnet

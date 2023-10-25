@@ -59,6 +59,15 @@ tables:
               - England and Wales
               - France
               - Sweden
+      central_death_rate_mf_ratio:
+        title: Central death rate ratio (m/f)
+        unit: ""
+        description_short: |-
+          <% if type == "cohort" %>
+          The ratio of cohort central death rate (males/females) at a given age.
+          <% elif type == "period" %>
+          The ratio of period central death rate (males/females) at a given age.
+          <% endif %>
 
       probability_of_death:
         title: Probability of death
