@@ -85,9 +85,9 @@ tables:
           {definitions.global.title_base}
         display: &display_hist
           name: |-
-            {definitions.global.title_base} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'all') >>
+            {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'all') >>
         presentation:
-          title_variant: &title_variant_hist << sex + 's, ' if sex != 'all' >>period life tables, historical data
+          title_variant: &title_variant_hist << sex + 's, ' if sex != 'all' >>period tables
 
       life_expectancy_0:
         title: |-
@@ -111,9 +111,9 @@ tables:
           {definitions.global.title_base} (with projections)
         display: &display_w_proj
           name: |-
-            Period life expectancy at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'all') >>, with UN medium projections
+            {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'all') >>, with UN medium projections
         presentation:
-          title_variant: &title_variant_w_proj << sex + 's, ' if sex != 'all' >>period life tables, with UN medium projections
+          title_variant: &title_variant_w_proj << sex + 's, ' if sex != 'all' >>period tables, with UN medium projections
 
       life_expectancy_0_with_proj:
         title: |-
@@ -139,10 +139,10 @@ tables:
           - *period_lt_def
         display: &display_o_proj
           name: |-
-            Period life expectancy at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'all') >>, medium projection
+            {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'all') >>, medium projection
         presentation:
           attribution_short: &attr_o_proj UN WPP
-          title_variant: &title_variant_o_proj << sex + 's, ' if sex != 'all' >>period life tables, medium projection
+          title_variant: &title_variant_o_proj << sex + 's, ' if sex != 'all' >>period tables, medium projection
 
       life_expectancy_0_only_proj:
         title: |-
