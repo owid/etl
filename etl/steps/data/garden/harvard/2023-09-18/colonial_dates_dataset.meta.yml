@@ -137,25 +137,25 @@ tables:
           numDecimalPlaces: 0
           conversionFactor: 1
 
-      # total_colonies_pop:
-      #   title: Population colonized
-      #   unit: "people"
-      #   short_unit: ""
-      #   description_short: |
-      #     Population of overseas territories colonized by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
-      #   description_processing: |
-      #     This is the sum of the population each European colonial power colonized each year. Colonized countries or countries not colonized show a null value.
+      total_colonies_pop:
+        title: Population colonized
+        unit: "people"
+        short_unit: ""
+        description_short: |
+          Population of overseas territories colonized by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_processing: |
+          This is the sum of the population each European colonial power colonized each year. Colonized countries or countries not colonized show a null value.
 
-      #     A total for each year is estimated with the country (entity) "World".
+          A total for each year is estimated with the country (entity) "World".
 
-      #     {common.years}
-      #   description_from_producer: ""
-      #   processing_level: major
-      #   display:
-      #     name: Number of colonies
-      #     entityAnnotationsMap: ""
-      #     numDecimalPlaces: 0
-      #     conversionFactor: 1
+          {common.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Number of colonies
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
 
       total_colonies_by_region:
         title: Number of colonies by region (old)

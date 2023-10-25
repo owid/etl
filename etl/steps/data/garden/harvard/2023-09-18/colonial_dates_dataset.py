@@ -93,28 +93,19 @@ def process_data(tb: Table, tb_pop: Table) -> Table:
 
     # Create another table with the total number of colonies per colonizer and year
     tb_count = tb_colonized.copy()
-    # tb_count = geo.harmonize_countries(df=tb_count, countries_file=paths.country_mapping_path)
-    # # tb_count = tb_count.merge(tb_pop[["country", "year", "population"]], how="left", on=["country", "year"])
+    tb_count = geo.harmonize_countries(df=tb_count, countries_file=paths.country_mapping_path)
+    tb_count = tb_count.merge(tb_pop[["country", "year", "population"]], how="left", on=["country", "year"])
 
     tb_count = (
         tb_count.groupby(["colonizer", "year"])
-        .agg(
-            {
-                "country": "count",
-                #   "population": "sum"
-            }
-        )
+        .agg({"country": "count", "population": "sum"})
         .reset_index()
         .copy_metadata(tb)
     )
 
     # Rename columns
     tb_count = tb_count.rename(
-        columns={
-            "colonizer": "country",
-            "country": "total_colonies",
-            #  "population": "total_colonies_pop"
-        }
+        columns={"colonizer": "country", "country": "total_colonies", "population": "total_colonies_pop"}
     )
 
     # Consolidate results in country and year columns, by merging colonizer column in each row
