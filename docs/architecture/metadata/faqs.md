@@ -41,7 +41,7 @@ In an ideal world, we could define all previous fields for all indicators, but i
         indicator.title
         ```
     * **Charts**
-        * **Table view** and **Learn more about this data**
+        * **Table view** and **Learn more about this data** (former sources tab)
             ```
             display.name > indicator.title
             ```
