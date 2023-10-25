@@ -23,11 +23,10 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
+from shared import add_indicators_extra
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-
-from .shared import add_indicators_extra
 
 log = get_logger()
 
@@ -124,6 +123,9 @@ def run(dest_dir: str) -> None:
 
     # Add data for "all intrastate" conflict types
     tb = add_conflict_all_intrastate(tb)
+
+    # Add data for "state-based" conflict types
+    tb = add_conflict_all_statebased(tb)
 
     # Force types
     # tb = tb.astype({"conflict_type": "category", "region": "category"})
@@ -675,6 +677,15 @@ def add_conflict_all_intrastate(tb: Table) -> Table:
     tb_intra = tb_intra.groupby(["year", "region"], as_index=False).sum(numeric_only=True, min_count=1)
     tb_intra["conflict_type"] = "intrastate"
     tb = pr.concat([tb, tb_intra], ignore_index=True)
+    return tb
+
+
+def add_conflict_all_statebased(tb: Table) -> Table:
+    """Add metrics for conflict_type = 'state-based'."""
+    tb_state = tb[tb["conflict_type"].isin(TYPE_OF_CONFLICT_MAPPING.values())].copy()
+    tb_state = tb_state.groupby(["year", "region"], as_index=False).sum(numeric_only=True, min_count=1)
+    tb_state["conflict_type"] = "state-based"
+    tb = pr.concat([tb, tb_state], ignore_index=True)
     return tb
 
 
