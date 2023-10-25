@@ -23,15 +23,19 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["colonial_dates_dataset"].reset_index()
 
+    # Load population data.
+    tb_pop = paths.load_dataset("population")
+    tb_pop = tb_pop["population"].reset_index()
+
     #
     # Process data.
     #
-    tb = process_data(tb)
+    tb = process_data(tb, tb_pop)
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Create regional aggregations for total_colonies
-    tb = regional_aggregations(tb)
+    tb = regional_aggregations(tb, tb_pop)
 
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
@@ -47,7 +51,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def process_data(tb: Table) -> Table:
+def process_data(tb: Table, tb_pop: Table) -> Table:
     """Process data and create new columns."""
 
     # Capitalize colonizer column and replace Britain by United Kingdom
@@ -88,10 +92,30 @@ def process_data(tb: Table) -> Table:
     tb_rest = tb_rest.drop(columns=["colstart_max", "colend_max", "colstart_mean", "colend_mean", "col"])
 
     # Create another table with the total number of colonies per colonizer and year
-    tb_count = tb_colonized.groupby(["colonizer", "year"]).agg({"country": "count"}).reset_index().copy_metadata(tb)
+    tb_count = tb_colonized.copy()
+    # tb_count = geo.harmonize_countries(df=tb_count, countries_file=paths.country_mapping_path)
+    # # tb_count = tb_count.merge(tb_pop[["country", "year", "population"]], how="left", on=["country", "year"])
+
+    tb_count = (
+        tb_count.groupby(["colonizer", "year"])
+        .agg(
+            {
+                "country": "count",
+                #   "population": "sum"
+            }
+        )
+        .reset_index()
+        .copy_metadata(tb)
+    )
 
     # Rename columns
-    tb_count = tb_count.rename(columns={"colonizer": "country", "country": "total_colonies"})
+    tb_count = tb_count.rename(
+        columns={
+            "colonizer": "country",
+            "country": "total_colonies",
+            #  "population": "total_colonies_pop"
+        }
+    )
 
     # Consolidate results in country and year columns, by merging colonizer column in each row
     tb_colonized = (
@@ -139,14 +163,10 @@ def process_data(tb: Table) -> Table:
     return tb
 
 
-def regional_aggregations(tb: Table) -> Table:
+def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
     """Create regional aggregations for total_colonies."""
     # Copy table
     tb_regions = tb.copy()
-
-    # Load population data.
-    tb_pop = paths.load_dataset("population")
-    tb_pop = tb_pop["population"].reset_index()
 
     # Merge population data.
     tb_regions = tb_regions.merge(tb_pop[["country", "year", "population"]], how="left", on=["country", "year"])
