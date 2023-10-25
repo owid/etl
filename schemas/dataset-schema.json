@@ -334,14 +334,17 @@
         },
         "licenses": {
           "type": "array",
-          "description": "List of all licenses that have been involved in the processing history of the indicators in this dataset. NOTE: Licenses should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails. In the near future, this field may not even exist, since `licenses` should only exist inside `origins`.",
+          "description": "List of all licenses that have been involved in the processing history of the indicators in this dataset.",
+          "guidelines": [
+            "**Note:** Licenses should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails. In the near future, this field may not even exist, since `licenses` should only exist inside `origins`."
+          ],
           "items": {
             "$ref": "definitions.json#/license"
           }
         },
         "sources": {
           "type": "array",
-          "description": "List of all sources of the indicators in this dataset. NOTE: This is no longer in use, you should use origins.",
+          "description": "(DEPRECATED, no longer in use). List of all sources of the indicators in this dataset.",
           "items": {
             "$ref": "definitions.json#/source"
           }
@@ -423,7 +426,8 @@
                   "description": "Title of the indicator, which is a few words definition of the indicator.",
                   "examples": [
                     "Number of neutron star mergers in the Milky Way",
-                    "Share of neutron star mergers that happen in the Milky Way"
+                    "Share of neutron star mergers that happen in the Milky Way",
+                    "Barley | 00000044 || Area harvested | 005312 || hectares"
                   ],
                   "examples_bad": [
                     [
@@ -431,6 +435,9 @@
                     ],
                     [
                       "Share of neutron star mergers that happen in the Milky Way (2023)"
+                    ],
+                    [
+                      "Barley"
                     ]
                   ],
                   "requirement_level": "required",
@@ -445,10 +452,10 @@
                       "Must be one short sentence (a few words)."
                     ],
                     [
-                      "Should not mention other metadata fields like `producer` or `version`."
+                      "For 'small datasets', this should be the publicly displayed title. For 'big datasets' (like FAOSTAT, with many dimensions), it can be less human-readable, optimized for internal searches (then, use `display.name` for the publicly displayed title)."
                     ],
                     [
-                      "For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), consider using other metadata fields to improve the public appearance of the title (namely `presentation.title_public` and `grapher_config.title`)."
+                      "Should not mention other metadata fields like `producer` or `version`."
                     ]
                   ],
                   "category": "metadata"
@@ -734,7 +741,10 @@
                 },
                 "origins": {
                   "type": "array",
-                  "description": "List of all origins of the indicator. Automatically filled. NOTE: Origins should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails.",
+                  "description": "List of all origins of the indicator.",
+                  "guidelines": [
+                    "**Note:** Origins should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails."
+                  ],
                   "items": {
                     "$ref": "definitions.json#/origin"
                   }

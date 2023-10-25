@@ -1,0 +1,46 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global atlas of medical devices
+    description: |-
+      The **Global Atlas of Medical Devices (GAMD)** provides global, regional, and country data on the availability of:
+
+        - National policy on health technology
+        - Regulation of medical devices
+        - Health technology assessment national unit
+        - Health technology management
+        - Use of medical devices nomenclature system
+        - National lists of priority medical devices
+        - High-cost medical equipment
+
+      The GAMD also identifies that Member States designate a focal point for health technologies and medical devices. Each Member State designates a focal point in the ministry of health with the survey responses.
+
+      The **WHO Baseline Country Survey on Medical Devices** was developed in 2009. The aim was to determine the health technology areas that required support in countries and regions. It was launched in February 2010. In 2013, it was updated and re-launched as the Global Atlas of Medical Devices. The GAMD was updated in 2017, and the 2022 update is under development.
+    date_published: '2010'
+    version_producer: 2017
+    title_snapshot: Global atlas of medical devices -  Gamma Camera or Nuclear Medicine
+    description_snapshot: |-
+      The dataset encompasses the subsequent indicators sourced from the Global Atlas of Medical Devices (GAMD) concerning Gamma Camera or Nuclear Medicine total density per million population.
+    # Citation
+    producer: World Health Organisation
+    citation_full: |-
+      Global atlas of medical devices, World Health Organization. Licence: CC BY-NC-SA 3.0 IGO.
+    attribution_short: WHO
+
+    # Files
+    url_main:
+      https://www.who.int/teams/health-product-policy-and-standards/assistive-and-medical-technology/medical-devices/global-atlas-of-medical-devices
+    date_accessed: 2023-10-13
+
+    # License
+    license:
+      name: custom license
+      url: https://www.who.int/about/policies/publishing/copyright
+
+wdir: ../../../data/snapshots/who/2023-10-13
+outs:
+- md5: 66e2217616942a63cd5129504fb71ea0
+  size: 56546
+  path: medical_devices_atlas_gc_nm.csv

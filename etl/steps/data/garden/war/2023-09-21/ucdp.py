@@ -27,7 +27,7 @@ from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
-from .shared import add_indicators_conflict_rate
+from .shared import add_indicators_extra
 
 log = get_logger()
 
@@ -129,7 +129,16 @@ def run(dest_dir: str) -> None:
     # tb = tb.astype({"conflict_type": "category", "region": "category"})
 
     # Add conflict rates
-    tb = add_indicators_conflict_rate(tb, tb_regions, ["number_ongoing_conflicts", "number_new_conflicts"])
+    tb = add_indicators_extra(
+        tb,
+        tb_regions,
+        columns_conflict_rate=["number_ongoing_conflicts", "number_new_conflicts"],
+        columns_conflict_mortality=[
+            "number_deaths_ongoing_conflicts",
+            "number_deaths_ongoing_conflicts_high",
+            "number_deaths_ongoing_conflicts_low",
+        ],
+    )
 
     # Adapt region names
     tb = adapt_region_names(tb)

@@ -72,7 +72,7 @@ def run(dest_dir: str) -> None:
     ## Check values
     paths.log.info("final checks")
     _check_column_values(tb, "sex", {"all", "male", "female"})
-    _check_column_values(tb, "age", {0, 15, 65, 80})
+    _check_column_values(tb, "age", {0, 10, 15, 25, 45, 65, 80})
 
     ## Set index
     tb = tb.set_index(["country", "year", "sex", "age"], verify_integrity=True)
@@ -116,7 +116,7 @@ def process_lt(tb: Table) -> Table:
     Desired format is with columns location, year, sex, age | life_expectancy.
     """
     tb = tb.loc[
-        (tb["age"].isin(["0", "15", "65", "80"])) & (tb["type"] == "period"),
+        (tb["age"].isin(["0", "10", "15", "25", "45", "65", "80"])) & (tb["type"] == "period"),
         ["location", "year", "sex", "age", "life_expectancy"],
     ]
 
@@ -138,7 +138,7 @@ def process_lt(tb: Table) -> Table:
     ## sex
     _check_column_values(tb, "sex", {"all", "female", "male"})
     ## age
-    _check_column_values(tb, "age", {0, 15, 65, 80})
+    _check_column_values(tb, "age", {0, 10, 15, 25, 45, 65, 80})
 
     return tb
 
