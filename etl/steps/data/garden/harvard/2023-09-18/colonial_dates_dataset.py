@@ -228,8 +228,8 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
         - tb_regions["colonizer_pop"]
     )
 
-    # # If missing_pop is negative, assign 0
-    # tb_regions["missing_pop"] = tb_regions["missing_pop"].where(tb_regions["missing_pop"] >= 0, 0)
+    # If missing_pop is negative, assign 0
+    tb_regions["missing_pop"] = tb_regions["missing_pop"].where(tb_regions["missing_pop"] >= 0, 0)
 
     # Create the columns total_colonies_by_region and colonial_population_by_region, copies of colony_number and colony_pop
     # NOTE: This is temporal to avoid breaking Grapher.
