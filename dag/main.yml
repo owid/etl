@@ -164,10 +164,6 @@ steps:
     - data://garden/aviation_safety_network/2023-04-18/aviation_statistics
 
   # HMD
-  data://meadow/hmd/2022-11-04/life_tables:
-    - walden://hmd/2022-11-04/life_tables
-  data://garden/hmd/2022-11-04/life_tables:
-    - data://meadow/hmd/2022-11-04/life_tables
   data://meadow/hmd/2022-12-07/life_tables:
     - snapshot://hmd/2022-12-07/hmd.zip
   data://garden/hmd/2022-12-07/life_tables:
@@ -213,7 +209,7 @@ steps:
     - data://garden/demography/2023-10-09/life_expectancy
     - data://garden/owid/latest/key_indicators
     - data://garden/regions/2023-01-01/regions
-    - data://garden/gcp/2023-07-10/global_carbon_budget
+    - data://garden/gcp/2023-09-28/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
     - data://garden/energy/2023-07-10/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
@@ -251,16 +247,16 @@ steps:
     - data://garden/ggdc/2022-11-28/penn_world_table
 
   #
-  # Met Office Hadley Centre - Near surface temperature anomaly.
+  # Met Office Hadley Centre - Near surface temperature anomaly (2023-10-18).
   #
-  data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_global.csv
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_northern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_southern_hemisphere.csv
-  data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature
-  data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
+  data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_southern_hemisphere.csv
+  data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature
+  data://grapher/met_office_hadley_centre/2023-10-18/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature
 
   #Luxembourg Income Study
   data://meadow/lis/2023-08-30/luxembourg_income_study:
@@ -603,6 +599,7 @@ steps:
     - snapshot://countries/2023-09-22/isd.xlsx
   data://garden/countries/2023-09-25/isd:
     - data://meadow/countries/2023-09-25/isd
+    - data://garden/demography/2023-03-31/population
   data://grapher/countries/2023-10-01/isd:
     - data://garden/countries/2023-09-25/isd
   data://meadow/countries/2023-09-25/gleditsch:
@@ -610,6 +607,7 @@ steps:
     - snapshot://countries/2023-09-22/gleditsch_microstates.dat
   data://garden/countries/2023-09-25/gleditsch:
     - data://meadow/countries/2023-09-25/gleditsch
+    - data://garden/demography/2023-03-31/population
   data://grapher/countries/2023-10-01/gleditsch:
     - data://garden/countries/2023-09-25/gleditsch
   data://meadow/countries/2023-09-29/cow_ssm:
@@ -618,6 +616,7 @@ steps:
     - snapshot://countries/2023-09-22/cow_ssm_system.csv
   data://garden/countries/2023-09-29/cow_ssm:
     - data://meadow/countries/2023-09-29/cow_ssm
+    - data://garden/demography/2023-03-31/population
   data://grapher/countries/2023-09-29/cow_ssm:
     - data://garden/countries/2023-09-29/cow_ssm
 
@@ -630,6 +629,14 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/gapminder/2023-09-22/total_fertility_rate:
     - data://garden/gapminder/2023-09-22/total_fertility_rate
+
+  # State Capacity Dataset
+  data://meadow/state_capacity/2023-10-19/state_capacity_dataset:
+    - snapshot://state_capacity/2023-10-19/state_capacity_dataset.dta
+  data://garden/state_capacity/2023-10-19/state_capacity_dataset:
+    - data://meadow/state_capacity/2023-10-19/state_capacity_dataset
+  data://grapher/state_capacity/2023-10-19/state_capacity_dataset:
+    - data://garden/state_capacity/2023-10-19/state_capacity_dataset
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -645,7 +652,6 @@ steps:
     - data://garden/un/2023-01-24/un_sdg
 
   ######################################################################################################################
-
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

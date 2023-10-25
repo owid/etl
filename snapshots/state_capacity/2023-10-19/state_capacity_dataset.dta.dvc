@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: State Capacity Dataset
+    description: |-
+      The State Capacity Dataset seeks to fill a gap in comparative, cross-national research by providing researchers with a measure that captures the multidimensionality of the concept and is distinct from other concepts of interest such as economic development or regime type. Version 1 of the dataset covers the years 1960-2015 for 177 countries.
+
+      The methodology for the state capacity estimates is described in ["Leviathan's Latent Dimensions: Measuring State Capacity for Comparative Political Research."](http://www-personal.umich.edu/~jkhanson/resources/hanson_sigman20.pdf) Additional documentation is provided in the [online appendix](http://www-personal.umich.edu/~jkhanson/resources/StateCapac_v1_doc.pdf) associated with the article.
+    date_published: 2021-08-09
+    version_producer: Version 1
+
+    # Citation
+    producer: Jonathan Hanson and Rachel Sigman
+    citation_full: |-
+      Jonathan K. Hanson and Rachel Sigman (2021). "Leviathan's Latent Dimensions: Measuring State Capacity for Comparative Political Research." Journal of Politics, Vol. 83, No 4. doi.org/10.1086/715066.
+    attribution_short: Hanson and Sigman
+
+    # Files
+    url_main: http://www-personal.umich.edu/~jkhanson/state_capacity.html
+    date_accessed: 2023-10-19
+
+    # License
+    license:
+      name: ©Jonathan Hanson and Rachel Sigman (2021)
+      url: http://www-personal.umich.edu/~jkhanson/state_capacity.html
+
+wdir: ../../../data/snapshots/state_capacity/2023-10-19
+outs:
+- md5: 9e43d9722bf30b24778e540b9add9a3f
+  size: 1911577
+  path: state_capacity_dataset.dta

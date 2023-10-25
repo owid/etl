@@ -591,8 +591,20 @@ def fix_duplicated_palau_data(tb_co2: Table) -> Table:
     # Check that duplicate rows are still there.
     error = "Expected 'Palau' data to be duplicated. Remove temporary fix."
     assert tb[tb.duplicated(subset=["country", "year"])]["country"].unique().tolist() == ["Palau"], error
-    # Remove duplicate rows.
-    tb = tb.drop_duplicates(subset=["country", "year"]).reset_index(drop=True)
+
+    # Select rows corresponding to "Palau" prior to 1992, and to "Pacific Islands (Palau)" from 1992 onwards.
+    indexes_to_drop = (
+        tb[
+            (tb["country"] == "Palau") & (tb["year"] < 1992) & (tb.duplicated(subset=["country", "year"], keep="first"))
+        ].index.tolist()
+        + tb[
+            (tb["country"] == "Palau") & (tb["year"] >= 1992) & (tb.duplicated(subset=["country", "year"], keep="last"))
+        ].index.tolist()
+    )
+    # Check that the selected rows do not overlap.
+    assert len(indexes_to_drop) == len(set(indexes_to_drop))
+    # Remove those rows.
+    tb = tb.drop(indexes_to_drop).reset_index(drop=True)
     # NOTE: Do not drop empty rows yet, as they will be needed to have a complete population series.
 
     return tb
@@ -966,35 +978,9 @@ def run(dest_dir: str) -> None:
     # TODO: Remove this temporary solution once primary energy consumption dataset has origins.
     error = "Remove temporary solution now that primary energy consumption has origins."
     assert not tb_energy["primary_energy_consumption__twh"].metadata.origins, error
-    from owid.catalog import License, Origin
+    from etl.data_helpers.misc import add_origins_to_energy_table
 
-    tb_energy["primary_energy_consumption__twh"].metadata.sources = []
-    tb_energy["primary_energy_consumption__twh"].metadata.origins = [
-        Origin(
-            producer="Energy Institute",
-            title="Statistical Review of World Energy",
-            attribution="Energy Institute - Statistical Review of World Energy (2023)",
-            url_main="https://www.energyinst.org/statistical-review/",
-            url_download="https://www.energyinst.org/__data/assets/file/0007/1055761/Consolidated-Dataset-Panel-format-CSV.csv",
-            date_published="2023-06-26",
-            date_accessed="2023-06-27",
-            description="The Energy Institute Statistical Review of World Energy analyses data on world energy markets from the prior year. Previously produced by BP, the Review has been providing timely, comprehensive and objective data to the energy community since 1952.",
-            license=License(
-                name="©Energy Institute 2023",
-                url="https://www.energyinst.org/__data/assets/file/0007/1055761/Consolidated-Dataset-Panel-format-CSV.csv",
-            ),
-        ),
-        Origin(
-            producer="U.S. Energy Information Administration",
-            title="International Energy Data",
-            url_main="https://www.eia.gov/opendata/bulkfiles.php",
-            url_download="https://api.eia.gov/bulk/INTL.zip",
-            date_published="2023-06-27",
-            date_accessed="2023-07-10",
-            license=License(name="Public domain", url="https://www.eia.gov/about/copyrights_reuse.php"),
-        ),
-    ]
-
+    tb_energy = add_origins_to_energy_table(tb_energy=tb_energy)
     ####################################################################################################################
 
     # Load GDP dataset.

@@ -4,8 +4,7 @@ meta:
     url: https://fas.org/issues/nuclear-weapons/status-world-nuclear-forces/
     source_data_url: 
       https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9gi-5QBEFuGclzGkfwv9NY_DavklY4DmA9-6QFG7KVFXTvuDf6fe4ETT7_e2zko4akSlAAqGduasG/pub?output=csv
-    date_accessed: '2023-08-22'
-    publication_year: .nan
+    date_accessed: '2023-10-16'
     published_by: Google Sheet
   name: Nuclear warhead stockpiles – Federation of American Scientists
   description: >-

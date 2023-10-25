@@ -4,7 +4,7 @@ from datetime import datetime as dt
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 # from etl.data_helpers import geo
@@ -31,42 +31,59 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
+    paths.log.info("Reading table from meadow dataset.")
     ds_meadow = paths.load_dataset("peace_diehl")
-
     # Read table from meadow dataset.
-    log.info("peace_diehl: Reading table from meadow dataset.")
     tb = ds_meadow["peace_diehl"].reset_index()
+    # Load COW state system
+    ds_cow_ssm = paths.load_dataset("cow_ssm")
 
     #
     # Process data.
     #
+    # Fix codes
+    codes_to_fix = {
+        "936": "946",
+        "937": "947",
+    }
+    columns_codes = ["code_1", "code_2"]
+    for col in columns_codes:
+        tb[col] = tb[col].replace(codes_to_fix)
+
     # Set time fields as strings
-    log.info("peace_diehl: Ensure correct types.")
+    paths.log.info("ensure correct types.")
     tb[["time_start", "time_end"]] = tb[["time_start", "time_end"]].astype(str)
 
     # Times (YYYYMMDD) -> Years (YYYY)
-    log.info("peace_diehl: Get year periods.")
+    paths.log.info("get year periods.")
     tb = set_years_in_table(tb)
 
     # Expand observations
-    log.info("peace_diehl: Expand observations.")
+    paths.log.info("expand observations.")
     tb = expand_observations(tb)
 
     # Replace NaNs with zeroes
     tb["peace_scale_level"] = tb["peace_scale_level"].fillna(0)
 
-    # Harmonize countries
-    # tb = geo.harmonize_countries(
-    #     df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    # )
+    # Region table
+    tb_regions = build_tb_regions(tb, ds_cow_ssm)
+
+    # Add region of the relationship
+    tb = add_region(tb)
 
     # Get aggregate table (counts)
-    log.info("peace_diehl: Get aggregate table.")
+    paths.log.info("get aggregate table")
     tb_agg = make_aggregate_table(tb)
+
+    # Add 'no relationship'
+    paths.log.info("adding indicator 'no relationship'")
+    tb_agg = add_no_relationship(tb_agg, tb_regions)
+
+    # Add short_name
     tb_agg.metadata.short_name = f"{tb.metadata.short_name}_agg"
 
     # Set index
-    log.info("peace_diehl: Set indexes.")
+    paths.log.info("set indexes")
     tb = tb.set_index(["code_1", "code_2", "year"], verify_integrity=True)[["peace_scale_level"]].sort_index()
     tb_agg = tb_agg.set_index(["country", "year"], verify_integrity=True).sort_index()
 
@@ -166,14 +183,21 @@ def make_aggregate_table(tb: Table) -> Table:
         }
     )
 
-    # Format table
-    tb_agg = tb_agg.groupby(["year", "peace_scale_level"]).size().unstack()
+    # World
+    ## Format table
+    tb_agg_world = tb_agg.groupby(["year", "peace_scale_level"]).size().unstack()
+    ## Set country to 'World'
+    tb_agg_world["country"] = "World"
+    # Reset index
+    tb_agg_world = tb_agg_world.reset_index()
 
-    # Set country to 'World'
-    tb_agg["country"] = "World"
-
+    # Regions
+    ## Format table
+    tb_agg = tb_agg.groupby(["year", "country", "peace_scale_level"]).size().unstack()
     # Reset index
     tb_agg = tb_agg.reset_index()
+
+    tb_agg = pr.concat([tb_agg, tb_agg_world], ignore_index=True)
 
     # Propagate metadata
     for column in tb_agg.all_columns:
@@ -226,3 +250,123 @@ def time_to_year(t: str, start: bool = False) -> int:
         if (date.month == 12) & (date.day == 31):
             return year + 1
         return year
+
+
+def build_tb_regions(tb: Table, ds_cow_ssm: Dataset) -> Table:
+    """Build table with number of countries per region per year (using Diehl's data).
+
+    We only consider countries listed in the dataset. Hence if a country existed but did not have any relationship, it is not counted. We sanity-checked this, and only country with code 260 was missing! This is West Germany. Instead, Diehl uses 255, which stands for Germany. I.e. they consider Germany to exist back then (not as West Germany but as modern Germany already).
+    """
+    tb_1 = tb[["code_1", "year"]].drop_duplicates().rename(columns={"code_1": "code"})
+    tb_2 = tb[["code_2", "year"]].drop_duplicates().rename(columns={"code_2": "code"})
+    tb_regions = pr.concat([tb_1, tb_2])
+    tb_regions["region"] = tb_regions["code"].apply(code_to_region)
+    tb_regions_regions = tb_regions.groupby(["region", "year"], as_index=False)[["code"]].nunique()
+    tb_regions_world = tb_regions.groupby(["year"], as_index=False)[["code"]].nunique()
+    tb_regions_world["region"] = "World"
+    tb_regions = pr.concat([tb_regions_regions, tb_regions_world]).rename(columns={"code": "number_countries"})
+
+    # COW table
+    tb_regions_cow = ds_cow_ssm["cow_ssm_system"].reset_index()
+    tb_regions_cow = tb_regions_cow[tb_regions_cow["year"] >= 1900]
+
+    missing_codes = set(tb_regions_cow["ccode"]) - (set(tb["code_2"]) | set(tb["code_1"]))
+    assert missing_codes == {
+        260
+    }, "Country codes missing in Diehl, when comparing with COW. Only code expected to miss is 260."
+
+    # Sanity check
+    assert (
+        tb_regions["year"].max() == tb["year"].max()
+    ), "Maximum year does not match between DIEHL and DIEHL-based country in region table."
+    assert (
+        tb_regions["year"].min() == tb["year"].min()
+    ), "Minimum year does not match between DIEHL and DIEHL-based country in region table."
+    return tb_regions
+
+
+def code_to_region(cow_code: int) -> str:
+    """Convert code to region name."""
+    match cow_code:
+        case c if 2 <= c <= 165:
+            return "Americas"
+        case c if 200 <= c <= 399:
+            return "Europe"
+        case c if 402 <= c <= 626:
+            return "Africa"
+        case c if 630 <= c <= 698:
+            return "Middle East"
+        case c if 700 <= c <= 999:
+            return "Asia and Oceania"
+        case _:
+            raise ValueError(f"Invalid COW code: {cow_code}")
+
+
+def add_region(tb: Table) -> Table:
+    """Add region of the relationship.
+
+    If both countries belong to region A, then the region of the relationship is A. Otherwise, the region is 'Inter-continental'.
+    """
+    tb["region_1"] = tb["code_1"].apply(code_to_region)
+    tb["region_2"] = tb["code_2"].apply(code_to_region)
+    assert tb["region_1"].notna().all(), "Some regions are NaN"
+    assert tb["region_2"].notna().all(), "Some regions are NaN"
+    mask = tb["region_1"] == tb["region_2"]
+    tb.loc[mask, "country"] = tb.loc[mask, "region_1"]
+    tb.loc[~mask, "country"] = "Inter-continental"
+    tb = tb.drop(columns=["region_1", "region_2"])
+    return tb
+
+
+def add_no_relationship(tb: Table, tb_regions: Table) -> Table:
+    """Add new column with number of country-pairs with no relationship."""
+    # Column types
+    columns_index = ["country", "year"]
+    columns_indicators = [col for col in tb.columns if col not in columns_index]
+    column_new = "no_relation"
+    ## Load region numbers, add number of country-pairs in inter-continental
+    tb_regions["number_countries"] = tb_regions["number_countries"].astype(float)
+    tb_regions["number_country_pairs"] = (
+        tb_regions["number_countries"] * (tb_regions["number_countries"] - 1) / 2
+    ).astype(int)
+    tb_no_rel = tb_regions.groupby("year", as_index=False).apply(_get_intercontinental_pairs)
+    tb_no_rel = Table(tb_no_rel).rename(columns={None: "number_country_pairs"})
+    tb_no_rel["region"] = "Inter-continental"
+    tb_regions = pr.concat([tb_regions, tb_no_rel]).rename(columns={"region": "country"})
+
+    ## Merge with main table
+    ## Note that we merge with `outer` mode. This is because `tb` sometimes is missing year entries
+    ## that `tb_regions` does have. We need to perform a subtraction later, hence we need all columns!
+    tb = tb.merge(tb_regions, on=["year", "country"], how="outer")
+
+    ## Sanity check
+    assert not tb["number_country_pairs"].isna().any(), "Some NaNs detected in `number_country_pairs` column!"
+
+    ## Fill NaNs
+    tb[columns_indicators] = tb[columns_indicators].fillna(0)
+
+    ## Estimate no-relationship
+    tb[column_new] = tb["number_country_pairs"] - tb[columns_indicators].sum(axis=1)
+
+    ## Remove unused columns
+    tb = tb[columns_index + columns_indicators + [column_new]]
+    return tb
+
+
+def _get_intercontinental_pairs(tb_group: Table):
+    # expected_regions = {
+    #     "Africa",
+    #     "Americas",
+    #     "Asia and Oceania",
+    #     "Europe",
+    #     "Middle East",
+    #     "World",
+    # }
+    mask = tb_group["region"] == "World"
+    value = tb_group.loc[mask, "number_country_pairs"] - tb_group.loc[~mask, "number_country_pairs"].sum()
+    return value.item()
+    # if set(tb_group["region"]) == expected_regions:
+    #     mask = tb_group["region"] == "World"
+    #     value = (tb_group.loc[mask, "number_country_pairs"] - tb_group.loc[~mask, "number_country_pairs"].sum())
+    #     return value.item()
+    # return np.nan

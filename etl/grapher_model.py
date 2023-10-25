@@ -769,6 +769,7 @@ class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
     fragmentId: Optional[str] = Field(
         default=None, sa_column=Column("fragmentId", String(255), primary_key=True, nullable=False)
     )
+    displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
 
     @classmethod
     def link_with_variable(cls, session: Session, variable_id: int, new_faqs: List[catalog.FaqLink]) -> None:
@@ -777,22 +778,28 @@ class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
         existing_faqs = session.query(cls).filter(cls.variableId == variable_id).all()
 
         # Work with tuples instead
-        existing_gdoc_fragment = {(f.gdocId, f.fragmentId) for f in existing_faqs}
-        new_gdoc_fragment = {(f.gdoc_id, f.fragment_id) for f in new_faqs}
+        existing_gdoc_fragment = {(f.gdocId, f.fragmentId, f.displayOrder) for f in existing_faqs}
+        new_gdoc_fragment = {(f.gdoc_id, f.fragment_id, i) for i, f in enumerate(new_faqs)}
 
         to_delete = existing_gdoc_fragment - new_gdoc_fragment
         to_add = new_gdoc_fragment - existing_gdoc_fragment
 
         # Delete the obsolete links
-        for gdoc_id, fragment_id in to_delete:
+        for gdoc_id, fragment_id, display_order in to_delete:
             session.query(cls).filter(
-                cls.variableId == variable_id, cls.gdocId == gdoc_id, cls.fragmentId == fragment_id
+                cls.variableId == variable_id,
+                cls.gdocId == gdoc_id,
+                cls.fragmentId == fragment_id,
+                cls.displayOrder == display_order,
             ).delete(synchronize_session="fetch")
 
         # Add the new links
         if to_add:
             session.add_all(
-                [cls(gdocId=gdoc_id, fragmentId=fragment_id, variableId=variable_id) for gdoc_id, fragment_id in to_add]
+                [
+                    cls(gdocId=gdoc_id, fragmentId=fragment_id, displayOrder=display_order, variableId=variable_id)
+                    for gdoc_id, fragment_id, display_order in to_add
+                ]
             )
 
 

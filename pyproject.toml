@@ -106,7 +106,6 @@ gspread = "^5.10.0"
 # unpinning those would introduce tons of type errors
 pyright = "1.1.288"
 pandas-stubs = "1.2.0.62"
-dataclasses-json = "0.5.7"
 jsonref = "^1.1.0"
 mkdocs-jupyter = "^0.24.2"
 mkdocs-exclude = "^1.0.2"

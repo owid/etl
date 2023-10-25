@@ -16,6 +16,7 @@ Some notes:
 
 from typing import List, cast
 
+import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -37,6 +38,7 @@ COLUMNS_INDICATORS = [
     "average_survival_length",
     "life_expectancy_fm_diff",
     "life_expectancy_fm_ratio",
+    "central_death_rate_mf_ratio",
 ]
 COLUMNS_INDEX = [
     "type",
@@ -143,23 +145,38 @@ def combine_tables(tb_hmd: Table, tb_un: Table) -> Table:
 def add_le_diff_and_ratios(tb: Table, columns_primary: List[str]) -> Table:
     """Add metrics on life expectancy ratios and differences between females and males."""
     ## Get relevant metric, split into f and m tables
-    metric = "life_expectancy"
-    tb_le = tb[columns_primary + [metric]].dropna(subset=[metric])
-    tb_le_m = tb_le[tb_le["sex"] == "male"].drop(columns=["sex"])
-    tb_le_f = tb_le[tb_le["sex"] == "female"].drop(columns=["sex"])
-    ## Merge f and m tables
-    tb_le = tb_le_f.merge(tb_le_m, on=list(set(columns_primary) - {"sex"}), suffixes=("_f", "_m"))
-    ## Calculate extra variables
-    tb_le["life_expectancy_fm_diff"] = tb_le["life_expectancy_f"] - tb_le["life_expectancy_m"]
-    tb_le["life_expectancy_fm_ratio"] = tb_le["life_expectancy_f"] / tb_le["life_expectancy_m"]
-    ## Set sex dimension to none
-    tb_le["sex"] = "both"
-    ## optional cast
-    tb_le = cast(Table, tb_le)
-    ## Remove unit
-    tb_le["life_expectancy_fm_ratio"].metadata.unit = ""
+    metrics = {
+        "life_expectancy": ["ratio_fm", "diff_fm"],
+        "central_death_rate": ["ratio_mf"],
+    }
+    for metric, operations in metrics.items():
+        tb_metric = tb[columns_primary + [metric]].dropna(subset=[metric])
+        tb_metric_m = tb_metric[tb_metric["sex"] == "male"].drop(columns=["sex"])
+        tb_metric_f = tb_metric[tb_metric["sex"] == "female"].drop(columns=["sex"])
 
-    ## Add table to main table
-    tb = tb.merge(tb_le, on=columns_primary, how="left")
+        ## Merge f and m tables
+        tb_metric = tb_metric_f.merge(tb_metric_m, on=list(set(columns_primary) - {"sex"}), suffixes=("_f", "_m"))
+        ## Calculate extra variables
+        if "diff_fm" in operations:
+            tb_metric[f"{metric}_fm_diff"] = tb_metric[f"{metric}_f"] - tb_metric[f"{metric}_m"]
+            tb_metric[f"{metric}_fm_diff"] = tb_metric[f"{metric}_fm_diff"].replace([np.inf, -np.inf], np.nan)
+        if "diff_mf" in operations:
+            tb_metric[f"{metric}_mf_diff"] = tb_metric[f"{metric}_m"] - tb_metric[f"{metric}_f"]
+            tb_metric[f"{metric}_mf_diff"] = tb_metric[f"{metric}_mf_diff"].replace([np.inf, -np.inf], np.nan)
+        if "ratio_fm" in operations:
+            tb_metric[f"{metric}_fm_ratio"] = tb_metric[f"{metric}_f"] / tb_metric[f"{metric}_m"]
+            tb_metric[f"{metric}_fm_ratio"] = tb_metric[f"{metric}_fm_ratio"].replace([np.inf, -np.inf], np.nan)
+        if "ratio_mf" in operations:
+            tb_metric[f"{metric}_mf_ratio"] = tb_metric[f"{metric}_m"] / tb_metric[f"{metric}_f"]
+            tb_metric[f"{metric}_mf_ratio"] = tb_metric[f"{metric}_mf_ratio"].replace([np.inf, -np.inf], np.nan)
+        # drop individual sex columns
+        tb_metric = tb_metric.drop(columns=[f"{metric}_f", f"{metric}_m"])
+        ## Set sex dimension to none
+        tb_metric["sex"] = "both"
+        ## optional cast
+        tb_metric = cast(Table, tb_metric)
+
+        ## Add table to main table
+        tb = tb.merge(tb_metric, on=columns_primary, how="left")
 
     return tb
