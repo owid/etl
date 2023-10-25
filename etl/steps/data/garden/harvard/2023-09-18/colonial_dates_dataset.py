@@ -156,17 +156,17 @@ def regional_aggregations(tb: Table) -> Table:
 
     # Define colony_number, which is 1 if countries are not in non_colonies and colony_pop, which is the product of colony and population
     tb_regions["colony_number"] = tb_regions["colonizer"].apply(lambda x: 0 if x in non_colonies else 1)
-    tb_regions["colony_pop"] = tb_regions["population"] * tb_regions["colony"]
+    tb_regions["colony_pop"] = tb_regions["population"] * tb_regions["colony_number"]
 
     # Define not_colonized_number, which is 1 if countries are in non_colonies and not_colonized_pop, which is the product of not_colonized and population
     tb_regions["not_colonized_number"] = tb_regions["colonizer"].apply(
         lambda x: 1 if x in ["zzz. Not colonized"] else 0
     )
-    tb_regions["not_colonized_pop"] = tb_regions["population"] * tb_regions["not_colonized"]
+    tb_regions["not_colonized_pop"] = tb_regions["population"] * tb_regions["not_colonized_number"]
 
     # Define colonizer_number, which is 1 if countries are in colonizers_list and colonizer_pop, which is the product of colonizer_bool and population
     tb_regions["colonizer_number"] = tb_regions["colonizer"].apply(lambda x: 1 if x in ["zz. Colonizer"] else 0)
-    tb_regions["colonizer_pop"] = tb_regions["population"] * tb_regions["colonizer_bool"]
+    tb_regions["colonizer_pop"] = tb_regions["population"] * tb_regions["colonizer_number"]
 
     # Define regions to aggregate
     regions = [
@@ -209,6 +209,17 @@ def regional_aggregations(tb: Table) -> Table:
             countries_that_must_have_data=[],
         )
 
+    # Create an additional column with the population not considered in the dataset
+    tb_regions["missing_pop"] = (
+        tb_regions["population"]
+        - tb_regions["colony_pop"]
+        - tb_regions["not_colonized_pop"]
+        - tb_regions["colonizer_pop"]
+    )
+
+    # # If missing_pop is negative, assign 0
+    # tb_regions["missing_pop"] = tb_regions["missing_pop"].where(tb_regions["missing_pop"] >= 0, 0)
+
     # Create the columns total_colonies_by_region and colonial_population_by_region, copies of colony_number and colony_pop
     # NOTE: This is temporal to avoid breaking Grapher.
     tb_regions["total_colonies_by_region"] = tb_regions["colony_number"]
@@ -227,6 +238,7 @@ def regional_aggregations(tb: Table) -> Table:
                 "country",
                 "year",
                 "total_colonies_by_region",
+                "missing_pop",
             ]
             + var_list
         ],
@@ -236,7 +248,7 @@ def regional_aggregations(tb: Table) -> Table:
     tb = pr.concat([tb, tb_regions], short_name="colonial_dates_dataset")
 
     # Make variables in var_list integer
-    for var in var_list + ["total_colonies_by_region"]:
+    for var in var_list + ["total_colonies_by_region", "missing_pop"]:
         tb[var] = tb[var].astype("Int64")
 
     # Drop population column
