@@ -110,6 +110,7 @@ steps:
 # Include all active steps plus all archive steps.
 include:
   - dag/main.yml
+  - dag/archive/animal_welfare.yml
   - dag/archive/agriculture.yml
   # - dag/archive/open_numbers.yml
   - dag/archive/faostat.yml

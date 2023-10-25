@@ -6,6 +6,14 @@
 dataset:
   update_period_days: 365
 
+definitions:
+  common:
+    display: &common-display
+      numDecimalPlaces: 1
+      tolerance: 5
+
+  exp_conversion: The data has been reconverted with the exponential function, to represent meaningful values.
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
@@ -19,10 +27,11 @@ tables:
         description_short: "Measures state capacity by combining 21 different indicators related to three key dimensions: extractive capacity, coercive capacity, and administrative capacity. Higher values indicate greater state capacity."
         # NOTE: Include a producer description if available
         # description_from_producer: Description of state capacity from producer.
-        processing_level: minor
+        processing_level: major
+        description_processing: Regional aggregations were included, where at least a 70% of the countries in the region had data available.
         display:
           name: State capacity
-          numDecimalPlaces: 1
+          <<: *common-display
       capacity_sd:
         title: Standard deviation of state capacity estimate
         unit: ""
@@ -30,7 +39,7 @@ tables:
         processing_level: minor
         display:
           name: State capacity standard deviation
-          numDecimalPlaces: 1
+          <<: *common-display
       admeffic:
         title: Administrative efficiency
         unit: ""
@@ -65,7 +74,7 @@ tables:
         processing_level: minor
         display:
           name: Administrative efficiency
-          numDecimalPlaces: 1
+          <<: *common-display
       bureau_qual:
         title: Bureaucratic quality
         unit: ""
@@ -81,7 +90,7 @@ tables:
         processing_level: minor
         display:
           name: Bureaucratic quality
-          numDecimalPlaces: 1
+          <<: *common-display
       law_order:
         title: Law and order
         unit: ""
@@ -96,7 +105,7 @@ tables:
         processing_level: minor
         display:
           name: Law and order
-          numDecimalPlaces: 1
+          <<: *common-display
       censusfreq:
         title: Census frequency
         unit: ""
@@ -112,7 +121,7 @@ tables:
         processing_level: minor
         display:
           name: Census frequency
-          numDecimalPlaces: 1
+          <<: *common-display
       v2clrspct:
         title: Rigourous and Impartial Public Administration
         unit: ""
@@ -137,7 +146,7 @@ tables:
         processing_level: minor
         display:
           name: Rigourous and Impartial Public Administration
-          numDecimalPlaces: 1
+          <<: *common-display
       v2stfisccap:
         title: Fiscal capacity
         unit: ""
@@ -160,7 +169,7 @@ tables:
         processing_level: minor
         display:
           name: Fiscal capacity
-          numDecimalPlaces: 1
+          <<: *common-display
       v2terr:
         title: State Authority over Territory
         unit: ""
@@ -179,7 +188,7 @@ tables:
         processing_level: minor
         display:
           name: State Authority over Territory
-          numDecimalPlaces: 1
+          <<: *common-display
       infcap:
         title: Information capacity filled
         unit: ""
@@ -203,7 +212,7 @@ tables:
         processing_level: minor
         display:
           name: Information capacity filled
-          numDecimalPlaces: 1
+          <<: *common-display
       irai_qbfm:
         title: Quality of Budgetary and Financial Management
         unit: ""
@@ -225,7 +234,7 @@ tables:
         processing_level: minor
         display:
           name: Quality of Budgetary and Financial Management
-          numDecimalPlaces: 1
+          <<: *common-display
       irai_qpa:
         title: Quality of Public Administration
         unit: ""
@@ -247,7 +256,7 @@ tables:
         processing_level: minor
         display:
           name: Quality of Public Administration
-          numDecimalPlaces: 1
+          <<: *common-display
       irai_erm:
         title: Efficiency of Revenue Mobilization
         unit: ""
@@ -268,49 +277,52 @@ tables:
         processing_level: minor
         display:
           name: Efficiency of Revenue Mobilization
-          numDecimalPlaces: 1
+          <<: *common-display
       milexpercap:
-        title: Military expenditures per capita, in logarithmic scale
+        title: Military expenditures per capita
         unit: ""
         short_unit: ""
-        description_short: Measures the amount of money spent on the military per capita. It is logged to reduce the skewness of the distribution.
+        description_short: Measures the amount of money spent on the military per capita.
         description_from_producer: >-
           Data on military spending from the SIPRI Military Expenditure Database (2020), which cover
           the years 1949-2019. Missing data are filled from from the Correlates of War Project’s National
           Military Capabilities dataset version 5.0 (Singer et al. 1972; Singer 1987). Population data are
           from the United Nations World Population Prospects (2019).
-        processing_level: minor
+        description_processing: "{definitions.exp_conversion}"
+        processing_level: major
         display:
           name: Military expenditures per capita
-          numDecimalPlaces: 1
+          <<: *common-display
       milpercap:
-        title: Military personnel per 1,000 people, in logarithmic scale
+        title: Military personnel per 1,000 people
         unit: ""
         short_unit: ""
-        description_short: Measures the number of military personnel per 1,000 people. It is logged to reduce the skewness of the distribution.
+        description_short: Measures the number of military personnel per 1,000 people.
         description_from_producer: >-
           Data on the number of military personnel (in thousands) from 1960-2012 comes primarily from
           the Correlates of War Project’s National Military Capabilities dataset version 5.0 (Singer et al.
           1972; Singer 1987). Data on military personnel for 2013-2015 come from the World Development
           Indicators (World Bank). Population data are from the United Nations World Population Prospects
           (2019).
-        processing_level: minor
+        processing_level: major
+        description_processing: "{definitions.exp_conversion}"
         display:
           name: Military personnel per 1,000 people
-          numDecimalPlaces: 1
+          <<: *common-display
       policecap:
-        title: Police Officers per 1,000 people, in logarithmic scale
+        title: Police Officers per 1,000 people
         unit: ""
         short_unit: ""
-        description_short: Measures the number of police officers per 1,000 people. It is logged to reduce the skewness of the distribution.
+        description_short: Measures the number of police officers per 1,000 people
         description_from_producer: >-
           Data on police personnel come from the United Nations Survey of Crime Trends and Operations of
           Criminal Justice Systems (UNODC) from various years. These are country-reported data covering
           the years 1973-2015 for a varying number of countries each year.
-        processing_level: minor
+        processing_level: major
+        description_processing: "{definitions.exp_conversion}"
         display:
           name: Police Officers per 1,000 people
-          numDecimalPlaces: 1
+          <<: *common-display
       statehist50s:
         title: State Antiquity Index
         unit: ""
@@ -331,7 +343,7 @@ tables:
         processing_level: minor
         display:
           name: State Antiquity Index
-          numDecimalPlaces: 1
+          <<: *common-display
       bti_mo:
         title: Monopoly of Force
         unit: ""
@@ -349,7 +361,7 @@ tables:
         processing_level: minor
         display:
           name: Monopoly of Force
-          numDecimalPlaces: 1
+          <<: *common-display
       weberian:
         title: Index of Weberianness
         unit: ""
@@ -367,7 +379,7 @@ tables:
         processing_level: minor
         display:
           name: Index of Weberiannes
-          numDecimalPlaces: 1
+          <<: *common-display
       wbstat:
         title: Statistical Capacity
         unit: ""
@@ -392,7 +404,7 @@ tables:
         processing_level: minor
         display:
           name: Statistical Capacity
-          numDecimalPlaces: 1
+          <<: *common-display
       tax_inc_tax:
         title: Taxes on income, profits and capital gains (as a share of total tax revenue)
         unit: "%"
@@ -409,7 +421,7 @@ tables:
         processing_level: minor
         display:
           name: Taxes on income (% of total revenue)
-          numDecimalPlaces: 1
+          <<: *common-display
       tax_trade_tax:
         title: Taxes on international trade (as a share of total tax revenue)
         unit: "%"
@@ -426,7 +438,7 @@ tables:
         processing_level: minor
         display:
           name: Taxes on international trade (% of total revenue)
-          numDecimalPlaces: 1
+          <<: *common-display
       taxrev_gdp:
         title: Tax revenue (as a share of GDP)
         unit: "%"
@@ -443,5 +455,4 @@ tables:
         processing_level: minor
         display:
           name: Tax revenue (% GDP)
-          numDecimalPlaces: 1
-
+          <<: *common-display
