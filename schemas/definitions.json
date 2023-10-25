@@ -11,7 +11,7 @@
       "name": {
         "type": "string",
         "title": "License name",
-        "description": "Name of the license.",
+        "description": "Name of the license. Find more details on licensing at https://creativecommons.org/share-your-work/cclicenses/.",
         "requirement_level": "required",
         "examples": [
           "Public domain",
@@ -22,17 +22,13 @@
           "© GISAID 2023"
         ],
         "options": [
-          "Public domain",
           "CC0",
-          "PDM",
           "CC BY 4.0",
           "CC BY-SA 4.0",
           "CC BY-ND 4.0",
           "CC BY-NC 4.0",
           "CC BY-NC-SA 4.0",
-          "CC BY-NC-ND 4.0",
-          "©producer year",
-          "custom license"
+          "CC BY-NC-ND 4.0"
         ],
         "examples_bad": [],
         "guidelines": [
