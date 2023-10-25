@@ -1,102 +1,58 @@
 dataset:
   update_period_days: 365
   sources: []
+
 definitions:
   common:
     sources: []
     origins:
-      - producer: United Nations Office for Outer Space Affairs, Online Index of Objects Launched into Outer Space
-        title: United Nations Office for Outer Space Affairs
+      - producer: United Nations Office for Outer Space Affairs
+        title: Online Index of Objects Launched into Outer Space
         description: |-
-          The Online Index of Objects Launched into Outer Space is a register of objects launched into outer space maintained by the United Nations Office for Outer Space Affairs since 1962.
+          The Online Index of Objects Launched into Outer Space is a register of objects launched into outer space maintained by the United Nations Office for Outer Space Affairs (UNOOSA) since 1962.
 
-          More details are available on [the website of the UN Office for Outer Space Affairs](https://www.unoosa.org/oosa/en/spaceobjectregister/index.html).
-        citation_full: Online Index of Objects Launched into Outer Space (2023)
+          Following multi-year discussion among States, the [Convention on Registration of Objects Launched into Outer Space](https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/registration-convention.html) entered into force in 1976. States and international intergovernmental organizations that agree to abide by the Convention are required to establish their own national registries and provide information on their space objects to the Secretary-General for inclusion in the United Nations Register. Responsibility for maintenance of the Register was delegated by the Secretary-General to the United Nations Office for Outer Space Affairs. As required under the treaty, UNOOSA publicly disseminates the information provided as United Nations documents, which are available through its website and through the [United Nations Official Document System](https://documents.un.org/).
+
+          To date approximately 88% of all satellites, probes, landers, crewed spacecraft and space station flight elements launched into Earth orbit or beyond have been registered with the Secretary-General.
+
+          More details are available on [the website of the UNOOSA](https://www.unoosa.org/oosa/en/spaceobjectregister/index.html).
+        citation_full: United Nations Office for Outer Space Affairs - Online Index of Objects Launched into Outer Space (2023).
         url_main: https://www.unoosa.org/oosa/osoindex/search-ng.jspx
-        date_accessed: '2023-09-29'
-        date_published: '2023'
-      # - producer: United Nations Office for Outer Space Affairs, Online Index of Objects Launched into Outer Space (2023)
-      #   title: Online Index of Objects Launched into Outer Space (UN, 2023-09-29)
-      #   description: >-
-      #     This data is compiled from the Online Index of Objects Launched into Outer Space, maintained by the United Nations
-      #     Office for Outer Space Affairs.
+        date_accessed: 2023-09-29
+        date_published: 2023-09-29
+    presentation:
+      attribution_short: UNOOSA
+      topic_tags:
+        - Space Exploration & Satellites
+        - Research & Development
 
-
-      #     Since 1962, the United Nations has maintained a Register of Objects Launched into Outer Space. Originally established
-      #     as a mechanism to aid the United Nations Committee on the Peaceful Uses of Outer Space in its discussions on the
-      #     political, legal, and technical issues concerning outer space, the evolution of international space law resulted
-      #     in space object registration becoming a means of identifying which States' bear international responsibility and
-      #     liability for space objects.
-
-
-      #     The source indicates that around 87% of all satellites, probes, landers, crewed spacecraft, and space station flight
-      #     elements launched into Earth orbit or beyond have been registered with the Secretary-General.
-
-
-      #     In the data shown on our charts:
-
-      #     - when an object is launched by a country on behalf of another one, it is attributed to the latter;
-
-      #     - when a launch is made jointly by several countries, it is recorded in each of these countries' time series, but
-      #     only once in the 'World' series.
-      #   citation_full: Online Index of Objects Launched into Outer Space (2023)
-      #   url_main: https://www.unoosa.org/oosa/osoindex/search-ng.jspx
-      #   date_accessed: '2023-09-29'
-      #   date_published: '2023'
 tables:
   un_space_objects:
     variables:
       yearly_launches:
         title: Yearly number of objects launched into outer space
         unit: objects
+        short_unit: ""
         description_short: Annual number of satellites, probes, landers, crewed spacecrafts, and space station flight elements, launched into Earth orbit or beyond.
-        description_from_producer: |-
-          Since 1962, the United Nations has maintained a Register of Objects Launched into Outer Space. Originally established as a mechanism to aid the United Nations Committee on the Peaceful Uses of Outer Space in its discussions on the political, legal and technical issues concerning outer space, the evolution of international space law resulted in space object registration becoming a means of identifying which States' bear international responsibility and liability for space objects.
-
-          Following multi-year discussion among States, the_ _[Convention on Registration of Objects Launched into Outer Space](https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/registration-convention.html)_ _entered into force in 1976. States and international intergovernmental organizations that agree to abide by the Convention are required to establish their own national registries and provide information on their space objects to the Secretary-General for inclusion in the United Nations Register. Responsibility for maintenance of the Register was delegated by the Secretary-General to the United Nations Office for Outer Space Affairs. As required under the treaty, UNOOSA publicly disseminates the information provided as United Nations documents, which are available through its website and through the_ _[United Nations Official Document System](https://documents.un.org/)__.
-
-          To date approximately 88% of all satellites, probes, landers, crewed spacecraft and space station flight elements launched into Earth orbit or beyond have been registered with the Secretary-General.
-
-          \[Text from United Nations [Space Objects Register website](https://www.unoosa.org/oosa/en/spaceobjectregister/index.html)\]
         description_key:
           - Objects are defined here as satellites, probes, landers, crewed spacecrafts, and space station flight elements launched into Earth orbit or beyond.
           - This data is based on national registers of launches submitted to the UN by participating nations. According to UN estimates, the data captures around 88% of all objects launched.
-          - When an object is marked by the source as launched by a country on behalf of another one, we’ve attributed the launch to the latter country.
+          - When an object is marked by the source as launched by a country on behalf of another one, the launch is attributed to the latter country.
           - When a launch is made jointly by several countries, it is recorded in each of these countries' time series but only once in the 'World' series.
-        # TODO: merge both paragraphs
         description_processing: |-
-          This data is compiled from the Online Index of Objects Launched into Outer Space, maintained by the United Nations Office for Outer Space Affairs.
-
-          The Online Index is a register of objects launched into outer space maintained by the United Nations since 1962.
-
-          To prepare this dataset:
-
           - We scrape the data from the source by iterating through all objects in the online index.
-          - We standardize the names of countries. Since the names of countries and regions differ in data sources, we harmonize all names to the [Our World in Data standard entity names](https://ourworldindata.org/world-region-map-definitions). When an object is marked by the source as launched by a country on behalf of another one, we attribute the launch to the latter country.
+          - We harmonize the names of countries. When an object is marked by the source as launched by a country on behalf of another one, we attribute the launch to the latter country.
           - We aggregate launches by country and year. When a launch is made jointly by several countries, it is recorded in each of these countries' time series.
-          - We calculate the total number of launches globally. This is available as “World” in the data. When a launch is made jointly by several countries, it is only recorded once in the “World” series.
+          - We calculate the total number of launches globally. This is available as 'World' in the data. When a launch is made jointly by several countries, it is only recorded once in the 'World' series.
           - We also calculate the cumulative number of launches over time.
-
-
-          To prepare this data:
-
-          - We aggregate object launches listed in the source’s online index by country and year.
-          - When an object is marked by the source as launched by a country on behalf of another one, we attribute the launch to the latter country.
-          - When a launch is made jointly by several countries, it is recorded in each of these countries' time series.
-          - We calculate the total number of launches globally. This is available as “World” in the data. When a launch is made jointly by several countries, it is only recorded once in the “World” series.
+        display:
+          name: Annual number of objects launched into space
         presentation:
-          title_public: Annual number of objects launched into space
-          title_variant: United Nations
-          attribution_short: the United Nations Office for Outer Space Affairs
-          topic_tags:
-            - Space Exploration & Satellites
-            - Research & Development
           grapher_config:
             slug: yearly-number-of-objects-launched-into-outer-space
             title: Annual number of objects launched into space
-            subtitle: >-
-              This includes satellites, probes, landers, crewed spacecrafts, and space
-              station flight elements launched into Earth orbit or beyond.
+            subtitle: |-
+              This includes satellites, probes, landers, crewed spacecrafts, and space station flight elements launched into Earth orbit or beyond.
             sourceDesc: United Nations Office for Outer Space Affairs
             note: >-
               When an object is launched by a country on behalf of another one, it is
@@ -105,6 +61,9 @@ tables:
               time: true
               entity: true
               changeInPrefix: true
+            # NOTE: Since 2023 is not completed yet, it is better to stop the timeline in 2022.
+            # Ideally, the latest data point should be removed from the data, otherwise this field will need to be
+            # manually edited on each update.
             timelineMaxTime: 2022
             hasMapTab: true
             originUrl: https://ourworldindata.org/space-exploration-satellites
