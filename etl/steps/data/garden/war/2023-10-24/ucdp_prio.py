@@ -48,9 +48,12 @@ def run(dest_dir: str) -> None:
     tb_ucdp["region"] = tb_ucdp["region"].str.replace(r" \(.+\)", "", regex=True)
     tb_prio["region"] = tb_prio["region"].str.replace(r" \(.+\)", "", regex=True)
 
+    ## In PRIO, change conflict_type 'all' to 'state-based'
+    tb_prio["conflict_type"] = tb_prio["conflict_type"].replace({"all": "state-based"})
+
     # Sanity checks
     assert set(tb_ucdp["region"]) == set(tb_prio["region"]), "Missmatch in regions between UCDP and PRIO"
-    expected_missmatch = {"non-state conflict", "one-sided violence"}
+    expected_missmatch = {"non-state conflict", "one-sided violence", "all"}
     assert (
         set(tb_ucdp["conflict_type"]) - set(tb_prio["conflict_type"]) == expected_missmatch
     ), "Missmatch in conflict_type between UCDP and PRIO not as expected!"
