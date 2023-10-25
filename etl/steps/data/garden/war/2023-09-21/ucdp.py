@@ -682,7 +682,7 @@ def add_conflict_all_intrastate(tb: Table) -> Table:
 
 def add_conflict_all_statebased(tb: Table) -> Table:
     """Add metrics for conflict_type = 'state-based'."""
-    tb_state = tb[tb["conflict_type"].isin(TYPE_OF_CONFLICT_MAPPING)].copy()
+    tb_state = tb[tb["conflict_type"].isin(TYPE_OF_CONFLICT_MAPPING.values())].copy()
     tb_state = tb_state.groupby(["year", "region"], as_index=False).sum(numeric_only=True, min_count=1)
     tb_state["conflict_type"] = "state-based"
     tb = pr.concat([tb, tb_state], ignore_index=True)

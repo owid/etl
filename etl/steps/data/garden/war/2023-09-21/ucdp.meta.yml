@@ -23,9 +23,8 @@ definitions:
       A non-state conflict is a conflict between non-state armed groups that causes at least 25 deaths during a year.
       <%- elif conflict_type == "one-sided violence" -%>
       One-sided violence is the use of armed force by a state or non-state armed group against civilians that causes at least 25 deaths during a year.
-
       <%- elif conflict_type == "state-based" -%>
-      A state-based conflict is an armed conflict, where at least one is a state, and that causes at least 25 deaths during a year.
+      A state-based conflict is a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year.
       <%- endif -%>
 
   number_deaths:
@@ -119,7 +118,7 @@ definitions:
         <% elif conflict_type == "one-sided violence" %>
         New one-sided violence is the use of armed force by a state or non-state armed group against civilians that causes at least 25 deaths during a year for the first time.
         <% elif conflict_type == "state-based" %>
-        A new state-based conflict is a conflict between non-state armed groups that causes at least 25 deaths during a year for the first time.
+        A new state-based conflict is a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year.
         <% endif %>
       - We only count a conflict as new when the conflict overall started that year, not if it became active again.
       - We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
