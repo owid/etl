@@ -21,7 +21,7 @@ Unidecode = ">=1.3.4"
 PyYAML = ">=5.4.1"
 structlog = ">=21.5.0"
 owid-repack = ">=0.1.1"
-dynamic-yaml = "^1.3.4"
+dynamic-yaml = "^1.3.5"
 mistune = "^3.0.1"
 # higher version causes error in python 3.9 when running
 # from owid import catalog; catalog.find("global_carbon_budget").sort_values("version", ascending=False).iloc[0].load()

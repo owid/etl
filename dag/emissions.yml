@@ -111,13 +111,17 @@ steps:
     - data://meadow/emissions/2023-10-24/emission_factors
   data://grapher/emissions/2023-10-24/emission_factors:
     - data://garden/emissions/2023-10-24/emission_factors
-  ######################################################################################################################
-  # Older versions to be archived once they are not used by any other steps.
-  ######################################################################################################################
+  #
+  # Net zero tracker (2023-10-10).
+  #
   data://meadow/emissions/2023-10-10/net_zero_tracker:
     - snapshot://emissions/2023-10-10/net_zero_tracker.xlsx
   data://garden/emissions/2023-10-10/net_zero_tracker:
     - data://meadow/emissions/2023-10-10/net_zero_tracker
   data://grapher/emissions/2023-10-10/net_zero_tracker:
     - data://garden/emissions/2023-10-10/net_zero_tracker
+  ######################################################################################################################
+  # Older versions to be archived once they are not used by any other steps.
+  ######################################################################################################################
+
   ######################################################################################################################

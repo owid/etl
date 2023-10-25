@@ -159,7 +159,10 @@ def run_sanity_checks_on_outputs(tb_combined: Table, expected_countries_dropping
         countries_to_inspect_for_any_carbon_mechanism += list(countries_to_inspect)
     # Check if the list of countries to inspect has changed.
     if set(countries_to_inspect_for_any_carbon_mechanism) != expected_countries_dropping_taxes:
-        log.warning("The list of countries that dropped their carbon prices to zero in the last year has changed. ")
+        log.warning(
+            "The list of countries that dropped their carbon prices to zero in the last year has changed."
+            "Remove temporary solution where spurious zeros are removed."
+        )
 
 
 def run(dest_dir: str) -> None:
@@ -207,13 +210,20 @@ def run(dest_dir: str) -> None:
         tb_combined = tb_combined[tb_combined["year"] <= LAST_INFORMED_YEAR].reset_index(drop=True)
 
     # Sanity checks.
-    ####################################################################################################################
     # Some countries suddenly dropped their carbon mechanisms to zero.
-    # I will ask the data producer if any of these drops may be spurious.
-    expected_countries_dropping_taxes = {"Kazakhstan", "Denmark", "Norway", "Iceland"}
     # expected_countries_dropping_taxes = set()
-    ####################################################################################################################
+    expected_countries_dropping_taxes = {"Kazakhstan", "Denmark", "Norway", "Iceland"}
     run_sanity_checks_on_outputs(tb_combined, expected_countries_dropping_taxes=expected_countries_dropping_taxes)
+    ####################################################################################################################
+    # Geoffroy Dolphin confirmed that Denmark, Norway and Iceland drop to zero in 2021 is spurious.
+    # I will remove those points.
+    # Kazakhstan is not spurious (I did not ask about this one, but looking at the data it is not the first time it is
+    # zero in recent years).
+    for column in ["price_with_tax_weighted_by_share_of_co2", "price_with_tax_weighted_by_share_of_ghg"]:
+        tb_combined.loc[
+            (tb_combined["country"].isin(["Denmark", "Iceland", "Norway"])) & (tb_combined["year"] == 2021), column
+        ] = None
+    ####################################################################################################################
 
     # Set an appropriate index and sort conveniently.
     tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
