@@ -47,6 +47,7 @@ tables:
           - We also calculate the cumulative number of launches over time.
         display:
           name: Annual number of objects launched into space
+          numDecimalPlaces: 0
         presentation:
           grapher_config:
             slug: yearly-number-of-objects-launched-into-outer-space
