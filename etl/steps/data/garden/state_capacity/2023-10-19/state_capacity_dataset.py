@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -30,6 +31,12 @@ def run(dest_dir: str) -> None:
     # Convert tax indicators to percentages.
     tax_vars = ["tax_inc_tax", "tax_trade_tax", "taxrev_gdp"]
     tb[tax_vars] *= 100
+
+    # Convert log indicators back to absolute values.
+    log_vars = ["milexpercap", "milpercap", "policecap"]
+
+    for var in log_vars:
+        tb[var] = tb[var].apply(lambda x: np.exp(x))
 
     #
     tb = geo.harmonize_countries(
