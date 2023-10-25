@@ -190,6 +190,10 @@ class Tag(SQLModel, table=True):
     datasets: List["Dataset"] = Relationship(back_populates="tags")
     chart_tags: List["ChartTags"] = Relationship(back_populates="tags")
 
+    @classmethod
+    def load_tags(cls, session: Session, is_topic: bool = True) -> List["Tag"]:  # type: ignore
+        return session.exec(select(cls).where(cls.isTopic == is_topic)).all()  # type: ignore
+
 
 class User(SQLModel, table=True):
     __tablename__: str = "users"  # type: ignore

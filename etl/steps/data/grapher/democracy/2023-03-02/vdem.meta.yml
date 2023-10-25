@@ -42,7 +42,7 @@ tables:
 
           `= .5 ∗ (v2x_elecoff ∗ v2xel_frefair ∗ v2x_frassoc_thick∗ v2x_suffr ∗ v2x_freexp_altinf) + .5 ∗ ((1/8) ∗ v2x_elecoff + (1/4) ∗ v2xel_frefair + (1/4) ∗ v2x_frassoc_thick + (1/8) ∗ v2x_suffr + (1/4) ∗ v2x_freexp_altinf)`
 
-          \[Text from [V-Dem Codebook v13](https://www.v-dem.net/documents/24/codebook_v13.pdf)\]
+          [Text from [V-Dem Codebook v13](https://www.v-dem.net/documents/24/codebook_v13.pdf)]
         description_processing: |-
           We ingested the original data from the [V-Dem project website](https://v-dem.net/data/the-v-dem-dataset/) and processed it with Stata.
 
@@ -70,7 +70,6 @@ tables:
             - fragment_id: vdem-more-info
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            slug: electoral-democracy-index
             title: Electoral democracy index
             subtitle: >-
               Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures

@@ -67,7 +67,6 @@ tables:
             - fragment_id: poverty-regional-estimates
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            slug: share-of-population-in-extreme-poverty
             title: Share of population living in extreme poverty
             subtitle: >-
               Extreme poverty is defined as living below the International Poverty Line of
@@ -130,7 +129,6 @@ tables:
             - fragment_id: poverty-comparability
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            slug: relative-poverty-share-of-people-below-60-of-the-median
             title: 'Relative poverty: Share of people below 60% of median income'
             subtitle: >-
               Relative poverty is measured in terms of a poverty line that rises and falls
@@ -184,7 +182,6 @@ tables:
             - fragment_id: poverty-comparability
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            slug: economic-inequality-gini-index
             title: 'Income inequality: Gini coefficient'
             subtitle: >-
               The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1.
