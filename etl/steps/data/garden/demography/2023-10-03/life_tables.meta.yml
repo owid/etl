@@ -59,6 +59,7 @@ tables:
               - England and Wales
               - France
               - Sweden
+
       central_death_rate_mf_ratio:
         title: Central death rate ratio (m/f)
         unit: ""
