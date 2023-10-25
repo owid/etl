@@ -43,7 +43,6 @@ tables:
           topic_tags:
             - Economic Inequality
           grapher_config:
-            slug: income-share-top-1-before-tax-wid
             title: Income share of the richest 1% (before tax)
             subtitle: >-
               The share of income received by the richest 1% of the population. Income here is measured before taxes and benefits.

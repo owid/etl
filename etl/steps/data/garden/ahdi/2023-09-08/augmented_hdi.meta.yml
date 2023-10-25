@@ -48,7 +48,6 @@ tables:
           conversionFactor: 1
         presentation:
           grapher_config:
-            slug: augmented-human-development-index
             title: Augmented Human Development Index
             subtitle: >-
               The Augmented Human Development Index (AHDI) is a summary measure of
@@ -108,7 +107,6 @@ tables:
           conversionFactor: 1
         presentation:
           grapher_config:
-            slug: augmented-human-development-index-excluding-income
             title: Augmented Human Development Index (excluding income)
             subtitle: >-
               The Augmented Human Development Index (AHDI) is a summary measure of

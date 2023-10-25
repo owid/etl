@@ -70,7 +70,6 @@ tables:
             - fragment_id: vdem-more-info
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            slug: electoral-democracy-index
             title: Electoral democracy index
             subtitle: >-
               Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures

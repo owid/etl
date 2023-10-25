@@ -1322,10 +1322,6 @@
                             "additionalProperties": false
                           }
                         },
-                        "slug": {
-                          "type": "string",
-                          "description": "Slug of the chart on Our World in Data"
-                        },
                         "internalNotes": {
                           "description": "Internal notes.",
                           "type": "string"
