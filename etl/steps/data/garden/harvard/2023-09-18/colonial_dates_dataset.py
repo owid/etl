@@ -144,11 +144,29 @@ def regional_aggregations(tb: Table) -> Table:
     # Copy table
     tb_regions = tb.copy()
 
+    # Load population data.
+    tb_pop = paths.load_dataset("population")
+    tb_pop = tb_pop["population"].reset_index()
+
+    # Merge population data.
+    tb_regions = tb_regions.merge(tb_pop[["country", "year", "population"]], how="left", on=["country", "year"])
+
     # Define non-colonies identifiers for `colonizer`
     non_colonies = ["zz. Colonizer", "zzz. Not colonized"]
 
-    # Define colony, which is 1 if countries are not in non_colonies
-    tb_regions["colony"] = tb_regions["colonizer"].apply(lambda x: 0 if x in non_colonies else 1)
+    # Define colony_number, which is 1 if countries are not in non_colonies and colony_pop, which is the product of colony and population
+    tb_regions["colony_number"] = tb_regions["colonizer"].apply(lambda x: 0 if x in non_colonies else 1)
+    tb_regions["colony_pop"] = tb_regions["population"] * tb_regions["colony"]
+
+    # Define not_colonized_number, which is 1 if countries are in non_colonies and not_colonized_pop, which is the product of not_colonized and population
+    tb_regions["not_colonized_number"] = tb_regions["colonizer"].apply(
+        lambda x: 1 if x in ["zzz. Not colonized"] else 0
+    )
+    tb_regions["not_colonized_pop"] = tb_regions["population"] * tb_regions["not_colonized"]
+
+    # Define colonizer_number, which is 1 if countries are in colonizers_list and colonizer_pop, which is the product of colonizer_bool and population
+    tb_regions["colonizer_number"] = tb_regions["colonizer"].apply(lambda x: 1 if x in ["zz. Colonizer"] else 0)
+    tb_regions["colonizer_pop"] = tb_regions["population"] * tb_regions["colonizer_bool"]
 
     # Define regions to aggregate
     regions = [
@@ -166,14 +184,34 @@ def regional_aggregations(tb: Table) -> Table:
         "World",
     ]
 
+    # Define group of variables to generate
+    var_list = [
+        "colony_number",
+        "colony_pop",
+        "not_colonized_number",
+        "not_colonized_pop",
+        "colonizer_number",
+        "colonizer_pop",
+    ]
+
+    # Define the variables and aggregation method to be used in the following function loop
+    aggregations = dict.fromkeys(
+        var_list + ["population"],
+        "sum",
+    )
+
     # Add regional aggregates, by summing up the variables in `aggregations`
     for region in regions:
         tb_regions = geo.add_region_aggregates(
-            tb_regions, region=region, aggregations={"colony": "sum"}, countries_that_must_have_data=[]
+            tb_regions,
+            region=region,
+            aggregations=aggregations,
+            countries_that_must_have_data=[],
         )
 
-    # Rename colony column to total_colonies
-    tb_regions = tb_regions.rename(columns={"colony": "total_colonies_by_region"})
+    # Create the columns total_colonies_by_region and colonial_population_by_region, copies of colony_number and colony_pop
+    # NOTE: This is temporal to avoid breaking Grapher.
+    tb_regions["total_colonies_by_region"] = tb_regions["colony_number"]
 
     # Select only regions in tb_regions and "World" tb_world
     tb_world = tb_regions[tb_regions["country"] == "World"].reset_index(drop=True)
@@ -182,10 +220,26 @@ def regional_aggregations(tb: Table) -> Table:
     )
 
     # Concatenate and merge
-    tb = pr.merge(tb, tb_world[["country", "year", "total_colonies_by_region"]], on=["country", "year"], how="left")
+    tb = pr.merge(
+        tb,
+        tb_world[
+            [
+                "country",
+                "year",
+                "total_colonies_by_region",
+            ]
+            + var_list
+        ],
+        on=["country", "year"],
+        how="left",
+    )
     tb = pr.concat([tb, tb_regions], short_name="colonial_dates_dataset")
 
-    # Make total_colonies_by_region integer
-    tb["total_colonies_by_region"] = tb["total_colonies_by_region"].astype("Int64")
+    # Make variables in var_list integer
+    for var in var_list + ["total_colonies_by_region"]:
+        tb[var] = tb[var].astype("Int64")
+
+    # Drop population column
+    tb = tb.drop(columns=["population"])
 
     return tb
