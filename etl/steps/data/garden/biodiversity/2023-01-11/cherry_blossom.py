@@ -9,8 +9,6 @@ log = get_logger()
 # naming conventions
 paths = PathFinder(__file__)
 
-# TRIGGER REBUILD
-
 
 def run(dest_dir: str) -> None:
     log.info("cherry_blossom.start")
