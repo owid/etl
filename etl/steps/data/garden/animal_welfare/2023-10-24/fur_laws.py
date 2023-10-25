@@ -46,6 +46,9 @@ FUR_TRADING_BAN_STATUS = {
 FUR_FARMING_ACTIVE = {
     "YES": "Yes",
     "NO": "No",
+    # NOTE: We assume that if there is no information, then there are no fur farms.
+    # This is the case of Montenegro (Fur Free Alliance confirmed this case).
+    "": "No",
 }
 
 
@@ -79,18 +82,6 @@ def prepare_fur_farming_ban_status(tb: Table) -> Table:
 
     # For those years years that are in the future, change the status.
     tb.loc[tb["ban_effective_year"].astype(float) > CURRENT_YEAR, "fur_farming_status"] = BANNED_NOT_EFFECTIVE
-
-    return tb
-
-
-def prepare_fur_farming_activity_status(tb: Table) -> Table:
-    # Prepare fur farming activity statuses.
-    tb["fur_farms_active"] = tb["fur_farms_active"].map(FUR_FARMING_ACTIVE)
-
-    # Montenegro does not have data on whether there is fur farming.
-    # However, according to Fur Free Alliance, Montenegro does have active fur farming:
-    # https://www.furfreealliance.com/make-fur-history-exhibition-hosted-in-montenegro/
-    tb.loc[tb["country"] == "Montenegro", "fur_farms_active"] = "Yes"
 
     return tb
 
@@ -167,8 +158,8 @@ def run(dest_dir: str) -> None:
     # Prepare fur trading ban statuses.
     tb["fur_trading_status"] = tb["fur_trading_status"].astype(object).fillna("").map(FUR_TRADING_BAN_STATUS)
 
-    # Prepare fur farming activity status.
-    tb = prepare_fur_farming_activity_status(tb=tb)
+    # Prepare fur farming activity statuses.
+    tb["fur_farms_active"] = tb["fur_farms_active"].astype(object).fillna("").map(FUR_FARMING_ACTIVE)
 
     # Fix inconsistent data points.
     tb = fix_inconsistencies(tb=tb)
