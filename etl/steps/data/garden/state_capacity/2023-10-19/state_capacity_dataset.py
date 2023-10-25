@@ -1,5 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -33,6 +36,10 @@ def run(dest_dir: str) -> None:
         df=tb,
         countries_file=paths.country_mapping_path,
     )
+
+    # Create regional aggregations.
+    tb = regional_aggregations(tb)
+
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
@@ -45,3 +52,58 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def regional_aggregations(tb: Table) -> Table:
+    # Load population data.
+    tb_pop = paths.load_dataset("population")
+    tb_pop = tb_pop["population"].reset_index()
+
+    tb_regions = tb.copy()
+
+    # Merge population data.
+    tb_regions = tb_regions.merge(tb_pop[["country", "year", "population"]], how="left", on=["country", "year"])
+
+    # Create capacity_pop, the product of capacity and population.
+    tb_regions["capacity_pop"] = tb_regions["capacity"] * tb_regions["population"]
+
+    # Define regions to aggregate
+    regions = [
+        "Europe",
+        "Asia",
+        "North America",
+        "South America",
+        "Africa",
+        "Oceania",
+        "High-income countries",
+        "Low-income countries",
+        "Lower-middle-income countries",
+        "Upper-middle-income countries",
+        "European Union (27)",
+        "World",
+    ]
+
+    # Add regional aggregates, by summing up the variables in `aggregations`
+    for region in regions:
+        tb_regions = geo.add_region_aggregates(
+            tb_regions,
+            region=region,
+            aggregations={"capacity_pop": "sum", "population": "sum"},
+            countries_that_must_have_data=[],
+            frac_allowed_nans_per_year=0.3,
+            population=tb_regions,
+        )
+
+    # Keep only regions
+    tb_regions = tb_regions[tb_regions["country"].isin(regions)].reset_index(drop=True)
+
+    # Redefine capacity
+    tb_regions["capacity"] = tb_regions["capacity_pop"] / tb_regions["population"]
+
+    # Drop capacity_pop and population
+    tb_regions = tb_regions.drop(columns=["capacity_pop", "population"])
+
+    # Concatenate tb with tb_regions
+    tb = pr.concat([tb, tb_regions], ignore_index=True)
+
+    return tb
