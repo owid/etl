@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - HIV/AIDS
+
 tables:
   unaids:
     variables:
