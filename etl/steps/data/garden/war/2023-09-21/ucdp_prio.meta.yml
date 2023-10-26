@@ -95,3 +95,29 @@ tables:
         display:
           numDecimalPlaces: 0
 
+      number_deaths_ongoing_conflicts_per_capita:
+        title: Number of deaths in ongoing conflicts (best estimate, per capita)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "best" %>
+          {definitions.number_deaths.description_short}
+        display:
+          numDecimalPlaces: 1
+
+      number_deaths_ongoing_conflicts_high_per_capita:
+        title: Number of deaths in ongoing conflicts (high estimate, per capita)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths.description_short}
+        display:
+          numDecimalPlaces: 1
+
+      number_deaths_ongoing_conflicts_low_per_capita:
+        title: Number of deaths in ongoing conflicts (low estimate, per capita)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths.description_short}
+        display:
+          numDecimalPlaces: 1

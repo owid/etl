@@ -113,8 +113,9 @@ steps:
     - data://garden/war/2023-09-27/peace_diehl
 
   # UCDP/PRIO
-  data://garden/war/2023-10-24/ucdp_prio:
+  data://garden/war/2023-09-21/ucdp_prio:
     - data://garden/war/2023-09-21/ucdp
     - data://garden/war/2023-09-21/prio_v31
-  data://grapher/war/2023-10-24/ucdp_prio:
-    - data://garden/war/2023-10-24/ucdp_prio
+    - data://garden/countries/2023-09-29/cow_ssm
+  data://grapher/war/2023-09-21/ucdp_prio:
+    - data://garden/war/2023-09-21/ucdp_prio
