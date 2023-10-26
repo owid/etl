@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
+from shared import add_indicators_extra
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -41,6 +42,10 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb_prio = ds_meadow["prio_v31"].reset_index()
 
+    # Read table from COW codes
+    ds_cow_ssm = paths.load_dataset("gleditsch")
+    tb_regions = ds_cow_ssm["gleditsch_regions"].reset_index()
+
     #
     # Process data.
     #
@@ -69,6 +74,17 @@ def run(dest_dir: str) -> None:
 
     # Concatenate
     tb = pr.concat([tb_ucdp, tb_prio], axis=0, ignore_index=True, short_name=paths.short_name)
+
+    # Add conflict rates
+    tb = add_indicators_extra(
+        tb,
+        tb_regions,
+        columns_conflict_mortality=[
+            "number_deaths_ongoing_conflicts",
+            "number_deaths_ongoing_conflicts_high",
+            "number_deaths_ongoing_conflicts_low",
+        ],
+    )
 
     # Set index
     tb = tb.set_index(COLUMNS_INDEX, verify_integrity=True)
