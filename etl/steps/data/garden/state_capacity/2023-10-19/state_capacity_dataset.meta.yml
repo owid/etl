@@ -12,6 +12,8 @@ definitions:
       numDecimalPlaces: 1
       tolerance: 5
 
+  exp_conversion: The data has been reconverted with the exponential function, to represent meaningful values.
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
@@ -25,7 +27,8 @@ tables:
         description_short: "Measures state capacity by combining 21 different indicators related to three key dimensions: extractive capacity, coercive capacity, and administrative capacity. Higher values indicate greater state capacity."
         # NOTE: Include a producer description if available
         # description_from_producer: Description of state capacity from producer.
-        processing_level: minor
+        processing_level: major
+        description_processing: Regional aggregations were included, where at least a 70% of the countries in the region had data available.
         display:
           name: State capacity
           <<: *common-display
@@ -276,44 +279,47 @@ tables:
           name: Efficiency of Revenue Mobilization
           <<: *common-display
       milexpercap:
-        title: Military expenditures per capita, in logarithmic scale
+        title: Military expenditures per capita
         unit: ""
         short_unit: ""
-        description_short: Measures the amount of money spent on the military per capita. It is logged to reduce the skewness of the distribution.
+        description_short: Measures the amount of money spent on the military per capita.
         description_from_producer: >-
           Data on military spending from the SIPRI Military Expenditure Database (2020), which cover
           the years 1949-2019. Missing data are filled from from the Correlates of War Project’s National
           Military Capabilities dataset version 5.0 (Singer et al. 1972; Singer 1987). Population data are
           from the United Nations World Population Prospects (2019).
-        processing_level: minor
+        description_processing: "{definitions.exp_conversion}"
+        processing_level: major
         display:
           name: Military expenditures per capita
           <<: *common-display
       milpercap:
-        title: Military personnel per 1,000 people, in logarithmic scale
+        title: Military personnel per 1,000 people
         unit: ""
         short_unit: ""
-        description_short: Measures the number of military personnel per 1,000 people. It is logged to reduce the skewness of the distribution.
+        description_short: Measures the number of military personnel per 1,000 people.
         description_from_producer: >-
           Data on the number of military personnel (in thousands) from 1960-2012 comes primarily from
           the Correlates of War Project’s National Military Capabilities dataset version 5.0 (Singer et al.
           1972; Singer 1987). Data on military personnel for 2013-2015 come from the World Development
           Indicators (World Bank). Population data are from the United Nations World Population Prospects
           (2019).
-        processing_level: minor
+        processing_level: major
+        description_processing: "{definitions.exp_conversion}"
         display:
           name: Military personnel per 1,000 people
           <<: *common-display
       policecap:
-        title: Police Officers per 1,000 people, in logarithmic scale
+        title: Police Officers per 1,000 people
         unit: ""
         short_unit: ""
-        description_short: Measures the number of police officers per 1,000 people. It is logged to reduce the skewness of the distribution.
+        description_short: Measures the number of police officers per 1,000 people
         description_from_producer: >-
           Data on police personnel come from the United Nations Survey of Crime Trends and Operations of
           Criminal Justice Systems (UNODC) from various years. These are country-reported data covering
           the years 1973-2015 for a varying number of countries each year.
-        processing_level: minor
+        processing_level: major
+        description_processing: "{definitions.exp_conversion}"
         display:
           name: Police Officers per 1,000 people
           <<: *common-display

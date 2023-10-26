@@ -190,6 +190,10 @@ class Tag(SQLModel, table=True):
     datasets: List["Dataset"] = Relationship(back_populates="tags")
     chart_tags: List["ChartTags"] = Relationship(back_populates="tags")
 
+    @classmethod
+    def load_tags(cls, session: Session, is_topic: bool = True) -> List["Tag"]:  # type: ignore
+        return session.exec(select(cls).where(cls.isTopic == is_topic)).all()  # type: ignore
+
 
 class User(SQLModel, table=True):
     __tablename__: str = "users"  # type: ignore
@@ -1010,6 +1014,8 @@ class Variable(SQLModel, table=True):
     ) -> "Variable":
         # `unit` can be an empty string, but cannot be null
         assert metadata.unit is not None
+        if catalog_path:
+            assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
 
         if metadata.presentation:
             presentation_dict = metadata.presentation.to_dict()  # type: ignore
@@ -1062,6 +1068,8 @@ class Variable(SQLModel, table=True):
 
     @classmethod
     def load_from_catalog_path(cls, catalog_path: str, session: Optional[Session] = None) -> "Variable":
+        assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
+
         def _run(ses: Session):
             return ses.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
 

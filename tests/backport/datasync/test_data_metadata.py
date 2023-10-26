@@ -43,7 +43,7 @@ def test_variable_metadata():
         "originalMetadata": None,
         "grapherConfigAdmin": None,
         "shortName": "population_density",
-        "catalogPath": "grapher/owid/latest/key_indicators/population_density",
+        "catalogPath": "grapher/owid/latest/key_indicators/population_density#population_density",
         "dimensions": None,
         "datasetName": "Key Indicators",
         "nonRedistributable": 0,
@@ -80,7 +80,7 @@ def test_variable_metadata():
                         meta = variable_metadata(session, 525715, variable_df)
 
     assert meta == {
-        "catalogPath": "grapher/owid/latest/key_indicators/population_density",
+        "catalogPath": "grapher/owid/latest/key_indicators/population_density#population_density",
         "columnOrder": 0,
         "coverage": "",
         "createdAt": "2022-09-20T12:16:46.000Z",
