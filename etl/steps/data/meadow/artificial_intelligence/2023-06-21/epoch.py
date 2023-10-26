@@ -24,14 +24,14 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("epoch.csv"))
+    snap = paths.load_snapshot("epoch.csv")
 
     # Now read the file with pandas
     df = pd.read_csv(snap.path)
     #
     # Process data.
     #
-    # Select columns of interest.
+    # Define columns of interest.
     cols = [
         "System",
         "Domain",
@@ -44,19 +44,28 @@ def run(dest_dir: str) -> None:
         "Training time (hours)",
         "Notability criteria",
     ]
+    # Check that the columns of interest are present
+    for col in cols:
+        assert col in df.columns, f"Column '{col}' is missing from the dataframe."
+    # Check that there are no negative values in the training compute column
+    assert not (df["Training compute (FLOP)"] < 0).any(), "Negative values found in 'Training compute (FLOP)' column."
 
-    df = df[cols]
-    df.replace("#REF!", np.nan, inplace=True)
+    # Replace empty strings with NaN values
     df.replace("", np.nan, inplace=True)
-
+    # Convert the training compute column to float
     df["Training compute (FLOP)"] = df["Training compute (FLOP)"].astype(float)
 
+    # Replace the missing values in the system column with the organization column
     df.loc[df["System"].isna(), "System"] = df.loc[df["System"].isna(), "Organization"]
+    # Check that there are no NaN values in the system column
+    assert not df["System"].isna().any(), "NaN values found in 'System' column after processing."
+    # Drop the organization column
     df.drop("Organization", axis=1, inplace=True)
     #
     # Create a new table and ensure all columns are snake-case.
     #
     tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = tb.set_index(["publication_date", "system"], verify_integrity=True)
     ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
     #
