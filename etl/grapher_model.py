@@ -817,6 +817,7 @@ class TagsVariablesTopicTagsLink(SQLModel, table=True):
 
     tagId: Optional[str] = Field(default=None, sa_column=Column("tagId", Integer, primary_key=True, nullable=False))
     variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
+    displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
 
     @classmethod
     def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: Set[str]) -> None:
@@ -824,21 +825,24 @@ class TagsVariablesTopicTagsLink(SQLModel, table=True):
         # Fetch current linked tags for the given Variable ID
         existing_links = session.query(cls.tagId).filter(cls.variableId == variable_id).all()
 
-        existing_tag_ids = {link.tagId for link in existing_links}
+        existing_tags = {(link.tagId, link.displayOrder) for link in existing_links}
+        new_tags = {(tag_id, i) for i, tag_id in enumerate(new_tag_ids)}
 
         # Find the tag IDs to delete and the IDs to add
-        to_delete_ids = existing_tag_ids - new_tag_ids
-        to_add_ids = new_tag_ids - existing_tag_ids
+        to_delete = existing_tags - new_tags
+        to_add = new_tags - existing_tags
 
         # Delete the obsolete links
-        if to_delete_ids:
-            session.query(cls).filter(cls.variableId == variable_id, col(cls.tagId).in_(to_delete_ids)).delete(
-                synchronize_session="fetch"
-            )
+        for tag_id, display_order in to_delete:
+            session.query(cls).filter(
+                cls.variableId == variable_id,
+                cls.tagId == tag_id,
+                cls.displayOrder == display_order,
+            ).delete(synchronize_session="fetch")
 
         # Add the new links
-        if to_add_ids:
-            session.add_all([cls(tagId=tag_id, variableId=variable_id) for tag_id in to_add_ids])
+        if to_add:
+            session.add_all([cls(tagId=tag_id, variableId=variable_id, displayOrder=display_order) for tag_id, display_order in to_add])
 
 
 class Variable(SQLModel, table=True):
