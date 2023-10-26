@@ -842,7 +842,12 @@ class TagsVariablesTopicTagsLink(SQLModel, table=True):
 
         # Add the new links
         if to_add:
-            session.add_all([cls(tagId=tag_id, variableId=variable_id, displayOrder=display_order) for tag_id, display_order in to_add])
+            session.add_all(
+                [
+                    cls(tagId=tag_id, variableId=variable_id, displayOrder=display_order)
+                    for tag_id, display_order in to_add
+                ]
+            )
 
 
 class Variable(SQLModel, table=True):
