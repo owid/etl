@@ -316,3 +316,43 @@ tables:
           entityAnnotationsMap: ""
           numDecimalPlaces: 0
           conversionFactor: 1
+
+      not_colonizer_number:
+        title: Number of not colonizers
+        unit: "countries"
+        short_unit: ""
+        description_short: |
+          Number of European colonial powers, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy which are not colonizing in a specific year. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_processing: |
+          This is is an aggregation of the number of countries considered European colonial powers with a total number of colonies equal to zero, by OWID geographic region or World Bank income groups.
+
+          We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
+
+          {common.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Number of not colonizers
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      not_colonizer_pop:
+        title: Population of not colonizers
+        unit: "people"
+        short_unit: ""
+        description_short: |
+          Population of European colonial powers, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy which are not colonizing in a specific year. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_processing: |
+          This is is an aggregation of the population of European colonial powers with a total number of colonies equal to zero, by OWID geographic region or World Bank income groups.
+
+          We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
+
+          {common.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Population of not colonizers
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
