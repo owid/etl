@@ -784,12 +784,10 @@ class GrapherStep(Step):
                     cols += [c for c in table.columns if c in {"year", "country"} and c not in cols]
                     table = table.loc[:, cols]
 
-                catalog_path = f"{self.path}/{table.metadata.short_name}"
-
                 table = gh._adapt_table_for_grapher(table)
 
                 # generate table with entity_id, year and value for every column
-                upsert = lambda t: gi.upsert_table(  # noqa: E731
+                upsert = lambda t, catalog_path: gi.upsert_table(  # noqa: E731
                     engine,
                     t,
                     dataset_upsert_results,
@@ -798,7 +796,9 @@ class GrapherStep(Step):
                 )
 
                 for t in gh._yield_wide_table(table, na_action="drop"):
-                    futures.append(thread_pool.submit(upsert, t))
+                    assert len(t.columns) == 1
+                    catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
+                    futures.append(thread_pool.submit(upsert, t, catalog_path=catalog_path))
 
             variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
 
