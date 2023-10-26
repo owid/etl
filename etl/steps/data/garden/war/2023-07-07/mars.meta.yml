@@ -1,4 +1,9 @@
 definitions:
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
+
   number_deaths_ongoing_conflicts: |-
     <% if conflict_type == "all" %>
     The << estimate >> estimate of the number of deaths in all ongoing conventional wars in each year.

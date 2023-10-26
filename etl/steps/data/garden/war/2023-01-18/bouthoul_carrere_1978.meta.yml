@@ -1,3 +1,10 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
+
+
 all_sources:
   - source_testing: &source-testing
       name: Bouthoul and Carrère (1978)
