@@ -40,6 +40,7 @@ def run(dest_dir: str) -> None:
         "Training dataset size (datapoints)",
         "Training time (hours)",
         "Notability criteria",
+        "Approach",
     ]
     # Check that the columns of interest are present
     for col in cols:
@@ -47,6 +48,8 @@ def run(dest_dir: str) -> None:
     # Check that there are no negative values in the training compute column
     assert not (df["Training compute (FLOP)"] < 0).any(), "Negative values found in 'Training compute (FLOP)' column."
 
+    # Select the columns of interest
+    df = df[cols]
     # Replace empty strings with NaN values
     df.replace("", np.nan, inplace=True)
     # Convert the training compute column to float
@@ -57,12 +60,11 @@ def run(dest_dir: str) -> None:
     # Check that there are no NaN values in the system column
     assert not df["System"].isna().any(), "NaN values found in 'System' column after processing."
     # Drop the organization column
-    df.drop("Organization", axis=1, inplace=True)
+    # df.drop("Organization", axis=1, inplace=True)
     #
     # Create a new table and ensure all columns are snake-case.
     #
     tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb = tb.set_index(["publication_date", "system"], verify_integrity=True)
     ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
     #
