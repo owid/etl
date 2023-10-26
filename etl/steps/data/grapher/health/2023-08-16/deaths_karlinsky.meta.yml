@@ -13,11 +13,11 @@ definitions:
           The work and sources are documented in detail on GitHub: https://github.com/akarlinsky/death_registration.
 
           You can read a detailed description of the ICDR in the medRxiv preprint "Karlinsky, A. (2021). International Completeness of Death Registration 2015–2019.": https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1.
-        citation_full: A. Karlinsky (2023). International Completeness of Death Registration 2015-2019. GitHub. https://github.com/akarlinsky/death_registration
+        citation_full: A. Karlinsky (2021). International Completeness of Death Registration 2015-2019. GitHub. https://github.com/akarlinsky/death_registration
         url_main: https://github.com/akarlinsky/death_registration
         url_download: https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv
         date_accessed: '2023-08-16'
-        date_published: '2023'
+        date_published: '2021-08-14'
         license:
           name: CC BY 4.0
           url: https://creativecommons.org/licenses/by/4.0/
@@ -71,12 +71,9 @@ tables:
   deaths_karlinsky:
     variables:
       death_comp:
-        # title: Estimated completeness of death reporting
         title: Share of deaths that are registered
         unit: '%'
         short_unit: '%'
-        # description_short: It ranges from 0 to 100. Derived as "Registered deaths" divided by "Expected number of deaths". See paper
-        #   (https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1) for details.
         description_short: |-
           The number of deaths reported in a country's vital registration system as a share of total expected deaths. Expected deaths are taken as the average of estimates from three international sources: the UN, WHO, and IHME.
         description_from_producer: |-
@@ -106,7 +103,7 @@ tables:
               system](#dod:cvrs) as a share of total expected deaths. Expected deaths are
               estimated by three international sources: UN, WHO, and IHME, using data from
               household surveys and censuses.
-            sourceDesc: Karlinsky, A. (2023)
+            sourceDesc: Karlinsky, A. (2021)
             minTime: latest
             hasMapTab: true
             tab: map
