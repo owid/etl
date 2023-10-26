@@ -100,7 +100,7 @@ tables:
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "best" %>
-          {definitions.number_deaths.description_short}
+          {definitions.others.description_short}
         display:
           numDecimalPlaces: 1
 
@@ -109,7 +109,7 @@ tables:
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "high" %>
-          {definitions.number_deaths.description_short}
+          {definitions.others.description_short}
         display:
           numDecimalPlaces: 1
 
@@ -118,6 +118,6 @@ tables:
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "low" %>
-          {definitions.number_deaths.description_short}
+          {definitions.others.description_short}
         display:
           numDecimalPlaces: 1
