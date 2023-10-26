@@ -60,7 +60,7 @@ def run(dest_dir: str) -> None:
     # Check that there are no NaN values in the system column
     assert not df["System"].isna().any(), "NaN values found in 'System' column after processing."
     # Drop the organization column
-    # df.drop("Organization", axis=1, inplace=True)
+    df.drop("Organization", axis=1, inplace=True)
     #
     # Create a new table and ensure all columns are snake-case.
     #
