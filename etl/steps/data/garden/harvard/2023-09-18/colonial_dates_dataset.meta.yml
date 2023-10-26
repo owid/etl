@@ -217,14 +217,14 @@ tables:
           numDecimalPlaces: 0
           conversionFactor: 1
 
-      not_colonized_number:
-        title: Number of countries not colonized by region
+      not_colonized_nor_colonizer_number:
+        title: Number of countries neither colonized nor colonizer by region
         unit: "countries"
         short_unit: ""
         description_short: |
           Number of countries not colonized in each region by an European colonial power. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
         description_processing: |
-          This is is an aggregation of the number of countries each European colonial power colonized each year, by OWID geographic region or World Bank income groups.
+          This is is an aggregation of the number of countries that are not colonized nor are colonizers in a given year, by OWID geographic region or World Bank income groups.
 
           We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
 
@@ -232,19 +232,19 @@ tables:
         description_from_producer: ""
         processing_level: major
         display:
-          name: Number of countries not colonized
+          name: Number of countries neither colonized nor colonizer
           entityAnnotationsMap: ""
           numDecimalPlaces: 0
           conversionFactor: 1
 
-      not_colonized_pop:
-        title: Population not colonized by region
+      not_colonized_nor_colonizer_pop:
+        title: Population neither colonized nor colonizer by region
         unit: "people"
         short_unit: ""
         description_short: |
           Population of countries not colonized in each region by an European colonial power. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
         description_processing: |
-          This is is an aggregation of the population of territories not colonized by European colonial powers, by OWID geographic region or World Bank income groups.
+          This is is an aggregation of the population of territories not colonized not colonizers in a given year, by OWID geographic region or World Bank income groups.
 
           We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
 
@@ -252,13 +252,13 @@ tables:
         description_from_producer: ""
         processing_level: major
         display:
-          name: Population not colonized
+          name: Population neither colonized nor colonizer
           entityAnnotationsMap: ""
           numDecimalPlaces: 0
           conversionFactor: 1
 
       colonizer_number:
-        title: Number of colonizers
+        title: Number of colonizers by region
         unit: "countries"
         short_unit: ""
         description_short: |
@@ -278,7 +278,7 @@ tables:
           conversionFactor: 1
 
       colonizer_pop:
-        title: Population of colonizers
+        title: Population of colonizers by region
         unit: "people"
         short_unit: ""
         description_short: |
@@ -313,46 +313,6 @@ tables:
         processing_level: major
         display:
           name: Population not considered in the dataset
-          entityAnnotationsMap: ""
-          numDecimalPlaces: 0
-          conversionFactor: 1
-
-      not_colonizer_number:
-        title: Number of not colonizers
-        unit: "countries"
-        short_unit: ""
-        description_short: |
-          Number of European colonial powers, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy which are not colonizing in a specific year. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
-        description_processing: |
-          This is is an aggregation of the number of countries considered European colonial powers with a total number of colonies equal to zero, by OWID geographic region or World Bank income groups.
-
-          We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
-
-          {common.years}
-        description_from_producer: ""
-        processing_level: major
-        display:
-          name: Number of not colonizers
-          entityAnnotationsMap: ""
-          numDecimalPlaces: 0
-          conversionFactor: 1
-
-      not_colonizer_pop:
-        title: Population of not colonizers
-        unit: "people"
-        short_unit: ""
-        description_short: |
-          Population of European colonial powers, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy which are not colonizing in a specific year. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
-        description_processing: |
-          This is is an aggregation of the population of European colonial powers with a total number of colonies equal to zero, by OWID geographic region or World Bank income groups.
-
-          We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
-
-          {common.years}
-        description_from_producer: ""
-        processing_level: major
-        display:
-          name: Population of not colonizers
           entityAnnotationsMap: ""
           numDecimalPlaces: 0
           conversionFactor: 1

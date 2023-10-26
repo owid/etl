@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -97,16 +98,18 @@ def process_data(tb: Table, tb_pop: Table) -> Table:
     tb_count = tb_count.merge(tb_pop[["country", "year", "population"]], how="left", on=["country", "year"])
 
     tb_count = (
-        tb_count.groupby(["colonizer", "year"])
+        tb_count.groupby(["colonizer", "year"], observed=True)
         .agg({"country": "count", "population": "sum"})
         .reset_index()
-        .copy_metadata(tb)
     )
 
     # Rename columns
     tb_count = tb_count.rename(
         columns={"colonizer": "country", "country": "total_colonies", "population": "total_colonies_pop"}
     )
+
+    # Replace zeros with nan
+    tb_count["total_colonies_pop"] = tb_count["total_colonies_pop"].replace(0, np.nan)
 
     # Consolidate results in country and year columns, by merging colonizer column in each row
     tb_colonized = (
@@ -183,6 +186,12 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
     )
     tb_regions["not_colonized_pop"] = tb_regions["population"] * tb_regions["not_colonized_number"]
 
+    # Define not_colonized_nor_colonizer_number, which is 1 if not_colonized_number or not_colonizer_number are 1
+    tb_regions["not_colonized_nor_colonizer_number"] = (
+        tb_regions["not_colonized_number"] + tb_regions["not_colonizer_number"]
+    )
+    tb_regions["not_colonized_nor_colonizer_pop"] = tb_regions["not_colonized_pop"] + tb_regions["not_colonizer_pop"]
+
     # Define regions to aggregate
     regions = [
         "Europe",
@@ -203,12 +212,10 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
     var_list = [
         "colony_number",
         "colony_pop",
-        "not_colonized_number",
-        "not_colonized_pop",
         "colonizer_number",
         "colonizer_pop",
-        "not_colonizer_number",
-        "not_colonizer_pop",
+        "not_colonized_nor_colonizer_number",
+        "not_colonized_nor_colonizer_pop",
     ]
 
     # Define the variables and aggregation method to be used in the following function loop
@@ -272,6 +279,8 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
         tb[var] = tb[var].astype("Int64")
 
     # Drop population column
-    tb = tb.drop(columns=["population"])
+    tb = tb.drop(
+        columns=["population", "not_colonized_pop", "not_colonized_number", "not_colonizer_pop", "not_colonizer_number"]
+    )
 
     return tb
