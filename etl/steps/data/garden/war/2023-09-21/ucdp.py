@@ -546,10 +546,21 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
     tb_extra = tb_extra.set_index(["year", "region"]).reindex(new_idx).reset_index()
     tb_extra["conflict_type"] = "extrasystemic"
 
-    # Replace nulls with zeroes
-    tb_extra[["number_ongoing_conflicts", "number_new_conflicts"]] = tb_extra[
-        ["number_ongoing_conflicts", "number_new_conflicts"]
-    ].fillna(0)
+    # Replace nulls with zeroes (all time series)
+    columns = [
+        "number_ongoing_conflicts",
+        "number_new_conflicts",
+    ]
+    tb_extra[columns] = tb_extra[columns].fillna(0)
+
+    # Replace nulls with zeroes (only post 1989 time series)
+    columns = [
+        "number_deaths_ongoing_conflicts",
+        "number_deaths_ongoing_conflicts_high",
+        "number_deaths_ongoing_conflicts_low",
+    ]
+    mask_1989 = tb_extra["year"] >= 1989
+    tb_extra.loc[mask_1989, columns] = tb_extra.loc[mask_1989, columns].fillna(0)
 
     # Add to main table
     tb = pr.concat([tb[-mask], tb_extra])
