@@ -12,69 +12,54 @@ definitions:
 
           Life evaluations from the Gallup World Poll provide the basis for the annual happiness rankings. They are based on answers to the main life evaluation question. The Cantril ladder asks respondents to think of a ladder, with the best possible life for them being a 10 and the worst possible life being a 0. They are then asked to rate their own current lives on that 0 to 10 scale. The rankings are from nationally representative samples over three years.
 
-          \[Text from [World Happiness Report](https://worldhappiness.report/about/) website\]
-        citation_full: 'Helliwell, J. F., Layard, R., Sachs, J. D., De Neve, J.-E., Aknin, L. B., & Wang, S. (Eds.). (2023).
-          World Happiness Report 2023. New York: Sustainable Development Solutions Network.'
+          [Text from [World Happiness Report](https://worldhappiness.report/about/) website]
+        citation_full:
+          "Helliwell, J. F., Layard, R., Sachs, J. D., De Neve, J.-E., Aknin, L. B., & Wang, S. (Eds.). (2023).
+          World Happiness Report 2023. New York: Sustainable Development Solutions Network."
         url_main: https://worldhappiness.report
-        date_accessed: '2023-03-20'
-        date_published: '2023-03-20'
+        date_accessed: "2023-03-20"
+        date_published: "2023-03-20"
       # - producer: World Happiness Report (2023)
       #   title: World Happiness Report
       #   description: >-
       #     Life evaluations from the Gallup World Poll provide the basis for the annual happiness rankings. They are based
       #     on answers to the main life evaluation question asked in the poll.
 
-
       #     This is called the Cantril ladder: it asks respondents to think of a ladder, with the best possible life for them
       #     being a 10 and the worst possible life being a 0. They are then asked to rate their own current lives on that 0
       #     to 10 scale.
-
 
       #     The rankings are calculated by the source based on nationally representative samples for the three years prior to
       #     the year of the report, so that data for the 2023 report will draw from survey data from 2020-2022. We show the
       #     data for final year of the three-year survey period, i.e. we show the 2020-2022 survey data as 2022.
 
-
       #     The only exception is the data for the 2012 report, which uses survey data from 2005-2011, we show this data as
       #     the final year of the survey data - 2011.
-
 
       #     The number of people and countries surveyed varies year to year, but typically more than 100,000 people in 130 countries
       #     participate in the Gallup World Poll each year.
 
-
       #     The rankings are based entirely on the survey scores, using the Gallup weights to make the estimates representative.
-
 
       #     Cantril ladder data from for current and previous reports can be found at:
 
-
       #     2023: https://happiness-report.s3.amazonaws.com/2023/DataForFigure2.1WHR2023.xls
-
 
       #     2022: https://happiness-report.s3.amazonaws.com/2022/Appendix_2_Data_for_Figure_2.1.xls
 
-
       #     2021: https://happiness-report.s3.amazonaws.com/2021/DataForFigure2.1WHR2021C2.xls
-
 
       #     2020: https://happiness-report.s3.amazonaws.com/2020/WHR20_DataForFigure2.1.xls
 
-
       #     2019: https://s3.amazonaws.com/happiness-report/2019/Chapter2OnlineData.xls
-
 
       #     2018: https://s3.amazonaws.com/happiness-report/2018/WHR2018Chapter2OnlineData.xls
 
-
       #     2017: https://s3.amazonaws.com/happiness-report/2017/online-data-chapter-2-whr-2017.xlsx
-
 
       #     2016: https://s3.amazonaws.com/happiness-report/2016/Online-data-for-chapter-2-whr-2016.xlsx
 
-
       #     2015: https://s3.amazonaws.com/happiness-report/2015/Chapter2OnlineData_Expanded-with-Trust-and-Governance.xlsx
-
 
       #     2012: https://happiness-report.s3.amazonaws.com/2012/2012.xlsx
       #   citation_full: 'Helliwell, J. F., Layard, R., Sachs, J. D., De Neve, J.-E., Aknin, L. B., & Wang, S. (Eds.). (2023).
@@ -90,10 +75,6 @@ tables:
         description_short: Average of survey responses to the 'Cantril Ladder' question in the Gallup World Poll. The survey question asks respondents to think of a ladder, with the best possible life for them being a 10, and the worst possible life being a 0.
         display:
           numDecimalPlaces: 2
-        # description: |-
-        #   Average of survey responses to the 'Cantril Ladder' question in the Gallup World Poll. The survey question
-        #   asks respondents to think of a ladder, with the best possible life for them being a 10, and the worst possible life
-        #   being a 0.
         description_key:
           - The data gives the national average of survey responses to the 'Cantril Ladder' question, which asks respondents to evaluate their life on a scale from 0 to 10.
           - "The exact wording of the question is the following: _“Please imagine a ladder, with steps numbered from 0 at the bottom to 10 at the top. The top of the ladder represents the best possible life for you and the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?”._"
@@ -130,7 +111,7 @@ tables:
               min: 0
               max: 10
             map:
-              columnSlug: '577009'
+              columnSlug: "577009"
               time: latest
               timeTolerance: 10
               colorScale:
@@ -150,16 +131,16 @@ tables:
                   - 9
                   - 10
                 customNumericLabels:
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
                 legendDescription: Self-assessed Happiness (0-10)
             selectedEntityNames:
               - Colombia
