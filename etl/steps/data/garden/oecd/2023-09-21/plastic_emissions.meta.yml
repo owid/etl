@@ -1,3 +1,10 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
+
 tables:
   plastic_emissions:
     variables:

@@ -2,6 +2,10 @@ definitions:
   common:
     display:
       numDecimalPlaces: 0
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
 tables:
   plastic_fate_regions:
     variables:
