@@ -1,0 +1,104 @@
+dataset:
+  update_period_days: 365
+  sources: []
+
+definitions:
+  common:
+    sources: []
+    origins:
+      - producer: United Nations Office for Outer Space Affairs
+        title: Online Index of Objects Launched into Outer Space
+        description: |-
+          The Online Index of Objects Launched into Outer Space is a register of objects launched into outer space maintained by the United Nations Office for Outer Space Affairs (UNOOSA) since 1962.
+
+          Following multi-year discussion among States, the [Convention on Registration of Objects Launched into Outer Space](https://www.unoosa.org/oosa/en/ourwork/spacelaw/treaties/registration-convention.html) entered into force in 1976. States and international intergovernmental organizations that agree to abide by the Convention are required to establish their own national registries and provide information on their space objects to the Secretary-General for inclusion in the United Nations Register. Responsibility for maintenance of the Register was delegated by the Secretary-General to the United Nations Office for Outer Space Affairs. As required under the treaty, UNOOSA publicly disseminates the information provided as United Nations documents, which are available through its website and through the [United Nations Official Document System](https://documents.un.org/).
+
+          To date approximately 88% of all satellites, probes, landers, crewed spacecraft and space station flight elements launched into Earth orbit or beyond have been registered with the Secretary-General.
+
+          More details are available on [the website of the UNOOSA](https://www.unoosa.org/oosa/en/spaceobjectregister/index.html).
+        citation_full: United Nations Office for Outer Space Affairs - Online Index of Objects Launched into Outer Space (2023).
+        url_main: https://www.unoosa.org/oosa/osoindex/search-ng.jspx
+        date_accessed: 2023-09-29
+        date_published: 2023-09-29
+    presentation:
+      attribution_short: UNOOSA
+      topic_tags:
+        - Space Exploration & Satellites
+        - Research & Development
+
+tables:
+  un_space_objects:
+    variables:
+      yearly_launches:
+        title: Yearly number of objects launched into outer space
+        unit: objects
+        short_unit: ""
+        description_short: Annual number of satellites, probes, landers, crewed spacecrafts, and space station flight elements, launched into Earth orbit or beyond.
+        description_key:
+          - Objects are defined here as satellites, probes, landers, crewed spacecrafts, and space station flight elements launched into Earth orbit or beyond.
+          - This data is based on national registers of launches submitted to the UN by participating nations. According to UN estimates, the data captures around 88% of all objects launched.
+          - When an object is marked by the source as launched by a country on behalf of another one, the launch is attributed to the latter country.
+          - When a launch is made jointly by several countries, it is recorded in each of these countries' time series but only once in the 'World' series.
+        description_processing: |-
+          - We scrape the data from the source by iterating through all objects in the online index.
+          - We harmonize the names of countries. When an object is marked by the source as launched by a country on behalf of another one, we attribute the launch to the latter country.
+          - We aggregate launches by country and year. When a launch is made jointly by several countries, it is recorded in each of these countries' time series.
+          - We calculate the total number of launches globally. This is available as 'World' in the data. When a launch is made jointly by several countries, it is only recorded once in the 'World' series.
+          - We also calculate the cumulative number of launches over time.
+        display:
+          name: Annual number of objects launched into space
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            slug: yearly-number-of-objects-launched-into-outer-space
+            title: Annual number of objects launched into space
+            subtitle: |-
+              This includes satellites, probes, landers, crewed spacecrafts, and space station flight elements launched into Earth orbit or beyond.
+            sourceDesc: United Nations Office for Outer Space Affairs
+            note: >-
+              When an object is launched by a country on behalf of another one, it is
+              attributed to the latter.
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            # NOTE: Since 2023 is not completed yet, it is better to stop the timeline in 2022.
+            # Ideally, the latest data point should be removed from the data, otherwise this field will need to be
+            # manually edited on each update.
+            timelineMaxTime: 2022
+            hasMapTab: true
+            originUrl: https://ourworldindata.org/space-exploration-satellites
+            yAxis:
+              min: 0
+              max: 0
+              canChangeScaleType: true
+            map:
+              columnSlug: '180341'
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 1
+                  - 3
+                  - 10
+                  - 30
+                  - 100
+                  - 300
+                  - 1000
+                  - 3000
+            selectedEntityNames:
+              - World
+              - United States
+              - China
+              - United Kingdom
+              - France
+              - Russia
+              - India
+              - Japan
+              - European Space Agency
+              - Germany
+            relatedQuestions:
+              - url: >-
+                  https://ourworldindata.org/grapher/cumulative-number-of-objects-launched-into-outer-space
+                text: Cumulative number of objects launched into outer space
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

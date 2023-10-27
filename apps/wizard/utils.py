@@ -302,15 +302,18 @@ class AppState:
         default_value = self.default_value(key, default_last=default_last)
         # Change key name, to be stored it in general st.session_state
         kwargs["key"] = f"{self.step}.{key}"
-        # Default value for selectbox (and other widgets with selectbox-like behavior)
-        if "options" in kwargs:
-            options = cast(List[str], kwargs["options"])
-            index = options.index(default_value) if default_value in options else 0
-            kwargs["index"] = index
-        # Default value for other widgets (if none is given)
-        elif ("value" not in kwargs) or ("value" in kwargs and kwargs.get("value") is None):
-            kwargs["value"] = default_value
-
+        # Special behaviour for multiselect
+        if "multiselect" not in str(st_widget):
+            # Default value for selectbox (and other widgets with selectbox-like behavior)
+            if "options" in kwargs:
+                options = cast(List[str], kwargs["options"])
+                index = options.index(default_value) if default_value in options else 0
+                kwargs["index"] = index
+            # Default value for other widgets (if none is given)
+            elif ("value" not in kwargs) or ("value" in kwargs and kwargs.get("value") is None):
+                kwargs["value"] = default_value
+        elif "default" not in kwargs:
+            kwargs["default"] = default_value
         # Create widget
         widget = st_widget(**kwargs)
         # Show error message
