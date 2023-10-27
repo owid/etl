@@ -823,7 +823,7 @@ class TagsVariablesTopicTagsLink(SQLModel, table=True):
     def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: Set[str]) -> None:
         """Link the given Variable ID with the given Tag IDs."""
         # Fetch current linked tags for the given Variable ID
-        existing_links = session.query(cls.tagId).filter(cls.variableId == variable_id).all()
+        existing_links = session.query(cls.tagId, cls.displayOrder).filter(cls.variableId == variable_id).all()
 
         existing_tags = {(link.tagId, link.displayOrder) for link in existing_links}
         new_tags = {(tag_id, i) for i, tag_id in enumerate(new_tag_ids)}
