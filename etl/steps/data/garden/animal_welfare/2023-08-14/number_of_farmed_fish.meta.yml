@@ -11,6 +11,7 @@ definitions:
   presentation:
     topic_tags:
     - Animal Welfare
+    - Fish & Overfishing
 
 tables:
   number_of_farmed_fish:

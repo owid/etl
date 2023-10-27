@@ -6,6 +6,7 @@ definitions:
   presentation:
     topic_tags:
     - Animal Welfare
+    - Fish & Overfishing
 
 tables:
   number_of_wild_fish_killed_for_food:
