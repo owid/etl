@@ -5,49 +5,49 @@ tables:
       birth_rate:
         title: Birth rate
         unit: births per 1,000 population
-        description: Number of births over a given period divided by the person-years lived by the population over that period.
+        description_short: Number of births over a given period divided by the person-years lived by the population over that period.
       births:
         title: Births
         unit: births
-        description: Number of births over a given period. Refers to live births for annual civil calendar years from 1 January to 31 December.
+        description_short: Number of births over a given period. Refers to live births for annual civil calendar years from 1 January to 31 December.
         display:
           conversionFactor: 1
       child_mortality_rate:
         title: Child mortality rate
         short_unit: "%"
         unit: "%"
-        description: Number of deaths under age 5 over a given period. Refers to annual civil calendar years from 1 January to 31 December.
+        description_short: Number of deaths under age 5 over a given period. Refers to annual civil calendar years from 1 January to 31 December.
         display:
           conversionFactor: 1
       death_rate:
         title: Death rate
         unit: deaths per 1,000 population
-        description: Number of deaths over a given period divided by the person-years lived by the population over that period.
+        description_short: Number of deaths over a given period divided by the person-years lived by the population over that period.
       deaths:
         title: Deaths
         unit: deaths
-        description: Number of deaths over a given period. Refers to annual civil calendar years from 1 January to 31 December.
+        description_short: Number of deaths over a given period. Refers to annual civil calendar years from 1 January to 31 December.
         display:
           conversionFactor: 1
       dependency_ratio_child:
         title: Child dependency ratio
         short_unit: "%"
         unit: "%"
-        description: The ratio of the population under age 15 (e.g., 0-14) to the number of persons of working age 15-64 (e.g., 15-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
+        description_short: The ratio of the population under age 15 (e.g., 0-14) to the number of persons of working age 15-64 (e.g., 15-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
       dependency_ratio_old:
         title: Old-age dependency ratio
         short_unit: "%"
         unit: "%"
-        description: The ratio of the population aged 65 and over (e.g., 65+) to the number of persons of working age 15-64 (e.g., 15-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
+        description_short: The ratio of the population aged 65 and over (e.g., 65+) to the number of persons of working age 15-64 (e.g., 15-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
       dependency_ratio_total:
         title: Total dependency ratio
         short_unit: "%"
         unit: "%"
-        description: The ratio of the sum of the population under age 15 (e.g., 0-14) and that aged 65 and over (e.g., 65+) to the number of persons of working age 15-64 (e.g., 15-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
+        description_short: The ratio of the sum of the population under age 15 (e.g., 0-14) and that aged 65 and over (e.g., 65+) to the number of persons of working age 15-64 (e.g., 15-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
       fertility_rate:
         title: Fertility rate
         unit: live births per woman
-        description: >-
+        description_short: >-
           The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject
           during their whole lives to the fertility rates of a given period and if they were not subject to mortality. It is expressed as live births
           per woman. For age-specific fertility rates, it measuresmber of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December."
@@ -56,63 +56,71 @@ tables:
         title: Natural growth rate
         short_unit: "%"
         unit: "%"
-        description: Crude birth rate minus the crude death rate. Represents the portion of population growth (or decline) determined exclusively by births and deaths.
+        description_short: Crude birth rate minus the crude death rate. Represents the portion of population growth (or decline) determined exclusively by births and deaths.
         display:
           conversionFactor: 1
       growth_rate:
         title: Growth rate
         short_unit: "%"
         unit: "%"
-        description: Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1)/n where P1 and P2 are the populations on 1 January of subsequent years, and n is the length of the period between t1 and t2 (n=1 for annual data).
+        description_short: Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1)/n where P1 and P2 are the populations on 1 January of subsequent years, and n is the length of the period between t1 and t2 (n=1 for annual data).
         display:
           conversionFactor: 1
       infant_mortality_rate:
         title: Infant mortality rate
         short_unit: "%"
         unit: "%"
-        description: Probability of dying between birth and exact age 1.
+        description_short: Probability of dying between birth and exact age 1.
+
       life_expectancy:
         title: Life expectancy
         unit: years
-        description: The average number of remaining years of life expected by a hypothetical cohort of individuals who already reached age x and would be subject during the remainder of their lives to the mortality rates of a given period.
+        description_short: The average number of remaining years of life expected by a hypothetical cohort of individuals who already reached age x and would be subject during the remainder of their lives to the mortality rates of a given period.
+        display:
+          name: |-
+            Life expectancy at << 'birth' if (age == 'at birth') else age >><< ', ' + sex + 's' if (sex != 'both') >>, period, << variant + " projections" if (variant != 'estimates') else variant >>
+        presentation:
+          title_public: Life expectancy at << 'birth' if (age == 'at birth') else age >>
+          title_variant: << sex + 's' if (sex != 'both') >>, period, << variant + " projections" if (variant != 'estimates') else variant >>
+
       median_age:
         title: Median age
         unit: years
-        description: Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median.
+        description_short: Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median.
       net_migration:
         title: Net migration
         unit: migrants
-        description: Net number of migrants, that is, the number of immigrants minus the number of emigrants.
+        description_short: Net number of migrants, that is, the number of immigrants minus the number of emigrants.
       net_migration_rate:
         title: Net migration rate
         unit: migrants per 1,000 population
-        description: The number of immigrants minus the number of emigrants over a period, divided by the person-years lived by the population of the receiving country over that period.
+        description_short: The number of immigrants minus the number of emigrants over a period, divided by the person-years lived by the population of the receiving country over that period.
       population:
         title: Population
         unit: persons
-        description: De facto population in a country, area or region as of 1 July of the year indicated.
+        description_short: De facto population in a country, area or region as of 1 July of the year indicated.
         display:
           conversionFactor: 1
       population_broad:
         title: Population by broad age group
         unit: persons
-        description: De facto population in a country, area or region as of 1 July of the year indicated. Figures are presented in thousands. Alternative metric to 'population', used for different (and groader) age groups.
+        description_short: De facto population in a country, area or region as of 1 July of the year indicated. Figures are presented in thousands. Alternative metric to 'population', used for different (and groader) age groups.
         display:
           conversionFactor: 1
       population_change:
         title: Population change
         unit: persons
-        description: Population increment over a period, that is, the difference between the population at the end of the period and that at the beginning of the period. Refers to calendar years from 1 July to 30 June.
+        description_short: Population increment over a period, that is, the difference between the population at the end of the period and that at the beginning of the period. Refers to calendar years from 1 July to 30 June.
         display:
           conversionFactor: 1
       population_density:
         title: Population density
         unit: persons per square kilometer
-        description: Population per square Kilometer as of 1 July.
+        description_short: Population per square Kilometer as of 1 July.
       sex_ratio:
         title: Sex ratio
         unit: males per 100 females
-        description: Number of males per 100 females in the population.
+        description_short: Number of males per 100 females in the population.
       # gdp:
       #   title: GDP
       #   short_unit: $
