@@ -69,8 +69,7 @@ tables:
             {tables.hmd.variables.central_death_rate.title} {definitions.others.title_public_dim}
           topic_tags:
             - Life Expectancy
-            - Causes of Death
-            # - << 'Child & Infant Mortality' if age in ['0', '1', '2', '3', '4'] else 'Causes of Death'>>
+            - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
 
       central_death_rate_mf_ratio:
         title: Central death rate ratio (m/f)
@@ -92,8 +91,7 @@ tables:
           topic_tags:
             - Life Expectancy
             - Gender Ratio
-            - Causes of Death
-            # - << 'Child & Infant Mortality' if age in ['0', '1', '2', '3', '4'] else 'Causes of Death'>>
+            - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
 
       probability_of_death:
         title: Probability of death
@@ -114,7 +112,7 @@ tables:
             {tables.hmd.variables.probability_of_death.title} {definitions.others.title_public_dim}
           topic_tags:
             - Life Expectancy
-            - Causes of Death
+            - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
 
       average_survival_length:
         title: Average survival length
@@ -152,7 +150,7 @@ tables:
             {tables.hmd.variables.number_deaths.title} {definitions.others.title_public_dim}
           topic_tags:
             - Life Expectancy
-            - Causes of Death
+            - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
 
       number_person_years_lived:
         title: Number of person-years lived
