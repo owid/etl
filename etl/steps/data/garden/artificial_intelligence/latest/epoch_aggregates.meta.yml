@@ -1,0 +1,239 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 31
+  title: Researcher Affiliation and Domain type in Notable AI Systems Data
+
+origin:
+  date_published: '2023-10-27'
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  epoch:
+    variables:
+      games:
+        title: Annual number of AI systems in the games domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Games
+          numDecimalPlaces: 0
+      language:
+        title: Annual number of AI systems in the language domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Language
+          numDecimalPlaces: 0
+      multimodal:
+        title: Annual number of AI systems in the multimodal domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Multimodal
+          numDecimalPlaces: 0
+      not_specified_domain:
+        title: Annual number of AI systems with no specified domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Not specified
+          numDecimalPlaces: 0
+      other_domain:
+        title: Annual number of AI systems in other domains
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Other
+          numDecimalPlaces: 0
+      vision:
+        title: Annual number of AI systems in the vision domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Vision
+          numDecimalPlaces: 0
+      academia:
+        title: Annual number of AI systems developed in academia
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Academia
+          numDecimalPlaces: 0
+      collaboration:
+        title: Annual number of AI systems developed in collaboration between academia and industry
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Collaboration
+          numDecimalPlaces: 0
+      industry:
+        title: Annual number of AI systems developed in industry
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Industry
+          numDecimalPlaces: 0
+      not_specified_organization_categorization:
+        title: Annual number of AI systems with no specified organization categorization
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Not specified
+          numDecimalPlaces: 0
+      other_organization_categorization:
+        title: Annual number of AI systems with from other organizations
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Other
+          numDecimalPlaces: 0
+      games_cumsum:
+        title: Cumulative number of AI systems in the games domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Games
+          numDecimalPlaces: 0
+      language_cumsum:
+        title: Cumulative number of AI systems in the language domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Language
+          numDecimalPlaces: 0
+      multimodal_cumsum:
+        title: Cumulative number of AI systems in the multimodal domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Multimodal
+          numDecimalPlaces: 0
+      not_specified_domain_cumsum:
+        title: Cumulative number of AI systems with no specified domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Not specified
+          numDecimalPlaces: 0
+      other_domain_cumsum:
+        title: Cumulative number of AI systems in other domains
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Other
+          numDecimalPlaces: 0
+      vision_cumsum:
+        title: Cumulative number of AI systems in the vision domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Vision
+          numDecimalPlaces: 0
+      academia_cumsum:
+        title: Cumulative number of AI systems developed in academia
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Academia
+          numDecimalPlaces: 0
+      collaboration_cumsum:
+        title:  Cumulative number of AI systems developed in collaboration between academia and industry
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Collaboration
+          numDecimalPlaces: 0
+      industry_cumsum:
+        title: Cumulative number of AI systems developed in industry
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Industry
+          numDecimalPlaces: 0
+      not_specified_organization_categorization_cumsum:
+        title: Cumulative number of AI systems with no specified organization categorization
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Not specified
+          numDecimalPlaces: 0
+      other_organization_categorization_cumsum:
+        title: Cumulative number of AI systems with from other organizations
+        unit: 'AI systems'
+        short_unit: ''
+        description_short:
+        description_processing:
+        processing_level: minor
+        display:
+          name: Other
+          numDecimalPlaces: 0
