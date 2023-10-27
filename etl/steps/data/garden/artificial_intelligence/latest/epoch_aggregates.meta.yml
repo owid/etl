@@ -21,8 +21,9 @@ tables:
         title: Annual number of AI systems in the games domain
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Games" when they are designed to play games.
+        description_processing: >
+          Processing involved calculating total number of AI systems in the games domain for each year.
         processing_level: minor
         display:
           name: Games
@@ -31,8 +32,9 @@ tables:
         title: Annual number of AI systems in the language domain
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Language" when they are designed to process language.
+        description_processing: >
+          Processing involved calculating total number of AI systems in the language domain for each year.
         processing_level: minor
         display:
           name: Language
@@ -41,8 +43,9 @@ tables:
         title: Annual number of AI systems in the multimodal domain
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Multimodal" when they are designed to process multiple modalities.
+        description_processing: >
+          Processing involved calculating total number of AI systems in the multimodal domain for each year.
         processing_level: minor
         display:
           name: Multimodal
@@ -51,8 +54,9 @@ tables:
         title: Annual number of AI systems with no specified domain
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Not specified" when their domain is not specified.
+        description_processing: >
+          Processing involved calculating total number of AI systems with no specified domain for each year.
         processing_level: minor
         display:
           name: Not specified
@@ -61,8 +65,11 @@ tables:
         title: Annual number of AI systems in other domains
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short:  Systems classified as "Other" include 3D reconstruction, Driving, Drawing, Recommendation, Speech, Video, Text-to-Video, Search, Audio and Robotics.
+        description_processing: >
+          To streamline the categorization of domains, 3D reconstruction, Driving, Drawing, Recommendation, Speech, Video, Text-to-Video, Search, Audio and Robotics were all unified under a single "Other" category.
+
+          Processing involved calculating total number of AI systems in other domains for each year.
         processing_level: minor
         display:
           name: Other
@@ -71,8 +78,9 @@ tables:
         title: Annual number of AI systems in the vision domain
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short:  Systems are classified as "Vision" when they are designed to process visual information.
+        description_processing: >
+          Processing involved calculating total number of AI systems in the vision domain for each year.
         processing_level: minor
         display:
           name: Vision
@@ -81,8 +89,9 @@ tables:
         title: Annual number of AI systems developed in academia
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Academia" when their authors have ties to academic institutions.
+        description_processing: >
+          Processing involved calculating total number of AI systems developed in academia for each year.
         processing_level: minor
         display:
           name: Academia
@@ -91,8 +100,11 @@ tables:
         title: Annual number of AI systems developed in collaboration between academia and industry
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Collaboration" when a minimum of 30% of the authors represent both academia and industry.
+        description_processing: >
+          To streamline the categorization of researcher affiliations, all variations of "Industry - Academia Collaboration" entries in the original dataset, regardless of their capitalization or leaning (towards academia or industry), were unified into a single "Collaboration" category.
+
+          Processing involved calculating total number of AI systems developed in academia for each year.
         processing_level: minor
         display:
           name: Collaboration
@@ -101,8 +113,9 @@ tables:
         title: Annual number of AI systems developed in industry
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Industry" when their authors have ties to private sector entities.
+        description_processing: >
+          Processing involved calculating total number of AI systems developed in industry for each year.
         processing_level: minor
         display:
           name: Industry
@@ -111,8 +124,9 @@ tables:
         title: Annual number of AI systems with no specified organization categorization
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Not specified" when their authors have no specified organization categorization.
+        description_processing: >
+          Processing involved calculating total number of AI systems with no specified organization categorization for each year.
         processing_level: minor
         display:
           name: Not specified
@@ -121,8 +135,11 @@ tables:
         title: Annual number of AI systems with from other organizations
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Other" when their authors have ties to organizations that are not academic or private sector entities.
+        description_processing: >
+          Affiliations explicitly labeled as "Research Collective", as well as those under "Government" and "Non-profit", were re-categorized under the "Other" label.
+
+          Processing involved calculating total number of AI systems with from other organizations for each year.
         processing_level: minor
         display:
           name: Other
@@ -131,8 +148,9 @@ tables:
         title: Cumulative number of AI systems in the games domain
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Games" when they are designed to play games.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems in the games domain for each year starting from 1950.
         processing_level: minor
         display:
           name: Games
@@ -141,8 +159,9 @@ tables:
         title: Cumulative number of AI systems in the language domain
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Language" when they are designed to process language.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems in the language domain for each year starting from 1950.
         processing_level: minor
         display:
           name: Language
@@ -151,8 +170,9 @@ tables:
         title: Cumulative number of AI systems in the multimodal domain
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Multimodal" when they are designed to process multiple modalities.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems in the multimodal domain for each year starting from 1950.
         processing_level: minor
         display:
           name: Multimodal
@@ -161,8 +181,9 @@ tables:
         title: Cumulative number of AI systems with no specified domain
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Not specified" when their domain is not specified.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems with no specified domain for each year starting from 1950.
         processing_level: minor
         display:
           name: Not specified
@@ -171,8 +192,11 @@ tables:
         title: Cumulative number of AI systems in other domains
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Other" include 3D reconstruction, Driving, Drawing, Recommendation, Speech, Video, Text-to-Video, Search, Audio and Robotics.
+        description_processing: >
+          To streamline the categorization of domains, 3D reconstruction, Driving, Drawing, Recommendation, Speech, Video, Text-to-Video, Search, Audio and Robotics were all unified under a single "Other" category.
+
+          Processing involved calculating cumulative number of AI systems in these other domains for each year starting from 1950.
         processing_level: minor
         display:
           name: Other
@@ -181,8 +205,9 @@ tables:
         title: Cumulative number of AI systems in the vision domain
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Vision" when they are designed to process visual information.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems in the vision domain for each year starting from 1950.
         processing_level: minor
         display:
           name: Vision
@@ -191,8 +216,9 @@ tables:
         title: Cumulative number of AI systems developed in academia
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Academia" when their authors have ties to academic institutions.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems developed in academia for each year starting from 1950.
         processing_level: minor
         display:
           name: Academia
@@ -201,8 +227,11 @@ tables:
         title:  Cumulative number of AI systems developed in collaboration between academia and industry
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short: Systems are classified as "Collaboration" when a minimum of 30% of the authors represent both academia and industry.
+        description_processing:   >
+          To streamline the categorization of researcher affiliations, all variations of "Industry - Academia Collaboration" entries in the original dataset, regardless of their capitalization or leaning (towards academia or industry), were unified into a single "Collaboration" category.
+
+          Processing involved calculating cumulative number of AI systems developed in academia for each year starting from 1950.
         processing_level: minor
         display:
           name: Collaboration
@@ -211,8 +240,9 @@ tables:
         title: Cumulative number of AI systems developed in industry
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short:  Systems are classified as "Industry" when their authors have ties to private sector entities.
+        description_processing:   >
+          Processing involved calculating cumulative number of AI systems developed in industry for each year starting from 1950.
         processing_level: minor
         display:
           name: Industry
@@ -221,8 +251,9 @@ tables:
         title: Cumulative number of AI systems with no specified organization categorization
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short:  Systems are classified as "Not specified" when their authors have no specified organization categorization.
+        description_processing:  >
+          Processing involved calculating cumulative number of AI systems with no specified organization categorization for each year starting from 1950.
         processing_level: minor
         display:
           name: Not specified
@@ -231,8 +262,11 @@ tables:
         title: Cumulative number of AI systems with from other organizations
         unit: 'AI systems'
         short_unit: ''
-        description_short:
-        description_processing:
+        description_short:  Systems are classified as "Other" when their authors have ties to organizations that are not academic or private sector entities.
+        description_processing:   >
+          Affiliations explicitly labeled as "Research Collective", as well as those under "Government" and "Non-profit", were re-categorized under the "Other" label.
+
+          Processing involved calculating cumulative number of AI systems with from other organizations for each year starting from 1950.
         processing_level: minor
         display:
           name: Other
