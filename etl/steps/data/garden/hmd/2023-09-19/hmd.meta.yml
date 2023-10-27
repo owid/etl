@@ -70,6 +70,7 @@ tables:
           topic_tags:
             - Life Expectancy
             - Causes of Death
+            # - << 'Child & Infant Mortality' if age in ['0', '1', '2', '3', '4'] else 'Causes of Death'>>
 
       central_death_rate_mf_ratio:
         title: Central death rate ratio (m/f)
@@ -92,6 +93,7 @@ tables:
             - Life Expectancy
             - Gender Ratio
             - Causes of Death
+            # - << 'Child & Infant Mortality' if age in ['0', '1', '2', '3', '4'] else 'Causes of Death'>>
 
       probability_of_death:
         title: Probability of death

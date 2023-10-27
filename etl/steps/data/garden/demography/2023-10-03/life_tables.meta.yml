@@ -87,7 +87,8 @@ tables:
           topic_tags:
             - Life Expectancy
             - Gender Ratio
-            - << 'Child & Infant Mortality' if age == '0' else 'Causes of Death'>>
+            - Causes of Death
+            # - << 'Child & Infant Mortality' if age in ['0', '1', '2', '3', '4'] else 'Causes of Death'>>
 
       probability_of_death:
         title: Probability of death
