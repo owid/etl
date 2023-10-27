@@ -1,5 +1,13 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  common:
+    presentation:
+      grapher_config:
+        selectedEntityNames:
+          - Italy
+          - England and Wales
+          - France
+          - Sweden
   global:
     life_expectancy:
       description_short: |-
@@ -33,8 +41,10 @@ dataset:
 tables:
   life_tables:
     variables:
+
       central_death_rate:
         title: Central death rate
+        unit: deaths per 1,000 people
         description_short: |-
           For a given population or cohort, the central death rate during a given 12 month interval is calculated as the number of deaths during the interval, divided by the number of person-years lived during that interval.
         description_key:
@@ -42,10 +52,16 @@ tables:
             Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years. This makes the value very slightly different from the 'probability of death' during the interval, because the 'probability of death' metric uses a different denominator: the number of people alive at that age at the start of the interval.
           - |-
             {definitions.global.data_used}
-        unit: deaths per 1,000 people
-        processing_level: minor
         description_processing: |-
           The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
+        processing_level: minor
+        display:
+          name: |-
+            Central death rate at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'both') >>, << type >>
+        presentation:
+          title_public: Central death rate at << age if age != '0' else 'birth'>>
+          title_variant: << sex + 's, ' if sex != 'both' >><< type + ' tables'>>
+
       central_death_rate_mf_ratio:
         title: Central death rate ratio (m/f)
         unit: ""
@@ -55,6 +71,13 @@ tables:
           <% elif type == "period" %>
           The ratio of period central death rate (males/females) at a given age.
           <% endif %>
+        processing_level: major
+        display:
+          name: |-
+            Central death rate (male-to-female ratio) at << 'birth' if (age == '0') else age >>, << type >>
+        presentation:
+          title_public: Central death rate at << age if age != '0' else 'birth'>>
+          title_variant: male-to-female ratio, << type + ' tables'>>
 
       probability_of_death:
         title: Probability of death
@@ -64,27 +87,38 @@ tables:
         description_key:
           - |-
             For example, the probability of death for a 50 year old in a given year is found by: dividing the number of deaths in 50 year olds that year, by the number of people alive at the age of 50 at the start of the year.
-        processing_level: minor
         description_processing: |-
           The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
+        processing_level: minor
+        display:
+          name: |-
+            Probability of death at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'both') >>, << type >>
+        presentation:
+          title_public: Probability of death at << age if age != '0' else 'birth'>>
+          title_variant: << sex + 's, ' if sex != 'both' >><< type + ' tables'>>
+
       average_survival_length:
         title: Average survival length
         short_unit: years
         unit: years
         description_short: Average length of survival between ages x and x+n for persons dying in the interval.
+
       number_survivors:
         title: Number of survivors
         unit: survivors
         description_short: Number of survivors at a given age, assuming survivors at 0 years old is 100,000.
+
       number_deaths:
         title: Number of deaths
         short_unit: deaths
         unit: deaths
         description_short: Number of deaths between during a given age.
+
       number_person_years_lived:
         title: Number of person-years lived
         unit: person-years
         description_short: Number of person-years lived between a given ages and a year after.
+
       number_person_years_remaining:
         title: Number of person-years remaining
         unit: person-years
@@ -107,6 +141,13 @@ tables:
             {definitions.global.life_expectancy.point_1}
           - |-
             {definitions.global.data_used}
+        display:
+          name: |-
+            Life expectancy at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'both') >>, << type >>
+        presentation:
+          title_public: Life expectancy at << age if age != '0' else 'birth'>>
+          title_variant: << sex + 's, ' if sex != 'both' >><< type + ' tables'>>
+
       life_expectancy_fm_diff:
         title: Life expectancy difference (f-m)
         short_unit: years
@@ -125,6 +166,13 @@ tables:
             {definitions.global.life_expectancy.point_1}
           - |-
             {definitions.global.data_used}
+        display:
+          name: |-
+            Life expectancy (female-male difference) at << 'birth' if (age == '0') else age >>, << type >>
+        presentation:
+          title_public: Life expectancy at << age if age != '0' else 'birth'>>
+          title_variant: female-male difference, << type + ' tables'>>
+
       life_expectancy_fm_ratio:
         title: Life expectancy ratio (f/m)
         unit: ""
@@ -142,3 +190,9 @@ tables:
             {definitions.global.life_expectancy.point_1}
           - |-
             {definitions.global.data_used}
+        display:
+          name: |-
+            Life expectancy (female-to-male ratio) at << 'birth' if (age == '0') else age >>, << type >>
+        presentation:
+          title_public: Life expectancy at << age if age != '0' else 'birth'>>
+          title_variant: female-to-male ratio, << type + ' tables'>>
