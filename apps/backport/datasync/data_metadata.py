@@ -132,6 +132,7 @@ def _load_topic_tags(session: Session, variable_id: int) -> List[str]:
     FROM tags_variables_topic_tags
     JOIN tags ON tags_variables_topic_tags.tagId = tags.id
     WHERE variableId = :variable_id
+    ORDER BY displayOrder
     """
 
     # Using the session to execute raw SQL
