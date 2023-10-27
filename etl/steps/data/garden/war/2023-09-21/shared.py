@@ -119,10 +119,14 @@ def add_indicators_extra(
         for column_name in columns_conflict_rate:
             # Add per country indicator
             column_name_new = f"{column_name}_per_country"
-            tb[column_name_new] = (tb[column_name] / tb["number_countries"]).replace([np.inf, -np.inf], np.nan)
+            tb[column_name_new] = (tb[column_name].astype(float) / tb["number_countries"].astype(float)).replace(
+                [np.inf, -np.inf], np.nan
+            )
             # Add per country-pair indicator
             column_name_new = f"{column_name}_per_country_pair"
-            tb[column_name_new] = (tb[column_name] / tb["number_country_pairs"]).replace([np.inf, -np.inf], np.nan)
+            tb[column_name_new] = (tb[column_name].astype(float) / tb["number_country_pairs"].astype(float)).replace(
+                [np.inf, -np.inf], np.nan
+            )
 
     # CONFLICT MORTALITY ###########
     if columns_conflict_mortality:
@@ -131,7 +135,9 @@ def add_indicators_extra(
             # Add per country indicator
             column_name_new = f"{column_name}_per_capita"
             tb[column_name_new] = (
-                (100000 * tb[column_name] / tb["population"]).replace([np.inf, -np.inf], np.nan).astype(float)
+                (100000 * tb[column_name].astype(float) / tb["population"])
+                .replace([np.inf, -np.inf], np.nan)
+                .astype(float)
             )
 
     # Drop intermediate columns
