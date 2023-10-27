@@ -14,6 +14,9 @@ definitions:
         - Each sector's contribution to a country's CO₂ emissions (e.g. what percentage of a country's emissions come from electricity, or road transport).
         They then weight each sector's carbon price by the relevant sector's contribution to CO₂ emissions, and aggregate these figures to get an economy-wide weighted carbon price.
       - A full technical note on the methodology is provided by the authors [in this report](https://www.rff.org/publications/working-papers/emissions-weighted-carbon-price-sources-and-methods/).
+    presentation:
+      topic_tags:
+      - CO2 & Greenhouse Gas Emissions
 
 dataset:
   update_period_days: 365

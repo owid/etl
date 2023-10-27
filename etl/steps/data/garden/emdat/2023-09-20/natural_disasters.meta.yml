@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Natural Disasters
+
 dataset:
   title: Natural disasters
 

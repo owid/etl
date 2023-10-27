@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+    topic_tags:
+    - Animal Welfare
+
 dataset:
   title: Global hen inventory (Welfare Footprint Project, 2022)
 
