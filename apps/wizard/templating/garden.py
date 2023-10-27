@@ -238,9 +238,13 @@ with form_widget.form("garden"):
         st_widget=st.multiselect,
         label="Indicators tag",
         help=(
-            "This tag will be propagated to all dataset's indicators (it will not be assigned to the dataset)."
-            "If you want to use a different tag for a specific indicator you can do it by editing its metadata field `variable.presentation.topic_tags`"
-            "Exceptionally, and if unsure what to choose, choose tag `Uncategorized`."
+            """
+            This tag will be propagated to all dataset's indicators (it will not be assigned to the dataset).
+
+            If you want to use a different tag for a specific indicator you can do it by editing its metadata field `variable.presentation.topic_tags`.
+
+            Exceptionally, and if unsure what to choose, choose tag `Uncategorized`.
+            """
         ),
         key="topic_tags",
         options=tag_list,
