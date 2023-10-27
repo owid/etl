@@ -39,6 +39,7 @@ tables:
         presentation:
           topic_tags:
             - Biodiversity
+            - Climate Change
           grapher_config:
             title: Day of the year with peak cherry tree blossom in Kyoto, Japan
             subtitle: >
