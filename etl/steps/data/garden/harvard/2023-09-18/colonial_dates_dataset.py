@@ -247,10 +247,6 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
         (tb_regions["missing_pop"] >= 0) | (tb_regions["missing_pop"].isnull()), 0
     )
 
-    # Create the columns total_colonies_by_region and colonial_population_by_region, copies of colony_number and colony_pop
-    # NOTE: This is temporal to avoid breaking Grapher.
-    tb_regions["total_colonies_by_region"] = tb_regions["colony_number"]
-
     # Select only regions in tb_regions and "World" tb_world
     tb_world = tb_regions[tb_regions["country"] == "World"].reset_index(drop=True)
     tb_regions = tb_regions[(tb_regions["country"].isin(regions)) & (tb_regions["country"] != "World")].reset_index(
@@ -264,7 +260,6 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
             [
                 "country",
                 "year",
-                "total_colonies_by_region",
                 "missing_pop",
             ]
             + var_list
@@ -275,7 +270,7 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
     tb = pr.concat([tb, tb_regions], short_name="colonial_dates_dataset")
 
     # Make variables in var_list integer
-    for var in var_list + ["total_colonies_by_region", "missing_pop"]:
+    for var in var_list + ["missing_pop"]:
         tb[var] = tb[var].astype("Int64")
 
     # Drop population column

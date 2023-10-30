@@ -1,7 +1,7 @@
 """Garden phase."""
 import os
 from pathlib import Path
-from typing import List, Optional, cast
+from typing import List, cast
 
 import ruamel.yaml
 import streamlit as st
@@ -37,7 +37,7 @@ dummy_values = {
 # Get list of available tags from DB (only those used as topic pages)
 with get_session() as session:
     tag_list = gm.Tag.load_tags(session)
-tag_list = sorted([tag.name for tag in tag_list])
+tag_list = ["Uncategorized"] + sorted([tag.name for tag in tag_list])
 
 #########################################################
 # FUNCTIONS & CLASSES ###################################
@@ -64,12 +64,11 @@ class GardenForm(utils.StepForm):
     generate_notebook: bool
     is_private: bool
     update_period_days: int
-    topic_tags: Optional[List[str]]
+    topic_tags: List[str]
 
     def __init__(self: Self, **data: str | bool) -> None:
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
-        print(1, data["topic_tags"])
         super().__init__(**data)
 
     def validate(self: Self) -> None:
@@ -79,13 +78,17 @@ class GardenForm(utils.StepForm):
         - Return True if all fields are valid, False otherwise.
         """
         # Check other fields (non meta)
-        fields_required = ["namespace", "version", "short_name", "meadow_version"]
+        fields_required = ["namespace", "version", "short_name", "meadow_version", "topic_tags"]
         fields_snake = ["namespace", "short_name"]
         fields_version = ["version", "meadow_version"]
 
         self.check_required(fields_required)
         self.check_snake(fields_snake)
         self.check_is_version(fields_version)
+
+        # Check tags
+        if (len(self.topic_tags) > 1) and ("Uncategorized" in self.topic_tags):
+            self.errors["topic_tags"] = "If you choose multiple tags, you cannot choose `Uncategorized`."
 
 
 def update_state() -> None:
@@ -234,7 +237,15 @@ with form_widget.form("garden"):
     APP_STATE.st_widget(
         st_widget=st.multiselect,
         label="Indicators tag",
-        help="This tag will be propagated to all dataset's indicators (it will not be assigned to the dataset). If you want to use a different tag for a specific indicator you can do it by editing its metadata under `variable.presentation.topic_tags`",
+        help=(
+            """
+            This tag will be propagated to all dataset's indicators (it will not be assigned to the dataset).
+
+            If you want to use a different tag for a specific indicator you can do it by editing its metadata field `variable.presentation.topic_tags`.
+
+            Exceptionally, and if unsure what to choose, choose tag `Uncategorized`.
+            """
+        ),
         key="topic_tags",
         options=tag_list,
         placeholder="Choose a tag (or multiple)",

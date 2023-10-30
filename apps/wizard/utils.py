@@ -446,7 +446,8 @@ class StepForm(BaseModel):
         """Check that all fields in `fields_names` are not empty."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
-            if attr == "":
+            print(field_name, attr)
+            if attr in ["", []]:
                 self.errors[field_name] = f"`{field_name}` is a required property"
 
     def check_snake(self: Self, fields_names: List[str]) -> None:
