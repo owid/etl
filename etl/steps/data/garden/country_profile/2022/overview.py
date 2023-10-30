@@ -87,6 +87,10 @@ def run(dest_dir: str) -> None:
 
                 # Add combined tables to the new dataset.
                 tb_combined = tb_combined.reset_index()
+
+                # Set an index.
+                tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True)
+
                 # Save also as a csv format for the website
                 ds_garden.add(tb_combined, formats=["csv", "feather"])
 
