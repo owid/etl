@@ -382,7 +382,9 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
     # https://www.foronuclear.org/en/nuclear-power/nuclear-power-in-the-world/
     # As well as Wikipedia and other sources.
     countries_without_nuclear = [
+        "Algeria",
         "Angola",
+        "Australia",
         "Austria",
         "Azerbaijan",
         "Bahrain",
