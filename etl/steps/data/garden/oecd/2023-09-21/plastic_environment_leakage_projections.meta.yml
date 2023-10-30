@@ -8,3 +8,6 @@ tables:
         display:
           isProjection: true
           numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Plastic Pollution
