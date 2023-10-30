@@ -1,9 +1,4 @@
 definitions:
-  common:
-    presentation:
-      topic_tags:
-        - War & Peace
-
   deaths_included: |-
     Deaths of combatants and civilians due to fighting are included.
 
