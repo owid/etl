@@ -1,7 +1,7 @@
 """Garden phase."""
 import os
 from pathlib import Path
-from typing import List, Optional, cast
+from typing import List, cast
 
 import ruamel.yaml
 import streamlit as st
