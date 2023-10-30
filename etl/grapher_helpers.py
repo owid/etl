@@ -592,8 +592,8 @@ def sanitize_numpy(obj: Any) -> Any:
 def add_columns_for_multiindicator_chart(
     table: catalog.Table,
     columns_in_chart: List[str],
-    suffix_for_new_columns: str,
-    suffix_for_titles: Optional[str] = " (adapted for visualization purposes)",
+    chart_slug: str,
+    suffix_for_titles: Optional[str] = None,
     columns_to_fill_with_zeros: Optional[List[str]] = None,
 ) -> catalog.Table:
     """Add columns that will be used in a specific multi-indicator (e.g. a stacked area) chart handling issues with
@@ -627,9 +627,9 @@ def add_columns_for_multiindicator_chart(
         Original table.
     columns_in_chart : List[str]
         Column names in the relevant multi-indicator chart.
-    suffix_for_new_columns : str
-        Suffix to be added to the new columns. By convention, it could be "_chart_" followed by the chart's slug in
-        snake case format.
+    chart_slug : str
+        URL slug of the chart, which will be added to the name of the new columns.
+        By convention, the suffix added to columns will be "_chart_" followed by the chart's slug in snake case format.
     suffix_for_titles: Optional[str]
         Suffix to be added to the new columns' titles, to avoid having multiple indicators with the same title.
     columns_to_fill_with_zeros : Optional[List[str]]
@@ -652,7 +652,7 @@ def add_columns_for_multiindicator_chart(
         table[columns_to_fill_with_zeros] = table[columns_to_fill_with_zeros].fillna(0)
 
     # Create new columns.
-    new_columns = [f"{column}{suffix_for_new_columns}" for column in columns_in_chart]
+    new_columns = [f"{column}_chart_{underscore(chart_slug)}" for column in columns_in_chart]
     table[new_columns] = table[columns_in_chart].copy()
 
     # For each row, if any of the columns in the chart is nan, fill other columns in the same row with nan.
@@ -664,6 +664,8 @@ def add_columns_for_multiindicator_chart(
         if ("name" not in table[column].display) or (table[column].metadata.display["name"] is None):
             table[column].metadata.display["name"] = table[column].metadata.title
         # To avoid having multiple indicators with the same title, add a suffix to the title.
+        if suffix_for_titles is None:
+            suffix_for_titles = f" (adapted for visualization of chart {chart_slug})"
         table[column].metadata.title += suffix_for_titles
 
     return table
