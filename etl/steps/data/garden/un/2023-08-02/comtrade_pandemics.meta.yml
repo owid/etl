@@ -98,15 +98,12 @@ tables:
           Total imports of pandemic-related customs.
         description_key:
           - |-
-            Products included are: "Breathing appliances and gas masks", "Gloves, mittens and mitts (knitted or crocheted)", "Gloves, mittens and mitts (not knitted or crocheted)",
-            "Vulcanized (other than hard rubber), gloves other than surgical gloves.",  "Plastics in clothing",  "Spectacles, goggles and the like",  "Surgical gloves", and
-            "Textiles and made up articles".
+            Products included are: "Breathing appliances and gas masks", "Gloves, mittens and mitts (knitted or crocheted)", "Gloves, mittens and mitts (not knitted or crocheted)", "Vulcanized (other than hard rubber), gloves other than surgical gloves.",  "Plastics in clothing",  "Spectacles, goggles and the like",  "Surgical gloves", and "Textiles and made up articles".
       import_cif_breathing_appliances_per_capita:
         title: Imports of breathing appliances and gas masks (per capita)
         unit: "current US$ per capita"
-        description_short: |-
-          Imports of breathing appliances and gas masks; excluding protective masks having neither mechanical parts nor
-          replaceable filters and excluding apparatus.
+        description_short: >-
+          Imports of breathing appliances and gas masks; excluding protective masks having neither mechanical parts nor replaceable filters and excluding apparatus.
         description_from_producer: >-
           Imports of breathing appliances and gas masks; excluding protective masks having neither mechanical parts nor
           replaceable filters and excluding apparatus of item no. "901920" ("901920 - Therapeutic respiration apparatus;
@@ -163,6 +160,4 @@ tables:
           Total imports of pandemic-related customs.
         description_key:
           - |-
-            Products included are: "Breathing appliances and gas masks", "Gloves, mittens and mitts (knitted or crocheted)", "Gloves, mittens and mitts (not knitted or crocheted)",
-            "Vulcanized (other than hard rubber), gloves other than surgical gloves.",  "Plastics in clothing",  "Spectacles, goggles and the like",  "Surgical gloves", and
-            "Textiles and made up articles".
+            Products included are: "Breathing appliances and gas masks", "Gloves, mittens and mitts (knitted or crocheted)", "Gloves, mittens and mitts (not knitted or crocheted)", "Vulcanized (other than hard rubber), gloves other than surgical gloves.",  "Plastics in clothing",  "Spectacles, goggles and the like","Textiles and made up articles".
