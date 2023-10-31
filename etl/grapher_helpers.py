@@ -612,7 +612,7 @@ def add_columns_for_multiindicator_chart(
 
     This function can be used to create columns for all indicators used in a specific multi-indicator chart.
     It will:
-    * Optionally, fill missing data for certain indicators with zeros.
+    * Optionally, fill missing data for some of the new columns with zeros.
       In the example of issue 1, nuclear power could be filled with zeros.
     * Make nan rows in the new columns if any indicator used in the chart is nan.
       In the example of issue 2, Algeria's renewable electricity in 2022 would be nan.
@@ -620,6 +620,7 @@ def add_columns_for_multiindicator_chart(
     NOTES:
     * This function assumes a wide-format table.
     * In the grapher admin, ensure you select "Hide entities with missing data" in the corresponding chart.
+    * This function creates new columns and does not affect already existing ones.
 
     Parameters
     ----------
@@ -634,7 +635,7 @@ def add_columns_for_multiindicator_chart(
         Suffix to be added to the new columns' titles, to avoid having multiple indicators with the same title.
     columns_to_fill_with_zeros : Optional[List[str]]
         Subset of columns_in_chart whose nans should be filled with zeros.
-        Note: The original columns will not be affected.
+        Note: The original columns will not be affected, only the newly created ones.
 
     Returns
     -------
@@ -644,16 +645,24 @@ def add_columns_for_multiindicator_chart(
     """
     table = table.copy()
 
-    # Fill columns with zeros.
+    def _rename_column(old_column_name: str, chart_slug: str) -> str:
+        # Generate a name for a new column based on the old column name and the chart slug.
+        return f"{old_column_name}_chart_{underscore(chart_slug)}"
+
+    # Create new columns.
+    new_columns = [_rename_column(old_column_name=column, chart_slug=chart_slug) for column in columns_in_chart]
+    table[new_columns] = table[columns_in_chart].copy()
+
+    # Optionally fill some of the new columns with zeros.
     if columns_to_fill_with_zeros is not None:
         # Sanity check.
         error = "columns_to_fill_with_zeros should be a subset of columns_in_chart."
         assert set(columns_to_fill_with_zeros) <= set(columns_in_chart), error
-        table[columns_to_fill_with_zeros] = table[columns_to_fill_with_zeros].fillna(0)
-
-    # Create new columns.
-    new_columns = [f"{column}_chart_{underscore(chart_slug)}" for column in columns_in_chart]
-    table[new_columns] = table[columns_in_chart].copy()
+        # Fill nans with zeros (in new columns).
+        new_columns_to_fill_with_zeros = [
+            _rename_column(old_column_name=column, chart_slug=chart_slug) for column in columns_to_fill_with_zeros
+        ]
+        table[new_columns_to_fill_with_zeros] = table[new_columns_to_fill_with_zeros].fillna(0)
 
     # For each row, if any of the columns in the chart is nan, fill other columns in the same row with nan.
     table.loc[table[new_columns].isnull().any(axis=1), new_columns] = np.nan
