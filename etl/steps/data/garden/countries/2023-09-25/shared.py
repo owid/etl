@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from typing import Optional
+from typing import Optional, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -119,7 +119,7 @@ def fill_timeseries(
         raise ValueError("Either `year_max` must be a value or `default_max` must be True")
 
     # Cross merge with missing years
-    tb_all_years = Table(pd.RangeIndex(year_min, year_max + 1), columns=["year"])
+    tb_all_years = Table(pd.RangeIndex(year_min, cast(int, year_max) + 1), columns=["year"])
     if "year" in tb.columns:
         raise ValueError("Column 'year' already in table! Please drop it from `tb`.")
     tb = tb.merge(tb_all_years, how="cross")
