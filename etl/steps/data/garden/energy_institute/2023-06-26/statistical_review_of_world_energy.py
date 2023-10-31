@@ -377,21 +377,202 @@ def prepare_prices_index_table(tb_prices: Table) -> Table:
     return tb_prices_index
 
 
+def fix_missing_nuclear_energy_data(tb: Table) -> Table:
+    # List of countries in the data that have never had nuclear power in their grid, based on:
+    # https://www.foronuclear.org/en/nuclear-power/nuclear-power-in-the-world/
+    # As well as Wikipedia and other sources.
+    countries_without_nuclear = [
+        "Algeria",
+        "Angola",
+        "Australia",
+        "Austria",
+        "Azerbaijan",
+        "Bahrain",
+        # Bangladesh is building its first nuclear power plant, to be commissioned in 2024.
+        # https://en.wikipedia.org/wiki/Rooppur_Nuclear_Power_Plant
+        "Bangladesh",
+        "Bolivia",
+        "Brunei",
+        # 'Central America (EI)',
+        "Chad",
+        "Chile",
+        "Colombia",
+        "Congo",
+        "Croatia",
+        "Cuba",
+        "Curacao",
+        "Cyprus",
+        "Democratic Republic of Congo",
+        "Denmark",
+        # 'Eastern Africa (EI)',
+        "Ecuador",
+        # Egypt is building its first nuclear power plant, to be commissioned in 2026.
+        # https://en.wikipedia.org/wiki/El_Dabaa_Nuclear_Power_Plant
+        "Egypt",
+        "Equatorial Guinea",
+        # Estonia has plans to built a nuclear power plant in 2023.
+        # https://en.wikipedia.org/wiki/Nuclear_power_in_Estonia
+        "Estonia",
+        "Gabon",
+        # Hong Kong imports electricity from mainland China.
+        # NOTE: Despite importing nuclear power from China, in the data, nuclear_consumption_ej is zero (or nan).
+        # https://en.wikipedia.org/wiki/Nuclear_energy_in_Hong_Kong
+        "Hong Kong",
+        "Iceland",
+        "Indonesia",
+        "Iraq",
+        "Ireland",
+        "Israel",
+        "Kuwait",
+        "Latvia",
+        "Libya",
+        "Luxembourg",
+        "Madagascar",
+        "Malaysia",
+        # 'Middle Africa (EI)',
+        # 'Middle East (EI)',
+        # 'Middle East and Africa (EI)',
+        "Mongolia",
+        "Morocco",
+        "Mozambique",
+        "Myanmar",
+        "Netherlands Antilles",
+        "New Caledonia",
+        "New Zealand",
+        "Nigeria",
+        # 'Non-OPEC (EI)',
+        "North Macedonia",
+        "Norway",
+        # 'OPEC (EI)',
+        "Oman",
+        # 'Other Africa (EI)',
+        # 'Other Asia Pacific (EI)',
+        # 'Other CIS (EI)',
+        # 'Other Caribbean (EI)',
+        # 'Other Eastern Africa (EI)',
+        # 'Other Middle Africa (EI)',
+        # 'Other Middle East (EI)',
+        # 'Other North America (EI)',
+        # 'Other Northern Africa (EI)',
+        # 'Other S. & Cent. America (EI)',
+        # 'Other South America (EI)',
+        # 'Other Southern Africa (EI)',
+        # 'Other Western Africa (EI)',
+        "Papua New Guinea",
+        "Peru",
+        "Philippines",
+        "Poland",
+        "Portugal",
+        "Qatar",
+        # 'Rest of World (EI)',
+        "Saudi Arabia",
+        "Serbia",
+        "Singapore",
+        "South Sudan",
+        "Sri Lanka",
+        "Sudan",
+        "Syria",
+        "Thailand",
+        "Trinidad and Tobago",
+        "Tunisia",
+        # Turkey is planned to start nuclear energy in 2023.
+        # https://en.wikipedia.org/wiki/Nuclear_power_in_Turkey
+        "Turkey",
+        "Turkmenistan",
+        "Uzbekistan",
+        "Venezuela",
+        "Vietnam",
+        # 'Western Africa (EI)',
+        "Yemen",
+        "Zambia",
+        "Zimbabwe",
+    ]
+    # Columns related to nuclear data.
+    columns_nuclear = ["nuclear_consumption_equivalent_ej", "nuclear_electricity_generation_twh"]
+
+    for column in columns_nuclear:
+        error = "List of countries expected to have at empty or zero nuclear data has changed."
+        assert tb[(tb["country"].isin(countries_without_nuclear)) & (tb[column].fillna(0) > 0)].empty, error
+        # For all these countries, simply fill nans with zeros, as they use no nuclear energy.
+        tb.loc[tb["country"].isin(countries_without_nuclear), column] = 0
+
+        # Now consider countries that have nuclear power at least for one year.
+        # Fix their missing data in a case by case scenario.
+        error = "Data for countries with partial nuclear energy has changed."
+
+        # Belarus nuclear was first connected to the grid in 2020.
+        # https://en.wikipedia.org/wiki/Astravets_Nuclear_Power_Plant
+        country = "Belarus"
+        assert tb[(tb["country"] == country) & (tb["year"] < 2020) & (tb[column].fillna(0) > 0)].empty, error
+        assert tb[(tb["country"] == country) & (tb["year"] > 2020) & (tb[column].isnull())].empty, error
+        tb.loc[(tb["country"] == country) & (tb["year"] < 2020), column] = 0
+
+        # Iran started producing electricity in 2010 (and the first informed point is 2011).
+        # https://en.wikipedia.org/wiki/Nuclear_facilities_in_Iran
+        country = "Iran"
+        assert tb[(tb["country"] == country) & (tb["year"] < 2011) & (tb[column].fillna(0) > 0)].empty, error
+        assert tb[(tb["country"] == country) & (tb["year"] > 2011) & (tb[column].isnull())].empty, error
+        tb.loc[(tb["country"] == country) & (tb["year"] < 2011), column] = 0
+
+        # Italy uses no nuclear power since 1990.
+        # https://en.wikipedia.org/wiki/Nuclear_power_in_Italy
+        country = "Italy"
+        assert tb[(tb["country"] == country) & (tb["year"] > 1990) & (tb[column].fillna(0) > 0)].empty, error
+        assert tb[(tb["country"] == country) & (tb["year"] < 1990) & (tb[column].isnull())].empty, error
+        tb.loc[(tb["country"] == country) & (tb["year"] > 1990), column] = 0
+
+        # Soviet Union successors (starting having data in 1985):
+        # Kazakhstan stopped using nuclear power in 1999.
+        # https://en.wikipedia.org/wiki/Nuclear_power_in_Kazakhstan
+        country = "Kazakhstan"
+        assert tb[(tb["country"] == country) & (tb["year"] > 1999) & (tb[column].fillna(0) > 0)].empty, error
+        assert tb[
+            (tb["country"] == country) & (tb["year"] < 1999) & (tb["year"] > 1985) & (tb[column].isnull())
+        ].empty, error
+        tb.loc[(tb["country"] == country) & (tb["year"] > 1999), column] = 0
+
+        # Lithuania stopped using nuclear power in 2009.
+        # https://en.wikipedia.org/wiki/Nuclear_power_in_Lithuania
+        country = "Lithuania"
+        assert tb[(tb["country"] == country) & (tb["year"] > 2009) & (tb[column].fillna(0) > 0)].empty, error
+        assert tb[
+            (tb["country"] == country) & (tb["year"] < 2009) & (tb["year"] > 1985) & (tb[column].isnull())
+        ].empty, error
+        tb.loc[(tb["country"] == country) & (tb["year"] > 2009), column] = 0
+
+        # UAE has nuclear power since 2020.
+        # https://en.wikipedia.org/wiki/Nuclear_power_in_the_United_Arab_Emirates
+        country = "United Arab Emirates"
+        assert tb[(tb["country"] == country) & (tb["year"] < 2020) & (tb[column].fillna(0) > 0)].empty
+        assert tb[(tb["country"] == country) & (tb["year"] > 2020) & (tb[column].isnull())].empty
+        tb.loc[(tb["country"] == country) & (tb["year"] < 2020), column] = 0
+
+        # For USSR and Russia we have nuclear data. The USSR data ends in 1984, and Russia data starts in 1985
+        # (they have nuclear power since 1954, the first in the world).
+        # Simply check that there's data for all years before 1985 for USSR and after 1985 for successors.
+        error = "Expected nuclear data for all years prior to 1985 for the USSR and for successors from 1985 onwards."
+        assert tb[(tb["country"] == "USSR") & (tb["year"] < 1985) & (tb[column].isnull())].empty, error
+        for country in ["Russia", "Ukraine", "Kazakhstan", "Lithuania"]:
+            assert tb[(tb["country"] == country) & (tb["year"] > 1985) & (tb[column].isnull())].empty, error
+
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
     # Load meadow dataset and read its tables.
-    ds_meadow: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    ds_meadow = paths.load_dataset("statistical_review_of_world_energy")
     tb_meadow = ds_meadow["statistical_review_of_world_energy"].reset_index()
     tb_meadow_prices = ds_meadow["statistical_review_of_world_energy_fossil_fuel_prices"].reset_index()
     tb_efficiency = ds_meadow["statistical_review_of_world_energy_efficiency_factors"].reset_index()
 
     # Load regions dataset.
-    ds_regions: Dataset = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
 
     # Load income groups dataset.
-    ds_income_groups: Dataset = paths.load_dependency("income_groups")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     #
     # Process data.
@@ -406,6 +587,9 @@ def run(dest_dir: str) -> None:
 
     # Add column for thermal equivalent efficiency factors.
     tb = tb.merge(tb_efficiency, how="left", on="year")
+
+    # Fill spurious nans in nuclear energy data with zeros.
+    tb = fix_missing_nuclear_energy_data(tb=tb)
 
     # Create additional variables, like primary energy consumption in TWh (both direct and in input-equivalents).
     tb = create_additional_variables(tb=tb)
