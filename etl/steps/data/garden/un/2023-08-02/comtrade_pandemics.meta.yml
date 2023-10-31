@@ -101,7 +101,7 @@ tables:
             Products included are: "Breathing appliances and gas masks", "Gloves, mittens and mitts (knitted or crocheted)", "Gloves, mittens and mitts (not knitted or crocheted)",
             "Vulcanized (other than hard rubber), gloves other than surgical gloves.",  "Plastics in clothing",  "Spectacles, goggles and the like",  "Surgical gloves", and
             "Textiles and made up articles".
-      ort_cif_breathing_appliances_per_capita:
+      import_cif_breathing_appliances_per_capita:
         title: Imports of breathing appliances and gas masks (per capita)
         unit: "current US$ per capita"
         description_short: |-
