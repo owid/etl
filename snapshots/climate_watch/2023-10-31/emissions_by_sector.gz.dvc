@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Greenhouse gas emissions by sector
+    date_published: 2023-04-21
+
+    # Citation
+    producer: Climate Watch
+    citation_full: |-
+      Climate Watch. 2022. Washington, DC: World Resources Institute (WRI). Available online at: https://www.climatewatchdata.org
+
+      Climate Watch data are derived from several sources.
+      - Data on land-Use Change and Forestry, and Agriculture, are sourced from the Food and Agriculture Organization of the United Nations, FAOSTAT Emissions Database.
+      - Data on greenhouse gas emissions from fuel combustion are sourced from the OECD/IEA.
+    attribution_short: Climate Watch
+
+    # Files
+    url_main: https://www.climatewatchdata.org/data-explorer/historical-emissions
+    date_accessed: 2023-10-31
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.climatewatchdata.org/about/permissions
+
+wdir: ../../../data/snapshots/climate_watch/2023-10-31
+outs:
+- md5: e73609fb6ad7f9b502d2846a5d95cb4c
+  size: 3766559
+  path: emissions_by_sector.gz
