@@ -3,8 +3,10 @@
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from shared import (
+    LAST_YEAR,
     add_latest_years_with_constant_num_countries,
     add_population_to_table,
+    fill_timeseries,
     init_table_countries_in_region,
 )
 
@@ -33,11 +35,12 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # Minor fix
-    tb.loc[tb["country"] == "German Federal Republic", "end"] = "02:10:1990"
-
     # Format table
     tb_formatted = format_table(tb)
+
+    # Minor fix
+    ## GW code 260 should be referred to as 'West Germany' until 1990, then as 'Germany'
+    tb_formatted.loc[(tb_formatted["id"] == 260) & (tb_formatted["year"] >= 1990), "country"] = "Germany"
 
     # Create new table
     tb_regions = create_table_countries_in_region(tb_formatted, ds_pop)
@@ -48,9 +51,13 @@ def run(dest_dir: str) -> None:
     # Combine tables
     tb_regions = tb_regions.merge(tb_pop, how="left", on=["region", "year"])
 
+    # Get table with id, year, country (whenever that country was present)
+    tb_countries = create_table_country_years(tb_formatted)
+
     # Add to table list
     tables = [
         tb.set_index(["id", "start", "end"], verify_integrity=True).sort_index(),
+        tb_countries.set_index(["id", "year"], verify_integrity=True).sort_index(),
         tb_regions.set_index(["region", "year"], verify_integrity=True).sort_index(),
     ]
 
@@ -84,6 +91,23 @@ def format_table(tb: Table) -> Table:
     # Get region name
     tb["region"] = tb["id"].apply(code_to_region)
 
+    return tb
+
+
+def create_table_country_years(tb: Table) -> Table:
+    """Create table with each country present in a year."""
+    tb_countries = tb[["id", "year", "country"]].copy()
+
+    # define mask for last year
+    mask = tb_countries["year"] == EXPECTED_LAST_YEAR
+
+    tb_last = fill_timeseries(
+        tb_countries[mask].drop(columns="year"),
+        EXPECTED_LAST_YEAR + 1,
+        LAST_YEAR,
+    )
+
+    tb = pr.concat([tb_countries, tb_last], ignore_index=True, short_name="gleditsch_countries")
     return tb
 
 
