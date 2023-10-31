@@ -14,6 +14,11 @@ def run(dest_dir: str) -> None:
 
     # Create and add patents table
     table = make_table()
+
+    # Set an appropriate index and sort conveniently
+    table = table.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    # Add table to dataset
     ds.add(table)
 
     # Save
