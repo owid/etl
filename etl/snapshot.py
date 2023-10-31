@@ -184,6 +184,10 @@ class Snapshot:
         """Read records into a Table and populate it with metadata."""
         return pr.read_from_records(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
+    def read_from_dict(self, *args, **kwargs) -> Table:
+        """Read data from a dictionary into a Table and populate it with metadata."""
+        return pr.read_from_dict(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
     def read_fwf(self, *args, **kwargs) -> Table:
         """Read a table of fixed-width formatted lines with metadata."""
         return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
