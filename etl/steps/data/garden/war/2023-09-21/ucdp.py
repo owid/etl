@@ -67,9 +67,10 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("ucdp")
 
-    # Read table from COW codes
-    ds_cow_ssm = paths.load_dataset("gleditsch")
-    tb_regions = ds_cow_ssm["gleditsch_regions"].reset_index()
+    # Read table from GW codes
+    ds_gw = paths.load_dataset("gleditsch")
+    tb_regions = ds_gw["gleditsch_regions"].reset_index()
+    tb_gw_countries = ds_gw["gleditsch_countries"]
 
     #
     # Process data.
@@ -95,7 +96,7 @@ def run(dest_dir: str) -> None:
 
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
-    tb_country = estimate_metrics_country_level(tb, ds_cow_ssm["gleditsch_countries"])
+    tb_country = estimate_metrics_country_level(tb, tb_gw_countries)
 
     # Sanity check conflict_type transitions
     ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
@@ -728,7 +729,7 @@ def adapt_region_names(tb: Table) -> Table:
     return tb
 
 
-def estimate_metrics_country_level(tb: Table, tb_gw) -> Table:
+def estimate_metrics_country_level(tb: Table, tb_gw: Table) -> Table:
     """Add country-level indicators."""
     ###################
     # Participated in #
