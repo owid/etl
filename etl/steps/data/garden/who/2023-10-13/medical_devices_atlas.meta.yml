@@ -6,6 +6,10 @@
 definitions:
   common:
     processing_level: minor
+    presentation:
+      topic_tags:
+        - Cardiovascular Diseases
+
 
 dataset:
   update_period_days: 365

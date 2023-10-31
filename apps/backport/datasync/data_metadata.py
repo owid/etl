@@ -166,6 +166,7 @@ def _load_origins_df(session: Session, variable_id: int) -> pd.DataFrame:
     FROM origins
     JOIN origins_variables ON origins.id = origins_variables.originId
     WHERE origins_variables.variableId = :variable_id
+    ORDER BY displayOrder
     """
 
     # Use the session to execute the raw SQL

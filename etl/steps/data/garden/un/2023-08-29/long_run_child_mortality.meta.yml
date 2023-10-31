@@ -1,3 +1,10 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Child & Infant Mortality
+
+
 dataset:
   title: Long-run child mortality (Gapminder; UN IGME)
 tables:

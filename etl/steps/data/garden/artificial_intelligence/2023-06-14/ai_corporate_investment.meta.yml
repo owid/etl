@@ -1,3 +1,10 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+
 dataset:
   title: Global Corporate Investment in AI by Investment Activity, 2013–22 (AI Index,
     2023)
@@ -33,7 +40,7 @@ tables:
         unit: ''
       total_corporate_investment_by_activity_inflation_adjusted:
         title: Total corporate investment - inflation adjusted
-        description: >-
+        description_short: >-
           Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
 
 
