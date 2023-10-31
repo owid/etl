@@ -132,8 +132,6 @@ def run(dest_dir: str) -> None:
     paths.log.info("rename regions")
     tb["conflict_type"] = tb["conflict_type"].map(CONFTYPES_RENAME | {"all": "all", "intrastate": "intrastate"})
     assert tb["conflict_type"].isna().sum() == 0, "Unmapped conflict_type!"
-    tb_country["conflict_type"] = tb_country["conflict_type"].map(CONFTYPES_RENAME)
-    assert tb_country["conflict_type"].isna().sum() == 0, "Unmapped conflict_type!"
 
     # sanity check: summing number of ongoing and new conflicts of all types is equivalent to conflict_type="all"
     paths.log.info("sanity checking number of conflicts")
@@ -396,6 +394,10 @@ def estimate_metrics_country_level(tb: Table, tb_gw: Table) -> Table:
     tb_country = tb_gw.merge(tb_country, on=["year", "country", "conflict_type"], how="left")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
     tb_country = tb_country[["year", "country", "conflict_type", "participated_in_conflict"]]
+
+    # Map conflict codes to labels
+    tb_country["conflict_type"] = tb_country["conflict_type"].map(CONFTYPES_RENAME)
+    assert tb_country["conflict_type"].isna().sum() == 0, "Unmapped conflict_type!"
 
     # Add intrastate (all)
     tb_country = add_conflict_country_all_intrastate(tb_country)
