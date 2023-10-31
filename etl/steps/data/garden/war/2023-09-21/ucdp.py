@@ -19,6 +19,8 @@ Notes:
             5 = Americas (GWNo: 2-199)
 """
 
+from typing import List, Optional
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -57,7 +59,7 @@ REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 
 
 def run(dest_dir: str) -> None:
-    log.info("war_ucdp.start")
+    paths.log.info("war_ucdp.start")
 
     #
     # Load inputs.
@@ -72,7 +74,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    log.info("war.ucdp: sanity checks")
+    paths.log.info("war.ucdp: sanity checks")
     _sanity_checks(ds_meadow)
 
     # Load relevant tables
@@ -81,15 +83,19 @@ def run(dest_dir: str) -> None:
     tb_prio = ds_meadow["ucdp_prio_armed_conflict"].reset_index()
 
     # Keep only active conflicts
-    log.info("war.ucdp: keep active conflicts")
+    paths.log.info("war.ucdp: keep active conflicts")
     tb_geo = tb_geo[tb_geo["active_year"] == 1]
 
     # Change region named "Asia" to "Asia and Oceania" (in GED)
     tb_geo["region"] = tb_geo["region"].replace(to_replace={"Asia": "Asia and Oceania"})
 
     # Create `conflict_type` column
-    log.info("war.ucdp: add field `conflict_type`")
+    paths.log.info("war.ucdp: add field `conflict_type`")
     tb = add_conflict_type(tb_geo, tb_conflict)
+
+    # Get country-level stuff
+    paths.log.info("getting country-level indicators")
+    tb_country = estimate_metrics_country_level(tb, ds_cow_ssm["gleditsch_countries"])
 
     # Sanity check conflict_type transitions
     ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
@@ -97,28 +103,28 @@ def run(dest_dir: str) -> None:
     _sanity_check_prio_conflict_types(tb_prio)
 
     # Add number of new conflicts and ongoing conflicts (also adds data for the World)
-    log.info("war.ucdp: get metrics for main dataset (also estimate values for 'World')")
+    paths.log.info("war.ucdp: get metrics for main dataset (also estimate values for 'World')")
     tb = estimate_metrics(tb)
 
     # Add table from UCDP/PRIO
-    log.info("war.ucdp: prepare data from ucdp/prio table (also estimate values for 'World')")
+    paths.log.info("war.ucdp: prepare data from ucdp/prio table (also estimate values for 'World')")
     tb_prio = prepare_prio_data(tb_prio)
 
     # Fill NaNs
-    log.info("war.ucdp: replace missing data with zeros (where applicable)")
+    paths.log.info("war.ucdp: replace missing data with zeros (where applicable)")
     tb_prio = replace_missing_data_with_zeros(tb_prio)
     tb = replace_missing_data_with_zeros(tb)
 
     # Combine main dataset with PRIO/UCDP
-    log.info("war.ucdp: add data from ucdp/prio table")
+    paths.log.info("war.ucdp: add data from ucdp/prio table")
     tb = combine_tables(tb, tb_prio)
 
     # Add extra-systemic after 1989
-    log.info("war.ucdp: fix extra-systemic nulls")
+    paths.log.info("war.ucdp: fix extra-systemic nulls")
     tb = fix_extrasystemic_entries(tb)
 
     # Add data for "all conflicts" conflict type
-    log.info("war.ucdp: add data for 'all conflicts'")
+    paths.log.info("war.ucdp: add data for 'all conflicts'")
     tb = add_conflict_all(tb)
 
     # Add data for "all intrastate" conflict types
@@ -147,23 +153,30 @@ def run(dest_dir: str) -> None:
 
     # Set index, sort rows
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True).sort_index()
+    tb_country = tb_country.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
 
     # Add short_name to table
-    log.info("war.ucdp: add shortname to table")
+    paths.log.info("war.ucdp: add shortname to table")
     tb.metadata.short_name = paths.short_name
+
+    # Tables
+    tables = [
+        tb,
+        tb_country,
+    ]
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-    log.info("ucdp.end")
+    paths.log.info("ucdp.end")
 
 
 def _sanity_checks(ds: Dataset) -> None:
@@ -342,7 +355,7 @@ def _sanity_check_prio_conflict_types(tb: Table) -> Table:
     assert not transitions_unk, f"Unknown transitions found: {transitions_unk}"
 
 
-def replace_missing_data_with_zeros(tb: Table) -> Table:
+def replace_missing_data_with_zeros(tb: Table, columns: Optional[List[str]] = None) -> Table:
     """Replace missing data with zeros.
 
     In some instances (e.g. extrasystemic conflicts after ~1964) there is missing data. Instead, we'd like this to be zero-valued.
@@ -357,13 +370,14 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     # ADD HERE IF YOU WANT TO REPLACE MISSING DATA WITH ZEROS
     ## Change NaNs for 0 for specific rows
     ## For columns "number_ongoing_conflicts", "number_new_conflicts", and "number_deaths_ongoing_conflict*"
-    columns = [
-        "number_ongoing_conflicts",
-        "number_new_conflicts",
-        "number_deaths_ongoing_conflicts",
-        "number_deaths_ongoing_conflicts_low",
-        "number_deaths_ongoing_conflicts_high",
-    ]
+    if columns is None:
+        columns = [
+            "number_ongoing_conflicts",
+            "number_new_conflicts",
+            "number_deaths_ongoing_conflicts",
+            "number_deaths_ongoing_conflicts_low",
+            "number_deaths_ongoing_conflicts_high",
+        ]
     for col in columns:
         if col in tb.columns:
             tb.loc[:, col] = tb.loc[:, col].fillna(0)
@@ -379,14 +393,14 @@ def estimate_metrics(tb: Table) -> Table:
     we need to access the actual conflict_id field to find the number of unique values. This can only be done here.
     """
     # Get number of ongoing conflicts, and deaths in ongoing conflicts
-    log.info("war.ucdp: get number of ongoing conflicts and deaths in ongoing conflicts")
+    paths.log.info("war.ucdp: get number of ongoing conflicts and deaths in ongoing conflicts")
     tb_ongoing = _get_ongoing_metrics(tb)
 
     # Get number of new conflicts every year
-    log.info("war.ucdp: get number of new conflicts every year")
+    paths.log.info("war.ucdp: get number of new conflicts every year")
     tb_new = _get_new_metrics(tb)
     # Combine and build single table
-    log.info("war.ucdp: combine and build single table")
+    paths.log.info("war.ucdp: combine and build single table")
     tb = tb_ongoing.merge(
         tb_new,
         left_on=["year", "region", "conflict_type"],
@@ -711,4 +725,89 @@ def adapt_region_names(tb: Table) -> Table:
     # Add suffix with source name
     msk = tb["region"] != "World"
     tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (UCDP)"
+    return tb
+
+
+def estimate_metrics_country_level(tb: Table, tb_gw) -> Table:
+    """Add country-level indicators."""
+    ###################
+    # Participated in #
+    ###################
+
+    # Get table with [year, conflict_type, code]
+    tb_country = pr.concat(
+        [
+            tb[["year", "conflict_type", "gwnoa"]].rename(columns={"gwnoa": "code"}),
+            tb[["year", "conflict_type", "gwnob"]].rename(columns={"gwnob": "code"}),
+        ],
+    )
+    # Drop rows with code = NaN
+    tb_country = tb_country.dropna(subset=["code"])
+    # Drop duplicates
+    tb_country = tb_country.drop_duplicates()
+
+    # Explode where multiple codes
+    tb_country["code"] = tb_country["code"].astype(str).str.split(";")
+    tb_country = tb_country.explode("code")
+    # Drop duplicates (may appear duplicates after exploding)
+    tb_country = tb_country.drop_duplicates()
+    # Ensure numeric type
+    tb_country["code"] = tb_country["code"].astype(int)
+
+    # Sanity check
+    assert not tb_country.isna().any(axis=None), "There are some NaNs!"
+
+    # Add country name
+    tb_country["country"] = tb_country.apply(lambda x: tb_gw.loc[(x["code"], x["year"])], axis=1)
+    assert tb_country["country"].notna().all(), "Some countries were not found! NaN was set"
+
+    # Add flag
+    tb_country["participated_in_conflict"] = 1
+    tb_country["participated_in_conflict"].m.origins = tb["gwnoa"].m.origins
+
+    # Prepare GW table
+    tb_alltypes = Table(pd.DataFrame({"conflict_type": tb_country["conflict_type"].unique()}))
+    tb_gw = tb_gw.reset_index().merge(tb_alltypes, how="cross")
+    tb_gw["country"] = tb_gw["country"].astype(str)
+
+    # Combine all GW entries with UCDP
+    tb_country = tb_gw.merge(tb_country, on=["year", "country", "conflict_type"], how="left")
+    tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
+    tb_country = tb_country[["year", "country", "conflict_type", "participated_in_conflict"]]
+
+    # Add intrastate (all)
+    tb_country = add_conflict_country_all_intrastate(tb_country)
+    # Add state-based
+    tb_country = add_conflict_country_all_statebased(tb_country)
+
+    # Only preserve years that make sense
+    tb_country = tb_country[tb_country["year"] >= tb["year"].min()]
+
+    # Set short name
+    tb_country.metadata.short_name = "ucdp_country"
+
+    return tb_country
+
+
+def add_conflict_country_all_intrastate(tb: Table) -> Table:
+    """Add metrics for conflict_type = 'intrastate'."""
+    tb_intra = tb[
+        tb["conflict_type"].isin(["intrastate (non-internationalized)", "intrastate (internationalized)"])
+    ].copy()
+    tb_intra = tb_intra.groupby(["year", "country"], as_index=False).agg(
+        {"participated_in_conflict": lambda x: min(x.sum(), 1)}
+    )
+    tb_intra["conflict_type"] = "intrastate"
+    tb = pr.concat([tb, tb_intra], ignore_index=True)
+    return tb
+
+
+def add_conflict_country_all_statebased(tb: Table) -> Table:
+    """Add metrics for conflict_type = 'state-based'."""
+    tb_state = tb[tb["conflict_type"].isin(TYPE_OF_CONFLICT_MAPPING.values())].copy()
+    tb_state = tb_state.groupby(["year", "country"], as_index=False).agg(
+        {"participated_in_conflict": lambda x: min(x.sum(), 1)}
+    )
+    tb_state["conflict_type"] = "state-based"
+    tb = pr.concat([tb, tb_state], ignore_index=True)
     return tb

@@ -161,6 +161,15 @@ dataset:
 
 
 tables:
+  # COUNTRY-LEVEL
+  ucdp_country:
+    variables:
+      participated_in_conflict:
+        title: Participated in conflict
+        unit: ""
+        description_short: |-
+          Whether the country participated in a conflict (of a specific kind) in a given year.
+
   ucdp:
     variables:
       ##################
