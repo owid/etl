@@ -11,6 +11,9 @@ definitions:
     display: &common-display
       numDecimalPlaces: 1
       tolerance: 5
+    presentation:
+      topic_tags:
+      - State Capacity
 
   exp_conversion: The data has been reconverted with the exponential function, to represent meaningful values.
 
