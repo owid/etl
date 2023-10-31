@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from typing import List, Optional
+from typing import Optional
 
 import owid.catalog.processing as pr
 import pandas as pd
