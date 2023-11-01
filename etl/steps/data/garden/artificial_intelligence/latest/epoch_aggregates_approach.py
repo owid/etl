@@ -12,13 +12,13 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     """
-    Generate aggregated table for total yearly and cumulative number of notable AI systems for each domain.
+    Generate aggregated table for total yearly and cumulative number of notable AI systems for each machine learning approach.
 
     This function performs the following steps:
     1. Load the epoch dataset.
     2. Assert that the 'publication_date' column is of type datetime64.
     3. Create a 'year' column derived from the 'publication_date' column.
-    4. Group the data by year and 'domain' and calculate the counts.
+    4. Group the data by year and 'approach' and calculate the counts.
     5. Pivot the table to get counts for each approach type in separate columns.
     6. Melt the dataframe to long format for yearly and cumulative counts.
     7. Merge the yearly and cumulative counts.
@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     9. Create a new dataset with the aggregated table.
     10. Save the new dataset.
     """
-    log.info("epoch_aggregates_domain.start")
+    log.info("epoch_aggregates_approach.start")
 
     #
     # Load inputs.
@@ -41,59 +41,51 @@ def run(dest_dir: str) -> None:
     assert tb["publication_date"].dtype == "datetime64[ns]", "publication_date column is not of type datetime64"
     # Create a year column
     tb["year"] = tb["publication_date"].dt.year
-    # Get domain counts
-    domain_counts = tb.groupby(["year", "domain"]).size().reset_index(name="count")
+    # Get approach counts
+    approach_counts = tb.groupby(["year", "approach"]).size().reset_index(name="count")
 
-    # Pivot the table to get the counts for each domain in a separate column
-    df_pivot_domain = domain_counts.pivot(index="year", columns="domain", values="count").reset_index()
+    # Pivot the table to get the counts for each approach type in a separate column
+    df_pivot_approach = approach_counts.pivot(index="year", columns="approach", values="count").reset_index()
 
     # Melting the dataframe
-    melted_df = df_pivot_domain.melt(
+    melted_df = df_pivot_approach.melt(
         id_vars=["year"],
         value_vars=[
-            "Drawing",
-            "Games",
-            "Language",
-            "Multimodal",
             "Not specified",
-            "Other",
-            "Recommendation",
-            "Speech",
-            "Vision",
+            "Reinforcement learning",
+            "Self-supervised learning",
+            "Supervised",
+            "Unsupervised",
         ],
-        var_name="domain",
+        var_name="approach",
         value_name="yearly_count",
     )
 
     # Replace with cumulative columns
-    for column in df_pivot_domain.columns:
+    for column in df_pivot_approach.columns:
         if column not in ["year"]:
-            df_pivot_domain[f"{column}"] = df_pivot_domain[column].cumsum()
+            df_pivot_approach[f"{column}"] = df_pivot_approach[column].cumsum()
     # Melting the dataframe
-    melted_df_cumulative = df_pivot_domain.melt(
+    melted_df_cumulative = df_pivot_approach.melt(
         id_vars=["year"],
         value_vars=[
-            "Drawing",
-            "Games",
-            "Language",
-            "Multimodal",
             "Not specified",
-            "Other",
-            "Recommendation",
-            "Speech",
-            "Vision",
+            "Reinforcement learning",
+            "Self-supervised learning",
+            "Supervised",
+            "Unsupervised",
         ],
-        var_name="domain",
+        var_name="approach",
         value_name="cumulative_count",
     )
 
-    df_merged = pr.merge(melted_df_cumulative, melted_df, on=["year", "domain"]).copy_metadata(from_table=tb)
+    df_merged = pr.merge(melted_df_cumulative, melted_df, on=["year", "approach"]).copy_metadata(from_table=tb)
     # Create table
-    tb_agg = df_merged.underscore().set_index(["year", "domain"], verify_integrity=True)
+    tb_agg = df_merged.underscore().set_index(["year", "approach"], verify_integrity=True)
 
     # Add origins metadata to the aggregated table
     for column in tb_agg:
-        tb_agg[column].metadata.origins = tb["domain"].metadata.origins
+        tb_agg[column].metadata.origins = tb["approach"].metadata.origins
 
     #
     # Save outputs.
@@ -104,4 +96,4 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-    log.info("epoch_aggregates_domain.end")
+    log.info("epoch_aggregates_approach.end")
