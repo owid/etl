@@ -669,6 +669,10 @@ steps:
 
   ######################################################################################################################
 
+  data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
+    - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
+  data://garden/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://meadow/unu_wider/2023-11-01/government_revenue_dataset
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
