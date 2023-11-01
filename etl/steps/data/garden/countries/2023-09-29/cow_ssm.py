@@ -193,7 +193,7 @@ def create_table_country_years(tb: Table) -> Table:
         LAST_YEAR,
     )
 
-    tb = pr.concat([tb_countries, tb_last], ignore_index=True, short_name="gleditsch_countries")
+    tb = pr.concat([tb_countries, tb_last], ignore_index=True, short_name="cow_ssm_countries")
 
     tb["year"] = tb["year"].astype(int)
     return tb
