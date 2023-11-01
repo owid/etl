@@ -782,7 +782,7 @@ def estimate_metrics_country_level(tb: Table, tb_gw: Table) -> Table:
     tb_country = add_conflict_country_all_statebased(tb_country)
 
     # Only preserve years that make sense
-    tb_country = tb_country[tb_country["year"] >= tb["year"].min()]
+    tb_country = tb_country[(tb_country["year"] >= tb["year"].min()) & (tb_country["year"] <= tb["year"].max())]
 
     # Set short name
     tb_country.metadata.short_name = "ucdp_country"
