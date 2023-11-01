@@ -333,6 +333,12 @@ steps:
   data://grapher/who/2023-10-13/medical_devices_atlas:
     - data://garden/who/2023-10-13/medical_devices_atlas
 
+  # WHO Cardiovascular diseases deaths
+  data://garden/cardiovascular_diseases/2023-11-01/who_cvd:
+    - data://garden/who/2023-08-01/mortality_database
+  data://grapher/cardiovascular_diseases/2023-11-01/who_cvd:
+    - data://garden/cardiovascular_diseases/2023-11-01/who_cvd
+
   # WHO Medical Devices Atlas
   data://meadow/who/2023-11-01/who_statins:
     - snapshot://who/2023-11-01/who_statins.csv
