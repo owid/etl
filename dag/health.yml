@@ -334,6 +334,7 @@ steps:
     - data://garden/who/2023-10-13/medical_devices_atlas
 
   # WHO Cardiovascular diseases deaths
+<<<<<<< HEAD
   data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/who/2023-08-01/mortality_database
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
@@ -346,3 +347,9 @@ steps:
     - data://meadow/who/2023-11-01/who_statins
   data://grapher/who/2023-11-01/who_statins:
     - data://garden/who/2023-11-01/who_statins
+=======
+  data://garden/cardiovascular_diseases/2023-11-01/who_cvd:
+    - data://garden/who/2023-08-01/mortality_database
+  data://grapher/cardiovascular_diseases/2023-11-01/who_cvd:
+    - data://garden/cardiovascular_diseases/2023-11-01/who_cvd
+>>>>>>> f690a6e8d (WHO based dataset for cardiovascular diseases topic)
