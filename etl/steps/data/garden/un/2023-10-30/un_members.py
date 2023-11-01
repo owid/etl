@@ -83,7 +83,7 @@ def add_missing_countries(tb: Table) -> Table:
 
     # Load region dataset
     tb_regions = paths.load_dependency("regions", channel="grapher")
-    tb_regions = tb_regions["regions"].reset_index()
+    tb_regions = tb_regions["regions"].reset_index()  # type: ignore
     tb_regions = tb_regions[
         (tb_regions["region_type"] == "country") & ~(tb_regions["is_historical"]) & (tb_regions["is_mappable"])
     ]
