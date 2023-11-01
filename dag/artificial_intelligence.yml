@@ -7,7 +7,33 @@ steps:
   data://grapher/artificial_intelligence/2023-06-21/epoch:
   - data://garden/artificial_intelligence/2023-06-21/epoch
 
-  # Large Language Models and Compute  (EPOCH)
+  # Artificial Intelligence (EPOCH, latest)
+  data://meadow/artificial_intelligence/latest/epoch:
+  - snapshot://artificial_intelligence/latest/epoch.csv
+  data://garden/artificial_intelligence/latest/epoch:
+  - data://meadow/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch:
+  - data://garden/artificial_intelligence/latest/epoch
+
+  # Aggregates by domain
+  data://garden/artificial_intelligence/latest/epoch_aggregates_domain:
+  - data://garden/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch_aggregates_domain:
+  - data://garden/artificial_intelligence/latest/epoch_aggregates_domain
+
+  # Aggregates by researcher affiliaiton
+  data://garden/artificial_intelligence/latest/epoch_aggregates_affiliation:
+  - data://garden/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch_aggregates_affiliation:
+  - data://garden/artificial_intelligence/latest/epoch_aggregates_affiliation
+
+  # Aggregates by machine learning approach
+  data://garden/artificial_intelligence/latest/epoch_aggregates_approach:
+  - data://garden/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch_aggregates_approach:
+  - data://garden/artificial_intelligence/latest/epoch_aggregates_approach
+
+  # Large Language Models and Compute (EPOCH)
   data://garden/artificial_intelligence/2023-07-12/epoch_llms:
   - snapshot://artificial_intelligence/2023-07-12/epoch_llms.csv
   data://grapher/artificial_intelligence/2023-07-12/epoch_llms:

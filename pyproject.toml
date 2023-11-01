@@ -30,7 +30,7 @@ etl-metaplay = 'apps.metadata_playground.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
 
 [tool.poetry.dependencies]
-python = ">=3.10, <3.13"
+python = ">=3.10, <3.12"
 owid-catalog = {path = "lib/catalog", develop = true}
 walden = {path = "lib/walden", develop = true}
 click = ">=8.0.1"

@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: United Nations member states
+    description: |-
+      This dataset contains the list of member states of the United Nations, with their date of admission.
+    date_published: '2023'
+
+    # Citation
+    producer: United Nations
+    citation_full: |-
+      United Nations (2023). Member States. Accessed 27 October 2023, https://www.un.org/en/about-us/member-states
+
+    # Files
+    url_main: https://www.un.org/en/about-us/member-states
+    date_accessed: 2023-10-30
+
+    # License
+    license:
+      name: Terms and conditions of use of United Nations websites
+      url: https://www.un.org/en/about-us/terms-of-use
+
+wdir: ../../../data/snapshots/un/2023-10-30
+outs:
+- md5: 2fd8b8d13b1a8cf8acad315b90f5435c
+  size: 3108
+  path: un_members.csv

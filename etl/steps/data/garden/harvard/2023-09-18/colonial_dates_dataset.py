@@ -233,18 +233,31 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
             countries_that_must_have_data=[],
         )
 
-    # Create an additional column with the population not considered in the dataset
-    tb_regions["missing_pop"] = (
-        tb_regions["population"]
-        - tb_regions["colony_pop"]
-        - tb_regions["not_colonized_pop"]
-        - tb_regions["colonizer_pop"]
-        - tb_regions["not_colonizer_pop"]
+    # Call the population data again to get regional total population
+    tb_regions = tb_regions.merge(
+        tb_pop[["country", "year", "population"]], how="left", on=["country", "year"], suffixes=("", "_region")
     )
 
-    # If missing_pop is negative, assign 0
-    tb_regions["missing_pop"] = tb_regions["missing_pop"].where(
-        (tb_regions["missing_pop"] >= 0) | (tb_regions["missing_pop"].isnull()), 0
+    # Create an additional column with the population not considered in the dataset
+    tb_regions["missing_pop"] = (
+        tb_regions["population_region"]
+        - tb_regions["colony_pop"]
+        - tb_regions["colonizer_pop"]
+        - tb_regions["not_colonized_nor_colonizer_pop"]
+    )
+
+    # Assert if missing_pop has negative values
+    if tb_regions["missing_pop"].min() < 0:
+        paths.log.warning(
+            f"""`missing_pop` has negative values and will be replaced by 0.:
+            {print(tb_regions[tb_regions["missing_pop"] < 0])}"""
+        )
+        # Replace negative values by 0
+        tb_regions.loc[tb_regions["missing_pop"] < 0, "missing_pop"] = 0
+
+    # Include missing_pop in not_colonized_nor_colonizer_pop
+    tb_regions["not_colonized_nor_colonizer_pop"] = (
+        tb_regions["not_colonized_nor_colonizer_pop"] + tb_regions["missing_pop"]
     )
 
     # Select only regions in tb_regions and "World" tb_world
@@ -260,7 +273,6 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
             [
                 "country",
                 "year",
-                "missing_pop",
             ]
             + var_list
         ],
@@ -270,12 +282,20 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
     tb = pr.concat([tb, tb_regions], short_name="colonial_dates_dataset")
 
     # Make variables in var_list integer
-    for var in var_list + ["missing_pop"]:
+    for var in var_list:
         tb[var] = tb[var].astype("Int64")
 
     # Drop population column
     tb = tb.drop(
-        columns=["population", "not_colonized_pop", "not_colonized_number", "not_colonizer_pop", "not_colonizer_number"]
+        columns=[
+            "population",
+            "population_region",
+            "not_colonized_pop",
+            "not_colonized_number",
+            "not_colonizer_pop",
+            "not_colonizer_number",
+            "missing_pop",
+        ]
     )
 
     return tb
