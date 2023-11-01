@@ -109,8 +109,6 @@ def add_missing_countries(tb: Table) -> Table:
     # All these countries are not members
     tb_countries_to_add["membership_status"] = "Not a member"
 
-    print(tb_countries_to_add.country.unique().tolist())
-
     # Concatenate tb and tb_countries_to_add
     tb = pr.concat([tb, tb_countries_to_add], ignore_index=True)
 
