@@ -94,6 +94,11 @@ def add_missing_countries(tb: Table) -> Table:
     # Obtain the list of countries in countries_regions_dataset that are not in countries_available
     countries_to_add = list(set(countries_regions_dataset) - set(countries_available))
 
+    paths.log.info(
+        f"""Adding these countries to the dataset (non-members):
+                   {countries_to_add}"""
+    )
+
     # Create a dataframe with the countries to add and years between tb["year"].min() and LATEST_YEAR
     tb_countries = Table({"country": countries_to_add})
     tb_years = Table({"year": range(tb["year"].min(), LATEST_YEAR + 1)})
