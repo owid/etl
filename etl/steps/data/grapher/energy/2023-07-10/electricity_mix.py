@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     # Drop unnecessary columns.
     tb = tb_garden.drop(columns=["population"])
 
-    # Create columns for specific multi-indicator charts, properly handling issues with missing data.
+    # Create columns for specific multi-indicator charts, to handle issues with missing data.
     # Add columns for chart with slug "electricity-prod-source-stacked".
     tb = add_columns_for_multiindicator_chart(
         table=tb,

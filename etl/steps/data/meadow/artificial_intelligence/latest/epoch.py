@@ -1,8 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-
 import numpy as np
-from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -24,7 +22,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("epoch.csv")
 
     # Read snapshot
-    df = snap.read()
+    tb = snap.read()
     #
     # Process data.
     #
@@ -40,30 +38,31 @@ def run(dest_dir: str) -> None:
         "Training dataset size (datapoints)",
         "Training time (hours)",
         "Notability criteria",
+        "Approach",
     ]
+
     # Check that the columns of interest are present
     for col in cols:
-        assert col in df.columns, f"Column '{col}' is missing from the dataframe."
+        assert col in tb.columns, f"Column '{col}' is missing from the dataframe."
     # Check that there are no negative values in the training compute column
-    assert not (df["Training compute (FLOP)"] < 0).any(), "Negative values found in 'Training compute (FLOP)' column."
+    assert not (tb["Training compute (FLOP)"] < 0).any(), "Negative values found in 'Training compute (FLOP)' column."
 
     # Select the columns of interest
-    df = df[cols]
+    tb = tb[cols]
     # Replace empty strings with NaN values
-    df.replace("", np.nan, inplace=True)
+    tb.replace("", np.nan, inplace=True)
     # Convert the training compute column to float
-    df["Training compute (FLOP)"] = df["Training compute (FLOP)"].astype(float)
+    tb["Training compute (FLOP)"] = tb["Training compute (FLOP)"].astype(float)
 
     # Replace the missing values in the system column with the organization column
-    df.loc[df["System"].isna(), "System"] = df.loc[df["System"].isna(), "Organization"]
+    tb.loc[tb["System"].isna(), "System"] = tb.loc[tb["System"].isna(), "Organization"]
     # Check that there are no NaN values in the system column
-    assert not df["System"].isna().any(), "NaN values found in 'System' column after processing."
-    # Drop the organization column
-    df.drop("Organization", axis=1, inplace=True)
+    assert not tb["System"].isna().any(), "NaN values found in 'System' column after processing."
     #
     # Create a new table and ensure all columns are snake-case.
     #
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = tb.underscore().set_index(["system", "publication_date"], verify_integrity=True).sort_index()
+
     ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
     #

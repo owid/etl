@@ -282,23 +282,3 @@ tables:
           entityAnnotationsMap: ""
           numDecimalPlaces: 0
           conversionFactor: 1
-
-      missing_pop:
-        title: Population not considered in the dataset
-        unit: "people"
-        short_unit: ""
-        description_short: |
-          Population of countries not considered in the dataset
-        description_processing: |
-          This is the difference between the population in the official Our World in Data dataset and the population for overseas colonies, not colonized countries and colonizers.
-
-          We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
-
-          {common.years}
-        description_from_producer: ""
-        processing_level: major
-        display:
-          name: Population not considered in the dataset
-          entityAnnotationsMap: ""
-          numDecimalPlaces: 0
-          conversionFactor: 1
