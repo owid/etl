@@ -15,11 +15,6 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["who_statins"]
-
-    #
-    # Process data.
-    #
-
     #
     # Save outputs.
     #

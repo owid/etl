@@ -16,7 +16,7 @@ meta:
 
     # Files
     url_main:
-      https://www.who.int/teams/health-product-policy-and-standards/assistive-and-medical-technology/medical-devices/global-atlas-of-medical-devices
+      https://www.who.int/data/gho/data/indicators/indicator-details/GHO/general-availability-of-statins-in-the-public-health-sector
     date_accessed: 2023-11-01
 
     # License
