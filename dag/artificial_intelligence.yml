@@ -7,7 +7,7 @@ steps:
   data://grapher/artificial_intelligence/2023-06-21/epoch:
   - data://garden/artificial_intelligence/2023-06-21/epoch
 
-
+  # Artificial Intelligence (EPOCH, latest)
   data://meadow/artificial_intelligence/latest/epoch:
   - snapshot://artificial_intelligence/latest/epoch.csv
   data://garden/artificial_intelligence/latest/epoch:
@@ -20,7 +20,7 @@ steps:
   data://grapher/artificial_intelligence/latest/epoch_aggregates:
   - data://garden/artificial_intelligence/latest/epoch_aggregates
 
-  # Large Language Models and Compute  (EPOCH)
+  # Large Language Models and Compute (EPOCH)
   data://garden/artificial_intelligence/2023-07-12/epoch_llms:
   - snapshot://artificial_intelligence/2023-07-12/epoch_llms.csv
   data://grapher/artificial_intelligence/2023-07-12/epoch_llms:
