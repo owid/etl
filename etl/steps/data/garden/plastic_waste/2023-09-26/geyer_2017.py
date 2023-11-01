@@ -23,7 +23,6 @@ def run(dest_dir: str) -> None:
 
     # Define the growth rate
     growth_rate = 0.05  # 5%
-    print(tb["plastic_production"].metadata.origins)
     # Add new rows for 2016-2018
     for year in range(2016, 2019):  # 2019 is the stop value and is not included
         last_value = tb.loc[tb.index[-1], "plastic_production"]  # Getting the last value in the 'Value' column
