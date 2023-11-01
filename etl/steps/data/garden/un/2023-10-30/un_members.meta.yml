@@ -5,6 +5,7 @@ definitions:
       topic_tags:
         - State Capacity
     processing_level: major
+    description_short: Membership is defined along current countries and their borders.
 
 
 # Learn more about the available fields:
@@ -30,7 +31,6 @@ tables:
         title: Number of UN member states by region
         unit: ""
         short_unit: ""
-        description_short: "The states are counted according to current definitions of countries."
         description_processing: "Data is aggregated using Our World in Data region classifications."
         display:
           name: Number of UN member states
@@ -40,7 +40,6 @@ tables:
         title: Number non UN member states by region
         unit: ""
         short_unit: ""
-        description_short: "The states are counted according to current definitions of countries."
         description_processing: "Data is aggregated using Our World in Data region classifications."
         display:
           name: Number non UN member states
@@ -50,7 +49,6 @@ tables:
         title: Population of UN member states by region
         unit: ""
         short_unit: ""
-        description_short: "Population is aggregated according to current definitions of countries."
         description_processing: "Data is aggregated using Our World in Data region classifications and using historical population data compiled by Our World in Data."
         display:
           name: Population of UN member states
@@ -60,7 +58,6 @@ tables:
         title: Population of non UN member states by region
         unit: ""
         short_unit: ""
-        description_short: "Population is aggregated according to current definitions of countries."
         description_processing: "Data is aggregated using Our World in Data region classifications and using historical population data compiled by Our World in Data."
         display:
           name: Population of non UN member states
