@@ -63,6 +63,16 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
+
+  # COUNTRY-LEVEL
+  ucdp_prio_country:
+    variables:
+      participated_in_conflict:
+        title: Participated in conflict
+        unit: ""
+        description_short: |-
+          Whether the country participated in a conflict (of a specific kind) in a given year.
+
   ucdp_prio:
     variables:
       ##################
