@@ -1,0 +1,59 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 31
+  title: Notable AI systems by domain type
+
+origin:
+  date_published: '2023-10-27'
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  epoch:
+    variables:
+      yearly_count:
+        title: Annual number of AI systems by domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
+        description_key:
+          - Games systems are specifically designed to play games. They use advanced algorithms to understand and strategize, often competing effectively against humans or other AI systems.
+
+          - Language systems are tailored to process language, focusing on understanding, translating, and interacting with human languages.
+
+          - Multimodal systems excel at processing multiple types of data at once, like sound and visuals together.
+
+          - Not specified category captures systems where their primary function isn't clearly defined.
+
+          - Other category represents a diverse set, including tasks from 3D reconstruction to speech processing and video analysis.
+
+          - Vision systems focus on processing visual information, playing a pivotal role in image recognition and related areas.
+
+          - Speech systems are dedicated to handling spoken language, being the backbone of voice assistants and similar applications.
+
+          - Recommendation systems offer suggestions based on user preferences, seen prominently in online shopping and media streaming.
+
+          - Drawing systems can create illustrations or sketches, either mimicking human techniques or generating unique art.
+        description_processing: >
+          Processing involved calculating total number of AI systems in each domain for each year.
+
+          To streamline the categorization of domains, 3D reconstruction, Driving, Drawing, Recommendation, Speech, Video, Text-to-Video, Search, Audio and Robotics were all unified under a single "Other" category.
+        display:
+          name: Games
+          numDecimalPlaces: 0
+      cumulative_count:
+        title: Cumulative number of AI systems by domain
+        unit: ''
+        short_unit: ''
+        description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
+        description_processing: >
+          Processing involved calculating total number of AI systems in each domain for each year.
+        display:
+          numDecimalPlaces: 0
