@@ -1,6 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: minor
     presentation:
       topic_tags:
         - Artificial Intelligence
@@ -24,7 +25,6 @@ tables:
         description_short: Systems are classified as "Games" when they are designed to play games.
         description_processing: >
           Processing involved calculating total number of AI systems in the games domain for each year.
-        processing_level: minor
         display:
           name: Games
           numDecimalPlaces: 0
@@ -35,7 +35,6 @@ tables:
         description_short: Systems are classified as "Language" when they are designed to process language.
         description_processing: >
           Processing involved calculating total number of AI systems in the language domain for each year.
-        processing_level: minor
         display:
           name: Language
           numDecimalPlaces: 0
@@ -46,7 +45,6 @@ tables:
         description_short: Systems are classified as "Multimodal" when they are designed to process multiple modalities.
         description_processing: >
           Processing involved calculating total number of AI systems in the multimodal domain for each year.
-        processing_level: minor
         display:
           name: Multimodal
           numDecimalPlaces: 0
@@ -57,7 +55,6 @@ tables:
         description_short: Systems are classified as "Not specified" when their domain is not specified.
         description_processing: >
           Processing involved calculating total number of AI systems with no specified domain for each year.
-        processing_level: minor
         display:
           name: Not specified
           numDecimalPlaces: 0
@@ -70,7 +67,6 @@ tables:
           To streamline the categorization of domains, 3D reconstruction, Driving, Drawing, Recommendation, Speech, Video, Text-to-Video, Search, Audio and Robotics were all unified under a single "Other" category.
 
           Processing involved calculating total number of AI systems in other domains for each year.
-        processing_level: minor
         display:
           name: Other
           numDecimalPlaces: 0
@@ -81,7 +77,6 @@ tables:
         description_short:  Systems are classified as "Vision" when they are designed to process visual information.
         description_processing: >
           Processing involved calculating total number of AI systems in the vision domain for each year.
-        processing_level: minor
         display:
           name: Vision
           numDecimalPlaces: 0
@@ -92,7 +87,6 @@ tables:
         description_short: Systems are classified as "Academia" when their authors have ties to academic institutions.
         description_processing: >
           Processing involved calculating total number of AI systems developed in academia for each year.
-        processing_level: minor
         display:
           name: Academia
           numDecimalPlaces: 0
@@ -105,7 +99,6 @@ tables:
           To streamline the categorization of researcher affiliations, all variations of "Industry - Academia Collaboration" entries in the original dataset, regardless of their capitalization or leaning (towards academia or industry), were unified into a single "Collaboration" category.
 
           Processing involved calculating total number of AI systems developed in academia for each year.
-        processing_level: minor
         display:
           name: Collaboration
           numDecimalPlaces: 0
@@ -116,7 +109,6 @@ tables:
         description_short: Systems are classified as "Industry" when their authors have ties to private sector entities.
         description_processing: >
           Processing involved calculating total number of AI systems developed in industry for each year.
-        processing_level: minor
         display:
           name: Industry
           numDecimalPlaces: 0
@@ -127,7 +119,6 @@ tables:
         description_short: Systems are classified as "Not specified" when their authors have no specified organization categorization.
         description_processing: >
           Processing involved calculating total number of AI systems with no specified organization categorization for each year.
-        processing_level: minor
         display:
           name: Not specified
           numDecimalPlaces: 0
@@ -140,7 +131,6 @@ tables:
           Affiliations explicitly labeled as "Research Collective", as well as those under "Government" and "Non-profit", were re-categorized under the "Other" label.
 
           Processing involved calculating total number of AI systems with from other organizations for each year.
-        processing_level: minor
         display:
           name: Other
           numDecimalPlaces: 0
@@ -151,7 +141,6 @@ tables:
         description_short: Systems are classified as "Games" when they are designed to play games.
         description_processing: >
           Processing involved calculating cumulative number of AI systems in the games domain for each year starting from 1950.
-        processing_level: minor
         display:
           name: Games
           numDecimalPlaces: 0
@@ -162,7 +151,6 @@ tables:
         description_short: Systems are classified as "Language" when they are designed to process language.
         description_processing: >
           Processing involved calculating cumulative number of AI systems in the language domain for each year starting from 1950.
-        processing_level: minor
         display:
           name: Language
           numDecimalPlaces: 0
@@ -173,7 +161,6 @@ tables:
         description_short: Systems are classified as "Multimodal" when they are designed to process multiple modalities.
         description_processing: >
           Processing involved calculating cumulative number of AI systems in the multimodal domain for each year starting from 1950.
-        processing_level: minor
         display:
           name: Multimodal
           numDecimalPlaces: 0
@@ -184,7 +171,6 @@ tables:
         description_short: Systems are classified as "Not specified" when their domain is not specified.
         description_processing: >
           Processing involved calculating cumulative number of AI systems with no specified domain for each year starting from 1950.
-        processing_level: minor
         display:
           name: Not specified
           numDecimalPlaces: 0
@@ -192,12 +178,15 @@ tables:
         title: Cumulative number of AI systems in other domains
         unit: 'AI systems'
         short_unit: ''
-        description_short: Systems are classified as "Other" include 3D reconstruction, Driving, Drawing, Recommendation, Speech, Video, Text-to-Video, Search, Audio and Robotics.
+        description_short: Systems are classified as "Other" include systems with less than a total of five notable AI systems since 1950 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio, Robotics and Other.
         description_processing: >
-          To streamline the categorization of domains, 3D reconstruction, Driving, Drawing, Recommendation, Speech, Video, Text-to-Video, Search, Audio and Robotics were all unified under a single "Other" category.
+          To streamline the categorization of domains, domain categories with less than a total of five notable AI systems since 1950 were grouped under the "Other" label. The following domains were re-categorized under "Other":
 
-          Processing involved calculating cumulative number of AI systems in these other domains for each year starting from 1950.
-        processing_level: minor
+          - 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio, Robotics
+
+          The aforementioned changes were implemented to make visualizations more coherent and concise.
+
+          Data processing also involved calculating cumulative number of AI systems in these other domains for each year starting from 1950.
         display:
           name: Other
           numDecimalPlaces: 0
@@ -208,7 +197,6 @@ tables:
         description_short: Systems are classified as "Vision" when they are designed to process visual information.
         description_processing: >
           Processing involved calculating cumulative number of AI systems in the vision domain for each year starting from 1950.
-        processing_level: minor
         display:
           name: Vision
           numDecimalPlaces: 0
@@ -219,7 +207,6 @@ tables:
         description_short: Systems are classified as "Academia" when their authors have ties to academic institutions.
         description_processing: >
           Processing involved calculating cumulative number of AI systems developed in academia for each year starting from 1950.
-        processing_level: minor
         display:
           name: Academia
           numDecimalPlaces: 0
@@ -232,7 +219,6 @@ tables:
           To streamline the categorization of researcher affiliations, all variations of "Industry - Academia Collaboration" entries in the original dataset, regardless of their capitalization or leaning (towards academia or industry), were unified into a single "Collaboration" category.
 
           Processing involved calculating cumulative number of AI systems developed in academia for each year starting from 1950.
-        processing_level: minor
         display:
           name: Collaboration
           numDecimalPlaces: 0
@@ -243,7 +229,6 @@ tables:
         description_short:  Systems are classified as "Industry" when their authors have ties to private sector entities.
         description_processing:   >
           Processing involved calculating cumulative number of AI systems developed in industry for each year starting from 1950.
-        processing_level: minor
         display:
           name: Industry
           numDecimalPlaces: 0
@@ -254,7 +239,6 @@ tables:
         description_short:  Systems are classified as "Not specified" when their authors have no specified organization categorization.
         description_processing:  >
           Processing involved calculating cumulative number of AI systems with no specified organization categorization for each year starting from 1950.
-        processing_level: minor
         display:
           name: Not specified
           numDecimalPlaces: 0
@@ -267,7 +251,6 @@ tables:
           Affiliations explicitly labeled as "Research Collective", as well as those under "Government" and "Non-profit", were re-categorized under the "Other" label.
 
           Processing involved calculating cumulative number of AI systems with from other organizations for each year starting from 1950.
-        processing_level: minor
         display:
           name: Other
           numDecimalPlaces: 0
@@ -276,10 +259,9 @@ tables:
           title: Annual number of AI systems using reinforcement learning
           unit: 'AI systems'
           short_unit: ''
-          description_short: Reinforcement learning is a type of machine learning where an agent learns to make decisions by interacting with an environment. It receives feedback in the form of rewards or penalties for its actions and aims to maximize the cumulative reward over time. Reinforcement learning is commonly used in robotics, game playing (e.g., AlphaGo), and autonomous systems where agents must learn to make sequential decisions.
+          description_short: Reinforcement learning teaches agents to make decisions through interaction, earning rewards or penalties for actions. The goal is to maximize rewards over time. It's widely used in robotics, games like AlphaGo, and autonomous decision-making systems.
           description_processing: >
             Processing involved calculating total number of AI systems using reinforcement learning for each year.
-          processing_level: minor
           display:
             name: Reinforcement learning
             numDecimalPlaces: 0
@@ -288,10 +270,9 @@ tables:
         title: Annual number of AI systems using self-supervised learning
         unit: 'AI systems'
         short_unit: ''
-        description_short: Self-supervised learning is a machine learning technique where the model learns from the data itself without requiring external labels or annotations. It leverages inherent structures or relationships within the data to create meaningful representations. Self-supervised learning is commonly used in natural language processing and computer vision tasks, where models learn to understand context and semantics from large unlabeled datasets.
+        description_short: Self-supervised learning is a type of machine learning where the model learns from unlabeled data. It uses inherent structures to create meaningful representations and is commonly used in natural language processing and computer vision.
         description_processing: >
           Processing involved calculating total number of AI systems using self-supervised learning for each year.
-        processing_level: minor
         display:
           name: Self-supervised learning
           numDecimalPlaces: 0
@@ -300,10 +281,9 @@ tables:
         title: Annual number of AI systems using supervised learning
         unit: 'AI systems'
         short_unit: ''
-        description_short: Supervised learning  is a machine learning approach where the AI system is trained on a labeled dataset, meaning each input data point is associated with a known output or target. The model learns to map inputs to outputs based on this labeled data. Supervised learning is widely used in tasks such as image classification, sentiment analysis, and regression, where the goal is to make predictions or classifications based on labeled training data.
+        description_short: Supervised learning is a machine learning approach where the model learns from labeled examples. Given data with the right answers, it learns to predict or decide on new data. Supervised learning is commonly used in image recognition, text analysis, and forecasting.
         description_processing: >
           Processing involved calculating total number of AI systems using supervised learning for each year.
-        processing_level: minor
         display:
           name: Supervised learning
           numDecimalPlaces: 0
@@ -312,10 +292,9 @@ tables:
         title: Annual number of AI systems using unsupervised learning
         unit: 'AI systems'
         short_unit: ''
-        description_short: Unsupervised learning is a machine learning paradigm where the AI system explores patterns and structures within data without the presence of labeled examples. It aims to discover hidden relationships or groupings in the data. Unsupervised learning is applied in clustering, dimensionality reduction, and anomaly detection tasks. It's used when there are no predefined labels for the data.
+        description_short: Unsupervised learning is a machine learning approach where the AI system learns to find patterns in data without specific examples. It uncovers hidden relationships and structures in data and is used in tasks such as grouping data, simplifying complex data, and detecting anomalies when no labels are provided.
         description_processing: >
           Processing involved calculating total number of AI systems using unsupervised learning for each year.
-        processing_level: minor
         display:
           name: Unsupervised learning
           numDecimalPlaces: 0
@@ -327,7 +306,6 @@ tables:
         description_short: Systems are classified as "Not specified" when their learning approach is not specified by Epoch.
         description_processing: >
           Processing involved calculating total number of AI systems with no specified learning approach for each year.
-        processing_level: minor
         display:
           name: Not specified
           numDecimalPlaces: 0
@@ -335,10 +313,9 @@ tables:
         title: Cumulative number of AI systems using reinforcement learning
         unit: 'AI systems'
         short_unit: ''
-        description_short: Reinforcement learning is a type of machine learning where an agent learns to make decisions by interacting with an environment. It receives feedback in the form of rewards or penalties for its actions and aims to maximize the cumulative reward over time. Reinforcement learning is commonly used in robotics, game playing (e.g., AlphaGo), and autonomous systems where agents must learn to make sequential decisions.
+        description_short: Reinforcement learning teaches agents to make decisions through interaction, earning rewards or penalties for actions. The goal is to maximize rewards over time. It's widely used in robotics, games like AlphaGo, and autonomous decision-making systems.
         description_processing: >
           Processing involved calculating cumulative number of AI systems using reinforcement learning for each year starting from 1950.
-        processing_level: minor
         display:
           name: Reinforcement learning
           numDecimalPlaces: 0
@@ -347,10 +324,9 @@ tables:
         title: Cumulative number of AI systems using self-supervised learning
         unit: 'AI systems'
         short_unit: ''
-        description_short: Self-supervised learning is a machine learning technique where the model learns from the data itself without requiring external labels or annotations. It leverages inherent structures or relationships within the data to create meaningful representations. Self-supervised learning is commonly used in natural language processing and computer vision tasks, where models learn to understand context and semantics from large unlabeled datasets.
+        description_short: Self-supervised learning enables models to learn from data without external labels, utilizing inherent structures to create meaningful representations. This approach is prevalent in natural language processing and computer vision, helping models grasp context and semantics from large unlabeled datasets.
         description_processing: >
           Processing involved calculating cumulative number of AI systems using self-supervised learning for each year starting from 1950.
-        processing_level: minor
         display:
           name: Self-supervised learning
           numDecimalPlaces: 0
@@ -359,10 +335,9 @@ tables:
         title: Cumulative number of AI systems using unsupervised learning
         unit: 'AI systems'
         short_unit: ''
-        description_short: Unsupervised learning is a machine learning paradigm where the AI system explores patterns and structures within data without the presence of labeled examples. It aims to discover hidden relationships or groupings in the data. Unsupervised learning is applied in clustering, dimensionality reduction, and anomaly detection tasks. It's used when there are no predefined labels for the data.
+        description_short: Unsupervised learning lets AI find patterns in data without specific examples. It uncovers hidden relationships and is used in grouping data, simplifying complex data, and spotting unusual data points when no labels are provided.
         description_processing: >
           Processing involved calculating cumulative number of AI systems using unsupervised learning for each year starting from 1950.
-        processing_level: minor
         display:
           name: Unsupervised learning
           numDecimalPlaces: 0
@@ -370,10 +345,9 @@ tables:
         title: Cumulative number of AI systems using supervised learning
         unit: 'AI systems'
         short_unit: ''
-        description_short: Supervised learning  is a machine learning approach where the AI system is trained on a labeled dataset, meaning each input data point is associated with a known output or target. The model learns to map inputs to outputs based on this labeled data. Supervised learning is widely used in tasks such as image classification, sentiment analysis, and regression, where the goal is to make predictions or classifications based on labeled training data.
+        description_short: Supervised learning trains AI with labeled examples. Given data with the right answers, it learns to predict or decide on new data. It's used in image recognition, text analysis, and forecasting.
         description_processing: >
           Processing involved calculating cumulative number of AI systems using supervised learning for each year starting from 1950.
-        processing_level: minor
         display:
           name: Supervised learning
           numDecimalPlaces: 0
@@ -385,7 +359,71 @@ tables:
         description_short: Systems are classified as "Not specified" when their learning approach is not specified by Epoch.
         description_processing: >
           Processing involved calculating cumulative number of AI systems with no specified learning approach for each year starting from 1950.
-        processing_level: minor
         display:
           name: Not specified
+          numDecimalPlaces: 0
+      drawing:
+        title: Annual number of AI systems in the drawing domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Drawing AI systems are designed to create visual illustrations or sketches.
+        description_processing: >
+          Processing involved calculating total number of AI systems in the drawing domain for each year.
+        display:
+          name: Drawing
+          numDecimalPlaces: 0
+
+      drawing_cumsum:
+        title: Cumulative number of AI systems in the drawing domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Drawing AI systems are designed to create visual illustrations or sketches.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems in the drawing domain for each year starting from 1950.
+        display:
+          name: Drawing
+          numDecimalPlaces: 0
+
+      recommendation:
+        title: Annual number of AI systems in the recommendation domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Recommendation AI systems are designed to suggest or advise based on user preferences or behavior.
+        description_processing: >
+          Processing involved calculating total number of AI systems in the recommendation domain for each year.
+        display:
+          name: Recommendation
+          numDecimalPlaces: 0
+
+      recommendation_cumsum:
+        title: Cumulative number of AI systems in the recommendation domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Recommendation systems are designed to suggest or advise based on user preferences or behavior.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems in the recommendation domain for each year starting from 1950.
+        display:
+          name: Recommendation
+          numDecimalPlaces: 0
+
+      speech:
+        title: Annual number of AI systems in the speech domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Speech AI systems are designed to recognize, interpret, generate, or respond to human spoken language.
+        description_processing: >
+          Processing involved calculating total number of AI systems in the speech domain for each year.
+        display:
+          name: Speech
+          numDecimalPlaces: 0
+
+      speech_cumsum:
+        title: Cumulative number of AI systems in the speech domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Speech AI systems are designed to recognize, interpret, generate, or respond to human spoken language.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems in the speech domain for each year starting from 1950.
+        display:
+          name: Speech
           numDecimalPlaces: 0

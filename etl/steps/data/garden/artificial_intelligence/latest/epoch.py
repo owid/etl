@@ -63,16 +63,14 @@ def run(dest_dir: str) -> None:
     domain_mapping = {
         "3D reconstruction": "Other",
         "Driving": "Other",
-        "Drawing": "Other",
         "Other": "Other",
-        "Recommendation": "Other",
-        "Speech": "Other",
         "Video": "Other",
         "Text-to-Video": "Other",
         "Search": "Other",
         "Audio": "Other",
         "Robotics": "Other",
     }
+
     tb["domain"] = tb["domain"].replace(domain_mapping)
 
     # Convert FLOP to petaFLOP and remove the column with FLOPs (along with training time in hours)
