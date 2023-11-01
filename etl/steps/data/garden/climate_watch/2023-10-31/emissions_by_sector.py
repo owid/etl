@@ -11,20 +11,20 @@ paths = PathFinder(__file__)
 
 # All sectors expected in the data, and how to rename them.
 SECTORS = {
-    "Agriculture": "Agriculture",
-    "Building": "Buildings",
-    "Bunker Fuels": "Aviation and shipping",
-    "Electricity/Heat": "Electricity and heat",
-    "Energy": "Energy",
+    "Agriculture": "Agriculture emissions",
+    "Building": "Buildings emissions",
+    "Bunker Fuels": "Aviation and shipping emissions",
+    "Electricity/Heat": "Electricity and heat emissions",
+    "Energy": "Energy emissions",
     "Fugitive Emissions": "Fugitive emissions",
-    "Industrial Processes": "Industry",
-    "Land-Use Change and Forestry": "Land-use change and forestry",
-    "Manufacturing/Construction": "Manufacturing and construction",
-    "Other Fuel Combustion": "Other fuel combustion",
-    "Total excluding LUCF": "Total excluding LUCF",
-    "Total including LUCF": "Total including LUCF",
-    "Transportation": "Transport",
-    "Waste": "Waste",
+    "Industrial Processes": "Industry emissions",
+    "Land-Use Change and Forestry": "Land-use change and forestry emissions",
+    "Manufacturing/Construction": "Manufacturing and construction emissions",
+    "Other Fuel Combustion": "Other fuel combustion emissions",
+    "Total excluding LUCF": "Total emissions excluding LUCF",
+    "Total including LUCF": "Total emissions including LUCF",
+    "Transportation": "Transport emissions",
+    "Waste": "Waste emissions",
 }
 
 # Suffix to add to the name of per capita variables.
@@ -142,6 +142,19 @@ def create_table_for_gas(
     # Adapt table title and short name.
     tb_gas.metadata.title = TABLE_NAMES[gas]
     tb_gas.metadata.short_name = utils.underscore(TABLE_NAMES[gas])
+
+    # Adapt column names.
+    tb_gas = tb_gas.rename(
+        columns={
+            column: utils.underscore(column)
+            .replace("__", "_")
+            .replace("emissions", f"{utils.underscore(gas)}_emissions")
+            .replace("all_ghg", "ghg")
+            .replace("f_gas", "fgas")
+            for column in tb_gas.columns
+            if column not in ["country", "year"]
+        }
+    )
 
     # Set an appropriate index and sort conveniently.
     tb_gas = tb_gas.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)

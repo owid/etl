@@ -9,16 +9,8 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
     - data://garden/wb/2023-04-30/income_groups
-  # data://grapher/climate_watch/2023-10-31/emissions_by_sector:
-  #   - data://garden/climate_watch/2023-10-31/emissions_by_sector
-  # data://grapher/cait/2022-08-10/all_ghg_emissions:
-  #   - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  # data://grapher/cait/2022-08-10/ch4_emissions:
-  #   - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  # data://grapher/cait/2022-08-10/co2_emissions:
-  #   - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  # data://grapher/cait/2022-08-10/n2o_emissions:
-  #   - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+  data://grapher/climate_watch/2023-10-31/emissions_by_sector:
+    - data://garden/climate_watch/2023-10-31/emissions_by_sector
   #
   # Andrew - CO2 mitigation curves (2019).
   #
