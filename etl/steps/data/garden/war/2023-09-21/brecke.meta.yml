@@ -1,4 +1,9 @@
 definitions:
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
+
   all:
     selectedEntityNames: &selected_entities
       - Africa

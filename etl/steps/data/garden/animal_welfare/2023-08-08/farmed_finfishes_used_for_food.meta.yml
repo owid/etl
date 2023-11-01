@@ -1,3 +1,10 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+      - Fish & Overfishing
+
 tables:
   farmed_finfishes_used_for_food:
     variables:
