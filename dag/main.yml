@@ -642,6 +642,18 @@ steps:
   data://grapher/state_capacity/2023-10-19/state_capacity_dataset:
     - data://garden/state_capacity/2023-10-19/state_capacity_dataset
 
+  # United Nations members
+  data://meadow/un/2023-10-30/un_members:
+    - snapshot://un/2023-10-30/un_members.csv
+  data://garden/un/2023-10-30/un_members:
+    - data://meadow/un/2023-10-30/un_members
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+    - data://grapher/regions/latest/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/un/2023-10-30/un_members:
+    - data://garden/un/2023-10-30/un_members
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
@@ -656,6 +668,7 @@ steps:
     - data://garden/un/2023-01-24/un_sdg
 
   ######################################################################################################################
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

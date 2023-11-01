@@ -3,7 +3,11 @@ definitions:
   global:
     region_numbers: |-
       Two-country relationships within a region are those where both countries are in the same region. If countries are in different regions, the relationship falls into the 'Inter-continental' region.
+
   common:
+    presentation:
+      topic_tags:
+        - War & Peace
     description_processing: |-
       The peace scale level of a relationship for a given year reports the level as of the 31st of December of that year.
 

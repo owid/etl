@@ -8,6 +8,9 @@ definitions:
           - England and Wales
           - France
           - Sweden
+      topic_tags:
+        - Life Expectancy
+
   global:
     life_expectancy:
       description_short: |-
@@ -61,6 +64,9 @@ tables:
         presentation:
           title_public: Central death rate at << age if age != '0' else 'birth'>>
           title_variant: << sex + 's, ' if sex != 'both' >><< type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - << 'Child & Infant Mortality' if age == '0' else 'Causes of Death'>>
 
       central_death_rate_mf_ratio:
         title: Central death rate ratio (m/f)
@@ -78,6 +84,10 @@ tables:
         presentation:
           title_public: Central death rate at << age if age != '0' else 'birth'>>
           title_variant: male-to-female ratio, << type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - Gender Ratio
+            - << 'Child & Infant Mortality' if age == '0' else 'Causes of Death'>>
 
       probability_of_death:
         title: Probability of death
@@ -96,6 +106,9 @@ tables:
         presentation:
           title_public: Probability of death at << age if age != '0' else 'birth'>>
           title_variant: << sex + 's, ' if sex != 'both' >><< type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - Causes of Death
 
       average_survival_length:
         title: Average survival length
@@ -112,7 +125,11 @@ tables:
         title: Number of deaths
         short_unit: deaths
         unit: deaths
-        description_short: Number of deaths between during a given age.
+        description_short: Number of deaths during a given age.
+        presentation:
+          topic_tags:
+            - Life Expectancy
+            - Causes of Death
 
       number_person_years_lived:
         title: Number of person-years lived
@@ -172,6 +189,9 @@ tables:
         presentation:
           title_public: Life expectancy at << age if age != '0' else 'birth'>>
           title_variant: female-male difference, << type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - Gender Ratio
 
       life_expectancy_fm_ratio:
         title: Life expectancy ratio (f/m)
@@ -196,3 +216,6 @@ tables:
         presentation:
           title_public: Life expectancy at << age if age != '0' else 'birth'>>
           title_variant: female-to-male ratio, << type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - Gender Ratio
