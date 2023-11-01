@@ -21,7 +21,7 @@ tables:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
       membership_status:
-        title: Membership status
+        title: United Nations membership status
         unit: ""
         short_unit: ""
         description_processing: "From the year of admission of each nation to United Nations, the dataset is expanded between 1945 and the year of the last 31 December when the dataset is created."
