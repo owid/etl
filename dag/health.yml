@@ -332,3 +332,11 @@ steps:
     - data://meadow/who/2023-10-13/medical_devices_atlas
   data://grapher/who/2023-10-13/medical_devices_atlas:
     - data://garden/who/2023-10-13/medical_devices_atlas
+
+  # WHO Medical Devices Atlas
+  data://meadow/who/2023-11-01/who_statins:
+    - snapshot://who/2023-11-01/who_statins.csv
+  data://garden/who/2023-11-01/who_statins:
+    - data://meadow/who/2023-11-01/who_statins
+  data://grapher/who/2023-11-01/who_statins:
+    - data://garden/who/2023-11-01/who_statins

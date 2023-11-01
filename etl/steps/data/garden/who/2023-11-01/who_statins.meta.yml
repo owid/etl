@@ -1,0 +1,29 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Cardiovascular Diseases
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 730
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  who_statins:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      general_availability_of_statins_in_the_public_health_sector:
+        title: General availability of statins in the public health sector
+        unit: ''
+        short_unit: ''
+        description_short: Signifies if a country typically has statins accessible in primary health care facilities within the public health sector. "Generally available" means they can be found in "50% or more pharmacies."
+        description_processing: Ambiguous or unclear values were standardized. The values "No data received", "No response", and "Don't know" were all consolidated to a single "No data" label.
+        description_from_producer: Indicates whether or not the country has statins generally available in primary health care facilities in the public health sector. "Generally available" is defined as "in 50% or more pharmacies."
+        processing_level: minor
