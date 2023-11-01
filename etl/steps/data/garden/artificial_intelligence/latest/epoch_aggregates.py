@@ -40,19 +40,25 @@ def run(dest_dir: str) -> None:
         index="year", columns="organization_categorization", values="count"
     ).reset_index()
 
-    # Merge the two dataframes
-    merged_df = pr.merge(df_pivot_domain, df_pivot_org, on="year").copy_metadata(from_table=tb)
+    # Get approach counts
+    approach_counts = tb.groupby(["year", "approach"]).size().reset_index(name="count")
+
+    # Pivot the table to get the counts for each approach type in a separate column
+    df_pivot_approach = approach_counts.pivot(index="year", columns="approach", values="count").reset_index()
 
     # Rename columns to avoid confusion with the original columns
-    merged_df = merged_df.rename(
+    df_pivot_domain = df_pivot_domain.rename(columns={"Not specified": "not_specified_domain", "Other": "other_domain"})
+    df_pivot_org = df_pivot_org.rename(
         columns={
-            "Not specified_x": "not_specified_domain",
-            "Other_x": "other_domain",
-            "Not specified_y": "not_specified_organization_categorization",
-            "Other_y": "other_organization_categorization",
+            "Not specified": "not_specified_organization_categorization",
+            "Other": "other_organization_categorization",
         }
     )
 
+    df_pivot_approach = df_pivot_approach.rename(columns={"Not specified": "not_specified_approach"})
+    # Merge the dataframes
+    merged_df = pr.merge(df_pivot_domain, df_pivot_org, on="year").copy_metadata(from_table=tb)
+    merged_df = pr.merge(df_pivot_approach, merged_df, on="year").copy_metadata(from_table=tb)
     # Create cumulative columns
     for column in merged_df.columns:
         if column not in ["year"]:
@@ -63,7 +69,6 @@ def run(dest_dir: str) -> None:
     # Add origins metadata to the aggregated table
     for column in tb_agg:
         tb_agg[column].metadata.origins = tb["domain"].metadata.origins
-
     #
     # Save outputs.
     #

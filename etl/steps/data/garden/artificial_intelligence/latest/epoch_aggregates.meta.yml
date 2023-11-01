@@ -271,3 +271,121 @@ tables:
         display:
           name: Other
           numDecimalPlaces: 0
+
+      reinforcement_learning:
+          title: Annual number of AI systems using reinforcement learning
+          unit: 'AI systems'
+          short_unit: ''
+          description_short: Reinforcement learning is a type of machine learning where an agent learns to make decisions by interacting with an environment. It receives feedback in the form of rewards or penalties for its actions and aims to maximize the cumulative reward over time. Reinforcement learning is commonly used in robotics, game playing (e.g., AlphaGo), and autonomous systems where agents must learn to make sequential decisions.
+          description_processing: >
+            Processing involved calculating total number of AI systems using reinforcement learning for each year.
+          processing_level: minor
+          display:
+            name: Reinforcement learning
+            numDecimalPlaces: 0
+
+      self_supervised_learning:
+        title: Annual number of AI systems using self-supervised learning
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Self-supervised learning is a machine learning technique where the model learns from the data itself without requiring external labels or annotations. It leverages inherent structures or relationships within the data to create meaningful representations. Self-supervised learning is commonly used in natural language processing and computer vision tasks, where models learn to understand context and semantics from large unlabeled datasets.
+        description_processing: >
+          Processing involved calculating total number of AI systems using self-supervised learning for each year.
+        processing_level: minor
+        display:
+          name: Self-supervised learning
+          numDecimalPlaces: 0
+
+      supervised:
+        title: Annual number of AI systems using supervised learning
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Supervised learning  is a machine learning approach where the AI system is trained on a labeled dataset, meaning each input data point is associated with a known output or target. The model learns to map inputs to outputs based on this labeled data. Supervised learning is widely used in tasks such as image classification, sentiment analysis, and regression, where the goal is to make predictions or classifications based on labeled training data.
+        description_processing: >
+          Processing involved calculating total number of AI systems using supervised learning for each year.
+        processing_level: minor
+        display:
+          name: Supervised learning
+          numDecimalPlaces: 0
+
+      unsupervised:
+        title: Annual number of AI systems using unsupervised learning
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Unsupervised learning is a machine learning paradigm where the AI system explores patterns and structures within data without the presence of labeled examples. It aims to discover hidden relationships or groupings in the data. Unsupervised learning is applied in clustering, dimensionality reduction, and anomaly detection tasks. It's used when there are no predefined labels for the data.
+        description_processing: >
+          Processing involved calculating total number of AI systems using unsupervised learning for each year.
+        processing_level: minor
+        display:
+          name: Unsupervised learning
+          numDecimalPlaces: 0
+
+      not_specified_approach:
+        title: Annual number of AI systems with no specified learning approach
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Systems are classified as "Not specified" when their learning approach is not specified by Epoch.
+        description_processing: >
+          Processing involved calculating total number of AI systems with no specified learning approach for each year.
+        processing_level: minor
+        display:
+          name: Not specified
+          numDecimalPlaces: 0
+      reinforcement_learning_cumsum:
+        title: Cumulative number of AI systems using reinforcement learning
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Reinforcement learning is a type of machine learning where an agent learns to make decisions by interacting with an environment. It receives feedback in the form of rewards or penalties for its actions and aims to maximize the cumulative reward over time. Reinforcement learning is commonly used in robotics, game playing (e.g., AlphaGo), and autonomous systems where agents must learn to make sequential decisions.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems using reinforcement learning for each year starting from 1950.
+        processing_level: minor
+        display:
+          name: Reinforcement learning
+          numDecimalPlaces: 0
+
+      self_supervised_learning_cumsum:
+        title: Cumulative number of AI systems using self-supervised learning
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Self-supervised learning is a machine learning technique where the model learns from the data itself without requiring external labels or annotations. It leverages inherent structures or relationships within the data to create meaningful representations. Self-supervised learning is commonly used in natural language processing and computer vision tasks, where models learn to understand context and semantics from large unlabeled datasets.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems using self-supervised learning for each year starting from 1950.
+        processing_level: minor
+        display:
+          name: Self-supervised learning
+          numDecimalPlaces: 0
+
+      unsupervised_cumsum:
+        title: Cumulative number of AI systems using unsupervised learning
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Unsupervised learning is a machine learning paradigm where the AI system explores patterns and structures within data without the presence of labeled examples. It aims to discover hidden relationships or groupings in the data. Unsupervised learning is applied in clustering, dimensionality reduction, and anomaly detection tasks. It's used when there are no predefined labels for the data.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems using unsupervised learning for each year starting from 1950.
+        processing_level: minor
+        display:
+          name: Unsupervised learning
+          numDecimalPlaces: 0
+      supervised_cumsum:
+        title: Cumulative number of AI systems using supervised learning
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Supervised learning  is a machine learning approach where the AI system is trained on a labeled dataset, meaning each input data point is associated with a known output or target. The model learns to map inputs to outputs based on this labeled data. Supervised learning is widely used in tasks such as image classification, sentiment analysis, and regression, where the goal is to make predictions or classifications based on labeled training data.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems using supervised learning for each year starting from 1950.
+        processing_level: minor
+        display:
+          name: Supervised learning
+          numDecimalPlaces: 0
+
+      not_specified_approach_cumsum:
+        title: Cumulative number of AI systems with no specified learning approach
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Systems are classified as "Not specified" when their learning approach is not specified by Epoch.
+        description_processing: >
+          Processing involved calculating cumulative number of AI systems with no specified learning approach for each year starting from 1950.
+        processing_level: minor
+        display:
+          name: Not specified
+          numDecimalPlaces: 0

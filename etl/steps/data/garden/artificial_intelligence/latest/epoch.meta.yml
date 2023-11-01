@@ -87,7 +87,7 @@ tables:
         title: Training computation (petaFLOP)
         unit: 'petaFLOP'
         description_key:
-          - Training computation in the context of artificial intelligence (AI) predominantly employs the unit known as FLOP, representing floating-point operations. Each FLOP corresponds to fundamental arithmetic operations, such as addition or multiplication, executed on two decimal numbers. To accommodate the vast computational demands of AI systems, the measurement unit of petaFLOP is commonly utilized. One petaFLOP stands as a staggering one quadrillion (10^15) FLOPs, underscoring the magnitude of computational operations within AI.
+          - Training computation in the context of artificial intelligence (AI) predominantly employs the unit known as FLOP, representing floating-point operations. Each FLOP corresponds to fundamental arithmetic operations, such as addition or multiplication, executed on two decimal numbers. To accommodate the vast computational demands of AI systems, the measurement unit of petaFLOP is commonly utilized. One petaFLOP stands as a staggering one quadrillion FLOPs, underscoring the magnitude of computational operations within AI.
 
           - The focal point of AI systems centers on models rooted in machine learning and deep learning techniques. These methodologies are notorious for their computational intensity, involving intricate mathematical processes and algorithms. During the training phase, AI models process substantial volumes of data, traversing multiple layers and nodes within the architecture. Simultaneously, the model continuously adapts and refines its parameters to optimize performance, rendering the training process a computationally intensive endeavor.
 
@@ -119,6 +119,7 @@ tables:
           description_short: The date when the AI system was first published.
           description_from_producer:  The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
           processing_level: minor
+
 
 
 
