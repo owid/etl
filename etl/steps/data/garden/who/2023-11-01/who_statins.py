@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -29,11 +31,11 @@ def run(dest_dir: str) -> None:
     unique_values_in_column = tb["general_availability_of_statins_in_the_public_health_sector"].unique()
     assert set(unique_values_in_column).issubset(provided_values)
 
-    # Replace the specified values with "No data" for consistency
+    # Replace the specified values where there is no data with "NaN" for consistency on grapher charts
     values_to_replace = ["No data received", "No response", "Don't know"]
     tb["general_availability_of_statins_in_the_public_health_sector"] = tb[
         "general_availability_of_statins_in_the_public_health_sector"
-    ].replace(values_to_replace, "No data")
+    ].replace(values_to_replace, np.nan)
 
     #
     # Save outputs.
