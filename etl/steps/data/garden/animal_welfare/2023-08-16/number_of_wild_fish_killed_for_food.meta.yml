@@ -3,6 +3,11 @@ definitions:
   description_key: &description_key
     - This indicator uses data on fisheries capture tonnages for 2007-2016 and estimated mean weights for fish species.
     - Note that this estimate does not include unrecorded fish capture, such as fish caught illegally and those caught as bycatch and discarded.
+  presentation:
+    topic_tags:
+    - Animal Welfare
+    - Fish & Overfishing
+
 tables:
   number_of_wild_fish_killed_for_food:
     variables:
