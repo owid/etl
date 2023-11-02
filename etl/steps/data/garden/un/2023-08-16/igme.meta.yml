@@ -1,3 +1,27 @@
+definitions:
+  indicator: <% if indicator == "Neonatal mortality rate" %>
+    The estimated number of deaths of {{ sex }} children aged less than 28 days, per 1,000 live births, in {{wealth_quintile}}.
+    <% elif indicator == "Mortality rate 1-59 months" %>
+    The estimated number of deaths of {{ sex }} children aged between 1 and 59 months, per 1,000 live births, in {{wealth_quintile}}.
+    <% elif indicator == "Infant mortality rate" %>
+    The estimated number of deaths of {{ sex }} children aged under one year, per 1,000 live births, in {{wealth_quintile}}.
+    <% elif indicator == "Under-five mortality rate" %>
+    The estimated number of deaths of {{ sex }} children aged under five years, per 1,000 live births, in {{wealth_quintile}}.
+    <% elif indicator == "Mortality rate age 10-14" %>
+    The estimated number of deaths of {{ sex }} children aged between 10 and 14, per 1,000 children aged 10, in {{wealth_quintile}}.
+    <% elif indicator == "Mortality rate age 10-19" %>
+    The estimated number of deaths of {{ sex }} children aged between 10 and 19, per 1,000 children aged 10, in {{wealth_quintile}}.
+    <% elif indicator == "Mortality rate age 15-19" %>
+    The estimated number of deaths of {{ sex }} children aged between 15 and 19, per 1,000 children aged 15, in {{wealth_quintile}}.
+    <% elif indicator == "Mortality rate age 15-24" %>
+    The estimated number of deaths of {{ sex }} children aged between 15 and 24, per 1,000 children aged 15, in {{wealth_quintile}}.
+    <% elif indicator == "Child Mortality rate age 1-4" %>
+    The estimated number of deaths of {{ sex }} children aged between 1 and 4, per 1,000 children aged 1, in {{wealth_quintile}}.
+    <% elif indicator == "Mortality rate age 20-24 %>
+    The estimated number of deaths of {{ sex }} children aged between 20 and 24, per 1,000 children aged 20, in {{wealth_quintile}}.
+    <% elif indicator == "Mortality rate age 5-14 %>
+    The estimated number of deaths of {{ sex }} children aged between 5 and 14, per 1,000 children aged 5, in {{wealth_quintile}}.
+
 tables:
   igme:
     variables:
