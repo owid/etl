@@ -334,7 +334,7 @@ steps:
     - data://garden/who/2023-10-13/medical_devices_atlas
 
   # WHO Cardiovascular diseases deaths
-  data://garden/cardiovascular_diseases/2023-11-01/who_cvd:
+  data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/who/2023-08-01/mortality_database
   data://grapher/cardiovascular_diseases/2023-11-01/who_cvd:
     - data://garden/cardiovascular_diseases/2023-11-01/who_cvd
