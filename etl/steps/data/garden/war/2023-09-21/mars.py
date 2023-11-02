@@ -44,11 +44,10 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
+from shared import add_indicators_extra, expand_observations
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-
-from .shared import add_indicators_extra, expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -91,6 +90,7 @@ def run(dest_dir: str) -> None:
     # Read table from COW codes
     ds_isd = paths.load_dataset("isd")
     tb_regions = ds_isd["isd_regions"].reset_index()
+    tb_isd_countries = ds_isd["isd_countries"]
 
     #
     # Process data.
@@ -116,6 +116,10 @@ def run(dest_dir: str) -> None:
         col_year_end="yrend",
         cols_scale=["kialow", "kiahigh"],
     )
+
+    # Get country-level data
+    paths.log.info("getting country-level indicators")
+    tb_country = estimate_metrics_country_level(tb, tb_isd_countries)
 
     log.info("war.mars: aggregate numbers at warcode level")
     tb = aggregate_wars(tb)
@@ -363,3 +367,74 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
 
     return tb
+
+
+def estimate_metrics_country_level(tb: Table, tb_isd: Table) -> Table:
+    """Add country-level indicators."""
+    ###################
+    # Participated in #
+    ###################
+
+    # Get table with [year, conflict_type, code]
+    tb_country = tb[["year", "conflict_type", "ccode"]].rename(columns={"ccode": "code"})
+
+    # Drop rows with code = NaN
+    tb_country = tb_country.dropna(subset=["code"])
+    # Drop duplicates
+    tb_country = tb_country.drop_duplicates()
+
+    # Ensure numeric type
+    tb_country["code"] = tb_country["code"].astype(int)
+
+    # Sanity check
+    assert not tb_country.isna().any(axis=None), "There are some NaNs!"
+
+    # Only consider years with data in ISD table
+    tb_country = tb_country[tb_country["year"] >= tb_isd["year"].min()]
+
+    # Add country name
+    tb_country["country"] = tb_country.apply(lambda x: _get_country_name(tb_isd, x["code"], x["year"]), axis=1)
+    assert tb_country["country"].notna().all(), "Some countries were not found! NaN was set"
+
+    # Add flag
+    tb_country["participated_in_conflict"] = 1
+    tb_country["participated_in_conflict"].m.origins = tb["gwnoa"].m.origins
+
+    # Prepare GW table
+    tb_alltypes = Table(pd.DataFrame({"conflict_type": tb_country["conflict_type"].unique()}))
+    tb_gw = tb_isd.reset_index().merge(tb_alltypes, how="cross")
+    tb_gw["country"] = tb_gw["country"].astype(str)
+
+    # Combine all GW entries with UCDP
+    tb_country = tb_gw.merge(tb_country, on=["year", "country", "conflict_type"], how="left")
+    tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
+    tb_country = tb_country[["year", "country", "conflict_type", "participated_in_conflict"]]
+
+    # Add intrastate (all)
+    # tb_country = add_conflict_country_all_intrastate(tb_country)
+    # Add state-based
+    # tb_country = add_conflict_country_all_statebased(tb_country)
+
+    # Only preserve years that make sense
+    tb_country = tb_country[(tb_country["year"] >= tb["year"].min()) & (tb_country["year"] <= tb["year"].max())]
+
+    # Set short name
+    tb_country.metadata.short_name = "ucdp_country"
+
+    return tb_country
+
+
+def _get_country_name(tb_gw: Table, code: int, year: int) -> str:
+    try:
+        country_name = tb_gw.loc[(code, year)]
+    except KeyError:
+        if code < 1000:
+            try:
+                country_name = tb_gw.loc[(code, year - 1)]
+            except KeyError:
+                try:
+                    country_name = tb_gw.loc[(code, year + 1)]
+                except KeyError:
+                    print(code, year)
+        country_name = code
+    return country_name
