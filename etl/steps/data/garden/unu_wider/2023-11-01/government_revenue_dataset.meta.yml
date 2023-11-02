@@ -127,7 +127,7 @@ dataset:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
   government_revenue_dataset:
-
+    variables:
       rev_inc_sc:
         title: Revenue including social contributions
         unit: "%"
