@@ -247,10 +247,16 @@ def code_to_region_alt(cow_code: int) -> str:
 
 def create_table_country_years(tb: Table) -> Table:
     """Create table with each country present in a year."""
-    tb_countries = tb[["cownum", "year", "statename"]].copy().rename(columns={
-        "cownum": "id",
-        "statename": "country",
-    })
+    tb_countries = (
+        tb[["cownum", "year", "statename"]]
+        .copy()
+        .rename(
+            columns={
+                "cownum": "id",
+                "statename": "country",
+            }
+        )
+    )
 
     # define mask for last year
     mask = tb_countries["year"] == EXPECTED_LAST_YEAR
