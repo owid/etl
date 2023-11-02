@@ -27,6 +27,18 @@ log = structlog.get_logger()
     help="Sync only this chart id.",
 )
 @click.option(
+    "--publish/--no-publish",
+    default=False,
+    type=bool,
+    help="Automatically publish new charts.",
+)
+@click.option(
+    "--need-revision/--no-need-revision",
+    default=True,
+    type=bool,
+    help="Create chart revision that requires approval if a chart with the same slug already exists.",
+)
+@click.option(
     "--dry-run/--no-dry-run",
     default=False,
     type=bool,
@@ -36,18 +48,22 @@ def cli(
     source_env: Path,
     target_env: Path,
     chart_id: Optional[int],
+    publish: bool,
+    need_revision: bool,
     dry_run: bool,
 ) -> None:
-    """Syncs grapher charts modified by Admin user from source_env to target_env (Admin user is used by staging servers).
-    Only sync charts that have been published.
+    """Syncs grapher charts and revisions modified by Admin user from source_env to target_env. (Admin user is used by staging servers)
 
     Charts:
-    - New charts are automatically created in target_env.
-    - Existing charts (with the same slug) are queued as chart revisions.
-    - Deleted charts are **not synced**.
+        - New charts are automatically created in target_env.
+        - Existing charts (with the same slug) are queued as chart revisions.
+        - Deleted charts are **not synced**.
+
+        Only syncs charts that are **published** on staging server. They are **created as drafts** in target and must be published
+        manually, unless the --publish flag is used.
 
     Chart revisions:
-    - Approved chart revisions on staging are automatically applied in target, assuming the chart has not been modified.
+        - Approved chart revisions on staging are automatically applied in target, assuming the chart has not been modified.
     """
     source_engine = get_engine(dotenv_values(str(source_env)))
     target_engine = get_engine(dotenv_values(str(target_env)))
@@ -69,7 +85,10 @@ def cli(
 
                 try:
                     existing_chart = gm.Chart.load_chart(target_session, slug=source_chart.config["slug"])
+                except NoResultFound:
+                    existing_chart = None
 
+                if existing_chart:
                     if _charts_configs_are_equal(existing_chart.config, target_chart.config):
                         log.info(
                             "staging_sync.skip",
@@ -87,8 +106,8 @@ def cli(
                         rev for rev in revs if rev.status == "approved" and rev.createdAt > existing_chart.updatedAt
                     ]
 
-                    # update existing chart directly
-                    if revs:
+                    # if there's no revision or a flag --no-need-revision, update the chart directly
+                    if not need_revision or revs:
                         log.info(
                             "staging_sync.update_chart", slug=target_chart.config["slug"], chart_id=existing_chart.id
                         )
@@ -113,8 +132,13 @@ def cli(
                             target_session.add(chart_revision)
                             target_session.commit()
                         log.info("staging_sync.create_chart_revision", slug=target_chart.config["slug"])
-                except NoResultFound:
+                else:
                     # create new chart
+                    if not publish:
+                        # only published charts are synced
+                        assert target_chart.config["isPublished"]
+                        del target_chart.config["isPublished"]
+
                     if not dry_run:
                         resp = target_api.create_chart(target_chart.config)
                     else:

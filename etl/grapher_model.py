@@ -291,36 +291,51 @@ class Chart(SQLModel, table=True):
         # Find charts
         return session.exec(select(Chart).where(Chart.id.in_(chart_ids))).all()  # type: ignore
 
-    def load_variable_paths(self, session: Session) -> Dict[int, str]:
+    def load_chart_variables(self, session: Session) -> Dict[int, "Variable"]:
         q = """
         select
-            cd.variableId,
-            v.catalogPath
+            v.*
         from chart_dimensions as cd
         join variables as v on v.id = cd.variableId
         where cd.chartId = :chart_id
         """
         rows = session.execute(q, params={"chart_id": self.id}).fetchall()  # type: ignore
-        var_paths = {r["variableId"]: r["catalogPath"] for r in rows}
+        variables = {r["id"]: Variable(**r) for r in rows}
 
         # add columnSlug if present
         column_slug = self.config.get("map", {}).get("columnSlug")
         if column_slug:
-            var_paths[int(column_slug)] = Variable.load_variable(session, column_slug).catalogPath
+            variables[int(column_slug)] = Variable.load_variable(session, column_slug)
 
-        return var_paths
+        return variables
 
     def migrate_to_db(self, source_session: Session, target_session: Session):
         """Remap variable ids from source to target session."""
         assert self.id, "Chart must come from a database"
-        source_variable_paths = self.load_variable_paths(source_session)
+        source_variables = self.load_chart_variables(source_session)
 
         remap_ids = {}
-        for source_var_id, source_var_path in source_variable_paths.items():
-            try:
-                remap_ids[source_var_id] = Variable.load_from_catalog_path(source_var_path, target_session).id
-            except NoResultFound:
-                raise ValueError(f"variables.catalogPath not found in target: {source_var_path}")
+        for source_var_id, source_var in source_variables.items():
+            if source_var.catalogPath:
+                try:
+                    target_var = Variable.load_from_catalog_path(source_var.catalogPath, target_session)
+                    remap_ids[source_var_id] = target_var.id
+                except NoResultFound:
+                    raise ValueError(f"variables.catalogPath not found in target: {source_var.catalogPath}")
+            # old style variable, match it on name and dataset id
+            else:
+                log.warning("migrate_to_db.variable_without_catalogPath", variable_id=source_var_id)
+                try:
+                    target_var = target_session.exec(
+                        select(Variable).where(
+                            Variable.name == source_var.name, Variable.datasetId == source_var.datasetId
+                        )
+                    ).one()
+                    remap_ids[source_var_id] = target_var.id
+                except NoResultFound:
+                    raise ValueError(
+                        f"variable with name `{source_var.name}` and datasetId `{source_var.datasetId}` not found in target"
+                    )
 
         target_chart = Chart(**self.dict())
         del target_chart.id
