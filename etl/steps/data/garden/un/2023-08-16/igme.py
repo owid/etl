@@ -167,9 +167,10 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
             "country",
             "year",
             "Observation value-Deaths per 1,000 live births-Under-fifteen mortality rate-Both sexes-All wealth quintiles",
+            "Observation value-Number of deaths-Under-fifteen deaths-Both sexes-All wealth quintiles",
         ]
     ]
-    tb.metadata.short_name = "igme_under_fifteen_mortality_rate"
+    tb.metadata.short_name = "igme_under_fifteen_mortality"
     return tb
 
 

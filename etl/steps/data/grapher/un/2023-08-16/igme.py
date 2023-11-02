@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["igme"]
-    tb_youth = ds_garden["igme_under_fifteen_mortality_rate"]
+    tb_youth = ds_garden["igme_under_fifteen_mortality"]
 
     #
     # Process data.

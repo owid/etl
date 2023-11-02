@@ -14,6 +14,7 @@ tables:
         description_processing: This indicator is processed by OWID based on the original data source. It is a combination of the under-five mortality rate and the 5-14 mortality rate.
         unit: deaths per 1,000 live births
         display:
+          name: Under-fifteen mortality rate, both sexes, all wealth quintiles
           numDecimalPlaces: 1
         sources:
           - name: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2023)
