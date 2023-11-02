@@ -7,7 +7,12 @@ definitions:
         - State Capacity
 
     processing_level: major
-    description_processing:
+    description_processing: |
+      Any observation in the dataset flagged with caution note has been dropped for the dataset. There are three categories of caution notes:
+        1. Accuracy, quality or comparability of data questionable.
+        2. Un-excluded resource revenues/taxes are significant but cannot be isolated from total revenue/taxes.
+        3. Un-excluded resource recenue/taxes are marginal but non-negligible and cannot be isolated from total revenue/taxes.
+        4. Inconsistencies with social contributions.
 
   revenue: >-
     Revenue refers to total government revenue, providing a set of variables that differentiates
@@ -122,49 +127,12 @@ dataset:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
   government_revenue_dataset:
-    # Learn more about the available fields:
-    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
-    variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
 
       rev_inc_sc:
         title: Revenue including social contributions
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Includes taxes, non-tax revenue, social contributions, and grants.
         description_from_producer: "{definitions.revenue}"
         display:
           name: Revenue including social contributions
@@ -173,7 +141,7 @@ tables:
         title: Revenue excluding social contributions
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Includes taxes, non-tax revenue, and grants.
         description_from_producer: "{definitions.revenue}"
         display:
           name: Revenue excluding social contributions
@@ -182,7 +150,7 @@ tables:
         title: Revenue excluding grants and including social contributions
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Includes taxes, non-tax revenue, and social contributions.
         description_from_producer: "{definitions.revenue}"
         display:
           name: Revenue excluding grants and including social contributions
@@ -191,7 +159,7 @@ tables:
         title: Revenue excluding grants and excluding social contributions
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Includes taxes and non-tax revenue.
         description_from_producer: "{definitions.revenue}"
         display:
           name: Revenue excluding grants and excluding social contributions
@@ -200,7 +168,6 @@ tables:
         title: Total resource revenue
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: "{definitions.revenue}"
         display:
           name: Total resource revenue
@@ -209,7 +176,7 @@ tables:
         title: Total non-resource revenue including social contributions
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Includes taxes minus resource taxes, non-tax revenue excluding resource component, and social contributions.
         description_from_producer: "{definitions.revenue}"
         display:
           name: Total non-resource revenue including social contributions
@@ -218,7 +185,6 @@ tables:
         title: Taxes including social contributions
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: "{definitions.total_taxes}"
         display:
           name: Taxes including social contributions
@@ -227,7 +193,6 @@ tables:
         title: Taxes excluding social contributions
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: "{definitions.total_taxes}"
         display:
           name: Taxes excluding social contributions
@@ -236,7 +201,7 @@ tables:
         title: Resource taxes
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Refers mostly to corporate taxation of resource extraction.
         description_from_producer: "{definitions.total_taxes}"
         display:
           name: Resource taxes
@@ -245,7 +210,7 @@ tables:
         title: Non-resource taxes including social contributions
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Includes taxes and social contributions, minus resource taxes.
         description_from_producer: "{definitions.total_taxes}"
         display:
           name: Non-resource taxes including social contributions
@@ -254,7 +219,7 @@ tables:
         title: Non-resource taxes excluding social contributions
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Includes taxes minus resource taxes.
         description_from_producer: "{definitions.total_taxes}"
         display:
           name: Non-resource taxes excluding social contributions
@@ -263,7 +228,7 @@ tables:
         title: Direct taxes including social contributions and resource revenue
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: It is defined as total direct tax plus social contributions.
         description_from_producer: "{definitions.direct_taxes}"
         display:
           name: Direct taxes including social contributions and resource revenue
@@ -272,7 +237,7 @@ tables:
         title: Direct taxes including social contributions and excluding resource revenue
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: It is defined as total direct tax plus social contributions minus resource taxes.
         description_from_producer: "{definitions.direct_taxes}"
         display:
           name: Direct taxes including social contributions and excluding resource revenue
@@ -281,7 +246,7 @@ tables:
         title: Direct taxes excluding social contributions and including resource revenue
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: It is composed of total direct tax only.
         description_from_producer: "{definitions.direct_taxes}"
         display:
           name: Direct taxes excluding social contributions and including resource revenue
@@ -290,16 +255,15 @@ tables:
         title: Direct taxes excluding social contributions and resource revenue
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: It is defined as total direct tax minus resource taxes.
         description_from_producer: "{definitions.direct_taxes}"
         display:
           name: Direct taxes excluding social contributions and resource revenue
           numDecimalPlaces: 1
       tax_income:
-        title: Taxes on income, profits and capital gains
+        title: Taxes on income, profits and capital gains (TIPCG)
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.direct_taxes}
 
@@ -311,7 +275,6 @@ tables:
         title: Resource component of taxes on income, profits, and capital gains
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.direct_taxes}
 
@@ -323,7 +286,6 @@ tables:
         title: Non-resource component of taxes on income, profits, and capital gains
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.direct_taxes}
 
@@ -332,10 +294,9 @@ tables:
           name: Non-resource component of taxes on income, profits, and capital gains
           numDecimalPlaces: 1
       tax_indiv:
-        title: Taxes on individuals
+        title: Taxes on individuals (PIT)
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.direct_taxes}
 
@@ -344,10 +305,9 @@ tables:
           name: Taxes on individuals
           numDecimalPlaces: 1
       tax_corp:
-        title: Taxes on corporations and other enterprises
+        title: Taxes on corporations and other enterprises (CIT)
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.direct_taxes}
 
@@ -359,7 +319,6 @@ tables:
         title: Resource component of taxes on corporations and other enterprises
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.direct_taxes}
 
@@ -371,7 +330,7 @@ tables:
         title: Non-resource component of taxes on corporations and other enterprises
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: It is defined as the taxes of corporations and other enterprises (CIT) minus the CIT from natural resources.
         description_from_producer: |
           {definitions.direct_taxes}
 
@@ -383,7 +342,6 @@ tables:
         title: Taxes on payroll and workforce
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.direct_taxes}
 
@@ -395,7 +353,6 @@ tables:
         title: Taxes on property
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.direct_taxes}
 
@@ -407,7 +364,7 @@ tables:
         title: Indirect taxes
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Includes taxes on goods and services, international trade and transactions, and other taxes. It may include a resource component.
         description_from_producer: "{definitions.indirect_taxes}"
         display:
           name: Indirect taxes
@@ -416,7 +373,7 @@ tables:
         title: Resource component of indirect taxes
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Includes export taxes on natural resources, where separately reported.
         description_from_producer: "{definitions.indirect_taxes}"
         display:
           name: Resource component of indirect taxes
@@ -425,7 +382,7 @@ tables:
         title: Non-resource component of indirect taxes
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Includes taxes on goods and services, international trade and transactions, and other taxes net of any resource component.
         description_from_producer: "{definitions.indirect_taxes}"
         display:
           name: Non-resource component of indirect taxes
@@ -434,7 +391,6 @@ tables:
         title: Taxes on goods and services
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.indirect_taxes}
 
@@ -446,7 +402,7 @@ tables:
         title: General taxes on goods and services
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: It is defined as the sum of value-added taxes (VAT), sales tax, turnover tax and tax on financial and capital transactions.
         description_from_producer: |
           {definitions.indirect_taxes}
 
@@ -458,7 +414,6 @@ tables:
         title: Value-added taxes (VAT)
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.indirect_taxes}
 
@@ -470,7 +425,6 @@ tables:
         title: Excise duties
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.indirect_taxes}
 
@@ -482,7 +436,7 @@ tables:
         title: Taxes on international trade and transactions
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Includes taxes on imports and exports, plus other taxes on international trade.
         description_from_producer: |
           {definitions.indirect_taxes}
 
@@ -494,7 +448,6 @@ tables:
         title: Taxes on imports
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.indirect_taxes}
 
@@ -506,7 +459,6 @@ tables:
         title: Taxes on exports
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.indirect_taxes}
 
@@ -518,7 +470,6 @@ tables:
         title: Other taxes
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: |
           {definitions.indirect_taxes}
 
@@ -530,7 +481,6 @@ tables:
         title: Non-tax revenue
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: "{definitions.non_tax_revenue}"
         display:
           name: Non-tax revenue
@@ -539,7 +489,6 @@ tables:
         title: Resource component of non-tax revenue
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: "{definitions.non_tax_revenue}"
         display:
           name: Resource component of non-tax revenue
@@ -548,7 +497,6 @@ tables:
         title: Non-resource component of non-tax revenue
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: "{definitions.non_tax_revenue}"
         display:
           name: Non-resource component of non-tax revenue
@@ -557,16 +505,14 @@ tables:
         title: Social contributions
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: "{definitions.social_contributions}"
         display:
           name: Social contributions
           numDecimalPlaces: 1
       grants:
-        title: Grants
+        title: Grants received
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
         description_from_producer: "{definitions.grants}"
         display:
           name: Grants
