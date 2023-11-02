@@ -138,7 +138,7 @@ def run(dest_dir: str) -> None:
     # Read table from COW codes
     ds_cow_ssm = paths.load_dataset("cow_ssm")
     tb_regions = ds_cow_ssm["cow_ssm_regions"].reset_index()
-    tb_cow_countries = ds_cow_ssm["cow_ssm_countries"]
+    tb_codes = ds_cow_ssm["cow_ssm_countries"]
 
     # Check that there are no overlapping warnums between tables
     log.info("war.cow: check overlapping warnum in tables")
@@ -156,7 +156,7 @@ def run(dest_dir: str) -> None:
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
     tb_country = estimate_metrics_country_level(
-        tb_extra=tb_extra, tb_intra=tb_intra, tb_inter=tb_inter, tb_cow=tb_cow_countries
+        tb_extra=tb_extra, tb_intra=tb_intra, tb_inter=tb_inter, tb_codes=tb_codes
     )
 
     # Post-processing
@@ -980,7 +980,7 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
 ########################################################################
 ## COUNTRY-LEVEL########################################################
 ########################################################################
-def _estimate_metrics_country_level(tb: Table, tb_cow: Table, codes: List[str], conflict_type: str) -> Table:
+def _estimate_metrics_country_level(tb: Table, tb_codes: Table, codes: List[str], conflict_type: str) -> Table:
     tb_country = pr.concat(
         [tb[["year_start", "year_end", code]].rename(columns={code: "code"}).copy() for code in codes]
     )
@@ -1009,7 +1009,7 @@ def _estimate_metrics_country_level(tb: Table, tb_cow: Table, codes: List[str], 
     assert not tb_country.isna().any(axis=None), "There are some NaNs!"
 
     # Add country name
-    tb_country["country"] = tb_country.apply(lambda x: tb_cow.loc[(x["code"], x["year"])], axis=1)
+    tb_country["country"] = tb_country.apply(lambda x: tb_codes.loc[(x["code"], x["year"])], axis=1)
     assert tb_country["country"].notna().all(), "Some countries were not found! NaN was set"
 
     # Add flag
@@ -1017,11 +1017,11 @@ def _estimate_metrics_country_level(tb: Table, tb_cow: Table, codes: List[str], 
     tb_country["participated_in_conflict"].m.origins = tb[codes[0]].m.origins
 
     # Prepare CoW table
-    tb_cow["country"] = tb_cow["country"].astype(str)
-    tb_cow = tb_cow.reset_index()
+    tb_codes["country"] = tb_codes["country"].astype(str)
+    tb_codes = tb_codes.reset_index()
 
     # Combine all CoW entries with CoW
-    tb_country = tb_cow.merge(tb_country, on=["year", "country"], how="left")
+    tb_country = tb_codes.merge(tb_country, on=["year", "country"], how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
     tb_country = tb_country[["year", "country", "participated_in_conflict"]]
 
@@ -1036,19 +1036,19 @@ def _estimate_metrics_country_level(tb: Table, tb_cow: Table, codes: List[str], 
     return tb_country
 
 
-def estimate_metrics_country_level(tb_extra: Table, tb_intra: Table, tb_inter: Table, tb_cow: Table) -> Table:
+def estimate_metrics_country_level(tb_extra: Table, tb_intra: Table, tb_inter: Table, tb_codes: Table) -> Table:
     """Add country-level indicators."""
     ###################
     # Participated in #
     ###################
     # Get participations for each conflict type
-    tb_extra_c = _estimate_metrics_country_level(tb_extra, tb_cow, ["ccode1", "ccode2"], CTYPE_EXTRA)
-    tb_inter_c = _estimate_metrics_country_level(tb_inter, tb_cow, ["ccode"], CTYPE_INTER)
+    tb_extra_c = _estimate_metrics_country_level(tb_extra, tb_codes, ["ccode1", "ccode2"], CTYPE_EXTRA)
+    tb_inter_c = _estimate_metrics_country_level(tb_inter, tb_codes, ["ccode"], CTYPE_INTER)
     tb_intra_i_c = _estimate_metrics_country_level(
-        tb_intra[tb_intra["intnl"] == 1], tb_cow, ["ccodea"], CTYPE_INTRA_INTL
+        tb_intra[tb_intra["intnl"] == 1], tb_codes, ["ccodea"], CTYPE_INTRA_INTL
     )
     tb_intra_ni_c = _estimate_metrics_country_level(
-        tb_intra[tb_intra["intnl"] != 1], tb_cow, ["ccodea"], CTYPE_INTRA_NINTL
+        tb_intra[tb_intra["intnl"] != 1], tb_codes, ["ccodea"], CTYPE_INTRA_NINTL
     )
 
     tb_country = pr.concat(

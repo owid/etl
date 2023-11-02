@@ -63,7 +63,7 @@ def run(dest_dir: str) -> None:
     # Read table from GW codes
     ds_gw = paths.load_dataset("gleditsch")
     tb_regions = ds_gw["gleditsch_regions"].reset_index()
-    tb_gw_countries = ds_gw["gleditsch_countries"]
+    tb_codes = ds_gw["gleditsch_countries"]
 
     #
     # Process data.
@@ -77,7 +77,7 @@ def run(dest_dir: str) -> None:
 
     # Country-level stuff
     paths.log.info("getting country-level indicators")
-    tb_country = estimate_metrics_country_level(tb, tb_gw_countries)
+    tb_country = estimate_metrics_country_level(tb, tb_codes)
 
     # Relevant rows
     paths.log.info("keep relevant columns")
@@ -347,7 +347,7 @@ def _sanity_check_final(tb: Table) -> Table:
     assert not msk.any(), f"Low estimates higher than high estimates. This can't be correct! {tb[msk]}"
 
 
-def estimate_metrics_country_level(tb: Table, tb_gw: Table) -> Table:
+def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     """Add country-level indicators."""
     ###################
     # Participated in #
@@ -378,7 +378,7 @@ def estimate_metrics_country_level(tb: Table, tb_gw: Table) -> Table:
     assert not tb_country.isna().any(axis=None), "There are some NaNs!"
 
     # Add country name
-    tb_country["country"] = tb_country.apply(lambda x: _get_country_name(tb_gw, x["code"], x["year"]), axis=1)
+    tb_country["country"] = tb_country.apply(lambda x: _get_country_name(tb_codes, x["code"], x["year"]), axis=1)
     assert tb_country["country"].notna().all(), "Some countries were not found! NaN was set"
 
     # Add flag
@@ -387,11 +387,11 @@ def estimate_metrics_country_level(tb: Table, tb_gw: Table) -> Table:
 
     # Prepare GW table
     tb_alltypes = Table(pd.DataFrame({"conflict_type": tb_country["conflict_type"].unique()}))
-    tb_gw = tb_gw.reset_index().merge(tb_alltypes, how="cross")
-    tb_gw["country"] = tb_gw["country"].astype(str)
+    tb_codes = tb_codes.reset_index().merge(tb_alltypes, how="cross")
+    tb_codes["country"] = tb_codes["country"].astype(str)
 
     # Combine all GW entries with UCDP
-    tb_country = tb_gw.merge(tb_country, on=["year", "country", "conflict_type"], how="left")
+    tb_country = tb_codes.merge(tb_country, on=["year", "country", "conflict_type"], how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
     tb_country = tb_country[["year", "country", "conflict_type", "participated_in_conflict"]]
 
@@ -413,11 +413,11 @@ def estimate_metrics_country_level(tb: Table, tb_gw: Table) -> Table:
     return tb_country
 
 
-def _get_country_name(tb_gw: Table, code: int, year: int) -> str:
+def _get_country_name(tb_codes: Table, code: int, year: int) -> str:
     try:
-        country_name = tb_gw.loc[(code, year)]
+        country_name = tb_codes.loc[(code, year)]
     except KeyError:
-        country_name = tb_gw.loc[(code, year - 1)]
+        country_name = tb_codes.loc[(code, year - 1)]
     return country_name
 
 
