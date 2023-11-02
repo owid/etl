@@ -3,6 +3,7 @@ import datetime as dt
 import json
 import random
 import string
+from typing import Any, Dict, List
 
 import requests
 from sqlmodel import Session
@@ -49,6 +50,17 @@ class AdminAPI(object):
             f"{self.base_url}/admin/api/charts/{chart_id}",
             cookies={"sessionid": self.session_id},
             json=chart_config,
+        )
+        resp.raise_for_status()
+        js = resp.json()
+        assert js["success"]
+        return js
+
+    def set_tags(self, chart_id: int, tags: List[Dict[str, Any]]) -> dict:
+        resp = requests.post(
+            f"{self.base_url}/admin/api/charts/{chart_id}/setTags",
+            cookies={"sessionid": self.session_id},
+            json={"tags": tags},
         )
         resp.raise_for_status()
         js = resp.json()

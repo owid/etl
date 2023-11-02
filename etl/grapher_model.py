@@ -318,24 +318,25 @@ class Chart(SQLModel, table=True):
         for source_var_id, source_var in source_variables.items():
             if source_var.catalogPath:
                 try:
-                    target_var = Variable.load_from_catalog_path(source_var.catalogPath, target_session)
-                    remap_ids[source_var_id] = target_var.id
+                    target_var = Variable.load_from_catalog_path(target_session, source_var.catalogPath)
                 except NoResultFound:
                     raise ValueError(f"variables.catalogPath not found in target: {source_var.catalogPath}")
             # old style variable, match it on name and dataset id
             else:
-                log.warning("migrate_to_db.variable_without_catalogPath", variable_id=source_var_id)
                 try:
                     target_var = target_session.exec(
                         select(Variable).where(
                             Variable.name == source_var.name, Variable.datasetId == source_var.datasetId
                         )
                     ).one()
-                    remap_ids[source_var_id] = target_var.id
+
                 except NoResultFound:
                     raise ValueError(
                         f"variable with name `{source_var.name}` and datasetId `{source_var.datasetId}` not found in target"
                     )
+
+            # log.debug("remap_variables", old_name=source_var.name, new_name=target_var.name)
+            remap_ids[source_var_id] = target_var.id
 
         target_chart = Chart(**self.dict())
         del target_chart.id
@@ -346,6 +347,21 @@ class Chart(SQLModel, table=True):
         target_chart.lastEditedByUserId = int(GRAPHER_USER_ID)
 
         return target_chart
+
+    def tags(self, session: Session) -> List[Dict[str, Any]]:
+        """Return tags in a format suitable for Admin API."""
+        q = """
+        select
+            tagId as id,
+            t.name,
+            ct.isApproved,
+            ct.keyChartLevel
+        from chart_tags as ct
+        join tags as t on ct.tagId = t.id
+        where ct.chartId = :chart_id
+        """
+        rows = session.execute(q, params={"chart_id": self.id}).fetchall()  # type: ignore
+        return rows
 
 
 class Dataset(SQLModel, table=True):
@@ -1150,18 +1166,9 @@ class Variable(SQLModel, table=True):
         return session.exec(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
 
     @classmethod
-    def load_from_catalog_path(cls, catalog_path: str, session: Optional[Session] = None) -> "Variable":
+    def load_from_catalog_path(cls, session: Session, catalog_path: str) -> "Variable":
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
-
-        def _run(ses: Session):
-            return ses.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
-
-        if session is None:
-            with Session(get_engine()) as session:
-                variable = _run(session)
-        else:
-            variable = _run(session)
-        return variable
+        return session.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
 
     def update_links(
         self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]

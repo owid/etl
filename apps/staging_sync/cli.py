@@ -6,8 +6,9 @@ import click
 import pandas as pd
 import structlog
 from dotenv import dotenv_values
+from rich import print
 from rich_click.rich_command import RichCommand
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlmodel import Session
 
 from etl import grapher_model as gm
@@ -67,6 +68,9 @@ def cli(
 
     Chart revisions:
         - Approved chart revisions on staging are automatically applied in target, assuming the chart has not been modified.
+
+    Tags:
+        - Tags are synced only for **new charts**.
     """
     source_engine = _get_engine_for_env(source)
     target_engine = _get_engine_for_env(target)
@@ -140,8 +144,20 @@ def cli(
                             updatedAt=dt.datetime.utcnow(),
                         )
                         if not dry_run:
-                            target_session.add(chart_revision)
-                            target_session.commit()
+                            try:
+                                target_session.add(chart_revision)
+                                target_session.commit()
+                            except IntegrityError:
+                                # chart revision already exists
+                                target_session.rollback()
+                                log.info(
+                                    "staging_sync.skip",
+                                    reason="revision already exists",
+                                    slug=target_chart.config["slug"],
+                                    chart_id=chart_id,
+                                )
+                                continue
+
                         log.info("staging_sync.create_chart_revision", slug=target_chart.config["slug"])
                 else:
                     # create new chart
@@ -150,13 +166,20 @@ def cli(
                         assert target_chart.config["isPublished"]
                         del target_chart.config["isPublished"]
 
+                    chart_tags = source_chart.tags(source_session)
+
                     if not dry_run:
                         resp = target_api.create_chart(target_chart.config)
+                        target_api.set_tags(resp["chartId"], chart_tags)
                     else:
                         resp = {"chartId": None}
                     log.info(
                         "staging_sync.create_chart", slug=target_chart.config["slug"], new_chart_id=resp["chartId"]
                     )
+
+    print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
+    print(f"[green]1.[/green] New charts were created as drafts, don't forget to publish them")
+    print(f"[green]2.[/green] Chart updates were added as chart revisions, you still have to manually approve them")
 
 
 def _get_engine_for_env(env: Path) -> Engine:
@@ -185,7 +208,7 @@ def _get_engine_for_env(env: Path) -> Engine:
 
 def _charts_configs_are_equal(config_1, config_2):
     """Compare two chart configs, ignoring their version."""
-    exclude_keys = ("version", "id")
+    exclude_keys = ("version", "id", "isPublished")
     config_1 = {k: v for k, v in config_1.items() if k not in exclude_keys}
     config_2 = {k: v for k, v in config_2.items() if k not in exclude_keys}
     return config_1 == config_2
