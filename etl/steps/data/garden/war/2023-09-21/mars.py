@@ -119,7 +119,7 @@ def run(dest_dir: str) -> None:
 
     # Get country-level data
     paths.log.info("getting country-level indicators")
-    tb_country = estimate_metrics_country_level(tb, tb_isd_countries)
+    # tb_country = estimate_metrics_country_level(tb, tb_isd_countries)
 
     log.info("war.mars: aggregate numbers at warcode level")
     tb = aggregate_wars(tb)
