@@ -109,21 +109,21 @@ table:
       observation_value:
         title: Observation value
         unit: |-
-          { definitions.unit_of_measure }
+          { definitions.unit_of_measure.unit }
         display:
           name: |-
-            {{ definitions.indicator }}
+            {{ definitions.indicator.display.name }}
       lower_bound:
         title: Lower bound
         unit: |-
-          {{ definitions.unit_of_measure }}
+          {{ definitions.unit_of_measure.unit }}
         display:
           name: |-
-            {{ definitions.indicator }}
+            {{ definitions.indicator.display.name }}
       upper_bound:
         title: Lower bound
         unit: |-
-          {{ definitions.unit_of_measure }}
+          {{ definitions.unit_of_measure.unit }}
         display:
           name: |-
-            {{ definitions.indicator }}
+            {{ definitions.indicator.display.name }}
