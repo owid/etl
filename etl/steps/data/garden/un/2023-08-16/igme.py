@@ -61,22 +61,27 @@ def run(dest_dir: str) -> None:
     tb_com = calculate_under_fifteen_deaths(tb_com)
 
     # Pivot the table so that the variables are in columns.
-    tb = pivot_table_and_format(tb)
+    # tb = pivot_table_and_format(tb)
     # Calculate post neonatal deaths
-    tb = add_post_neonatal_deaths(tb)
-    tb_com = pivot_table_and_format(tb_com)
+    # tb = add_post_neonatal_deaths(tb)
+    # tb_com = pivot_table_and_format(tb_com)
 
-    tb_com = calculate_under_fifteen_mortality_rates(tb_com)
+    # tb_com = calculate_under_fifteen_mortality_rates(tb_com)
     # Add some metadata to the variables. Getting the unit from the column name and inferring the number of decimal places from the unit.
     # If it contains " per " we know it is a rate and should have 1 d.p., otherwise it should be an integer.
 
-    tb = add_metadata_and_set_index(tb)
-    tb_com = add_metadata_and_set_index(tb_com)
+    # tb = add_metadata_and_set_index(tb)
+    # tb_com = add_metadata_and_set_index(tb_com)
 
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_com], default_metadata=ds_meadow.metadata)
+    tb = tb.set_index(
+        ["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"], verify_integrity=True
+    ).drop(columns=["source"])
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
