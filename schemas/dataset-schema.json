@@ -226,6 +226,7 @@
       "additionalProperties": false
     }
   },
+  "additionalProperties": false,
   "properties": {
     "definitions": {
       "type": "object",
@@ -1664,6 +1665,7 @@
           }
         }
       }
-    }
+    },
+    "all_sources": {}
   }
 }
