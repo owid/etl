@@ -11,14 +11,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("who_cvd")
+    ds_garden = paths.load_dataset("deaths_from_cardiovascular_diseases_vs_other")
 
     # Read table from garden dataset.
-    tb = ds_garden["who_cvd"]
-
-    #
-    # Process data.
-    #
+    tb = ds_garden["deaths_from_cardiovascular_diseases_vs_other"]
 
     #
     # Save outputs.
