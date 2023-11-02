@@ -136,8 +136,8 @@ def cli(
                             originalConfig=existing_chart.config,
                             suggestedConfig=target_chart.config,
                             status="pending",
-                            createdAt=dt.datetime.now(),
-                            updatedAt=dt.datetime.now(),
+                            createdAt=dt.datetime.utcnow(),
+                            updatedAt=dt.datetime.utcnow(),
                         )
                         if not dry_run:
                             target_session.add(chart_revision)
