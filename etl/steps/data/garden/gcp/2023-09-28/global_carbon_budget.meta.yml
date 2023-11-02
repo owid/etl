@@ -1,7 +1,3 @@
-dataset:
-  title: Global Carbon Budget
-  update_period_days: 365
-
 definitions:
   production_emissions_description_key: &production_emissions_description_key
     - This data is based on territorial emissions, which do not account for emissions embedded in traded goods.
@@ -28,6 +24,13 @@ definitions:
       # NOTE: The description key points are re-defined for each indicator on consumption-based emissions and traded emissions, as well as on per-capita indicators.
       - *production_emissions_description_key
       - *international_aviation_description_key
+    presentation:
+      topic_tags:
+      - CO2 & Greenhouse Gas Emissions
+
+dataset:
+  title: Global Carbon Budget
+  update_period_days: 365
 
 tables:
   global_carbon_budget:

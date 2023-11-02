@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - CO2 & Greenhouse Gas Emissions
+
 dataset:
   update_period_days: 365
 

@@ -149,6 +149,19 @@ tables:
           <<: *common-display
 ```
 
+You can also specify `common` for individual tables that would overwrite the `common` section under `definitions`.
+
+```yaml
+tables:
+  my_table:
+    common:
+      display:
+        numDecimalPlaces: 1
+
+    variables:
+      ...
+```
+
 
 ## Dynamic YAML
 

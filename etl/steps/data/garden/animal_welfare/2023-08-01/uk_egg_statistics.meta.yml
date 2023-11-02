@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+
 dataset:
   title: "UK egg statistics (Defra, 2023)"
 

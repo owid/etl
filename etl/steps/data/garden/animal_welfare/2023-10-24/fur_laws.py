@@ -164,6 +164,19 @@ def run(dest_dir: str) -> None:
     # Fix inconsistent data points.
     tb = fix_inconsistencies(tb=tb)
 
+    ####################################################################################################################
+    # Manually fix some issues pointed out by the Fur Free Alliance (by email).
+    # * Sweden should be labeled as "Partial" for fur farming ban.
+    # * New Zealand should be labeled as "Partial" for fur farming ban.
+    # First check that they are currently labeled as "Not banned" (in case it changes in an update).
+    error = "Expected Sweden to be labeled as 'Not banned'; remove temporary fix."
+    assert tb.loc[tb["country"] == "Sweden", "fur_farming_status"].item() == "Not banned", error
+    tb.loc[tb["country"] == "Sweden", "fur_farming_status"] = "Partially banned"
+    error = "Expected New Zealand to be labeled as 'Not banned'; remove temporary fix."
+    assert tb.loc[tb["country"] == "New Zealand", "fur_farming_status"].item() == "Not banned"
+    tb.loc[tb["country"] == "New Zealand", "fur_farming_status"] = "Partially banned"
+    ####################################################################################################################
+
     # Run sanity checks.
     run_sanity_checks(tb=tb)
 

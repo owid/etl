@@ -2631,20 +2631,35 @@ tables:
         title: GDP per capita (current US$)
         short_unit: $
         unit: current US$
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_cn:
         title: GDP per capita (current LCU)
         unit: current LCU
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_kd:
         title: GDP per capita (constant 2015 US$)
         short_unit: $
         unit: constant 2015 US$
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_kd_zg:
         title: GDP per capita growth (annual %)
         short_unit: '%'
         unit: annual %
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_kn:
         title: GDP per capita (constant LCU)
         unit: constant LCU
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_pp_cd:
         title: GDP per capita, PPP (current international $)
         short_unit: $
@@ -2652,6 +2667,9 @@ tables:
         display:
           name: GDP per capita
           numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_pp_kd:
         title: GDP per capita, PPP (constant 2017 international $)
         short_unit: $
@@ -2661,6 +2679,9 @@ tables:
           tolerance: 5
           isProjection: false
           numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_petr_rt_zs:
         title: Oil rents (% of GDP)
         short_unit: '%'

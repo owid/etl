@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Natural Disasters
+
 dataset:
   title: Natural disasters
 
@@ -55,6 +61,9 @@ tables:
       population:
         title: Population
         unit: 'people'
+        presentation:
+          topic_tags:
+            - Uncategorized
       total_dead_per_100k_people:
         title: Total number of deaths per 100,000 people
         unit: 'cases per 100k people'
@@ -86,6 +95,9 @@ tables:
         short_unit: "$"
         description_processing: &description-processing-gdp |
           Our World in Data has calculated economic damage metrics adjusted for gross domestic product (GDP).
+        presentation:
+          topic_tags:
+            - Uncategorized
       reconstruction_costs_per_gdp:
         title: "Reconstruction costs from natural disasters as a share of GDP"
         unit: "%"

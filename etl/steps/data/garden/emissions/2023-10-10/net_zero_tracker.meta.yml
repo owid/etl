@@ -12,6 +12,9 @@ definitions:
     description_from_producer: "More detail about each indicator is available in [the Tracker Codebook](https://docs.google.com/document/d/13bGE8FCOeF5QweoOvyMPZi3XbZrGLEPL2aM04LuZQcc/edit?usp=sharing)."
     unit: ""
     short_unit: ""
+  presentation:
+    topic_tags:
+    - CO2 & Greenhouse Gas Emissions
 
 dataset:
   update_period_days: 365
