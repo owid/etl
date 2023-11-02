@@ -133,7 +133,7 @@ tables:
   government_revenue_dataset:
     variables:
       rev_inc_sc:
-        title: Revenue including social contributions
+        title: Revenue including social contributions (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: Includes taxes, non-tax revenue, social contributions, and grants.
@@ -142,7 +142,7 @@ tables:
           name: Revenue including social contributions
           <<: *common-display
       rev_ex_sc:
-        title: Revenue excluding social contributions
+        title: Revenue excluding social contributions (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: Includes taxes, non-tax revenue, and grants.
@@ -151,7 +151,7 @@ tables:
           name: Revenue excluding social contributions
           <<: *common-display
       rev_ex_gr_inc_sc:
-        title: Revenue excluding grants and including social contributions
+        title: Revenue excluding grants and including social contributions (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: Includes taxes, non-tax revenue, and social contributions.
@@ -160,7 +160,7 @@ tables:
           name: Revenue excluding grants and including social contributions
           <<: *common-display
       rev_ex_gr_ex_sc:
-        title: Revenue excluding grants and excluding social contributions
+        title: Revenue excluding grants and excluding social contributions (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: Includes taxes and non-tax revenue.
@@ -169,7 +169,7 @@ tables:
           name: Revenue excluding grants and excluding social contributions
           <<: *common-display
       tot_res_rev:
-        title: Total resource revenue
+        title: Total resource revenue (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: "{definitions.revenue}"
@@ -177,7 +177,7 @@ tables:
           name: Total resource revenue
           <<: *common-display
       tot_nres_rev_inc_sc:
-        title: Total non-resource revenue including social contributions
+        title: Total non-resource revenue including social contributions (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: Includes taxes minus resource taxes, non-tax revenue excluding resource component, and social contributions.
@@ -186,7 +186,7 @@ tables:
           name: Total non-resource revenue including social contributions
           <<: *common-display
       tax_inc_sc:
-        title: Taxes including social contributions
+        title: Taxes including social contributions (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: "{definitions.total_taxes}"
@@ -194,7 +194,7 @@ tables:
           name: Taxes including social contributions
           <<: *common-display
       tax_ex_sc:
-        title: Taxes excluding social contributions
+        title: Taxes excluding social contributions (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: "{definitions.total_taxes}"
@@ -202,7 +202,7 @@ tables:
           name: Taxes excluding social contributions
           <<: *common-display
       resourcetaxes:
-        title: Resource taxes
+        title: Resource taxes (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: Refers mostly to corporate taxation of resource extraction.
@@ -211,7 +211,7 @@ tables:
           name: Resource taxes
           <<: *common-display
       nrtax_inc_sc:
-        title: Non-resource taxes including social contributions
+        title: Non-resource taxes including social contributions (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: Includes taxes and social contributions, minus resource taxes.
@@ -220,7 +220,7 @@ tables:
           name: Non-resource taxes including social contributions
           <<: *common-display
       nrtax_ex_sc:
-        title: Non-resource taxes excluding social contributions
+        title: Non-resource taxes excluding social contributions (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: Includes taxes minus resource taxes.
@@ -229,7 +229,7 @@ tables:
           name: Non-resource taxes excluding social contributions
           <<: *common-display
       direct_inc_sc_inc_rt:
-        title: Direct taxes including social contributions and resource revenue
+        title: Direct taxes including social contributions and resource revenue (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: It is defined as total direct tax plus social contributions.
@@ -238,7 +238,7 @@ tables:
           name: Direct taxes including social contributions and resource revenue
           <<: *common-display
       direct_inc_sc_ex_rt:
-        title: Direct taxes including social contributions and excluding resource revenue
+        title: Direct taxes including social contributions and excluding resource revenue (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: It is defined as total direct tax plus social contributions minus resource taxes.
@@ -247,7 +247,7 @@ tables:
           name: Direct taxes including social contributions and excluding resource revenue
           <<: *common-display
       direct_ex_sc_inc_rt:
-        title: Direct taxes excluding social contributions and including resource revenue
+        title: Direct taxes excluding social contributions and including resource revenue (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: It is composed of total direct tax only.
@@ -256,7 +256,7 @@ tables:
           name: Direct taxes excluding social contributions and including resource revenue
           <<: *common-display
       direct_ex_sc_ex_rt:
-        title: Direct taxes excluding social contributions and resource revenue
+        title: Direct taxes excluding social contributions and resource revenue (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: It is defined as total direct tax minus resource taxes.
@@ -265,7 +265,7 @@ tables:
           name: Direct taxes excluding social contributions and resource revenue
           <<: *common-display
       tax_income:
-        title: Taxes on income, profits and capital gains (TIPCG)
+        title: Taxes on income, profits and capital gains (TIPCG) (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -276,7 +276,7 @@ tables:
           name: Taxes on income, profits and capital gains
           <<: *common-display
       tax_res_income:
-        title: Resource component of taxes on income, profits, and capital gains
+        title: Resource component of taxes on income, profits, and capital gains (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -287,7 +287,7 @@ tables:
           name: Resource component of taxes on income, profits, and capital gains
           <<: *common-display
       tax_nr_income:
-        title: Non-resource component of taxes on income, profits, and capital gains
+        title: Non-resource component of taxes on income, profits, and capital gains (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -298,7 +298,7 @@ tables:
           name: Non-resource component of taxes on income, profits, and capital gains
           <<: *common-display
       tax_indiv:
-        title: Taxes on individuals (PIT)
+        title: Taxes on individuals (PIT) (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -309,7 +309,7 @@ tables:
           name: Taxes on individuals
           <<: *common-display
       tax_corp:
-        title: Taxes on corporations and other enterprises (CIT)
+        title: Taxes on corporations and other enterprises (CIT) (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -320,7 +320,7 @@ tables:
           name: Taxes on corporations and other enterprises
           <<: *common-display
       tax_res_corp:
-        title: Resource component of taxes on corporations and other enterprises
+        title: Resource component of taxes on corporations and other enterprises (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -331,7 +331,7 @@ tables:
           name: Resource component of taxes on corporations and other enterprises
           <<: *common-display
       tax_nr_corp:
-        title: Non-resource component of taxes on corporations and other enterprises
+        title: Non-resource component of taxes on corporations and other enterprises (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: It is defined as the taxes of corporations and other enterprises (CIT) minus the CIT from natural resources.
@@ -343,7 +343,7 @@ tables:
           name: Non-resource component of taxes on corporations and other enterprises
           <<: *common-display
       tax_payr_workf:
-        title: Taxes on payroll and workforce
+        title: Taxes on payroll and workforce (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -354,7 +354,7 @@ tables:
           name: Taxes on payroll and workforce
           <<: *common-display
       tax_property:
-        title: Taxes on property
+        title: Taxes on property (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -365,7 +365,7 @@ tables:
           name: Taxes on property
           <<: *common-display
       tax_indirect:
-        title: Indirect taxes
+        title: Indirect taxes (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: Includes taxes on goods and services, international trade and transactions, and other taxes. It may include a resource component.
@@ -374,7 +374,7 @@ tables:
           name: Indirect taxes
           <<: *common-display
       res_indirect:
-        title: Resource component of indirect taxes
+        title: Resource component of indirect taxes (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: Includes export taxes on natural resources, where separately reported.
@@ -383,7 +383,7 @@ tables:
           name: Resource component of indirect taxes
           <<: *common-display
       nr_indirect:
-        title: Non-resource component of indirect taxes
+        title: Non-resource component of indirect taxes (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: Includes taxes on goods and services, international trade and transactions, and other taxes net of any resource component.
@@ -392,7 +392,7 @@ tables:
           name: Non-resource component of indirect taxes
           <<: *common-display
       tax_g_s:
-        title: Taxes on goods and services
+        title: Taxes on goods and services (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -403,7 +403,7 @@ tables:
           name: Taxes on goods and services
           <<: *common-display
       tax_gs_general:
-        title: General taxes on goods and services
+        title: General taxes on goods and services (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: It is defined as the sum of value-added taxes (VAT), sales tax, turnover tax and tax on financial and capital transactions.
@@ -415,7 +415,7 @@ tables:
           name: General of taxes on goods and services
           <<: *common-display
       vat:
-        title: Value-added taxes (VAT)
+        title: Value-added taxes (VAT) (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -426,7 +426,7 @@ tables:
           name: Value-added taxes (VAT)
           <<: *common-display
       tax_gs_excises:
-        title: Excise duties
+        title: Excise duties (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -437,7 +437,7 @@ tables:
           name: Excise duties
           <<: *common-display
       tax_trade:
-        title: Taxes on international trade and transactions
+        title: Taxes on international trade and transactions (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_short: Includes taxes on imports and exports, plus other taxes on international trade.
@@ -449,7 +449,7 @@ tables:
           name: Taxes on international trade and transactions
           <<: *common-display
       tax_trade_import:
-        title: Taxes on imports
+        title: Taxes on imports (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -460,7 +460,7 @@ tables:
           name: Taxes on imports
           <<: *common-display
       tax_trade_export:
-        title: Taxes on exports
+        title: Taxes on exports (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -471,7 +471,7 @@ tables:
           name: Taxes on exports
           <<: *common-display
       tax_other:
-        title: Other taxes
+        title: Other taxes (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: |
@@ -482,7 +482,7 @@ tables:
           name: Other taxes
           <<: *common-display
       nontax:
-        title: Non-tax revenue
+        title: Non-tax revenue (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: "{definitions.non_tax_revenue}"
@@ -490,7 +490,7 @@ tables:
           name: Non-tax revenue
           <<: *common-display
       res_nontax:
-        title: Resource component of non-tax revenue
+        title: Resource component of non-tax revenue (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: "{definitions.non_tax_revenue}"
@@ -498,7 +498,7 @@ tables:
           name: Resource component of non-tax revenue
           <<: *common-display
       nr_nontax:
-        title: Non-resource component of non-tax revenue
+        title: Non-resource component of non-tax revenue (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: "{definitions.non_tax_revenue}"
@@ -506,7 +506,7 @@ tables:
           name: Non-resource component of non-tax revenue
           <<: *common-display
       sc:
-        title: Social contributions
+        title: Social contributions (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: "{definitions.social_contributions}"
@@ -514,7 +514,7 @@ tables:
           name: Social contributions
           <<: *common-display
       grants:
-        title: Grants received
+        title: Grants received (as a share of GDP)
         unit: "%"
         short_unit: "%"
         description_from_producer: "{definitions.grants}"
