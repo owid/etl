@@ -1,4 +1,8 @@
 definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Child & Infant Mortality
   sex: |-
     <% if sex == "Both sexes" %>
 
