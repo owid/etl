@@ -20,7 +20,18 @@ class AdminAPI(object):
             self.session_id = _create_user_session(session, user.email)
             session.commit()
 
-        self.base_url = f"http://{engine.url.host}"
+        if engine.url.database == "live_grapher" and engine.url.host == "owid-live-db":
+            self.base_url = "https://owid.cloud"
+        else:
+            self.base_url = f"http://{engine.url.host}"
+
+    def get_chart_config(self, chart_id: int) -> dict:
+        resp = requests.get(
+            f"{self.base_url}/admin/api/charts/{chart_id}.config.json",
+            cookies={"sessionid": self.session_id},
+        )
+        resp.raise_for_status()
+        return resp.json()
 
     def create_chart(self, chart_config: dict) -> dict:
         resp = requests.post(

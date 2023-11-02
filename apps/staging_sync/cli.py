@@ -6,21 +6,22 @@ import click
 import pandas as pd
 import structlog
 from dotenv import dotenv_values
+from rich_click.rich_command import RichCommand
 from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session
 
 from etl import grapher_model as gm
 from etl.config import GRAPHER_USER_ID
-from etl.db import get_engine
+from etl.db import Engine, get_engine
 
 from .admin_api import AdminAPI
 
 log = structlog.get_logger()
 
 
-@click.command()
-@click.argument("source_env", type=Path)
-@click.argument("target_env", type=Path)
+@click.command(cls=RichCommand, help=__doc__)
+@click.argument("source", type=Path)
+@click.argument("target", type=Path)
 @click.option(
     "--chart-id",
     type=int,
@@ -45,14 +46,16 @@ log = structlog.get_logger()
     help="Do not write to target database.",
 )
 def cli(
-    source_env: Path,
-    target_env: Path,
+    source: Path,
+    target: Path,
     chart_id: Optional[int],
     publish: bool,
     need_revision: bool,
     dry_run: bool,
 ) -> None:
-    """Syncs grapher charts and revisions modified by Admin user from source_env to target_env. (Admin user is used by staging servers)
+    """Syncs grapher charts and revisions modified by Admin user from source_env to target_env. (Admin user is used by staging servers).
+
+    SOURCE and TARGET can be either paths to .env file or name of a staging server.
 
     Charts:
         - New charts are automatically created in target_env.
@@ -65,10 +68,10 @@ def cli(
     Chart revisions:
         - Approved chart revisions on staging are automatically applied in target, assuming the chart has not been modified.
     """
-    source_engine = get_engine(dotenv_values(str(source_env)))
-    target_engine = get_engine(dotenv_values(str(target_env)))
+    source_engine = _get_engine_for_env(source)
+    target_engine = _get_engine_for_env(target)
 
-    target_api = AdminAPI(target_engine)
+    target_api: AdminAPI = AdminAPI(target_engine) if not dry_run else None  # type: ignore
 
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
@@ -103,8 +106,16 @@ def cli(
 
                     # revision must be approved and be created after chart latest edit
                     revs = [
-                        rev for rev in revs if rev.status == "approved" and rev.createdAt > existing_chart.updatedAt
+                        rev
+                        for rev in revs
+                        # min(rev.createdAt, rev.updatedAt) is needed because of a bug in chart revisions, it should be fixed soon
+                        if rev.status == "approved"
+                        and rev.updatedBy == 1
+                        and min(rev.createdAt, rev.updatedAt) > existing_chart.updatedAt
                     ]
+
+                    # Chart must not be updated after this revision - if it is updated, we send it for revision
+                    revs = [rev for rev in revs if rev.updatedAt >= source_chart.updatedAt]
 
                     # if there's no revision or a flag --no-need-revision, update the chart directly
                     if not need_revision or revs:
@@ -146,6 +157,30 @@ def cli(
                     log.info(
                         "staging_sync.create_chart", slug=target_chart.config["slug"], new_chart_id=resp["chartId"]
                     )
+
+
+def _get_engine_for_env(env: Path) -> Engine:
+    # env exists as a path
+    if env.exists():
+        config = dotenv_values(str(env))
+    # env could be server name
+    else:
+        staging_name = str(env)
+
+        # add staging-site- prefix
+        if not staging_name.startswith("staging-site-"):
+            staging_name = "staging-site-" + staging_name
+
+        # generate config for staging server
+        config = {
+            "DB_USER": "owid",
+            "DB_NAME": "owid",
+            "DB_PASS": "",
+            "DB_PORT": "3306",
+            "DB_HOST": staging_name,
+        }
+
+    return get_engine(config)
 
 
 def _charts_configs_are_equal(config_1, config_2):
