@@ -90,7 +90,7 @@ def run(dest_dir: str) -> None:
     # Read table from COW codes
     ds_isd = paths.load_dataset("isd")
     tb_regions = ds_isd["isd_regions"].reset_index()
-    tb_isd_countries = ds_isd["isd_countries"]
+    # tb_isd_countries = ds_isd["isd_countries"]
 
     #
     # Process data.
