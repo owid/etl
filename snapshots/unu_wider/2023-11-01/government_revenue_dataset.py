@@ -1,7 +1,7 @@
 """Script to create a snapshot of the UNU-WIDER Government Revenue Dataset.
 
 Steps to obtain the data:
-- Go to https://www.wider.unu.edu/database/government-revenue-dataset
+- Go to https://www.wider.unu.edu/project/grd-government-revenue-dataset
 - Click on `Access full and additional datasets here`
 - Fill the form and submit
 - Download the Full dataset (Stata format). The name of the file should be similar to UNUWIDERGRD_{year}.dta_.zip
