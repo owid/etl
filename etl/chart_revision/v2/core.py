@@ -223,8 +223,8 @@ def create_chart_comparison(config_1: Dict[str, Any], config_2: Dict[str, Any]) 
         originalConfig=config_1,
         suggestedConfig=config_2,
         status="pending",
-        createdAt=datetime.now(),
-        updatedAt=datetime.now(),
+        createdAt=datetime.utcnow(),
+        updatedAt=datetime.utcnow(),
     )
 
 

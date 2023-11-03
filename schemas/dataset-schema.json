@@ -226,6 +226,7 @@
       "additionalProperties": false
     }
   },
+  "additionalProperties": false,
   "properties": {
     "definitions": {
       "type": "object",
@@ -361,6 +362,10 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "common": {
+            "description": "Metadata that will be merged with all indicators. Does not overwrite existing metadata.",
+            "$ref": "#/properties/tables/additionalProperties/properties/variables/additionalProperties"
+          },
           "title": {
             "type": "string",
             "title": "Title of the ETL table",
@@ -1660,6 +1665,7 @@
           }
         }
       }
-    }
+    },
+    "all_sources": {}
   }
 }
