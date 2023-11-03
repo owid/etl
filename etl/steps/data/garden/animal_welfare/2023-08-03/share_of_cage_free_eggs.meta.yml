@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+
 dataset:
   title: "Share of cage-free eggs (Various sources, 2023)"
 

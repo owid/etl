@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Human Development Index (HDI)
+
 common:
   entity_annotations: "Western offshoots (AHDI): United States, Canada, Australia and New Zealand"
 dataset:

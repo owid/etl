@@ -4,6 +4,9 @@ definitions:
       - This data primarily focuses on economic instruments targeting carbon dioxide (CO₂) emissions.
       - In some cases these instruments also cover other greenhouse gases. However, any pricing mechanisms that specifically target non-CO₂ gases (such as methane or nitrous oxide) are not included.
       - A country is considered to have a carbon tax or emissions trading system if at least one IPCC sector or gas is covered by the instrument. These instruments do not need to cover all sectors within the economy for this to apply.
+  presentation:
+    topic_tags:
+    - CO2 & Greenhouse Gas Emissions
 
 dataset:
   update_period_days: 365
