@@ -87,7 +87,11 @@ definitions:
       <% elif indicator == "Mortality rate age 5-14" %>
       The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
       <% elif indicator == "Post-neonatal deaths" %>
-      The estimated number of deaths of {definitions.sex} childrean aged between 28 days and 1 year, in {definitions.wealth_quintile}
+      The estimated number of deaths of {definitions.sex} children aged between 28 days and 1 year, in {definitions.wealth_quintile}
+      <% elif indicator == "Under-fifteen deaths" %>
+      The estimated number of deaths of {definitions.sex} children aged under fifteen years, in {definitions.wealth_quintile}
+      <% elif indicator == "Under-fifteen mortality rate" %>
+      The estimated number of deaths of {definitions.sex} children aged under fifteen years, per 1,000 live births, in {definitions.wealth_quintile}
       <%- endif -%>
 tables:
   igme:
@@ -119,10 +123,12 @@ tables:
   igme_under_fifteen_mortality:
     variables:
       obs_value:
-        title: Under fifteen mortality rate
+        title: Under fifteen mortality
         description_processing: This indicator is processed by OWID based on the original data source. It is a combination of the under-five mortality rate and the 5-14 mortality rate.
         unit: deaths per 1,000 live births
         display:
+          name: |-
+            {definitions.indicator.display_name}
           numDecimalPlaces: 1
         sources:
           - name: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2023)
