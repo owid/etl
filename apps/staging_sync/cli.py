@@ -203,8 +203,8 @@ def cli(
                     )
 
     print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
-    print(f"[green]1.[/green] New charts were created as drafts, don't forget to publish them")
-    print(f"[green]2.[/green] Chart updates were added as chart revisions, you still have to manually approve them")
+    print("[green]1.[/green] New charts were created as drafts, don't forget to publish them")
+    print("[green]2.[/green] Chart updates were added as chart revisions, you still have to manually approve them")
 
 
 def _get_engine_for_env(env: Path) -> Engine:
