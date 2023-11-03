@@ -97,7 +97,7 @@ tables:
         display:
           name: |-
             {definitions.indicator.display_name}
-          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%>
+          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%> # yaml-language-server: $schema=ignore
       lower_bound:
         title: Lower bound
         unit: |-
