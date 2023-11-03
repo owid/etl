@@ -28,7 +28,9 @@ tables:
         description_processing: >
           Processing involved calculating total number of AI systems developed within each category of reseacher affiliation for each year.
 
+
           To streamline the categorization of researcher affiliations, the original data underwent the following transformations:
+
 
           **Consolidating Collaborations**:
             - All variations of "Industry - Academia Collaboration" entries, regardless of their capitalization or leaning (towards academia or industry), were unified into a single "Collaboration" category.
@@ -37,7 +39,6 @@ tables:
             - Affiliations explicitly labeled as "Research Collective" or "research collective", as well as those under "Government" and "Non-profit", were re-categorized under the "Other" label.
 
           The aforementioned changes were implemented to make visualizations more coherent and concise.
-
         display:
           numDecimalPlaces: 0
       cumulative_count:
@@ -50,7 +51,9 @@ tables:
         description_processing: >
           For each year starting from 1950, the total number of AI systems in each resercher affiliation category was calculated by adding that year's count to the previous years' counts. This provides a running total or cumulative count of AI systems for each year and researcher affiliation.
 
+
           To streamline the categorization of researcher affiliations, the original data underwent the following transformations:
+
 
           **Consolidating Collaborations**:
             - All variations of "Industry - Academia Collaboration" entries, regardless of their capitalization or leaning (towards academia or industry), were unified into a single "Collaboration" category.

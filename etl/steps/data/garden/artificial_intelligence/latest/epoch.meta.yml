@@ -23,9 +23,9 @@ tables:
         short_unit: ''
         description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
         description_processing: >
-          To streamline the categorization of domains, domain categories with less than a total of five notable AI systems since 1950 were grouped under the "Other" label. The following domains were re-categorized under "Other":
-
-          - 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio, Robotics
+          To streamline the categorization of domains, domain categories with less than a total of five notable AI systems since 1950 were grouped under the "Other" label.
+          The following domains were re-categorized under "Other":
+            - 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio, Robotics
 
           The aforementioned changes were implemented to make visualizations more coherent and concise.
         display:
@@ -40,6 +40,7 @@ tables:
             Systems are classified as "Industry" when their authors have ties to private sector entities, "Academia" when the authors come from universities or scholarly institutions, and "Industry - Academia Collaboration" if a minimum of 30% of the authors represent each sector.
         description_processing: >
           To streamline the categorization of researcher affiliations, the original data underwent the following transformations:
+
 
           **Consolidating Collaborations**:
             - All variations of "Industry - Academia Collaboration" entries, regardless of their capitalization or leaning (towards academia or industry), were unified into a single "Collaboration" category.
