@@ -2,81 +2,99 @@ tables:
   iucn_animal:
     variables:
       ex:
-        title: Extinct animal species
+        title: Extinct (EX) animal species
+        description_short: The total number of species that have been classified as extinct by the IUCN Red List.
+        description_from_producer: A taxon is Extinct (EX) when there is no reasonable doubt that the last individual has died. A taxon is presumed Extinct when exhaustive surveys in known and/or expected habitat, at appropriate times (diurnal, seasonal, annual), throughout its historic range have failed to record an individual. Surveys should be over a time frame appropriate to the taxon’s life cycle and life form.
         unit: species
         display:
           numDecimalPlaces: 0
       ew:
-        title: Extinct in the wild animal species
+        title: Extinct in the wild (EW) animal species
+        description_short: The total number of species that have been classified as extinct in the wild by the IUCN Red List.
+        description_from_producer: A taxon is Extinct In The Wild (EW) when it is known only to survive in cultivation, in captivity or as a naturalized population (or populations) well outise the past range. A taxon is presumed Extinct In The Wild  when exhaustive surveys in known and/or expected habitat, at appropriate times (diurnal, seasonal, annual), throughout its historic range have failed to record an individual. Surveys should be over a time frame appropriate to the taxon’s life cycle and life form.
         unit: species
         display:
           numDecimalPlaces: 0
       subtotal__explusew:
-        title: Extinct plus extinct in the wild animal species
+        title: Extinct (EX) plus extinct in the wild (EW) animal species
+        description_short: The total number of species that have been classified as extinct or extinct in the wild by the IUCN Red List.
         unit: species
         display:
           numDecimalPlaces: 0
       cr__pe:
         title: Critically endangered animal species (probably extinct)
-        description: This is not an IUCN Red List Category; it is a tag that has be attached to the CR category to highlight those taxa that are possibly extinct. They are included in the above table to indicate a plausible upper estimate for number of recently extinct species on The IUCN Red List.
+        description_short: This is not an IUCN Red List Category; it is a tag that has be attached to the critically endangered category to highlight those taxa that are possibly extinct. They are included in the above table to indicate a plausible upper estimate for number of recently extinct species on The IUCN Red List.
         unit: species
         display:
           numDecimalPlaces: 0
       cr__pew:
         title: Critically endangered animal species (probably extinct in the wild)
-        description: This is not an IUCN Red List Category; it is a tag that has be attached to the CR category to highlight those taxa that are possibly extinct. They are included in the above table to indicate a plausible upper estimate for number of recently extinct species on The IUCN Red List.
+        description_short: This is not an IUCN Red List Category; it is a tag that has be attached to the critically endangered category to highlight those taxa that are possibly extinct. They are included in the above table to indicate a plausible upper estimate for number of recently extinct species on The IUCN Red List.
         unit: species
         display:
           numDecimalPlaces: 0
       subtotal__explusewplus_cr__pe__pluscr__pew:
-        title: Subtotal of extinct plus extinct in the wild plus critically endangered animal species (that are probably extinct or probably extinct in the wild)
-        unit: ''
+        title: Subtotal of extinct species plus extinct in the wild species plus critically endangered animal species (that are probably extinct or probably extinct in the wild)
+        unit: species
         display:
           numDecimalPlaces: 0
       cr:
-        title: Critically endangered animal species
-        description: This includes those that are CR probably extinct and CR probably extinct in the wild.
+        title: Critically (CR) endangered animal species
+        description_short: The total number of species that have been classified as critically endangered by the IUCN Red List.
+        description_from_producer: A taxon is Critically Endangered (CR) when the best available evidence indicates that it meets any of the criteria A to E for Critically Endangered (see Section V), and it is therefore considered to be facing an extremely high risk of extinction in the wild.
         unit: species
         display:
           numDecimalPlaces: 0
       en:
-        title: Endangered animal species
+        title: Endangered (EN) animal species
+        description_short: The total number of species that have been classified as endangered by the IUCN Red List.
+        description_from_producer: A taxon is Endangered (EN) when the best available evidence indicates that it meets any of the criteria A to E for Endangered (see Section V), and it is therefore considered to be facing a very high risk of extinction in the wild.
         unit: species
         display:
           numDecimalPlaces: 0
       vu:
-        title: Vulnerable animal species
-        unit: ''
+        title: Vulnerable (VU) animal species
+        description_short: The total number of species that have been classified as vulnerable by the IUCN Red List.
+        description_from_producer: A taxon is Vulnerable (VU) when the best available evidence indicates that it meets any of the criteria A to E for Vulnerable (see Section V), and it is therefore considered to be facing a high risk of extinction in the wild.
+        unit: species
         display:
           numDecimalPlaces: 0
       subtotal__threatened_spp:
         title: Threatened animal species
-        description: The sum of vulnerable, endangered and critically endangered species.
+        description_short: In the IUCN Red List, "threatened" embraces the categories of Critically Endangered, Endangered, and Vulnerable.
         unit: species
         display:
           numDecimalPlaces: 0
       lr_cd:
         title: Lower risk conservation dependent animal species
+        description_short: A conservation-dependent species is a species which has been categorized as "Conservation Dependent" ("LR/cd") by the International Union for Conservation of Nature (IUCN), as dependent on conservation efforts to prevent it from becoming endangered.
         unit: species
         display:
           numDecimalPlaces: 0
       nt_or_lr_nt:
         title: Near threatened or lower risk near threatened animal species
+        description_short: The total number of species that have been classified as near threatened or lower risk near threatened by the IUCN Red List.
+        description_from_producer: A taxon is Near Threatened (NT) when it has been evaluated against the criteria but does not qualify for Critically Endangered, Endangered or Vulnerable now, but is close to qualifying for or is likely to qualify for a threatened category in the near future.
         unit: species
         display:
           numDecimalPlaces: 0
       lc_or_lr_lc:
-        title: Leact concern or lower risk/least concern animal species
+        title: Least concern or lower risk least concern animal species
+        description_short: The total number of species that have been classified as least concern or lower risk least concern by the IUCN Red List.
+        description_from_producer: A taxon is Least Concern (LC) when it has been evaluated against the criteria and does not qualify for Critically Endangered, Endangered, Vulnerable or Near Threatened. Widespread and abundant taxa are included in this category.
         unit: species
         display:
           numDecimalPlaces: 0
       dd:
         title: Data deficient animal species
+        description_short: The total number of species that have been classified as data deficient by the IUCN Red List.
+        description_from_producer: A taxon is Data Deficient (DD) when there is inadequate information to make a direct, or indirect, assessment of its risk of extinction based on its distribution and/or population status. A taxon in this category may be well studied, and its biology well known, but appropriate data on abundance and/or distribution are lacking.
         unit: species
         display:
           numDecimalPlaces: 0
       total:
         title: Total animal species listed in the IUCN Red List
+        description_short: The total number of species that have been assessed by the IUCN Red List.
         unit: species
         display:
           numDecimalPlaces: 0

@@ -8,7 +8,7 @@ meta:
   url: https://www.iucnredlist.org/statistics
   source_data_url:
   license_url: https://www.iucnredlist.org/terms/terms-of-use
-  license_name: ""
+  license_name: CC BY 4.0
   date_accessed: 2023-08-14
   is_public: true
   description: |
