@@ -86,6 +86,8 @@ definitions:
       The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
       <% elif indicator == "Mortality rate age 5-14" %>
       The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
+      <% elif indicator == "Post-neonatal deaths" %>
+      The estimated number of deaths of {definitions.sex} childrean aged between 28 days and 1 year, in {definitions.wealth_quintile}
       <%- endif -%>
 tables:
   igme:
