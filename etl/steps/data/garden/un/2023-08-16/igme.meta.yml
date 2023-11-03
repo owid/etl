@@ -4,7 +4,7 @@ definitions:
       topic_tags:
         - Child & Infant Mortality
   sex: |-
-    <% if sex == "Both sexes" %><% elif sex == "Male" %>male<% elif sex == "Female" %>female<%- endif -%>
+    <% if sex == "Both sexes" %><% elif sex == "Male" %>male <% elif sex == "Female" %>female <%- endif -%>
   wealth_quintile: |-
     <% if wealth_quintile == "All wealth quintiles" %>all wealth quintiles<% elif wealth_quintile == "Poorest quintile" %>the poorest 20% of the population<% elif wealth_quintile == "Second poorest quintile" %>the second poorest 20% of the population<% elif wealth_quintile == "Middle wealth quintile" %>the middle 20% of the population in terms of wealth<% elif wealth_quintile == "Fourth poorest quintile" %>the second richest 20% of the population<% elif wealth_quintile == "Richest quintile" %>the richest 20% of the population<%- endif -%>
   unit_of_measure:
@@ -66,26 +66,28 @@ definitions:
       The estimated number of deaths of {definitions.sex} children aged less than 28 days, in {definitions.wealth_quintile}
       <% elif indicator == "Deaths 1-59 months" %>
       The estimated number of deaths of {definitions.sex} children aged between 1 and 59 months, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 1,000 children aged 5, in {definitions.wealth_quintile}
+      <% elif indicator == "Infant deaths" %>
+      The estimated number of deaths of {definitions.sex} children aged under 1, in {definitions.wealth_quintile}
+      <% elif indicator == "Under-five deaths" %>
+      The estimated number of deaths of {definitions.sex} children aged under 5, in {definitions.wealth_quintile}
+      <% elif indicator == "Deaths age 10 to 14" %>
+      The estimated number of deaths of {definitions.sex} children aged between 10 and 14, in {definitions.wealth_quintile}
+      <% elif indicator == "Deaths age 10 to 19" %>
+      The estimated number of deaths of {definitions.sex} children aged between 10 and 19, in {definitions.wealth_quintile}
+      <% elif indicator == "Deaths age 15 to 19" %>
+      The estimated number of deaths of {definitions.sex} children aged between 15 and 19, in {definitions.wealth_quintile}
+      <% elif indicator == "Deaths age 15 to 24" %>
+      The estimated number of deaths of {definitions.sex} children aged between 15 and 24, in {definitions.wealth_quintile}
+      <% elif indicator == "Child deaths age 1 to 4" %>
+      The estimated number of deaths of {definitions.sex} children aged between 1 and 4, in {definitions.wealth_quintile}
+      <% elif indicator == "Deaths age 20 to 24" %>
+      The estimated number of deaths of {definitions.sex} children aged between 20 and 24, in {definitions.wealth_quintile}
+      <% elif indicator == "Deaths age 5 to 14" %>
+      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, in {definitions.wealth_quintile}
+      <% elif indicator == "Deaths age 5 to 24" %>
+      The estimated number of deaths of {definitions.sex} children aged between 5 and 24, in {definitions.wealth_quintile}
+      <% elif indicator == "Deaths age 5 to 9" %>
+      The estimated number of deaths of {definitions.sex} children aged between 5 and 9, in {definitions.wealth_quintile}
       <% elif indicator == "Post-neonatal deaths" %>
       The estimated number of deaths of {definitions.sex} children aged between 28 days and 1 year, in {definitions.wealth_quintile}
       <% elif indicator == "Under-fifteen deaths" %>
@@ -103,7 +105,7 @@ tables:
         display:
           name: |-
             {definitions.indicator.display_name}
-          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%> # yaml-language-server: $schema=ignore
+          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%>
       lower_bound:
         title: Lower bound
         unit: |-
