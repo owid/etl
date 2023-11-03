@@ -84,6 +84,7 @@ st-pages = "^0.4.4"
 streamlit-extras = "^0.3.0"
 typing-extensions = "^4.7.1"
 scipy = "^1.11.2"
+selenium = "^4.15.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"
