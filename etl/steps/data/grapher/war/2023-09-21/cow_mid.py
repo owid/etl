@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["cow_mid"]
-    tb_country = ds_garden["cow_mid_countries"]
+    tb_country = ds_garden["cow_mid_country"]
 
     #
     # Process data.
