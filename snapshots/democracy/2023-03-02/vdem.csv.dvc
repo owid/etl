@@ -1,13 +1,14 @@
 meta:
   namespace: democracy
   short_name: vdem
-  name: Democracy and Human rights - OWID based on Varieties of Democracy (v12) and
+  name: Democracy and Human rights - OWID based on Varieties of Democracy (v13) and
     Regimes of the World
   version: 2023-03-02
-  source_name: OWID based on V-Dem (v12) and Lührmann et al. (2018)
-  source_published_by: Data comes from the Varieties of Democracy project (v12), sometimes
-    using Lührmann et al's (2018) Regimes of the World classification, and own expansions
-    and refinements.
+  source_name: V-Dem (v13)
+  source_published_by: |
+    Coppedge, Michael, John Gerring, Carl Henrik Knutsen, Staffan I. Lindberg, Jan Teorell, David Altman, Michael Bernhard, Agnes Cornell, M. Steven Fish, Lisa Gastaldi, Haakon Gjerløw, Adam Glynn, Ana Good God, Sandra Grahn, Allen Hicken, Katrin Kinzelbach, Joshua Krusell, Kyle L. Marquardt, Kelly McMann, Valeriya Mechkova, Juraj Medzihorsky, Natalia Natsika, Anja Neundorf, Pamela Paxton, Daniel Pemstein, Josefine Pernes, Oskar Rydén, Johannes von Römer, Brigitte Seim, Rachel Sigman, Svend-Erik Skaaning, Jeffrey Staton, Aksel Sundström, Eitan Tzelgov, Yi-ting Wang, Tore Wig, Steven Wilson and Daniel Ziblatt. 2023. “V-Dem [Country-Year/Country-Date] Dataset v13” Varieties of Democracy (V-Dem) Project. https://doi.org/10.23696/vdemds23.
+
+    Pemstein, Daniel, Kyle L. Marquardt, Eitan Tzelgov, Yi-ting Wang, Juraj Medzihorsky, Joshua Krusell, Farhad Miri, and Johannes von Römer. 2023. “The V-Dem Measurement Model: Latent Variable Analysis for Cross-National and Cross-Temporal Expert-Coded Data”. V-Dem Working Paper No. 21. 8th edition. University of Gothenburg: Varieties of Democracy Institute.
   url: http://v-dem.net/vdemds.html
   source_data_url:
   file_extension: csv
@@ -16,7 +17,7 @@ meta:
   date_accessed: 2023-03-02
   is_public: true
   description: |
-    This dataset provides information on democracy and human rights, using data from the Varieties of Democracy project (v12), and the Regimes of the World classification by Lührmann et al. (2018).
+    This dataset provides information on democracy and human rights, using data from the Varieties of Democracy project (v13), and the Regimes of the World classification by Lührmann et al. (2018).
 
     We expand the countries and years covered, and refine the coding of the Regimes of the World classification. You can read a detailed description of the data in these posts:
     https://ourworldindata.org/regimes-of-the-world-data
