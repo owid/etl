@@ -116,11 +116,21 @@ def cli(
                     if _charts_configs_are_equal(existing_chart.config, target_chart.config):
                         log.info(
                             "staging_sync.skip",
-                            reason="identical chart already exists",
                             slug=target_chart.config["slug"],
+                            reason="identical chart already exists",
                             chart_id=chart_id,
                         )
                         continue
+
+                    # if chart has been updated in production after our change, warn about it
+                    if existing_chart.updatedAt > source_chart.updatedAt:
+                        log.warning(
+                            "staging_sync.chart_modified_in_target",
+                            slug=target_chart.config["slug"],
+                            target_updatedAt=str(existing_chart.updatedAt),
+                            source_updatedAt=str(source_chart.updatedAt),
+                            chart_id=chart_id,
+                        )
 
                     # if the chart has gone through a revision, update it directly
                     revs = gm.SuggestedChartRevisions.load_revisions(source_session, chart_id=chart_id)
@@ -171,7 +181,9 @@ def cli(
                                 )
                                 continue
 
-                        log.info("staging_sync.create_chart_revision", slug=target_chart.config["slug"])
+                        log.info(
+                            "staging_sync.create_chart_revision", slug=target_chart.config["slug"], chart_id=chart_id
+                        )
                 else:
                     # create new chart
                     if not publish:
