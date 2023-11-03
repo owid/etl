@@ -119,6 +119,15 @@ dataset:
     You can find more information about the data in our article: [To be published]
 
 tables:
+  # COUNTRY-LEVEL
+  mars_country:
+    variables:
+      participated_in_conflict:
+        title: Participated in conflict
+        unit: ""
+        description_short: |-
+          Whether the country participated in a conflict (of a specific kind) in a given year.
+
   mars:
     variables:
       ##################

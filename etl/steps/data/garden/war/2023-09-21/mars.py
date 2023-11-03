@@ -51,8 +51,66 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-
+# Some codes in Project Mars do not correspond to those in ISD
+# This is used to map codes to country participants
+# See in `_get_country_name`
+CCODE_MAPPING = {
+    324: 325,
+    1001: 8531,
+    1004: 4521,
+    1006: 672,
+    1007: 373,
+    1009: 4327,
+    1014: 4763,
+    1015: 7020,
+    1022: 371,
+    1023: 700,
+    1024: 4768,
+    1026: 452,
+    1028: 7103,
+    1029: 101,
+    1030: 670,
+    1033: 5516,
+    1034: 100,
+    1036: 7579,
+    1037: 663,
+    1038: 7003,
+    1040: 670,
+    1042: 700,
+    1048: 160,
+    1049: 7103,
+    1050: 7030,
+    1052: 811,
+    1053: 434,
+    1054: 700,
+    1055: 329,
+    1060: 8121,
+    1067: 625,
+    1068: 4393,
+    1069: 750,
+    1070: 580,
+    1071: 341,
+    1077: 4832,
+    1078: 136,
+    1084: 713,
+    1085: 600,
+    1086: 101,
+    1089: 327,
+    1088: 600,
+    1090: 678,
+    1093: 7103,
+    1096: 800,
+    1097: 7691,
+    1098: 7693,
+    1099: 680,
+    1100: 4751,
+    1106: 4841,
+    1108: 7910,
+    1111: 4321,
+    1115: 816,
+    1121: 100,
+    1124: 5621,
+}
 # Logger
 log = get_logger()
 
@@ -90,26 +148,26 @@ def run(dest_dir: str) -> None:
     # Read table from COW codes
     ds_isd = paths.load_dataset("isd")
     tb_regions = ds_isd["isd_regions"].reset_index()
-    # tb_isd_countries = ds_isd["isd_countries"]
+    tb_codes = ds_isd["isd_countries"]
 
     #
     # Process data.
     #
-    log.info("war.mars: clean table")
+    paths.log.info("clean table")
     tb = clean_table(tb)
 
-    log.info("war.mars: format regions and conflict type")
+    log.info("format regions and conflict type")
     tb = format_region_and_type(tb)
 
     # Rename regions
-    log.info("war.mars: rename regions")
+    paths.log.info("rename regions")
     tb["region"] = tb["region"].map(REGIONS_RENAME)
     assert tb["region"].isna().sum() == 0, "Unmapped regions!"
 
-    log.info("war.mars: de-duplicate triplets")
+    paths.log.info("de-duplicate triplets")
     tb = reduce_triplets(tb)
 
-    log.info("war.mars: add all observation years")
+    paths.log.info("add all observation years")
     tb = expand_observations(
         tb,
         col_year_start="yrstart",
@@ -119,15 +177,15 @@ def run(dest_dir: str) -> None:
 
     # Get country-level data
     paths.log.info("getting country-level indicators")
-    # tb_country = estimate_metrics_country_level(tb, tb_isd_countries)
+    tb_country = estimate_metrics_country_level(tb, tb_codes)
 
-    log.info("war.mars: aggregate numbers at warcode level")
+    paths.log.info("aggregate numbers at warcode level")
     tb = aggregate_wars(tb)
 
-    log.info("war.mars: estimate metrics")
+    paths.log.info("estimate metrics")
     tb = estimate_metrics(tb)
 
-    log.info("war.mars: replace NaNs with zeroes")
+    paths.log.info("replace NaNs with zeroes")
     tb = replace_missing_data_with_zeros(tb)
 
     # Add conflict rates
@@ -148,7 +206,7 @@ def run(dest_dir: str) -> None:
     tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (Project Mars)"
 
     # Dtypes
-    log.info("war.mars: set dtypes")
+    paths.log.info("set dtypes")
     tb = tb.astype(
         {
             "year": "uint16",
@@ -160,15 +218,19 @@ def run(dest_dir: str) -> None:
     )
 
     # Set index
-    log.info("war.mars: set index")
+    paths.log.info("set index")
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
     #
+    tables = [
+        tb,
+        tb_country,
+    ]
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -369,49 +431,54 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     return tb
 
 
-def estimate_metrics_country_level(tb: Table, tb_isd: Table) -> Table:
+def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     """Add country-level indicators."""
     ###################
     # Participated in #
     ###################
 
     # Get table with [year, conflict_type, code]
-    tb_country = tb[["year", "conflict_type", "ccode"]].rename(columns={"ccode": "code"})
+    tb_country = tb[["year", "conflict_type", "ccode"]].rename(columns={"ccode": "id"})
 
     # Drop rows with code = NaN
-    tb_country = tb_country.dropna(subset=["code"])
+    tb_country = tb_country.dropna(subset=["id"])
     # Drop duplicates
     tb_country = tb_country.drop_duplicates()
-
     # Ensure numeric type
-    tb_country["code"] = tb_country["code"].astype(int)
+    tb_country["id"] = tb_country["id"].astype(int)
+    # Translate Mars -> ISD codes
+    tb_country["id"] = tb_country["id"].replace(CCODE_MAPPING)
+    tb_country = tb_country.drop_duplicates()
 
     # Sanity check
     assert not tb_country.isna().any(axis=None), "There are some NaNs!"
 
     # Only consider years with data in ISD table
-    tb_country = tb_country[tb_country["year"] >= tb_isd["year"].min()]
+    tb_country = tb_country[tb_country["year"] >= tb_codes.reset_index()["year"].min()]
+    # Only consider codes present in ISD + custom mapping
+    codes = set(tb_codes.reset_index()["id"]) | set(CCODE_MAPPING)
+    tb_country = tb_country[tb_country["id"].isin(codes)]
 
     # Add country name
-    tb_country["country"] = tb_country.apply(lambda x: _get_country_name(tb_isd, x["code"], x["year"]), axis=1)
+    tb_country["country"] = tb_country.apply(lambda x: _get_country_name(tb_codes, x["id"], x["year"]), axis=1)
     assert tb_country["country"].notna().all(), "Some countries were not found! NaN was set"
 
     # Add flag
     tb_country["participated_in_conflict"] = 1
-    tb_country["participated_in_conflict"].m.origins = tb["gwnoa"].m.origins
+    tb_country["participated_in_conflict"].m.origins = tb["ccode"].m.origins
 
     # Prepare GW table
     tb_alltypes = Table(pd.DataFrame({"conflict_type": tb_country["conflict_type"].unique()}))
-    tb_gw = tb_isd.reset_index().merge(tb_alltypes, how="cross")
-    tb_gw["country"] = tb_gw["country"].astype(str)
+    tb_codes = tb_codes.reset_index().merge(tb_alltypes, how="cross")
+    tb_codes["country"] = tb_codes["country"].astype(str)
 
     # Combine all GW entries with UCDP
-    tb_country = tb_gw.merge(tb_country, on=["year", "country", "conflict_type"], how="left")
+    tb_country = tb_codes.merge(tb_country, on=["year", "country", "conflict_type"], how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
     tb_country = tb_country[["year", "country", "conflict_type", "participated_in_conflict"]]
 
     # Add intrastate (all)
-    # tb_country = add_conflict_country_all_intrastate(tb_country)
+    tb_country = add_conflict_country_all_ctypes(tb_country)
     # Add state-based
     # tb_country = add_conflict_country_all_statebased(tb_country)
 
@@ -419,22 +486,42 @@ def estimate_metrics_country_level(tb: Table, tb_isd: Table) -> Table:
     tb_country = tb_country[(tb_country["year"] >= tb["year"].min()) & (tb_country["year"] <= tb["year"].max())]
 
     # Set short name
-    tb_country.metadata.short_name = "ucdp_country"
+    tb_country.metadata.short_name = f"{paths.short_name}_country"
 
+    # Set index
+    tb_country = tb_country.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
     return tb_country
 
 
-def _get_country_name(tb_gw: Table, code: int, year: int) -> str:
+def _get_country_name(tb_codes: Table, code: int, year: int) -> str:
+    if code not in set(tb_codes.reset_index()["id"]):
+        print(code)
+        return code
     try:
-        country_name = tb_gw.loc[(code, year)]
+        country_name = tb_codes.loc[(code, year)]
     except KeyError:
-        if code < 1000:
-            try:
-                country_name = tb_gw.loc[(code, year - 1)]
-            except KeyError:
-                try:
-                    country_name = tb_gw.loc[(code, year + 1)]
-                except KeyError:
-                    print(code, year)
-        country_name = code
+        # Concrete cases
+        match code:
+            # Serbia
+            case 345:
+                if (year < 1941) or (year >= 2006):
+                    return "Serbia"
+                elif year >= 1941 and year < 1992:
+                    return "Yugoslavia"
+                elif year >= 1992 and year < 2006:
+                    return "Serbia and Montenegro"
+            case _:
+                countries = set(tb_codes.loc[code, "country"])
+                assert len(countries) == 1, f"More than one country found for code {code} in year {year}"
+                country_name = list(countries)[0]
     return country_name
+
+
+def add_conflict_country_all_ctypes(tb: Table) -> Table:
+    """Add metrics for conflict_type = 'state-based'."""
+    tb_all = tb.groupby(["year", "country"], as_index=False).agg(
+        {"participated_in_conflict": lambda x: min(x.sum(), 1)}
+    )
+    tb_all["conflict_type"] = "all"
+    tb = pr.concat([tb, tb_all], ignore_index=True)
+    return tb
