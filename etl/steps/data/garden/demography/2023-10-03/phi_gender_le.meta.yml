@@ -1,4 +1,9 @@
 # NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Life Expectancy
 
 
 # Learn more about the available fields:
@@ -24,6 +29,9 @@ tables:
           Citation: Bergeron-Boucher, M.-P., Alvarez, J.-A., Kashnitsky, I., & Zarulli, V. (2022). Probability of males to outlive females: An international comparison from 1751 to 2020. BMJ Open, 12(8), e059964. https://doi.org/10.1136/bmjopen-2021-059964
 
           Code available at: https://github.com/CPop-SDU/outsurvival-in-perspective
+        description_key:
+          - The probability that a male will live longer than a female, in a given population during a given interval.
+          - This is calculated for random pairs of one male and one female at age 0.
         display:
           numDecimalPlaces: 1
         presentation:

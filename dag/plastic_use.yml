@@ -1,4 +1,5 @@
 steps:
+  # OECD plastic production and plastic waste datasets
   data://meadow/oecd/2023-09-21/plastic_fate_regions:
     - snapshot://oecd/2023-09-21/plastic_fate_regions.csv
   data://garden/oecd/2023-09-21/plastic_fate_regions:
@@ -78,7 +79,7 @@ steps:
   data://grapher/oecd/2023-09-21/plastic_aquatic_leakage_projections:
     - data://garden/oecd/2023-09-21/plastic_aquatic_leakage_projections
 
-
+  # Geyer et al. 2017 historical plastic production
   data://meadow/plastic_waste/2023-09-26/geyer_2017:
     - snapshot://plastic_waste/2023-09-26/geyer_2017.pdf
   data://garden/plastic_waste/2023-09-26/geyer_2017:
@@ -86,3 +87,17 @@ steps:
     - data://garden/oecd/2023-09-21/plastic_use_application
   data://grapher/plastic_waste/2023-09-26/geyer_2017:
     - data://garden/plastic_waste/2023-09-26/geyer_2017
+
+  # UN Comstat plastic trade dataset
+  data://meadow/un/2023-10-09/plastic_waste:
+    - snapshot://un/2023-10-09/plastic_waste_1987_1998.csv
+    - snapshot://un/2023-10-09/plastic_waste_1999_2010.csv
+    - snapshot://un/2023-10-09/plastic_waste_2011_2022.csv
+  data://garden/un/2023-10-09/plastic_waste:
+    - data://meadow/un/2023-10-09/plastic_waste
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/demography/2023-03-31/population
+
+  data://grapher/un/2023-10-09/plastic_waste:
+    - data://garden/un/2023-10-09/plastic_waste

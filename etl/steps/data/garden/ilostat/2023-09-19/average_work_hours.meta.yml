@@ -1,3 +1,10 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Working Hours
+
+
 dataset:
   title: "Average hours of work, by education level and economic activity (ILOSTAT)"
 tables:

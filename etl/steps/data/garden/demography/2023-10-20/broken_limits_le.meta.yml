@@ -1,0 +1,50 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Life Expectancy
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  title: "Life Expectancy: Broken limits"
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  broken_limits_le:
+    variables:
+      life_expectancy:
+        title: &le_name Maximum life expectancy
+        unit: years
+        description_short: |-
+          <% if (sex == 'female') %>
+          Maximum life expectancy recorded in a given year (among females). Life expectancy is the total number of years a newborn is expected to live.
+          <% elif (sex == 'male') %>
+          Maximum life expectancy recorded in a given year (among males). Life expectancy is the total number of years a newborn is expected to live.
+          <% elif (sex == 'all') %>
+          Maximum life expectancy recorded in a given year. Life expectancy is the total number of years a newborn is expected to live.
+          <% endif %>
+        description_key:
+          - Period life expectancy assumes that current mortality trends will continue for the rest of a subject's life.
+        display:
+          name: *le_name
+        presentation:
+          title_public: *le_name
+          title_variant: ""
+          attribution_short: HMD; UN WPP
+          topic_tags:
+            - Life Expectancy
+          grapher_config:
+            hasMapTab: true
+
+      country_with_max_le:
+        title: Country with yearly maximum life expectancy
+        unit: ""
+        description_short: |-
+          Name of the country with the yearly maximum life expectancy registered<% if (sex == 'female') %> among females<% elif (sex == 'male') %> among males<% endif %>.
+        description_processing: This indicator is meant to be used as an auxiliary indicator.

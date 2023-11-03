@@ -1,6 +1,6 @@
-<!-- !!! warning "This is still being written."
+!!! warning "This is still being written."
 
-    Our metadata formats are still in flux, and are likely to change over the coming weeks. -->
+    Our metadata formats are still in flux, and are likely to change over the coming weeks.
 
 
 We are defining an internal ETL logic so that the metadata is propagation in a smart way from Snapshot to Grapher.

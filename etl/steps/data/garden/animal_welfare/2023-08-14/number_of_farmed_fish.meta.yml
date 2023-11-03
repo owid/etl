@@ -8,6 +8,10 @@ definitions:
       - Fish deaths arising in fish farms prior to harvest, in the capture of wild fish for feed or re-stocking, or from environmental impacts on surrounding wildlife.
       - Fish farmed for use as bait, whose small production tonnages may comprise large numbers of fish due to their very small size of just a few grams.
       - Species without an estimated mean weight (which were an additional 17% of reported global fish production).
+  presentation:
+    topic_tags:
+    - Animal Welfare
+    - Fish & Overfishing
 
 tables:
   number_of_farmed_fish:

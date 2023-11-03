@@ -41,6 +41,8 @@ DAG = Dict[str, Any]
 
 dvc_lock = Lock()
 
+DVC_REPO_CACHE = files.RuntimeCache()
+
 
 def compile_steps(
     dag: DAG,
@@ -644,22 +646,26 @@ class SnapshotStep(Step):
         return f"snapshot://{self.path}"
 
     def run(self) -> None:
-        from dvc.repo import Repo
+        from dvc.exceptions import CheckoutError
 
         with _unignore_backports(Path(self._path)):
-            Repo(paths.BASE_DIR).pull(self._path, remote="public-read", force=True)
+            try:
+                _cached_dvc_repo(self._dvc_path).pull(self._path, remote="public-read", force=True)
+            except CheckoutError as e:
+                raise Exception(
+                    "File not found in DVC. Have you run the snapshot script? Make sure you're not using `is_public: false`."
+                ) from e
 
     def is_dirty(self) -> bool:
         # check if the snapshot has been added to DVC
         from dvc.dvcfile import load_file
-        from dvc.repo import Repo
 
         with open(self._dvc_path) as istream:
             if "outs:\n" not in istream.read():
                 raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
 
         with _unignore_backports(Path(self._dvc_path)), dvc_lock:
-            repo = Repo(paths.BASE_DIR)
+            repo = _cached_dvc_repo(self._dvc_path)
             dvc_file = load_file(repo, self._dvc_path)
             with repo.lock:
                 # DVC returns empty dictionary if file is up to date
@@ -690,10 +696,16 @@ class SnapshotStepPrivate(SnapshotStep):
         return f"snapshot-private://{self.path}"
 
     def run(self) -> None:
+        from dvc.exceptions import CheckoutError
         from dvc.repo import Repo
 
         with _unignore_backports(Path(self._path)):
-            Repo(paths.BASE_DIR).pull(self._path, remote="private", force=True)
+            try:
+                Repo(paths.BASE_DIR).pull(self._path, remote="private", force=True)
+            except CheckoutError as e:
+                raise Exception(
+                    "File not found in DVC. Have you run the snapshot script with `is_public: false`?"
+                ) from e
 
 
 class GrapherStep(Step):
@@ -768,14 +780,14 @@ class GrapherStep(Step):
             for table in dataset:
                 # if GRAPHER_FILTER is set, only upsert matching columns
                 if config.GRAPHER_FILTER:
-                    table = table.loc[:, table.filter(regex=config.GRAPHER_FILTER).columns]
-
-                catalog_path = f"{self.path}/{table.metadata.short_name}"
+                    cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
+                    cols += [c for c in table.columns if c in {"year", "country"} and c not in cols]
+                    table = table.loc[:, cols]
 
                 table = gh._adapt_table_for_grapher(table)
 
                 # generate table with entity_id, year and value for every column
-                upsert = lambda t: gi.upsert_table(  # noqa: E731
+                upsert = lambda t, catalog_path: gi.upsert_table(  # noqa: E731
                     engine,
                     t,
                     dataset_upsert_results,
@@ -784,7 +796,9 @@ class GrapherStep(Step):
                 )
 
                 for t in gh._yield_wide_table(table, na_action="drop"):
-                    futures.append(thread_pool.submit(upsert, t))
+                    assert len(t.columns) == 1
+                    catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
+                    futures.append(thread_pool.submit(upsert, t, catalog_path=catalog_path))
 
             variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
 
@@ -973,6 +987,22 @@ def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
+
+
+def _cached_dvc_repo(dvc_path: str) -> Any:
+    """Return DVC repo and cache it. Backported steps do not use cached repository."""
+    if "backport" in dvc_path:
+        from dvc.repo import Repo
+
+        return Repo(paths.BASE_DIR)
+
+    key = str(paths.BASE_DIR)
+    cache = DVC_REPO_CACHE
+    if key not in cache:
+        from dvc.repo import Repo
+
+        cache.add(key, Repo(paths.BASE_DIR))
+    return cache[key]
 
 
 def _uses_old_schema(e: KeyError) -> bool:

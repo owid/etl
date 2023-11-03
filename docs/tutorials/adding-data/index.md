@@ -7,8 +7,7 @@ when are they most useful.
 
 
 :material-walk: I have some coding skills and I am concerned about reproducibility<br>
-[Use Wizard :octicons-arrow-right-24:](wizard.md)<br>
-[Use Walkthrough :octicons-arrow-right-24:](walkthrough.md) (deprecated)
+[Use Wizard :octicons-arrow-right-24:](wizard.md)
 
 :material-tools: I have something complex to do or am very comfortable with the ETL<br>
 [Manual addition :octicons-arrow-right-24:](manual.md)

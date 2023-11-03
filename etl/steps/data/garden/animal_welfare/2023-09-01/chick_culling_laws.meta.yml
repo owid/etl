@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+
 tables:
   chick_culling_laws:
     variables:

@@ -6,12 +6,20 @@ def guidelines_to_markdown(guidelines: List[Any], extra_tab: int = 0) -> str:
     tab = "\t" * extra_tab
     text = ""
     for guideline in guidelines:
-        # Main guideline
+        text = _guideline_to_markdown(text, tab, guideline)
+    return text
+
+
+def _guideline_to_markdown(text: str, tab: str, guideline):
+    # Main guideline
+    if isinstance(guideline, str):
+        text += f"\n{tab}- {guideline}"
+    else:
         if isinstance(guideline[0], str):
             # Add main guideline
             text += f"\n{tab}- {guideline[0]}"
         else:
-            raise TypeError("The first element of an element in `guidelines` must be a string!")
+            raise TypeError(f"The first element of an element in `guidelines` must be a string! {guideline}")
 
         # Additions to the guideline (nested bullet points, exceptions, etc.)
         if len(guideline) == 2:
@@ -24,13 +32,17 @@ def guidelines_to_markdown(guidelines: List[Any], extra_tab: int = 0) -> str:
 
                 # Render exceptions
                 if guideline[1]["type"] == "exceptions":
-                    text += " Exceptions:"
-                    for exception in guideline[1]["value"]:
-                        text += f"\n{tab}\t- {exception}"
+                    text += " **Exceptions:**"
+                    for sub_guideline in guideline[1]["value"]:
+                        text = _guideline_to_markdown(text, f"{tab}\t", sub_guideline)
+                    # for exception in guideline[1]["value"]:
+                    #     text += f"\n{tab}\t- {exception}"
                 # Render nested list
                 elif guideline[1]["type"] == "list":
-                    for subitem in guideline[1]["value"]:
-                        text += f"\n{tab}\t- {subitem}"
+                    for sub_guideline in guideline[1]["value"]:
+                        text = _guideline_to_markdown(text, f"{tab}\t", sub_guideline)
+                    # for subitem in guideline[1]["value"]:
+                    #     text += f"\n{tab}\t- {subitem}"
                 # Exception
                 else:
                     raise ValueError(f"Unknown guideline type: {guideline[1]['type']}!")
@@ -39,7 +51,10 @@ def guidelines_to_markdown(guidelines: List[Any], extra_tab: int = 0) -> str:
 
         # Element in guideliens is more than 2 items long
         if len(guideline) > 2:
-            raise ValueError("Each element in `guidelines` must have at most 2 elements!")
+            raise ValueError(
+                f"Each element in `guidelines` must have at most 2 elements! Found {len(guideline)} instead in '{guideline}'!"
+            )
+
     return text
 
 

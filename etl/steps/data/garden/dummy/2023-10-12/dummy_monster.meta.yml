@@ -1,0 +1,273 @@
+# Definitions that can be used in metadata to avoid repetition.
+definitions:
+  common:
+    topic_tags:
+    - Uncategorized
+  # Random long text to be used in different places of the metadata.
+  long_text: &long_text |-
+    Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph.
+    Long text after line break. Long text after line break. Long text after line break. Long text after line break. Long text after line break. Long text after line break. Long text after line break. Long text after line break. Long text after line break. Long text after line break.
+
+    Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph.
+
+    Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph.
+
+    Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph. Long text in new paragraph.
+
+  # Definition of an origin that has the minimum possible metadata.
+  origin_0: &origin_with_almost_no_metadata
+    title: "Title of the zeroth data product"
+    producer: "Producer of the zeroth data product"
+
+  # Definition of an origin that has all possible fields, and all of them are long and ugly.
+  origin_1: &origin_with_all_long_fields
+    title: "Title of the first data product, a very long and ugly title"
+    url_main: https://data-product-main-page.com/long_and_horrible_url_that_should_be_truncated/and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more
+    url_download: https://data-product-download-page.com/long_and_horrible_url_that_should_be_truncated/and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more
+    title_snapshot: "Title of the first snapshot, a very long and ugly title"
+    producer: "Producer of the first data product, a very long and ugly title for a producer"
+    description: |-
+      Long description for this data product.
+
+      {definitions.long_text}
+    date_accessed: "2023-01-01"
+    date_published: "2000-01-01"
+    attribution: Producer of the first data product, long and ugly - Title of the first data product, long and ugly (2023)
+    attribution_short: Short attribution but not as short as it should
+    citation_full: |-
+      Long citation full.
+
+      {definitions.long_text}
+    version_producer: "VERSION OF DATA PRODUCT BUT LONG AND UGLY AS WELL"
+    license:
+      name: "CC BY 4.0"
+      url: "https://data-product-page-where-license-is-shown.com/long_and_horrible_url_that_should_be_truncated/and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more"
+
+  # Definition of an origin that has all possible fields, and all of them are quite normal.
+  origin_2: &origin_with_all_normal_fields
+    title: "Title of the second data product"
+    url_main: https://data-product-main-page.com/
+    url_download: https://data-product-download-page.com/
+    title_snapshot: "Title of the second snapshot"
+    producer: "Producer of the second data product"
+    description: |-
+      Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product.
+    date_accessed: "2023-01-01"
+    date_published: "2000-01-01"
+    attribution: Producer of data product - Title of data product (2023)
+    attribution_short: Producer two
+    citation_full: |-
+      Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full.
+    version_producer: "V1"
+    license:
+      name: "CC BY 4.0"
+      url: "https://data-product-page-where-license-is-shown.com/"
+
+  # Definition of a typical origin.
+  origin_3: &origin_typical
+    title: "Title of the third data product"
+    url_main: https://data-product-main-page.com/
+    url_download: https://data-product-download-page.com/
+    # title_snapshot: "Title of the third snapshot"
+    producer: "Producer of the third data product"
+    description: |-
+      Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product.
+    date_accessed: "2023-01-01"
+    date_published: "2000-01-01"
+    # attribution: Producer of data product - Title of data product (2023)
+    attribution_short: Producer three
+    citation_full: |-
+      Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full.
+    # version_producer: "V1"
+    license:
+      name: "CC BY 4.0"
+      url: "https://data-product-page-where-license-is-shown.com/"
+
+dataset:
+  title: "Dummy monster"
+  description: |-
+    Long dataset description.
+
+    {definitions.long_text}
+
+tables:
+  dummy_monster:
+    title: "Dummy monster"
+    variables:
+      # Indicator with almost no metadata.
+      almost_no_metadata:
+        title: "Almost no metadata"
+        unit: ""
+        origins:
+          - *origin_with_almost_no_metadata
+
+      # Typical curated indicator.
+      curated_indicator:
+        title: "Curated indicator title"
+        unit: "normal unit"
+        short_unit: "short/unit"
+        description_from_producer: |-
+          Description from producer. Just the right amount of text. Just the right amount of text. Just the right amount of text. Just the right amount of text. Just the right amount of text.
+        description_key:
+          - "Description key 1. Some text that is the right amount of information to be shown as a key description point."
+          - "Description key 2. Some text that is the right amount of information to be shown as a key description point."
+          - "Description key 3. Some text that is the right amount of information to be shown as a key description point."
+        description_processing: |-
+          - Description processing point 1. Something was done to the data of this indicator.
+          - Description processing point 2. Something was done to the data of this indicator.
+        description_short: |-
+          Short description of this indicator, which complements the information given in the title.
+        origins:
+          - *origin_with_all_normal_fields
+          - *origin_typical
+        presentation:
+          # Keep indicator's attribution empty, so that the origins' attributions are used.
+          # attribution: Data product - producer (2023)
+          attribution_short: Short attribution
+          title_public: "Normal looking title public"
+          title_variant: "Normal title variant"
+        presentation_license:
+          name: "CC BY 4.0"
+          url: https://indicator-license.com/
+        processing_level: major
+
+      # Typical, non-curated indicator.
+      non_curated_indicator:
+        title: "Non-curated indicator title"
+        unit: "normal unit"
+        short_unit: "short/unit"
+        description_from_producer: |-
+          Description from producer. Just the right amount of text. Just the right amount of text. Just the right amount of text. Just the right amount of text. Just the right amount of text.
+        description_short: |-
+          Short description of this indicator, which complements the information given in the title.
+        origins:
+          - *origin_typical
+        processing_level: minor
+
+      # Indicator based on multiple snapshots of the same data product.
+      multiple_snapshots_for_the_same_data_product:
+        title: "Multiple snapshots for the same data product are repeated in data pages"
+        unit: ""
+        origins:
+          - title: "Common origin that has multiple snapshots"
+            title_snapshot: "Snapshot number one"
+            description_snapshot: |-
+              Long description for snapshot number one. THIS SHOULD APPEAR NOWHERE IN DATA PAGES.
+
+              {definitions.long_text}
+            producer: "Common producer for this data product"
+            citation_full: &common_citation_full |-
+              Long citation full that is exactly the same for the three snapshots of the same data product, since the citation full should refer to the data product and not to the specific snapshot.
+
+              {definitions.long_text}
+          - title: "Common origin that has multiple snapshots"
+            title_snapshot: "Snapshot number two THIS SHOULD APPEAR NOWHERE IN DATA PAGES"
+            description_snapshot: |-
+              Long description for snapshot number TWO. THIS SHOULD APPEAR NOWHERE IN DATA PAGES.
+
+              {definitions.long_text}
+            producer: "Common producer for this data product"
+            citation_full: *common_citation_full
+          - title: "Common origin that has multiple snapshots"
+            title_snapshot: "Snapshot number three THIS SHOULD APPEAR NOWHERE IN DATA PAGES"
+            producer: "Common producer for this data product"
+            citation_full: *common_citation_full
+
+      # Indicator that has multiple origins and sources.
+      multiple_origins_and_sources:
+        title: "Multiple origins and sources"
+        unit: ""
+        origins:
+          - *origin_typical
+          - *origin_with_all_normal_fields
+        sources:
+          - name: "Source number one"
+            description: Description of source one. This could be a long text that describes the source. This could be a long text that describes the source. This could be a long text that describes the source.
+            published_by: Citation of the first source. This could be a long text that contains the full citation of the source. This could be a long text that contains the full citation of the source. This could be a long text that contains the full citation of the source.
+            url: https://url-for-source-one.com/
+            source_data_url: https://url-to-download-data-from-source-one.com/
+            date_accessed: "2023-01-01"
+            publication_date: "2000-01-01"
+            publication_year: 2000
+          - name: "Source number two"
+            description: Description of source two. This could be a long text that describes the source. This could be a long text that describes the source. This could be a long text that describes the source.
+            published_by: Citation of the second source. This could be a long text that contains the full citation of the source. This could be a long text that contains the full citation of the source. This could be a long text that contains the full citation of the source.
+            url: https://url-for-source-two.com/
+            source_data_url: https://url-to-download-data-from-source-two.com/
+            date_accessed: "2023-01-01"
+            publication_date: "2000-01-01"
+            publication_year: 2000
+
+      # Horrible indicator with all possible metadata, and all fields unreasonably long.
+      all_possible_long_metadata:
+        title: "The longest indicator title we have ever read, really ugly and long, full of unreadable stuff"
+        unit: "long and complicated unit"
+        short_unit: "long/and/complicated/unit"
+        description_from_producer: |-
+          Long description from producer.
+
+          {definitions.long_text}
+        description_key:
+          - "Long description key 1. {definitions.long_text}"
+          - "Long description key 2. {definitions.long_text}"
+          - "Long description key 3. {definitions.long_text}"
+          - "Long description key 4. {definitions.long_text}"
+          - "Long description key 5. {definitions.long_text}"
+          - "Long description key 6. {definitions.long_text}"
+        description_processing: |-
+          - Long description processing point 1. {definitions.long_text}
+          - Long description processing point 2. {definitions.long_text}
+        description_short: |-
+          Long description short. {definitions.long_text}
+        origins:
+          - *origin_with_all_long_fields
+          - *origin_with_all_normal_fields
+          - *origin_typical
+          # Do not add more origins or the footer of the chart will be replaced by "Multiple sources".
+          # - *origin_with_almost_no_metadata
+        presentation:
+          # Keep indicator's attribution empty, so that the origins' attributions are used.
+          # attribution: Long indicator attribution - Much longer than it should be, but good for testing purposes (2022)
+          attribution_short: Long indicator short attribution which is much longer than it should be
+          title_public: "Long title public, way longer than it should be, full of unnecessary information, but excellent for testing purposes"
+          title_variant: "Long title variant, way longer than it should be, full of unnecessary information, but excellent for testing purposes"
+        presentation_license:
+          name: "Long license name, very long for some reason"
+          url: https://indicator-license.com/long_and_horrible_url_that_should_be_truncated/and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more_and_more
+        processing_level: major
+
+      # Indicator that points out the issue that, when `date_accessed` is not given, data page shows incomplete info.
+      issue_no_date_accessed:
+        title: "If origin has no `date_accessed`, data page shows incomplete info for the origin!"
+        unit: ""
+        origins:
+          - title: "Title of the first data product"
+            # date_accessed: "2023-09-07"
+            url_main: https://data.some_institution.com/dataset_12
+            title_snapshot: "Title of the first snapshot"
+            producer: "Producer of the first data product (no date accessed)"
+            description: |-
+              {definitions.long_text}
+            date_published: "2023-09-07"
+            attribution: Producer of the first data product - Title of the first data product (2023)
+            attribution_short: Producer one
+            citation_full: |-
+              Long citation full.
+
+              {definitions.long_text}
+          - title: "Title of the second data product"
+            date_accessed: "2023-09-07"
+            url_main: https://data.some_institution.com/dataset_12
+            title_snapshot: "Title of the second snapshot"
+            producer: "Producer of the second data product (with date accessed)"
+            description: |-
+              Long description for this data product.
+
+              {definitions.long_text}
+            date_published: "2023-09-07"
+            attribution: Producer of the second data product - Title of the second data product (2023)
+            attribution_short: Producer two
+            citation_full: |-
+              Long citation full.
+
+              {definitions.long_text}

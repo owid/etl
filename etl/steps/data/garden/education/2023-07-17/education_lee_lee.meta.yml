@@ -1,3 +1,26 @@
+definitions:
+  common:
+    origins:
+    - producer: Lee and Lee
+      title: Lee and Lee (2016)
+      description: >-
+        Datasets on estimated school enrollment ratios from 1820 to 2010 and estimated educational attainment for the total,
+        female and male populations from 1870 to 2010. The estimates are available in five-year intervals for 111 countries.
+
+
+        Datasets were last updated in 2021 September.
+      url_main: https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html
+      date_accessed: '2023-07-17'
+      date_published: '2016'
+      citation_full: Lee, Jong-Wha and Hanol Lee, 2016, "Human Capital in the Long Run," Journal of Development Economics, vol. 122, pp. 147-169.
+    presentation:
+      topic_tags:
+        - Global Education
+  others:
+    description_processing: &description_processing
+      Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+
+
 dataset:
   title: Human Capital in the Long Run (Lee and Lee, 2016)
   description: >-
@@ -9,31 +32,17 @@ dataset:
   licenses:
   - name: 2021 by Robert J. Barro and Jong-Wha Lee.
     url: https://github.com/barrolee/BarroLeeDataSet
-  origin:
-  - name: Lee and Lee (2016)
-    description: >-
-      Datasets on estimated school enrollment ratios from 1820 to 2010 and estimated educational attainment for the total,
-      female and male populations from 1870 to 2010. The estimates are available in five-year intervals for 111 countries.
 
-
-      Datasets were last updated in 2021 September.
-    url: https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html
-    date_accessed: '2023-07-17'
-    publication_year: 2016
-    published_by: Lee, Jong-Wha and Hanol Lee, 2016, "Human Capital in the Long Run," Journal of Development Economics, vol.
-      122, pp. 147-169.
 tables:
   education_lee_lee:
     variables:
       mf_primary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, primary, both sexes
-        description: >
+        description_short: >
           Net enrollment rate for primary school is calculated by dividing the number of students of official
           school age enrolled in primary education by the population of the age group which officially corresponds to primary
           education, and multiplying by 100.
-
-
-          Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+        description_processing: *description_processing
         unit: '%'
         short_unit: '%'
         display:
@@ -41,13 +50,11 @@ tables:
 
       f_primary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, primary, female
-        description: >
+        description_short: >
           Net enrollment rate for primary school is calculated by dividing the number of students of official
           school age enrolled in primary education by the population of the age group which officially corresponds to primary
           education, and multiplying by 100.
-
-
-          Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+        description_processing: *description_processing
         unit: '%'
         short_unit: '%'
         display:
@@ -55,13 +62,11 @@ tables:
 
       m_primary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, primary, male
-        description: >
+        description_short: >
           Net enrollment rate for primary school is calculated by dividing the number of students of official
           school age enrolled in primary education by the population of the age group which officially corresponds to primary
           education, and multiplying by 100.
-
-
-          Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+        description_processing: *description_processing
         unit: '%'
         short_unit: '%'
         display:
@@ -69,13 +74,11 @@ tables:
 
       mf_secondary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, secondary, both sexes
-        description: >
+        description_short: >
           Net enrollment rate for secondary school is calculated by dividing the number of students of official
           school age enrolled in secondary education by the population of the age group which officially corresponds to secondary
           education, and multiplying by 100.
-
-
-          Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+        description_processing: *description_processing
         unit: '%'
         short_unit: '%'
         display:
@@ -83,13 +86,11 @@ tables:
 
       f_secondary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, secondary, female
-        description: >
+        description_short: >
           Net enrollment rate for secondary school is calculated by dividing the number of students of official
           school age enrolled in secondary education by the population of the age group which officially corresponds to secondary
           education, and multiplying by 100.
-
-
-          Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+        description_processing: *description_processing
         unit: '%'
         short_unit: '%'
         display:
@@ -97,13 +98,11 @@ tables:
 
       m_secondary_enrollment_rates_combined_wb:
         title: Combined total net enrolment rate, secondary, male
-        description: >
+        description_short: >
           Net enrollment rate for secondary school is calculated by dividing the number of students of official
           school age enrolled in secondary education by the population of the age group which officially corresponds to secondary
           education, and multiplying by 100.
-
-
-          Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+        description_processing: *description_processing
         unit: '%'
         short_unit: '%'
         display:
@@ -111,12 +110,10 @@ tables:
 
       mf_tertiary_enrollment_rates_combined_wb:
         title: Combined gross enrolment ratio for tertiary education, both sexes
-        description: >
+        description_short: >
           Total enrolment in tertiary education regardless of age expressed as a percentage of the population in
           the 5-year age group immediately following upper secondary education.
-
-
-          Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+        description_processing: *description_processing
         unit: '%'
         short_unit: '%'
         display:
@@ -124,12 +121,10 @@ tables:
 
       f_tertiary_enrollment_rates_combined_wb:
         title: Combined gross enrolment ratio for tertiary education, female
-        description: >
+        description_short: >
           Total enrolment in tertiary education regardless of age expressed as a percentage of the population in
           the 5-year age group immediately following upper secondary education.
-
-
-          Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+        description_processing: *description_processing
         unit: '%'
         short_unit: '%'
         display:
@@ -137,48 +132,41 @@ tables:
 
       m_tertiary_enrollment_rates_combined_wb:
         title: Combined gross enrolment ratio for tertiary education, male
-        description: >
+        description_short: >
           Total enrolment in tertiary education regardless of age expressed as a percentage of the population in
           the 5-year age group immediately following upper secondary education.
-
-
-          Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+        description_processing: *description_processing
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
 
       female_over_male_enrollment_rates_primary:
-        title: Femal to male gross enrolment ratio for primary education
-        description: >
+        title: Female to male gross enrolment ratio for primary education
+        description_short: >
           Ratio of net enrolment rates in primary education of males to females expressed the number of students of official school age enrolled in primary education by the population of the age group which officially corresponds to primary education.
-
-
-          Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+        description_processing: *description_processing
         unit: 'ratio'
         short_unit: ''
         display:
           numDecimalPlaces: 1
 
       female_over_male_enrollment_rates_secondary:
-        title: Femal to male gross enrolment ratio for secondary education
-        description: >
+        title: Female to male gross enrolment ratio for secondary education
+        description_short: >
           Ratio of net enrolment rates in secondary education of males to females expressed the number of students of official school age enrolled in secondary education by the population of the age group which officially corresponds to secondary education.
-
-
-          Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+        description_processing: *description_processing
         unit: 'ratio'
         short_unit: ''
         display:
           numDecimalPlaces: 1
 
       female_over_male_enrollment_rates_tertiary:
-        title: Femal to male gross enrolment ratio for tertiary education
-        description: >
+        title: Female to male gross enrolment ratio for tertiary education
+        description_short: >
           Ratio of enrolment rates in tertiary education of males to females regardless of age expressed as a percentage of the population in
           the 5-year age group immediately following upper secondary education.
-
-
+        description_processing:
           Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
         unit: 'ratio'
         short_unit: ''
@@ -187,7 +175,7 @@ tables:
 
       mf_primary_enrollment_rates:
         title: Total net enrolment rate, primary, both sexes
-        description:  Net enrollment rate for primary school is calculated by dividing the number of students of official
+        description_short:  Net enrollment rate for primary school is calculated by dividing the number of students of official
           school age enrolled in primary education by the population of the age group which officially corresponds to primary
           education, and multiplying by 100.
         unit: '%'
@@ -196,7 +184,7 @@ tables:
           numDecimalPlaces: 1
       f_primary_enrollment_rates:
         title: Total net enrolment rate, primary, female
-        description: Net enrollment rate for primary school is calculated by dividing the number of students of official
+        description_short: Net enrollment rate for primary school is calculated by dividing the number of students of official
           school age enrolled in primary education by the population of the age group which officially corresponds to primary
           education, and multiplying by 100.
         unit: '%'
@@ -205,7 +193,7 @@ tables:
           numDecimalPlaces: 1
       m_primary_enrollment_rates:
         title: Total net enrolment rate, primary, male
-        description:  Net enrollment rate for primary school is calculated by dividing the number of students of official
+        description_short:  Net enrollment rate for primary school is calculated by dividing the number of students of official
           school age enrolled in primary education by the population of the age group which officially corresponds to primary
           education, and multiplying by 100.
         unit: '%'
@@ -214,7 +202,7 @@ tables:
           numDecimalPlaces: 1
       mf_secondary_enrollment_rates:
         title: Total net enrolment rate, secondary, both sexes
-        description: Net enrollment rate for secondary school is calculated by dividing the number of students of official
+        description_short: Net enrollment rate for secondary school is calculated by dividing the number of students of official
           school age enrolled in secondary education by the population of the age group which officially corresponds to secondary
           education, and multiplying by 100.
         unit: '%'
@@ -223,7 +211,7 @@ tables:
           numDecimalPlaces: 1
       f_secondary_enrollment_rates:
         title: Total net enrolment rate, secondary, female
-        description: Net enrollment rate for secondary school is calculated by dividing the number of students of official
+        description_short: Net enrollment rate for secondary school is calculated by dividing the number of students of official
           school age enrolled in secondary education by the population of the age group which officially corresponds to secondary
           education, and multiplying by 100.
         unit: '%'
@@ -232,7 +220,7 @@ tables:
           numDecimalPlaces: 1
       m_secondary_enrollment_rates:
         title: Total net enrolment rate, secondary, male
-        description: Net enrollment rate for secondary school is calculated by dividing the number of students of official
+        description_short: Net enrollment rate for secondary school is calculated by dividing the number of students of official
           school age enrolled in secondary education by the population of the age group which officially corresponds to secondary
           education, and multiplying by 100.
         unit: '%'
@@ -241,7 +229,7 @@ tables:
           numDecimalPlaces: 1
       mf_tertiary_enrollment_rates:
         title: Gross enrolment ratio for tertiary education, both sexes
-        description: Total enrolment in tertiary education regardless of age expressed as a percentage of the population in
+        description_short: Total enrolment in tertiary education regardless of age expressed as a percentage of the population in
           the 5-year age group immediately following upper secondary education.
         unit: '%'
         short_unit: '%'
@@ -249,7 +237,7 @@ tables:
           numDecimalPlaces: 1
       f_tertiary_enrollment_rates:
         title: Gross enrolment ratio for tertiary education, female
-        description: Total enrolment in tertiary education regardless of age expressed as a percentage of the population in
+        description_short: Total enrolment in tertiary education regardless of age expressed as a percentage of the population in
           the 5-year age group immediately following upper secondary education.
         unit: '%'
         short_unit: '%'
@@ -257,7 +245,7 @@ tables:
           numDecimalPlaces: 1
       m_tertiary_enrollment_rates:
         title: Gross enrolment ratio for tertiary education, male
-        description: Total enrolment in tertiary education regardless of age expressed as a percentage of the population in
+        description_short: Total enrolment in tertiary education regardless of age expressed as a percentage of the population in
           the 5-year age group immediately following upper secondary education.
         unit: '%'
         short_unit: '%'

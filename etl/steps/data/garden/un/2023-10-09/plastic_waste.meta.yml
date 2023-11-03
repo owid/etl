@@ -1,0 +1,283 @@
+# NOTE: To learn more about the fields, hover over their names.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  plastic_waste:
+    variables:
+      import_total_mot:
+        title: Imports of plastic waste via all modes of transport
+        unit: tonnes
+        short_unit: t
+        description_short: Aggregate data of plastic waste imports, encompassing all transport methods.
+        display:
+          numDecimalPlaces: 0
+
+      export_total_mot:
+        title: Exports of plastic waste via all modes of transport
+        unit: tonnes
+        short_unit: t
+        description_short: Aggregate data of plastic waste exports, encompassing all transport methods.
+        display:
+          numDecimalPlaces: 0
+
+      import_air:
+        title: Imports of plastic waste via air
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imported through air transport.
+        display:
+          numDecimalPlaces: 0
+
+      import_sea:
+        title: Imports of plastic waste via sea
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imported through maritime routes.
+        display:
+          numDecimalPlaces: 0
+
+      import_railway:
+        title: Imports of plastic waste via railway
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imported utilizing railway networks.
+        display:
+          numDecimalPlaces: 0
+
+      import_road:
+        title: Imports of plastic waste via road
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imported using road networks.
+        display:
+          numDecimalPlaces: 0
+
+      export_air:
+        title: Exports of plastic waste via air
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste exported through air transport.
+        display:
+          numDecimalPlaces: 0
+
+      export_sea:
+        title: Exports of plastic waste via sea
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste exported through maritime routes.
+        display:
+          numDecimalPlaces: 0
+
+      export_road:
+        title: Exports of plastic waste via roads
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste exported using road networks.
+        display:
+          numDecimalPlaces: 0
+
+      import_other_mot:
+        title: Imports of plastic waste via other modes of tranport
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imported via miscellaneous and/or combined transport modes.
+        display:
+          numDecimalPlaces: 0
+
+      import_postal_consignments__mail_or_courier_shipment:
+        title: Imports of plastic waste via postal or courier services
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imported through postal and courier services.
+        display:
+          numDecimalPlaces: 0
+
+      export_other_mot:
+        title: Exports of plastic waste via other modes of transport
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste exported via miscellaneous and/or combined transport modes.
+        display:
+          numDecimalPlaces: 0
+
+      import_inland_waterway:
+        title: Imports of plastic waste via inland waterways
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imported using inland waterways, such as rivers and canals.
+        display:
+          numDecimalPlaces: 0
+
+      export_inland_waterway:
+        title: Exports of plastic waste via inland waterways
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste exported using inland waterways, such as rivers and canals.
+        display:
+          numDecimalPlaces: 0
+
+      export_railway:
+        title: Exports of plastic waste via railway
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste exported utilizing railway networks.
+        display:
+          numDecimalPlaces: 0
+
+      export_postal_consignments__mail_or_courier_shipment:
+        title: Exports of plastic waste via postal or courier services
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste exported through postal and courier services.
+        display:
+          numDecimalPlaces: 0
+
+      import_pipelines__cables__postal_and_others:
+        title: Imports of plastic waste via pipelines, cables, and other methods
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imported through pipelines, cables, and various other methods.
+        display:
+          numDecimalPlaces: 0
+
+      export_water__not_else_classified:
+        title: Unspecified waterborne exports of plastic waste
+        unit: tonnes
+        short_unit: t
+        description_short: Data representing plastic waste exported via waterways, where specific details may be unavailable or varied.
+        display:
+          numDecimalPlaces: 0
+
+      export_self_propelled_goods:
+        title: Exports of self-propelled plastic waste
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste exports involving self-propelled goods or mechanisms.
+        display:
+          numDecimalPlaces: 0
+
+      import_land:
+        title: Land-based imports of plastic waste
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imports that are specifically land-based, excluding maritime and airborne methods.
+        display:
+          numDecimalPlaces: 0
+
+      export_land:
+        title: Land-based exports of plastic waste
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste exports that are specifically land-based, excluding maritime and airborne methods.
+        display:
+          numDecimalPlaces: 0
+
+      export_pipelines_and_cables:
+        title: Exports of plastic waste via pipelines and cables
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste exported through pipeline and cable transport systems.
+        display:
+          numDecimalPlaces: 0
+
+      import_pipelines_and_cables:
+        title: Imports of plastic waste via pipelines and cables
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imported through pipeline and cable transport systems.
+        display:
+          numDecimalPlaces: 0
+
+      import_water:
+        title: Waterborne imports of plastic waste
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imported via waterways, such as seas, oceans, and rivers.
+        display:
+          numDecimalPlaces: 0
+
+      import_self_propelled_goods:
+        title: Imports of self-propelled plastic waste goods
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imports involving self-propelled goods or mechanisms.
+        display:
+          numDecimalPlaces: 0
+
+      export_water:
+        title: Waterborne exports of plastic waste
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste exported via waterways, such as seas, oceans, and rivers.
+        display:
+          numDecimalPlaces: 0
+
+      import_land__not_else_classified:
+        title: Unspecified land-based imports of plastic waste
+        unit: tonnes
+        short_unit: t
+        description_short: Data representing plastic waste imported via land, where specific details may be unavailable or varied.
+        display:
+          numDecimalPlaces: 0
+
+      export_land__not_else_classified:
+        title: Unspecified land-based exports of plastic waste
+        unit: tonnes
+        short_unit: t
+        description_short: Data representing plastic waste exported via land, where specific details may be unavailable or varied.
+        display:
+          numDecimalPlaces: 0
+
+      import_total_mot_per_capita:
+        title: Per capita imports of plastic waste via all modes of transport
+        unit: kilograms
+        short_unit: kg
+        processing_level: minor
+        description_short: Plastic waste imports encompassing all transport methods per capita. These are calculated by dividing by each country's population.
+        display:
+          numDecimalPlaces: 1
+
+      export_total_mot_per_capita:
+        title: Per capita exports of plastic waste via all modes of transport
+        unit: kilograms
+        short_unit: kg
+        processing_level: minor
+        description_short: Plastic waste exports encompassing all transport methods per capita. These are calculated by dividing by each country's population.
+        display:
+          numDecimalPlaces: 1
+
+      net_export:
+        title: Net exports of plastic waste via all modes of transport
+        unit: tonnes
+        short_unit: t
+        processing_level: minor
+        description_short: Plastic waste net exports encompassing all transport methods. Net exports are calculated as exports minus imports.
+        display:
+          numDecimalPlaces: 0
+
+      import_share:
+        title: Share of plastic waste imports via all modes of transport
+        unit: '%'
+        short_unit: '%'
+        processing_level: minor
+        description_short: Share of plastic waste imports encompassing all transport methods from total global. These are calculated by determining the proportion of plastic waste imports from the total plastic waste imports worldwide.
+        display:
+          numDecimalPlaces: 1
+
+      export_share:
+        title: Share of plastic waste exports via all modes of transport
+        unit: '%'
+        short_unit: '%'
+        processing_level: minor
+        description_short: Share of plastic waste exports encompassing all transport methods from total global. These are calculated by determining the proportion of plastic waste exports from the total plastic waste exports worldwide.
+        display:
+          numDecimalPlaces: 1
+
+      net_export_per_capita:
+        title: Per capita net exports of plastic waste via all modes of transport
+        unit: kilograms
+        short_unit: kg
+        processing_level: minor
+        description_short: Plastic waste net exports encompassing all transport methods per capita. Net exports are calculated as exports minus imports. These are calculated by dividing by each country's population.
+        display:
+          numDecimalPlaces: 1

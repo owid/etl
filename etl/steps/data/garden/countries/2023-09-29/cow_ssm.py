@@ -2,7 +2,7 @@
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -21,6 +21,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("cow_ssm")
+    # Load population table
+    ds_pop = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb_system = ds_meadow["cow_ssm_system"].reset_index()
@@ -51,8 +53,18 @@ def run(dest_dir: str) -> None:
     tb_states = geo.harmonize_countries(df=tb_states, countries_file=paths.country_mapping_path, country_col="statenme")
     tb_majors = geo.harmonize_countries(df=tb_majors, countries_file=paths.country_mapping_path, country_col="statenme")
 
+    # Minor format
+    tb = tb_system.copy()
+    tb["region"] = tb_system["ccode"].apply(code_to_region)
+
     # Create new table
-    tb_regions = create_table_countries_in_region(tb_system)
+    tb_regions = create_table_countries_in_region(tb)
+
+    # Population table
+    tb_pop = add_population_to_table(tb, ds_pop)
+
+    # Combine tables
+    tb_regions = tb_regions.merge(tb_pop, how="left", on=["region", "year"])
 
     # Group tables and format tables
     tables = [
@@ -78,7 +90,6 @@ def create_table_countries_in_region(tb_system: Table):
     """Create table with number of countries per region per year."""
     # Create new table
     tb_regions = tb_system.copy()
-    tb_regions["region"] = tb_regions["ccode"].apply(code_to_region)
 
     # Get number of countries per region per year
     tb_regions = (
@@ -124,3 +135,38 @@ def code_to_region(cow_code: int) -> str:
             return "Asia and Oceania"
         case _:
             raise ValueError(f"Invalid COW code: {cow_code}")
+
+
+def add_population_to_table(tb: Table, ds_pop: Dataset, country_col: str = "country") -> Table:
+    """Add population.
+
+    1. Get list of countries from latest available year. That is, we only have one row per country.
+    2. Duplicate these entries for each year from first available to latest available year. As if they existed.
+        This is because the population dataset tracks population back in time with current countries' borders.
+    3. Merge with population dataset
+
+    NOTE: Duplicated from etl/steps/data/garden/countries/2023-09-25/shared.py
+    """
+    YEAR_MAX = tb["year"].max()
+    YEAR_MIN = tb["year"].min()
+    # Get last year data
+    tb_last = tb[tb["year"] == YEAR_MAX].drop(columns=["year"])
+
+    # Extend to all years
+    tb_all_years = Table(pd.RangeIndex(YEAR_MIN, LAST_YEAR + 1), columns=["year"])
+    tb_pop = tb_last.merge(tb_all_years, how="cross")
+
+    # Add population
+    tb_pop = geo.add_population_to_table(tb_pop, ds_pop, country_col="statenme")
+
+    # Estimate population by region
+    tb_pop_regions = tb_pop.groupby(["year", "region"], as_index=False)[["population"]].sum()
+
+    # Estimate world population
+    tb_pop_world = tb_pop.groupby(["year"], as_index=False)[["population"]].sum()
+    tb_pop_world["region"] = "World"
+
+    # Combine
+    tb_pop = pr.concat([tb_pop_regions, tb_pop_world], ignore_index=True)
+
+    return tb_pop

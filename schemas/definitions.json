@@ -11,7 +11,7 @@
       "name": {
         "type": "string",
         "title": "License name",
-        "description": "Name of the license.",
+        "description": "Name of the license. Find more details on licensing at https://creativecommons.org/share-your-work/cclicenses/.",
         "requirement_level": "required",
         "examples": [
           "Public domain",
@@ -22,17 +22,13 @@
           "© GISAID 2023"
         ],
         "options": [
-          "Public domain",
           "CC0",
-          "PDM",
           "CC BY 4.0",
           "CC BY-SA 4.0",
           "CC BY-ND 4.0",
           "CC BY-NC 4.0",
           "CC BY-NC-SA 4.0",
-          "CC BY-NC-ND 4.0",
-          "©producer year",
-          "custom license"
+          "CC BY-NC-ND 4.0"
         ],
         "examples_bad": [],
         "guidelines": [
@@ -239,8 +235,7 @@
         "description": "Exact day (or year, if exact day is unknown) when the producer's data (in its current version) was published.",
         "examples": [
           "2023-09-07",
-          "2023",
-          "latest"
+          "2023"
         ],
         "examples_bad": [],
         "requirement_level": "required",
@@ -252,7 +247,7 @@
             "Must be the date when the current version of the dataset was published (not when the dataset was first released)."
           ]
         ],
-        "pattern": "(^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$)|(^\\d{4}$)|(^latest$)",
+        "pattern": "(^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$)|(^\\d{4}$)",
         "errorMessage": "`date_published` must have format YYYY-MM-DD, YYYY or 'latest'",
         "category": "dataset"
       },
@@ -342,9 +337,9 @@
             {
               "type": "list",
               "value": [
-                "One author: `Williams`.",
-                "Two authors: `Williams and Jones`.",
-                "Three or more authors: `Williams et al.`."
+                ["One author: `Williams`."],
+                ["Two authors: `Williams and Jones`."],
+                ["Three or more authors: `Williams et al.`."]
               ]
             }
           ],
@@ -584,7 +579,13 @@
             {
               "type": "exceptions",
               "value": [
-                "The name of the origin is well known and includes other metadata fields."
+                "The name of the origin is well known and includes other metadata fields.",
+                [
+                  "The producer's data product has a well-known name, and the snapshot is a specific slice of the data product. If so, use the format 'Data product - Specific slice'.",
+                  {
+                    "type": "list",
+                    "value": ["**Note:** This means that the title of the snapshot may contain the title of the data product."]}
+                ]
               ]
             }
           ],
@@ -596,9 +597,6 @@
           ],
           [
             "Should not include words like `data`, `dataset` or `database`, unless that's part of a well-known name of the origin."
-          ],
-          [
-            "If the producer's data product has a well-known name, and the snapshot is a specific slice of the data product, use a title like 'Data product - Specific slice'. NOTE: The title of the snapshot may contain the title of the data product."
           ],
           [
             "If the producer's data product does not have a well-known name, use a short sentence that describes the snapshot."
@@ -654,7 +652,42 @@
       },
       "name": {
         "type": "string",
-        "description": "Title to display for the indicator, to replace the indicator's `title`. NOTE: Currently, `grapher_config.title` will be used only in charts, whereas `display.name` will be used in other places, like the table tab."
+        "description": "Title to display for the indicator, to replace the indicator's `title`. NOTE: Currently, `grapher_config.title` will be used only in charts, whereas `display.name` will be used in other places, like the table tab.",
+        "examples": [
+          "Number of neutron star mergers in the Milky Way",
+          "Share of neutron star mergers that happen in the Milky Way",
+          "Area harvested of barley"
+        ],
+        "examples_bad": [
+          [
+            "Number of neutron stars (NASA)"
+          ],
+          [
+            "Share of neutron star mergers that happen in the Milky Way (2023)"
+          ],
+          [
+            "Barley | 00000044 || Area harvested | 005312 || hectares"
+          ]
+        ],
+        "requirement_level": "required",
+        "guidelines": [
+          [
+            "Must be suitable to be publicly displayed, even for 'big datasets' with many dimensions."
+          ],
+          [
+            "Must start with a capital letter."
+          ],
+          [
+            "Must not end with a period."
+          ],
+          [
+            "Must be one short sentence (a few words)."
+          ],
+          [
+            "Should not mention other metadata fields like `producer` or `version`."
+          ]
+        ],
+        "category": "metadata"
       },
       "description": {
         "type": "string",
@@ -707,7 +740,10 @@
       },
       "conversionFactor": {
         "type": "number",
-        "description": "Conversion factor to apply to indicator values. NOTE: We should avoid using this, and instead convert data and units (and possibly other metadata fields where the units are mentioned) consistently in the ETL grapher step."
+        "description": "Conversion factor to apply to indicator values.",
+        "guidelines": [
+          "**Note:** We should avoid using this, and instead convert data and units (and possibly other metadata fields where the units are mentioned) consistently in the ETL grapher step."
+        ]
       },
       "unit": {
         "type": "string",

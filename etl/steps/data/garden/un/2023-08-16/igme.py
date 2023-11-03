@@ -25,8 +25,9 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["igme"].reset_index()
     tb_vintage = ds_vintage["igme"].reset_index()
     tb_youth = tb_vintage[tb_vintage["indicator_name"].isin(["Deaths age 5 to 14", "Mortality rate age 5 to 14"])]
-    #
-    # Process data.
+    tb_youth = process_vintage_data(tb_youth)
+
+    # Process current data.
     #
     tb = fix_sub_saharan_africa(tb)
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
@@ -37,8 +38,88 @@ def run(dest_dir: str) -> None:
         columns={"obs_value": "Observation value", "lower_bound": "Lower bound", "upper_bound": "Upper bound"}
     )
     tb["source"] = "igme (current)"
+    # Separate out the variables needed to calculate the under-fifteen mortality rate.
+    tb_under_fifteen = tb[
+        (
+            tb["indicator"].isin(
+                ["Under-five deaths", "Deaths age 5 to 14", "Under-five mortality rate", "Mortality rate age 5-14"]
+            )
+        )
+        & (
+            tb["unit_of_measure"].isin(
+                ["Number of deaths", "Deaths per 1,000 live births", "Deaths per 1000 children aged 5"]
+            )
+        )
+    ]
 
-    # Process 5-14 mortality data
+    # Combine datasets with a preference for the current data when there is a conflict.
+
+    tb_com = combine_datasets(
+        tb_a=tb_under_fifteen, tb_b=tb_youth, table_name="igme_combined", preferred_source="igme (current)"
+    )
+
+    tb_com = calculate_under_fifteen_deaths(tb_com)
+
+    # Pivot the table so that the variables are in columns.
+    tb = pivot_table_and_format(tb)
+    # Calculate post neonatal deaths
+    tb = add_post_neonatal_deaths(tb)
+    tb_com = pivot_table_and_format(tb_com)
+
+    tb_com = calculate_under_fifteen_mortality_rates(tb_com)
+    # Add some metadata to the variables. Getting the unit from the column name and inferring the number of decimal places from the unit.
+    # If it contains " per " we know it is a rate and should have 1 d.p., otherwise it should be an integer.
+
+    tb = add_metadata_and_set_index(tb)
+    tb_com = add_metadata_and_set_index(tb_com)
+
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb, tb_com], default_metadata=ds_meadow.metadata)
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+
+def add_post_neonatal_deaths(tb: Table) -> Table:
+    """
+    Calculate the deaths for the post-neonatal age-group, 28 days - 1 year
+    """
+    tb["Observation value-Number of deaths-Post-neonatal deaths-Both sexes-All wealth quintiles"] = (
+        tb["Observation value-Number of deaths-Infant deaths-Both sexes-All wealth quintiles"]
+        - tb["Observation value-Number of deaths-Neonatal deaths-Both sexes-All wealth quintiles"]
+    )
+
+    return tb
+
+
+def add_metadata_and_set_index(tb: Table) -> Table:
+    for col in tb.columns[2:]:
+        unit = col.split("-")[1]
+        tb[col].metadata.unit = unit.lower().strip()
+        tb[col].metadata.title = col
+        if " per " in unit:
+            tb[col].metadata.display = {"numDecimalPlaces": 1}
+        else:
+            tb[col].metadata.display = {"numDecimalPlaces": 0}
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    return tb
+
+
+def pivot_table_and_format(tb: Table) -> Table:
+    tb = tb.pivot(
+        index=["country", "year"],
+        values=["Observation value", "Lower bound", "Upper bound"],
+        columns=["unit_of_measure", "indicator", "sex", "wealth_quintile"],
+    )
+    tb.columns = ["-".join(col).strip() for col in tb.columns.values]
+    tb = tb.reset_index()
+    return tb
+
+
+def process_vintage_data(tb_youth: Table) -> Table:
+    # Process vintage 5-14 mortality data
     tb_youth = tb_youth.rename(
         columns={
             "indicator_name": "indicator",
@@ -54,38 +135,7 @@ def run(dest_dir: str) -> None:
     tb_youth["source"] = "igme (2018)"
     tb_youth["indicator"] = tb_youth["indicator"].replace({"Mortality rate age 5 to 14": "Mortality rate age 5-14"})
 
-    # Combine datasets with a preference for the current data when there is a conflict.
-
-    tb = combine_datasets(tb_a=tb, tb_b=tb_youth, table_name="igme_combined", preferred_source="igme (current)")
-
-    tb = calculate_under_fifteen_deaths(tb)
-
-    tb = tb.pivot(
-        index=["country", "year"],
-        values=["Observation value", "Lower bound", "Upper bound"],
-        columns=["unit_of_measure", "indicator", "sex", "wealth_quintile"],
-    )
-    tb.columns = ["-".join(col).strip() for col in tb.columns.values]
-    tb = tb.reset_index()
-    tb = calculate_under_fifteen_mortality_rates(tb)
-    # Add some metadata to the variables. Getting the unit from the column name and inferring the number of decimal places from the unit.
-    # If it contains " per " we know it is a rate and should have 1 d.p., otherwise it should be an integer.
-    for col in tb.columns[2:]:
-        unit = col.split("-")[1]
-        tb[col].metadata.unit = unit.lower().strip()
-        tb[col].metadata.title = col
-        if " per " in unit:
-            tb[col].metadata.display = {"numDecimalPlaces": 1}
-        else:
-            tb[col].metadata.display = {"numDecimalPlaces": 0}
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
-
-    # Save changes in the new garden dataset.
-    ds_garden.save()
+    return tb_youth
 
 
 def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
@@ -112,7 +162,14 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
         tb["Observation value-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-All wealth quintiles"]
         + tb["adjusted_5_14_mortality_rate"]
     )
-    tb = tb.drop(columns="adjusted_5_14_mortality_rate")
+    tb = tb[
+        [
+            "country",
+            "year",
+            "Observation value-Deaths per 1,000 live births-Under-fifteen mortality rate-Both sexes-All wealth quintiles",
+        ]
+    ]
+    tb.metadata.short_name = "igme_under_fifteen_mortality_rate"
     return tb
 
 

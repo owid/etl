@@ -1,4 +1,8 @@
 definitions:
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
   all:
     selectedEntityNames: &selected_entities
       - Africa
@@ -186,6 +190,32 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames: *selected_entities
+
+      number_deaths_ongoing_conflicts_low_per_capita:
+        title: Number of deaths in ongoing conflicts (low estimate, per capita)
+        unit: deaths per 100,000 people
+        description_short: |-
+          The low estimate of the number of deaths in all ongoing interstate conflicts in each year.
+        description_key: *description_key_deaths
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            selectedEntityNames: *selected_entities
+
+      number_deaths_ongoing_conflicts_high_per_capita:
+        title: Number of deaths in ongoing conflicts (high estimate, per capita)
+        unit: deaths per 100,000 people
+        description_short: |-
+          The high estimate of the number of deaths in all ongoing interstate conflicts in each year.
+        description_key: *description_key_deaths
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities

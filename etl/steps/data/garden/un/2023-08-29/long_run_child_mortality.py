@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     ds_gapminder_v7: Dataset = paths.load_dependency("under_five_mortality", version="2023-09-18")
 
     # Read table from meadow dataset.
-    tb_igme = ds_igme["igme_combined"].reset_index()
+    tb_igme = ds_igme["igme"].reset_index()
 
     # Select out columns of interest.
     columns = {

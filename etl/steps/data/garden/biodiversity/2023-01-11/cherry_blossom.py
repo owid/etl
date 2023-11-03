@@ -40,5 +40,6 @@ def calculate_multiple_year_average(tb: Table) -> Table:
     tb["country"] = "Japan"
 
     tb["average_20_years"] = tb["full_flowering_date"].rolling(20, min_periods=5).mean()
+    tb["average_20_years"].metadata = tb["full_flowering_date"].metadata
 
     return tb

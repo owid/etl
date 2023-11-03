@@ -1,4 +1,8 @@
 definitions:
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
   all:
     selectedEntityNames: &selected_entities
       - Africa
@@ -124,20 +128,20 @@ tables:
         description_key: *description_key_ongoing
         processing_level: major
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 3
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities
 
       number_ongoing_disputes_per_country_pair:
         title: Number of ongoing disputes per country-pair
-        unit: disputes per country
+        unit: disputes per country-pair
         description_short: |-
           {definitions.number_ongoing_disputes.description_short}, divided by the number of country-pairs in the region.
         description_key: *description_key_ongoing
         processing_level: major
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 5
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities
@@ -166,7 +170,7 @@ tables:
         description_key: *description_key_new
         processing_level: major
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 3
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities
@@ -179,7 +183,7 @@ tables:
         description_key: *description_key_new
         processing_level: major
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 5
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities

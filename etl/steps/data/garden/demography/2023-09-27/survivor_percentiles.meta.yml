@@ -1,4 +1,9 @@
 # NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Life Expectancy
 
 
 # Learn more about the available fields:
@@ -19,9 +24,17 @@ tables:
         description_short: |-
           The age until which the << percentile >>% percentile of the population would survive until, if mortality rates remained constant, using data from a given interval.
         description_processing: |-
-          This was calculated with the method published in Alvarez and Vaupel (2023), with code provided by the authors. These estimates were regenerated for data from more recent years in the Human Mortality Database.
+          This was calculated with the method published in Alvarez and Vaupel (2023), with code provided by the authors:
 
           Jesús-Adrián Alvarez, James W. Vaupel; Mortality as a Function of Survival. Demography 1 February 2023; 60 (1): 327–342. doi: https://doi.org/10.1215/00703370-10429097
+
+          These estimates were regenerated for data from more recent years in the Human Mortality Database.
+
+          Original R code from: https://github.com/jssalvrz/s-ages
+        description_key:
+          - |-
+            {tables.survivor_percentiles.variables.age.description_short}
+          - This is calculated with the period life tables indicators.
         display:
           numDecimalPlaces: 1
         presentation:

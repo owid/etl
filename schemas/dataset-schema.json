@@ -226,7 +226,19 @@
       "additionalProperties": false
     }
   },
+  "additionalProperties": false,
   "properties": {
+    "definitions": {
+      "type": "object",
+      "description": "Definitions with anchors that are reused in other parts of the metadata",
+      "additionalProperties": true,
+      "properties": {
+        "common": {
+          "description": "Metadata that will be merged with all indicators. Does not overwrite existing metadata.",
+          "$ref": "#/properties/tables/additionalProperties/properties/variables/additionalProperties"
+        }
+      }
+    },
     "dataset": {
       "type": "object",
       "description": "An ETL dataset is a collection of tables. The dataset metadata fields are the attributes of the `DatasetMeta` object in ETL.",
@@ -323,14 +335,17 @@
         },
         "licenses": {
           "type": "array",
-          "description": "List of all licenses that have been involved in the processing history of the indicators in this dataset. NOTE: Licenses should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails. In the near future, this field may not even exist, since `licenses` should only exist inside `origins`.",
+          "description": "List of all licenses that have been involved in the processing history of the indicators in this dataset.",
+          "guidelines": [
+            "**Note:** Licenses should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails. In the near future, this field may not even exist, since `licenses` should only exist inside `origins`."
+          ],
           "items": {
             "$ref": "definitions.json#/license"
           }
         },
         "sources": {
           "type": "array",
-          "description": "List of all sources of the indicators in this dataset. NOTE: This is no longer in use, you should use origins.",
+          "description": "(DEPRECATED, no longer in use). List of all sources of the indicators in this dataset.",
           "items": {
             "$ref": "definitions.json#/source"
           }
@@ -347,6 +362,10 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "common": {
+            "description": "Metadata that will be merged with all indicators. Does not overwrite existing metadata.",
+            "$ref": "#/properties/tables/additionalProperties/properties/variables/additionalProperties"
+          },
           "title": {
             "type": "string",
             "title": "Title of the ETL table",
@@ -412,7 +431,8 @@
                   "description": "Title of the indicator, which is a few words definition of the indicator.",
                   "examples": [
                     "Number of neutron star mergers in the Milky Way",
-                    "Share of neutron star mergers that happen in the Milky Way"
+                    "Share of neutron star mergers that happen in the Milky Way",
+                    "Barley | 00000044 || Area harvested | 005312 || hectares"
                   ],
                   "examples_bad": [
                     [
@@ -420,6 +440,9 @@
                     ],
                     [
                       "Share of neutron star mergers that happen in the Milky Way (2023)"
+                    ],
+                    [
+                      "Barley"
                     ]
                   ],
                   "requirement_level": "required",
@@ -434,10 +457,10 @@
                       "Must be one short sentence (a few words)."
                     ],
                     [
-                      "Should not mention other metadata fields like `producer` or `version`."
+                      "For 'small datasets', this should be the publicly displayed title. For 'big datasets' (like FAOSTAT, with many dimensions), it can be less human-readable, optimized for internal searches (then, use `display.name` for the publicly displayed title)."
                     ],
                     [
-                      "For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), consider using other metadata fields to improve the public appearance of the title (namely `presentation.title_public` and `grapher_config.title`)."
+                      "Should not mention other metadata fields like `producer` or `version`."
                     ]
                   ],
                   "category": "metadata"
@@ -471,10 +494,23 @@
                 },
                 "description_key": {
                   "title": "Indicator's key information",
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ],
                   "description": "List of key pieces of information about the indicator.",
                   "requirement_level": "recommended (for curated indicators)",
                   "guidelines": [
@@ -489,7 +525,13 @@
                       }
                     ],
                     [
-                      "Should contain all the key information given in other description fields, like `description_short`, `grapher_config.subtitle` or `grapher_config.note`."
+                      "Must not contain `description_short` (although there might be some overlap of information)."
+                    ],
+                    [
+                      "Should contain all the key information about the indicator (except that already given in `description_short`)."
+                    ],
+                    [
+                      "Should include the key information given in other fields like `grapher_config.subtitle` (if different from `description_short`) and `grapher_config.note`."
                     ],
                     [
                       "Should not contain information about processing (which should be in `description_processing`)."
@@ -704,7 +746,10 @@
                 },
                 "origins": {
                   "type": "array",
-                  "description": "List of all origins of the indicator. Automatically filled. NOTE: Origins should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails.",
+                  "description": "List of all origins of the indicator.",
+                  "guidelines": [
+                    "**Note:** Origins should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails."
+                  ],
                   "items": {
                     "$ref": "definitions.json#/origin"
                   }
@@ -869,7 +914,137 @@
                         ]
                       ],
                       "items": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "Population Growth",
+                            "Fertility Rate",
+                            "Age Structure",
+                            "Child & Infant Mortality",
+                            "Life Expectancy",
+                            "Gender Ratio",
+                            "Eradication of Diseases",
+                            "HIV/AIDS",
+                            "Malaria",
+                            "Maternal Mortality",
+                            "Smoking",
+                            "Suicides",
+                            "Vaccination",
+                            "Cancer",
+                            "Financing Healthcare",
+                            "Causes of Death",
+                            "Burden of Disease",
+                            "Cardiovascular Diseases",
+                            "Tuberculosis",
+                            "Mental Health",
+                            "Food Supply",
+                            "Hunger & Undernourishment",
+                            "Famines",
+                            "Human Height",
+                            "Employment in Agriculture",
+                            "Fertilizers",
+                            "Food Prices",
+                            "Agricultural Production",
+                            "Diet Compositions",
+                            "Obesity",
+                            "Meat & Dairy Production",
+                            "CO2 & Greenhouse Gas Emissions",
+                            "Energy",
+                            "Nuclear Energy",
+                            "Renewable Energy",
+                            "Fossil Fuels",
+                            "Forests & Deforestation",
+                            "Indoor Air Pollution",
+                            "Land Use",
+                            "Natural Disasters",
+                            "Oil Spills",
+                            "Climate Change",
+                            "Biodiversity",
+                            "Water Use & Stress",
+                            "Ozone Layer",
+                            "Air Pollution",
+                            "Waste Management",
+                            "Research & Development",
+                            "Technological Change",
+                            "Space Exploration & Satellites",
+                            "Economic Growth",
+                            "Economic Inequality",
+                            "Economic Inequality by Gender",
+                            "Happiness & Life Satisfaction",
+                            "Human Development Index (HDI)",
+                            "Light at Night",
+                            "Working Hours",
+                            "Urbanization",
+                            "Homelessness",
+                            "Child Labor",
+                            "Government Spending",
+                            "Trade & Globalization",
+                            "Tourism",
+                            "Migration",
+                            "Nuclear Weapons",
+                            "Terrorism",
+                            "War & Peace",
+                            "Democracy",
+                            "Homicides",
+                            "Women's Rights",
+                            "Human Rights",
+                            "Violence Against Children & Children's Rights",
+                            "LGBT+ Rights",
+                            "Animal Welfare",
+                            "Education Spending",
+                            "Global Education",
+                            "Tertiary Education",
+                            "Quality of Education",
+                            "Literacy",
+                            "Pre-Primary Education",
+                            "Teachers & Schools",
+                            "Books",
+                            "Internet",
+                            "Trust",
+                            "Marriages & Divorces",
+                            "Smallpox",
+                            "Diarrheal Diseases",
+                            "Polio",
+                            "Neurodevelopmental Disorders",
+                            "Alcohol Consumption",
+                            "Pesticides",
+                            "Plastic Pollution",
+                            "Sanitation",
+                            "Transport",
+                            "Taxation",
+                            "Corruption",
+                            "Women's Employment",
+                            "Poverty",
+                            "Micronutrient Deficiency",
+                            "Tetanus",
+                            "Access to Energy",
+                            "Crop Yields",
+                            "COVID-19",
+                            "Fish & Overfishing",
+                            "Environmental Impacts of Food Production",
+                            "Lead Pollution",
+                            "Biological & Chemical Weapons",
+                            "Artificial Intelligence",
+                            "Farm Size",
+                            "Influenza",
+                            "Rights of Marginalized Ethnic Groups",
+                            "Pandemics",
+                            "Alzheimer's & Dementia",
+                            "Clean Water & Sanitation",
+                            "Electricity Mix",
+                            "Energy Mix",
+                            "Global Health",
+                            "Labor Supply & Employment",
+                            "Loneliness & Social Connections",
+                            "Mpox (monkeypox)",
+                            "Outdoor Air Pollution",
+                            "Pneumonia",
+                            "Primary & Secondary Education",
+                            "State Capacity",
+                            "Time Use",
+                            "Illicit Drug Use",
+                            "Military Personnel & Spending",
+                            "Clean Water"
+                        ]
                       }
                     },
                     "faqs": {
@@ -1151,10 +1326,6 @@
                             },
                             "additionalProperties": false
                           }
-                        },
-                        "slug": {
-                          "type": "string",
-                          "description": "Slug of the chart on Our World in Data"
                         },
                         "internalNotes": {
                           "description": "Internal notes.",
@@ -1495,15 +1666,6 @@
         }
       }
     },
-    "all": {
-      "description": "Metadata fields appended to all indicators",
-      "origins": {
-        "type": "array",
-        "description": "Origins appended to all indicators.",
-        "items": {
-          "$ref": "definitions.json#/origin"
-        }
-      }
-    }
+    "all_sources": {}
   }
 }

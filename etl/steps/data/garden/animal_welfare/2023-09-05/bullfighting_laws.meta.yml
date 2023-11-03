@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+
 tables:
   bullfighting_laws:
     variables:

@@ -1,3 +1,6 @@
+dataset:
+  update_period_days: 365
+
 tables:
   wdi:
     variables:
@@ -1910,9 +1913,8 @@ tables:
         unit: per 1 million people
       it_net_user_zs:
         title: Individuals using the Internet (% of population)
-        description: Share of the population who used the Internet in the last three months.
         description_short: Share of the population who used the Internet in the last three months.
-        description_from_producer: >
+        description_from_producer: >-
           Internet users are individuals who have used the Internet (from any location)
           in the last 3 months. The Internet can be used via a computer, mobile phone,
           personal digital assistant, games machine, digital TV etc.
@@ -1953,13 +1955,15 @@ tables:
         origins:  # Going forward this will usually come from snapshots in this form but you could also set it here
         - producer: World Bank
           title: World Development Indicators
-          description: >
+          description: >-
             The World Development Indicators (WDI) is the primary
             World Bank collection of development indicators, compiled
             from officially-recognized international sources. It
             presents the most current and accurate global development
             data available, and includes national, regional and
             global estimates.
+
+            [Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)]
           attribution: International Telecommunication Union (via World Bank) # This is an override that we would want to do for many indicators in the WDI especially
           attribution_short: World Bank
           citation_full: ""
@@ -1978,18 +1982,24 @@ tables:
         processing_level: minor
         presentation:
           title_public: Share of the population using the Internet
-          title_variant: WDI
+          # title_variant: WDI
+          title_variant: International Telecommunication Union
           # attribution: # defaults to origin[*].producer so does not have to be set here
           topic_tags:
-          - Technological Progress
+          - Technological Change
           - Internet
+          - Loneliness & Social Connections
           faqs: []
-          # - gdoc_id: 1E1sLXZmwU1SSVDFvMsJNbOAreHaKnRXqmJDqCAUfdDE
-          #   fragment_id: test
           grapher_config:
             title: Share of the population using the Internet
             subtitle: 'Share of the population who [used the Internet](#dod:internetuser) in the last three months.'
             timelineMinTime: 1990
+            sourceDesc: International Telecommunication Union (via World Bank)
+            originUrl: https://ourworldindata.org/internet
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
             hasMapTab: true
             yAxis:
               min: 0
@@ -2001,15 +2011,38 @@ tables:
                   colorSchemeInvert: false
                   binningStrategy: manual
                   customNumericMinValue: 0
+                  customNumericValues:
+                    - 10
+                    - 20
+                    - 30
+                    - 40
+                    - 50
+                    - 60
+                    - 70
+                    - 80
+                    - 90
+                    - 100
+                  customNumericLabels:
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                  legendDescription: Individuals using the Internet (% of population)
             selectedEntityNames:
-            - South Asia
-            - North America
-            - Sub-Saharan Africa
-            - East Asia and Pacific
-            - Middle East and North Africa
-            - Europe and Central Asia
-            - Latin America and Caribbean
-            - World
+              - South Asia (WB)
+              - North America (WB)
+              - Sub-Saharan Africa (WB)
+              - East Asia and Pacific (WB)
+              - Middle East and North Africa (WB)
+              - Europe and Central Asia (WB)
+              - Latin America and Caribbean (WB)
+              - World
       lp_exp_durs_md:
         title: Lead time to export, median case (days)
         short_unit: days
@@ -2598,20 +2631,35 @@ tables:
         title: GDP per capita (current US$)
         short_unit: $
         unit: current US$
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_cn:
         title: GDP per capita (current LCU)
         unit: current LCU
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_kd:
         title: GDP per capita (constant 2015 US$)
         short_unit: $
         unit: constant 2015 US$
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_kd_zg:
         title: GDP per capita growth (annual %)
         short_unit: '%'
         unit: annual %
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_kn:
         title: GDP per capita (constant LCU)
         unit: constant LCU
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_pp_cd:
         title: GDP per capita, PPP (current international $)
         short_unit: $
@@ -2619,6 +2667,9 @@ tables:
         display:
           name: GDP per capita
           numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_pp_kd:
         title: GDP per capita, PPP (constant 2017 international $)
         short_unit: $
@@ -2628,6 +2679,9 @@ tables:
           tolerance: 5
           isProjection: false
           numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_petr_rt_zs:
         title: Oil rents (% of GDP)
         short_unit: '%'

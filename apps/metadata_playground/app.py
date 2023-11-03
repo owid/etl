@@ -37,7 +37,7 @@ with open(PATH_METADATA_GARDEN, "r") as f:
 METADATA_GARDEN_DISPLAY = METADATA_GARDEN_BASE
 
 # Catalog path
-CATALOG_PATH = f"grapher/dummy/2020-01-01/{DUMMY}/{DUMMY}"
+CATALOG_PATH = f"grapher/dummy/2020-01-01/{DUMMY}/{DUMMY}#dummy_variable"
 
 
 # Functions
@@ -57,6 +57,9 @@ def run_steps() -> None:
 def get_data_page_url() -> str:
     """Get data page URL"""
     HOST = config.DB_HOST
+    if HOST == "127.0.0.1":
+        # The following port is defined in one of owid-grapher's config files.
+        HOST = "localhost:3030"
     VARIABLE_ID = gm.Variable.load_from_catalog_path(CATALOG_PATH).id
     url = f"http://{HOST}/admin/datapage-preview/{VARIABLE_ID}"
     return url

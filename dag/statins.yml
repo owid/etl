@@ -1,0 +1,14 @@
+steps:
+  data://meadow/statins/2023-10-05/lancet_2022:
+    - snapshot://statins/2023-10-05/lancet_2022.csv
+  data://garden/statins/2023-10-05/lancet_2022:
+    - data://meadow/statins/2023-10-05/lancet_2022
+  data://grapher/statins/2023-10-05/lancet_2022:
+    - data://garden/statins/2023-10-05/lancet_2022
+
+  data://meadow/statins/2023-10-05/bmj_2022:
+    - snapshot://statins/2023-10-05/bmj_2022.csv
+  data://garden/statins/2023-10-05/bmj_2022:
+    - data://meadow/statins/2023-10-05/bmj_2022
+  data://grapher/statins/2023-10-05/bmj_2022:
+    - data://garden/statins/2023-10-05/bmj_2022

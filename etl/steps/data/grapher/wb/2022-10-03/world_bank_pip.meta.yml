@@ -1,0 +1,221 @@
+dataset:
+  update_period_days: 365
+  sources: []
+
+definitions:
+  common:
+    sources: []
+    origins:
+      - producer: World Bank Poverty and Inequality Platform
+        title: World Bank Poverty and Inequality Platform
+        version_producer: '20220909_2017_01_02_PROD'
+        description: |-
+          The Poverty and Inequality Platform (PIP) is an interactive computational tool that offers users quick access to the World Bank’s estimates of poverty, inequality, and shared prosperity. PIP provides a comprehensive view of global, regional, and country-level trends for more than 160 economies around the world.
+        citation_full: World Bank Poverty and Inequality Platform
+        url_main: https://pip.worldbank.org/
+        date_accessed: '2022-10-03'
+        date_published: '2022-10-03'
+
+    presentation:
+      title_variant: World Bank, PIP
+      attribution_short: World Bank
+      grapher_config:
+        originUrl: https://ourworldindata.org/poverty
+
+  income_consumption_pc: Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children).
+  non_market_income: Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+  processing_notes: |-
+    For a small number of country-year observations, the World Bank PIP data contains two estimates: one based on income data and one based on consumption data. In these cases we keep only the consumption estimate in order to obtain a single series for each country.
+
+    You can find the data with all available income and consumption data points, including these overlapping estimates, in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.
+
+
+
+tables:
+  world_bank_pip:
+    variables:
+      dollar2_15_a_day__share_of_population_below_poverty_line:
+        title: $2.15 a day - share of population below poverty line
+        unit: '%'
+        short_unit: '%'
+        description_short: "% of population living in households with an income or consumption per person below $2.15 a day."
+        description_key:
+          - Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.
+          - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+          - "{definitions.income_consumption_pc}"
+          - "{definitions.non_market_income}"
+        description_processing: |-
+          {definitions.processing_notes}
+        presentation:
+          title_public: Share of population living in extreme poverty
+          topic_tags:
+            - Poverty
+            - Economic Growth
+            - Economic Inequality
+          faqs:
+            # NOTE: there's an image, but I'm getting an error
+            # Image error
+            # Image with filename "Five-income-distributions-national-poverty-and-IPL-2.png" not found. This block will not render when the page is baked.
+            #
+            # perhaps this will be rendered correctly in production?
+            - fragment_id: poverty-international-poverty-line
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-regional-estimates
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Share of population living in extreme poverty
+            subtitle: >-
+              Extreme poverty is defined as living below the International Poverty Line of
+              $2.15 per day. This data is adjusted for inflation and for differences in the
+              cost of living between countries.
+            note: >-
+              This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
+              2017 prices. Depending on the country and year, it relates to income measured
+              after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            variantName: Line chart
+            yAxis:
+              min: 0
+            map:
+              time: 2019
+              timeTolerance: 5
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 3
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+            selectedEntityNames:
+              - Bangladesh
+              - Bolivia
+              - Madagascar
+              - India
+              - China
+              - Ethiopia
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      _60pct_of_median__share_of_population_below_poverty_line:
+        title: 60% of median - share of population below poverty line
+        unit: '%'
+        short_unit: '%'
+        description_short: "The share of population with income or consumption below 60% of the median."
+        description_key:
+          - This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
+          - "{definitions.income_consumption_pc}"
+          - "{definitions.non_market_income}"
+        description_processing: |-
+          Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country and year, calculate a relative poverty line – in this case 60% of the median – and then run a specific query on the PIP API to return the share of population below that line.
+
+          {definitions.processing_notes}
+        presentation:
+          title_public: Share of population below 60% of median income or consumption
+          topic_tags:
+            - Poverty
+            - Economic Inequality
+          faqs:
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: 'Relative poverty: Share of people below 60% of median income'
+            subtitle: >-
+              Relative poverty is measured in terms of a poverty line that rises and falls
+              over time with average incomes — in this case set at 60% of median income.
+            note: >-
+              Depending on the country and year, the data relates to income measured after
+              taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            colorScale:
+              baseColorScheme: YlGn
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 5
+                  - 10
+                  - 15
+                  - 20
+                  - 25
+                  - 30
+                  - 35
+            selectedEntityNames:
+              - Bangladesh
+              - Bolivia
+              - Madagascar
+              - India
+              - China
+              - Ethiopia
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      gini_coefficient:
+        title: Gini coefficient
+        description_short: The Gini coefficient measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        display:
+          numDecimalPlaces: 2
+        description_key:
+          - "{definitions.income_consumption_pc}"
+          - "{definitions.non_market_income}"
+        description_processing: |-
+          {definitions.processing_notes}
+        presentation:
+          title_public: Gini Coefficient
+          topic_tags:
+            - Poverty
+            - Economic Inequality
+          faqs:
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: 'Income inequality: Gini coefficient'
+            subtitle: >-
+              The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1.
+              Higher values indicate higher inequality. Depending on the country and year,
+              the data relates to income measured after taxes and benefits, or to
+              consumption, [per capita](#dod:per-capita).
+            note: >-
+              Income and consumption estimates are available separately in this [Data
+              Explorer](https://ourworldindata.org/explorers/pip-inequality-explorer).
+            hasMapTab: true
+            tab: map
+            variantName: World Bank
+            originUrl: https://ourworldindata.org/economic-inequality
+            yAxis:
+              min: 0
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: Oranges
+                binningStrategy: manual
+                customNumericMinValue: 1
+                customNumericValues:
+                  - 0.3
+                  - 0.35
+                  - 0.4
+                  - 0.45
+                  - 0.5
+                  - 0.55
+                  - 0.6
+            selectedEntityNames:
+              - Chile
+              - Brazil
+              - South Africa
+              - United States
+              - France
+              - China
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

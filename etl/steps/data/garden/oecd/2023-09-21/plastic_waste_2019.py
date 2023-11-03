@@ -25,10 +25,38 @@ def run(dest_dir: str) -> None:
     #
     country_mapping_path = paths.directory / "plastic_pollution.countries.json"
     tb = geo.harmonize_countries(df=tb, countries_file=country_mapping_path)
+    # Save metadata for later use
+    metadata = tb.metadata
+    # Create a dictionary to map the original countries/regions to the desired regions
+    region_mapping = {
+        "Canada": "Americas (excl. USA)",
+        "China": "China",
+        "India": "India",
+        "Latin America": "Americas (excl. USA)",
+        "Middle East & North Africa": "Middle East & North Africa",
+        "OECD Asia": "Asia (excl. China and India)",
+        "OECD European Union": "Europe",
+        "OECD Oceania": "Oceania",
+        "OECD non-EU": "Europe",
+        "Other Africa": "Sub-Saharan Africa",
+        "Other EU": "Europe",
+        "Other Eurasia": "Asia (excl. China and India)",
+        "Other OECD America": "Americas (excl. USA)",
+        "Other non-OECD Asia": "Asia (excl. China and India)",
+        "United States": "United States",
+    }
+    # Map the 'country' column to the desired regions using the dictionary
+    tb["region"] = tb["country"].map(region_mapping)
+
+    # Drop the 'country' column if it's no longer needed
+    tb = tb.drop(columns=["country"])
+    tb = tb.rename(columns={"region": "country"})
+    # Ensure the regions with the same country name are summed
+    tb = tb.groupby(["year", "polymer", "application", "country"])["plastic_waste"].sum().reset_index()
+    # Add the metadata back to the table
+    tb.metadata = metadata
     # Process plastic waste data by application type
     tb = by_application(tb)
-    print(tb)
-
     tb = tb.underscore().set_index(["country", "year", "application"], verify_integrity=True).sort_index()
     #
     # Save outputs.
@@ -51,7 +79,7 @@ def by_application(tb):
     function first aggregates certain application types into broader categories, then
     performs string replacements to standardize names, and finally calculates a new
     column ('share') that represents the percentage of each entry's 'plastic_waste'
-    relative to the global total.
+    relative to thxfe global total.
 
     Parameters
     ----------
@@ -174,6 +202,6 @@ def aggregate_entries(df, entries, new_entry):
     aggregated_row = aggregated_row.reset_index()
 
     # Append the new row to the original DataFrame
-    df = df.append(aggregated_row, ignore_index=True)
+    df = pr.concat([df, aggregated_row], ignore_index=True)
 
     return df

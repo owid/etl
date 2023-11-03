@@ -48,7 +48,7 @@ from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
-from .shared import expand_observations
+from .shared import add_indicators_extra, expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -65,13 +65,13 @@ COLUMN_CIVIL_WAR = "civilwar"
 # Regions
 ## Region name mapping
 REGIONS_RENAME = {
-    "asia": "Asia (Project Mars)",
-    "eeurop": "Europe (Project Mars)",  # "Eastern Europe (Project Mars)",
-    "weurope": "Europe (Project Mars)",  # "Western Europe (Project Mars)",
-    "lamerica": "Americas (Project Mars)",  # "Latin America (Project Mars)",
-    "namerica": "Americas (Project Mars)",  # "North America (Project Mars)",
-    "nafrme": "North Africa and the Middle East (Project Mars)",
-    "ssafrica": "Sub-Saharan Africa (Project Mars)",
+    "asia": "Asia and Oceania",
+    "eeurop": "Europe",  # "Eastern Europe (Project Mars)",
+    "weurope": "Europe",  # "Western Europe (Project Mars)",
+    "lamerica": "Americas",  # "Latin America (Project Mars)",
+    "namerica": "Americas",  # "North America (Project Mars)",
+    "nafrme": "North Africa and the Middle East",
+    "ssafrica": "Sub-Saharan Africa",
 }
 ## Columns containing FLAGs for regions
 COLUMNS_REGIONS = list(REGIONS_RENAME.keys())
@@ -85,9 +85,12 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("mars")
-
     # Read table from meadow dataset.
     tb = ds_meadow["mars"].reset_index()
+
+    # Read table from COW codes
+    ds_isd = paths.load_dataset("isd")
+    tb_regions = ds_isd["isd_regions"].reset_index()
 
     #
     # Process data.
@@ -122,6 +125,23 @@ def run(dest_dir: str) -> None:
 
     log.info("war.mars: replace NaNs with zeroes")
     tb = replace_missing_data_with_zeros(tb)
+
+    # Add conflict rates
+    log.info("war.cow: map fatality codes to names")
+    tb_regions = tb_regions[~tb_regions["region"].isin(["Africa", "Middle East"])]
+    tb = add_indicators_extra(
+        tb,
+        tb_regions,
+        columns_conflict_rate=["number_ongoing_conflicts", "number_new_conflicts"],
+        columns_conflict_mortality=[
+            "number_deaths_ongoing_conflicts_high",
+            "number_deaths_ongoing_conflicts_low",
+        ],
+    )
+
+    # Add suffix with source name
+    msk = tb["region"] != "World"
+    tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (Project Mars)"
 
     # Dtypes
     log.info("war.mars: set dtypes")

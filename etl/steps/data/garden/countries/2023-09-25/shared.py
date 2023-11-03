@@ -2,7 +2,9 @@ from datetime import datetime as dt
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
+
+from etl.data_helpers import geo
 
 # Only for table tb_regions:
 # Latest year to have had a 31st of December
@@ -43,7 +45,7 @@ def init_table_countries_in_region(
     return tb_regions
 
 
-def add_latest_years_with_constat_num_countries(tb_regions: Table, column_year: str, expected_last_year: int) -> Table:
+def add_latest_years_with_constant_num_countries(tb_regions: Table, column_year: str, expected_last_year: int) -> Table:
     """Extend data until LAST_YEAR with constant number of countries.
 
     Data stops at expected_last_year, extend it until LAST_YEAR with constant number of countries.
@@ -91,3 +93,44 @@ def _get_end_year(date_str: str, date_format: str) -> int:
     if (date.month == 12) & (date.day == 31):
         return date.year + 1
     return date.year
+
+
+def add_population_to_table(
+    tb: Table, ds_pop: Dataset, country_col: str = "country", region_alt: bool = False
+) -> Table:
+    """Add population to table.
+
+    1. Get list of countries from latest available year. That is, we only have one row per country.
+    2. Duplicate these entries for each year from first available to latest available year. As if they existed.
+        This is because the population dataset tracks population back in time with current countries' borders.
+    3. Merge with population dataset
+    """
+    YEAR_MAX = tb["year"].max()
+    YEAR_MIN = tb["year"].min()
+    # Get last year data
+    tb_last = tb[tb["year"] == YEAR_MAX].drop(columns=["year"])
+
+    # Extend to all years
+    tb_all_years = Table(pd.RangeIndex(YEAR_MIN, LAST_YEAR + 1), columns=["year"])
+    tb_pop = tb_last.merge(tb_all_years, how="cross")
+
+    # Add population
+    tb_pop = geo.add_population_to_table(tb_pop, ds_pop, country_col=country_col)
+
+    # Estimate population by region
+    tb_pop_regions = tb_pop.groupby(["year", "region"], as_index=False)[["population"]].sum()
+
+    # Estimate world population
+    tb_pop_world = tb_pop.groupby(["year"], as_index=False)[["population"]].sum()
+    tb_pop_world["region"] = "World"
+
+    if region_alt:
+        # Estimate population by region
+        tb_pop_regions_alt = tb_pop.groupby(["year", "region_alt"], as_index=False)[["population"]].sum()
+        tb_pop_regions_alt = tb_pop_regions_alt.rename(columns={"region_alt": "region"})
+        tb_pop_regions_alt = tb_pop_regions_alt[tb_pop_regions_alt["region"] != "Rest"]
+        # Combine
+        tb_pop = pr.concat([tb_pop_regions, tb_pop_regions_alt, tb_pop_world], ignore_index=True)
+    else:
+        tb_pop = pr.concat([tb_pop_regions, tb_pop_world], ignore_index=True)
+    return tb_pop

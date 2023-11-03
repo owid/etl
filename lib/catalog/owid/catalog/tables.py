@@ -192,9 +192,11 @@ class Table(pd.DataFrame):
             raise ValueError(f'filename must end in ".csv": {path}')
 
         df = pd.DataFrame(self)
-        # if the dataframe uses the default index then we don't want to store it (would be a column of row numbers)
-        save_index = self.primary_key != []
-        df.to_csv(path, index=save_index, **kwargs)
+        if "index" not in kwargs:
+            # if the dataframe uses the default index then we don't want to store it (would be a column of row numbers)
+            # NOTE: By default pandas does store the index, and users often explicitly add "index=False".
+            kwargs["index"] = self.primary_key != []
+        df.to_csv(path, **kwargs)
 
         metadata_filename = splitext(path)[0] + ".meta.json"
         self._save_metadata(metadata_filename)
@@ -499,73 +501,15 @@ class Table(pd.DataFrame):
         :param path: Path to YAML file.
         :param table_name: Name of table, also updates this in the metadata.
         """
-        from .meta import DatasetMeta
-        from .utils import dynamic_yaml_load
+        from .yaml_metadata import update_metadata_from_yaml
 
-        annot = dynamic_yaml_load(path, DatasetMeta._params_yaml(self.metadata.dataset or DatasetMeta()))
-
-        self.metadata.short_name = table_name
-
-        t_annot = annot["tables"][table_name]
-
-        # validation
-        if extra_variables == "raise":
-            yaml_variable_names = t_annot.get("variables", {}).keys()
-            table_variable_names = self.columns
-            extra_variable_names = yaml_variable_names - table_variable_names
-            if extra_variable_names:
-                raise ValueError(f"Table {table_name} has extra variables: {extra_variable_names}")
-
-        # update variables
-        for v_short_name, v_annot in (t_annot.get("variables", {}) or {}).items():
-            if v_short_name in self.columns:
-                for k, v in v_annot.items():
-                    # create an object out of sources
-                    if k == "sources":
-                        self[v_short_name].metadata.sources = [Source(**source) for source in v]
-                    elif k == "origins":
-                        if if_origins_exist == "fail" and self[v_short_name].metadata.origins:
-                            raise ValueError(f"Origins already exist for variable {v_short_name}")
-                        if if_origins_exist == "replace":
-                            self[v_short_name].metadata.origins = []
-                        self[v_short_name].metadata.origins += [Origin(**origin) for origin in v]
-                    else:
-                        setattr(self[v_short_name].metadata, k, v)
-
-                    # we allow `- *descriptions` which needs to be flattened
-                    if k == "description_key":
-                        self[v_short_name].metadata.description_key = _flatten(
-                            self[v_short_name].metadata.description_key
-                        )
-
-        # update table attributes
-        for k, v in t_annot.items():
-            if k != "variables":
-                setattr(self.metadata, k, v)
-
-        # parse `all` section
-        # append origins to all indicators
-        all_origins = [Origin(**origin_dict) for origin_dict in annot.get("all", {}).get("origins", [])]
-        if all_origins:
-            for var_name in self.columns:
-                self[var_name].metadata.origins += [
-                    origin for origin in all_origins if origin not in self[var_name].metadata.origins
-                ]
-
-        # append sources to all indicators
-        if "sources" in annot.get("all", {}):
-            # setting [] explicitly means you want to remove them all
-            if list(annot["all"]["sources"]) == []:
-                for var_name in self.columns:
-                    self[var_name].metadata.sources = []
-            # otherwise append them if there are any
-            else:
-                all_sources = [Source(**source_dict) for source_dict in annot.get("all", {}).get("sources", [])]
-                if all_sources:
-                    for var_name in self.columns:
-                        self[var_name].metadata.sources += [
-                            source for source in all_sources if source not in self[var_name].metadata.sources
-                        ]
+        return update_metadata_from_yaml(
+            tb=self,
+            path=path,
+            table_name=table_name,
+            extra_variables=extra_variables,
+            if_origins_exist=if_origins_exist,
+        )
 
     def prune_metadata(self) -> "Table":
         """Prune metadata for columns that are not in the table. This can happen after slicing
@@ -914,8 +858,8 @@ class Table(pd.DataFrame):
 
     def groupby(self, *args, observed=False, **kwargs) -> "TableGroupBy":
         """Groupby that preserves metadata."""
-        by_list = [args[0]] if isinstance(args[0], str) else args[0]
-        if observed is False:
+        if observed is False and args:
+            by_list = [args[0]] if isinstance(args[0], str) else args[0]
             for by in by_list:
                 if isinstance(by, str):
                     by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
@@ -1345,7 +1289,8 @@ def read_csv(
     if isinstance(filepath_or_buffer, (str, Path)):
         table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
     else:
-        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_csv.")
+        # NOTE: Currently, the processing log cannot be updated unless you pass a path to read_csv.
+        table = update_log(table=table, operation="load", parents=["unknown"])
 
     return cast(Table, table)
 
@@ -1450,7 +1395,30 @@ def read_json(
     return cast(Table, table)
 
 
+def read_stata(
+    filepath_or_buffer: Union[str, Path, IO[AnyStr]],
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(pd.read_stata(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    if isinstance(filepath_or_buffer, (str, Path)):
+        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
+    else:
+        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_stata.")
+
+    return cast(Table, table)
+
+
 class ExcelFile(pd.ExcelFile):
+    def __init__(self, *args, metadata: Optional[TableMeta] = None, origin: Optional[Origin] = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.metadata = metadata
+        self.origin = origin
+
     def parse(
         self,
         sheet_name: Union[str, int] = 0,
@@ -1460,6 +1428,9 @@ class ExcelFile(pd.ExcelFile):
         underscore: bool = False,
         **kwargs,
     ):
+        metadata = metadata or self.metadata
+        origin = origin or self.origin
+
         # Note: Maybe we should include the sheet name in parents.
         df = super().parse(sheet_name=sheet_name, *args, **kwargs)  # type: ignore
         table = Table(df, underscore=underscore, short_name=str(sheet_name))
@@ -1686,11 +1657,6 @@ def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List
             for field in fields:
                 if not getattr(table[column].metadata, field):
                     log.warning(f"Table {table_name}, column {column} has no {field}.")
-
-
-def _flatten(lst: List[Any]) -> List[str]:
-    """Flatten list that contains either strings or lists."""
-    return [item for sublist in lst for item in ([sublist] if isinstance(sublist, str) else sublist)]
 
 
 def _resolve_collisions(

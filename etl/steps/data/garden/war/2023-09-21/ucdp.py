@@ -23,6 +23,7 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
+from shared import add_indicators_extra
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -63,6 +64,10 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("ucdp")
+
+    # Read table from COW codes
+    ds_cow_ssm = paths.load_dataset("gleditsch")
+    tb_regions = ds_cow_ssm["gleditsch_regions"].reset_index()
 
     #
     # Process data.
@@ -119,8 +124,23 @@ def run(dest_dir: str) -> None:
     # Add data for "all intrastate" conflict types
     tb = add_conflict_all_intrastate(tb)
 
+    # Add data for "state-based" conflict types
+    tb = add_conflict_all_statebased(tb)
+
     # Force types
     # tb = tb.astype({"conflict_type": "category", "region": "category"})
+
+    # Add conflict rates
+    tb = add_indicators_extra(
+        tb,
+        tb_regions,
+        columns_conflict_rate=["number_ongoing_conflicts", "number_new_conflicts"],
+        columns_conflict_mortality=[
+            "number_deaths_ongoing_conflicts",
+            "number_deaths_ongoing_conflicts_high",
+            "number_deaths_ongoing_conflicts_low",
+        ],
+    )
 
     # Adapt region names
     tb = adapt_region_names(tb)
@@ -526,10 +546,21 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
     tb_extra = tb_extra.set_index(["year", "region"]).reindex(new_idx).reset_index()
     tb_extra["conflict_type"] = "extrasystemic"
 
-    # Replace nulls with zeroes
-    tb_extra[["number_ongoing_conflicts", "number_new_conflicts"]] = tb_extra[
-        ["number_ongoing_conflicts", "number_new_conflicts"]
-    ].fillna(0)
+    # Replace nulls with zeroes (all time series)
+    columns = [
+        "number_ongoing_conflicts",
+        "number_new_conflicts",
+    ]
+    tb_extra[columns] = tb_extra[columns].fillna(0)
+
+    # Replace nulls with zeroes (only post 1989 time series)
+    columns = [
+        "number_deaths_ongoing_conflicts",
+        "number_deaths_ongoing_conflicts_high",
+        "number_deaths_ongoing_conflicts_low",
+    ]
+    mask_1989 = tb_extra["year"] >= 1989
+    tb_extra.loc[mask_1989, columns] = tb_extra.loc[mask_1989, columns].fillna(0)
 
     # Add to main table
     tb = pr.concat([tb[-mask], tb_extra])
@@ -657,6 +688,15 @@ def add_conflict_all_intrastate(tb: Table) -> Table:
     tb_intra = tb_intra.groupby(["year", "region"], as_index=False).sum(numeric_only=True, min_count=1)
     tb_intra["conflict_type"] = "intrastate"
     tb = pr.concat([tb, tb_intra], ignore_index=True)
+    return tb
+
+
+def add_conflict_all_statebased(tb: Table) -> Table:
+    """Add metrics for conflict_type = 'state-based'."""
+    tb_state = tb[tb["conflict_type"].isin(TYPE_OF_CONFLICT_MAPPING.values())].copy()
+    tb_state = tb_state.groupby(["year", "region"], as_index=False).sum(numeric_only=True, min_count=1)
+    tb_state["conflict_type"] = "state-based"
+    tb = pr.concat([tb, tb_state], ignore_index=True)
     return tb
 
 

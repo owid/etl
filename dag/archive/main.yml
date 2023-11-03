@@ -25,6 +25,17 @@ steps:
     - data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature
   data://grapher/met_office_hadley_centre/2023-01-02/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly (2023-01-17).
+  #
+  data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_southern_hemisphere.csv
+  data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature
+  data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
 
 
   # Homicide - UNODC - to archive
@@ -34,6 +45,12 @@ steps:
   - data://meadow/homicide/2023-01-27/unodc
   data://grapher/homicide/2023-01-27/unodc:
   - data://garden/homicide/2023-01-27/unodc
+
+  # HMD
+  data://meadow/hmd/2022-11-04/life_tables:
+    - walden://hmd/2022-11-04/life_tables
+  data://garden/hmd/2022-11-04/life_tables:
+    - data://meadow/hmd/2022-11-04/life_tables
 
   # SDG dataset assmebled from https://sdg-tracker.org/
   # This is commented now to avoid `etl.helpers.LatestVersionOfStepShouldBeActive` error
@@ -93,11 +110,12 @@ steps:
 # Include all active steps plus all archive steps.
 include:
   - dag/main.yml
+  - dag/archive/animal_welfare.yml
   - dag/archive/agriculture.yml
   # - dag/archive/open_numbers.yml
   - dag/archive/faostat.yml
   - dag/archive/energy.yml
-  # - dag/archive/walkthrough.yml
+  # - dag/archive/wizard.yml
   # - dag/archive/examples.yml
   - dag/archive/emissions.yml
   - dag/archive/papers.yml

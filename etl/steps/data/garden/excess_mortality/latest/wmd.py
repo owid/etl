@@ -65,6 +65,9 @@ def run(dest_dir: str) -> None:
 
 
 def process(df: pd.DataFrame) -> pd.DataFrame:
+    # Clean dataframe
+    log.info("\thmd_stmf: cleaning bad values")
+    df = df_clean(df)
     # Check dataframe fields and values
     log.info("\thmd_stmf: initial dataframe API check")
     df_api_check(df)
@@ -80,6 +83,15 @@ def process(df: pd.DataFrame) -> pd.DataFrame:
     # Ensure columns match expected format
     log.info("\twmd: format columns in dataframe")
     df = format_columns(df)
+    return df
+
+
+def df_clean(df: pd.DataFrame) -> pd.DataFrame:
+    ix = df.year == 0
+    # NOTE: There are some values for FJI with year 0. Drop them as a hotfix.
+    if ix.any():
+        log.warning(f"\t\twmd: dropping {ix.sum()} rows with year==0")
+    df = df[~ix]
     return df
 
 

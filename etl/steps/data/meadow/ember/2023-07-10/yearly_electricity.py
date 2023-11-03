@@ -1,8 +1,6 @@
 """Load snapshot of Ember's Yearly Electricity Data and create a raw data table.
 
 """
-import owid.catalog.processing as pr
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get naming conventions.
@@ -14,8 +12,8 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_dependency("yearly_electricity.csv")
-    tb = pr.read_csv(snap.path, metadata=snap.to_table_metadata(), underscore=True)
+    snap = paths.load_snapshot("yearly_electricity.csv")
+    tb = snap.read_csv(underscore=True)
 
     #
     # Process data.

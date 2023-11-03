@@ -238,7 +238,7 @@ def migrate(
         "2. Add spreadsheet to Google Drive with: File -> Add a shortcut to Drive -> Shared Drives -> OWID Fast-track"
     )
     lg.info("3. Import spreadsheet with Fast-track on http://etl-prod-1:8082/")
-    lg.info("4. Run walkthrough charts to migrate charts to the new dataset")
+    lg.info("4. Run `etl-wizard charts` to migrate charts to the new dataset")
     lg.info("5. Delete old dataset")
 
     lg.info("migrate.finish")

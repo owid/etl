@@ -2,6 +2,7 @@ Learn more about the fields available in our metadata from this reference. The r
 
 - [Origin](origin.md)
 - [Dataset](dataset.md)
-- [Tables](tables.md)
+- [Table](tables.md)
+- [Indicator](indicator.md)
 
 

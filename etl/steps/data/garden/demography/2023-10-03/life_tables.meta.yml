@@ -1,5 +1,32 @@
 # NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      grapher_config:
+        selectedEntityNames:
+          - Italy
+          - England and Wales
+          - France
+          - Sweden
+      topic_tags:
+        - Life Expectancy
 
+  global:
+    life_expectancy:
+      description_short: |-
+        <% if type == "period" %>
+        The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
+        <% elif type == "cohort" %>
+        The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+        <% endif %>
+      point_1: |-
+        <% if type == "period" %>
+        This is based on a synthetic cohort created using mortality rates across age groups in a given year.
+        <% elif type == "cohort" %>
+        Rather than waiting for the entire cohort to have died before calculating the cohort life expectancy, researchers may use data from birth cohorts that are 'almost extinct'.
+        <% endif %>
+    data_used: |-
+      Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -17,62 +44,178 @@ dataset:
 tables:
   life_tables:
     variables:
+
       central_death_rate:
         title: Central death rate
-        description_short: |-
-          The number of people who died during a 12-month period while at a given age by the average number who were living in that age group during this period.
         unit: deaths per 1,000 people
-        processing_level: minor
+        description_short: |-
+          For a given population or cohort, the central death rate during a given 12 month interval is calculated as the number of deaths during the interval, divided by the number of person-years lived during that interval.
+        description_key:
+          - |-
+            Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years. This makes the value very slightly different from the 'probability of death' during the interval, because the 'probability of death' metric uses a different denominator: the number of people alive at that age at the start of the interval.
+          - |-
+            {definitions.global.data_used}
         description_processing: |-
-          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
+          The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
+        processing_level: minor
+        display:
+          name: |-
+            Central death rate at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'both') >>, << type >>
+        presentation:
+          title_public: Central death rate at << age if age != '0' else 'birth'>>
+          title_variant: << sex + 's, ' if sex != 'both' >><< type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - << 'Child & Infant Mortality' if age == '0' else 'Causes of Death'>>
+
+      central_death_rate_mf_ratio:
+        title: Central death rate ratio (m/f)
+        unit: ""
+        description_short: |-
+          <% if type == "cohort" %>
+          The ratio of cohort central death rate (males/females) at a given age.
+          <% elif type == "period" %>
+          The ratio of period central death rate (males/females) at a given age.
+          <% endif %>
+        processing_level: major
+        display:
+          name: |-
+            Central death rate (male-to-female ratio) at << 'birth' if (age == '0') else age >>, << type >>
+        presentation:
+          title_public: Central death rate at << age if age != '0' else 'birth'>>
+          title_variant: male-to-female ratio, << type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - Gender Ratio
+            - << 'Child & Infant Mortality' if age == '0' else 'Causes of Death'>>
+
       probability_of_death:
         title: Probability of death
         unit: "%"
-        description_short: The probability that a person who survived until the start of a given interval will have died by the end of the interval.
-        processing_level: minor
+        description_short: |-
+          The probability of dying in a given interval, among people who survived to the start of that interval.
+        description_key:
+          - |-
+            For example, the probability of death for a 50 year old in a given year is found by: dividing the number of deaths in 50 year olds that year, by the number of people alive at the age of 50 at the start of the year.
         description_processing: |-
-          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
+          The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
+        processing_level: minor
+        display:
+          name: |-
+            Probability of death at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'both') >>, << type >>
+        presentation:
+          title_public: Probability of death at << age if age != '0' else 'birth'>>
+          title_variant: << sex + 's, ' if sex != 'both' >><< type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - Causes of Death
+
       average_survival_length:
         title: Average survival length
         short_unit: years
         unit: years
         description_short: Average length of survival between ages x and x+n for persons dying in the interval.
+
       number_survivors:
         title: Number of survivors
         unit: survivors
         description_short: Number of survivors at a given age, assuming survivors at 0 years old is 100,000.
+
       number_deaths:
         title: Number of deaths
         short_unit: deaths
         unit: deaths
-        description_short: Number of deaths between during a given age.
+        description_short: Number of deaths during a given age.
+        presentation:
+          topic_tags:
+            - Life Expectancy
+            - Causes of Death
+
       number_person_years_lived:
         title: Number of person-years lived
         unit: person-years
         description_short: Number of person-years lived between a given ages and a year after.
+
       number_person_years_remaining:
         title: Number of person-years remaining
         unit: person-years
         description_short: Number of person-years remaining after a given age.
+
       life_expectancy:
         title: Life expectancy
         short_unit: years
         unit: years
         description_short: |-
-          <% if type == "period" %>
-          The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
-
-          <% elif type == "cohort" %>
-          The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
-          <% endif %>
+          {definitions.global.life_expectancy.description_short}
         description_key:
-          - Life expectancy at age 0 refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy people who have already survived to the given age.
+          - |-
+            <% if age == 0 %>
+            Life expectancy at age 0 refers to life expectancy at birth.
+            <% else %>
+            It refers to the remaining life expectancy for people who have already survived to the given age.
+            <% endif %>
+          - |-
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.data_used}
+        display:
+          name: |-
+            Life expectancy at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'both') >>, << type >>
+        presentation:
+          title_public: Life expectancy at << age if age != '0' else 'birth'>>
+          title_variant: << sex + 's, ' if sex != 'both' >><< type + ' tables'>>
+
       life_expectancy_fm_diff:
         title: Life expectancy difference (f-m)
         short_unit: years
         unit: years
-        description_short: Life expectancy difference (females - males) at a given age.
+        description_short: |-
+          <% if type == "cohort" %>
+          The difference in cohort life expectancy (females - males) at a given age.
+          <% elif type == "period" %>
+          The difference in period life expectancy (females - males) at a given age.
+          <% endif %>
+        description_key:
+          - Higher values indicate longer life expectancy among females than males.
+          - |-
+            {definitions.global.life_expectancy.description_short}
+          - |-
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.data_used}
+        display:
+          name: |-
+            Life expectancy (female-male difference) at << 'birth' if (age == '0') else age >>, << type >>
+        presentation:
+          title_public: Life expectancy at << age if age != '0' else 'birth'>>
+          title_variant: female-male difference, << type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - Gender Ratio
+
       life_expectancy_fm_ratio:
         title: Life expectancy ratio (f/m)
         unit: ""
-        description_short: Life expectancy ratio (females/males) at a given age.
+        description_short: |-
+          <% if type == "cohort" %>
+          The ratio of cohort life expectancy (females/males) at a given age.
+          <% elif type == "period" %>
+          The ratio of period life expectancy (females/males) at a given age.
+          <% endif %>
+        description_key:
+          - Higher values indicate longer life expectancy among females than males.
+          - |-
+            {definitions.global.life_expectancy.description_short}
+          - |-
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.data_used}
+        display:
+          name: |-
+            Life expectancy (female-to-male ratio) at << 'birth' if (age == '0') else age >>, << type >>
+        presentation:
+          title_public: Life expectancy at << age if age != '0' else 'birth'>>
+          title_variant: female-to-male ratio, << type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - Gender Ratio

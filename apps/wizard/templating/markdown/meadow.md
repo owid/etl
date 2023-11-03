@@ -1,4 +1,4 @@
-Here's a summary of this walkthrough, you don't have to manually execute anything, all of it will be done automatically after submitting a form below
+Here's a summary, you don't have to manually execute anything, all of it will be done automatically after submitting a form below
 
 
 1. **Create a new `meadow` step file** (e.g. `etl/etl/steps/data/meadow/example_institution/YYYY-MM-DD/example_dataset.py`). The step must contain a `run(dest_dir)` function that loads snapshot and creates a dataset (a `catalog.Dataset` object) with one or more tables (`catalog.Table` objects) containing the raw data.

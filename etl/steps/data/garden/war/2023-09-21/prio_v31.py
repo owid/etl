@@ -30,17 +30,19 @@ from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
+from .shared import add_indicators_extra
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 # Logger
 log = get_logger()
 # Rename columns
 REGIONS_RENAME = {
-    1: "Europe (PRIO)",
-    2: "Middle East (PRIO)",
-    3: "Asia and Oceania (PRIO)",
-    4: "Africa (PRIO)",
-    5: "Americas (PRIO)",
+    1: "Europe",
+    2: "Middle East",
+    3: "Asia and Oceania",
+    4: "Africa",
+    5: "Americas",
 }
 CONFTYPES_RENAME = {
     1: "extrasystemic",
@@ -56,52 +58,72 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("prio_v31")
-
     # Read table from meadow dataset.
     tb = ds_meadow["prio_v31"].reset_index()
+
+    # Read table from COW codes
+    ds_cow_ssm = paths.load_dataset("gleditsch")
+    tb_regions = ds_cow_ssm["gleditsch_regions"].reset_index()
 
     #
     # Process data.
     #
     # Relevant rows
-    log.info("war.prio_v31: keep relevant columns")
+    paths.log.info("keep relevant columns")
     COLUMNS_RELEVANT = ["id", "year", "region", "type", "startdate", "ependdate", "bdeadlow", "bdeadhig", "bdeadbes"]
     tb = tb[COLUMNS_RELEVANT]
 
-    log.info("war.prio_v31: sanity checks")
+    paths.log.info("sanity checks")
     _sanity_checks(tb)
 
-    log.info("war.prio_v31: replace NA in best estimate with lower bound")
+    paths.log.info("replace NA in best estimate with lower bound")
     tb["bdeadbes"] = tb["bdeadbes"].fillna(tb["bdeadlow"])
 
-    log.info("war.prio_v31: estimate metrics")
+    paths.log.info("estimate metrics")
     tb = estimate_metrics(tb)
 
-    log.info("war.prio_v31: rename columns")
+    paths.log.info("rename columns")
     tb = tb.rename(
         columns={
             "type": "conflict_type",
         }
     )
 
-    log.info("war.prio_v31: replace NaNs with zeroes")
+    paths.log.info("replace NaNs with zeroes")
     tb = replace_missing_data_with_zeros(tb)
 
     # Rename regions
-    log.info("war.prio_v31: rename regions")
+    log.info("war.cow: rename regions")
     tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
     assert tb["region"].isna().sum() == 0, "Unmapped regions!"
 
+    # Add conflict rates
+    paths.log.info("war.cow: map fatality codes to names")
+    tb = add_indicators_extra(
+        tb,
+        tb_regions,
+        columns_conflict_rate=["number_ongoing_conflicts", "number_new_conflicts"],
+        columns_conflict_mortality=[
+            "number_deaths_ongoing_conflicts_battle_high",
+            "number_deaths_ongoing_conflicts_battle_low",
+            "number_deaths_ongoing_conflicts_battle",
+        ],
+    )
+
+    # Add suffix with source name
+    msk = tb["region"] != "World"
+    tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (PRIO)"
+
     # Rename conflict_type
-    log.info("war.prio_v31: rename regions")
+    paths.log.info("rename regions")
     tb["conflict_type"] = tb["conflict_type"].map(CONFTYPES_RENAME | {"all": "all", "intrastate": "intrastate"})
     assert tb["conflict_type"].isna().sum() == 0, "Unmapped conflict_type!"
 
     # sanity check: summing number of ongoing and new conflicts of all types is equivalent to conflict_type="all"
-    log.info("war.prio_v31: sanity checking number of conflicts")
+    paths.log.info("sanity checking number of conflicts")
     _sanity_check_final(tb)
 
-    log.info("war.prio_v31: set index")
+    paths.log.info("set index")
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True)
 
     #

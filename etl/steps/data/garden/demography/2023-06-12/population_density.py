@@ -46,10 +46,10 @@ def run(dest_dir: str) -> None:
     )
 
     # Additional descriptions.
-    tb = ds_garden["population_density"]
-    tb.population_density.metadata.description += "\n" + tb_population.population.metadata.description
-    ds_garden.metadata.description += "\n\n" + ds_population.metadata.description
-    ds_garden.add(tb)
+    # tb = ds_garden["population_density"]
+    # tb.population_density.metadata.description += "\n" + tb_population.population.metadata.description
+    # ds_garden.metadata.description += "\n\n" + ds_population.metadata.description
+    # ds_garden.add(tb)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

@@ -18,7 +18,8 @@ def run(dest_dir: str) -> None:
     ds_garden = cast(Dataset, paths.load_dependency("igme"))
 
     # Read table from garden dataset.
-    tb = ds_garden["igme_combined"]
+    tb = ds_garden["igme"]
+    tb_youth = ds_garden["igme_under_fifteen_mortality_rate"]
 
     #
     # Process data.
@@ -28,7 +29,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = create_dataset(dest_dir, tables=[tb, tb_youth], default_metadata=ds_garden.metadata)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

@@ -6,7 +6,7 @@
   "files.trimTrailingWhitespace": true,
   "yaml.schemas": {
     "schemas/snapshot-schema.json": "**/*.dvc",
-    "schemas/dataset-schema.json": "**/*.meta.yml"
+    "schemas/dataset-schema.json": ["**/*.meta.yml", "**/*.meta.override.yml"]
   },
   "[python]": {
     "editor.formatOnSave": true,

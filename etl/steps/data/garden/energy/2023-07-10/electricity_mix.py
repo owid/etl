@@ -76,9 +76,9 @@ def process_statistical_review_data(tb_review: Table) -> Table:
     # Create a table with a dummy index.
     tb_review = tb_review.reset_index()
 
-    # Create new columns, by adding up other columns (and allowing for only one nan in each sum).
+    # Create new columns, by adding up other columns (and allowing for zero nans in each sum).
     for new_column in aggregates:
-        tb_review[new_column] = tb_review[aggregates[new_column]].sum(axis=1, min_count=len(aggregates[new_column]) - 1)
+        tb_review[new_column] = tb_review[aggregates[new_column]].sum(axis=1, min_count=len(aggregates[new_column]))
 
     return tb_review
 

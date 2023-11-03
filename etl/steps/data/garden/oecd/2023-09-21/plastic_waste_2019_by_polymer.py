@@ -25,6 +25,36 @@ def run(dest_dir: str) -> None:
     #
     country_mapping_path = paths.directory / "plastic_pollution.countries.json"
     tb = geo.harmonize_countries(df=tb, countries_file=country_mapping_path)
+    # Save metadata for later use
+    metadata = tb.metadata
+    # Create a dictionary to map the original countries/regions to the desired regions
+    region_mapping = {
+        "Canada": "Americas (excl. USA)",
+        "China": "China",
+        "India": "India",
+        "Latin America": "Americas (excl. USA)",
+        "Middle East & North Africa": "Middle East & North Africa",
+        "OECD Asia": "Asia (excl. China and India)",
+        "OECD European Union": "Europe",
+        "OECD Oceania": "Oceania",
+        "OECD non-EU": "Europe",
+        "Other Africa": "Sub-Saharan Africa",
+        "Other EU": "Europe",
+        "Other Eurasia": "Asia (excl. China and India)",
+        "Other OECD America": "Americas (excl. USA)",
+        "Other non-OECD Asia": "Asia (excl. China and India)",
+        "United States": "United States",
+    }
+    # Map the 'country' column to the desired regions using the dictionary
+    tb["region"] = tb["country"].map(region_mapping)
+
+    # Drop the 'country' column if it's no longer needed
+    tb = tb.drop(columns=["country"])
+    tb = tb.rename(columns={"region": "country"})
+    # Ensure the regions with the same country name are summed
+    tb = tb.groupby(["year", "polymer", "application", "country"])["plastic_waste"].sum().reset_index()
+    # Add the metadata back to the table
+    tb.metadata = metadata
     # Process plastic waste data by polymer type
     tb = by_polymer(tb)
     tb = tb.underscore().set_index(["country", "year", "polymer"], verify_integrity=True).sort_index()

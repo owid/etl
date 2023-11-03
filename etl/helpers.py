@@ -183,23 +183,28 @@ def create_dataset(
     for k, v in match.groupdict().items():
         setattr(ds.metadata, k, v)
 
-    # update metadata from yaml file
-    N_archive = PathFinder(str(paths.STEP_DIR / "archive" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
-    if N_archive.metadata_path.exists():
-        N = N_archive
-    else:
-        N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
-    if N.metadata_path.exists():
-        ds.update_metadata(N.metadata_path, if_origins_exist=if_origins_exist)
+    meta_path = get_metadata_path(str(dest_dir))
+    if meta_path.exists():
+        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist)
 
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():
             assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
+
     # run grapher checks
     if ds.metadata.channel == "grapher" and run_grapher_checks:
         grapher_checks(ds)
 
     return ds
+
+
+def get_metadata_path(dest_dir: str) -> Path:
+    N_archive = PathFinder(str(paths.STEP_DIR / "archive" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
+    if N_archive.metadata_path.exists():
+        N = N_archive
+    else:
+        N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
+    return N.metadata_path
 
 
 def create_dataset_with_combined_metadata(

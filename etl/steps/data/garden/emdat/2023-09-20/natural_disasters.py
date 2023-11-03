@@ -355,28 +355,6 @@ def create_additional_variables(tb: Table, ds_population: Dataset, tb_gdp: Table
         tb=tb, ds_population=ds_population, expected_countries_without_population=["North Yemen", "South Yemen"]
     )
 
-    ####################################################################################################################
-    # TODO: Remote this temporary solution once WDI has origins.
-    from owid.catalog import License, Origin
-
-    error = "Remove temporary solution where origins where manually created."
-    assert tb_gdp["ny_gdp_mktp_cd"].metadata.origins == [], error
-    tb_gdp["ny_gdp_mktp_cd"].metadata.sources = []
-    tb_gdp["ny_gdp_mktp_cd"].metadata.origins = [
-        Origin(
-            title="World Development Indicators",
-            producer="World Bank and OECD",
-            url_main="https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators",
-            url_download="http://databank.worldbank.org/data/download/WDI_csv.zip",
-            date_accessed="2023-05-29",
-            date_published="2023-05-11",
-            citation_full="World Bank national accounts data, and OECD National Accounts data files. Data extracted from the World Bank's World Development Indicators (WDI).",
-            description="The World Development Indicators (WDI) is the primary World Bank collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available, and includes national, regional and global estimates.",
-            license=License(name="CC BY 4.0"),
-        )
-    ]
-    ####################################################################################################################
-
     # Combine natural disasters with GDP data.
     tb = tb.merge(tb_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
     # Prepare cost variables.
@@ -542,6 +520,13 @@ def run(dest_dir: str) -> None:
     # Load WDI dataset, read its main table and select variable corresponding to GDP (in current US$).
     ds_wdi = paths.load_dataset("wdi")
     tb_gdp = ds_wdi["wdi"][["ny_gdp_mktp_cd"]].reset_index()
+
+    ####################################################################################################################
+    # TODO: Remote this temporary solution once WDI has origins.
+    from etl.data_helpers.misc import add_origins_to_wdi
+
+    tb_gdp = add_origins_to_wdi(tb_wdi=tb_gdp)
+    ####################################################################################################################
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")

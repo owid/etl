@@ -1,5 +1,6 @@
 """Snapshot phase."""
 import subprocess
+import traceback
 from datetime import datetime as dt
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, cast
@@ -676,7 +677,7 @@ with st.sidebar:
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
-        st.markdown("3. **Only supports `origin`**. To work with `source` instead, use `walkthrough`.")
+        st.markdown("3. **Only supports `origin`**. `source` is not supported anymore.")
 
 # FORM
 if st.session_state["show_form"]:
@@ -730,7 +731,7 @@ if submitted:
         # Create files
         utils.generate_step(
             cookiecutter_path=utils.COOKIE_SNAPSHOT,
-            data=dict(**form.dict(), channel="snapshots", walkthrough_origins=utils.WALKTHROUGH_ORIGINS),
+            data=dict(**form.dict(), channel="snapshots"),
             target_dir=SNAPSHOTS_DIR,
         )
         ingest_path = SNAPSHOTS_DIR / form.namespace / form.snapshot_version / (form.short_name + ".py")
@@ -805,5 +806,11 @@ if st.session_state["run_step"]:
 
     # Run step
     with st.spinner(f"Running snapshot step... {command_str}"):
-        subprocess.call(args=commands)
-    st.write("Snapshot uploaded!")
+        try:
+            output = subprocess.check_output(args=commands)
+        except Exception as e:
+            st.write("The snapshot was NOT uploaded! Please check the terminal for the complete error message.")
+            tb_str = "".join(traceback.format_exception(e))
+            st.error(tb_str)
+        else:
+            st.write("Snapshot should be uploaded!")

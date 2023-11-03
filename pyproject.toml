@@ -14,7 +14,6 @@ backport = 'apps.backport.backport:backport_cli'
 bulk_backport = 'apps.backport.bulk_backport:bulk_backport'
 backport-migrate = 'apps.backport.migrate.migrate:cli'
 backport-fasttrack = 'apps.backport.fasttrack_backport:cli'
-walkthrough = 'apps.walkthrough.cli:cli'
 fasttrack = 'apps.fasttrack.cli:cli'
 run_python_step = 'etl.run_python_step:main'
 compare = 'etl.compare:cli'
@@ -31,7 +30,7 @@ etl-metaplay = 'apps.metadata_playground.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
 
 [tool.poetry.dependencies]
-python = ">=3.10, <3.13"
+python = ">=3.10, <3.12"
 owid-catalog = {path = "lib/catalog", develop = true}
 walden = {path = "lib/walden", develop = true}
 click = ">=8.0.1"
@@ -107,7 +106,6 @@ gspread = "^5.10.0"
 # unpinning those would introduce tons of type errors
 pyright = "1.1.288"
 pandas-stubs = "1.2.0.62"
-dataclasses-json = "0.5.7"
 jsonref = "^1.1.0"
 mkdocs-jupyter = "^0.24.2"
 mkdocs-exclude = "^1.0.2"
@@ -115,12 +113,12 @@ mkdocs-gen-files = "^0.5.0"
 
 
 [tool.black]
-exclude = ".ipynb_checkpoints|apps/walkthrough/.*_cookiecutter|apps/wizard/templating/cookiecutter|.*playground.*.ipynb"
+exclude = ".ipynb_checkpoints|apps/wizard/templating/cookiecutter|.*playground.*.ipynb"
 line-length = 120
 
 [tool.isort]
 profile = "black"
-extend_skip = [".ipynb_checkpoints", "apps/walkthrough/meadow_cookiecutter"]
+extend_skip = [".ipynb_checkpoints"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -130,7 +128,6 @@ build-backend = "poetry.core.masonry.api"
 exclude = [
     "etl/steps/archive",
     "etl/snapshots/archive",
-    "apps/walkthrough/*_cookiecutter",
     "apps/wizard/templating/cookiecutter",
     "**/node_modules",
     "**/__pycache__",

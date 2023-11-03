@@ -5,21 +5,18 @@ from typing import Any, cast
 import numpy as np
 from numpy.typing import NDArray
 from owid.catalog import Table, Variable
-from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-# Logger
-log = get_logger()
 
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    log.info("gini_le: load data")
+    paths.log.info("gini_le: load data")
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("life_tables")
 
@@ -30,20 +27,20 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Keep relevant dimensions
-    log.info("gini_le: keep relevant dimensions (format='1x1', type='period', sex in ['male', 'female'])")
+    paths.log.info("gini_le: keep relevant dimensions (format='1x1', type='period', sex in ['male', 'female'])")
     tb = tb[(tb["type"] == "period") & (tb["sex"].isin(["male", "female"]))]
-    log.info("gini_le: set year dtype to int")
+    paths.log.info("gini_le: set year dtype to int")
     tb["year"] = tb["year"].astype("Int64")
 
     # Get origins
     origins = tb["life_expectancy"].m.origins
 
     # Get rate for central_death_rate, as it is given per 1,000 people.
-    log.info("gini_le: get rate for central_death_rate, as it is given per 1,000 people.")
+    paths.log.info("gini_le: get rate for central_death_rate, as it is given per 1,000 people.")
     tb["central_death_rate"] = tb["central_death_rate"] / 1000
 
     # 110+ -> 110
-    log.info("gini_le: replace 110+ -> 100, 110+ -> 110, set Dtypes.")
+    paths.log.info("gini_le: replace 110+ -> 100, 110+ -> 110, set Dtypes.")
     tb["age"] = (
         tb["age"]
         .replace(
@@ -56,22 +53,22 @@ def run(dest_dir: str) -> None:
     )
 
     # Sort rows
-    log.info("gini_le: sort rows (needed for correct estimation)")
+    paths.log.info("gini_le: sort rows (needed for correct estimation)")
     tb = tb.sort_values(["location", "year", "sex", "age"])
 
     # Estimates
     tb = tb.groupby(["location", "year", "sex"], as_index=False).apply(gini_from_mx)
 
     # Rename columns
-    log.info("gini_le: rename columns")
+    paths.log.info("gini_le: rename columns")
     tb = tb.rename(columns={"central_death_rate": "life_expectancy_gini"})
 
     # Set index
-    log.info("gini_le: set index")
+    paths.log.info("gini_le: set index")
     tb = tb.set_index(["location", "year", "sex"], verify_integrity=True)
 
     # Update metadata
-    log.info("gini_le: metadata")
+    paths.log.info("gini_le: metadata")
     tb.metadata.short_name = paths.short_name
     # Propagate origins metadata (unsure why this has not been propagated?)
     for col in tb.columns:

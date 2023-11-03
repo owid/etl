@@ -10,6 +10,7 @@ import pandas as pd
 import structlog
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
+from sqlmodel import Session
 
 from etl import config
 from etl.db_utils import DBUtils
@@ -28,6 +29,11 @@ def get_connection() -> MySQLdb.Connection:
         charset="utf8mb4",
         autocommit=True,
     )
+
+
+def get_session() -> Session:
+    """Get session with defaults."""
+    return Session(get_engine())
 
 
 def get_engine() -> Engine:

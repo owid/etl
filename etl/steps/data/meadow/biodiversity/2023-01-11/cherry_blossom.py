@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from owid.catalog import Table, tables
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -17,8 +17,7 @@ def run(dest_dir: str) -> None:
 
     # retrieve snapshot
     snap = Snapshot("biodiversity/2023-01-11/cherry_blossom.csv")
-    tb = tables.read_csv(snap.path)
-    tb.metadata.short_name = paths.short_name
+    tb = snap.read()
 
     # clean and transform data
     tb = clean_data(tb)
@@ -58,7 +57,7 @@ def convert_date(df: Table) -> Table:
     df["Full-flowering date"] = df["Full-flowering date"].astype("Int64").astype("str").str.zfill(4)
     df["date_combine"] = df["year"] + df["Full-flowering date"]
 
-    df["Full-flowering date"] = list(map(lambda x: datetime.strptime(x, "%Y%m%d").strftime("%j"), df["date_combine"]))
+    df["Full-flowering date"] = df["date_combine"].apply(lambda x: datetime.strptime(x, "%Y%m%d").strftime("%j"))
 
     df = df.drop(columns=["Full-flowering date (DOY)", "date_combine"])
 

@@ -1,12 +1,27 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Child & Infant Mortality
+
 tables:
-  igme_combined:
+  igme:
+    variables:
+      ? observation_value_number_of_deaths_post_neonatal_deaths_both_sexes_all_wealth_quintiles
+      : title: Post-neonatal deaths
+        description_short: The estimated number of deaths of children aged between 28 days and one year.
+        description_processing: This indicator is calculated by Our World in Data by subtracting the neonatal (< 28 days) deaths from the under-one deaths.
+        display:
+          numDecimalPlaces: 0
+  igme_under_fifteen_mortality_rate:
     variables:
       ? observation_value_deaths_per_1_000_live_births_under_fifteen_mortality_rate_both_sexes_all_wealth_quintiles
-      : title: Under fifteen mortality rate, both sexes, all wealth quintiles
-        description_processing: Under-fifteen mortality rate has been calculated by OWID from the under-five mortality rate and the infant mortality rate. Additionally, two vintages of the UN IGME Child Mortality Estimates have been used to ensure a longer time series.
+      : title: Observation value-Deaths per 1,000 live births-Under-fifteen mortality rate-Both sexes-All wealth quintiles
+        description_processing: This indicator is processed by OWID based on the original data source. It is a combination of the under-five mortality rate and the 5-14 mortality rate.
         unit: deaths per 1,000 live births
         display:
           numDecimalPlaces: 1
+        sources:
+          - name: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2023)
         presentation:
-          title_public: Under-fifteen mortality rate
-          attribution: UN IGME (2018; 2023)
+          attribution: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2023)

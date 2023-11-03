@@ -8,7 +8,7 @@ meta:
       researchers from making hard to justify choices between different historical
       datasets.
 
-      The dataset only considers the colonial status of countries that are independent today.
+      The dataset only considers the colonial status of countries that are independent today. It also includes overseas colonies only.
     producer: Bastian Becker
     citation_full: 'Becker, Bastian (2019), Introducing COLDAT: The Colonial Dates
       Dataset, SOCIUM/SFB1342 Working Paper Series, 02/2019. url: https://www.socium.uni-bremen.de/f/51ebd445c4.pdf'

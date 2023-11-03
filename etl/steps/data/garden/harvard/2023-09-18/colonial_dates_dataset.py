@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -23,15 +24,19 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["colonial_dates_dataset"].reset_index()
 
+    # Load population data.
+    tb_pop = paths.load_dataset("population")
+    tb_pop = tb_pop["population"].reset_index()
+
     #
     # Process data.
     #
-    tb = process_data(tb)
+    tb = process_data(tb, tb_pop)
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Create regional aggregations for total_colonies
-    tb = regional_aggregations(tb)
+    tb = regional_aggregations(tb, tb_pop)
 
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
@@ -47,7 +52,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def process_data(tb: Table) -> Table:
+def process_data(tb: Table, tb_pop: Table) -> Table:
     """Process data and create new columns."""
 
     # Capitalize colonizer column and replace Britain by United Kingdom
@@ -88,10 +93,23 @@ def process_data(tb: Table) -> Table:
     tb_rest = tb_rest.drop(columns=["colstart_max", "colend_max", "colstart_mean", "colend_mean", "col"])
 
     # Create another table with the total number of colonies per colonizer and year
-    tb_count = tb_colonized.groupby(["colonizer", "year"]).agg({"country": "count"}).reset_index().copy_metadata(tb)
+    tb_count = tb_colonized.copy()
+    tb_count = geo.harmonize_countries(df=tb_count, countries_file=paths.country_mapping_path)
+    tb_count = tb_count.merge(tb_pop[["country", "year", "population"]], how="left", on=["country", "year"])
+
+    tb_count = (
+        tb_count.groupby(["colonizer", "year"], observed=True)
+        .agg({"country": "count", "population": "sum"})
+        .reset_index()
+    )
 
     # Rename columns
-    tb_count = tb_count.rename(columns={"colonizer": "country", "country": "total_colonies"})
+    tb_count = tb_count.rename(
+        columns={"colonizer": "country", "country": "total_colonies", "population": "total_colonies_pop"}
+    )
+
+    # Replace zeros with nan
+    tb_count["total_colonies_pop"] = tb_count["total_colonies_pop"].replace(0, np.nan)
 
     # Consolidate results in country and year columns, by merging colonizer column in each row
     tb_colonized = (
@@ -139,16 +157,40 @@ def process_data(tb: Table) -> Table:
     return tb
 
 
-def regional_aggregations(tb: Table) -> Table:
+def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
     """Create regional aggregations for total_colonies."""
     # Copy table
     tb_regions = tb.copy()
 
+    # Merge population data.
+    tb_regions = tb_regions.merge(tb_pop[["country", "year", "population"]], how="left", on=["country", "year"])
+
     # Define non-colonies identifiers for `colonizer`
     non_colonies = ["zz. Colonizer", "zzz. Not colonized"]
 
-    # Define colony, which is 1 if countries are not in non_colonies
-    tb_regions["colony"] = tb_regions["colonizer"].apply(lambda x: 0 if x in non_colonies else 1)
+    # Define colony_number, which is 1 if countries are not in non_colonies and colony_pop, which is the product of colony and population
+    tb_regions["colony_number"] = tb_regions["colonizer"].apply(lambda x: 0 if x in non_colonies else 1)
+    tb_regions["colony_pop"] = tb_regions["population"] * tb_regions["colony_number"]
+
+    # Define colonizer_number, which is 1 if countries are in colonizers_list and colonizer_pop, which is the product of colonizer_bool and population
+    tb_regions["colonizer_number"] = tb_regions["total_colonies"].apply(lambda x: 1 if x > 0 else 0)
+    tb_regions["colonizer_pop"] = tb_regions["population"] * tb_regions["colonizer_number"]
+
+    # Define former_colonizer_number, which is 1 if total_colonies = 0
+    tb_regions["not_colonizer_number"] = tb_regions["total_colonies"].apply(lambda x: 1 if x == 0 else 0)
+    tb_regions["not_colonizer_pop"] = tb_regions["population"] * tb_regions["not_colonizer_number"]
+
+    # Define not_colonized_number, which is 1 if countries are in non_colonies and not_colonized_pop, which is the product of not_colonized and population
+    tb_regions["not_colonized_number"] = tb_regions["colonizer"].apply(
+        lambda x: 1 if x in ["zzz. Not colonized"] else 0
+    )
+    tb_regions["not_colonized_pop"] = tb_regions["population"] * tb_regions["not_colonized_number"]
+
+    # Define not_colonized_nor_colonizer_number, which is 1 if not_colonized_number or not_colonizer_number are 1
+    tb_regions["not_colonized_nor_colonizer_number"] = (
+        tb_regions["not_colonized_number"] + tb_regions["not_colonizer_number"]
+    )
+    tb_regions["not_colonized_nor_colonizer_pop"] = tb_regions["not_colonized_pop"] + tb_regions["not_colonizer_pop"]
 
     # Define regions to aggregate
     regions = [
@@ -166,14 +208,57 @@ def regional_aggregations(tb: Table) -> Table:
         "World",
     ]
 
+    # Define group of variables to generate
+    var_list = [
+        "colony_number",
+        "colony_pop",
+        "colonizer_number",
+        "colonizer_pop",
+        "not_colonized_nor_colonizer_number",
+        "not_colonized_nor_colonizer_pop",
+    ]
+
+    # Define the variables and aggregation method to be used in the following function loop
+    aggregations = dict.fromkeys(
+        var_list + ["population"],
+        "sum",
+    )
+
     # Add regional aggregates, by summing up the variables in `aggregations`
     for region in regions:
         tb_regions = geo.add_region_aggregates(
-            tb_regions, region=region, aggregations={"colony": "sum"}, countries_that_must_have_data=[]
+            tb_regions,
+            region=region,
+            aggregations=aggregations,
+            countries_that_must_have_data=[],
         )
 
-    # Rename colony column to total_colonies
-    tb_regions = tb_regions.rename(columns={"colony": "total_colonies_by_region"})
+    # Call the population data again to get regional total population
+    tb_regions = tb_regions.merge(
+        tb_pop[["country", "year", "population"]], how="left", on=["country", "year"], suffixes=("", "_region")
+    )
+
+    # Create an additional column with the population not considered in the dataset
+    tb_regions["missing_pop"] = (
+        tb_regions["population_region"]
+        - tb_regions["colony_pop"]
+        - tb_regions["colonizer_pop"]
+        - tb_regions["not_colonized_nor_colonizer_pop"]
+    )
+
+    # Assert if missing_pop has negative values
+    if tb_regions["missing_pop"].min() < 0:
+        paths.log.warning(
+            f"""`missing_pop` has negative values and will be replaced by 0.:
+            {print(tb_regions[tb_regions["missing_pop"] < 0])}"""
+        )
+        # Replace negative values by 0
+        tb_regions.loc[tb_regions["missing_pop"] < 0, "missing_pop"] = 0
+
+    # Include missing_pop in not_colonized_nor_colonizer_pop
+    tb_regions["not_colonized_nor_colonizer_pop"] = (
+        tb_regions["not_colonized_nor_colonizer_pop"] + tb_regions["missing_pop"]
+    )
 
     # Select only regions in tb_regions and "World" tb_world
     tb_world = tb_regions[tb_regions["country"] == "World"].reset_index(drop=True)
@@ -182,10 +267,35 @@ def regional_aggregations(tb: Table) -> Table:
     )
 
     # Concatenate and merge
-    tb = pr.merge(tb, tb_world[["country", "year", "total_colonies_by_region"]], on=["country", "year"], how="left")
+    tb = pr.merge(
+        tb,
+        tb_world[
+            [
+                "country",
+                "year",
+            ]
+            + var_list
+        ],
+        on=["country", "year"],
+        how="left",
+    )
     tb = pr.concat([tb, tb_regions], short_name="colonial_dates_dataset")
 
-    # Make total_colonies_by_region integer
-    tb["total_colonies_by_region"] = tb["total_colonies_by_region"].astype("Int64")
+    # Make variables in var_list integer
+    for var in var_list:
+        tb[var] = tb[var].astype("Int64")
+
+    # Drop population column
+    tb = tb.drop(
+        columns=[
+            "population",
+            "population_region",
+            "not_colonized_pop",
+            "not_colonized_number",
+            "not_colonizer_pop",
+            "not_colonizer_number",
+            "missing_pop",
+        ]
+    )
 
     return tb

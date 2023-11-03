@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+
 dataset:
   title: Population (various sources, 2023.1)
   update_period_days: 365
@@ -44,6 +50,7 @@ tables:
           numDecimalPlaces: 0
         origins: *origins-combined
         processing_level: major
+
       world_pop_share:
         title: Share of world population
         description_key:
@@ -53,6 +60,7 @@ tables:
         short_unit: "%"
         origins: *origins-combined
         processing_level: major
+
       source:
         title: Source
         description_key:
@@ -61,6 +69,7 @@ tables:
         unit: ""
         origins: *origins-combined
         processing_level: major
+
   population_original:
     title: Population
     description: *dataset-description

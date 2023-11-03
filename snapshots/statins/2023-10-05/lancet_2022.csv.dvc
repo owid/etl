@@ -1,0 +1,43 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Use of statins for the prevention of cardiovascular disease in 41 low-income
+      and middle-income countries.
+    date_published: 2022-03-10
+    title_snapshot: Use of statins for the prevention of cardiovascular disease in
+      41 low-income and middle-income countries (Marcus et al. 2022)
+    description_snapshot: |-
+      The dataset is crafted from a study aimed at evaluating the use of statins - a medication pivotal for preventing cardiovascular diseases (CVD) - in low and middle-income countries (LMICs), where a significant portion of CVD-related mortalities are reported. The World Health Organization (WHO) has set a target, advocating that at least 50% of eligible individuals utilize statins. This study aims to assess the progress towards achieving this target in LMICs and explores the characteristics related to statin use both at country and individual levels.
+
+      Key Points:
+
+      - Data Collection: The study encompasses a cross-sectional analysis of individual-level data, pooled from nationally representative health surveys conducted in 41 LMICs from 2013 to 2019. The primary focus was on WHO Stepwise Approach to Surveillance (STEPS) surveys, and when unavailable, alternative surveys were sought through a systematic search.
+
+      - Population: Adults aged 40-69 years old with a final pooled sample of 116,449 individuals.
+
+      - Outcomes Measured: The primary outcomes were the proportions of individuals self-reporting use of statins for primary and secondary prevention of CVD. The eligibility criteria for statin therapy were established based on either a history of diagnosed diabetes/a 10-year CVD risk of at least 20% (for primary prevention) or a history of self-reported CVD (for secondary prevention).
+
+    # Citation
+    producer: Marcus et al.
+    citation_full: |-
+      Marcus ME, Manne-Goehler J, Theilmann M, Farzadfar F, Moghaddam SS, Keykhaei M, Hajebi A, Tschida S, Lemp JM, Aryal KK, Dunn M, Houehanou C, Bahendeka S, Rohloff P, Atun R, Bärnighausen TW, Geldsetzer P, Ramirez-Zea M, Chopra V, Heisler M, Davies JI, Huffman MD, Vollmer S, Flood D. Use of statins for the prevention of cardiovascular disease in 41 low-income and middle-income countries: a cross-sectional study of nationally representative, individual-level data. Lancet Glob Health. 2022 Mar;10(3):e369-e379. doi: 10.1016/S2214-109X(21)00551-9. PMID: 35180420; PMCID: PMC8896912.
+
+    # Files
+    url_main:
+      https://www.thelancet.com/journals/langlo/article/PIIS2214-109X(21)00551-9/fulltext#sec1
+    url_download:
+      https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8896912/bin/NIHMS1783023-supplement-Appendix.pdf
+
+    date_accessed: 2023-10-05
+
+    # License
+    license:
+      name: CC BY 4.0
+
+wdir: ../../../data/snapshots/statins/2023-10-05
+outs:
+- md5: a9bae94a60b04dea8b889d16f23c0ca9
+  size: 1632
+  path: lancet_2022.csv

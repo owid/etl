@@ -132,6 +132,7 @@ def _load_topic_tags(session: Session, variable_id: int) -> List[str]:
     FROM tags_variables_topic_tags
     JOIN tags ON tags_variables_topic_tags.tagId = tags.id
     WHERE variableId = :variable_id
+    ORDER BY displayOrder
     """
 
     # Using the session to execute raw SQL
@@ -148,6 +149,7 @@ def _load_faqs(session: Session, variable_id: int) -> List[Dict[str, Any]]:
         fragmentId
     FROM posts_gdocs_variables_faqs
     WHERE variableId = :variable_id
+    ORDER BY displayOrder
     """
 
     # Using the session to execute raw SQL
@@ -164,6 +166,7 @@ def _load_origins_df(session: Session, variable_id: int) -> pd.DataFrame:
     FROM origins
     JOIN origins_variables ON origins.id = origins_variables.originId
     WHERE origins_variables.variableId = :variable_id
+    ORDER BY displayOrder
     """
 
     # Use the session to execute the raw SQL

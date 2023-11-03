@@ -1,4 +1,8 @@
 definitions:
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
   all:
     selectedEntityNames: &selected_entities
       - Africa
@@ -8,21 +12,21 @@ definitions:
       - Middle East
   number_ongoing_conflicts:
     description_short: |-
-      <% if conflict_type == "all" %>
-      The number of all ongoing wars in each year. This includes interstate, intrastate, extrastate, and non-state wars.
-      <% elif conflict_type == "inter-state" %>
-      The number of ongoing interstate wars in each year.
-      <% elif conflict_type == "intra-state" %>
-      The number of ongoing intrastate wars in each year.
-      <% elif conflict_type == "intra-state (internationalized)" %>
-      The number of ongoing internationalized intrastate wars in each year.
-      <% elif conflict_type == "intra-state (non-internationalized)" %>
-      The number of ongoing non-internationalized intrastate wars in each year.
-      <% elif conflict_type == "extra-state" %>
-      The number of ongoing extrastate wars in each year.
-      <% elif conflict_type == "non-state" %>
-      The number of ongoing non-state wars in each year.
-      <% endif %>
+      <%- if conflict_type == "all" %>
+      The number of all ongoing wars in each year. This includes interstate, intrastate, extrastate, and non-state wars
+      <%- elif conflict_type == "inter-state" -%>
+      The number of ongoing interstate wars in each year
+      <%- elif conflict_type == "intra-state" -%>
+      The number of ongoing intrastate wars in each year
+      <%- elif conflict_type == "intra-state (internationalized)" -%>
+      The number of ongoing internationalized intrastate wars in each year
+      <%- elif conflict_type == "intra-state (non-internationalized)" -%>
+      The number of ongoing non-internationalized intrastate wars in each year
+      <%- elif conflict_type == "extra-state" -%>
+      The number of ongoing extrastate wars in each year
+      <%- elif conflict_type == "non-state" -%>
+      The number of ongoing non-state wars in each year
+      <%- endif -%>
     description_key: &description_key_ongoing
       - |-
         <% if conflict_type == "all" %>
@@ -49,21 +53,21 @@ definitions:
         <% endif %>
   number_new_conflicts:
     description_short: |-
-      <% if conflict_type == "all" %>
+      <% if conflict_type == "all" -%>
       The number of new wars in each year. This includes interstate, intrastate, extrastate, and non-state wars
-      <% elif conflict_type == "inter-state" %>
+      <% elif conflict_type == "inter-state" -%>
       The number of new interstate wars in each year
-      <% elif conflict_type == "intra-state" %>
+      <% elif conflict_type == "intra-state" -%>
       The number of new intrastate wars in each year
-      <% elif conflict_type == "intra-state (internationalized)" %>
+      <% elif conflict_type == "intra-state (internationalized)" -%>
       The number of new internationalized intrastate wars in each year
-      <% elif conflict_type == "intra-state (non-internationalized)" %>
+      <% elif conflict_type == "intra-state (non-internationalized)" -%>
       The number of new non-internationalized intrastate wars in each year
-      <% elif conflict_type == "extra-state" %>
+      <% elif conflict_type == "extra-state" -%>
       The number of new extrastate wars in each year
-      <% elif conflict_type == "non-state" %>
+      <% elif conflict_type == "non-state" -%>
       The number of new non-state wars in each year
-      <% endif %>
+      <% endif -%>
     description_key: &description_key_new
       - |-
         <% if conflict_type == "all" %>
@@ -98,21 +102,21 @@ definitions:
         <% endif %>
   number_deaths:
     description_short: |-
-      <% if conflict_type == "all" %>
+      <%- if conflict_type == "all" -%>
       The estimated number of deaths in all ongoing wars in each year. This includes interstate, intrastate, extrastate, and non-state wars
-      <% elif conflict_type == "inter-state" %>
+      <%- elif conflict_type == "inter-state" -%>
       The estimated number of deaths in ongoing interstate wars in each year
-      <% elif conflict_type == "intra-state" %>
+      <%- elif conflict_type == "intra-state" -%>
       The estimated number of deaths in ongoing intrastate wars in each year
-      <% elif conflict_type == "intra-state (internationalized)" %>
+      <%- elif conflict_type == "intra-state (internationalized)" -%>
       The estimated number of deaths in ongoing internationalized intrastate wars in each year
-      <% elif conflict_type == "intra-state (non-internationalized)" %>
+      <%- elif conflict_type == "intra-state (non-internationalized)" -%>
       The estimated number of deaths in ongoing non-internationalized intrastate wars in each year
-      <% elif conflict_type == "extra-state" %>
+      <%- elif conflict_type == "extra-state" -%>
       The estimated number of deaths in ongoing extrastate wars in each year
-      <% elif conflict_type == "non-state" %>
+      <%- elif conflict_type == "non-state" -%>
       The estimated number of deaths in ongoing non-state wars in each year
-      <% endif %>
+      <%- endif -%>
     description_key: &description_key_deaths
       - |-
         <% if conflict_type == "all" %>
@@ -188,6 +192,18 @@ tables:
           grapher_config:
             selectedEntityNames: *selected_entities
 
+      number_deaths_ongoing_conflicts_per_capita:
+        title: Number of battle-related deaths in ongoing conflicts (per capita)
+        unit: deaths per 100,000 people
+        description_short: |-
+          {definitions.number_deaths.description_short}, per capita.
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            selectedEntityNames: *selected_entities
+
       ####################
       # Ongoing disputes #
       ####################
@@ -210,7 +226,7 @@ tables:
           {definitions.number_ongoing_conflicts.description_short}, divided by the number of countries in the region.
         description_key: *description_key_ongoing
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 3
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities
@@ -222,7 +238,7 @@ tables:
           {definitions.number_ongoing_conflicts.description_short}, divided by the number of country-pairs in the region.
         description_key: *description_key_ongoing
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 5
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities
@@ -249,7 +265,7 @@ tables:
           {definitions.number_new_conflicts.description_short}, divided by the number of countries in the region.
         description_key: *description_key_new
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 3
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities
@@ -261,7 +277,7 @@ tables:
           {definitions.number_new_conflicts.description_short}, divided by the number of country-pairs in the region.
         description_key: *description_key_new
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 5
         presentation:
           grapher_config:
             selectedEntityNames: *selected_entities

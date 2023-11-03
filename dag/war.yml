@@ -41,25 +41,18 @@ steps:
     - snapshot://war/2023-09-21/ucdp_prio_armed_conflict.zip
   data://garden/war/2023-09-21/ucdp:
     - data://meadow/war/2023-09-21/ucdp
+    - data://garden/countries/2023-09-25/gleditsch
   data://grapher/war/2023-09-21/ucdp:
     - data://garden/war/2023-09-21/ucdp
 
-  # MIE
-  data://meadow/war/2023-09-21/mie:
-    - snapshot://war/2023-09-21/mie.zip
-  data://garden/war/2023-09-21/mie:
-    - data://meadow/war/2023-09-21/mie
-    - data://garden/countries/2023-09-29/cow_ssm
-  data://grapher/war/2023-09-21/mie:
-    - data://garden/war/2023-09-21/mie
-
-  # Mars
-  data://meadow/war/2023-09-21/mars:
-    - snapshot://war/2023-09-21/war_mars.xls
-  data://garden/war/2023-09-21/mars:
-    - data://meadow/war/2023-09-21/mars
-  data://grapher/war/2023-09-21/mars:
-    - data://garden/war/2023-09-21/mars
+  # PRIO v3.1
+  data://meadow/war/2023-09-21/prio_v31:
+    - snapshot://war/2023-09-21/prio_v31.xls
+  data://garden/war/2023-09-21/prio_v31:
+    - data://meadow/war/2023-09-21/prio_v31
+    - data://garden/countries/2023-09-25/gleditsch
+  data://grapher/war/2023-09-21/prio_v31:
+    - data://garden/war/2023-09-21/prio_v31
 
   # COW - Wars
   data://meadow/war/2023-09-21/cow:
@@ -83,26 +76,46 @@ steps:
   data://grapher/war/2023-09-21/cow_mid:
     - data://garden/war/2023-09-21/cow_mid
 
+  # MIE
+  data://meadow/war/2023-09-21/mie:
+    - snapshot://war/2023-09-21/mie.zip
+  data://garden/war/2023-09-21/mie:
+    - data://meadow/war/2023-09-21/mie
+    - data://garden/countries/2023-09-29/cow_ssm
+  data://grapher/war/2023-09-21/mie:
+    - data://garden/war/2023-09-21/mie
+
+  # Mars
+  data://meadow/war/2023-09-21/mars:
+    - snapshot://war/2023-09-21/war_mars.xls
+  data://garden/war/2023-09-21/mars:
+    - data://meadow/war/2023-09-21/mars
+    - data://garden/countries/2023-09-25/isd
+  data://grapher/war/2023-09-21/mars:
+    - data://garden/war/2023-09-21/mars
+
   # Brecke
   data://meadow/war/2023-09-21/brecke:
     - snapshot://war/2023-09-21/war_brecke.xlsx
   data://garden/war/2023-09-21/brecke:
     - data://meadow/war/2023-09-21/brecke
+    - data://garden/countries/2023-09-25/isd
   data://grapher/war/2023-09-21/brecke:
     - data://garden/war/2023-09-21/brecke
-
-  # PRIO v3.1
-  data://meadow/war/2023-09-21/prio_v31:
-    - snapshot://war/2023-09-21/prio_v31.xls
-  data://garden/war/2023-09-21/prio_v31:
-    - data://meadow/war/2023-09-21/prio_v31
-  data://grapher/war/2023-09-21/prio_v31:
-    - data://garden/war/2023-09-21/prio_v31
 
   # Peace data (Diehl)
   data://meadow/war/2023-09-27/peace_diehl:
     - snapshot://war/2023-09-27/peace_diehl.zip
   data://garden/war/2023-09-27/peace_diehl:
     - data://meadow/war/2023-09-27/peace_diehl
+    - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/war/2023-09-27/peace_diehl:
     - data://garden/war/2023-09-27/peace_diehl
+
+  # UCDP/PRIO
+  data://garden/war/2023-09-21/ucdp_prio:
+    - data://garden/war/2023-09-21/ucdp
+    - data://garden/war/2023-09-21/prio_v31
+    - data://garden/countries/2023-09-25/gleditsch
+  data://grapher/war/2023-10-24/ucdp_prio:
+    - data://garden/war/2023-09-21/ucdp_prio

@@ -40,7 +40,6 @@ from sqlmodel import (
     Relationship,
     Session,
     SQLModel,
-    col,
     create_engine,
     or_,
     select,
@@ -189,6 +188,10 @@ class Tag(SQLModel, table=True):
     tags_reverse: List["Tag"] = Relationship(back_populates="tags")
     datasets: List["Dataset"] = Relationship(back_populates="tags")
     chart_tags: List["ChartTags"] = Relationship(back_populates="tags")
+
+    @classmethod
+    def load_tags(cls, session: Session, is_topic: bool = True) -> List["Tag"]:  # type: ignore
+        return session.exec(select(cls).where(cls.isTopic == is_topic)).all()  # type: ignore
 
 
 class User(SQLModel, table=True):
@@ -728,30 +731,39 @@ class PostsGdocs(SQLModel, table=True):
 class OriginsVariablesLink(SQLModel, table=True):
     __tablename__: str = "origins_variables"  # type: ignore
 
-    originId: Optional[int] = Field(default=None, foreign_key="origins.id", primary_key=True)
-    variableId: Optional[int] = Field(default=None, foreign_key="variables.id", primary_key=True)
+    originId: int = Field(default=None, foreign_key="origins.id", primary_key=True)
+    variableId: int = Field(default=None, foreign_key="variables.id", primary_key=True)
+    displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
 
     @classmethod
     def link_with_variable(cls, session: Session, variable_id: int, new_origin_ids: Set[int]) -> None:
         """Link the given Variable ID with the given Origin IDs."""
         # Fetch current linked Origins for the given Variable ID
-        existing_links = session.query(cls.originId).filter(cls.variableId == variable_id).all()
+        existing_links = session.query(cls.originId, cls.displayOrder).filter(cls.variableId == variable_id).all()
 
-        existing_origin_ids = {link.originId for link in existing_links}
+        existing_origins = {(link.originId, link.displayOrder) for link in existing_links}
+        new_origins = {(origin_id, i) for i, origin_id in enumerate(new_origin_ids)}
 
         # Find the Origin IDs to delete and the IDs to add
-        to_delete_ids = existing_origin_ids - new_origin_ids
-        to_add_ids = new_origin_ids - existing_origin_ids
+        to_delete = existing_origins - new_origins
+        to_add = new_origins - existing_origins
 
         # Delete the obsolete Origin-Variable links
-        if to_delete_ids:
-            session.query(cls).filter(cls.variableId == variable_id, col(cls.originId).in_(to_delete_ids)).delete(
-                synchronize_session="fetch"
-            )
+        for origin_id, display_order in to_delete:
+            session.query(cls).filter(
+                cls.variableId == variable_id,
+                cls.originId == origin_id,
+                cls.displayOrder == display_order,
+            ).delete(synchronize_session="fetch")
 
         # Add the new Origin-Variable links
-        if to_add_ids:
-            session.add_all([cls(originId=origin_id, variableId=variable_id) for origin_id in to_add_ids])
+        if to_add:
+            session.add_all(
+                [
+                    cls(originId=origin_id, variableId=variable_id, displayOrder=display_order)
+                    for origin_id, display_order in to_add
+                ]
+            )
 
 
 class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
@@ -769,6 +781,7 @@ class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
     fragmentId: Optional[str] = Field(
         default=None, sa_column=Column("fragmentId", String(255), primary_key=True, nullable=False)
     )
+    displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
 
     @classmethod
     def link_with_variable(cls, session: Session, variable_id: int, new_faqs: List[catalog.FaqLink]) -> None:
@@ -777,22 +790,28 @@ class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
         existing_faqs = session.query(cls).filter(cls.variableId == variable_id).all()
 
         # Work with tuples instead
-        existing_gdoc_fragment = {(f.gdocId, f.fragmentId) for f in existing_faqs}
-        new_gdoc_fragment = {(f.gdoc_id, f.fragment_id) for f in new_faqs}
+        existing_gdoc_fragment = {(f.gdocId, f.fragmentId, f.displayOrder) for f in existing_faqs}
+        new_gdoc_fragment = {(f.gdoc_id, f.fragment_id, i) for i, f in enumerate(new_faqs)}
 
         to_delete = existing_gdoc_fragment - new_gdoc_fragment
         to_add = new_gdoc_fragment - existing_gdoc_fragment
 
         # Delete the obsolete links
-        for gdoc_id, fragment_id in to_delete:
+        for gdoc_id, fragment_id, display_order in to_delete:
             session.query(cls).filter(
-                cls.variableId == variable_id, cls.gdocId == gdoc_id, cls.fragmentId == fragment_id
+                cls.variableId == variable_id,
+                cls.gdocId == gdoc_id,
+                cls.fragmentId == fragment_id,
+                cls.displayOrder == display_order,
             ).delete(synchronize_session="fetch")
 
         # Add the new links
         if to_add:
             session.add_all(
-                [cls(gdocId=gdoc_id, fragmentId=fragment_id, variableId=variable_id) for gdoc_id, fragment_id in to_add]
+                [
+                    cls(gdocId=gdoc_id, fragmentId=fragment_id, displayOrder=display_order, variableId=variable_id)
+                    for gdoc_id, fragment_id, display_order in to_add
+                ]
             )
 
 
@@ -806,28 +825,37 @@ class TagsVariablesTopicTagsLink(SQLModel, table=True):
 
     tagId: Optional[str] = Field(default=None, sa_column=Column("tagId", Integer, primary_key=True, nullable=False))
     variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
+    displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
 
     @classmethod
     def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: Set[str]) -> None:
         """Link the given Variable ID with the given Tag IDs."""
         # Fetch current linked tags for the given Variable ID
-        existing_links = session.query(cls.tagId).filter(cls.variableId == variable_id).all()
+        existing_links = session.query(cls.tagId, cls.displayOrder).filter(cls.variableId == variable_id).all()
 
-        existing_tag_ids = {link.tagId for link in existing_links}
+        existing_tags = {(link.tagId, link.displayOrder) for link in existing_links}
+        new_tags = {(tag_id, i) for i, tag_id in enumerate(new_tag_ids)}
 
         # Find the tag IDs to delete and the IDs to add
-        to_delete_ids = existing_tag_ids - new_tag_ids
-        to_add_ids = new_tag_ids - existing_tag_ids
+        to_delete = existing_tags - new_tags
+        to_add = new_tags - existing_tags
 
         # Delete the obsolete links
-        if to_delete_ids:
-            session.query(cls).filter(cls.variableId == variable_id, col(cls.tagId).in_(to_delete_ids)).delete(
-                synchronize_session="fetch"
-            )
+        for tag_id, display_order in to_delete:
+            session.query(cls).filter(
+                cls.variableId == variable_id,
+                cls.tagId == tag_id,
+                cls.displayOrder == display_order,
+            ).delete(synchronize_session="fetch")
 
         # Add the new links
-        if to_add_ids:
-            session.add_all([cls(tagId=tag_id, variableId=variable_id) for tag_id in to_add_ids])
+        if to_add:
+            session.add_all(
+                [
+                    cls(tagId=tag_id, variableId=variable_id, displayOrder=display_order)
+                    for tag_id, display_order in to_add
+                ]
+            )
 
 
 class Variable(SQLModel, table=True):
@@ -1003,6 +1031,8 @@ class Variable(SQLModel, table=True):
     ) -> "Variable":
         # `unit` can be an empty string, but cannot be null
         assert metadata.unit is not None
+        if catalog_path:
+            assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
 
         if metadata.presentation:
             presentation_dict = metadata.presentation.to_dict()  # type: ignore
@@ -1039,6 +1069,7 @@ class Variable(SQLModel, table=True):
             descriptionShort=metadata.description_short,
             descriptionFromProducer=metadata.description_from_producer,
             descriptionKey=metadata.description_key,
+            descriptionProcessing=metadata.description_processing,
             licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
             license=metadata.license.to_dict() if metadata.license else None,
             **presentation_dict,
@@ -1054,6 +1085,8 @@ class Variable(SQLModel, table=True):
 
     @classmethod
     def load_from_catalog_path(cls, catalog_path: str, session: Optional[Session] = None) -> "Variable":
+        assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
+
         def _run(ses: Session):
             return ses.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
 

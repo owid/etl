@@ -2,8 +2,6 @@
 
 """
 
-import owid.catalog.processing as pr
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current data step.
@@ -15,8 +13,8 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load snapshot.
-    snap = paths.load_dependency("farmer_lafond_2016.csv")
-    tb = pr.read_csv(snap.path, metadata=snap.to_table_metadata())
+    snap = paths.load_snapshot("farmer_lafond_2016.csv")
+    tb = snap.read_csv()
 
     #
     # Prepare data.

@@ -1,4 +1,18 @@
 # NOTE: To learn more about the fields, hover over their names.
+definitions:
+  life_expectancy:
+    description_short: |-
+      <% if type == "period" %>
+      Period life expectancy is the average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
+      <% elif type == "cohort" %>
+      Cohort life expectancy is the average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+      <% endif %>
+    point_1: |-
+      <% if type == "period" %>
+      This is based on a synthetic cohort created using mortality rates across age groups in a given year.
+      <% elif type == "cohort" %>
+      Rather than waiting for the entire cohort to have died before calculating the cohort life expectancy, researchers may use data from birth cohorts that are 'almost extinct'.
+      <% endif %>
 
 
 # Learn more about the available fields:
@@ -17,25 +31,32 @@ tables:
       central_death_rate:
         title: Central death rate
         description_short: |-
-          For a given population or cohort, the central death rate at age x during a given period of 12 months is found by dividing the number of people who died during this period while aged x by the average number who were living in that age group during the period.
+          For a given population or cohort, the central death rate during a given 12 month interval is calculated as the number of deaths during the interval, divided by the number of person-years lived during that interval.
+        description_key:
+          - |-
+            Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years. This makes the value very slightly different from the 'probability of death' during the interval, because the 'probability of death' metric uses a different denominator: the number of people alive at that age at the start of the interval.
         unit: deaths per 1,000 people
         processing_level: minor
         description_processing: |-
-          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
+          The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
       probability_of_death:
         title: Probability of death
         unit: "%"
-        description_short: The probability that a person who survived until the start of a given interval will have survived by the end of the interval.
+        description_short: |-
+          The probability of dying in a given interval, among people who survived to the start of that interval.
+        description_key:
+          - |-
+            For example, the probability of death for a 50 year old in a given year is found by: dividing the number of deaths in 50 year olds that year, by the number of people alive at the age of 50 at the start of the year.
         processing_level: minor
         description_processing: |-
-          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
+          The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
       probability_of_survival:
         title: Probability of survival
         unit: "%"
         description_short: The probability that a person who survived until the start of a given interval will have died by the end of the interval.
         processing_level: minor
         description_processing: |-
-          The original metric is given as a score between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
+          The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
       average_survival_length:
         title: Average survival length
         short_unit: years
@@ -66,15 +87,16 @@ tables:
         title: Life expectancy
         short_unit: years
         unit: years
-        # description_short: |-
-        #   The number of years that a person of a given age is expected to live. 'Life expectancy at age 0' refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy for people who have already survived to the given age.
         description_short: |-
+          <% if type == "period" %>
+          The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
+          <% elif type == "cohort" %>
+          The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+          <% endif %>
+        description_key:
+          - |-
             <% if type == "period" %>
-            The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
-
-            <% elif type == "cohort" %>
-            The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
+            Life expectancy at age 0 refers to life expectancy at birth.
+            <% else %>
+            It refers to the remaining life expectancy for people who have already survived to the given age.
             <% endif %>
-
-            'Life expectancy at age 0' refers to life expectancy at birth. For other ages, it refers to the remaining life expectancy for people who have already survived to the given age.
-

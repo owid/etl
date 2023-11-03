@@ -20,8 +20,6 @@ import ruamel.yaml
 import streamlit as st
 from cookiecutter.main import cookiecutter
 from MySQLdb import OperationalError
-from owid import walden
-from owid.catalog.utils import validate_underscore
 from pydantic import BaseModel
 from typing_extensions import Self
 
@@ -38,16 +36,11 @@ from etl.paths import (
 )
 from etl.steps import DAG
 
-DAG_WALKTHROUGH_PATH = DAG_DIR / "walkthrough.yml"
-WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
+DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
 
 # Load latest dataset versions
 DATASET_POPULATION_URI = f"data://garden/demography/{LATEST_POPULATION_VERSION}/population"
 DATASET_REGIONS_URI = f"data://garden/regions/{LATEST_REGIONS_VERSION}/regions"
-
-# use origins in walkthrough
-# WALKTHROUGH_ORIGINS = os.environ.get("WALKTHROUGH_ORIGINS", "1") == "1"
-WALKTHROUGH_ORIGINS = os.environ.get("WALKTHROUGH_ORIGINS", "0") == "1"
 
 # DAG dropdown options
 dag_files = sorted(os.listdir(DAG_DIR))
@@ -78,51 +71,24 @@ MD_GRAPHER = APPS_DIR / "wizard" / "templating" / "markdown" / "grapher.md"
 WIZARD_CONFIG = BASE_DIR / ".wizard"
 
 
-if WALKTHROUGH_ORIGINS:
-    DUMMY_DATA = {
-        "namespace": "dummy",
-        "short_name": "dummy",
-        "version": "2020-01-01",
-        "walden_version": "2020-01-01",
-        "snapshot_version": "2020-01-01",
-        "title": "Data product title",
-        "description": "This\nis\na\ndummy\ndataset",
-        "file_extension": "csv",
-        "date_published": "2020-01-01",
-        "producer": "Dummy producer",
-        "citation_full": "Dummy producer citation",
-        "url_download": "https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv",
-        "url_main": "https://www.url-dummy.com/",
-        "license_name": "MIT dummy license",
-    }
-else:
-    DUMMY_DATA = {
-        "namespace": "dummy",
-        "short_name": "dummy",
-        "version": "2020-01-01",
-        "walden_version": "2020-01-01",
-        "snapshot_version": "2020-01-01",
-        "name": "Dummy dataset",
-        "description": "This\nis\na\ndummy\ndataset",
-        "file_extension": "csv",
-        "source_data_url": "https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv",
-        "publication_date": "2020-01-01",
-        "source_name": "Dummy short source citation",
-        "source_published_by": "Dummy full source citation",
-        "url": "https://www.url-dummy.com/",
-    }
+DUMMY_DATA = {
+    "namespace": "dummy",
+    "short_name": "dummy",
+    "version": "2020-01-01",
+    "snapshot_version": "2020-01-01",
+    "title": "Data product title",
+    "description": "This\nis\na\ndummy\ndataset",
+    "file_extension": "csv",
+    "date_published": "2020-01-01",
+    "producer": "Dummy producer",
+    "citation_full": "Dummy producer citation",
+    "url_download": "https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv",
+    "url_main": "https://www.url-dummy.com/",
+    "license_name": "MIT dummy license",
+}
 
 
-def validate_short_name(short_name: str) -> Optional[str]:
-    """Validate short name."""
-    try:
-        validate_underscore(short_name, "Short name")
-        return None
-    except Exception as e:
-        return str(e)
-
-
-def add_to_dag(dag: DAG, dag_path: Path = DAG_WALKTHROUGH_PATH) -> str:
+def add_to_dag(dag: DAG, dag_path: Path = DAG_WIZARD_PATH) -> str:
     """Add dag to dag_path file."""
     with open(dag_path, "r") as f:
         doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
@@ -141,7 +107,7 @@ def add_to_dag(dag: DAG, dag_path: Path = DAG_WALKTHROUGH_PATH) -> str:
     return output_str
 
 
-def remove_from_dag(step: str, dag_path: Path = DAG_WALKTHROUGH_PATH) -> None:
+def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
     with open(dag_path, "r") as f:
         doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
 
@@ -336,15 +302,18 @@ class AppState:
         default_value = self.default_value(key, default_last=default_last)
         # Change key name, to be stored it in general st.session_state
         kwargs["key"] = f"{self.step}.{key}"
-        # Default value for selectbox (and other widgets with selectbox-like behavior)
-        if "options" in kwargs:
-            options = cast(List[str], kwargs["options"])
-            index = options.index(default_value) if default_value in options else 0
-            kwargs["index"] = index
-        # Default value for other widgets (if none is given)
-        elif ("value" not in kwargs) or ("value" in kwargs and kwargs.get("value") is None):
-            kwargs["value"] = default_value
-
+        # Special behaviour for multiselect
+        if "multiselect" not in str(st_widget):
+            # Default value for selectbox (and other widgets with selectbox-like behavior)
+            if "options" in kwargs:
+                options = cast(List[str], kwargs["options"])
+                index = options.index(default_value) if default_value in options else 0
+                kwargs["index"] = index
+            # Default value for other widgets (if none is given)
+            elif ("value" not in kwargs) or ("value" in kwargs and kwargs.get("value") is None):
+                kwargs["value"] = default_value
+        elif "default" not in kwargs:
+            kwargs["default"] = default_value
         # Create widget
         widget = st_widget(**kwargs)
         # Show error message
@@ -477,7 +446,8 @@ class StepForm(BaseModel):
         """Check that all fields in `fields_names` are not empty."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
-            if attr == "":
+            print(field_name, attr)
+            if attr in ["", []]:
                 self.errors[field_name] = f"`{field_name}` is a required property"
 
     def check_snake(self: Self, fields_names: List[str]) -> None:

@@ -9,7 +9,7 @@ from rich import print
 from sqlalchemy.engine import Engine
 
 from apps.backport.backport import PotentialBackport
-from apps.walkthrough.utils import add_to_dag, generate_step
+from apps.wizard.utils import add_to_dag, generate_step
 from etl import config
 from etl.backport_helpers import create_dataset
 from etl.db import get_engine
@@ -131,7 +131,7 @@ def migrate(
         f"[green]1.[/green] Execute snapshot with [bold]`python snapshots/{namespace}/{version}/{short_name}.py`[/bold]"
     )
     print(f"[green]2.[/green] Import dataset with [bold]`etl {namespace}/{version}/{short_name} --grapher`[/bold]")
-    print("[green]3.[/green] Run chart revisions with [bold]`ENV=.env.prod.write walkthrough charts`[/bold]")
+    print("[green]3.[/green] Run chart revisions with [bold]`ENV=.env.prod.write etl-wizard charts`[/bold]")
     print("[green]4.[/green] [bold]Delete[/bold] or archive the old dataset")
 
 

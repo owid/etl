@@ -1,7 +1,7 @@
 """Garden phase."""
 import os
 from pathlib import Path
-from typing import cast
+from typing import List, cast
 
 import ruamel.yaml
 import streamlit as st
@@ -9,7 +9,9 @@ from owid.catalog import Dataset
 from st_pages import add_indentation
 from typing_extensions import Self
 
+import etl.grapher_model as gm
 from apps.wizard import utils
+from etl.db import get_session
 from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR
 
 #########################################################
@@ -32,7 +34,10 @@ dummy_values = {
     "short_name": "dummy",
     "meadow_version": utils.DATE_TODAY,
 }
-
+# Get list of available tags from DB (only those used as topic pages)
+with get_session() as session:
+    tag_list = gm.Tag.load_tags(session)
+tag_list = ["Uncategorized"] + sorted([tag.name for tag in tag_list])
 
 #########################################################
 # FUNCTIONS & CLASSES ###################################
@@ -59,6 +64,7 @@ class GardenForm(utils.StepForm):
     generate_notebook: bool
     is_private: bool
     update_period_days: int
+    topic_tags: List[str]
 
     def __init__(self: Self, **data: str | bool) -> None:
         """Construct class."""
@@ -72,13 +78,17 @@ class GardenForm(utils.StepForm):
         - Return True if all fields are valid, False otherwise.
         """
         # Check other fields (non meta)
-        fields_required = ["namespace", "version", "short_name", "meadow_version"]
+        fields_required = ["namespace", "version", "short_name", "meadow_version", "topic_tags"]
         fields_snake = ["namespace", "short_name"]
         fields_version = ["version", "meadow_version"]
 
         self.check_required(fields_required)
         self.check_snake(fields_snake)
         self.check_is_version(fields_version)
+
+        # Check tags
+        if (len(self.topic_tags) > 1) and ("Uncategorized" in self.topic_tags):
+            self.errors["topic_tags"] = "If you choose multiple tags, you cannot choose `Uncategorized`."
 
 
 def update_state() -> None:
@@ -108,7 +118,7 @@ def _check_dataset_in_meadow(form: GardenForm) -> None:
 def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     """Fill dummy metadata yaml file with some dummy values.
 
-    Only useful when `--dummy-data` is used. We need this to avoid errors in `walkthrough grapher --dummy-data`.
+    Only useful when `--dummy-data` is used. We need this to avoid errors in `etl-wizard grapher --dummy-data`.
     """
     with open(metadata_path, "r") as f:
         doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
@@ -129,6 +139,11 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
             "entityAnnotationsMap": "Germany: dummy annotation",
             "includeInTable": True,
         },
+        "description_processing": "This is some description of the dummy indicator processing.",
+        "description_key": [
+            "Key information 1",
+            "Key information 2",
+        ],
         "description_short": "Short description of the dummy indicator.",
         "description_from_producer": "The description of the dummy indicator by the producer, shown separately on a data page.",
         "processing_level": "major",
@@ -219,6 +234,24 @@ with form_widget.form("garden"):
         default_last=365,
     )
 
+    APP_STATE.st_widget(
+        st_widget=st.multiselect,
+        label="Indicators tag",
+        help=(
+            """
+            This tag will be propagated to all dataset's indicators (it will not be assigned to the dataset).
+
+            If you want to use a different tag for a specific indicator you can do it by editing its metadata field `variable.presentation.topic_tags`.
+
+            Exceptionally, and if unsure what to choose, choose tag `Uncategorized`.
+            """
+        ),
+        key="topic_tags",
+        options=tag_list,
+        placeholder="Choose a tag (or multiple)",
+        default=None,
+    )
+
     st.markdown("#### Dependencies")
     # Meadow version
     APP_STATE.st_widget(
@@ -297,8 +330,17 @@ if submitted:
             dag_content = ""
 
         # Create necessary files
+        ## HOTFIX 1: filter topic_tags if empty
+        form_dict = form.dict()
+        if form_dict.get("topic_tags") is None or form_dict.get("topic_tags") == []:
+            form_dict["topic_tags"] = ""
+        ## HOTFIX 2: For some reason, when using cookiecutter only the first element in the list is taken?
+        ## Hence we need to convert the list to an actual string
+        else:
+            form_dict["topic_tags"] = "- " + "\n- ".join(form_dict["topic_tags"])
+
         DATASET_DIR = utils.generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_GARDEN, data=dict(**form.dict(), channel="garden")
+            cookiecutter_path=utils.COOKIE_GARDEN, data=dict(**form_dict, channel="garden")
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")

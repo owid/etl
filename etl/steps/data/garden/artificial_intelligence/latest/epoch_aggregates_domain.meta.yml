@@ -1,0 +1,89 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 31
+  title: Notable AI systems by domain type
+
+origin:
+  date_published: '2023-10-27'
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  epoch:
+    variables:
+      yearly_count:
+        title: Annual number of AI systems by domain
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
+        description_key:
+          - Games systems are specifically designed for games excel in understanding and strategizing gameplay. For instance, AlphaGo, developed by DeepMind, defeated the world champion in the game of Go. Such systems use complex algorithms to compete effectively, even against skilled human players.
+
+          - Language systems are tailored to process language, focusing on understanding, translating, and interacting with human languages. Examples include chatbots, machine translation tools like Google Translate, and sentiment analysis algorithms that can detect emotions in text.
+
+          - Multimodal systems excel at processing multiple types of data at once, like sound and visuals together.  An example would be voice assistants like Siri or Alexa, which can understand spoken words (audio) and provide visual feedback (graphics) at the same time.
+
+          - Vision systems focus on processing visual information, playing a pivotal role in image recognition and related areas. For example, Facebook's photo tagging system uses vision AI to identify faces.
+
+          - Speech systems are dedicated to handling spoken language, being the backbone of voice assistants and similar applications.  They recognize, interpret, and generate spoken language to interact with users.
+
+          - Recommendation systems offer suggestions based on user preferences, seen prominently in online shopping and media streaming. For instance, Netflix's movie suggestions or Amazon's product recommendations are powered by such algorithms that analyze users' preferences and past behaviors.
+
+          - Drawing systems can create illustrations or sketches, either mimicking human techniques or generating unique art. Examples range from AI-generated artwork to design tools that can sketch based on user input or descriptions.
+
+          - Not specified category captures systems where their primary function isn't clearly defined.
+
+          - Other category represents a diverse set, including tasks from 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio and Robotics.
+        description_processing: >
+          Processing involved calculating total number of AI systems in each domain for each year.
+
+
+          To streamline the categorization of domains, domain categories with less than a total of five notable AI systems since 1950 were grouped under the "Other" label.
+          The following domains were re-categorized under "Other":
+            - 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio, Robotics
+
+          The aforementioned changes were implemented to make visualizations more coherent and concise.
+        display:
+          numDecimalPlaces: 0
+      cumulative_count:
+        title: Cumulative number of AI systems by domain
+        unit: ''
+        short_unit: ''
+        description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
+        description_key:
+          - Games systems are specifically designed for games excel in understanding and strategizing gameplay. For instance, AlphaGo, developed by DeepMind, defeated the world champion in the game of Go. Such systems use complex algorithms to compete effectively, even against skilled human players.
+
+          - Language systems are tailored to process language, focusing on understanding, translating, and interacting with human languages. Examples include chatbots, machine translation tools like Google Translate, and sentiment analysis algorithms that can detect emotions in text.
+
+          - Multimodal systems excel at processing multiple types of data at once, like sound and visuals together.  An example would be voice assistants like Siri or Alexa, which can understand spoken words (audio) and provide visual feedback (graphics) at the same time.
+
+          - Vision systems focus on processing visual information, playing a pivotal role in image recognition and related areas. For example, Facebook's photo tagging system uses vision AI to identify faces.
+
+          - Speech systems are dedicated to handling spoken language, being the backbone of voice assistants and similar applications.  They recognize, interpret, and generate spoken language to interact with users.
+
+          - Recommendation systems offer suggestions based on user preferences, seen prominently in online shopping and media streaming. For instance, Netflix's movie suggestions or Amazon's product recommendations are powered by such algorithms that analyze users' preferences and past behaviors.
+
+          - Drawing systems can create illustrations or sketches, either mimicking human techniques or generating unique art. Examples range from AI-generated artwork to design tools that can sketch based on user input or descriptions.
+
+          - Not specified category captures systems where their primary function isn't clearly defined.
+
+          - Other category represents a diverse set, including tasks from 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio and Robotics.
+
+        description_processing: >
+          For each year starting from 1950, the total number of AI systems in each domain was calculated by adding that year's count to the previous years' counts. This provides a running total or cumulative count of AI systems for each year and domain.
+
+
+          To streamline the categorization of domains, domain categories with less than a total of five notable AI systems since 1950 were grouped under the "Other" label.
+          The following domains were re-categorized under "Other":
+            - 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio, Robotics
+
+          The aforementioned changes were implemented to make visualizations more coherent and concise.
+        display:
+          numDecimalPlaces: 0

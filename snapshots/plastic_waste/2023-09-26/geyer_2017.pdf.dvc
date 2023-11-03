@@ -13,7 +13,7 @@ meta:
       Data on annual waste production in million metric tons between 1950 and 2015.
 
     # Citation
-    producer: Geyer et al. (2017)
+    producer: Geyer et al.
     citation_full: |-
       Roland Geyer et al. ,Production, use, and fate of all plastics ever made.Sci. Adv.3,e1700782(2017).DOI:10.1126/sciadv.1700782
 

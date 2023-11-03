@@ -29,7 +29,7 @@ from rich import print
 from rich.console import Console
 from sqlmodel import Session
 
-from apps.walkthrough import utils as walkthrough_utils
+from apps.wizard import utils as wizard_utils
 from etl import config
 from etl import grapher_model as gm
 from etl.command import main as etl_main
@@ -47,7 +47,7 @@ from etl.paths import (
 )
 from etl.snapshot import Snapshot, SnapshotMeta
 
-from . import csv, sheets
+from . import csv, pywebio_utils, sheets
 
 config.enable_bugsnag()
 
@@ -135,14 +135,12 @@ class FasttrackImport:
         # since sheets url is accessible with link, we have to encrypt it when storing in metadata
         sheets_url = _encrypt(self.sheets_url) if not self.meta.is_public else self.sheets_url
 
-        source_name = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
-
         if len(self.meta.sources) == 1:
             dataset_source = self.meta.sources[0]
             source = Source(
                 url=dataset_source.url,
-                name=source_name,
-                published_by=source_name,
+                name=dataset_source.name,
+                published_by=dataset_source.published_by,
                 source_data_url=sheets_url,
                 date_accessed=str(dt.date.today()),
                 publication_year=dataset_source.publication_year
@@ -157,7 +155,7 @@ class FasttrackImport:
             origin.date_accessed = str(dt.date.today())
 
             # Misuse the version field and url_download fields to store info about the spreadsheet
-            origin.version_producer = source_name
+            origin.version_producer = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
             origin.url_download = sheets_url
             license = self.meta.licenses[0]
         else:
@@ -185,7 +183,10 @@ class FasttrackImport:
 
     def dataset_yaml(self) -> str:
         """Generate dataset YAML file."""
-        return yaml_dump(metadata_export(self.dataset))  # type: ignore
+        yml = metadata_export(self.dataset)
+        # source is already in the snapshot and is propagated
+        yml["dataset"].pop("sources")
+        return yaml_dump(yml)  # type: ignore
 
     def save_metadata(self) -> None:
         with open(self.metadata_path, "w") as f:
@@ -226,19 +227,19 @@ def app(dummy_data: bool, commit: bool) -> None:
     po.put_warning("This tool is still in beta. Please report any issues to @Mojmir")
 
     with open(CURRENT_DIR / "instructions_sheets.md", "r") as f:
-        walkthrough_utils.put_widget(
+        pywebio_utils.put_widget(
             title=po.put_html("<b>Instructions for importing Google Sheet</b>"),
             contents=[po.put_markdown(f.read())],
         )
 
     with open(CURRENT_DIR / "instructions_csv.md", "r") as f:
-        walkthrough_utils.put_widget(
+        pywebio_utils.put_widget(
             title=po.put_html("<b>Instructions for importing Local CSV</b>"),
             contents=[po.put_markdown(f.read())],
         )
 
     with open(CURRENT_DIR / "instructions_large_csv.md", "r") as f:
-        walkthrough_utils.put_widget(
+        pywebio_utils.put_widget(
             title=po.put_html("<b>Instructions for importing large CSV file</b>"),
             contents=[po.put_markdown(f.read())],
         )
@@ -264,7 +265,7 @@ def app(dummy_data: bool, commit: bool) -> None:
     dag_content = _add_to_dag(dataset.metadata)
 
     # create step and metadata file
-    walkthrough_utils.generate_step_to_channel(CURRENT_DIR / "grapher_cookiecutter/", fast_import.meta.to_dict())
+    wizard_utils.generate_step_to_channel(CURRENT_DIR / "grapher_cookiecutter/", fast_import.meta.to_dict())
     fast_import.save_metadata()
 
     po.put_markdown(
@@ -312,10 +313,10 @@ def app(dummy_data: bool, commit: bool) -> None:
 ## Generated files
         """
     )
-    walkthrough_utils.preview_file(fast_import.metadata_path, language="yaml")
-    walkthrough_utils.preview_file(fast_import.step_path, language="python")
-    walkthrough_utils.preview_file(snapshot_path, language="yaml")
-    walkthrough_utils.preview_dag(dag_content, dag_name="dag/fasttrack.yml")
+    pywebio_utils.preview_file(fast_import.metadata_path, language="yaml")
+    pywebio_utils.preview_file(fast_import.step_path, language="python")
+    pywebio_utils.preview_file(snapshot_path, language="yaml")
+    pywebio_utils.preview_dag(dag_content, dag_name="dag/fasttrack.yml")
 
 
 class Options(Enum):
@@ -703,11 +704,11 @@ def _add_to_dag(ds_meta: DatasetMeta) -> str:
         to_remove = public_data_step
         to_add = {private_data_step: [f"snapshot-private://{snapshot_uri}.csv"]}
 
-    walkthrough_utils.remove_from_dag(
+    wizard_utils.remove_from_dag(
         to_remove,
         DAG_FASTTRACK_PATH,
     )
-    return walkthrough_utils.add_to_dag(
+    return wizard_utils.add_to_dag(
         to_add,
         DAG_FASTTRACK_PATH,
     )

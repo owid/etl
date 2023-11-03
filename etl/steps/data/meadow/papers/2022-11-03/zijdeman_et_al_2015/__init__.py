@@ -36,6 +36,10 @@ def run(dest_dir: str) -> None:
     tb = make_table(df, walden_ds)
     tb_metadata = make_table_metadata(metadata, walden_ds)
 
+    # Set index
+    tb = tb.set_index(["country_name", "year"], verify_integrity=True)
+    tb_metadata = tb_metadata.reset_index().set_index("index", verify_integrity=True)
+
     # initialize meadow dataset
     ds = init_meadow_dataset(dest_dir, walden_ds)
     # add table to a dataset

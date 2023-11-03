@@ -153,6 +153,8 @@ class Snapshot:
             return self.read_excel(*args, **kwargs)
         elif self.metadata.file_extension == "json":
             return self.read_json(*args, **kwargs)
+        elif self.metadata.file_extension == "dta":
+            return self.read_stata(*args, **kwargs)
         else:
             raise ValueError(f"Unknown extension {self.metadata.file_extension}")
 
@@ -174,6 +176,10 @@ class Snapshot:
         """Read JSON file into a Table and populate it with metadata."""
         return pr.read_json(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
+    def read_stata(self, *args, **kwargs) -> Table:
+        """Read Stata file into a Table and populate it with metadata."""
+        return pr.read_stata(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
     def read_from_records(self, *args, **kwargs) -> Table:
         """Read records into a Table and populate it with metadata."""
         return pr.read_from_records(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
@@ -181,6 +187,10 @@ class Snapshot:
     def read_fwf(self, *args, **kwargs) -> Table:
         """Read a table of fixed-width formatted lines with metadata."""
         return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
+    def ExcelFile(self, *args, **kwargs) -> pr.ExcelFile:
+        """Return an Excel file object ready for parsing."""
+        return pr.ExcelFile(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
 
 @pruned_json

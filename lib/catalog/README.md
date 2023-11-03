@@ -215,6 +215,13 @@ t = Table.read_csv('/tmp/my_table.csv')
 ## Changelog
 
 - `dev`
+- `v0.3.8`
+  - Pin dataclasses-json==0.5.8 to fix error with python3.9
+- `v0.3.7`
+  - Fix bugs.
+  - Improve metadata propagation.
+  - Improve metadata YAML file handling, to have common definitions.
+  - Remove `DatasetMeta.origins`.
 - `v0.3.6`
   - Fixed tons of bugs
   - `processing.py` module with pandas-like functions that propagate metadata

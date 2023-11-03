@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     snap_metadata = snaps[0].metadata
 
     # Load data from snapshot.
-    tbs = [pr.read_csv(snap.path, metadata=snap.to_table_metadata(), encoding="latin-1") for snap in snaps]
+    tbs = [snap.read_csv(encoding="latin-1") for snap in snaps]
     tb = pr.concat(tbs, ignore_index=True)
 
     # Sanity checks

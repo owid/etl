@@ -1,4 +1,9 @@
 steps:
+
+  ####################################
+  # Population #######################
+  ####################################
+
   # Population
   data://garden/demography/2022-12-08/population:
     - data://garden/hyde/2017/baseline
@@ -45,26 +50,10 @@ steps:
   data://grapher/demography/2023-06-12/population_density:
     - data://garden/demography/2023-06-12/population_density
 
-  # Life expectancy
-  ## Meadow
-  data://meadow/papers/2022-11-03/zijdeman_et_al_2015:
-    - walden://papers/2022-11-01/zijdeman_et_al_2015
-  data://meadow/papers/2023-02-03/riley_2005:
-    - walden://papers/2022-11-01/riley_2005
-  ## Garden
-  data://garden/papers/2022-11-03/zijdeman_et_al_2015:
-    - data://meadow/papers/2022-11-03/zijdeman_et_al_2015
-  data://garden/papers/2023-02-03/riley_2005:
-    - data://meadow/papers/2023-02-03/riley_2005
-  data://garden/demography/2023-02-03/life_expectancy:
-    - data://garden/papers/2022-11-03/zijdeman_et_al_2015
-    - data://garden/papers/2023-02-03/riley_2005
-    - data://garden/un/2022-07-11/un_wpp
-    - data://garden/hmd/2022-11-04/life_tables
-    - data://garden/owid/latest/key_indicators
-  ## Grapher
-  data://grapher/demography/2022-11-30/life_expectancy:
-    - data://garden/demography/2023-02-03/life_expectancy
+
+  ####################################
+  # Life expectancy ##################
+  ####################################
 
   # HMD
   data://meadow/hmd/2023-09-19/hmd:
@@ -106,3 +95,39 @@ steps:
     - data://garden/un/2023-10-02/un_wpp_lt
   data://grapher/demography/2023-10-04/life_tables:
     - data://garden/demography/2023-10-03/life_tables
+
+  # Zijdeman et al
+  data://meadow/demography/2023-10-10/zijdeman_et_al_2015:
+    - snapshot://demography/2023-10-10/zijdeman_et_al_2015.xlsx
+  data://garden/demography/2023-10-10/zijdeman_et_al_2015:
+    - data://meadow/demography/2023-10-10/zijdeman_et_al_2015
+
+  # Riley
+  data://meadow/demography/2023-10-10/riley_2005:
+    - snapshot://demography/2023-10-10/riley_2005.pdf
+  data://garden/demography/2023-10-10/riley_2005:
+    - data://meadow/demography/2023-10-10/riley_2005
+
+  # OMM: Life Expectancy
+  data://garden/demography/2023-10-09/life_expectancy:
+    - data://garden/demography/2023-10-03/life_tables
+    - data://garden/demography/2023-10-10/zijdeman_et_al_2015
+    - data://garden/demography/2023-10-10/riley_2005
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/demography/2023-10-10/life_expectancy:
+    - data://garden/demography/2023-10-09/life_expectancy
+
+  # Life Expectancy OECD
+  data://meadow/oecd/2023-10-11/life_expectancy_birth:
+    - snapshot://oecd/2023-10-11/life_expectancy_birth.csv
+  data://garden/oecd/2023-10-11/life_expectancy_birth:
+    - data://meadow/oecd/2023-10-11/life_expectancy_birth
+  data://grapher/oecd/2023-10-11/life_expectancy_birth:
+    - data://garden/oecd/2023-10-11/life_expectancy_birth
+
+  # Broken limits of Life Expectancy
+  data://garden/demography/2023-10-20/broken_limits_le:
+    - data://garden/demography/2023-10-03/life_tables
+    - data://garden/hmd/2023-09-19/hmd
+  data://grapher/demography/2023-10-20/broken_limits_le:
+    - data://garden/demography/2023-10-20/broken_limits_le

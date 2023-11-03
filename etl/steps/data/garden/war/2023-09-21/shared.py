@@ -57,53 +57,91 @@ def expand_observations(
     return tb
 
 
-def add_indicators_conflict_rate(tb: Table, tb_regions: Table, columns_to_scale: List[str]) -> Table:
-    """Scale columns `columns_to_scale` based on the number of countries (and country-pairs) in each region and year.
+def add_indicators_extra(
+    tb: Table,
+    tb_regions: Table,
+    columns_conflict_rate: Optional[List[str]] = None,
+    columns_conflict_mortality: Optional[List[str]] = None,
+) -> Table:
+    """Scale original columns to obtain new indicators (conflict rate and conflict mortality indicators).
 
-    For each indicator listed in `columns_to_scale`, two new columns are added to the table:
-    - `{indicator}_per_country`: the indicator value divided by the number of countries in the region and year.
-    - `{indicator}_per_country_pair`: the indicator value divided by the number of country-pairs in the region and year.
+    CONFLICT RATE:
+        Scale columns `columns_conflict_rate` based on the number of countries (and country-pairs) in each region and year.
 
-    TODO: add metadata to derived columns? can't do atm bc metadata of the original columns is added after creating the dataset.
+        For each indicator listed in `columns_to_scale`, two new columns are added to the table:
+        - `{indicator}_per_country`: the indicator value divided by the number of countries in the region and year.
+        - `{indicator}_per_country_pair`: the indicator value divided by the number of country-pairs in the region and year.
+
+    CONFLICT MORTALITY:
+        Scale columns `columns_conflict_mortality` based on the population in each region.
+
+        For each indicator listed in `columns_to_scale`, a new column is added to the table:
+        - `{indicator}_per_capita`: the indicator value divided by the number of countries in the region and year.
+
 
     tb: Main table
     tb_regions: Table with three columns: "year", "region", "num_countries". Gives the number of countries per region per year.
     columns_to_scale: List with the names of the columns that need scaling. E.g. number_ongiong_conflicts -> number_ongiong_conflicts_per_country
-
-    NOTE: Only tested for COW-based state lists (MIE).
     """
+    tb_regions_ = tb_regions.copy()
+
     # Sanity check 1: columns as expected in tb_regions
-    assert set(tb_regions.columns) == {
+    assert set(tb_regions_.columns) == {
         "year",
         "region",
         "number_countries",
-    }, f"Invalid columns in tb_regions {tb_regions.columns}"
+        "population",
+    }, f"Invalid columns in tb_regions {tb_regions_.columns}"
     # Sanity check 2: regions equivalent in both tables
     regions_main = set(tb["region"])
-    regions_aux = set(tb_regions["region"])
+    regions_aux = set(tb_regions_["region"])
     assert regions_main == regions_aux, f"Regions in main table and tb_regions differ: {regions_main} vs {regions_aux}"
 
     # Ensure full precision
-    tb_regions["number_countries"] = tb_regions["number_countries"].astype(float)
-
+    tb_regions_["number_countries"] = tb_regions_["number_countries"].astype(float)
+    tb_regions_["population"] = tb_regions_["population"]  # .astype(float)
     # Get number of country-pairs
-    tb_regions["number_country_pairs"] = (
-        tb_regions["number_countries"] * (tb_regions["number_countries"] - 1) / 2
+    tb_regions_["number_country_pairs"] = (
+        tb_regions_["number_countries"] * (tb_regions_["number_countries"] - 1) / 2
     ).astype(int)
-    # Add number of countries and number of country pairs to main table
-    tb = tb.merge(tb_regions, on=["year", "region"], how="left")
 
-    # Add normalised indicators
-    for column_name in columns_to_scale:
-        # Add per country indicator
-        column_name_new = f"{column_name}_per_country"
-        tb[column_name_new] = (tb[column_name] / tb["number_countries"]).replace([np.inf, -np.inf], np.nan)
-        # Add per country-pair indicator
-        column_name_new = f"{column_name}_per_country_pair"
-        tb[column_name_new] = (tb[column_name] / tb["number_country_pairs"]).replace([np.inf, -np.inf], np.nan)
+    # Add number of countries and number of country pairs to main table
+    tb = tb.merge(tb_regions_, on=["year", "region"], how="left")
+
+    if not columns_conflict_rate and not columns_conflict_mortality:
+        raise ValueError(
+            "Call to function is useless. Either provide `columns_conflict_rate` or `columns_conflict_mortality`."
+        )
+
+    # CONFLICT RATES ###########
+    if columns_conflict_rate:
+        # Add normalised indicators
+        for column_name in columns_conflict_rate:
+            # Add per country indicator
+            column_name_new = f"{column_name}_per_country"
+            tb[column_name_new] = (tb[column_name].astype(float) / tb["number_countries"].astype(float)).replace(
+                [np.inf, -np.inf], np.nan
+            )
+            # Add per country-pair indicator
+            column_name_new = f"{column_name}_per_country_pair"
+            tb[column_name_new] = (tb[column_name].astype(float) / tb["number_country_pairs"].astype(float)).replace(
+                [np.inf, -np.inf], np.nan
+            )
+
+    # CONFLICT MORTALITY ###########
+    if columns_conflict_mortality:
+        # Add normalised indicators
+        for column_name in columns_conflict_mortality:
+            # Add per country indicator
+            column_name_new = f"{column_name}_per_capita"
+            tb[column_name_new] = (
+                (100000 * tb[column_name].astype(float) / tb["population"])
+                .replace([np.inf, -np.inf], np.nan)
+                .astype(float)
+            )
 
     # Drop intermediate columns
-    tb = tb.drop(columns=["number_countries", "number_country_pairs"])
+    tb = tb.drop(columns=["number_countries", "number_country_pairs", "population"])
 
     return tb
 

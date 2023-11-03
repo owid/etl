@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 import mkdocs_gen_files
 
@@ -82,26 +82,29 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
     return prop_docs
 
 
-def render_props_recursive(prop: Dict[str, Any], prop_name: str, level: int, text: str) -> str:
+def render_props_recursive(prop: Dict[str, Any], prop_name: str, level: int, text: str, ignore_fields: Optional[List[str]] = None, render_top_as_scalar: bool = True) -> str:
     """Render all properties."""
-    print(prop_name)
+    if ignore_fields is None:
+        ignore_fields = []
+
     if "type" in prop and prop["type"] == "object":
         text += render_prop_doc(prop, prop_name=prop_name, level=level, top_level=True)
 
-        # Do not go deeper
-        if prop_name == "tables[].variables[].presentation.grapher_config":
+        # Do not got deeper either
+        if prop_name in ignore_fields:
             return text
 
         if "properties" not in prop and "additionalProperties" in prop:
             props_children = prop["additionalProperties"]["properties"]
-            prop_name = f"{prop_name}[]"
+            if not render_top_as_scalar:
+                prop_name = f"{prop_name}[]"
         elif "properties" in prop:
             props_children = prop["properties"]
         else:
             return text
         props_children_sorted = dict(sorted(props_children.items()))
         for prop_name_child, prop_child in props_children_sorted.items():
-            text += render_props_recursive(prop_child, prop_name=f"{prop_name}.{prop_name_child}", level=level + 1, text="")
+            text += render_props_recursive(prop_child, prop_name=f"{prop_name}.{prop_name_child}", level=level + 1, text="", ignore_fields=ignore_fields)
     else:
         text += render_prop_doc(prop, prop_name=prop_name, level=level)
     return text
@@ -129,8 +132,17 @@ def render_table() -> str:
     """Render documentation for origin."""
     # Rendering of 'snapshot' is only meta.origin and meta.license
     ## Origin
-    dataset = DATASET_SCHEMA["properties"]["tables"]
-    documentation = render_props_recursive(dataset, "tables", 1, "")
+    tables = DATASET_SCHEMA["properties"]["tables"]
+    documentation = render_props_recursive(tables, "table", 1, "", ignore_fields=["table.variables"])
+    return documentation
+
+
+def render_indicator() -> str:
+    """Render documentation for origin."""
+    # Rendering of 'snapshot' is only meta.origin and meta.license
+    ## Origin
+    variables = DATASET_SCHEMA["properties"]["tables"]["additionalProperties"]["properties"]["variables"]
+    documentation = render_props_recursive(variables, "variable", 1, "", ignore_fields=["variable.presentation.grapher_config"])
     return documentation
 
 
@@ -147,6 +159,11 @@ with mkdocs_gen_files.open("architecture/metadata/reference/dataset.md", "w") as
 # Tables reference
 with mkdocs_gen_files.open("architecture/metadata/reference/tables.md", "w") as f:
     text_tables = render_table()
+    print(text_tables, file=f)
+
+# Indicator reference
+with mkdocs_gen_files.open("architecture/metadata/reference/indicator.md", "w") as f:
+    text_tables = render_indicator()
     print(text_tables, file=f)
 
 

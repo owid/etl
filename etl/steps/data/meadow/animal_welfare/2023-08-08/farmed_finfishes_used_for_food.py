@@ -1,9 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-import owid.catalog.processing as pr
-
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -14,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("farmed_finfishes_used_for_food.zip")
+    snap = paths.load_snapshot("farmed_finfishes_used_for_food.zip")
 
     #
     # Process data.
@@ -70,7 +67,7 @@ def run(dest_dir: str) -> None:
         (2018, 54431, 76, 167, 121, 627, 908, 79),
         (2019, 56327, 78, 171, 124, 649, 932, 80),
     ]
-    tb = pr.read_from_records(
+    tb = snap.read_from_records(
         records,
         columns=[
             "year",
@@ -82,7 +79,6 @@ def run(dest_dir: str) -> None:
             "n_fish_relative_to_1990_pct",
             "n_birds_and_mammals_billions",
         ],
-        metadata=snap.to_table_metadata(),
     )
 
     # Set an appropriate index and sort conveniently.
