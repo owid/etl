@@ -18,8 +18,6 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     tb = snap.read()
 
-    raise ValueError("oh no")
-
     #
     # Process data.
     #
