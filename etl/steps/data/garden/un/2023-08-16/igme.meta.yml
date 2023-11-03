@@ -109,7 +109,7 @@ tables:
         display:
           name: |-
             {definitions.indicator.display_name}
-  igme_under_fifteen_mortality_rate:
+  igme_under_fifteen_mortality:
     variables:
       obs_value:
         title: Under fifteen mortality rate

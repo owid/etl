@@ -35,23 +35,6 @@ def run(dest_dir: str) -> None:
     tb = round_down_year(tb)
     tb = clean_values(tb)
 
-    # tb = pr.melt(
-    #    tb,
-    #    id_vars=["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile"],
-    #    value_vars=["obs_value", "lower_bound", "upper_bound"],
-    #    var_name="value_type",
-    #    value_name="value",
-    # )
-    # tb = pr.pivot(
-    #    tb,
-    #    index=["country", "year", "sex", "unit_of_measure", "wealth_quintile", "value_type"],
-    #    columns="indicator",
-    #    values="value",
-    # ).reset_index()
-    # tb.columns = tb.columns.map(underscore)
-    # cols_to_exclude = ["country", "year", "sex", "unit_of_measure", "wealth_quintile", "value_type"]
-    # tb = tb.dropna(subset=[col for col in tb.columns if col not in cols_to_exclude], how="all")
-
     tb["source"] = "igme (current)"
     # Separate out the variables needed to calculate the under-fifteen mortality rate.
     tb_under_fifteen = tb[
@@ -75,18 +58,11 @@ def run(dest_dir: str) -> None:
 
     tb_com = calculate_under_fifteen_deaths(tb_com)
 
-    # Pivot the table so that the variables are in columns.
-    # tb = pivot_table_and_format(tb)
     # Calculate post neonatal deaths
     tb = add_post_neonatal_deaths(tb)
     # tb_com = pivot_table_and_format(tb_com)
 
     tb_com = calculate_under_fifteen_mortality_rates(tb_com)
-    # Add some metadata to the variables. Getting the unit from the column name and inferring the number of decimal places from the unit.
-    # If it contains " per " we know it is a rate and should have 1 d.p., otherwise it should be an integer.
-
-    # tb = add_metadata_and_set_index(tb)
-    # tb_com = add_metadata_and_set_index(tb_com)
 
     # Save outputs.
     #
@@ -382,14 +358,3 @@ def round_down_year(tb: Table) -> Table:
     tb["year"] = tb["year"].apply(trunc)
 
     return tb
-
-
-# def pivot_table_and_format(tb: Table) -> Table:
-#    tb = tb.pivot(
-#        index=["country", "year"],
-#        values=["obs_value", "lower_bound", "upper_bound"],
-#        columns=["unit_of_measure", "indicator", "sex", "wealth_quintile"],
-#    )
-#    tb.columns = ["-".join(col).strip() for col in tb.columns.values]
-#    tb = tb.reset_index()
-#    return tb
