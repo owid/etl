@@ -28,7 +28,7 @@ SECTORS = {
 }
 
 # Suffix to add to the name of per capita variables.
-PER_CAPITA_SUFFIX = " (per capita)"
+PER_CAPITA_SUFFIX = "_per_capita"
 
 # Mapping of gas name (as given in Climate Watch data) to the name of the corresponding output table.
 TABLE_NAMES = {
@@ -147,7 +147,6 @@ def create_table_for_gas(
     tb_gas = tb_gas.rename(
         columns={
             column: utils.underscore(column)
-            .replace("__", "_")
             .replace("emissions", f"{utils.underscore(gas)}_emissions")
             .replace("all_ghg", "ghg")
             .replace("f_gas", "fgas")
