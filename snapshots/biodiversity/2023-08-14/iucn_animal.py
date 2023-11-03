@@ -39,7 +39,13 @@ def main(upload: bool) -> None:
 
     # Start the browser with the custom options
     driver = webdriver.Chrome(options=chrome_options)
-    driver.get(snap.metadata.source.url)
+    if snap.metadata.source is not None:
+        # Only access "url" if snap.metadata.source is not None
+        driver.get(snap.metadata.source.url)
+    else:
+        # Handle the case when snap.metadata.source is None
+        print("snap.metadata.source is None, cannot access 'url'.")
+    # driver.get(snap.metadata.source.url)
 
     try:
         # Step 1: Navigate to the section with the specific title
