@@ -35,10 +35,8 @@ tables:
           **Consolidating Collaborations**:
             - All variations of "Industry - Academia Collaboration" entries, regardless of their capitalization or leaning (towards academia or industry), were unified into a single "Collaboration" category.
 
-
           **Grouping Other Affiliations**:
             - Affiliations explicitly labeled as "Research Collective" or "research collective", as well as those under "Government" and "Non-profit", were re-categorized under the "Other" label.
-
 
           The aforementioned changes were implemented to make visualizations more coherent and concise.
         display:
@@ -60,10 +58,8 @@ tables:
           **Consolidating Collaborations**:
             - All variations of "Industry - Academia Collaboration" entries, regardless of their capitalization or leaning (towards academia or industry), were unified into a single "Collaboration" category.
 
-
           **Grouping Other Affiliations**:
             - Affiliations explicitly labeled as "Research Collective" or "research collective", as well as those under "Government" and "Non-profit", were re-categorized under the "Other" label.
-
 
           The aforementioned changes were implemented to make visualizations more coherent and concise.
         display:
