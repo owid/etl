@@ -41,7 +41,7 @@ tables:
         display:
           numDecimalPlaces: 0
       cumulative_count:
-        title: Cumulative number of AI systems by domain
+        title: Cumulative number of AI systems by researcher affiliation
         unit: 'AI systems'
         short_unit: ''
         description_short: Describes the sector (Industry, Academia, or Collaboration) where the authors of an AI system have their primary affiliations.
