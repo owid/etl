@@ -309,8 +309,14 @@ class Chart(SQLModel, table=True):
 
         return variables
 
-    def migrate_to_db(self, source_session: Session, target_session: Session):
-        """Remap variable ids from source to target session."""
+    def migrate_to_db(self, source_session: Session, target_session: Session) -> "Chart":
+        """Remap variable ids from source to target session. Variable in source is uniquely identified
+        by its catalogPath if available, or by name and datasetId otherwise. It is looked up
+        by this identifier in the target session to get the new variable id.
+
+        Once we get the `source variable id -> target variable id` mapping, we remap all variables in the
+        chart config.
+        """
         assert self.id, "Chart must come from a database"
         source_variables = self.load_chart_variables(source_session)
 

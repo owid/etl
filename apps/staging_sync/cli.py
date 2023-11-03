@@ -35,10 +35,12 @@ log = structlog.get_logger()
     help="Automatically publish new charts.",
 )
 @click.option(
-    "--need-revision/--no-need-revision",
-    default=True,
+    "--apply-revisions/--no-apply-revisions",
+    default=False,
     type=bool,
-    help="Create chart revision that requires approval if a chart with the same slug already exists.",
+    help="""Directly update existing charts with approved revisions
+    (skip chart revision). Useful for large updates. This still
+    creates a chart revision if the target chart has been modified.""",
 )
 @click.option(
     "--dry-run/--no-dry-run",
@@ -51,12 +53,27 @@ def cli(
     target: Path,
     chart_id: Optional[int],
     publish: bool,
-    need_revision: bool,
+    apply_revisions: bool,
     dry_run: bool,
 ) -> None:
     """Syncs grapher charts and revisions modified by Admin user from source_env to target_env. (Admin user is used by staging servers).
 
     SOURCE and TARGET can be either paths to .env file or name of a staging server.
+
+    The dataset from source must exist in target (i.e. you have to merge your work to master and wait for the ETL to finish).
+
+    Usage:
+        # run staging-sync in dry-run mode to see what charts will be updated
+        etl-staging-sync staging-site-my-branch .env.prod.write --dry-run
+
+        # run it for real
+        etl-staging-sync staging-site-my-branch .env.prod.write
+
+        # sync only one chart
+        etl-staging-sync staging-site-my-branch .env.prod.write --chart-id 123 --dry-run
+
+        # WARNING: skip chart revisions and update charts directly
+        etl-staging-sync staging-site-my-branch .env.prod.write --apply-revisions
 
     Charts:
         - New charts are automatically created in target_env.
@@ -112,17 +129,13 @@ def cli(
                     revs = [
                         rev
                         for rev in revs
+                        if rev.status == "approved" and rev.updatedBy == 1
                         # min(rev.createdAt, rev.updatedAt) is needed because of a bug in chart revisions, it should be fixed soon
-                        if rev.status == "approved"
-                        and rev.updatedBy == 1
                         and min(rev.createdAt, rev.updatedAt) > existing_chart.updatedAt
                     ]
 
-                    # Chart must not be updated after this revision - if it is updated, we send it for revision
-                    revs = [rev for rev in revs if rev.updatedAt >= source_chart.updatedAt]
-
-                    # if there's no revision or a flag --no-need-revision, update the chart directly
-                    if not need_revision or revs:
+                    # if chart has gone through revision in source and --apply-revisions is set, update it directly
+                    if apply_revisions and revs:
                         log.info(
                             "staging_sync.update_chart", slug=target_chart.config["slug"], chart_id=existing_chart.id
                         )
