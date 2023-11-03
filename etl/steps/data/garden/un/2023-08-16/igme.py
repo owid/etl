@@ -63,6 +63,9 @@ def run(dest_dir: str) -> None:
     # tb_com = pivot_table_and_format(tb_com)
 
     tb_com = calculate_under_fifteen_mortality_rates(tb_com)
+    tb_com = tb_com.set_index(
+        ["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"], verify_integrity=True
+    ).drop(columns=["source", "Observation value", "Lower bound", "Upper bound"])
 
     # Save outputs.
     #
@@ -71,7 +74,7 @@ def run(dest_dir: str) -> None:
         ["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"], verify_integrity=True
     ).drop(columns=["source"])
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb, tb_com], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -292,7 +295,11 @@ def filter_data(tb: Table) -> Table:
     """
     # Keeping only the UN IGME estimates and the total wealth quintile
     tb = tb.loc[(tb["series_name"] == "UN IGME estimate")]
-
+    tb = tb[
+        -tb["indicator"].isin(
+            ["Progress towards SDG in neonatal mortality rate", "Progress towards SDG in under-five mortality rate"]
+        )
+    ]
     cols_to_keep = [
         "country",
         "year",
