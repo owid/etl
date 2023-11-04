@@ -17,7 +17,7 @@ meta:
     url: https://github.com/dkobak/excess-mortality
     source_data_url: 
       https://raw.githubusercontent.com/dkobak/excess-mortality/main/baselines-per-year.csv
-    date_accessed: 2023-11-03
+    date_accessed: 2023-11-04
     publication_date: '2021-06-30'
     publication_year: 2021
     published_by: Karlinsky & Kobak, 2021, Tracking excess mortality across countries
