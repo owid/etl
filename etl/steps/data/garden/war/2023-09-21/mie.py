@@ -363,7 +363,7 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     ###################
 
     # Get table with [year, conflict_type, code]
-    tb_country = tb[["styear", "endyear", "ccode"]].copy()
+    tb_country = tb[["styear", "endyear", "ccode", "hostlev"]].copy()
     # Rename
     tb_country = tb_country.rename(columns={"ccode": "id"})
 
@@ -412,13 +412,17 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     tb_country["participated_in_conflict"].m.origins = tb["ccode"].m.origins
 
     # Prepare codes table
+    tb_alltypes = Table(pd.DataFrame({"hostlev": tb_country["hostlev"].unique()}))
+    tb_codes = tb_codes.reset_index().merge(tb_alltypes, how="cross")
     tb_codes["country"] = tb_codes["country"].astype(str)
-    tb_codes = tb_codes.reset_index()
 
     # Combine all codes entries with MIE table
-    tb_country = tb_codes.merge(tb_country, on=["year", "country"], how="outer")
+    tb_country = tb_codes.merge(tb_country, on=["year", "country", "hostlev"], how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
-    tb_country = tb_country[["year", "country", "participated_in_conflict"]]
+    tb_country = tb_country[["year", "country", "hostlev", "participated_in_conflict"]]
+
+    # Add "all" hostility level
+    tb_country = add_conflict_country_all_htypes(tb_country)
 
     # Only preserve years that make sense
     tb_country = tb_country[(tb_country["year"] >= tb["styear"].min()) & (tb_country["year"] <= tb["endyear"].max())]
@@ -426,8 +430,11 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     # Set short name
     tb_country.metadata.short_name = f"{paths.short_name}_country"
 
+    # Replace hostlev codes with names
+    tb_country["hostlev"] = tb_country["hostlev"].map(HOSTILITY_LEVEL_MAP | {"all": "all"})
+
     # Set index
-    tb_country = tb_country.set_index(["year", "country"], verify_integrity=True)
+    tb_country = tb_country.set_index(["year", "hostlev", "country"], verify_integrity=True)
     return tb_country
 
 
@@ -440,3 +447,13 @@ def _get_country_name(tb_codes: Table, code: int, year: int) -> str:
         else:
             raise ValueError(f"Unknown country with code {code} for year {year}")
     return country_name
+
+
+def add_conflict_country_all_htypes(tb: Table) -> Table:
+    """Add metrics for conflict_type = 'state-based'."""
+    tb_all = tb.groupby(["year", "country"], as_index=False).agg(
+        {"participated_in_conflict": lambda x: min(x.sum(), 1)}
+    )
+    tb_all["hostlev"] = "all"
+    tb = pr.concat([tb, tb_all], ignore_index=True)
+    return tb

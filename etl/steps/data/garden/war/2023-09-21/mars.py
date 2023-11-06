@@ -467,17 +467,17 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     tb_country["participated_in_conflict"] = 1
     tb_country["participated_in_conflict"].m.origins = tb["ccode"].m.origins
 
-    # Prepare GW table
+    # Prepare codes table
     tb_alltypes = Table(pd.DataFrame({"conflict_type": tb_country["conflict_type"].unique()}))
     tb_codes = tb_codes.reset_index().merge(tb_alltypes, how="cross")
     tb_codes["country"] = tb_codes["country"].astype(str)
 
-    # Combine all GW entries with UCDP
+    # Combine all codes entries with MARS
     tb_country = tb_codes.merge(tb_country, on=["year", "country", "conflict_type"], how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
     tb_country = tb_country[["year", "country", "conflict_type", "participated_in_conflict"]]
 
-    # Add intrastate (all)
+    # Add all conflict types
     tb_country = add_conflict_country_all_ctypes(tb_country)
     # Add state-based
     # tb_country = add_conflict_country_all_statebased(tb_country)
