@@ -106,7 +106,5 @@ def run(dest_dir: str) -> None:
     grouped_tb = add_origins_to_mortality_database(tb_who=grouped_tb)
 
     # Save the processed data.
-    ds_garden = create_dataset(
-        dest_dir, tables=[grouped_tb], check_variables_metadata=True, default_metadata=ds_garden_who.metadata
-    )
+    ds_garden = create_dataset(dest_dir, tables=[grouped_tb], check_variables_metadata=True)
     ds_garden.save()

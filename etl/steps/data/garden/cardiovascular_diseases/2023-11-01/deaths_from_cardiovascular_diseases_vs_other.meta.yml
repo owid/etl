@@ -10,13 +10,12 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 365
-  title: Mortality Database
-  title_snapshot: Mortality Database - Cardiovascular Diseases vs Other Causes of Death
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
   deaths_from_cardiovascular_diseases_vs_other:
+    title: Mortality Database
     variables:
         cancer_and_neoplasms:
           title: Share of deaths from cancer and neoplasms
