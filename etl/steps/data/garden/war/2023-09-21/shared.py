@@ -308,17 +308,52 @@ def fill_gaps_with_zeroes(
 
 def aggregate_conflict_types(
     tb: Table,
-    parent_conflict: str,
-    children_conflicts: List[str],
+    parent_name: str,
+    children_names: Optional[List[str]] = None,
     columns_to_aggregate: List[str] = ["participated_in_conflict"],
+    dim_name: str = "conflict_type",
 ) -> Table:
     """Aggregate metrics in broader conflict types."""
-    tb_agg = tb[tb["conflict_type"].isin(children_conflicts)].copy()
+    if children_names is None:
+        tb_agg = tb.copy()
+    else:
+        tb_agg = tb[tb[dim_name].isin(children_names)].copy()
     tb_agg = tb_agg.groupby(["year", "country", "id"], as_index=False).agg(
         {col: lambda x: min(x.sum(), 1) for col in columns_to_aggregate}
     )
-    tb_agg["conflict_type"] = parent_conflict
+    tb_agg[dim_name] = parent_name
 
     # Combine
     tb = pr.concat([tb, tb_agg], ignore_index=True)
     return tb
+
+
+def get_number_of_countries_in_conflict_by_region(tb: Table, dimension_name: str, country_system: Literal["gw", "cow", "isd"]) -> Table:
+    """Get the number of countries participating in conflicts by region."""
+    # Add region
+    tb_num_participants = add_region_from_code(tb, country_system)
+    tb_num_participants = tb_num_participants.drop(columns=["country"]).rename(columns={"region": "country"})
+
+    # Sanity check
+    assert not tb_num_participants["id"].isna().any(), "Some countries with NaNs!"
+    tb_num_participants = tb_num_participants.drop(columns=["id"])
+
+    # Groupby sum (regions)
+    tb_num_participants = tb_num_participants.groupby(["country", dimension_name, "year"], as_index=False)[
+        "participated_in_conflict"
+    ].sum()
+    # Groupby sum (world)
+    tb_num_participants_world = tb_num_participants.groupby([dimension_name, "year"], as_index=False)[
+        "participated_in_conflict"
+    ].sum()
+    tb_num_participants_world["country"] = "World"
+    # Combine
+    tb_num_participants = pr.concat([tb_num_participants, tb_num_participants_world], ignore_index=True)
+    tb_num_participants = tb_num_participants.rename(columns={"participated_in_conflict": "number_participants"})
+
+    # Complement with missing entries
+    tb_num_participants = fill_gaps_with_zeroes(
+        tb_num_participants, ["country", dimension_name, "year"], cols_use_range=["year"]
+    )
+
+    return tb_num_participants
