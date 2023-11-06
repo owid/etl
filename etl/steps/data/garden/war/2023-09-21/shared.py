@@ -262,21 +262,34 @@ def _code_to_region_cow(code: int) -> str:
             raise ValueError(f"Invalid COW code: {code}")
 
 
-def _code_to_region_isd(code: int) -> str:
+def _code_to_region_isd(cow_code: int) -> str:
     """Convert code to region name."""
-    match code:
+    match cow_code:
         case c if 2 <= c <= 165:
             return "Americas"
-        case c if 200 <= c <= 399:
+        case c if (200 <= c <= 395) or (c in [2558, 3375]):
             return "Europe"
-        case c if 402 <= c <= 626:
-            return "Africa"
-        case c if 630 <= c <= 698:
-            return "Middle East"
-        case c if 700 <= c <= 999:
+        case c if (
+            (402 <= c <= 434)
+            or (437 <= c <= 482)  # Skipping Mauritania, Niger
+            or (484 <= c <= 591)  # Skipping Chad
+            or (4044 <= c <= 4343)  # SKipping: Morocco, Algeria, Tunisia, Libya, Sudan, South Sudan
+            or (4362 <= c <= 4761)  # Skipping Brakna, Trarza Emirate
+            or (4765 <= c <= 4831)  # Skipping Kanem-Bornu
+            or (4841 <= c <= 5814)  # Skipping Wadai  # Skipping Darfur, Funj Sultanate, Shilluk Kingdom, Tegali Kingdom
+        ):
+            return "Sub-Saharan Africa"
+        case c if (
+            (c in [435, 436, 483])  # North Africa
+            or (600 <= c <= 698)  # NA & Middle East
+            or (c in [4352, 4354, 4763, 4832])  # NA
+            or (6251 <= c <= 6845)  # NA & ME
+        ):
+            return "North Africa and the Middle East"
+        case c if (700 <= c <= 990) or (7003 <= c <= 9210):
             return "Asia and Oceania"
         case _:
-            raise ValueError(f"Invalid COW code: {code}")
+            raise ValueError(f"Invalid ISD code: {cow_code}")
 
 
 def fill_gaps_with_zeroes(
@@ -328,7 +341,9 @@ def aggregate_conflict_types(
     return tb
 
 
-def get_number_of_countries_in_conflict_by_region(tb: Table, dimension_name: str, country_system: Literal["gw", "cow", "isd"]) -> Table:
+def get_number_of_countries_in_conflict_by_region(
+    tb: Table, dimension_name: str, country_system: Literal["gw", "cow", "isd"]
+) -> Table:
     """Get the number of countries participating in conflicts by region."""
     # Add region
     tb_num_participants = add_region_from_code(tb, country_system)

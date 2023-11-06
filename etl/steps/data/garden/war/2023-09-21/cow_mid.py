@@ -487,6 +487,7 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     ###################
     # Participated in #
     ###################
+    # FLAG YES/NO (country-level)
 
     # Get table with [year, conflict_type, code]
     tb_country = tb[["year", "hostlev", "ccode"]].copy()
@@ -516,9 +517,10 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     tb_codes["country"] = tb_codes["country"].astype(str)
 
     # Combine all Codes entries with CoW MID
-    tb_country = tb_codes.merge(tb_country, on=["year", "country", "id", "hostlev"], how="outer")
+    columns_idx = ["year", "country", "id", "hostlev"]
+    tb_country = tb_codes.merge(tb_country, on=columns_idx, how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
-    tb_country = tb_country[["year", "country", "id", "hostlev", "participated_in_conflict"]]
+    tb_country = tb_country[columns_idx + ["participated_in_conflict"]]
 
     # Add "all" hostility level
     tb_country = aggregate_conflict_types(tb_country, "all", dim_name="hostlev")
@@ -533,6 +535,7 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     # Participated in #
     ###################
     # NUMBER COUNTRIES
+
     tb_num_participants = get_number_of_countries_in_conflict_by_region(tb_country, "hostlev", "cow")
 
     # Combine tables
@@ -544,6 +547,7 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     ###############
     # Final steps #
     ###############
+
     # Set index
     tb_country = tb_country.set_index(["year", "country", "hostlev"], verify_integrity=True)
     # Set short name

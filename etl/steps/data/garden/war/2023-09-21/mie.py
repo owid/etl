@@ -35,6 +35,7 @@ import pandas as pd
 from owid.catalog import Table
 from shared import (
     add_indicators_extra,
+    aggregate_conflict_types,
     expand_observations,
     get_number_of_countries_in_conflict_by_region,
 )
@@ -421,12 +422,13 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     tb_codes["country"] = tb_codes["country"].astype(str)
 
     # Combine all codes entries with MIE table
-    tb_country = tb_codes.merge(tb_country, on=["year", "country", "id", "hostlev"], how="outer")
+    columns_idx = ["year", "country", "id", "hostlev"]
+    tb_country = tb_codes.merge(tb_country, on=columns_idx, how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
-    tb_country = tb_country[["year", "country", "id", "hostlev", "participated_in_conflict"]]
+    tb_country = tb_country[columns_idx + ["participated_in_conflict"]]
 
     # Add "all" hostility level
-    tb_country = add_conflict_country_all_htypes(tb_country)
+    tb_country = aggregate_conflict_types(tb_country, "all", dim_name="hostlev")
 
     # Only preserve years that make sense
     tb_country = tb_country[(tb_country["year"] >= tb["styear"].min()) & (tb_country["year"] <= tb["endyear"].max())]
@@ -465,13 +467,3 @@ def _get_country_name(tb_codes: Table, code: int, year: int) -> str:
         else:
             raise ValueError(f"Unknown country with code {code} for year {year}")
     return country_name
-
-
-def add_conflict_country_all_htypes(tb: Table) -> Table:
-    """Add metrics for conflict_type = 'state-based'."""
-    tb_all = tb.groupby(["year", "country"], as_index=False).agg(
-        {"participated_in_conflict": lambda x: min(x.sum(), 1)}
-    )
-    tb_all["hostlev"] = "all"
-    tb = pr.concat([tb, tb_all], ignore_index=True)
-    return tb

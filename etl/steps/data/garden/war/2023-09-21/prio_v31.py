@@ -356,6 +356,7 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     ###################
     # Participated in #
     ###################
+    # FLAG YES/NO (country-level)
 
     # Get table with [year, conflict_type, code]
     codes = ["gwnoa", "gwnob"]
@@ -427,6 +428,7 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     ###############
     # Final steps #
     ###############
+
     # Set short name
     tb_country.metadata.short_name = f"{paths.short_name}_country"
 

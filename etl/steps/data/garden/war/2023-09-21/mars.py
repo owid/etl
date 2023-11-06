@@ -44,7 +44,12 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
-from shared import add_indicators_extra, expand_observations
+from shared import (
+    add_indicators_extra,
+    aggregate_conflict_types,
+    expand_observations,
+    get_number_of_countries_in_conflict_by_region,
+)
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -436,6 +441,7 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     ###################
     # Participated in #
     ###################
+    # FLAG YES/NO (country-level)
 
     # Get table with [year, conflict_type, code]
     tb_country = tb[["year", "conflict_type", "ccode"]].rename(columns={"ccode": "id"})
@@ -473,21 +479,38 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     tb_codes["country"] = tb_codes["country"].astype(str)
 
     # Combine all codes entries with MARS
-    tb_country = tb_codes.merge(tb_country, on=["year", "country", "conflict_type"], how="outer")
+    columns_idx = ["year", "country", "id", "conflict_type"]
+    tb_country = tb_codes.merge(tb_country, on=columns_idx, how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
-    tb_country = tb_country[["year", "country", "conflict_type", "participated_in_conflict"]]
+    tb_country = tb_country[columns_idx + ["participated_in_conflict"]]
 
     # Add all conflict types
-    tb_country = add_conflict_country_all_ctypes(tb_country)
+    tb_country = aggregate_conflict_types(tb_country, "all")
     # Add state-based
     # tb_country = add_conflict_country_all_statebased(tb_country)
 
     # Only preserve years that make sense
     tb_country = tb_country[(tb_country["year"] >= tb["year"].min()) & (tb_country["year"] <= tb["year"].max())]
 
+    ###################
+    # Participated in #
+    ###################
+    # NUMBER COUNTRIES
+
+    tb_num_participants = get_number_of_countries_in_conflict_by_region(tb_country, "conflict_type", "isd")
+
+    # Combine tables
+    tb_country = pr.concat([tb_country, tb_num_participants], ignore_index=True)
+
+    # Drop column `id`
+    tb_country = tb_country.drop(columns=["id"])
+
+    ###############
+    # Final steps #
+    ###############
+
     # Set short name
     tb_country.metadata.short_name = f"{paths.short_name}_country"
-
     # Set index
     tb_country = tb_country.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
     return tb_country
@@ -499,7 +522,7 @@ def _get_country_name(tb_codes: Table, code: int, year: int) -> str:
     else:
         country_name = ""
         try:
-            country_name = tb_codes.loc[(code, year)]
+            country_name = tb_codes.loc[(code, year)].item()
         except KeyError:
             # Concrete cases
             match code:

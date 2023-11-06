@@ -1024,9 +1024,10 @@ def _estimate_metrics_country_level(tb: Table, tb_codes: Table, codes: List[str]
     tb_codes = tb_codes.reset_index()
 
     # Combine all CoW entries with CoW
-    tb_country = tb_codes.merge(tb_country, on=["year", "country", "id"], how="outer")
+    columns_idx = ["year", "country", "id"]
+    tb_country = tb_codes.merge(tb_country, on=columns_idx, how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
-    tb_country = tb_country[["year", "country", "id", "participated_in_conflict"]]
+    tb_country = tb_country[columns_idx + ["participated_in_conflict"]]
 
     # Only preserve years that make sense
     tb_country = tb_country[
@@ -1044,6 +1045,8 @@ def estimate_metrics_country_level(tb_extra: Table, tb_intra: Table, tb_inter: T
     ###################
     # Participated in #
     ###################
+    # FLAG YES/NO (country-level)
+
     # Get participations for each conflict type
     tb_extra_c = _estimate_metrics_country_level(tb_extra, tb_codes, ["ccode1", "ccode2"], CTYPE_EXTRA)
     tb_inter_c = _estimate_metrics_country_level(tb_inter, tb_codes, ["ccode"], CTYPE_INTER)
@@ -1099,6 +1102,7 @@ def estimate_metrics_country_level(tb_extra: Table, tb_intra: Table, tb_inter: T
     ###############
     # Final steps #
     ###############
+
     # Set short name
     tb_country.metadata.short_name = f"{paths.short_name}_country"
     # Set index
