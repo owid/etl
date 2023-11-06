@@ -6,7 +6,7 @@ It has been slightly modified since then.
 """
 import json
 from datetime import date, datetime
-from typing import Annotated, Any, Dict, List, Optional, Set, TypedDict
+from typing import Annotated, Any, Dict, List, Optional, Set, TypedDict, Union
 from urllib.parse import quote
 
 import humps
@@ -32,6 +32,7 @@ from sqlalchemy.dialects.mysql import (
     TINYINT,
     VARCHAR,
 )
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.future import Engine as _FutureEngine
 from sqlmodel import JSON as _JSON
 from sqlmodel import (
@@ -47,6 +48,7 @@ from sqlmodel import (
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
 from etl import config
+from etl.config import GRAPHER_USER_ID
 
 log = structlog.get_logger()
 
@@ -269,9 +271,13 @@ class Chart(SQLModel, table=True):
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="charts")
 
     @classmethod
-    def load_chart(cls, session: Session, chart_id: int) -> "Chart":
+    def load_chart(cls, session: Session, chart_id: Optional[int] = None, slug: Optional[str] = None) -> "Chart":
         """Load chart with id `chart_id`."""
-        return session.exec(select(cls).where(cls.id == chart_id)).one()
+        if chart_id:
+            cond = cls.id == chart_id
+        elif slug:
+            cond = _json_is(cls.config, "slug", slug)
+        return session.exec(select(cls).where(cond)).one()  # type: ignore
 
     @classmethod
     def load_charts_using_variables(cls, session: Session, variable_ids: List[int]) -> List["Chart"]:
@@ -284,6 +290,84 @@ class Chart(SQLModel, table=True):
         )
         # Find charts
         return session.exec(select(Chart).where(Chart.id.in_(chart_ids))).all()  # type: ignore
+
+    def load_chart_variables(self, session: Session) -> Dict[int, "Variable"]:
+        q = """
+        select
+            v.*
+        from chart_dimensions as cd
+        join variables as v on v.id = cd.variableId
+        where cd.chartId = :chart_id
+        """
+        rows = session.execute(q, params={"chart_id": self.id}).fetchall()  # type: ignore
+        variables = {r["id"]: Variable(**r) for r in rows}
+
+        # add columnSlug if present
+        column_slug = self.config.get("map", {}).get("columnSlug")
+        if column_slug:
+            variables[int(column_slug)] = Variable.load_variable(session, column_slug)
+
+        return variables
+
+    def migrate_to_db(self, source_session: Session, target_session: Session) -> "Chart":
+        """Remap variable ids from source to target session. Variable in source is uniquely identified
+        by its catalogPath if available, or by name and datasetId otherwise. It is looked up
+        by this identifier in the target session to get the new variable id.
+
+        Once we get the `source variable id -> target variable id` mapping, we remap all variables in the
+        chart config.
+        """
+        assert self.id, "Chart must come from a database"
+        source_variables = self.load_chart_variables(source_session)
+
+        remap_ids = {}
+        for source_var_id, source_var in source_variables.items():
+            if source_var.catalogPath:
+                try:
+                    target_var = Variable.load_from_catalog_path(target_session, source_var.catalogPath)
+                except NoResultFound:
+                    raise ValueError(f"variables.catalogPath not found in target: {source_var.catalogPath}")
+            # old style variable, match it on name and dataset id
+            else:
+                try:
+                    target_var = target_session.exec(
+                        select(Variable).where(
+                            Variable.name == source_var.name, Variable.datasetId == source_var.datasetId
+                        )
+                    ).one()
+
+                except NoResultFound:
+                    raise ValueError(
+                        f"variable with name `{source_var.name}` and datasetId `{source_var.datasetId}` not found in target"
+                    )
+
+            # log.debug("remap_variables", old_name=source_var.name, new_name=target_var.name)
+            remap_ids[source_var_id] = target_var.id
+
+        target_chart = Chart(**self.dict())
+        del target_chart.id
+        target_chart.config = _remap_variable_ids(target_chart.config, remap_ids)
+
+        # set proper GRAPHER_USER_ID
+        assert GRAPHER_USER_ID
+        target_chart.lastEditedByUserId = int(GRAPHER_USER_ID)
+
+        return target_chart
+
+    def tags(self, session: Session) -> List[Dict[str, Any]]:
+        """Return tags in a format suitable for Admin API."""
+        q = """
+        select
+            tagId as id,
+            t.name,
+            ct.isApproved,
+            ct.keyChartLevel
+        from chart_tags as ct
+        join tags as t on ct.tagId = t.id
+        where ct.chartId = :chart_id
+        """
+        rows = session.execute(q, params={"chart_id": self.id}).fetchall()  # type: ignore
+        return rows
 
 
 class Dataset(SQLModel, table=True):
@@ -686,7 +770,7 @@ class SuggestedChartRevisions(SQLModel, table=True):
     users_: Optional["User"] = Relationship(back_populates="suggested_chart_revisions_")
 
     @classmethod
-    def load_pending(cls, session: Session, user_id: Optional[int] = None):
+    def load_pending(cls, session: Session, user_id: Optional[int] = None) -> List["SuggestedChartRevisions"]:
         if user_id is None:
             return session.exec(
                 select(SuggestedChartRevisions).where((SuggestedChartRevisions.status == "pending"))
@@ -697,6 +781,10 @@ class SuggestedChartRevisions(SQLModel, table=True):
                 .where(SuggestedChartRevisions.status == "pending")
                 .where(SuggestedChartRevisions.createdBy == user_id)
             ).all()
+
+    @classmethod
+    def load_revisions(cls, session: Session, chart_id: int) -> List["SuggestedChartRevisions"]:
+        return session.exec(select(SuggestedChartRevisions).where(SuggestedChartRevisions.chartId == chart_id)).all()
 
 
 class DimensionFilter(TypedDict):
@@ -1084,18 +1172,9 @@ class Variable(SQLModel, table=True):
         return session.exec(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
 
     @classmethod
-    def load_from_catalog_path(cls, catalog_path: str, session: Optional[Session] = None) -> "Variable":
+    def load_from_catalog_path(cls, session: Session, catalog_path: str) -> "Variable":
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
-
-        def _run(ses: Session):
-            return ses.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
-
-        if session is None:
-            with Session(get_engine()) as session:
-                variable = _run(session)
-        else:
-            variable = _run(session)
-        return variable
+        return session.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
 
     def update_links(
         self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
@@ -1291,3 +1370,19 @@ def _json_is(json_field: Any, key: str, val: Any) -> Any:
         return text(f"JSON_VALUE({json_field.key}, '$.{key}') IS NULL")
     else:
         return json_field[key] == val
+
+
+def _remap_variable_ids(config: Union[List, Dict[str, Any]], remap_ids: Dict[int, int]) -> Any:
+    """Replace variableIds from chart config using `remap_ids` mapping."""
+    if isinstance(config, dict):
+        out = {}
+        for k, v in config.items():
+            if k in ("variableId", "columnSlug"):
+                out[k] = remap_ids[int(v)]
+            else:
+                out[k] = _remap_variable_ids(v, remap_ids)
+        return out
+    elif isinstance(config, list):
+        return [_remap_variable_ids(item, remap_ids) for item in config]
+    else:
+        return config
