@@ -496,25 +496,30 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
 def _get_country_name(tb_codes: Table, code: int, year: int) -> str:
     if code not in set(tb_codes.reset_index()["id"]):
         raise ValueError(f"Code {code} not found in ISD table!")
-    try:
-        country_name = tb_codes.loc[(code, year)]
-    except KeyError:
-        # Concrete cases
-        match code:
-            # Serbia
-            case 345:
-                if (year < 1941) or (year >= 2006):
-                    return "Serbia"
-                elif year >= 1941 and year < 1992:
-                    return "Yugoslavia"
-                elif year >= 1992 and year < 2006:
-                    return "Serbia and Montenegro"
-            case _:
-                countries = set(tb_codes.loc[code, "country"])
-                assert len(countries) == 1, f"More than one country found for code {code} in year {year}"
-                return list(countries)[0]
     else:
-        return country_name
+        country_name = ""
+        try:
+            country_name = tb_codes.loc[(code, year)]
+        except KeyError:
+            # Concrete cases
+            match code:
+                # Serbia
+                case 345:
+                    if (year < 1941) or (year >= 2006):
+                        country_name = "Serbia"
+                    elif year >= 1941 and year < 1992:
+                        country_name = "Yugoslavia"
+                    elif year >= 1992 and year < 2006:
+                        country_name = "Serbia and Montenegro"
+                case _:
+                    countries = set(tb_codes.loc[code, "country"])
+                    if len(countries) != 1:
+                        raise ValueError(f"More than one country found for code {code} in year {year}")
+                    country_name = list(countries)[0]
+    if country_name == "":
+        raise ValueError("`country_name` must be set to a value!")
+
+    return country_name
 
 
 def add_conflict_country_all_ctypes(tb: Table) -> Table:
