@@ -25,7 +25,12 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
-from shared import add_indicators_extra, add_region_from_code, fill_gaps_with_zeroes
+from shared import (
+    add_indicators_extra,
+    add_region_from_code,
+    aggregate_conflict_types,
+    fill_gaps_with_zeroes,
+)
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -737,12 +742,9 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     # FLAG YES/NO (country-level)
 
     # Get table with [year, conflict_type, code]
-    tb_country = pr.concat(
-        [
-            tb[["year", "conflict_type", "gwnoa"]].rename(columns={"gwnoa": "id"}),
-            tb[["year", "conflict_type", "gwnob"]].rename(columns={"gwnob": "id"}),
-        ],
-    )
+    codes = ["gwnoa", "gwnob"]
+    tb_country = pr.concat([tb[["year", "conflict_type", code]].rename(columns={code: "id"}).copy() for code in codes])
+
     # Drop rows with code = NaN
     tb_country = tb_country.dropna(subset=["id"])
     # Drop duplicates
@@ -773,14 +775,17 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     tb_codes["country"] = tb_codes["country"].astype(str)
 
     # Combine all GW entries with UCDP
-    tb_country = tb_codes.merge(tb_country, on=["year", "country", "id", "conflict_type"], how="outer")
+    columns_idx = ["year", "country", "id", "conflict_type"]
+    tb_country = tb_codes.merge(tb_country, on=columns_idx, how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
-    tb_country = tb_country[["year", "country", "id", "conflict_type", "participated_in_conflict"]]
+    tb_country = tb_country[columns_idx + ["participated_in_conflict"]]
 
     # Add intrastate (all)
-    tb_country = add_conflict_country_all_intrastate(tb_country)
+    tb_country = aggregate_conflict_types(
+        tb_country, "intrastate", ["intrastate (non-internationalized)", "intrastate (internationalized)"]
+    )
     # Add state-based
-    tb_country = add_conflict_country_all_statebased(tb_country)
+    tb_country = aggregate_conflict_types(tb_country, "state-based", TYPE_OF_CONFLICT_MAPPING.values())
 
     # Only preserve years that make sense
     tb_country = tb_country[(tb_country["year"] >= tb["year"].min()) & (tb_country["year"] <= tb["year"].max())]
@@ -829,27 +834,3 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     tb_country.metadata.short_name = f"{paths.short_name}_country"
 
     return tb_country
-
-
-def add_conflict_country_all_intrastate(tb: Table) -> Table:
-    """Add metrics for conflict_type = 'intrastate'."""
-    tb_intra = tb[
-        tb["conflict_type"].isin(["intrastate (non-internationalized)", "intrastate (internationalized)"])
-    ].copy()
-    tb_intra = tb_intra.groupby(["year", "country", "id"], as_index=False).agg(
-        {"participated_in_conflict": lambda x: min(x.sum(), 1)}
-    )
-    tb_intra["conflict_type"] = "intrastate"
-    tb = pr.concat([tb, tb_intra], ignore_index=True)
-    return tb
-
-
-def add_conflict_country_all_statebased(tb: Table) -> Table:
-    """Add metrics for conflict_type = 'state-based'."""
-    tb_state = tb[tb["conflict_type"].isin(TYPE_OF_CONFLICT_MAPPING.values())].copy()
-    tb_state = tb_state.groupby(["year", "country", "id"], as_index=False).agg(
-        {"participated_in_conflict": lambda x: min(x.sum(), 1)}
-    )
-    tb_state["conflict_type"] = "state-based"
-    tb = pr.concat([tb, tb_state], ignore_index=True)
-    return tb
