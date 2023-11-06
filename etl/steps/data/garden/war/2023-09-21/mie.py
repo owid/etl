@@ -33,7 +33,11 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
-from shared import add_indicators_extra, expand_observations
+from shared import (
+    add_indicators_extra,
+    expand_observations,
+    get_number_of_countries_in_conflict_by_region,
+)
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -417,9 +421,9 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     tb_codes["country"] = tb_codes["country"].astype(str)
 
     # Combine all codes entries with MIE table
-    tb_country = tb_codes.merge(tb_country, on=["year", "country", "hostlev"], how="outer")
+    tb_country = tb_codes.merge(tb_country, on=["year", "country", "id", "hostlev"], how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
-    tb_country = tb_country[["year", "country", "hostlev", "participated_in_conflict"]]
+    tb_country = tb_country[["year", "country", "id", "hostlev", "participated_in_conflict"]]
 
     # Add "all" hostility level
     tb_country = add_conflict_country_all_htypes(tb_country)
@@ -427,12 +431,26 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     # Only preserve years that make sense
     tb_country = tb_country[(tb_country["year"] >= tb["styear"].min()) & (tb_country["year"] <= tb["endyear"].max())]
 
-    # Set short name
-    tb_country.metadata.short_name = f"{paths.short_name}_country"
-
     # Replace hostlev codes with names
     tb_country["hostlev"] = tb_country["hostlev"].map(HOSTILITY_LEVEL_MAP | {"all": "all"})
 
+    ###################
+    # Participated in #
+    ###################
+    # NUMBER COUNTRIES
+    tb_num_participants = get_number_of_countries_in_conflict_by_region(tb_country, "hostlev", "cow")
+
+    # Combine tables
+    tb_country = pr.concat([tb_country, tb_num_participants], ignore_index=True)
+
+    # Drop column `id`
+    tb_country = tb_country.drop(columns=["id"])
+
+    ###############
+    # Final steps #
+    ###############
+    # Set short name
+    tb_country.metadata.short_name = f"{paths.short_name}_country"
     # Set index
     tb_country = tb_country.set_index(["year", "hostlev", "country"], verify_integrity=True)
     return tb_country
