@@ -318,5 +318,7 @@ def aggregate_conflict_types(
         {col: lambda x: min(x.sum(), 1) for col in columns_to_aggregate}
     )
     tb_agg["conflict_type"] = parent_conflict
+
+    # Combine
     tb = pr.concat([tb, tb_agg], ignore_index=True)
     return tb
