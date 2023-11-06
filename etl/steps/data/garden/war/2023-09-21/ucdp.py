@@ -785,7 +785,7 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
         tb_country, "intrastate", ["intrastate (non-internationalized)", "intrastate (internationalized)"]
     )
     # Add state-based
-    tb_country = aggregate_conflict_types(tb_country, "state-based", TYPE_OF_CONFLICT_MAPPING.values())
+    tb_country = aggregate_conflict_types(tb_country, "state-based", list(TYPE_OF_CONFLICT_MAPPING.values()))
 
     # Only preserve years that make sense
     tb_country = tb_country[(tb_country["year"] >= tb["year"].min()) & (tb_country["year"] <= tb["year"].max())]

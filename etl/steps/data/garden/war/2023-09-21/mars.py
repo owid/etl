@@ -495,8 +495,7 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
 
 def _get_country_name(tb_codes: Table, code: int, year: int) -> str:
     if code not in set(tb_codes.reset_index()["id"]):
-        print(code)
-        return code
+        raise ValueError(f"Code {code} not found in ISD table!")
     try:
         country_name = tb_codes.loc[(code, year)]
     except KeyError:
@@ -513,8 +512,9 @@ def _get_country_name(tb_codes: Table, code: int, year: int) -> str:
             case _:
                 countries = set(tb_codes.loc[code, "country"])
                 assert len(countries) == 1, f"More than one country found for code {code} in year {year}"
-                country_name = list(countries)[0]
-    return country_name
+                return list(countries)[0]
+    else:
+        return country_name
 
 
 def add_conflict_country_all_ctypes(tb: Table) -> Table:
