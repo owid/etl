@@ -28,9 +28,8 @@ import pandas as pd
 from owid.catalog import Table
 from shared import (
     add_indicators_extra,
-    add_region_from_code,
     aggregate_conflict_types,
-    fill_gaps_with_zeroes,
+    get_number_of_countries_in_conflict_by_region,
 )
 from structlog import get_logger
 
@@ -417,31 +416,7 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     ###################
     # NUMBER COUNTRIES
 
-    # Add region
-    tb_num_participants = add_region_from_code(tb_country, "gw")
-    tb_num_participants = tb_num_participants.drop(columns=["country"]).rename(columns={"region": "country"})
-
-    # Sanity check
-    assert not tb_num_participants["id"].isna().any(), "Some countries with NaNs!"
-    tb_num_participants = tb_num_participants.drop(columns=["id"])
-
-    # Groupby sum (regions)
-    tb_num_participants = tb_num_participants.groupby(["country", "conflict_type", "year"], as_index=False)[
-        "participated_in_conflict"
-    ].sum()
-    # Groupby sum (world)
-    tb_num_participants_world = tb_num_participants.groupby(["conflict_type", "year"], as_index=False)[
-        "participated_in_conflict"
-    ].sum()
-    tb_num_participants_world["country"] = "World"
-    # Combine
-    tb_num_participants = pr.concat([tb_num_participants, tb_num_participants_world], ignore_index=True)
-    tb_num_participants = tb_num_participants.rename(columns={"participated_in_conflict": "number_participants"})
-
-    # Complement with missing entries
-    tb_num_participants = fill_gaps_with_zeroes(
-        tb_num_participants, ["country", "conflict_type", "year"], cols_use_range=["year"]
-    )
+    tb_num_participants = get_number_of_countries_in_conflict_by_region(tb_country, "conflict_type", "gw")
 
     # Combine tables
     tb_country = pr.concat([tb_country, tb_num_participants], ignore_index=True)
