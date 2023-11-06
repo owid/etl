@@ -184,7 +184,7 @@ def _uses_jinja(text: Optional[str]):
 
 
 def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> str:
-    if not _uses_jinja(text) or not dim_dict:
+    if not _uses_jinja(text):
         return text
 
     try:
