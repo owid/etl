@@ -35,7 +35,7 @@ log = structlog.get_logger()
     help="Automatically publish new charts.",
 )
 @click.option(
-    "--apply-revisions/--no-apply-revisions",
+    "--approve-revisions/--keep-revisions",
     default=False,
     type=bool,
     help="""Directly update existing charts with approved revisions
@@ -53,10 +53,14 @@ def cli(
     target: Path,
     chart_id: Optional[int],
     publish: bool,
-    apply_revisions: bool,
+    approve_revisions: bool,
     dry_run: bool,
 ) -> None:
-    """Syncs grapher charts and revisions modified by Admin user from source_env to target_env. (Admin user is used by staging servers).
+    """Syncs grapher charts and revisions modified by Admin user from source_env to target_env (Admin user is used
+    by staging servers). This is especially useful for syncing work from staging servers to production.
+
+    Staging servers are destroyed after 7 days of merging to master, so this script should be run before that, but
+    after the dataset has been built by ETL in production.
 
     SOURCE and TARGET can be either paths to .env file or name of a staging server.
 
@@ -73,11 +77,12 @@ def cli(
         etl-staging-sync staging-site-my-branch .env.prod.write --chart-id 123 --dry-run
 
         # WARNING: skip chart revisions and update charts directly
-        etl-staging-sync staging-site-my-branch .env.prod.write --apply-revisions
+        etl-staging-sync staging-site-my-branch .env.prod.write --approve-revisions
 
     Charts:
-        - New charts are automatically created in target_env.
-        - Existing charts (with the same slug) are queued as chart revisions.
+        - New charts are synced as **drafts** in target.
+        - Existing charts (with the same slug) are added as chart revisions in target. (Revisions could be pre-approved with --approve-revisions flag)
+        - You get a warning if the chart has been updated in production.
         - Deleted charts are **not synced**.
 
         Only syncs charts that are **published** on staging server. They are **created as drafts** in target and must be published
@@ -144,8 +149,8 @@ def cli(
                         and min(rev.createdAt, rev.updatedAt) > existing_chart.updatedAt
                     ]
 
-                    # if chart has gone through revision in source and --apply-revisions is set, update it directly
-                    if apply_revisions and revs:
+                    # if chart has gone through revision in source and --approve-revisions is set, update it directly
+                    if approve_revisions and revs:
                         log.info(
                             "staging_sync.update_chart", slug=target_chart.config["slug"], chart_id=existing_chart.id
                         )
