@@ -1,4 +1,4 @@
-from typing import List, Optional, Type
+from typing import List, Literal, Optional, Type
 
 import numpy as np
 import pandas as pd
@@ -211,3 +211,95 @@ class COWNormaliser(Normaliser):
                 return "Asia and Oceania"
             case _:
                 raise ValueError(f"Invalid COW code: {cow_code}")
+
+
+def add_region_from_code(tb: Table, mode: Literal["gw", "cow", "isd"], col_code: str = "id") -> Table:
+    """Add region to table based on code (gw, cow, isd)."""
+    tb_ = tb.copy()
+    if mode == "gw":
+        tb_["region"] = tb_[col_code].apply(_code_to_region_gw)
+    elif mode == "cow":
+        tb_["region"] = tb_[col_code].apply(_code_to_region_cow)
+    elif mode == "isd":
+        tb_["region"] = tb_[col_code].apply(_code_to_region_isd)
+    else:
+        raise ValueError(f"Invalid mode: {mode}")
+    return tb_
+
+
+def _code_to_region_gw(code: int) -> str:
+    """Convert code to region name."""
+    match code:
+        case c if 2 <= c <= 199:
+            return "Americas"
+        case c if 200 <= c <= 399:
+            return "Europe"
+        case c if 400 <= c <= 626:
+            return "Africa"
+        case c if 630 <= c <= 699:
+            return "Middle East"
+        case c if 700 <= c <= 999:
+            return "Asia and Oceania"
+        case _:
+            raise ValueError(f"Invalid GW code: {code}")
+
+
+def _code_to_region_cow(code: int) -> str:
+    """Convert code to region name."""
+    match code:
+        case c if 2 <= c <= 165:
+            return "Americas"
+        case c if 200 <= c <= 399:
+            return "Europe"
+        case c if 402 <= c <= 626:
+            return "Africa"
+        case c if 630 <= c <= 698:
+            return "Middle East"
+        case c if 700 <= c <= 999:
+            return "Asia and Oceania"
+        case _:
+            raise ValueError(f"Invalid COW code: {code}")
+
+
+def _code_to_region_isd(code: int) -> str:
+    """Convert code to region name."""
+    match code:
+        case c if 2 <= c <= 165:
+            return "Americas"
+        case c if 200 <= c <= 399:
+            return "Europe"
+        case c if 402 <= c <= 626:
+            return "Africa"
+        case c if 630 <= c <= 698:
+            return "Middle East"
+        case c if 700 <= c <= 999:
+            return "Asia and Oceania"
+        case _:
+            raise ValueError(f"Invalid COW code: {code}")
+
+
+def fill_gaps_with_zeroes(
+    tb: Table, columns: List[str], cols_use_range: Optional[List[str]] = None, use_nan: bool = False
+) -> Table:
+    """Fill missing values with zeroes.
+
+    Makes sure all combinations of `columns` are present. If not present in the original table, then it is added with zero value.
+    """
+    # Build grid with all possible values
+    values_possible = []
+    for col in columns:
+        if cols_use_range and col in cols_use_range:
+            value_range = np.arange(tb[col].min(), tb[col].max() + 1)
+            values_possible.append(value_range)
+        else:
+            values_possible.append(set(tb[col]))
+
+    # Reindex
+    new_idx = pd.MultiIndex.from_product(values_possible, names=columns)
+    tb = tb.set_index(columns).reindex(new_idx).reset_index()
+
+    # Fill zeroes
+    if not use_nan:
+        columns_fill = [col for col in tb.columns if col not in columns]
+        tb[columns_fill] = tb[columns_fill].fillna(0)
+    return tb
