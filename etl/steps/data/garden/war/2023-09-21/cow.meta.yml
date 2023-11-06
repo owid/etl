@@ -185,6 +185,12 @@ tables:
         description_short: |-
           Whether the country participated in a conflict (of a specific kind) in a given year.
 
+      number_participants:
+        title: Number of countries in conflict
+        unit: "countries"
+        description_short: |-
+          The number of countries that participated in a conflict (of a specific kind) in a given year and region.
+
   cow:
     variables:
       ##################
