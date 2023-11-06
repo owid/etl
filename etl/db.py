@@ -2,7 +2,7 @@ import traceback
 import warnings
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 from urllib.parse import quote
 
 import MySQLdb
@@ -18,27 +18,30 @@ from etl.db_utils import DBUtils
 log = structlog.get_logger()
 
 
-def get_connection() -> MySQLdb.Connection:
+def get_connection(conf: Optional[Dict[str, Any]] = None) -> MySQLdb.Connection:
     "Connect to the Grapher database."
+    cf: Any = dict_to_object(conf) if conf else config
     return MySQLdb.connect(
-        db=config.DB_NAME,
-        host=config.DB_HOST,
-        port=config.DB_PORT,
-        user=config.DB_USER,
-        password=config.DB_PASS,
+        db=cf.DB_NAME,
+        host=cf.DB_HOST,
+        port=cf.DB_PORT,
+        user=cf.DB_USER,
+        password=cf.DB_PASS,
         charset="utf8mb4",
         autocommit=True,
     )
 
 
-def get_session() -> Session:
+def get_session(**kwargs) -> Session:
     """Get session with defaults."""
-    return Session(get_engine())
+    return Session(get_engine(**kwargs))
 
 
-def get_engine() -> Engine:
+def get_engine(conf: Optional[Dict[str, Any]] = None) -> Engine:
+    cf: Any = dict_to_object(conf) if conf else config
+
     return create_engine(
-        f"mysql://{config.DB_USER}:{quote(config.DB_PASS)}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}",
+        f"mysql://{cf.DB_USER}:{quote(cf.DB_PASS)}@{cf.DB_HOST}:{cf.DB_PORT}/{cf.DB_NAME}",
         pool_size=30,  # Increase the pool size to allow higher GRAPHER_WORKERS
         max_overflow=30,  # Increase the max overflow limit to allow higher GRAPHER_WORKERS
     )
@@ -166,3 +169,7 @@ def get_all_datasets(archived: bool = True, db_conn: Optional[MySQLdb.Connection
         query += " WHERE isArchived = 0"
     datasets = pd.read_sql(query, con=db_conn)
     return datasets.sort_values(["name", "namespace"])
+
+
+def dict_to_object(d):
+    return type("DynamicObject", (object,), d)()
