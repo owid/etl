@@ -1,6 +1,7 @@
 from typing import List, Literal, Optional, Type
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 from typing_extensions import Self
@@ -302,4 +303,20 @@ def fill_gaps_with_zeroes(
     if not use_nan:
         columns_fill = [col for col in tb.columns if col not in columns]
         tb[columns_fill] = tb[columns_fill].fillna(0)
+    return tb
+
+
+def aggregate_conflict_types(
+    tb: Table,
+    parent_conflict: str,
+    children_conflicts: List[str],
+    columns_to_aggregate: List[str] = ["participated_in_conflict"],
+) -> Table:
+    """Aggregate metrics in broader conflict types."""
+    tb_agg = tb[tb["conflict_type"].isin(children_conflicts)].copy()
+    tb_agg = tb_agg.groupby(["year", "country", "id"], as_index=False).agg(
+        {col: lambda x: min(x.sum(), 1) for col in columns_to_aggregate}
+    )
+    tb_agg["conflict_type"] = parent_conflict
+    tb = pr.concat([tb, tb_agg], ignore_index=True)
     return tb
