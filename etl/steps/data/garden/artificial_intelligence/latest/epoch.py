@@ -35,12 +35,12 @@ def run(dest_dir: str) -> None:
 
     # Clean up researcher affiliation in column 'organization_categorization'
     organization_mapping = {
-        "Industry - Academia Collaboration":  "Academia and industry collaboration",
-        "Industry - Academia collaboration":  "Academia and industry collaboration"
-        "Industry - Academia Collaboration (Academia leaning)":  "Academia and industry collaboration"
-        "Industry - Academia Collaboration (Academia Leaning)":  "Academia and industry collaboration"
-        "Industry - Academia Collaboration (Industry Leaning)":  "Academia and industry collaboration"
-        "Industry - Academia Collaboration (Industry leaning)":  "Academia and industry collaboration"
+        "Industry - Academia Collaboration": "Academia and industry collaboration",
+        "Industry - Academia collaboration": "Academia and industry collaboration",
+        "Industry - Academia Collaboration (Academia leaning)": "Academia and industry collaboration",
+        "Industry - Academia Collaboration (Academia Leaning)": "Academia and industry collaboration",
+        "Industry - Academia Collaboration (Industry Leaning)": "Academia and industry collaboration",
+        "Industry - Academia Collaboration (Industry leaning)": "Academia and industry collaboration",
         "Research Collective": "Other",
         "Research collective": "Other",
         "Government": "Other",
