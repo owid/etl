@@ -26,7 +26,12 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
-from shared import add_indicators_extra
+from shared import (
+    add_indicators_extra,
+    add_region_from_code,
+    aggregate_conflict_types,
+    fill_gaps_with_zeroes,
+)
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -354,31 +359,28 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     ###################
 
     # Get table with [year, conflict_type, code]
-    tb_country = pr.concat(
-        [
-            tb[["year", "conflict_type", "gwnoa"]].rename(columns={"gwnoa": "code"}),
-            tb[["year", "conflict_type", "gwnob"]].rename(columns={"gwnob": "code"}),
-        ],
-    )
+    codes = ["gwnoa", "gwnob"]
+    tb_country = pr.concat([tb[["year", "conflict_type", code]].rename(columns={code: "id"}).copy() for code in codes])
+
     # Drop rows with code = NaN
-    tb_country = tb_country.dropna(subset=["code"])
-    tb_country = tb_country[~tb_country["code"].isin(["nan", "-99"])]
+    tb_country = tb_country.dropna(subset=["id"])
+    tb_country = tb_country[~tb_country["id"].isin(["nan", "-99"])]
     # Drop duplicates
     tb_country = tb_country.drop_duplicates()
 
     # Explode where multiple codes
-    tb_country["code"] = tb_country["code"].astype(str).str.split(",")
-    tb_country = tb_country.explode("code")
+    tb_country["id"] = tb_country["id"].astype(str).str.split(",")
+    tb_country = tb_country.explode("id")
     # Drop duplicates (may appear duplicates after exploding)
     tb_country = tb_country.drop_duplicates()
     # Ensure numeric type
-    tb_country["code"] = tb_country["code"].str.strip().astype(int)
+    tb_country["id"] = tb_country["id"].str.strip().astype(int)
 
     # Sanity check
     assert not tb_country.isna().any(axis=None), "There are some NaNs!"
 
     # Add country name
-    tb_country["country"] = tb_country.apply(lambda x: _get_country_name(tb_codes, x["code"], x["year"]), axis=1)
+    tb_country["country"] = tb_country.apply(lambda x: _get_country_name(tb_codes, x["id"], x["year"]), axis=1)
     assert tb_country["country"].notna().all(), "Some countries were not found! NaN was set"
 
     # Add flag
@@ -390,25 +392,68 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     tb_codes = tb_codes.reset_index().merge(tb_alltypes, how="cross")
     tb_codes["country"] = tb_codes["country"].astype(str)
 
-    # Combine all GW entries with UCDP
-    tb_country = tb_codes.merge(tb_country, on=["year", "country", "conflict_type"], how="outer")
+    # Combine all GW entries with PRIO
+    columns_idx = ["year", "country", "id", "conflict_type"]
+    tb_country = tb_codes.merge(tb_country, on=columns_idx, how="outer")
     tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
-    tb_country = tb_country[["year", "country", "conflict_type", "participated_in_conflict"]]
+    tb_country = tb_country[columns_idx + ["participated_in_conflict"]]
 
     # Map conflict codes to labels
     tb_country["conflict_type"] = tb_country["conflict_type"].map(CONFTYPES_RENAME)
     assert tb_country["conflict_type"].isna().sum() == 0, "Unmapped conflict_type!"
 
     # Add intrastate (all)
-    tb_country = add_conflict_country_all_intrastate(tb_country)
+    tb_country = aggregate_conflict_types(
+        tb_country, "intrastate", ["intrastate (non-internationalized)", "intrastate (internationalized)"]
+    )
     # Add state-based
-    tb_country = add_conflict_country_all_statebased(tb_country)
+    tb_country = aggregate_conflict_types(tb_country, "state-based", CONFTYPES_RENAME.values())
 
     # Only preserve years that make sense
     tb_country = tb_country[(tb_country["year"] >= tb["year"].min()) & (tb_country["year"] <= tb["year"].max())]
 
+    ###################
+    # Participated in #
+    ###################
+    # NUMBER COUNTRIES
+
+    # Add region
+    tb_num_participants = add_region_from_code(tb_country, "gw")
+    tb_num_participants = tb_num_participants.drop(columns=["country"]).rename(columns={"region": "country"})
+
+    # Sanity check
+    assert not tb_num_participants["id"].isna().any(), "Some countries with NaNs!"
+    tb_num_participants = tb_num_participants.drop(columns=["id"])
+
+    # Groupby sum (regions)
+    tb_num_participants = tb_num_participants.groupby(["country", "conflict_type", "year"], as_index=False)[
+        "participated_in_conflict"
+    ].sum()
+    # Groupby sum (world)
+    tb_num_participants_world = tb_num_participants.groupby(["conflict_type", "year"], as_index=False)[
+        "participated_in_conflict"
+    ].sum()
+    tb_num_participants_world["country"] = "World"
+    # Combine
+    tb_num_participants = pr.concat([tb_num_participants, tb_num_participants_world], ignore_index=True)
+    tb_num_participants = tb_num_participants.rename(columns={"participated_in_conflict": "number_participants"})
+
+    # Complement with missing entries
+    tb_num_participants = fill_gaps_with_zeroes(
+        tb_num_participants, ["country", "conflict_type", "year"], cols_use_range=["year"]
+    )
+
+    # Combine tables
+    tb_country = pr.concat([tb_country, tb_num_participants], ignore_index=True)
+
+    # Drop column `id`
+    tb_country = tb_country.drop(columns=["id"])
+
+    ###############
+    # Final steps #
+    ###############
     # Set short name
-    tb_country.metadata.short_name = "prio_v31_country"
+    tb_country.metadata.short_name = f"{paths.short_name}_country"
 
     return tb_country
 
@@ -419,27 +464,3 @@ def _get_country_name(tb_codes: Table, code: int, year: int) -> str:
     except KeyError:
         country_name = tb_codes.loc[(code, year - 1)]
     return country_name
-
-
-def add_conflict_country_all_intrastate(tb: Table) -> Table:
-    """Add metrics for conflict_type = 'intrastate'."""
-    tb_intra = tb[
-        tb["conflict_type"].isin(["intrastate (non-internationalized)", "intrastate (internationalized)"])
-    ].copy()
-    tb_intra = tb_intra.groupby(["year", "country"], as_index=False).agg(
-        {"participated_in_conflict": lambda x: min(x.sum(), 1)}
-    )
-    tb_intra["conflict_type"] = "intrastate"
-    tb = pr.concat([tb, tb_intra], ignore_index=True)
-    return tb
-
-
-def add_conflict_country_all_statebased(tb: Table) -> Table:
-    """Add metrics for conflict_type = 'state-based'."""
-    tb_state = tb[tb["conflict_type"].isin(CONFTYPES_RENAME.values())].copy()
-    tb_state = tb_state.groupby(["year", "country"], as_index=False).agg(
-        {"participated_in_conflict": lambda x: min(x.sum(), 1)}
-    )
-    tb_state["conflict_type"] = "state-based"
-    tb = pr.concat([tb, tb_state], ignore_index=True)
-    return tb
