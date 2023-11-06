@@ -38,8 +38,6 @@ tables:
 
           - Drawing systems can create illustrations or sketches, either mimicking human techniques or generating unique art. Examples range from AI-generated artwork to design tools that can sketch based on user input or descriptions.
 
-          - Not specified category captures systems where their primary function isn't clearly defined.
-
           - Other category represents a diverse set, including tasks from 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio and Robotics.
         description_processing: >
           Processing involved calculating total number of AI systems in each domain for each year.
@@ -71,8 +69,6 @@ tables:
           - Recommendation systems offer suggestions based on user preferences, seen prominently in online shopping and media streaming. For instance, Netflix's movie suggestions or Amazon's product recommendations are powered by such algorithms that analyze users' preferences and past behaviors.
 
           - Drawing systems can create illustrations or sketches, either mimicking human techniques or generating unique art. Examples range from AI-generated artwork to design tools that can sketch based on user input or descriptions.
-
-          - Not specified category captures systems where their primary function isn't clearly defined.
 
           - Other category represents a diverse set, including tasks from 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio and Robotics.
 
