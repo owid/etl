@@ -100,7 +100,7 @@ tables:
         title: Observation value
         unit: |-
           {definitions.unit_of_measure.unit}
-        short_unit: <% if 'per 100' in indicator %>'%'<% else %><%- endif -%>
+        short_unit: <% if 'rate' in indicator %>%<% else %><%- endif -%>
         display:
           name: |-
             {definitions.indicator.display_name}
@@ -109,7 +109,7 @@ tables:
         title: Lower bound
         unit: |-
           {definitions.unit_of_measure.unit}
-        short_unit: <% if 'per 100' in indicator %>'%'<% else %><%- endif -%>
+        short_unit: <% if 'rate' in indicator %>%<% else %><%- endif -%>
         display:
           name: |-
             {definitions.indicator.display_name}
@@ -118,7 +118,7 @@ tables:
         title: Upper bound
         unit: |-
           {definitions.unit_of_measure.unit}
-        short_unit: <% if 'per 100' in indicator %>'%'<% else %><%- endif -%>
+        short_unit: <% if 'rate' in indicator %>%<% else %><%- endif -%>
         display:
           name: |-
             {definitions.indicator.display_name}
