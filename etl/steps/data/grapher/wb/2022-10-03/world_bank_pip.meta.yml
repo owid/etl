@@ -17,7 +17,6 @@ definitions:
         date_published: '2022-10-03'
 
     presentation:
-      title_variant: World Bank, PIP
       attribution_short: World Bank
       grapher_config:
         originUrl: https://ourworldindata.org/poverty

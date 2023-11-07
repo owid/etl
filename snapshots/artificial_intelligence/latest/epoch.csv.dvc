@@ -4,7 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: Parameter, Compute and Data Trends in Machine Learning
-    date_published: 2023-10-26
+    date_published: 2023-11-07
     description_snapshot: |
       We update this chart with the latest available data from our source every month.
 
@@ -22,9 +22,9 @@ meta:
       The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models.
     # Citation
     producer: Epoch
-    citation_full: 'Epoch, Parameter, Compute and Data Trends in Machine Learning.*
-      Published online at [epochai.org](https://epochai.org/mlinputs/visualization).
-      Retrieved from: [https://epochai.org/mlinputs/visualization](https://epochai.org/mlinputs/visualization)'
+    citation_full: 'Epoch, ‘Parameter, Compute and Data Trends in Machine Learning’.
+      Published online at epochai.org. Retrieved from: ‘https://epochai.org/mlinputs/visualization’
+      [online resource]'
     # Files
     url_main: https://epochai.org/mlinputs/visualization
     url_download: 
@@ -33,9 +33,8 @@ meta:
     # License
     license:
       name: Public domain
-
 wdir: ../../../data/snapshots/artificial_intelligence/latest
 outs:
-- md5: cb687d468a635022b04e912cbbc5c05a
-  size: 667431
+- md5: 652ae5afc96e2fc5b986972a4bf49b19
+  size: 703291
   path: epoch.csv
