@@ -392,6 +392,13 @@ def get_unique_licenses_from_variables(variables: List[Variable]) -> List[Licens
     return pd.unique(licenses).tolist()
 
 
+def get_unique_description_key_points_from_variables(variables: List[Variable]) -> List[str]:
+    # Make a list of all description key points of all variables.
+    description_key_points = sum([variable.metadata.description_key for variable in variables], [])
+
+    return pd.unique(description_key_points).tolist()
+
+
 def combine_variables_processing_logs(variables: List[Variable]) -> List[Dict[str, Any]]:
     # Make a list with all entries in the processing log of all variables.
     processing_log = sum(
@@ -487,6 +494,8 @@ def combine_variables_metadata(
     metadata.description_short = _get_metadata_value_from_variables_if_all_identical(
         variables=variables_only, field="description_short", operation=operation
     )
+    metadata.description_key = get_unique_description_key_points_from_variables(variables=variables_only)
+    # TODO: Combine description_processing: If not identical, append one after another.
     metadata.description_from_producer = _get_metadata_value_from_variables_if_all_identical(
         variables=variables_only, field="description_from_producer", operation=operation
     )
