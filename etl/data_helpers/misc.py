@@ -99,7 +99,7 @@ def add_origins_to_energy_table(tb_energy: Table) -> Table:
                 url_download="https://www.energyinst.org/__data/assets/file/0007/1055761/Consolidated-Dataset-Panel-format-CSV.csv",
                 date_published="2023-06-26",
                 date_accessed="2023-06-27",
-                description="The Energy Institute Statistical Review of World Energy analyses data on world energy markets from the prior year. Previously produced by BP, the Review has been providing timely, comprehensive and objective data to the energy community since 1952.",
+                description="The Energy Institute Statistical Review of World Energy analyses data on world energy markets from the prior year.",
                 license=License(
                     name="©Energy Institute 2023",
                     url="https://www.energyinst.org/__data/assets/file/0007/1055761/Consolidated-Dataset-Panel-format-CSV.csv",
