@@ -7,6 +7,8 @@ definitions:
     processing_level: major
     description_short: Membership is defined along current countries and their borders.
 
+  expanded_list: The list of current UN members has been expanded with non-member states not included in the original list. Added states include Taiwan, Palestine and Kosovo, among others.
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -25,13 +27,16 @@ tables:
         title: United Nations membership status
         unit: ""
         short_unit: ""
-        description_processing: "From the year of admission of each nation to United Nations, the dataset is expanded between 1945 and the year of the last 31 December when the dataset is created."
+        description_processing: "{definitions.expanded_list}"
 
       membership_number:
         title: Number of UN member states by region
         unit: ""
         short_unit: ""
-        description_processing: "Data is aggregated using Our World in Data region classifications."
+        description_processing: |
+          {definitions.expanded_list}
+
+          Data is aggregated using Our World in Data region classifications.
         display:
           name: Number of UN member states
           numDecimalPlaces: 0
@@ -40,7 +45,10 @@ tables:
         title: Number non UN member states by region
         unit: ""
         short_unit: ""
-        description_processing: "Data is aggregated using Our World in Data region classifications."
+        description_processing: |
+          {definitions.expanded_list}
+
+          Data is aggregated using Our World in Data region classifications.
         display:
           name: Number non UN member states
           numDecimalPlaces: 0
@@ -49,7 +57,10 @@ tables:
         title: Population of UN member states by region
         unit: ""
         short_unit: ""
-        description_processing: "Data is aggregated using Our World in Data region classifications and using historical population data compiled by Our World in Data."
+        description_processing: |
+          {definitions.expanded_list}
+
+          Data is aggregated using Our World in Data region classifications and using historical population data compiled by Our World in Data.
         display:
           name: Population of UN member states
           numDecimalPlaces: 0
@@ -58,7 +69,10 @@ tables:
         title: Population of non UN member states by region
         unit: ""
         short_unit: ""
-        description_processing: "Data is aggregated using Our World in Data region classifications and using historical population data compiled by Our World in Data."
+        description_processing: |
+          {definitions.expanded_list}
+
+          Data is aggregated using Our World in Data region classifications and using historical population data compiled by Our World in Data.
         display:
           name: Population of non UN member states
           numDecimalPlaces: 0

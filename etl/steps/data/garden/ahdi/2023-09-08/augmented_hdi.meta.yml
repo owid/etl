@@ -3,9 +3,9 @@ definitions:
     presentation:
       topic_tags:
       - Human Development Index (HDI)
+    display: &common-display
+      entityAnnotationsMap: "Western offshoots (AHDI): United States, Canada, Australia and New Zealand"
 
-common:
-  entity_annotations: "Western offshoots (AHDI): United States, Canada, Australia and New Zealand"
 dataset:
   title: Augmented Human Development Index (AHDI)
   update_period_days: 1095
@@ -40,18 +40,17 @@ tables:
         processing_level: minor
         description_key:
           - "{tables.augmented_hdi.variables.ahdi.description_short}"
-          - "Each of these dimensions are measured as normalized sub-indices, in a scale from 0 to 1:"
-          - Life expectancy is the proxy for healthy life, where 1 represents 85 or more years and 0 represents 20 or less years.
-          - Years of schooling is the proxy for access to knowledge, where 1 represents 15 or more years of education and 0 represents 0 years of education.
-          - (log) GDP per capita is the proxy for a decent standard of living, bounded between 47,000 and 100 international-$ at 1990 prices.
-          - "[Varieties of Democracy's Liberal democracy index](https://ourworldindata.org/vdem-electoral-democracy-data) is the proxy for civil and political freedom, higher values represents more democracy."
-          - The AHDI is then estimated as the geometric of these indices, or
+          - "Each of these dimensions is measured on a scale from 0 to 1:
+              - Life expectancy is the proxy for healthy life, where 1 represents 85 or more years and 0 represents 20 or less years.
+              - Years of schooling is the proxy for access to knowledge, where 1 represents 15 or more years of education and 0 represents 0 years of education.
+              - The logarithm of GDP per capita is the proxy for a decent standard of living, where 1 represents 47,000 international-$ at 1990 prices and 0 represents 100 international-$ at 1990 prices.
+              - [Varieties of Democracy's Liberal democracy index](https://ourworldindata.org/vdem-electoral-democracy-data) is the proxy for civil and political freedom, higher values represents more democracy."
+          - The AHDI is then estimated as the geometric mean of these indices, or
             AHDI = (Health index * Education index * Income index * Freedom index)^(1/4)
         display:
           name: Augmented Human Development Index (AHDI)
-          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 3
-          conversionFactor: 1
+          <<: *common-display
         presentation:
           grapher_config:
             title: Augmented Human Development Index
@@ -108,9 +107,8 @@ tables:
         processing_level: minor
         display:
           name: AHDI excluding income
-          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 3
-          conversionFactor: 1
+          <<: *common-display
         presentation:
           grapher_config:
             title: Augmented Human Development Index (excluding income)
@@ -159,9 +157,8 @@ tables:
         processing_level: minor
         display:
           name: Life expectancy
-          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 1
-          conversionFactor: 1
+          <<: *common-display
 
       years_of_schooling:
         title: Years of schooling
@@ -174,9 +171,8 @@ tables:
         processing_level: minor
         display:
           name: Years of schooling
-          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 1
-          conversionFactor: 1
+          <<: *common-display
 
       liberal_democracy_index:
         title: Liberal Democracy Index
@@ -196,9 +192,8 @@ tables:
         processing_level: minor
         display:
           name: Liberal Democracy Index
-          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 3
-          conversionFactor: 1
+          <<: *common-display
 
       gdp_per_capita:
         title: GDP per capita
@@ -210,9 +205,8 @@ tables:
         processing_level: minor
         display:
           name: GDP per capita
-          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 0
-          conversionFactor: 1
+          <<: *common-display
 
       life_expectancy_index:
         title: Kakwani index of life expectancy
@@ -232,10 +226,9 @@ tables:
 
         processing_level: minor
         display:
-          name: Life expectancy indecx
-          entityAnnotationsMap: "{common.entity_annotations}"
+          name: Life expectancy index
           numDecimalPlaces: 3
-          conversionFactor: 1
+          <<: *common-display
 
       schooling_index:
         title: Kakwani index of schooling
@@ -255,9 +248,8 @@ tables:
         processing_level: minor
         display:
           name: Schooling index
-          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 3
-          conversionFactor: 1
+          <<: *common-display
 
       adjusted_income_index:
         title: UNDP adjusted per capita income
@@ -278,6 +270,5 @@ tables:
         processing_level: minor
         display:
           name: Adjusted income index
-          entityAnnotationsMap: "{common.entity_annotations}"
           numDecimalPlaces: 3
-          conversionFactor: 1
+          <<: *common-display

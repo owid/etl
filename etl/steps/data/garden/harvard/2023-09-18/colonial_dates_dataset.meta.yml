@@ -7,7 +7,6 @@ definitions:
       topic_tags:
       - State Capacity
 
-common:
   years: |
     Years are defined from last date aggregations available in the Colonial Dates Dataset. This means that when sources differ, years of colonization are defined from the last date between them. This is different from mean date aggregations (also available), which averages the dates of colonization across the original sources.
 
@@ -25,7 +24,7 @@ tables:
         description_processing: |
           The indicator has been processed to identify the European colonial powers as "Colonizers", the countries not colonized as "Not colonized" and the countries colonized for multiple colonizers in the same year as the name of the colonizers separated by "-".
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -43,7 +42,7 @@ tables:
         description_processing: |
           The indicator has been processed to identify the European colonial powers as "Colonizers", the countries not colonized as "Not colonized" and the countries colonized for multiple colonizers in the same year as "Multiple colonizers".
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -61,7 +60,7 @@ tables:
         description_processing: |
           This is a cumulative sum of the years the country has been colonized, across the entire time series. Colonizers or countries not colonized show a value of 0.
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -79,7 +78,7 @@ tables:
         description_processing: |
           The indicator is constructed by filling years with no colonizers with the last colonizer in the time series for each country. Colonizers are identified as such, countries not colonized as "Not colonized" and countries colonized for multiple colonizers in the same year as the name of the colonizers separated by "-".
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -97,7 +96,7 @@ tables:
         description_processing: |
           The indicator is constructed by filling years with no colonizers with the last colonizer (grouped) in the time series for each country. Colonizers are identified as such, countries not colonized as "Not colonized" and countries colonized for multiple colonizers in the same year as "Multiple colonizers".
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -134,7 +133,7 @@ tables:
 
           A total for each year is estimated with the country (entity) "World".
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -154,7 +153,7 @@ tables:
 
           A total for each year is estimated with the country (entity) "World".
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -174,7 +173,7 @@ tables:
 
           We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -194,7 +193,7 @@ tables:
 
           We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -214,7 +213,7 @@ tables:
 
           We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -234,7 +233,7 @@ tables:
 
           We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -254,7 +253,7 @@ tables:
 
           We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
@@ -274,7 +273,7 @@ tables:
 
           We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
 
-          {common.years}
+          {definitions.years}
         description_from_producer: ""
         processing_level: major
         display:
