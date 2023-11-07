@@ -21,6 +21,8 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["igme"]
     tb_youth = ds_garden["igme_under_fifteen_mortality"]
 
+    tb = tb.reorder_levels(["country", "year", "unit_of_measure", "indicator", "sex", "wealth_quintile"])
+    tb_youth = tb_youth.reorder_levels(["country", "year", "unit_of_measure", "indicator", "sex", "wealth_quintile"])
     #
     # Save outputs.
     #
