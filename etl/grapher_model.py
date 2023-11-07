@@ -807,6 +807,7 @@ class Dimensions(TypedDict):
 
 class PostsGdocs(SQLModel, table=True):
     __tablename__ = "posts_gdocs"  # type: ignore
+    __table_args__ = {"extend_existing": True}
 
     id: Optional[str] = Field(default=None, sa_column=Column("id", VARCHAR(255), primary_key=True))
     slug: str = Field(sa_column=Column("slug", VARCHAR(255), nullable=False))
@@ -825,6 +826,7 @@ class PostsGdocs(SQLModel, table=True):
 
 class OriginsVariablesLink(SQLModel, table=True):
     __tablename__: str = "origins_variables"  # type: ignore
+    __table_args__ = {"extend_existing": True}
 
     originId: int = Field(default=None, foreign_key="origins.id", primary_key=True)
     variableId: int = Field(default=None, foreign_key="variables.id", primary_key=True)
@@ -867,6 +869,7 @@ class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
         ForeignKeyConstraint(["gdocId"], ["posts_gdocs.id"], name="posts_gdocs_variables_faqs_ibfk_1"),
         ForeignKeyConstraint(["variableId"], ["variables.id"], name="posts_gdocs_variables_faqs_ibfk_2"),
         Index("variableId", "variableId"),
+        {"extend_existing": True},
     )
 
     gdocId: Optional[str] = Field(
@@ -916,6 +919,7 @@ class TagsVariablesTopicTagsLink(SQLModel, table=True):
         ForeignKeyConstraint(["tagId"], ["tags.id"], name="tags_variables_topic_tags_ibfk_1"),
         ForeignKeyConstraint(["variableId"], ["variables.id"], name="tags_variables_topic_tags_ibfk_2"),
         Index("variableId", "variableId"),
+        {"extend_existing": True},
     )
 
     tagId: Optional[str] = Field(default=None, sa_column=Column("tagId", Integer, primary_key=True, nullable=False))
@@ -1273,6 +1277,7 @@ class Origin(SQLModel, table=True):
     """
 
     __tablename__: str = "origins"  # type: ignore
+    __table_args__ = {"extend_existing": True}
 
     id: Optional[int] = Field(default=None, primary_key=True)
     producer: Optional[str] = None
