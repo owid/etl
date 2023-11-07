@@ -49,6 +49,16 @@ DB_PASS = env.get("DB_PASS", "")
 # metaplay config
 METAPLAY_PORT = int(env.get("METAPLAY_PORT", "8051"))
 
+# if STAGING is used, override ENV values
+if env.get("STAGING"):
+    staging = env.get("STAGING")
+    DB_USER = "owid"
+    DB_NAME = "owid"
+    DB_PASS = ""
+    DB_PORT = 3306
+    DB_HOST = f"staging-site-{staging}"
+    DATA_API_ENV = f"staging-site-{staging}"
+
 
 def get_username():
     return pwd.getpwuid(os.getuid())[0]

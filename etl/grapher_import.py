@@ -171,17 +171,22 @@ def _add_or_update_origins(session: Session, origins: list[catalog.Origin]) -> l
     return out
 
 
-def _update_variables_display(table: catalog.Table) -> None:
-    """Grapher uses units from field `display` instead of fields `unit` and `short_unit`
-    before we fix grapher data model, copy them to `display`.
-    """
+def _update_variables_metadata(table: catalog.Table) -> None:
+    """Update variables metadata."""
     for col in table.columns:
         meta = table[col].metadata
+
+        # Grapher uses units from field `display` instead of fields `unit` and `short_unit`
+        # before we fix grapher data model, copy them to `display`.
         meta.display = meta.display or {}
         if meta.short_unit:
             meta.display.setdefault("shortUnit", meta.short_unit)
         if meta.unit:
             meta.display.setdefault("unit", meta.unit)
+
+        # Prune empty fields from description_key
+        if meta.description_key:
+            meta.description_key = [k for k in meta.description_key if k.strip()]
 
 
 def upsert_table(
@@ -228,7 +233,7 @@ def upsert_table(
 
     assert not gh.contains_inf(table.iloc[:, 0]), f"Column `{table.columns[0]}` has inf values"
 
-    _update_variables_display(table)
+    _update_variables_metadata(table)
 
     with Session(engine) as session:
         # For easy retrieveal of the value series we store the name

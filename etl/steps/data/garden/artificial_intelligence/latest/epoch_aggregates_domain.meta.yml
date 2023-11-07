@@ -38,15 +38,17 @@ tables:
 
           - Drawing systems can create illustrations or sketches, either mimicking human techniques or generating unique art. Examples range from AI-generated artwork to design tools that can sketch based on user input or descriptions.
 
-          - Not specified category captures systems where their primary function isn't clearly defined.
-
-          - Other category represents a diverse set, including tasks from 3D reconstruction to speech processing and video analysis.
+          - Other category represents a diverse set, including tasks from 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio and Robotics.
         description_processing: >
           Processing involved calculating total number of AI systems in each domain for each year.
 
-          To streamline the categorization of domains, 3D reconstruction, Driving, Drawing, Recommendation, Speech, Video, Text-to-Video, Search, Audio and Robotics were all unified under a single "Other" category.
+
+          To streamline the categorization of domains, domain categories with less than a total of five notable AI systems since 1950 were grouped under the "Other" label.
+          The following domains were re-categorized under "Other":
+            - 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio, Robotics
+
+          The aforementioned changes were implemented to make visualizations more coherent and concise.
         display:
-          name: Games
           numDecimalPlaces: 0
       cumulative_count:
         title: Cumulative number of AI systems by domain
@@ -68,14 +70,16 @@ tables:
 
           - Drawing systems can create illustrations or sketches, either mimicking human techniques or generating unique art. Examples range from AI-generated artwork to design tools that can sketch based on user input or descriptions.
 
-          - Not specified category captures systems where their primary function isn't clearly defined.
-
-          - Other category represents a diverse set, including tasks from 3D reconstruction to speech processing and video analysis.
+          - Other category represents a diverse set, including tasks from 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio and Robotics.
 
         description_processing: >
           For each year starting from 1950, the total number of AI systems in each domain was calculated by adding that year's count to the previous years' counts. This provides a running total or cumulative count of AI systems for each year and domain.
 
-          To streamline the categorization of domains, 3D reconstruction, Driving, Drawing, Recommendation, Speech, Video, Text-to-Video, Search, Audio and Robotics were all unified under a single "Other" category.
 
+          To streamline the categorization of domains, domain categories with less than a total of five notable AI systems since 1950 were grouped under the "Other" label.
+          The following domains were re-categorized under "Other":
+            - 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio, Robotics
+
+          The aforementioned changes were implemented to make visualizations more coherent and concise.
         display:
           numDecimalPlaces: 0

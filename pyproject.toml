@@ -28,6 +28,7 @@ etl-datadiff = 'etl.datadiff:cli'
 etl-chartgpt = 'etl.chart_revision.v2.chartgpt:cli'
 etl-metaplay = 'apps.metadata_playground.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
+etl-staging-sync = 'apps.staging_sync.cli:cli'
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.12"
@@ -84,6 +85,7 @@ st-pages = "^0.4.4"
 streamlit-extras = "^0.3.0"
 typing-extensions = "^4.7.1"
 scipy = "^1.11.2"
+selenium = "^4.15.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"
