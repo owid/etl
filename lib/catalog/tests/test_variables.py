@@ -81,6 +81,12 @@ def test_create_new_variable_as_sum_of_other_two(table_1, sources, origins, lice
     # Since "a" and "b" have different title and description, "c" should have no title or description.
     assert tb1["c"].metadata.title is None
     assert tb1["c"].metadata.description is None
+    assert tb1["c"].metadata.description_key == [
+        "Key description point 1 of Variable 1",
+        "Common key description point",
+        "Key description point 1 of Variable 2",
+        "Key description point 2 of Variable 2",
+    ]
     assert tb1["c"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["c"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
@@ -99,6 +105,10 @@ def test_create_new_variable_as_sum_of_another_variable_plus_a_scalar(table_1) -
     assert (tb1["d"] == pd.Series([2, 3, 4])).all()
     assert tb1["d"].metadata.title == table_1["a"].metadata.title
     assert tb1["d"].metadata.description == table_1["a"].metadata.description
+    assert tb1["d"].metadata.description_key == [
+        "Key description point 1 of Variable 1",
+        "Common key description point",
+    ]
     assert tb1["d"].metadata.sources == table_1["a"].metadata.sources
     assert tb1["d"].metadata.origins == table_1["a"].metadata.origins
     assert tb1["d"].metadata.licenses == table_1["a"].metadata.licenses
@@ -152,6 +162,12 @@ def test_create_new_variable_as_product_of_other_two(table_1, sources, origins, 
     assert (tb1["e"] == pd.Series([4, 10, 18])).all()
     assert tb1["e"].metadata.title is None
     assert tb1["e"].metadata.description is None
+    assert tb1["e"].metadata.description_key == [
+        "Key description point 1 of Variable 1",
+        "Common key description point",
+        "Key description point 1 of Variable 2",
+        "Key description point 2 of Variable 2",
+    ]
     assert tb1["e"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["e"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["e"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
@@ -172,6 +188,12 @@ def test_create_new_variable_as_product_of_other_three(table_1, sources, origins
     assert (tb1["f"] == pd.Series([20, 70, 162])).all()
     assert tb1["f"].metadata.title is None
     assert tb1["f"].metadata.description is None
+    assert tb1["f"].metadata.description_key == [
+        "Key description point 1 of Variable 1",
+        "Common key description point",
+        "Key description point 1 of Variable 2",
+        "Key description point 2 of Variable 2",
+    ]
     assert tb1["f"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["f"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["f"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
@@ -190,6 +212,12 @@ def test_create_new_variable_as_division_of_other_two(table_1, sources, origins,
     assert (tb1["g"] == pd.Series([0.25, 0.40, 0.50])).all()
     assert tb1["g"].metadata.title is None
     assert tb1["g"].metadata.description is None
+    assert tb1["g"].metadata.description_key == [
+        "Key description point 1 of Variable 1",
+        "Common key description point",
+        "Key description point 1 of Variable 2",
+        "Key description point 2 of Variable 2",
+    ]
     assert tb1["g"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["g"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["g"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
@@ -208,6 +236,13 @@ def test_create_new_variable_as_floor_division_of_other_two(table_1, sources, or
     assert (tb1["h"] == pd.Series([4, 2, 2])).all()
     assert tb1["h"].metadata.title is None
     assert tb1["h"].metadata.description is None
+    # Note that the order of key description points should be first b and then a.
+    assert tb1["h"].metadata.description_key == [
+        "Key description point 1 of Variable 2",
+        "Common key description point",
+        "Key description point 2 of Variable 2",
+        "Key description point 1 of Variable 1",
+    ]
     assert tb1["h"].metadata.sources == [sources[2], sources[3], sources[1]]
     assert tb1["h"].metadata.origins == [origins[2], origins[3], origins[1]]
     assert tb1["h"].metadata.licenses == [licenses[2], licenses[3], licenses[1]]
@@ -226,6 +261,12 @@ def test_create_new_variable_as_module_division_of_other_two(table_1, sources, o
     assert (tb1["i"] == pd.Series([1, 2, 3])).all()
     assert tb1["i"].metadata.title is None
     assert tb1["i"].metadata.description is None
+    assert tb1["i"].metadata.description_key == [
+        "Key description point 1 of Variable 1",
+        "Common key description point",
+        "Key description point 1 of Variable 2",
+        "Key description point 2 of Variable 2",
+    ]
     assert tb1["i"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["i"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["i"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
@@ -244,6 +285,10 @@ def test_create_new_variable_as_another_variable_to_the_power_of_a_scalar(table_
     assert (tb1["j"] == pd.Series([1, 4, 9])).all()
     assert tb1["j"].metadata.title == "Title of Table 1 Variable a"
     assert tb1["j"].metadata.description == "Description of Table 1 Variable a"
+    assert tb1["j"].metadata.description_key == [
+        "Key description point 1 of Variable 1",
+        "Common key description point",
+    ]
     assert tb1["j"].metadata.sources == [sources[2], sources[1]]
     assert tb1["j"].metadata.origins == [origins[2], origins[1]]
     assert tb1["j"].metadata.licenses == [licenses[1]]
@@ -261,6 +306,12 @@ def test_create_new_variables_as_another_variable_to_the_power_of_another_variab
     assert (tb1["k"] == pd.Series([1, 32, 729])).all()
     assert tb1["k"].metadata.title is None
     assert tb1["k"].metadata.description is None
+    assert tb1["k"].metadata.description_key == [
+        "Key description point 1 of Variable 1",
+        "Common key description point",
+        "Key description point 1 of Variable 2",
+        "Key description point 2 of Variable 2",
+    ]
     assert tb1["k"].metadata.sources == [sources[2], sources[1], sources[3]]
     assert tb1["k"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["k"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
