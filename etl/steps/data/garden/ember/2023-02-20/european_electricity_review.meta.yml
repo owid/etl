@@ -1,7 +1,7 @@
 all_sources:
   - source_testing: &source-testing
-      name: Our World in Data based on Ember's European Electricity Review (2023).
-      published_by: Ember's European Electricity Review (2023).
+      name: Ember's European Electricity Review (2023)
+      published_by: Ember's European Electricity Review (2023)
       url: https://ember-climate.org/insights/research/european-electricity-review-2023/
       date_accessed: 2023-02-20
       publication_date: 2023-01-31
@@ -10,7 +10,7 @@ all_sources:
 dataset:
   title: European Electricity Review (Ember, 2023)
   licenses:
-    - name: Creative Commons ShareAlike Attribution Licence (CC BY-SA 4.0)
+    - name: Creative Commons ShareAlike Attribution License (CC BY-SA 4.0)
       url: https://ember-climate.org/creative-commons/
   sources:
     - *source-testing
