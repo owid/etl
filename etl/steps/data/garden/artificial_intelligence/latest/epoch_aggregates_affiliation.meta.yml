@@ -24,6 +24,8 @@ tables:
         short_unit: ''
         description_short: Describes the sector (Industry, Academia, or Collaboration) where the authors of an AI system have their primary affiliations.
         description_key:
+          - The authors of the Epoch dataset have established a set of criteria to identify key AI systems, which they refer to as notable. These systems must demonstrate the ability to learn, show tangible experimental results, and contribute advancements that push the boundaries of existing AI technology. In terms of notability, the AI must have garnered extensive academic attention, evidenced by a high citation count, hold historical significance in the field, mark a substantial advancement in technology, or be implemented in a significant real-world context. Recognizing the difficulty in evaluating the impact of newer AI systems since 2020 due to less available data, the authors also employ subjective judgment in their selection process for recent developments.
+
           - Systems are classified as "Industry" when their authors have ties to private sector entities, "Academia" when the authors come from universities or scholarly institutions, and "Industry - Academia Collaboration" if a minimum of 30% of the authors represent each sector.
         description_processing: >
           Processing involved calculating total number of AI systems developed within each category of reseacher affiliation for each year.
@@ -47,6 +49,8 @@ tables:
         short_unit: ''
         description_short: Describes the sector (Industry, Academia, or Collaboration) where the authors of an AI system have their primary affiliations.
         description_key:
+          - The authors of the Epoch dataset have established a set of criteria to identify key AI systems, which they refer to as notable. These systems must demonstrate the ability to learn, show tangible experimental results, and contribute advancements that push the boundaries of existing AI technology. In terms of notability, the AI must have garnered extensive academic attention, evidenced by a high citation count, hold historical significance in the field, mark a substantial advancement in technology, or be implemented in a significant real-world context. Recognizing the difficulty in evaluating the impact of newer AI systems since 2020 due to less available data, the authors also employ subjective judgment in their selection process for recent developments.
+
           - Systems are classified as "Industry" when their authors have ties to private sector entities, "Academia" when the authors come from universities or scholarly institutions, and "Industry - Academia Collaboration" if a minimum of 30% of the authors represent each sector.
         description_processing: >
           For each year starting from 1950, the total number of AI systems in each resercher affiliation category was calculated by adding that year's count to the previous years' counts. This provides a running total or cumulative count of AI systems for each year and researcher affiliation.

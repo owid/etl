@@ -19,7 +19,7 @@ meta:
       — Important state-of-the-art advance
       — Deployed in a notable context
 
-      The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models.
+      The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models."
     # Citation
     producer: Epoch
     citation_full: 'Epoch, ‘Parameter, Compute and Data Trends in Machine Learning’.
@@ -27,7 +27,7 @@ meta:
       [online resource]'
     # Files
     url_main: https://epochai.org/mlinputs/visualization
-    url_download: 
+    url_download:
       https://docs.google.com/spreadsheets/d/1AAIebjNsnJj_uKALHbXNfn3_YsT6sHXtCU0q7OIPuc4/export?gid=0&format=csv
     date_accessed: 2023-10-26
     # License
