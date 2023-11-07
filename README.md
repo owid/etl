@@ -14,5 +14,4 @@ _The compute graph for Our World in Data's data processing._
 
 ## Documentation
 
-See: https://docs.owid.io/projects/etl/
-
+See: https://docs.owid.io/projects/etl/ for more information.
