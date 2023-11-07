@@ -47,7 +47,7 @@ def run(dest_dir: str) -> None:
     combined_df["cumulative_production"] = combined_df["plastic_production"].cumsum()
 
     tb = combined_df.set_index(["country", "year"], verify_integrity=True)
-
+    # Add metadata from OECD to the new combined columns
     for column in tb.columns:
         tb[column].metadata.origins.append(total_prod["plastic_production"].metadata.origins[0])
 
