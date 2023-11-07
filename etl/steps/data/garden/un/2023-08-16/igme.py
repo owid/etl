@@ -92,9 +92,11 @@ def convert_to_percentage(tb: Table) -> Table:
         "Stillbirths per 1000 births": "Stillbirths per 100 births",
     }
     # Dividing values of selected rows by 10
-    tb[["obs_value", "lower_bound", "upper_bound"]][tb["unit_of_measure"].isin(rate_conversions.keys())] = (
-        tb[["obs_value", "lower_bound", "upper_bound"]][tb["unit_of_measure"].isin(rate_conversions.keys())] / 10
-    )
+
+    selected_rows = tb["unit_of_measure"].isin(rate_conversions.keys())
+    tb.loc[selected_rows, ["obs_value", "lower_bound", "upper_bound"]] = tb.loc[
+        selected_rows, ["obs_value", "lower_bound", "upper_bound"]
+    ].div(10)
 
     tb = tb.replace({"unit_of_measure": rate_conversions})
 
