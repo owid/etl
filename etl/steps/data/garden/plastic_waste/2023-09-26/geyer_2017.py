@@ -48,6 +48,9 @@ def run(dest_dir: str) -> None:
 
     tb = combined_df.set_index(["country", "year"], verify_integrity=True)
 
+    for column in tb.columns:
+        tb[column].metadata.origins.append(total_prod["plastic_production"].metadata.origins[0])
+
     #
     # Save outputs.
     #
