@@ -57,16 +57,13 @@ def run(dest_dir: str) -> None:
     )
 
     tb_com = calculate_under_fifteen_deaths(tb_com)
-
-    # Calculate post neonatal deaths
-    tb = add_post_neonatal_deaths(tb)
-    # tb_com = pivot_table_and_format(tb_com)
-
     tb_com = calculate_under_fifteen_mortality_rates(tb_com)
     tb_com = tb_com.set_index(
         ["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"], verify_integrity=True
-    ).drop(columns=["source", "Observation value", "Lower bound", "Upper bound", "lower_bound", "upper_bound"])
+    ).drop(columns=["source"])
 
+    # Calculate post neonatal deaths
+    tb = add_post_neonatal_deaths(tb)
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
