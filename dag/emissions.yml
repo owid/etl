@@ -115,6 +115,16 @@ steps:
     - data://meadow/emissions/2023-10-10/net_zero_tracker
   data://grapher/emissions/2023-10-10/net_zero_tracker:
     - data://garden/emissions/2023-10-10/net_zero_tracker
+  #
+  # Global Warming Potential factors (IPCC, 2021).
+  #
+  data://meadow/emissions/2023-11-06/global_warming_potential_factors:
+    - snapshot://emissions/2023-11-06/global_warming_potential_factors.csv
+  data://garden/emissions/2023-11-06/global_warming_potential_factors:
+    - data://meadow/emissions/2023-11-06/global_warming_potential_factors
+  data://grapher/emissions/2023-11-06/global_warming_potential_factors:
+    - data://garden/emissions/2023-11-06/global_warming_potential_factors
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
   #
