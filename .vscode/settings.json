@@ -17,13 +17,6 @@
     "editor.defaultFormatter": "ms-python.black-formatter"
   },
   "isort.args": ["--profile", "black"],
-  "python.linting.flake8Enabled": true,
-  "python.linting.enabled": true,
-  "python.linting.ignorePatterns": [
-    "**/site-packages/**/*.py",
-    ".vscode/*.py",
-    "**/*.ipynb"
-  ],
   "grammarly.files.include": [
       "**/README.md",
       "**/readme.md",

@@ -6,7 +6,7 @@ It has been slightly modified since then.
 """
 import json
 from datetime import date, datetime
-from typing import Annotated, Any, Dict, List, Optional, Set, TypedDict, Union
+from typing import Annotated, Any, Dict, List, Optional, TypedDict, Union
 from urllib.parse import quote
 
 import humps
@@ -194,6 +194,13 @@ class Tag(SQLModel, table=True):
     @classmethod
     def load_tags(cls, session: Session, is_topic: bool = True) -> List["Tag"]:  # type: ignore
         return session.exec(select(cls).where(cls.isTopic == is_topic)).all()  # type: ignore
+
+    @classmethod
+    def load_tags_by_names(cls, session: Session, tag_names: List[str]) -> List["Tag"]:
+        """Load topic tags by their names in the order given in `tag_names`."""
+        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names), Tag.isTopic == 1)).all()  # type: ignore
+        tags = [next(tag for tag in tags if tag.name == ordered_name) for ordered_name in tag_names]
+        return tags
 
 
 class User(SQLModel, table=True):
@@ -824,7 +831,7 @@ class OriginsVariablesLink(SQLModel, table=True):
     displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
 
     @classmethod
-    def link_with_variable(cls, session: Session, variable_id: int, new_origin_ids: Set[int]) -> None:
+    def link_with_variable(cls, session: Session, variable_id: int, new_origin_ids: List[int]) -> None:
         """Link the given Variable ID with the given Origin IDs."""
         # Fetch current linked Origins for the given Variable ID
         existing_links = session.query(cls.originId, cls.displayOrder).filter(cls.variableId == variable_id).all()
@@ -916,7 +923,7 @@ class TagsVariablesTopicTagsLink(SQLModel, table=True):
     displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
 
     @classmethod
-    def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: Set[str]) -> None:
+    def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: List[str]) -> None:
         """Link the given Variable ID with the given Tag IDs."""
         # Fetch current linked tags for the given Variable ID
         existing_links = session.query(cls.tagId, cls.displayOrder).filter(cls.variableId == variable_id).all()
@@ -1185,7 +1192,7 @@ class Variable(SQLModel, table=True):
         assert self.id
 
         # establish relationships between variables and origins
-        OriginsVariablesLink.link_with_variable(session, self.id, {origin.id for origin in db_origins})  # type: ignore
+        OriginsVariablesLink.link_with_variable(session, self.id, [origin.id for origin in db_origins])  # type: ignore
 
         # establish relationships between variables and posts
         required_gdoc_ids = {faq.gdoc_id for faq in faqs}
@@ -1200,15 +1207,14 @@ class Variable(SQLModel, table=True):
         )
 
         # establish relationships between variables and tags
-        # get tags by their name
-        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names), Tag.isTopic == 1)).all()  # type: ignore
+        tags = Tag.load_tags_by_names(session, tag_names)
 
         # raise a warning if some tags were not found
         if len(tags) != len(tag_names):
             found_tags = [tag.name for tag in tags]
             missing_tags = [tag for tag in tag_names if tag not in found_tags]
             log.warning("create_links.missing_tags", tags=missing_tags)
-        TagsVariablesTopicTagsLink.link_with_variable(session, self.id, {tag.id for tag in tags})  # type: ignore
+        TagsVariablesTopicTagsLink.link_with_variable(session, self.id, [tag.id for tag in tags])  # type: ignore
 
     def s3_data_path(self) -> str:
         """Path to S3 with data in JSON format for Grapher. Typically
