@@ -10,6 +10,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -773,6 +774,8 @@ class GrapherStep(Step):
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
             futures = []
+            verbose = True
+            i = 0
 
             # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
             # is fetching the whole dataset from data-api as they would receive all tables merged in a single
@@ -787,18 +790,26 @@ class GrapherStep(Step):
                 table = gh._adapt_table_for_grapher(table)
 
                 # generate table with entity_id, year and value for every column
-                upsert = lambda t, catalog_path: gi.upsert_table(  # noqa: E731
+                upsert = lambda t, catalog_path, verbose: gi.upsert_table(  # noqa: E731
                     engine,
                     t,
                     dataset_upsert_results,
                     catalog_path=catalog_path,
                     dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                    verbose=verbose,
                 )
 
                 for t in gh._yield_wide_table(table, na_action="drop"):
+                    i += 1
                     assert len(t.columns) == 1
                     catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
-                    futures.append(thread_pool.submit(upsert, t, catalog_path=catalog_path))
+
+                    # stop logging to stop cluttering logs
+                    if i > 20 and verbose:
+                        verbose = False
+                        thread_pool.submit(lambda: (time.sleep(5), log.info("upsert_dataset.continue_without_logging")))
+
+                    futures.append(thread_pool.submit(upsert, t, catalog_path=catalog_path, verbose=verbose))
 
             variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
 
