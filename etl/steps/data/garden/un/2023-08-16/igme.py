@@ -190,10 +190,10 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
             "source",
         ]
     ]
-    tb = pr.concat([tb, result_tb])
-    tb.metadata.short_name = "igme_under_fifteen_mortality"
+    result_tb = result_tb[result_tb["indicator"].isin(["Under-fifteen mortality rate", "Under-fifteen deaths"])]
+    result_tb.metadata.short_name = "igme_under_fifteen_mortality"
 
-    return tb
+    return result_tb
 
 
 def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source: str) -> Table:
