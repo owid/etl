@@ -32,7 +32,7 @@ meta:
       HMD provides an online STMF visualization toolkit (https://mpidr.shinyapps.io/stmortality).
     url: https://www.mortality.org/Data/STMF
     source_data_url: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
-    date_accessed: 2023-11-06
+    date_accessed: 2023-11-07
     publication_date: 2023-10-16
     publication_year: 2023
     published_by: HMD. Human Mortality Database. Max Planck Institute for Demographic

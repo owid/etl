@@ -3,8 +3,7 @@
 #
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Union, cast
-from urllib.parse import quote
+from typing import Any, Optional, Union, cast
 
 import click
 import pandas as pd
@@ -15,11 +14,10 @@ from owid.repack import repack_frame
 from rich import print
 from rich_click.rich_command import RichCommand
 from rich_click.rich_group import RichGroup
-from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
 
 from apps.backport.datasync.data_metadata import variable_data_df_from_s3
 from etl import tempcompare
+from etl.db import get_engine
 
 
 @click.group(cls=RichGroup)
@@ -280,12 +278,6 @@ def grapher(
             "local",
             **ctx.obj,
         )
-
-
-def get_engine(config: Dict[str, Any]) -> Engine:
-    return create_engine(
-        f'mysql://{config["DB_USER"]}:{quote(config["DB_PASS"])}@{config["DB_HOST"]}:{config["DB_PORT"]}/{config["DB_NAME"]}'
-    )
 
 
 def read_dataset_from_db(env_path: str, namespace: str, version: str, dataset: str) -> pd.DataFrame:

@@ -1,3 +1,4 @@
+#
 dataset:
   update_period_days: 365
 
@@ -1986,8 +1987,8 @@ tables:
           title_variant: International Telecommunication Union
           # attribution: # defaults to origin[*].producer so does not have to be set here
           topic_tags:
-          - Technological Change
           - Internet
+          - Technological Change
           - Loneliness & Social Connections
           faqs: []
           grapher_config:
