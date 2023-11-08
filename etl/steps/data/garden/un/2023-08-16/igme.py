@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
     tb = filter_data(tb)
     tb = round_down_year(tb)
     tb = clean_values(tb)
-
+    tb = convert_to_percentage(tb)
     tb["source"] = "igme (current)"
     # Separate out the variables needed to calculate the under-fifteen mortality rate.
     tb_under_fifteen = tb[
@@ -76,6 +76,31 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def convert_to_percentage(tb: Table) -> Table:
+    """
+    Convert the units which are given as 'per 1,000...' into percentages.
+    """
+    rate_conversions = {
+        "Deaths per 1,000 live births": "Deaths per 100 live births",
+        "Deaths per 1000 children aged 1": "Deaths per 100 children aged 1",
+        "Deaths per 1000 children aged 5": "Deaths per 100 children aged 5",
+        "Deaths per 1000 children aged 10": "Deaths per 100 children aged 10",
+        "Deaths per 1000 children aged 15": "Deaths per 100 children aged 15",
+        "Deaths per 1000 children aged 20": "Deaths per 100 children aged 20",
+        "Stillbirths per 1000 births": "Stillbirths per 100 births",
+    }
+    # Dividing values of selected rows by 10
+
+    selected_rows = tb["unit_of_measure"].isin(rate_conversions.keys())
+    tb.loc[selected_rows, ["obs_value", "lower_bound", "upper_bound"]] = tb.loc[
+        selected_rows, ["obs_value", "lower_bound", "upper_bound"]
+    ].div(10)
+
+    tb = tb.replace({"unit_of_measure": rate_conversions})
+
+    return tb
 
 
 def add_post_neonatal_deaths(tb: Table) -> Table:
@@ -170,7 +195,7 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
         on=["country", "year", "wealth_quintile", "sex", "source"],
         suffixes=("_u5", "_5_14"),
     )
-    tb_merge["adjusted_5_14_mortality_rate"] = (1000 - tb_merge["obs_value_u5"]) / 1000 * tb_merge["obs_value_5_14"]
+    tb_merge["adjusted_5_14_mortality_rate"] = (100 - tb_merge["obs_value_u5"]) / 100 * tb_merge["obs_value_5_14"]
     tb_merge["obs_value"] = tb_merge["obs_value_u5"] + tb_merge["adjusted_5_14_mortality_rate"]
     tb_merge["indicator"] = "Under-fifteen mortality rate"
     tb_merge["unit_of_measure"] = "Deaths per 1,000 live births"
