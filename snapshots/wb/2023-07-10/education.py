@@ -2,11 +2,9 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from time import sleep
 
 import click
 import pandas as pd
-import requests
 import world_bank_data as wb
 from owid.datautils.io import df_to_file
 from tqdm import tqdm
