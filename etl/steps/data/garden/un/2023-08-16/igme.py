@@ -24,11 +24,16 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["igme"].reset_index()
     tb_vintage = ds_vintage["igme"].reset_index()
-    tb_youth = tb_vintage[tb_vintage["indicator_name"].isin(["Deaths age 5 to 14", "Mortality rate age 5 to 14"])]
+    tb_youth = tb_vintage[
+        tb_vintage["indicator_name"].isin(
+            ["Deaths age 5 to 14", "Mortality rate age 5 to 14", "Under-5 mortality rate"]
+        )
+    ]
     tb_youth = process_vintage_data(tb_youth)
     tb_youth = tb_youth.rename(
         columns={"Observation value": "obs_value", "Lower bound": "lower_bound", "Upper bound": "upper_bound"}
     )
+    tb_youth = tb_youth.replace({"indicator": {"Under-5 mortality rate": "Under-five mortality rate"}})
     # Process current data.
     #
     tb = fix_sub_saharan_africa(tb)
@@ -43,11 +48,6 @@ def run(dest_dir: str) -> None:
         (
             tb["indicator"].isin(
                 ["Under-five deaths", "Deaths age 5 to 14", "Under-five mortality rate", "Mortality rate age 5-14"]
-            )
-        )
-        & (
-            tb["unit_of_measure"].isin(
-                ["Number of deaths", "Deaths per 1,000 live births", "Deaths per 1000 children aged 5"]
             )
         )
     ]
@@ -188,22 +188,28 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
 
     If there are 100 deaths per 1000 under fives, then we need to adjust the denominator of the 5-14 age group to take account of this.
     """
-    u5_mortality = tb[tb["indicator"] == "Under-five deaths"]
+    u5_mortality = tb[tb["indicator"] == "Under-five mortality rate"]
+    # Converting back to per 1000 for the calculations below
+    # u5_mortality[['obs_value', 'lower_bound', 'upper_bound']] = u5_mortality[['obs_value', 'lower_bound', 'upper_bound']].multiply(10)
     mortality_5_14 = tb[tb["indicator"] == "Mortality rate age 5-14"]
-
+    youth_mortality = tb[tb["indicator"] == "Under-fifteen deaths"]
+    youth_mortality = youth_mortality.drop(columns=["source"])
     tb_merge = pr.merge(
         u5_mortality,
         mortality_5_14,
-        on=["country", "year", "wealth_quintile", "sex"],
+        on=["country", "year", "wealth_quintile", "sex", "source"],
         suffixes=("_u5", "_5_14"),
     )
-    tb_merge["adjusted_5_14_mortality_rate"] = (100 - tb_merge["obs_value_u5"]) / 100 * tb_merge["obs_value_5_14"]
+    tb_merge["adjusted_5_14_mortality_rate"] = (1000 - tb_merge["obs_value_u5"]) / 1000 * tb_merge["obs_value_5_14"]
+    # tb_merge["adjusted_5_14_mortality_rate"] = (100 - tb_merge["obs_value_u5"]) / 100 * tb_merge["obs_value_5_14"]
     tb_merge["obs_value"] = tb_merge["obs_value_u5"] + tb_merge["adjusted_5_14_mortality_rate"]
+    # convert to percent
+    tb_merge["obs_value"] = tb_merge["obs_value"] / 10
     tb_merge["indicator"] = "Under-fifteen mortality rate"
-    tb_merge["unit_of_measure"] = "Deaths per 1,000 live births"
+    tb_merge["unit_of_measure"] = "Deaths per 100 live births"
 
     result_tb = tb_merge[["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile", "obs_value"]]
-    result_tb = result_tb[result_tb["indicator"].isin(["Under-fifteen mortality rate"])]
+    result_tb = pr.concat([youth_mortality, result_tb])
     result_tb.metadata.short_name = "igme_under_fifteen_mortality"
 
     return result_tb
