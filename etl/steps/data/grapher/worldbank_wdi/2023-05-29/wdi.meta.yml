@@ -65,7 +65,7 @@ tables:
           attribution: UNICEF; World Health Organization; World Bank
           attribution_short: UNICEF/WHO (via World Bank)
           topic_tags:
-            - Hunger and Undernourishment
+            - Hunger & Undernourishment
             - Micronutrient Deficiency
           faqs:
             - fragment_id: stunting-definition

@@ -199,6 +199,13 @@ class Tag(SQLModel, table=True):
     def load_tags_by_names(cls, session: Session, tag_names: List[str]) -> List["Tag"]:
         """Load topic tags by their names in the order given in `tag_names`."""
         tags = session.exec(select(Tag).where(Tag.name.in_(tag_names), Tag.isTopic == 1)).all()  # type: ignore
+
+        if len(tags) != len(tag_names):
+            found_tags = [tag.name for tag in tags]
+            missing_tags = [tag for tag in tag_names if tag not in found_tags]
+            tag_names = found_tags
+            log.warning("create_links.missing_tags", tags=missing_tags)
+
         tags = [next(tag for tag in tags if tag.name == ordered_name) for ordered_name in tag_names]
         return tags
 
@@ -1213,11 +1220,6 @@ class Variable(SQLModel, table=True):
         # establish relationships between variables and tags
         tags = Tag.load_tags_by_names(session, tag_names)
 
-        # raise a warning if some tags were not found
-        if len(tags) != len(tag_names):
-            found_tags = [tag.name for tag in tags]
-            missing_tags = [tag for tag in tag_names if tag not in found_tags]
-            log.warning("create_links.missing_tags", tags=missing_tags)
         TagsVariablesTopicTagsLink.link_with_variable(session, self.id, [tag.id for tag in tags])  # type: ignore
 
     def s3_data_path(self) -> str:
