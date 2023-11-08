@@ -21,7 +21,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path,
+        df=tb,
+        countries_file=paths.country_mapping_path,
     )
     tb = tb.set_index(["country", "year", "sex"], verify_integrity=True)
 

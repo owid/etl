@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
     tbs = []
     num_triplets = int(len(tb.columns) / 3)
     for i in range(num_triplets):
-        columns = tb.columns[i * 3: (i + 1) * 3]
+        columns = tb.columns[i * 3 : (i + 1) * 3]
         tb_ = format_subtable(tb[columns])
         tbs.append(tb_)
     tb = pr.concat(tbs)
