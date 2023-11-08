@@ -22,10 +22,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("unaids"))
+    ds_meadow = paths.load_dataset("unaids")
 
     # Load population dataset.
-    ds_population: Dataset = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
 
     # Read tables from meadow datasets.
     tb = ds_meadow["unaids"].reset_index()
