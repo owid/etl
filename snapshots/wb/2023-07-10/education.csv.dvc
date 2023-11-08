@@ -23,6 +23,6 @@ meta:
       url: https://creativecommons.org/licenses/by/4.0/
 wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
-- md5: 1b7d02fb9b5808382975353a2d085d74
-  size: 4802
+- md5: c7be30cc6a25ec312c6bd0b185de61e3
+  size: 5344754768
   path: education.csv
