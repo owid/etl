@@ -33,18 +33,17 @@ tables:
     variables:
       population:
         title: Population
-        description_key:
-          - &population-description "Population by country, available from 10,000 BCE to 2100, based on data and estimates from different sources."
+        description_short: &population-description "Population by country, available from 10,000 BCE to 2100, based on data and estimates from different sources."
         description_processing: &description-processing |-
           The population time series is constructed by combining data from multiple sources:
 
-          • 10,000 BCE - 1799: Historical estimates by HYDE (v3.2). Includes some data from Gapminder (Systema Globalis).
+          - 10,000 BCE - 1799: Historical estimates by HYDE (v3.2). Includes some data from Gapminder (Systema Globalis).
 
-          • 1800-1949: Historical estimates by Gapminder. Includes some data from HYDE (v3.2) and Gapminder (Systema Globalis).
+          - 1800-1949: Historical estimates by Gapminder. Includes some data from HYDE (v3.2) and Gapminder (Systema Globalis).
 
-          • 1950-2021: Population records by the UN World Population Prospects (2022 revision). Includes some data from HYDE (v3.2), Gapminder (Systema Globalis) and Gapminder (v7).
+          - 1950-2021: Population records by the UN World Population Prospects (2022 revision). Includes some data from HYDE (v3.2), Gapminder (Systema Globalis) and Gapminder (v7).
 
-          • 2022-2100: Projections based on Medium variant by the UN World Population Prospects (2022 revision).
+          - 2022-2100: Projections based on Medium variant by the UN World Population Prospects (2022 revision).
         unit: persons
         display:
           numDecimalPlaces: 0
@@ -53,8 +52,7 @@ tables:
 
       world_pop_share:
         title: Share of world population
-        description_key:
-          - &population-share-description "Share of the world's population by country, available from 10,000 BCE to 2100, based on data and estimates from different sources."
+        description_short: &population-share-description "Share of the world's population by country, available from 10,000 BCE to 2100, based on data and estimates from different sources."
         description_processing: *description-processing
         unit: "%"
         short_unit: "%"
@@ -63,8 +61,7 @@ tables:
 
       source:
         title: Source
-        description_key:
-          - &population-source-description "Name of the source for a specific data point. The name includes a short name for the source and a link."
+        description_short: &population-source-description "Name of the source for a specific data point. The name includes a short name for the source and a link."
         description_processing: *description-processing
         unit: ""
         origins: *origins-combined
@@ -76,8 +73,7 @@ tables:
     variables:
       population:
         title: Population
-        description_key:
-          - *population-description
+        description_short: *population-description
         description_processing: *description-processing
         unit: persons
         display:
@@ -85,16 +81,14 @@ tables:
         processing_level: major
       world_pop_share:
         title: Share of world population
-        description_key:
-          - *population-share-description
+        description_short: *population-share-description
         description_processing: *description-processing
         unit: "%"
         short_unit: "%"
         processing_level: major
       source:
         title: Source
-        description_key:
-          - *population-source-description
+        description_short: *population-source-description
         description_processing: *description-processing
         unit: ""
         processing_level: major
