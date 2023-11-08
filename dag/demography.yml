@@ -131,3 +131,7 @@ steps:
     - data://garden/hmd/2023-09-19/hmd
   data://grapher/demography/2023-10-20/broken_limits_le:
     - data://garden/demography/2023-10-20/broken_limits_le
+
+  # Contribution to sex gap in Life Expectancy
+  data://meadow/demography/2023-11-08/le_sex_gap_age_contribution:
+    - snapshot://demography/2023-11-08/le_sex_gap_age_contribution.zip
