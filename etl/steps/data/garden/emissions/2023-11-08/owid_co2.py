@@ -357,9 +357,15 @@ def run(dest_dir: str) -> None:
     # Choose required columns and rename them.
     tb_gcp = tb_gcp.reset_index()[list(GCP_COLUMNS)].rename(columns=GCP_COLUMNS, errors="raise")
     tb_jones = tb_jones.reset_index()[list(JONES_COLUMNS)].rename(columns=JONES_COLUMNS, errors="raise")
-    tb_climate_watch_ghg = tb_climate_watch_ghg.reset_index()[list(CLIMATE_WATCH_GHG_COLUMNS)].rename(columns=CLIMATE_WATCH_GHG_COLUMNS, errors="raise")
-    tb_climate_watch_ch4 = tb_climate_watch_ch4.reset_index()[list(CLIMATE_WATCH_CH4_COLUMNS)].rename(columns=CLIMATE_WATCH_CH4_COLUMNS, errors="raise")
-    tb_climate_watch_n2o = tb_climate_watch_n2o.reset_index()[list(CLIMATE_WATCH_N2O_COLUMNS)].rename(columns=CLIMATE_WATCH_N2O_COLUMNS, errors="raise")
+    tb_climate_watch_ghg = tb_climate_watch_ghg.reset_index()[list(CLIMATE_WATCH_GHG_COLUMNS)].rename(
+        columns=CLIMATE_WATCH_GHG_COLUMNS, errors="raise"
+    )
+    tb_climate_watch_ch4 = tb_climate_watch_ch4.reset_index()[list(CLIMATE_WATCH_CH4_COLUMNS)].rename(
+        columns=CLIMATE_WATCH_CH4_COLUMNS, errors="raise"
+    )
+    tb_climate_watch_n2o = tb_climate_watch_n2o.reset_index()[list(CLIMATE_WATCH_N2O_COLUMNS)].rename(
+        columns=CLIMATE_WATCH_N2O_COLUMNS, errors="raise"
+    )
     tb_energy = tb_energy.reset_index()[list(PRIMARY_ENERGY_COLUMNS)].rename(
         columns=PRIMARY_ENERGY_COLUMNS, errors="raise"
     )
