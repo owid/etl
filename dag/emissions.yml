@@ -45,12 +45,12 @@ steps:
   data://grapher/gcp/2023-09-28/global_carbon_budget:
     - data://garden/gcp/2023-09-28/global_carbon_budget
   #
-  # Emissions - CO2 dataset (2023-09-28).
+  # Emissions - CO2 dataset (2023-11-08).
   #
-  data://garden/emissions/2023-09-28/owid_co2:
+  data://garden/emissions/2023-11-08/owid_co2:
     - data://garden/emissions/2023-05-02/national_contributions
     - data://garden/gcp/2023-09-28/global_carbon_budget
-    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+    - data://garden/climate_watch/2023-10-31/emissions_by_sector
     - data://garden/energy/2023-07-10/primary_energy_consumption
     - data://garden/demography/2023-03-31/population
     - data://garden/ggdc/2020-10-01/ggdc_maddison
@@ -127,22 +127,5 @@ steps:
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
-  #
-  # CAIT - Greenhouse gas emissions by sector (2022).
-  #
-  data://meadow/cait/2022-08-10/ghg_emissions_by_sector:
-    - walden://cait/2022-08-10/cait_ghg_emissions
-  data://garden/cait/2022-08-10/ghg_emissions_by_sector:
-    - data://meadow/cait/2022-08-10/ghg_emissions_by_sector
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/owid/latest/key_indicators
-  data://grapher/cait/2022-08-10/all_ghg_emissions:
-    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  data://grapher/cait/2022-08-10/ch4_emissions:
-    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  data://grapher/cait/2022-08-10/co2_emissions:
-    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  data://grapher/cait/2022-08-10/n2o_emissions:
-    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
 
   ######################################################################################################################

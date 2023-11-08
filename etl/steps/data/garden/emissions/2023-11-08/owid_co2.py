@@ -3,7 +3,7 @@
 Datasets combined:
 * Global Carbon Budget (Global Carbon Project, 2022).
 * National contributions to climate change (Jones et al. (2023), 2023).
-* Greenhouse gas emissions by sector (CAIT, 2022).
+* Greenhouse gas emissions by sector (Climate Watch, 2023).
 * Primary energy consumption (BP & EIA, 2022)
 
 Additionally, OWID's regions dataset, population dataset and Maddison Project Database (Bolt and van Zanden, 2020) on
@@ -97,25 +97,25 @@ JONES_COLUMNS = {
     "temperature_response_n2o_total": "temperature_change_from_n2o",
     "share_of_temperature_response_ghg_total": "share_of_temperature_change_from_ghg",
 }
-CAIT_GHG_COLUMNS = {
+CLIMATE_WATCH_GHG_COLUMNS = {
     "country": "country",
     "year": "year",
-    "total_excluding_lucf": "total_ghg_excluding_lucf",
-    "total_excluding_lucf__per_capita": "ghg_excluding_lucf_per_capita",
-    "total_including_lucf": "total_ghg",
-    "total_including_lucf__per_capita": "ghg_per_capita",
+    "total_ghg_emissions_excluding_lucf": "total_ghg_excluding_lucf",
+    "total_ghg_emissions_excluding_lucf_per_capita": "ghg_excluding_lucf_per_capita",
+    "total_ghg_emissions_including_lucf": "total_ghg",
+    "total_ghg_emissions_including_lucf_per_capita": "ghg_per_capita",
 }
-CAIT_CH4_COLUMNS = {
+CLIMATE_WATCH_CH4_COLUMNS = {
     "country": "country",
     "year": "year",
-    "total_including_lucf": "methane",
-    "total_including_lucf__per_capita": "methane_per_capita",
+    "total_ch4_emissions_including_lucf": "methane",
+    "total_ch4_emissions_including_lucf_per_capita": "methane_per_capita",
 }
-CAIT_N2O_COLUMNS = {
+CLIMATE_WATCH_N2O_COLUMNS = {
     "country": "country",
     "year": "year",
-    "total_including_lucf": "nitrous_oxide",
-    "total_including_lucf__per_capita": "nitrous_oxide_per_capita",
+    "total_n2o_emissions_including_lucf": "nitrous_oxide",
+    "total_n2o_emissions_including_lucf_per_capita": "nitrous_oxide_per_capita",
 }
 PRIMARY_ENERGY_COLUMNS = {
     "country": "country",
@@ -210,9 +210,9 @@ def convert_units(table: Table) -> Table:
 def combine_tables(
     tb_gcp: Table,
     tb_jones: Table,
-    tb_cait_ghg: Table,
-    tb_cait_ch4: Table,
-    tb_cait_n2o: Table,
+    tb_climate_watch_ghg: Table,
+    tb_climate_watch_ch4: Table,
+    tb_climate_watch_n2o: Table,
     tb_energy: Table,
     tb_gdp: Table,
     tb_population: Table,
@@ -226,12 +226,12 @@ def combine_tables(
         Global Carbon Budget table (from Global Carbon Project).
     tb_jones : Table
         National contributions to climate change (from Jones et al. (2023)).
-    tb_cait_ghg : Table
-        Greenhouse gas emissions table (from CAIT).
-    tb_cait_ch4 : Table
-        CH4 emissions table (from CAIT).
-    tb_cait_n2o : Table
-        N2O emissions table (from CAIT).
+    tb_climate_watch_ghg : Table
+        Greenhouse gas emissions table (from Climate Watch).
+    tb_climate_watch_ch4 : Table
+        CH4 emissions table (from Climate Watch).
+    tb_climate_watch_n2o : Table
+        N2O emissions table (from Climate Watch).
     tb_energy : Table
         Primary energy consumption table (from BP & EIA).
     tb_gdp : Table
@@ -249,7 +249,7 @@ def combine_tables(
     """
     # Combine main tables (with an outer join, to gather all entities from all tables).
     combined = tb_gcp.copy()
-    for table in [tb_jones, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o]:
+    for table in [tb_jones, tb_climate_watch_ghg, tb_climate_watch_ch4, tb_climate_watch_n2o]:
         combined = combined.merge(table, on=["country", "year"], how="outer", short_name=paths.short_name)
 
     # Add secondary tables (with a left join, to keep only entities for which we have emissions data).
@@ -309,8 +309,8 @@ def run(dest_dir: str) -> None:
     # Load the Jones et al. (2023) dataset on national contributions to climate change.
     ds_jones = paths.load_dataset("national_contributions")
 
-    # Load the greenhouse gas emissions by sector dataset by CAIT.
-    ds_cait = paths.load_dataset("ghg_emissions_by_sector")
+    # Load the greenhouse gas emissions by sector dataset by Climate Watch.
+    ds_climate_watch = paths.load_dataset("emissions_by_sector")
 
     # Load the GDP dataset by GGDC Maddison.
     ds_gdp = paths.load_dataset("ggdc_maddison")
@@ -327,9 +327,9 @@ def run(dest_dir: str) -> None:
     # Gather all required tables from all datasets.
     tb_gcp = ds_gcp["global_carbon_budget"]
     tb_jones = ds_jones["national_contributions"]
-    tb_cait_ghg = ds_cait["greenhouse_gas_emissions_by_sector"]
-    tb_cait_ch4 = ds_cait["methane_emissions_by_sector"]
-    tb_cait_n2o = ds_cait["nitrous_oxide_emissions_by_sector"]
+    tb_climate_watch_ghg = ds_climate_watch["greenhouse_gas_emissions_by_sector"]
+    tb_climate_watch_ch4 = ds_climate_watch["methane_emissions_by_sector"]
+    tb_climate_watch_n2o = ds_climate_watch["nitrous_oxide_emissions_by_sector"]
     tb_energy = ds_energy["primary_energy_consumption"]
     tb_gdp = ds_gdp["maddison_gdp"]
     tb_population = ds_population["population"]
@@ -348,9 +348,6 @@ def run(dest_dir: str) -> None:
         return table
 
     tb_jones = propagate_sources_to_all_indicators(table=tb_jones, ds=ds_jones)
-    tb_cait_ghg = propagate_sources_to_all_indicators(table=tb_cait_ghg, ds=ds_cait)
-    tb_cait_ch4 = propagate_sources_to_all_indicators(table=tb_cait_ch4, ds=ds_cait)
-    tb_cait_n2o = propagate_sources_to_all_indicators(table=tb_cait_n2o, ds=ds_cait)
     tb_regions = propagate_sources_to_all_indicators(table=tb_regions, ds=ds_regions)
     ####################################################################################################################
 
@@ -360,9 +357,15 @@ def run(dest_dir: str) -> None:
     # Choose required columns and rename them.
     tb_gcp = tb_gcp.reset_index()[list(GCP_COLUMNS)].rename(columns=GCP_COLUMNS, errors="raise")
     tb_jones = tb_jones.reset_index()[list(JONES_COLUMNS)].rename(columns=JONES_COLUMNS, errors="raise")
-    tb_cait_ghg = tb_cait_ghg.reset_index()[list(CAIT_GHG_COLUMNS)].rename(columns=CAIT_GHG_COLUMNS, errors="raise")
-    tb_cait_ch4 = tb_cait_ch4.reset_index()[list(CAIT_CH4_COLUMNS)].rename(columns=CAIT_CH4_COLUMNS, errors="raise")
-    tb_cait_n2o = tb_cait_n2o.reset_index()[list(CAIT_N2O_COLUMNS)].rename(columns=CAIT_N2O_COLUMNS, errors="raise")
+    tb_climate_watch_ghg = tb_climate_watch_ghg.reset_index()[list(CLIMATE_WATCH_GHG_COLUMNS)].rename(
+        columns=CLIMATE_WATCH_GHG_COLUMNS, errors="raise"
+    )
+    tb_climate_watch_ch4 = tb_climate_watch_ch4.reset_index()[list(CLIMATE_WATCH_CH4_COLUMNS)].rename(
+        columns=CLIMATE_WATCH_CH4_COLUMNS, errors="raise"
+    )
+    tb_climate_watch_n2o = tb_climate_watch_n2o.reset_index()[list(CLIMATE_WATCH_N2O_COLUMNS)].rename(
+        columns=CLIMATE_WATCH_N2O_COLUMNS, errors="raise"
+    )
     tb_energy = tb_energy.reset_index()[list(PRIMARY_ENERGY_COLUMNS)].rename(
         columns=PRIMARY_ENERGY_COLUMNS, errors="raise"
     )
@@ -376,9 +379,9 @@ def run(dest_dir: str) -> None:
     combined = combine_tables(
         tb_gcp=tb_gcp,
         tb_jones=tb_jones,
-        tb_cait_ghg=tb_cait_ghg,
-        tb_cait_ch4=tb_cait_ch4,
-        tb_cait_n2o=tb_cait_n2o,
+        tb_climate_watch_ghg=tb_climate_watch_ghg,
+        tb_climate_watch_ch4=tb_climate_watch_ch4,
+        tb_climate_watch_n2o=tb_climate_watch_n2o,
         tb_energy=tb_energy,
         tb_gdp=tb_gdp,
         tb_population=tb_population,
