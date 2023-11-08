@@ -1,6 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
 import tempfile
+from pathlib import Path
 
 import owid.catalog.processing as pr
 
@@ -20,12 +21,17 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     with tempfile.TemporaryDirectory() as tmpdir:
         snap.extract(tmpdir)
-        tb = pr.read_rda(tmpdir / "a6gap33cntrs.rda", "df6")
+        tb = pr.read_rda(
+            Path(tmpdir) / "sex-gap-e0-pnas-2.0" / "dat" / "a6gap33cntrs.rda",
+            "df6",
+            metadata=snap.to_table_metadata(),
+            origin=snap.metadata.origin,
+        )
     #
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.underscore().set_index(["name", "year", "age_group"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.

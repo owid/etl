@@ -135,3 +135,7 @@ steps:
   # Contribution to sex gap in Life Expectancy
   data://meadow/demography/2023-11-08/le_sex_gap_age_contribution:
     - snapshot://demography/2023-11-08/le_sex_gap_age_contribution.zip
+  data://garden/demography/2023-11-08/le_sex_gap_age_contribution:
+    - data://meadow/demography/2023-11-08/le_sex_gap_age_contribution
+  data://grapher/demography/2023-11-08/le_sex_gap_age_contribution:
+    - data://garden/demography/2023-11-08/le_sex_gap_age_contribution
