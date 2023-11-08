@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
 from shared import add_indicators_extra
 
 from etl.helpers import PathFinder, create_dataset
@@ -9,6 +10,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 # Index columns
 COLUMNS_INDEX = ["year", "region", "conflict_type"]
+COLUMNS_INDEX_COUNTRY = ["year", "country", "conflict_type"]
 # Rename columns (has an entry for each dataset. All entries should be dictionaries with the same number of entries (and identical values))
 COLUMNS_RENAME = {
     "ucdp": {
@@ -33,18 +35,20 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("ucdp")
+    ds_ucdp = paths.load_dataset("ucdp")
     # Read table from meadow dataset.
-    tb_ucdp = ds_meadow["ucdp"].reset_index()
+    tb_ucdp = ds_ucdp["ucdp"].reset_index()
+    tb_ucdp_countries = ds_ucdp["ucdp_country"].reset_index()
 
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("prio_v31")
+    ds_prio = paths.load_dataset("prio_v31")
     # Read table from meadow dataset.
-    tb_prio = ds_meadow["prio_v31"].reset_index()
+    tb_prio = ds_prio["prio_v31"].reset_index()
+    tb_prio_countries = ds_prio["prio_v31_country"].reset_index()
 
     # Read table from COW codes
-    ds_cow_ssm = paths.load_dataset("gleditsch")
-    tb_regions = ds_cow_ssm["gleditsch_regions"].reset_index()
+    ds_gw = paths.load_dataset("gleditsch")
+    tb_regions = ds_gw["gleditsch_regions"].reset_index()
 
     #
     # Process data.
@@ -86,16 +90,58 @@ def run(dest_dir: str) -> None:
         ],
     )
 
+    tb_country = make_tb_country(tb_ucdp_countries, tb_prio_countries)
+
     # Set index
     tb = tb.set_index(COLUMNS_INDEX, verify_integrity=True)
+    tb_country = tb_country.set_index(COLUMNS_INDEX_COUNTRY, verify_integrity=True)
 
     #
     # Save outputs.
     #
+    tables = [
+        tb,
+        tb_country,
+    ]
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_ucdp.metadata
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def make_tb_country(tb_ucdp_countries: Table, tb_prio_countries: Table) -> Table:
+    """Combine UCDP and PRIO country data."""
+
+    # PRIO 'all' conflict is actually 'state-based'
+    tb_prio_countries["conflict_type"] = tb_prio_countries["conflict_type"].replace({"all": "state-based"})
+
+    # Sanity checks
+    assert set(tb_ucdp_countries["conflict_type"]) - set(tb_prio_countries["conflict_type"]) == {
+        "one-sided violence"
+    }, "Missmatch in conflict_type between UCDP and PRIO (country) not as expected!"
+    assert set(tb_prio_countries["conflict_type"]) - set(tb_ucdp_countries["conflict_type"]) == {
+        "extrasystemic"
+    }, "Missmatch in conflict_type between UCDP and PRIO (country) not as expected!"
+
+    # Preserve only pre-UCDP-time data in PRIO
+    assert tb_ucdp_countries["year"].min() == YEAR_UCDP_MIN, "UCDP year min is not as expected!"
+    tb_prio_countries = tb_prio_countries[tb_prio_countries["year"] < YEAR_UCDP_MIN]
+
+    # Fix extrasystemic: UCDP has no data for extrasystemic, we add zeroes.
+    ## Sanity check: no extrasystemic coming from UCDP
+    assert "extrasystemic" not in set(tb_ucdp_countries["conflict_type"]), "Extrasystemic conflicts found in UCDP!"
+    # Build extrasystemic data for UCDP (all zeroes)
+    tb_extra = tb_ucdp_countries[tb_ucdp_countries["conflict_type"] == "interstate"]
+    tb_extra["conflict_type"] = "extrasystemic"
+    tb_extra["participated_in_conflict"] = 0
+    ## Concatenate with og
+    tb = pr.concat([tb_ucdp_countries, tb_extra], ignore_index=True)
+
+    # Concatenate
+    tb = pr.concat(
+        [tb_ucdp_countries, tb_prio_countries], axis=0, ignore_index=True, short_name=f"{paths.short_name}_country"
+    )
+    return tb

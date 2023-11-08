@@ -24,21 +24,23 @@ tables:
         short_unit: ''
         description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
         description_key:
-          - Games systems are specifically designed for games excel in understanding and strategizing gameplay. For instance, AlphaGo, developed by DeepMind, defeated the world champion in the game of Go. Such systems use complex algorithms to compete effectively, even against skilled human players.
+          - The authors of the Epoch dataset have established a set of criteria to identify key AI systems, which they refer to as notable. These systems must demonstrate the ability to learn, show tangible experimental results, and contribute advancements that push the boundaries of existing AI technology. In terms of notability, the AI must have garnered extensive academic attention, evidenced by a high citation count, hold historical significance in the field, mark a substantial advancement in technology, or be implemented in a significant real-world context. Recognizing the difficulty in evaluating the impact of newer AI systems since 2020 due to less available data, the authors also employ subjective judgment in their selection process for recent developments.
+
+          - Game systems are specifically designed for games and excel in understanding and strategizing gameplay. For instance, AlphaGo, developed by DeepMind, defeated the world champion in the game of Go. Such systems use complex algorithms to compete effectively, even against skilled human players.
 
           - Language systems are tailored to process language, focusing on understanding, translating, and interacting with human languages. Examples include chatbots, machine translation tools like Google Translate, and sentiment analysis algorithms that can detect emotions in text.
 
-          - Multimodal systems excel at processing multiple types of data at once, like sound and visuals together.  An example would be voice assistants like Siri or Alexa, which can understand spoken words (audio) and provide visual feedback (graphics) at the same time.
+          - Multimodal systems are artificial intelligence frameworks that integrate and interpret more than one type of data input, such as text, images, and audio. ChatGPT-4 is an example of a multimodal system, as it has the capability to process and generate responses based on both textual and visual inputs.
 
           - Vision systems focus on processing visual information, playing a pivotal role in image recognition and related areas. For example, Facebook's photo tagging system uses vision AI to identify faces.
 
-          - Speech systems are dedicated to handling spoken language, being the backbone of voice assistants and similar applications.  They recognize, interpret, and generate spoken language to interact with users.
+          - Speech systems are dedicated to handling spoken language, serving as the backbone of voice assistants and similar applications. They recognize, interpret, and generate spoken language to interact with users.
 
-          - Recommendation systems offer suggestions based on user preferences, seen prominently in online shopping and media streaming. For instance, Netflix's movie suggestions or Amazon's product recommendations are powered by such algorithms that analyze users' preferences and past behaviors.
+          - Recommendation systems offer suggestions based on user preferences, prominently seen in online shopping and media streaming. For instance, Netflix's movie suggestions or Amazon's product recommendations are powered by algorithms that analyze users' preferences and past behaviors.
 
-          - Drawing systems can create illustrations or sketches, either mimicking human techniques or generating unique art. Examples range from AI-generated artwork to design tools that can sketch based on user input or descriptions.
+          - Drawing systems can create illustrations or sketches, either by mimicking human techniques or by generating unique art. Examples range from AI-generated artwork to design tools that can sketch based on user input or descriptions.
 
-          - Other category represents a diverse set, including tasks from 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio and Robotics.
+          - The 'Other' category represents a diverse set of tasks, including 3D reconstruction, autonomous driving, video processing, text-to-video synthesis, search algorithms, audio processing, and robotics.
         description_processing: >
           Processing involved calculating total number of AI systems in each domain for each year.
 
@@ -56,22 +58,23 @@ tables:
         short_unit: ''
         description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
         description_key:
-          - Games systems are specifically designed for games excel in understanding and strategizing gameplay. For instance, AlphaGo, developed by DeepMind, defeated the world champion in the game of Go. Such systems use complex algorithms to compete effectively, even against skilled human players.
+          - The authors of the Epoch dataset have established a set of criteria to identify key AI systems, which they refer to as notable. These systems must demonstrate the ability to learn, show tangible experimental results, and contribute advancements that push the boundaries of existing AI technology. In terms of notability, the AI must have garnered extensive academic attention, evidenced by a high citation count, hold historical significance in the field, mark a substantial advancement in technology, or be implemented in a significant real-world context. Recognizing the difficulty in evaluating the impact of newer AI systems since 2020 due to less available data, the authors also employ subjective judgment in their selection process for recent developments.
+
+          - Game systems are specifically designed for games and excel in understanding and strategizing gameplay. For instance, AlphaGo, developed by DeepMind, defeated the world champion in the game of Go. Such systems use complex algorithms to compete effectively, even against skilled human players.
 
           - Language systems are tailored to process language, focusing on understanding, translating, and interacting with human languages. Examples include chatbots, machine translation tools like Google Translate, and sentiment analysis algorithms that can detect emotions in text.
 
-          - Multimodal systems excel at processing multiple types of data at once, like sound and visuals together.  An example would be voice assistants like Siri or Alexa, which can understand spoken words (audio) and provide visual feedback (graphics) at the same time.
+          - Multimodal systems are artificial intelligence frameworks that integrate and interpret more than one type of data input, such as text, images, and audio. ChatGPT-4 is an example of a multimodal system, as it has the capability to process and generate responses based on both textual and visual inputs.
 
           - Vision systems focus on processing visual information, playing a pivotal role in image recognition and related areas. For example, Facebook's photo tagging system uses vision AI to identify faces.
 
-          - Speech systems are dedicated to handling spoken language, being the backbone of voice assistants and similar applications.  They recognize, interpret, and generate spoken language to interact with users.
+          - Speech systems are dedicated to handling spoken language, serving as the backbone of voice assistants and similar applications. They recognize, interpret, and generate spoken language to interact with users.
 
-          - Recommendation systems offer suggestions based on user preferences, seen prominently in online shopping and media streaming. For instance, Netflix's movie suggestions or Amazon's product recommendations are powered by such algorithms that analyze users' preferences and past behaviors.
+          - Recommendation systems offer suggestions based on user preferences, prominently seen in online shopping and media streaming. For instance, Netflix's movie suggestions or Amazon's product recommendations are powered by algorithms that analyze users' preferences and past behaviors.
 
-          - Drawing systems can create illustrations or sketches, either mimicking human techniques or generating unique art. Examples range from AI-generated artwork to design tools that can sketch based on user input or descriptions.
+          - Drawing systems can create illustrations or sketches, either by mimicking human techniques or by generating unique art. Examples range from AI-generated artwork to design tools that can sketch based on user input or descriptions.
 
-          - Other category represents a diverse set, including tasks from 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio and Robotics.
-
+          - The 'Other' category represents a diverse set of tasks, including 3D reconstruction, autonomous driving, video processing, text-to-video synthesis, search algorithms, audio processing, and robotics.
         description_processing: >
           For each year starting from 1950, the total number of AI systems in each domain was calculated by adding that year's count to the previous years' counts. This provides a running total or cumulative count of AI systems for each year and domain.
 

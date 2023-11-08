@@ -19,12 +19,10 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["igme"]
-    tb_youth = ds_garden["igme_under_fifteen_mortality_rate"]
+    tb_youth = ds_garden["igme_under_fifteen_mortality"]
 
-    #
-    # Process data.
-    #
-
+    tb = tb.reorder_levels(["country", "year", "unit_of_measure", "indicator", "sex", "wealth_quintile"])
+    tb_youth = tb_youth.reorder_levels(["country", "year", "unit_of_measure", "indicator", "sex", "wealth_quintile"])
     #
     # Save outputs.
     #

@@ -1,0 +1,33 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - CO2 & Greenhouse Gas Emissions
+        - Climate Change
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  title: Global warming potential factors
+  update_period_days: 365
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  global_warming_potential_factors:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      gwp_100:
+        title: Global Warming Potentials with a 100-year time horizon (GWP-100)
+        unit: ""
+        short_unit: ""
+        description_short: "[Global warming potential](#dod:gwp) measures the relative warming impact of one unit mass of a greenhouse gas relative to carbon dioxide."
+        description_key:
+        - GWP values are used to convert greenhouse gases into a carbon dioxide equivalent metric by multiplying emissions in mass terms by their respective GWP factors.
+        - For example, a GWP value of 25 for a certain gas means that one tonne of that ags has 25 times the warming impact of one tonne of carbon dioxide.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 1

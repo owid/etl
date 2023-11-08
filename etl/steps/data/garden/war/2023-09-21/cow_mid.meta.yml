@@ -93,6 +93,26 @@ dataset:
 
 
 tables:
+
+  # COUNTRY-LEVEL
+  cow_mid_country:
+    variables:
+      participated_in_conflict:
+        title: Participated in conflict
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          Whether the country participated in a conflict (of a specific kind) in a given year.
+
+      number_participants:
+        title: Number of countries in conflict
+        unit: "countries"
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          The number of countries that participated in a conflict (of a specific kind) in a given year and region.
+
   cow_mid:
     description: >-
       Data on the number of disputes and deaths from militarized disputes.

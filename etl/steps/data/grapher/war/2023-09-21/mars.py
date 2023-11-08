@@ -15,6 +15,7 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["mars"]
+    tb_country = ds_garden["mars_country"]
 
     #
     # Process data.
@@ -29,9 +30,13 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
+    tables = [
+        tb,
+        tb_country,
+    ]
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Remove source description so that it doesn't get appended to the dataset description.
