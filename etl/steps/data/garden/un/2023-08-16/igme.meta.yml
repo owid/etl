@@ -2,137 +2,24 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Child & Infant Mortality
-  sex: |-
-    <% if sex == "Both sexes" %><% elif sex == "Male" %>male <% elif sex == "Female" %>female <%- endif -%>
-  wealth_quintile: |-
-    <% if wealth_quintile == "All wealth quintiles" %>all wealth quintiles<% elif wealth_quintile == "Poorest quintile" %>the poorest 20% of the population<% elif wealth_quintile == "Second poorest quintile" %>the second poorest 20% of the population<% elif wealth_quintile == "Middle wealth quintile" %>the middle 20% of the population in terms of wealth<% elif wealth_quintile == "Fourth poorest quintile" %>the second richest 20% of the population<% elif wealth_quintile == "Richest quintile" %>the richest 20% of the population<%- endif -%>
-  unit_of_measure:
-    unit: |-
-      <% if unit_of_measure == "Deaths per 100 live births" %>
-      deaths per 100 live births
-      <% elif unit_of_measure == "Deaths per 100 children aged 10" %>
-      deaths per 100 children aged 10
-      <% elif unit_of_measure == "Deaths per 100 children aged 15" %>
-      deaths per 100 children aged 15
-      <% elif unit_of_measure == "Deaths per 100 children aged 1" %>
-      deaths per 100 children aged 1
-      <% elif unit_of_measure == "Deaths per 100 children aged 20" %>
-      deaths per 100 children aged 20
-      <% elif unit_of_measure == "Deaths per 100 children aged 5" %>
-      deaths per 100 children aged 5
-      <% elif unit_of_measure == "Number of stillbirths" %>
-      stillbirths
-      <% elif unit_of_measure == "Stillbirths per 100 total births" %>
-      stillbirths per 100 total births
-      <% elif unit_of_measure == "Number of deaths" %>
-      deaths
-      <%- endif -%>
-  indicator:
-    display_name: |-
-      <% if indicator == "Neonatal mortality rate" %>
-      The estimated number of deaths of {definitions.sex} children aged less than 28 days, per 100 live births, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate 1-59 months" %>
-      The estimated number of deaths of {definitions.sex} children aged between 1 and 59 months, per 100 live births, in {definitions.wealth_quintile}
-      <% elif indicator == "Infant mortality rate" %>
-      The estimated number of deaths of {definitions.sex} children aged under one year, per 100 live births, in {definitions.wealth_quintile}
-      <% elif indicator == "Under-five mortality rate" %>
-      The estimated number of deaths of {definitions.sex} children aged under five years, per 100 live births, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 10-14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 10 and 14, per 100 children aged 10, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 10-19" %>
-      The estimated number of deaths of {definitions.sex} children aged between 10 and 19, per 100 children aged 10, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 15-19" %>
-      The estimated number of deaths of {definitions.sex} children aged between 15 and 19, per 100 children aged 15, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 15-24" %>
-      The estimated number of deaths of {definitions.sex} children aged between 15 and 24, per 100 children aged 15, in {definitions.wealth_quintile}
-      <% elif indicator == "Child Mortality rate age 1-4" %>
-      The estimated number of deaths of {definitions.sex} children aged between 1 and 4, per 100 children aged 1, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 20-24" %>
-      The estimated number of deaths of {definitions.sex} children aged between 20 and 24, per 100 children aged 20, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 100 children aged 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-24" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 24, per 100 children aged 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Mortality rate age 5-9" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 9, per 100 children aged 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Stillbirths" %>
-      The estimated number of stillbirths, in {definitions.wealth_quintile}
-      <% elif indicator == "Stillbirth rate" %>
-      The estimated number of stillbirths, per 100 total births, in {definitions.wealth_quintile}
-      <% elif indicator == "Neonatal deaths" %>
-      The estimated number of deaths of {definitions.sex} children aged less than 28 days, in {definitions.wealth_quintile}
-      <% elif indicator == "Deaths 1-59 months" %>
-      The estimated number of deaths of {definitions.sex} children aged between 1 and 59 months, in {definitions.wealth_quintile}
-      <% elif indicator == "Infant deaths" %>
-      The estimated number of deaths of {definitions.sex} children aged under 1, in {definitions.wealth_quintile}
-      <% elif indicator == "Under-five deaths" %>
-      The estimated number of deaths of {definitions.sex} children aged under 5, in {definitions.wealth_quintile}
-      <% elif indicator == "Deaths age 10 to 14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 10 and 14, in {definitions.wealth_quintile}
-      <% elif indicator == "Deaths age 10 to 19" %>
-      The estimated number of deaths of {definitions.sex} children aged between 10 and 19, in {definitions.wealth_quintile}
-      <% elif indicator == "Deaths age 15 to 19" %>
-      The estimated number of deaths of {definitions.sex} children aged between 15 and 19, in {definitions.wealth_quintile}
-      <% elif indicator == "Deaths age 15 to 24" %>
-      The estimated number of deaths of {definitions.sex} children aged between 15 and 24, in {definitions.wealth_quintile}
-      <% elif indicator == "Child deaths age 1 to 4" %>
-      The estimated number of deaths of {definitions.sex} children aged between 1 and 4, in {definitions.wealth_quintile}
-      <% elif indicator == "Deaths age 20 to 24" %>
-      The estimated number of deaths of {definitions.sex} children aged between 20 and 24, in {definitions.wealth_quintile}
-      <% elif indicator == "Deaths age 5 to 14" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 14, in {definitions.wealth_quintile}
-      <% elif indicator == "Deaths age 5 to 24" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 24, in {definitions.wealth_quintile}
-      <% elif indicator == "Deaths age 5 to 9" %>
-      The estimated number of deaths of {definitions.sex} children aged between 5 and 9, in {definitions.wealth_quintile}
-      <% elif indicator == "Post-neonatal deaths" %>
-      The estimated number of deaths of {definitions.sex} children aged between 28 days and 1 year, in {definitions.wealth_quintile}
-      <% elif indicator == "Under-fifteen deaths" %>
-      The estimated number of deaths of {definitions.sex} children aged under fifteen years, in {definitions.wealth_quintile}
-      <% elif indicator == "Under-fifteen mortality rate" %>
-      The estimated number of deaths of {definitions.sex} children aged under fifteen years, per 1,000 live births, in {definitions.wealth_quintile}
-      <%- endif -%>
+      - Child & Infant Mortality
+
 tables:
   igme:
     variables:
-      obs_value:
-        title: Observation value
-        unit: |-
-          {definitions.unit_of_measure.unit}
-        short_unit: <% if 'rate' in indicator %>%<% else %><%- endif -%>
+      ? observation_value_number_of_deaths_post_neonatal_deaths_both_sexes_all_wealth_quintiles
+      : title: Post-neonatal deaths
+        description_short: The estimated number of deaths of children aged between 28 days and one year.
+        description_processing: This indicator is calculated by Our World in Data by subtracting the neonatal (< 28 days) deaths from the under-one deaths.
         display:
-          name: |-
-            {definitions.indicator.display_name}
-          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%>
-      lower_bound:
-        title: Lower bound
-        unit: |-
-          {definitions.unit_of_measure.unit}
-        short_unit: <% if 'rate' in indicator %>%<% else %><%- endif -%>
-        display:
-          name: |-
-            {definitions.indicator.display_name}
-          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%>
-      upper_bound:
-        title: Upper bound
-        unit: |-
-          {definitions.unit_of_measure.unit}
-        short_unit: <% if 'rate' in indicator %>%<% else %><%- endif -%>
-        display:
-          name: |-
-            {definitions.indicator.display_name}
-          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%>
-  igme_under_fifteen_mortality:
+          numDecimalPlaces: 0
+  igme_under_fifteen_mortality_rate:
     variables:
-      obs_value:
-        title: Under fifteen mortality
+      ? observation_value_deaths_per_1_000_live_births_under_fifteen_mortality_rate_both_sexes_all_wealth_quintiles
+      : title: Observation value-Deaths per 1,000 live births-Under-fifteen mortality rate-Both sexes-All wealth quintiles
         description_processing: This indicator is processed by OWID based on the original data source. It is a combination of the under-five mortality rate and the 5-14 mortality rate.
-        unit: share of live births
-        short_unit: "%"
+        unit: deaths per 1,000 live births
         display:
-          name: |-
-            {definitions.indicator.display_name}
           numDecimalPlaces: 1
         sources:
           - name: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2023)

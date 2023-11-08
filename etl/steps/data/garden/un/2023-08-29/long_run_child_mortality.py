@@ -17,17 +17,16 @@ def run(dest_dir: str) -> None:
     ds_gapminder_v11: Dataset = paths.load_dependency("under_five_mortality", version="2023-09-21")
     ds_gapminder_v7: Dataset = paths.load_dependency("under_five_mortality", version="2023-09-18")
 
-    # Read table from meadow dataset and filter out the main indicator, under five mortality, central estimate, both sexes, all wealth quintiles.
+    # Read table from meadow dataset.
     tb_igme = ds_igme["igme"].reset_index()
-    tb_igme = tb_igme[
-        (tb_igme["indicator"] == "Under-five mortality rate")
-        & (tb_igme["sex"] == "Both sexes")
-        & (tb_igme["wealth_quintile"] == "All wealth quintiles")
-    ]
-    tb_igme = tb_igme.rename(columns={"obs_value": "under_five_mortality"}).drop(
-        columns=["lower_bound", "upper_bound", "sex", "wealth_quintile", "indicator", "unit_of_measure"]
-    )
+
     # Select out columns of interest.
+    columns = {
+        "country": "country",
+        "year": "year",
+        "observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_all_wealth_quintiles": "under_five_mortality",
+    }
+    tb_igme = tb_igme[list(columns)].rename(columns=columns, errors="raise")
     tb_igme["source"] = "igme"
 
     # Load full Gapminder data v11, v11 includes projections, so we need to remove years beyond the last year of IGME data
