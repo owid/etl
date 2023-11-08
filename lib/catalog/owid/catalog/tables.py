@@ -1421,7 +1421,7 @@ def read_rda(
     origin: Optional[Origin] = None,
     underscore: bool = False,
 ) -> Table:
-    parsed = rdata.parser.parse_file(filepath_or_buffer)
+    parsed = rdata.parser.parse_file(filepath_or_buffer)  # type: ignore
     converted = rdata.conversion.convert(parsed)
 
     if table_name not in converted:
