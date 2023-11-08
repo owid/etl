@@ -26,12 +26,20 @@ def run(dest_dir: str) -> None:
     # Set index
     tb = tb.set_index(["year", "country", "conflict_type"])
 
+    # Get country-level data
+    tb_country = ds_garden["ucdp_country"]
+
+    tables = [
+        tb,
+        tb_country,
+    ]
+
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Remove source description so that it doesn't get appended to the dataset description.

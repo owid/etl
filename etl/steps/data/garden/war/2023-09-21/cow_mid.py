@@ -41,11 +41,15 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
+from shared import (
+    add_indicators_extra,
+    aggregate_conflict_types,
+    expand_observations,
+    get_number_of_countries_in_conflict_by_region,
+)
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-
-from .shared import add_indicators_extra, expand_observations
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -85,6 +89,7 @@ def run(dest_dir: str) -> None:
     # Read table from COW codes
     ds_cow_ssm = paths.load_dataset("cow_ssm")
     tb_regions = ds_cow_ssm["cow_ssm_regions"].reset_index()
+    tb_codes = ds_cow_ssm["cow_ssm_countries"]
 
     #
     # Process data.
@@ -98,6 +103,10 @@ def run(dest_dir: str) -> None:
     log.info("war.cow_mid: read and process MIDB table")
     tb_b = process_midb_table(tb_b)
 
+    # Get country-level indicators
+    tb_country = estimate_metrics_country_level(tb_b, tb_codes)
+
+    # Combine tables
     log.info("war.cow_mid: combine tables")
     tb = combine_tables(tb_a, tb_b)
 
@@ -137,9 +146,13 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
+    tables = [
+        tb,
+        tb_country,
+    ]
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -208,10 +221,10 @@ def process_midb_table(tb: Table) -> Table:
         "endyear",
         "region",
     ]
-    tb = tb[COLUMNS_RELEVANT]
+    tb = tb[COLUMNS_RELEVANT + ["ccode", "hostlev"]]
 
     # Drop duplicates
-    tb = tb.drop_duplicates()
+    tb = tb.drop_duplicates(subset=COLUMNS_RELEVANT)
 
     # Add observation for each year
     tb = expand_observations(
@@ -231,6 +244,8 @@ def combine_tables(tb_a: Table, tb_b: Table) -> Table:
 
     Basically, we add region information (from MIDB) to MIDA.
     """
+    tb_b = tb_b.drop(columns=["ccode", "hostlev"])
+
     # Merge
     tb = tb_a.merge(tb_b, on=["dispnum", "year"], how="left")
 
@@ -465,3 +480,88 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     # Drop all-NaN rows
     tb = tb.dropna(subset=columns, how="all")
     return tb
+
+
+def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
+    """Add country-level indicators."""
+    ###################
+    # Participated in #
+    ###################
+    # FLAG YES/NO (country-level)
+
+    # Get table with [year, conflict_type, code]
+    tb_country = tb[["year", "hostlev", "ccode"]].copy()
+    # Rename
+    tb_country = tb_country.rename(columns={"ccode": "id"})
+
+    # Drop rows with code = NaN, drop duplicates
+    tb_country = tb_country.dropna(subset=["id"]).drop_duplicates()
+
+    # Ensure numeric type
+    tb_country["id"] = tb_country["id"].astype(int)
+
+    # Sanity check
+    assert not tb_country.isna().any(axis=None), "There are some NaNs!"
+
+    # Add country name
+    tb_country["country"] = tb_country.apply(lambda x: _get_country_name(tb_codes, x["id"], x["year"]), axis=1)
+    assert tb_country["country"].notna().all(), "Some countries were not found! NaN was set"
+
+    # Add participation flag
+    tb_country["participated_in_conflict"] = 1
+    tb_country["participated_in_conflict"].m.origins = tb["ccode"].m.origins
+
+    # Prepare codes table
+    tb_alltypes = Table(pd.DataFrame({"hostlev": tb_country["hostlev"].unique()}))
+    tb_codes = tb_codes.reset_index().merge(tb_alltypes, how="cross")
+    tb_codes["country"] = tb_codes["country"].astype(str)
+
+    # Combine all Codes entries with CoW MID
+    columns_idx = ["year", "country", "id", "hostlev"]
+    tb_country = tb_codes.merge(tb_country, on=columns_idx, how="outer")
+    tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
+    tb_country = tb_country[columns_idx + ["participated_in_conflict"]]
+
+    # Add "all" hostility level
+    tb_country = aggregate_conflict_types(tb_country, "all", dim_name="hostlev")
+
+    # Only preserve years that make sense
+    tb_country = tb_country[(tb_country["year"] >= tb["year"].min()) & (tb_country["year"] <= tb["year"].max())]
+
+    # Replace hostlev codes with names
+    tb_country["hostlev"] = tb_country["hostlev"].map(HOSTILITY_LEVEL_MAP | {"all": "all"})
+
+    ###################
+    # Participated in #
+    ###################
+    # NUMBER COUNTRIES
+
+    tb_num_participants = get_number_of_countries_in_conflict_by_region(tb_country, "hostlev", "cow")
+
+    # Combine tables
+    tb_country = pr.concat([tb_country, tb_num_participants], ignore_index=True)
+
+    # Drop column `id`
+    tb_country = tb_country.drop(columns=["id"])
+
+    ###############
+    # Final steps #
+    ###############
+
+    # Set index
+    tb_country = tb_country.set_index(["year", "country", "hostlev"], verify_integrity=True)
+    # Set short name
+    tb_country.metadata.short_name = f"{paths.short_name}_country"
+
+    return tb_country
+
+
+def _get_country_name(tb_codes: Table, code: int, year: int) -> str:
+    try:
+        country_name = tb_codes.loc[(code, year)].item()
+    except KeyError:
+        if (code == 20) and (year in [1918, 1919]):
+            country_name = "Canada"
+        else:
+            raise ValueError(f"Unknown country with code {code} for year {year}")
+    return country_name
