@@ -30,10 +30,6 @@ def run(dest_dir: str) -> None:
         )
     ]
     tb_youth = process_vintage_data(tb_youth)
-    tb_youth = tb_youth.rename(
-        columns={"Observation value": "obs_value", "Lower bound": "lower_bound", "Upper bound": "upper_bound"}
-    )
-    tb_youth = tb_youth.replace({"indicator": {"Under-5 mortality rate": "Under-five mortality rate"}})
     # Process current data.
     #
     tb = fix_sub_saharan_africa(tb)
@@ -41,7 +37,6 @@ def run(dest_dir: str) -> None:
     tb = filter_data(tb)
     tb = round_down_year(tb)
     tb = clean_values(tb)
-    tb = convert_to_percentage(tb)
     tb["source"] = "igme (current)"
     # Separate out the variables needed to calculate the under-fifteen mortality rate.
     tb_under_fifteen = tb[
@@ -64,7 +59,9 @@ def run(dest_dir: str) -> None:
         ["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"], verify_integrity=True
     )
 
+    tb = convert_to_percentage(tb)
     # Calculate post neonatal deaths
+
     tb = add_post_neonatal_deaths(tb)
     # Save outputs.
     #
@@ -175,8 +172,15 @@ def process_vintage_data(tb_youth: Table) -> Table:
     tb_youth = clean_values(tb_youth)
     tb_youth["wealth_quintile"] = "All wealth quintiles"
     tb_youth["source"] = "igme (2018)"
-    tb_youth["indicator"] = tb_youth["indicator"].replace({"Mortality rate age 5 to 14": "Mortality rate age 5-14"})
-
+    tb_youth["indicator"] = tb_youth["indicator"].replace(
+        {"Mortality rate age 5 to 14": "Mortality rate age 5-14", "Under-5 mortality rate": "Under-five mortality rate"}
+    )
+    tb_youth["unit_of_measure"] = tb_youth["unit_of_measure"].replace(
+        {"Deaths per 1000 live births": "Deaths per 1,000 live births"}
+    )
+    tb_youth = tb_youth.rename(
+        columns={"Observation value": "obs_value", "Lower bound": "lower_bound", "Upper bound": "upper_bound"}
+    )
     return tb_youth
 
 
@@ -188,17 +192,29 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
 
     If there are 100 deaths per 1000 under fives, then we need to adjust the denominator of the 5-14 age group to take account of this.
     """
-    u5_mortality = tb[tb["indicator"] == "Under-five mortality rate"]
-    # Converting back to per 1000 for the calculations below
-    # u5_mortality[['obs_value', 'lower_bound', 'upper_bound']] = u5_mortality[['obs_value', 'lower_bound', 'upper_bound']].multiply(10)
-    mortality_5_14 = tb[tb["indicator"] == "Mortality rate age 5-14"]
-    youth_mortality = tb[tb["indicator"] == "Under-fifteen deaths"]
+    u5_mortality = tb[
+        (tb["indicator"] == "Under-five mortality rate")
+        & (tb["sex"] == "Both sexes")
+        & (tb["wealth_quintile"] == "All wealth quintiles")
+    ]
+    mortality_5_14 = tb[
+        (tb["indicator"] == "Mortality rate age 5-14")
+        & (tb["sex"] == "Both sexes")
+        & (tb["wealth_quintile"] == "All wealth quintiles")
+    ]
+    youth_mortality = tb[
+        (tb["indicator"] == "Under-fifteen deaths")
+        & (tb["sex"] == "Both sexes")
+        & (tb["wealth_quintile"] == "All wealth quintiles")
+    ]
     youth_mortality = youth_mortality.drop(columns=["source"])
+
     tb_merge = pr.merge(
         u5_mortality,
         mortality_5_14,
         on=["country", "year", "wealth_quintile", "sex"],
         suffixes=("_u5", "_5_14"),
+        how="inner",
     )
     tb_merge["adjusted_5_14_mortality_rate"] = (1000 - tb_merge["obs_value_u5"]) / 1000 * tb_merge["obs_value_5_14"]
     # tb_merge["adjusted_5_14_mortality_rate"] = (100 - tb_merge["obs_value_u5"]) / 100 * tb_merge["obs_value_5_14"]
@@ -236,7 +252,7 @@ def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -
 
     """
     assert any(tb["source"] == preferred_source)
-
+    tb = tb.copy(deep=True)
     duplicate_rows = tb.duplicated(subset=dimensions, keep=False)
 
     tb_no_duplicates = tb[~duplicate_rows]
@@ -245,7 +261,7 @@ def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -
 
     tb_duplicates_removed = tb_duplicates[tb_duplicates["source"] == preferred_source]
 
-    tb = pr.concat([tb_no_duplicates, tb_duplicates_removed])
+    tb = pr.concat([tb_no_duplicates, tb_duplicates_removed]).reset_index()
 
     assert len(tb[tb.duplicated(subset=dimensions, keep=False)]) == 0, "Duplicates still in table!"
 
