@@ -60,8 +60,16 @@ def format_subtable(tb: Table) -> Table:
 
     # Extract country name
     regex = r"M_[M|F]_([A-Z]{3})"
-    country_F = re.match(regex, tb.columns[1]).group(1)
-    country_M = re.match(regex, tb.columns[1]).group(1)
+    country_F = re.match(regex, tb.columns[1])
+    if country_F:
+        country_F = country_F.group(1)
+    else:
+        raise ValueError("Could not extract country name from column name (Female)!")
+    country_M = re.match(regex, tb.columns[1])
+    if country_M:
+        country_M = country_M.group(1)
+    else:
+        raise ValueError("Could not extract country name from column name (Male)!")
     assert country_F == country_M, "Country names in triplet should be the same!"
 
     # Clean column names
