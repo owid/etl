@@ -1,18 +1,28 @@
 meta:
-  name: World Bank EdStats (2023)
-  publication_year: 2023
-  source_name: World Bank (2023)
-  source_published_by: World Bank Education Statistics (2023)
-  url: https://databank.worldbank.org/reports.aspx?source=Education%20Statistics
-  source_data_url: https://databank.worldbank.org/data/download/EdStats_CSV.zip
-  license_url: Creative Commons Attribution 4.0
-  license_name: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
-  date_accessed: 2023-07-26
-  is_public: true
-  description: |
-    The World Bank EdStats database holds over 4,000 internationally comparable indicators that describe education access, progression, completion, literacy, teachers, population, and expenditures. The indicators cover the education cycle from pre-primary to vocational and tertiary education. The database also holds learning outcome data from international and regional learning assessments (e.g. PISA, TIMSS, PIRLS), equity data from household surveys, and projection/attainment data to 2050. For further information, please visit the EdStats website - https://datatopics.worldbank.org/education/.
+  origin:
+    # Data product / Snapshot
+    title: World Bank Education Statistics (EdStats)
+    description: |-
+      The **World Bank EdStats** offers a comprehensive array of over 4,000 internationally comparable indicators related to education access, progression, completion, literacy, teachers, demographics, and expenditures. It covers the education cycle from pre-primary to vocational and tertiary education, including data on learning outcomes from assessments like PISA, TIMSS, PIRLS, equity data from household surveys, and educational projections up to 2050.
+    date_published: '2023'
+    version_producer: '2023'
+
+    # Citation
+    producer: World Bank
+    citation_full: |-
+      World Bank Education Statistics (EdStats), World Bank, 2023. Licence: CC BY 4.0.
+    attribution_short: World Bank
+
+    # Files
+    url_main: https://databank.worldbank.org/reports.aspx?source=Education%20Statistics
+    date_accessed: 2023-07-26
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
 wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
-- md5: d9cc0b529e0871fe7de2c3f7f519f5cf
-  size: 2840291212
+- md5: 1b7d02fb9b5808382975353a2d085d74
+  size: 4802
   path: education.csv
