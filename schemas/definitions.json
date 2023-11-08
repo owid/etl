@@ -379,6 +379,9 @@
             "Must end with a period."
           ],
           [
+            "Must include (wherever is appropriate) the year of publication, i.e. the year given in `date_published`."
+          ],
+          [
             "If the producer specified how to cite them, this field should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits.",
             {
               "type": "list",
