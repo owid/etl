@@ -106,8 +106,8 @@ def calculate_share_surviving_first_five_years(tb_combined: Table) -> Table:
 
     # Add global labels and calculate the share of children surviving/dying in their first five years
 
-    tb_world["share_dying_first_five_years"] = tb_world["under_five_mortality"] / 10
-    tb_world["share_surviving_first_five_years"] = 100 - (tb_world["under_five_mortality"] / 10)
+    tb_world["share_dying_first_five_years"] = tb_world["under_five_mortality"]
+    tb_world["share_surviving_first_five_years"] = 100 - (tb_world["under_five_mortality"])
 
     tb_world = tb_world.drop(columns=["under_five_mortality"])
 
