@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Modal age at death
+    description: |-
+      Indicators based a fixed “old” age threshold have been widely used for assessing socioeconomic disparities in mortality at older ages. Interpretation of long-term trends and determinants of these indicators is challenging because mortality above a fixed age that in the past would have reflected old age deaths is today mixing premature and old-age mortality. We propose the modal (i.e., most frequent) age at death, M, an indicator increasingly recognized in aging research, but which has been infrequently used for monitoring mortality disparities at older ages. We use mortality and population exposure data by occupational class over the 1971-2017 period from Finnish register data. The modal age and life expectancy indicators are estimated from mortality rates smoothed with penalized B-splines. Over the 1971-2017 period, occupational class disparities in life expectancy at 65 and 75 widened while disparities in M remained relatively stable. The proportion of the group surviving to the modal age was constant across time and occupational class. In contrast, the proportion surviving to age 65 and 75 has roughly doubled since 1971 and showed strong occupational class differences. Increasing socioeconomic disparities in mortality based on fixed old age thresholds may be a feature of changing selection dynamics in a context of overall declining mortality. Unlike life expectancy at a selected fixed old age, M compares individuals with similar survival chances over time and across occupational classes. This property makes trends and differentials in M easier to interpret in countries where old-age survival has improved significantly.
+    date_published: 2022-02-09
+
+    # Citation
+    producer: Diaconu et al.
+    citation_full: |-
+      Diaconu, V., Van Raalte, A., & Martikainen, P. (2022). Why we should monitor disparities in old-age mortality with the modal age at death. PLOS ONE, 17(2), e0263626. https://doi.org/10.1371/journal.pone.0263626
+
+    # Files
+    url_main: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0263626
+    date_accessed: 2023-11-08
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0263626
+
+wdir: ../../../data/snapshots/demography/2023-11-08
+outs:
+- md5: bd5f22f3398638824af970ede7f4292c
+  size: 15262
+  path: modal_age_death.xlsx

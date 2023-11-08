@@ -139,3 +139,11 @@ steps:
     - data://meadow/demography/2023-11-08/le_sex_gap_age_contribution
   data://grapher/demography/2023-11-08/le_sex_gap_age_contribution:
     - data://garden/demography/2023-11-08/le_sex_gap_age_contribution
+
+  # Modal age at death
+  data://meadow/demography/2023-11-08/modal_age_death:
+    - snapshot://demography/2023-11-08/modal_age_death.xlsx
+  data://garden/demography/2023-11-08/modal_age_death:
+    - data://meadow/demography/2023-11-08/modal_age_death
+  data://grapher/demography/2023-11-08/modal_age_death:
+    - data://garden/demography/2023-11-08/modal_age_death
