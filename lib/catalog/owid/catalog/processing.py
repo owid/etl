@@ -32,5 +32,5 @@ __all__ = [
     "read_json",
     "read_fwf",
     "read_stata",
-    "read_rda"
+    "read_rda",
 ]
