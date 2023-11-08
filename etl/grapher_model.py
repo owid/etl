@@ -1390,8 +1390,11 @@ def _remap_variable_ids(config: Union[List, Dict[str, Any]], remap_ids: Dict[int
     if isinstance(config, dict):
         out = {}
         for k, v in config.items():
-            if k in ("variableId", "columnSlug"):
+            if k == "variableId":
                 out[k] = remap_ids[int(v)]
+            # columnSlug is actually a variable id, but stored as a string (it wasn't a great decision)
+            elif k == "columnSlug":
+                out[k] = str(remap_ids[int(v)])
             else:
                 out[k] = _remap_variable_ids(v, remap_ids)
         return out
