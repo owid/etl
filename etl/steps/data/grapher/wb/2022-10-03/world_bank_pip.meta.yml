@@ -17,7 +17,6 @@ definitions:
         date_published: '2022-10-03'
 
     presentation:
-      title_variant: World Bank, PIP
       attribution_short: World Bank
       grapher_config:
         originUrl: https://ourworldindata.org/poverty
@@ -53,11 +52,6 @@ tables:
             - Economic Growth
             - Economic Inequality
           faqs:
-            # NOTE: there's an image, but I'm getting an error
-            # Image error
-            # Image with filename "Five-income-distributions-national-poverty-and-IPL-2.png" not found. This block will not render when the page is baked.
-            #
-            # perhaps this will be rendered correctly in production?
             - fragment_id: poverty-international-poverty-line
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
             - fragment_id: poverty-international-dollars

@@ -7,7 +7,7 @@ definitions:
     origins:
       - producer: V-Dem
         version_producer: "v13"
-        title: Democracy and Human rights - OWID based on Varieties of Democracy (v13) and Regimes of the World
+        title: Democracy and Human rights, OWID based on Varieties of Democracy (v13) and Regimes of the World
         description: |-
           The Varieties of Democracy (V-Dem) project publishes data and research on democracy and human rights.
 
@@ -59,7 +59,6 @@ tables:
 
           All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
         presentation:
-          title_variant: V-Dem
           attribution_short: V-Dem
           topic_tags:
             - Democracy

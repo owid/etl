@@ -15,18 +15,26 @@ logger = structlog.get_logger()
 
 S3_OBJECT = Union[dict, str, pd.DataFrame]
 
+R2_ENDPOINT = os.environ.get(
+    "R2_ENDPOINT", "https://078fcdfed9955087315dd86792e71a7e.r2.cloudflarestorage.com"
+)
 AWS_PROFILE = os.environ.get("AWS_PROFILE", "default")
 
 
 class S3:
     """S3 API class."""
 
-    SPACES_ENDPOINT = "https://nyc3.digitaloceanspaces.com"
-    S3_BASE = "s3://{bucket}.nyc3.digitaloceanspaces.com"
-    HTTPS_BASE = "https://{bucket}.nyc3.digitaloceanspaces.com"
-
     def __init__(self, profile_name: str = AWS_PROFILE) -> None:
         self.client = self.connect(profile_name)
+
+    def s3_base(self, bucket: str) -> str:
+        return f"s3://{bucket}"
+
+    def http_base(self, bucket: str) -> str:
+        if bucket.startswith("owid-"):
+            return f"https://{bucket.replace('owid-', '')}.owid.io"
+        else:
+            raise NotImplementedError(f"Missing HTTP base for bucket {bucket}")
 
     def connect(self, profile_name: str = AWS_PROFILE) -> Any:
         """Return a connection to Walden's DigitalOcean space."""
@@ -37,7 +45,7 @@ class S3:
         session = boto3.Session(profile_name=profile_name)
         client = session.client(
             service_name="s3",
-            endpoint_url=self.SPACES_ENDPOINT,
+            endpoint_url=R2_ENDPOINT,
         )
         return client
 
@@ -122,9 +130,9 @@ class S3:
             logger.info("UPLOADED", s3_path=s3_path, local_path=local_path)
 
         if public:
-            base = self.HTTPS_BASE.format(bucket=bucket_name)
+            base = self.http_base(bucket_name)
         else:
-            base = self.S3_BASE.format(bucket=bucket_name)
+            base = self.s3_base(bucket_name)
         return f"{base}/{s3_file}"
 
     def download_from_s3(
@@ -157,6 +165,19 @@ class S3:
             logger.info("DOWNLOADED", s3_path=s3_path, local_path=local_path)
 
         return
+
+    def delete_from_s3(self, s3_path: str, quiet: bool = False) -> None:
+        """Delete object at given S3 URL."""
+        bucket_name, s3_file = s3_path_to_bucket_key(s3_path)
+
+        try:
+            self.client.delete_object(Bucket=bucket_name, Key=s3_file)
+        except ClientError as e:
+            logger.error(e)
+            raise DeleteError(e)
+
+        if not quiet:
+            logger.info("DELETED", s3_path=s3_path)
 
     def obj_to_s3(
         self, obj: S3_OBJECT, s3_path: str, public: bool = False, **kwargs: Any
@@ -305,5 +326,11 @@ class UploadError(Exception):
 
 class DownloadError(Exception):
     """Download error."""
+
+    pass
+
+
+class DeleteError(Exception):
+    """Delete error."""
 
     pass

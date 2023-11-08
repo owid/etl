@@ -24,17 +24,11 @@ load_dotenv(ENV_FILE)
 # - run steps in the same process (speeding up ETL)
 DEBUG = env.get("DEBUG") in ("True", "true", "1")
 
-# publishing to OWID's public data catalog
-S3_BUCKET = "owid-catalog"
-S3_REGION_NAME = "nyc3"
-S3_ENDPOINT_URL = "https://nyc3.digitaloceanspaces.com"
-S3_HOST = "nyc3.digitaloceanspaces.com"
-S3_ACCESS_KEY = env.get("OWID_ACCESS_KEY")
-S3_SECRET_KEY = env.get("OWID_SECRET_KEY")
-
-# publishing to R2 public data catalog
+# publishing to OWID's public data catalog in R2
+R2_BUCKET = "owid-catalog"
 R2_REGION_NAME = "auto"
-R2_ENDPOINT_URL = env.get("R2_ENDPOINT_URL")
+R2_ENDPOINT_URL = env.get("R2_ENDPOINT_URL", "https://078fcdfed9955087315dd86792e71a7e.r2.cloudflarestorage.com")
+# if R2_ACCESS_KEY and R2_SECRET_KEY are null, we use credentials from ~/.aws/config
 R2_ACCESS_KEY = env.get("R2_ACCESS_KEY")
 R2_SECRET_KEY = env.get("R2_SECRET_KEY")
 
@@ -48,6 +42,16 @@ DB_PASS = env.get("DB_PASS", "")
 
 # metaplay config
 METAPLAY_PORT = int(env.get("METAPLAY_PORT", "8051"))
+
+# if STAGING is used, override ENV values
+if env.get("STAGING"):
+    staging = env.get("STAGING")
+    DB_USER = "owid"
+    DB_NAME = "owid"
+    DB_PASS = ""
+    DB_PORT = 3306
+    DB_HOST = f"staging-site-{staging}"
+    DATA_API_ENV = f"staging-site-{staging}"
 
 
 def get_username():

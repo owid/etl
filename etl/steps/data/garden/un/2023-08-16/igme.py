@@ -26,7 +26,9 @@ def run(dest_dir: str) -> None:
     tb_vintage = ds_vintage["igme"].reset_index()
     tb_youth = tb_vintage[tb_vintage["indicator_name"].isin(["Deaths age 5 to 14", "Mortality rate age 5 to 14"])]
     tb_youth = process_vintage_data(tb_youth)
-
+    tb_youth = tb_youth.rename(
+        columns={"Observation value": "obs_value", "Lower bound": "lower_bound", "Upper bound": "upper_bound"}
+    )
     # Process current data.
     #
     tb = fix_sub_saharan_africa(tb)
@@ -34,9 +36,7 @@ def run(dest_dir: str) -> None:
     tb = filter_data(tb)
     tb = round_down_year(tb)
     tb = clean_values(tb)
-    tb = tb.rename(
-        columns={"obs_value": "Observation value", "lower_bound": "Lower bound", "upper_bound": "Upper bound"}
-    )
+    tb = convert_to_percentage(tb)
     tb["source"] = "igme (current)"
     # Separate out the variables needed to calculate the under-fifteen mortality rate.
     tb_under_fifteen = tb[
@@ -59,37 +59,90 @@ def run(dest_dir: str) -> None:
     )
 
     tb_com = calculate_under_fifteen_deaths(tb_com)
+    tb_com = calculate_under_fifteen_mortality_rates(tb_com)
+    tb_com = tb_com.set_index(
+        ["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"], verify_integrity=True
+    )
 
-    # Pivot the table so that the variables are in columns.
-    tb = pivot_table_and_format(tb)
     # Calculate post neonatal deaths
     tb = add_post_neonatal_deaths(tb)
-    tb_com = pivot_table_and_format(tb_com)
-
-    tb_com = calculate_under_fifteen_mortality_rates(tb_com)
-    # Add some metadata to the variables. Getting the unit from the column name and inferring the number of decimal places from the unit.
-    # If it contains " per " we know it is a rate and should have 1 d.p., otherwise it should be an integer.
-
-    tb = add_metadata_and_set_index(tb)
-    tb_com = add_metadata_and_set_index(tb_com)
-
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_com], default_metadata=ds_meadow.metadata)
+    tb = tb.set_index(
+        ["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"], verify_integrity=True
+    ).drop(columns=["source"])
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb, tb_com], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def convert_to_percentage(tb: Table) -> Table:
+    """
+    Convert the units which are given as 'per 1,000...' into percentages.
+    """
+    rate_conversions = {
+        "Deaths per 1,000 live births": "Deaths per 100 live births",
+        "Deaths per 1000 children aged 1": "Deaths per 100 children aged 1",
+        "Deaths per 1000 children aged 5": "Deaths per 100 children aged 5",
+        "Deaths per 1000 children aged 10": "Deaths per 100 children aged 10",
+        "Deaths per 1000 children aged 15": "Deaths per 100 children aged 15",
+        "Deaths per 1000 children aged 20": "Deaths per 100 children aged 20",
+        "Stillbirths per 1000 births": "Stillbirths per 100 births",
+    }
+    # Dividing values of selected rows by 10
+
+    selected_rows = tb["unit_of_measure"].isin(rate_conversions.keys())
+    tb.loc[selected_rows, ["obs_value", "lower_bound", "upper_bound"]] = tb.loc[
+        selected_rows, ["obs_value", "lower_bound", "upper_bound"]
+    ].div(10)
+
+    tb = tb.replace({"unit_of_measure": rate_conversions})
+
+    return tb
 
 
 def add_post_neonatal_deaths(tb: Table) -> Table:
     """
     Calculate the deaths for the post-neonatal age-group, 28 days - 1 year
     """
-    tb["Observation value-Number of deaths-Post-neonatal deaths-Both sexes-All wealth quintiles"] = (
-        tb["Observation value-Number of deaths-Infant deaths-Both sexes-All wealth quintiles"]
-        - tb["Observation value-Number of deaths-Neonatal deaths-Both sexes-All wealth quintiles"]
+    infant_deaths = tb[(tb["indicator"] == "Infant deaths")]
+    neonatal_deaths = tb[(tb["indicator"] == "Neonatal deaths")]
+
+    tb_merge = pr.merge(
+        infant_deaths,
+        neonatal_deaths,
+        on=["country", "year", "wealth_quintile", "sex", "unit_of_measure", "source"],
+        suffixes=("_infant", "_neonatal"),
     )
+    tb_merge["obs_value"] = tb_merge["obs_value_infant"] - tb_merge["obs_value_neonatal"]
+    tb_merge["lower_bound"] = tb_merge["lower_bound_infant"] - tb_merge["lower_bound_neonatal"]
+    tb_merge["upper_bound"] = tb_merge["upper_bound_infant"] - tb_merge["upper_bound_neonatal"]
+    tb_merge["indicator"] = "Post-neonatal deaths"
+    result_tb = tb_merge[
+        [
+            "country",
+            "year",
+            "indicator",
+            "sex",
+            "unit_of_measure",
+            "wealth_quintile",
+            "obs_value",
+            "lower_bound",
+            "upper_bound",
+            "source",
+        ]
+    ]
+    # There are some cases where the neonatal deaths are greater than the infant deaths, so we need to set these to 0, e.g. for some years in Monaco.
+    # Perhaps due to the transitory nature of the population.
+    result_tb[["obs_value", "lower_bound", "upper_bound"]] = result_tb[
+        ["obs_value", "lower_bound", "upper_bound"]
+    ].clip(lower=0)
+    assert all(result_tb["obs_value"] >= 0), "Negative values in post-neonatal deaths!"
+    tb = pr.concat([tb, result_tb])
 
     return tb
 
@@ -104,17 +157,6 @@ def add_metadata_and_set_index(tb: Table) -> Table:
         else:
             tb[col].metadata.display = {"numDecimalPlaces": 0}
     tb = tb.set_index(["country", "year"], verify_integrity=True)
-    return tb
-
-
-def pivot_table_and_format(tb: Table) -> Table:
-    tb = tb.pivot(
-        index=["country", "year"],
-        values=["Observation value", "Lower bound", "Upper bound"],
-        columns=["unit_of_measure", "indicator", "sex", "wealth_quintile"],
-    )
-    tb.columns = ["-".join(col).strip() for col in tb.columns.values]
-    tb = tb.reset_index()
     return tb
 
 
@@ -146,31 +188,25 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
 
     If there are 100 deaths per 1000 under fives, then we need to adjust the denominator of the 5-14 age group to take account of this.
     """
-    tb["adjusted_5_14_mortality_rate"] = (
-        (
-            1000
-            - tb[
-                "Observation value-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-All wealth quintiles"
-            ]
-        )
-        / 1000
-    ) * tb["Observation value-Deaths per 1000 children aged 5-Mortality rate age 5-14-Both sexes-All wealth quintiles"]
+    u5_mortality = tb[tb["indicator"] == "Under-five deaths"]
+    mortality_5_14 = tb[tb["indicator"] == "Mortality rate age 5-14"]
 
-    tb[
-        "Observation value-Deaths per 1,000 live births-Under-fifteen mortality rate-Both sexes-All wealth quintiles"
-    ] = (
-        tb["Observation value-Deaths per 1,000 live births-Under-five mortality rate-Both sexes-All wealth quintiles"]
-        + tb["adjusted_5_14_mortality_rate"]
+    tb_merge = pr.merge(
+        u5_mortality,
+        mortality_5_14,
+        on=["country", "year", "wealth_quintile", "sex"],
+        suffixes=("_u5", "_5_14"),
     )
-    tb = tb[
-        [
-            "country",
-            "year",
-            "Observation value-Deaths per 1,000 live births-Under-fifteen mortality rate-Both sexes-All wealth quintiles",
-        ]
-    ]
-    tb.metadata.short_name = "igme_under_fifteen_mortality_rate"
-    return tb
+    tb_merge["adjusted_5_14_mortality_rate"] = (100 - tb_merge["obs_value_u5"]) / 100 * tb_merge["obs_value_5_14"]
+    tb_merge["obs_value"] = tb_merge["obs_value_u5"] + tb_merge["adjusted_5_14_mortality_rate"]
+    tb_merge["indicator"] = "Under-fifteen mortality rate"
+    tb_merge["unit_of_measure"] = "Deaths per 1,000 live births"
+
+    result_tb = tb_merge[["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile", "obs_value"]]
+    result_tb = result_tb[result_tb["indicator"].isin(["Under-fifteen mortality rate"])]
+    result_tb.metadata.short_name = "igme_under_fifteen_mortality"
+
+    return result_tb
 
 
 def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source: str) -> Table:
@@ -219,9 +255,9 @@ def calculate_under_fifteen_deaths(tb: Table) -> Table:
         .drop(columns="indicator")
         .rename(
             columns={
-                "Observation value": "under_five_mortality",
-                "Lower bound": "under_five_mortality_lb",
-                "Upper bound": "under_five_mortality_ub",
+                "obs_value": "under_five_mortality",
+                "lower_bound": "under_five_mortality_lb",
+                "upper_bound": "under_five_mortality_ub",
             }
         )
     )
@@ -230,9 +266,9 @@ def calculate_under_fifteen_deaths(tb: Table) -> Table:
         .drop(columns="indicator")
         .rename(
             columns={
-                "Observation value": "five_to_fourteen_mortality",
-                "Lower bound": "five_to_fourteen_mortality_lb",
-                "Upper bound": "five_to_fourteen_mortality_ub",
+                "obs_value": "five_to_fourteen_mortality",
+                "lower_bound": "five_to_fourteen_mortality_lb",
+                "upper_bound": "five_to_fourteen_mortality_ub",
             }
         )
     )
@@ -254,9 +290,9 @@ def calculate_under_fifteen_deaths(tb: Table) -> Table:
         ]
     ).rename(
         columns={
-            "under_fifteen_mortality": "Observation value",
-            "under_fifteen_mortality_lb": "Lower bound",
-            "under_fifteen_mortality_ub": "Upper bound",
+            "under_fifteen_mortality": "obs_value",
+            "under_fifteen_mortality_lb": "lower_bound",
+            "under_fifteen_mortality_ub": "upper_bound",
         }
     )
     tb_u15["indicator"] = "Under-fifteen deaths"
@@ -272,7 +308,11 @@ def filter_data(tb: Table) -> Table:
     """
     # Keeping only the UN IGME estimates and the total wealth quintile
     tb = tb.loc[(tb["series_name"] == "UN IGME estimate")]
-
+    tb = tb[
+        -tb["indicator"].isin(
+            ["Progress towards SDG in neonatal mortality rate", "Progress towards SDG in under-five mortality rate"]
+        )
+    ]
     cols_to_keep = [
         "country",
         "year",

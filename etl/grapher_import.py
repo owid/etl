@@ -195,6 +195,7 @@ def upsert_table(
     dataset_upsert_result: DatasetUpsertResult,
     catalog_path: Optional[str] = None,
     dimensions: Optional[gm.Dimensions] = None,
+    verbose: bool = True,
 ) -> VariableUpsertResult:
     """This function is used to put one ready to go formatted Table (i.e.
     in the format (year, entityId, value)) into mysql. The metadata
@@ -301,10 +302,11 @@ def upsert_table(
 
         # upload them to R2
         with ThreadPoolExecutor() as executor:
-            executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path(), r2=True)
-            executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path(), r2=True)
+            executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path())
+            executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path())
 
-        log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
+        if verbose:
+            log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
 
         return VariableUpsertResult(db_variable_id, source_id)  # type: ignore
 
