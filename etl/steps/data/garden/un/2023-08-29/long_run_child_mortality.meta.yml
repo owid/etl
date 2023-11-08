@@ -4,7 +4,6 @@ definitions:
       topic_tags:
         - Child & Infant Mortality
 
-
 dataset:
   title: Long-run child mortality (Gapminder; UN IGME)
 tables:
@@ -12,7 +11,8 @@ tables:
     variables:
       under_five_mortality:
         title: Under-five mortality rate (full)
-        unit: deaths per 1,000 live births
+        unit: deaths per 100 live births
+        short_unit: "%"
         display:
           numDecimalPlaces: 1
       share_dying_first_five_years:
@@ -25,6 +25,7 @@ tables:
     variables:
       under_five_mortality:
         title: Under-five mortality rate (selected)
-        unit: deaths per 1,000 live births
+        unit: deaths per 100 live births
+        short_unit: "%"
         display:
           numDecimalPlaces: 1
