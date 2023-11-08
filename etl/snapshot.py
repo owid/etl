@@ -210,6 +210,7 @@ class Snapshot:
     def extract(self, output_dir: Path | str):
         decompress_file(self.path, output_dir)
 
+
 @pruned_json
 @dataclass_json
 @dataclass
