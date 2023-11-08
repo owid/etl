@@ -26,7 +26,9 @@ def run(dest_dir: str) -> None:
     tb_vintage = ds_vintage["igme"].reset_index()
     tb_youth = tb_vintage[tb_vintage["indicator_name"].isin(["Deaths age 5 to 14", "Mortality rate age 5 to 14"])]
     tb_youth = process_vintage_data(tb_youth)
-
+    tb_youth = tb_youth.rename(
+        columns={"Observation value": "obs_value", "Lower bound": "lower_bound", "Upper bound": "upper_bound"}
+    )
     # Process current data.
     #
     tb = fix_sub_saharan_africa(tb)
@@ -60,7 +62,7 @@ def run(dest_dir: str) -> None:
     tb_com = calculate_under_fifteen_mortality_rates(tb_com)
     tb_com = tb_com.set_index(
         ["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"], verify_integrity=True
-    ).drop(columns=["source"])
+    )
 
     # Calculate post neonatal deaths
     tb = add_post_neonatal_deaths(tb)
@@ -192,7 +194,7 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
     tb_merge = pr.merge(
         u5_mortality,
         mortality_5_14,
-        on=["country", "year", "wealth_quintile", "sex", "source"],
+        on=["country", "year", "wealth_quintile", "sex"],
         suffixes=("_u5", "_5_14"),
     )
     tb_merge["adjusted_5_14_mortality_rate"] = (100 - tb_merge["obs_value_u5"]) / 100 * tb_merge["obs_value_5_14"]
@@ -200,19 +202,8 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
     tb_merge["indicator"] = "Under-fifteen mortality rate"
     tb_merge["unit_of_measure"] = "Deaths per 1,000 live births"
 
-    result_tb = tb_merge[
-        [
-            "country",
-            "year",
-            "indicator",
-            "sex",
-            "unit_of_measure",
-            "wealth_quintile",
-            "obs_value",
-            "source",
-        ]
-    ]
-    result_tb = result_tb[result_tb["indicator"].isin(["Under-fifteen mortality rate", "Under-fifteen deaths"])]
+    result_tb = tb_merge[["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile", "obs_value"]]
+    result_tb = result_tb[result_tb["indicator"].isin(["Under-fifteen mortality rate"])]
     result_tb.metadata.short_name = "igme_under_fifteen_mortality"
 
     return result_tb
@@ -264,9 +255,9 @@ def calculate_under_fifteen_deaths(tb: Table) -> Table:
         .drop(columns="indicator")
         .rename(
             columns={
-                "Observation value": "under_five_mortality",
-                "Lower bound": "under_five_mortality_lb",
-                "Upper bound": "under_five_mortality_ub",
+                "obs_value": "under_five_mortality",
+                "lower_bound": "under_five_mortality_lb",
+                "upper_bound": "under_five_mortality_ub",
             }
         )
     )
@@ -275,9 +266,9 @@ def calculate_under_fifteen_deaths(tb: Table) -> Table:
         .drop(columns="indicator")
         .rename(
             columns={
-                "Observation value": "five_to_fourteen_mortality",
-                "Lower bound": "five_to_fourteen_mortality_lb",
-                "Upper bound": "five_to_fourteen_mortality_ub",
+                "obs_value": "five_to_fourteen_mortality",
+                "lower_bound": "five_to_fourteen_mortality_lb",
+                "upper_bound": "five_to_fourteen_mortality_ub",
             }
         )
     )
@@ -299,9 +290,9 @@ def calculate_under_fifteen_deaths(tb: Table) -> Table:
         ]
     ).rename(
         columns={
-            "under_fifteen_mortality": "Observation value",
-            "under_fifteen_mortality_lb": "Lower bound",
-            "under_fifteen_mortality_ub": "Upper bound",
+            "under_fifteen_mortality": "obs_value",
+            "under_fifteen_mortality_lb": "lower_bound",
+            "under_fifteen_mortality_ub": "upper_bound",
         }
     )
     tb_u15["indicator"] = "Under-fifteen deaths"
