@@ -302,8 +302,8 @@ def upsert_table(
 
         # upload them to R2
         with ThreadPoolExecutor() as executor:
-            executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path(), r2=True)
-            executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path(), r2=True)
+            executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path())
+            executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path())
 
         if verbose:
             log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
