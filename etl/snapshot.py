@@ -26,7 +26,7 @@ from tenacity import Retrying
 from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 
-from etl import paths
+from etl import config, paths
 from etl.files import yaml_dump
 
 dvc = None
@@ -42,8 +42,18 @@ def get_dvc():
     global dvc
 
     if dvc is None:
-        dvc = Repo(paths.BASE_DIR)
-
+        dvc = Repo(
+            paths.BASE_DIR,
+            config={
+                "remote": {
+                    "public": {
+                        "access_key_id": config.R2_ACCESS_KEY,
+                        "secret_access_key": config.R2_SECRET_KEY,
+                        "region": "auto",
+                    }
+                }
+            },
+        )
     return dvc
 
 
