@@ -625,23 +625,23 @@ def run_checks() -> None:
         st.success(text)
 
     # S3 conncetion
-    # error, buckets_or_error = _get_s3_buckets()
-    # if error:
-    #     text = "Error connecting to S3:\n{}".format(buckets_or_error)
-    #     st.error(text)
-    #     st.toast(text + text_reference_expander, icon="❌")
-    #     raise buckets_or_error
-    # else:
-    #     text = "S3 connection successful"
-    #     # st.toast(text, icon="✅")
-    #     st.success(text)
+    error, buckets_or_error = _get_s3_buckets()
+    if error:
+        text = "Error connecting to S3:\n{}".format(buckets_or_error)
+        st.error(text)
+        st.toast(text + text_reference_expander, icon="❌")
+        raise buckets_or_error
+    else:
+        text = "S3 connection successful"
+        # st.toast(text, icon="✅")
+        st.success(text)
 
-    #     bucket_names = [b["Name"] for b in buckets_or_error]  # type: ignore
-    #     if "owid-catalog" not in bucket_names:
-    #         text = "`owid-catalog` bucket not found"
-    #         st.error(text)
-    #         st.toast(text + text_reference_expander, icon="❌")
-    #         raise Exception()
+        bucket_names = [b["Name"] for b in buckets_or_error]  # type: ignore
+        if "owid-catalog" not in bucket_names:
+            text = "`owid-catalog` bucket not found"
+            st.error(text)
+            st.toast(text + text_reference_expander, icon="❌")
+            raise Exception()
 
 
 def update_state() -> None:
