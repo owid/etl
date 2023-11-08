@@ -21,6 +21,7 @@ from owid.catalog.meta import (
     pruned_json,
 )
 from owid.datautils import dataframes
+from owid.datautils.io import decompress_file
 from owid.walden import files
 from tenacity import Retrying
 from tenacity.retry import retry_if_exception_type
@@ -206,6 +207,8 @@ class Snapshot:
         """Return an Excel file object ready for parsing."""
         return pr.ExcelFile(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
+    def extract(self, output_dir: Path | str):
+        decompress_file(self.path, output_dir)
 
 @pruned_json
 @dataclass_json
