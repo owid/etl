@@ -6,11 +6,11 @@ definitions:
     sources: []
     origins:
       - producer: World Bank World Development Indicators
-        title: UNICEF, World Health Organization and World Bank
+        title: UNICEF; World Health Organization; World Bank
         description: |-
           The World Development Indicators (WDI) is the World Bank’s primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
 
-          \[Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)\]
+          [Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)]
         citation_full: TBD
         url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
         url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
@@ -58,11 +58,11 @@ tables:
           Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two standard deviations below the median for the international reference population ages 0-59 months. For children up to two years old height is measured by recumbent length. For older children height is measured by stature while standing. The data are based on the WHO's new child growth standards released in 2006.
 
 
-          \[Text from World Bank World Development Indicators [metadata glossary](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SH.STA.STNT.ZS)\]
+          [Text from World Bank World Development Indicators [metadata glossary](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SH.STA.STNT.ZS)]
         presentation:
           title_public: Share of children who are stunted
           # title_variant: UNICEF/WHO
-          attribution: UNICEF, World Health Organization and World Bank
+          attribution: UNICEF; World Health Organization; World Bank
           attribution_short: UNICEF/WHO (via World Bank)
           topic_tags:
             - Hunger and Undernourishment
