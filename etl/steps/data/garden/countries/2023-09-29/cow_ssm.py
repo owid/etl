@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import Optional, cast
+
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -66,12 +68,16 @@ def run(dest_dir: str) -> None:
     # Combine tables
     tb_regions = tb_regions.merge(tb_pop, how="left", on=["region", "year"])
 
+    # Get table with id, year, country (whenever that country was present)
+    tb_countries = create_table_country_years(tb)
+
     # Group tables and format tables
     tables = [
         tb_system.set_index(["ccode", "year"], verify_integrity=True).sort_index(),
         tb_states.set_index(["ccode", "styear", "stmonth", "stday", "endyear", "endmonth", "endday"]).sort_index(),
         tb_majors.set_index(["ccode", "styear", "stmonth", "stday", "endyear", "endmonth", "endday"]).sort_index(),
         tb_regions.set_index(["region", "year"], verify_integrity=True).sort_index(),
+        tb_countries.set_index(["id", "year"], verify_integrity=True).sort_index(),
     ]
 
     #
@@ -170,3 +176,69 @@ def add_population_to_table(tb: Table, ds_pop: Dataset, country_col: str = "coun
     tb_pop = pr.concat([tb_pop_regions, tb_pop_world], ignore_index=True)
 
     return tb_pop
+
+
+def create_table_country_years(tb: Table) -> Table:
+    """Create table with each country present in a year."""
+    tb_countries = tb[["ccode", "year", "statenme"]].copy()
+
+    tb_countries = tb_countries.rename(columns={"ccode": "id", "statenme": "country"})
+
+    # define mask for last year
+    mask = tb_countries["year"] == EXPECTED_LAST_YEAR
+
+    tb_last = fill_timeseries(
+        tb_countries[mask].drop(columns="year"),
+        EXPECTED_LAST_YEAR + 1,
+        LAST_YEAR,
+    )
+
+    tb = pr.concat([tb_countries, tb_last], ignore_index=True, short_name="cow_ssm_countries")
+
+    tb["year"] = tb["year"].astype(int)
+    return tb
+
+
+def fill_timeseries(
+    tb: Table,
+    year_min: Optional[int],
+    year_max: Optional[int],
+    default_min: bool = False,
+    default_max: bool = False,
+    col_year_start: Optional[str] = None,
+    col_year_end: Optional[str] = None,
+    filter_times: bool = False,
+) -> Table:
+    """Complement table with missing years."""
+    # Get starting year
+    if default_min:
+        if col_year_start in tb.columns:
+            year_min = tb[col_year_start].min()
+        else:
+            raise ValueError(f"{col_year_start} not in table columns!")
+    elif year_min is None:
+        raise ValueError("Either `year_min` must be a value or `default_min` must be True")
+    # Get ending year
+    if default_max:
+        if (col_year_end) and (col_year_end in tb.columns):
+            year_max = tb[col_year_end].max()
+        else:
+            raise ValueError(f"{col_year_end} not in table columns!")
+    elif year_max is None:
+        raise ValueError("Either `year_max` must be a value or `default_max` must be True")
+
+    # Cross merge with missing years
+    tb_all_years = Table(pd.RangeIndex(year_min, cast(int, year_max) + 1), columns=["year"])
+    if "year" in tb.columns:
+        raise ValueError("Column 'year' already in table! Please drop it from `tb`.")
+    tb = tb.merge(tb_all_years, how="cross")
+
+    # Only keep years that 'make sense'
+    if filter_times:
+        if (col_year_end and (col_year_end not in tb.columns)) or (
+            col_year_start and (col_year_start not in tb.columns)
+        ):
+            raise ValueError(f"Columns {col_year_start} and {col_year_end} must be in table columns!")
+        else:
+            tb = tb[(tb["year"] >= tb[col_year_start]) & (tb["year"] < tb[col_year_end])]
+    return tb

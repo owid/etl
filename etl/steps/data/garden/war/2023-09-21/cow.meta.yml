@@ -175,6 +175,26 @@ dataset:
     You can find more information about the data in our article: [To be published]
 
 tables:
+
+  # COUNTRY-LEVEL
+  cow_country:
+    variables:
+      participated_in_conflict:
+        title: Participated in conflict
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          Whether the country participated in a conflict (of a specific kind) in a given year.
+
+      number_participants:
+        title: Number of countries in conflict
+        unit: "countries"
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          The number of countries that participated in a conflict (of a specific kind) in a given year and region.
+
   cow:
     variables:
       ##################
