@@ -43,7 +43,8 @@ def run(dest_dir: str) -> None:
     tb_gap_sel["source"] = "gapminder"
     tb_gap_sel["under_five_mortality"] = tb_gap_sel["under_five_mortality"].div(10)
 
-    # Combine IGME and Gapminder data
+    # Combine IGME and Gapminder data with two versions
+
     tb_combined_full = combine_datasets(tb_igme, tb_gap_full, "long_run_child_mortality")
     tb_combined_sel = combine_datasets(tb_igme, tb_gap_sel, "long_run_child_mortality_selected")
 
