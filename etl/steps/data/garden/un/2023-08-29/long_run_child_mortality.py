@@ -37,12 +37,14 @@ def run(dest_dir: str) -> None:
     tb_gap_full = tb_gap_full[tb_gap_full["year"] <= max_year].reset_index(drop=True)
     tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "under_five_mortality"})
     tb_gap_full["source"] = "gapminder"
-
+    tb_gap_full["under_five_mortality"] = tb_gap_full["under_five_mortality"].div(10)
     # Load Gapminder data v7
     tb_gap_sel = ds_gapminder_v7["under_five_mortality_selected"].reset_index()
     tb_gap_sel["source"] = "gapminder"
+    tb_gap_sel["under_five_mortality"] = tb_gap_sel["under_five_mortality"].div(10)
 
-    # Combine IGME and Gapminder data
+    # Combine IGME and Gapminder data with two versions
+
     tb_combined_full = combine_datasets(tb_igme, tb_gap_full, "long_run_child_mortality")
     tb_combined_sel = combine_datasets(tb_igme, tb_gap_sel, "long_run_child_mortality_selected")
 
@@ -105,8 +107,8 @@ def calculate_share_surviving_first_five_years(tb_combined: Table) -> Table:
 
     # Add global labels and calculate the share of children surviving/dying in their first five years
 
-    tb_world["share_dying_first_five_years"] = tb_world["under_five_mortality"] / 10
-    tb_world["share_surviving_first_five_years"] = 100 - (tb_world["under_five_mortality"] / 10)
+    tb_world["share_dying_first_five_years"] = tb_world["under_five_mortality"]
+    tb_world["share_surviving_first_five_years"] = 100 - (tb_world["under_five_mortality"])
 
     tb_world = tb_world.drop(columns=["under_five_mortality"])
 

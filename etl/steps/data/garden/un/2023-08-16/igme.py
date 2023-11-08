@@ -197,7 +197,7 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
     tb_merge = pr.merge(
         u5_mortality,
         mortality_5_14,
-        on=["country", "year", "wealth_quintile", "sex", "source"],
+        on=["country", "year", "wealth_quintile", "sex"],
         suffixes=("_u5", "_5_14"),
     )
     tb_merge["adjusted_5_14_mortality_rate"] = (1000 - tb_merge["obs_value_u5"]) / 1000 * tb_merge["obs_value_5_14"]
