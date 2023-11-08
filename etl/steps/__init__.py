@@ -781,6 +781,8 @@ class GrapherStep(Step):
             # is fetching the whole dataset from data-api as they would receive all tables merged in a single
             # table. This won't be a problem after we introduce the concept of "tables"
             for table in dataset:
+                assert not table.empty, f"table {table.metadata.short_name} is empty"
+
                 # if GRAPHER_FILTER is set, only upsert matching columns
                 if config.GRAPHER_FILTER:
                     cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
@@ -807,7 +809,9 @@ class GrapherStep(Step):
                     # stop logging to stop cluttering logs
                     if i > 20 and verbose:
                         verbose = False
-                        thread_pool.submit(lambda: (time.sleep(5), log.info("upsert_dataset.continue_without_logging")))
+                        thread_pool.submit(
+                            lambda: (time.sleep(10), log.info("upsert_dataset.continue_without_logging"))
+                        )
 
                     futures.append(thread_pool.submit(upsert, t, catalog_path=catalog_path, verbose=verbose))
 

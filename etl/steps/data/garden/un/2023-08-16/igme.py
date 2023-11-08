@@ -186,7 +186,7 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
 
     If there are 100 deaths per 1000 under fives, then we need to adjust the denominator of the 5-14 age group to take account of this.
     """
-    u5_mortality = tb[tb["indicator"] == "Under-five mortality rate"]
+    u5_mortality = tb[tb["indicator"] == "Under-five deaths"]
     mortality_5_14 = tb[tb["indicator"] == "Mortality rate age 5-14"]
 
     tb_merge = pr.merge(
