@@ -207,7 +207,7 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
         & (tb["sex"] == "Both sexes")
         & (tb["wealth_quintile"] == "All wealth quintiles")
     ]
-    youth_mortality = youth_mortality.drop(columns=["source"])
+    youth_mortality = youth_mortality.drop(columns=["source", "lower_bound", "upper_bound"])
 
     tb_merge = pr.merge(
         u5_mortality,
@@ -217,7 +217,6 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
         how="inner",
     )
     tb_merge["adjusted_5_14_mortality_rate"] = (1000 - tb_merge["obs_value_u5"]) / 1000 * tb_merge["obs_value_5_14"]
-    # tb_merge["adjusted_5_14_mortality_rate"] = (100 - tb_merge["obs_value_u5"]) / 100 * tb_merge["obs_value_5_14"]
     tb_merge["obs_value"] = tb_merge["obs_value_u5"] + tb_merge["adjusted_5_14_mortality_rate"]
     # convert to percent
     tb_merge["obs_value"] = tb_merge["obs_value"] / 10
@@ -261,7 +260,7 @@ def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -
 
     tb_duplicates_removed = tb_duplicates[tb_duplicates["source"] == preferred_source]
 
-    tb = pr.concat([tb_no_duplicates, tb_duplicates_removed]).reset_index()
+    tb = pr.concat([tb_no_duplicates, tb_duplicates_removed])
 
     assert len(tb[tb.duplicated(subset=dimensions, keep=False)]) == 0, "Duplicates still in table!"
 
