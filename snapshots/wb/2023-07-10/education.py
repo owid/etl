@@ -149,7 +149,6 @@ def add_metadata(df, path_to_file):
     # Load metadata from the provided Excel file
     metadata_columns = [
         "Code",
-        "Indicator Name",
         "Short definition",
         "Long definition",
         "Source",

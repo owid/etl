@@ -84,10 +84,24 @@ def run(dest_dir: str) -> None:
     #
 
     tb.reset_index(inplace=True)
+
     # Save the metadata df
-    metadata_tb = tb.loc[:, ["indicator_code", "indicator_name", "description", "source"]]
+    metadata_columns = [
+        "indicator_name",
+        "short_definition",
+        "long_definition",
+        "source",
+        "aggregation_method",
+        "statistical_concept_and_methodology",
+        "limitations_and_exceptions",
+        "general_comments",
+    ]
+    metadata_tb = tb.loc[
+        :,
+        ["indicator_code"] + metadata_columns,
+    ]
     # Drop metadata columns from the dataset table
-    tb.drop(["indicator_name", "description", "source"], axis=1, inplace=True)
+    tb = tb.drop(metadata_columns, axis=1)
 
     tb = geo.harmonize_countries(
         df=tb,
@@ -237,8 +251,29 @@ def add_metadata(
                 .str.replace("‚", "")  # commas caused problems when renaming variables later on
                 .iloc[0]
             )
-            description = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "description"].iloc[0]
+
+            description_short = metadata_tb.loc[
+                metadata_tb["indicator_code"] == indicator_to_find, "short_definition"
+            ].iloc[0]
+            description = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "long_definition"].iloc[0]
             source = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "source"].iloc[0]
+            aggregation_method = metadata_tb.loc[
+                metadata_tb["indicator_code"] == indicator_to_find, "aggregation_method"
+            ].iloc[0]
+            statistical_concept_and_methodology = metadata_tb.loc[
+                metadata_tb["indicator_code"] == indicator_to_find, "statistical_concept_and_methodology"
+            ].iloc[0]
+            limitations_and_exceptions = metadata_tb.loc[
+                metadata_tb["indicator_code"] == indicator_to_find, "limitations_and_exceptions"
+            ].iloc[0]
+
+            # Replace NaN values with a placeholder string
+            source = "" if pd.isna(source) else source
+            aggregation_method = "" if pd.isna(aggregation_method) else aggregation_method
+            statistical_concept_and_methodology = (
+                "" if pd.isna(statistical_concept_and_methodology) else statistical_concept_and_methodology
+            )
+            limitations_and_exceptions = "" if pd.isna(limitations_and_exceptions) else limitations_and_exceptions
             new_column_name = underscore(name)  # Convert extracted name to underscore format
 
             # If more detailed description is currently missing in the API --> use the long title as a description
@@ -248,15 +283,20 @@ def add_metadata(
 
             # Update the column names and metadata
             tb.rename(columns={column: new_column_name}, inplace=True)
-            description_string = " ".join(
+            description_string = "\n\n".join(
                 [
-                    description + "\n\n" "World Bank variable id: " + indicator_to_find + "",
+                    f"{description}\nWorld Bank variable id: {indicator_to_find}",
                     source,
+                    aggregation_method,
+                    statistical_concept_and_methodology,
+                    limitations_and_exceptions,
                 ]
             )
 
-            tb[new_column_name].metadata.description = description_string
+            tb[new_column_name].metadata.description_short = description_short
+            tb[new_column_name].metadata.description_from_producer = description_string
             tb[new_column_name].metadata.title = name
+            tb[new_column_name].metadata.processing = "minor"
 
             # Conver Witthgenstein projections to %
             if "wittgenstein_projection__percentage" in new_column_name:
