@@ -8,7 +8,7 @@ definitions:
 
     processing_level: major
     description_processing: |
-      Any observation flagged with a caution note has been removed from the data. There are three categories of caution notes:
+      Any observation flagged with the caution note 1 has been removed from the data. There are four categories of caution notes:
         1. Accuracy, quality or comparability of data questionable.
         2. Un-excluded resource revenues/taxes are significant but cannot be isolated from total revenue/taxes.
         3. Un-excluded resource revenue/taxes are marginal but non-negligible and cannot be isolated from total revenue/taxes.
