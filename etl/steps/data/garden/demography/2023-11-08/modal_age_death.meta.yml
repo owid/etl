@@ -23,15 +23,17 @@ tables:
         title: Adult modal age at death
         unit: years
         description_short: |-
-          The most common age at death, among adults.
+          The most common age at which adults die in a given year.
 
         description_key:
-          - The adult modal age at death is the age (beyond infancy) at which the majority of deaths occur.
           - In a recent paper by Diaconu et al. (2022), the authors propose the modal age at death for measuring occupational inequalities at older ages in Finland. They compare trends in modal age at death with those of more conventional measures of mortality at older ages, such as life expectancy at age 65, 75.
           - |-
-            Compared to life expectancy at birth or at age 65, M has the advantages of being: (i) determined solely by mortality at older ages, (ii) free from an arbitrary choice of "old" age threshold, and (iii) compares individuals with similar survival chances over time.
+            Compared to life expectancy at birth or at age 65, the modal age has the advantages of being: (i) determined solely by mortality at older ages, (ii) free from an arbitrary choice of "old" age threshold, and (iii) compares individuals with similar survival chances over time.
           - The estimates by sex for Finland and the G7 countries, i.e., Canada, France, Italy, Japan, the United Kingdom, and the United States, are estimated from country- and sex-specific smooth distributions of ages at death (Diaconu et al. 2022). Because death rates at very old ages are often noisy and vary from one age to the next, precise identification of the modal age requires that death rates be smoothed with penalized B-splines (P-splines).
           - Observed deaths and population exposures by single year of age (10 years and older) and sex, used to smooth the mortality rates, are taken from the Human Mortality Database.
         display:
           tolerance: 3
           numDecimalPlaces: 2
+        presentation:
+          grapher_config:
+            subtitle: The most common age at death, among adults.
