@@ -260,9 +260,6 @@ def add_metadata(
                 .iloc[0]
             )
 
-            description_short = metadata_tb.loc[
-                metadata_tb["indicator_code"] == indicator_to_find, "short_definition"
-            ].iloc[0]
             description = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "long_definition"].iloc[0]
             source = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "source"].iloc[0]
             aggregation_method = metadata_tb.loc[
@@ -302,17 +299,25 @@ def add_metadata(
 
             # Update the column names and metadata
             tb.rename(columns={column: new_column_name}, inplace=True)
-            description_string = "\n\n".join(
-                [
-                    f"{description}\nWorld Bank variable id: {indicator_to_find}",
-                    source,
-                    aggregation_method,
-                    statistical_concept_and_methodology,
-                    limitations_and_exceptions,
-                ]
+
+            # Now build the description string conditionally
+            components = []
+
+            if description:
+                components.append(f"{description}\nWorld Bank variable id: {indicator_to_find}")
+            if source:
+                components.append(f"Source: {source}")
+            if aggregation_method:
+                components.append(f"Aggregation method: {aggregation_method}")
+            if statistical_concept_and_methodology:
+                components.append(f"Statistical concept and methodology: {statistical_concept_and_methodology}")
+            if limitations_and_exceptions:
+                components.append(f"Limitations and exceptions: {limitations_and_exceptions}")
+
+            description_string = (
+                "\n\n".join(components) if components else "No detailed metadata available from World Bank."
             )
 
-            tb[new_column_name].metadata.description_short = description_short
             tb[new_column_name].metadata.description_from_producer = description_string
             tb[new_column_name].metadata.title = name
             tb[new_column_name].metadata.processing = "minor"
@@ -410,7 +415,7 @@ def add_metadata(
                 + "**Recent estimates:**\n\n"
                 + "Percentage of the population between age 25 and age 64 who can, with understanding, read and write a short, simple statement on their everyday life. Generally, ‘literacy’ also encompasses ‘numeracy’, the ability to make simple arithmetic calculations. This indicator is calculated by dividing the number of literates aged 25-64 years by the corresponding age group population and multiplying the result by 100."
                 + "\n\n"
-                + "World Bank variable id: UIS.LR.AG25T64. UNESCO Institute for Statistics"
+                + "World Bank variable id: UIS.LR.AG25T64. Source: UNESCO Institute for Statistics"
             )
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 2
@@ -426,7 +431,7 @@ def add_metadata(
                 + "**Recent estimates:**\n\n"
                 + "General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments."
                 + "\n\n"
-                + "World Bank variable id: SE.XPD.TOTL.GD.ZS. UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022."
+                + "World Bank variable id: SE.XPD.TOTL.GD.ZS. Source: UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022."
             )
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 2
