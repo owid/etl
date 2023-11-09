@@ -42,17 +42,14 @@ def get_dvc():
     global dvc
 
     if dvc is None:
+        r2_config = {
+            "access_key_id": config.R2_ACCESS_KEY,
+            "secret_access_key": config.R2_SECRET_KEY,
+            "region": "auto",
+        }
         dvc = Repo(
             paths.BASE_DIR,
-            config={
-                "remote": {
-                    "public": {
-                        "access_key_id": config.R2_ACCESS_KEY,
-                        "secret_access_key": config.R2_SECRET_KEY,
-                        "region": "auto",
-                    }
-                }
-            },
+            config={"remote": {"public": r2_config, "private": r2_config}},
         )
     return dvc
 
