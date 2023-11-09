@@ -4,7 +4,9 @@ definitions:
     presentation:
       topic_tags:
         - Life Expectancy
-
+    description_key:
+      - Positive values in the total sex gap in life expectancy indicate higher life expectancy in females.
+      - A negative contribution by a specific age group indicates that there are higher death rates among females in this age group.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -20,19 +22,19 @@ tables:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
       ctb:
-        title: Contribution to gender gap in life expectancy (years)
+        title: Contribution to sex gap in life expectancy (years)
         unit: years
         description_short: |-
-          The gender gap in life expectancy arises from gender differences in death rates across the lifespan. This indicator shows the number of years that a given age group's death rates have contributed to the overall gender gap in life expectancy.
+          The sex gap in life expectancy arises from sex differences in death rates across the lifespan. This indicator shows the number of years that a given age group's death rates have contributed to the overall sex gap in life expectancy.
         display:
           tolerance: 5
 
       ctb_rel:
-        title: Relative contribution to gender gap in life expectancy (years)
+        title: Relative contribution to sex gap in life expectancy (years)
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The gender gap in life expectancy arises from gender differences in death rates across the lifespan. This indicator shows the relative contribution of a given age group’s death rates to the overall gender gap in life expectancy.
+          The sex gap in life expectancy arises from sex differences in death rates across the lifespan. This indicator shows the relative contribution of a given age group's death rates to the overall sex gap in life expectancy.
         description_processing: |-
           The original indicator in the source is given as a value between 0 and 1. We scale it to a percentage by multiplying by 100.
         display:
