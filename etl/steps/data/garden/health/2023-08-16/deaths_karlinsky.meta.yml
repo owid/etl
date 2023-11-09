@@ -14,7 +14,7 @@ tables:
         description_short: >-
           The number of deaths registered in the vital registration system for the country-year.
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       expected_wpp:
         title: Expected number of deaths (WPP 2019)
