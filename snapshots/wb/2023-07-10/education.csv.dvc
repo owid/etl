@@ -21,6 +21,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
+
 wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
 - md5: d7b725432d3a5206b28846e3cb394b58
