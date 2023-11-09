@@ -56,9 +56,9 @@ def drop_flagged_rows_and_unnecessary_columns(tb: Table) -> Table:
     # Define caution variables. We will remove the rows with caution values.
     caution_variables = [
         "caution1accuracyqualityorco",  # Caution 1 Accuracy, Quality or Comparability of data questionable
-        "caution2resourcerevenuestax",  # Caution 2 Un-excluded Resource Revenues/ taxes are significant but cannot be isolated from total revenue/ taxes
-        "caution3unexcludedresourcere",  # Caution 3 Un-excluded Resource Revenue/ taxes are marginal but non-negligible and cannot be isolated from total revenue/ taxes
-        "caution4inconsistencieswiths",  # Caution 4 Inconsistencies with Social Contributions
+        # "caution2resourcerevenuestax",  # Caution 2 Un-excluded Resource Revenues/ taxes are significant but cannot be isolated from total revenue/ taxes
+        # "caution3unexcludedresourcere",  # Caution 3 Un-excluded Resource Revenue/ taxes are marginal but non-negligible and cannot be isolated from total revenue/ taxes
+        # "caution4inconsistencieswiths",  # Caution 4 Inconsistencies with Social Contributions
     ]
 
     # Count the number of rows before dropping caution variables.
@@ -92,6 +92,9 @@ def drop_flagged_rows_and_unnecessary_columns(tb: Table) -> Table:
             "cautionnotes",
             "resourcerevenuenotes",
             "socialcontributionsnotes",
+            "caution2resourcerevenuestax",
+            "caution3unexcludedresourcere",
+            "caution4inconsistencieswiths",
         ]
         + caution_variables
     )
