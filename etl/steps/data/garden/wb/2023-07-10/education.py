@@ -141,7 +141,6 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    tb.short_name = "education"
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
