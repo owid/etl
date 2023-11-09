@@ -36,17 +36,13 @@ tables:
 
           If we denote the non-linearly transformed values of life expectancy and education as LEB and EDU, LD to represent those of liberal democracy, and the adjusted per capita income as UNY, the historical index of human development can be expressed as,
 
-          AHDI = (LEB * EDU * LD * UNY)^(1/4)
+          _AHDI = (LEB * EDU * LD * UNY)^(1/4)_
         processing_level: minor
         description_key:
           - "{tables.augmented_hdi.variables.ahdi.description_short}"
-          - "Each of these dimensions is measured on a scale from 0 to 1:
-              - Life expectancy is the proxy for healthy life, where 1 represents 85 or more years and 0 represents 20 or less years.
-              - Years of schooling is the proxy for access to knowledge, where 1 represents 15 or more years of education and 0 represents 0 years of education.
-              - The logarithm of GDP per capita is the proxy for a decent standard of living, where 1 represents 47,000 international-$ at 1990 prices and 0 represents 100 international-$ at 1990 prices.
-              - [Varieties of Democracy's Liberal democracy index](https://ourworldindata.org/vdem-electoral-democracy-data) is the proxy for civil and political freedom, higher values represents more democracy."
+          - "Each of these dimensions is measured on a scale from 0 to 1: _Life expectancy_ is the proxy for healthy life, where 1 represents 85 or more years and 0 represents 20 or less years. _Years of schooling_ is the proxy for access to knowledge, where 1 represents 15 or more years of education and 0 represents 0 years of education. The _logarithm of GDP per capita_ is the proxy for a decent standard of living, where 1 represents 47,000 international-$ at 1990 prices and 0 represents 100 international-$ at 1990 prices. [_Varieties of Democracy's Liberal democracy index_](https://ourworldindata.org/vdem-electoral-democracy-data) is the proxy for civil and political freedom, higher values represents more democracy."
           - The AHDI is then estimated as the geometric mean of these indices, or
-            AHDI = (Health index * Education index * Income index * Freedom index)^(1/4)
+            _AHDI = (Health index * Education index * Income index * Freedom index)^(1/4)_
         display:
           name: Augmented Human Development Index (AHDI)
           numDecimalPlaces: 3
