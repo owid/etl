@@ -108,6 +108,9 @@ def prepare_land_use_emissions(tb_land_use: Table) -> Table:
     # Ignore countries that have no data.
     tb_land_use = tb_land_use.dropna(axis=1, how="all")
 
+    # Remove rows that are either empty, or have some other additional operation (e.g. 2013-2022).
+    tb_land_use = tb_land_use[tb_land_use["year"].astype(str).str.match(r"^\d{4}$")].reset_index(drop=True)
+
     # Restructure data to have a column for country and another for emissions.
     tb_land_use = tb_land_use.melt(id_vars="year", var_name="country", value_name="emissions")
 
