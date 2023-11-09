@@ -2,6 +2,7 @@
 
 from typing import cast
 
+import owid.catalog.processing as pr
 import pandas as pd
 import shared
 from owid.catalog import Dataset, Table
@@ -78,7 +79,8 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["education"]
-
+    # Save metadata for later use
+    metadata = tb.metadata
     #
     # Process data.
     #
@@ -130,18 +132,21 @@ def run(dest_dir: str) -> None:
     tb = add_data_for_regions(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Set an appropriate index and sort.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-    tb = Table(tb, short_name=paths.short_name, underscore=True)
+    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
+    # Add the metadata back to the table
+    tb.metadata = metadata
     # Add metadata by finding the descriptions and sources using the indicator codes.
     tb = add_metadata(tb, metadata_tb, combined_literacy_description, combined_expenditure_description)
-
     #
     # Save outputs.
     #
+    tb.short_name = "education"
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], default_metadata=ds_meadow.metadata, check_variables_metadata=True
+    )
     # Save changes in the new garden dataset.
     ds_garden.save()
 
@@ -172,17 +177,20 @@ def combine_historical_literacy_expenditure(tb):
     recent_expenditure = tb[["year", "country", "SE.XPD.TOTL.GD.ZS"]].copy()  # Public expenditure
 
     # Merge the DataFrames based on 'year' and 'country'
-    combined_df = pd.merge(
+    combined_df = pr.merge(
         historic_literacy,
         recent_literacy,
         on=["year", "country"],
         how="outer",
         suffixes=("_historic_lit", "_recent_lit"),
+    ).copy_metadata(from_table=recent_literacy)
+
+    combined_df = pr.merge(combined_df, historic_expenditure, on=["year", "country"], how="outer").copy_metadata(
+        from_table=combined_df
     )
-    combined_df = pd.merge(combined_df, historic_expenditure, on=["year", "country"], how="outer")
-    combined_df = pd.merge(
+    combined_df = pr.merge(
         combined_df, recent_expenditure, on=["year", "country"], how="outer", suffixes=("_historic_exp", "_recent_exp")
-    )
+    ).copy_metadata(from_table=combined_df)
 
     # Define the functions to decide which value to keep
     def decide_literacy(row):
@@ -204,12 +212,12 @@ def combine_historical_literacy_expenditure(tb):
     combined_df["combined_expenditure"] = combined_df.apply(decide_expenditure, axis=1)
 
     # Now, merge the combined_df back into the original tb DataFrame based on 'year' and 'country'
-    tb = pd.merge(
+    tb = pr.merge(
         tb,
         combined_df[["year", "country", "combined_literacy", "combined_expenditure"]],
         on=["year", "country"],
         how="outer",
-    )
+    ).copy_metadata(from_table=tb)
 
     combined_literacy_description = ds_literacy.metadata.sources[0].description
     combined_expenditure_description = ds_expenditure.metadata.sources[0].description
@@ -241,6 +249,7 @@ def add_metadata(
     ]
     # Loop through the DataFrame columns
     for column in tqdm(tb.columns, desc="Processing metadata for indicators"):
+        origin = metadata_tb[metadata_tb.columns[0]].metadata.origins[0]
         if column not in custom_cols:
             # Extract the title from the default metadata to find the corresponding World Bank indicator
             indicator_to_find = tb[column].metadata.title
@@ -279,7 +288,7 @@ def add_metadata(
             # If more detailed description is currently missing in the API --> use the long title as a description
             if str(description) == "nan":
                 description = name
-                source = " "
+                source = ""
 
             # Update the column names and metadata
             tb.rename(columns={column: new_column_name}, inplace=True)
@@ -297,6 +306,7 @@ def add_metadata(
             tb[new_column_name].metadata.description_from_producer = description_string
             tb[new_column_name].metadata.title = name
             tb[new_column_name].metadata.processing = "minor"
+            tb[new_column_name].metadata.origins = [origin]
 
             # Conver Witthgenstein projections to %
             if "wittgenstein_projection__percentage" in new_column_name:
@@ -357,6 +367,7 @@ def add_metadata(
                 update_metadata(tb, new_column_name, 0, " ", " ")
         # Now, update metadata for custom indicators
         elif column == "total_funding_per_student_ppp":
+            tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Total funding per student (in PPP)"
             tb[column].metadata.display = {}
             tb[
@@ -366,18 +377,21 @@ def add_metadata(
             tb[column].metadata.unit = "international-$"
             tb[column].metadata.short_unit = "$"
         elif column == "percentage_of_female_pre_primary_students":
+            tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Share of female students in pre-primary education"
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 1
             tb[column].metadata.unit = "%"
             tb[column].metadata.short_unit = "%"
         elif column == "normalized_hci":
+            tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Normalised harmonized learning score"
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 1
             tb[column].metadata.unit = "score"
             tb[column].metadata.short_unit = ""
         elif column == "combined_literacy":
+            tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Historical and more recent literacy estimates"
             tb[column].metadata.description = (
                 "**Historical literacy data:**\n\n"
@@ -393,6 +407,7 @@ def add_metadata(
             tb[column].metadata.unit = "%"
             tb[column].metadata.short_unit = "%"
         elif column == "combined_expenditure":
+            tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Historical and more recent expenditure estimates"
             tb[column].metadata.description = (
                 "**Historical expenditure data:**\n\n"
