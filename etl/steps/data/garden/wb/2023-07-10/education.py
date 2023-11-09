@@ -282,6 +282,17 @@ def add_metadata(
                 "" if pd.isna(statistical_concept_and_methodology) else statistical_concept_and_methodology
             )
             limitations_and_exceptions = "" if pd.isna(limitations_and_exceptions) else limitations_and_exceptions
+
+            # Truncate the last 5 words if the length of the string exceeds 250 characters
+            if len(name) > 250:
+                # Separate the string into words and truncate
+                words = name.split()
+                # Get all words up to the fifth-to-last word
+                selected_words = words[:-10]
+                # Reconstruct the selected words into a single string
+                name = " ".join(selected_words)
+
+            # Convert the name to underscore format
             new_column_name = underscore(name)  # Convert extracted name to underscore format
 
             # If more detailed description is currently missing in the API --> use the long title as a description
