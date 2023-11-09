@@ -3,11 +3,9 @@ import subprocess
 import traceback
 from datetime import datetime as dt
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, cast
 
 import streamlit as st
-from botocore.exceptions import ClientError
-from owid.catalog import s3_utils
 from st_pages import add_indentation
 from typing_extensions import Self
 
@@ -591,59 +589,6 @@ Only in rare occasions you will need to define a custom attribution.
     return form
 
 
-@st.cache_resource
-def _aws_is_ok() -> None | s3_utils.MissingCredentialsError:
-    try:
-        s3_utils.check_for_default_profile()
-    except s3_utils.MissingCredentialsError as e:
-        return e
-
-
-@st.cache_resource
-def _get_s3_buckets() -> Tuple[bool, Any]:
-    s3 = s3_utils.connect()
-    try:
-        buckets = s3.list_buckets()["Buckets"]
-    except ClientError as e:
-        return (True, e)
-    return (False, buckets)
-
-
-def run_checks() -> None:
-    """Environment checks."""
-    text_reference_expander = "\n\nExpand the **Environment checks** section for more details!"
-    # AWS config
-    aws_error = _aws_is_ok()
-    if aws_error:
-        text = "Invalid AWS profile:\n{}".format(aws_error)
-        st.error(text)
-        st.toast(text + text_reference_expander, icon="❌")
-        raise aws_error
-    else:
-        text = "AWS profile is valid"
-        # st.toast(text, icon="✅")
-        st.success(text)
-
-    # S3 conncetion
-    error, buckets_or_error = _get_s3_buckets()
-    if error:
-        text = "Error connecting to S3:\n{}".format(buckets_or_error)
-        st.error(text)
-        st.toast(text + text_reference_expander, icon="❌")
-        raise buckets_or_error
-    else:
-        text = "S3 connection successful"
-        # st.toast(text, icon="✅")
-        st.success(text)
-
-        bucket_names = [b["Name"] for b in buckets_or_error]  # type: ignore
-        if "owid-catalog" not in bucket_names:
-            text = "`owid-catalog` bucket not found"
-            st.error(text)
-            st.toast(text + text_reference_expander, icon="❌")
-            raise Exception()
-
-
 def update_state() -> None:
     """Submit form."""
     # Create form
@@ -668,10 +613,6 @@ st.title("Wizard **:gray[Snapshot]**")
 # SIDEBAR
 with st.sidebar:
     utils.warning_metadata_unstable()
-    if APP_STATE.args.run_checks:
-        # CONNECT AND CHECK
-        with st.expander("**Environment checks**", expanded=True):
-            run_checks()
 
     # INSTRUCTIONS
     with st.expander("**Instructions**", expanded=True):
