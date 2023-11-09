@@ -68,7 +68,7 @@ PyPDF2 = ">=2.11.1"
 dvc = {version = ">=2.58.2,<3.0.0", extras = ["s3"]}
 "ruamel.yaml" = ">=0.17.21"
 owid-repack = {path = "lib/repack", develop = true}
-gitpython = "^3.1.30"
+gitpython = "^3.1.37"
 rapidfuzz = "^2.13.7"
 # pinned because of frictionless, remove this pin when frictionless is updated
 fsspec = "2022.11.0"
