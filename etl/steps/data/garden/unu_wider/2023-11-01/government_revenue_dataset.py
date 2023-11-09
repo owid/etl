@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
 
     #
     # Process data.
-    tb = process_data(tb)
+    tb = drop_flagged_rows_and_unnecessary_columns(tb)
 
     #
     tb = geo.harmonize_countries(
@@ -48,7 +48,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def process_data(tb: Table) -> Table:
+def drop_flagged_rows_and_unnecessary_columns(tb: Table) -> Table:
     """
     Process data, changing column names, dropping columns and dropping flagged rows.
     """
@@ -74,7 +74,7 @@ def process_data(tb: Table) -> Table:
     rows_dropped = rows_before - rows_after
     rows_dropped_pct = round(rows_dropped / rows_before * 100, 2)
 
-    paths.log.warning(
+    paths.log.info(
         f"Dropped {rows_dropped} rows out of {rows_before} ({rows_dropped_pct}%), because of them being flagged."
     )
 

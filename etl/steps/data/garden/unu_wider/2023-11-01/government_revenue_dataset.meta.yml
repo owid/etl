@@ -8,10 +8,10 @@ definitions:
 
     processing_level: major
     description_processing: |
-      Any observation in the dataset flagged with caution note has been dropped for the dataset. There are three categories of caution notes:
+      Any observation flagged with a caution note has been removed from the data. There are three categories of caution notes:
         1. Accuracy, quality or comparability of data questionable.
         2. Un-excluded resource revenues/taxes are significant but cannot be isolated from total revenue/taxes.
-        3. Un-excluded resource recenue/taxes are marginal but non-negligible and cannot be isolated from total revenue/taxes.
+        3. Un-excluded resource revenue/taxes are marginal but non-negligible and cannot be isolated from total revenue/taxes.
         4. Inconsistencies with social contributions.
 
     display: &common-display
@@ -232,7 +232,7 @@ tables:
         title: Direct taxes including social contributions and resource revenue (as a share of GDP)
         unit: "%"
         short_unit: "%"
-        description_short: It is defined as total direct tax plus social contributions.
+        description_short: Defined as total direct tax plus social contributions.
         description_from_producer: "{definitions.direct_taxes}"
         display:
           name: Direct taxes including social contributions and resource revenue
@@ -241,7 +241,7 @@ tables:
         title: Direct taxes including social contributions and excluding resource revenue (as a share of GDP)
         unit: "%"
         short_unit: "%"
-        description_short: It is defined as total direct tax plus social contributions minus resource taxes.
+        description_short: Defined as total direct tax plus social contributions minus resource taxes.
         description_from_producer: "{definitions.direct_taxes}"
         display:
           name: Direct taxes including social contributions and excluding resource revenue
@@ -259,7 +259,7 @@ tables:
         title: Direct taxes excluding social contributions and resource revenue (as a share of GDP)
         unit: "%"
         short_unit: "%"
-        description_short: It is defined as total direct tax minus resource taxes.
+        description_short: Defined as total direct tax minus resource taxes.
         description_from_producer: "{definitions.direct_taxes}"
         display:
           name: Direct taxes excluding social contributions and resource revenue
@@ -334,7 +334,7 @@ tables:
         title: Non-resource component of taxes on corporations and other enterprises (as a share of GDP)
         unit: "%"
         short_unit: "%"
-        description_short: It is defined as the taxes of corporations and other enterprises (CIT) minus the CIT from natural resources.
+        description_short: Defined as the taxes of corporations and other enterprises (CIT) minus the CIT from natural resources.
         description_from_producer: |
           {definitions.direct_taxes}
 
@@ -406,7 +406,7 @@ tables:
         title: General taxes on goods and services (as a share of GDP)
         unit: "%"
         short_unit: "%"
-        description_short: It is defined as the sum of value-added taxes (VAT), sales tax, turnover tax and tax on financial and capital transactions.
+        description_short: Defined as the sum of value-added taxes (VAT), sales tax, turnover tax and tax on financial and capital transactions.
         description_from_producer: |
           {definitions.indirect_taxes}
 

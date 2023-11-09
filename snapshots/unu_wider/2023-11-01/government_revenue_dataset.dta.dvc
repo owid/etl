@@ -10,7 +10,8 @@ meta:
     version_producer: 2023
 
     # Citation
-    producer: UNU-WIDER Government Revenue Dataset
+    producer: UNU-WIDER
+    attribution: UNU-WIDER Government Revenue Dataset (2023)
     citation_full: |-
       UNU-WIDER Government Revenue Dataset. Version 2023. https://doi.org/10.35188/UNU-WIDER/GRD-2023
     attribution_short: UNU-WIDER

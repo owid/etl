@@ -17,10 +17,6 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["government_revenue_dataset"]
 
     #
-    # Process data.
-    #
-
-    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
