@@ -75,6 +75,7 @@ tables:
       life_expectancy:
         title: Life expectancy
         unit: years
+        short_unit: years
         description_short: The average number of remaining years of life expected by a hypothetical cohort of individuals who already reached age x and would be subject during the remainder of their lives to the mortality rates of a given period.
         display:
           numDecimalPlaces: 1
