@@ -20,7 +20,7 @@ tables:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
       statagency:
-        title: Testing variable title
+        title: Statistical agency operating
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
@@ -34,11 +34,11 @@ tables:
           collecting and maintaining numerical in-formation.
         processing_level: minor
         display:
-          name: Testing variable
+          name: Statistical agency operating
           numDecimalPlaces: 0
           tolerance: 0
       census:
-        title: Testing variable title
+        title: Census was run
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
@@ -51,11 +51,11 @@ tables:
           counted within a discrete time window).
         processing_level: minor
         display:
-          name: Testing variable
+          name: Census was run
           numDecimalPlaces: 0
           tolerance: 0
       first_moderncensus:
-        title: Testing variable title
+        title: Modern census first implemented
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
@@ -68,11 +68,11 @@ tables:
           disaggregated information for each individual.
         processing_level: minor
         display:
-          name: Testing variable
+          name: Modern census first implemented
           numDecimalPlaces: 0
           tolerance: 0
       register_based_census:
-        title: Testing variable title
+        title: Census based on population register
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
@@ -83,11 +83,11 @@ tables:
           during a discrete period of time) and 0 otherwise.
         processing_level: minor
         display:
-          name: Testing variable
+          name: Census based on population register
           numDecimalPlaces: 0
           tolerance: 0
       yearbook_published:
-        title: Testing variable title
+        title: Statistical yearbook published
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
@@ -100,11 +100,11 @@ tables:
           affairs, political affairs, and social and cultural affairs.
         processing_level: minor
         display:
-          name: Testing variable
+          name: Statistical yearbook published
           numDecimalPlaces: 0
           tolerance: 0
       yearbook_coverage:
-        title: Testing variable title
+        title: Statistical yearbook with information for that year
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
@@ -115,11 +115,11 @@ tables:
           following year) and 0 otherwise.
         processing_level: minor
         display:
-          name: Testing variable
+          name: Statistical yearbook with information for that year
           numDecimalPlaces: 0
           tolerance: 0
       civreg:
-        title: Testing variable title
+        title: Birth register implemented
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
@@ -133,11 +133,11 @@ tables:
           was not part of the state (as in the Catholic world).
         processing_level: minor
         display:
-          name: Testing variable
+          name: Birth register implemented
           numDecimalPlaces: 0
           tolerance: 0
       popreg:
-        title: Testing variable title
+        title: Population register implemented
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
@@ -148,11 +148,11 @@ tables:
           and permanently updated records of every person in the territory.
         processing_level: minor
         display:
-          name: Testing variable
+          name: Population register implemented
           numDecimalPlaces: 0
           tolerance: 0
       statag_intro:
-        title: Testing variable title
+        title: Statistical agency established
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
@@ -163,16 +163,14 @@ tables:
           all previous years.
         processing_level: minor
         display:
-          name: Testing variable
+          name: Statistical agency established
           numDecimalPlaces: 0
           tolerance: 0
       censusgraded_ability:
-        title: Testing variable title
+        title: Ability to run census
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
-        description_processing: Description of processing of testing variable.
-        description_key: List of key points about the indicator.
         description_from_producer: >-
           A graded index of the ability of the country
           to carry out census-es consistently with different degrees of
@@ -188,16 +186,14 @@ tables:
           census, and after 40 years from the last register-based census.
         processing_level: minor
         display:
-          name: Testing variable
+          name: Ability to run census
           numDecimalPlaces: 0
           tolerance: 0
       ybcov_ability:
-        title: Testing variable title
+        title: Ability to publish statistical yearbook
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
-        description_processing: Description of processing of testing variable.
-        description_key: List of key points about the indicator.
         description_from_producer: >-
           A graded index of the ability of the country to
           publish a statistical yearbook over a ten-year window. The index
@@ -208,16 +204,14 @@ tables:
           statistical yearbooks published.
         processing_level: minor
         display:
-          name: Testing variable
+          name: Ability to publish statistical yearbook
           numDecimalPlaces: 0
           tolerance: 0
       infcap_irt:
-        title: Testing variable title
+        title: Information Capacity Index (IRT)
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
-        description_processing: Description of processing of testing variable.
-        description_key: List of key points about the indicator.
         description_from_producer: >-
           An aggregate index of information capacity. It is based
           on a hybrid two-parameter and graded Item Response Model (IRT)
@@ -228,23 +222,21 @@ tables:
           (censusgraded_ability) and yearbook ability (ybcov_ability).
         processing_level: minor
         display:
-          name: Testing variable
+          name: Information Capacity Index
           numDecimalPlaces: 0
           tolerance: 0
       infcap_pca:
-        title: Testing variable title
+        title: Information Capacity Index (PCA)
         unit: arbitrary units
         short_unit: au
         description_short: Short description of testing variable.
-        description_processing: Description of processing of testing variable.
-        description_key: List of key points about the indicator.
         description_from_producer: >-
           An aggregate index of information capacity based on a
           Principal Components Analysis (PCA) model, using the same
           component variables as infcap_irt.
         processing_level: minor
         display:
-          name: Testing variable
+          name: Information Capacity Index
           numDecimalPlaces: 0
           tolerance: 0
       # testing_variable:
