@@ -90,13 +90,11 @@ def run(dest_dir: str) -> None:
     # Columns containing metadata
     metadata_columns = [
         "indicator_name",
-        "short_definition",
         "long_definition",
         "source",
         "aggregation_method",
         "statistical_concept_and_methodology",
         "limitations_and_exceptions",
-        "general_comments",
     ]
 
     # Save the table with just metadata
@@ -312,7 +310,7 @@ def add_metadata(
             if description:
                 components.append(f"{description}\nWorld Bank variable id: {indicator_to_find}")
             if source:
-                components.append(f"Source: {source}")
+                components.append(f"Original source: {source}")
             if aggregation_method:
                 components.append(f"Aggregation method: {aggregation_method}")
             if statistical_concept_and_methodology:
