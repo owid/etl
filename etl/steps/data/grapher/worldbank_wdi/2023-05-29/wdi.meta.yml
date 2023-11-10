@@ -1,5 +1,6 @@
 dataset:
   update_period_days: 365
+  sources: []
 
 # definitions:
 #   common:
