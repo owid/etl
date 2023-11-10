@@ -1,0 +1,284 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - State Capacity
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  information_capacity_dataset:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      statagency:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_from_producer: >-
+          Dummy variable that takes a value 1 if the country has a
+          statistical agency operating that year, and 0 otherwise. A statistical
+          agency is an official government organization that is tasked with
+          gathering numerical information on a variety of topics. We as-sign
+          the value 0 to this variable when these tasks were absorbed by
+          several government offices that performed other functions besides
+          collecting and maintaining numerical in-formation.
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      census:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_from_producer: >-
+          Dummy variable that takes the value 1 if the country ran a
+          census that year and 0 otherwise. A census is a population count
+          that meets three requirements: (1) universality (it seeks to cover the
+          entire population); (2) defined territory (it counts the population
+          within a well-defined territory); and (3) simultaneity (each person is
+          counted within a discrete time window).
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      first_moderncensus:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_from_producer: >-
+          Dummy variable that takes the value 1 the year
+          a country first implemented a modern census (it is missing
+          otherwise). A modern census meets all three requirements from the
+          census variable plus a fourth one – (4) individual enumeration,
+          which means that the census produces tabular data sets with
+          disaggregated information for each individual.
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      register_based_census:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_from_producer: >-
+          Dummy variable that takes the value 1 if the
+          country runs a census that is based on a continuously updated
+          population register (as opposed to an enumeration carried out
+          during a discrete period of time) and 0 otherwise.
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      yearbook_published:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_from_producer: >-
+          Dummy variable that takes the value 1 if the
+          country published a statistical yearbook that year and 0 otherwise.
+          A statistical yearbook is an annual publication of the state that
+          contains numerical data about the country regarding several of the
+          following categories: physical environment, demography, economic
+          affairs, political affairs, and social and cultural affairs.
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      yearbook_coverage:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_from_producer: >-
+          Dummy variable that takes the value 1 if the
+          country published a statistical yearbook with information for that
+          year (typically, but not necessarily, in the yearbook published the
+          following year) and 0 otherwise.
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      civreg:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_from_producer: >-
+          Dummy variable that takes the value 1 if the country
+          maintained a birth register that year and 0 otherwise. A civil register
+          is a government agency that records key events in the life
+          trajectories of individuals (such as births, marriages, and deaths).
+          We include parish registers when they were administered by official
+          state churches (as in the Nordic countries) but not when the Church
+          was not part of the state (as in the Catholic world).
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      popreg:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_from_producer: >-
+          Dummy variable that takes the value 1 if the country
+          maintained a population register that year and 0 otherwise.
+          Population registers are centralized state agencies that keep detailed
+          and permanently updated records of every person in the territory.
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      statag_intro:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_from_producer: >-
+          This variable takes the value 1 for every year after the
+          first adoption of a statistical agency, even if it was later abolished
+          (which only occurred in France, Germany and Denmark) and 0 for
+          all previous years.
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      censusgraded_ability:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_processing: Description of processing of testing variable.
+        description_key: List of key points about the indicator.
+        description_from_producer: >-
+          A graded index of the ability of the country
+          to carry out census-es consistently with different degrees of
+          difficulty. The index takes the value 30 if the country ran a census
+          based on a continuously updated population register (based on
+          register_based_census), 20 if it ran a modern (enumeration-based)
+          census (censuses implement-ed after first_moderncensus takes the
+          value 1 but that were not based on population registers), and 10 if it
+          ran a non-modern census. The index is depreciated by 1 point for
+          every consecutive year without a census, starting 10 years after the
+          previous census. Therefore, the index takes a value of 0 after 20
+          years without any census, after 30 years from the last modern
+          census, and after 40 years from the last register-based census.
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      ybcov_ability:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_processing: Description of processing of testing variable.
+        description_key: List of key points about the indicator.
+        description_from_producer: >-
+          A graded index of the ability of the country to
+          publish a statistical yearbook over a ten-year window. The index
+          takes the value 10 when the country published a statistical yearbook
+          covering that year (based on yearbook_coverage) and is depreciated
+          by 1 point for each consecutive year without a statistical yearbook.
+          Therefore, the index takes the value 0 after 10 years without
+          statistical yearbooks published.
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      infcap_irt:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_processing: Description of processing of testing variable.
+        description_key: List of key points about the indicator.
+        description_from_producer: >-
+          An aggregate index of information capacity. It is based
+          on a hybrid two-parameter and graded Item Response Model (IRT)
+          that is based on five component indicators – when the country first
+          established a statistical agency (statag_intro), whether the country
+          had in place a civil register (civreg) and a population register
+          (popreg), and the graded indexes of census ability
+          (censusgraded_ability) and yearbook ability (ybcov_ability).
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      infcap_pca:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description_short: Short description of testing variable.
+        description_processing: Description of processing of testing variable.
+        description_key: List of key points about the indicator.
+        description_from_producer: >-
+          An aggregate index of information capacity based on a
+          Principal Components Analysis (PCA) model, using the same
+          component variables as infcap_irt.
+        processing_level: minor
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 0
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description_short: Short description of testing variable.
+      #   description_processing: Description of processing of testing variable.
+      #   description_key: List of key points about the indicator.
+      #   description_from_producer: Description of testing variable from producer.
+      #   processing_level: minor
+      #   presentation:
+      #     attribution:
+      #     attribution_short:
+      #     faqs:
+      #     grapher_config:
+      #     title_public:
+      #     title_variant:
+      #     topic_tags:
+      #   display:
+      #     color:
+      #     conversionFactor: 1
+      #     description:
+      #     entityAnnotationsMap: Test annotation
+      #     includeInTable:
+      #     isProjection: false
+      #     name: Testing variable
+      #     numDecimalPlaces: 0
+      #     shortUnit: au
+      #     tableDisplay:
+      #       hideAbsoluteChange:
+      #       hideRelativeChange:
+      #     tolerance: 0
+      #     unit: arbitrary units
+      #     yearIsDay: false
+      #     zeroDay:
+

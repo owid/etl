@@ -677,6 +677,10 @@ steps:
 
   ######################################################################################################################
 
+  data://meadow/state_capacity/2023-11-10/information_capacity_dataset:
+    - snapshot://state_capacity/2023-11-10/information_capacity_dataset.dta
+  data://garden/state_capacity/2023-11-10/information_capacity_dataset:
+    - data://meadow/state_capacity/2023-11-10/information_capacity_dataset
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
