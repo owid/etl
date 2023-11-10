@@ -192,6 +192,7 @@ tables:
           - |-
             {definitions.life_expectancy.point_1}
         display:
+          numDecimalPlaces: 1
           name: |-
             {tables.hmd.variables.life_expectancy.title} {definitions.others.display_name_dim}
         presentation:
@@ -215,6 +216,7 @@ tables:
           - |-
             {definitions.life_expectancy.point_1}
         display:
+          numDecimalPlaces: 1
           name: |-
             Life expectancy (female-male difference) at << 'birth' if (age == '0') else age >>, << type >>
         presentation:
@@ -227,6 +229,7 @@ tables:
       life_expectancy_fm_ratio:
         title: Life expectancy ratio (f/m)
         unit: ""
+        short_unit: ""
         description_short: |-
           <% if type == "cohort" %>
           The ratio of cohort life expectancy (females/males) at a given age.
@@ -240,6 +243,7 @@ tables:
           - |-
             {definitions.life_expectancy.point_1}
         display:
+          numDecimalPlaces: 1
           name: |-
             Life expectancy (female-to-male ratio) at << 'birth' if (age == '0') else age >>, << type >>
         presentation:

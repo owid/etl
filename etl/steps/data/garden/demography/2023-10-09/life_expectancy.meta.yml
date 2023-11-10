@@ -84,6 +84,7 @@ tables:
         title: |-
           {definitions.global.title_base}
         display: &display_hist
+          numDecimalPlaces: 1
           name: |-
             {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'all') >>
         presentation:
@@ -110,6 +111,7 @@ tables:
         title: |-
           {definitions.global.title_base} (with projections)
         display: &display_w_proj
+          numDecimalPlaces: 1
           name: |-
             {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'all') >>, with UN medium projections
         presentation:
@@ -138,6 +140,7 @@ tables:
         description_key:
           - *period_lt_def
         display: &display_o_proj
+          numDecimalPlaces: 1
           name: |-
             {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'all') >>, medium projection
         presentation:

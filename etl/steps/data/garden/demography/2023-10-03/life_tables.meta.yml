@@ -159,6 +159,7 @@ tables:
           - |-
             {definitions.global.data_used}
         display:
+          numDecimalPlaces: 1
           name: |-
             Life expectancy at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'both') >>, << type >>
         presentation:
@@ -184,6 +185,7 @@ tables:
           - |-
             {definitions.global.data_used}
         display:
+          numDecimalPlaces: 1
           name: |-
             Life expectancy (female-male difference) at << 'birth' if (age == '0') else age >>, << type >>
         presentation:
@@ -212,6 +214,7 @@ tables:
           - |-
             {definitions.global.data_used}
         display:
+          numDecimalPlaces: 1
           name: |-
             Life expectancy (female-to-male ratio) at << 'birth' if (age == '0') else age >>, << type >>
         presentation:
