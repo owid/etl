@@ -14,6 +14,7 @@ from .tables import (
     read_from_records,
     read_fwf,
     read_json,
+    read_rda,
     read_stata,
 )
 
@@ -31,4 +32,5 @@ __all__ = [
     "read_json",
     "read_fwf",
     "read_stata",
+    "read_rda",
 ]

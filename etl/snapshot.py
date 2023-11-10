@@ -11,7 +11,7 @@ import owid.catalog.processing as pr
 import pandas as pd
 import yaml
 from dataclasses_json import dataclass_json
-from owid.catalog import Table
+from owid.catalog import Table, s3_utils
 from owid.catalog.meta import (
     DatasetMeta,
     License,
@@ -21,6 +21,7 @@ from owid.catalog.meta import (
     pruned_json,
 )
 from owid.datautils import dataframes
+from owid.datautils.io import decompress_file
 from owid.walden import files
 from tenacity import Retrying
 from tenacity.retry import retry_if_exception_type
@@ -116,7 +117,10 @@ class Snapshot:
         else:
             raise ValueError("Neither origin nor source is set")
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        files.download(download_url, str(self.path))
+        if download_url.startswith("s3://"):
+            s3_utils.download(download_url, str(self.path))
+        else:
+            files.download(download_url, str(self.path))
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
@@ -205,6 +209,9 @@ class Snapshot:
     def ExcelFile(self, *args, **kwargs) -> pr.ExcelFile:
         """Return an Excel file object ready for parsing."""
         return pr.ExcelFile(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
+    def extract(self, output_dir: Path | str):
+        decompress_file(self.path, output_dir)
 
 
 @pruned_json

@@ -1,0 +1,524 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Taxation
+        - State Capacity
+
+    processing_level: major
+    description_processing: |
+      Any observation flagged with the caution note 1 has been removed from the data. There are four categories of caution notes:
+        1. Accuracy, quality or comparability of data questionable.
+        2. Un-excluded resource revenues/taxes are significant but cannot be isolated from total revenue/taxes.
+        3. Un-excluded resource revenue/taxes are marginal but non-negligible and cannot be isolated from total revenue/taxes.
+        4. Inconsistencies with social contributions.
+
+    display: &common-display
+      numDecimalPlaces: 1
+      tolerance: 5
+
+  revenue: >-
+    Revenue refers to total government revenue, providing a set of variables that differentiates
+    between sources and sub-components considered. Revenue contains four sub-components,
+    namely:
+
+
+    (i) Taxes;
+    (ii) Non-Tax Revenue;
+    (iii) Social Contributions;
+    (iv) Grants.
+
+
+    The variable Taxes captures tax collected regardless of sources (i.e., unless otherwise defined, this
+    includes resource-based taxes). These follow the definition of taxes found in both the IMF’
+    Government Finance Statistics Manual (GFSM) and OECD Revenue Statistics Interpretive Guide
+    as ‘compulsory, unrequited …’ payments to the government (IMF 2014; OECD 2020).
+    Non-tax revenue includes all other revenue that is collected by governments that does not classify
+    as either a tax, social contribution, or grant. According to IMF (2014:85), non-tax revenue captures
+    ‘… property income, sales of goods and services, fines, penalties, and forfeits, transfers not
+    elsewhere classified and premiums, fees, and claims related to nonlife insurance and standardized
+    guarantee schemes.’
+    Social contributions include both compulsory and voluntary social insurance contributions from
+    employers, employees, and the self-employed.
+    Grants include transfers from other government
+    units (foreign) and international organisations. Regarding natural resources, please note that they
+    refer to natural resources that include a significant component of economic rent, primarily from
+    oil and mining activities.
+
+  total_taxes: >-
+    The Taxes variables presents aggregate indicators that capture all tax revenue as defined above.
+    Resource taxes typically present taxes levied on natural resource extraction, although differ across
+    territories. Resource Taxes are not (systematically) defined or captured in the OECD Revenue
+    Statistics, and not captured at all in the IMF’s GFS, thus do not have a separate code for either
+    publication.
+
+  direct_taxes: >-
+    Direct taxes include taxes on income, profits and capital gains, taxes on payroll and workforce as
+    well as taxes on property. Please note that the total values of direct taxes (total direct tax
+    mentioned in all variables listed below) may sometimes exceed the sum of the
+    aforementioned sub-components, owing to revenue that is unclassified among these subcomponents. When specified as direct taxes excluding resource revenue, direct taxes comprise
+    non-resource taxes on the mentioned sub-components (e.g., excluding corporate taxes accruing
+    from entities engaged in the extraction of natural resource).
+
+  taxes_income_profits_capital_gains: >-
+    Taxes on income, profits, and capital gains (TIPCG) are always reported exclusive of social
+    contributions. The total value of TIPCG may sometimes exceed the sum of the positions displayed
+    in individuals and corporations and other enterprises, due to revenues that are unallocated between the
+    two.
+
+  taxes_payroll_workforce:
+    Total taxes on payroll and workforce are always reported excluding social contributions, although
+    in underlying sources, for certain countries, there is an element of conflation between the reporting
+    of social contributions and payroll taxes; see McNabb (2017).
+
+  taxes_property:
+    This variable displays the total taxation on property, comprising mostly recurrent taxes on
+    immovable property and net wealth, estate, inheritance and gift taxes, capital levies and other
+    recurrent taxes on property. Note that the OECD’s revenue statistics class taxes on financial and
+    capital transactions as a property tax, whilst the IMF’s GFSM 2014 does not.4 In the name of
+    consistency, these are removed from the property tax figure for OECD countries and placed into
+    taxes and goods and services; see McNabb (2017) for a fuller discussion.
+
+  indirect_taxes: >-
+    Indirect taxes comprise the sum of taxes on goods and services, international trade and
+    transactions, and other taxes. The position displayed in Indirect may exceed the sum of mentioned
+    sub-components due to unallocated revenue not classified in any of these categories. Note that the
+    component of indirect taxes from natural resources is only non-zero in a small number of cases.
+
+  taxes_goods_services:
+    The majority of taxes on goods and services is comprised of sales taxes, value-added taxes (VAT)
+    and excise duties. The OECD’s Revenue Statistics classes taxes on international trade and
+    transactions under taxes on goods and services; thus for the GRD it is stripped out and reallocated
+    as shown below. Note that the total of ‘Taxes on Goods and Services’ may be greater than the
+    sum of the subcomponents due to unallocated residual revenues. Note also that, historically, a
+    large number of countries classed VAT and Excise duty collected on imports as trade taxes. Both
+    the IMF and OECD classify these as taxes on goods and services, and thus fall in this category. In
+    the GRD, where it has not been possible to make this correction—primarily where historical
+    Article IV data is involved—a note has been added to the relevant observations.
+
+  taxes_trade: |
+    Taxes on international trade include taxes on imports and exports.
+
+  taxes_other: >-
+    Total other taxes comprises tax revenues that are not otherwise classified, or identified. Often this
+    incorporates, amongst other items, certain stamp duties.
+
+  non_tax_revenue: >-
+    These variables represent the non-tax components of government revenues. Total non-tax
+    revenue is generally based on data categorized as either ‘non-tax revenue’ or ‘other revenue’
+    depending on the underlying source.
+
+  social_contributions: >-
+    The variable for social contributions captures all social contributions remitted to government,
+    either by employees, employer or the self-employed. This category also includes voluntary and
+    imputed social contributions.
+
+  grants: >-
+    Grants include transfers from other government units (foreign) and international organisations.
+    Whilst it is possible that at subnational levels of government, grants might also include
+    intragovernmental grants, these are ‘netted out’ at the general government level and it is unlikely
+    that grants would flow from state or local governments to the central government (the other level
+    at which the GRD reports).
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  government_revenue_dataset:
+    variables:
+      rev_inc_sc:
+        title: Revenue including social contributions (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes taxes, non-tax revenue, social contributions, and grants.
+        description_from_producer: "{definitions.revenue}"
+        display:
+          name: Revenue including social contributions
+          <<: *common-display
+      rev_ex_sc:
+        title: Revenue excluding social contributions (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes taxes, non-tax revenue, and grants.
+        description_from_producer: "{definitions.revenue}"
+        display:
+          name: Revenue excluding social contributions
+          <<: *common-display
+      rev_ex_gr_inc_sc:
+        title: Revenue excluding grants and including social contributions (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes taxes, non-tax revenue, and social contributions.
+        description_from_producer: "{definitions.revenue}"
+        display:
+          name: Revenue excluding grants and including social contributions
+          <<: *common-display
+      rev_ex_gr_ex_sc:
+        title: Revenue excluding grants and excluding social contributions (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes taxes and non-tax revenue.
+        description_from_producer: "{definitions.revenue}"
+        display:
+          name: Revenue excluding grants and excluding social contributions
+          <<: *common-display
+      tot_res_rev:
+        title: Total resource revenue (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: "{definitions.revenue}"
+        display:
+          name: Total resource revenue
+          <<: *common-display
+      tot_nres_rev_inc_sc:
+        title: Total non-resource revenue including social contributions (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes taxes minus resource taxes, non-tax revenue excluding resource component, and social contributions.
+        description_from_producer: "{definitions.revenue}"
+        display:
+          name: Total non-resource revenue including social contributions
+          <<: *common-display
+      tax_inc_sc:
+        title: Taxes including social contributions (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: "{definitions.total_taxes}"
+        display:
+          name: Taxes including social contributions
+          <<: *common-display
+      tax_ex_sc:
+        title: Taxes excluding social contributions (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: "{definitions.total_taxes}"
+        display:
+          name: Taxes excluding social contributions
+          <<: *common-display
+      resourcetaxes:
+        title: Resource taxes (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Refers mostly to corporate taxation of resource extraction.
+        description_from_producer: "{definitions.total_taxes}"
+        display:
+          name: Resource taxes
+          <<: *common-display
+      nrtax_inc_sc:
+        title: Non-resource taxes including social contributions (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes taxes and social contributions, minus resource taxes.
+        description_from_producer: "{definitions.total_taxes}"
+        display:
+          name: Non-resource taxes including social contributions
+          <<: *common-display
+      nrtax_ex_sc:
+        title: Non-resource taxes excluding social contributions (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes taxes minus resource taxes.
+        description_from_producer: "{definitions.total_taxes}"
+        display:
+          name: Non-resource taxes excluding social contributions
+          <<: *common-display
+      direct_inc_sc_inc_rt:
+        title: Direct taxes including social contributions and resource revenue (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Defined as total direct tax plus social contributions.
+        description_from_producer: "{definitions.direct_taxes}"
+        display:
+          name: Direct taxes including social contributions and resource revenue
+          <<: *common-display
+      direct_inc_sc_ex_rt:
+        title: Direct taxes including social contributions and excluding resource revenue (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Defined as total direct tax plus social contributions minus resource taxes.
+        description_from_producer: "{definitions.direct_taxes}"
+        display:
+          name: Direct taxes including social contributions and excluding resource revenue
+          <<: *common-display
+      direct_ex_sc_inc_rt:
+        title: Direct taxes excluding social contributions and including resource revenue (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: It is composed of total direct tax only.
+        description_from_producer: "{definitions.direct_taxes}"
+        display:
+          name: Direct taxes excluding social contributions and including resource revenue
+          <<: *common-display
+      direct_ex_sc_ex_rt:
+        title: Direct taxes excluding social contributions and resource revenue (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Defined as total direct tax minus resource taxes.
+        description_from_producer: "{definitions.direct_taxes}"
+        display:
+          name: Direct taxes excluding social contributions and resource revenue
+          <<: *common-display
+      tax_income:
+        title: Taxes on income, profits and capital gains (TIPCG) (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.direct_taxes}
+
+          {definitions.taxes_income_profits_capital_gains}
+        display:
+          name: Taxes on income, profits and capital gains
+          <<: *common-display
+      tax_res_income:
+        title: Resource component of taxes on income, profits, and capital gains (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.direct_taxes}
+
+          {definitions.taxes_income_profits_capital_gains}
+        display:
+          name: Resource component of taxes on income, profits, and capital gains
+          <<: *common-display
+      tax_nr_income:
+        title: Non-resource component of taxes on income, profits, and capital gains (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.direct_taxes}
+
+          {definitions.taxes_income_profits_capital_gains}
+        display:
+          name: Non-resource component of taxes on income, profits, and capital gains
+          <<: *common-display
+      tax_indiv:
+        title: Taxes on individuals (PIT) (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.direct_taxes}
+
+          {definitions.taxes_income_profits_capital_gains}
+        display:
+          name: Taxes on individuals
+          <<: *common-display
+      tax_corp:
+        title: Taxes on corporations and other enterprises (CIT) (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.direct_taxes}
+
+          {definitions.taxes_income_profits_capital_gains}
+        display:
+          name: Taxes on corporations and other enterprises
+          <<: *common-display
+      tax_res_corp:
+        title: Resource component of taxes on corporations and other enterprises (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.direct_taxes}
+
+          {definitions.taxes_income_profits_capital_gains}
+        display:
+          name: Resource component of taxes on corporations and other enterprises
+          <<: *common-display
+      tax_nr_corp:
+        title: Non-resource component of taxes on corporations and other enterprises (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Defined as the taxes of corporations and other enterprises (CIT) minus the CIT from natural resources.
+        description_from_producer: |
+          {definitions.direct_taxes}
+
+          {definitions.taxes_income_profits_capital_gains}
+        display:
+          name: Non-resource component of taxes on corporations and other enterprises
+          <<: *common-display
+      tax_payr_workf:
+        title: Taxes on payroll and workforce (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.direct_taxes}
+
+          {definitions.taxes_payroll_workforce}
+        display:
+          name: Taxes on payroll and workforce
+          <<: *common-display
+      tax_property:
+        title: Taxes on property (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.direct_taxes}
+
+          {definitions.taxes_property}
+        display:
+          name: Taxes on property
+          <<: *common-display
+      tax_indirect:
+        title: Indirect taxes (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes taxes on goods and services, international trade and transactions, and other taxes. It may include a resource component.
+        description_from_producer: "{definitions.indirect_taxes}"
+        display:
+          name: Indirect taxes
+          <<: *common-display
+      res_indirect:
+        title: Resource component of indirect taxes (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes export taxes on natural resources, where separately reported.
+        description_from_producer: "{definitions.indirect_taxes}"
+        display:
+          name: Resource component of indirect taxes
+          <<: *common-display
+      nr_indirect:
+        title: Non-resource component of indirect taxes (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes taxes on goods and services, international trade and transactions, and other taxes net of any resource component.
+        description_from_producer: "{definitions.indirect_taxes}"
+        display:
+          name: Non-resource component of indirect taxes
+          <<: *common-display
+      tax_g_s:
+        title: Taxes on goods and services (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.indirect_taxes}
+
+          {definitions.taxes_goods_services}
+        display:
+          name: Taxes on goods and services
+          <<: *common-display
+      tax_gs_general:
+        title: General taxes on goods and services (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Defined as the sum of value-added taxes (VAT), sales tax, turnover tax and tax on financial and capital transactions.
+        description_from_producer: |
+          {definitions.indirect_taxes}
+
+          {definitions.taxes_goods_services}
+        display:
+          name: General of taxes on goods and services
+          <<: *common-display
+      vat:
+        title: Value-added taxes (VAT) (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.indirect_taxes}
+
+          {definitions.taxes_goods_services}
+        display:
+          name: Value-added taxes (VAT)
+          <<: *common-display
+      tax_gs_excises:
+        title: Excise duties (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.indirect_taxes}
+
+          {definitions.taxes_goods_services}
+        display:
+          name: Excise duties
+          <<: *common-display
+      tax_trade:
+        title: Taxes on international trade and transactions (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes taxes on imports and exports, plus other taxes on international trade.
+        description_from_producer: |
+          {definitions.indirect_taxes}
+
+          {definitions.taxes_trade}
+        display:
+          name: Taxes on international trade and transactions
+          <<: *common-display
+      tax_trade_import:
+        title: Taxes on imports (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.indirect_taxes}
+
+          {definitions.taxes_trade}
+        display:
+          name: Taxes on imports
+          <<: *common-display
+      tax_trade_export:
+        title: Taxes on exports (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.indirect_taxes}
+
+          {definitions.taxes_trade}
+        display:
+          name: Taxes on exports
+          <<: *common-display
+      tax_other:
+        title: Other taxes (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |
+          {definitions.indirect_taxes}
+
+          {definitions.taxes_other}
+        display:
+          name: Other taxes
+          <<: *common-display
+      nontax:
+        title: Non-tax revenue (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: "{definitions.non_tax_revenue}"
+        display:
+          name: Non-tax revenue
+          <<: *common-display
+      res_nontax:
+        title: Resource component of non-tax revenue (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: "{definitions.non_tax_revenue}"
+        display:
+          name: Resource component of non-tax revenue
+          <<: *common-display
+      nr_nontax:
+        title: Non-resource component of non-tax revenue (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: "{definitions.non_tax_revenue}"
+        display:
+          name: Non-resource component of non-tax revenue
+          <<: *common-display
+      sc:
+        title: Social contributions (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: "{definitions.social_contributions}"
+        display:
+          name: Social contributions
+          <<: *common-display
+      grants:
+        title: Grants received (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: "{definitions.grants}"
+        display:
+          name: Grants
+          <<: *common-display
+
