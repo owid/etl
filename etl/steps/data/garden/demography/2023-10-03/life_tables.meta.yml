@@ -196,6 +196,7 @@ tables:
       life_expectancy_fm_ratio:
         title: Life expectancy ratio (f/m)
         unit: ""
+        short_unit: ""
         description_short: |-
           <% if type == "cohort" %>
           The ratio of cohort life expectancy (females/males) at a given age.
