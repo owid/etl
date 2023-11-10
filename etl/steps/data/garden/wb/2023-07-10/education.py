@@ -131,19 +131,7 @@ def run(dest_dir: str) -> None:
     tb = add_data_for_regions(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Set an appropriate index and sort.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-
-    tb = tb.dropna(how="all")
-
-    # Calculating the percentage of NaNs in each column
-    nan_percentage_original = tb.isna().sum() / len(tb) * 100
-
-    # Threshold to remove indicators where 95% of the possible data is missing
-    threshold = 95
-
-    # Identifying columns that exceed the threshold
-    columns_to_drop = nan_percentage_original[nan_percentage_original > threshold].index
-    tb = tb.drop(columns=columns_to_drop)
+    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)xw
 
     # Add the metadata back to the table
     tb.metadata = metadata
