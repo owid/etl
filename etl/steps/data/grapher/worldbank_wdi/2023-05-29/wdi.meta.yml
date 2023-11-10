@@ -1,24 +1,8 @@
 dataset:
   update_period_days: 365
-  sources: []
-definitions:
-  common:
-    sources: []
-    origins:
-      - producer: World Bank World Development Indicators
-        title: UNICEF; World Health Organization; World Bank
-        description: |-
-          The World Development Indicators (WDI) is the World Bank’s primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
 
-          [Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)]
-        citation_full: TBD
-        url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
-        url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
-        date_accessed: '2023-05-29'
-        date_published: '2023-05-11'
-        license:
-          name: CC BY 4.0
-          url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+# definitions:
+#   common:
       # - producer: World Bank
       #   title: World Development Indicators - World Bank (2023.05.11)
       #   description: >-
@@ -137,4 +121,19 @@ tables:
                   https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
                 text: FAQs on this data
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+        sources: []
+        origins:
+          - producer: World Bank World Development Indicators
+            title: UNICEF; World Health Organization; World Bank
+            description: |-
+              The World Development Indicators (WDI) is the World Bank's primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
 
+              [Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)]
+            citation_full: World Development Indicators, The World Bank (2023).
+            url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+            url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
+            date_accessed: '2023-05-29'
+            date_published: '2023-05-11'
+            license:
+              name: CC BY 4.0
+              url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
