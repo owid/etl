@@ -131,7 +131,7 @@ def run(dest_dir: str) -> None:
     tb = add_data_for_regions(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Set an appropriate index and sort.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)xw
+    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     # Add the metadata back to the table
     tb.metadata = metadata
