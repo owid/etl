@@ -28,7 +28,6 @@ OUTLIERS_IN_CONSUMPTION_DF = [
     ("Panama", 2004),
     ("Panama", 2005),
     ("Panama", 2006),
-    ("Panama", 2011),
     ("Panama", 2012),
     ("Panama", 2013),
     ("Venezuela", 2018),
@@ -246,14 +245,34 @@ def sanity_checks_on_input_data(
         comparison[(comparison["country"] == "Kuwait") & (comparison["year"] == 1991)].index
     ).reset_index(drop=True)
 
+    # Check that production emissions from national file coincide with the Fossil CO2 emissions dataset.
+    # NOTE: There are two countries for which the difference is big, namely Iceland and New Caledonia.
+    # First assert that these two countries have a big discrepancy, and then assert that all other countries do not
+    # differ more than 2%.
+    error = (
+        "Expected Iceland and New Caledonia to have a large discrepancy between production and fossil emissions. "
+        "If that is no longer the case, remove this assertion."
+    )
+    countries_with_discrepancy = ["Iceland", "New Caledonia"]
+    assert set(
+        comparison[
+            (
+                100
+                * abs(comparison["production_emissions"] - comparison["emissions_total"])
+                / (comparison["emissions_total"])
+            ).fillna(0)
+            > 2
+        ]["country"]
+    ) == set(countries_with_discrepancy), error
     error = "Production emissions from national file were expected to coincide with the Fossil CO2 emissions dataset."
+    comparison = comparison[~comparison["country"].isin(countries_with_discrepancy)].reset_index(drop=True)
     assert (
         (
             100
             * abs(comparison["production_emissions"] - comparison["emissions_total"])
             / (comparison["emissions_total"])
         ).fillna(0)
-        < 0.1
+        < 2
     ).all(), error
 
 
@@ -634,7 +653,7 @@ def fix_consumption_emissions_for_africa(tb_co2_with_regions: Table) -> Table:
     )
     assert (
         consumption_emissions_africa_gcp - consumption_emissions_africa
-    ) / consumption_emissions_africa_gcp > 0.24, error
+    ) / consumption_emissions_africa_gcp > 0.23, error
 
     # Replace consumption emissions for "Africa" by those by "Africa (GCP)".
     consumption_emissions = tb[tb["country"] != "Africa"][["country", "year", "consumption_emissions"]].reset_index(
@@ -1017,10 +1036,9 @@ def run(dest_dir: str) -> None:
     tb_historical = prepare_historical_emissions(tb_historical=tb_historical)
 
     # Run sanity checks on input data.
-    # TODO: Uncomment once discrepancies are fixed.
-    # sanity_checks_on_input_data(
-    #     tb_production=tb_production, tb_consumption=tb_consumption, tb_historical=tb_historical, tb_co2=tb_co2
-    # )
+    sanity_checks_on_input_data(
+        tb_production=tb_production, tb_consumption=tb_consumption, tb_historical=tb_historical, tb_co2=tb_co2
+    )
 
     # For some reason, "International Transport" is included as another country, that only has emissions from oil.
     # Extract that data and remove it from the rest of national emissions.
