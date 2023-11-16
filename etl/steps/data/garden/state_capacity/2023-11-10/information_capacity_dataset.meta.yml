@@ -21,14 +21,14 @@ tables:
     variables:
       statagency:
         title: Statistical agency operating
-        unit: arbitrary units
-        short_unit: au
-        description_short: Short description of testing variable.
+        unit: ""
+        short_unit: ""
+        description_short: A statistical agency is an official government organization that is tasked with gathering numerical information on a variety of topics.
         description_from_producer: >-
           Dummy variable that takes a value 1 if the country has a
           statistical agency operating that year, and 0 otherwise. A statistical
           agency is an official government organization that is tasked with
-          gathering numerical information on a variety of topics. We as-sign
+          gathering numerical information on a variety of topics. We assign
           the value 0 to this variable when these tasks were absorbed by
           several government offices that performed other functions besides
           collecting and maintaining numerical in-formation.
@@ -39,9 +39,9 @@ tables:
           tolerance: 0
       census:
         title: Census was run
-        unit: arbitrary units
-        short_unit: au
-        description_short: Short description of testing variable.
+        unit: ""
+        short_unit: ""
+        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity."
         description_from_producer: >-
           Dummy variable that takes the value 1 if the country ran a
           census that year and 0 otherwise. A census is a population count
@@ -56,9 +56,9 @@ tables:
           tolerance: 0
       first_moderncensus:
         title: Modern census first implemented
-        unit: arbitrary units
-        short_unit: au
-        description_short: Short description of testing variable.
+        unit: ""
+        short_unit: ""
+        description_short: "A modern census is defined as a census that meets four requirements: universality, well-defined territory, simultaneity, and individual enumeration."
         description_from_producer: >-
           Dummy variable that takes the value 1 the year
           a country first implemented a modern census (it is missing
@@ -73,9 +73,9 @@ tables:
           tolerance: 0
       register_based_census:
         title: Census based on population register
-        unit: arbitrary units
-        short_unit: au
-        description_short: Short description of testing variable.
+        unit: ""
+        short_unit: ""
+        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
         description_from_producer: >-
           Dummy variable that takes the value 1 if the
           country runs a census that is based on a continuously updated
@@ -88,9 +88,9 @@ tables:
           tolerance: 0
       yearbook_published:
         title: Statistical yearbook published
-        unit: arbitrary units
-        short_unit: au
-        description_short: Short description of testing variable.
+        unit: ""
+        short_unit: ""
+        description_short: "A statistical yearbook is defined as an annual publication of the state that contains numerical data about the country regarding physical environment, demography, economic affairs, political affairs, and social and cultural affairs."
         description_from_producer: >-
           Dummy variable that takes the value 1 if the
           country published a statistical yearbook that year and 0 otherwise.
@@ -105,9 +105,9 @@ tables:
           tolerance: 0
       yearbook_coverage:
         title: Statistical yearbook with information for that year
-        unit: arbitrary units
-        short_unit: au
-        description_short: Short description of testing variable.
+        unit: ""
+        short_unit: ""
+        description_short: "A statistical yearbook is defined as is an annual publication of the state that contains numerical data about the country regarding physical environment, demography, economic affairs, political affairs, and social and cultural affairs."
         description_from_producer: >-
           Dummy variable that takes the value 1 if the
           country published a statistical yearbook with information for that
@@ -119,10 +119,10 @@ tables:
           numDecimalPlaces: 0
           tolerance: 0
       civreg:
-        title: Birth register implemented
-        unit: arbitrary units
-        short_unit: au
-        description_short: Short description of testing variable.
+        title: Civil register implemented
+        unit: ""
+        short_unit: ""
+        description_short: "A civil register is defined as a government agency that records key events in the life trajectories of individuals, such as births, marriages, and deaths."
         description_from_producer: >-
           Dummy variable that takes the value 1 if the country
           maintained a birth register that year and 0 otherwise. A civil register
@@ -138,9 +138,9 @@ tables:
           tolerance: 0
       popreg:
         title: Population register implemented
-        unit: arbitrary units
-        short_unit: au
-        description_short: Short description of testing variable.
+        unit: ""
+        short_unit: ""
+        description_short: "A population register is defined as a centralized state agency that keeps detailed and permanently updated records of every person in the territory."
         description_from_producer: >-
           Dummy variable that takes the value 1 if the country
           maintained a population register that year and 0 otherwise.
@@ -153,9 +153,9 @@ tables:
           tolerance: 0
       statag_intro:
         title: Statistical agency established
-        unit: arbitrary units
-        short_unit: au
-        description_short: Short description of testing variable.
+        unit: ""
+        short_unit: ""
+        description_short: "A statistical agency is an official government organization that is tasked with gathering numerical information on a variety of topics."
         description_from_producer: >-
           This variable takes the value 1 for every year after the
           first adoption of a statistical agency, even if it was later abolished
@@ -168,8 +168,8 @@ tables:
           tolerance: 0
       censusgraded_ability:
         title: Ability to run census
-        unit: arbitrary units
-        short_unit: au
+        unit: ""
+        short_unit: ""
         description_short: Short description of testing variable.
         description_from_producer: >-
           A graded index of the ability of the country
@@ -191,8 +191,8 @@ tables:
           tolerance: 0
       ybcov_ability:
         title: Ability to publish statistical yearbook
-        unit: arbitrary units
-        short_unit: au
+        unit: ""
+        short_unit: ""
         description_short: Short description of testing variable.
         description_from_producer: >-
           A graded index of the ability of the country to
@@ -209,8 +209,8 @@ tables:
           tolerance: 0
       infcap_irt:
         title: Information Capacity Index (IRT)
-        unit: arbitrary units
-        short_unit: au
+        unit: ""
+        short_unit: ""
         description_short: Short description of testing variable.
         description_from_producer: >-
           An aggregate index of information capacity. It is based
@@ -227,8 +227,8 @@ tables:
           tolerance: 0
       infcap_pca:
         title: Information Capacity Index (PCA)
-        unit: arbitrary units
-        short_unit: au
+        unit: ""
+        short_unit: ""
         description_short: Short description of testing variable.
         description_from_producer: >-
           An aggregate index of information capacity based on a
@@ -241,8 +241,8 @@ tables:
           tolerance: 0
       # testing_variable:
       #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
+      #   unit: ""
+      #   short_unit: ""
       #   description_short: Short description of testing variable.
       #   description_processing: Description of processing of testing variable.
       #   description_key: List of key points about the indicator.
@@ -265,12 +265,12 @@ tables:
       #     isProjection: false
       #     name: Testing variable
       #     numDecimalPlaces: 0
-      #     shortUnit: au
+      #     shortUnit: ""
       #     tableDisplay:
       #       hideAbsoluteChange:
       #       hideRelativeChange:
       #     tolerance: 0
-      #     unit: arbitrary units
+      #     unit: ""
       #     yearIsDay: false
       #     zeroDay:
 
