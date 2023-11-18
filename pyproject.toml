@@ -33,7 +33,7 @@ frictionless = {version = "^4.40.8", extras = ["pandas"]}
 regex = ">=2022.1.18"
 wikipedia = ">=1.4.0"
 # pandas updates can be dangerous, it is better to pin the version and carefully update it manually
-pandas = "1.5.2"
+pandas = ">=2.1.0,<2.2.0"
 numpy = ">=1.22.1"
 pydantic = ">=1.9.0"
 structlog = ">=21.5.0"
