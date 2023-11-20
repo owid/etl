@@ -5,13 +5,13 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, Iterator, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union
 
 import owid.catalog.processing as pr
 import pandas as pd
 import yaml
 from dataclasses_json import dataclass_json
-from owid.catalog import Table
+from owid.catalog import Table, s3_utils
 from owid.catalog.meta import (
     DatasetMeta,
     License,
@@ -27,34 +27,47 @@ from tenacity import Retrying
 from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 
-from etl import config, paths
-from etl.files import yaml_dump
+if TYPE_CHECKING:
+    from dvc.repo import Repo
 
-dvc = None
+from etl import config, paths
+from etl.files import RuntimeCache, yaml_dump
 
 # DVC is not thread-safe, so we need to lock it
 dvc_lock = Lock()
 unignore_backports_lock = Lock()
 
+DVC_REPO_CACHE = RuntimeCache()
 
-def get_dvc():
+
+def get_dvc(use_cache: bool = True) -> "Repo":
+    """Return DVC repo. If `use_cache` is True, the repo is cached in memory. Cache is thread-safe."""
     from dvc.repo import Repo
 
-    global dvc
+    key = str(paths.BASE_DIR)
+    cache = DVC_REPO_CACHE
+    if not use_cache or key not in cache:
+        if config.R2_ACCESS_KEY and config.R2_SECRET_KEY:
+            remote_config = {
+                "access_key_id": config.R2_ACCESS_KEY,
+                "secret_access_key": config.R2_SECRET_KEY,
+                "region": "auto",
+            }
+            dvc_config = {"remote": {"public": remote_config, "private": remote_config}}
+        else:
+            dvc_config = None
 
-    if dvc is None:
         dvc = Repo(
             paths.BASE_DIR,
-            config={
-                "remote": {
-                    "public": {
-                        "access_key_id": config.R2_ACCESS_KEY,
-                        "secret_access_key": config.R2_SECRET_KEY,
-                        "region": "auto",
-                    }
-                }
-            },
+            config=dvc_config,
         )
+
+        # Store repo in cache.
+        if use_cache:
+            cache.add(key, dvc)
+    else:
+        dvc = cache[key]
+
     return dvc
 
 
@@ -117,7 +130,10 @@ class Snapshot:
         else:
             raise ValueError("Neither origin nor source is set")
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        files.download(download_url, str(self.path))
+        if download_url.startswith("s3://"):
+            s3_utils.download(download_url, str(self.path))
+        else:
+            files.download(download_url, str(self.path))
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""

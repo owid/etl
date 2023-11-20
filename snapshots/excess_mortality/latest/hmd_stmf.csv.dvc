@@ -32,8 +32,8 @@ meta:
       HMD provides an online STMF visualization toolkit (https://mpidr.shinyapps.io/stmortality).
     url: https://www.mortality.org/Data/STMF
     source_data_url: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
-    date_accessed: 2023-11-08
-    publication_date: 2023-10-16
+    date_accessed: 2023-11-20
+    publication_date: 2023-11-13
     publication_year: 2023
     published_by: HMD. Human Mortality Database. Max Planck Institute for Demographic
       Research (Germany), University of California, Berkeley (USA), and French Institute
@@ -73,6 +73,6 @@ meta:
     url: https://www.mortality.org/Data/UserAgreement
 wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: 99be001e5aa12da93ef33bf7fc93d5d6
-  size: 20187538
+- md5: aabdd223c4c5d5144f6489473da5764e
+  size: 20292656
   path: hmd_stmf.csv

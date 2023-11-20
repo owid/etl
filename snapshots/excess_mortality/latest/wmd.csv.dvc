@@ -22,7 +22,7 @@ meta:
     url: https://github.com/akarlinsky/world_mortality/
     source_data_url: 
       https://raw.githubusercontent.com/akarlinsky/world_mortality/main/world_mortality.csv
-    date_accessed: 2023-11-08
+    date_accessed: 2023-11-20
     publication_date: '2021-06-30'
     publication_year: 2021
     published_by: Karlinsky & Kobak 2021, Tracking excess mortality across countries
@@ -51,6 +51,6 @@ meta:
     url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
 wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: 7e537609cfdf43ef531ee580849a74fb
-  size: 978114
+- md5: 7e73c86b4f45943141e0764d92dbf3f1
+  size: 983889
   path: wmd.csv

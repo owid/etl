@@ -512,7 +512,7 @@
         "requirement_level": "required (if existing)",
         "guidelines": [
           [
-            "Must be a complete URL, i.e. `http...`."
+            "Must be a complete URL or S3 URI, i.e. `http...`."
           ],
           [
             "Must be a direct download link.",
@@ -525,7 +525,8 @@
           ]
         ],
         "examples": [
-          "https://data.some_institution.com/dataset_12/data.csv"
+          "https://data.some_institution.com/dataset_12/data.csv",
+          "s3://owid-private/data.csv"
         ],
         "examples_bad": [],
         "category": "files"

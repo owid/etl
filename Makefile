@@ -6,7 +6,7 @@
 
 include default.mk
 
-SRC = etl snapshots apps tests
+SRC = etl snapshots apps tests docs
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 LIBS = lib/*
 

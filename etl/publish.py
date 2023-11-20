@@ -209,12 +209,15 @@ def object_md5(s3: Any, bucket: str, key: str, obj: Dict[str, Any]) -> Optional[
 
 
 def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[Dict[str, Any]]:
-    objs = s3.list_objects(Bucket=bucket, Prefix=path)
+    objs = s3.list_objects(Bucket=bucket, Prefix=path, MaxKeys=100)
     yield from objs.get("Contents", [])
 
-    while objs["IsTruncated"]:
-        objs = s3.list_objects(Bucket=bucket, Prefix=path, Marker=objs["NextMarker"])
-        yield from objs.get("Contents", [])
+    while objs["IsTruncated"] and objs.get("Contents"):
+        # If the response does not include the NextMarker element and it is truncated, we can
+        # use the value of the last Key element in the response as the marker parameter
+        marker = objs.get("NextMarker", objs["Contents"][-1]["Key"])
+        objs = s3.list_objects(Bucket=bucket, Prefix=path, Marker=marker)
+        yield from objs["Contents"]
 
 
 def delete_dataset(s3: Any, bucket: str, relative_path: str) -> None:
