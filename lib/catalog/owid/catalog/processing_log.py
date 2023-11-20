@@ -5,6 +5,7 @@ import webbrowser
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import wraps
+from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Tuple
 
 from dataclasses_json import dataclass_json
@@ -23,6 +24,16 @@ def enabled() -> bool:
 def disable_processing_log():
     original_value = os.environ.get("PROCESSING_LOG", "0")
     os.environ["PROCESSING_LOG"] = "0"
+    try:
+        yield
+    finally:
+        os.environ["PROCESSING_LOG"] = original_value
+
+
+@contextmanager
+def enable_processing_log():
+    original_value = os.environ.get("PROCESSING_LOG", "0")
+    os.environ["PROCESSING_LOG"] = "1"
     try:
         yield
     finally:
@@ -67,30 +78,32 @@ class ProcessingLog(List[LogEntry]):
             super().clear()
         return self
 
-    def _parse_parents(self, parents: List[Any], variable: str) -> List[str]:
+    def _parse_parents(self, parents: List[Any]) -> List[str]:
         """Parents currently can be Variable, VariableMeta or str. Here we should ensure that they
         are strings. For example, we could extract the name of the parent if it is a variable."""
         new_parents = []
+
         for parent in parents:
             # Variable instance
             if hasattr(parent, "metadata"):
+                parent_name = parent.name
                 parent = parent.metadata
+            else:
+                parent_name = getattr(parent, "name", str(parent))
 
             # VariableMeta instance
             if hasattr(parent, "processing_log"):
                 if len(parent.processing_log) == 0:
-                    new_parents.append(variable)
+                    # no history, use parent name
+                    new_parents.append(parent_name)
                 else:
+                    # use last target as parent
                     new_parents.append(parent.processing_log[-1].target)
-            elif hasattr(parent, "name"):
-                new_parents.append(parent.name)
             # owid.catalog.tables.ExcelFile
             elif hasattr(parent, "io"):
-                from etl.paths import DATA_DIR
-
-                new_parents.append(str(parent.io.relative_to(DATA_DIR)))
+                new_parents.append(str(parent.io))
             else:
-                new_parents.append(str(parent))
+                new_parents.append(parent_name)
 
         return new_parents
 
@@ -111,7 +124,7 @@ class ProcessingLog(List[LogEntry]):
         if len(self) > 0 and self[-1].variable == variable and operation == "rename":
             return
 
-        new_parents = self._parse_parents(parents, variable)
+        new_parents = self._parse_parents(parents)
 
         if not target:
             target = f"{variable}#{random_hash()}"
@@ -127,14 +140,22 @@ class ProcessingLog(List[LogEntry]):
 
         self.append(entry)
 
-    def display(self, output: Literal["text", "html"] = "html", show_upstream=True, auto_open=True):
+    def display(
+        self,
+        data_dir: Optional[Path] = None,
+        output: Literal["text", "html"] = "html",
+        show_upstream=True,
+        auto_open=True,
+    ):
         """Displays processing log as a Mermaid diagram in a browser or as a text.
+        :param data_dir: Path to the data directory. Usually etl.paths.DATA_DIR.
         :param show_upstream: Show processing log for upstream channels too.
         """
         pl = self
 
         if show_upstream:
-            pl = _add_upstream_channels(pl)
+            assert data_dir is not None, "data_dir must be provided to show upstream channels. Use etl.paths.DATA_DIR."
+            pl = _add_upstream_channels(data_dir, pl)
 
         pl = preprocess_log(pl)
 
@@ -188,6 +209,7 @@ def wrap(operation: str, parents: List[str] = []):
     """Decorator that wraps function returning Table object. It disables
     processing log during the execution of the function and adds a clean new entry.
     """
+
     # TODO: this should work for functions taking Table as a argument and using columns
     #   as parents
     # TODO: make sure that the first argument `parent` is valid
@@ -236,7 +258,7 @@ def _sanitize_mermaid(s: str) -> str:
     return s.replace(" ", "_").replace(">", "").replace("<", "")
 
 
-def _mermaid_diagram(pl: list[LogEntry]):
+def _mermaid_diagram(pl: List[LogEntry]):
     yield "graph TB;"
 
     for r in pl:
@@ -255,38 +277,35 @@ def _mermaid_diagram(pl: list[LogEntry]):
 
 
 def preprocess_log(pl: ProcessingLog) -> ProcessingLog:
-    # try to merge rename with previous operation
+    """Preprocess log to make it more readable. This should be applied on raw ProcessingLog from metadata."""
     new_pl = []
-    last_r = None
-    seen_r = set()
-    for r in pl:
-        # TODO: when is this happening??
-        if str(r) in seen_r:
+    last_entry = None
+    seen_entries = set()
+    for entry in pl:
+        if str(entry) in seen_entries:
             continue
-            # raise NotImplementedError("Fixme")
 
-        if last_r and r.operation == "rename":
+        if last_entry and entry.operation == "rename":
             # operation is just renaming, we can merge it with the previous one
             # exclude sort and load, these are nicer to keep
-            if last_r.target == r.parents[0] and last_r.operation not in ("sort", "load", "pivot"):
-                new_pl[-1] = last_r.clone(target=r.target, variable=r.variable)
+            if last_entry.target == entry.parents[0] and last_entry.operation not in ("sort", "load", "pivot"):
+                new_pl[-1] = last_entry.clone(target=entry.target, variable=entry.variable)
                 continue
 
-        last_r = r
-        new_pl.append(r)
-        seen_r.add(str(r))
+        last_entry = entry
+        new_pl.append(entry)
+        seen_entries.add(str(entry))
 
     return ProcessingLog(new_pl)
 
 
-def _add_upstream_channels(pl: ProcessingLog) -> ProcessingLog:
-    # TODO: get rid of this circular dependency
+def _add_upstream_channels(data_dir: Path, pl: ProcessingLog) -> ProcessingLog:
+    """Each dataset only contains processing logs from its own channel. This function
+    traverses upstream channels and adds their processing logs to the log of the current channel."""
     from owid.catalog import Dataset
 
-    from etl.paths import DATA_DIR
-
     # reverse processing log to traverse backwards
-    pl: list = pl[::-1]
+    pl = ProcessingLog(pl[::-1])
     new_pl = []
 
     seen_parents_variables = set()
@@ -310,7 +329,7 @@ def _add_upstream_channels(pl: ProcessingLog) -> ProcessingLog:
 
             # TODO: this is inefficient, we're loading entire dataset to get a
             # single column
-            tab = Dataset(DATA_DIR / dataset_name)[table_name]
+            tab = Dataset(data_dir / dataset_name)[table_name]
             upstream_pl = tab[r.variable].m.processing_log
 
             # add reverted log to the queue

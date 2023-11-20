@@ -19,9 +19,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = tb.drop(columns=["yummy_variable", "out"])
-
-    tb = tb.rename(columns={"dummy_variable": "dummy_var"})
 
     #
     # Save outputs.

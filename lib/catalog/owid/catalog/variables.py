@@ -5,7 +5,6 @@
 import copy
 import json
 import os
-import random
 from collections import defaultdict
 from typing import Any, Dict, List, Literal, Optional, Union, cast, overload
 
@@ -460,7 +459,7 @@ def combine_variables_processing_level(variables: List[Variable]) -> Optional[PR
 
 
 def combine_variables_metadata(
-    variables: List[Any], operation: Optional[OPERATION] = None, name: str = UNNAMED_VARIABLE
+    variables: List[Any], operation: OPERATION, name: str = UNNAMED_VARIABLE
 ) -> VariableMeta:
     # Initialise an empty metadata.
     metadata = VariableMeta()
@@ -493,7 +492,6 @@ def combine_variables_metadata(
     metadata.sources = get_unique_sources_from_variables(variables=variables_only)
     metadata.origins = get_unique_origins_from_variables(variables=variables_only)
     metadata.licenses = get_unique_licenses_from_variables(variables=variables_only)
-    metadata.processing_log = combine_variables_processing_logs(variables=variables_only)
     metadata.display = combine_variables_display(variables=variables_only, operation=operation)
     metadata.presentation = combine_variables_presentation(variables=variables_only, operation=operation)
     metadata.processing_level = combine_variables_processing_level(variables=variables_only)

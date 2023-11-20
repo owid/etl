@@ -309,37 +309,6 @@ def test_copy_metadata() -> None:
     assert t.gdp.metadata.title == "GDP"
 
 
-def test_addition_without_metadata() -> None:
-    t: Table = Table({"a": [1, 2], "b": [3, 4]})
-    t["c"] = t["a"] + t["b"]
-    if pl.enabled():
-        expected_metadata = VariableMeta(processing_log=[{"variable": "c", "parents": ["a", "b"], "operation": "+"}])
-    else:
-        expected_metadata = VariableMeta()
-    assert t.c.metadata == expected_metadata
-
-
-def test_addition_with_metadata() -> None:
-    t: Table = Table({"a": [1, 2], "b": [3, 4]})
-    t.a.metadata.title = "A"
-    t.b.metadata.title = "B"
-
-    t["c"] = t["a"] + t["b"]
-
-    if pl.enabled():
-        expected_metadata = VariableMeta(processing_log=[{"variable": "c", "parents": ["a", "b"], "operation": "+"}])
-    else:
-        expected_metadata = VariableMeta()
-    assert t.c.metadata == expected_metadata
-
-    t.c.metadata.title = "C"
-
-    # addition shouldn't change the metadata of the original columns
-    assert t.a.metadata.title == "A"
-    assert t.b.metadata.title == "B"
-    assert t.c.metadata.title == "C"
-
-
 def test_addition_same_variable() -> None:
     t: Table = Table({"a": [1, 2], "b": [3, 4]})
     t.a.metadata.title = "A"

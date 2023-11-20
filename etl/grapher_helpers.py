@@ -205,7 +205,7 @@ def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
             setattr(obj, k, _expand_jinja(v, dim_dict))
         return obj
     elif isinstance(obj, list):
-        return [_expand_jinja(v, dim_dict) for v in obj]
+        return type(obj)([_expand_jinja(v, dim_dict) for v in obj])
     elif isinstance(obj, dict):
         return {k: _expand_jinja(v, dim_dict) for k, v in obj.items()}
     else:

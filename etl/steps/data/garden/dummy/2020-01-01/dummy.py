@@ -13,20 +13,9 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("dummy")
-    tb = ds_meadow["dummy"]
-    tb = tb.reset_index()
-
-    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["dummy"].reset_index()
-    tb_population = ds_population["population"].reset_index()
-
-    # tb = tb.merge(tb_population["population"], on=["country", "year"])
-
-    tb["dummy_variable"] = tb["dummy_variable"] / tb_population["population"]
-
-    tb["c"] = tb["dummy_variable"] + tb["yummy_variable"] + 5
 
     #
     # Process data.

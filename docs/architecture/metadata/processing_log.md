@@ -17,7 +17,7 @@ To visualize the processing log in a browser, use the following code (from noteb
 ```python
 ds = Dataset(DATA_DIR / "meadow/dummy/2020-01-01/dummy")
 tab = ds['dummy']
-tab['dummy_variable'].metadata.processing_log.display()
+tab['dummy_variable'].metadata.processing_log.display(DATA_DIR)
 ```
 
 Ensure that the `PROCESSING_LOG` environment variable is unset or set to "0" when displaying the log. Otherwise, the diagram will only show a single "load" operation. Therefore, it is not advisable to set this variable in the `.env` file.

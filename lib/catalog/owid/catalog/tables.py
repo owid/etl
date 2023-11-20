@@ -400,7 +400,6 @@ class Table(pd.DataFrame):
                 if not value.name:
                     value.name = key
                 if value.name == variables.UNNAMED_VARIABLE:
-                    raise NotImplementedError("Is this reachable?")
                     # Update the variable name, if it had the unnamed variable tag.
                     # Replace all instances of unnamed variables in the processing log by the actual name of the new
                     # variable.
@@ -763,7 +762,7 @@ class Table(pd.DataFrame):
         # tb = update_log(table=tb, operation="+", parents=[other], variable_names=tb.columns)
         # Instead, update the processing log of each variable in the table.
         for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="+", variable_name=column)
+            tb[column].update_log(parents=[tb[column], other], operation="+")
         return tb
 
     def __iadd__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
@@ -772,7 +771,7 @@ class Table(pd.DataFrame):
     def __sub__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         tb = cast(Table, Table(super().__sub__(other=other)).copy_metadata(self))
         for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="-", variable_name=column)
+            tb[column].update_log(parents=[tb[column], other], operation="-")
         return tb
 
     def __isub__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
@@ -781,7 +780,7 @@ class Table(pd.DataFrame):
     def __mul__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         tb = cast(Table, Table(super().__mul__(other=other)).copy_metadata(self))
         for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="*", variable_name=column)
+            tb[column].update_log(parents=[tb[column], other], operation="*")
         return tb
 
     def __imul__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
@@ -790,7 +789,7 @@ class Table(pd.DataFrame):
     def __truediv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         tb = cast(Table, Table(super().__truediv__(other=other)).copy_metadata(self))
         for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="/", variable_name=column)
+            tb[column].update_log(parents=[tb[column], other], operation="/")
         return tb
 
     def __itruediv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
@@ -799,7 +798,7 @@ class Table(pd.DataFrame):
     def __floordiv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         tb = cast(Table, Table(super().__floordiv__(other=other)).copy_metadata(self))
         for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="//", variable_name=column)
+            tb[column].update_log(parents=[tb[column], other], operation="//")
         return tb
 
     def __ifloordiv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
@@ -808,7 +807,7 @@ class Table(pd.DataFrame):
     def __mod__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         tb = cast(Table, Table(super().__mod__(other=other)).copy_metadata(self))
         for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="%", variable_name=column)
+            tb[column].update_log(parents=[tb[column], other], operation="%")
         return tb
 
     def __imod__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
@@ -817,9 +816,7 @@ class Table(pd.DataFrame):
     def __pow__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
         tb = cast(Table, Table(super().__pow__(other=other)).copy_metadata(self))
         for column in tb.columns:
-            tb[column].update_log(
-                variable=tb[column], parents=[tb[column], other], operation="**", variable_name=column
-            )
+            tb[column].update_log(parents=[tb[column], other], operation="**")
         return tb
 
     def __ipow__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
@@ -1205,7 +1202,12 @@ def pivot(
 
     # Update variable metadata in the new table.
     for column in table.columns:
-        variables_to_combine = _extract_variables(data, columns) + _extract_variables(data, values)
+        if isinstance(values, str):
+            column_name = values
+        else:
+            column_name = column[0]
+        variables_to_combine = [data[column_name]]
+        # variables_to_combine = _extract_variables(data, columns) + _extract_variables(data, values)
 
         # For now, I assume the only metadata we want to propagate is the one of the upper level.
         # Alternatively, we could combine the metadata of the upper level variable with the metadata of the original
@@ -1282,11 +1284,6 @@ def read_fwf(
 ) -> Table:
     table = Table(pd.read_fwf(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
-    if isinstance(filepath_or_buffer, (str, Path)):
-        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
-    else:
-        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_fwf.")
-
     return cast(Table, table)
 
 
@@ -1367,11 +1364,6 @@ def read_stata(
 ) -> Table:
     table = Table(pd.read_stata(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
-    if isinstance(filepath_or_buffer, (str, Path)):
-        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
-    else:
-        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_stata.")
-
     return cast(Table, table)
 
 
@@ -1389,11 +1381,6 @@ def read_rda(
         raise ValueError(f"Table {table_name} not found in RDA file.")
     table = Table(converted[table_name], underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
-    if isinstance(filepath_or_buffer, (str, Path)):
-        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
-    else:
-        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_stata.")
-
     return cast(Table, table)
 
 
@@ -1576,7 +1563,7 @@ def _resolve_collisions(
     return new_cols
 
 
-def _extract_variables(t: Table, cols: list[str] | str | None) -> list[variables.Variable]:
+def _extract_variables(t: Table, cols: Optional[Union[List[str], str]]) -> List[variables.Variable]:
     if not cols:
         return []
     if isinstance(cols, str):
