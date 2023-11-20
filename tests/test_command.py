@@ -31,7 +31,7 @@ def test_validate_private_steps(dag):
         dag,
         **{
             "data://c": {"data-private://d"},
-        }
+        },
     )
     with pytest.raises(ValueError):
         cmd._validate_private_steps(new_dag)
@@ -42,6 +42,6 @@ def test_validate_private_steps(dag):
         dag,
         **{
             "grapher://c": {"data-private://a"},
-        }
+        },
     )
     cmd._validate_private_steps(new_dag)

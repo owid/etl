@@ -3,9 +3,11 @@ from typing import Any, Callable, Generator, Iterable, List, Optional, cast
 
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_datetime64_any_dtype  # type: ignore
-from pandas.api.types import is_numeric_dtype  # type: ignore
-from pandas.api.types import union_categoricals
+from pandas.api.types import (
+    is_datetime64_any_dtype,  # type: ignore
+    is_numeric_dtype,  # type: ignore
+    union_categoricals,
+)
 
 # ######## Note - this file will be moved to owid-catalog-py before the branch is merged ##############
 
@@ -18,8 +20,6 @@ def get_list_description_with_max_length(items: List[Any], max_items: int = 20) 
         )
     else:
         return ", ".join(str(item) for item in items)
-
-
 
 
 def yield_list_lines(description: str, items: Iterable[Any]) -> Generator[str, None, None]:

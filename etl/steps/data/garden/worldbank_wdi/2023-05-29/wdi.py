@@ -38,9 +38,7 @@ def run(dest_dir: str) -> None:
         df=df,
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
-    ).set_index(
-        ["country", "year"], verify_integrity=True
-    )  # type: ignore
+    ).set_index(["country", "year"], verify_integrity=True)  # type: ignore
 
     df_cust = mk_custom_entities(df)
     assert all([col in df.columns for col in df_cust.columns])

@@ -29,6 +29,7 @@ pydrive2 = ">=1.15.0"
 pyarrow = ">=10.0.1"
 # this is a hint for poetry to avoid a dependency conflict with boto3
 urllib3 = "<2"
+click = "^8.1.7"
 
 
 [tool.poetry.group.dev.dependencies]

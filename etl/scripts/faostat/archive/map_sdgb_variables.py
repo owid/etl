@@ -100,7 +100,6 @@ def map_old_to_new_variable_names(variables_old: List[str], variables_new: List[
 def get_grapher_variable_id_mapping_for_two_dataset_versions(
     dataset_short_name: str, version_old: str, version_new: str
 ) -> Dict[int, int]:
-
     # Load old and new datasets.
     dataset_old = Dataset(DATA_DIR / "grapher" / NAMESPACE / version_old / dataset_short_name)
     dataset_new = Dataset(DATA_DIR / "grapher" / NAMESPACE / version_new / dataset_short_name)
@@ -139,7 +138,6 @@ def main(
     version_new: Optional[str] = None,
     execute_revisions: bool = False,
 ) -> None:
-
     if domains is None:
         # If domains is not specified, gather all domains found in all steps for the considered channel.
         domains = sorted(
@@ -164,7 +162,9 @@ def main(
 
         # Get mapping of old grapher id variable to new grapher id variable.
         grapher_variable_ids_mapping = get_grapher_variable_id_mapping_for_two_dataset_versions(
-            dataset_short_name=dataset_short_name, version_old=version_old, version_new=version_new  # type: ignore
+            dataset_short_name=dataset_short_name,
+            version_old=version_old,  # type: ignore
+            version_new=version_new,  # type: ignore
         )
 
         if execute_revisions and len(grapher_variable_ids_mapping) > 0:

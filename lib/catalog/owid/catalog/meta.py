@@ -288,9 +288,7 @@ class VariableMeta:
              <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
              <p style="font-variant: small-caps; font-family: sans-serif; font-size: 1.5em; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">variable meta</p>
              {}
-        """.format(
-            getattr(self, "_name", None), to_html(record)
-        )
+        """.format(getattr(self, "_name", None), to_html(record))
 
     def copy(self, deep=True) -> "VariableMeta":
         """Return a copy of the VariableMeta object."""
@@ -460,9 +458,7 @@ class TableMeta:
              <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
              <p style="font-variant: small-caps; font-family: sans-serif; font-size: 1.5em; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">table meta</p>
              {}
-        """.format(
-            short_name, to_html(record)
-        )
+        """.format(short_name, to_html(record))
 
     def copy(self, deep=True) -> "TableMeta":
         """Return a copy of the TableMeta object."""
