@@ -654,6 +654,14 @@ steps:
   data://grapher/un/2023-10-30/un_members:
     - data://garden/un/2023-10-30/un_members
 
+  # UNU-WIDER Government Revenue Dataset
+  data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
+    - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
+  data://garden/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://meadow/unu_wider/2023-11-01/government_revenue_dataset
+  data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://garden/unu_wider/2023-11-01/government_revenue_dataset
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 

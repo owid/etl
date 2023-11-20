@@ -27,6 +27,7 @@ import numpy as np
 import pandas as pd
 import pyarrow
 import pyarrow.parquet as pq
+import rdata
 import structlog
 from owid.repack import repack_frame
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
@@ -1404,6 +1405,28 @@ def read_stata(
     **kwargs,
 ) -> Table:
     table = Table(pd.read_stata(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    if isinstance(filepath_or_buffer, (str, Path)):
+        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
+    else:
+        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_stata.")
+
+    return cast(Table, table)
+
+
+def read_rda(
+    filepath_or_buffer: Union[str, Path, IO[AnyStr]],
+    table_name: str,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+) -> Table:
+    parsed = rdata.parser.parse_file(filepath_or_buffer)  # type: ignore
+    converted = rdata.conversion.convert(parsed)
+
+    if table_name not in converted:
+        raise ValueError(f"Table {table_name} not found in RDA file.")
+    table = Table(converted[table_name], underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     if isinstance(filepath_or_buffer, (str, Path)):
         table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
