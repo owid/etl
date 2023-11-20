@@ -159,6 +159,7 @@ tables:
           - |-
             {definitions.global.data_used}
         display:
+          numDecimalPlaces: 1
           name: |-
             Life expectancy at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'both') >>, << type >>
         presentation:
@@ -184,6 +185,7 @@ tables:
           - |-
             {definitions.global.data_used}
         display:
+          numDecimalPlaces: 1
           name: |-
             Life expectancy (female-male difference) at << 'birth' if (age == '0') else age >>, << type >>
         presentation:
@@ -196,6 +198,7 @@ tables:
       life_expectancy_fm_ratio:
         title: Life expectancy ratio (f/m)
         unit: ""
+        short_unit: ""
         description_short: |-
           <% if type == "cohort" %>
           The ratio of cohort life expectancy (females/males) at a given age.
@@ -211,6 +214,7 @@ tables:
           - |-
             {definitions.global.data_used}
         display:
+          numDecimalPlaces: 1
           name: |-
             Life expectancy (female-to-male ratio) at << 'birth' if (age == '0') else age >>, << type >>
         presentation:

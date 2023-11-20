@@ -35,6 +35,7 @@ tables:
         description_from_producer: |-
           Life expectancy at birth is defined as how long, on average, a newborn can expect to live, if current death rates do not change. However, the actual age-specific death rate of any particular birth cohort cannot be known in advance. If rates are falling, actual life spans will be higher than life expectancy calculated using current death rates. Life expectancy at birth is one of the most frequently used health status indicators. Gains in life expectancy at birth can be attributed to a number of factors, including rising living standards, improved lifestyle and better education, as well as greater access to quality health services. This indicator is presented as a total and per gender and is measured in years.
         display:
+          numDecimalPlaces: 1
           name: |-
             Life expectancy at birth<< ', ' + sex + 's' if (sex != 'all') >>, period
         presentation:
