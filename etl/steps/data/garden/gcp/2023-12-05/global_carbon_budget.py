@@ -283,7 +283,7 @@ def sanity_checks_on_output_data(tb_combined: Table) -> None:
 
     Parameters
     ----------
-    combined_df : Table
+    tb_combined : Table
         Combination of all input tables, after processing, harmonization, and addition of variables.
 
     """
@@ -368,12 +368,20 @@ def prepare_fossil_co2_emissions(tb_co2: Table) -> Table:
     tb_co2[EMISSION_SOURCES] *= MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2
 
     ####################################################################################################################
-    # NOTE: For certain years, column "emissions_from_other_industry" is not informed for "World" but it is informed
+    # For certain years, column "emissions_from_other_industry" is not informed for "World" but it is informed
     # for some countries (namely China and US).
-    # This causes the cumulative emissions from other industry as share of global for those countries to become larger
-    # than 100%.
-    # This temporary solution fixes the issue: We aggregate the data for China and US on those years when the world's
-    # data is missing (without touching other years or other columns).
+    # Note that this is not necessarily an issue in the original data: The data provider may have decided that it is
+    # better to leave the world uninformed where not enough countries are informed.
+    # However, "emissions_total" for the World seems to include those contributions from China and the US.
+    # This can be easily checked in the original data by selecting the year 1989 (last year for which there is data for
+    # China and US, but not for the World). The sum of emissions from all sources (namely coal, oil, gas, cement, and
+    # flaring, given that "other" is empty) does not add up to "emissions_total". But, if one includes the other
+    # emissions from China and US, then it does add up.
+    # This inconsistency causes the cumulative emissions from other industry for China and US to be larger than the
+    # global cumulative emissions. And the share of global emissions for those countries becomes hence larger than 100%.
+    # To fix this issue, we aggregate the data for China and US on those years when the world's data is missing (without
+    # touching other years or other columns), and add that data to the global emissions from other industry.
+
     # Firstly, list of years for which the world has no data for emissions_from_other_industry.
     world_missing_years = (
         tb_co2[(tb_co2["country"] == "Global") & (tb_co2["emissions_from_other_industry"].isnull())]["year"]
@@ -577,13 +585,13 @@ def harmonize_country_names(tb: Table) -> Table:
 
     Parameters
     ----------
-    df : Table
+    tb : Table
         Emissions data (either from the fossil CO2, the production-based, consumption-based, or land-use emissions
         datasets).
 
     Returns
     -------
-    df : Table
+    tb : Table
         Emissions data after harmonizing country names.
 
     """
@@ -607,6 +615,7 @@ def fix_duplicated_palau_data(tb_co2: Table) -> Table:
     # In the fossil CO2 emissions data, after harmonization, "Pacific Islands (Palau)" is mapped to "Palau", and
     # therefore there are rows with different data for the same country-year.
     # However, "Pacific Islands (Palau)" have data until 1991, and "Palau" has data from 1992 onwards.
+    # So this is not an issue with the original data, and it's simply caused by our harmonization of names.
     # Check that duplicate rows are still there.
     error = "Expected 'Palau' data to be duplicated. Remove temporary fix."
     assert tb[tb.duplicated(subset=["country", "year"])]["country"].unique().tolist() == ["Palau"], error
@@ -904,21 +913,6 @@ def combine_data_and_add_variables(
         tb_co2_with_regions["traded_emissions"] / tb_co2_with_regions["population"]
     )
 
-    # Add variable of emissions embedded in trade, including land-use change emissions.
-    # NOTE: The following variables would be a little misleading, since consumption emissions do not include land-use
-    # change emissions, but total emissions do.
-    # tb_co2_with_regions["traded_emissions_including_land_use_change"] = (
-    #     tb_co2_with_regions["consumption_emissions"] - tb_co2_with_regions["emissions_total_including_land_use_change"]
-    # )
-    # tb_co2_with_regions["pct_traded_emissions_including_land_use_change"] = (
-    #     100
-    #     * tb_co2_with_regions["traded_emissions_including_land_use_change"]
-    #     / tb_co2_with_regions["emissions_total_including_land_use_change"]
-    # )
-    # tb_co2_with_regions["traded_emissions_including_land_use_change_per_capita"] = (
-    #     tb_co2_with_regions["traded_emissions_including_land_use_change"] / tb_co2_with_regions["population"]
-    # )
-
     # Remove temporary columns.
     tb_co2_with_regions = tb_co2_with_regions.drop(
         columns=["global_consumption_emissions", "global_cumulative_consumption_emissions"]
@@ -951,7 +945,7 @@ def combine_data_and_add_variables(
     for column in tb_co2_with_regions.drop(columns=["country", "year"]).columns:
         tb_co2_with_regions.loc[np.isinf(tb_co2_with_regions[column]), column] = np.nan
 
-    # For special GCP countries/regions (e.g. "Africa (GCP)") we should keep only the original data.
+    # For special GCP countries/regions (e.g. "Europe (GCP)") we should keep only the original data.
     # Therefore, make nan all additional variables for those countries/regions, and keep only GCP's original data.
     added_variables = tb_co2_with_regions.drop(
         columns=["country", "year"] + COLUMNS_THAT_MUST_HAVE_DATA
