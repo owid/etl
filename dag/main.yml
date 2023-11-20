@@ -662,6 +662,14 @@ steps:
   data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
     - data://garden/unu_wider/2023-11-01/government_revenue_dataset
 
+  # Information Capacity Dataset
+  data://meadow/state_capacity/2023-11-10/information_capacity_dataset:
+    - snapshot://state_capacity/2023-11-10/information_capacity_dataset.dta
+  data://garden/state_capacity/2023-11-10/information_capacity_dataset:
+    - data://meadow/state_capacity/2023-11-10/information_capacity_dataset
+  data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
+    - data://garden/state_capacity/2023-11-10/information_capacity_dataset
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
@@ -677,10 +685,6 @@ steps:
 
   ######################################################################################################################
 
-  data://meadow/state_capacity/2023-11-10/information_capacity_dataset:
-    - snapshot://state_capacity/2023-11-10/information_capacity_dataset.dta
-  data://garden/state_capacity/2023-11-10/information_capacity_dataset:
-    - data://meadow/state_capacity/2023-11-10/information_capacity_dataset
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
