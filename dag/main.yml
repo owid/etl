@@ -662,6 +662,14 @@ steps:
   data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
     - data://garden/unu_wider/2023-11-01/government_revenue_dataset
 
+  # Temporary chart for global temperature anomaly.
+  data://meadow/climate_change/2023-11-17/temperature_anomaly:
+    - snapshot://climate_change/2023-11-17/temperature_anomaly.csv
+  data://garden/climate_change/2023-11-17/temperature_anomaly:
+    - data://meadow/climate_change/2023-11-17/temperature_anomaly
+  data://grapher/climate_change/2023-11-17/temperature_anomaly:
+    - data://garden/climate_change/2023-11-17/temperature_anomaly
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
