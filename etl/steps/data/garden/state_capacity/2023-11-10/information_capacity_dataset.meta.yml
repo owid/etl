@@ -203,7 +203,7 @@ tables:
           statistical yearbooks published.
         processing_level: minor
         display:
-          name: Ability to publish statistical yearbook
+          name: Ability to publish statistical yearbook index
           numDecimalPlaces: 0
           tolerance: 0
       infcap_irt:
