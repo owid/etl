@@ -5,7 +5,6 @@ definitions:
       topic_tags:
         - State Capacity
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
@@ -167,13 +166,13 @@ tables:
           numDecimalPlaces: 0
           tolerance: 0
       censusgraded_ability:
-        title: Ability to run census
+        title: Ability to run census index
         unit: ""
         short_unit: ""
-        description_short: Short description of testing variable.
+        description_short: Measures the ability of the country to carry out censuses consistently with different degrees of difficulty. It ranges between 0 (20 years between any census) and 30 (census based on a continuously updated population register).
         description_from_producer: >-
           A graded index of the ability of the country
-          to carry out census-es consistently with different degrees of
+          to carry out censuses consistently with different degrees of
           difficulty. The index takes the value 30 if the country ran a census
           based on a continuously updated population register (based on
           register_based_census), 20 if it ran a modern (enumeration-based)
@@ -186,14 +185,14 @@ tables:
           census, and after 40 years from the last register-based census.
         processing_level: minor
         display:
-          name: Ability to run census
+          name: Ability to run census index
           numDecimalPlaces: 0
           tolerance: 0
       ybcov_ability:
-        title: Ability to publish statistical yearbook
+        title: Ability to publish statistical yearbook index
         unit: ""
         short_unit: ""
-        description_short: Short description of testing variable.
+        description_short: Measures the ability of the country to publish a statistical yearbook over a ten-year window. It ranges between 0 (10 years without statistical yearbooks published) and 10 (country publisjed a statistical yearbook covering that year).
         description_from_producer: >-
           A graded index of the ability of the country to
           publish a statistical yearbook over a ten-year window. The index
@@ -211,7 +210,7 @@ tables:
         title: Information Capacity Index (IRT)
         unit: ""
         short_unit: ""
-        description_short: Short description of testing variable.
+        description_short: "Measures information capacity by combining five indicators: when the country first established a statistical agency, whether the country had in place a civil register and a population register, and indexes of census ability and yearbook ability. The indicators are combined via a hybrid two-parameter and graded Item Response Model (IRT)."
         description_from_producer: >-
           An aggregate index of information capacity. It is based
           on a hybrid two-parameter and graded Item Response Model (IRT)
@@ -229,7 +228,7 @@ tables:
         title: Information Capacity Index (PCA)
         unit: ""
         short_unit: ""
-        description_short: Short description of testing variable.
+        description_short: "Measures information capacity by combining five indicators: when the country first established a statistical agency, whether the country had in place a civil register and a population register, and indexes of census ability and yearbook ability. The indicators are combined via a Principal Components Analysis (PCA) model."
         description_from_producer: >-
           An aggregate index of information capacity based on a
           Principal Components Analysis (PCA) model, using the same
@@ -239,38 +238,4 @@ tables:
           name: Information Capacity Index
           numDecimalPlaces: 0
           tolerance: 0
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: ""
-      #   short_unit: ""
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: ""
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: ""
-      #     yearIsDay: false
-      #     zeroDay:
 
