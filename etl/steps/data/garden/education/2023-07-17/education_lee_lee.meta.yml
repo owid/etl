@@ -1,18 +1,5 @@
 definitions:
   common:
-    origins:
-    - producer: Lee and Lee
-      title: Lee and Lee (2016)
-      description: >-
-        Datasets on estimated school enrollment ratios from 1820 to 2010 and estimated educational attainment for the total,
-        female and male populations from 1870 to 2010. The estimates are available in five-year intervals for 111 countries.
-
-
-        Datasets were last updated in 2021 September.
-      url_main: https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html
-      date_accessed: '2023-07-17'
-      date_published: '2016'
-      citation_full: Lee, Jong-Wha and Hanol Lee, 2016, "Human Capital in the Long Run," Journal of Development Economics, vol. 122, pp. 147-169.
     presentation:
       topic_tags:
         - Global Education
@@ -20,18 +7,8 @@ definitions:
     description_processing: &description_processing
       Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
 
-
 dataset:
   title: Human Capital in the Long Run (Lee and Lee, 2016)
-  description: >-
-    Datasets on estimated school enrollment ratios from 1820 to 2010 and estimated educational attainment for the total, female
-    and male populations from 1870 to 2010. The estimates are available in five-year intervals for 111 countries.
-
-
-    Datasets were last updated in 2021 September.
-  licenses:
-  - name: 2021 by Robert J. Barro and Jong-Wha Lee.
-    url: https://github.com/barrolee/BarroLeeDataSet
 
 tables:
   education_lee_lee:
@@ -166,8 +143,7 @@ tables:
         description_short: >
           Ratio of enrolment rates in tertiary education of males to females regardless of age expressed as a percentage of the population in
           the 5-year age group immediately following upper secondary education.
-        description_processing:
-          Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank. For the period before 1985, regional aggregates were calculated by Our World in Data, using yearly population-weighted averages.
+        description_processing: *description_processing
         unit: 'ratio'
         short_unit: ''
         display:

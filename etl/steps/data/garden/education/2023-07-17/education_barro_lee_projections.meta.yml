@@ -1,3 +1,12 @@
+
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Education
+dataset:
+  title: Projections of Educational Attainment
+
 tables:
   education_barro_lee_projections:
     variables:
