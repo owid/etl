@@ -4,7 +4,6 @@ from typing import cast
 
 import owid.catalog.processing as pr
 import pandas as pd
-import shared
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
 from tqdm import tqdm
@@ -18,55 +17,6 @@ paths = PathFinder(__file__)
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-REGIONS = [
-    "North America",
-    "South America",
-    "Europe",
-    "European Union (27)",
-    "Africa",
-    "Asia",
-    "Oceania",
-    "Low-income countries",
-    "Upper-middle-income countries",
-    "Lower-middle-income countries",
-    "High-income countries",
-]
-
-
-def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
-    tb_with_regions = tb.copy()
-    # Aggregates for adjusted years of schooling and harmonized learning scores
-    aggregations = {
-        column: "mean"
-        for column in tb_with_regions.columns
-        if column
-        in [
-            "HD.HCI.LAYS",
-            "HD.HCI.LAYS.FE",
-            "HD.HCI.LAYS.MA",
-            "HD.HCI.HLOS",
-            "HD.HCI.HLOS.FE",
-            "HD.HCI.HLOS.MA",
-        ]
-    }
-
-    for region in REGIONS:
-        # Find members of current region.
-        members = geo.list_members_of_region(
-            region=region,
-            ds_regions=ds_regions,
-            ds_income_groups=ds_income_groups,
-        )
-        tb_with_regions = shared.add_region_aggregates_education(
-            df=tb_with_regions,
-            region=region,
-            countries_in_region=members,
-            countries_that_must_have_data=[],
-            num_allowed_nans_per_year=None,
-            frac_allowed_nans_per_year=0.5,
-            aggregations=aggregations,
-        )
-    return tb_with_regions
 
 
 def run(dest_dir: str) -> None:
@@ -124,11 +74,6 @@ def run(dest_dir: str) -> None:
 
     # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
     tb, combined_literacy_description, combined_expenditure_description = combine_historical_literacy_expenditure(tb)
-
-    # Load additional datasets for region and income group information for regional aggregates
-    ds_regions = paths.load_dependency("regions")
-    ds_income_groups = paths.load_dependency("income_groups")
-    tb = add_data_for_regions(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Set an appropriate index and sort.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
