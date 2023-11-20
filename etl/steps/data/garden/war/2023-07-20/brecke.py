@@ -210,8 +210,8 @@ def add_conflict_type(tb: Table) -> Table:
         "Vietnam, 1964-75",
     ]
     mask_custom = tb["name"].isin(wars_interstate)
-    assert mask_custom.sum() == len(
-        wars_interstate
+    assert (
+        mask_custom.sum() == len(wars_interstate)
     ), "Some corrections can't be made, because some war names specified in `wars_interstate` are not found in the data!"
     ## Build final mask
     mask = name_wo_year.str.contains("-") | mask_custom

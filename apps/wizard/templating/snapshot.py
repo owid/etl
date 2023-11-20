@@ -258,7 +258,11 @@ def create_description(field: Dict[str, Any]) -> str:
     if field.get("examples"):
         if "examples_bad" in field:
             description += "\n## Examples\n\n" + examples_to_markdown(
-                examples=field["examples"], examples_bad=field["examples_bad"], extra_tab=0, do_sign="✅", dont_sign="❌"
+                examples=field["examples"],
+                examples_bad=field["examples_bad"],
+                extra_tab=0,
+                do_sign="✅",
+                dont_sign="❌",
             )
         else:
             description += "\n## Examples\n\n" + examples_to_markdown(
@@ -356,7 +360,10 @@ def render_fields_from_schema(
         if "properties" in props:
             if categories:
                 form_fields = render_fields_from_schema(
-                    props["properties"], prop_uri, form_fields, container=containers[cat]  # type: ignore
+                    props["properties"],
+                    prop_uri,
+                    form_fields,
+                    container=containers[cat],  # type: ignore
                 )
             else:
                 form_fields = render_fields_from_schema(props["properties"], prop_uri, form_fields)
@@ -458,7 +465,11 @@ def render_license_field(form: List[Any]) -> List[str]:
     if props.get("examples"):
         if "examples_bad" in props:
             help_text += "\n## Examples" + examples_to_markdown(
-                examples=props["examples"], examples_bad=props["examples_bad"], extra_tab=0, do_sign="✅", dont_sign="❌"
+                examples=props["examples"],
+                examples_bad=props["examples_bad"],
+                extra_tab=0,
+                do_sign="✅",
+                dont_sign="❌",
             )
         else:
             help_text += "\n## Examples" + examples_to_markdown(
@@ -539,7 +550,11 @@ Only in rare occasions you will need to define a custom attribution.
     if props.get("examples"):
         if "examples_bad" in props:
             help_text += "\n## Examples" + examples_to_markdown(
-                examples=props["examples"], examples_bad=props["examples_bad"], extra_tab=0, do_sign="✅", dont_sign="❌"
+                examples=props["examples"],
+                examples_bad=props["examples_bad"],
+                extra_tab=0,
+                do_sign="✅",
+                dont_sign="❌",
             )
         else:
             help_text += "\n## Examples" + examples_to_markdown(

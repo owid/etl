@@ -839,7 +839,17 @@ def _get_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world_intra["conflict_type"] = "intra-state"
 
     ## Combine all
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_alltypes, tb_ongoing_world, tb_ongoing_world_alltypes, tb_ongoing_intra, tb_ongoing_world_intra], ignore_index=True).sort_values(  # type: ignore
+    tb_ongoing = pd.concat(
+        [
+            tb_ongoing,
+            tb_ongoing_alltypes,
+            tb_ongoing_world,
+            tb_ongoing_world_alltypes,
+            tb_ongoing_intra,
+            tb_ongoing_world_intra,
+        ],
+        ignore_index=True,
+    ).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
 
@@ -892,7 +902,10 @@ def _get_new_metrics(tb: Table) -> Table:
     tb_new_world_intra["conflict_type"] = "intra-state"
 
     ## Combine
-    tb_new = pd.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes, tb_new_intra, tb_new_world_intra], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pd.concat(
+        [tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes, tb_new_intra, tb_new_world_intra],
+        ignore_index=True,
+    ).sort_values(  # type: ignore
         by=["year_start", "region", "conflict_type"]
     )
 

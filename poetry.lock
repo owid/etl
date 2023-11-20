@@ -4491,6 +4491,7 @@ develop = true
 
 [package.dependencies]
 boto3 = ">=1.21.16"
+click = "^8.1.7"
 colorama = ">=0.4.4"
 gdown = ">=4.5.2"
 gsheets = ">=0.6.1"
@@ -8063,4 +8064,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.12"
-content-hash = "a00ca4280e700da712ca54cd01da1f583b3d812cbc0e9ccb7d172542854d1b0a"
+content-hash = "4cca3c51ae1539860852c0422c2d56c6d88b767bf6af95b15ea014a14077ba36"

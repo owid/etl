@@ -56,9 +56,7 @@ class IntegerNumberWithSeparators:
     @classmethod
     def regex_number_with_separator(cls) -> str:
         """Regex expression for number with separators."""
-        accepted_separators_str = "|".join(
-            rf"(({sep}\d{{3}})+)" for sep in cls.accepted_separators
-        )
+        accepted_separators_str = "|".join(rf"(({sep}\d{{3}})+)" for sep in cls.accepted_separators)
         regex_number_with_separator: str = rf"\d{{1,3}}({accepted_separators_str})"
         return regex_number_with_separator
 
@@ -185,20 +183,14 @@ class IntegerNumberWithWords:
             Regex.
         """
         regex = [
-            cls.regex_number_verbose_template.format(k, "|".join(v["words"]))
-            for k, v in cls.numeric_words.items()
+            cls.regex_number_verbose_template.format(k, "|".join(v["words"])) for k, v in cls.numeric_words.items()
         ]
         return r"\s?".join(regex)
 
     @classmethod
     def numeric_words_list(cls) -> Set[str]:
         """Return list of all numeric words (flattened)."""
-        words = set(
-            word
-            for value in cls.numeric_words.values()
-            for word in value["words"]
-            if word != ""
-        )
+        words = set(word for value in cls.numeric_words.values() for word in value["words"] if word != "")
         return words
 
     def _match_numeric_words(self) -> Dict[str, Union[str, int]]:

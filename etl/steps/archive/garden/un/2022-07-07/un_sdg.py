@@ -190,7 +190,6 @@ def generate_tables_for_indicator_and_series(
     data_dimensions: pd.DataFrame,
     dimensions: List[str],
 ) -> pd.DataFrame:
-
     if len(dimensions) == 0:
         return data_dimensions
     else:
@@ -230,7 +229,6 @@ def get_series_with_relevant_dimensions(
 
 
 def create_short_unit(long_unit: pd.Series) -> np.ndarray[Any, np.dtype[Any]]:
-
     conditions = [
         (long_unit.str.contains("PERCENT")) | (long_unit.str.contains("Percentage") | (long_unit.str.contains("%"))),
         (long_unit.str.contains("KG")) | (long_unit.str.contains("Kilograms")),
