@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["source"])
     # Merge with child mortality
     tbm = tb.merge(tb_cm, on=["country", "year"], how="inner")
-    tbm["under_five_mortality"] = tbm["under_five_mortality"] / 1000
+    tbm["under_five_mortality"] = tbm["under_five_mortality"] / 100
     # Calculate the number of children that die before age five, per woman
     tbm["children_dying_before_five_per_woman"] = tbm["under_five_mortality"] * tbm["fertility_rate"]
     # Calculate the number of children that survive past age five, per woman
