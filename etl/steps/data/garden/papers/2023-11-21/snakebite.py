@@ -3,7 +3,6 @@
 import re
 
 import numpy as np
-from owid.catalog.datasets import NULLABLE_DTYPES
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, Table, create_dataset
@@ -30,10 +29,6 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-
-    # Convert nullable types to float64, otherwise we risk pd.NA and np.nan being mixed up.
-    float64_cols = [col for col, dtype in tb.dtypes.items() if dtype in NULLABLE_DTYPES]
-    tb[float64_cols] = tb[float64_cols].astype(float)
 
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
@@ -66,7 +61,7 @@ def clean_values(tb: Table) -> Table:
     tb[columns_to_clean] = tb[columns_to_clean].mask(tb[columns_to_clean].eq("--"), np.nan)
 
     tb[columns_to_clean] = tb[columns_to_clean].applymap(clean_text)
-    # tb[columns_to_clean] = tb[columns_to_clean].apply(pd.to_numeric)
+    tb[columns_to_clean] = tb[columns_to_clean].astype(float)
 
     return tb
 
@@ -75,4 +70,5 @@ def clean_text(text):
     text = re.sub(r"\([^)]*\)", "", str(text))  # Remove text within parentheses
     text = re.sub(r"<", "", text)  # Remove '<' symbols
     text = re.sub(r",", "", text)  # Remove commas
+    text = re.sub(r"%", "", text)  # Remove percentages
     return text
