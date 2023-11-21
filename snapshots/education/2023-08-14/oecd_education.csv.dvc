@@ -10,7 +10,8 @@ meta:
     citation_full: |-
       van Zanden, J., et al. (eds.) (2014), How Was Life?: Global Well-being since 1820, Education, OECD Publishing, Paris. Available at https://www.oecd-ilibrary.org/economics/how-was-life/education-since-1820_9789264214262-9-en. Accessed on 14th August 2023.
 
-    url_main: https://www.oecd-ilibrary.org/economics/how-was-life/education-since-1820_9789264214262-9-en
+    url_main:
+      https://www.oecd-ilibrary.org/economics/how-was-life/education-since-1820_9789264214262-9-en
     date_accessed: 2023-08-14
 
     license:
