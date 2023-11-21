@@ -25,7 +25,7 @@ from typing_extensions import Self
 
 from etl import config
 from etl.db import get_connection
-from etl.files import apply_black_formatter_to_files
+from etl.files import apply_ruff_formatter_to_files
 from etl.paths import (
     APPS_DIR,
     BASE_DIR,
@@ -138,7 +138,7 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Pat
             config_path.unlink()
 
         # Apply black formatter to generated files.
-        apply_black_formatter_to_files(file_paths=list(Path(temp_dir).glob("**/*.py")))
+        apply_ruff_formatter_to_files(file_paths=list(Path(temp_dir).glob("**/*.py")))
 
         shutil.copytree(
             Path(temp_dir),

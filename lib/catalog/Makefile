@@ -3,7 +3,7 @@
 #
 
 
-include default.mk
+include ../../default.mk
 
 SRC = owid tests
 
