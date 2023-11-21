@@ -65,6 +65,8 @@ def run(dest_dir: str) -> None:
             merged_wb[column].metadata.origins[0],
             tb[tb.columns[0]].metadata.origins[0],
         ]
+    # Set metadata and format the dataframe for saving.
+    merged_wb.metadata.short_name = paths.short_name
 
     # Save the processed data in a new garden dataset
     ds_garden = create_dataset(
