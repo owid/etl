@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -20,6 +20,9 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["information_capacity_dataset"].reset_index()
 
+    # Load population data.
+    ds_pop = paths.load_dataset("population")
+
     #
     # Process data.
     #
@@ -36,7 +39,7 @@ def run(dest_dir: str) -> None:
     tb = tb.reset_index(drop=True)
 
     # Add regional aggregations
-    tb = regional_aggregations(tb)
+    tb = regional_aggregations(tb, ds_pop)
 
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
@@ -52,19 +55,14 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def regional_aggregations(tb: Table) -> Table:
+def regional_aggregations(tb: Table, ds_pop: Dataset) -> Table:
     """
     Add regional aggregations for some of the indicators
     """
 
     tb_regions = tb.copy()
 
-    # Load population data.
-    tb_pop = paths.load_dataset("population")
-    tb_pop = tb_pop["population"].reset_index()
-
-    # Merge population data.
-    tb_regions = tb_regions.merge(tb_pop[["country", "year", "population"]], how="left", on=["country", "year"])
+    tb_regions = geo.add_population_to_table(tb_regions, ds_pop)
 
     # List of index columns
     index_cols = ["censusgraded_ability", "ybcov_ability", "infcap_irt", "infcap_pca"]
@@ -108,17 +106,18 @@ def regional_aggregations(tb: Table) -> Table:
     # Filter table to keep only regions
     tb_regions = tb_regions[tb_regions["country"].isin(regions)].reset_index(drop=True)
 
+    # Drop the population column from tb_regions
+    tb_regions = tb_regions.drop(columns=["population"])
+
     # Call the population data again to get regional total population
-    tb_regions = tb_regions.merge(
-        tb_pop[["country", "year", "population"]], how="left", on=["country", "year"], suffixes=("", "_region")
-    )
+    tb_regions = geo.add_population_to_table(tb_regions, ds_pop)
 
     # Divide index_cols_pop by population_region to get the index
     for col in index_cols:
-        tb_regions[col] = tb_regions[col] / tb_regions["population_region"]
+        tb_regions[col] = tb_regions[col] / tb_regions["population"]
 
     # Drop columns
-    tb_regions = tb_regions.drop(columns=["population", "population_region"])
+    tb_regions = tb_regions.drop(columns=["population"])
 
     # Concatenate tb and tb_regions
     tb = pr.concat([tb, tb_regions], ignore_index=True)
