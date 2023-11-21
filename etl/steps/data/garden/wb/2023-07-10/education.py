@@ -346,7 +346,7 @@ def add_metadata(
         elif column == "combined_literacy":
             tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Historical and more recent literacy estimates"
-            tb[column].metadata.description = (
+            tb[column].metadata.description_from_producer = (
                 "**Historical literacy data:**\n\n"
                 + combined_literacy_description
                 + "\n\n"
@@ -364,7 +364,7 @@ def add_metadata(
         elif column == "combined_expenditure":
             tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Historical and more recent expenditure estimates"
-            tb[column].metadata.description = (
+            tb[column].metadata.description_from_producer = (
                 "**Historical expenditure data:**\n\n"
                 + combined_expenditure_description
                 + "\n\n"
