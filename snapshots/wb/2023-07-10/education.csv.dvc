@@ -24,6 +24,6 @@ meta:
 
 wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
-- md5: d61b20c57fa2f030407939b1880a1576
-  size: 183719810
+- md5: 19fc254b9035a0e5db082a0b395daa23
+  size: 183713849
   path: education.csv
