@@ -59,9 +59,17 @@ def run(dest_dir: str) -> None:
             "literacy",
         ]
     ]
+    # Make sure origins from both datasets are present
+    for column in merged_wb.columns:
+        merged_wb[column].metadata.origins = [
+            merged_wb[column].metadata.origins[0],
+            tb[tb.columns[0]].metadata.origins[0],
+        ]
 
     # Save the processed data in a new garden dataset
-    ds_garden = create_dataset(dest_dir, tables=[merged_wb], check_variables_metadata=True)
+    ds_garden = create_dataset(
+        dest_dir, tables=[merged_wb], check_variables_metadata=True
+    )
 
     ds_garden.save()
 
@@ -93,6 +101,8 @@ def extract_related_world_bank_data(tb_wb):
 
     # Filter the DataFrame for years above 2010 (OECD dataset stops in 2010)
     tb_above_2010 = tb_wb[tb_wb["year"] > 2010]
-    tb_above_2010["population_with_basic_education"] = 100 - tb_above_2010["no_formal_education"]
+    tb_above_2010["population_with_basic_education"] = (
+        100 - tb_above_2010["no_formal_education"]
+    )
 
     return tb_above_2010
