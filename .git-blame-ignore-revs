@@ -6,3 +6,6 @@ ab772adce9a987639cb1cde15b9a62a349568582
 
 # load geo from etl.data_helpers instead of owid.datautils
 4143dfe6ca9d66d6129fa67a43ca13444f7b2dbd
+
+# switching to ruff
+5647751506f0685c6704aebc31a59632904d0741
