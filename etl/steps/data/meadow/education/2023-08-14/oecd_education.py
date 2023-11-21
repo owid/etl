@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     tb = snap.read_csv()
-    tb.rename(columns={"country_or_region": "country"}, inplace=True)
+    tb = tb.rename(columns={"country_or_region": "country"})
 
     #
     # Process data.

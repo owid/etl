@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     merged_wb = pr.concat([tb, tb_above_2010])
     merged_wb["illiterate"] = 100 - merged_wb["literacy"]
 
-    merged_wb.set_index(["country", "year"], verify_integrity=True, inplace=True)
+    merged_wb = merged_wb.set_index(["country", "year"], verify_integrity=True)
 
     merged_wb = merged_wb[
         [
