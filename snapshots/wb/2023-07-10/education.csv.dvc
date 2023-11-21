@@ -21,9 +21,8 @@ meta:
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
-
 wdir: ../../../data/snapshots/wb/2023-07-10
 outs:
-- md5: 19fc254b9035a0e5db082a0b395daa23
-  size: 183713849
+- md5: e804e18320692a7e782468c2c1d63a42
+  size: 183713867
   path: education.csv
