@@ -729,7 +729,7 @@ class Table(pd.DataFrame):
             else:
                 parents = by + [column]
 
-            parent_variables = [tb[parent] for parent in parents]
+            parent_variables = [tb.get_column_or_index(parent) for parent in parents]
 
             tb._fields[column].processing_log.add_entry(variable=column, parents=parent_variables, operation="sort")
 
@@ -756,70 +756,72 @@ class Table(pd.DataFrame):
     def assign(self, *args, **kwargs) -> "Table":
         return super().assign(*args, **kwargs)  # type: ignore
 
-    def __add__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
-        tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
+    @staticmethod
+    def _update_log(tb: "Table", other: Union[Scalar, Series, variables.Variable, "Table"], operation: str) -> None:
         # The following would have a parents only the scalar, not the scalar and the corresponding variable.
         # tb = update_log(table=tb, operation="+", parents=[other], variable_names=tb.columns)
         # Instead, update the processing log of each variable in the table.
         for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="+")
+            if isinstance(other, pd.DataFrame):
+                parents = [tb[column], other[column]]
+            else:
+                parents = [tb[column], other]
+            tb[column].update_log(parents=parents, operation=operation)
+
+    def __add__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+        tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
+        self._update_log(tb, other, "+")
         return tb
 
-    def __iadd__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __iadd__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__add__(other)
 
-    def __sub__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __sub__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         tb = cast(Table, Table(super().__sub__(other=other)).copy_metadata(self))
-        for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="-")
+        self._update_log(tb, other, "-")
         return tb
 
-    def __isub__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __isub__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__sub__(other)
 
-    def __mul__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __mul__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         tb = cast(Table, Table(super().__mul__(other=other)).copy_metadata(self))
-        for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="*")
+        self._update_log(tb, other, "*")
         return tb
 
-    def __imul__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __imul__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__mul__(other)
 
-    def __truediv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __truediv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         tb = cast(Table, Table(super().__truediv__(other=other)).copy_metadata(self))
-        for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="/")
+        self._update_log(tb, other, "/")
         return tb
 
-    def __itruediv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __itruediv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__truediv__(other)
 
-    def __floordiv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __floordiv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         tb = cast(Table, Table(super().__floordiv__(other=other)).copy_metadata(self))
-        for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="//")
+        self._update_log(tb, other, "//")
         return tb
 
-    def __ifloordiv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __ifloordiv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__floordiv__(other)
 
-    def __mod__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __mod__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         tb = cast(Table, Table(super().__mod__(other=other)).copy_metadata(self))
-        for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="%")
+        self._update_log(tb, other, "%")
         return tb
 
-    def __imod__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __imod__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__mod__(other)
 
-    def __pow__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __pow__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         tb = cast(Table, Table(super().__pow__(other=other)).copy_metadata(self))
-        for column in tb.columns:
-            tb[column].update_log(parents=[tb[column], other], operation="**")
+        self._update_log(tb, other, "**")
         return tb
 
-    def __ipow__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __ipow__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__pow__(other)
 
     def sort_index(self, *args, **kwargs) -> "Table":

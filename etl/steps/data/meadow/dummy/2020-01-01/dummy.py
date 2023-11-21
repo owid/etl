@@ -16,11 +16,6 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     tb = snap.read()
 
-    # print(tb.dummy_variable.metadata.processing_log)
-    # print("pp tb.dummy_variable.metadata.processing_log")
-
-    # tb["out"] = tb["dummy_variable"] + tb["yummy_variable"]
-
     #
     # Process data.
     #

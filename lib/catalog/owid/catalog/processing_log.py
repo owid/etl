@@ -3,7 +3,7 @@ import random
 import tempfile
 import webbrowser
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import wraps
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Tuple
@@ -45,9 +45,9 @@ def enable_processing_log():
 @dataclass(frozen=True)
 class LogEntry:
     variable: str
-    parents: Tuple[str, ...]
     operation: str
     target: str
+    parents: Tuple[str, ...] = field(default_factory=tuple)
     comment: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
@@ -84,8 +84,11 @@ class ProcessingLog(List[LogEntry]):
         new_parents = []
 
         for parent in parents:
+            if parent.__class__.__name__ in ("Table",):
+                raise NotImplementedError("Fixme")
+
             # Variable instance
-            if hasattr(parent, "metadata"):
+            if parent.__class__.__name__ == "Variable":
                 parent_name = parent.name
                 parent = parent.metadata
             else:

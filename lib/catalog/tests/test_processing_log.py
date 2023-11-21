@@ -25,6 +25,16 @@ def test_addition() -> None:
 
 
 @enable_pl
+def test_tables_addition() -> None:
+    t1: Table = Table({"a": [1, 2]})
+    t2: Table = Table({"a": [3, 4]})
+    t3 = t1 + t2
+    assert t3["a"].metadata.processing_log.as_dict() == [
+        {"variable": "a", "parents": ["a", "a"], "operation": "+", "target": "a#7921731533"}
+    ]
+
+
+@enable_pl
 def test_sum() -> None:
     random.seed(0)
     with pl.enable_processing_log():
@@ -48,7 +58,7 @@ def test_sum() -> None:
 
 @enable_pl
 def test_proper_type_after_copy():
-    v1 = Variable([1], name="v", metadata=VariableMeta(processing_log=ProcessingLog([LogEntry("a", (), "+", "")])))
+    v1 = Variable([1], name="v", metadata=VariableMeta(processing_log=ProcessingLog([LogEntry("a", "+", "")])))
     assert isinstance(v1.metadata.processing_log, ProcessingLog)
     v2 = v1.copy()
     assert isinstance(v2.metadata.processing_log, ProcessingLog)
@@ -56,7 +66,7 @@ def test_proper_type_after_copy():
 
 @enable_pl
 def test_serialization():
-    entry = LogEntry("c", ("a", "b"), "+", "")
+    entry = LogEntry("c", "+", "", ("a", "b"))
     meta1 = VariableMeta(processing_log=ProcessingLog([entry]))
     d = meta1.to_dict()
     meta2 = VariableMeta.from_dict(d)
@@ -72,8 +82,8 @@ def test_processing_log_add():
             "b": [2],
         }
     )
-    t.a.metadata = VariableMeta(processing_log=ProcessingLog([LogEntry("a", (), "create", "a")]))
-    t.b.metadata = VariableMeta(processing_log=ProcessingLog([LogEntry("b", (), "create", "b")]))
+    t.a.metadata = VariableMeta(processing_log=ProcessingLog([LogEntry("a", "create", "a")]))
+    t.b.metadata = VariableMeta(processing_log=ProcessingLog([LogEntry("b", "create", "b")]))
     t["c"] = t["a"] + t["b"]
 
     assert t["c"].metadata.processing_log.as_dict() == [
@@ -94,8 +104,8 @@ def test_preprocess_log_rename_after_add():
     out = pl.preprocess_log(
         ProcessingLog(
             [
-                LogEntry("a", ("a", "b"), "+", "a#123"),
-                LogEntry("b", ("a#123",), "rename", "b#234"),
+                LogEntry("a", "+", "a#123", ("a", "b")),
+                LogEntry("b", "rename", "b#234", ("a#123",)),
             ]
         )
     )
