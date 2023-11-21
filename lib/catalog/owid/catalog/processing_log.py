@@ -87,10 +87,12 @@ class ProcessingLog(List[LogEntry]):
             if parent.__class__.__name__ in ("Table",):
                 raise NotImplementedError("Fixme")
 
-            # Variable instance
             if parent.__class__.__name__ == "Variable":
                 parent_name = parent.name
                 parent = parent.metadata
+            elif parent.__class__.__name__ == "VariableMeta":
+                # NOTE: this won't be used if variable has processing_log
+                parent_name = parent.title
             else:
                 parent_name = getattr(parent, "name", str(parent))
 

@@ -57,6 +57,28 @@ def test_sum() -> None:
 
 
 @enable_pl
+def test_groupby() -> None:
+    t: Table = Table({"a": [1, 2, 3], "b": ["a", "a", "b"]})
+    t.a.title = "A"
+    t.b.title = "B"
+    tb = t.groupby("b").sum()
+    assert tb["a"].metadata.processing_log.as_dict() == [
+        {"variable": "a", "operation": "groupby_sum", "target": "a#7921731533", "parents": ["a", "b"]}
+    ]
+
+
+@enable_pl
+def test_agg() -> None:
+    t: Table = Table({"a": [1, 2, 3], "b": ["a", "a", "b"]})
+    t.a.title = "A"
+    t.b.title = "B"
+    tb = t.groupby("b").agg("sum")
+    assert tb["a"].metadata.processing_log.as_dict() == [
+        {"variable": "a", "operation": "agg_sum", "target": "a#7921731533", "parents": ["a", "b"]}
+    ]
+
+
+@enable_pl
 def test_proper_type_after_copy():
     v1 = Variable([1], name="v", metadata=VariableMeta(processing_log=ProcessingLog([LogEntry("a", "+", "")])))
     assert isinstance(v1.metadata.processing_log, ProcessingLog)

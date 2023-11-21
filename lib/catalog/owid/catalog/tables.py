@@ -35,6 +35,7 @@ from pandas.util._decorators import rewrite_axis_style_signature
 
 from owid.repack import repack_frame
 
+from . import processing_log as pl
 from . import variables
 from .meta import (
     SOURCE_EXISTS_OPTIONS,
@@ -903,13 +904,16 @@ class TableGroupBy:
                     # output is series, e.g. `size` function
                     return df
                 else:
-                    return _create_table(df, self.metadata, self._fields)
-
-            # TODO
-            # for k in tb.columns:
-            #     tb[k].update_log(
-            #         operation=f"groupby_{op}",
-            #     )
+                    tb = _create_table(df, self.metadata, self._fields)
+                    if pl.enabled():
+                        for col in tb.columns:
+                            # parents are grouping columns and grouped one
+                            index_parents = [tb.get_column_or_index(n) for n in tb.index.names]
+                            tb[col].update_log(
+                                operation=f"groupby_{name}",
+                                parents=[tb[col]] + index_parents,
+                            )
+                    return tb
 
             self.__annotations__[name] = Callable[..., "Table"]
             return func
@@ -944,14 +948,14 @@ class TableGroupBy:
         for new_col, (col, _) in kwargs.items():
             tb._fields[new_col] = self._fields[col]
 
-        # TODO:
-        # add processing log
-        # for k, op in func.items():
-        #     if not isinstance(op, str):
-        #         op = op.__name__
-        #     tb[k].update_log(
-        #         operation=f"groupby_agg - {op}",
-        #     )
+        if pl.enabled():
+            for col in tb.columns:
+                # parents are grouping columns and grouped one
+                index_parents = [tb.get_column_or_index("b") for n in tb.index.names]
+                tb[col].update_log(
+                    operation=f"agg_{func}",
+                    parents=[tb[col]] + index_parents,
+                )
 
         return tb
 
