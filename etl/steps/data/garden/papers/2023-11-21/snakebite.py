@@ -3,6 +3,7 @@
 import re
 
 import numpy as np
+from owid.catalog.datasets import NULLABLE_DTYPES
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, Table, create_dataset
@@ -29,6 +30,11 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+
+    # Convert nullable types to float64, otherwise we risk pd.NA and np.nan being mixed up.
+    float64_cols = [col for col, dtype in tb.dtypes.items() if dtype in NULLABLE_DTYPES]
+    tb[float64_cols] = tb[float64_cols].astype(float)
+
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
