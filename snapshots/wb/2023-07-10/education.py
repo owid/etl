@@ -118,6 +118,9 @@ def get_data():
     # Some variables were created posthoc and don't use the standard World bank id convention
     wb_ids = [element for element in wb_ids if element is not None]
 
+    # Add Wittgenstein Projection: Percentage of the population age 15-19 by highest level of educational attainment. No Education. Total
+    wb_ids = wb_ids + ["PRJ.ATT.1519.NED.MF"]
+
     # Assert that the list is not empty
     assert len(wb_ids) > 0, "The list wb_ids is empty after removing None elements."
 
