@@ -39,6 +39,7 @@ with get_session() as session:
     tag_list = gm.Tag.load_tags(session)
 tag_list = ["Uncategorized"] + sorted([tag.name for tag in tag_list])
 
+
 #########################################################
 # FUNCTIONS & CLASSES ###################################
 #########################################################

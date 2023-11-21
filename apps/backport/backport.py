@@ -17,9 +17,8 @@ from apps.backport.datasync.data_metadata import (
     variable_data_df_from_s3,
 )
 from apps.backport.datasync.datasync import upload_gzip_dict
-from etl import config
+from etl import config, paths
 from etl import grapher_model as gm
-from etl import paths
 from etl.backport_helpers import GrapherConfig
 from etl.db import get_engine
 from etl.files import checksum_str

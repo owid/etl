@@ -144,7 +144,8 @@ def cli(
                     revs = [
                         rev
                         for rev in revs
-                        if rev.status == "approved" and rev.updatedBy == 1
+                        if rev.status == "approved"
+                        and rev.updatedBy == 1
                         # min(rev.createdAt, rev.updatedAt) is needed because of a bug in chart revisions, it should be fixed soon
                         and min(rev.createdAt, rev.updatedAt) > existing_chart.updatedAt
                     ]

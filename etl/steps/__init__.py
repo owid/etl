@@ -29,9 +29,8 @@ from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Dataset as WaldenDataset
 
-from etl import config, files, git
+from etl import config, files, git, paths
 from etl import grapher_helpers as gh
-from etl import paths
 from etl.db import get_engine
 from etl.snapshot import _unignore_backports, get_dvc
 

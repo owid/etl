@@ -67,6 +67,8 @@ watch: .venv
 	fi
 	touch .sanity-check
 
+test: check-formatting lint check-typing unittest version-tracker
+
 .venv: .sanity-check pyproject.toml poetry.toml poetry.lock
 	@echo '==> Installing packages'
 	poetry install --no-ansi || poetry install --no-ansi

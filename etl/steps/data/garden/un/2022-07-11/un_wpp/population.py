@@ -272,8 +272,12 @@ def _add_metric_sexratio_all(df_p_granular: Table) -> Any:
     # Check
     (df_p_granular.metric.unique() == ["population"]).all()
     # Get M/F values
-    df_male = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "male")].rename(columns={"value": "value_male"})  # type: ignore
-    df_female = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "female")].rename(columns={"value": "value_female"})  # type: ignore
+    df_male = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "male")].rename(
+        columns={"value": "value_male"}
+    )  # type: ignore
+    df_female = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "female")].rename(
+        columns={"value": "value_female"}
+    )  # type: ignore
     # Check
     assert len(df_male) == len(df_female)
     # Build df
