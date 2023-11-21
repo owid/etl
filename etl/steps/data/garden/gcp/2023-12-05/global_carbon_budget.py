@@ -23,6 +23,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 # Expected outliers in consumption-based emissions (with negative emissions in the original data, that will be removed).
+# NOTE: This issue has been reported to the data providers, and will hopefully be fixed in a coming version.
 OUTLIERS_IN_CONSUMPTION_DF = [
     ("Panama", 2003),
     ("Panama", 2004),
@@ -249,6 +250,7 @@ def sanity_checks_on_input_data(
     # NOTE: There are two countries for which the difference is big, namely Iceland and New Caledonia.
     # First assert that these two countries have a big discrepancy, and then assert that all other countries do not
     # differ more than 2%.
+    # NOTE: This issue has been reported to the data providers, and will hopefully be fixed in a coming version.
     error = (
         "Expected Iceland and New Caledonia to have a large discrepancy between production and fossil emissions. "
         "If that is no longer the case, remove this assertion."
@@ -381,6 +383,7 @@ def prepare_fossil_co2_emissions(tb_co2: Table) -> Table:
     # global cumulative emissions. And the share of global emissions for those countries becomes hence larger than 100%.
     # To fix this issue, we aggregate the data for China and US on those years when the world's data is missing (without
     # touching other years or other columns), and add that data to the global emissions from other industry.
+    # NOTE: This issue has been reported to the data providers, and will hopefully be fixed in a coming version.
 
     # Firstly, list of years for which the world has no data for emissions_from_other_industry.
     world_missing_years = (
@@ -615,7 +618,8 @@ def fix_duplicated_palau_data(tb_co2: Table) -> Table:
     # In the fossil CO2 emissions data, after harmonization, "Pacific Islands (Palau)" is mapped to "Palau", and
     # therefore there are rows with different data for the same country-year.
     # However, "Pacific Islands (Palau)" have data until 1991, and "Palau" has data from 1992 onwards.
-    # So this is not an issue with the original data, and it's simply caused by our harmonization of names.
+    # NOTE: this is not an issue with the original data, and it's simply caused by our harmonization of names.
+
     # Check that duplicate rows are still there.
     error = "Expected 'Palau' data to be duplicated. Remove temporary fix."
     assert tb[tb.duplicated(subset=["country", "year"])]["country"].unique().tolist() == ["Palau"], error
@@ -647,6 +651,7 @@ def fix_consumption_emissions_for_africa(tb_co2_with_regions: Table) -> Table:
     # with those from GCP.
     # At the end of the day, the reason why we keep ours and GCP's version of continents is that our definitions may
     # differ. But it is unlikely that their definition of the African continent is different from ours.
+    # NOTE: This issue has been reported to the data providers, and will hopefully be fixed in a coming version.
 
     # First, check that the discrepancy exists in the current data.
     tb = tb_co2_with_regions.copy()
