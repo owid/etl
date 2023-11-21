@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Table, VariableMeta
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -26,7 +25,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns={"country_name": "country"})
 
     # Make indicator_code snake_case
-    tb["indicator_code"] = tb["indicator_code"].astype(str).lower().str.replace(".", "_")
+    tb["indicator_code"] = tb["indicator_code"].str.lower().str.replace(".", "_", regex=False)
 
     # Save a dictionary with the unique values of the indicator_code and the corresponding indicator_name
     indicator_dict = (

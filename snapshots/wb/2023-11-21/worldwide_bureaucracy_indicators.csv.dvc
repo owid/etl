@@ -17,15 +17,15 @@ meta:
       World Bank. 2022. Worldwide Bureaucracy Indicators version 3.0
 
     # Files
-    url_main: 
-      https://datacatalog.worldbank.org/search/dataset/0038132/Worldwide%20Bureaucracy%20Indicators
+    url_main:
+      https://datacatalog.worldbank.org/dataset/worldwide-bureaucracy-indicators
     date_accessed: 2023-11-21
 
     # License
     license:
       name: CC BY 4.0
-      url: 
-        https://datacatalog.worldbank.org/search/dataset/0038132/Worldwide%20Bureaucracy%20Indicators
+      url:
+        https://datacatalog.worldbank.org/dataset/worldwide-bureaucracy-indicators
 
 wdir: ../../../data/snapshots/wb/2023-11-21
 outs:

@@ -5,6 +5,8 @@ definitions:
       topic_tags:
         - State Capacity
     processing_level: minor
+    unit: ""
+    short_unit: ""
     display:
       numDecimalPlaces: 1
       tolerance: 5
