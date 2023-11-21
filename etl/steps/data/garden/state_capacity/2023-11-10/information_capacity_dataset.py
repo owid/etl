@@ -73,7 +73,7 @@ def regional_aggregations(tb: Table) -> Table:
 
     for col in index_cols:
         # Create new columns with the product of the index and the population
-        tb_regions[col] = tb_regions[col] * tb_regions["population"]
+        tb_regions[col] = tb_regions[col].astype(float) * tb_regions["population"]
 
     # Define regions to aggregate
     regions = [
@@ -104,6 +104,7 @@ def regional_aggregations(tb: Table) -> Table:
             region=region,
             aggregations=aggregations,
             countries_that_must_have_data=[],
+            frac_allowed_nans_per_year=0.1,
         )
 
     # Filter table to keep only regions
@@ -118,32 +119,10 @@ def regional_aggregations(tb: Table) -> Table:
     for col in index_cols:
         tb_regions[col] = tb_regions[col] / tb_regions["population_region"]
 
-    # # Add missing_pop column, population minus membership_pop and non_membership_pop.
-    # tb_regions["missing_pop"] = (
-    #     tb_regions["population_region"] - tb_regions["membership_pop"] - tb_regions["non_membership_pop"]
-    # )
-
-    # # Assert if missing_pop has negative values
-    # if tb_regions["missing_pop"].min() < 0:
-    #     paths.log.warning(
-    #         f"""`missing_pop` has negative values and will be replaced by 0.:
-    #         {print(tb_regions[tb_regions["missing_pop"] < 0])}"""
-    #     )
-    #     # Replace negative values by 0
-    #     tb_regions.loc[tb_regions["missing_pop"] < 0, "missing_pop"] = 0
-
-    # # Include missing_pop in non_membership_pop
-    # tb_regions["non_membership_pop"] = tb_regions["non_membership_pop"] + tb_regions["missing_pop"]
-
     # Drop columns
     tb_regions = tb_regions.drop(columns=["population", "population_region"])
 
     # Concatenate tb and tb_regions
     tb = pr.concat([tb, tb_regions], ignore_index=True)
-
-    # Make variables integer
-    for var in index_cols:
-        tb[var] = tb[var].astype("Float64")
-        tb[var] = tb[var].replace(np.nan, pd.NA)
 
     return tb

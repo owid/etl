@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - State Capacity
+    display: &common-display
+      tolerance: 5
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -35,7 +37,7 @@ tables:
         display:
           name: Statistical agency operating
           numDecimalPlaces: 0
-          tolerance: 0
+          <<: *common-display
       census:
         title: Census was run
         unit: ""
@@ -52,7 +54,7 @@ tables:
         display:
           name: Census was run
           numDecimalPlaces: 0
-          tolerance: 0
+          <<: *common-display
       first_moderncensus:
         title: Modern census first implemented
         unit: ""
@@ -69,7 +71,7 @@ tables:
         display:
           name: Modern census first implemented
           numDecimalPlaces: 0
-          tolerance: 0
+          <<: *common-display
       register_based_census:
         title: Census based on population register
         unit: ""
@@ -84,7 +86,7 @@ tables:
         display:
           name: Census based on population register
           numDecimalPlaces: 0
-          tolerance: 0
+          <<: *common-display
       yearbook_published:
         title: Statistical yearbook published
         unit: ""
@@ -101,7 +103,7 @@ tables:
         display:
           name: Statistical yearbook published
           numDecimalPlaces: 0
-          tolerance: 0
+          <<: *common-display
       yearbook_coverage:
         title: Statistical yearbook with information for that year
         unit: ""
@@ -116,7 +118,7 @@ tables:
         display:
           name: Statistical yearbook with information for that year
           numDecimalPlaces: 0
-          tolerance: 0
+          <<: *common-display
       civreg:
         title: Civil register implemented
         unit: ""
@@ -134,7 +136,7 @@ tables:
         display:
           name: Birth register implemented
           numDecimalPlaces: 0
-          tolerance: 0
+          <<: *common-display
       popreg:
         title: Population register implemented
         unit: ""
@@ -149,7 +151,7 @@ tables:
         display:
           name: Population register implemented
           numDecimalPlaces: 0
-          tolerance: 0
+          <<: *common-display
       statag_intro:
         title: Statistical agency established
         unit: ""
@@ -164,7 +166,7 @@ tables:
         display:
           name: Statistical agency established
           numDecimalPlaces: 0
-          tolerance: 0
+          <<: *common-display
       censusgraded_ability:
         title: Ability to run census index
         unit: ""
@@ -186,8 +188,8 @@ tables:
         processing_level: minor
         display:
           name: Ability to run census index
-          numDecimalPlaces: 0
-          tolerance: 0
+          numDecimalPlaces: 1
+          <<: *common-display
       ybcov_ability:
         title: Ability to publish statistical yearbook index
         unit: ""
@@ -204,8 +206,8 @@ tables:
         processing_level: minor
         display:
           name: Ability to publish statistical yearbook index
-          numDecimalPlaces: 0
-          tolerance: 0
+          numDecimalPlaces: 1
+          <<: *common-display
       infcap_irt:
         title: Information Capacity Index (IRT)
         unit: ""
@@ -222,8 +224,8 @@ tables:
         processing_level: minor
         display:
           name: Information Capacity Index
-          numDecimalPlaces: 0
-          tolerance: 0
+          numDecimalPlaces: 1
+          <<: *common-display
       infcap_pca:
         title: Information Capacity Index (PCA)
         unit: ""
@@ -236,6 +238,6 @@ tables:
         processing_level: minor
         display:
           name: Information Capacity Index
-          numDecimalPlaces: 0
-          tolerance: 0
+          numDecimalPlaces: 1
+          <<: *common-display
 
