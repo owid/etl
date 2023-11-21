@@ -2,8 +2,8 @@
 
 from typing import cast
 
+import owid.catalog.processing as pr
 import pandas as pd
-import shared
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
 from tqdm import tqdm
@@ -17,55 +17,6 @@ paths = PathFinder(__file__)
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-REGIONS = [
-    "North America",
-    "South America",
-    "Europe",
-    "European Union (27)",
-    "Africa",
-    "Asia",
-    "Oceania",
-    "Low-income countries",
-    "Upper-middle-income countries",
-    "Lower-middle-income countries",
-    "High-income countries",
-]
-
-
-def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
-    tb_with_regions = tb.copy()
-    # Aggregates for adjusted years of schooling and harmonized learning scores
-    aggregations = {
-        column: "mean"
-        for column in tb_with_regions.columns
-        if column
-        in [
-            "HD.HCI.LAYS",
-            "HD.HCI.LAYS.FE",
-            "HD.HCI.LAYS.MA",
-            "HD.HCI.HLOS",
-            "HD.HCI.HLOS.FE",
-            "HD.HCI.HLOS.MA",
-        ]
-    }
-
-    for region in REGIONS:
-        # Find members of current region.
-        members = geo.list_members_of_region(
-            region=region,
-            ds_regions=ds_regions,
-            ds_income_groups=ds_income_groups,
-        )
-        tb_with_regions = shared.add_region_aggregates_education(
-            df=tb_with_regions,
-            region=region,
-            countries_in_region=members,
-            countries_that_must_have_data=[],
-            num_allowed_nans_per_year=None,
-            frac_allowed_nans_per_year=0.5,
-            aggregations=aggregations,
-        )
-    return tb_with_regions
 
 
 def run(dest_dir: str) -> None:
@@ -78,17 +29,34 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["education"]
+    # Save metadata for later use
+    metadata = tb.metadata
 
     #
     # Process data.
     #
-
     tb.reset_index(inplace=True)
-    # Save the metadata df
-    metadata_tb = tb.loc[:, ["indicator_code", "indicator_name", "description", "source"]]
-    # Drop metadata columns from the dataset table
-    tb.drop(["indicator_name", "description", "source"], axis=1, inplace=True)
 
+    # Columns containing metadata
+    metadata_columns = [
+        "indicator_name",
+        "long_definition",
+        "source",
+        "aggregation_method",
+        "statistical_concept_and_methodology",
+        "limitations_and_exceptions",
+    ]
+
+    # Save the table with just metadata
+    metadata_tb = tb.loc[
+        :,
+        ["indicator_code"] + metadata_columns,
+    ]
+
+    # Drop metadata columns from the original table
+    tb = tb.drop(metadata_columns, axis=1)
+
+    # Harmonize countries
     tb = geo.harmonize_countries(
         df=tb,
         excluded_countries_file=paths.excluded_countries_path,
@@ -96,38 +64,38 @@ def run(dest_dir: str) -> None:
     )
     # Pivot the dataframe so that each indicator is a separate column
     tb = tb.pivot(index=["country", "year"], columns="indicator_code", values="value")
-    tb.reset_index(inplace=True)
-    # Adding share of female students in pre-primary school and total funding per student (household + government)
-    tb["percentage_of_female_pre_primary_students)"] = (tb["SE.PRE.ENRL.FE"] / tb["SE.PRE.ENRL"]) * 100
-    tb["total_funding_per_student_ppp"] = tb["UIS.XUNIT.PPPCONST.1.FSGOV"] + tb["UIS.XUNIT.PPPCONST.1.FSHH"]
+    tb = tb.reset_index()
+
     # Find the maximum value in the 'HD.HCI.HLOS' column
     max_value = tb["HD.HCI.HLOS"].max()
 
-    # Normalize every value in the 'HD.HCI.HLOS' column by the maximum value (How many years of effective learning do you get for every year of educaiton)
+    # Normalize every value in the 'HD.HCI.HLOS' column by the maximum value (How many years of effective learning do you get for every year of education)
     tb["normalized_hci"] = tb["HD.HCI.HLOS"] / max_value
 
     # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
     tb, combined_literacy_description, combined_expenditure_description = combine_historical_literacy_expenditure(tb)
 
-    # Load additional datasets for region and income group information for regional aggregates
-    ds_regions = paths.load_dependency("regions")
-    ds_income_groups = paths.load_dependency("income_groups")
-
-    tb = add_data_for_regions(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-
+    # Compare two columnst that seem to have identical indicies (if values are the same then remove)
+    if tb["SE.XPD.TOTL.GD.ZS"].equals(tb["SE.XPD.TOTL.GD.ZS."]):
+        # If they are the same, drop one of the columns
+        tb.drop("SE.XPD.TOTL.GD.ZS.", axis=1, inplace=True)
+    else:
+        print("The columns are not the same.")
     # Set an appropriate index and sort.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-    tb = Table(tb, short_name=paths.short_name, underscore=True)
+    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
+    # Add the metadata back to the table
+    tb.metadata = metadata
     # Add metadata by finding the descriptions and sources using the indicator codes.
     tb = add_metadata(tb, metadata_tb, combined_literacy_description, combined_expenditure_description)
-
     #
     # Save outputs.
     #
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], default_metadata=ds_meadow.metadata, check_variables_metadata=True
+    )
     # Save changes in the new garden dataset.
     ds_garden.save()
 
@@ -141,10 +109,11 @@ def combine_historical_literacy_expenditure(tb):
     'combined_literacy' and 'combined_expenditure', which hold the respective values, preferring recent
     data when available.
     """
-    # Load historical literacy and and expenditure data
+    # Load historical literacy
     ds_literacy = cast(Dataset, paths.load_dependency("literacy_rates"))
     tb_literacy = ds_literacy["literacy_rates"]
 
+    # Load historical literacy expenditure data
     ds_expenditure = cast(Dataset, paths.load_dependency("public_expenditure"))
     tb_expenditure = ds_expenditure["public_expenditure"]
 
@@ -154,23 +123,32 @@ def combine_historical_literacy_expenditure(tb):
     historic_expenditure = (
         tb_expenditure[["public_expenditure_on_education__tanzi__and__schuktnecht__2000"]].reset_index().copy()
     )
-    recent_literacy = tb[["year", "country", "SE.ADT.LITR.ZS"]].copy()  # Literacy
-    recent_expenditure = tb[["year", "country", "SE.XPD.TOTL.GD.ZS"]].copy()  # Public expenditure
+    # Recent literacy rates
+    recent_literacy = tb[["year", "country", "SE.ADT.LITR.ZS"]].copy()
 
-    # Merge the DataFrames based on 'year' and 'country'
-    combined_df = pd.merge(
+    # Recent public expenditure
+    recent_expenditure = tb[["year", "country", "SE.XPD.TOTL.GD.ZS"]].copy()
+
+    # Merge the historic and more recent literacy data based on 'year' and 'country'
+    combined_df = pr.merge(
         historic_literacy,
         recent_literacy,
         on=["year", "country"],
         how="outer",
         suffixes=("_historic_lit", "_recent_lit"),
-    )
-    combined_df = pd.merge(combined_df, historic_expenditure, on=["year", "country"], how="outer")
-    combined_df = pd.merge(
-        combined_df, recent_expenditure, on=["year", "country"], how="outer", suffixes=("_historic_exp", "_recent_exp")
+    ).copy_metadata(from_table=recent_literacy)
+
+    # Merge the historic expenditure with newly created literacy table based on 'year' and 'country'
+    combined_df = pr.merge(combined_df, historic_expenditure, on=["year", "country"], how="outer").copy_metadata(
+        from_table=combined_df
     )
 
-    # Define the functions to decide which value to keep
+    # Merge the recent expenditure with newly created literacy and historic expenditure table based on 'year' and 'country'
+    combined_df = pr.merge(
+        combined_df, recent_expenditure, on=["year", "country"], how="outer", suffixes=("_historic_exp", "_recent_exp")
+    ).copy_metadata(from_table=combined_df)
+
+    # Define the functions to decide which value to keep (prefer more recent World Bank data; if NaN pick the historic ones (which could also be NaN))
     def decide_literacy(row):
         return (
             row["SE.ADT.LITR.ZS"]
@@ -185,18 +163,19 @@ def combine_historical_literacy_expenditure(tb):
             else row["public_expenditure_on_education__tanzi__and__schuktnecht__2000"]
         )
 
-    # Apply the functions and create new columns
+    # Apply the functions to prioritise more recent datat and create new columns
     combined_df["combined_literacy"] = combined_df.apply(decide_literacy, axis=1)
     combined_df["combined_expenditure"] = combined_df.apply(decide_expenditure, axis=1)
 
-    # Now, merge the combined_df back into the original tb DataFrame based on 'year' and 'country'
-    tb = pd.merge(
+    # Now, merge the relevant columns in newly created table that includes both historic and more recent data back into the original tb based on 'year' and 'country'
+    tb = pr.merge(
         tb,
         combined_df[["year", "country", "combined_literacy", "combined_expenditure"]],
         on=["year", "country"],
         how="outer",
-    )
+    ).copy_metadata(from_table=tb)
 
+    # Keep descriptions from the original historic datasets
     combined_literacy_description = ds_literacy.metadata.sources[0].description
     combined_expenditure_description = ds_expenditure.metadata.sources[0].description
 
@@ -218,15 +197,13 @@ def add_metadata(
     """
     # List of columns that were calculated in the etl for which metadata won't be available
     custom_cols = [
-        "percentage_of_female_pre_primary_students",
-        "percentage_of_female_tertiary_teachers",
-        "total_funding_per_student_ppp",
         "normalized_hci",
         "combined_literacy",
         "combined_expenditure",
     ]
     # Loop through the DataFrame columns
     for column in tqdm(tb.columns, desc="Processing metadata for indicators"):
+        origin = metadata_tb[metadata_tb.columns[0]].metadata.origins[0]
         if column not in custom_cols:
             # Extract the title from the default metadata to find the corresponding World Bank indicator
             indicator_to_find = tb[column].metadata.title
@@ -237,26 +214,69 @@ def add_metadata(
                 .str.replace("‚", "")  # commas caused problems when renaming variables later on
                 .iloc[0]
             )
-            description = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "description"].iloc[0]
+
+            description = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "long_definition"].iloc[0]
             source = metadata_tb.loc[metadata_tb["indicator_code"] == indicator_to_find, "source"].iloc[0]
+            aggregation_method = metadata_tb.loc[
+                metadata_tb["indicator_code"] == indicator_to_find, "aggregation_method"
+            ].iloc[0]
+            statistical_concept_and_methodology = metadata_tb.loc[
+                metadata_tb["indicator_code"] == indicator_to_find, "statistical_concept_and_methodology"
+            ].iloc[0]
+            limitations_and_exceptions = metadata_tb.loc[
+                metadata_tb["indicator_code"] == indicator_to_find, "limitations_and_exceptions"
+            ].iloc[0]
+
+            # Replace NaN values with a placeholder string
+            source = "" if pd.isna(source) else source
+            aggregation_method = "" if pd.isna(aggregation_method) else aggregation_method
+            statistical_concept_and_methodology = (
+                "" if pd.isna(statistical_concept_and_methodology) else statistical_concept_and_methodology
+            )
+            limitations_and_exceptions = "" if pd.isna(limitations_and_exceptions) else limitations_and_exceptions
+
+            # Truncate the last 5 words if the length of the string exceeds 250 characters
+            if len(name) > 250:
+                # Separate the string into words and truncate
+                words = name.split()
+                # Get all words up to the fifth-to-last word
+                selected_words = words[:-10]
+                # Reconstruct the selected words into a single string
+                name = " ".join(selected_words)
+
+            # Convert the name to underscore format
             new_column_name = underscore(name)  # Convert extracted name to underscore format
 
             # If more detailed description is currently missing in the API --> use the long title as a description
             if str(description) == "nan":
                 description = name
-                source = " "
+                source = ""
 
             # Update the column names and metadata
             tb.rename(columns={column: new_column_name}, inplace=True)
-            description_string = " ".join(
-                [
-                    description + "\n\n" "World Bank variable id: " + indicator_to_find + "",
-                    source,
-                ]
+
+            # Now build the description string conditionally
+            components = []
+
+            if description:
+                components.append(f"{description}\n\nWorld Bank variable id: {indicator_to_find}")
+            if source:
+                components.append(f"Original source: {source}")
+            if aggregation_method:
+                components.append(f"Aggregation method: {aggregation_method}")
+            if statistical_concept_and_methodology:
+                components.append(f"Statistical concept and methodology: {statistical_concept_and_methodology}")
+            if limitations_and_exceptions:
+                components.append(f"Limitations and exceptions: {limitations_and_exceptions}")
+
+            description_string = (
+                "\n\n".join(components) if components else "No detailed metadata available from World Bank."
             )
 
-            tb[new_column_name].metadata.description = description_string
+            tb[new_column_name].metadata.description_from_producer = description_string
             tb[new_column_name].metadata.title = name
+            tb[new_column_name].metadata.processing = "minor"
+            tb[new_column_name].metadata.origins = [origin]
 
             # Conver Witthgenstein projections to %
             if "wittgenstein_projection__percentage" in new_column_name:
@@ -315,53 +335,45 @@ def add_metadata(
             else:
                 # Default metadata update when no other conditions are met.
                 update_metadata(tb, new_column_name, 0, " ", " ")
-        # Now, update metadata for custom indicators
-        elif column == "total_funding_per_student_ppp":
-            tb[column].metadata.title = "Total funding per student (in PPP)"
-            tb[column].metadata.display = {}
-            tb[
-                column
-            ].metadata.description = "Combined total payments of households and governmental funding per primary student. The total payments of households (pupils, students and their families) for educational institutions (such as for tuition fees, exam and registration fees, contribution to Parent-Teacher associations or other school funds, and fees for canteen, boarding and transport) and purchases outside of educational institutions (such as for uniforms, textbooks, teaching materials, or private classes). 'Initial funding' means that government transfers to households, such as scholarships and other financial aid for education, are subtracted from what is spent by households. Note that in some countries for some education levels, the value of this indicator may be 0, since on average households may be receiving as much, or more, in financial aid from the government than what they are spending on education. Indicators for household expenditure on education should be interpreted with caution since data comes from household surveys which may not all follow the same definitions and concepts. These types of surveys are also not carried out in all countries with regularity, and for some categories (such as pupils in pre-primary education), the sample sizes may be low. In some cases where data on government transfers to households (scholarships and other financial aid) was not available, they could not be subtracted from amounts paid by households. Total general (local, regional and central, current and capital) initial government funding of education per student, includes transfers paid (such as scholarships to students), but excludes transfers received, in this case international transfers to government for education (when foreign donors provide education sector budget support or other support integrated in the government budget). Limitations: In some instances data on total government expenditure on education refers only to the Ministry of Education, excluding other ministries which may also spend a part of their budget on educational activities. There are also cases where it may not be possible to separate international transfers to government from general government expenditure on education, in which cases they have not been subtracted in the formula. "
-            tb[column].metadata.display["numDecimalPlaces"] = 0
-            tb[column].metadata.unit = "international-$"
-            tb[column].metadata.short_unit = "$"
-        elif column == "percentage_of_female_pre_primary_students":
-            tb[column].metadata.title = "Share of female students in pre-primary education"
-            tb[column].metadata.display = {}
-            tb[column].metadata.display["numDecimalPlaces"] = 1
-            tb[column].metadata.unit = "%"
-            tb[column].metadata.short_unit = "%"
+
         elif column == "normalized_hci":
+            tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Normalised harmonized learning score"
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 1
             tb[column].metadata.unit = "score"
             tb[column].metadata.short_unit = ""
         elif column == "combined_literacy":
+            tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Historical and more recent literacy estimates"
-            tb[column].metadata.description = (
+            tb[column].metadata.description_from_producer = (
                 "**Historical literacy data:**\n\n"
                 + combined_literacy_description
                 + "\n\n"
                 + "**Recent estimates:**\n\n"
                 + "Percentage of the population between age 25 and age 64 who can, with understanding, read and write a short, simple statement on their everyday life. Generally, ‘literacy’ also encompasses ‘numeracy’, the ability to make simple arithmetic calculations. This indicator is calculated by dividing the number of literates aged 25-64 years by the corresponding age group population and multiplying the result by 100."
                 + "\n\n"
-                + "World Bank variable id: UIS.LR.AG25T64. UNESCO Institute for Statistics"
+                + "World Bank variable id: UIS.LR.AG25T64"
+                + "\n\n"
+                + "Original source: UNESCO Institute for Statistics"
             )
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 2
             tb[column].metadata.unit = "%"
             tb[column].metadata.short_unit = "%"
         elif column == "combined_expenditure":
+            tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Historical and more recent expenditure estimates"
-            tb[column].metadata.description = (
+            tb[column].metadata.description_from_producer = (
                 "**Historical expenditure data:**\n\n"
                 + combined_expenditure_description
                 + "\n\n"
                 + "**Recent estimates:**\n\n"
                 + "General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments."
                 + "\n\n"
-                + "World Bank variable id: SE.XPD.TOTL.GD.ZS. UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022."
+                + "World Bank variable id: SE.XPD.TOTL.GD.ZS"
+                + "\n\n"
+                + "Original source: UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022."
             )
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 2
