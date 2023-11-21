@@ -276,7 +276,6 @@ def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: li
     Remove rows where the percent = 100 but all available denominators are 0.
     """
     for col in surveillance_cols:
-
         df.loc[
             (df["inf_negative" + col] == 0)
             & (df["inf_negative" + col] + df["inf_all" + col] != df["spec_processed_nb" + col]),

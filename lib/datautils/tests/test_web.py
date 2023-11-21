@@ -25,39 +25,21 @@ class TestGetBaseUrl:
         # With http.
         assert get_base_url("http://example.com") == "http://example.com"
         assert get_base_url("http://example.com/some/path") == "http://example.com"
-        assert (
-            get_base_url("http://example.com.au/some/path") == "http://example.com.au"
-        )
+        assert get_base_url("http://example.com.au/some/path") == "http://example.com.au"
         # With https.
         assert get_base_url("https://example.com") == "https://example.com"
         assert get_base_url("https://example.com/some/path") == "https://example.com"
-        assert (
-            get_base_url("https://example.com.au/some/path") == "https://example.com.au"
-        )
+        assert get_base_url("https://example.com.au/some/path") == "https://example.com.au"
 
     def test_on_correct_urls_without_returning_scheme(self):
         # With http.
         assert get_base_url("http://example.com", include_scheme=False) == "example.com"
-        assert (
-            get_base_url("http://example.com/some/path", include_scheme=False)
-            == "example.com"
-        )
-        assert (
-            get_base_url("http://example.com.au/some/path", include_scheme=False)
-            == "example.com.au"
-        )
+        assert get_base_url("http://example.com/some/path", include_scheme=False) == "example.com"
+        assert get_base_url("http://example.com.au/some/path", include_scheme=False) == "example.com.au"
         # With https.
-        assert (
-            get_base_url("https://example.com", include_scheme=False) == "example.com"
-        )
-        assert (
-            get_base_url("https://example.com/some/path", include_scheme=False)
-            == "example.com"
-        )
-        assert (
-            get_base_url("https://example.com.au/some/path", include_scheme=False)
-            == "example.com.au"
-        )
+        assert get_base_url("https://example.com", include_scheme=False) == "example.com"
+        assert get_base_url("https://example.com/some/path", include_scheme=False) == "example.com"
+        assert get_base_url("https://example.com.au/some/path", include_scheme=False) == "example.com.au"
 
     def test_on_urls_without_scheme_returning_scheme(self):
         with warns(UserWarning):
@@ -69,14 +51,8 @@ class TestGetBaseUrl:
     def test_on_urls_without_scheme_without_returning_scheme(self):
         with warns(UserWarning):
             assert get_base_url("example.com", include_scheme=False) == "example.com"
-            assert (
-                get_base_url("example.com/some/path", include_scheme=False)
-                == "example.com"
-            )
-            assert (
-                get_base_url("example.com.au/some/path", include_scheme=False)
-                == "example.com.au"
-            )
+            assert get_base_url("example.com/some/path", include_scheme=False) == "example.com"
+            assert get_base_url("example.com.au/some/path", include_scheme=False) == "example.com.au"
             assert get_base_url("bad_url", include_scheme=False) == "bad_url"
 
 
@@ -102,9 +78,7 @@ class TestDownloadFileFromUrl:
         download_file_from_url(url=MOCK_URL_2, local_path=tmp_file)
         assert load_json(tmp_file) == MOCK_RESPONSE_2
 
-    def test_download_file_from_url_with_valid_urls_and_ciphers_low(
-        self, mock_get, tmp_path
-    ):
+    def test_download_file_from_url_with_valid_urls_and_ciphers_low(self, mock_get, tmp_path):
         # Send a mock request to MOCK_URL_1, store the result in a temporary file, and check that it is MOCK_RESPONSE_1.
         tmp_file = tmp_path / "test_1.json"
         download_file_from_url(url=MOCK_URL_1, local_path=tmp_file, ciphers_low=True)

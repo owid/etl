@@ -56,9 +56,7 @@ class GoogleApi:
         self.sheets = GSheetsApi(CLIENT_SECRETS_PATH, CREDENTIALS_PATH)
 
     @classmethod
-    def download_folder(
-        cls, url: str, output: str, quiet: bool = True, **kwargs: Any
-    ) -> None:
+    def download_folder(cls, url: str, output: str, quiet: bool = True, **kwargs: Any) -> None:
         """Download a folder from Google Drive.
 
         The folderm must be public, otherwise this function won't work.
@@ -72,9 +70,7 @@ class GoogleApi:
         quiet: bool, optional
             Suppress terminal output. Default is False.
         """
-        gdown.download_folder(
-            url, output=output, quiet=quiet, use_cookies=False, **kwargs
-        )
+        gdown.download_folder(url, output=output, quiet=quiet, use_cookies=False, **kwargs)
 
     @classmethod
     def download_file(
