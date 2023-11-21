@@ -24,7 +24,9 @@ test-default: check-formatting lint check-typing unittest
 
 check-default:
 	@echo '==> Format & Lint & Typecheck changed files'
-	@CHANGED_PY_FILES=$$(git diff --name-only master | grep '\.py'); \
+	# make it work with lib/ packages too
+	@RELATIVE_PATH=$$(pwd | sed "s|^$$(git rev-parse --show-toplevel)/||"); \
+	CHANGED_PY_FILES=$$(git diff --name-only master -- . | sed "s|^$$RELATIVE_PATH/||" | grep '\.py'); \
 	if [ -n "$$CHANGED_PY_FILES" ]; then \
 		echo "$$CHANGED_PY_FILES" | xargs ruff format; \
 		echo "$$CHANGED_PY_FILES" | xargs ruff check --fix; \
@@ -34,6 +36,10 @@ check-default:
 lint-default: .venv
 	@echo '==> Linting & Sorting imports'
 	@poetry run ruff check --fix $(SRC)
+
+check-linting-default: .venv
+	@echo '==> Checking linting'
+	@poetry run ruff check $(SRC)
 
 check-formatting-default: .venv
 	@echo '==> Checking formatting'
