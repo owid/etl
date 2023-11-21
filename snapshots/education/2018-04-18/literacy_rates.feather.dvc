@@ -1,6 +1,7 @@
 meta:
-  source:
-    name: Literacy rates (World Bank, CIA World Factbook, and other sources)
+  origin:
+    title: Literacy rates (World Bank, CIA World Factbook, and other sources)
+
     description: >-
       Additional Information
 
@@ -68,13 +69,14 @@ meta:
 
 
       - Sources for each country-year observation can be found in [this table.](http://ourworldindata.org/wp-content/uploads/2018/06/cross-country-literacy-sources-final.csv)
-    url: '- World Bank: https://data.worldbank.org/indicator/SE.ADT.LITR.ZS </br>
+    date_published: '2018-04-18'
+    date_accessed: '2018-04-18'
+    producer: Our World in Data
+    citation_full: |-
+      Literacy rates (World Bank, CIA World Factbook, and other sources), Our World in Data, 2018. Accessed on 18th April 2018 from various sources including the World Bank, CIA Factbook, and others. Detailed sources and links are provided in the dataset.
+    url_main: '- World Bank: https://data.worldbank.org/indicator/SE.ADT.LITR.ZS </br>
       - CIA Factbook: https://www.cia.gov/library/publications/the-world-factbook/
       </br> - Links to other sources below'
-    date_accessed: 2018-04-18
-    published_by: Our World in Data
-  name: Cross-country literacy rates - World Bank, CIA World Factbook, and other sources
-  description: ''
 wdir: ../../../data/snapshots/education/2018-04-18
 outs:
 - md5: ac7d7e08ff61171f09a027dcc15b939e

@@ -1,20 +1,18 @@
 meta:
-  source:
-    name: Tanzi & Schuknecht (2000)
-    description: 'The underlying sources for Tanzi & Schuknecht (2000) include: League
-      of Nations Statistical Yearbook (various years), Mitchell (1962), OECD Education
-      at a Glance (1996), UNESCO World Education Report (1993), UNDP Human Development
-      Report (1996), UN World Economics Survey (various years). To the extent that
-      the authors do not specify which sources were prioritised for each year/country,
-      it is not possible for us to reliably extend the time series with newer data.
-      For instance, the OECD Education at a Glance report (1998), which presents estimates
-      for the years 1990 and 1995, suggests discrepancies with the values reported
-      by Tanzi & Schuknecht (2000) for 1993.'
-    url: https://link.springer.com/article/10.1023%2FA%3A1017578302202?LI=true
-    date_accessed: 2017-09-30
-    published_by: Vito and Schuknecht (2000) Public Spending in the 20th Century A
-      Global Perspective
-  name: Public Expenditure on Education OECD - Tanzi & Schuknecht (2000)
+  origin:
+    title: Public Expenditure on Education OECD - Tanzi & Schuknecht (2000)
+    description: |-
+      Tanzi & Schuknecht (2000) is based on various underlying sources, including the League of Nations Statistical Yearbook, Mitchell (1962), OECD Education at a Glance (1996), UNESCO World Education Report (1993), UNDP Human Development Report (1996), and UN World Economics Survey. The dataset highlights inconsistencies in data for certain years and countries due to unspecified prioritization of sources by the authors. For example, discrepancies are noted when comparing the OECD Education at a Glance report (1998) with Tanzi & Schuknecht (2000) data for 1993.
+    date_published: '2000'
+    version_producer: '2000'
+
+    producer: Vito and Schuknecht
+    citation_full: |-
+      Vito and Schuknecht (2000) Public Spending in the 20th Century A Global Perspective. Tanzi & Schuknecht (2000). Accessed on 30th September 2017 from https://link.springer.com/article/10.1023%2FA%3A1017578302202?LI=true
+    attribution_short: Tanzi & Schuknecht (2000)
+
+    url_main: https://link.springer.com/article/10.1023%2FA%3A1017578302202?LI=true
+    date_accessed: '2017-09-30'
 wdir: ../../../data/snapshots/education/2017-09-30
 outs:
 - md5: 5ecb8cb6411e3a4f47d5f32a79ef9bdf
