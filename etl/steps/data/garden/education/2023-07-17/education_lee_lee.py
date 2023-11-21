@@ -57,9 +57,6 @@ def run(dest_dir: str) -> None:
     # Load dataset containing regions data.
     ds_regions = paths.load_dataset("regions")
 
-    # Load dataset containing income groups data.
-    ds_income_groups = paths.load_dataset("income_groups")
-
     # Load the World Bank Education Dataset
     ds_garden_wdi = paths.load_dataset("wdi")
     tb_wdi = ds_garden_wdi["wdi"]
