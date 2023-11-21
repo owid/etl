@@ -65,3 +65,9 @@ steps:
   # Older versions to be archived once they are not used by any other steps.
 
   ######################################################################################################################
+  data://meadow/papers/2023-11-21/snakebite:
+    - snapshot://papers/2023-11-21/snakebite.xlsx
+  data://garden/papers/2023-11-21/snakebite:
+    - data://meadow/papers/2023-11-21/snakebite
+  data://grapher/papers/2023-11-21/snakebite:
+    - data://garden/papers/2023-11-21/snakebite

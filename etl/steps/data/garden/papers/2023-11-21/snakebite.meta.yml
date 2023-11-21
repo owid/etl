@@ -1,0 +1,53 @@
+tables:
+  snakebite:
+    title: Global mortality of snakebite envenoming between 1990 and 2019
+    description:
+      Snakebite envenoming is an important cause of preventable death. The World Health Organization (WHO) set
+      a goal to halve snakebite mortality by 2030. We used verbal autopsy and vital registration data to model the proportion
+      of venomous animal deaths due to snakes by location, age, year, and sex, and applied these proportions to venomous animal
+      contact mortality estimates from the Global Burden of Disease 2019 study. In 2019, 63,400 people (95% uncertainty interval
+      38,900-78,600) died globally from snakebites, which was equal to an age-standardized mortality rate (ASMR) of 0.8 deaths
+      (0.5-1.0) per 100,000 and represents a 36% (2-49) decrease in ASMR since 1990. India had the greatest number of deaths
+      in 2019, equal to an ASMR of 4.0 per 100,000 (2.3-5.0). We forecast mortality will continue to decline, but not sufficiently
+      to meet WHO's goals. Improved data collection should be prioritized to help target interventions, improve burden estimation,
+      and monitor progress.
+    variables:
+      endemic_venomous_snakes:
+        title: Endemic venomous snakes
+        description_short: Whether or not there are venomous snake species endemic to this country.
+        unit: ""
+      deaths_count:
+        title: Deaths from snakebite envenoming
+        description_short: Number of deaths from snakebite envenoming.
+        unit: "deaths"
+        display:
+          numDecimalPlaces: 0
+      age_standardized_death_rate_per_100000:
+        title: Age-standardized death rate from snakebite envenoming
+        description_short: Age-standardized death rate per 100,000 people from snakebite envenoming.
+        unit: "deaths per 100,000 people"
+        display:
+          numDecimalPlaces: 1
+      percent_change_in_deaths_from_1990_to_2019:
+        title: Percent change in deaths from snakebite envenoming between 1990 and 2019
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      ylls_count:
+        title: Years of life lost due to snakebite envenoming
+        description_short: Number of years of life lost due to snakebite envenoming.
+        unit: "years or life lost (YLLs)"
+        display:
+          numDecimalPlaces: 1
+      age_standardized_yll_rate_per_100000:
+        title: Age-standardized years of life lost per 100,000 people due to snakebite envenoming
+        unit: "years of life lost per 100,000 people"
+        display:
+          numDecimalPlaces: 1
+      percent_change_in_ylls_from_1990_to_2019:
+        title: Percent change in years of life lost due to snakebite envenoming between 1990 and 2019
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
