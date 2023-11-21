@@ -21,7 +21,7 @@ REGIONS = [
 ]
 
 
-def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def add_data_for_regions(tb: Table, ds_regions: Dataset) -> Table:
     tb_with_regions = tb.copy()
     aggregations = {column: "mean" for column in tb_with_regions.columns if column not in ["country", "year"]}
 
@@ -30,7 +30,6 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Datas
         members = geo.list_members_of_region(
             region=region,
             ds_regions=ds_regions,
-            ds_income_groups=ds_income_groups,
         )
         tb_with_regions = shared.add_region_aggregates_education(
             df=tb_with_regions,
@@ -63,9 +62,6 @@ def run(dest_dir: str) -> None:
     # Load dataset containing regions data.
     ds_regions = paths.load_dataset("regions")
 
-    # Load dataset containing income groups data.
-    ds_income_groups = paths.load_dataset("income_groups")
-
     # Process data.
 
     # Harmonize the country names in the table.
@@ -84,7 +80,7 @@ def run(dest_dir: str) -> None:
     tb_projections = tb_projections.drop(columns=columns_to_drop)
 
     # Add regional and income group data to the projections.
-    tb_projections = add_data_for_regions(tb=tb_projections, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    tb_projections = add_data_for_regions(tb=tb_projections, ds_regions=ds_regions)
     tb_projections = tb_projections.underscore()
 
     # Create a copy of the projections table with a suffix in the column names.
@@ -140,6 +136,24 @@ def run(dest_dir: str) -> None:
 
     # Set metadata and format the dataframe for saving.
     tb_stiched = tb_stiched.underscore().set_index(["country", "year"], verify_integrity=True)
+
+    # Save columns to use on grapher
+    columns_to_use_on_grapher = [
+        "mf_youth_and_adults__15_64_years__percentage_of_no_education",
+        "f_youth_and_adults__15_64_years__percentage_of_no_education",
+        "f_adults__25_64_years__percentage_of_no_education",
+        "mf_adults__25_64_years__percentage_of_tertiary_education",
+        "mf_youth_and_adults__15_64_years__average_years_of_education",
+        "f_youth_and_adults__15_64_years__average_years_of_education",
+        "female_over_male_average_years_of_schooling",
+        "female_over_male_share_with_no_education",
+        "female_over_male_share_some_formal_education",
+        "some_formal_education_female",
+        "some_formal_education_male",
+        "some_formal_education_both_sexes",
+    ]
+
+    tb_stiched = tb_stiched[columns_to_use_on_grapher]
 
     # Set metadata and format the dataframe for saving.
     tb_stiched.metadata.short_name = paths.short_name

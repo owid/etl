@@ -23,17 +23,13 @@ REGIONS = [
 ]
 
 
-def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def add_data_for_regions(tb: Table, ds_regions: Dataset) -> Table:
     tb_with_regions = tb.copy()
     aggregations = {column: "mean" for column in tb_with_regions.columns if column not in ["country", "year"]}
 
     for region in REGIONS:
         # Find members of current region.
-        members = geo.list_members_of_region(
-            region=region,
-            ds_regions=ds_regions,
-            ds_income_groups=ds_income_groups,
-        )
+        members = geo.list_members_of_region(region=region, ds_regions=ds_regions)
         tb_with_regions = shared.add_region_aggregates_education(
             df=tb_with_regions,
             region=region,
@@ -107,7 +103,7 @@ def run(dest_dir: str) -> None:
     merged_tb = merged_tb.drop(columns=[column for column in merged_tb.columns if "__thousands" in column])
     merged_tb.columns = [underscore(col) for col in merged_tb.columns]
 
-    merged_tb = add_data_for_regions(tb=merged_tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    merged_tb = add_data_for_regions(tb=merged_tb, ds_regions=ds_regions)
 
     # Concatenate historical and more recent enrollment data
     hist_1985_tb = merged_tb[merged_tb["year"] < 1985]
@@ -137,6 +133,29 @@ def run(dest_dir: str) -> None:
     # Set metadata and format the dataframe for saving.
     tb_merged_wb.metadata.short_name = paths.short_name
     tb_merged_wb = tb_merged_wb.underscore().set_index(["country", "year"], verify_integrity=True)
+
+    columns_to_use = [
+        "mf_primary_enrollment_rates_combined_wb",
+        "f_primary_enrollment_rates_combined_wb",
+        "m_primary_enrollment_rates_combined_wb",
+        "mf_secondary_enrollment_rates_combined_wb",
+        "f_secondary_enrollment_rates_combined_wb",
+        "m_secondary_enrollment_rates_combined_wb",
+        "mf_tertiary_enrollment_rates_combined_wb",
+        "f_tertiary_enrollment_rates_combined_wb",
+        "m_tertiary_enrollment_rates_combined_wb",
+        "female_over_male_enrollment_rates_primary",
+        "female_over_male_enrollment_rates_secondary",
+        "female_over_male_enrollment_rates_tertiary",
+        "mf_youth_and_adults__15_64_years__percentage_of_no_education",
+        "f_youth_and_adults__15_64_years__percentage_of_no_education",
+        "f_adults__25_64_years__percentage_of_no_education",
+        "mf_adults__25_64_years__percentage_of_tertiary_education",
+        "mf_youth_and_adults__15_64_years__average_years_of_education",
+        "f_youth_and_adults__15_64_years__average_years_of_education",
+    ]
+    tb_merged_wb = tb_merged_wb[columns_to_use]
+
     #
     # Save outputs
     #
