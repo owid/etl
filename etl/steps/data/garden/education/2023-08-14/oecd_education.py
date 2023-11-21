@@ -19,12 +19,12 @@ def run(dest_dir: str) -> None:
     """
 
     # Load meadow dataset.
-    ds_meadow = paths.load_dependency("oecd_education")
+    ds_meadow = paths.load_dataset("oecd_education")
     tb = ds_meadow["oecd_education"].reset_index()
 
     # Load the World Bank Education Dataset
-    ds_garden_wb = paths.load_dependency("education")
-    tb_wb = ds_garden_wb["education"]
+    ds_garden_wb = paths.load_dataset("education")
+    tb_wb = ds_garden_wb["education"].reset_index()
 
     # Harmonize country names
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
@@ -61,7 +61,9 @@ def run(dest_dir: str) -> None:
     ]
 
     # Save the processed data in a new garden dataset
-    ds_garden = create_dataset(dest_dir, tables=[merged_wb], check_variables_metadata=True)
+    ds_garden = create_dataset(
+        dest_dir, tables=[merged_wb], check_variables_metadata=True
+    )
 
     ds_garden.save()
 
@@ -88,12 +90,13 @@ def extract_related_world_bank_data(tb_wb):
     }
 
     # Select and rename columns
-    tb_wb = tb_wb[select_wb_cols]
+    tb_wb = tb_wb[["country", "year"] + select_wb_cols]
     tb_wb.rename(columns=dictionary_to_rename_and_combine, inplace=True)
 
     # Filter the DataFrame for years above 2010 (OECD dataset stops in 2010)
-    tb_above_2010 = tb_wb[(tb_wb.index.get_level_values("year") > 2010)]
-    tb_above_2010["population_with_basic_education"] = 100 - tb_above_2010["no_formal_education"]
-    tb_above_2010.reset_index(inplace=True)
+    tb_above_2010 = tb_wb[tb_wb["year"] > 2010]
+    tb_above_2010["population_with_basic_education"] = (
+        100 - tb_above_2010["no_formal_education"]
+    )
 
     return tb_above_2010
