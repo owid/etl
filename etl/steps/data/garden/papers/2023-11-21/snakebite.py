@@ -3,9 +3,10 @@
 import re
 
 import numpy as np
+from owid.catalog import Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, Table, create_dataset
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
