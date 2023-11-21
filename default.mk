@@ -24,9 +24,9 @@ test-default: check-formatting lint check-typing unittest
 
 check-default:
 	@echo '==> Format & Lint & Typecheck changed files'
-	# make it work with lib/ packages too
+	@git fetch -q origin master
 	@RELATIVE_PATH=$$(pwd | sed "s|^$$(git rev-parse --show-toplevel)/||"); \
-	CHANGED_PY_FILES=$$(git diff --name-only master -- . | sed "s|^$$RELATIVE_PATH/||" | grep '\.py'); \
+	CHANGED_PY_FILES=$$(git diff --name-only origin/master -- . | sed "s|^$$RELATIVE_PATH/||" | grep '\.py'); \
 	if [ -n "$$CHANGED_PY_FILES" ]; then \
 		echo "$$CHANGED_PY_FILES" | xargs ruff format; \
 		echo "$$CHANGED_PY_FILES" | xargs ruff check --fix; \
