@@ -9,6 +9,7 @@ import world_bank_data as wb
 from owid.datautils.io import df_to_file
 from tqdm import tqdm
 
+from etl.db import get_engine
 from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
@@ -58,7 +59,7 @@ def main(path_to_file: str, upload: bool) -> None:
     snap.path.parent.mkdir(exist_ok=True, parents=True)
 
     # Fetch data from the World Bank API.
-    wb_education_df = get_data(path_to_file)
+    wb_education_df = get_data()
 
     # Add metadata columns to the DataFrame.
     wb_education_df = add_metadata(wb_education_df, path_to_file)
@@ -83,7 +84,6 @@ def fetch_education_data(education_code: str) -> pd.DataFrame:
     try:
         # Replace the indicator code if necessary
         education_code = "IT.NET.USER.ZS" if education_code == "IT.NET.USER.P2" else education_code
-
         # Fetch data for the given indicator code
         # This is a placeholder for the actual data fetching function
         data_series = wb.get_series(education_code)
@@ -102,7 +102,7 @@ def fetch_education_data(education_code: str) -> pd.DataFrame:
     return pd.DataFrame()  # Return an empty DataFrame in case of an error
 
 
-def get_data(path_to_file: str) -> pd.DataFrame:
+def get_data():
     """
     Reads the data with indicators from the given file path and fetches education data for each indicator.
 
@@ -112,18 +112,40 @@ def get_data(path_to_file: str) -> pd.DataFrame:
     Returns:
         DataFrame: DataFrame with education data for all indicators.
     """
-    indicators = pd.read_excel(path_to_file)
-    unique_series_codes = indicators["Code"].dropna().unique()
-    unique_series_codes = [code for code in unique_series_codes if code not in INVALID_EDUCATION_CODES]
+    # Get the list of World Bank series codes from live Grapher
+    wb_ids = used_world_bank_ids()
+
+    # Some variables were created posthoc and don't use the standard World bank id convention
+    wb_ids = [element for element in wb_ids if element is not None]
+
+    # Assert that the list is not empty
+    assert len(wb_ids) > 0, "The list wb_ids is empty after removing None elements."
 
     with ThreadPoolExecutor() as executor:
-        futures = [executor.submit(fetch_education_data, code) for code in unique_series_codes]
-        wb_education = [f.result() for f in tqdm(futures, total=len(unique_series_codes), desc="Fetching data")]
+        futures = [executor.submit(fetch_education_data, code) for code in wb_ids]
+        wb_education = [f.result() for f in tqdm(futures, total=len(wb_ids), desc="Fetching data")]
 
     # Concatenate all non-empty dataframes efficiently
     wb_education_df = pd.concat(wb_education, ignore_index=True)
 
     return wb_education_df
+
+
+def used_world_bank_ids():
+    # This will connect to MySQL from specified ENV, so to run it against production you'd run
+    # ETL=.env.prod python snapshots/wb/2023-07-10/education.py
+    engine = get_engine()
+    q = """
+    select distinct
+        SUBSTRING_INDEX(SUBSTRING(v.description, LOCATE('World Bank variable id: ', v.description) + LENGTH('World Bank variable id: ')), ' ', 1) AS wb_id,
+        v.*
+    from chart_dimensions as cd
+    join charts as c on c.id = cd.chartId
+    join variables as v on v.id = cd.variableId
+    where v.datasetId = 6194
+    """
+    df = pd.read_sql(q, engine)
+    return list(df["wb_id"].unique())
 
 
 def add_metadata(df, path_to_file):

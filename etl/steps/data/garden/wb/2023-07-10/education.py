@@ -75,6 +75,12 @@ def run(dest_dir: str) -> None:
     # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
     tb, combined_literacy_description, combined_expenditure_description = combine_historical_literacy_expenditure(tb)
 
+    # Compare two columnst that seem to have identical indicies (if values are the same then remove)
+    if tb["SE.XPD.TOTL.GD.ZS"].equals(tb["SE.XPD.TOTL.GD.ZS."]):
+        # If they are the same, drop one of the columns
+        tb.drop("SE.XPD.TOTL.GD.ZS.", axis=1, inplace=True)
+    else:
+        print("The columns are not the same.")
     # Set an appropriate index and sort.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
@@ -347,7 +353,7 @@ def add_metadata(
                 + "**Recent estimates:**\n\n"
                 + "Percentage of the population between age 25 and age 64 who can, with understanding, read and write a short, simple statement on their everyday life. Generally, ‘literacy’ also encompasses ‘numeracy’, the ability to make simple arithmetic calculations. This indicator is calculated by dividing the number of literates aged 25-64 years by the corresponding age group population and multiplying the result by 100."
                 + "\n\n"
-                + "World Bank variable id: UIS.LR.AG25T64."
+                + "World Bank variable id: UIS.LR.AG25T64"
                 + "\n\n"
                 + "Original source: UNESCO Institute for Statistics"
             )
@@ -365,7 +371,7 @@ def add_metadata(
                 + "**Recent estimates:**\n\n"
                 + "General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments."
                 + "\n\n"
-                + "World Bank variable id: SE.XPD.TOTL.GD.ZS."
+                + "World Bank variable id: SE.XPD.TOTL.GD.ZS"
                 + "\n\n"
                 + "Original source: UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022."
             )
