@@ -23,7 +23,21 @@ definitions:
         url_main: http://v-dem.net/vdemds.html
         date_accessed: '2023-03-02'
         date_published: '2023-03-02'
-
+    presentation:
+      attribution_short: V-Dem
+      topic_tags:
+        - Democracy
+      faqs:
+        - fragment_id: vdem-characteristics
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: vdem-scoring
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: vdem-coverage
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: vdem-measured
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: vdem-more-info
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
     processing_level: major
 
 tables:
@@ -59,20 +73,6 @@ tables:
 
           All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
         presentation:
-          attribution_short: V-Dem
-          topic_tags:
-            - Democracy
-          faqs:
-            - fragment_id: vdem-characteristics
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-scoring
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-coverage
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-measured
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-more-info
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Electoral democracy index
             subtitle: >-
@@ -115,4 +115,3 @@ tables:
                 text: FAQs on this data
             selectedFacetStrategy: entity
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
-
