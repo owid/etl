@@ -164,7 +164,7 @@ tables:
           was not part of the state (as in the Catholic world).
         processing_level: minor
         display:
-          name: Birth register implemented
+          name: Civil register implemented
           numDecimalPlaces: 0
           <<: *common-display
 
