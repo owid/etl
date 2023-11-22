@@ -301,13 +301,13 @@ tables:
           name: Number of population registers implemented
           numDecimalPlaces: 0
 
-      statag_intro_region:
-        title: Number of statistical agencies implemented by region
+      statagency_region:
+        title: Number of statistical agencies operating by region
         unit: ""
         short_unit: ""
         description_short: "A statistical agency is an official government organization that is tasked with gathering numerical information on a variety of topics."
         description_processing: |
-          This indicator is constructed by counting the number of statistical agencies implemented by region. Data is aggregated using Our World in Data region classifications.
+          This indicator is constructed by counting the number of statistical agencies operating by region. Data is aggregated using Our World in Data region classifications.
         processing_level: major
         display:
           name: Number of statistical agencies implemented

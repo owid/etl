@@ -123,7 +123,7 @@ def regional_aggregations(tb: Table, tb_country_list: Table) -> Table:
     cols_to_use = [
         "civreg",
         "popreg",
-        "statag_intro",
+        "statagency",
         "census",
         "register_based_census",
         "census_10_years",
