@@ -2,6 +2,7 @@
 
 from typing import Optional, cast
 
+import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -61,6 +62,23 @@ def run(dest_dir: str) -> None:
 
     # Create new table
     tb_regions = create_table_countries_in_region(tb)
+
+    # Add missing years
+    ## Create grid of possible values
+    assert tb_regions["number_countries"].notna().all(), "No missing years to add!"
+    values_regions = set(tb_regions["region"])
+    values_year = np.arange(tb_regions["year"].min(), tb_regions["year"].max() + 1)
+    values_possible = [
+        values_regions,
+        values_year,
+    ]
+    # ## Set new index
+    columns = ["region", "year"]
+    new_idx = pd.MultiIndex.from_product(values_possible, names=columns)
+    tb_regions = tb_regions.set_index(columns).reindex(new_idx).reset_index()
+    # ## Replace NaNs with zeroes & sort
+    tb_regions["number_countries"] = tb_regions["number_countries"].fillna(0)
+    tb_regions = tb_regions.sort_values(["region", "year"])
 
     # Population table
     tb_pop = add_population_to_table(tb, ds_pop)
