@@ -45,7 +45,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def reformat_table(tb: Table) -> [Table, dict]:
+def reformat_table(tb: Table) -> tuple[Table, dict]:
     """Reformat table to wide format and drop columns"""
 
     # Rename columns
@@ -97,11 +97,11 @@ def add_metadata_from_dict(tb: Table, indicator_dict: dict) -> Table:
 
         elif "number" in meta_title.lower():
             tb[col].metadata.unit = "employees"
-            tb[col].metadata.short_unit = "employees"
+            tb[col].metadata.short_unit = ""
 
         elif "mean age" in meta_title.lower() or "median age" in meta_title.lower():
             tb[col].metadata.unit = "years"
-            tb[col].metadata.short_unit = "years"
+            tb[col].metadata.short_unit = ""
 
         else:
             tb[col].metadata.unit = ""

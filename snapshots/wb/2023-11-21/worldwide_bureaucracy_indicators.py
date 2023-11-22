@@ -4,6 +4,7 @@ Script to create a snapshot of dataset Worldwide Bureaucracy Indicators.
 Instructions:
 1.  Download the dataset from the link below.
     https://datacatalog.worldbank.org/dataset/worldwide-bureaucracy-indicators
+# TODO: Download the link automatically.
 2.  Unzip the file and place the csv file in the data folder.
 3.  Run the script with the following command:
     python snapshots/wb/{date}/worldwide_bureaucracy_indicators.py --path-to-file <relative-path-to-file>
