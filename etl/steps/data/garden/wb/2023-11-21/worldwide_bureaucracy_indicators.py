@@ -64,6 +64,23 @@ def run(dest_dir: str) -> None:
         meta_title = indicator_dict[col]
         tb[col].metadata.title = meta_title
 
+        # Add units depending on the text of the indicator
+        if "share" in meta_title.lower() or "percentage" in meta_title.lower():
+            tb[col].metadata.unit = "%"
+            tb[col].metadata.short_unit = "%"
+
+        elif "number" in meta_title.lower():
+            tb[col].metadata.unit = "employees"
+            tb[col].metadata.short_unit = "employees"
+
+        elif "mean age" in meta_title.lower() or "median age" in meta_title.lower():
+            tb[col].metadata.unit = "years"
+            tb[col].metadata.short_unit = "years"
+
+        else:
+            tb[col].metadata.unit = ""
+            tb[col].metadata.short_unit = ""
+
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
