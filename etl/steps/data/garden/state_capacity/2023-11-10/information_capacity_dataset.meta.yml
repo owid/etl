@@ -1,0 +1,363 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - State Capacity
+    display: &common-display
+      tolerance: 5
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  information_capacity_dataset:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      statagency:
+        title: Statistical agency operating
+        unit: ""
+        short_unit: ""
+        description_short: A statistical agency is an official government organization that is tasked with gathering numerical information on a variety of topics.
+        description_from_producer: >-
+          Dummy variable that takes a value 1 if the country has a
+          statistical agency operating that year, and 0 otherwise. A statistical
+          agency is an official government organization that is tasked with
+          gathering numerical information on a variety of topics. We assign
+          the value 0 to this variable when these tasks were absorbed by
+          several government offices that performed other functions besides
+          collecting and maintaining numerical in-formation.
+        processing_level: minor
+        display:
+          name: Statistical agency operating
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      census:
+        title: Census was run
+        unit: ""
+        short_unit: ""
+        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity."
+        description_from_producer: >-
+          Dummy variable that takes the value 1 if the country ran a
+          census that year and 0 otherwise. A census is a population count
+          that meets three requirements: (1) universality (it seeks to cover the
+          entire population); (2) defined territory (it counts the population
+          within a well-defined territory); and (3) simultaneity (each person is
+          counted within a discrete time window).
+        processing_level: minor
+        display:
+          name: Census was run
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      census_10_years:
+        title: Census was run within 10 years
+        unit: ""
+        short_unit: ""
+        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity."
+        description_processing: |
+          This indicator is constructed by taking the value of the `Census was run` variable for the current year and the previous nine years and summing them up. The indicator takes the value 1 if the sum is greater than 0 and 0 otherwise.
+        processing_level: major
+        display:
+          name: Census was run within 10 years
+          numDecimalPlaces: 0
+
+      first_moderncensus:
+        title: Modern census first implemented
+        unit: ""
+        short_unit: ""
+        description_short: "A modern census is defined as a census that meets four requirements: universality, well-defined territory, simultaneity, and individual enumeration."
+        description_from_producer: >-
+          Dummy variable that takes the value 1 the year
+          a country first implemented a modern census (it is missing
+          otherwise). A modern census meets all three requirements from the
+          census variable plus a fourth one – (4) individual enumeration,
+          which means that the census produces tabular data sets with
+          disaggregated information for each individual.
+        processing_level: minor
+        display:
+          name: Modern census first implemented
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      register_based_census:
+        title: Census based on population register
+        unit: ""
+        short_unit: ""
+        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
+        description_from_producer: >-
+          Dummy variable that takes the value 1 if the
+          country runs a census that is based on a continuously updated
+          population register (as opposed to an enumeration carried out
+          during a discrete period of time) and 0 otherwise.
+        processing_level: minor
+        display:
+          name: Census based on population register
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      register_based_census_10_years:
+        title: Census based on population register within 10 years
+        unit: ""
+        short_unit: ""
+        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
+        description_processing: |
+          This indicator is constructed by taking the value of the `Census based on population register` variable for the current year and the previous nine years and summing them up. The indicator takes the value 1 if the sum is greater than 0 and 0 otherwise.
+        processing_level: major
+        display:
+          name: Census based on population register within 10 years
+          numDecimalPlaces: 0
+
+      yearbook_published:
+        title: Statistical yearbook published
+        unit: ""
+        short_unit: ""
+        description_short: "A statistical yearbook is defined as an annual publication of the state that contains numerical data about the country regarding physical environment, demography, economic affairs, political affairs, and social and cultural affairs."
+        description_from_producer: >-
+          Dummy variable that takes the value 1 if the
+          country published a statistical yearbook that year and 0 otherwise.
+          A statistical yearbook is an annual publication of the state that
+          contains numerical data about the country regarding several of the
+          following categories: physical environment, demography, economic
+          affairs, political affairs, and social and cultural affairs.
+        processing_level: minor
+        display:
+          name: Statistical yearbook published
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      yearbook_coverage:
+        title: Statistical yearbook with information for that year
+        unit: ""
+        short_unit: ""
+        description_short: "A statistical yearbook is defined as is an annual publication of the state that contains numerical data about the country regarding physical environment, demography, economic affairs, political affairs, and social and cultural affairs."
+        description_from_producer: >-
+          Dummy variable that takes the value 1 if the
+          country published a statistical yearbook with information for that
+          year (typically, but not necessarily, in the yearbook published the
+          following year) and 0 otherwise.
+        processing_level: minor
+        display:
+          name: Statistical yearbook with information for that year
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      civreg:
+        title: Civil register implemented
+        unit: ""
+        short_unit: ""
+        description_short: "A civil register is defined as a government agency that records key events in the life trajectories of individuals, such as births, marriages, and deaths."
+        description_from_producer: >-
+          Dummy variable that takes the value 1 if the country
+          maintained a birth register that year and 0 otherwise. A civil register
+          is a government agency that records key events in the life
+          trajectories of individuals (such as births, marriages, and deaths).
+          We include parish registers when they were administered by official
+          state churches (as in the Nordic countries) but not when the Church
+          was not part of the state (as in the Catholic world).
+        processing_level: minor
+        display:
+          name: Birth register implemented
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      popreg:
+        title: Population register implemented
+        unit: ""
+        short_unit: ""
+        description_short: "A population register is defined as a centralized state agency that keeps detailed and permanently updated records of every person in the territory."
+        description_from_producer: >-
+          Dummy variable that takes the value 1 if the country
+          maintained a population register that year and 0 otherwise.
+          Population registers are centralized state agencies that keep detailed
+          and permanently updated records of every person in the territory.
+        processing_level: minor
+        display:
+          name: Population register implemented
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      statag_intro:
+        title: Statistical agency established
+        unit: ""
+        short_unit: ""
+        description_short: "A statistical agency is an official government organization that is tasked with gathering numerical information on a variety of topics."
+        description_from_producer: >-
+          This variable takes the value 1 for every year after the
+          first adoption of a statistical agency, even if it was later abolished
+          (which only occurred in France, Germany and Denmark) and 0 for
+          all previous years.
+        processing_level: minor
+        display:
+          name: Statistical agency established
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      censusgraded_ability:
+        title: Ability to run census index
+        unit: ""
+        short_unit: ""
+        description_short: Measures the ability of the country to carry out censuses consistently with different degrees of difficulty. It ranges between 0 (20 years between any census) and 30 (census based on a continuously updated population register).
+        description_from_producer: >-
+          A graded index of the ability of the country
+          to carry out censuses consistently with different degrees of
+          difficulty. The index takes the value 30 if the country ran a census
+          based on a continuously updated population register (based on
+          register_based_census), 20 if it ran a modern (enumeration-based)
+          census (censuses implement-ed after first_moderncensus takes the
+          value 1 but that were not based on population registers), and 10 if it
+          ran a non-modern census. The index is depreciated by 1 point for
+          every consecutive year without a census, starting 10 years after the
+          previous census. Therefore, the index takes a value of 0 after 20
+          years without any census, after 30 years from the last modern
+          census, and after 40 years from the last register-based census.
+        processing_level: minor
+        display:
+          name: Ability to run census index
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      ybcov_ability:
+        title: Ability to publish statistical yearbook index
+        unit: ""
+        short_unit: ""
+        description_short: Measures the ability of the country to publish a statistical yearbook over a ten-year window. It ranges between 0 (10 years without statistical yearbooks published) and 10 (country publisjed a statistical yearbook covering that year).
+        description_from_producer: >-
+          A graded index of the ability of the country to
+          publish a statistical yearbook over a ten-year window. The index
+          takes the value 10 when the country published a statistical yearbook
+          covering that year (based on yearbook_coverage) and is depreciated
+          by 1 point for each consecutive year without a statistical yearbook.
+          Therefore, the index takes the value 0 after 10 years without
+          statistical yearbooks published.
+        processing_level: minor
+        display:
+          name: Ability to publish statistical yearbook index
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      infcap_irt:
+        title: Information Capacity Index (IRT)
+        unit: ""
+        short_unit: ""
+        description_short: "Measures information capacity by combining five indicators: when the country first established a statistical agency, whether the country had in place a civil register and a population register, and indexes of census ability and yearbook ability. The indicators are combined via a hybrid two-parameter and graded Item Response Model (IRT)."
+        description_from_producer: >-
+          An aggregate index of information capacity. It is based
+          on a hybrid two-parameter and graded Item Response Model (IRT)
+          that is based on five component indicators – when the country first
+          established a statistical agency (statag_intro), whether the country
+          had in place a civil register (civreg) and a population register
+          (popreg), and the graded indexes of census ability
+          (censusgraded_ability) and yearbook ability (ybcov_ability).
+        processing_level: minor
+        display:
+          name: Information Capacity Index
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      infcap_pca:
+        title: Information Capacity Index (PCA)
+        unit: ""
+        short_unit: ""
+        description_short: "Measures information capacity by combining five indicators: when the country first established a statistical agency, whether the country had in place a civil register and a population register, and indexes of census ability and yearbook ability. The indicators are combined via a Principal Components Analysis (PCA) model."
+        description_from_producer: >-
+          An aggregate index of information capacity based on a
+          Principal Components Analysis (PCA) model, using the same
+          component variables as infcap_irt.
+        processing_level: minor
+        display:
+          name: Information Capacity Index
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      civreg_region:
+        title: Number of civil registers implemented by region
+        unit: ""
+        short_unit: ""
+        description_short: "A civil register is defined as a government agency that records key events in the life trajectories of individuals, such as births, marriages, and deaths."
+        description_processing: |
+          This indicator is constructed by counting the number of civil registers implemented by region. Data is aggregated using Our World in Data region classifications.
+        processing_level: major
+        display:
+          name: Number of civil registers implemented
+          numDecimalPlaces: 0
+
+      popreg_region:
+        title: Number of population registers implemented by region
+        unit: ""
+        short_unit: ""
+        description_short: "A population register is defined as a centralized state agency that keeps detailed and permanently updated records of every person in the territory."
+        description_processing: |
+          This indicator is constructed by counting the number of population registers implemented by region. Data is aggregated using Our World in Data region classifications.
+        processing_level: major
+        display:
+          name: Number of population registers implemented
+          numDecimalPlaces: 0
+
+      statag_intro_region:
+        title: Number of statistical agencies implemented by region
+        unit: ""
+        short_unit: ""
+        description_short: "A statistical agency is an official government organization that is tasked with gathering numerical information on a variety of topics."
+        description_processing: |
+          This indicator is constructed by counting the number of statistical agencies implemented by region. Data is aggregated using Our World in Data region classifications.
+        processing_level: major
+        display:
+          name: Number of statistical agencies implemented
+          numDecimalPlaces: 0
+
+      census_region:
+        title: Number of censuses implemented by region
+        unit: ""
+        short_unit: ""
+        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity."
+        description_processing: |
+          This indicator is constructed by counting the number of censuses implemented by region. Data is aggregated using Our World in Data region classifications.
+        processing_level: major
+        display:
+          name: Number of censuses implemented
+          numDecimalPlaces: 0
+
+      register_based_census_region:
+        title: Number of register-based censuses implemented by region
+        unit: ""
+        short_unit: ""
+        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
+        description_processing: |
+          This indicator is constructed by counting the number of register-based censuses implemented by region. Data is aggregated using Our World in Data region classifications.
+        processing_level: major
+        display:
+          name: Number of register-based censuses implemented
+          numDecimalPlaces: 0
+
+      census_10_years_region:
+        title: Number of censuses implemented within 10 years by region
+        unit: ""
+        short_unit: ""
+        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity."
+        description_processing: |
+          This indicator is constructed by counting the number of censuses implemented within 10 years by region. Data is aggregated using Our World in Data region classifications.
+        processing_level: major
+        display:
+          name: Number of censuses implemented within 10 years
+          numDecimalPlaces: 0
+
+      register_based_census_10_years_region:
+        title: Number of register-based censuses implemented within 10 years by region
+        unit: ""
+        short_unit: ""
+        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
+        description_processing: |
+          This indicator is constructed by counting the number of register-based censuses implemented within 10 years by region. Data is aggregated using Our World in Data region classifications.
+        processing_level: major
+        display:
+          name: Number of register-based censuses implemented within 10 years
+          numDecimalPlaces: 0
+
