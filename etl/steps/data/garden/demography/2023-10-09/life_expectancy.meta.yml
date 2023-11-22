@@ -36,7 +36,7 @@ definitions:
 
   common:
     description_short: |-
-      <% if age == '0' %>
+      <% if age == 0 %>
 
       <% if sex == 'all' %>
       The period life expectancy at birth, in a given year.

@@ -77,9 +77,9 @@ tables:
         unit: years
         short_unit: years
         description_short: |-
-          <% if age == '0' %>
+          <% if age == 'at birth' %>
 
-          <% if sex == 'both' %>
+          <% if sex == 'all' %>
           The period life expectancy at birth, in a given year.
           <% else %>
           The period life expectancy at birth among << sex + 's' >>, in a given year.
@@ -87,7 +87,7 @@ tables:
 
           <% else %>
 
-          <% if sex == 'both' %>
+          <% if sex == 'all' %>
           The total period life expectancy at age << age >>, in a given year.
           <% else %>
           The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
