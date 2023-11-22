@@ -34,10 +34,6 @@ OUTLIERS_IN_CONSUMPTION_DF = [
     ("Venezuela", 2018),
 ]
 
-# Label used for international transport (emissions from oil in bunker fuels), included as a country in the
-# fossil CO2 emissions dataset.
-INTERNATIONAL_TRANSPORT_LABEL = "International Transport"
-
 # Regions and income groups to create by aggregating contributions from member countries.
 # In the following dictionary, if nothing is stated, the region is supposed to be a default continent/income group.
 # Otherwise, the dictionary can have "regions_included", "regions_excluded", "countries_included", and
@@ -231,12 +227,65 @@ def sanity_checks_on_input_data(
         < 0.001
     ).all(), error
 
-    # Check that emissions in tb_production (emissions from the national excel file) coincide with emissions in tb_co2
-    # (from the Fossil CO2 emissions csv file).
-    # Given that country names have not yet been harmonized, rename the only countries that are present in both datasets.
+    # In the Fossil CO2 file, international transport emissions has been separated into aviation and shipping.
+    # Emissions are also separated by fuel.
+    # We'll add them to the global emissions.
+    global_aviation_and_shipping = (
+        tb_co2[tb_co2["country"].isin(["International Aviation", "International Shipping"])]
+        .dropna()
+        .pivot(index="year", columns="country", values="emissions_total")
+        .reset_index()
+    )
+    global_aviation_and_shipping["global_aviation_and_shipping"] = (
+        global_aviation_and_shipping["International Aviation"] + global_aviation_and_shipping["International Shipping"]
+    )
+    comparison = (
+        tb_production[tb_production["country"] == "Bunkers"]
+        .reset_index(drop=True)
+        .rename(columns={"production_emissions": "global_bunker_emissions"})
+        .merge(
+            global_aviation_and_shipping[["year", "global_aviation_and_shipping"]],
+            how="outer",
+            on="year",
+        )
+        .sort_values("year")
+        .reset_index(drop=True)
+    )
+    # Keep only rows where both time series are informed.
+    comparison = comparison.dropna(
+        subset=["global_bunker_emissions", "global_aviation_and_shipping"], how="any"
+    ).reset_index(drop=True)
+    ####################################################################################################################
+    # NOTE: Bunker emissions from the production emissions file should coincide with the sum of aviation and shipping
+    # emissions from the fossil co2 file.
+    # This is indeed the case for all years except 2020, where there is a ~4% difference.
+    check = comparison[comparison["year"] == 2020].reset_index(drop=True)
+    error = (
+        "Bunker emissions from national emissions file was expected to differ ~4% with the sum of aviation and "
+        "shipping emissions from the fossil co2 file in 2020. If this is no longer true, remove this part of the code."
+    )
+    assert (
+        abs(check["global_bunker_emissions"] - check["global_aviation_and_shipping"]) / check["global_bunker_emissions"]
+    ).item() > 0.04, error
+    comparison = comparison[comparison["year"] != 2020].reset_index(drop=True)
+    ####################################################################################################################
+    error = (
+        "Bunker emissions from national emissions file should coincide (within 0.0001%) with the sum of aviation"
+        " and shipping emissions from the Fossil CO2 file."
+    )
+    assert (
+        100
+        * abs(comparison["global_bunker_emissions"] - comparison["global_aviation_and_shipping"])
+        / (comparison["global_bunker_emissions"])
+        < 0.0001
+    ).all(), error
+
+    # Now check that all other emissions (that are not from bunker fuels) in tb_production (emissions from the national
+    # excel file) coincide with emissions in tb_co2 (from the Fossil CO2 emissions csv file).
+    # Since country names have not yet been harmonized, rename the only countries that are present in both datasets.
     comparison = pr.merge(
         tb_co2[["country", "year", "emissions_total"]],
-        tb_production.replace({"Bunkers": "International Transport", "World": "Global"}),
+        tb_production[tb_production["country"] != "Bunkers"].replace({"World": "Global"}),
         on=["country", "year"],
         how="inner",
     ).dropna(subset=["emissions_total", "production_emissions"], how="any")
@@ -245,7 +294,6 @@ def sanity_checks_on_input_data(
     comparison = comparison.drop(
         comparison[(comparison["country"] == "Kuwait") & (comparison["year"] == 1991)].index
     ).reset_index(drop=True)
-
     # Check that production emissions from national file coincide with the Fossil CO2 emissions dataset.
     # Assert that the difference is smaller than 1%.
     error = "Production emissions from national file were expected to coincide with the Fossil CO2 emissions dataset."
@@ -496,7 +544,7 @@ def extract_global_emissions(tb_co2: Table, tb_historical: Table, ds_population:
     The resulting global emissions data includes bunker and land-use change emissions.
 
     NOTE: This function has to be used after selecting and renaming columns in tb_co2, but before harmonizing country
-    names in tb_co2 (so that "International Transport" is still listed as a country).
+    names in tb_co2 (so that "International Aviation" and "International Shipping" are still listed as countries).
 
     Parameters
     ----------
@@ -513,19 +561,27 @@ def extract_global_emissions(tb_co2: Table, tb_historical: Table, ds_population:
         World emissions.
 
     """
-    # For some reason, "International Transport" is included as another country, that only has emissions from oil.
-    # We separate it as another variable (only given at the global level).
-    global_transport = tb_co2[tb_co2["country"] == INTERNATIONAL_TRANSPORT_LABEL].reset_index(drop=True)
+    # "International Aviation" and "International Shipping" are now included as separate countries.
+    # Combine their emissions into one variable.
+    global_aviation = (
+        tb_co2[tb_co2["country"] == "International Aviation"].set_index(["year"]).drop(columns=["country"])
+    )
+    global_shipping = (
+        tb_co2[tb_co2["country"] == "International Shipping"].set_index(["year"]).drop(columns=["country"])
+    )
+    global_transport = global_aviation + global_shipping
 
-    # Check that total emissions for international transport coincide with oil emissions.
-    error = "Total emissions from international transport do not coincide with oil emissions."
-    assert all((global_transport["emissions_from_oil"] - global_transport["emissions_total"]).dropna() == 0), error
+    # Check that total emissions for international aviation coincide with oil emissions.
+    # NOTE: International shipping does include emissions from gas, coal and oil.
+    error = "Total emissions from international aviation do not coincide with oil emissions."
+    assert all((global_aviation["emissions_from_oil"] - global_aviation["emissions_total"]).dropna() == 0), error
 
-    # Therefore, we can keep only one column for international transport emissions.
+    # Keep only total emissions from international transport.
     global_transport = (
-        global_transport[["year", "emissions_from_oil"]]
+        global_transport[["emissions_total"]]
+        .rename(columns={"emissions_total": "global_emissions_from_international_transport"}, errors="raise")
         .dropna()
-        .rename(columns={"emissions_from_oil": "global_emissions_from_international_transport"}, errors="raise")
+        .reset_index()
     )
 
     # Create a new table of global emissions.
@@ -815,21 +871,22 @@ def combine_data_and_add_variables(
     # Fix consumption emissions for Africa.
     tb_co2_with_regions = fix_consumption_emissions_for_africa(tb_co2_with_regions=tb_co2_with_regions)
 
-    # Add global emissions and global cumulative emissions columns to main table.
+    # Temporarily add global emissions and global cumulative emissions columns to main table, to be able to calculate
+    # indicators in terms of global emissions.
     tb_co2_with_regions = pr.merge(
         tb_co2_with_regions, tb_global_emissions.drop(columns="country"), on=["year"], how="left"
     )
 
-    # Ensure main table is sorted (so that cumulative emissions are properly calculated).
-    tb_co2_with_regions = tb_co2_with_regions.sort_values(["country", "year"]).reset_index(drop=True)
-
     # Temporarily add certain global emissions variables.
     # This is done simply to be able to consider "consumption_emissions" as just another type of emission
     # when creating additional variables.
-    tb_co2_with_regions["global_consumption_emissions"] = tb_co2_with_regions["global_emissions_total"]
+    tb_co2_with_regions["global_consumption_emissions"] = tb_co2_with_regions["global_emissions_total"].copy()
     tb_co2_with_regions["global_cumulative_consumption_emissions"] = tb_co2_with_regions[
         "global_cumulative_emissions_total"
-    ]
+    ].copy()
+
+    # Ensure main table is sorted (so that cumulative emissions are properly calculated).
+    tb_co2_with_regions = tb_co2_with_regions.sort_values(["country", "year"]).reset_index(drop=True)
 
     # Add new variables for each source of emissions.
     for column in EMISSION_SOURCES + [
@@ -899,11 +956,6 @@ def combine_data_and_add_variables(
         tb_co2_with_regions["traded_emissions"] / tb_co2_with_regions["population"]
     )
 
-    # Remove temporary columns.
-    tb_co2_with_regions = tb_co2_with_regions.drop(
-        columns=["global_consumption_emissions", "global_cumulative_consumption_emissions"]
-    )
-
     # Add annual percentage growth of total emissions.
     tb_co2_with_regions["pct_growth_emissions_total"] = (
         tb_co2_with_regions.groupby("country")["emissions_total"].pct_change() * 100
@@ -925,6 +977,11 @@ def combine_data_and_add_variables(
     # Create variable of population as a share of global population.
     tb_co2_with_regions["population_as_share_of_global"] = (
         tb_co2_with_regions["population"] / tb_co2_with_regions["global_population"] * 100
+    )
+
+    # Remove temporary columns of global emissions.
+    tb_co2_with_regions = tb_co2_with_regions.drop(
+        columns=[column for column in tb_co2_with_regions.columns if column.startswith("global_")]
     )
 
     # Replace infinity values (for example when calculating growth from zero to non-zero) in the data by nan.
@@ -1020,8 +1077,7 @@ def run(dest_dir: str) -> None:
         tb_production=tb_production, tb_consumption=tb_consumption, tb_historical=tb_historical, tb_co2=tb_co2
     )
 
-    # For some reason, "International Transport" is included as another country, that only has emissions from oil.
-    # Extract that data and remove it from the rest of national emissions.
+    # "International Aviation" and "International Shipping" are included as additional countries.
     tb_global_emissions = extract_global_emissions(
         tb_co2=tb_co2, tb_historical=tb_historical, ds_population=ds_population
     )
