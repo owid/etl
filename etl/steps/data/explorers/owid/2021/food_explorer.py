@@ -1039,7 +1039,7 @@ metrics = [
 
 fe_bulk_melted_regions = fe_bulk_melted_regions[
     ~((fe_bulk_melted_regions.population_diff_perc >= t1) & (fe_bulk_melted_regions.metric.isin(metrics)))
-    | ((fe_bulk_melted_regions["product"] == "Total"))
+    | (fe_bulk_melted_regions["product"] == "Total")
 ]
 
 # %%

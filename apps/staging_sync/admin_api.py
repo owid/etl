@@ -88,6 +88,13 @@ def _create_user_session(session: Session, user_email: str, expiration_seconds=3
         INSERT INTO sessions (session_key, session_data, expire_date)
         VALUES (:session_key, :session_data, :expire_date);
     """
-    session.execute(query, params={"session_key": session_key, "session_data": session_data, "expire_date": dt.datetime.utcnow() + dt.timedelta(seconds=expiration_seconds)})  # type: ignore
+    session.execute(
+        query,  # type: ignore
+        params={
+            "session_key": session_key,
+            "session_data": session_data,
+            "expire_date": dt.datetime.utcnow() + dt.timedelta(seconds=expiration_seconds),
+        },
+    )
 
     return session_key

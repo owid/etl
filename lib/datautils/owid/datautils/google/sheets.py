@@ -26,9 +26,7 @@ class GSheetsApi:
     def sheets(self) -> Sheets:
         """Access or initialize sheets attribute."""
         if self.__sheets is None:
-            self.__sheets = Sheets.from_files(
-                self.clients_secrets, self.credentials_path, no_webserver=True
-            )
+            self.__sheets = Sheets.from_files(self.clients_secrets, self.credentials_path, no_webserver=True)
         return self.__sheets
 
     def _init_config_folder(self) -> None:
@@ -36,9 +34,7 @@ class GSheetsApi:
         if not os.path.isdir(credentials_folder):
             os.makedirs(credentials_folder, exist_ok=True)
 
-    def get(
-        self, spreadsheet_id: str, worksheet_id: Optional[int] = None
-    ) -> Union[SpreadSheet, WorkSheet]:
+    def get(self, spreadsheet_id: str, worksheet_id: Optional[int] = None) -> Union[SpreadSheet, WorkSheet]:
         """Get a spreadsheet or worksheet from a Google sheet.
 
         If only `spreadsheet_id` is provided, this will return the entire spreadsheet. Otherwise,
@@ -67,7 +63,7 @@ class GSheetsApi:
         worksheet_id: int,
         output_path: Optional[str] = None,
         encoding: str = "utf-8",
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         """Download a worksheet from a Google sheet.
 
@@ -94,11 +90,7 @@ class GSheetsApi:
             sheet.to_csv(make_filename=make_filename, encoding=encoding, **kwargs)
 
     def download_spreadsheet(
-        self,
-        spreadsheet_id: str,
-        output_dir: str,
-        encoding: str = "utf-8",
-        **kwargs: Any
+        self, spreadsheet_id: str, output_dir: str, encoding: str = "utf-8", **kwargs: Any
     ) -> None:
         """Download a spreadsheet from a Google sheet.
 

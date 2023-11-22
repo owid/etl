@@ -39,7 +39,7 @@ def test_list_files_in_folder(connect_mock):
     connect_mock.return_value.list_objects_v2.return_value = {
         "KeyCount": 0,
         "MaxKeys": "1000",
-        "Contents": [{"Key": "test.csv", "Key": "test_2.csv"}],
+        "Contents": [{"Key": "test.csv"}, {"Key": "test_2.csv"}],
     }
     obj_list = S3.list_files_in_folder(url)
     assert obj_list == []

@@ -215,6 +215,7 @@ t = Table.read_csv('/tmp/my_table.csv')
 ## Changelog
 
 - `dev`
+  - Switch from isort & black & fake8 to ruff
 - `v0.3.8`
   - Pin dataclasses-json==0.5.8 to fix error with python3.9
 - `v0.3.7`

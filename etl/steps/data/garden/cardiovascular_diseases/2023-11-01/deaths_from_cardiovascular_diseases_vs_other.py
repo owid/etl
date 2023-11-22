@@ -79,8 +79,8 @@ def run(dest_dir: str) -> None:
         "share_of_total_deaths_in_both_sexes_aged_all_ages_years_that_are_from_all_causes", axis=1
     )
     # Assert that the number of unique indicators in CAUSE_MAPPING matches the number of unique columns
-    assert len(set(CAUSE_MAPPING.keys())) == len(
-        all_causes.columns
+    assert (
+        len(set(CAUSE_MAPPING.keys())) == len(all_causes.columns)
     ), "The number of indicators from CAUSE_MAPPING does not match the number of 'share_of_total_deaths_' columns found in the tables."
     # Invert the mapping to facilitate grouping.
     reverse_mapping = {col: category for col, category in CAUSE_MAPPING.items()}
