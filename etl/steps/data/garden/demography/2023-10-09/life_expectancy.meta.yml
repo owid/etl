@@ -21,32 +21,43 @@ definitions:
     title_public: Life expectancy
     data_used: |-
       <% if (age == 0) and (sex == 'all') %>
-      Prior to 1950, we use HMD (2023) data combined with Zijdeman (2015). From 1950 onwards, we use UN WPP (2022) data. For old regional data, we use Riley (2005) estimates.
+        Prior to 1950, we use HMD (2023) data combined with Zijdeman (2015). From 1950 onwards, we use UN WPP (2022) data. For old regional data, we use Riley (2005) estimates.
       <% else %>
-      Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data.
+        Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data.
+      <% endif %>
+    point_1: |-
+      Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
+    point_2: |-
+      <% if age == '0' %>
+      For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+      <% else %>
+      For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
       <% endif %>
 
   common:
     description_short: |-
-      <% if (age == 0) %>
-      <% if (sex == 'female') %>
-      The total number of years a newborn is expected to live (among females).
-      <% elif (sex == 'male') %>
-      The total number of years a newborn is expected to live (among males).
-      <% elif (sex == 'all') %>
-      The total number of years a newborn is expected to live.
-      <% endif %>
+      <% if age == 0 %>
+
+      <% if sex == 'all' %>
+      The period life expectancy at birth, in a given year.
       <% else %>
-      <% if (sex == 'female') %>
-      The total number of years a person is expected to live, among females who have already reached << age >> years of age.
-      <% elif (sex == 'male') %>
-      The total number of years a person is expected to live, among males who have already reached << age >> years of age.
-      <% elif (sex == 'all') %>
-      The total number of years a person is expected to live, among people who have already reached << age >> years of age.
+      The period life expectancy at birth among << sex + 's' >>, in a given year.
       <% endif %>
+
+      <% else %>
+
+      <% if sex == 'all' %>
+      The total period life expectancy at age << age >>, in a given year.
+      <% else %>
+      The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
+      <% endif %>
+
       <% endif %>
     description_key:
-      - &period_lt_def Period life expectancy assumes that current mortality trends will continue for the rest of a subject's life.
+      - |-
+        {definitions.global.point_1}
+      - |-
+        {definitions.global.point_2}
       - |-
         {definitions.global.data_used}
     presentation:
@@ -138,7 +149,10 @@ tables:
         title: |-
           {definitions.global.title_base} (only projections)
         description_key:
-          - *period_lt_def
+          - |-
+            {definitions.global.point_1}
+          - |-
+            {definitions.global.point_2}
         display: &display_o_proj
           numDecimalPlaces: 1
           name: |-
@@ -151,7 +165,10 @@ tables:
         title: |-
           {definitions.global.title_base} at birth (only projections)
         description_key:
-          - *period_lt_def
+          - |-
+            {definitions.global.point_1}
+          - |-
+            {definitions.global.point_2}
         display: *display_o_proj
         presentation:
           attribution_short: *attr_o_proj

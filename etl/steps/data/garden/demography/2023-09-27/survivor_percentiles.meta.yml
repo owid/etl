@@ -22,7 +22,12 @@ tables:
         unit: years
         processing_level: major
         description_short: |-
-          The age until which the << percentile >>% percentile of the population would survive until, if mortality rates remained constant, using data from a given interval.
+          <% if percentile == 1 %>
+          The age until which the 1st percentile (99% of the population) of the population would survive until, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+          <% else %>
+          The age until which the << 100 - percentile|int>>th percentile (<< percentile >>% of the population) of the population would survive until, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+          <% endif %>
+
         description_processing: |-
           This was calculated with the method published in Alvarez and Vaupel (2023), with code provided by the authors:
 
@@ -32,8 +37,6 @@ tables:
 
           Original R code from: https://github.com/jssalvrz/s-ages
         description_key:
-          - |-
-            {tables.survivor_percentiles.variables.age.description_short}
           - This is calculated with the period life tables indicators.
         display:
           numDecimalPlaces: 1

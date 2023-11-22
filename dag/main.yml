@@ -669,6 +669,16 @@ steps:
     - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators
   data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
     - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators
+    
+  # Information Capacity Dataset
+  data://meadow/state_capacity/2023-11-10/information_capacity_dataset:
+    - snapshot://state_capacity/2023-11-10/information_capacity_dataset.dta
+  data://garden/state_capacity/2023-11-10/information_capacity_dataset:
+    - data://meadow/state_capacity/2023-11-10/information_capacity_dataset
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
+    - data://garden/state_capacity/2023-11-10/information_capacity_dataset
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.

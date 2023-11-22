@@ -16,9 +16,15 @@ from dotenv import load_dotenv
 
 from etl.paths import BASE_DIR
 
+
+def get_username():
+    return pwd.getpwuid(os.getuid())[0]
+
+
 ENV_FILE = env.get("ENV", BASE_DIR / ".env")
 
 load_dotenv(ENV_FILE)
+
 
 # When DEBUG is on
 # - run steps in the same process (speeding up ETL)
@@ -43,20 +49,6 @@ DB_PASS = env.get("DB_PASS", "")
 # metaplay config
 METAPLAY_PORT = int(env.get("METAPLAY_PORT", "8051"))
 
-# if STAGING is used, override ENV values
-if env.get("STAGING"):
-    staging = env.get("STAGING")
-    DB_USER = "owid"
-    DB_NAME = "owid"
-    DB_PASS = ""
-    DB_PORT = 3306
-    DB_HOST = f"staging-site-{staging}"
-    DATA_API_ENV = f"staging-site-{staging}"
-
-
-def get_username():
-    return pwd.getpwuid(os.getuid())[0]
-
 
 if "DATA_API_ENV" in env:
     DATA_API_ENV = env["DATA_API_ENV"]
@@ -69,6 +61,20 @@ if DATA_API_ENV == "production":
 
 if DB_NAME == "live_grapher":
     assert DATA_API_ENV == "production", "DATA_API_ENV must be set to production when publishing to live_grapher"
+
+
+# if STAGING is used, override ENV values
+if env.get("STAGING"):
+    STAGING = env.get("STAGING")
+    DB_USER = "owid"
+    DB_NAME = "owid"
+    DB_PASS = ""
+    DB_PORT = 3306
+    DB_HOST = f"staging-site-{STAGING}"
+    DATA_API_ENV = f"staging-site-{STAGING}"
+else:
+    STAGING = None
+
 
 # if running against live, use s3://owid-api, otherwise use s3://owid-api-staging
 # Cloudflare workers running on https://api.ourworldindata.org/ and https://api-staging.owid.io/ will use them

@@ -1,0 +1,51 @@
+definitions:
+  common:
+    processing_level: minor
+
+tables:
+  snakebite:
+    variables:
+      endemic_venomous_snakes:
+        title: Endemic venomous snakes
+        description_short: Whether or not there are venomous snake species endemic to this country.
+        unit: ""
+        short_unit: ""
+      deaths_count:
+        title: Deaths from snakebite envenoming
+        description_short: Number of deaths from snakebite envenoming.
+        unit: "deaths"
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      age_standardized_death_rate_per_100000:
+        title: Age-standardized death rate from snakebite envenoming
+        description_short: Age-standardized death rate per 100,000 people from snakebite envenoming.
+        unit: "deaths per 100,000 people"
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+      percent_change_in_deaths_from_1990_to_2019:
+        title: Percent change in deaths from snakebite envenoming between 1990 and 2019
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      ylls_count:
+        title: Years of life lost due to snakebite envenoming
+        description_short: Number of years of life lost due to snakebite envenoming.
+        unit: "years or life lost (YLLs)"
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+      age_standardized_yll_rate_per_100000:
+        title: Age-standardized years of life lost per 100,000 people due to snakebite envenoming
+        unit: "years of life lost per 100,000 people"
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+      percent_change_in_ylls_from_1990_to_2019:
+        title: Percent change in years of life lost due to snakebite envenoming between 1990 and 2019
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
