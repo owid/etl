@@ -100,7 +100,7 @@ PRIMARY_ENERGY_COLUMNS = {
     "primary_energy_consumption__twh": "primary_energy_consumption",
 }
 
-# Columns to use from primary energy consumption data and how to rename them.
+# Columns to use from historical emissions data and how to rename them.
 HISTORICAL_EMISSIONS_COLUMNS = {
     "country": "country",
     "year": "year",
