@@ -1,0 +1,7 @@
+tables:
+  gleditsch_countries:
+    variables:
+      is_present:
+        title: Country is in dataset
+        description_short: Whether the country is present in the Gleditsch and Ward countries dataset.
+        unit: ""
