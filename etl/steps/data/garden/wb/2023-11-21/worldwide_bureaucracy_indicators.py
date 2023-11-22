@@ -1,6 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
 
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -20,6 +22,31 @@ def run(dest_dir: str) -> None:
 
     #
     # Process data.
+
+    tb, indicator_dict = reformat_table(tb)
+
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
+    )
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
+
+    #
+    # Save outputs.
+
+    tb = add_metadata_from_dict(tb, indicator_dict)
+
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+
+def reformat_table(tb: Table) -> [Table, dict]:
+    """Reformat table to wide format and drop columns"""
 
     # Rename columns
     tb = tb.rename(columns={"country_name": "country"})
@@ -50,16 +77,15 @@ def run(dest_dir: str) -> None:
     # Remove trailing _ from year values
     tb["year"] = tb["year"].str.replace("_", "").astype(int)
 
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-    )
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    return tb, indicator_dict
 
-    #
-    # Save outputs.
-    #
-    # Add indicator.title with dictionary
+
+def add_metadata_from_dict(tb: Table, indicator_dict: dict) -> Table:
+    """
+    Add metadata to the table from a dictionary.
+    The dictionary comes from the previous function, extracted from indicator_code and indicator_name.
+    """
+
     for col in indicator_dict:
         meta_title = indicator_dict[col]
         tb[col].metadata.title = meta_title
@@ -81,10 +107,4 @@ def run(dest_dir: str) -> None:
             tb[col].metadata.unit = ""
             tb[col].metadata.short_unit = ""
 
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
-
-    # Save changes in the new garden dataset.
-    ds_garden.save()
+    return tb
