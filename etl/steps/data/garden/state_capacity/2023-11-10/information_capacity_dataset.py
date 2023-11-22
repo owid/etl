@@ -93,12 +93,20 @@ def add_new_indicators(tb: Table) -> Table:
     tb = tb.sort_values(by=["country", "year"]).reset_index(drop=True)
 
     # Count the number of census (census column) and register-based census (register_based_census column) have been run in the previous 10 years for each country
-    tb["census_10_years"] = Variable(
-        pd.DataFrame(tb).groupby("country")["census"].rolling(10, min_periods=1).sum().values
-    ).copy_metadata(tb["census"])
-    tb["register_based_census_10_years"] = Variable(
-        pd.DataFrame(tb).groupby("country")["register_based_census"].rolling(10, min_periods=1).sum().values
-    ).copy_metadata(tb["register_based_census"])
+    tb["census_10_years"] = (
+        pd.DataFrame(tb).groupby("country", as_index=False)["census"].rolling(10, min_periods=1).sum()["census"]
+    )
+    tb["census_10_years"] = tb["census_10_years"].copy_metadata(tb["census"])
+
+    tb["register_based_census_10_years"] = (
+        pd.DataFrame(tb)
+        .groupby("country", as_index=False)["register_based_census"]
+        .rolling(10, min_periods=1)
+        .sum()["register_based_census"]
+    )
+    tb["register_based_census_10_years"] = tb["register_based_census_10_years"].copy_metadata(
+        tb["register_based_census"]
+    )
 
     # For both variables, replace with 1 if values are greater than 1, and with 0 otherwise
     tb["census_10_years"] = tb["census_10_years"].apply(lambda x: 1 if x > 0 else 0)
