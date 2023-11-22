@@ -1,7 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+import pandas as pd
+from owid.catalog import Dataset, Table, Variable
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -37,6 +38,9 @@ def run(dest_dir: str) -> None:
     # Drop country id columns
     tb = tb.drop(columns=["ccodecow", "vdemcode"])
 
+    # Add new indicators
+    tb = add_new_indicators(tb)
+
     # Harmonize country names.
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
@@ -62,6 +66,47 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
+def add_new_indicators(tb: Table) -> Table:
+    """
+    Add new indicators to the dataset, based on census and register_based_census
+    """
+
+    # Define minimum and maximum years
+    tb["year"] = tb["year"].astype(int)
+    min_year = tb["year"].min()
+    max_year = tb["year"].max()
+
+    # Define the list of countries
+    countries = tb["country"].unique().tolist()
+
+    # Create a table of years and another of countries
+    tb_years = Table({"year": range(min_year, max_year + 1)})
+    tb_countries = Table({"country": countries})
+
+    # Create a new table with the cartesian product of tb_years and tb_countries
+    tb_countries_years = pr.merge(tb_years, tb_countries, how="cross")
+
+    # Merge this table with tb
+    tb = pr.merge(tb_countries_years, tb, how="left", on=["country", "year"])
+
+    # Sort table by country and year
+    tb = tb.sort_values(by=["country", "year"]).reset_index(drop=True)
+
+    # Count the number of census (census column) and register-based census (register_based_census column) have been run in the previous 10 years for each country
+    tb["census_10_years"] = Variable(
+        pd.DataFrame(tb).groupby("country")["census"].rolling(10, min_periods=1).sum()
+    ).copy_metadata(tb["census"])
+    tb["register_based_census_10_years"] = Variable(
+        pd.DataFrame(tb).groupby("country")["register_based_census"].rolling(10, min_periods=1).sum()
+    ).copy_metadata(tb["register_based_census"])
+
+    # For both variables, replace with 1 if values are greater than 1, and with 0 otherwise
+    tb["census_10_years"] = tb["census_10_years"].apply(lambda x: 1 if x > 0 else 0)
+    tb["register_based_census_10_years"] = tb["register_based_census_10_years"].apply(lambda x: 1 if x > 0 else 0)
+
+    return tb
+
+
 def regional_aggregations(tb: Table, ds_pop: Dataset, tb_country_list: Table) -> Table:
     """
     Add regional aggregations for some of the indicators
@@ -69,18 +114,22 @@ def regional_aggregations(tb: Table, ds_pop: Dataset, tb_country_list: Table) ->
 
     tb_regions = tb.copy()
 
-    # Add missing countries to tb_regions
-    tb_regions = add_missing_countries(tb_regions, tb_country_list)
-
-    # Add population data
-    tb_regions = geo.add_population_to_table(tb_regions, ds_pop)
-
     # List of index columns
-    index_cols = ["censusgraded_ability", "ybcov_ability", "infcap_irt", "infcap_pca"]
+    cols_to_use = [
+        "civreg",
+        "popreg",
+        "statag_intro",
+        "census",
+        "register_based_census",
+        "census_10_years",
+        "register_based_census_10_years",
+    ]
 
-    for col in index_cols:
-        # Create new columns with the product of the index and the population
-        tb_regions[col] = tb_regions[col].astype(float) * tb_regions["population"]
+    # Add "_region" to each item in cols to use and name it cols_to_agg
+    cols_to_agg = [col + "_region" for col in cols_to_use]
+
+    # Rename columns in tb_regions
+    tb_regions = tb_regions.rename(columns=dict(zip(cols_to_use, cols_to_agg)))
 
     # Define regions to aggregate
     regions = [
@@ -100,7 +149,7 @@ def regional_aggregations(tb: Table, ds_pop: Dataset, tb_country_list: Table) ->
 
     # Define the variables and aggregation method to be used in the following function loop
     aggregations = dict.fromkeys(
-        index_cols + ["population"],
+        cols_to_agg,
         "sum",
     )
 
@@ -117,19 +166,6 @@ def regional_aggregations(tb: Table, ds_pop: Dataset, tb_country_list: Table) ->
     # Filter table to keep only regions
     tb_regions = tb_regions[tb_regions["country"].isin(regions)].reset_index(drop=True)
 
-    # Drop the population column from tb_regions
-    tb_regions = tb_regions.drop(columns=["population"])
-
-    # Call the population data again to get regional total population
-    tb_regions = geo.add_population_to_table(tb_regions, ds_pop)
-
-    # Divide index_cols_pop by population_region to get the index
-    for col in index_cols:
-        tb_regions[col] = tb_regions[col] / tb_regions["population"]
-
-    # Drop columns
-    tb_regions = tb_regions.drop(columns=["population"])
-
     # Concatenate tb and tb_regions
     tb = pr.concat([tb, tb_regions], ignore_index=True)
 
@@ -137,31 +173,3 @@ def regional_aggregations(tb: Table, ds_pop: Dataset, tb_country_list: Table) ->
     tb = tb.dropna(how="all", subset=[col for col in tb.columns if col not in ["country", "year"]])
 
     return tb
-
-
-def add_missing_countries(tb_regions: Table, tb_country_list: Table) -> Table:
-    """
-    Add countries not in the dataset to generate regional aggregates
-    """
-
-    # Add all the countries available in tb_country_list to tb_regions
-    countries_tb = tb_regions["country"].unique().tolist()
-    countries_regions_dataset = tb_country_list["name"].unique().tolist()
-
-    # Obtain the list of countries in countries_regions_dataset that are not in countries_available
-    countries_to_add = list(set(countries_regions_dataset) - set(countries_tb))
-
-    # Make year integer
-    tb_regions["year"] = tb_regions["year"].astype(int)
-
-    # Create two tables, one for countries_to_add and one with the range between the minimum and maximum years
-    tb_countries = Table({"country": countries_to_add})
-    tb_years = Table({"year": range(tb_regions["year"].min(), tb_regions["year"].max() + 1)})
-
-    # Create a new table with all the countries in country_list and all the years in year_list
-    tb_country_year = pr.merge(tb_countries, tb_years, how="cross")
-
-    # Add the new table to tb_regions
-    tb_regions = pr.concat([tb_regions, tb_country_year], ignore_index=True)
-
-    return tb_regions
