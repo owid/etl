@@ -174,7 +174,4 @@ def regional_aggregations(tb: Table, tb_country_list: Table) -> Table:
     # Concatenate tb and tb_regions
     tb = pr.concat([tb, tb_regions], ignore_index=True)
 
-    # Delete all the rows with only nan values (except for country and year)
-    tb = tb.dropna(how="all", subset=[col for col in tb.columns if col not in ["country", "year"]])
-
     return tb
