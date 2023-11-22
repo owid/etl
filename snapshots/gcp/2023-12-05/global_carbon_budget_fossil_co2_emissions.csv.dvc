@@ -55,15 +55,15 @@ meta:
       2022.
     attribution: Global Carbon Budget (2023)
     url_main: https://globalcarbonbudget.org/
-    url_download: https://zenodo.org/records/10065794/files/GCB2023v28_MtCO2_flat.csv
+    url_download: https://zenodo.org/records/10177738/files/GCB2023v36_MtCO2_flat.csv
     date_accessed: '2023-12-05'
     date_published: '2023-12-05'
   license:
     name: CC BY 4.0
-    url: https://zenodo.org/records/10065794
+    url: https://zenodo.org/records/10177738
   is_public: false
 wdir: ../../../data/snapshots/gcp/2023-12-05
 outs:
-- md5: d51d385ae05bba09025f3e7066b5c04e
-  size: 2887874
+- md5: 33d883a0a14e069eb239cce68b127c62
+  size: 2902409
   path: global_carbon_budget_fossil_co2_emissions.csv
