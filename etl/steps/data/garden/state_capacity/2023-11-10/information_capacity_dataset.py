@@ -94,10 +94,10 @@ def add_new_indicators(tb: Table) -> Table:
 
     # Count the number of census (census column) and register-based census (register_based_census column) have been run in the previous 10 years for each country
     tb["census_10_years"] = Variable(
-        pd.DataFrame(tb).groupby("country")["census"].rolling(10, min_periods=1).sum()
+        pd.DataFrame(tb).groupby("country")["census"].rolling(10, min_periods=1).sum().values
     ).copy_metadata(tb["census"])
     tb["register_based_census_10_years"] = Variable(
-        pd.DataFrame(tb).groupby("country")["register_based_census"].rolling(10, min_periods=1).sum()
+        pd.DataFrame(tb).groupby("country")["register_based_census"].rolling(10, min_periods=1).sum().values
     ).copy_metadata(tb["register_based_census"])
 
     # For both variables, replace with 1 if values are greater than 1, and with 0 otherwise
