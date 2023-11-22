@@ -30,7 +30,7 @@ tables:
           Maximum life expectancy recorded in a given year. Life expectancy is the total number of years a newborn is expected to live.
           <% endif %>
         description_key:
-          - Period life expectancy assumes that current mortality trends will continue for the rest of a subject's life.
+          - Period life expectancy is a metric that summarizes death rates across all age groups in one particular year. For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their lives as the age-specific death rates seen in that particular year.
         display:
           name: *le_name
         presentation:
