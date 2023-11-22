@@ -91,6 +91,10 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
+    # Add origins metadata to the columns with historical data (fasstracked and won't be updated with new metadata)
+    from etl.data_helpers.misc import add_origins_to_education_fasttracked
+
+    tb = add_origins_to_education_fasttracked(tb)
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
@@ -343,19 +347,19 @@ def add_metadata(
             tb[column].metadata.display["numDecimalPlaces"] = 1
             tb[column].metadata.unit = "score"
             tb[column].metadata.short_unit = ""
+
         elif column == "combined_literacy":
             tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Historical and more recent literacy estimates"
             tb[column].metadata.description_from_producer = (
-                "**Historical literacy data:**\n\n"
-                + combined_literacy_description
-                + "\n\n"
-                + "**Recent estimates:**\n\n"
+                "**Recent estimates:**\n\n"
                 + "Percentage of the population between age 25 and age 64 who can, with understanding, read and write a short, simple statement on their everyday life. Generally, ‘literacy’ also encompasses ‘numeracy’, the ability to make simple arithmetic calculations. This indicator is calculated by dividing the number of literates aged 25-64 years by the corresponding age group population and multiplying the result by 100."
                 + "\n\n"
                 + "World Bank variable id: UIS.LR.AG25T64"
                 + "\n\n"
                 + "Original source: UNESCO Institute for Statistics"
+                + "\n\n"
+                "**Historical literacy data:**\n\n" + combined_literacy_description
             )
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 2

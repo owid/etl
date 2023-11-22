@@ -152,3 +152,40 @@ def add_origins_to_mortality_database(tb_who: Table) -> Table:
 
 
 ########################################################################################################################
+
+
+def add_origins_to_education_fasttracked(tb: Table) -> Table:
+    tb = tb.copy()
+
+    # For the historical indicator, add an origin (using information from the old sources) and then remove the source.
+    for column in ["combined_expenditure", "combined_literacy"]:
+        tb[column].metadata.sources = []
+        if column == "combined_expenditure":
+            tb[column].metadata.origins = tb[column].metadata.origins + [
+                Origin(
+                    title="Public Expenditure on Education OECD - Tanzi & Schuknecht (2000)",
+                    producer="Tanzi and Schuknecht",
+                    url_main="https://link.springer.com/article/10.1023%2FA%3A1017578302202?LI=true",
+                    date_accessed="2017-09-30",
+                    date_published="2023",
+                    citation_full="Tanzi and Schuknecht (2000) Public Spending in the 20th Century A Global Perspective",
+                    description="The underlying sources for Tanzi & Schuknecht (2000) include: League of Nations Statistical Yearbook (various years), Mitchell (1962), OECD Education at a Glance (1996), UNESCO World Education Report (1993), UNDP Human Development Report (1996), UN World Economics Survey (various years). To the extent that the authors do not specify which sources were prioritised for each year/country, it is not possible for us to reliably extend the time series with newer data. For instance, the OECD Education at a Glance report (1998), which presents estimates for the years 1990 and 1995, suggests discrepancies with the values reported by Tanzi & Schuknecht (2000) for 1993.",
+                )
+            ]
+
+        else:
+            tb[column].metadata.origins = tb[column].metadata.origins + [
+                Origin(
+                    title="Literacy rates (World Bank, CIA World Factbook, and other sources)",
+                    producer="Our World in Data based on World Bank, CIA World Factbook, and other sources",
+                    date_accessed="2018-04-18",
+                    date_published="2018",
+                    citation_full="Our World in Data based on World Bank, CIA World Factbook, and other sources.",
+                    description="This dataset, curated by Our World in Data, is an extensive cross-country compilation of literacy rates, primarily based on the World Bank's World Development Indicators. It enriches this data with literacy estimates from the CIA World Factbook and other historical sources. These include pre-1800 data from Buringh and Van Zanden (2009), 1820 and 1870 data from Broadberry and O'Rourke (2010), U.S. specific data from the National Center for Education Statistics, global estimates for 1820-2000 from van Zanden et al. (2014), and historical data for Latin America from OxLAD. The dataset also features the most recent literacy rates for high-income countries and available 2016 estimates. Notably, it acknowledges variations among sources and advises careful interpretation of year-to-year changes, highlighting discrepancies in methodologies and definitions across different sources. Additionally, it includes specific instances where data preferences were made, as in the case of Paraguay in 1982.",
+                )
+            ]
+
+        # Remove sources from indicator.
+        tb[column].metadata.sources = []
+
+    return tb
