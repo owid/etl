@@ -21,9 +21,6 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["information_capacity_dataset"].reset_index()
 
-    # Load population data.
-    ds_pop = paths.load_dataset("population")
-
     # Load regional data
     ds_regions = paths.load_dataset("regions")
     tb_country_list = ds_regions["regions"].reset_index()
@@ -50,7 +47,7 @@ def run(dest_dir: str) -> None:
     tb = tb.reset_index(drop=True)
 
     # Add regional aggregations
-    tb = regional_aggregations(tb, ds_pop, tb_country_list)
+    tb = regional_aggregations(tb, tb_country_list)
 
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
@@ -115,7 +112,7 @@ def add_new_indicators(tb: Table) -> Table:
     return tb
 
 
-def regional_aggregations(tb: Table, ds_pop: Dataset, tb_country_list: Table) -> Table:
+def regional_aggregations(tb: Table, tb_country_list: Table) -> Table:
     """
     Add regional aggregations for some of the indicators
     """
