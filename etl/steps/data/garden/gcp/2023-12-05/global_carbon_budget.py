@@ -247,34 +247,15 @@ def sanity_checks_on_input_data(
     ).reset_index(drop=True)
 
     # Check that production emissions from national file coincide with the Fossil CO2 emissions dataset.
-    # NOTE: There are two countries for which the difference is big, namely Iceland and New Caledonia.
-    # First assert that these two countries have a big discrepancy, and then assert that all other countries do not
-    # differ more than 2%.
-    # NOTE: This issue has been reported to the data providers, and will hopefully be fixed in a coming version.
-    error = (
-        "Expected Iceland and New Caledonia to have a large discrepancy between production and fossil emissions. "
-        "If that is no longer the case, remove this assertion."
-    )
-    countries_with_discrepancy = ["Iceland", "New Caledonia"]
-    assert set(
-        comparison[
-            (
-                100
-                * abs(comparison["production_emissions"] - comparison["emissions_total"])
-                / (comparison["emissions_total"])
-            ).fillna(0)
-            > 2
-        ]["country"]
-    ) == set(countries_with_discrepancy), error
+    # Assert that the difference is smaller than 1%.
     error = "Production emissions from national file were expected to coincide with the Fossil CO2 emissions dataset."
-    comparison = comparison[~comparison["country"].isin(countries_with_discrepancy)].reset_index(drop=True)
     assert (
         (
             100
             * abs(comparison["production_emissions"] - comparison["emissions_total"])
             / (comparison["emissions_total"])
         ).fillna(0)
-        < 2
+        < 1
     ).all(), error
 
 
