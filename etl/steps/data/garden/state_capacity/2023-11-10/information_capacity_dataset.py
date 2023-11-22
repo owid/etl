@@ -87,7 +87,7 @@ def add_new_indicators(tb: Table) -> Table:
     tb_countries_years = pr.merge(tb_years, tb_countries, how="cross")
 
     # Merge this table with tb
-    tb = pr.merge(tb_countries_years, tb, how="left", on=["country", "year"])
+    tb = pr.merge(tb_countries_years, tb, how="left", on=["country", "year"], short_name=tb.metadata.short_name)
 
     # Sort table by country and year
     tb = tb.sort_values(by=["country", "year"]).reset_index(drop=True)
