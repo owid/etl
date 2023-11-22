@@ -78,29 +78,33 @@ tables:
         short_unit: years
         description_short: |-
           <% if age == '0' %>
-            <% if sex == 'both' %>
-              The period life expectancy at birth, in a given year.
-            <% else %>
-              The period life expectancy at birth among << sex + 's' >>, in a given year.
-            <% endif %>
+
+          <% if sex == 'both' %>
+          The period life expectancy at birth, in a given year.
           <% else %>
-            <% if sex == 'both' %>
-              The total period life expectancy at age << age >>, in a given year.
-            <% else %>
-              The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
-            <% endif %>
+          The period life expectancy at birth among << sex + 's' >>, in a given year.
+          <% endif %>
+
+          <% else %>
+
+          <% if sex == 'both' %>
+          The total period life expectancy at age << age >>, in a given year.
+          <% else %>
+          The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
+          <% endif %>
+
           <% endif %>
         description_key:
           - Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
           - |-
             <% if (age == 'at birth') %>
-              For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their lives as the age-specific death rates seen in that particular year.
+            For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their lives as the age-specific death rates seen in that particular year.
             <% else %>
-              For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
+            For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
             <% endif %>
           - |-
             <% if (age != 'at birth') %>
-              This shows the total life expectancy among people who have already reached the age << age >> (including the number of years they have already lived), using death rates from their age group and older age groups.
+            This shows the total life expectancy among people who have already reached the age << age >> (including the number of years they have already lived), using death rates from their age group and older age groups.
             <% endif %>
         display:
           numDecimalPlaces: 1
