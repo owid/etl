@@ -1,0 +1,7 @@
+tables:
+  isd_countries:
+    variables:
+      is_present:
+        title: Country is in dataset
+        description_short: Whether the country is present in the ISD countries dataset.
+        unit: ""

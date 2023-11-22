@@ -197,7 +197,6 @@ def find_and_check_available_versions_for_dataset(
 def get_grapher_variable_id_mapping_for_two_dataset_versions(
     dataset_short_name: str, version_old: str, version_new: str
 ) -> Dict[int, int]:
-
     # Load old and new datasets.
     dataset_old = Dataset(DATA_DIR / "grapher" / NAMESPACE / version_old / dataset_short_name)
     dataset_new = Dataset(DATA_DIR / "grapher" / NAMESPACE / version_new / dataset_short_name)
@@ -260,7 +259,6 @@ def main(
     ####################################################################################################################
 
     for dataset_short_name in dataset_short_names:
-
         log.info(f"Checking available versions for dataset {dataset_short_name}.")
         # Ensure a dataset exist for each of the specified versions.
         # And if a version is not specified, assume the latest for the new dataset, or second latest for the old.

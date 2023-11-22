@@ -4,7 +4,7 @@
 
 import tempfile
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -66,12 +66,8 @@ class TestCompareDataFrames:
         # Even if dataframes are not identical, compare_dataframes should return all Trues (since it does not care about
         # indexes, only values).
         assert dataframes.compare(
-            df1=pd.DataFrame({"col_01": [1, 2], "col_02": ["a", "b"]}).set_index(
-                "col_02"
-            ),
-            df2=pd.DataFrame({"col_01": [1, 2], "col_02": ["a", "c"]}).set_index(
-                "col_02"
-            ),
+            df1=pd.DataFrame({"col_01": [1, 2], "col_02": ["a", "b"]}).set_index("col_02"),
+            df2=pd.DataFrame({"col_01": [1, 2], "col_02": ["a", "c"]}).set_index("col_02"),
         ).equals(pd.DataFrame({"col_01": [True, True]}))
 
     def test_with_two_dataframes_with_object_columns_with_nans(self):
@@ -201,22 +197,14 @@ class TestAreDataFramesEqual:
 
     def test_on_equal_dataframes_with_non_numeric_indexes(self):
         assert dataframes.are_equal(
-            df1=pd.DataFrame({"col_01": [1, 2], "col_02": ["a", "b"]}).set_index(
-                "col_02"
-            ),
-            df2=pd.DataFrame({"col_01": [1, 2], "col_02": ["a", "b"]}).set_index(
-                "col_02"
-            ),
+            df1=pd.DataFrame({"col_01": [1, 2], "col_02": ["a", "b"]}).set_index("col_02"),
+            df2=pd.DataFrame({"col_01": [1, 2], "col_02": ["a", "b"]}).set_index("col_02"),
         )[0]
 
     def test_on_dataframes_of_equal_values_but_different_indexes(self):
         assert not dataframes.are_equal(
-            df1=pd.DataFrame({"col_01": [1, 2], "col_02": ["a", "b"]}).set_index(
-                "col_02"
-            ),
-            df2=pd.DataFrame({"col_01": [1, 2], "col_02": ["a", "c"]}).set_index(
-                "col_02"
-            ),
+            df1=pd.DataFrame({"col_01": [1, 2], "col_02": ["a", "b"]}).set_index("col_02"),
+            df2=pd.DataFrame({"col_01": [1, 2], "col_02": ["a", "c"]}).set_index("col_02"),
         )[0]
 
     def test_on_dataframes_with_object_columns_with_nans(self):
@@ -359,9 +347,7 @@ class TestGroupbyAggregate:
                 "value_02": [np.nan, np.nan, "def"],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series(
-            [np.nan, 0, np.nan], index=[2001, 2002, 2003], dtype=object
-        )
+        df_out["value_03"] = pd.Series([np.nan, 0, np.nan], index=[2001, 2002, 2003], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -389,9 +375,7 @@ class TestGroupbyAggregate:
                 "value_02": [0, "b", "def"],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series(
-            [0, 0, np.nan], index=[2001, 2002, 2003], dtype=object
-        )
+        df_out["value_03"] = pd.Series([0, 0, np.nan], index=[2001, 2002, 2003], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -419,9 +403,7 @@ class TestGroupbyAggregate:
                 "value_02": [0, "b", "def"],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series(
-            [0, 0, 1], index=[2001, 2002, 2003], dtype=object
-        )
+        df_out["value_03"] = pd.Series([0, 0, 1], index=[2001, 2002, 2003], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -449,9 +431,7 @@ class TestGroupbyAggregate:
                 "value_02": [0, "b", "defg"],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series(
-            [0, 0, 1], index=[2001, 2002, 2004], dtype=object
-        )
+        df_out["value_03"] = pd.Series([0, 0, 1], index=[2001, 2002, 2004], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -479,9 +459,7 @@ class TestGroupbyAggregate:
                 "value_02": [np.nan, np.nan, "def"],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series(
-            [np.nan, 0, np.nan], index=[2001, 2002, 2003], dtype=object
-        )
+        df_out["value_03"] = pd.Series([np.nan, 0, np.nan], index=[2001, 2002, 2003], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -509,9 +487,7 @@ class TestGroupbyAggregate:
                 "value_02": [np.nan, "b", "def"],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series(
-            [np.nan, 0, np.nan], index=[2001, 2002, 2003], dtype=object
-        )
+        df_out["value_03"] = pd.Series([np.nan, 0, np.nan], index=[2001, 2002, 2003], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -539,9 +515,7 @@ class TestGroupbyAggregate:
                 "value_02": [np.nan, "b", "def"],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series(
-            [np.nan, 0, 1], index=[2001, 2002, 2003], dtype=object
-        )
+        df_out["value_03"] = pd.Series([np.nan, 0, 1], index=[2001, 2002, 2003], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -580,9 +554,7 @@ class TestGroupbyAggregate:
                 "value_02": [0, "b", "def", "ghij"],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series(
-            [0, 0, 1, 1], index=[2001, 2002, 2003, 2004], dtype=object
-        )
+        df_out["value_03"] = pd.Series([0, 0, 1, 1], index=[2001, 2002, 2003, 2004], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -621,9 +593,7 @@ class TestGroupbyAggregate:
                 "value_02": [np.nan, "b", "def", "ghij"],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series(
-            [np.nan, 0, np.nan, np.nan], index=[2001, 2002, 2003, 2004], dtype=object
-        )
+        df_out["value_03"] = pd.Series([np.nan, 0, np.nan, np.nan], index=[2001, 2002, 2003, 2004], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -710,9 +680,7 @@ class TestGroupbyAggregate:
             }
         )
 
-        df_out = pd.DataFrame(
-            {"col_01": ["a", "c"], "col_02": ["b", "d"], "col_03": [3, 3]}
-        ).astype(
+        df_out = pd.DataFrame({"col_01": ["a", "c"], "col_02": ["b", "d"], "col_03": [3, 3]}).astype(
             {
                 "col_01": "category",
                 "col_02": "category",
@@ -735,9 +703,7 @@ class TestMultiMerge:
         df1 = self.df1.copy()
         df2 = self.df1.copy()
         df3 = self.df1.copy()
-        assert dataframes.multi_merge(
-            [df1, df2, df3], how="inner", on=["col_01", "col_02"]
-        ).equals(df1)
+        assert dataframes.multi_merge([df1, df2, df3], how="inner", on=["col_01", "col_02"]).equals(df1)
 
     def test_inner_join_with_non_overlapping_dataframes(self):
         df1 = self.df1.copy()
@@ -785,9 +751,7 @@ class TestMultiMerge:
                 "col_04": [np.nan, np.nan, np.nan],
             }
         )
-        assert dataframes.multi_merge(
-            [df1, df2, df3], how="left", on=["col_01", "col_02"]
-        ).equals(df_out)
+        assert dataframes.multi_merge([df1, df2, df3], how="left", on=["col_01", "col_02"]).equals(df_out)
 
     def test_right_join(self):
         df1 = self.df1.copy()
@@ -799,9 +763,7 @@ class TestMultiMerge:
             }
         )
         # df12 = pd.DataFrame({'col_01': ['aa', 'ab', 'ad'], 'col_02': ['ba', 'bB', 'bc'], 'col_03': [1, 2, 3]})
-        df3 = pd.DataFrame(
-            {"col_01": ["aa", "ae"], "col_02": ["ba", "be"], "col_04": [4, 5]}
-        )
+        df3 = pd.DataFrame({"col_01": ["aa", "ae"], "col_02": ["ba", "be"], "col_04": [4, 5]})
         df_out = pd.DataFrame(
             {
                 "col_01": ["aa", "ae"],
@@ -810,9 +772,7 @@ class TestMultiMerge:
                 "col_04": [4, 5],
             }
         )
-        assert dataframes.multi_merge(
-            [df1, df2, df3], how="right", on=["col_01", "col_02"]
-        ).equals(df_out)
+        assert dataframes.multi_merge([df1, df2, df3], how="right", on=["col_01", "col_02"]).equals(df_out)
 
 
 class TestMapSeries:
@@ -824,59 +784,49 @@ class TestMapSeries:
     def test_all_countries_mapped_and_all_mappings_used(self):
         series_in = pd.Series(["country_01", "country_02"])
         series_out = pd.Series(["Country 1", "Country 2"])
-        assert dataframes.map_series(series=series_in, mapping=self.mapping).equals(
-            series_out
-        )
+        assert dataframes.map_series(series=series_in, mapping=self.mapping).equals(series_out)
 
     def test_one_country_missing_in_mapping(self):
         series_in = pd.Series(["country_01", "country_02", "country_03"])
         series_out = pd.Series(["Country 1", "Country 2", "country_03"])
-        assert dataframes.map_series(
-            series=series_in, mapping=self.mapping, make_unmapped_values_nan=False
-        ).equals(series_out)
+        assert dataframes.map_series(series=series_in, mapping=self.mapping, make_unmapped_values_nan=False).equals(
+            series_out
+        )
 
     def test_one_country_missing_in_mapping_converted_into_nan(self):
         series_in = pd.Series(["country_01", "country_02", "country_03"])
         series_out = pd.Series(["Country 1", "Country 2", np.nan])
-        assert dataframes.map_series(
-            series=series_in, mapping=self.mapping, make_unmapped_values_nan=True
-        ).equals(series_out)
+        assert dataframes.map_series(series=series_in, mapping=self.mapping, make_unmapped_values_nan=True).equals(
+            series_out
+        )
 
     def test_warn_if_one_country_missing_in_mapping(self):
         series_in = pd.Series(["country_01", "country_02", "country_03"])
         with warns(UserWarning, match="missing"):
-            dataframes.map_series(
-                series=series_in, mapping=self.mapping, warn_on_missing_mappings=True
-            )
+            dataframes.map_series(series=series_in, mapping=self.mapping, warn_on_missing_mappings=True)
 
     def test_one_country_unused_in_mapping(self):
         series_in = pd.Series(["country_01"])
         series_out = pd.Series(["Country 1"])
-        assert dataframes.map_series(
-            series=series_in, mapping=self.mapping, warn_on_unused_mappings=False
-        ).equals(series_out)
+        assert dataframes.map_series(series=series_in, mapping=self.mapping, warn_on_unused_mappings=False).equals(
+            series_out
+        )
 
     def test_warn_when_one_country_unused_in_mapping(self):
         series_in = pd.Series(["country_01"])
         with warns(UserWarning, match="unused"):
-            dataframes.map_series(
-                series=series_in, mapping=self.mapping, warn_on_unused_mappings=True
-            )
+            dataframes.map_series(series=series_in, mapping=self.mapping, warn_on_unused_mappings=True)
 
     def test_empty_series(self):
         series_in = pd.Series([], dtype=object)
         series_out = pd.Series([], dtype=object)
-        assert dataframes.map_series(series=series_in, mapping=self.mapping).equals(
-            series_out
-        )
+        assert dataframes.map_series(series=series_in, mapping=self.mapping).equals(series_out)
 
     def test_empty_mapping(self):
-        mapping = {}  # type: Dict[Any, Any]
+        mapping = {}
         series_in = pd.Series(["country_01", "country_02"])
         series_out = pd.Series(["country_01", "country_02"])
-        assert dataframes.map_series(series=series_in, mapping=mapping).equals(
-            series_out
-        )
+        assert dataframes.map_series(series=series_in, mapping=mapping).equals(series_out)
 
     def test_mappings_of_mixed_types(self):
         # Note: A series containing 1 and True are considered identical. Therefore, a mapping
@@ -887,9 +837,7 @@ class TestMapSeries:
         mapping = {2: "20", 3: False, "4": 40, True: 50}
         series_in = pd.Series([2, 3, "4", True])
         series_out = pd.Series(["20", False, 40, 50])
-        assert dataframes.map_series(series=series_in, mapping=mapping).equals(
-            series_out
-        )
+        assert dataframes.map_series(series=series_in, mapping=mapping).equals(series_out)
 
     def test_mapping_to_nan(self):
         # Even if make_unmapped_values_nan is False, we want to keep nan values if we are intentionally mapping a value
@@ -897,74 +845,48 @@ class TestMapSeries:
         mapping = {2: 20, 3: np.nan}
         series_in = pd.Series([1, 2, 3])
         series_out = pd.Series([1, 20, np.nan])
-        assert dataframes.map_series(
-            series=series_in, mapping=mapping, make_unmapped_values_nan=False
-        ).equals(series_out)
+        assert dataframes.map_series(series=series_in, mapping=mapping, make_unmapped_values_nan=False).equals(
+            series_out
+        )
 
     def test_map_categorical(self):
-        series_in = pd.Series(
-            ["country_01", "country_02", "country_03", np.nan]
-        ).astype("category")
-        series_out = pd.Series(["Country 1", "Country 2", "country_03", np.nan]).astype(
-            "category"
-        )
-        out = dataframes.map_series(
-            series=series_in, mapping=self.mapping, make_unmapped_values_nan=False
-        )
+        series_in = pd.Series(["country_01", "country_02", "country_03", np.nan]).astype("category")
+        series_out = pd.Series(["Country 1", "Country 2", "country_03", np.nan]).astype("category")
+        out = dataframes.map_series(series=series_in, mapping=self.mapping, make_unmapped_values_nan=False)
         assert out.equals(series_out)
         assert out.dtype == "category"
 
     def test_map_categorical_non_unique(self):
-        series_in = pd.Series(
-            ["country_01", "country_02", "country_03", np.nan]
-        ).astype("category")
-        series_out = pd.Series(["Country 1", "Country 1", "country_03", np.nan]).astype(
-            "category"
-        )
+        series_in = pd.Series(["country_01", "country_02", "country_03", np.nan]).astype("category")
+        series_out = pd.Series(["Country 1", "Country 1", "country_03", np.nan]).astype("category")
         mapping = {
             "country_01": "Country 1",
             "country_02": "Country 1",
         }
-        out = dataframes.map_series(
-            series=series_in, mapping=mapping, make_unmapped_values_nan=False
-        )
+        out = dataframes.map_series(series=series_in, mapping=mapping, make_unmapped_values_nan=False)
         assert out.equals(series_out)
         assert out.dtype == "category"
 
     def test_map_categorical_with_nan(self):
-        series_in = pd.Series(
-            ["country_01", "country_02", "country_03", np.nan]
-        ).astype("category")
+        series_in = pd.Series(["country_01", "country_02", "country_03", np.nan]).astype("category")
         mapping = {
             "country_01": "Country 1",
             "country_02": np.nan,
         }
 
-        out = dataframes.map_series(
-            series=series_in, mapping=mapping, make_unmapped_values_nan=False
-        )
-        assert out.equals(
-            pd.Series(["Country 1", np.nan, "country_03", np.nan]).astype("category")
-        )
+        out = dataframes.map_series(series=series_in, mapping=mapping, make_unmapped_values_nan=False)
+        assert out.equals(pd.Series(["Country 1", np.nan, "country_03", np.nan]).astype("category"))
         assert out.dtype == "category"
 
-        out = dataframes.map_series(
-            series=series_in, mapping=mapping, make_unmapped_values_nan=True
-        )
-        assert out.equals(
-            pd.Series(["Country 1", np.nan, np.nan, np.nan]).astype("category")
-        )
+        out = dataframes.map_series(series=series_in, mapping=mapping, make_unmapped_values_nan=True)
+        assert out.equals(pd.Series(["Country 1", np.nan, np.nan, np.nan]).astype("category"))
         assert out.dtype == "category"
 
 
 class TestRenameCategories:
     def test_rename_categories(self):
-        series_in = pd.Series(
-            ["country_01", "country_02", "country_03", np.nan]
-        ).astype("category")
-        series_out = pd.Series(["Country 1", "Country 1", "country_03", np.nan]).astype(
-            "category"
-        )
+        series_in = pd.Series(["country_01", "country_02", "country_03", np.nan]).astype("category")
+        series_out = pd.Series(["Country 1", "Country 1", "country_03", np.nan]).astype("category")
         mapping = {
             "country_01": "Country 1",
             "country_02": "Country 1",
@@ -974,12 +896,8 @@ class TestRenameCategories:
         assert out.dtype == "category"
 
     def test_rename_categories_with_nans(self):
-        series_in = pd.Series(
-            ["country_01", "country_02", "country_03", np.nan]
-        ).astype("category")
-        series_out = pd.Series(["Country 1", np.nan, "country_03", np.nan]).astype(
-            "category"
-        )
+        series_in = pd.Series(["country_01", "country_02", "country_03", np.nan]).astype("category")
+        series_out = pd.Series(["Country 1", np.nan, "country_03", np.nan]).astype("category")
         mapping = {
             "country_01": "Country 1",
             "country_02": np.nan,
@@ -1002,9 +920,7 @@ class TestConcatenate:
 class TestApplyOnCategoricals:
     def test_string_func(self):
         df = pd.DataFrame({"x": ["a", "b"], "y": ["b", "c"]}).astype("category")
-        out = dataframes.apply_on_categoricals(
-            [df.x, df.y], lambda x, y: str(x + "|" + y)
-        )
+        out = dataframes.apply_on_categoricals([df.x, df.y], lambda x, y: str(x + "|" + y))
         assert list(out.categories) == ["a|b", "b|c"]
 
     def test_mask(self):
@@ -1013,9 +929,7 @@ class TestApplyOnCategoricals:
 
         new_desc = dataframes.apply_on_categoricals(
             [desc, mask.astype("category")],
-            lambda desc, mask: f"{'' if pd.isna(desc) else desc} per capita"
-            if mask
-            else f"{desc}",
+            lambda desc, mask: f"{'' if pd.isna(desc) else desc} per capita" if mask else f"{desc}",
         )
 
         assert list(new_desc) == ["a", "b per capita", " per capita"]
@@ -1023,9 +937,7 @@ class TestApplyOnCategoricals:
 
 class TestCombineTwoOverlappingDataFrames:
     def test_combine_dataframes(self):
-        a = pd.DataFrame(
-            {"year": [2000, 2001, 2002], "var_a": [0, 1, 2], "var_b": ["0", "1", "2"]}
-        )
+        a = pd.DataFrame({"year": [2000, 2001, 2002], "var_a": [0, 1, 2], "var_b": ["0", "1", "2"]})
         b = pd.DataFrame(
             {
                 "year": [2001, 2002, 2003],
@@ -1033,9 +945,7 @@ class TestCombineTwoOverlappingDataFrames:
                 "var_c": ["10", "20", "30"],
             }
         )
-        out = dataframes.combine_two_overlapping_dataframes(
-            df1=a, df2=b, index_columns=["year"]
-        )
+        out = dataframes.combine_two_overlapping_dataframes(df1=a, df2=b, index_columns=["year"])
         expected = pd.DataFrame(
             {
                 "year": [2000, 2001, 2002, 2003],
@@ -1049,9 +959,7 @@ class TestCombineTwoOverlappingDataFrames:
 
     def test_combine_dataframes_inverted_order(self):
         # Now we prioritize b.
-        a = pd.DataFrame(
-            {"year": [2000, 2001, 2002], "var_a": [0, 1, 2], "var_b": ["0", "1", "2"]}
-        )
+        a = pd.DataFrame({"year": [2000, 2001, 2002], "var_a": [0, 1, 2], "var_b": ["0", "1", "2"]})
         b = pd.DataFrame(
             {
                 "year": [2001, 2002, 2003],
@@ -1059,9 +967,7 @@ class TestCombineTwoOverlappingDataFrames:
                 "var_c": ["10", "20", "30"],
             }
         )
-        out = dataframes.combine_two_overlapping_dataframes(
-            df1=b, df2=a, index_columns=["year"]
-        )
+        out = dataframes.combine_two_overlapping_dataframes(df1=b, df2=a, index_columns=["year"])
         expected = pd.DataFrame(
             {
                 "year": [2000, 2001, 2002, 2003],
@@ -1075,9 +981,7 @@ class TestCombineTwoOverlappingDataFrames:
 
     def test_combine_dataframes_inverted_order_keeping_column_order(self):
         # Now we prioritize b.
-        a = pd.DataFrame(
-            {"year": [2000, 2001, 2002], "var_a": [0, 1, 2], "var_b": ["0", "1", "2"]}
-        )
+        a = pd.DataFrame({"year": [2000, 2001, 2002], "var_a": [0, 1, 2], "var_b": ["0", "1", "2"]})
         b = pd.DataFrame(
             {
                 "year": [2001, 2002, 2003],
@@ -1117,9 +1021,7 @@ class TestCombineTwoOverlappingDataFrames:
                 "var_c": ["10", "20", "30"],
             }
         )
-        out = dataframes.combine_two_overlapping_dataframes(
-            df1=a, df2=b, index_columns=["year"]
-        )
+        out = dataframes.combine_two_overlapping_dataframes(df1=a, df2=b, index_columns=["year"])
         expected = pd.DataFrame(
             {
                 "year": [2000, 2001, 2002, 2003],
@@ -1132,13 +1034,9 @@ class TestCombineTwoOverlappingDataFrames:
         assert dataframes.are_equal(df1=expected, df2=out)[0]
 
     def test_combine_dataframes_no_overlapping_columns(self):
-        a = pd.DataFrame(
-            {"year": [2000, 2001, 2002], "var_a": [0, 1, 2], "var_b": ["0", "1", "2"]}
-        )
+        a = pd.DataFrame({"year": [2000, 2001, 2002], "var_a": [0, 1, 2], "var_b": ["0", "1", "2"]})
         b = pd.DataFrame({"year": [2001, 2002, 2003], "var_c": [10, 20, 30]})
-        out = dataframes.combine_two_overlapping_dataframes(
-            df1=a, df2=b, index_columns=["year"]
-        )
+        out = dataframes.combine_two_overlapping_dataframes(df1=a, df2=b, index_columns=["year"])
         expected = pd.DataFrame(
             {
                 "year": [2000, 2001, 2002, 2003],
@@ -1151,9 +1049,7 @@ class TestCombineTwoOverlappingDataFrames:
         assert dataframes.are_equal(df1=expected, df2=out)[0]
 
     def test_combine_single_index_dataframes(self):
-        a = pd.DataFrame(
-            {"year": [2000, 2001, 2002], "var_a": [0, 1, 2], "var_b": ["0", "1", "2"]}
-        ).set_index("year")
+        a = pd.DataFrame({"year": [2000, 2001, 2002], "var_a": [0, 1, 2], "var_b": ["0", "1", "2"]}).set_index("year")
         b = pd.DataFrame(
             {
                 "year": [2001, 2002, 2003],
@@ -1161,9 +1057,7 @@ class TestCombineTwoOverlappingDataFrames:
                 "var_c": ["10", "20", "30"],
             }
         ).set_index("year")
-        out = dataframes.combine_two_overlapping_dataframes(
-            df1=a, df2=b, index_columns=None
-        )
+        out = dataframes.combine_two_overlapping_dataframes(df1=a, df2=b, index_columns=None)
         expected = pd.DataFrame(
             {
                 "year": [2000, 2001, 2002, 2003],
@@ -1192,9 +1086,7 @@ class TestCombineTwoOverlappingDataFrames:
                 "var_c": ["10", "20", "30"],
             }
         ).set_index(["year", "country"])
-        out = dataframes.combine_two_overlapping_dataframes(
-            df1=a, df2=b, index_columns=None
-        )
+        out = dataframes.combine_two_overlapping_dataframes(df1=a, df2=b, index_columns=None)
         # Note that currently combine_two_overlapping_dataframes sorts indexes (which at the moment can't be avoided).
         expected = pd.DataFrame(
             {
@@ -1269,27 +1161,17 @@ class TestHasIndex:
         assert dataframes.has_index(df=df) is False
 
     def test_dataframe_with_multiple_columns_and_multiple_indexes_reset(self):
-        df = (
-            pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-            .set_index(["a", "b"])
-            .reset_index()
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}).set_index(["a", "b"]).reset_index()
         assert dataframes.has_index(df=df) is False
 
     def test_dataframe_with_multiple_columns_and_multiple_indexes_reset_dropping_index(
         self,
     ):
-        df = (
-            pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-            .set_index(["a", "b"])
-            .reset_index(drop=True)
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}).set_index(["a", "b"]).reset_index(drop=True)
         assert dataframes.has_index(df=df) is False
 
 
-def _store_dataframe_in_temp_file_and_read_it(
-    df: pd.DataFrame, file_path: Path, **kwargs: Any
-) -> pd.DataFrame:
+def _store_dataframe_in_temp_file_and_read_it(df: pd.DataFrame, file_path: Path, **kwargs: Any) -> pd.DataFrame:
     with tempfile.TemporaryDirectory() as temp_dir:
         # Save dataframe in a temporary file.
         temp_file = Path(temp_dir) / file_path
@@ -1303,9 +1185,7 @@ def _store_dataframe_in_temp_file_and_read_it(
 class TestToFile:
     def test_save_csv_file_with_dummy_index(self):
         df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv")
-        )
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"))
         assert recovered_df.equals(df)
 
     def test_save_csv_file_with_dummy_index_and_overwrite(self):
@@ -1333,73 +1213,47 @@ class TestToFile:
     def test_save_csv_file_within_subfolders(self):
         df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
         # Save dataframe in a temporary file, ensuring all required subfolders are created.
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("dir_1/dir_2/temp.csv")
-        )
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("dir_1/dir_2/temp.csv"))
         assert recovered_df.equals(df)
 
     def test_save_csv_file_with_single_column_and_single_index(self):
         df = pd.DataFrame({"a": [1, 2, 3]}).set_index("a")
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv")
-        )
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"))
         assert recovered_df.equals(df.reset_index())
 
     def test_save_csv_file_with_multiple_columns_and_single_index(self):
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(
-            "a"
-        )
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv")
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index("a")
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"))
         assert recovered_df.equals(df.reset_index())
 
     def test_save_csv_file_with_multiple_columns_and_single_index_as_a_list(self):
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(
-            ["a"]
-        )
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv")
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(["a"])
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"))
         assert recovered_df.equals(df.reset_index())
 
     def test_save_csv_file_with_multiple_columns_and_multiple_indexes(self):
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(
-            ["a", "b"]
-        )
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv")
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(["a", "b"])
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"))
         assert recovered_df.equals(df.reset_index())
 
     def test_save_csv_file_with_multiple_columns_and_multiple_indexes_ignoring_indexes(
         self,
     ):
         # Now the dataframe will be stored ignoring the index (so it will only have column "c").
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(
-            ["a", "b"]
-        )
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv"), index=False
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(["a", "b"])
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"), index=False)
         assert recovered_df.equals(df.reset_index(drop=True))
 
     def test_save_csv_file_with_multiple_columns_and_multiple_indexes_and_additional_kwarg(
         self,
     ):
         # We will impose that nans must be replaced by a certain number (by using keyword argument 'na_rep').
-        df = pd.DataFrame(
-            {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, np.nan, 9]}
-        ).set_index(["a", "b"])
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv"), na_rep=80
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, np.nan, 9]}).set_index(["a", "b"])
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"), na_rep=80)
         assert recovered_df.equals(df.reset_index().replace({np.nan: 80}))
 
     def test_save_parquet_file_keeping_multiindex(self):
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(
-            ["a", "b"]
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(["a", "b"])
         with tempfile.TemporaryDirectory() as temp_dir:
             # Save dataframe in a temporary file.
             temp_file = Path(temp_dir) / "test.parquet"
@@ -1409,9 +1263,7 @@ class TestToFile:
         assert recovered_df.equals(df)
 
     def test_save_parquet_file_resetting_multiindex(self):
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(
-            ["a", "b"]
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(["a", "b"])
         with tempfile.TemporaryDirectory() as temp_dir:
             # Save dataframe in a temporary file.
             temp_file = Path(temp_dir) / "test.parquet"

@@ -164,9 +164,7 @@ class Variable(pd.Series):
              <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
              <p style="font-variant: small-caps; font-size: 1.5em; font-family: sans-serif; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">variable</p>
              <pre>{}</pre>
-        """.format(
-            self.name, html
-        )
+        """.format(self.name, html)
 
     def __add__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
         variable_name = self.name or UNNAMED_VARIABLE

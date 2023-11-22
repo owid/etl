@@ -22,7 +22,6 @@ def run(dest_dir: str) -> None:
     with zipfile.ZipFile(snap.path) as z:
         # open the csv file in the dataset
         with z.open("peacedata3.1/peacedata3.1.csv") as f:
-
             # read the dataset
             tb = pr.read_fwf(f, header=None, names=["data"], metadata=snap.to_table_metadata(), origin=snap.m.origin)
 
