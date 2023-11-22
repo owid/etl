@@ -662,6 +662,14 @@ steps:
   data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
     - data://garden/unu_wider/2023-11-01/government_revenue_dataset
 
+  # World Bank - Worldwide Bureaucracy Indicators
+  data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
+  data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators
+  data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators
+    
   # Information Capacity Dataset
   data://meadow/state_capacity/2023-11-10/information_capacity_dataset:
     - snapshot://state_capacity/2023-11-10/information_capacity_dataset.dta

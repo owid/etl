@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Worldwide Bureaucracy Indicators (WWBI)
+    description: |-
+      The Worldwide Bureaucracy Indicators (WWBI) database is a unique cross-national dataset on public sector employment and wages that aims to fill an information gap, thereby helping researchers, development practitioners, and policymakers gain a better understanding of the personnel dimensions of state capability, the footprint of the public sector within the overall labor market, and the fiscal implications of the public sector wage bill. The dataset is derived from administrative data and household surveys, thereby complementing existing, expert perception-based approaches.
+
+      The WWBI includes 302 indicators that are estimated from microdata drawn from the labor force and household welfare surveys and augmented with administrative data for 202 economies in five categories: the demographics of the private and public sector workforces; public sector wage premiums; relative wages and pay compression ratios, gender pay gaps; and the public sector wage bill.
+    date_published: 2022-09-15
+    version_producer: Version 3
+
+    # Citation
+    producer: World Bank
+    citation_full: |-
+      World Bank. 2022. Worldwide Bureaucracy Indicators version 3.0
+
+    # Files
+    url_main:
+      https://datacatalog.worldbank.org/dataset/worldwide-bureaucracy-indicators
+    date_accessed: 2023-11-21
+
+    # License
+    license:
+      name: CC BY 4.0
+      url:
+        https://datacatalog.worldbank.org/dataset/worldwide-bureaucracy-indicators
+
+wdir: ../../../data/snapshots/wb/2023-11-21
+outs:
+- md5: 191d0f3335056c4b3548b9c83c49e2a8
+  size: 13369262
+  path: worldwide_bureaucracy_indicators.csv
