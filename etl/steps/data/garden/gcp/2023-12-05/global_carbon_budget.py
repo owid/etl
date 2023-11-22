@@ -785,6 +785,9 @@ def combine_data_and_add_variables(
 
     # Add region aggregates that were included in the national emissions file, but not in the Fossil CO2 emissions file.
     gcp_aggregates = sorted(set(tb_production["country"]) - set(tb_co2_with_regions["country"]))
+    # NOTE: Here, "International transport" is included. This will cause that total emissions have both data for
+    # international aviation and shipping, and international transport (which is the sum of the former two).
+    # But international transport will be removed later, in columns when that happens.
     tb_co2_with_regions = pr.concat(
         [
             tb_co2_with_regions,
@@ -984,6 +987,25 @@ def combine_data_and_add_variables(
         columns=[column for column in tb_co2_with_regions.columns if column.startswith("global_")]
     )
 
+    # Empty rows of international transport if international aviation and shipping are already informed.
+    # First find the list of columns where this happens.
+    international_entities = [entity for entity in set(tb_co2_with_regions["country"]) if "International" in entity]
+    check = tb_co2_with_regions[tb_co2_with_regions["country"].isin(international_entities)].reset_index(drop=True)
+    # Check that the only columns where international transport, aviation and shipping are all informed are columns
+    # derived from total emissions.
+    columns_with_redundant_international_emissions = [
+        column
+        for column in check.drop(columns=["country", "year"]).columns
+        if set(check.dropna(subset=column)["country"]) == set(international_entities)
+    ]
+    error = (
+        "Unexpected columns where international transport is informed as well as international aviation and shipping."
+    )
+    assert all(["emissions_total" in column for column in columns_with_redundant_international_emissions]), error
+    # TODO: Now for those columns, make international transport nan.
+    for column in columns_with_redundant_international_emissions:
+        tb_co2_with_regions.loc[tb_co2_with_regions["country"] == "International transport", column] = np.nan
+
     # Replace infinity values (for example when calculating growth from zero to non-zero) in the data by nan.
     for column in tb_co2_with_regions.drop(columns=["country", "year"]).columns:
         tb_co2_with_regions.loc[np.isinf(tb_co2_with_regions[column]), column] = np.nan
@@ -1077,7 +1099,7 @@ def run(dest_dir: str) -> None:
         tb_production=tb_production, tb_consumption=tb_consumption, tb_historical=tb_historical, tb_co2=tb_co2
     )
 
-    # "International Aviation" and "International Shipping" are included as additional countries.
+    # Extract global emissions, including bunker and land-use change emissions.
     tb_global_emissions = extract_global_emissions(
         tb_co2=tb_co2, tb_historical=tb_historical, ds_population=ds_population
     )
