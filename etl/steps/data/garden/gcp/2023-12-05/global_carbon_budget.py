@@ -1002,7 +1002,7 @@ def combine_data_and_add_variables(
         "Unexpected columns where international transport is informed as well as international aviation and shipping."
     )
     assert all(["emissions_total" in column for column in columns_with_redundant_international_emissions]), error
-    # TODO: Now for those columns, make international transport nan.
+    # Now for those columns, make international transport nan.
     for column in columns_with_redundant_international_emissions:
         tb_co2_with_regions.loc[tb_co2_with_regions["country"] == "International transport", column] = np.nan
 
