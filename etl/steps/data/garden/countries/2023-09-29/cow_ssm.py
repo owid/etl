@@ -214,6 +214,12 @@ def create_table_country_years(tb: Table) -> Table:
     tb = pr.concat([tb_countries, tb_last], ignore_index=True, short_name="cow_ssm_countries")
 
     tb["year"] = tb["year"].astype(int)
+
+    ## Serbia and Montenegro, Serbia
+    tb["country"] = tb["country"].astype(str)
+    # tb.loc[(tb["id"] == 345) & (tb["year"] >= 1992) & (tb["year"] < 2006), "country"] = "Serbia and Montenegro"
+    tb.loc[(tb["id"] == 345) & (tb["year"] >= 2006), "country"] = "Serbia"
+
     return tb
 
 
