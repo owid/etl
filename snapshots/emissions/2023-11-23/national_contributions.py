@@ -12,8 +12,8 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 # Names of data files to snapshot.
 DATA_FILES = {
     "annual_emissions.csv",
-    "cumulative_emissions.csv",
-    "temperature_response.csv",
+    # "cumulative_emissions.csv",
+    # "temperature_response.csv",
 }
 
 
@@ -29,11 +29,8 @@ def main(upload: bool) -> None:
         # Create a new snapshot.
         snap = Snapshot(f"emissions/{SNAPSHOT_VERSION}/national_contributions_{data_file}")
 
-        # Download data from source.
-        snap.download_from_source()
-
-        # Add file to DVC and upload to S3.
-        snap.dvc_add(upload=upload)
+        # Download data from source, add file to DVC and upload to S3.
+        snap.create_snapshot(upload=upload)
 
 
 if __name__ == "__main__":
