@@ -13,6 +13,7 @@ from .meta import (
     VariableMeta,
     VariablePresentationMeta,
 )
+from .processing_log import LogEntry, ProcessingLog
 from .tables import Table
 from .variables import Variable
 
@@ -29,6 +30,8 @@ __all__ = [
     "TableMeta",
     "VariableMeta",
     "VariablePresentationMeta",
+    "LogEntry",
+    "ProcessingLog",
     "FaqLink",
     "Source",
     "Origin",

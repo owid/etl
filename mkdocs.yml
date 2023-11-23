@@ -64,6 +64,7 @@ nav:
         - FAQs: "architecture/metadata/faqs.md"
         - Propagation of metadata: "architecture/metadata/propagation.md"
         - Using metadata: "architecture/metadata/using.md"
+        - Processing log: "architecture/metadata/processing_log.md"
       - Our journey: "architecture/our-journey.md"
   - API and catalog:
     - API: "api/index.md"
