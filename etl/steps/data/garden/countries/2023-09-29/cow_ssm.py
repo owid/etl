@@ -220,7 +220,7 @@ def create_table_country_years(tb: Table) -> Table:
     # tb.loc[(tb["id"] == 345) & (tb["year"] >= 1992) & (tb["year"] < 2006), "country"] = "Serbia and Montenegro"
     # tb.loc[(tb["id"] == 345) & (tb["year"] >= 2006), "country"] = "Serbia"
     ## Replace Yugoslavia -> Serbia
-    tb_countries["country"] = tb_countries["country"].replace({"Yugoslavia": "Serbia"})
+    tb["country"] = tb["country"].replace({"Yugoslavia": "Serbia"})
 
     return tb
 
