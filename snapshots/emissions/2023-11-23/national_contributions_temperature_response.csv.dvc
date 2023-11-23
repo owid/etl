@@ -27,3 +27,7 @@ meta:
     name: CC BY 4.0
     url: https://zenodo.org/record/7636699#.ZFCy4exBweZ
 wdir: ../../../data/snapshots/emissions/2023-11-23
+outs:
+- md5: 842d9a3f041cc5bd56d908c5a310c08a
+  size: 28946077
+  path: national_contributions_temperature_response.csv

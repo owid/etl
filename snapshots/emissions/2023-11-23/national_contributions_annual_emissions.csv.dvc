@@ -30,4 +30,4 @@ wdir: ../../../data/snapshots/emissions/2023-11-23
 outs:
 - md5: dce07a206256931a5a23589ef76bcd3e
   size: 26320900
-  path: national_contributions__annual_emissions.csv
+  path: national_contributions_annual_emissions.csv

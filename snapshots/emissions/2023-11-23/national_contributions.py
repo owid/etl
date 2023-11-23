@@ -12,8 +12,8 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 # Names of data files to snapshot.
 DATA_FILES = {
     "annual_emissions.csv",
-    # "cumulative_emissions.csv",
-    # "temperature_response.csv",
+    "cumulative_emissions.csv",
+    "temperature_response.csv",
 }
 
 

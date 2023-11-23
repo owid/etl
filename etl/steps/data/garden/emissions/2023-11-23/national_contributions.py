@@ -1,14 +1,11 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import pandas as pd
-from owid.catalog import Dataset, Table
+import owid.catalog.processing as pr
+from owid.catalog import Dataset, Table, Variable
 from owid.datautils.dataframes import map_series
-from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -97,20 +94,20 @@ REGIONS = {
 }
 
 
-def run_sanity_checks_on_inputs(df):
+def run_sanity_checks_on_inputs(tb):
     # Sanity checks.
     error = "Names of gases have changed."
-    assert set(df["gas"]) == set(GASES_RENAMING), error
+    assert set(tb["gas"]) == set(GASES_RENAMING), error
     error = "Names of components have changed."
-    assert set(df["component"]) == set(COMPONENTS_RENAMING), error
+    assert set(tb["component"]) == set(COMPONENTS_RENAMING), error
     error = "Units have changed."
-    assert set(df["unit"]) == set(
+    assert set(tb["unit"]) == set(
         ["Tg~CH[4]~year^-1", "Pg~CO[2]~year^-1", "Tg~N[2]*O~year^-1", "Pg~CO[2]*-e[100]", "°C"]
     ), error
 
 
-def add_kuwaiti_oil_fires_to_kuwait(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
+def add_kuwaiti_oil_fires_to_kuwait(tb: Table) -> Table:
+    tb = tb.copy()
 
     # NOTE: Use this function before harmonizing country names. Otherwise adapt the following definitions.
     kuwait = "Kuwait"
@@ -118,51 +115,51 @@ def add_kuwaiti_oil_fires_to_kuwait(df: pd.DataFrame) -> pd.DataFrame:
 
     # Sanity check.
     error = f"'{kuwait}' or '{oil_fires}' not found in the data."
-    assert kuwait in set(df["country"]), error
-    assert oil_fires in set(df["country"]), error
+    assert kuwait in set(tb["country"]), error
+    assert oil_fires in set(tb["country"]), error
 
     # Add the emissions from the Kuwaiti oil fires (in 1991) to Kuwait.
-    df_kuwait = df[df["country"] == kuwait].drop(columns="country").set_index("year")
-    df_oil_fires = df[df["country"] == oil_fires].drop(columns="country").fillna(0).set_index(["year"])
-    df_combined = (df_kuwait + df_oil_fires).reset_index().assign(**{"country": kuwait})
+    tb_kuwait = tb[tb["country"] == kuwait].drop(columns="country").set_index("year")
+    tb_oil_fires = tb[tb["country"] == oil_fires].drop(columns="country").fillna(0).set_index(["year"])
+    tb_combined = (tb_kuwait + tb_oil_fires).reset_index().assign(**{"country": kuwait})
 
     # Replace the origina data for Kuwait by the combined data.
-    df_updated = pd.concat([df[df["country"] != kuwait].reset_index(drop=True), df_combined], ignore_index=True)
+    tb_updated = pr.concat([tb[tb["country"] != kuwait].reset_index(drop=True), tb_combined], ignore_index=True)
 
     # Sort conveniently.
-    df_updated = df_updated.sort_values(["country", "year"]).reset_index(drop=True)
+    tb_updated = tb_updated.sort_values(["country", "year"]).reset_index(drop=True)
 
-    return df_updated
+    return tb_updated
 
 
-def add_emissions_in_co2_equivalents(df: pd.DataFrame) -> pd.DataFrame:
+def add_emissions_in_co2_equivalents(tb: Table) -> Table:
     # Add columns for fossil/land/total emissions of CH4 in terms of CO2 equivalents.
-    df["annual_emissions_ch4_fossil_co2eq"] = (
-        df["annual_emissions_ch4_fossil"] * CH4_FOSSIL_EMISSIONS_TO_CO2_EQUIVALENTS
+    tb["annual_emissions_ch4_fossil_co2eq"] = (
+        tb["annual_emissions_ch4_fossil"] * CH4_FOSSIL_EMISSIONS_TO_CO2_EQUIVALENTS
     )
-    df["annual_emissions_ch4_land_co2eq"] = df["annual_emissions_ch4_land"] * CH4_LAND_EMISSIONS_TO_CO2_EQUIVALENTS
-    df["annual_emissions_ch4_total_co2eq"] = (
-        df["annual_emissions_ch4_fossil_co2eq"] + df["annual_emissions_ch4_land_co2eq"]
+    tb["annual_emissions_ch4_land_co2eq"] = tb["annual_emissions_ch4_land"] * CH4_LAND_EMISSIONS_TO_CO2_EQUIVALENTS
+    tb["annual_emissions_ch4_total_co2eq"] = (
+        tb["annual_emissions_ch4_fossil_co2eq"] + tb["annual_emissions_ch4_land_co2eq"]
     )
 
     # Add columns for fossil/land/total emissions of N2O in terms of CO2 equivalents.
     for component in ["fossil", "land", "total"]:
-        df[f"annual_emissions_n2o_{component}_co2eq"] = (
-            df[f"annual_emissions_n2o_{component}"] * N2O_EMISSIONS_TO_CO2_EQUIVALENTS
+        tb[f"annual_emissions_n2o_{component}_co2eq"] = (
+            tb[f"annual_emissions_n2o_{component}"] * N2O_EMISSIONS_TO_CO2_EQUIVALENTS
         )
 
     # Add columns for fossil/land/total emissions of all GHG in terms of CO2 equivalents.
     for component in ["fossil", "land", "total"]:
-        df[f"annual_emissions_ghg_{component}_co2eq"] = (
-            df[f"annual_emissions_co2_{component}"]
-            + df[f"annual_emissions_ch4_{component}_co2eq"]
-            + df[f"annual_emissions_n2o_{component}_co2eq"]
+        tb[f"annual_emissions_ghg_{component}_co2eq"] = (
+            tb[f"annual_emissions_co2_{component}"]
+            + tb[f"annual_emissions_ch4_{component}_co2eq"]
+            + tb[f"annual_emissions_n2o_{component}_co2eq"]
         )
 
-    return df
+    return tb
 
 
-def add_region_aggregates(df: pd.DataFrame, ds_regions: Dataset, ds_income_groups: Dataset) -> pd.DataFrame:
+def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     for region in REGIONS:
         # List members in this region.
         members = geo.list_members_of_region(
@@ -174,8 +171,8 @@ def add_region_aggregates(df: pd.DataFrame, ds_regions: Dataset, ds_income_group
             additional_members=REGIONS[region].get("additional_members", None),
             excluded_members=REGIONS[region].get("excluded_members", None),
         )
-        df = geo.add_region_aggregates(
-            df=df,
+        tb = geo.add_region_aggregates(
+            df=tb,
             region=region,
             countries_in_region=members,
             countries_that_must_have_data=[],
@@ -184,62 +181,62 @@ def add_region_aggregates(df: pd.DataFrame, ds_regions: Dataset, ds_income_group
             frac_allowed_nans_per_year=0.999,
         )
 
-    return df
+    return tb
 
 
-def add_share_variables(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
+def add_share_variables(tb: Table) -> Table:
+    tb = tb.copy()
 
     # Create "share" variables (percentages with respect to global).
-    # To do that, first create a separate dataframe for global data, and add it to the main dataframe.
-    df_global = df[df["country"] == "World"][["year"] + SHARE_VARIABLES].reset_index(drop=True)
+    # To do that, first create a separate table for global data, and add it to the main table.
+    tb_global = tb[tb["country"] == "World"][["year"] + SHARE_VARIABLES].reset_index(drop=True)
 
-    df = pd.merge(df, df_global, on=["year"], how="left", suffixes=("", "_global"))
+    tb = pr.merge(tb, tb_global, on=["year"], how="left", suffixes=("", "_global"))
     # For a list of variables, add the percentage with respect to global.
     for variable in SHARE_VARIABLES:
-        df[f"share_of_{variable}"] = 100 * df[variable] / df[f"{variable}_global"]
+        tb[f"share_of_{variable}"] = 100 * tb[variable] / tb[f"{variable}_global"]
 
     # Drop unnecessary columns for global data.
-    df = df.drop(columns=[column for column in df.columns if column.endswith("_global")])
+    tb = tb.drop(columns=[column for column in tb.columns if column.endswith("_global")])
 
-    return df
+    return tb
 
 
-def add_per_capita_variables(df: pd.DataFrame, ds_population: Dataset) -> pd.DataFrame:
-    df = df.copy()
+def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
+    tb = tb.copy()
 
     # Add population to data.
-    df = geo.add_population_to_dataframe(
-        df=df,
+    tb = geo.add_population_to_table(
+        tb=tb,
         ds_population=ds_population,
         warn_on_missing_countries=False,
     )
 
     # Add per-capita variables.
     for variable in PER_CAPITA_VARIABLES:
-        df[f"{variable}_per_capita"] = df[variable] / df["population"]
+        tb[f"{variable}_per_capita"] = tb[variable] / tb["population"]
 
     # Drop population column.
-    df = df.drop(columns="population")
+    tb = tb.drop(columns="population")
 
-    return df
+    return tb
 
 
-def run_sanity_checks_on_outputs(df: pd.DataFrame) -> None:
+def run_sanity_checks_on_outputs(tb: Table) -> None:
     error = "Share of global emissions cannot be larger than 101%"
-    assert (df[[column for column in df.columns if "share" in column]].max() < 101).all(), error
+    assert (tb[[column for column in tb.columns if "share" in column]].max() < 101).all(), error
     error = "Share of global emissions was not expected to be smaller than -1%"
     # Some countries did contribute negatively to CO2 emissions, however overall the negative contribution is always
     # smaller than 1% in absolute value.
-    assert (df[[column for column in df.columns if "share" in column]].min() > -1).all(), error
+    assert (tb[[column for column in tb.columns if "share" in column]].min() > -1).all(), error
 
     # Ensure that no country contributes to emissions more than the entire world.
     columns_that_should_be_smaller_than_global = [
-        column for column in df.drop(columns=["country", "year"]).columns if "capita" not in column
+        column for column in tb.drop(columns=["country", "year"]).columns if "capita" not in column
     ]
-    df_global = df[df["country"] == "World"].drop(columns="country")
-    check = pd.merge(
-        df[df["country"] != "World"].reset_index(drop=True), df_global, on="year", how="left", suffixes=("", "_global")
+    tb_global = tb[tb["country"] == "World"].drop(columns="country")
+    check = pr.merge(
+        tb[tb["country"] != "World"].reset_index(drop=True), tb_global, on="year", how="left", suffixes=("", "_global")
     )
     for column in columns_that_should_be_smaller_than_global:
         # It is in principle possible that some region would emit more than the world, if the rest of regions
@@ -250,58 +247,60 @@ def run_sanity_checks_on_outputs(df: pd.DataFrame) -> None:
 
 
 def run(dest_dir: str) -> None:
-    log.info("national_contributions.start")
-
     #
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
-    ds_meadow: Dataset = paths.load_dependency("national_contributions")
-    tb_meadow = ds_meadow["national_contributions"]
+    ds_meadow = paths.load_dataset("national_contributions")
+    tb = ds_meadow["national_contributions"].reset_index()
 
     # Load regions dataset.
-    ds_regions: Dataset = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
 
     # Load income groups dataset.
-    ds_income_groups: Dataset = paths.load_dependency("wb_income")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     # Load population dataset.
-    ds_population = paths.load_dependency("population")
-
-    # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow).reset_index()
+    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
     #
     # Sanity checks.
-    run_sanity_checks_on_inputs(df=df)
+    run_sanity_checks_on_inputs(tb=tb)
 
     # Rename gases and components.
-    df["gas"] = map_series(
-        series=df["gas"], mapping=GASES_RENAMING, warn_on_missing_mappings=True, warn_on_unused_mappings=True
-    )
-    df["component"] = map_series(
-        series=df["component"], mapping=COMPONENTS_RENAMING, warn_on_missing_mappings=True, warn_on_unused_mappings=True
-    )
+    tb["gas"] = Variable(
+        map_series(
+            series=tb["gas"], mapping=GASES_RENAMING, warn_on_missing_mappings=True, warn_on_unused_mappings=True
+        )
+    ).copy_metadata(tb["gas"])
+    tb["component"] = Variable(
+        map_series(
+            series=tb["component"],
+            mapping=COMPONENTS_RENAMING,
+            warn_on_missing_mappings=True,
+            warn_on_unused_mappings=True,
+        )
+    ).copy_metadata(tb["component"])
 
     # Convert units from teragrams and petagrams to tonnes.
-    df.loc[df["unit"].str.startswith("Tg"), "data"] *= TERAGRAMS_TO_TONNES
-    df.loc[df["unit"].str.startswith("Pg"), "data"] *= PETAGRAMS_TO_TONNES
+    tb.loc[tb["unit"].str.startswith("Tg"), "data"] *= TERAGRAMS_TO_TONNES
+    tb.loc[tb["unit"].str.startswith("Pg"), "data"] *= PETAGRAMS_TO_TONNES
 
     # Transpose data.
-    df = df.pivot(index=["country", "year"], columns=["file", "gas", "component"], values="data")
-    df.columns = ["_".join(column) for column in df.columns]
-    df = df.reset_index()
+    tb = tb.pivot(
+        index=["country", "year"], columns=["file", "gas", "component"], values="data", join_column_levels_with="_"
+    )
 
     # We add the emissions from the Kuwaiti oil fires in 1991 (which are also included as a separate country) as part
     # of the emissions of Kuwait.
     # This ensures that these emissions will be included in aggregates of regions that include Kuwait.
-    df = add_kuwaiti_oil_fires_to_kuwait(df=df)
+    tb = add_kuwaiti_oil_fires_to_kuwait(tb=tb)
 
     # Harmonize country names.
-    df = geo.harmonize_countries(
-        df,
+    tb = geo.harmonize_countries(
+        tb,
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
         warn_on_missing_countries=True,
@@ -309,36 +308,29 @@ def run(dest_dir: str) -> None:
     )
 
     # Add region aggregates.
-    df = add_region_aggregates(df=df, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    tb = add_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Add columns for emissions in terms of CO2 equivalents.
-    df = add_emissions_in_co2_equivalents(df=df)
+    tb = add_emissions_in_co2_equivalents(tb=tb)
 
     # Add "share" variables (percentages with respect to global emissions).
-    df = add_share_variables(df=df)
+    tb = add_share_variables(tb=tb)
 
     # Add per-capita variables.
-    df = add_per_capita_variables(df=df, ds_population=ds_population)
+    tb = add_per_capita_variables(tb=tb, ds_population=ds_population)
 
     # Ensure data starts from a certain fixed year (see notes above).
-    df = df[df["year"] >= YEAR_MIN].reset_index(drop=True)
+    tb = tb[tb["year"] >= YEAR_MIN].reset_index(drop=True)
 
     # Sanity checks.
-    run_sanity_checks_on_outputs(df=df)
-
-    # Create a new table with the processed data.
-    tb_garden = Table(df, short_name=paths.short_name, underscore=True)
+    run_sanity_checks_on_outputs(tb=tb)
 
     # Set an appropriate index and sort conveniently.
-    tb_garden = tb_garden.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
-
-    # Save changes in the new garden dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()
-
-    log.info("national_contributions.end")
