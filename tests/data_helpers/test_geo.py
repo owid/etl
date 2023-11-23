@@ -9,6 +9,7 @@ from unittest.mock import mock_open, patch
 
 import numpy as np
 import pandas as pd
+from owid.catalog import Table
 from owid.datautils import dataframes
 from pytest import warns
 
@@ -24,7 +25,7 @@ mock_excluded_countries = [
     "country_06",
 ]
 
-mock_population = pd.DataFrame(
+mock_population = Table(
     {
         "country": ["Country 1", "Country 1", "Country 2", "Country 2", "Country 3"],
         "year": [2020, 2021, 2019, 2020, 2020],

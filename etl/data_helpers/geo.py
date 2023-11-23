@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, TypeVar, Union, cast
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table, Variable
 from owid.datautils.common import ExceptionFromDocstring, warn_on_list_of_entities
@@ -44,13 +45,12 @@ TNAME_WB_INCOME = "wb_income_group"
 
 
 @functools.lru_cache
-def _load_population() -> pd.DataFrame:
+def _load_population() -> Table:
     ####################################################################################################################
     # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
     ####################################################################################################################
     population = Dataset(DATASET_POPULATION)[TNAME_KEY_INDICATORS]
-    population = population.reset_index()
-    return cast(pd.DataFrame, population)
+    return population.reset_index()
 
 
 @functools.lru_cache
@@ -191,7 +191,7 @@ def list_countries_in_region_that_must_have_data(
 
     # Select population data for reference year for all countries in the region.
     reference = (
-        population[(population["country"].isin(members)) & (population["year"] == reference_year)]
+        population[(population["country"].isin(members)) & (population["year"] == reference_year)]  # type: ignore
         .dropna(subset="population")
         .sort_values("population", ascending=False)
         .reset_index(drop=True)
@@ -457,7 +457,7 @@ def harmonize_countries(
 
 
 def add_population_to_dataframe(
-    df: pd.DataFrame,
+    df: TableOrDataFrame,
     ds_population: Optional[Dataset] = None,
     country_col: str = "country",
     year_col: str = "year",
@@ -466,12 +466,12 @@ def add_population_to_dataframe(
     show_full_warning: bool = True,
     interpolate_missing_population: bool = False,
     expected_countries_without_population: Optional[List[str]] = None,
-) -> pd.DataFrame:
+) -> TableOrDataFrame:
     """Add column of population to a dataframe.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    df : TableOrDataFrame
         Original dataframe that contains a column of country names and years.
     ds_population : Dataset or None
         Population dataset.
@@ -542,9 +542,11 @@ def add_population_to_dataframe(
         )
 
     # Add population to original dataframe.
-    df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
+    merge = pr.merge if isinstance(df, Table) else pd.merge
 
-    return df_with_population
+    df_with_population = merge(df, population, on=[country_col, year_col], how="left")
+
+    return cast(TableOrDataFrame, df_with_population)
 
 
 def add_population_to_table(
