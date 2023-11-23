@@ -1,9 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
 import education_lee_lee
-import pandas as pd
+import owid.catalog.processing as pr
 import shared
 from owid.catalog import Dataset, Table
 
@@ -23,7 +21,7 @@ REGIONS = [
 ]
 
 
-def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def add_data_for_regions(tb: Table, ds_regions: Dataset) -> Table:
     tb_with_regions = tb.copy()
     aggregations = {column: "mean" for column in tb_with_regions.columns if column not in ["country", "year"]}
 
@@ -32,7 +30,6 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Datas
         members = geo.list_members_of_region(
             region=region,
             ds_regions=ds_regions,
-            ds_income_groups=ds_income_groups,
         )
         tb_with_regions = shared.add_region_aggregates_education(
             df=tb_with_regions,
@@ -43,6 +40,7 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Datas
             frac_allowed_nans_per_year=0.2,
             aggregations=aggregations,
         )
+
     return tb_with_regions
 
 
@@ -51,22 +49,19 @@ def run(dest_dir: str) -> None:
     # These datasets contain information required for the calculations.
 
     # Load dataset containing Barro-Lee education projections.
-    ds_meadow = cast(Dataset, paths.load_dependency("education_barro_lee_projections"))
+    # Load meadow dataset.
+    ds_meadow = paths.load_dataset("education_barro_lee_projections")
+
+    # Read table from meadow dataset.
+    tb = ds_meadow["education_barro_lee_projections"].reset_index()
 
     # Load dataset containing regions data.
-    ds_regions: Dataset = paths.load_dependency("regions")
-
-    # Load dataset containing income groups data.
-    ds_income_groups: Dataset = paths.load_dependency("income_groups")
-
-    # Extract the table for education projections and reset its index.
-    tb = ds_meadow["education_barro_lee_projections"]
-    tb.reset_index(inplace=True)
+    ds_regions = paths.load_dataset("regions")
 
     # Process data.
 
     # Harmonize the country names in the table.
-    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Rename the age groups for clarity.
     tb["age_group"] = tb["age_group"].replace(
@@ -74,76 +69,96 @@ def run(dest_dir: str) -> None:
     )
 
     # Prepare attainment data using the Lee-Lee method.
-    df_projections = education_lee_lee.prepare_attainment_data(tb)
+    tb_projections = education_lee_lee.prepare_attainment_data(tb)
 
     # Drop columns containing thousands values as they are not needed.
-    columns_to_drop = [column for column in df_projections.columns if "__thousands" in column]
-    df_projections = df_projections.drop(columns=columns_to_drop)
-
-    # Convert the DataFrame to a Table object and set required properties.
-    tb_projections = Table(df_projections, short_name=paths.short_name, underscore=True)
+    columns_to_drop = [column for column in tb_projections.columns if "__thousands" in column]
+    tb_projections = tb_projections.drop(columns=columns_to_drop)
 
     # Add regional and income group data to the projections.
-    tb_projections = add_data_for_regions(tb=tb_projections, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-
-    # Set the index to be based on country and year.
-    tb_projections.set_index(["country", "year"], inplace=True)
+    tb_projections = add_data_for_regions(tb=tb_projections, ds_regions=ds_regions)
+    tb_projections = tb_projections.underscore()
 
     # Create a copy of the projections table with a suffix in the column names.
     tb_projections_copy = tb_projections.copy(deep=True)
+    tb_projections_copy = tb_projections_copy.set_index(["country", "year"], verify_integrity=True)
+
     suffix = "_projections"
     tb_projections_copy.columns = tb_projections_copy.columns + suffix
+    tb_projections_copy = tb_projections_copy.reset_index()
 
     # Load historical education data and drop columns related to enrollment rates.
-    ds_past = cast(Dataset, paths.load_dependency("education_lee_lee"))
-    tb_past = ds_past["education_lee_lee"]
+    ds_past = paths.load_dataset("education_lee_lee")
+    tb_past = ds_past["education_lee_lee"].reset_index()
     cols_to_drop = [col for col in tb_past.columns if "enrollment_rates" in col]
     tb_past = tb_past.drop(columns=cols_to_drop)
 
     # Concatenate the projections with historical data below the year 2015.
-    df_below_2015 = tb_past[(tb_past.index.get_level_values("year") < 2015)]
-    stiched = pd.concat([tb_projections, df_below_2015])
+    tb_below_2015 = tb_past[tb_past["year"] < 2015]
+    stiched = pr.concat([tb_projections, tb_below_2015])
 
     # Merge the original projections and the concatenated data.
-    stiched_projections = pd.merge(
+    tb_stiched = pr.merge(
         tb_projections_copy,
         stiched,
         on=["country", "year"],
         how="outer",
     )
     # Create share with some formal education indicators
-    stiched_projections["some_formal_education_female"] = (
-        100 - stiched_projections["f_youth_and_adults__15_64_years__percentage_of_no_education"]
+    tb_stiched["some_formal_education_female"] = (
+        100 - tb_stiched["f_youth_and_adults__15_64_years__percentage_of_no_education"]
     )
-    stiched_projections["some_formal_education_male"] = (
-        100 - stiched_projections["m_youth_and_adults__15_64_years__percentage_of_no_education"]
+    tb_stiched["some_formal_education_male"] = (
+        100 - tb_stiched["m_youth_and_adults__15_64_years__percentage_of_no_education"]
     )
-    stiched_projections["some_formal_education_both_sexes"] = (
-        100 - stiched_projections["mf_youth_and_adults__15_64_years__percentage_of_no_education"]
+    tb_stiched["some_formal_education_both_sexes"] = (
+        100 - tb_stiched["mf_youth_and_adults__15_64_years__percentage_of_no_education"]
     )
 
     # Create female to male ratios for key variables
-    stiched_projections["female_over_male_average_years_of_schooling"] = (
-        stiched_projections["f_youth_and_adults__15_64_years__average_years_of_education"]
-        / stiched_projections["m_youth_and_adults__15_64_years__average_years_of_education"]
+    tb_stiched["female_over_male_average_years_of_schooling"] = (
+        tb_stiched["f_youth_and_adults__15_64_years__average_years_of_education"]
+        / tb_stiched["m_youth_and_adults__15_64_years__average_years_of_education"]
     )
 
-    stiched_projections["female_over_male_share_with_no_education"] = (
-        stiched_projections["f_youth_and_adults__15_64_years__percentage_of_no_education"]
-        / stiched_projections["m_youth_and_adults__15_64_years__percentage_of_no_education"]
+    tb_stiched["female_over_male_share_with_no_education"] = (
+        tb_stiched["f_youth_and_adults__15_64_years__percentage_of_no_education"]
+        / tb_stiched["m_youth_and_adults__15_64_years__percentage_of_no_education"]
     )
 
-    stiched_projections["female_over_male_share_some_formal_education"] = (
-        stiched_projections["some_formal_education_female"] / stiched_projections["some_formal_education_male"]
+    tb_stiched["female_over_male_share_some_formal_education"] = (
+        tb_stiched["some_formal_education_female"] / tb_stiched["some_formal_education_male"]
     )
 
-    # Convert the merged data into a Table object.
-    tb_stiched = Table(stiched_projections, short_name=paths.short_name)
+    # Set metadata and format the dataframe for saving.
+    tb_stiched = tb_stiched.underscore().set_index(["country", "year"], verify_integrity=True)
 
-    # Save outputs.
+    # Save columns to use on grapher
+    columns_to_use_on_grapher = [
+        "mf_youth_and_adults__15_64_years__percentage_of_no_education",
+        "f_youth_and_adults__15_64_years__percentage_of_no_education",
+        "f_adults__25_64_years__percentage_of_no_education",
+        "mf_adults__25_64_years__percentage_of_tertiary_education",
+        "mf_youth_and_adults__15_64_years__average_years_of_education",
+        "f_youth_and_adults__15_64_years__average_years_of_education",
+        "female_over_male_average_years_of_schooling",
+        "female_over_male_share_with_no_education",
+        "female_over_male_share_some_formal_education",
+        "some_formal_education_female",
+        "some_formal_education_male",
+        "some_formal_education_both_sexes",
+    ]
 
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_stiched], default_metadata=ds_meadow.metadata)
+    tb_stiched = tb_stiched[columns_to_use_on_grapher]
+
+    # Set metadata and format the dataframe for saving.
+    tb_stiched.metadata.short_name = paths.short_name
+
+    #
+    # Save outputs
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset
+    ds_garden = create_dataset(dest_dir, tables=[tb_stiched], check_variables_metadata=True)
 
     # Save the newly created dataset.
     ds_garden.save()

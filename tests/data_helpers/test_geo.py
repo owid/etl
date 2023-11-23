@@ -9,6 +9,7 @@ from unittest.mock import mock_open, patch
 
 import numpy as np
 import pandas as pd
+from owid.catalog import Table
 from owid.datautils import dataframes
 from pytest import warns
 
@@ -24,7 +25,7 @@ mock_excluded_countries = [
     "country_06",
 ]
 
-mock_population = pd.DataFrame(
+mock_population = Table(
     {
         "country": ["Country 1", "Country 1", "Country 2", "Country 2", "Country 3"],
         "year": [2020, 2021, 2019, 2020, 2020],
@@ -644,6 +645,44 @@ class TestAddRegionAggregates:
         )
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
 
+    def test_replace_region_with_one_mandatory_country_having_nan(self):
+        # Country 2 has NaN value in 2021. It is a mandatory country and is present, so the aggregation will
+        # exist, but will be nan.
+        df_in = self.df_in.copy()
+
+        # Add NaN value for Country 2
+        df_in = df_in.append(
+            {"country": "Country 2", "year": 2021, "var_01": np.nan, "var_02": np.nan}, ignore_index=True
+        )
+
+        df = geo.add_region_aggregates(
+            df=df_in,
+            region="Region 1",
+            countries_in_region=["Country 1", "Country 2"],
+            countries_that_must_have_data=["Country 1", "Country 2"],
+            num_allowed_nans_per_year=0,
+            country_col="country",
+            year_col="year",
+        )
+        df_out = pd.DataFrame(
+            {
+                "country": [
+                    "Country 1",
+                    "Country 1",
+                    "Country 2",
+                    "Country 2",
+                    "Country 3",
+                    "Income group 1",
+                    "Region 1",
+                    "Region 1",
+                ],
+                "year": [2020, 2021, 2020, 2021, 2022, 2022, 2020, 2021],
+                "var_01": [1.0, 2.0, 3.0, np.nan, np.nan, 6.0, 4.0, np.nan],
+                "var_02": [10.0, 20.0, 30.0, np.nan, 40.0, 60.0, 40.0, np.nan],
+            }
+        )
+        assert dataframes.are_equal(df1=df, df2=df_out)[0]
+
     def test_replace_region_with_custom_aggregations(self):
         # Country 2 does not have data for 2021, and, given that it is a mandatory country, the aggregation will be nan.
         df = geo.add_region_aggregates(
@@ -732,3 +771,35 @@ class TestAddRegionAggregates:
             }
         )
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
+
+    def test_add_region_with_Table(self):
+        tb = Table(self.df_in)
+        tb.var_01.m.title = "Var 01"
+        df = geo.add_region_aggregates(
+            df=tb,
+            region="Region 2",
+            countries_in_region=["Country 3"],
+            countries_that_must_have_data=["Country 3"],
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=None,
+            country_col="country",
+            year_col="year",
+        )
+        df_out = Table(
+            {
+                "country": [
+                    "Country 1",
+                    "Country 1",
+                    "Country 2",
+                    "Country 3",
+                    "Income group 1",
+                    "Region 1",
+                    "Region 2",
+                ],
+                "year": [2020, 2021, 2020, 2022, 2022, 2022, 2022],
+                "var_01": [1, 2, 3, np.nan, 6, 5, 0.0],
+                "var_02": [10.0, 20.0, 30.0, 40.0, 60.0, 50.0, 40.0],
+            }
+        )
+        assert dataframes.are_equal(df1=df, df2=df_out)[0]
+        assert df.var_01.m.title == "Var 01"

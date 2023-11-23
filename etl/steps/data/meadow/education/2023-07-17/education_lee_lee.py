@@ -1,12 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
-
-import pandas as pd
-from owid.catalog import Table
-
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -17,9 +11,9 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("education_lee_lee.xlsx"))
+    snap = paths.load_snapshot("education_lee_lee.xlsx")
     # Load data from snapshot.
-    df = pd.read_excel(snap.path)
+    tb = snap.read_excel()
     #
     # Process data.
     #
@@ -42,12 +36,11 @@ def run(dest_dir: str) -> None:
         "Tertiary": "Tertiary enrollment rates",
     }
     # Rename columns in the DataFrame.
-    df = df.rename(columns=COLUMNS_RENAME)
+    tb = tb.rename(columns=COLUMNS_RENAME)
 
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
+    tb = tb.underscore().set_index(["country", "year", "sex", "age_group"], verify_integrity=True).sort_index()
 
-    tb.set_index(["country", "year", "sex", "age_group"], inplace=True)
     # Drop unnecessary columns
     tb = tb.drop("region", axis=1)
 
@@ -55,7 +48,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

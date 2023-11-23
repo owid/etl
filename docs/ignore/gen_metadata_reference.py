@@ -31,7 +31,7 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
         return f"""
 {prop_title}
 
-{prop["description"]}
+{prop.get("description", "")}
 """
     # Prepare requirement_level
     requirement_level = ""
