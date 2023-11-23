@@ -722,6 +722,26 @@ class Table(pd.DataFrame):
                 comment=comment,
             )
 
+    # TODO: make this work with plog
+    # def amend_log(
+    #     self,
+    #     operation: str,
+    #     parents: Optional[List[Any]] = None,
+    #     variable_names: Optional[List[str]] = None,
+    #     comment: Optional[str] = None,
+    #     entry_num: Optional[int] = -1,
+    #     inplace: bool = False,
+    # ) -> Optional["Table"]:
+    #     return amend_log(
+    #         table=self,
+    #         operation=operation,
+    #         parents=parents,
+    #         variable_names=variable_names,
+    #         comment=comment,
+    #         entry_num=entry_num,
+    #         inplace=inplace,
+    #     )
+
     def sort_values(self, by: str, *args, **kwargs) -> "Table":
         tb = super().sort_values(by=by, *args, **kwargs).copy()
         for column in list(tb.all_columns):
@@ -1480,6 +1500,40 @@ def copy_metadata(from_table: Table, to_table: Table, deep=False) -> Table:
 
     tab._fields = new_fields
     return tab
+
+
+# TODO: make this work
+# def amend_log(
+#     table: Table,
+#     operation: str,
+#     parents: Optional[List[Any]] = None,
+#     variable_names: Optional[List[str]] = None,
+#     comment: Optional[str] = None,
+#     entry_num: Optional[int] = -1,
+#     inplace: bool = False,
+# ) -> Optional[Table]:
+#     if not inplace:
+#         table = table.copy()
+
+#     # Append a new entry to the processing log of the required variables.
+#     if variable_names is None:
+#         # If no variable is specified, assume all (including index columns).
+#         variable_names = list(table.all_columns)
+#     for column in variable_names:
+#         # If parents is not defined, assume the parents are simply the current variable.
+#         _parents = parents or [column]
+#         # Update (in place) the processing log of current variable.
+#         table._fields[column].processing_log = variables.amend_entry_in_processing_log(
+#             processing_log=table._fields[column].processing_log,
+#             variable_name=column,
+#             parents=_parents,
+#             operation=operation,
+#             comment=comment,
+#             entry_num=entry_num,
+#         )
+
+#     if not inplace:
+#         return table
 
 
 def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:

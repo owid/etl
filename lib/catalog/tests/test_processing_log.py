@@ -37,30 +37,27 @@ def test_tables_addition() -> None:
 @enable_pl
 def test_sum() -> None:
     random.seed(0)
-    with pl.enable_processing_log():
-        t: Table = Table({"a": [1, 2], "b": [3, 4]})
-        t["c"] = t[["a", "b"]].sum(axis=1)
-        assert t["c"].metadata.processing_log.as_dict() == [
-            {
-                "variable": "**TEMPORARY UNNAMED VARIABLE**",
-                "parents": ["a", "b"],
-                "operation": "+",
-                "target": "**TEMPORARY UNNAMED VARIABLE**#7921731533",
-            },
-            {
-                "variable": "c",
-                "parents": ["**TEMPORARY UNNAMED VARIABLE**#7921731533"],
-                "operation": "rename",
-                "target": "c#1806341205",
-            },
-        ]
+    t: Table = Table({"a": [1, 2], "b": [3, 4]})
+    t["c"] = t[["a", "b"]].sum(axis=1)
+    assert t["c"].metadata.processing_log.as_dict() == [
+        {
+            "variable": "**TEMPORARY UNNAMED VARIABLE**",
+            "parents": ["a", "b"],
+            "operation": "+",
+            "target": "**TEMPORARY UNNAMED VARIABLE**#7921731533",
+        },
+        {
+            "variable": "c",
+            "parents": ["**TEMPORARY UNNAMED VARIABLE**#7921731533"],
+            "operation": "rename",
+            "target": "c#1806341205",
+        },
+    ]
 
 
 @enable_pl
 def test_groupby() -> None:
     t: Table = Table({"a": [1, 2, 3], "b": ["a", "a", "b"]})
-    t.a.title = "A"
-    t.b.title = "B"
     tb = t.groupby("b").sum()
     assert tb["a"].metadata.processing_log.as_dict() == [
         {"variable": "a", "operation": "groupby_sum", "target": "a#7921731533", "parents": ["a", "b"]}
@@ -70,8 +67,6 @@ def test_groupby() -> None:
 @enable_pl
 def test_agg() -> None:
     t: Table = Table({"a": [1, 2, 3], "b": ["a", "a", "b"]})
-    t.a.title = "A"
-    t.b.title = "B"
     tb = t.groupby("b").agg("sum")
     assert tb["a"].metadata.processing_log.as_dict() == [
         {"variable": "a", "operation": "agg_sum", "target": "a#7921731533", "parents": ["a", "b"]}

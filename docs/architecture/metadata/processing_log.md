@@ -4,7 +4,7 @@
     The processing log is an experimental feature that is not yet fully tested.
 
 
-This log captures every pandas operation in its metadata, allowing users to track the processing history of a dataset. It is particularly useful for visualizing the data pipeline and aiding in debugging processes.
+This log captures every operation in its metadata, allowing users to track the processing history of each indicator in a dataset. It is particularly useful for visualizing the data pipeline and aiding in debugging processes.
 
 To enable the processing log, set the environment variable `PROCESSING_LOG` to `1`. For example:
 
