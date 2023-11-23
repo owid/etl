@@ -26,40 +26,32 @@ definitions:
         Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data.
       <% endif %>
     point_1: |-
-      <% if type == "period" %>
-        Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
-      <% else %>
-        Cohort life expectancy is the average lifespan of a group of people, usually a birth cohort – people born in the same year.
-      <% endif %>
+      Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
     point_2: |-
-      <% if type == "period" %>
-        <% if age == '0' %>
-          For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
-        <% else %>
-          For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
-        <% endif %>
+      <% if age == '0' %>
+      For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
       <% else %>
-        <% if age == '0' %>
-          It is calculated by tracking individuals from that cohort throughout their lives until death, and calculating their average lifespan.
-        <% else %>
-          It is calculated by tracking individuals from that cohort throughout the rest of their lives until death, and calculating their average remaining lifespan.
-        <% endif %>
+      For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
       <% endif %>
 
   common:
     description_short: |-
-      <% if age == '0' %>
-        <% if sex == 'all' %>
-          The period life expectancy at birth, in a given year.
-        <% else %>
-          The period life expectancy at birth among << sex + 's' >>, in a given year.
-        <% endif %>
+      <% if age == 0 %>
+
+      <% if sex == 'all' %>
+      The period life expectancy at birth, in a given year.
       <% else %>
-        <% if sex == 'all' %>
-          The total period life expectancy at age << age >>, in a given year.
-        <% else %>
-          The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
-        <% endif %>
+      The period life expectancy at birth among << sex + 's' >>, in a given year.
+      <% endif %>
+
+      <% else %>
+
+      <% if sex == 'all' %>
+      The total period life expectancy at age << age >>, in a given year.
+      <% else %>
+      The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
+      <% endif %>
+
       <% endif %>
     description_key:
       - |-
