@@ -15,23 +15,27 @@ definitions:
     life_expectancy:
       point_1: |-
         <% if type == "period" %>
-          Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
+        Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
         <% else %>
-          Cohort life expectancy is the average lifespan of a group of people, usually a birth cohort – people born in the same year.
+        Cohort life expectancy is the average lifespan of a group of people, usually a birth cohort – people born in the same year.
         <% endif %>
       point_2: |-
         <% if type == "period" %>
-          <% if age == '0' %>
-            For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
-          <% else %>
-            For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
-          <% endif %>
+
+        <% if age == '0' %>
+        For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
         <% else %>
-          <% if age == '0' %>
-            It is calculated by tracking individuals from that cohort throughout their lives until death, and calculating their average lifespan.
-          <% else %>
-            It is calculated by tracking individuals from that cohort throughout the rest of their lives until death, and calculating their average remaining lifespan.
-          <% endif %>
+        For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
+        <% endif %>
+
+        <% else %>
+
+        <% if age == '0' %>
+        It is calculated by tracking individuals from that cohort throughout their lives until death, and calculating their average lifespan.
+        <% else %>
+        It is calculated by tracking individuals from that cohort throughout the rest of their lives until death, and calculating their average remaining lifespan.
+        <% endif %>
+
         <% endif %>
     data_used: |-
       Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data.
@@ -174,11 +178,13 @@ tables:
             {definitions.global.life_expectancy.point_2}
           - |-
             <% if age != '0' %>
-              <% if type == "period" %>
-                This shows the remaining life expectancy among people who have already reached the age << age >>, using death rates from their age group and older age groups.
-              <% else %>
-                This shows the remaining cohort life expectancy of people who have reached the age << age >>.
-              <% endif %>
+
+            <% if type == "period" %>
+            This shows the remaining life expectancy among people who have already reached the age << age >>, using death rates from their age group and older age groups.
+            <% else %>
+            This shows the remaining cohort life expectancy of people who have reached the age << age >>.
+            <% endif %>
+
             <% endif %>
           - |-
             {definitions.global.data_used}
