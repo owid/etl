@@ -28,7 +28,7 @@ meta:
 
     # License
     license:
-      name: ©producer year
+      name: 2021 by Robert J. Barro and Jong-Wha Lee.
       url: https://barrolee.github.io/BarroLeeDataSet/OUPProj.html
 
 wdir: ../../../data/snapshots/education/2023-07-17
