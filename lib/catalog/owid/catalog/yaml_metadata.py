@@ -59,7 +59,7 @@ def update_metadata_from_yaml(
         )
 
         # then overwrite with table specific metadata
-        variable_dict = t_annot.get("variables", {}).get(v_short_name, {})
+        variable_dict = (t_annot.get("variables") or {}).get(v_short_name, {})
         meta_dict = _merge_variable_metadata(
             meta_dict, variable_dict, if_origins_exist=if_origins_exist, overwrite=True
         )
@@ -121,7 +121,7 @@ def _merge_table_metadata(meta: dict, new: dict) -> dict:
 
 
 def _validate_variables(t_annot: dict, tb: Table) -> None:
-    yaml_variable_names = t_annot.get("variables", {}).keys()
+    yaml_variable_names = (t_annot.get("variables") or {}).keys()
     table_variable_names = tb.columns
     extra_variable_names = yaml_variable_names - table_variable_names
     if extra_variable_names:
