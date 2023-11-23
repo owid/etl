@@ -2,6 +2,6 @@ tables:
   cow_ssm_countries:
     variables:
       is_present:
-        title: Country is in dataset
+        title: Sovereign state
         description_short: Whether the country is present in the COW SSM dataset.
         unit: ""
