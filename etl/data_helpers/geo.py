@@ -320,26 +320,25 @@ def add_region_aggregates(
     variables = list(aggregations)
 
     # Initialise dataframe of added regions, and add variables one by one to it.
-    df_region = pd.DataFrame({country_col: [], year_col: []}).astype(dtype={country_col: "object", year_col: "int"})
+    # df_region = Table({country_col: [], year_col: []}).astype(dtype={country_col: "object", year_col: "int"})
     # Select data for countries in the region.
     df_countries = df[df[country_col].isin(countries_in_region)]
-    for variable in variables:
-        df_added = groupby_agg(
-            df=df_countries,
-            groupby_columns=year_col,
-            aggregations={
-                country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
-                variable: aggregations[variable],
-            },
-            num_allowed_nans=num_allowed_nans_per_year,
-            frac_allowed_nans=frac_allowed_nans_per_year,
-        ).reset_index()
-        # Make nan all aggregates if the most contributing countries were not present.
-        df_added.loc[~df_added[country_col], variable] = np.nan
-        # Replace the column that was used to check if most contributing countries were present by the region's name.
-        df_added[country_col] = region
-        # Include this variable to the dataframe of added regions.
-        df_region = pd.merge(df_region, df_added, on=[country_col, year_col], how="outer")
+
+    df_region = groupby_agg(
+        df=df_countries,
+        groupby_columns=year_col,
+        aggregations=dict(
+            **aggregations,
+            **{country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x)))},
+        ),
+        num_allowed_nans=num_allowed_nans_per_year,
+        frac_allowed_nans=frac_allowed_nans_per_year,
+    ).reset_index()
+
+    # Make nan all aggregates if the most contributing countries were not present.
+    df_region.loc[~df_region[country_col], variables] = np.nan
+    # Replace the column that was used to check if most contributing countries were present by the region's name.
+    df_region[country_col] = region
 
     if isinstance(keep_original_region_with_suffix, str):
         # Keep rows in the original dataframe containing rows for region (adding a suffix to the region name), and then
@@ -545,6 +544,10 @@ def add_population_to_dataframe(
 
     # Add population to original dataframe.
     merge = pr.merge if isinstance(df, Table) else pd.merge
+
+    if population.index.names != [None]:
+        # If population has a multiindex, we need to reset it before merging.
+        population = population.reset_index()
 
     df_with_population = merge(df, population, on=[country_col, year_col], how="left")
 
