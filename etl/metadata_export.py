@@ -1,9 +1,10 @@
 import copy
-import os
-from typing import Any, Dict, Literal, Optional, Tuple, Union
+from pathlib import Path
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 import pandas as pd
 import rich_click as click
+import ruamel.yaml
 from owid.catalog import Dataset, utils
 from rich.console import Console
 from rich.syntax import Syntax
@@ -44,6 +45,8 @@ def cli(
     """Export dataset & tables & columns metadata in YAML format. This
     is useful for generating *.meta.yml files that can be later manually edited.
 
+    If the output YAML already exists, it will be updated with new values.
+
     Usage:
         # save to YAML file etl/steps/data/garden/ggdc/2020-10-01/ggdc_maddison.meta.yml
         etl-metadata-export data/garden/ggdc/2020-10-01/ggdc_maddison
@@ -57,17 +60,38 @@ def cli(
     ds = Dataset(path)
     meta_dict = metadata_export(ds, prune=True, decimals=int(decimals) if decimals.isnumeric() else decimals)  # type: ignore
 
-    if not output:
-        output = str(paths.STEP_DIR / "data" / f"{ds.metadata.uri}.meta.yml")
+    output_path = Path(output) if output else paths.STEP_DIR / "data" / f"{ds.metadata.uri}.meta.yml"
 
-    yaml_str = yaml_dump(meta_dict, replace_confusing_ascii=True)
+    # if output_path exists, update its values, but keep YAML structure intact
+    if output_path.exists():
+        with open(output_path, "r") as f:
+            doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+
+        if "dataset" not in doc:
+            doc["dataset"] = {}
+        if "tables" not in doc:
+            doc["tables"] = {}
+
+        doc["dataset"].update(meta_dict["dataset"])
+        for tab_name, tab_dict in meta_dict.get("tables", {}).items():
+            variables = tab_dict.pop("variables", {})
+            if tab_name not in doc["tables"]:
+                doc["tables"][tab_name] = {}
+            doc["tables"][tab_name].update(tab_dict)
+            doc["tables"][tab_name]["variables"].update(variables)
+
+        doc = reorder_fields(doc)
+
+        yaml_str = ruamel.yaml.dump(doc, Dumper=ruamel.yaml.RoundTripDumper)
+    else:
+        yaml_str = yaml_dump(reorder_fields(meta_dict), replace_confusing_ascii=True)
     assert yaml_str
 
     if show:
         Console().print(Syntax(yaml_str, "yaml", line_numbers=True))
     else:
-        os.makedirs(os.path.dirname(output), exist_ok=True)
-        with open(output, "w") as f:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w") as f:
             f.write(yaml_str)  # type: ignore
 
 
@@ -203,6 +227,75 @@ def metadata_export(
         "dataset": ds_meta,
         "tables": tb_meta,
     }
+
+
+def reorder_fields(m: Dict[str, Any]) -> Dict[str, Any]:
+    """Reorder metadata fields to have consistent YAML."""
+    # make copy and then modify everything in place
+    m = copy.deepcopy(m)
+
+    _reorder_keys(m, ["definitions", "common", "dataset", "tables"])
+
+    origin_order = ["producer", "version_producer", "title", "description", "citation_full"]
+    for origin in m.get("definitions", {}).get("common", {}).get("origins", []):
+        _reorder_keys(origin, origin_order)
+
+    tab_order = [
+        "title",
+        "description",
+        "variables",
+    ]
+    var_order = [
+        "title",
+        "unit",
+        "short_unit",
+        "display",
+        "description_short",
+        "description_key",
+        "description_from_producer",
+        "description_processing",
+        "processing_level",
+    ]
+    presentation_order = [
+        "title_public",
+        "title_variant",
+        "attribution_short",
+        "topic_tags",
+        "faqs",
+        "grapher_config",
+    ]
+    grapher_config_order = [
+        "title",
+        "subtitle",
+        "variantName",
+        "originUrl",
+        "hasMapTab",
+        "tab",
+        "addCountryMode",
+        "yAxis",
+        "selectedFacetStrategy",
+        "hideAnnotationFieldsInTitle",
+        "relatedQuestions",
+        "map",
+        "selectedEntityNames",
+        "$schema",
+    ]
+    for tab in m["tables"].values():
+        _reorder_keys(tab, tab_order)
+        for var_meta in tab["variables"].values():
+            _reorder_keys(var_meta, var_order)
+            if "presentation" in var_meta:
+                _reorder_keys(var_meta["presentation"], presentation_order)
+                _reorder_keys(var_meta["presentation"].get("grapher_config", {}), grapher_config_order)
+
+    return m
+
+
+def _reorder_keys(d: Dict[str, Any], order: List[str]) -> None:
+    keys = order + [k for k in d.keys() if k not in order]
+    for k in keys:
+        if k in d:
+            d[k] = d.pop(k)
 
 
 def _move_sources_to_dataset(ds_meta: Dict[str, Any], tb_meta: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:

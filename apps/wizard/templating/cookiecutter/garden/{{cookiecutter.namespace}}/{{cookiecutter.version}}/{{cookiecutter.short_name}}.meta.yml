@@ -57,4 +57,5 @@ tables:
       #     unit: arbitrary units
       #     yearIsDay: false
       #     zeroDay:
+      {}
 

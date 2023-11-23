@@ -1,12 +1,8 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
-
 import pandas as pd
-from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -17,10 +13,9 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("education_barro_lee_projections.csv"))
-
+    snap = paths.load_snapshot("education_barro_lee_projections.csv")
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
+    tb = snap.read_csv()
 
     #
     # Process data.
@@ -50,31 +45,32 @@ def run(dest_dir: str) -> None:
         "pop": "Population (thousands)",
     }
     # Rename columns in the DataFrame.
-    df = df.rename(columns=COLUMNS_RENAME)
+    tb = tb.rename(columns=COLUMNS_RENAME)
 
-    df["age_group"] = df["Starting Age"].astype(str) + "-" + df["Finishing Age"].astype(str)
+    tb["age_group"] = tb["Starting Age"].astype(str) + "-" + tb["Finishing Age"].astype(str)
 
     # Simple sanity check to see that the values in "Starting Age" and "Finishing Age" are as expected
     starting_ages_expected = {64, 25, 24, 15}
-    ages_found = set(df["Starting Age"].append(df["Finishing Age"]))
+    # Assuming tb["Starting Age"] and tb["Finishing Age"] are pandas Series
+    ages_combined = pd.concat([tb["Starting Age"], tb["Finishing Age"]])
+    ages_found = set(ages_combined)
     ages_unexpected = ages_found - starting_ages_expected
     # Ensure that there are no unexpected ages
     assert not ages_unexpected, f"Unexpected ages in column 'Starting Age': {ages_unexpected}!"
 
-    df.drop(["Starting Age", "Finishing Age"], axis=1, inplace=True)
+    tb = tb.drop(["Starting Age", "Finishing Age"], axis=1)
 
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb = tb.set_index(["country", "year", "sex", "age_group"])
+    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
+    tb = tb.underscore().set_index(["country", "year", "sex", "age_group"], verify_integrity=True).sort_index()
 
     # Drop unnecessary columns
-    tb.drop(["barro_lee_country_code", "world_bank_country_code", "region"], axis=1, inplace=True)
+    tb = tb.drop(["barro_lee_country_code", "world_bank_country_code", "region"], axis=1)
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

@@ -1,8 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List, cast
+from typing import List
 
-import pandas as pd
+import owid.catalog.processing as pr
 import shared
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
@@ -23,17 +23,13 @@ REGIONS = [
 ]
 
 
-def add_data_for_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def add_data_for_regions(tb: Table, ds_regions: Dataset) -> Table:
     tb_with_regions = tb.copy()
     aggregations = {column: "mean" for column in tb_with_regions.columns if column not in ["country", "year"]}
 
     for region in REGIONS:
         # Find members of current region.
-        members = geo.list_members_of_region(
-            region=region,
-            ds_regions=ds_regions,
-            ds_income_groups=ds_income_groups,
-        )
+        members = geo.list_members_of_region(region=region, ds_regions=ds_regions)
         tb_with_regions = shared.add_region_aggregates_education(
             df=tb_with_regions,
             region=region,
@@ -50,24 +46,27 @@ def run(dest_dir: str) -> None:
     #
     # Load input datasets
     #
-    # Load the Lee meadow dataset
-    ds_meadow = cast(Dataset, paths.load_dependency("education_lee_lee"))
+    # Read the main education table from the meadow dataset and reset its index
+    ds_meadow = paths.load_dataset("education_lee_lee")
+    tb = ds_meadow["education_lee_lee"].reset_index()
 
-    # Load additional datasets for region and income group information
-    ds_regions = paths.load_dependency("regions")
-    ds_income_groups = paths.load_dependency("income_groups")
+    # Load dataset containing regions data.
+    ds_regions = paths.load_dataset("regions")
 
     # Load the World Bank Education Dataset
-    ds_garden_wdi = cast(Dataset, paths.load_dependency("wdi"))
+    ds_garden_wdi = paths.load_dataset("wdi")
     tb_wdi = ds_garden_wdi["wdi"]
 
     # Extract enrollment rates from the World Bank Education Dataset starting from 2010
     enrolment_wb = extract_related_world_bank_data(tb_wdi)
+    # Add origins metadata to the WDI table (remove when the WDI dataset is updated with new metadata)
+    from etl.data_helpers.misc import add_origins_to_wdi
+
+    enrolment_wb = add_origins_to_wdi(enrolment_wb)
+
+    # Get the list of columns from the World Bank dataset
     world_bank_indicators = enrolment_wb.columns
 
-    # Read the main education table from the meadow dataset and reset its index
-    tb = ds_meadow["education_lee_lee"]
-    tb.reset_index(inplace=True)
     #
     # Data Processing
     #
@@ -85,59 +84,84 @@ def run(dest_dir: str) -> None:
     )
 
     # Prepare enrollment and attainment data
-    df_enrollment = prepare_enrollment_data(tb)
-    df_attainment = prepare_attainment_data(tb)
-    df_attainment = df_attainment.dropna(subset=df_attainment.columns.drop(["country", "year"]), how="all")
-    df_attainment.reset_index(drop=True, inplace=True)
+    tb_enrollment = prepare_enrollment_data(tb)
+    tb_attainment = prepare_attainment_data(tb)
+    tb_attainment = tb_attainment.dropna(subset=tb_attainment.columns.drop(["country", "year"]), how="all")
+    tb_attainment = tb_attainment.reset_index(drop=True)
 
     # Merge enrollment and attainment data
-    merged_df = pd.merge(df_enrollment, df_attainment, on=["year", "country"], how="outer")
+    merged_tb = pr.merge(tb_enrollment, tb_attainment, on=["year", "country"], how="outer")
 
     # Drop columns related to historic population values
-    merged_df = merged_df.drop(columns=[column for column in merged_df.columns if "__thousands" in column])
-    merged_df.columns = [underscore(col) for col in merged_df.columns]
-    merged_df = add_data_for_regions(tb=merged_df, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    merged_tb = merged_tb.drop(columns=[column for column in merged_tb.columns if "__thousands" in column])
+    merged_tb.columns = [underscore(col) for col in merged_tb.columns]
+
+    merged_tb = add_data_for_regions(tb=merged_tb, ds_regions=ds_regions)
 
     # Concatenate historical and more recent enrollment data
-    hist_1985_df = merged_df[merged_df["year"] < 1985]
-    df_merged_enrollment = pd.concat([enrolment_wb, hist_1985_df[world_bank_indicators]])
-    df_merged_enrollment.set_index(["country", "year"], inplace=True)
+    hist_1985_tb = merged_tb[merged_tb["year"] < 1985]
+    tb_merged_enrollment = pr.concat([enrolment_wb, hist_1985_tb[world_bank_indicators]])
+    tb_merged_enrollment.set_index(["country", "year"], inplace=True)
     # Differentiate these columns from the original data
-    df_merged_enrollment.columns = df_merged_enrollment.columns + "_combined_wb"
+    tb_merged_enrollment.columns = tb_merged_enrollment.columns + "_combined_wb"
+    tb_merged_enrollment = tb_merged_enrollment.reset_index()
 
     # Merge historical data with combined enrollment data
-    df_merged_wb = pd.merge(df_merged_enrollment, merged_df, on=["country", "year"], how="outer")
-    df_merged_wb = df_merged_wb.dropna(how="all")
+    tb_merged_wb = pr.merge(tb_merged_enrollment, merged_tb, on=["country", "year"], how="outer")
+    tb_merged_wb = tb_merged_wb.dropna(how="all")
 
     # Create female to male enrollment ratios
-    df_merged_wb["female_over_male_enrollment_rates_primary"] = (
-        df_merged_wb["f_primary_enrollment_rates_combined_wb"] / df_merged_wb["m_primary_enrollment_rates_combined_wb"]
+    tb_merged_wb["female_over_male_enrollment_rates_primary"] = (
+        tb_merged_wb["f_primary_enrollment_rates_combined_wb"] / tb_merged_wb["m_primary_enrollment_rates_combined_wb"]
     )
-    df_merged_wb["female_over_male_enrollment_rates_secondary"] = (
-        df_merged_wb["f_secondary_enrollment_rates_combined_wb"]
-        / df_merged_wb["m_secondary_enrollment_rates_combined_wb"]
+    tb_merged_wb["female_over_male_enrollment_rates_secondary"] = (
+        tb_merged_wb["f_secondary_enrollment_rates_combined_wb"]
+        / tb_merged_wb["m_secondary_enrollment_rates_combined_wb"]
     )
-    df_merged_wb["female_over_male_enrollment_rates_tertiary"] = (
-        df_merged_wb["f_tertiary_enrollment_rates_combined_wb"]
-        / df_merged_wb["m_tertiary_enrollment_rates_combined_wb"]
+    tb_merged_wb["female_over_male_enrollment_rates_tertiary"] = (
+        tb_merged_wb["f_tertiary_enrollment_rates_combined_wb"]
+        / tb_merged_wb["m_tertiary_enrollment_rates_combined_wb"]
     )
 
-    tb = Table(df_merged_wb, short_name=paths.short_name, underscore=True)
-    tb.set_index(["country", "year"], inplace=True)
+    # Set metadata and format the dataframe for saving.
+    tb_merged_wb.metadata.short_name = paths.short_name
+    tb_merged_wb = tb_merged_wb.underscore().set_index(["country", "year"], verify_integrity=True)
+
+    columns_to_use = [
+        "mf_primary_enrollment_rates_combined_wb",
+        "f_primary_enrollment_rates_combined_wb",
+        "m_primary_enrollment_rates_combined_wb",
+        "mf_secondary_enrollment_rates_combined_wb",
+        "f_secondary_enrollment_rates_combined_wb",
+        "m_secondary_enrollment_rates_combined_wb",
+        "mf_tertiary_enrollment_rates_combined_wb",
+        "f_tertiary_enrollment_rates_combined_wb",
+        "m_tertiary_enrollment_rates_combined_wb",
+        "female_over_male_enrollment_rates_primary",
+        "female_over_male_enrollment_rates_secondary",
+        "female_over_male_enrollment_rates_tertiary",
+        "mf_youth_and_adults__15_64_years__percentage_of_no_education",
+        "f_youth_and_adults__15_64_years__percentage_of_no_education",
+        "f_adults__25_64_years__percentage_of_no_education",
+        "mf_adults__25_64_years__percentage_of_tertiary_education",
+        "mf_youth_and_adults__15_64_years__average_years_of_education",
+        "f_youth_and_adults__15_64_years__average_years_of_education",
+    ]
+    tb_merged_wb = tb_merged_wb[columns_to_use]
 
     #
     # Save outputs
     #
     # Create a new garden dataset with the same metadata as the meadow dataset
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb_merged_wb], check_variables_metadata=True)
 
     # Save the processed data in the new garden dataset
     ds_garden.save()
 
 
-def extract_related_world_bank_data(tb_wb: Table) -> pd.DataFrame:
+def extract_related_world_bank_data(tb_wb: Table):
     """
-    Extracts enrollment rate indicators from the WD Bank dataset.
+    Extracts enrollment rate indicators from the World Bank dataset.
     The function specifically extracts net enrollment rates up to secondary education and gross enrollment rates for tertiary education.
 
     :param tb_wb: Table containing World Bank education dataset
@@ -175,23 +199,21 @@ def extract_related_world_bank_data(tb_wb: Table) -> pd.DataFrame:
 
     # Select and rename columns
     enrolment_wb = tb_wb[select_enrolment_cols]
-    enrolment_wb.rename(columns=dictionary_to_rename_and_combine, inplace=True)
+    enrolment_wb = enrolment_wb.rename(columns=dictionary_to_rename_and_combine)
 
     # Select data above 1985
     enrolment_wb = enrolment_wb[(enrolment_wb.index.get_level_values("year") >= 1985)]
-    enrolment_wb.reset_index(inplace=True)
+    enrolment_wb = enrolment_wb.reset_index()
 
     return enrolment_wb
 
 
-def melt_and_pivot(
-    df: pd.DataFrame, id_vars: List[str], value_vars: List[str], index_vars: List[str], columns_vars: List[str]
-) -> pd.DataFrame:
+def melt_and_pivot(tb, id_vars: List[str], value_vars: List[str], index_vars: List[str], columns_vars: List[str]):
     """
     Melt the dataframe to long format and then pivot it to wide format.
 
     Parameters:
-    df (DataFrame): Original dataframe to process.
+    tb: Original table to process.
     id_vars (List[str]): Identifier variables for melting.
     value_vars (List[str]): Column(s) to unpivot.
     index_vars (List[str]): Column(s) to set as index for pivoting.
@@ -200,69 +222,69 @@ def melt_and_pivot(
     Returns:
     DataFrame: Processed dataframe.
     """
-    df_melted = df.melt(id_vars=id_vars, value_vars=value_vars, var_name="measurement", value_name="value")
-    df_pivot = df_melted.pivot(index=index_vars, columns=columns_vars, values="value")
+    tb_melted = tb.melt(id_vars=id_vars, value_vars=value_vars, var_name="measurement", value_name="value")
+    tb_pivot = tb_melted.pivot(index=index_vars, columns=columns_vars, values="value")
 
-    return df_pivot
+    return tb_pivot
 
 
-def flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
+def flatten_columns(tb):
     """
     Flatten hierarchical columns in dataframe.
 
     Parameters:
-    df (DataFrame): Dataframe with multi-level columns.
+    tb: Table with multi-level columns.
 
     Returns:
-    DataFrame: Dataframe with flattened columns.
+    tb: Table with flattened columns.
     """
-    df.columns = ["_".join(col).strip() for col in df.columns.values]
-    df = df.reset_index()
+    tb.columns = ["_".join(col).strip() for col in tb.columns.values]
+    tb = tb.reset_index()
 
-    return df
+    return tb
 
 
-def prepare_enrollment_data(df: pd.DataFrame) -> pd.DataFrame:
+def prepare_enrollment_data(tb):
     """
-    Prepare the DataFrame by selecting and processing enrollment columns. This function extracts the enrollment data
+    Prepare the table by selecting and processing enrollment columns. This function extracts the enrollment data
     related to primary, secondary, and tertiary education levels. The data is melted and pivoted to create a clean
-    DataFrame with the desired structure.
+    table with the desired structure.
 
     Parameters:
-    df (pd.DataFrame): Original DataFrame to process, which must contain columns for country, year, sex, and enrollment
+    tb: Original table to process, which must contain columns for country, year, sex, and enrollment
                        rates for primary, secondary, and tertiary levels.
 
     Returns:
-    pd.DataFrame: Processed DataFrame with enrollment data.
+    tb: Processed table with enrollment data.
     """
     id_vars_enrollment = ["country", "year", "sex"]
     enrollment_columns = ["primary_enrollment_rates", "secondary_enrollment_rates", "tertiary_enrollment_rates"]
-    df_enrollment = df[enrollment_columns + id_vars_enrollment]
-    df_enrollment = df_enrollment.dropna(subset=enrollment_columns, how="all")
-    df_enrollment.reset_index(drop=True, inplace=True)
+    tb_enrollment = tb[enrollment_columns + id_vars_enrollment]
+    tb_enrollment = tb_enrollment.dropna(subset=enrollment_columns, how="all")
+    tb_enrollment.reset_index(drop=True, inplace=True)
 
-    df_pivot_enrollment = melt_and_pivot(
-        df_enrollment, id_vars_enrollment, enrollment_columns, ["country", "year"], ["sex", "measurement"]
+    tb_pivot_enrollment = melt_and_pivot(
+        tb_enrollment, id_vars_enrollment, enrollment_columns, ["country", "year"], ["sex", "measurement"]
     )
-    df_pivot_enrollment = flatten_columns(df_pivot_enrollment)
+    tb_pivot_enrollment = flatten_columns(tb_pivot_enrollment)
 
-    return df_pivot_enrollment
+    return tb_pivot_enrollment
 
 
-def prepare_attainment_data(df: pd.DataFrame) -> pd.DataFrame:
+def prepare_attainment_data(tb):
     """
-    Prepare the DataFrame by selecting and processing attainment-related columns. This function extracts the
+    Prepare the table by selecting and processing attainment-related columns. This function extracts the
     attainment data for different education levels, including the percentages of attainment and average years
     of education for primary, secondary, and tertiary levels. The data is then melted and pivoted to create a
     clean DataFrame with the desired structure.
 
     Parameters:
-    df (pd.DataFrame): Original DataFrame to process, which must contain columns for country, year, sex, age_group,
+    tb: Original table to process, which must contain columns for country, year, sex, age_group,
                        and the specified attainment-related columns such as percentages of no education, primary,
                        secondary, tertiary education, etc.
 
     Returns:
-    pd.DataFrame: Processed DataFrame with attainment data.
+    tb: Processed table with attainment data.
     """
     id_vars_attainment = ["country", "year", "sex", "age_group"]
     attainment_columns = [
@@ -280,17 +302,17 @@ def prepare_attainment_data(df: pd.DataFrame) -> pd.DataFrame:
         "population__thousands",
     ]
 
-    df_pivot = melt_and_pivot(
-        df[id_vars_attainment + attainment_columns],
+    tb_pivot = melt_and_pivot(
+        tb[id_vars_attainment + attainment_columns],
         id_vars_attainment,
         attainment_columns,
         ["country", "year"],
         ["sex", "age_group", "measurement"],
     )
 
-    df_pivot = flatten_columns(df_pivot)
+    tb_pivot = flatten_columns(tb_pivot)
 
-    cols_to_drop = [col for col in df_pivot.columns if "Age not specified" in col]
-    df_pivot = df_pivot.drop(columns=cols_to_drop)
+    cols_to_drop = [col for col in tb_pivot.columns if "Age not specified" in col]
+    tb_pivot = tb_pivot.drop(columns=cols_to_drop)
 
-    return df_pivot
+    return tb_pivot
