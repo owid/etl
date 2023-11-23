@@ -39,10 +39,6 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset) -> Table:
             frac_allowed_nans_per_year=0.2,
             aggregations=aggregations,
         )
-    for column in tb_with_regions.columns:
-        if column not in ["year", "country"]:
-            # Add origins metadata
-            tb_with_regions[column].metadata.origins.append(tb[column].metadata.origins[0])
     return tb_with_regions
 
 
