@@ -24,9 +24,9 @@ tables:
         processing_level: minor
         description_short: |-
           <% if sex == 'all' %>
-            The period life expectancy at birth, in a given year.
+          The period life expectancy at birth, in a given year.
           <% else %>
-            The period life expectancy at birth among << sex + 's' >>, in a given year.
+          The period life expectancy at birth among << sex + 's' >>, in a given year.
           <% endif %>
         description_key:
           - Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
