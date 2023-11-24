@@ -48,8 +48,8 @@ def reshape_and_clean(tb: Table) -> Table:
     tb["year"] = tb["year"].astype(int)
 
     # Split between observations and forecasts
-    tb.loc[tb.year > tb["Estimates Start After"], "variable"] += " - Forecast"
-    tb.loc[tb.year <= tb["Estimates Start After"], "variable"] += " - Observation"
+    tb.loc[tb.year > tb["Estimates Start After"], "variable"] += "_forecast"
+    tb.loc[tb.year <= tb["Estimates Start After"], "variable"] += "_observation"
 
     # Drop rows with missing values.
     tb = tb.dropna(subset=["value"])
