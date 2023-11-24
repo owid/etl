@@ -482,8 +482,8 @@ steps:
     - snapshot://imf/2023-11-02/world_economic_outlook.xls
   data://garden/imf/2023-11-02/world_economic_outlook:
     - data://meadow/imf/2023-11-02/world_economic_outlook
-  # data://grapher/imf/2023-11-02/world_economic_outlook:
-  #   - data://garden/imf/2023-11-02/world_economic_outlook
+  data://grapher/imf/2023-11-02/world_economic_outlook:
+    - data://garden/imf/2023-11-02/world_economic_outlook
 
   # Patents & journal articles (World Bank, United Nations)
   data://garden/research_development/2023-05-05/patents_articles:
