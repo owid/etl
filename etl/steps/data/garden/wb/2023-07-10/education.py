@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
     tb["normalized_hci"] = tb["HD.HCI.HLOS"] / max_value
 
     # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
-    tb, combined_literacy_description, combined_expenditure_description = combine_historical_literacy_expenditure(tb)
+    tb = combine_historical_literacy_expenditure(tb)
 
     # Compare two columnst that seem to have identical indicies (if values are the same then remove)
     if tb["SE.XPD.TOTL.GD.ZS"].equals(tb["SE.XPD.TOTL.GD.ZS."]):
@@ -87,14 +87,10 @@ def run(dest_dir: str) -> None:
     # Add the metadata back to the table
     tb.metadata = metadata
     # Add metadata by finding the descriptions and sources using the indicator codes.
-    tb = add_metadata(tb, metadata_tb, combined_literacy_description, combined_expenditure_description)
+    tb = add_metadata(tb, metadata_tb)
     #
     # Save outputs.
     #
-    # Add origins metadata to the columns with historical data (fasstracked and won't be updated with new metadata)
-    from etl.data_helpers.misc import add_origins_to_education_fasttracked
-
-    tb = add_origins_to_education_fasttracked(tb)
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
@@ -179,16 +175,17 @@ def combine_historical_literacy_expenditure(tb):
         how="outer",
     ).copy_metadata(from_table=tb)
 
-    # Keep descriptions from the original historic datasets
-    combined_literacy_description = ds_literacy.metadata.sources[0].description
-    combined_expenditure_description = ds_expenditure.metadata.sources[0].description
+    # Add origins from historical datasets to the new columns
+    tb["combined_expenditure"].metadata.origins = tb["combined_expenditure"].metadata.origins + [
+        tb_expenditure["public_expenditure_on_education__tanzi__and__schuktnecht__2000"].metadata.origins[0]
+    ]
+    tb["combined_literacy"].metadata.origins = tb["combined_literacy"].metadata.origins + [
+        tb_literacy["literacy_rates__world_bank__cia_world_factbook__and_other_sources"].metadata.origins[0]
+    ]
+    return tb
 
-    return tb, combined_literacy_description, combined_expenditure_description
 
-
-def add_metadata(
-    tb: Table, metadata_tb: Table, combined_literacy_description, combined_expenditure_description
-) -> None:
+def add_metadata(tb: Table, metadata_tb: Table) -> None:
     """
     Adds metadata by fetching details from the table with descriptions and sources originally retrieved in snapshot using the World Bank API.
 
@@ -207,7 +204,6 @@ def add_metadata(
     ]
     # Loop through the DataFrame columns
     for column in tqdm(tb.columns, desc="Processing metadata for indicators"):
-        origin = metadata_tb[metadata_tb.columns[0]].metadata.origins[0]
         if column not in custom_cols:
             # Extract the title from the default metadata to find the corresponding World Bank indicator
             indicator_to_find = tb[column].metadata.title
@@ -280,7 +276,6 @@ def add_metadata(
             tb[new_column_name].metadata.description_from_producer = description_string
             tb[new_column_name].metadata.title = name
             tb[new_column_name].metadata.processing = "minor"
-            tb[new_column_name].metadata.origins = [origin]
 
             # Conver Witthgenstein projections to %
             if "wittgenstein_projection__percentage" in new_column_name:
@@ -341,7 +336,6 @@ def add_metadata(
                 update_metadata(tb, new_column_name, 0, " ", " ")
 
         elif column == "normalized_hci":
-            tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Normalised harmonized learning score"
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 1
@@ -349,7 +343,9 @@ def add_metadata(
             tb[column].metadata.short_unit = ""
 
         elif column == "combined_literacy":
-            tb[column].metadata.origins = [origin]
+            tb[column].metadata.origins += [
+                metadata_tb[metadata_tb.columns[0]].origins[0]
+            ]  # Add World Bank origins to the combined column metadata
             tb[column].metadata.title = "Historical and more recent literacy estimates"
             tb[column].metadata.description_from_producer = (
                 "**Recent estimates:**\n\n"
@@ -367,11 +363,13 @@ def add_metadata(
             tb[column].metadata.unit = "%"
             tb[column].metadata.short_unit = "%"
         elif column == "combined_expenditure":
-            tb[column].metadata.origins = [origin]
+            tb[column].metadata.origins += [
+                metadata_tb[metadata_tb.columns[0]].origins[0]
+            ]  # Add World Bank origins to the combined column metadata
             tb[column].metadata.title = "Historical and more recent expenditure estimates"
             tb[column].metadata.description_from_producer = (
                 "**Historical expenditure data:**\n\n"
-                + combined_expenditure_description
+                + "Historical data in this dataset is based on a wide array of sources, reflecting a comprehensive approach to data collection across different time periods and regions. However, the diverse nature of these sources leads to inconsistencies, as methodologies and data quality vary between sources. For instance, older sources like the League of Nations Statistical Yearbook or Mitchell's 1962 data may use different metrics or collection methods compared to more modern sources like the OECD Education reports or UN surveys. This variance in source material and methodology means that direct comparisons across different years or countries might be challenging, necessitating careful interpretation and cross-reference for accuracy. The dataset serves as a rich historical repository but also underscores the complexities and challenges inherent in compiling and harmonizing historical data from multiple, diverse sources."
                 + "\n\n"
                 + "**Recent estimates:**\n\n"
                 + "General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments."
