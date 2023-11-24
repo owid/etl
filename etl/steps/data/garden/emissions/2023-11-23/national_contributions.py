@@ -40,7 +40,9 @@ COMPONENTS_RENAMING = {
     "Total": "total",
 }
 
-# Columns for which we will create "share" variables (percentage with respect to global).
+# Columns for which we will create "share" variables, e.g. the percentage of methane emissions that a country produces
+# in a year with respect to the world's methane emissions on the same year.
+# NOTE: For this calculation, it doesn't matter if we use the total or the CO2-equivalent emissions.
 SHARE_VARIABLES = [
     "annual_emissions_ch4_total",
     "annual_emissions_co2_total",
@@ -52,6 +54,7 @@ SHARE_VARIABLES = [
 # Columns for which a per-capita variable will be created.
 PER_CAPITA_VARIABLES = [
     "annual_emissions_ch4_total_co2eq",
+    "annual_emissions_co2_total",
     "annual_emissions_n2o_total_co2eq",
     "annual_emissions_ghg_total_co2eq",
 ]
@@ -134,6 +137,7 @@ def add_kuwaiti_oil_fires_to_kuwait(tb: Table) -> Table:
 
 def add_emissions_in_co2_equivalents(tb: Table) -> Table:
     # Add columns for fossil/land/total emissions of CH4 in terms of CO2 equivalents.
+    # NOTE: For methane, we apply different conversion factors for fossil and land-use emissions.
     tb["annual_emissions_ch4_fossil_co2eq"] = (
         tb["annual_emissions_ch4_fossil"] * CH4_FOSSIL_EMISSIONS_TO_CO2_EQUIVALENTS
     )
@@ -143,12 +147,15 @@ def add_emissions_in_co2_equivalents(tb: Table) -> Table:
     )
 
     # Add columns for fossil/land/total emissions of N2O in terms of CO2 equivalents.
+    # NOTE: For nitrous oxide, we apply the same conversion factors for fossil and land-use emissions.
     for component in ["fossil", "land", "total"]:
         tb[f"annual_emissions_n2o_{component}_co2eq"] = (
             tb[f"annual_emissions_n2o_{component}"] * N2O_EMISSIONS_TO_CO2_EQUIVALENTS
         )
 
     # Add columns for fossil/land/total emissions of all GHG in terms of CO2 equivalents.
+    # NOTE: The file of annual emissions does not include GHG emissions, which is why we need to add them now.
+    #  However, the files of temperature response and cumulative emissions do include GHG emissions.
     for component in ["fossil", "land", "total"]:
         tb[f"annual_emissions_ghg_{component}_co2eq"] = (
             tb[f"annual_emissions_co2_{component}"]
@@ -194,7 +201,8 @@ def add_share_variables(tb: Table) -> Table:
     tb = pr.merge(tb, tb_global, on=["year"], how="left", suffixes=("", "_global"))
     # For a list of variables, add the percentage with respect to global.
     for variable in SHARE_VARIABLES:
-        tb[f"share_of_{variable}"] = 100 * tb[variable] / tb[f"{variable}_global"]
+        new_variable = f"share_of_{variable.replace('_co2eq', '')}"
+        tb[new_variable] = 100 * tb[variable] / tb[f"{variable}_global"]
 
     # Drop unnecessary columns for global data.
     tb = tb.drop(columns=[column for column in tb.columns if column.endswith("_global")])
