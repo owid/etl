@@ -14,6 +14,7 @@ paths = PathFinder(__file__)
 # But this first version could be extended to a traditional bulk import of the entire dataset later.
 VARIABLE_LIST = [
     "NGDP_RPCH",  # Gross domestic product, constant prices / Percent change
+    "LUR",  # Unemployment rate / Percent of total labor force
 ]
 
 
