@@ -12,15 +12,15 @@ paths = PathFinder(__file__)
 # This is a preliminary bulk importer for the IMF's WEO dataset.
 # As of October 2021, it only generates a grapher-compatible dataset with 1 variable (GDP growth).
 # But this first version could be extended to a traditional bulk import of the entire dataset later.
-VARIABLE_LIST = ["Gross domestic product, constant prices - Percent change"]
+VARIABLE_LIST = [
+    "NGDP_RPCH",  # Gross domestic product, constant prices / Percent change
+]
 
 
 def select_data(tb: Table) -> Table:
     tb = tb.drop(
         columns=[
             "WEO Country Code",
-            "WEO Subject Code",
-            "Estimates Start After",
             "ISO",
             "Country/Series-specific Notes",
             "Subject Notes",
@@ -37,17 +37,25 @@ def make_variable_names(tb: Table) -> Table:
 
 
 def pick_variables(tb: Table) -> Table:
-    return tb[tb.variable.isin(VARIABLE_LIST)]
+    return tb[tb["WEO Subject Code"].isin(VARIABLE_LIST)].drop(columns="WEO Subject Code")
 
 
 def reshape_and_clean(tb: Table) -> Table:
-    tb = tb.melt(id_vars=["Country", "variable"], var_name="year")
+    tb = tb.melt(id_vars=["Country", "variable", "Estimates Start After"], var_name="year")
 
     # Coerce values to numeric.
     tb["value"] = tb["value"].replace("--", np.nan).astype(float)
+    tb["year"] = tb["year"].astype(int)
+
+    # Split between observations and forecasts
+    tb.loc[tb.year > tb["Estimates Start After"], "variable"] += " - Forecast"
+    tb.loc[tb.year <= tb["Estimates Start After"], "variable"] += " - Observation"
 
     # Drop rows with missing values.
     tb = tb.dropna(subset=["value"])
+
+    # Drop Estimates Start After
+    tb = tb.drop(columns="Estimates Start After")
 
     tb = tb.pivot(index=["Country", "year"], columns="variable", values="value", join_column_levels_with="_")
     return tb
@@ -71,6 +79,7 @@ def run(dest_dir: str) -> None:
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    print(tb.columns)
 
     #
     # Save outputs.
