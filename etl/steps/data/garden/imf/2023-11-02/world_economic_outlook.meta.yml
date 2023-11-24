@@ -1,0 +1,54 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Growth
+    processing_level: minor
+
+dataset:
+  update_period_days: 183
+
+tables:
+  world_economic_outlook:
+    variables:
+      gross_domestic_product__constant_prices__percent_change_observation:
+        title: Gross domestic product, constant prices - Percent change - Observations
+        unit: "%"
+        short_unit: "%"
+        description_short: "Annual percent change in gross domestic product. This data is adjusted for inflation."
+        description_from_producer: "Gross domestic product, constant prices. Percent change. Annual percentages of constant price GDP are year-on-year changes; the base year is country-specific. Expenditure-based GDP is total final expenditures at purchasers' prices (including the f.o.b. value of exports of goods and services), less the f.o.b. value of imports of goods and services. [SNA 1993]"
+        display:
+          numDecimalPlaces: 2
+          tableDisplay:
+            hideRelativeChange: True
+      gross_domestic_product__constant_prices__percent_change_forecast:
+        title: Gross domestic product, constant prices - Percent change - Observations
+        unit: "%"
+        short_unit: "%"
+        description_short: "Near-term projections of the annual percent change in gross domestic product. This data is adjusted for inflation."
+        description_from_producer: "Gross domestic product, constant prices. Percent change. Annual percentages of constant price GDP are year-on-year changes; the base year is country-specific. Expenditure-based GDP is total final expenditures at purchasers' prices (including the f.o.b. value of exports of goods and services), less the f.o.b. value of imports of goods and services. [SNA 1993]"
+        display:
+          numDecimalPlaces: 2
+          tableDisplay:
+            hideRelativeChange: True
+      unemployment_rate__percent_of_total_labor_force_observation:
+        title: Unemployment rate - Percent of total labor force - Observations
+        unit: "%"
+        short_unit: "%"
+        description_short: "Unemployment refers to the share of the labor force that is without work but available for and seeking employment."
+        description_from_producer: "Unemployment rate can be defined by either the national definition, the ILO harmonized definition, or the OECD harmonized definition. The OECD harmonized unemployment rate gives the number of unemployed persons as a percentage of the labor force (the total number of people employed plus unemployed). [OECD Main Economic Indicators, OECD, monthly] As defined by the International Labour Organization, unemployed workers are those who are currently not working but are willing and able to work for pay, currently available to work, and have actively searched for work. [ILO, http://www.ilo.org/public/english/bureau/stat/res/index.htm]"
+        display:
+          numDecimalPlaces: 1
+          tableDisplay:
+            hideRelativeChange: True
+      unemployment_rate__percent_of_total_labor_force_forecast:
+        title: Unemployment rate - Percent of total labor force - Forecasts
+        unit: "%"
+        short_unit: "%"
+        description_short: "Near-term projections. Unemployment refers to the share of the labor force that is without work but available for and seeking employment."
+        description_from_producer: "Unemployment rate can be defined by either the national definition, the ILO harmonized definition, or the OECD harmonized definition. The OECD harmonized unemployment rate gives the number of unemployed persons as a percentage of the labor force (the total number of people employed plus unemployed). [OECD Main Economic Indicators, OECD, monthly] As defined by the International Labour Organization, unemployed workers are those who are currently not working but are willing and able to work for pay, currently available to work, and have actively searched for work. [ILO, http://www.ilo.org/public/english/bureau/stat/res/index.htm]"
+        display:
+          numDecimalPlaces: 1
+          tableDisplay:
+            hideRelativeChange: True
