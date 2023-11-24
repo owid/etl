@@ -19,6 +19,7 @@ import yaml
 
 from . import tables, utils
 from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta
+from .processing_log import disable_processing_log
 from .properties import metadata_property
 
 FileFormat = Literal["csv", "feather", "parquet"]
@@ -178,8 +179,10 @@ class Dataset:
         self.metadata.save(self._index_file)
 
         # Update the copy of this datasets metadata in every table in the set.
+        # TODO: this entire part should go away and we should make t.metadata.dataset read only
         for table_name in self.table_names:
-            table = self[table_name]
+            with disable_processing_log():
+                table = self[table_name]
             table.metadata.dataset = self.metadata
             table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
@@ -208,7 +211,8 @@ class Dataset:
         with open(metadata_path) as istream:
             metadata = yaml.safe_load(istream)
             for table_name in metadata.get("tables", {}).keys():
-                table = self[table_name]
+                with disable_processing_log():
+                    table = self[table_name]
                 table.update_metadata_from_yaml(metadata_path, table_name, if_origins_exist=if_origins_exist)
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
