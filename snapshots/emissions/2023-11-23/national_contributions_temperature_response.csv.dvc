@@ -1,46 +1,33 @@
 meta:
   origin:
     title_snapshot: National contributions to climate change - Temperature response
-    title: National contributions to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide.
-    description: >-
-      A dataset describing the global warming response to national emissions CO2, CH4 and N2O from fossil and land use sources
-      during 1851-2021.
+    title: National contributions to climate change
+    description: |-
+      National contributions to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide.
 
+      This dataset describes the global warming response to national emissions CO2, CH4 and N2O from fossil and land use sources during 1851-2021.
 
-      National CO2 emissions data are collated from the Global Carbon Project (Andrew and Peters, 2022; Friedlingstein et
-      al., 2022).
-
+      National CO2 emissions data are collated from the Global Carbon Project (Andrew and Peters, 2022; Friedlingstein et al., 2022).
 
       National CH4 and N2O emissions data are collated from PRIMAP-hist (HISTTP) (Gütschow et al., 2022).
 
+      A time series of cumulative CO2-equivalent emissions is constructed for each country, gas, and emissions source (fossil or land use). Emissions of CH4 and N2O emissions are related to cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach, with best-estimates of the coefficients taken from the IPCC AR6 (Forster et al., 2021).
 
-      We construct a time series of cumulative CO2-equivalent emissions for each country, gas, and emissions source (fossil
-      or land use). Emissions of CH4 and N2O emissions are related to cumulative CO2-equivalent emissions using the Global
-      Warming Potential (GWP*) approach, with best-estimates of the coefficients taken from the IPCC AR6 (Forster et al.,
-      2021).
+      Warming in response to cumulative CO2-equivalent emissions is estimated using the transient climate response to cumulative carbon emissions (TCRE) approach, with best-estimate value of TCRE taken from the IPCC AR6 (Forster et al., 2021, Canadell et al., 2021). 'Warming' is specifically the change in global mean surface temperature (GMST).
 
-
-      Warming in response to cumulative CO2-equivalent emissions is estimated using the transient climate response to cumulative
-      carbon emissions (TCRE) approach, with best-estimate value of TCRE taken from the IPCC AR6 (Forster et al., 2021, Canadell
-      et al., 2021). 'Warming' is specifically the change in global mean surface temperature (GMST).
-
-
-      The data files provide emissions, cumulative emissions and the GMST response by country, gas (CO2, CH4, N2O or 3-GHG
-      total) and source (fossil emissions, land use emissions or the total).
+      The data files provide emissions, cumulative emissions and the GMST response by country, gas (CO2, CH4, N2O or 3-GHG total) and source (fossil emissions, land use emissions or the total).
     producer: Jones et al.
-    citation_full: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew, Robbie M., Schwingshackl, Clemens, Gütschow,
-      Johannes, Houghton, Richard A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023). National contributions
-      to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide [Data set]. In Scientific
-      Data (2023.1). Zenodo.
+    citation_full: |-
+      Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew, Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023). National contributions to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data (2023.1). Zenodo.
     url_main: https://zenodo.org/record/7636699#.ZFCy4exBweZ
     url_download: https://zenodo.org/record/7636699/files/GMST_response_1851-2021.csv
-    date_accessed: 2023-05-02
+    date_accessed: 2023-11-23
     date_published: 2023-02-13
   license:
-    name: Creative Commons Attribution 4.0 International
+    name: CC BY 4.0
     url: https://zenodo.org/record/7636699#.ZFCy4exBweZ
-wdir: ../../../data/snapshots/emissions/2023-05-02
+wdir: ../../../data/snapshots/emissions/2023-11-23
 outs:
 - md5: 842d9a3f041cc5bd56d908c5a310c08a
-  path: national_contributions_temperature_response.csv
   size: 28946077
+  path: national_contributions_temperature_response.csv

@@ -1,10 +1,10 @@
 """Garden step that combines various datasets related to greenhouse emissions and produces the OWID CO2 dataset (2022).
 
 Datasets combined:
-* Global Carbon Budget (Global Carbon Project, 2022).
-* National contributions to climate change (Jones et al. (2023), 2023).
-* Greenhouse gas emissions by sector (Climate Watch, 2023).
-* Primary energy consumption (BP & EIA, 2022)
+* Global Carbon Budget - Global Carbon Project (2022).
+* National contributions to climate change - Jones et al. (2023).
+* Greenhouse gas emissions by sector - Climate Watch (2023).
+* Primary energy consumption - BP & EIA (2022).
 
 Additionally, OWID's regions dataset, population dataset and Maddison Project Database (Bolt and van Zanden, 2020) on
 GDP are included.
@@ -334,22 +334,6 @@ def run(dest_dir: str) -> None:
     tb_gdp = ds_gdp["maddison_gdp"]
     tb_population = ds_population["population"]
     tb_regions = ds_regions["regions"]
-
-    ####################################################################################################################
-    # TODO: Remove this temporary solution once all indicators of all tables of all dataset have metadata.
-    def propagate_sources_to_all_indicators(table: Table, ds: Dataset) -> Table:
-        table = table.copy()
-        for column in table.columns:
-            error = f"Column {column} of table {table.metadata.short_name} already has sources or origins. Remove temporary solution for this table."
-            assert (len(table[column].metadata.sources) == 0) and (len(table[column].metadata.origins) == 0), error
-            # if (len(table[column].metadata.sources) == 0) and (len(table[column].metadata.origins) == 0):
-            table[column].metadata.sources = ds.metadata.sources
-
-        return table
-
-    tb_jones = propagate_sources_to_all_indicators(table=tb_jones, ds=ds_jones)
-    tb_regions = propagate_sources_to_all_indicators(table=tb_regions, ds=ds_regions)
-    ####################################################################################################################
 
     #
     # Process data.
