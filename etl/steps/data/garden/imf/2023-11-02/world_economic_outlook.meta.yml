@@ -23,7 +23,7 @@ tables:
           tableDisplay:
             hideRelativeChange: True
       gross_domestic_product__constant_prices__percent_change_forecast:
-        title: Gross domestic product, constant prices - Percent change - Observations
+        title: Gross domestic product, constant prices - Percent change - Forecasts
         unit: "%"
         short_unit: "%"
         description_short: "Near-term projections of the annual percent change in gross domestic product. This data is adjusted for inflation."
