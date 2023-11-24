@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, TypeVar, Union, cast
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table, Variable
 from owid.datautils.common import ExceptionFromDocstring, warn_on_list_of_entities
@@ -44,13 +45,12 @@ TNAME_WB_INCOME = "wb_income_group"
 
 
 @functools.lru_cache
-def _load_population() -> pd.DataFrame:
+def _load_population() -> Table:
     ####################################################################################################################
     # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
     ####################################################################################################################
     population = Dataset(DATASET_POPULATION)[TNAME_KEY_INDICATORS]
-    population = population.reset_index()
-    return cast(pd.DataFrame, population)
+    return population.reset_index()
 
 
 @functools.lru_cache
@@ -191,7 +191,7 @@ def list_countries_in_region_that_must_have_data(
 
     # Select population data for reference year for all countries in the region.
     reference = (
-        population[(population["country"].isin(members)) & (population["year"] == reference_year)]
+        population[(population["country"].isin(members)) & (population["year"] == reference_year)]  # type: ignore
         .dropna(subset="population")
         .sort_values("population", ascending=False)
         .reset_index(drop=True)
@@ -320,26 +320,25 @@ def add_region_aggregates(
     variables = list(aggregations)
 
     # Initialise dataframe of added regions, and add variables one by one to it.
-    df_region = pd.DataFrame({country_col: [], year_col: []}).astype(dtype={country_col: "object", year_col: "int"})
+    # df_region = Table({country_col: [], year_col: []}).astype(dtype={country_col: "object", year_col: "int"})
     # Select data for countries in the region.
     df_countries = df[df[country_col].isin(countries_in_region)]
-    for variable in variables:
-        df_added = groupby_agg(
-            df=df_countries,
-            groupby_columns=year_col,
-            aggregations={
-                country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
-                variable: aggregations[variable],
-            },
-            num_allowed_nans=num_allowed_nans_per_year,
-            frac_allowed_nans=frac_allowed_nans_per_year,
-        ).reset_index()
-        # Make nan all aggregates if the most contributing countries were not present.
-        df_added.loc[~df_added[country_col], variable] = np.nan
-        # Replace the column that was used to check if most contributing countries were present by the region's name.
-        df_added[country_col] = region
-        # Include this variable to the dataframe of added regions.
-        df_region = pd.merge(df_region, df_added, on=[country_col, year_col], how="outer")
+
+    df_region = groupby_agg(
+        df=df_countries,
+        groupby_columns=year_col,
+        aggregations=dict(
+            **aggregations,
+            **{country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x)))},
+        ),
+        num_allowed_nans=num_allowed_nans_per_year,
+        frac_allowed_nans=frac_allowed_nans_per_year,
+    ).reset_index()
+
+    # Make nan all aggregates if the most contributing countries were not present.
+    df_region.loc[~df_region[country_col], variables] = np.nan
+    # Replace the column that was used to check if most contributing countries were present by the region's name.
+    df_region[country_col] = region
 
     if isinstance(keep_original_region_with_suffix, str):
         # Keep rows in the original dataframe containing rows for region (adding a suffix to the region name), and then
@@ -445,10 +444,12 @@ def harmonize_countries(
         show_full_warning=show_full_warning,
     )
 
-    # Put back metadata.
+    # Put back metadata and add processing log.
     if isinstance(df_harmonized, Table):
         country_harmonized = Variable(
             country_harmonized, name=country_col, metadata=df_harmonized[country_col].metadata
+        ).update_log(
+            operation="harmonize",
         )
 
     df_harmonized[country_col] = country_harmonized
@@ -457,7 +458,7 @@ def harmonize_countries(
 
 
 def add_population_to_dataframe(
-    df: pd.DataFrame,
+    df: TableOrDataFrame,
     ds_population: Optional[Dataset] = None,
     country_col: str = "country",
     year_col: str = "year",
@@ -466,12 +467,12 @@ def add_population_to_dataframe(
     show_full_warning: bool = True,
     interpolate_missing_population: bool = False,
     expected_countries_without_population: Optional[List[str]] = None,
-) -> pd.DataFrame:
+) -> TableOrDataFrame:
     """Add column of population to a dataframe.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    df : TableOrDataFrame
         Original dataframe that contains a column of country names and years.
     ds_population : Dataset or None
         Population dataset.
@@ -542,9 +543,15 @@ def add_population_to_dataframe(
         )
 
     # Add population to original dataframe.
-    df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
+    merge = pr.merge if isinstance(df, Table) else pd.merge
 
-    return df_with_population
+    if population.index.names != [None]:
+        # If population has a multiindex, we need to reset it before merging.
+        population = population.reset_index()
+
+    df_with_population = merge(df, population, on=[country_col, year_col], how="left")
+
+    return cast(TableOrDataFrame, df_with_population)
 
 
 def add_population_to_table(

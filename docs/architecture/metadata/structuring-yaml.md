@@ -16,8 +16,10 @@ tables:
 To generate a metadata YAML file with pre-populated variable names for an existing garden dataset, execute:
 
 ```
-poetry run etl-metadata-export data/garden/my_namespace/my_version/my_dataset -o etl/steps/data/garden/my_namespace/my_version/my_dataset.meta.yml
+poetry run etl-metadata-export data/garden/my_namespace/my_version/my_dataset
 ```
+
+Check `poetry run etl-metadata-export --help` for more options.
 
 ## Handling Multi-line Strings and Whitespace
 

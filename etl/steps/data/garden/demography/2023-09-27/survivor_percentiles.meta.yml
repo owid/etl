@@ -25,7 +25,7 @@ tables:
           <% if percentile == 1 %>
           The age until which the 1st percentile (99% of the population) of the population would survive until, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
           <% else %>
-          The age until which the << 100 - percentile|int>>th percentile (<< percentile >>% of the population) of the population would survive until, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+          The age until which the << percentile>>th percentile (<< 100 - percentile|int>>% of the population) of the population would survive until, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
           <% endif %>
 
         description_processing: |-
