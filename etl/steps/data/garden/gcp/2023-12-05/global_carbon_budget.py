@@ -43,6 +43,8 @@ REGIONS = {
     "Africa": {},
     "Asia": {},
     "Europe": {},
+    # We exclude GCB's EU27 data, because it appears only in a few metrics, and, when it exists, it is identical to our
+    # aggregated European Union (27).
     "European Union (27)": {},
     "North America": {},
     "Oceania": {},
@@ -255,20 +257,6 @@ def sanity_checks_on_input_data(
     comparison = comparison.dropna(
         subset=["global_bunker_emissions", "global_aviation_and_shipping"], how="any"
     ).reset_index(drop=True)
-    ####################################################################################################################
-    # NOTE: Bunker emissions from the production emissions file should coincide with the sum of aviation and shipping
-    # emissions from the fossil co2 file.
-    # This is indeed the case for all years except 2020, where there is a ~4% difference.
-    check = comparison[comparison["year"] == 2020].reset_index(drop=True)
-    error = (
-        "Bunker emissions from national emissions file was expected to differ ~4% with the sum of aviation and "
-        "shipping emissions from the fossil co2 file in 2020. If this is no longer true, remove this part of the code."
-    )
-    assert (
-        abs(check["global_bunker_emissions"] - check["global_aviation_and_shipping"]) / check["global_bunker_emissions"]
-    ).item() > 0.04, error
-    comparison = comparison[comparison["year"] != 2020].reset_index(drop=True)
-    ####################################################################################################################
     error = (
         "Bunker emissions from national emissions file should coincide (within 0.0001%) with the sum of aviation"
         " and shipping emissions from the Fossil CO2 file."
@@ -520,6 +508,15 @@ def prepare_land_use_emissions(tb_land_use: Table) -> Table:
     """Prepare land-use change emissions data (basic processing)."""
     # Convert units from megatonnes of carbon per year emissions to tonnes of CO2 per year.
     tb_land_use["emissions"] *= MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
+
+    # There are two additional regions in the land-use change file, namely Global and EU27.
+    # It makes sense to extract national land-use change contributions from one of the sheets of that file (we currently
+    # do so from the "BLUE" sheet), since there are no other national land-use change emissions in other files.
+    # But for global emissions, it makes more sense to take the ones estimated by GCP, which are given in the
+    # "Historical Budget" sheet of the global emissions file.
+    # So, remove the data for "Global".
+    # We also remove EU27 data, as explained above, since we aggregate that data ourselves.
+    tb_land_use = tb_land_use[~tb_land_use["country"].isin(["Global", "EU27"])].reset_index(drop=True)
 
     return tb_land_use
 

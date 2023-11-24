@@ -114,10 +114,6 @@ def prepare_land_use_emissions(tb_land_use: Table) -> Table:
     # Restructure data to have a column for country and another for emissions.
     tb_land_use = tb_land_use.melt(id_vars="year", var_name="country", value_name="emissions")
 
-    # In the latest version of the file, there are three new regions.
-    # For now, remove them (in the future, consider adding a sanity check for the World).
-    tb_land_use = tb_land_use[~tb_land_use["country"].isin(["World", "EU27", "ROW"])].reset_index(drop=True)
-
     error = "Countries with emissions data differ from countries with quality flag."
     assert set(tb_land_use["country"]) == set(quality_flag["country"]), error
 

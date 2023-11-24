@@ -55,7 +55,7 @@ meta:
       2022.
     attribution: Global Carbon Budget (2023)
     url_main: https://globalcarbonbudget.org/
-    url_download: s3://owid-private/gcb/global_carbon_budget_land_use_change_emissions.xlsx
+    url_download: s3://owid-private/global_carbon_budget_land_use_change_emissions.xlsx
     date_accessed: '2023-12-05'
     date_published: '2023-12-05'
   license:
@@ -64,6 +64,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/gcp/2023-12-05
 outs:
-- md5: e278f932b50cb1cf06593a6a76bd07e2
-  size: 1840758
+- md5: 30f481c9b0c24a37550506f2347594c9
+  size: 1009546
   path: global_carbon_budget_land_use_change_emissions.xlsx
