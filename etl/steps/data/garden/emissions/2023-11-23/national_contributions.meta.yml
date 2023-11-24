@@ -6,19 +6,19 @@ definitions:
   measured_in_tonnes_per_person: &measured-in-tonnes-per-person |-
     Measured in tonnes per person.
   measured_in_co2_eq: &measured-in-co2-eq |-
-    Emissions are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) over a 100-year timescale.
+    Measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) over a 100-year timescale.
   measured_in_co2_eq_per_person: &measured-in-co2-eq-per-person |-
-    Emissions are measured in tonnes per person of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) over a 100-year timescale.
+    Measured in tonnes per person of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) over a 100-year timescale.
   ghg_emissions: &ghg-emissions |-
     [Greenhouse gas emissions](#dod:ghgemissions) are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) over a 100-year timescale.
   ghg_emissions_per_person: &ghg-emissions-per-person |-
     [Greenhouse gas emissions](#dod:ghgemissions) are measured in tonnes per person of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) over a 100-year timescale.
   processing_methane: &processing-methane |-
-    Methane emissions in tonnes have been converted to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
+    Methane emissions in tonnes have been converted to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources and 27.2 for agricultural and land use sources. These factors are taken from the 6th Assessment Report (AR6) of the Intergovernmental Panel on Climate Change (IPCC).
   processing_nitrous_oxide: &processing-nitrous-oxide |-
-    Nitrous oxide emissions in tonnes have been converted to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
+    Nitrous oxide emissions in tonnes have been converted to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273. This factor is taken from the 6th Assessment Report (AR6) of the Intergovernmental Panel on Climate Change (IPCC).
   processing_greenhouse_gases: &processing-greenhouse-gases |-
-    Emissions given in tonnes have been converted to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
+    Emissions given in tonnes have been converted to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources. These factors are taken from the 6th Assessment Report (AR6) of the Intergovernmental Panel on Climate Change (IPCC).
   common:
     processing_level: major
 
@@ -35,7 +35,7 @@ tables:
         title: Annual methane emissions from fossil fuels and industry
         unit: tonnes
         short_unit: t
-        description_short_short: *measured-in-tonnes
+        description_short: *measured-in-tonnes
       annual_emissions_ch4_land:
         title: Annual methane emissions from agriculture and land use
         unit: tonnes
