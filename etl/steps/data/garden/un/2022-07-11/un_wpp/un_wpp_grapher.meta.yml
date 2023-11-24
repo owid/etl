@@ -47,6 +47,7 @@ tables:
       fertility_rate:
         title: Fertility rate
         unit: live births per woman
+        description_short: Average number of children a woman would have during her reproductive years, calculated using age-specific fertility rates for different age groups (15-19, 20-24, ..., 45-49) in a given year, assuming no mortality.
         description_key:
           - "The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality. It is expressed as live births per woman. For age-specific fertility rates, it measuresmber of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December."
 
