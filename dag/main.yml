@@ -654,6 +654,32 @@ steps:
   data://grapher/un/2023-10-30/un_members:
     - data://garden/un/2023-10-30/un_members
 
+  # UNU-WIDER Government Revenue Dataset
+  data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
+    - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
+  data://garden/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://meadow/unu_wider/2023-11-01/government_revenue_dataset
+  data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://garden/unu_wider/2023-11-01/government_revenue_dataset
+
+  # World Bank - Worldwide Bureaucracy Indicators
+  data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
+  data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators
+  data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators
+    
+  # Information Capacity Dataset
+  data://meadow/state_capacity/2023-11-10/information_capacity_dataset:
+    - snapshot://state_capacity/2023-11-10/information_capacity_dataset.dta
+  data://garden/state_capacity/2023-11-10/information_capacity_dataset:
+    - data://meadow/state_capacity/2023-11-10/information_capacity_dataset
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
+    - data://garden/state_capacity/2023-11-10/information_capacity_dataset
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 

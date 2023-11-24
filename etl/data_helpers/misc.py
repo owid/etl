@@ -99,7 +99,7 @@ def add_origins_to_energy_table(tb_energy: Table) -> Table:
                 url_download="https://www.energyinst.org/__data/assets/file/0007/1055761/Consolidated-Dataset-Panel-format-CSV.csv",
                 date_published="2023-06-26",
                 date_accessed="2023-06-27",
-                description="The Energy Institute Statistical Review of World Energy analyses data on world energy markets from the prior year. Previously produced by BP, the Review has been providing timely, comprehensive and objective data to the energy community since 1952.",
+                description="The Energy Institute Statistical Review of World Energy analyses data on world energy markets from the prior year.",
                 license=License(
                     name="©Energy Institute 2023",
                     url="https://www.energyinst.org/__data/assets/file/0007/1055761/Consolidated-Dataset-Panel-format-CSV.csv",
@@ -117,6 +117,38 @@ def add_origins_to_energy_table(tb_energy: Table) -> Table:
         ]
 
     return tb_energy
+
+
+########################################################################################################################
+# TODO: Remote this temporary function once WDI has origins.
+def add_origins_to_mortality_database(tb_who: Table) -> Table:
+    tb_who = tb_who.copy()
+
+    # List all non-index columns in the WDI table.
+    data_columns = [column for column in tb_who.columns if column not in ["country", "year"]]
+
+    # For each indicator, add an origin (using information from the old source) and then remove the source.
+    for column in data_columns:
+        tb_who[column].metadata.sources = []
+        error = "Remove temporary solution where origins where manually created."
+        assert tb_who[column].metadata.origins == [], error
+        tb_who[column].metadata.origins = [
+            Origin(
+                title="Mortality Database",
+                producer="World Health Organisation",
+                url_main="https://platform.who.int/mortality/themes/theme-details/MDB/all-causes",
+                date_accessed="2023-08-01",
+                date_published="2023-08-01",
+                citation_full="Mortality Database, World Health Organization. Licence: CC BY-NC-SA 3.0 IGO.",
+                description="The WHO mortality database is a collection death registration data including cause-of-death information from member states. Where they are collected, death registration data are the best source of information on key health indicators, such as life expectancy, and death registration data with cause-of-death information are the best source of information on mortality by cause, such as maternal mortality and suicide mortality. WHO requests from all countries annual data by age, sex, and complete ICD code (e.g., 4-digit code if the 10th revision of ICD was used). Countries have reported deaths by cause of death, year, sex, and age for inclusion in the WHO Mortality Database since 1950. Data are included only for countries reporting data properly coded according to the International Classification of Diseases (ICD). Today the database is maintained by the WHO Division of Data, Analytics and Delivery for Impact (DDI) and contains data from over 120 countries and areas. Data reported by member states and selected areas are displayed in this portal’s interactive visualizations if the data are reported to the WHO mortality database in the requested format and at least 65% of deaths were recorded in each country and year.",
+                license=License(name="CC BY 4.0"),
+            )
+        ]
+
+        # Remove sources from indicator.
+        tb_who[column].metadata.sources = []
+
+    return tb_who
 
 
 ########################################################################################################################

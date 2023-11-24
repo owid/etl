@@ -18,19 +18,16 @@ log = structlog.get_logger()
 config.enable_bugsnag()
 
 
-def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False, r2: bool = False) -> None:
+def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False) -> None:
     """Upload compressed dictionary to S3 and return its URL."""
     body_gzip = gzip.compress(json.dumps(d, default=str).encode())  # type: ignore
 
     bucket, key = s3_utils.s3_bucket_key(s3_path)
 
-    client = connect_s3_cached(r2=r2)
+    client = connect_s3_cached()
 
-    if r2:
-        assert not private, "r2 does not support private files yet"
-        extra_args = {}
-    else:
-        extra_args = {"ACL": "private" if private else "public-read"}
+    assert not private, "r2 does not support private files yet"
+    extra_args = {}
 
     for attempt in Retrying(
         wait=wait_exponential(min=5, max=100),

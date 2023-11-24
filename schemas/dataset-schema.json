@@ -226,6 +226,7 @@
       "additionalProperties": false
     }
   },
+  "additionalProperties": false,
   "properties": {
     "definitions": {
       "type": "object",
@@ -818,6 +819,9 @@
                         ],
                         [
                           "Should only be used if the indicator's title is ambiguous (e.g. if there are multiple indicators with the same title)."
+                        ],
+                        [
+                          "Should not reference the data provider. For that, instead, use `attribution_short`."
                         ]
                       ],
                       "examples": [
@@ -1664,6 +1668,7 @@
           }
         }
       }
-    }
+    },
+    "all_sources": {}
   }
 }

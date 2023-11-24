@@ -11,6 +11,7 @@ import jsonschema
 import numpy as np
 import pandas as pd
 import pytest
+
 from owid.catalog import tables
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
@@ -20,7 +21,7 @@ from owid.catalog.tables import (
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
 )
-from owid.catalog.variables import PROCESSING_LOG, Variable
+from owid.catalog.variables import Variable
 
 from .mocking import mock
 
@@ -209,9 +210,7 @@ def test_field_access_can_be_typecast():
 
 def test_tables_can_drop_duplicates():
     # https://github.com/owid/owid-catalog-py/issues/11
-    t: Table = Table({"gdp": [100, 100, 102, 104], "country": ["AU", "AU", "SE", "CH"]}).set_index(
-        "country"
-    )  # type: ignore
+    t: Table = Table({"gdp": [100, 100, 102, 104], "country": ["AU", "AU", "SE", "CH"]}).set_index("country")  # type: ignore
     t.metadata = mock(TableMeta)
 
     # in the bug, the dtype of t.duplicated() became object
@@ -307,37 +306,6 @@ def test_copy_metadata() -> None:
     # make sure it doesn't affect the original table
     t2.gdp.metadata.title = "new GDP"
     assert t.gdp.metadata.title == "GDP"
-
-
-def test_addition_without_metadata() -> None:
-    t: Table = Table({"a": [1, 2], "b": [3, 4]})
-    t["c"] = t["a"] + t["b"]
-    if PROCESSING_LOG:
-        expected_metadata = VariableMeta(processing_log=[{"variable": "c", "parents": ["a", "b"], "operation": "+"}])
-    else:
-        expected_metadata = VariableMeta()
-    assert t.c.metadata == expected_metadata
-
-
-def test_addition_with_metadata() -> None:
-    t: Table = Table({"a": [1, 2], "b": [3, 4]})
-    t.a.metadata.title = "A"
-    t.b.metadata.title = "B"
-
-    t["c"] = t["a"] + t["b"]
-
-    if PROCESSING_LOG:
-        expected_metadata = VariableMeta(processing_log=[{"variable": "c", "parents": ["a", "b"], "operation": "+"}])
-    else:
-        expected_metadata = VariableMeta()
-    assert t.c.metadata == expected_metadata
-
-    t.c.metadata.title = "C"
-
-    # addition shouldn't change the metadata of the original columns
-    assert t.a.metadata.title == "A"
-    assert t.b.metadata.title == "B"
-    assert t.c.metadata.title == "C"
 
 
 def test_addition_same_variable() -> None:

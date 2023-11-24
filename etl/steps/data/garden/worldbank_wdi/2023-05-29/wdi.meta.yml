@@ -1,3 +1,4 @@
+#
 dataset:
   update_period_days: 365
 
@@ -1849,6 +1850,8 @@ tables:
         unit: scale 0 - 100
       iq_sci_ovrl:
         title: Statistical Capacity Score (Overall Average) (scale 0 - 100)
+        display:
+          numDecimalPlaces: 1
       iq_sci_prdc:
         title: Periodicity and timeliness assessment of statistical capacity (scale 0 - 100)
         unit: scale 0 - 100
@@ -1986,8 +1989,8 @@ tables:
           title_variant: International Telecommunication Union
           # attribution: # defaults to origin[*].producer so does not have to be set here
           topic_tags:
-          - Technological Change
           - Internet
+          - Technological Change
           - Loneliness & Social Connections
           faqs: []
           grapher_config:
@@ -2081,7 +2084,9 @@ tables:
       ms_mil_totl_tf_zs:
         title: Armed forces personnel (% of total labor force)
         short_unit: '%'
-        unit: '% of total labor force'
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
       ms_mil_xpnd_cd:
         title: Military expenditure (current USD)
         unit: current USD
@@ -5000,6 +5005,8 @@ tables:
         title: Completeness of birth registration (%)
         short_unit: '%'
         unit: '%'
+        display:
+          numDecimalPlaces: 1
       sp_reg_dths_zs:
         title: Completeness of death registration with cause-of-death information (%)
         short_unit: '%'

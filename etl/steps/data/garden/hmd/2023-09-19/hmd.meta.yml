@@ -12,20 +12,32 @@ definitions:
       at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'both') >>, << type >>
     title_public_dim: |-
        at << age if age != '0' else 'birth'>>
+  global:
+    life_expectancy:
+      point_1: |-
+        <% if type == "period" %>
+        Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
+        <% else %>
+        Cohort life expectancy is the average lifespan of a group of people, usually a birth cohort – people born in the same year.
+        <% endif %>
+      point_2: |-
+        <% if type == "period" %>
 
-  life_expectancy:
-    description_short: |-
-      <% if type == "period" %>
-      The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
-      <% elif type == "cohort" %>
-      The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
-      <% endif %>
-    point_1: |-
-      <% if type == "period" %>
-      This is based on a synthetic cohort created using mortality rates across age groups in a given year.
-      <% elif type == "cohort" %>
-      Rather than waiting for the entire cohort to have died before calculating the cohort life expectancy, researchers may use data from birth cohorts that are 'almost extinct'.
-      <% endif %>
+        <% if age == '0' %>
+        For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+        <% else %>
+        For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
+        <% endif %>
+
+        <% else %>
+
+        <% if age == '0' %>
+        It is calculated by tracking individuals from that cohort throughout their lives until death, and calculating their average lifespan.
+        <% else %>
+        It is calculated by tracking individuals from that cohort throughout the rest of their lives until death, and calculating their average remaining lifespan.
+        <% endif %>
+
+        <% endif %>
 
 
 # Learn more about the available fields:
@@ -179,19 +191,36 @@ tables:
         short_unit: years
         unit: years
         description_short: |-
-          {definitions.life_expectancy.description_short}
+          <% if age == '0' %>
+            <% if sex == 'both' %>
+              The << type >> life expectancy at birth, in a given year.
+            <% else %>
+              The << type >> life expectancy at birth among << sex + 's' >>, in a given year.
+            <% endif %>
+          <% else %>
+            <% if sex == 'both' %>
+              The remaining << type >> life expectancy at age << age >>, in a given year.
+            <% else %>
+              The remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
+            <% endif %>
+          <% endif %>
         description_key:
           - |-
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.life_expectancy.point_2}
+          - |-
+            <% if age != '0' %>
+
             <% if type == "period" %>
-            Life expectancy at age 0 refers to life expectancy at birth.
+            This shows the remaining period life expectancy among people who have already reached the age << age >>, using death rates from their age group and older age groups.
             <% else %>
-            It refers to the remaining life expectancy for people who have already survived to the given age.
+            This shows the remaining cohort life expectancy of people who have reached the age << age >>.
             <% endif %>
-          - |-
-            {definitions.life_expectancy.description_short}
-          - |-
-            {definitions.life_expectancy.point_1}
+
+            <% endif %>
         display:
+          numDecimalPlaces: 1
           name: |-
             {tables.hmd.variables.life_expectancy.title} {definitions.others.display_name_dim}
         presentation:
@@ -203,18 +232,15 @@ tables:
         short_unit: years
         unit: years
         description_short: |-
-          <% if type == "cohort" %>
-          The difference in cohort life expectancy (females - males) at a given age.
-          <% elif type == "period" %>
-          The difference in period life expectancy (females - males) at a given age.
-          <% endif %>
+          The difference in << type >> life expectancy (females - males) at a given age.
         description_key:
           - Higher values indicate longer life expectancy among females than males.
           - |-
-            {definitions.life_expectancy.description_short}
+            {definitions.global.life_expectancy.point_1}
           - |-
-            {definitions.life_expectancy.point_1}
+            {definitions.global.life_expectancy.point_2}
         display:
+          numDecimalPlaces: 1
           name: |-
             Life expectancy (female-male difference) at << 'birth' if (age == '0') else age >>, << type >>
         presentation:
@@ -227,19 +253,17 @@ tables:
       life_expectancy_fm_ratio:
         title: Life expectancy ratio (f/m)
         unit: ""
+        short_unit: ""
         description_short: |-
-          <% if type == "cohort" %>
-          The ratio of cohort life expectancy (females/males) at a given age.
-          <% elif type == "period" %>
-          The ratio of period life expectancy (females/males) at a given age.
-          <% endif %>
+          The ratio of << type >> life expectancy (females/males) at a given age.
         description_key:
           - Higher values indicate longer life expectancy among females than males.
           - |-
-            {definitions.life_expectancy.description_short}
+            {definitions.global.life_expectancy.point_1}
           - |-
-            {definitions.life_expectancy.point_1}
+            {definitions.global.life_expectancy.point_2}
         display:
+          numDecimalPlaces: 1
           name: |-
             Life expectancy (female-to-male ratio) at << 'birth' if (age == '0') else age >>, << type >>
         presentation:

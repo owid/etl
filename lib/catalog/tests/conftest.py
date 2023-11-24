@@ -2,6 +2,7 @@ from collections import defaultdict
 
 import pandas as pd
 import pytest
+
 from owid.catalog.meta import (
     DatasetMeta,
     License,
@@ -99,6 +100,10 @@ def table_1(sources, licenses, origins):
                 title="Title of Table 1 Variable a",
                 description="Description of Table 1 Variable a",
                 description_short="Short description of Table 1 Variable a",
+                description_key=[
+                    "Key description point 1 of Variable 1",
+                    "Common key description point",
+                ],
                 description_from_producer="Common description from producer",
                 sources=[sources[2], sources[1]],
                 origins=[origins[2], origins[1]],
@@ -111,6 +116,11 @@ def table_1(sources, licenses, origins):
                 title="Title of Table 1 Variable b",
                 description="Description of Table 1 Variable b",
                 description_short="Short description of Table 1 Variable b",
+                description_key=[
+                    "Key description point 1 of Variable 2",
+                    "Common key description point",
+                    "Key description point 2 of Variable 2",
+                ],
                 description_from_producer="Common description from producer",
                 sources=[sources[2], sources[3]],
                 origins=[origins[2], origins[3]],

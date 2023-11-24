@@ -23,18 +23,18 @@ tables:
         short_unit: years
         processing_level: minor
         description_short: |-
-          <% if (sex == 'female') %>
-          The total number of years a newborn is expected to live (among females).
-          <% elif (sex == 'male') %>
-          The total number of years a person is expected to live (among males).
-          <% elif (sex == 'all') %>
-          The total number of years a person is expected to live.
+          <% if sex == 'all' %>
+          The period life expectancy at birth, in a given year.
+          <% else %>
+          The period life expectancy at birth among << sex + 's' >>, in a given year.
           <% endif %>
         description_key:
-          - Period life expectancy assumes that current mortality trends will continue for the rest of a subject's life.
+          - Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
+          - For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their lives as the age-specific death rates seen in that particular year.
         description_from_producer: |-
           Life expectancy at birth is defined as how long, on average, a newborn can expect to live, if current death rates do not change. However, the actual age-specific death rate of any particular birth cohort cannot be known in advance. If rates are falling, actual life spans will be higher than life expectancy calculated using current death rates. Life expectancy at birth is one of the most frequently used health status indicators. Gains in life expectancy at birth can be attributed to a number of factors, including rising living standards, improved lifestyle and better education, as well as greater access to quality health services. This indicator is presented as a total and per gender and is measured in years.
         display:
+          numDecimalPlaces: 1
           name: |-
             Life expectancy at birth<< ', ' + sex + 's' if (sex != 'all') >>, period
         presentation:

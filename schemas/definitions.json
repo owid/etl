@@ -28,7 +28,8 @@
           "CC BY-ND 4.0",
           "CC BY-NC 4.0",
           "CC BY-NC-SA 4.0",
-          "CC BY-NC-ND 4.0"
+          "CC BY-NC-ND 4.0",
+          "MIT License"
         ],
         "examples_bad": [],
         "guidelines": [
@@ -379,6 +380,9 @@
             "Must end with a period."
           ],
           [
+            "Must include (wherever is appropriate) the year of publication, i.e. the year given in `date_published`."
+          ],
+          [
             "If the producer specified how to cite them, this field should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits.",
             {
               "type": "list",
@@ -508,7 +512,7 @@
         "requirement_level": "required (if existing)",
         "guidelines": [
           [
-            "Must be a complete URL, i.e. `http...`."
+            "Must be a complete URL or S3 URI, i.e. `http...`."
           ],
           [
             "Must be a direct download link.",
@@ -521,7 +525,8 @@
           ]
         ],
         "examples": [
-          "https://data.some_institution.com/dataset_12/data.csv"
+          "https://data.some_institution.com/dataset_12/data.csv",
+          "s3://owid-private/data.csv"
         ],
         "examples_bad": [],
         "category": "files"

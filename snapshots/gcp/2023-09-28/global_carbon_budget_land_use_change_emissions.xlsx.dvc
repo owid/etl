@@ -2,7 +2,6 @@ meta:
   origin:
     producer: Global Carbon Project
     title: Global Carbon Budget
-    attribution: Global Carbon Budget (2022)
     description: The Global Carbon Budget 2022 has over 105 contributors from 80 organisations
       and 18 countries. It was founded by the Global Carbon Project international
       science team to track the trends in global carbon emissions and sinks and is
@@ -10,28 +9,46 @@ meta:
       recognised as the most comprehensive report of its kind. The 2022 report was
       published at COP27 in Egypt on Friday 11th November.
     title_snapshot: Global Carbon Budget - Land-use change emissions
-    citation_full: "Friedlingstein, P., O'Sullivan, M., Jones, M. W., Andrew, R. M.,
-      Gregor, L., Hauck, J., Le Quéré, C., Luijkx, I. T., Olsen, A., Peters, G. P.,
-      Peters, W., Pongratz, J., Schwingshackl, C., Sitch, S., Canadell, J. G., Ciais,
-      P., Jackson, R. B., Alin, S. R., Alkama, R., Arneth, A., Arora, V. K., Bates,
-      N. R., Becker, M., Bellouin, N., Bittig, H. C., Bopp, L., Chevallier, F., Chini,
-      L. P., Cronin, M., Evans, W., Falk, S., Feely, R. A., Gasser, T., Gehlen, M.,
-      Gkritzalis, T., Gloege, L., Grassi, G., Gruber, N., Gürses, Ö., Harris, I.,
-      Hefner, M., Houghton, R. A., Hurtt, G. C., Iida, Y., Ilyina, T., Jain, A. K.,
-      Jersild, A., Kadono, K., Kato, E., Kennedy, D., Klein Goldewijk, K., Knauer,
-      J., Korsbakken, J. I., Landschützer, P., Lefèvre, N., Lindsay, K., Liu, J.,
-      Liu, Z., Marland, G., Mayot, N., McGrath, M. J., Metzl, N., Monacci, N. M.,
-      Munro, D. R., Nakaoka, S.-I., Niwa, Y., O'Brien, K., Ono, T., Palmer, P. I.,
-      Pan, N., Pierrot, D., Pocock, K., Poulter, B., Resplandy, L., Robertson, E.,
-      Rödenbeck, C., Rodriguez, C., Rosan, T. M., Schwinger, J., Séférian, R., Shutler,
-      J. D., Skjelvan, I., Steinhoff, T., Sun, Q., Sutton, A. J., Sweeney, C., Takao,
-      S., Tanhua, T., Tans, P. P., Tian, X., Tian, H., Tilbrook, B., Tsujino, H.,
-      Tubiello, F., van der Werf, G. R., Walker, A. P., Wanninkhof, R., Whitehead,
-      C., Willstrand Wranne, A., Wright, R., Yuan, W., Yue, C., Yue, X., Zaehle, S.,
-      Zeng, J., and Zheng, B.: Global Carbon Budget 2022, Earth Syst. Sci. Data, 14,
-      4811–4900, https://doi.org/10.5194/essd-14-4811-2022, 2022."
+    citation_full: >-
+      Andrew, R. M., & Peters, G. P. (2022). The Global Carbon Project's fossil CO2
+      emissions dataset (2022v27) [Data set].
+      Zenodo. Data and methodology can be found at: https://doi.org/10.5281/zenodo.7215364
+
+
+      The data files of the Global Carbon Budget can be found at: https://globalcarbonbudget.org/carbonbudget/
+
+
+      For more details, see the original paper:
+
+      Friedlingstein, P., O'Sullivan, M., Jones, M. W., Andrew, R. M., Gregor, L.,
+      Hauck, J., Le Quéré, C., Luijkx, I. T.,
+      Olsen, A., Peters, G. P., Peters, W., Pongratz, J., Schwingshackl, C., Sitch,
+      S., Canadell, J. G., Ciais, P., Jackson,
+      R. B., Alin, S. R., Alkama, R., Arneth, A., Arora, V. K., Bates, N. R., Becker,
+      M., Bellouin, N., Bittig, H. C., Bopp,
+      L., Chevallier, F., Chini, L. P., Cronin, M., Evans, W., Falk, S., Feely, R.
+      A., Gasser, T., Gehlen, M., Gkritzalis,
+      T., Gloege, L., Grassi, G., Gruber, N., Gürses, Ö., Harris, I., Hefner, M.,
+      Houghton, R. A., Hurtt, G. C., Iida, Y.,
+      Ilyina, T., Jain, A. K., Jersild, A., Kadono, K., Kato, E., Kennedy, D., Klein
+      Goldewijk, K., Knauer, J., Korsbakken,
+      J. I., Landschützer, P., Lefèvre, N., Lindsay, K., Liu, J., Liu, Z., Marland,
+      G., Mayot, N., McGrath, M. J., Metzl,
+      N., Monacci, N. M., Munro, D. R., Nakaoka, S.-I., Niwa, Y., O'Brien, K., Ono,
+      T., Palmer, P. I., Pan, N., Pierrot, D.,
+      Pocock, K., Poulter, B., Resplandy, L., Robertson, E., Rödenbeck, C., Rodriguez,
+      C., Rosan, T. M., Schwinger, J., Séférian,
+      R., Shutler, J. D., Skjelvan, I., Steinhoff, T., Sun, Q., Sutton, A. J., Sweeney,
+      C., Takao, S., Tanhua, T., Tans, P.
+      P., Tian, X., Tian, H., Tilbrook, B., Tsujino, H., Tubiello, F., van der Werf,
+      G. R., Walker, A. P., Wanninkhof, R.,
+      Whitehead, C., Willstrand Wranne, A., Wright, R., Yuan, W., Yue, C., Yue, X.,
+      Zaehle, S., Zeng, J., and Zheng, B.: Global
+      Carbon Budget 2022, Earth Syst. Sci. Data, 14, 4811-4900, https://doi.org/10.5194/essd-14-4811-2022,
+      2022.
+    attribution: Global Carbon Budget (2022)
     url_main: https://globalcarbonbudget.org/
-    url_download:
+    url_download: 
       https://globalcarbonbudget.org/wp-content/uploads/National_LandUseChange_Carbon_Emissions_2022v1.0.xlsx
     date_accessed: '2023-09-28'
     date_published: '2022-11-11'

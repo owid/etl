@@ -15,8 +15,9 @@ meta:
     published_by: Vito and Schuknecht (2000) Public Spending in the 20th Century A
       Global Perspective
   name: Public Expenditure on Education OECD - Tanzi & Schuknecht (2000)
+  description: ''
 wdir: ../../../data/snapshots/education/2017-09-30
 outs:
-- md5: 5ecb8cb6411e3a4f47d5f32a79ef9bdf
+- md5: 70215292759c49a6bdb664321f757c15
   size: 3666
   path: public_expenditure.feather

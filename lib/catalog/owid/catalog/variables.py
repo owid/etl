@@ -13,11 +13,13 @@ import structlog
 from pandas._typing import Scalar
 from pandas.core.series import Series
 
+from . import processing_log as pl
 from .meta import (
     PROCESSING_LEVELS,
     PROCESSING_LEVELS_ORDER,
     License,
     Origin,
+    ProcessingLog,
     Source,
     VariableMeta,
     VariablePresentationMeta,
@@ -51,10 +53,6 @@ OPERATION = Literal[
     "sort",
     "pct_change",
 ]
-
-# Environment variable such that, if True, the processing log will be updated, if False, the log will always be empty.
-# If not defined, assume False.
-PROCESSING_LOG = bool(os.getenv("PROCESSING_LOG", False))
 
 # NOTE: The following issue seems to not be happening anymore. Consider deleting instances of UNNAMED_VARIABLE.
 # When creating a new variable, might we need to pass a temporary name. For example, when doing tb["a"] + tb["b"]:
@@ -164,9 +162,7 @@ class Variable(pd.Series):
              <h2 style="margin-bottom: 0em"><pre>{}</pre></h2>
              <p style="font-variant: small-caps; font-size: 1.5em; font-family: sans-serif; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">variable</p>
              <pre>{}</pre>
-        """.format(
-            self.name, html
-        )
+        """.format(self.name, html)
 
     def __add__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
         variable_name = self.name or UNNAMED_VARIABLE
@@ -290,39 +286,27 @@ class Variable(pd.Series):
 
     def update_log(
         self,
-        parents: List[Any],
         operation: str,
-        variable_name: Optional[str] = None,
-        comment: Optional[str] = None,
-        inplace: bool = False,
-    ) -> Optional["Variable"]:
-        return update_log(
-            variable=self,
-            parents=parents,
-            operation=operation,
-            variable_name=variable_name,
-            comment=comment,
-            inplace=inplace,  # type: ignore
-        )
-
-    def amend_log(
-        self,
-        variable_name: Optional[str] = None,
         parents: Optional[List[Any]] = None,
-        operation: Optional[str] = None,
+        variable: Optional[str] = None,
         comment: Optional[str] = None,
-        entry_num: int = -1,
-        inplace: bool = False,
-    ) -> Optional["Variable"]:
-        return amend_log(
-            variable=self,
-            variable_name=variable_name,
+    ) -> "Variable":
+        if variable is None:
+            # If a variable name is not specified, take it from the variable, or otherwise use UNNAMED_VARIABLE.
+            variable = self.name or UNNAMED_VARIABLE
+
+        if parents is None:
+            # If parents are not specified, take the variable itself as the only parent.
+            parents = [self]
+
+        # Add new entry to the variable's processing log.
+        self.metadata.processing_log.add_entry(
+            variable=variable,
             parents=parents,
             operation=operation,
             comment=comment,
-            entry_num=entry_num,
-            inplace=inplace,  # type: ignore
         )
+        return self
 
     def copy_metadata(self, from_variable: "Variable", inplace: bool = False) -> Optional["Variable"]:
         return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)  # type: ignore
@@ -392,7 +376,14 @@ def get_unique_licenses_from_variables(variables: List[Variable]) -> List[Licens
     return pd.unique(licenses).tolist()
 
 
-def combine_variables_processing_logs(variables: List[Variable]) -> List[Dict[str, Any]]:
+def get_unique_description_key_points_from_variables(variables: List[Variable]) -> List[str]:
+    # Make a list of all description key points of all variables.
+    description_key_points = sum([variable.metadata.description_key for variable in variables], [])
+
+    return pd.unique(description_key_points).tolist()
+
+
+def combine_variables_processing_logs(variables: List[Variable]) -> ProcessingLog:
     # Make a list with all entries in the processing log of all variables.
     processing_log = sum(
         [
@@ -402,7 +393,7 @@ def combine_variables_processing_logs(variables: List[Variable]) -> List[Dict[st
         [],
     )
 
-    return processing_log
+    return ProcessingLog(processing_log)
 
 
 def _get_dict_from_list_if_all_identical(list_of_objects: List[Optional[Dict[str, Any]]]) -> Optional[Dict[str, Any]]:
@@ -487,6 +478,8 @@ def combine_variables_metadata(
     metadata.description_short = _get_metadata_value_from_variables_if_all_identical(
         variables=variables_only, field="description_short", operation=operation
     )
+    metadata.description_key = get_unique_description_key_points_from_variables(variables=variables_only)
+    # TODO: Combine description_processing: If not identical, append one after another.
     metadata.description_from_producer = _get_metadata_value_from_variables_if_all_identical(
         variables=variables_only, field="description_from_producer", operation=operation
     )
@@ -499,208 +492,20 @@ def combine_variables_metadata(
     metadata.sources = get_unique_sources_from_variables(variables=variables_only)
     metadata.origins = get_unique_origins_from_variables(variables=variables_only)
     metadata.licenses = get_unique_licenses_from_variables(variables=variables_only)
-    metadata.processing_log = combine_variables_processing_logs(variables=variables_only)
     metadata.display = combine_variables_display(variables=variables_only, operation=operation)
     metadata.presentation = combine_variables_presentation(variables=variables_only, operation=operation)
     metadata.processing_level = combine_variables_processing_level(variables=variables_only)
 
-    # List names of variables and scalars (or other objects passed in variables).
-    variables_and_scalars_names = [
-        variable.name if hasattr(variable, "name") else str(variable) for variable in variables
-    ]
-    metadata.processing_log = add_entry_to_processing_log(
-        processing_log=metadata.processing_log,
-        variable_name=name,
-        parents=variables_and_scalars_names,
-        operation=operation,
-    )
+    if pl.enabled():
+        metadata.processing_log = combine_variables_processing_logs(variables=variables_only)
+        if operation:
+            metadata.processing_log.add_entry(
+                variable=name,
+                parents=variables,
+                operation=operation,
+            )
 
     return metadata
-
-
-def add_entry_to_processing_log(
-    processing_log: List[Any],
-    variable_name: str,
-    parents: List[Any],
-    operation: str,
-    comment: Optional[str] = None,
-) -> List[Any]:
-    if not PROCESSING_LOG:
-        # Avoid any processing and simply return the same input processing log.
-        return processing_log
-
-    # Consider using a deepcopy if any of the operations in this function alter mutable objects in processing_log.
-    processing_log_updated = copy.deepcopy(processing_log)
-
-    # TODO: Parents currently can be anything. Here we should ensure that they are strings. For example, we could
-    # extract the name of the parent if it is a variable.
-
-    # Define new log entry.
-    log_new_entry = {"variable": variable_name, "parents": parents, "operation": operation}
-    if comment is not None:
-        log_new_entry["comment"] = comment
-
-    # Add new entry to log.
-    processing_log_updated += [log_new_entry]
-
-    return processing_log_updated
-
-
-@overload
-def update_log(
-    variable: Variable,
-    parents: List[Any],
-    operation: str,
-    variable_name: Optional[str] = None,
-    comment: Optional[str] = None,
-    inplace: Literal[True] = True,
-) -> None:
-    ...
-
-
-@overload
-def update_log(
-    variable: Variable,
-    parents: List[Any],
-    operation: str,
-    variable_name: Optional[str] = None,
-    comment: Optional[str] = None,
-    inplace: Literal[False] = False,
-) -> Variable:
-    ...
-
-
-def update_log(
-    variable: Variable,
-    parents: List[Any],
-    operation: str,
-    variable_name: Optional[str] = None,
-    comment: Optional[str] = None,
-    inplace: bool = False,
-) -> Optional[Variable]:
-    if not inplace:
-        variable = copy.deepcopy(variable)
-
-    if variable_name is None:
-        # If a variable name is not specified, take it from the variable, or otherwise use UNNAMED_VARIABLE.
-        variable_name = variable.name or UNNAMED_VARIABLE
-
-    # Add new entry to the variable's processing log.
-    variable.metadata.processing_log = add_entry_to_processing_log(
-        processing_log=variable.metadata.processing_log,
-        variable_name=variable_name,
-        parents=parents,
-        operation=operation,
-        comment=comment,
-    )
-
-    if not inplace:
-        return variable
-
-
-def amend_entry_in_processing_log(
-    processing_log: List[Dict[str, Any]],
-    parents: Optional[List[Any]],
-    operation: Optional[str],
-    variable_name: Optional[str] = None,
-    comment: Optional[str] = None,
-    entry_num: Optional[int] = -1,
-) -> List[Any]:
-    if not PROCESSING_LOG:
-        # Avoid any processing and simply return the same input processing log.
-        return processing_log
-
-    # Consider using a deepcopy if any of the operations in this function alter mutable objects in processing_log.
-    processing_log_updated = copy.deepcopy(processing_log)
-
-    fields = {"variable": variable_name, "parents": parents, "operation": operation, "comment": comment}
-    for field, value in fields.items():
-        if value:
-            processing_log_updated[entry_num][field] = value  # type: ignore
-
-    return processing_log_updated
-
-
-@overload
-def amend_log(
-    variable: Variable,
-    variable_name: Optional[str] = None,
-    parents: Optional[List[Any]] = None,
-    operation: Optional[str] = None,
-    comment: Optional[str] = None,
-    entry_num: int = -1,
-    inplace: Literal[True] = True,
-) -> None:
-    ...
-
-
-@overload
-def amend_log(
-    variable: Variable,
-    variable_name: Optional[str] = None,
-    parents: Optional[List[Any]] = None,
-    operation: Optional[str] = None,
-    comment: Optional[str] = None,
-    entry_num: int = -1,
-    inplace: Literal[False] = False,
-) -> Variable:
-    ...
-
-
-def amend_log(
-    variable: Variable,
-    variable_name: Optional[str] = None,
-    parents: Optional[List[Any]] = None,
-    operation: Optional[str] = None,
-    comment: Optional[str] = None,
-    entry_num: int = -1,
-    inplace: bool = False,
-) -> Optional[Variable]:
-    if not inplace:
-        variable = variable.copy()
-
-    variable.metadata.processing_log = amend_entry_in_processing_log(
-        processing_log=variable.metadata.processing_log,
-        parents=parents,
-        operation=operation,
-        variable_name=variable_name,
-        comment=comment,
-        entry_num=entry_num,
-    )
-
-    if not inplace:
-        return variable
-
-
-def update_variable_name(variable: Variable, name: str) -> None:
-    """Update the name of an unnamed variable, as well as its processing log, to have a new name.
-
-    Say you have a table tb with columns "a" and "b".
-    If you create a new variable "c" as
-    > variable_c = tb["a"] + tb["b"]
-    the new variable will have UNNAMED_VARIABLE as name.
-    Also, in the processing log, the variable will be cited as UNNAMED_VARIABLE.
-    To change the variable name to something more meaningful (e.g. "c"), the current function can be used,
-    > update_variable_name(variable=variable_c, name="c")
-    This function will update the variable name (in place) and will replace all instances of UNNAMED_VARIABLE in the
-    processing log to the new name.
-
-    This function is already used when a variable is added to a table column, so that
-    > tb["c"] = tb["a"] + tb["b"]
-    will create a new variable with name "c" (which, in the processing log, will be referred to as "c").
-
-    Parameters
-    ----------
-    variable : Variable
-        Variable whose name is given by UNNAMED_VARIABLE.
-    name : str
-        New name to assign to the variable.
-    """
-    if hasattr(variable.metadata, "processing_log") and variable.metadata.processing_log is not None:
-        variable.metadata.processing_log = json.loads(
-            json.dumps(variable.metadata.processing_log).replace("**TEMPORARY UNNAMED VARIABLE**", name)
-        )
-    variable.name = name
 
 
 @overload

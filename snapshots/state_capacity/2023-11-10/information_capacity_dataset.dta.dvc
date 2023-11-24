@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Information Capacity Dataset
+    description: |-
+      Thomas Brambor, Agustín Goenaga, Johannes Lindvall and Jan Teorell created The Information Capacity Dataset for their article "[The Lay of the Land: Information Capacity and the Modern State](https://journals.sagepub.com/doi/10.1177/0010414019843432)". The Information Capacity Dataset offers numerical data on five institutions and policies that modern states use to collect information about their populations and territories: (1) the regular implementation of a reliable census, (2) the regular release of statistical yearbooks, the operation of (3) civil and (4) population registers, and (5) the establishment of a government agency tasked with processing statistical information. The dataset also includes an overall index of “information capacity” for 85 polities from 1750 to 2015.
+    date_published: 2019-05-27
+
+    # Citation
+    producer: Thomas Brambor et al.
+    citation_full: |-
+      Brambor, Thomas, Agustín Goenaga, Johannes Lindvall and Jan Teorell (2019) "The Lay of the Land: Information Capacity and the Modern State", Comparative Political Studies, version of record published online 2019
+
+    # Files
+    url_main: http://www.stanceatlund.org/information-capacity-dataset.html
+    url_download: http://www.stanceatlund.org/uploads/4/6/2/0/46202583/information_capacity.dta
+    date_accessed: 2023-11-10
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: http://www.stanceatlund.org/information-capacity-dataset.html
+
+wdir: ../../../data/snapshots/state_capacity/2023-11-10
+outs:
+- md5: 55c353c49bccc98c01f72994490a7452
+  size: 1502423
+  path: information_capacity_dataset.dta

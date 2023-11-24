@@ -10,6 +10,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -28,11 +29,10 @@ from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Dataset as WaldenDataset
 
-from etl import config, files, git
+from etl import config, files, git, paths
 from etl import grapher_helpers as gh
-from etl import paths
 from etl.db import get_engine
-from etl.snapshot import _unignore_backports
+from etl.snapshot import _unignore_backports, get_dvc
 
 log = structlog.get_logger()
 
@@ -40,8 +40,6 @@ Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
 dvc_lock = Lock()
-
-DVC_REPO_CACHE = files.RuntimeCache()
 
 
 def compile_steps(
@@ -645,12 +643,20 @@ class SnapshotStep(Step):
     def __str__(self) -> str:
         return f"snapshot://{self.path}"
 
+    def _cached_dvc_repo(self) -> Any:
+        """Return DVC repo and cache it. Backported steps do not use cached repository."""
+        if "backport" in self._dvc_path:
+            # The repo has to be created again to pick unignored files
+            return get_dvc(use_cache=False)
+        else:
+            return get_dvc(use_cache=True)
+
     def run(self) -> None:
         from dvc.exceptions import CheckoutError
 
         with _unignore_backports(Path(self._path)):
             try:
-                _cached_dvc_repo(self._dvc_path).pull(self._path, remote="public-read", force=True)
+                self._cached_dvc_repo().pull(self._path, remote="public-read", force=True)
             except CheckoutError as e:
                 raise Exception(
                     "File not found in DVC. Have you run the snapshot script? Make sure you're not using `is_public: false`."
@@ -665,7 +671,7 @@ class SnapshotStep(Step):
                 raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
 
         with _unignore_backports(Path(self._dvc_path)), dvc_lock:
-            repo = _cached_dvc_repo(self._dvc_path)
+            repo = self._cached_dvc_repo()
             dvc_file = load_file(repo, self._dvc_path)
             with repo.lock:
                 # DVC returns empty dictionary if file is up to date
@@ -697,11 +703,11 @@ class SnapshotStepPrivate(SnapshotStep):
 
     def run(self) -> None:
         from dvc.exceptions import CheckoutError
-        from dvc.repo import Repo
 
         with _unignore_backports(Path(self._path)):
             try:
-                Repo(paths.BASE_DIR).pull(self._path, remote="private", force=True)
+                # The repo has to be created again to pick unignored files
+                get_dvc(use_cache=False).pull(self._path, remote="private", force=True)
             except CheckoutError as e:
                 raise Exception(
                     "File not found in DVC. Have you run the snapshot script with `is_public: false`?"
@@ -773,11 +779,15 @@ class GrapherStep(Step):
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
             futures = []
+            verbose = True
+            i = 0
 
             # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
             # is fetching the whole dataset from data-api as they would receive all tables merged in a single
             # table. This won't be a problem after we introduce the concept of "tables"
             for table in dataset:
+                assert not table.empty, f"table {table.metadata.short_name} is empty"
+
                 # if GRAPHER_FILTER is set, only upsert matching columns
                 if config.GRAPHER_FILTER:
                     cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
@@ -787,18 +797,28 @@ class GrapherStep(Step):
                 table = gh._adapt_table_for_grapher(table)
 
                 # generate table with entity_id, year and value for every column
-                upsert = lambda t, catalog_path: gi.upsert_table(  # noqa: E731
+                upsert = lambda t, catalog_path, verbose: gi.upsert_table(  # noqa: E731
                     engine,
                     t,
                     dataset_upsert_results,
                     catalog_path=catalog_path,
                     dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                    verbose=verbose,
                 )
 
                 for t in gh._yield_wide_table(table, na_action="drop"):
+                    i += 1
                     assert len(t.columns) == 1
                     catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
-                    futures.append(thread_pool.submit(upsert, t, catalog_path=catalog_path))
+
+                    # stop logging to stop cluttering logs
+                    if i > 20 and verbose:
+                        verbose = False
+                        thread_pool.submit(
+                            lambda: (time.sleep(10), log.info("upsert_dataset.continue_without_logging"))
+                        )
+
+                    futures.append(thread_pool.submit(upsert, t, catalog_path=catalog_path, verbose=verbose))
 
             variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
 
@@ -987,22 +1007,6 @@ def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
-
-
-def _cached_dvc_repo(dvc_path: str) -> Any:
-    """Return DVC repo and cache it. Backported steps do not use cached repository."""
-    if "backport" in dvc_path:
-        from dvc.repo import Repo
-
-        return Repo(paths.BASE_DIR)
-
-    key = str(paths.BASE_DIR)
-    cache = DVC_REPO_CACHE
-    if key not in cache:
-        from dvc.repo import Repo
-
-        cache.add(key, Repo(paths.BASE_DIR))
-    return cache[key]
 
 
 def _uses_old_schema(e: KeyError) -> bool:

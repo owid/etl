@@ -56,7 +56,7 @@ def run(dest_dir: str) -> None:
         id_vars=["year"],
         value_vars=[
             "Academia",
-            "Collaboration",
+            "Academia and industry collaboration",
             "Industry",
             "Not specified",
             "Other",
@@ -75,7 +75,7 @@ def run(dest_dir: str) -> None:
         id_vars=["year"],
         value_vars=[
             "Academia",
-            "Collaboration",
+            "Academia and industry collaboration",
             "Industry",
             "Not specified",
             "Other",

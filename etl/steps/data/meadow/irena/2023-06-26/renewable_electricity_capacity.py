@@ -2,6 +2,7 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
+from owid.catalog import processing_log as pl
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
@@ -51,16 +52,22 @@ def extract_capacity_from_sheet(excel_object: pr.ExcelFile, sheet_name: str) -> 
     return tb
 
 
-def extract_capacity_from_all_sheets(snap: Snapshot) -> Table:
-    # Select sheets that contain data (their names are numbers).
-    excel_object = snap.ExcelFile()
-    sheet_names = [sheet for sheet in excel_object.sheet_names if sheet.strip().isdigit()]
-
+@pl.wrap("extract_capacity_from_sheets")
+def _extract_data_sheet_by_sheet(excel_object: pr.ExcelFile, sheet_names: list[str], snap: Snapshot) -> Table:
     # Extract data sheet by sheet.
     all_data = Table(metadata=snap.to_table_metadata())
     for sheet_name in sheet_names:
         data = extract_capacity_from_sheet(excel_object=excel_object, sheet_name=sheet_name)
         all_data = pr.concat([all_data, data], ignore_index=True)
+    return all_data
+
+
+def extract_capacity_from_all_sheets(snap: Snapshot) -> Table:
+    # Select sheets that contain data (their names are numbers).
+    excel_object = snap.ExcelFile()
+    sheet_names = [sheet for sheet in excel_object.sheet_names if sheet.strip().isdigit()]  # type: ignore
+
+    all_data = _extract_data_sheet_by_sheet(excel_object, sheet_names, snap)  # type: ignore
 
     # Set a short name to the new table.
     all_data.metadata.short_name = paths.short_name

@@ -1,76 +1,67 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Global Education
 dataset:
-  title: How Was Life? Global Well-being since 1820 - Education (2014)
-  description: 'This dataset contains two indicators to describe educational inequalities around the globe since 1820: literacy
-    rates and years of schooling. These indicators are based on merging two major datasets that rely mainly on population
-    census data.'
-  licenses:
-  - name: Creative Commons BY 4.0
-    url: https://www.oecd.org/termsandconditions/
-  sources:
-  - name: van Zanden, J. et al. via OECD (2014)
-    description: 'This dataset contains two indicators to describe educational inequalities around the globe since 1820: literacy
-      rates and years of schooling. These indicators are based on merging two major datasets that rely mainly on population
-      census data.'
-    url: https://www.oecd-ilibrary.org/economics/how-was-life/education-since-1820_9789264214262-9-en
-    date_accessed: '2023-08-14'
-    publication_date: '2014-10-06'
-    publication_year: 2014
-    published_by: 'van Zanden, J., et al. (eds.) (2014), How Was Life?: Global Well-being since 1820, OECD Publishing, Paris,
-      https://doi.org/10.1787/9789264214262-en.'
+  title: How Was Life? Global Well-being since 1820 and World Bank
+  description: >
+    This dataset is based on van Zanden, J., et al.(2014), How Was Life?: Global Well-being since 1820 and World Bank indicators.
+
+    It includes indicators relating to historic data and more recent data on population with no formal education and literacy.
 tables:
   oecd_education:
     variables:
       population_with_basic_education:
         title: Share of population with some formal education, 1820-2020
-        description: >
+        description_processing:
           Historical data from van Zanden, J. et al. (2014) with estimates from 1870 to 2010 was combined with educational attainment estimates from Wittgenstein Centre for Demography and Global Human Capita.
 
+        description_from_producer: >
+          Recent data from 2010 onwards is based on the Wittgenstein Centre for Demography and Global Human Capita. These projections are based on collected census and survey data for the base year (around 2010) and the Medium Shared Socioeconomic Pathways (SSP2) projection model. The SSP2 is a middle-of-the-road scenario that combines medium fertility with medium mortality, medium migration, and the Global Education Trend (GET) education scenario. For more information and other projection models, consult the Wittgenstein Centre for Demography and Global Human Capital's website: http://www.oeaw.ac.at/vid/dataexplorer/.
 
-          The Wittgenstein Centre for Demography and Global Human Capita projections are based on collected census and survey data for the base year (around 2010) and the Medium Shared Socioeconomic Pathways (SSP2) projection model. The SSP2 is a middle-of-the-road scenario that combines medium fertility with medium mortality, medium migration, and the Global Education Trend (GET) education scenario. For more information and other projection models, consult the Wittgenstein Centre for Demography and Global Human Capital's website: http://www.oeaw.ac.at/vid/dataexplorer/. World Bank variable id: PRJ.ATT.15UP.NED.MF. Wittgenstein Centre for Demography and Global Human Capital: http://www.oeaw.ac.at/vid/dataexplorer/.        unit: '%'
+
+          World Bank variable id: PRJ.ATT.15UP.NED.MF.
+
+
+          Original source: Wittgenstein Centre for Demography and Global Human Capital: http://www.oeaw.ac.at/vid/dataexplorer/.
         unit: '%'
         short_unit: '%'
-        display:
-          numDecimalPlaces: 2
-
-      average_years_of_education:
-        title:  Average years of education by region, 1850-2010
-        unit: 'years'
         display:
           numDecimalPlaces: 2
 
       literacy:
         title: Share of population aged 15+ literate, 1820-2020
-        description: >
+        description_processing:
+          Historical data from van Zanden, J. et al. (2014) with estimates from 1820 to 2010 was combined with literacy estimates from World Bank.
+        description_from_producer: >
           Adult literacy rate is the percentage of people ages 15 and above who can both read and write with understanding a short simple statement about their everyday life.
 
 
-          Historical data from van Zanden, J. et al. (2014) with estimates from 1820 to 2010 was combined with literacy estimates from World Bank (variable id: SE.ADT.LITR.FE.ZS). UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022.
+          World Bank variable id: PRJ.ATT.15UP.NED.MF.
+
+
+          Original source: Wittgenstein Centre for Demography and Global Human Capital: http://www.oeaw.ac.at/vid/dataexplorer/.
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 2
 
-      best_guess:
-        title: Best guess for world development of at least basic education, 1820
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 2
-
-      educational_attainment:
-        title: World development of at least basic education, 1870-2010
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 2
 
       no_formal_education:
         title: Share of population with no formal education, 1820-2020
-        description: >
+        description_processing:
           Historical data from van Zanden, J. et al. (2014) with estimates from 1870 to 2010 was combined with educational attainment estimates from Wittgenstein Centre for Demography and Global Human Capita.
 
+        description_from_producer: >
+          Recent data from 2010 onwards is based on the Wittgenstein Centre for Demography and Global Human Capita. These projections are based on collected census and survey data for the base year (around 2010) and the Medium Shared Socioeconomic Pathways (SSP2) projection model. The SSP2 is a middle-of-the-road scenario that combines medium fertility with medium mortality, medium migration, and the Global Education Trend (GET) education scenario. For more information and other projection models, consult the Wittgenstein Centre for Demography and Global Human Capital's website: http://www.oeaw.ac.at/vid/dataexplorer/.
 
-          The Wittgenstein Centre for Demography and Global Human Capita projections are based on collected census and survey data for the base year (around 2010) and the Medium Shared Socioeconomic Pathways (SSP2) projection model. The SSP2 is a middle-of-the-road scenario that combines medium fertility with medium mortality, medium migration, and the Global Education Trend (GET) education scenario. For more information and other projection models, consult the Wittgenstein Centre for Demography and Global Human Capital's website: http://www.oeaw.ac.at/vid/dataexplorer/. World Bank variable id: PRJ.ATT.15UP.NED.MF. Wittgenstein Centre for Demography and Global Human Capital: http://www.oeaw.ac.at/vid/dataexplorer/.        unit: '%'
+
+          World Bank variable id: PRJ.ATT.15UP.NED.MF.
+
+
+          Original source: Wittgenstein Centre for Demography and Global Human Capital: http://www.oeaw.ac.at/vid/dataexplorer/.
         unit: '%'
         short_unit: '%'
         display:
@@ -78,11 +69,16 @@ tables:
 
       illiterate:
         title: Share of population aged 15+ illiterate, 1820-2020
-        description: >
+        description_processing:
+          Historical data from van Zanden, J. et al. (2014) with estimates from 1820 to 2010 was combined with literacy estimates from World Bank.
+        description_from_producer: >
           Adult illiteracy rate is the percentage of people ages 15 and above who cannot read or write with understanding a short simple statement about their everyday life.
 
 
-          Historical data from van Zanden, J. et al. (2014) with estimates from 1820 to 2010 was combined with literacy estimates from World Bank (variable id: SE.ADT.LITR.FE.ZS). UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022.
+          World Bank variable id: SE.ADT.LITR.FE.ZS.
+
+
+          Original source: UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022.
         unit: '%'
         short_unit: '%'
         display:

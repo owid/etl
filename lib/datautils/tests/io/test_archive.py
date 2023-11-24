@@ -81,9 +81,7 @@ def _test_decompress_file_with_content(containing_dir: str, f: str) -> None:
         assert _recovered_file.read() == example_content
 
 
-def _test_decompress_file_with_content_within_folder(
-    containing_dir: str, f: str
-) -> None:
+def _test_decompress_file_with_content_within_folder(containing_dir: str, f: str) -> None:
     # Create a compressed file with some example content within a folder.
     example_content = "Example content."
     file_name = "example_file.txt"
