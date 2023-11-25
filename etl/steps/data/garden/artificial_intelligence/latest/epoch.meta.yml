@@ -11,7 +11,7 @@ dataset:
   update_period_days: 31
 
 origin:
-  date_published: '2023-10-27'
+  date_published: '2023-11-24'
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
@@ -115,7 +115,8 @@ tables:
           unit: ''
           description_short: The date when the AI system was first published.
           description_from_producer:  The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
-
-
-
+      organization:
+          title: Organization
+          unit: ''
+          description_short: The name of the organization that developed the AI system.
 

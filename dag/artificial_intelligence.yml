@@ -33,6 +33,12 @@ steps:
   data://grapher/artificial_intelligence/latest/epoch_aggregates_approach:
   - data://garden/artificial_intelligence/latest/epoch_aggregates_approach
 
+  # Aggregates by organization
+  data://garden/artificial_intelligence/latest/epoch_aggregates_org:
+  - data://garden/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch_aggregates_org:
+  - data://garden/artificial_intelligence/latest/epoch_aggregates_org
+
   # Large Language Models and Compute (EPOCH)
   data://garden/artificial_intelligence/2023-07-12/epoch_llms:
   - snapshot://artificial_intelligence/2023-07-12/epoch_llms.csv

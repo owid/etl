@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
         "System",
         "Domain",
         "Organization",
-        "Organization Categorization",
+        "Organization categorization",
         "Publication date",
         "Parameters",
         "Training compute (FLOP)",
@@ -40,7 +40,6 @@ def run(dest_dir: str) -> None:
         "Notability criteria",
         "Approach",
     ]
-
     # Check that the columns of interest are present
     for col in cols:
         assert col in tb.columns, f"Column '{col}' is missing from the dataframe."

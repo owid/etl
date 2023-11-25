@@ -27,7 +27,7 @@ meta:
       [online resource]'
     # Files
     url_main: https://epochai.org/mlinputs/visualization
-    url_download:
+    url_download: 
       https://docs.google.com/spreadsheets/d/1AAIebjNsnJj_uKALHbXNfn3_YsT6sHXtCU0q7OIPuc4/export?gid=0&format=csv
     date_accessed: 2023-10-26
     # License
@@ -35,6 +35,6 @@ meta:
       name: Public domain
 wdir: ../../../data/snapshots/artificial_intelligence/latest
 outs:
-- md5: 652ae5afc96e2fc5b986972a4bf49b19
-  size: 703291
+- md5: 7fe0095a123976115d028fb13d8fa0b1
+  size: 704590
   path: epoch.csv

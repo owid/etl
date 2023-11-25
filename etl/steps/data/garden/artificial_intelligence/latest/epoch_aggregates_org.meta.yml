@@ -1,0 +1,27 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  title: Notable AI systems by organization
+  update_period_days: 31
+
+origin:
+  date_published: '2023-11-24'
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  epoch:
+    variables:
+      cumulative_count:
+        title: Cumulative share of AI systems by organization
+        unit: 'AI systems'
+        short_unit: ''
+        description_short: Describes the organization where the authors of an AI system have their primary affiliations.
+        description_key:
+          - The authors of the Epoch dataset have established a set of criteria to identify key AI systems, which they refer to as notable. These systems must demonstrate the ability to learn, show tangible experimental results, and contribute advancements that push the boundaries of existing AI technology. In terms of notability, the AI must have garnered extensive academic attention, evidenced by a high citation count, hold historical significance in the field, mark a substantial advancement in technology, or be implemented in a significant real-world context. Recognizing the difficulty in evaluating the impact of newer AI systems since 2020 due to less available data, the authors also employ subjective judgment in their selection process for recent developments.

@@ -89,7 +89,7 @@ def run(dest_dir: str) -> None:
     assert not tb[["system", "days_since_1949"]].isnull().any().any(), "Index columns should not have NaN values"
 
     # Drop columns that are not needed
-    tb = tb.drop(["training_compute__flop", "training_time__hours", "organization"], axis=1)
+    tb = tb.drop(["training_compute__flop", "training_time__hours"], axis=1)
     tb = tb.set_index(["days_since_1949", "system"], verify_integrity=True).sort_index()
 
     # Add metadata to the publication date column
