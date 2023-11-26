@@ -12,7 +12,7 @@ from typing_extensions import Self
 import etl.grapher_model as gm
 from apps.wizard import utils
 from etl.db import get_session
-from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR
+from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR, GARDEN_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -20,6 +20,11 @@ from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR
 # Page config
 st.set_page_config(page_title="Wizard (garden)", page_icon="🪄")
 add_indentation()
+
+# Available namespaces
+OPTIONS_NAMESPACES = sorted(os.listdir(GARDEN_DIR))
+
+
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
 # FIELDS FROM OTHER STEPS
@@ -70,6 +75,11 @@ class GardenForm(utils.StepForm):
     def __init__(self: Self, **data: str | bool) -> None:
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+
+        # Handle custom namespace
+        if "namespace_custom" in data:
+            data["namespace"] = str(data["namespace_custom"])
+
         super().__init__(**data)
 
     def validate(self: Self) -> None:
@@ -183,7 +193,7 @@ st.title("Wizard  **:gray[Garden]**")
 
 # SIDEBAR
 with st.sidebar:
-    utils.warning_metadata_unstable()
+    # utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
@@ -196,14 +206,17 @@ with form_widget.form("garden"):
         default_version = APP_STATE.default_value("version", default_last=utils.DATE_TODAY)
 
     # Namespace
-    APP_STATE.st_widget(
-        st_widget=st.text_input,
-        label="Namespace",
-        help="Institution or topic name",
-        placeholder="Example: 'emdat', 'health'",
-        key="namespace",
-        value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
-    )
+    # APP_STATE.st_widget(
+    #     st_widget=st.text_input,
+    #     label="Namespace",
+    #     help="Institution or topic name",
+    #     placeholder="Example: 'emdat', 'health'",
+    #     key="namespace",
+    #     value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
+    # )
+    # Namespace
+    namespace_field = [st.empty(), st.container()]
+
     # Garden version
     APP_STATE.st_widget(
         st_widget=st.text_input,
@@ -299,6 +312,20 @@ with form_widget.form("garden"):
         use_container_width=True,
         on_click=update_state,
     )
+
+
+# Render responsive namespace field
+utils.render_responsive_field_in_form(
+    key="namespace",
+    display_name="Namespace",
+    field_1=namespace_field[0],
+    field_2=namespace_field[1],
+    options=OPTIONS_NAMESPACES,
+    custom_label="Custom namespace...",
+    help_text="Institution or topic name",
+    app_state=APP_STATE,
+    default_value=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
+)
 
 
 #########################################################

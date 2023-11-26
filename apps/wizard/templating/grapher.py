@@ -1,4 +1,5 @@
 """Grapher phase."""
+import os
 from pathlib import Path
 from typing import cast
 
@@ -7,7 +8,7 @@ from st_pages import add_indentation
 from typing_extensions import Self
 
 from apps.wizard import utils
-from etl.paths import DAG_DIR
+from etl.paths import DAG_DIR, GRAPHER_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -15,6 +16,11 @@ from etl.paths import DAG_DIR
 # Page config
 st.set_page_config(page_title="Wizard (grapher)", page_icon="🪄")
 add_indentation()
+
+# Available namespaces
+OPTIONS_NAMESPACES = sorted(os.listdir(GRAPHER_DIR))
+
+
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
 # FIELDS FROM OTHER STEPS
@@ -57,6 +63,11 @@ class GrapherForm(utils.StepForm):
     def __init__(self: Self, **data: str | bool) -> None:
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+
+        # Handle custom namespace
+        if "namespace_custom" in data:
+            data["namespace"] = str(data["namespace_custom"])
+
         super().__init__(**data)
 
     def validate(self: Self) -> None:
@@ -91,7 +102,7 @@ st.title("Wizard  **:gray[Grapher]**")
 
 # SIDEBAR
 with st.sidebar:
-    utils.warning_metadata_unstable()
+    # utils.warning_metadata_unstable()
     # CONNECT AND
     if APP_STATE.args.run_checks:
         with st.expander("**Environment checks**", expanded=True):
@@ -108,14 +119,16 @@ with st.sidebar:
 form_widget = st.empty()
 with form_widget.form("grapher"):
     # Namespace
-    namespace = APP_STATE.st_widget(
-        st_widget=st.text_input,
-        label="Namespace",
-        help="Institution or topic name",
-        placeholder="Example: 'emdat', 'health'",
-        key="namespace",
-        value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
-    )
+    # namespace = APP_STATE.st_widget(
+    #     st_widget=st.text_input,
+    #     label="Namespace",
+    #     help="Institution or topic name",
+    #     placeholder="Example: 'emdat', 'health'",
+    #     key="namespace",
+    #     value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
+    # )
+    # Namespace
+    namespace_field = [st.empty(), st.container()]
     # Grapher version
     version_grapher = APP_STATE.st_widget(
         st_widget=st.text_input,
@@ -171,6 +184,20 @@ with form_widget.form("grapher"):
         use_container_width=True,
         on_click=APP_STATE.update,
     )
+
+
+# Render responsive namespace field
+utils.render_responsive_field_in_form(
+    key="namespace",
+    display_name="Namespace",
+    field_1=namespace_field[0],
+    field_2=namespace_field[1],
+    options=OPTIONS_NAMESPACES,
+    custom_label="Custom namespace...",
+    help_text="Institution or topic name",
+    app_state=APP_STATE,
+    default_value=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
+)
 
 
 #########################################################
