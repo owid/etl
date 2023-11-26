@@ -7,7 +7,6 @@
 """
 
 import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
