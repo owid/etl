@@ -24,4 +24,8 @@ meta:
       name: IVS Conditions of use
       url: https://www.worldvaluessurvey.org/WVSEVStrend.jsp
 
-  
+wdir: ../../../data/snapshots/ivs/2023-11-27
+outs:
+- md5: c5575af2f8e3a23910dde80708687fdd
+  size: 99689
+  path: integrated_values_survey.csv
