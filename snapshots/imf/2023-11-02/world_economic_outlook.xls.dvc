@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Economic Outlook
+    description: |-
+      The World Economic Outlook (WEO) database contains selected macroeconomic data series from the statistical appendix of the World Economic Outlook report, which presents the IMF staff's analysis and projections of economic developments at the global level, in major country groups, and in many individual countries.
+    date_published: 2023-10-05
+    version_producer: October 2023 Edition
+
+    # Citation
+    producer: International Monetary Fund
+    citation_full: |-
+      International Monetary Fund. 2023. World Economic Outlook Database
+    attribution_short: IMF
+
+    # Files
+    url_main: https://www.imf.org/en/Publications/WEO/weo-database/2023/October
+    url_download: 
+      https://www.imf.org/-/media/Files/Publications/WEO/WEO-Database/2023/WEOOct2023all.ashx
+    date_accessed: 2023-11-02
+
+    # License
+    license:
+      name: © International Monetary Fund
+      url: https://www.imf.org/external/terms.htm
+
+wdir: ../../../data/snapshots/imf/2023-11-02
+outs:
+- md5: 2c63c189e84979591623273e64028872
+  size: 9984224
+  path: world_economic_outlook.xls

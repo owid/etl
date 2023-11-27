@@ -61,10 +61,14 @@ tables:
         title: Central death rate
         unit: deaths per 1,000 people
         description_short: |-
-          For a given population or cohort, the central death rate during a given 12 month interval is calculated as the number of deaths during the interval, divided by the number of person-years lived during that interval.
+          The death rate, calculated as the number of deaths divided by the average number of people alive during the interval.
         description_key:
           - |-
-            Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years. This makes the value very slightly different from the 'probability of death' during the interval, because the 'probability of death' metric uses a different denominator: the number of people alive at that age at the start of the interval.
+            The death rate is measured using the number of person-years lived during the interval.
+          - |-
+            Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years.
+          - |-
+            The death rate is slightly different from the 'probability of death' during the interval, because the 'probability of death' metric uses a different denominator: the number of people alive at that age at the start of the interval, while this indicator uses the average number of people alive during the interval.
           - |-
             {definitions.global.data_used}
         description_processing: |-

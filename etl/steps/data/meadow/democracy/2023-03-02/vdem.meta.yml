@@ -1590,3 +1590,172 @@ tables:
           The variable ranges from 0 to 1 (most equal).
 
           Many countries in recent years receive high scores even though they are far from equal participation because the index scores them relative to the historical average across countries.
+
+      terr_contr_vdem_owid:
+        description: |
+          The indicator denotes the best estimate of the percentage of territory controlled by the government.
+
+          It is based on the V-Dem indicator `v2svstterr`, and we expand it to cover more years for some countries.
+
+          The indicator reaches from 0 to 100%.
+
+      terr_contr_vdem_high_owid:
+        description: |
+          The indicator denotes the upper-bound estimate of the percentage of territory controlled by the government.
+
+          It is based on the V-Dem indicator `v2svstterr_codehigh`, and we expand it to cover more years for some countries.
+
+          The indicator reaches from 0 to 100%.
+
+      terr_contr_vdem_low_owid:
+        description: |
+          The indicator denotes the lower-bound estimate of the percentage of territory controlled by the government.
+
+          It is based on the V-Dem indicator `v2svstterr_codelow`, and we expand it to cover more years for some countries.
+
+          The indicator reaches from 0 to 100%.
+
+      rule_of_law_vdem_owid:
+        description: |
+          The indicator denotes the best estimate of the extent to which the government complies with the law, courts are independent, laws transparent, justice accessible, corruption absent, and the bureaucracy is impartial.
+
+          It is based on the V-Dem indicator `v2x_rule`, and we expand it to cover more years for some countries.
+
+          The indicator reaches from 0 to 1 (most rule-based).
+
+      rule_of_law_vdem_high_owid:
+        description: |
+          The indicator denotes the upper-bound estimate of the extent to which the government complies with the law, courts are independent, laws transparent, justice accessible, corruption absent, and the bureaucracy is impartial.
+
+          It is based on the V-Dem indicator `v2x_rule_codehigh`, and we expand it to cover more years for some countries.
+
+          The indicator reaches from 0 to 1 (most rule-based).
+
+      rule_of_law_vdem_low_owid:
+        description: |
+          The indicator denotes the lower-bound estimate of the extent to which the government complies with the law, courts are independent, laws transparent, justice accessible, corruption absent, and the bureaucracy is impartial.
+
+          It is based on the V-Dem indicator `v2x_rule_codelow`, and we expand it to cover more years for some countries.
+
+          The indicator reaches from 0 to 1 (most rule-based).
+
+      public_admin_vdem_owid:
+        description: |
+          The indicator denotes the best estimate of the extent to which public officials respect the law, and administer it without arbitrariness and bias.
+
+          It is based on the V-Dem indicator `v2clrspct`, and we expand it to cover more years for some countries.
+
+          Higher scores mean more rigor and impartiality.
+
+      public_admin_vdem_high_owid:
+        description: |
+          The indicator denotes the upper-bound estimate of the extent to which public officials respect the law, and administer it without arbitrariness and bias.
+
+          It is based on the V-Dem indicator `v2clrspct_codehigh`, and we expand it to cover more years for some countries.
+
+          Higher scores mean more rigor and impartiality.
+
+      public_admin_vdem_low_owid:
+        description: |
+          The indicator denotes the lower-bound estimate of the extent to which public officials respect the law, and administer it without arbitrariness and bias.
+
+          It is based on the V-Dem indicator `v2clrspct_codelow`, and we expand it to cover more years for some countries.
+
+          Higher scores mean more rigor and impartiality.
+
+      personalism_vdem_owid:
+        description: |
+          The indicator denotes the best estimate of the extent to which the executive is unconstrained by the legislature, judiciary, electoral managementbody, and other oversight.
+
+          It is based on the V-Dem indicator `v2xnp_pres`, and we expand it to cover more years for some countries.
+
+          The indicator reaches from 0 to 1 (most personalized).
+
+      personalism_vdem_high_owid:
+        description: |
+          The indicator denotes the upper-bound estimate of the extent to which the executive is unconstrained by the legislature, judiciary, electoral managementbody, and other oversight.
+
+          It is based on the V-Dem indicator `v2xnp_pres`, and we expand it to cover more years for some countries.
+
+          The indicator reaches from 0 to 1 (most personalized).
+
+      personalism_vdem_low_owid:
+        description: |
+          The indicator denotes the lower-bound estimate of the extent to which the executive is unconstrained by the legislature, judiciary, electoral managementbody, and other oversight.
+
+          It is based on the V-Dem indicator `v2xnp_pres`, and we expand it to cover more years for some countries.
+
+          The indicator reaches from 0 to 1 (most personalized).
+
+      int_auton_vdem_owid:
+        description: |
+          The indicator denotes the best estimate of the extent to which foreign policy is free from the interference of other states.
+
+          It is based on the V-Dem indicator `v2svinlaut`, and we expand it to cover more years for some countries.
+
+          International treaties, organizations, and confederations not considered if the state negotiated its entry and is free to exit.
+
+          International market forces and transnational corporations not considered.
+
+          Higher scores mean more freedom.
+
+      int_auton_vdem_high_owid:
+        description: |
+          The indicator denotes the upper-bound estimate of the extent to which foreign policy is free from the interference of other states.
+
+          It is based on the V-Dem indicator `v2svinlaut`, and we expand it to cover more years for some countries.
+
+          International treaties, organizations, and confederations not considered if the state negotiated its entry and is free to exit.
+
+          International market forces and transnational corporations not considered.
+
+          Higher scores mean more freedom.
+
+      int_auton_vdem_low_owid:
+        description: |
+          The indicator denotes the lower-bound estimate of the extent to which foreign policy is free from the interference of other states.
+
+          It is based on the V-Dem indicator `v2svinlaut`, and we expand it to cover more years for some countries.
+
+          International treaties, organizations, and confederations not considered if the state negotiated its entry and is free to exit.
+
+          International market forces and transnational corporations not considered.
+
+          Higher scores mean more freedom.
+
+      dom_auton_vdem_owid:
+        description: |
+          The indicator denotes the best estimate of the extent to which domestic policy is free from the interference of other states.
+
+          International treaties, organizations, and confederations not considered if the state negotiated its entry and is free to exit.
+
+          International market forces and transnational corporations not considered.
+
+          It is based on the V-Dem indicator v2svdomaut, and we expand it to cover more years for some countries.
+
+          Higher scores mean more freedom.
+
+      dom_auton_vdem_high_owid:
+        description: |
+          The indicator denotes the upper-bound estimate of the extent to which domestic policy is free from the interference of other states.
+
+          International treaties, organizations, and confederations not considered if the state negotiated its entry and is free to exit.
+
+          International market forces and transnational corporations not considered.
+
+          It is based on the V-Dem indicator `v2svdomaut`, and we expand it to cover more years for some countries.
+
+          Higher scores mean more freedom.
+
+      dom_auton_vdem_low_owid:
+        description: |
+          The indicator denotes the lower-bound estimate of the extent to which domestic policy is free from the interference of other states.
+
+          International treaties, organizations, and confederations not considered if the state negotiated its entry and is free to exit.
+
+          International market forces and transnational corporations not considered.
+
+          It is based on the V-Dem indicator `v2svdomaut`, and we expand it to cover more years for some countries.
+
+          Higher scores mean more freedom.
+
