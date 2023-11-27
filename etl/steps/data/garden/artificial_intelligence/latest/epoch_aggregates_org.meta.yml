@@ -19,7 +19,7 @@ tables:
   epoch:
     variables:
       cumulative_count:
-        title: Cumulative share of AI systems by organization
+        title: Cumulative number of AI systems by organization
         unit: 'AI systems'
         short_unit: ''
         description_short: Describes the organization where the authors of an AI system have their primary affiliations.

@@ -41,6 +41,17 @@ def run(dest_dir: str) -> None:
     assert tb["publication_date"].dtype == "datetime64[ns]", "publication_date column is not of type datetime64"
     # Create a year column
     tb["year"] = tb["publication_date"].dt.year
+    # Clean up researcher affiliation in column 'organization_categorization'
+    organization_mapping = {
+        "Meta AI": "Meta/Facebook",
+        "Facebook AI Research": "Meta/Facebook",
+        "Facebook AI": "Meta/Facebook",
+        "Microsoft Research": "Microsoft",
+        "Google DeepMind": "DeepMind",
+    }
+
+    tb["organization"] = tb["organization"].replace(organization_mapping)
+
     # Get domain counts
 
     org_counts = tb.groupby(["year", "organization"]).size().reset_index(name="count")
@@ -69,16 +80,10 @@ def run(dest_dir: str) -> None:
     top_columns = sorted_columns[: min(11, number_of_columns)]
 
     df_pivot_org = df_pivot_org[["year"] + top_columns]
-
-    # Calculate the shares for each column (excluding 'year' and 'Total')
-    df_pivot_org[df_pivot_org.columns.difference(["year", "Total"])] = df_pivot_org[
+    df_pivot_org["Other"] = df_pivot_org["Total"] - df_pivot_org[
         df_pivot_org.columns.difference(["year", "Total"])
-    ].div(df_pivot_org["Total"], axis=0)
-
-    # Assuming you have already calculated the shares
-    df_pivot_org[df_pivot_org.columns.difference(["year", "Total"])] = (
-        df_pivot_org[df_pivot_org.columns.difference(["year", "Total"])] * 100
-    )
+    ].sum(axis=1)
+    df_pivot_org = df_pivot_org.drop(columns="Total")
     # List of variables to melt (excluding 'year')
     variables_to_melt = df_pivot_org.columns.difference(["year"]).tolist()
 
