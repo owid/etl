@@ -237,9 +237,9 @@ steps:
 
   # UN Comtrade
   data://meadow/un/2023-08-02/comtrade_pandemics:
-    - snapshot://un/2023-08-02/comtrade_pandemics.1987_1998.csv
-    - snapshot://un/2023-08-02/comtrade_pandemics.1999_2010.csv
-    - snapshot://un/2023-08-02/comtrade_pandemics.2011_2022.csv
+    - snapshot://un/2023-08-02/comtrade_pandemics_1987_1998.csv
+    - snapshot://un/2023-08-02/comtrade_pandemics_1999_2010.csv
+    - snapshot://un/2023-08-02/comtrade_pandemics_2011_2022.csv
   data://garden/un/2023-08-02/comtrade_pandemics:
     - data://meadow/un/2023-08-02/comtrade_pandemics
     - data://garden/regions/2023-01-01/regions
