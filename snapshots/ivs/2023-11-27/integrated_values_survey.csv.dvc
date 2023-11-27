@@ -26,6 +26,6 @@ meta:
 
 wdir: ../../../data/snapshots/ivs/2023-11-27
 outs:
-- md5: c5575af2f8e3a23910dde80708687fdd
-  size: 99689
+- md5: 1f5fbe2ca7d40898dd28545d14e36acb
+  size: 118748
   path: integrated_values_survey.csv

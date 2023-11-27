@@ -36,7 +36,7 @@ global additional_questions $confidence_questions $other_trust_questions
 global questions A165 A168 G007_33_B G007_34_B $additional_questions
 
  * Keep wave ID, country, weight and the list of questions
-keep S002VS S003 S017 $questions
+keep S002VS S002EVS S003 S017 $questions
 
 * Replace wave ID with last year of survey
 replace S002VS=1984 if S002VS==1
@@ -46,6 +46,13 @@ replace S002VS=2004 if S002VS==4
 replace S002VS=2010 if S002VS==5
 replace S002VS=2014 if S002VS==6
 replace S002VS=2022 if S002VS==7
+
+* There are several S002VS missing (only in EVS), so they are replaced according to the year of survey of EVS
+replace S002VS = 1984 if S002VS==. & S002EVS==1
+replace S002VS = 1993 if S002VS==. & S002EVS==2
+replace S002VS = 2001 if S002VS==. & S002EVS==3
+replace S002VS = 2010 if S002VS==. & S002EVS==4
+replace S002VS = 2021 if S002VS==. & S002EVS==5
 
 rename S002VS year
 rename S003 country

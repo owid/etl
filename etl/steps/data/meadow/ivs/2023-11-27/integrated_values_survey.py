@@ -24,9 +24,6 @@ def run(dest_dir: str) -> None:
     # Rename variables
     tb = rename_vars(tb)
 
-    # Remove rows with missing year values
-    tb = tb.dropna(subset=["year"])
-
     # Remove trailing spaces from country names (right strip)
     tb["country"] = tb["country"].str.rstrip()
 
@@ -67,6 +64,7 @@ def rename_vars(tb: Table) -> Table:
         "E069_13": "Major Companies",
         "E069_14": "Environmental Protection Movement",
         "E069_15": "Women's Movement",
+        "E069_16": "Health Care System",
         "E069_17": "Justice System/Courts",
         "E069_18": "European Union",
         "E069_18A": "Major regional organization (combined from country-specific)",

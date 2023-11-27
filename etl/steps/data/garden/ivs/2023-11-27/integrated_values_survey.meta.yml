@@ -208,6 +208,14 @@ tables:
         display:
           name: "Trust: Confidence in the women's movement"
           <<: *common-display
+      confidence_health_care_system:
+        title: "Trust: Confidence in the health care system"
+        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: is it a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "The health care system".'
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: "Trust: Confidence in the health care system"
+          <<: *common-display
       confidence_justice_system_courts:
         title: "Trust: Confidence in the justice system (courts)"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The justice system (courts)".'
@@ -304,14 +312,6 @@ tables:
         display:
           name: "Trust: Confidence in APEC"
           <<: *common-display
-      confidence_sadc_sadec:
-        title: "Trust: Confidence in SADC (SADEC)"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one how much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Southern African Development Community (SADEC)".'
-        unit: "%"
-        short_unit: "%"
-        display:
-          name: "Trust: Confidence in SADC (SADEC)"
-          <<: *common-display
       confidence_charitable_or_humanitarian_organizations:
         title: "Trust: Confidence in charitable or humanitarian organizations"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one how much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Charitable or humanitarian organizations".'
@@ -368,14 +368,6 @@ tables:
         display:
           name: "Trust: Confidence in the Organization of the Islamic World"
           <<: *common-display
-      confidence_arab_maghreb_union:
-        title: "Trust: Confidence in the Arab Maghreb Union"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Arab Maghreb Union".'
-        unit: "%"
-        short_unit: "%"
-        display:
-          name: "Trust: Confidence in the Arab Maghreb Union"
-          <<: *common-display
       confidence_cooperation_council_for_the_arab_states_of_gulf__gcc:
         title: "Trust: Confidence in the Cooperation Council for the Arab States of Gulf (GCC)"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Cooperation Council for the Arab States of Gulf (GCC)".'
@@ -383,53 +375,5 @@ tables:
         short_unit: "%"
         display:
           name: "Trust: Confidence in the Cooperation Council for the Arab States of Gulf (GCC)"
-          <<: *common-display
-      confidence_world_trade_organization__wto:
-        title: "Trust: Confidence in the World Trade Organization (WTO)"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "World Trade Organization (WTO)".'
-        unit: "%"
-        short_unit: "%"
-        display:
-          name: "Trust: Confidence in the World Trade Organization (WTO)"
-          <<: *common-display
-      confidence_world_health_organization__who:
-        title: "Trust: Confidence in the World Health Organization (WHO)"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "World Health Organization (WHO)".'
-        unit: "%"
-        short_unit: "%"
-        display:
-          name: "Trust: Confidence in the World Health Organization (WHO)"
-          <<: *common-display
-      confidence_world_bank:
-        title: "Trust: Confidence in the World Bank"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "World Bank".'
-        unit: "%"
-        short_unit: "%"
-        display:
-          name: "Trust: Confidence in the World Bank"
-          <<: *common-display
-      confidence_elections:
-        title: "Trust: Confidence in elections"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Elections".'
-        unit: "%"
-        short_unit: "%"
-        display:
-          name: "Trust: Confidence in elections"
-          <<: *common-display
-      confidence_international_criminal_court__icc:
-        title: "Trust: Confidence in the International Criminal Court (ICC)"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in organization "International Criminal Court (ICC)".'
-        unit: "%"
-        short_unit: "%"
-        display:
-          name: "Trust: Confidence in the International Criminal Court (ICC)"
-          <<: *common-display
-      confidence_african_union__au:
-        title: "Trust: Confidence in the African Union (AU)"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in organization "African Union (AU)".'
-        unit: "%"
-        short_unit: "%"
-        display:
-          name: "Trust: Confidence in the African Union (AU)"
           <<: *common-display
 
