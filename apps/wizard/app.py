@@ -18,7 +18,8 @@ st.title("Wizard")
 # should be
 show_pages(
     [
-        Section("Create new ETsL steps"),
+        Page(str(CURRENT_DIR / "home.py"), "Home", icon="🏠"),
+        Section("Create new ETL steps"),
         Page(str(CURRENT_DIR / "templating/snapshot.py"), "Snapshot", icon="1️⃣"),
         Page(str(CURRENT_DIR / "templating/meadow.py"), "Meadow", icon="2️⃣"),
         Page(str(CURRENT_DIR / "templating/garden.py"), "Garden", icon="3️⃣"),
@@ -31,6 +32,6 @@ show_pages(
 add_indentation()
 
 if utils.AppState.args.phase == "all":  # type: ignore
-    switch_page("Snapshot")  # type: ignore
-elif utils.AppState.args.phase != "all":  # type: ignore
+    switch_page("Home")  # type: ignore
+if utils.AppState.args.phase != "all":  # type: ignore
     switch_page(utils.AppState.args.phase.title())  # type: ignore
