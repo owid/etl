@@ -24,15 +24,15 @@ steps:
   data://grapher/andrew/2019-12-03/co2_mitigation_curves_2celsius:
     - data://garden/andrew/2019-12-03/co2_mitigation_curves
   #
-  # GCP - Global Carbon Budget (2023-09-28).
+  # GCP - Global Carbon Budget (2023-12-05).
   #
-  data://meadow/gcp/2023-09-28/global_carbon_budget:
-    - snapshot://gcp/2023-09-28/global_carbon_budget_fossil_co2_emissions.csv
-    - snapshot://gcp/2023-09-28/global_carbon_budget_global_emissions.xlsx
-    - snapshot://gcp/2023-09-28/global_carbon_budget_national_emissions.xlsx
-    - snapshot://gcp/2023-09-28/global_carbon_budget_land_use_change_emissions.xlsx
-  data://garden/gcp/2023-09-28/global_carbon_budget:
-    - data://meadow/gcp/2023-09-28/global_carbon_budget
+  data-private://meadow/gcp/2023-12-05/global_carbon_budget:
+    - snapshot-private://gcp/2023-12-05/global_carbon_budget_fossil_co2_emissions.csv
+    - snapshot-private://gcp/2023-12-05/global_carbon_budget_global_emissions.xlsx
+    - snapshot-private://gcp/2023-12-05/global_carbon_budget_national_emissions.xlsx
+    - snapshot-private://gcp/2023-12-05/global_carbon_budget_land_use_change_emissions.xlsx
+  data-private://garden/gcp/2023-12-05/global_carbon_budget:
+    - data-private://meadow/gcp/2023-12-05/global_carbon_budget
     # Loaded to calculate emissions per unit energy.
     - data://garden/energy/2023-07-10/primary_energy_consumption
     # Loaded to calculate emissions per GDP.
@@ -42,8 +42,8 @@ steps:
     # Loaded to create region aggregates (including income groups).
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
-  data://grapher/gcp/2023-09-28/global_carbon_budget:
-    - data://garden/gcp/2023-09-28/global_carbon_budget
+  data-private://grapher/gcp/2023-12-05/global_carbon_budget:
+    - data-private://garden/gcp/2023-12-05/global_carbon_budget
   #
   # Emissions - CO2 dataset (2023-11-23).
   #
@@ -127,5 +127,26 @@ steps:
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
+  #
+  # GCP - Global Carbon Budget (2023-09-28).
+  #
+  data://meadow/gcp/2023-09-28/global_carbon_budget:
+    - snapshot://gcp/2023-09-28/global_carbon_budget_fossil_co2_emissions.csv
+    - snapshot://gcp/2023-09-28/global_carbon_budget_global_emissions.xlsx
+    - snapshot://gcp/2023-09-28/global_carbon_budget_national_emissions.xlsx
+    - snapshot://gcp/2023-09-28/global_carbon_budget_land_use_change_emissions.xlsx
+  data://garden/gcp/2023-09-28/global_carbon_budget:
+    - data://meadow/gcp/2023-09-28/global_carbon_budget
+    # Loaded to calculate emissions per unit energy.
+    - data://garden/energy/2023-07-10/primary_energy_consumption
+    # Loaded to calculate emissions per GDP.
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    # Loaded to create per-capita variables.
+    - data://garden/demography/2023-03-31/population
+    # Loaded to create region aggregates (including income groups).
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/gcp/2023-09-28/global_carbon_budget:
+    - data://garden/gcp/2023-09-28/global_carbon_budget
 
   ######################################################################################################################
