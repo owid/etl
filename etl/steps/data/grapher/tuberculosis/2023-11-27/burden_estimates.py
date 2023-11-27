@@ -15,11 +15,6 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["burden_estimates"]
-
-    #
-    # Process data.
-    #
-
     #
     # Save outputs.
     #
