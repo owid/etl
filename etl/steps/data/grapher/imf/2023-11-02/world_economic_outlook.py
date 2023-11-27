@@ -17,6 +17,29 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["world_economic_outlook"]
 
     #
+    # Process data.
+    #
+
+    # For Grapher charts, we want the dashed projection line to start at the last observation so
+    # that the line looks continuous. For this, we take each variable's last observation per country
+    # and make it its first forecast as well.
+    indicators = tb.columns.str.replace("_observation|_forecast", "", regex=True).unique().tolist()
+    tb = tb.reset_index()
+
+    for ind in indicators:
+        # Find the last observation year by country
+        last_obs = tb.loc[tb[ind + "_observation"].notnull()].groupby("country")["year"].max()
+        # Assign that to last_obs column
+        tb["last_obs"] = tb["country"].map(last_obs)
+        # Where the year is the last_obs year, assign the value of the last observation
+        tb.loc[tb["year"] == tb["last_obs"], ind + "_forecast"] = tb[ind + "_observation"]
+        # Drop last_obs
+        tb = tb.drop(columns="last_obs")
+
+    # Reinstate the index
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
+
+    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
