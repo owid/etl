@@ -21,6 +21,9 @@ definitions:
     Emissions given in tonnes have been converted to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources. These factors are taken from the 6th Assessment Report (AR6) of the Intergovernmental Panel on Climate Change (IPCC).
   common:
     processing_level: major
+    presentation:
+      topic_tags:
+      - CO2 & Greenhouse Gas Emissions
 
 dataset:
   update_period_days: 0
