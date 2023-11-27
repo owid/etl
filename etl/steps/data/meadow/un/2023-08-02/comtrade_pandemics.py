@@ -17,15 +17,14 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snaps = [
-        cast(Snapshot, paths.load_dependency(f"comtrade_pandemics.{years}.csv"))
-        for years in ["1987_1998", "1999_2010", "2011_2022"]
+        paths.load_snapshot(f"comtrade_pandemics_{years}.csv") for years in ["1987_1998", "1999_2010", "2011_2022"]
     ]
     # Default metadata (metadata is common to all snapshots)
     snap_metadata = snaps[0].metadata
 
     # Load data from snapshot.
     tbs = [snap.read_csv(encoding="latin-1") for snap in snaps]
-    tb = pr.concat(tbs, ignore_index=True)
+    tb = pr.concat(tbs, ignore_index=True, short_name=paths.short_name)
 
     # Sanity checks
     assert (tb["Period"] == tb["RefYear"]).all(), "`period` != `refyear`!"

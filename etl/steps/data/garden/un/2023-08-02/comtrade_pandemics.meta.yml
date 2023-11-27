@@ -41,6 +41,7 @@ tables:
           Total value of imports of breathing appliances and gas masks (commodity code: 902000).
         description_key:
           - This excludes protective masks having neither mechanical parts nor replaceable filters and excluding apparatus of commodity no. 901920 ("Therapeutic respiration apparatus; ozone, oxygen, aerosol therapy apparatus; artificial respiration or other therapeutic respiration apparatus" in COMTRADE database").
+          - *currency
 
       import_cif_breathing_appliances_per_capita:
         title: Imports of breathing appliances (per capita)
@@ -49,6 +50,7 @@ tables:
           Total value of imports (per capita) of breathing appliances and gas masks (commodity code: 902000).
         description_key:
           - This excludes protective masks having neither mechanical parts nor replaceable filters and excluding apparatus of commodity no. 901920 ("Therapeutic respiration apparatus; ozone, oxygen, aerosol therapy apparatus; artificial respiration or other therapeutic respiration apparatus" in COMTRADE database").
+          - *currency
         description_processing: |-
           The commodity was originally named "Breathing appliances and gas masks".
 
@@ -62,6 +64,7 @@ tables:
           Total value of imports of surgical gloves (code: 401511).
         description_key:
           - Includes vulcanised rubber (other than hard rubber) surgical gloves.
+          - *currency
 
       import_cif_surgical_gloves_per_capita:
         title: Imports of surgical gloves (per capita)
@@ -72,7 +75,7 @@ tables:
           Imports of vulcanized (other than hard rubber), surgical gloves.
         description_key:
           - Includes vulcanised rubber (other than hard rubber) surgical gloves.
-
+          - *currency
 
       # PLASTICS IN CLOTHING #
       import_cif_plastics_clothing:
@@ -83,7 +86,7 @@ tables:
           Total value of imports of plastics in clothing (commodity code: 392620).
         description_key:
           - Includes articles of apparel and clothing accessories (including gloves, mittens and mitts).
-
+          - *currency
       import_cif_plastics_clothing_per_capita:
         title: Imports of plastics in clothing (per capita)
         unit: "current US$ per capita"
@@ -123,6 +126,7 @@ tables:
           Total value of imports of textiles and manufactured or processed textiles (commodity code: 630790).
         description_key:
           - This commodity concerns 'other textiles', not elsewhere classified in commodities 63 ("Textiles, made up articles") and 6307.
+          - *currency
         description_processing: |-
           This commodity is originally named "Textiles and made up articles".
 
@@ -133,6 +137,7 @@ tables:
           Total value of imports (per capita) of textiles and manufactured or processed textiles (commodity code: 630790).
         description_key:
           - This commodity concerns 'other textiles', not elsewhere classified in commodities 63 ("Textiles, made up articles") and 6307.
+          - *currency
         description_processing: |-
           This commodity was originally named "Textiles and made up articles".
 
@@ -144,6 +149,7 @@ tables:
         unit: "current US$"
         description_short: |-
           Total value of imports of gloves, mittens and mitts knitted or crocheted, impregnated, coated or covered with plastics or rubber.
+
       import_cif_gloves_mittens_mitts_knitted_croacheted_per_capita:
         title: Imports of gloves, mittens and mitts (knitted or crocheted) (per capita)
         unit: "current US$ per capita"
