@@ -53,9 +53,9 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file-2011_2022", prompt=True, type=str, help="Path to local data file (period 2011 to 2022).")
 def main(path_to_file_1987_1998: str, path_to_file_1999_2010: str, path_to_file_2011_2022: str, upload: bool) -> None:
     snapshot_paths = [
-        f"un/{SNAPSHOT_VERSION}/comtrade_pandemics.1987_1998.csv",
-        f"un/{SNAPSHOT_VERSION}/comtrade_pandemics.1999_2010.csv",
-        f"un/{SNAPSHOT_VERSION}/comtrade_pandemics.2011_2022.csv",
+        f"un/{SNAPSHOT_VERSION}/comtrade_pandemics_1987_1998.csv",
+        f"un/{SNAPSHOT_VERSION}/comtrade_pandemics_1999_2010.csv",
+        f"un/{SNAPSHOT_VERSION}/comtrade_pandemics_2011_2022.csv",
     ]
     path_to_files = [
         path_to_file_1987_1998,
