@@ -15,7 +15,7 @@ from etl import grapher_model as gm
 from etl.command import main as etl_main
 from etl.config import STAGING
 from etl.db import get_engine
-from etl.metadata_export import merge_or_create_yaml
+from etl.metadata_export import merge_or_create_yaml, reorder_fields
 from etl.paths import DAG_FILE, DATA_DIR, STEP_DIR
 
 log = structlog.get_logger()
@@ -212,6 +212,10 @@ def cli(
         if grapher_config:
             vars[col]["presentation"]["grapher_config"] = _prune_chart_config(grapher_config)
 
+            # use chart subtitle as description_short
+            if "subtitle" in grapher_config and vars[col]["description_short"].startswith("TBD"):
+                vars[col]["description_short"] = grapher_config["subtitle"]
+
     dataset = {
         "update_period_days": "TBD - Number of days between OWID updates",
     }
@@ -228,10 +232,12 @@ def cli(
         definitions["common"]["sources"] = []
         definitions["common"]["origins"] = [origin.to_dict() for origin in origins]
 
-    meta = {"dataset": dataset, "definitions": definitions, "tables": {ds.table_names[0]: {"variables": vars}}}
+    meta_dict = {"dataset": dataset, "definitions": definitions, "tables": {ds.table_names[0]: {"variables": vars}}}
+
+    meta_dict = reorder_fields(meta_dict)
 
     output_path = STEP_DIR / "data/grapher" / (uri + ".meta.yml")
-    yaml_str = merge_or_create_yaml(meta, output_path)
+    yaml_str = merge_or_create_yaml(meta_dict, output_path)
 
     if show:
         Console().print(Syntax(yaml_str, "yaml", line_numbers=True))
