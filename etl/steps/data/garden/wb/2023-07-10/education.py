@@ -1,10 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog.utils import underscore
 from tqdm import tqdm
 
@@ -24,13 +22,17 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
 
-    # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("education"))
-
-    # Read table from meadow dataset.
+    # Load meadow datasets.
+    ds_meadow = paths.load_dataset("education")
     tb = ds_meadow["education"]
-    # Save metadata for later use
-    metadata = tb.metadata
+
+    # Load historical literacy
+    ds_literacy = paths.load_dataset("literacy_rates")
+    tb_literacy = ds_literacy["literacy_rates"]
+
+    # Load historical literacy expenditure data
+    ds_expenditure = paths.load_dataset("public_expenditure")
+    tb_expenditure = ds_expenditure["public_expenditure"]
 
     #
     # Process data.
@@ -73,7 +75,7 @@ def run(dest_dir: str) -> None:
     tb["normalized_hci"] = tb["HD.HCI.HLOS"] / max_value
 
     # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
-    tb = combine_historical_literacy_expenditure(tb)
+    tb = combine_historical_literacy_expenditure(tb, tb_literacy, tb_expenditure)
 
     # Compare two columnst that seem to have identical indicies (if values are the same then remove)
     if tb["SE.XPD.TOTL.GD.ZS"].equals(tb["SE.XPD.TOTL.GD.ZS."]):
@@ -84,8 +86,6 @@ def run(dest_dir: str) -> None:
     # Set an appropriate index and sort.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
-    # Add the metadata back to the table
-    tb.metadata = metadata
     # Add metadata by finding the descriptions and sources using the indicator codes.
     tb = add_metadata(tb, metadata_tb)
     #
@@ -100,22 +100,34 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def combine_historical_literacy_expenditure(tb):
+def combine_historical_literacy_expenditure(tb, tb_literacy, tb_expenditure):
     """
-    Combines historical and recent literacy and expenditure data into a single DataFrame.
+    Merges historical and recent literacy and expenditure data into a single DataFrame.
 
-    This function loads historical literacy and expenditure data, merges them with the recent data in
-    the input DataFrame 'tb' based on 'year' and 'country' columns. It then creates two new columns:
-    'combined_literacy' and 'combined_expenditure', which hold the respective values, preferring recent
-    data when available.
+    This function integrates data from two separate DataFrames containing historical literacy rates and
+    public expenditure on education with a primary DataFrame. It merges these datasets based on common
+    'year' and 'country' columns. The resulting DataFrame includes two new columns, 'combined_literacy'
+    and 'combined_expenditure', which contain the respective literacy and expenditure data. The function
+    prioritizes recent data over historical data when both are available.
+
+    Parameters:
+    - tb (DataFrame): The primary DataFrame containing recent literacy and expenditure data.
+    - tb_literacy (DataFrame): A DataFrame containing historical literacy data with columns
+      ['year', 'country', 'literacy_rates__world_bank__cia_world_factbook__and_other_sources'].
+    - tb_expenditure (DataFrame): A DataFrame containing historical expenditure data with columns
+      ['year', 'country', 'public_expenditure_on_education__tanzi__and__schuktnecht__2000'].
+
+    The function handles missing data by favoring recent World Bank data; if this is not available,
+    it falls back to historical data, which could also be missing (NaN).
+
+    Returns:
+    DataFrame: The merged DataFrame with new columns 'combined_literacy' and 'combined_expenditure',
+    and metadata about data origins added to these columns.
+
+    This function assumes that the input DataFrames share a common structure in terms of the 'year' and
+    'country' columns, and that these columns are used as keys for merging the datasets.
+    The function adds metadata to the new columns, indicating the origin of the data.
     """
-    # Load historical literacy
-    ds_literacy = cast(Dataset, paths.load_dependency("literacy_rates"))
-    tb_literacy = ds_literacy["literacy_rates"]
-
-    # Load historical literacy expenditure data
-    ds_expenditure = cast(Dataset, paths.load_dependency("public_expenditure"))
-    tb_expenditure = ds_expenditure["public_expenditure"]
 
     historic_literacy = (
         tb_literacy[["literacy_rates__world_bank__cia_world_factbook__and_other_sources"]].reset_index().copy()
@@ -136,17 +148,15 @@ def combine_historical_literacy_expenditure(tb):
         on=["year", "country"],
         how="outer",
         suffixes=("_historic_lit", "_recent_lit"),
-    ).copy_metadata(from_table=recent_literacy)
+    )
 
     # Merge the historic expenditure with newly created literacy table based on 'year' and 'country'
-    combined_df = pr.merge(combined_df, historic_expenditure, on=["year", "country"], how="outer").copy_metadata(
-        from_table=combined_df
-    )
+    combined_df = pr.merge(combined_df, historic_expenditure, on=["year", "country"], how="outer")
 
     # Merge the recent expenditure with newly created literacy and historic expenditure table based on 'year' and 'country'
     combined_df = pr.merge(
         combined_df, recent_expenditure, on=["year", "country"], how="outer", suffixes=("_historic_exp", "_recent_exp")
-    ).copy_metadata(from_table=combined_df)
+    )
 
     # Define the functions to decide which value to keep (prefer more recent World Bank data; if NaN pick the historic ones (which could also be NaN))
     def decide_literacy(row):
@@ -173,7 +183,7 @@ def combine_historical_literacy_expenditure(tb):
         combined_df[["year", "country", "combined_literacy", "combined_expenditure"]],
         on=["year", "country"],
         how="outer",
-    ).copy_metadata(from_table=tb)
+    )
 
     # Add origins from historical datasets to the new columns
     tb["combined_expenditure"].metadata.origins = tb["combined_expenditure"].metadata.origins + [

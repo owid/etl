@@ -14,8 +14,8 @@ meta:
       sources may have discrepancies and different underlying methodologies, and thus
       year-to-year changes should be interpreted cautiously.
     # Citation
-    producer: Our World in Data
-    citation_full: 'Literacy rates (World Bank, CIA World Factbook, and other sources). Published by Our World in Data.'
+    producer: Various sources
+    citation_full: 'Literacy rates (World Bank, CIA World Factbook, and other sources)'
     # Files
     url_main: 'https://data.worldbank.org/indicator/SE.ADT.LITR.ZS, https://www.cia.gov/library/publications/the-world-factbook/, and other sources.'
     date_accessed: 2018-04-18
