@@ -158,9 +158,13 @@ def create_dataset(
     ds = catalog.Dataset.create_empty(dest_dir, metadata=default_metadata)
 
     # add tables to dataset
+    used_short_names = set()
     for table in tables:
         if underscore_table:
             table = catalog.utils.underscore_table(table, camel_to_snake=camel_to_snake)
+        if table.metadata.short_name in used_short_names:
+            raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
+        used_short_names.add(table.metadata.short_name)
         ds.add(table, formats=formats)
 
     # set metadata from dest_dir

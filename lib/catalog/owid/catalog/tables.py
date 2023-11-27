@@ -1275,7 +1275,7 @@ def _add_table_and_variables_metadata_to_table(
     table: Table, metadata: Optional[TableMeta], origin: Optional[Origin]
 ) -> Table:
     if metadata is not None:
-        table.metadata = metadata
+        table.metadata = metadata.copy()
         for column in list(table.all_columns):
             if origin:
                 table._fields[column].origins = [origin]
