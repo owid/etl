@@ -165,7 +165,7 @@ def regional_aggregations(tb: Table, tb_country_list: Table) -> Table:
             region=region,
             aggregations=aggregations,
             countries_that_must_have_data=[],
-            frac_allowed_nans_per_year=0.1,
+            frac_allowed_nans_per_year=1,  # Allow all nans, because I want to see the total number of countries that have data
         )
 
     # Filter table to keep only regions

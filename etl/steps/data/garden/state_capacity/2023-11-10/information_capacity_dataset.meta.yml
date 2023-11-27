@@ -7,6 +7,9 @@ definitions:
     display: &common-display
       tolerance: 5
 
+  census: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity."
+  modern_census: "A modern census is defined as a census that meets four requirements: universality, well-defined territory, simultaneity, and individual enumeration."
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
@@ -43,7 +46,7 @@ tables:
         title: Census was run
         unit: ""
         short_unit: ""
-        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity."
+        description_short: "{definitions.census}"
         description_from_producer: >-
           Dummy variable that takes the value 1 if the country ran a
           census that year and 0 otherwise. A census is a population count
@@ -61,7 +64,7 @@ tables:
         title: Census was run within 10 years
         unit: ""
         short_unit: ""
-        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity."
+        description_short: "{definitions.census}"
         description_processing: |
           This indicator is constructed by taking the value of the `Census was run` variable for the current year and the previous nine years and summing them up. The indicator takes the value 1 if the sum is greater than 0 and 0 otherwise.
         processing_level: major
@@ -73,7 +76,7 @@ tables:
         title: Modern census first implemented
         unit: ""
         short_unit: ""
-        description_short: "A modern census is defined as a census that meets four requirements: universality, well-defined territory, simultaneity, and individual enumeration."
+        description_short: "{definitions.modern_census}"
         description_from_producer: >-
           Dummy variable that takes the value 1 the year
           a country first implemented a modern census (it is missing
@@ -91,7 +94,7 @@ tables:
         title: Census based on population register
         unit: ""
         short_unit: ""
-        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
+        description_short: "{definitions.modern_census}. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
         description_from_producer: >-
           Dummy variable that takes the value 1 if the
           country runs a census that is based on a continuously updated
@@ -107,7 +110,7 @@ tables:
         title: Census based on population register within 10 years
         unit: ""
         short_unit: ""
-        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
+        description_short: "{definitions.modern_census}. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
         description_processing: |
           This indicator is constructed by taking the value of the `Census based on population register` variable for the current year and the previous nine years and summing them up. The indicator takes the value 1 if the sum is greater than 0 and 0 otherwise.
         processing_level: major
@@ -317,7 +320,7 @@ tables:
         title: Number of censuses implemented by region
         unit: ""
         short_unit: ""
-        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity."
+        description_short: "{definitions.census}"
         description_processing: |
           This indicator is constructed by counting the number of censuses implemented by region. Data is aggregated using Our World in Data region classifications.
         processing_level: major
@@ -329,7 +332,7 @@ tables:
         title: Number of register-based censuses implemented by region
         unit: ""
         short_unit: ""
-        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
+        description_short: "{definitions.modern_census}. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
         description_processing: |
           This indicator is constructed by counting the number of register-based censuses implemented by region. Data is aggregated using Our World in Data region classifications.
         processing_level: major
@@ -341,7 +344,7 @@ tables:
         title: Number of censuses implemented within 10 years by region
         unit: ""
         short_unit: ""
-        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity."
+        description_short: "{definitions.census}"
         description_processing: |
           This indicator is constructed by counting the number of censuses implemented within 10 years by region. Data is aggregated using Our World in Data region classifications.
         processing_level: major
@@ -353,7 +356,7 @@ tables:
         title: Number of register-based censuses implemented within 10 years by region
         unit: ""
         short_unit: ""
-        description_short: "A census is defined as a population count that meets three requirements: universality, well-defined territory, and simultaneity. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
+        description_short: "{definitions.modern_census}. Population registers are state agencies that keep detailed and permanently updated records of every person in the territory."
         description_processing: |
           This indicator is constructed by counting the number of register-based censuses implemented within 10 years by region. Data is aggregated using Our World in Data region classifications.
         processing_level: major
