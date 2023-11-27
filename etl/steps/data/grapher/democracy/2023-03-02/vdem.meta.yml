@@ -115,3 +115,69 @@ tables:
                 text: FAQs on this data
             selectedFacetStrategy: entity
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      civ_libs_vdem_owid:
+        title: civ_libs_vdem_owid
+        description_short: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures the extent to which people are free from government torture, political killings, and forced labor; they have property rights; and enjoy the freedoms of movement, religion, expression, and association. The variable ranges from 0 to 1 (most rights).
+        description_key:
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        description: "The variable denotes the central estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association.\n\nIt is based on the V-Dem variable v2x_civlib and we expand it to cover more years for some countries.\n\nThe variable ranges from 0 to 1 (most rights)."
+        presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          attribution_short: TBD - Indicator's attribution (shorter version)
+          faqs:
+            - fragment_id: TBD - Question identifier from FAQ GDoc
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Human rights index
+            subtitle: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures the extent to which people are free from government torture, political killings, and forced labor; they have property rights; and enjoy the freedoms of movement, religion, expression, and association. The variable ranges from 0 to 1 (most rights).
+            originUrl: https://ourworldindata.org/human-rights
+            hasMapTab: true
+            tab: map
+            addCountryMode: change-country
+            yAxis:
+              max: 1
+              min: 0
+              facetDomain: shared
+            selectedFacetStrategy: entity
+            hideAnnotationFieldsInTitle:
+              time: true
+            relatedQuestions:
+              - url: https://ourworldindata.org/vdem-human-rights-data
+                text: "The 'Varieties of Democracy' data: how do researchers measure human rights?"
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#9f0026'
+                  - '#e31a1c'
+                  - '#fd8d3c'
+                  - '#fed976'
+                  - '#ffeda0'
+                  - '#edf8b1'
+                  - '#c7e9b4'
+                  - '#41b6c4'
+                  - '#225ea8'
+                  - '#172976'
+                customNumericValues:
+                  - 0.1
+                  - 0.2
+                  - 0.3
+                  - 0.4
+                  - 0.5
+                  - 0.6
+                  - 0.7
+                  - 0.8
+                  - 0.9
+                  - 1
+            selectedEntityNames:
+              - Argentina
+              - Australia
+              - Botswana
+              - China
+              - World
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
