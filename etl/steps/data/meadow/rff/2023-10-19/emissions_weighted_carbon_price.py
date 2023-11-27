@@ -59,7 +59,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create new dataset with metadata from walden.
+    # Create new dataset with metadata from snapshot.
     ds_meadow = create_dataset(
         dest_dir=dest_dir,
         tables=[tb_economy, tb_coverage],
