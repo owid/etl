@@ -145,6 +145,110 @@ COLUMNS_THAT_MUST_HAVE_DATA = [
 ]
 
 
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset and read all its tables.
+    ds_meadow = paths.load_dataset("global_carbon_budget")
+    tb_co2 = ds_meadow["global_carbon_budget_fossil_co2_emissions"].reset_index()
+    tb_historical = ds_meadow["global_carbon_budget_historical_budget"].reset_index()
+    tb_consumption = ds_meadow["global_carbon_budget_consumption_emissions"].reset_index()
+    tb_production = ds_meadow["global_carbon_budget_production_emissions"].reset_index()
+    tb_land_use = ds_meadow["global_carbon_budget_land_use_change"].reset_index()
+
+    # Load primary energy consumption dataset and read its main table.
+    ds_energy = paths.load_dataset("primary_energy_consumption")
+    tb_energy = ds_energy["primary_energy_consumption"].reset_index()
+
+    ####################################################################################################################
+    # TODO: Remove this temporary solution once primary energy consumption dataset has origins.
+    error = "Remove temporary solution now that primary energy consumption has origins."
+    assert not tb_energy["primary_energy_consumption__twh"].metadata.origins, error
+    from etl.data_helpers.misc import add_origins_to_energy_table
+
+    tb_energy = add_origins_to_energy_table(tb_energy=tb_energy)
+    ####################################################################################################################
+
+    # Load GDP dataset.
+    ds_gdp = paths.load_dataset("ggdc_maddison")
+
+    # Load population dataset.
+    ds_population = paths.load_dataset("population")
+
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
+
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
+
+    #
+    # Process data.
+    #
+    # Prepare fossil CO2 emissions data.
+    tb_co2 = prepare_fossil_co2_emissions(tb_co2=tb_co2)
+
+    # Prepare consumption-based emission data.
+    tb_consumption = prepare_consumption_emissions(tb_consumption=tb_consumption)
+
+    # Prepare production-based emission data.
+    tb_production = prepare_production_emissions(tb_production=tb_production)
+
+    # Prepare land-use emission data.
+    tb_land_use = prepare_land_use_emissions(tb_land_use=tb_land_use)
+
+    # Select and rename columns from primary energy data.
+    tb_energy = tb_energy[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS, errors="raise")
+
+    # Prepare historical emissions data.
+    tb_historical = prepare_historical_emissions(tb_historical=tb_historical)
+
+    # Run sanity checks on input data.
+    sanity_checks_on_input_data(
+        tb_production=tb_production, tb_consumption=tb_consumption, tb_historical=tb_historical, tb_co2=tb_co2
+    )
+
+    # Extract global emissions, including bunker and land-use change emissions.
+    tb_global_emissions = extract_global_emissions(
+        tb_co2=tb_co2, tb_historical=tb_historical, ds_population=ds_population
+    )
+
+    # Harmonize country names.
+    tb_co2 = harmonize_country_names(tb=tb_co2)
+    tb_consumption = harmonize_country_names(tb=tb_consumption)
+    tb_production = harmonize_country_names(tb=tb_production)
+    tb_land_use = harmonize_country_names(tb=tb_land_use)
+
+    # Fix duplicated rows for Palau.
+    tb_co2 = fix_duplicated_palau_data(tb_co2=tb_co2)
+
+    # Add new variables to main table (consumption-based emissions, emission intensity, per-capita emissions, etc.).
+    tb_combined = combine_data_and_add_variables(
+        tb_co2=tb_co2,
+        tb_production=tb_production,
+        tb_consumption=tb_consumption,
+        tb_global_emissions=tb_global_emissions,
+        tb_land_use=tb_land_use,
+        tb_energy=tb_energy,
+        ds_gdp=ds_gdp,
+        ds_population=ds_population,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+    )
+
+    # Run sanity checks on output data.
+    sanity_checks_on_output_data(tb_combined)
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset and use metadata from meadow dataset.
+    ds_garden = create_dataset(
+        dest_dir=dest_dir, tables=[tb_combined], default_metadata=ds_meadow.metadata, check_variables_metadata=True
+    )
+    ds_garden.save()
+
+
 def sanity_checks_on_input_data(
     tb_production: Table, tb_consumption: Table, tb_historical: Table, tb_co2: Table
 ) -> None:
@@ -1031,107 +1135,3 @@ def combine_data_and_add_variables(
     tb_co2_with_regions.metadata.short_name = paths.short_name
 
     return tb_co2_with_regions
-
-
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset and read all its tables.
-    ds_meadow = paths.load_dataset("global_carbon_budget")
-    tb_co2 = ds_meadow["global_carbon_budget_fossil_co2_emissions"].reset_index()
-    tb_historical = ds_meadow["global_carbon_budget_historical_budget"].reset_index()
-    tb_consumption = ds_meadow["global_carbon_budget_consumption_emissions"].reset_index()
-    tb_production = ds_meadow["global_carbon_budget_production_emissions"].reset_index()
-    tb_land_use = ds_meadow["global_carbon_budget_land_use_change"].reset_index()
-
-    # Load primary energy consumption dataset and read its main table.
-    ds_energy = paths.load_dataset("primary_energy_consumption")
-    tb_energy = ds_energy["primary_energy_consumption"].reset_index()
-
-    ####################################################################################################################
-    # TODO: Remove this temporary solution once primary energy consumption dataset has origins.
-    error = "Remove temporary solution now that primary energy consumption has origins."
-    assert not tb_energy["primary_energy_consumption__twh"].metadata.origins, error
-    from etl.data_helpers.misc import add_origins_to_energy_table
-
-    tb_energy = add_origins_to_energy_table(tb_energy=tb_energy)
-    ####################################################################################################################
-
-    # Load GDP dataset.
-    ds_gdp = paths.load_dataset("ggdc_maddison")
-
-    # Load population dataset.
-    ds_population = paths.load_dataset("population")
-
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
-    #
-    # Process data.
-    #
-    # Prepare fossil CO2 emissions data.
-    tb_co2 = prepare_fossil_co2_emissions(tb_co2=tb_co2)
-
-    # Prepare consumption-based emission data.
-    tb_consumption = prepare_consumption_emissions(tb_consumption=tb_consumption)
-
-    # Prepare production-based emission data.
-    tb_production = prepare_production_emissions(tb_production=tb_production)
-
-    # Prepare land-use emission data.
-    tb_land_use = prepare_land_use_emissions(tb_land_use=tb_land_use)
-
-    # Select and rename columns from primary energy data.
-    tb_energy = tb_energy[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS, errors="raise")
-
-    # Prepare historical emissions data.
-    tb_historical = prepare_historical_emissions(tb_historical=tb_historical)
-
-    # Run sanity checks on input data.
-    sanity_checks_on_input_data(
-        tb_production=tb_production, tb_consumption=tb_consumption, tb_historical=tb_historical, tb_co2=tb_co2
-    )
-
-    # Extract global emissions, including bunker and land-use change emissions.
-    tb_global_emissions = extract_global_emissions(
-        tb_co2=tb_co2, tb_historical=tb_historical, ds_population=ds_population
-    )
-
-    # Harmonize country names.
-    tb_co2 = harmonize_country_names(tb=tb_co2)
-    tb_consumption = harmonize_country_names(tb=tb_consumption)
-    tb_production = harmonize_country_names(tb=tb_production)
-    tb_land_use = harmonize_country_names(tb=tb_land_use)
-
-    # Fix duplicated rows for Palau.
-    tb_co2 = fix_duplicated_palau_data(tb_co2=tb_co2)
-
-    # Add new variables to main table (consumption-based emissions, emission intensity, per-capita emissions, etc.).
-    tb_combined = combine_data_and_add_variables(
-        tb_co2=tb_co2,
-        tb_production=tb_production,
-        tb_consumption=tb_consumption,
-        tb_global_emissions=tb_global_emissions,
-        tb_land_use=tb_land_use,
-        tb_energy=tb_energy,
-        ds_gdp=ds_gdp,
-        ds_population=ds_population,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
-    )
-
-    # Run sanity checks on output data.
-    sanity_checks_on_output_data(tb_combined)
-
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset and use metadata from meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[tb_combined], default_metadata=ds_meadow.metadata, check_variables_metadata=True
-    )
-    ds_garden.save()
