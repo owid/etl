@@ -27,6 +27,7 @@ definitions:
     presentation:
       topic_tags:
       - CO2 & Greenhouse Gas Emissions
+    processing_level: major
 
 dataset:
   title: Global Carbon Budget
