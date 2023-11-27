@@ -41,16 +41,12 @@ def make_variable_names(tb: Table) -> Table:
 
 def pick_variables(tb: Table) -> Table:
     """Selects the variables we want to import from the raw table."""
-    return tb[tb["WEO Subject Code"].isin(VARIABLE_LIST)].drop(
-        columns="WEO Subject Code"
-    )
+    return tb[tb["WEO Subject Code"].isin(VARIABLE_LIST)].drop(columns="WEO Subject Code")
 
 
 def reshape_and_clean(tb: Table) -> Table:
     """Reshapes the table from wide to long format and cleans the data."""
-    tb = tb.melt(
-        id_vars=["Country", "variable", "Estimates Start After"], var_name="year"
-    )
+    tb = tb.melt(id_vars=["Country", "variable", "Estimates Start After"], var_name="year")
 
     # Coerce values to numeric.
     tb["value"] = tb["value"].replace("--", np.nan).astype(float)
@@ -89,20 +85,10 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Prepare raw data.
-    tb = (
-        select_data(tb)
-        .pipe(make_variable_names)
-        .pipe(pick_variables)
-        .pipe(reshape_and_clean)
-    )
+    tb = select_data(tb).pipe(make_variable_names).pipe(pick_variables).pipe(reshape_and_clean)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = (
-        tb.underscore()
-        .set_index(["country", "year"], verify_integrity=True)
-        .sort_index()
-        .sort_index(axis=1)
-    )
+    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     #
     # Save outputs.
