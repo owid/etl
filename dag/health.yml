@@ -346,3 +346,5 @@ steps:
     - data://meadow/who/2023-11-01/who_statins
   data://grapher/who/2023-11-01/who_statins:
     - data://garden/who/2023-11-01/who_statins
+  data://meadow/tuberculosis/2023-11-27/burden_estimates:
+    - snapshot://tuberculosis/2023-11-27/burden_estimates.csv
