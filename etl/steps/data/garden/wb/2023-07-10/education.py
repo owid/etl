@@ -83,9 +83,9 @@ def run(dest_dir: str) -> None:
         tb.drop("SE.XPD.TOTL.GD.ZS.", axis=1, inplace=True)
     else:
         print("The columns are not the same.")
+
     # Set an appropriate index and sort.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-
     # Add metadata by finding the descriptions and sources using the indicator codes.
     tb = add_metadata(tb, metadata_tb)
     #
@@ -157,25 +157,12 @@ def combine_historical_literacy_expenditure(tb, tb_literacy, tb_expenditure):
     combined_df = pr.merge(
         combined_df, recent_expenditure, on=["year", "country"], how="outer", suffixes=("_historic_exp", "_recent_exp")
     )
-
-    # Define the functions to decide which value to keep (prefer more recent World Bank data; if NaN pick the historic ones (which could also be NaN))
-    def decide_literacy(row):
-        return (
-            row["SE.ADT.LITR.ZS"]
-            if pd.notna(row["SE.ADT.LITR.ZS"])
-            else row["literacy_rates__world_bank__cia_world_factbook__and_other_sources"]
-        )
-
-    def decide_expenditure(row):
-        return (
-            row["SE.XPD.TOTL.GD.ZS"]
-            if pd.notna(row["SE.XPD.TOTL.GD.ZS"])
-            else row["public_expenditure_on_education__tanzi__and__schuktnecht__2000"]
-        )
-
-    # Apply the functions to prioritise more recent datat and create new columns
-    combined_df["combined_literacy"] = combined_df.apply(decide_literacy, axis=1)
-    combined_df["combined_expenditure"] = combined_df.apply(decide_expenditure, axis=1)
+    combined_df["combined_literacy"] = combined_df["SE.ADT.LITR.ZS"].fillna(
+        combined_df["literacy_rates__world_bank__cia_world_factbook__and_other_sources"]
+    )
+    combined_df["combined_expenditure"] = combined_df["SE.XPD.TOTL.GD.ZS"].fillna(
+        combined_df["public_expenditure_on_education__tanzi__and__schuktnecht__2000"]
+    )
 
     # Now, merge the relevant columns in newly created table that includes both historic and more recent data back into the original tb based on 'year' and 'country'
     tb = pr.merge(
@@ -185,13 +172,6 @@ def combine_historical_literacy_expenditure(tb, tb_literacy, tb_expenditure):
         how="outer",
     )
 
-    # Add origins from historical datasets to the new columns
-    tb["combined_expenditure"].metadata.origins = tb["combined_expenditure"].metadata.origins + [
-        tb_expenditure["public_expenditure_on_education__tanzi__and__schuktnecht__2000"].metadata.origins[0]
-    ]
-    tb["combined_literacy"].metadata.origins = tb["combined_literacy"].metadata.origins + [
-        tb_literacy["literacy_rates__world_bank__cia_world_factbook__and_other_sources"].metadata.origins[0]
-    ]
     return tb
 
 
@@ -353,9 +333,6 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
             tb[column].metadata.short_unit = ""
 
         elif column == "combined_literacy":
-            tb[column].metadata.origins += [
-                metadata_tb[metadata_tb.columns[0]].origins[0]
-            ]  # Add World Bank origins to the combined column metadata
             tb[column].metadata.title = "Historical and more recent literacy estimates"
             tb[column].metadata.description_from_producer = (
                 "**Recent estimates:**\n\n"
@@ -373,9 +350,6 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
             tb[column].metadata.unit = "%"
             tb[column].metadata.short_unit = "%"
         elif column == "combined_expenditure":
-            tb[column].metadata.origins += [
-                metadata_tb[metadata_tb.columns[0]].origins[0]
-            ]  # Add World Bank origins to the combined column metadata
             tb[column].metadata.title = "Historical and more recent expenditure estimates"
             tb[column].metadata.description_from_producer = (
                 "**Historical expenditure data:**\n\n"
