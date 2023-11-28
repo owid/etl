@@ -195,6 +195,11 @@ def create_dataset(
         for k, v in match.groupdict().items():
             assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
 
+    # another override YAML file with higher priority
+    meta_override_path = get_metadata_path(str(dest_dir)).with_suffix(".override.yml")
+    if meta_override_path.exists():
+        ds.update_metadata(meta_override_path, if_origins_exist=if_origins_exist)
+
     # run grapher checks
     if ds.metadata.channel == "grapher" and run_grapher_checks:
         grapher_checks(ds)
