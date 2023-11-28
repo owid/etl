@@ -24,16 +24,16 @@ tables:
         title: Top 1% - Share (Pretax) (Estimated)
         unit: '%'
         short_unit: '%'
-        description_short: TBD - Indicator's short description
         display:
           name: Top 1% - Share (Pretax) (Estimated)
           numDecimalPlaces: 1
           tolerance: 5
-        description: "The share of income received by the richest 1%.\n\n            Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.\n\n            \nThe data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.\nThese underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries.\n"
-        description_from_producer: TBD - Indicator's description given by the producer
+        description_short: The share of income received by the richest 1% of the population. Income here is measured before taxes and benefits.
         description_key:
           - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
         description_processing: TBD - Indicator's processing description
+        description: "The share of income received by the richest 1%.\n\n            Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.\n\n            \nThe data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.\nThese underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries.\n"
         presentation:
           title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
           title_variant: TBD - Indicator's title variant
@@ -42,6 +42,14 @@ tables:
             - fragment_id: TBD - Question identifier from FAQ GDoc
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
+            title: Income share of the richest 1% (before tax)
+            subtitle: The share of income received by the richest 1% of the population. Income here is measured before taxes and benefits.
+            variantName: WID
+            originUrl: https://ourworldindata.org/economic-inequality
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
             map:
               time: 2019
               colorScale:
@@ -54,16 +62,6 @@ tables:
                   - 20
                   - 25
                   - 30
-              columnSlug: '541254'
-            tab: map
-            note: Income is measured before payment of taxes and non-pension benefits, but after the payment of public and private pensions.
-            title: Income share of the richest 1% (before tax)
-            yAxis:
-              min: 0
-            subtitle: The share of income received by the richest 1% of the population. Income here is measured before taxes and benefits.
-            hasMapTab: true
-            originUrl: https://ourworldindata.org/economic-inequality
-            variantName: WID
             selectedEntityNames:
               - Chile
               - Brazil
@@ -71,3 +69,4 @@ tables:
               - South Africa
               - China
               - France
+            note: Income is measured before payment of taxes and non-pension benefits, but after the payment of public and private pensions.

@@ -288,6 +288,7 @@ def reorder_fields(m: Dict[str, Any]) -> Dict[str, Any]:
         "timelineMaxTime",
         "selectedFacetStrategy",
         "hideAnnotationFieldsInTitle",
+        "hideRelativeToggle",
         "relatedQuestions",
         "map",
         "selectedEntityNames",

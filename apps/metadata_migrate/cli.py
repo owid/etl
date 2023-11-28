@@ -298,6 +298,9 @@ def _get_origins(tab: Table, ds: Dataset) -> List[Origin]:
         else:
             license = None
 
+        if not ds.metadata.sources:
+            raise ValueError(f"No sources or origins found in dataset metadata for {tab.columns[0]}")
+
         return [_create_origin_from_source(ds, ds.metadata.sources[0], license)]
 
 
@@ -362,10 +365,10 @@ def _load_grapher_config(engine: Engine, col: str, ds_meta: DatasetMeta) -> Dict
 
 def _prune_chart_config(config: Dict[Any, Any]) -> Dict[Any, Any]:
     # prune fields not useful for ETL grapher_config
-    # TODO: should we delete title or can we reuse it?
-    # TODO: are dimensions useful?
     for field in ("id", "version", "dimensions", "isPublished", "data", "slug"):
         config.pop(field, None)
+    if "map" in config:
+        config["map"].pop("columnSlug", None)
     return config
 
 
