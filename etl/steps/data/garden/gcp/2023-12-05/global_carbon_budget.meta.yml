@@ -12,7 +12,7 @@ definitions:
     - Consumption-based emissions are not available for all countries because not all countries have sufficient, high-quality trade data. But those without complete data are a small fraction (3%) of the global total.
     - This data measures carbon dioxide (CO₂) emissions from fossil fuels and industry and does not include emissions from land use change, deforestation, soils, or vegetation.
   per_capita_description_key: &per_capita_description_key
-    - Per capita emissions represent the emissions of an average person in a country or region - they are total emissions divided by population.
+    - Per capita emissions represent the emissions of an average person in a country or region - they are calculated as the total emissions divided by population.
   # Common fields to be used in all indicators (unless overridden for specific indicators below).
   common:
     description_processing: &description_processing |
