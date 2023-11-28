@@ -1,8 +1,10 @@
-from owid import catalog
+"""Load a garden dataset and create a grapher dataset."""
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset, grapher_checks
 
-N = PathFinder(__file__)
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
 VARS_TO_KEEP = [
     "rgdpe_pc",
     "rgdpo_pc",
@@ -39,21 +41,32 @@ VARS_TO_KEEP = [
 
 
 def run(dest_dir: str) -> None:
-    dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
+    #
+    # Load inputs.
+    #
+    # Load garden dataset.
+    ds_garden = paths.load_dataset("penn_world_table")
 
-    table = N.garden_dataset["penn_world_table"]
+    # Read table from garden dataset.
+    tb = ds_garden["penn_world_table"]
 
-    # %%
+    #
+    # Process data.
+    #
     # Select country, year and only those variables with metadata specified
     # in the metadata sheet.
+    tb = tb.loc[:, [col for col in tb.columns if col in ["country", "year"] + VARS_TO_KEEP]]
 
-    id_vars = ["country", "year"]
+    #
+    # Save outputs.
+    #
+    # Create a new grapher dataset with the same metadata as the garden dataset.
+    ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
 
-    var_list = id_vars + VARS_TO_KEEP
+    #
+    # Checks.
+    #
+    grapher_checks(ds_grapher)
 
-    table = table[table.columns.intersection(var_list)]
-
-    # if you data is in long format, check gh.long_to_wide_tables
-    dataset.add(table)
-
-    dataset.save()
+    # Save changes in the new grapher dataset.
+    ds_grapher.save()

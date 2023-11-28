@@ -12,6 +12,7 @@ tables:
         title: Annual plastic production between 1950 and 2019
         unit: tonnes
         short_unit: t
+        description_short: Annual production of polymer resin and fibers.
         description_processing: The data on plastic production from 1950 to 2015 are based on the research by Greyer et al., published in 2017. For the years 2016 to 2018, the figures were projected by applying a consistent annual growth rate of 5%, which aligns with the growth estimates provided by Geyer. The most recent data for the year 2019 has been directly sourced from the OECD Global Plastics Outlook, released in 2022.
         description_from_producer: >-
            Total annual plastic production is global annual pure polymer (resin) production data from 1950 to 2015, published by the Plastics Europe Market Research Group, and global annual fiber production data from 1970 to 2015 published by The Fiber Year and Tecnon OrbiChem (Geyer et al. 2017)
@@ -23,6 +24,7 @@ tables:
         title: Cumulative plastic production between 1950 and 2019
         unit: tonnes
         short_unit: t
+        description_short: Cumulative annual production of polymer resin and fibers.
         description_processing: The data on plastic production from 1950 to 2015 are based on the research by Greyer et al., published in 2017. For the years 2016 to 2018, the figures were projected by applying a consistent annual growth rate of 5%, which aligns with the growth estimates provided by Geyer. The most recent data for the year 2019 has been directly sourced from the OECD Global Plastics Outlook, released in 2022.
         description_from_producer: >-
            Total annual plastic production is global annual pure polymer (resin) production data from 1950 to 2015, published by the Plastics Europe Market Research Group, and global annual fiber production data from 1970 to 2015 published by The Fiber Year and Tecnon OrbiChem (Geyer et al. 2017)
